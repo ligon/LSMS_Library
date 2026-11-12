@@ -7,7 +7,8 @@ Single Index:
   # `plot_id` -- plot.  Two sentinels, and they mean different things
   # (GH #1120 D3 / GH #1119, @ligon 2026-10-23):
   #   Farm-level   -- STRUCTURAL: the record is household-grain by design and
-  #                   has no plot (plot_inputs' `missing_level_sentinels`
+  #                   is not allocated to an individual plot (plot_inputs'
+  #                   `missing_level_sentinels`
   #                   below; GhanaLSS/_/CONTENTS.org "The Farm-level
   #                   convention").
   #   unknown_plot -- EPISTEMIC: the survey records a plot-grain answer but the
@@ -24,15 +25,17 @@ Single Index:
   # `crop_diversity(weight='count')` do this, in `attrs['unknown_plot_excluded']`
   # (GH #1460).
   # `plot_id == 'Farm-level'` is not a plot either, so a count of plots drops
-  # every such row.  On `crop_production` such a row holds a sale no plot can own
+  # every such row.  On `crop_production` a Farm-level row may carry a sale,
+  # a harvest, or both.  It may hold a sale no plot can own
   # (Mali 2017-18 and 2021-22; Nigeria W3-W5; Niger 2014-15 and 2021-22; Tanzania;
   # Malawi; Ethiopia, GH #843 / #824 / #1457) or a harvest from a roster off
-  # the field grid (Mali's EAC-I trees, GH #1476).  In a count of crop occurrences,
+  # the field grid (Mali's EAC-I trees, GH #1476), or household-level harvest records
+  # (Mali 2021-22, GH #1437).  In a count of crop occurrences,
   # drop it where the household has a plot row of that crop and keep it where it
   # has none, because it is then the only record of the crop (GH #1469;
   # `transformations.crop_diversity(weight='count')`).  All 37,280 rows of GhanaLSS
   # 1987-88 / 1988-89 are Farm-level, so a blanket filter there deletes every crop
-  # record.  A value sum keeps every such row; the sale is there.
+  # record.  A value sum keeps every such row's value where present.
   plot_id: plot id
   int_t: interview date
   # Opaque crop-observation coordinate within the full native key (GH1198).
@@ -98,6 +101,9 @@ Index Info:
     household_roster: (t, v, i, pid)
     household_characteristics: (t, v, i, m)
     plot_features: (t, v, i, plot_id)
+    # Native seasonal roster/expense operands, not lasting parcels or totals.
+    cultivation_records: (t, i, cultivation_obs)
+    farm_cost_operands: (t, i, cost_obs)
     food_acquired: (t, v, i, j, u, s)
     interview_date: (t, v, i, visit)
     shocks: (t, i, Shock)
@@ -226,6 +232,18 @@ Index Info:
     # that never dropped a row -- into `Feature('community_prices')`: under
     # the modal rule its `obs` level made it the excluded minority.
     community_prices: (t, v, j, u, variety, visit, obs)
+
+  # Provider requirements are distinct from the preferred canonical shape.
+  # GH1588: household characteristics/food expenditure requirements remain
+  # unchanged; GH1529 also requires native roster observation coordinates.
+  # m is optional on household characteristics and s on food expenditures. This does
+  # not register food_expenditures or change the healthy shape winner. Other
+  # tables' reduced/optional-axis contracts have not been censused here.
+  required_index_levels:
+    household_characteristics: [t, v, i]
+    cultivation_records: [t, i, cultivation_obs]
+    farm_cost_operands: [t, i, cost_obs]
+    food_expenditures: [t, v, i, j]
 
   # Per-feature canonical level-name ALIASES: `<the name a country emits>:
   # <the canonical name>`.  Applied by `feature._rename_index_levels` to each
@@ -1021,10 +1039,11 @@ Columns:
       note: |
         The state of the crop as the survey recorded it, in the survey's own
         words, where the `condition` level folds several answers onto one token.
-        Ruling @ligon 2026-11-04 (GH #1436): the EHCVM list has five answers
-        (Epis, Grain, Décortiqué, Non-décortiqué, Non concerné) and the level
-        serves three tokens, so this column keeps the recorded answer in the API.
-        Cote d'Ivoire's vague 2 instrument adds two more, Fève and Autre à
+        Ruling @ligon 2026-11-04 (GH #1436): the five-answer EHCVM instruments
+        record Epis, Grain, Décortiqué, Non-décortiqué and Non concerné; their
+        level serves three tokens, so this column keeps the recorded answer.
+        Answer domains remain instrument-specific. Cote d'Ivoire's vague 1 has
+        those five answers; its vague 2 adds two more, Fève and Autre à
         préciser, which its .dta does not label, so its column takes those two from
         the instrument.
         It is the `crop_variety` shape: a COLUMN named for the level it refines,
@@ -1286,6 +1305,28 @@ Columns:
         NA-bearing for the same reason `Unit_sold` is, and unlike the
         `condition` INDEX level, which must carry `unknown_condition`.
       spellings: *crop_condition_vocabulary
+    planting_month:
+      type: str
+      optional: true
+      note: |
+        Survey-specific month answer, carried as nullable text so countries
+        with numeric month codes and countries with year-month strings can
+        be stacked and saved together (GH #1535). Numeric codes retain their
+        textual form; existing strings are preserved verbatim. This does not
+        supply a year, parse a date, validate a month or equate calendars.
+        Native builders and pre-finalize parquets keep their own types.
+    harvest_month:
+      type: str
+      optional: true
+      note: |
+        Survey-specific harvest month answer, carried as nullable text for
+        cross-country assembly and Parquet export (GH #1535). Retain complete
+        multi-month answers (GhanaSPS) and year-month strings (Nigeria), and
+        stringify numeric scalars without selecting, rounding or parsing a
+        month. Missing stays missing. Text is a common carrier, not a common
+        calendar or event: a survey's harvest-start, harvest-end or season-end
+        proxy retains its documented meaning. Native builders and cached
+        pre-finalize values retain their original representations.
     condition_sold_native:
       type: str
       optional: true

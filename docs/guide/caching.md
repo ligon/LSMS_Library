@@ -129,9 +129,9 @@ still forces a full rebuild.
 You can still invalidate manually:
 
 - Set `LSMS_NO_CACHE=1` for the session to force a rebuild from source. Only
-  `1`, `true` or `yes` bypass the cache reads; no other value does. Any non-empty
-  value, `0` included, still skips writing the L2-wave parquet during a rebuild,
-  which changes no content. The rebuild rewrites the L2-country parquet in the
+  `1`, `true` or `yes` (case-insensitive) bypass the cache reads and skip the
+  YAML-path L2-wave write during a rebuild; all other values leave those gates
+  on their ordinary routes. The rebuild rewrites the L2-country parquet in the
   data root you are pointed at, with the frame an ordinary build would write.
 - Run `lsms-library cache clear --country {Country}` (optionally with
   `--method {table}`) to evict the affected L2-country and L2-wave
@@ -139,6 +139,148 @@ You can still invalidate manually:
 
 Either way, the rebuild reads from L1 (the DVC blob cache) where
 possible, so you only pay the S3 cost once per blob per machine.
+
+### Direct country builders with the Make backend
+
+For a declared `materialize: make` table with a country builder, a current
+country parquet with sufficient declared wave coverage can be reused. Otherwise
+the library builds in a temporary data root: current registered prerequisites
+are copied, missing declared wave contributions use the existing loaders or
+scripts, and the selected country target starts absent. The actual country
+builder still supplies the table and its transformations. A zero-exit producer
+that leaves no output cannot borrow an old wave or country parquet.
+
+Finalization and required-column validation inspect a copy. After checking that
+declared inputs stayed stable, the library stamps the original **pre-finalize**
+parquet with its input hash and full builder coverage, then atomically replaces
+only the selected country output. Live wave files, other tables, reviewed JSON
+sources and grouped-rule companions retain their original bytes and availability.
+The optional `lsms_make_inputs` footer records declared Other-table hashes and
+literal source fingerprints not already covered by the selected wave hashes.
+Direct Make reuse checks this witness as well as the normal hash/coverage gate.
+Available declared L1 blobs are copied into the temporary root; there is no
+shared writable L1 link. Cold builds therefore need extra temporary disk space.
+
+Literal registered Other-table references can use their existing builders in
+the private root when reuse is unproven. Explicit Other-wave references run
+the physical wave producer; a native country build is not assumed to retain
+its temporary wave companions. Declared raw/DVC inputs keep their source
+provenance and are eligible without a harmonized-cache hash. A hashless input alone is not evidence
+of staleness. Dependencies computed outside the existing declarations/literal
+scanner remain a boundary: a missing rule or unknown prerequisite keeps its
+native failure, and an input with no current producer/provenance is not copied
+and certified merely to keep the build running. Root-honoring, sanctioned IO is
+required; arbitrary outside-root reads are not certified by this mechanism.
+This can refuse a legacy build whose computed, hashless, rule-less prerequisite
+happens to be correct but has no established current producer/provenance. The
+live file is retained. This availability tradeoff is an explicit residual;
+broader country exposure and other backend failure paths remain unverified.
+The native output is copied to a parent-owned private snapshot for validation
+and promotion, so a later producer write cannot replace the bytes being
+validated. Prepared selected-wave bytes and declared source fingerprints must
+remain stable through the country build. Wave grain/date/drop evidence is
+retained in the country footer; grain and date replay describe the requested
+waves, using the existing read-gate policies. Finalization never writes back.
+Default/JSON/legacy failure policies, explicit `assume_cache_fresh`, and the
+existing wave-rebuild and guarded country-fallback evictions retain their scope.
+
+### Degraded sources with a read-only L1
+
+The once-per-source heal probe normally uses local files or cached DVC blobs,
+fetching an absent blob through the configured backend. If a **local** cache
+mkdir, temporary write or rename fails with `EACCES`/`EROFS`, that probe alone
+may check metadata existence on the same two configured remote md5 keys. It
+makes at most two existence calls, with no streaming, parsing, World Bank
+fallback or additional retry loop. A positive result is availability evidence,
+not proof that a rebuild can decode the source. The existing per-process probe
+memo and once-per-key rebuild limit still apply.
+
+Cached blobs and successful writable-cache fetches make no extra existence
+calls. Remote access failures, ambiguous error locations and unrelated IO
+errors do not trigger this fallback. Ordinary readers and cache warmers keep
+their best-effort behavior and their existing streaming fallback; there is no
+new user setting or shared-cache write policy.
+
+### Repeated advisory connection failures
+
+After both remote layouts finish their existing retry sequence with uniform,
+positively identified connection-establishment failures, the fast heal probe
+can defer other uncached sources on the same eligible S3 route for five seconds.
+The deadline does not slide. It retains the backend already used, including a
+default-endpoint route with demonstrably nonrefreshing profile authentication;
+unknown or refreshing authentication and ambiguous routes keep probing normally.
+Local files and either L1 layout still win immediately. A deferred False is
+transient and is not added to the completed per-source memo. Completed actual
+negative probes keep their existing memo behavior.
+
+Only advisory GET probes participate. The local-write-denial metadata branch
+still makes its original at-most-two existence calls, even during this window;
+HEAD-only failures never start it. Ordinary readers, warmers and streaming keep
+their full paths. State is process-local, reset on owner/configuration changes,
+and bounded to 16 retained routes. Expiry releases references lazily on a later
+probe without closing another caller's client. Savings concern sequential
+eligible wrapper calls after the first sequence, not SDK HTTP attempts, measured
+field latency or universal outage detection. There is no user setting.
+
+### Dropped subframes with multiple source files
+
+A dropped multi-file subframe records every declared tracked source whose L1
+blob is absent. It becomes eligible for the existing once-per-key retry only
+when all recorded sources are fetchable; separate dropped subframes can heal
+independently. Discovery uses sidecar/local-cache metadata, not new source reads.
+A definite no-source path remains a configuration problem even when another
+listed file is tracked; existing required-column config errors stay loud.
+
+The existing `file` field and older single-file stamps retain their behavior.
+New stamps add an ordered `files` list; malformed lists do not claim healing.
+Older ambiguous multi-file stamps still contain only one path until a legitimate
+rebuild writes the richer evidence. There is no automatic migration, source-config
+lookup, schema bump or promise that metadata availability proves decoding.
+
+### Explicit input lineage and unknown coverage
+
+Wave table declarations can describe inputs used by a derived step or a final
+hook. Names refer to harmonized merged columns or index levels before `drop:`,
+not raw source variable names or derivation-registry retrieval functions:
+
+```yaml
+derived:
+  v:
+    kind: coalesce_coord_bin
+    lat: Latitude
+    lon: Longitude
+    inputs: [v, Latitude, Longitude]
+output_inputs:
+  Region: [Region, Region_enrichment]
+```
+
+`inputs` is reserved metadata and is consumed before transformer kwargs are
+dispatched. Derived steps execute in declaration order, once each. Name the
+existing target explicitly when a step reads it: self-input means its value
+before that step. Explicit chains propagate interrupted-provider lineage.
+`output_inputs` belongs to the table in wave `data_info.yml`, for final hooks
+and direct sibling coverage; its entries all refer to the pre-hook state.
+Empty mappings/lists declare no dependencies. Malformed declarations raise;
+input presence is not validated by this metadata, and transform/hook errors
+retain their existing behavior, including absent coordinate errors.
+
+If a declared input's provider was dropped, the footer adds
+`coverage_unknown_required`, `coverage_unknown_optional` and `affected_outputs`.
+Each affected output records the interrupted original input names and whether
+the final output is present, alongside the drop's wave, subframe and source
+`file`/`files`. Existing `missing_required`/`missing_optional` fields continue to
+mean entirely absent direct columns. Unknown coverage is conservative even if
+a sibling fills every value: it is not evidence of lost rows or wrong values.
+Warnings distinguish these states and expose `coverage_unknown_required`,
+`coverage_unknown_optional` and `input_drops` separately from `missing` fields.
+
+Unavailable explicit interruptions use the existing bounded degraded probe and
+rebuild policy, including per-source memo, once per key, just-written suppression
+and all-source readiness for multi-file drops. Configuration drops keep their
+existing policy. No declarations means legacy behavior; old footers are not
+inferred or migrated, and unrelated temporary columns remain ungraded. This
+metadata does not fill, filter, normalize or otherwise change the frame, its
+axes or attrs. Existing country configurations are not automatically annotated.
 
 ## Cache Location
 
@@ -196,6 +338,15 @@ content; the warnings will stop and reads will use the canonical
 cache path.
 
 ## Assume Cache Fresh Mode
+
+!!! note "Stored grain-audit replay (GH1066)"
+    Successful assumed-fresh reads replay stored grain warnings and
+    `grain_reports()` entries, using the same requested-wave filtering and
+    `LSMS_GRAIN_STRICT` behavior as the normal cache read. Date replay remains;
+    strict grain errors take precedence just as on the normal path. Historical
+    footer evidence does not establish current freshness or served completeness.
+    The selected policy restores stored diagnostics without checking hashes,
+    probing sources, rebuilding data or writing the cache.
 
 ```python
 uga = ll.Country('Uganda', assume_cache_fresh=True)
@@ -316,15 +467,16 @@ country and environment:
 | Make / script | When `data_scheme.yml` marks a table `materialize: make` | Per-country/wave Makefiles and standalone Python scripts; the only choice for tables that cannot be expressed purely in YAML (post-planting/post-harvest dual rounds, multi-wave source files, etc.). These also write L2-wave parquets via `to_parquet()` |
 
 ```bash
-# Rebuild from source on every call, bypassing both Parquet tiers
+# Select the Make backend (this does not bypass the parquet tiers)
 export LSMS_BUILD_BACKEND=make
 ```
 
-Note that `LSMS_BUILD_BACKEND=make` changes how `_aggregate_wave_data`
-dispatches (`country.py:3727`): a table with a `data_scheme.yml` entry goes to
-`load_from_waves`, otherwise to `run_make_target()`. Either way both L2 parquet
-tiers are bypassed. L1 is still used to serve
-raw blobs. Use only when actively debugging.
+`LSMS_BUILD_BACKEND=make` changes how `_aggregate_wave_data` dispatches.
+A declared `materialize: make` table with a country builder uses the private
+transaction described above, including verified warm country reuse. A declared
+table without that builder uses its waves, whose YAML loaders still read and
+write L2-wave parquets. Other legacy callers retain their existing runner.
+L1 still serves raw blobs.
 
 ## Build Parallelism
 
@@ -401,3 +553,21 @@ The blob fetch (`local_tools._get_file_with_retry`) already retries these
 transient errors (`LSMS_FETCH_ATTEMPTS`, default 3) with exponential backoff
 before falling back to a single-stream read, so most such hiccups self-heal
 without touching `-j`. Reach for `LSMS_MAKE_JOBS=1` only if they persist.
+
+### Unreadable managed caches (#1071, first tranche)
+
+The YAML/script wave gates and ordinary/assumed-fresh country gates treat an
+existing managed Parquet that fails initial payload decoding with OSError or
+ArrowInvalid as a cache miss, with an explicit unreadable-cache warning. This
+is a reader failure, not proof of physically damaged bytes. Saved coverage is
+retained before rejecting the exact old entry; script rebuilds are forced so
+Make cannot mtime-serve that entry. One ordinary rebuild is attempted; a fresh
+invalid output or failed producer still raises. Valid hits, assumed-fresh hash
+bypass, normal null/index/grain/date policy and strict refusals are unchanged.
+
+This is not generic file healing: raw/user inputs, post-payload schema/index
+restoration and audits are never reclassified. Other-features caches, legacy
+JSON/parquet alternatives, retired-stage outputs and private Make prerequisite
+owner routes remain separate #1071 work. Earlier raise-only tests/receipts
+characterize the old policy; they are not evidence that unreadability proves
+physical damage or that the entire issue is resolved.

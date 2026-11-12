@@ -64,11 +64,45 @@ FOOD_ROWS = [("a", 1, np.nan, "BM_R", "Rural"), ("a", 1, np.nan, "BM_R", "Rural"
              ("b", 2, np.nan, "BM_U", "Urban")]
 
 
+# Independent literal oracle transcribed from the sealed own2014 triples (GH1573).
+# Old 4/5 <-> BM_R/BM_U fixture values below remain invented pairing controls.
+_STRATA_LABELS_1573 = {
+    '1': 'Hauts-Bassins Urbain',
+    '2': 'Hauts-Bassins Rural',
+    '3': 'Boucle du Mouhoun Urbain',
+    '4': 'Boucle du Mouhoun Rural',
+    '5': 'Sahel Urbain',
+    '6': 'Sahel Rural',
+    '7': 'Est Urbain',
+    '8': 'Est Rural',
+    '9': 'Sud-Ouest Urbain',
+    '10': 'Sud-Ouest Rural',
+    '11': 'Centre-Nord Urbain',
+    '12': 'Centre-Nord Rural',
+    '13': 'Centre-Ouest Urbain',
+    '14': 'Centre-Ouest Rural',
+    '15': 'Plateau-Central Urbain',
+    '16': 'Plateau-Central Rural',
+    '17': 'Nord Urbain',
+    '18': 'Nord Rural',
+    '19': 'Centre-Est Urbain',
+    '20': 'Centre-Est Rural',
+    '21': 'Centre Urbain',
+    '22': 'Centre Rural',
+    '23': 'Cascades Urbain',
+    '24': 'Cascades Rural',
+    '25': 'Centre-Sud Urbain',
+    '26': 'Centre-Sud Rural',
+}
+
+
 class TestHook:
     def test_welfare_rows_stay_first_and_unchanged(self):
         frame = _frame(WELFARE_ROWS + FOOD_ROWS + [("c", 2, np.nan, "BM_U", "Urban")])
         out = _hook()(frame)
-        pd.testing.assert_frame_equal(out.iloc[:2], frame.iloc[:2], check_exact=True)
+        expected = frame.iloc[:2].copy()
+        expected["strata"] = ["Boucle du Mouhoun Rural", "Sahel Urbain"]
+        pd.testing.assert_frame_equal(out.iloc[:2], expected, check_exact=True)
 
     def test_an_added_household_is_one_row_with_no_weight(self):
         added = [("c", 2, np.nan, "BM_U", "Urban")] * 3 + [("d", 1, np.nan, "BM_R", "Rural")]
@@ -81,11 +115,13 @@ class TestHook:
 
     def test_strata_is_spelled_as_the_welfare_file_spells_it(self):
         out = _hook()(_frame(WELFARE_ROWS + FOOD_ROWS + [("c", 2, np.nan, "BM_U", "Urban")]))
-        assert out["strata"].tolist() == ["4", "5", "5"]
+        assert out["strata"].tolist() == ["Boucle du Mouhoun Rural", "Sahel Urbain", "Sahel Urbain"]
 
     def test_no_added_household_returns_the_welfare_rows(self):
         frame = _frame(WELFARE_ROWS + FOOD_ROWS)
-        pd.testing.assert_frame_equal(_hook()(frame), frame.iloc[:2], check_exact=True)
+        expected = frame.iloc[:2].copy()
+        expected["strata"] = ["Boucle du Mouhoun Rural", "Sahel Urbain"]
+        pd.testing.assert_frame_equal(_hook()(frame), expected, check_exact=True)
 
     def test_attrs_survive(self):
         frame = _frame(WELFARE_ROWS + FOOD_ROWS)
@@ -139,6 +175,103 @@ class TestHook:
             country._join_v_from_sample(frame)
 
 
+class TestStrataLabels1573:
+    """Only own recorded strata labels change; no row or weight construction."""
+
+    def test_the_26_literal_pairs_are_reversible_and_use_current_region_aliases(self):
+        mod = _module()
+        assert mod._EMC_2014_STRATA_LABELS == _STRATA_LABELS_1573
+        assert set(mod._EMC_2014_STRATA_LABELS) == {str(i) for i in range(1, 27)}
+        assert len(set(mod._EMC_2014_STRATA_LABELS.values())) == 26
+        tables = local_tools.all_dfs_from_orgfile(ROOT / "_" / "categorical_mapping.org")
+        preferred = set(tables["Region"]["Preferred Label"])
+        for label in _STRATA_LABELS_1573.values():
+            region, milieu = label.rsplit(" ", 1)
+            assert region in preferred and milieu in {"Urbain", "Rural"}
+
+    def test_all_26_labels_and_every_non_strata_value_and_axis_are_exact(self):
+        frame = _frame([(f"h{n}", n, float(n), str(n), "Rural") for n in range(1, 27)])
+        frame.attrs = {"id_converted": True, "source_note": {"native": "EMC"}}
+        before = frame.copy(deep=True)
+        expected = frame.copy(deep=True)
+        # The unchanged1464 concat returns object strata at this boundary.
+        expected["strata"] = pd.Series(list(_STRATA_LABELS_1573.values()),
+                                        index=expected.index, dtype=object)
+        out = _hook()(frame)
+        pd.testing.assert_frame_equal(out, expected, check_exact=True)
+        pd.testing.assert_frame_equal(frame, before, check_exact=True)
+        assert out.attrs == before.attrs == expected.attrs
+        inverse = {v: k for k, v in _STRATA_LABELS_1573.items()}
+        native_at_boundary = pd.Series([str(n) for n in range(1, 27)],
+                                       index=before.index, name="strata", dtype=object)
+        pd.testing.assert_series_equal(out["strata"].replace(inverse), native_at_boundary, check_exact=True)
+
+    @pytest.mark.parametrize("native", [None, pd.NA, np.nan])
+    def test_true_missing_is_not_a_label_or_a_new_household_default(self, native):
+        frame = _frame([("a", "1", 2.0, native, "Rural")])
+        before = frame.copy(deep=True)
+        out = _hook()(frame)
+        pd.testing.assert_frame_equal(out, before, check_exact=True)
+        pd.testing.assert_frame_equal(frame, before, check_exact=True)
+
+    @pytest.mark.parametrize("native", ["27", "Unknown", "not-listed", 99])
+    def test_unknown_nonmissing_values_remain_native_without_coercion(self, native):
+        frame = _frame([("a", "1", 2.0, native, "Rural")])
+        before = frame.copy(deep=True)
+        expected = before.copy(deep=True)
+        # Exact-source9f witness: empty-new concat produces object for strings,
+        # float64 for this out-of-formatter numeric toy. Decoding changes neither.
+        expected["strata"] = pd.Series([99.0] if native == 99 else [native],
+                                        index=expected.index,
+                                        dtype="float64" if native == 99 else object)
+        out = _hook()(frame)
+        pd.testing.assert_frame_equal(out, expected, check_exact=True)
+        pd.testing.assert_frame_equal(frame, before, check_exact=True)
+
+    def test_actual_scalar_formatter_reaches_string_key_without_new_conversion(self):
+        mod = _module()
+        assert mod.strata(1) == mod.strata(1.0) == "1"
+        frame = _frame([("a", "1", 2.0, mod.strata(1.0), "Urban")])
+        expected = frame.copy(deep=True)
+        expected["strata"] = pd.Series(["Hauts-Bassins Urbain"],
+                                        index=expected.index, dtype=object)
+        pd.testing.assert_frame_equal(mod.sample(frame), expected, check_exact=True)
+
+    def test_the_food_proof_precedes_one_shared_and_added_label_decoding(self):
+        # Genuine own code3/4 labels; Rural is not used to infer a stratum.
+        rows = [("a", "1", 2.0, "3", "Urban"), ("b", "2", 6.0, "4", "Rural"),
+                ("a", "1", np.nan, "BM_U", "Urban"),
+                ("b", "2", np.nan, "BM_R", "Rural"),
+                ("c", "2", np.nan, "BM_R", "Rural"),
+                ("c", "2", np.nan, "BM_R", "Rural")]
+        frame = _frame(rows)
+        frame.attrs = {"id_converted": True, "proof": "kept"}
+        before = frame.copy(deep=True)
+        expected = _frame(rows[:2] + [("c", "2", np.nan, "4", "Rural")])
+        expected["strata"] = ["Boucle du Mouhoun Urbain", "Boucle du Mouhoun Rural",
+                               "Boucle du Mouhoun Rural"]
+        expected.attrs = dict(frame.attrs)
+        out = _hook()(frame)
+        pd.testing.assert_frame_equal(out, expected, check_exact=True)
+        pd.testing.assert_frame_equal(frame, before, check_exact=True)
+        assert out.attrs == expected.attrs
+        assert out.loc[("2014", "c"), ["weight", "panel_weight"]].isna().all()
+
+    def test_missing_rural_is_not_filled_when_recorded_stratum_is_decoded(self):
+        frame = _frame([("a", "1", 2.0, "1", pd.NA)])
+        expected = frame.copy(deep=True)
+        expected["strata"] = pd.Series(["Hauts-Bassins Urbain"],
+                                        index=expected.index, dtype=object)
+        pd.testing.assert_frame_equal(_hook()(frame), expected, check_exact=True)
+
+    def test_existing_labels_are_idempotent_without_a_global_numeric_mapping(self):
+        frame = _frame([("a", "1", 2.0, "Hauts-Bassins Urbain", "Urban")])
+        expected = frame.copy(deep=True)
+        expected["strata"] = pd.Series(["Hauts-Bassins Urbain"],
+                                        index=expected.index, dtype=object)
+        pd.testing.assert_frame_equal(_hook()(frame), expected, check_exact=True)
+
+
 class TestWiring:
     def test_a_refusal_reaches_the_caller_of_the_wave_build(self, monkeypatch, tmp_path):
         """Through Wave.grab_data, with invented frames and a private data root."""
@@ -186,7 +319,7 @@ class TestWiring:
         assert out.loc["EMC_2001", "weight"] == 9.0
         assert pd.isna(out.loc["EMC_3007", "weight"]) and pd.isna(out.loc["EMC_3007", "panel_weight"])
         assert str(out.loc["EMC_3007", "v"]) == "3"
-        assert out.loc["EMC_3007", "strata"] == "4"
+        assert out.loc["EMC_3007", "strata"] == "Boucle du Mouhoun Rural"
         assert out.loc["EMC_3007", "Rural"] == "Rural"
 
 
@@ -250,7 +383,7 @@ class TestOracle:
             row = by_hh.loc[i]
             assert str(served.loc[i, "v"]) == str(int(row["zd"])), i
             assert served.loc[i, "Rural"] == milieu[row["milieu"]], i
-            assert served.loc[i, "strata"] == to_number[row["strate_code"]], i
+            assert served.loc[i, "strata"] == _STRATA_LABELS_1573[to_number[row["strate_code"]]], i
 
     @pytest.mark.parametrize("table", ["household_roster", "food_expenditures", "food_prices",
                                        "food_quantities", "housing", "individual_education"])

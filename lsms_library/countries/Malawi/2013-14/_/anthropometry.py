@@ -30,8 +30,8 @@ from malawi import _anthropometry_block, assemble_anthropometry
 WAVE = '2013-14'
 BASE = '../Data/'
 
-health = get_dataframe(BASE + 'HH_MOD_V_13.dta')
-roster = get_dataframe(BASE + 'HH_MOD_B_13.dta')
+health = get_dataframe('../Data/HH_MOD_V_13.dta')
+roster = get_dataframe('../Data/HH_MOD_B_13.dta')
 
 # Remap the health module's long-string PID to the roster's hh_b01 line
 # number, so the emitted pid matches household_roster.  (y2_hhid, PID) is a

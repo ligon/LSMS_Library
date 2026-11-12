@@ -1629,9 +1629,9 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
 #         2026-09-25, ruling 2)
 #   4     both stated and different, price sides with the    contradiction-price-sale /
 #         sale's answer / the harvest row's                  contradiction-price-harvest
-#   5     everything else with a candidate row               sale-basis-unresolved (a REFUSAL,
-#                                                            rows: 0: no harvest row holds these
-#                                                            lines, and each has a Farm-level row)
+#   5     everything else with a candidate row               sale-basis-unresolved (a REFUSAL:
+#                                                            no harvest row holds these lines;
+#                                                            its Farm-level row carries the key)
 #
 # Rungs 0-1 are the bundle's own compatibility rule and its 1:1 gate,
 # unchanged (tier A).  Rungs 2-4 (tier B) compete only for harvest rows and
@@ -1654,8 +1654,8 @@ SALE_BASIS_NOT_APPLICABLE = 'Malawi::crop_production::sale-basis-not-applicable'
 SALE_BASIS_NO_REFERENCE = 'Malawi::crop_production::sale-basis-no-reference'
 SALE_BASIS_CONTRADICTION_SALE = 'Malawi::crop_production::contradiction-price-sale'
 SALE_BASIS_CONTRADICTION_HARVEST = 'Malawi::crop_production::contradiction-price-harvest'
-#: The refusal entry (rows: 0): a sale with a candidate row that no rung admitted.
-#: Its own Farm-level row holds it since GH #1457, and carries no key.
+#: The refusal entry: a sale with a candidate row that no rung admitted.
+#: Its own Farm-level row holds it since GH #1457, and carries this key.
 SALE_BASIS_UNRESOLVED = 'Malawi::crop_production::sale-basis-unresolved'
 SALE_BASIS_KEYS = (SALE_BASIS_WILDCARD, SALE_BASIS_FROM_PRICE,
                    SALE_BASIS_FROM_PRICE_OVERRULE,
@@ -2227,13 +2227,61 @@ def _production_obs_of_sale(sale):
     return token.where(n.eq(1), token + '/row:' + nth).astype('string')
 
 
+#: A sale on its crop's one harvest row in another unit (user selected 2026-11-10, GH #1457).
+#: Entry: `_/derivations.yml`.
+SALE_OTHER_UNIT = 'Malawi::crop_production::sale-other-unit-single-row'
+
+
+def derive_other_unit_sale(harv, decisions):
+    """Put a sale in another unit on its crop's ONE harvest row, in its own unit.
+
+    User selected on 2026-11-10 (GH #1457).  A sale the ladder had no candidate for (no harvest row in its unit) goes on the
+    household-crop's single harvest row where (1) it is a sale, (2) the row names a plot,
+    (3) its state is compatible with the row's: equal, or either unknown, the ladder's
+    tier A, since a sale on another basis is what GH #833 refused, and a price cannot
+    decide across units, and (4) the row holds no other record and no other such sale
+    wants it.  ``Value_sold / Quantity_sold`` is then a price per ``Unit_sold``, which is
+    the canonical denominator (the ruling of 2026-10-23 on GH #824), and differs from
+    the row's ``u``.
+
+    Returns ``(harv, decisions)``: the row's sale columns filled, ``_branch`` set to
+    :data:`SALE_OTHER_UNIT`, and the decision's ``outcome`` the same, so the sale takes
+    no Farm-level row.  Nothing else moves.
+    """
+    outcome = decisions['outcome'].astype(object)
+    wanting = decisions[outcome.isna().to_numpy() & _sold_answers(decisions).to_numpy()
+                        & decisions['u'].notna().to_numpy()]
+    n_rows = harv.groupby(['i', '_crop_code'], dropna=False)['_crop_code'].transform('size')
+    free = (harv['Quantity_sold'].isna() & harv['Value_sold'].isna()).to_numpy()
+    known = (harv['plot_id'].notna() & ~_is_unknown_plot(harv['plot_id'])).to_numpy()
+    rows = harv.loc[n_rows.eq(1).to_numpy() & free & known, ['i', '_crop_code', 'condition']].copy()
+    rows['_row'] = rows.index
+    pairs = wanting.reset_index().rename(columns={'index': '_dec'}).astype(
+        {'i': 'string', '_crop_code': 'Int64'}).merge(
+        rows.astype({'i': 'string', '_crop_code': 'Int64'}), on=['i', '_crop_code'], how='inner')
+    state, sold = pairs['condition'].astype(object), pairs['condition_sold'].astype(object)
+    pairs = pairs[(state == sold) | (state == _CONDITION_UNKNOWN) | (sold == _CONDITION_UNKNOWN)]
+    pairs = pairs[~pairs['_row'].duplicated(keep=False)]
+    harv, decisions = harv.copy(), decisions.copy()
+    at = pairs['_row'].to_numpy()
+    for col in ('Quantity_sold', 'Value_sold'):
+        recorded = pairs[f"_{'quantity' if col == 'Quantity_sold' else 'value'}_recorded"].astype(bool)
+        harv.loc[at, col] = pd.to_numeric(pairs[col], errors='coerce').astype('Float64').where(recorded).to_numpy()
+    harv.loc[at, '_branch'] = SALE_OTHER_UNIT
+    harv.loc[at, '_other_unit'] = pairs['u'].astype('string').to_numpy()
+    harv.loc[at, '_other_state'] = pairs['condition_sold'].astype('string').to_numpy()
+    decisions.loc[pairs['_dec'].to_numpy(), 'outcome'] = SALE_OTHER_UNIT
+    return harv, decisions
+
+
 def _farm_level_sales(t, decisions, harv=None):
     """One row per sale that reached no harvest row, on ``plot_id = FARM_LEVEL``.
 
     The ruling on GH #843, option (d), extended in bulk on 2026-11-04 (GH #1457).
     What the ladder attached stays where it is; this takes every other sale: a crop on
     two or more plots, a crop with no harvest row, a sale in a unit no row of its one
-    plot uses (GH #824), and one the ladder refused for its basis (GH #833).  Also one
+    plot uses that derive_other_unit_sale cannot place, and one the ladder refused
+    for its basis (GH #833). Also one
     the ladder attached to a harvest row that is then dropped because its crop code
     is in no table.  A cell no line recorded stays NA here, unlike the 0 of
     ``_sale_block``'s sum on a harvest row.  Unit and state are the sale's own, in ``Unit_sold`` /
@@ -2289,7 +2337,8 @@ def _farm_level_sales(t, decisions, harv=None):
                         .where(sale['_value_recorded'].astype(bool)),
         'Unit_sold': sale['u'].astype('string'),
         'Condition_sold': sale['condition_sold'].astype('string'),
-        '_branch': pd.Series(pd.NA, index=sale.index, dtype='string'),
+        '_branch': pd.Series(SALE_BASIS_UNRESOLVED, index=sale.index, dtype='string').where(
+            sale['outcome'].astype(object).eq(SALE_UNRESOLVED).to_numpy(), pd.NA),
     }).reset_index(drop=True)
     by_cause = sale['outcome'].astype(object).where(sale['outcome'].notna(), 'no_candidate_row')
     by_cause = by_cause.where(in_table, 'crop_code_in_no_table')
@@ -2369,6 +2418,12 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         harv['Unit_sold'] = harv['u'].astype('string').where(holds_sale, pd.NA)
         harv['Condition_sold'] = harv['condition_sold'].astype('string').where(holds_sale, pd.NA)
         harv = harv.drop(columns='condition_sold')
+        harv['_other_unit'] = pd.array([pd.NA] * len(harv), dtype='string')
+        harv['_other_state'] = pd.array([pd.NA] * len(harv), dtype='string')
+        harv, _decisions = derive_other_unit_sale(harv, _decisions)
+        harv['Unit_sold'] = harv['_other_unit'].where(harv['_other_unit'].notna(), harv['Unit_sold'])
+        harv['Condition_sold'] = harv['_other_state'].where(harv['_other_state'].notna(), harv['Condition_sold'])
+        harv = harv.drop(columns=['_other_unit', '_other_state'])
         farm, farm_tally = _farm_level_sales(t, _decisions, harv)
         # "Attach nothing and COUNT IT" -- and the counting has to be code,
         # not a number frozen in CONTENTS.org that will not move when the
@@ -2629,6 +2684,32 @@ def _inputs_sale_basis(wave, outcome):
     return out.set_index(['t', 'i', 'crop', 'u'])
 
 
+def inputs_sale_other_unit_single_row(wave):
+    """Native I/Q inputs of R1 attachments, enriched with their served observation.
+
+    Retain each selected native line and the decision annotations. The sale's own
+    u remains a column; it is not the harvest row's unit. No native line is reduced.
+    """
+    harvest, sale, raw = _crop_pieces(wave)
+    harv = _consolidate_harvest(harvest)
+    harv, dec, _ = _attach_sales(wave, harv, pd.concat(sale, ignore_index=True))
+    harv = harv.assign(_other_unit=pd.array([pd.NA] * len(harv), dtype='string'),
+                       _other_state=pd.array([pd.NA] * len(harv), dtype='string'))
+    harv, dec = derive_other_unit_sale(harv, dec)
+    key = ['i', '_crop_code', 'u', 'condition_sold']
+    types = {'i': 'string', '_crop_code': 'Int64', 'u': 'string', 'condition_sold': 'string'}
+    picked = dec.loc[dec['outcome'] == SALE_OTHER_UNIT,
+                     key + ['outcome', 'rung', 'basis']].astype(types)
+    lines = raw.astype(types).merge(picked, on=key, how='inner', validate='m:1')
+    rows = harv.loc[harv['_branch'].eq(SALE_OTHER_UNIT).fillna(False) & harv['crop'].notna(),
+                    ['i', '_crop_code', 'crop', 'production_obs']].astype(
+                        {'i': 'string', '_crop_code': 'Int64', 'crop': 'string',
+                         'production_obs': 'string'}).rename(columns={'crop': 'served_crop'})
+    lines = lines.merge(rows, on=['i', '_crop_code'], how='left', validate='m:1')
+    lines['crop'] = lines['served_crop'].where(lines['served_crop'].notna(), lines['crop'])
+    return lines.drop(columns='served_crop').set_index(['t', 'i', 'crop', 'production_obs'])
+
+
 def inputs_sale_basis_wildcard(wave):
     return _inputs_sale_basis(wave, SALE_BASIS_WILDCARD)
 
@@ -2658,8 +2739,37 @@ def inputs_sale_basis_contradiction_harvest(wave):
 
 
 def inputs_sale_basis_unresolved(wave):
-    """The REFUSED sale lines -- the refusal entry's inputs (rows: 0)."""
-    return _inputs_sale_basis(wave, SALE_UNRESOLVED)
+    """Refused I/Q inputs, with the served Farm-level observation when one exists.
+
+    Keep every previously retrievable refused line and its annotations. A refused
+    non-sale has no Farm-level row; its production_obs is missing. For a served
+    refusal, join on (t, i, crop, production_obs); u remains the sale's own unit.
+    """
+    harvest, sale, raw = _crop_pieces(wave)
+    harv = _consolidate_harvest(harvest)
+    harv, dec, _ = _attach_sales(wave, harv, pd.concat(sale, ignore_index=True))
+    # Replay current R1 placement before constructing the complete Farm-level set.
+    harv = harv.assign(_other_unit=pd.array([pd.NA] * len(harv), dtype='string'),
+                       _other_state=pd.array([pd.NA] * len(harv), dtype='string'))
+    harv, dec = derive_other_unit_sale(harv, dec)
+    # Generate observation suffixes on the complete Farm-level set before filtering.
+    farm, _ = _farm_level_sales(wave, dec, harv)
+    farm = farm[farm['_branch'].eq(SALE_BASIS_UNRESOLVED).fillna(False)]
+    key = ['i', '_crop_code', 'u', 'condition_sold']
+    types = {'i': 'string', '_crop_code': 'Int64', 'u': 'string', 'condition_sold': 'string'}
+    picked = dec.loc[dec['outcome'] == SALE_UNRESOLVED,
+                     key + ['outcome', 'rung', 'basis']].astype(types)
+    lines = raw.astype(types).merge(picked, on=key, how='inner', validate='m:1')
+    served = pd.DataFrame({
+        'i': farm['i'].astype('string'), '_crop_code': farm['_crop_code'].astype('Int64'),
+        'u': farm['Unit_sold'].astype('string'),
+        'condition_sold': farm['Condition_sold'].astype('string'),
+        'served_crop': farm['crop'].astype('string'),
+        'production_obs': farm['production_obs'].astype('string')})
+    # Enrich the old input selection; do not make serving a new input keep-filter.
+    lines = lines.merge(served, on=key, how='left', validate='m:1')
+    lines['crop'] = lines['served_crop'].where(lines['served_crop'].notna(), lines['crop'])
+    return lines.drop(columns='served_crop').set_index(['t', 'i', 'crop', 'production_obs'])
 
 
 # --- IHS5 crop-side conversion factor tables (GH #854) -------------------
@@ -3859,6 +3969,141 @@ _SEED_LINE_SOURCES = {
                      hhid='y4_hhid', prefix='', gplot=None, gcrop='crop_code', hcrop='crop_code',
                      improved='ag_g0f', **_H_SLOTS_PANEL)],
 }
+
+
+SEED_ACQUISITION_ROLE = 'reported_H_component'
+
+
+def _seed_acquisition_block(df, *, t, source_ref, source_half, row_positions):
+    """Literal quantity-bearing H components, without a plot/application claim.
+
+    Reuse the six existing source/field bindings (ledger 1190-selected-farm-carrier
+    §§2–5). First/second purchases retain their own nonzero recorded-value gate;
+    gift and third quantities retain contradictory/missing flags. No reduction.
+    Raw H scalars stay under their native names, including source answers whose
+    semantic binding is unresolved. H36_1 payers and transport are never values.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.transformations import U_UNKNOWN
+
+    bindings = [s for s in _SEED_LINE_SOURCES.get(t, []) if s['half'] == source_half]
+    if len(bindings) != 1:
+        raise ValueError('Malawi H component requires a declared wave/source half')
+    binding = bindings[0]
+    path = f'Malawi/{t}/{binding["h"]}'
+    # Fail malformed, wrong-source and changed-release references explicitly.
+    if source_ref != _seed_source_reference(countries_root() / path):
+        raise ValueError('Malawi H component source/sidecar reference disagrees')
+    positions = list(row_positions)
+    if any(isinstance(v, (bool, np.bool_)) for v in positions):
+        raise ValueError('Malawi H components require unique original row positions')
+    positions = pd.Series(positions, dtype='Int64')
+    if (len(positions) != len(df) or positions.isna().any()
+            or positions.lt(0).any() or positions.duplicated().any()):
+        raise ValueError('Malawi H components require unique original row positions')
+    if not df.columns.is_unique:
+        raise ValueError('Malawi H component has duplicate native fields')
+    raw = df.reset_index(drop=True)
+    crop, native = _seed_crop_identity(raw[binding['hcrop']])
+    ident = raw['hhid'].astype('string')
+    if ident.isna().any() or ident.str.strip().eq('').any():
+        raise ValueError('Malawi H component lacks household identity')
+    slots = [(q, u, v, None, None,
+              'purchase:second' if q == 'ag_h26a' else 'purchase:first')
+             for q, u, v in zip(binding['q'], binding['u'], binding['v'])]
+    # The later XS releases do not declare this block. Do not invent one.
+    if source_half != 'Cross_Sectional':
+        source = 'ag_h35__0' if source_half == 'Panel' else 'ag_h35'
+        slots.append(('ag_h36a', 'ag_h36b', None, 'ag_h34', source, 'purchase:third'))
+    slots.append(('ag_h38a', 'ag_h38b', None, 'ag_h37', None, 'gift'))
+    pieces = []
+    for order, (qcol, ucol, vcol, flag, source, kind) in enumerate(slots):
+        if qcol not in raw:
+            continue
+        quantity = pd.to_numeric(raw[qcol], errors='coerce').astype('Float64')
+        value = (pd.to_numeric(raw[vcol], errors='coerce').astype('Float64')
+                 if vcol in raw else pd.Series(pd.NA, index=raw.index, dtype='Float64'))
+        keep = native.notna() & quantity.notna()
+        if vcol is not None:
+            keep &= value.notna() & value.ne(0)
+        codes = (_int_codes(raw[ucol]) if ucol in raw
+                 else pd.Series(pd.NA, index=raw.index, dtype='Int64'))
+        unit = codes.map(_MWI_PURCH_UNIT_LABELS).astype('string')
+        unit = unit.fillna('Seed unit code ' + codes.astype('string')).fillna(U_UNKNOWN)
+        status = 'existing_field_binding;raw_source_answers_uninterpreted'
+        if t == '2013-14':
+            status += ';own_paired_question_labels_truncated'
+        if t == '2016-17' and qcol == 'ag_h38a':
+            status += ';own_quantity_label_says_OTHER_UNIT'
+        if t == '2016-17' and qcol == 'ag_h07a':
+            status += ';own_quantity_label_says_U_Other_Specify'
+        if t == '2019-20' and qcol == 'ag_h36a':
+            status += ';own_quantity_question_label_truncated'
+        piece = pd.DataFrame({
+            't': t, 'i': ident, 'plot_id': 'Farm-level', 'input': 'Seed',
+            'crop': crop, 'u': U_UNKNOWN,
+            'input_obs': 'row:' + source_ref + ':' + positions.astype('string') + '/field:' + qcol,
+            'Carrier_role': SEED_ACQUISITION_ROLE,
+            'Acquisition_quantity': quantity, 'Acquisition_unit': unit,
+            'Acquisition_value': value, 'Acquisition_kind': kind,
+            'Acquisition_flag': _use_answer(raw, flag),
+            'Acquisition_source': raw[source].astype('string') if source in raw else pd.NA,
+            'Source_path': path, 'Source_sidecar_sha256': source_ref.rsplit(':', 1)[1],
+            'Source_half': source_half, 'Source_row': positions,
+            'Component_field': qcol, 'Quantity_field': qcol, 'Unit_field': ucol,
+            'Value_field': vcol, 'Flag_field': flag, 'Source_answer_field': source,
+            'Native_crop': native, 'Binding_status': status, '_component_order': order,
+        })
+        # Preserve literal own answers, blanks/nulls and native scalar values.
+        # No cross-wave source-name inference: only H35's closed binding above
+        # supplies Acquisition_source; other source/payer/text answers remain raw.
+        for name in raw:
+            if name.startswith('ag_h') or name == binding['hcrop']:
+                piece[name] = raw[name]
+        pieces.append(piece.loc[keep])
+    keys = ['t', 'i', 'plot_id', 'input', 'crop', 'u', 'input_obs']
+    if not pieces:
+        return pd.DataFrame(columns=keys).set_index(keys)
+    out = pd.concat(pieces, ignore_index=True)
+    out = out.sort_values(['Source_row', '_component_order'], kind='stable')
+    out = out.drop(columns='_component_order')
+    strings = keys + ['Carrier_role', 'Acquisition_unit', 'Acquisition_kind', 'Acquisition_source',
+                     'Source_path', 'Source_sidecar_sha256', 'Source_half',
+                     'Component_field', 'Quantity_field', 'Unit_field', 'Value_field',
+                     'Flag_field', 'Source_answer_field', 'Native_crop', 'Binding_status']
+    out[strings] = out[strings].astype('string')
+    out = out.set_index(keys)
+    if not out.index.is_unique or out.index.get_level_values('input_obs').hasnans:
+        raise ValueError('Malawi H component has missing/colliding source keys')
+    return out
+
+
+def _append_seed_acquisitions(legacy, components):
+    """Append after unchanged G/D assembly; old columns/attrs stay exact."""
+    additions = [p for p in components if len(p)]
+    if not additions:
+        return legacy
+    extra = pd.concat(additions)
+    if (not extra.index.is_unique
+            or extra.index.get_level_values('input_obs').duplicated().any()
+            or extra.index.isin(legacy.index).any()
+            or extra.index.get_level_values('input_obs').isin(
+                legacy.index.get_level_values('input_obs')).any()):
+        raise ValueError('Malawi H component has colliding source keys')
+    if set(extra.columns) & set(legacy.columns):
+        raise ValueError('Malawi H component overwrites legacy payload')
+    # Pandas 3 distinguishes str (NaN) from string (pd.NA). New keys must use
+    # the existing axis dtypes so concat cannot change old observation axes.
+    extra.index = extra.index.set_levels([
+        level.astype(legacy.index.levels[n].dtype)
+        for n, level in enumerate(extra.index.levels)])
+    # Build typed missing application/attached fields BEFORE concat. This also
+    # prevents provenance from resurrecting any old all-payload-NA G observation.
+    for name in legacy:
+        extra[name] = legacy[name].iloc[:0].reindex(extra.index)
+    out = pd.concat([legacy, extra])
+    out.attrs = dict(legacy.attrs)
+    return out
 
 
 def derive_seed_line_no_payload(plot_inputs):

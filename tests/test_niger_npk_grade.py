@@ -15,6 +15,7 @@ without the key would remove these rows' nitrogen silently.
 from __future__ import annotations
 
 import warnings
+import hashlib
 
 import pandas as pd
 import pytest
@@ -29,6 +30,100 @@ BARE = "NPK"
 ECVMA = {"2011-12": ("NER_2011_ECVMA_v01_M_Stata8/ecvmaas2c_p1.dta", "as02cq02", "as02cq03"),
          "2014-15": ("NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS02CP1.dta", "AS02CQ02", "AS02CQ03")}
 EHCVM = {"2018-19": "s16b_me_ner2018.dta", "2021-22": "s16b_me_ner2021.dta"}
+
+# Independent test source roles, not imported from the producer (ledger1687 §5).
+# The same household/slot in 2C and 3C is two observations, in two windows.
+INPUT_SOURCES = {
+    "2011-12": ((ECVMA["2011-12"][0], "as02cq"),
+                ("NER_2011_ECVMA_v01_M_Stata8/ecvmaas3c_p1.dta", "as03cq")),
+    "2014-15": ((ECVMA["2014-15"][0], "AS02CQ"),),
+    "2018-19": ((EHCVM["2018-19"], "s16bq"),),
+    "2021-22": ((EHCVM["2021-22"], "s16bq"),),
+}
+
+
+def _map_table(name):
+    table = df_from_orgfile(str(countries_root() / COUNTRY / "_" /
+                               "categorical_mapping.org"), name=name)
+    return dict(zip(table["Original Label"], table["Preferred Label"]))
+
+
+def _source_prefix(wave, name, prefix):
+    assert (name, prefix) in INPUT_SOURCES[wave], "wrong source/field roles"
+    path = countries_root() / COUNTRY / wave / "Data" / name
+    digest = hashlib.sha256(path.with_name(path.name + ".dvc").read_bytes()).hexdigest()
+    slot = prefix + "02"
+    return f"slot:{COUNTRY}/{wave}/Data/{name}@dvc:{path.name}:{digest}:{slot}="
+
+
+def _project_input_source(wave, name, prefix, codes, labels, *, input_map, unit_map):
+    """Independent source-row denominator, before comparing served results.
+
+    Explicit application answer, own unit, own purchase flag and own amounts.
+    Keep zero and missing quantities; only the existing all-payload-NA finalizer
+    removes a row. No producer/helper/API is an expected-value oracle.
+    """
+    assert (name, prefix) in INPUT_SOURCES[wave], "wrong source/field roles"
+    assert codes.index.equals(labels.index), "numeric/category rows misaligned"
+    ecvma = wave in ECVMA
+    upper = lambda x: x.upper() if prefix == "AS02CQ" else x
+    slot, gate = prefix + ("02" if ecvma else "01"), prefix + ("03" if ecvma else "02")
+    qty = prefix + upper("05a" if ecvma else "03a")
+    unit = prefix + upper("05b" if ecvma else "03b")
+    bought = prefix + ("07" if ecvma else "05")
+    qty_bought = prefix + upper("08a" if ecvma else "07a")
+    selected = codes[gate].eq(1)
+    n, c = codes.loc[selected], labels.loc[selected]
+    raw_input = c[slot].astype("string")
+    raw_unit = c[unit].astype("string")
+    mapped = lambda values, mapping: values.map(
+        lambda x: mapping.get(x, x) if pd.notna(x) else pd.NA).astype("string")
+    quantity = pd.to_numeric(n[qty], errors="coerce").astype("Float64")
+    if wave == "2021-22":
+        quantity = quantity.mask(quantity.eq(9999))  # own existing GH865 rule
+    purchased = (n[bought].map({1: True, 2: False}) if ecvma else
+                 c[bought].astype("string").map({"Oui": True, "Non": False}))
+    rows = pd.DataFrame({
+        "input": mapped(raw_input, input_map),
+        "u": mapped(raw_unit, unit_map).fillna("Unknown"),
+        "Quantity": quantity,
+        "Purchased": purchased.astype("boolean"),
+        "Quantity_purchased": pd.to_numeric(n[qty_bought], errors="coerce").astype("Float64"),
+    })
+    if ecvma:
+        slots = pd.to_numeric(n[slot], errors="raise")
+        assert slots.notna().all() and ((slots > 0) & (slots % 1 == 0)).all()
+        rows["input_obs"] = _source_prefix(wave, name, prefix) + slots.astype("Int64").astype("string")
+    else:
+        rows["input_obs"] = "unresolved_observation"
+    payload = ["Quantity", "Purchased", "Quantity_purchased"]
+    rows = rows.loc[rows["input"].notna() & rows[payload].notna().any(axis=1)].copy()
+    rows["t"], rows["source"] = wave, name
+    return rows
+
+
+def _expected_plot_inputs(read=None):
+    read = _raw if read is None else read
+    input_map, unit_map = _map_table("harmonize_input"), _map_table("u")
+    parts = []
+    for wave, specs in INPUT_SOURCES.items():
+        for name, prefix in specs:
+            codes, labels = read(wave, name)
+            parts.append(_project_input_source(wave, name, prefix, codes, labels,
+                                              input_map=input_map, unit_map=unit_map))
+    return pd.concat(parts, ignore_index=True)
+
+
+def _assert_plot_input_counts(actual, expected, *, by_wave=False):
+    """Keep total, Unknown and per-wave obligations with an independent source denominator."""
+    if by_wave:
+        def tally(frame):
+            return (frame.assign(_s=frame["u"].eq("Unknown"))
+                         .groupby("t")["_s"].sum().astype(int).to_dict())
+        assert tally(actual) == tally(expected)
+    else:
+        assert len(actual) == len(expected)
+        assert int(actual["u"].eq("Unknown").sum()) == int(expected["u"].eq("Unknown").sum())
 
 
 def _table():
@@ -90,7 +185,24 @@ class TestServed:
         applied = codes[slot].eq(5) & codes[used].eq(1)
         assert set(labels.loc[applied, slot].astype(str).str.lower()) == \
             {"engrais inorganiques - npk 15/15"}
-        assert len(_rows(served, wave, GRADED)) == int(applied.sum()) > 0
+        total = 0
+        for source, prefix in INPUT_SOURCES[wave]:
+            # Reuse the already-read original source; read dry3C separately.
+            numeric, categorical = ((codes, labels) if source == name else _raw(wave, source))
+            code5 = numeric[prefix + "02"].eq(5) & numeric[prefix + "03"].eq(1)
+            own_labels = categorical.loc[code5, prefix + "02"].astype("string")
+            assert set(own_labels.map(_table())) == {GRADED}
+            expected = _project_input_source(wave, source, prefix, numeric, categorical,
+                                            input_map=_table(), unit_map=_map_table("u"))
+            expected = expected.loc[expected["input"] == GRADED]
+            assert len(expected) == int(code5.sum()) > 0
+            got = _rows(served, wave, GRADED)
+            tokens = got.index.get_level_values("input_obs")
+            assert tokens.notna().all()
+            assert sum(bool(x) for x in tokens.str.startswith(
+                _source_prefix(wave, source, prefix))) == len(expected)
+            total += len(expected)
+        assert len(_rows(served, wave, GRADED)) == total > 0
         assert _rows(served, wave, BARE).empty
 
     @pytest.mark.parametrize("wave", sorted(EHCVM))

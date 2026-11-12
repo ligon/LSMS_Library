@@ -1,6 +1,7 @@
 # Formatting  Functions for Mali
 import re
 import pandas as pd
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import U_UNKNOWN
@@ -22,14 +23,16 @@ def i(value):
 # 2021-22.  A cross-wave ``groupby('i')`` merged them.  Member-level roster match
 # on those ids is at the level of two unrelated households of one grappe
 # (CONTENTS.org, GH #1494).  Letters cannot occur in the numeric ids, so a prefixed
-# id can never equal an unprefixed one, whatever the serials do.  The EHCVM ids stay
-# as they are: 2018-19 / 2021-22 are the panel lineage in panel_ids / updated_ids.
+# id can never equal an unprefixed one, whatever the serials do. The later1494
+# ruling namespaces ALL2021 raw IDs; only approved panel links map back to bare
+# 2018 canonical IDs. Unlinked/unknown/orphan records stay distinct.
 # Burkina Faso's ``EMC_`` is the precedent (GH #1244).  One prefix per EAC-I wave, because
 # the two waves are not linked either: they visit the same EAs with households selected
 # afresh, and both number rural households 3, 6 and 9 on the Lourd form, so 3,560 ids
 # recurred between them with a roster match at the level of two different households.
 EACI14_PREFIX = 'EACI14_'
 EACI17_PREFIX = 'EACI17_'
+EHCVM21_PREFIX = 'EHCVM21_'
 
 
 def eaci14_i(value):
@@ -40,6 +43,15 @@ def eaci14_i(value):
 def eaci17_i(value):
     '''2017-18 household id: ``'EACI17_' + i([grappe, exploitation])``.'''
     return EACI17_PREFIX + i(value)
+
+
+def ehcvm21_i(value):
+    '''2021-22 RAW household id; approved panel maps return its bare2018 target.
+
+    GH1494 user ruling: every raw record is namespaced, without classifying
+    Non/missing/orphan records or changing the native composite formatter.
+    '''
+    return EHCVM21_PREFIX + i(value)
 
 
 def pid(value):
@@ -221,9 +233,14 @@ def plot_features_for_wave(t, source, colmap):
     # collide once two such households id_walk to the same baseline id.
     src = source[source[c['field_no']].notna() & source[c['parcel_no']].notna()].copy()
 
-    # Household id: EHCVM composite (grappe, menage) via mali.i().
-    hh = src.apply(lambda r: i(pd.Series([r[c['grappe']], r[c['menage']]])),
-                   axis=1)
+    # The raw2021 namespace is shared by YAML, scripts and derivation inputs.
+    if t == '2021-22':
+        keys = src[[c['grappe'], c['menage']]].rename(
+            columns={c['grappe']: 'grappe', c['menage']: 'menage'})
+        hh = ehcvm_household_ids(keys, wave=t)
+    else:
+        hh = src.apply(lambda r: i(pd.Series([r[c['grappe']], r[c['menage']]])),
+                       axis=1)
 
     field = src[c['field_no']].apply(tools.format_id)
     parcel = src[c['parcel_no']].apply(tools.format_id)
@@ -873,8 +890,8 @@ def crop_production_finalize(df):
 # the answer as recorded in `condition_native`.  Both waves use the same five codes
 # and labels, so one table serves both.  A blank code is the sentinel, and so is a
 # row with no s16c line behind it (a Farm-level row) or a harvest derived from s16d,
-# whose s16cq16d is blank.  The sold states (s16cq16c, s16dq05d) are not served
-# (GH #1462).
+# whose s16cq16d is blank. The separate sold states s16cq16c/s16dq05d now
+# retain their own fold and native answer (GH1528), without supplying harvest state.
 
 #: The canonical structural sentinel for `plot_id`: the record has no plot by
 #: design (lsms_library/data_info.yml, top of file).  It is not `unknown_plot`,
@@ -956,8 +973,7 @@ def ehcvm_crop_conditions(codes):
     table = {int(code): token for code, token in table.items()}
     if sorted(table) != [1, 2, 3, 4, 5]:
         raise ValueError(f'harmonize_crop_condition_ehcvm1: {table}')
-    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)
-    return mapped.astype('string').fillna(CONDITION_NA)
+    return crop_condition_codes(pd.to_numeric(codes, errors='coerce'), table).fillna(CONDITION_NA)
 
 
 def ehcvm_crop_condition_labels(labels):
@@ -965,13 +981,35 @@ def ehcvm_crop_condition_labels(labels):
     column read with ``convert_categoricals=True``.  A blank stays NA, never a
     sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,
     GH #1436)."""
-    out = pd.Series(labels).astype('string').str.strip()
-    return out.where(out != '', pd.NA)
+    return crop_condition_labels(labels)
 
 
-def ehcvm_household_ids(src):
-    """The served household id of each row of an EHCVM (grappe, menage) file."""
-    return src.apply(lambda r: i(pd.Series([r['grappe'], r['menage']])), axis=1)
+def ehcvm_crop_sold_conditions(codes):
+    """Own EHCVM sold-state fold, NA-bearing (ledger1528 §§2–4).
+
+    Both own sold dictionaries were checked, including 2021 s16dq05d; no
+    harvest answer supplies a sold state and no blank becomes an index sentinel.
+    """
+    folded = ehcvm_crop_conditions(codes)
+    return folded.where(folded != CONDITION_NA, pd.NA)
+
+
+def ehcvm_household_ids(src, wave='2018-19'):
+    """Raw EHCVM keys; canonical panel IDs are applied later by id_walk.
+
+    The legacy default is the unchanged2018 formatter.2021 is explicit at
+    every own consumer. Column scalars avoid mixing an integer ID with an
+    unrelated fractional quantity in a rowSeries; native answers stay intact.
+    """
+    if wave == '2018-19':
+        return src.apply(lambda r: i(pd.Series([r['grappe'], r['menage']])), axis=1)
+    if wave != '2021-22':
+        raise ValueError('Mali EHCVM household IDs require 2018-19 or2021-22')
+    return pd.Series(
+        [ehcvm21_i(pd.Series([g, h], dtype=object))
+         for g, h in zip(src['grappe'].array, src['menage'].array)],
+        index=src.index,
+    )
 
 
 def ehcvm_plot_ids(src):
@@ -1164,9 +1202,9 @@ def derive_hh_crop_harvest_total(served, dispositions):
     return pd.concat([out, new], ignore_index=True)
 
 
-def ehcvm_dispositions(src):
+def ehcvm_dispositions(src, wave='2018-19'):
     """s16d, one row per (i, crop), with its dispositions on the served unit labels."""
-    out = pd.DataFrame({'i': ehcvm_household_ids(src).astype('string').values,
+    out = pd.DataFrame({'i': ehcvm_household_ids(src, wave=wave).astype('string').values,
                         'crop': ehcvm_crop_labels(src['s16dq01']).values})
     for var in _DISPOSITIONS:
         out[f'{var}a'] = pd.to_numeric(src[f'{var}a'], errors='coerce').values
@@ -1199,7 +1237,7 @@ def finish_ehcvm_crop_production(df, wave):
     if out[['i', 'plot_id', 'crop']].isna().any(axis=None):
         raise ValueError(f'crop_production {wave}: a NA household, plot or crop')
     # A Farm-level row has no s16c line behind it, so no state: the sentinel, and NA.
-    for col in ('condition', 'condition_native'):
+    for col in ('condition', 'condition_native', 'Condition_sold', 'condition_sold_native'):
         if col not in out.columns:
             out[col] = pd.NA
         out[col] = out[col].astype('string')
@@ -1210,7 +1248,7 @@ def finish_ehcvm_crop_production(df, wave):
     return out[['Quantity', 'Quantity_kg', 'u', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold',
                 'Value_sold', 'months_harvested', 'planting_month',
                 'harvest_month', 'intercropped', 'perennial', 'condition_native',
-                'Derivation']].sort_index()
+                'Condition_sold', 'condition_sold_native', 'Derivation']].sort_index()
 
 
 def _ehcvm_crop_map(wave):
@@ -1232,7 +1270,7 @@ def _ehcvm_keyed(wave, name, crop):
     src = tools.get_dataframe(str(path), convert_categoricals=True)
     out = src.copy()
     out['t'] = wave
-    out['i'] = ehcvm_household_ids(src).astype('string')
+    out['i'] = ehcvm_household_ids(src, wave=wave).astype('string')
     out['crop'] = (src[crop].astype('string').str.strip().map(_ehcvm_crop_map(wave))
                    .astype('string'))
     return out
@@ -1274,7 +1312,7 @@ def inputs_hh_crop_sale_single_row(wave):
         harvest = _ehcvm_keyed(wave, f's16c_me_mli{year}.dta', 's16cq04')
         sold = _ehcvm_keyed(wave, f's16d_me_mli{year}.dta', 's16dq01')
         sold = sold[ehcvm_is_sale(sold['s16dq05a'], sold['s16dq06'])]
-        names = ['s16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq06']
+        names = ['s16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq05d', 's16dq06']
         plot = ['s16cq02', 's16cq03']
     lines = harvest.groupby(_SALE_KEYS).size()
     single = lines[lines == 1].index
@@ -1346,10 +1384,12 @@ def inputs_survey_kg_estimate(wave):
 # plot_inputs (GAP 2; parity loop) — item-level (t, i, plot, input)
 # ---------------------------------------------------------------------------
 #
-# One row per input APPLIED to a plot.  The crop/input modules live in the
-# EACI waves only (2014-15 EACI14, 2017-18 EACI17); the EHCVM waves
-# (2018-19, 2021-22) carry no agriculture-input block, so plot_inputs is wired
-# for the two EACI waves only.
+# This finalizer handles EACI plot applications (2014-15 EACI14, 2017-18
+# EACI17). Earlier no-input wording was incorrect; EACI-only described pre1483 wiring.
+# EHCVM household s16b inputs now use their separate source-bound adapter
+# and wave wrappers, not this EACI finalizer. Their s16a parcel questions
+# remain distinct and unwired; no household allocation or shared grain is
+# inferred. See CONTENTS.org and 1483-input-source-contract.md's dated scope.
 #
 # Grain: one row per (t, i, plot, input), where
 #   - i     = Mali composite household id (grappe, menage/exploitation),

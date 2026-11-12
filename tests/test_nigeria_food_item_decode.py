@@ -114,7 +114,7 @@ def test_noargument_mapping_keeps_complete_global_code_contract(nigeria):
     tab = df_from_orgfile(ORG, name='harmonize_food')
     expected = {int(code): str(label).strip()
                 for code, label in zip(tab['Code'], tab['Preferred Label'])
-                if pd.notna(label) and str(label).strip() not in ('', '---')}
+                if pd.notna(code) and pd.notna(label) and str(label).strip() not in ('', '---')}
     assert nigeria.harmonized_food_labels() == expected
     assert nigeria._crop_labels() == expected
 

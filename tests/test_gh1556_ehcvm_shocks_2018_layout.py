@@ -18,7 +18,7 @@ import importlib.util
 import numpy as np
 import pandas as pd
 import pytest
-import yaml
+from lsms_library.yaml_utils import load_yaml
 
 import lsms_library as ll
 from lsms_library.local_tools import get_dataframe
@@ -35,7 +35,7 @@ NO_LIVESTOCK_QUESTION = 0.15
 
 
 def _block(country):
-    info = yaml.safe_load((ROOT / country / WAVE / '_' / 'data_info.yml').read_text(encoding='utf-8'))
+    info = load_yaml(ROOT / country / WAVE / '_' / 'data_info.yml')
     return info['shocks']['myvars']
 
 

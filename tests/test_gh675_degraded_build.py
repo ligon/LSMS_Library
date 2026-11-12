@@ -146,7 +146,10 @@ def test_fast_tiers_local_sidecar_and_nowhere(tmp_path, monkeypatch):
     import lsms_library.data_access as DA
     monkeypatch.setattr(DA, "get_data_file", never)
     monkeypatch.setattr(LT, "_try_get_data_file", never, raising=False)
-    monkeypatch.setattr(LT, "_ensure_dvc_pulled", lambda p: None)
+    def warmer(path, *, _metadata_on_local_write_denied=False):
+        assert _metadata_on_local_write_denied is True
+        return None
+    monkeypatch.setattr(LT, "_ensure_dvc_pulled", warmer)
 
     local = tmp_path / "local.csv"
     local.write_text("a\n1\n")

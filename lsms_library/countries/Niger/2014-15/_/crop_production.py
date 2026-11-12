@@ -59,9 +59,8 @@ KG_SENTINELS = (999999, 999998)
 
 crop_map, unit_map = _crop_maps()
 
-base = '../Data/NER_2014_ECVMA-II_v02_M_STATA8/'
-src = get_dataframe(base + 'ECVMA2_AS2E1P2.dta', convert_categoricals=True)
-srcn = get_dataframe(base + 'ECVMA2_AS2E1P2.dta', convert_categoricals=False)
+src = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E1P2.dta', convert_categoricals=True)
+srcn = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E1P2.dta', convert_categoricals=False)
 
 hh = src.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSION']],
                                            index=['GRAPPE', 'MENAGE', 'EXTENSION'])), axis=1)
@@ -85,8 +84,8 @@ df = pd.DataFrame({
 })
 
 # --- crop-level sale block (AS2E2), single-plot attribution --------------
-sold = get_dataframe(base + 'ECVMA2_AS2E2P2.dta', convert_categoricals=True)
-soldn = get_dataframe(base + 'ECVMA2_AS2E2P2.dta', convert_categoricals=False)
+sold = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta', convert_categoricals=True)
+soldn = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta', convert_categoricals=False)
 sold_i = sold.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSION']],
                                                 index=['GRAPPE', 'MENAGE', 'EXTENSION'])), axis=1)
 sold_crop = _crop_labels(soldn['AS02EQ110B'], sold['AS02EQ110B'], crop_map)

@@ -101,18 +101,23 @@ def test_one_labelled_country_selects_the_route_on_a_feature_shaped_frame():
 def test_a_label_outranks_a_stale_scalar_attr():
     cp, pf = _frames('Niger')
     cp = pd.concat({'Uganda': cp}, names=['country'])
+    pf = pd.concat({'Uganda': pf}, names=['country'])
     cp.attrs['country'] = 'Niger'
     with pytest.warns(PlotGrainMismatchWarning):
         assert yield_kg(cp, pf).empty
 
 
-def test_a_pooled_frame_keeps_the_old_route():
-    """Crop transforms do not group on country yet (GH #1475)."""
+def test_a_pooled_frame_uses_each_countrys_existing_route():
+    """GH1475 repairs the former pooled fallback, retaining both land keys."""
     a, pa = _frames('Niger', attrs=False)
     cp = pd.concat({'Niger': a, 'Mali': a}, names=['country'])
     pf = pd.concat({'Niger': pa, 'Mali': pa}, names=['country'])
-    with pytest.warns(PlotGrainMismatchWarning):
-        assert yield_kg(cp, pf).empty
+    with warnings.catch_warnings():
+        warnings.simplefilter('error', PlotGrainMismatchWarning)
+        got = yield_kg(cp, pf)
+    expected = pd.concat({c: yield_kg(*_frames(c)) for c in ('Niger', 'Mali')},
+                         names=['country']).sort_index()
+    pd.testing.assert_frame_equal(got, expected)
 
 
 def test_the_list_is_the_one_the_ruling_names_less_what_is_held():
@@ -162,23 +167,42 @@ class TestAWaveThatJoinsNothing:
     """A wave lost beside waves that join used to go without a word: a real Feature of
     Malawi and Ethiopia served 18,919 yields where Malawi alone serves 54,419."""
 
-    def test_a_pooled_country_names_each_lost_wave(self):
+    def test_repaired_pooled_routes_keep_the_formerly_lost_waves(self):
         cp, pf = _country_frames(
             Malawi=[('w1', 'R1', 'h1'), ('w2', 'G1_R1', 'h1')],
             Ethiopia=[('w1', '1_1', 'h2')])
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', PlotGrainMismatchWarning)
+            out = yield_kg(cp, pf)
+        assert out.index.tolist() == [('Ethiopia', 'w1', 'h2', '1_1'),
+                                     ('Malawi', 'w1', 'h1', 'R1'),
+                                     ('Malawi', 'w2', 'h1', 'G1_R1')]
+        assert out['Yield_kg'].tolist() == [5., 5., 5.]
+
+    def test_a_pooled_country_still_names_each_genuinely_lost_wave(self):
+        cp, pf = _country_frames(
+            Malawi=[('w1', 'R1', 'h1'), ('w2', 'G1_R1', 'h1')],
+            Ethiopia=[('w1', '1_1', 'h2')])
+        area = pf.reset_index()
+        area.loc[(area['country'] == 'Ethiopia') | (area['t'] == 'w2'),
+                 'plot_id'] = 'different_land'
+        pf = area.set_index(pf.index.names)
         with pytest.warns(PlotGrainMismatchWarning) as caught:
             out = yield_kg(cp, pf)
         message = str(caught[0].message)
         assert 'Malawi w2' in message and 'Ethiopia w1' in message
         assert 'Malawi w1' not in message
-        assert 'one country at a time' in message
-        assert out.index.get_level_values('parcel').tolist() == ['R1']
+        assert 'one country at a time' not in message
+        assert out.index.tolist() == [('Malawi', 'w1', 'h1', 'R1')]
 
     def test_it_is_per_country_within_a_wave(self):
         """Uganda's rows keep w1 non-empty, and Malawi's are still lost."""
         cp, pf = _country_frames(
             Malawi=[('w1', 'G1_R1', 'h1')],
             Uganda=[('w1', '1', 'h2')])
+        area = pf.reset_index()
+        area.loc[area['country'] == 'Malawi', 'plot_id'] = 'G2_R1'
+        pf = area.set_index(pf.index.names)
         with pytest.warns(PlotGrainMismatchWarning, match='Malawi w1') as caught:
             out = yield_kg(cp, pf)
         assert 'Uganda' not in str(caught[0].message)

@@ -34,6 +34,7 @@ methods that do accept it, rather than being silently ignored.
 | `numeraire=` | monetary tables | convert monetary columns to a common numeraire |
 | `basis=` | `food_expenditures` | `'purchased'` or `'total'` |
 | `valuation=` | `food_expenditures` (with `basis='total'`) | value produced / in-kind rows: `'own_price'`, `'median_price'`, or a tuple applied in order; off by default |
+| `period=` | `food_expenditures`, `food_quantities` | rescale by declared wave exposure; `None` preserves the recorded window; see [recall](recall.md) |
 | `age_cuts=` | `household_characteristics` | age-bracket boundaries |
 
 `currency=` and `numeraire=` are mutually exclusive. Available numeraires come
@@ -151,7 +152,7 @@ numeraire : str, optional
 
 ## `food_expenditures()`
 
-Documents: basis, valuation.
+Documents: basis, valuation, period.
 
 ```
 Return food_expenditures as a DataFrame, aggregated across *waves*.
@@ -198,6 +199,31 @@ labels : str or dict, optional
     ``Feature`` degrades over both.  A plain ``KeyError`` means
     the mapping table is MALFORMED (no ``Preferred Label``, or
     no key column left), which stays loud.
+period : {'day', 'week', 'month', 'year'}, optional
+    Rescale each wave from the window its survey recorded
+    to this one (``month`` = 365.25/12 days, ``year`` =
+    365.25): value x period_days / exposure_days, where
+    exposure is ``recall_days * n_asks`` from
+    ``ll.recall()`` -- or the column's own count where the
+    record has ``n_asks_by_column`` (Burkina Faso 2014
+    quantities: 1 ask of 4).  Default ``None`` returns the recorded
+    window unchanged.  Raises ``PeriodUnavailableError``
+    (a ``ValueError``) naming every wave whose window is
+    not established -- not recorded, a weak rung, or
+    varying within the wave -- and the waves that do
+    convert (pass them as ``waves=``); ``Feature`` drops
+    only the unknown waves, with one warning and
+    ``attrs['period_unavailable']``.  The conversion is
+    recorded on ``attrs['period']``, which also discloses,
+    per wave, how many households the served
+    ``food_acquired`` ``visit`` level shows asked FEWER
+    times than declared and the understatement that
+    implies (``shortfall``; the exposure is still one
+    constant per wave, option A, @ligon 2026-10-20) --
+    an upper bound, since a food-row count understates
+    the asks: a visit with no purchases has no rows.
+    GH #851; see ``docs/guide/recall.md``.
+    ``food_prices`` refuses it: a price is not a flow.
 currency : {'index', 'column'}, optional
     Attach the ISO 4217 currency code (resolved per wave,
     e.g. UGX, NGN, XOF; GhanaLSS 2005-06 -> GHC vs 2016-17

@@ -179,6 +179,34 @@ This will:
    (if `push=True`, the default)
 8. Record the held release only after complete acquisition and requested push,
    then show a rich progress summary
+9. Best-effort fetch the catalog's published documents separately, using
+   `push_to_cache_batch()` for binaries and an atomic Git-managed
+   `Documentation/DOCUMENTS-<catalog_id>.json` receipt. Inspect incomplete
+   results; document failure never changes raw-file returns or raw `HELD`
+   identity. Use `documentation=False` for an explicit data-only operation.
+
+Minimum `Documentation/` holdings are `SOURCE.org` with citation/release,
+the actual licence/terms or cited terms location, and published questionnaire,
+manual/technical/BID/report and DDI documentation. Record a successfully
+inspected listing with no documents separately from discovery/download failure;
+neither proves no official documentation exists elsewhere. Binaries are
+DVC-managed; text and sidecars are committed to Git. Public forms alone do not
+prove fielded CAPI/export-version correspondence.
+
+For documentation-only backfill, without downloading microdata:
+
+```python
+from lsms_library.data_access import fetch_documentation
+report = fetch_documentation("Ethiopia", "2021-22", "6161", push=True)
+```
+
+The report preserves per-catalog ownership and distinguishes held identities,
+new local-only bytes (`push=False`), confirmed pushes and incomplete attempts.
+A held resource id/receipt is not a current remote-content validator. Conflicting
+filenames, source/terms paths and other catalogs' documents are preserved rather
+than silently overwritten. Unknown resource API/Related Materials layouts are
+discovery failures, not successful empty inventories. Already-held documents
+need evidence-backed reconciliation, not a fresh raw-wave acquisition.
 
 Pass `verbose=True` (default) for spinners and a summary table. Use `verbose=False` for scripted/non-interactive use.
 

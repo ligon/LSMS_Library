@@ -90,17 +90,22 @@ def test_unreadable_fresh_parquet_is_named_read_error(gate, monkeypatch):
     """A fresh, covering parquet that fails to READ is a miss named
     ``read-error``, surfaced as a ``UserWarning``, and still reports its
     coverage so the rebuild takes the #891 union."""
-    import lsms_library.country as country_mod
     c, cache_path, df = gate
     _write(df, cache_path, cache_hash=c._table_cache_hash(TABLE, c.waves),
            cache_waves=list(c.waves))
 
-    def _unreadable(*args, **kwargs):
+    payloads = []
+    def _unreadable(stream, **kwargs):
+        payloads.append((stream.name, kwargs))
         raise OSError("simulated unreadable parquet")
 
-    monkeypatch.setattr(country_mod, "get_dataframe", _unreadable)
-    with pytest.warns(UserWarning, match="cache read failed"):
+    # Inject at the actual initial payload phase; preserve real footer /
+    # coverage reads, observed identity and exact-entry rejection.
+    monkeypatch.setattr(pd, "read_parquet", _unreadable)
+    with pytest.warns(UserWarning, match="Unreadable managed cache"):
         out, covered, reason = c._read_l2_country_cache(TABLE, cache_path, [c.waves[0]])
     assert out is None
     assert reason.startswith("read-error") and "simulated unreadable parquet" in reason
     assert covered == list(c.waves)
+    assert payloads == [(str(cache_path), {"engine": "pyarrow"})]
+    assert not cache_path.exists()

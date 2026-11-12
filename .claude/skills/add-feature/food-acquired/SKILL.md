@@ -159,7 +159,9 @@ Access from code:
 unit_labels = get_categorical_mapping(tablename='unit')
 ```
 
-The legacy approach uses a separate `unitlabels.csv` — the modern approach puts everything in `categorical_mapping.org`.
+The generated `unitlabels.csv` writers were retired (GH #790 / PR #1021).
+Use the curated tables in `categorical_mapping.org`; a separately named
+`unit_labels.csv` reference table is a distinct artifact and should be preserved.
 
 Reference: `lsms_library/countries/Uganda/_/units.org`, `lsms_library/countries/Mali/_/categorical_mapping.org` (has `#+NAME: unit`)
 
@@ -305,14 +307,14 @@ never reach kg, so 100% is not the target for every country).
 country is still on the pre-#169 wide shape and needs migration before the
 `_FOOD_DERIVED` kg path works.
 
-**Gap countries** (have a `data_scheme` but no `food_acquired`): Albania,
-Armenia, Azerbaijan, Cambodia, China, Guatemala, Guyana, India, Iraq,
-Kazakhstan, Kosovo, Liberia, Pakistan, Serbia, Tajikistan, Timor-Leste.
-Several (Serbia, Cambodia) carry a *legacy* `food_acquired.py` +
-`food_prices_quantities_and_expenditures.py` that predates the canonical
-schema — filling those is a *modernize-and-wire* job (port to
-`food_acquired_to_canonical`, declare in `data_scheme.yml`), not a
-from-scratch build.
+Check the current country `data_scheme.yml`, native `food_acquired` inputs
+and country notes before identifying a coverage gap. Script presence alone is
+not a declaration of availability. Serbia and Cambodia already declare
+canonical `food_acquired` and have country concatenators; the earlier gap
+inventory does not describe their current wiring. The retired
+`food_prices_quantities_and_expenditures.py` family no longer exists and must
+not be used as a migration starting point. Preserve the public derived food
+methods supplied by `_FOOD_DERIVED` from `food_acquired`.
 
 ## Check existing documentation first
 

@@ -43,11 +43,10 @@ FARM_CODES = {1101, 1102, 1103, 1104, 1105, 1106, 1107,
 SB_CODES = {6101, 6202, 6203, 6204, 6205, 6206, 6207,
             6209, 6210, 6211, 6212}
 
-base = '../Data/NER_2014_ECVMA-II_v02_M_STATA8/'
-lab = get_dataframe(base + 'ECVMA2_MS04P1.dta', convert_categoricals=False)
+lab = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS04P1.dta', convert_categoricals=False)
 # Value labels of the labor module, for the declared-missing NA (GH #877).
-VALUE_LABELS = get_categorical_mapping(base + 'ECVMA2_MS04P1.dta')
-ros = get_dataframe(base + 'ECVMA2_MS01P1.dta', convert_categoricals=False)
+VALUE_LABELS = get_categorical_mapping('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS04P1.dta')
+ros = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_MS01P1.dta', convert_categoricals=False)
 
 key = ['GRAPPE', 'MENAGE', 'EXTENSION']
 ros_small = ros[key + ['MS01Q00', 'MS01Q06A']].copy()

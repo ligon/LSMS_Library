@@ -514,11 +514,11 @@ Malawi::crop_production::contradiction-price-harvest:
 Malawi::crop_production::sale-basis-unresolved:
   waves: ['2010-11', '2013-14', '2016-17', '2019-20']
   columns: [Quantity_sold, Value_sold]
-  rows: 0
   rule: >-
     A REFUSAL.  Until GH #1457 a deletion; the sale is now served on its own
-    plot_id = 'Farm-level' row with its own unit and state, and no row carries this
-    key, because the index discloses it.  A sale with a candidate harvest row
+    plot_id = 'Farm-level' row with its own unit and state, carrying this key.
+    Farm-level alone does not distinguish refusal from the other causes.
+    A sale with a candidate harvest row
     (single-plot crop, same unit) that no rung admits is attached to no harvest
     row, and is COUNTED in
     attrs['sale_basis_mismatch'] and in the SaleAttachmentWarning the build
@@ -536,7 +536,9 @@ Malawi::crop_production::sale-basis-unresolved:
     an exact match already claimed (`claimed_by_tier_a`).  Ambiguous
     pairings (more than one compatible row or sale) are a separate count,
     attrs['sale_suppressed'] (GH #854), not this entry.
-    `derivation_inputs` returns the lines.
+    `derivation_inputs` retains the refused lines and adds the served crop and
+    production_obs where a Farm-level row exists. Refused non-sales remain
+    retrievable without a served observation coordinate.
   function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
   inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_unresolved
   raw_variables:
@@ -568,6 +570,49 @@ Malawi::crop_production::sale-basis-unresolved:
     harvest-side / 550,400 MWK); claimed by tier A 0.  See CONTENTS.org.
   contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
   since: '2026-09-24'
+
+# User selected R1 on 2026-11-10; retained implementation cd76e550f (GH #1457).
+Malawi::crop_production::sale-other-unit-single-row:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold, Unit_sold, Condition_sold]
+  rule: >-
+    Module I / Q records a sale per household and crop code in its own unit. A sale with
+    a nonmissing reported unit and no harvest row in that unit goes on the household-crop's
+    ONE harvest row where the row names a plot, its state is compatible (equal, or either unknown) and the row holds no
+    other record, and that row carries this key.  Quantity_sold is in Unit_sold, not u.  What
+    is derived is the ATTACHMENT, not the numbers.  A sale on another basis, or of a crop on
+    two or more rows, or that a second sale competes for the row with, goes to Farm-level.
+    An actual missing sale-unit label stays NA on Farm-level: it is not a reported different
+    unit and moving it would enable the existing harvest-unit fallback. Nonmissing Other,
+    unconvertible and explicit Unknown labels remain eligible; no kg factor is required.
+  function: lsms_library.countries.Malawi._.malawi:derive_other_unit_sale
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_other_unit_single_row
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g13b, ag_g13c; ag_mod_p.ag_p09b
+  assumptions:
+    - text: >-
+        Unit_sold is the sale's denominator, so a sale in another unit can sit on the row: the
+        canonical note says both shapes are correct, and #824's "cannot be expressed at the
+        grain" predates Unit_sold.  Historically measured by the #1457 review (not remeasured here): on 2,106 other-unit sales
+        with both units convertible, the sold unit is closer to the same-unit price on 90.4%
+        (median |log| 0.357 against 3.792), so Uganda's 40.5% caveat does not carry over.
+      basis: modelling-choice
+      evidence: >-
+        User approval of R1 on 2026-11-10, following the historical #1457 own-unit review; the
+        ruling of 2026-10-23 on GH #824.
+    - text: >-
+        a sale on another basis stays off the row, per GH #833: 975 records (21,897,879 MWK)
+        contradict shelled against unshelled, and 101 (11,142,265 MWK) are not-applicable against
+        either in that historical review; those counts were not remeasured here,
+        and a price cannot decide across units.
+      basis: modelling-choice
+      evidence: GH #833, Malawi/_/CONTENTS.org, "The rule".
+  validated_against: >-
+    tests/test_gh1457_malawi_farm_level_sales.py; value equals the raw modules in all four waves.
+  contents: 'Malawi/_/CONTENTS.org, "2026-11-04 -- sales no harvest row holds: Farm-level (GH #1457)"'
+  since: '2026-11-10'
 
 # GH #827 (2026-10-23).  community_prices: the Module CK form strikes out the
 # NUMBER OF UNITS and UNIT CODES cells on 17 items whose text names the unit.
@@ -669,7 +714,7 @@ Malawi::community_prices::struck-item-one-unit:
 # nothing is served for it and the loss is registered here.
 Malawi::plot_inputs::seed-line-no-payload:
   waves: ['2010-11', '2013-14', '2016-17', '2019-20']
-  columns: [Quantity, Quantity_purchased, Unit_purchased, Purchased, Improved, Quantity_received_as_gift, Unit_received_as_gift, Received_as_gift]
+  columns: [Quantity, Quantity_purchased, Unit_purchased, Purchased, Improved, Applied, Quantity_received_as_gift, Unit_received_as_gift, Received_as_gift]
   rows: 0
   rule: >-
     A DELETION.  A Module G line with no planted amount (ag_g04a), no Improved answer
@@ -700,3 +745,41 @@ Malawi::plot_inputs::seed-line-no-payload:
     (459 / 185 / 672 / 39 by wave, cold build of 74e60f713), none with a planted amount.
   contents: 'Malawi/_/CONTENTS.org, "The seed half, counted"'
   since: '2026-11-05'
+
+# Issue 1174: the nonseed residual of the same existing all-payload-NA gate.
+Malawi::plot_inputs::nonseed-group-no-payload:
+  waves: ['2010-11']
+  columns: [Quantity, Quantity_purchased, Unit_purchased, Purchased, Improved, Applied, Quantity_received_as_gift, Unit_received_as_gift, Received_as_gift]
+  rows: 0
+  rule: >-
+    A DELETION. A 2010-11 Module D nonseed group whose entire assembled payload
+    is missing is removed by the existing _finalize_result dropna(how='all').
+    The current source has one DAP Fertilizer group with no ag_d38 answer and
+    no enumerator-total quantity. A unit is an index level, not payload.
+    A recorded zero, False, or any other payload prevents this deletion.
+    No use answer is inferred and no native amount replaces a blank total.
+    The dropped group has nowhere to carry a key; derivation_inputs returns
+    every contributing original Module D line, once per source-release row.
+  function: lsms_library.countries.Malawi.2010-11._.mapping:derive_nonseed_group_no_payload
+  inputs: lsms_library.countries.Malawi.2010-11._.mapping:inputs_nonseed_group_no_payload
+  raw_variables:
+    - ag_mod_d.case_id, ag_d00 (household and plot keys)
+    - ag_mod_d.ag_d38, ag_d39a, ag_d39d, ag_d39f, ag_d39i (use, types and selected enumerator-total kg)
+    - ag_mod_d.ag_d39b, ag_d39c, ag_d39g, ag_d39h (separate native amounts/units, retained without substitution)
+    - ag_mod_d.ag_d36, ag_d37a, ag_d37b, ag_d40, ag_d41a, ag_d41b, ag_d41c, ag_d41d, ag_d41e, ag_d41f (other Module D blocks)
+  assumptions:
+    - text: >-
+        Preserve the existing all-payload-NA exclusion without interpreting
+        missing use as No or as an affirmative use. This is disclosure of an
+        existing deletion, not a new source-eligibility or quantity rule.
+      basis: modelling-choice
+      evidence: >-
+        Issue 1174 narrowed 2026-11-05; merged PR 1422; Malawi CONTENTS.org,
+        "Module D use answers; a missing amount is not 0".
+  validated_against: >-
+    Current-base sanctioned Module D census: 19,265 source lines, one deleted
+    DAP group contributed by one raw line, with Quantity and Applied missing.
+    Source MD5 d143b71ea7c7f4efcac3b9afa0d6be48. Full API conservation and raw
+    replay are recorded in the task ledger and source validation receipts.
+  contents: 'Malawi/_/CONTENTS.org, "Nonseed deletion provenance"'
+  since: '2026-11-07'

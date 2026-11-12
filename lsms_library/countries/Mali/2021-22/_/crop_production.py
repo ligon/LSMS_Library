@@ -40,7 +40,10 @@ THE STATE (GH #1436).  condition is s16cq16d, "Etat du produit", by code through
 harmonize_crop_condition_ehcvm1, and condition_native the answer as recorded.  The file
 states it on exactly the 309 rows with a Quantity.  Every other row carries the sentinel,
 and that includes a derived harvest: its dispositions have states of their own in s16d,
-not read here, and they fold differently on 166 of the 3,360 totals (derivations.yml).
+not read as a harvest state here, and they fold differently on 166 of the 3,360 totals (derivations.yml).
+
+The sale's own s16dq05d answer is Condition_sold plus condition_sold_native
+(GH1528), including on a Farm-level sale row. It supplies no harvest state.
 
 See mali.py, "crop_production: the EHCVM waves".
 """
@@ -52,6 +55,7 @@ import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet
 from mali import (derive_hh_crop_harvest_total, derive_hh_crop_sale_attachment,
                   derive_survey_kg_estimate, ehcvm_crop_condition_labels, ehcvm_crop_conditions,
+                  ehcvm_crop_sold_conditions,
                   ehcvm_crop_labels, ehcvm_dispositions, ehcvm_household_ids,
                   ehcvm_intercropped, ehcvm_is_sale, ehcvm_plot_ids, ehcvm_unit_labels,
                   finish_ehcvm_crop_production, stamp_harvest_to_date,
@@ -60,7 +64,7 @@ from mali import (derive_hh_crop_harvest_total, derive_hh_crop_sale_attachment,
 src = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=True)
 src_codes = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=False)
 harvest = pd.DataFrame({
-    'i':            ehcvm_household_ids(src).astype('string').values,
+    'i':            ehcvm_household_ids(src, wave='2021-22').astype('string').values,
     'plot_id':      ehcvm_plot_ids(src).values,
     'crop':         ehcvm_crop_labels(src['s16cq04']).values,
     'u':            ehcvm_unit_labels(src['s16cq16b']).values,
@@ -74,16 +78,24 @@ harvest = pd.DataFrame({
 })
 
 records = get_dataframe('../Data/s16d_me_mli2021.dta', convert_categoricals=True)
+records_codes = get_dataframe('../Data/s16d_me_mli2021.dta', convert_categoricals=False)
 sold = records[ehcvm_is_sale(records['s16dq05a'], records['s16dq06'])]
 sales = pd.DataFrame({
-    'i':             ehcvm_household_ids(sold).astype('string').values,
+    'i':             ehcvm_household_ids(sold, wave='2021-22').astype('string').values,
     'crop':          ehcvm_crop_labels(sold['s16dq01']).values,
     'Quantity_sold': pd.to_numeric(sold['s16dq05a'], errors='coerce').values,
     'Unit_sold':     ehcvm_unit_labels(sold['s16dq05b']).values,
     'Value_sold':    pd.to_numeric(sold['s16dq06'], errors='coerce').values,
+    'Condition_sold': ehcvm_crop_sold_conditions(
+        records_codes.loc[sold.index, 's16dq05d']).values,
+    'condition_sold_native': ehcvm_crop_condition_labels(sold['s16dq05d']).values,
 })
 
-df = derive_hh_crop_sale_attachment(harvest, sales)
+# Transport each own sale answer through the existing placement, without
+# changing EAC-I/default sale columns or any attachment gate (ledger1528 §4).
+df = derive_hh_crop_sale_attachment(
+    harvest, sales, columns=['Quantity_sold', 'Unit_sold', 'Value_sold',
+                             'Condition_sold', 'condition_sold_native'])
 
 # Conservation: every sale record is on exactly one served row, unchanged.
 on_a_row = df[df['Quantity_sold'].notna() | df['Value_sold'].notna()]
@@ -93,7 +105,7 @@ assert on_a_row['Quantity_sold'].sum() == sales['Quantity_sold'].sum()
 
 recorded = pd.to_numeric(df['Quantity'], errors='coerce').astype('float64').sum()
 df = stamp_harvest_to_date(df)
-df = derive_hh_crop_harvest_total(df, ehcvm_dispositions(records))
+df = derive_hh_crop_harvest_total(df, ehcvm_dispositions(records, wave='2021-22'))
 
 # Nothing recorded moved: every other Quantity is the file's.
 derived = df['Derivation'].astype('string').str.contains(

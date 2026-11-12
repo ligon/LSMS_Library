@@ -17,8 +17,10 @@ wave_folder_map = {
 }
 ```
 
-The Country class picks this up in the `waves` property and stores it
-as `self.wave_folder_map`.  When you call `country['2008-09']`, it
+The Country class resolves `wave_folder_map` on first access through the same
+metadata lookup as `waves`; reading `waves` first is optional. The mapping
+remains mutable, and later `waves` reads still refresh a declared map.
+When you call `country['2008-09']`, it
 creates `Wave(year='2008-09', wave_folder='2008-15', ...)`.
 
 The wave-level script (e.g. `2008-15/_/food_acquired.py`) produces

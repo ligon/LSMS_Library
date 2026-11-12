@@ -24,6 +24,8 @@ Recall:
     ask_count_basis: measured
     recall_days: 7
     n_asks: 4
+    n_asks_by_column:
+      Quantity: 1
     recall_verbatim: 'consommation des 7 derniers jours (per passage)'
     evidence: 'lsms_library/build_transforms.py:557; lsms_library/countries/Burkina_Faso/_/CONTENTS.org:35'
     notes: 'non-food module ran in only 3 of 4 passages (21d)'

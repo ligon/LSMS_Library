@@ -99,8 +99,23 @@ def test_wave_corrupt_payload_disposition(private_root, monkeypatch, route):
     w, table, path, _ = _wave(route, monkeypatch)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(b'controlled non-parquet payload')
-    with pytest.raises(_Rebuilt if route == 'yaml' else pa.ArrowInvalid):
-        w.grab_data(table)
+    name = 'df_data_grabber' if route == 'yaml' else '_build_wave_script_target'
+    original = getattr(C, name)
+    builds = []
+    def rebuild(*args, **kwargs):
+        # The owner must reject this precise old entry before rebuilding.
+        assert not path.exists()
+        builds.append((args, kwargs))
+        return original(*args, **kwargs)
+    monkeypatch.setattr(C, name, rebuild)
+    with pytest.warns(UserWarning, match='Unreadable managed cache'):
+        with pytest.raises(_Rebuilt):
+            w.grab_data(table)
+    assert len(builds) == 1 and not path.exists()
+    if route == 'script':
+        assert builds == [((w.file_path.parent / '_',
+                           Path(w.wave_folder) / '_' / (table + '.parquet')),
+                          {'force': True})]
 
 
 @pytest.mark.parametrize('route', ['yaml', 'script'])
@@ -109,13 +124,30 @@ def test_wave_payload_errors_keep_original_disposition(private_root, monkeypatch
     w, table, path, expected = _wave(route, monkeypatch)
     _plant(path, _native(w), expected, True)
     error = error_type('controlled payload failure')
-    def fail(*args, **kwargs):
+    payloads, builds = [], []
+    def fail(stream, **kwargs):
+        payloads.append((stream.name, kwargs))
         raise error
     monkeypatch.setattr(pd, 'read_parquet', fail)
-    with pytest.raises(_Rebuilt if route == 'yaml' else error_type) as result:
-        w.grab_data(table)
+    name = 'df_data_grabber' if route == 'yaml' else '_build_wave_script_target'
+    original = getattr(C, name)
+    def rebuild(*args, **kwargs):
+        assert not path.exists()
+        builds.append((args, kwargs))
+        return original(*args, **kwargs)
+    monkeypatch.setattr(C, name, rebuild)
+    #1071 changes only initial OLD-cache payload failures. Footer, restore,
+    # programmer and fresh-output error identity controls below stay strict.
+    with pytest.warns(UserWarning, match='Unreadable managed cache') as notices:
+        with pytest.raises(_Rebuilt):
+            w.grab_data(table)
+    assert payloads == [(str(path), {})]
+    assert len(builds) == 1 and not path.exists()
+    assert any('controlled payload failure' in str(n.message) for n in notices)
     if route == 'script':
-        assert result.value is error
+        assert builds == [((w.file_path.parent / '_',
+                           Path(w.wave_folder) / '_' / (table + '.parquet')),
+                          {'force': True})]
 
 
 @pytest.mark.parametrize('route', ['yaml', 'script'])

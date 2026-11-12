@@ -144,6 +144,10 @@ _EXCLUDED_CALLABLES = frozenset({
     # tests/test_build_transform_hash.py::
     # test_editing_a_wave_read_gate_moves_no_hash.
     "lsms_library.country.Wave._read_l2_wave_cache",
+    # The reading of LSMS_NO_CACHE (GH #1455).  It decides whether a parquet is
+    # read or written, and a no-cache build writes the same bytes of data as an
+    # ordinary one, so it determines no byte of content.
+    "lsms_library.country._no_cache",
     "lsms_library.country.Wave._fresh_script_parquet",
     "lsms_library.country.Country._read_assumed_fresh_cache",
     # GH #675: the degraded-build record.  Filing a drop, grading a stamped
@@ -200,6 +204,11 @@ _EXCLUDED_CALLABLES = frozenset({
     # listed so a future direct call from build code cannot fold the probe
     # into every hash.
     "lsms_library.country.Country._probe_country_builder",
+    # GH #381 / #1516: this established availability/failure-routing handler
+    # now has a direct build-path caller. It chooses a route, never parquet
+    # content; handler edits must remain outside content fingerprints. The
+    # calling orchestrator stays versioned. Revisit if the handler shapes data.
+    "lsms_library.country.Country._legacy_can_build",
     # The wave-script RUNNER (GH #968): make if installed, else the wave
     # script directly.  It decides which program executes the script, not
     # what the script writes -- the script text and the country _/Makefile

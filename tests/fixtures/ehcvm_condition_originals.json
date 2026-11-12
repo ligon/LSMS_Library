@@ -1,0 +1,300 @@
+{
+  "base": "b8346cf1f953ac82517b1b7473c715a5655ca950",
+  "homes": {
+    "Benin": {
+      "path": "lsms_library/countries/Benin/2018-19/_/crop_production.py",
+      "sha256": "734cdf294bd20d5b02c34537ad442629d2b30cd7d90f6b8924d1fe43e48e5950",
+      "definitions": {
+        "_crop_conditions": "def _crop_conditions(codes):\n    \"\"\"Map raw \"Etat du produit\" codes (``convert_categoricals=False``) through\n    ``harmonize_crop_condition_ehcvm1`` (GH #1436).  The table is read strictly:\n    a missing table must not serve every row as the sentinel.  A blank or\n    off-scheme code becomes ``unknown_condition``, a real value and never NA,\n    because a null index key is deleted by the next ``groupby`` (GH #323 3b).\"\"\"\n    table = tools.get_categorical_mapping(\n        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',\n        **{'Preferred Label': 'Preferred Label'})\n    table = {int(code): token for code, token in table.items()}\n    assert sorted(table) == [1, 2, 3, 4, 5], f'harmonize_crop_condition_ehcvm1: {table}'\n    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)\n    return mapped.astype('string').fillna('unknown_condition')",
+        "_crop_condition_labels": "def _crop_condition_labels(labels):\n    \"\"\"The state as the survey recorded it, for ``condition_native``: *labels* is\n    the column read with ``convert_categoricals=True``.  A blank stays NA, never a\n    sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,\n    GH #1436).\"\"\"\n    out = pd.Series(labels).astype('string').str.strip()\n    return out.where(out != '', pd.NA)"
+      },
+      "tables": {
+        "harmonize_crop_condition_ehcvm1": [
+          [
+            "1",
+            "unshelled",
+            "Epis"
+          ],
+          [
+            "2",
+            "shelled",
+            "Grain"
+          ],
+          [
+            "3",
+            "shelled",
+            "Décortiqué"
+          ],
+          [
+            "4",
+            "unshelled",
+            "Non-décortiqué"
+          ],
+          [
+            "5",
+            "shell_not_applicable",
+            "Non concerné"
+          ]
+        ]
+      }
+    },
+    "Burkina_Faso": {
+      "path": "lsms_library/countries/Burkina_Faso/2018-19/_/crop_production.py",
+      "sha256": "1c85c1757449a81c62efe4f35f2ad2fecbf5fed5441e1697079cf9b9cd396b10",
+      "definitions": {
+        "_crop_conditions": "def _crop_conditions(codes):\n    \"\"\"Map raw \"Etat du produit\" codes (``convert_categoricals=False``) through\n    ``harmonize_crop_condition_ehcvm1`` (GH #1436).  The table is read strictly:\n    a missing table must not serve every row as the sentinel.  A blank or\n    off-scheme code becomes ``unknown_condition``, a real value and never NA,\n    because a null index key is deleted by the next ``groupby`` (GH #323 3b).\"\"\"\n    table = get_categorical_mapping(\n        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',\n        **{'Preferred Label': 'Preferred Label'})\n    table = {int(code): token for code, token in table.items()}\n    assert sorted(table) == [1, 2, 3, 4, 5], f'harmonize_crop_condition_ehcvm1: {table}'\n    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)\n    return mapped.astype('string').fillna('unknown_condition')",
+        "_crop_condition_labels": "def _crop_condition_labels(labels):\n    \"\"\"The state as the survey recorded it, for ``condition_native``: *labels* is\n    the column read with ``convert_categoricals=True``.  A blank stays NA, never a\n    sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,\n    GH #1436).\"\"\"\n    out = pd.Series(labels).astype('string').str.strip()\n    return out.where(out != '', pd.NA)",
+        "_crop_sold_conditions": "def _crop_sold_conditions(codes):\n    \"\"\"Reuse the own-wave harvest fold, with NA for a column (ledger1528 §3).\"\"\"\n    folded = _crop_conditions(codes)\n    return folded.where(folded != 'unknown_condition', pd.NA)"
+      },
+      "tables": {
+        "harmonize_crop_condition_ehcvm1": [
+          [
+            "1",
+            "unshelled",
+            "Epis"
+          ],
+          [
+            "2",
+            "shelled",
+            "Grain"
+          ],
+          [
+            "3",
+            "shelled",
+            "Décortiqué"
+          ],
+          [
+            "4",
+            "unshelled",
+            "Non-décortiqué"
+          ],
+          [
+            "5",
+            "shell_not_applicable",
+            "Non concerné"
+          ]
+        ]
+      }
+    },
+    "CotedIvoire": {
+      "path": "lsms_library/countries/CotedIvoire/2018-19/_/crop_production.py",
+      "sha256": "03d8363ebf5e89ddfa586b8d039b91fc8227ef1d602a337dfd3791cf2fba5724",
+      "definitions": {
+        "_crop_conditions": "def _crop_conditions(codes):\n    \"\"\"Map raw \"Etat du produit\" codes (``convert_categoricals=False``) through\n    ``harmonize_crop_condition_ehcvm1`` (GH #1436).  The table is read strictly:\n    a missing table must not serve every row as the sentinel.  A blank or\n    off-scheme code becomes ``unknown_condition``, a real value and never NA,\n    because a null index key is deleted by the next ``groupby`` (GH #323 3b).\"\"\"\n    table = get_categorical_mapping(\n        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',\n        **{'Preferred Label': 'Preferred Label'})\n    table = {int(code): token for code, token in table.items()}\n    assert sorted(table) == [1, 2, 3, 4, 5, 6, 7], f'harmonize_crop_condition_ehcvm1: {table}'\n    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)\n    return mapped.astype('string').fillna('unknown_condition')",
+        "_crop_condition_labels": "def _crop_condition_labels(labels, codes):\n    \"\"\"The state as the survey recorded it, for ``condition_native``: *labels* is\n    the column read with ``convert_categoricals=True``, *codes* the same column\n    read without.  The .dta labels codes 1-5 only, so 6 and 7 arrive as bare\n    numbers and take the table's Source Label, as the vague 2 instrument prints\n    them (CIV-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf, p. 197).  A blank stays NA, never a\n    sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,\n    GH #1436).\"\"\"\n    instrument = get_categorical_mapping(\n        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',\n        **{'Source Label': 'Source Label'})\n    instrument = {int(code): label for code, label in instrument.items()}\n    codes = pd.to_numeric(codes, errors='coerce').astype('Int64')\n    out = pd.Series(labels).astype('string').str.strip()\n    out = out.where(out != '', pd.NA)\n    return out.where(~codes.isin([6, 7]), codes.map(instrument).astype('string'))"
+      },
+      "tables": {
+        "harmonize_crop_condition_ehcvm1": [
+          [
+            "1",
+            "unshelled",
+            "Epis"
+          ],
+          [
+            "2",
+            "shelled",
+            "Grain"
+          ],
+          [
+            "3",
+            "shelled",
+            "Décortiqué"
+          ],
+          [
+            "4",
+            "unshelled",
+            "Non-décortiqué"
+          ],
+          [
+            "5",
+            "shell_not_applicable",
+            "Non concerné"
+          ],
+          [
+            "6",
+            "other_condition",
+            "Fève"
+          ],
+          [
+            "7",
+            "other_condition",
+            "Autre à préciser"
+          ]
+        ]
+      }
+    },
+    "Senegal": {
+      "path": "lsms_library/countries/Senegal/2018-19/_/crop_production.py",
+      "sha256": "19078f6f0c2bc6f23eccd86f0e488bf449105abaf73ef94ad74c5cbf0009178d",
+      "definitions": {
+        "_crop_conditions": "def _crop_conditions(codes):\n    \"\"\"Map raw \"Etat du produit\" codes (``convert_categoricals=False``) through\n    ``harmonize_crop_condition_ehcvm1`` (GH #1436).  The table is read strictly:\n    a missing table must not serve every row as the sentinel.  A blank or\n    off-scheme code becomes ``unknown_condition``, a real value and never NA,\n    because a null index key is deleted by the next ``groupby`` (GH #323 3b).\"\"\"\n    table = tools.get_categorical_mapping(\n        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',\n        **{'Preferred Label': 'Preferred Label'})\n    table = {int(code): token for code, token in table.items()}\n    assert sorted(table) == [1, 2, 3, 4, 5], f'harmonize_crop_condition_ehcvm1: {table}'\n    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)\n    return mapped.astype('string').fillna('unknown_condition')",
+        "_crop_condition_labels": "def _crop_condition_labels(labels):\n    \"\"\"The state as the survey recorded it, for ``condition_native``: *labels* is\n    the column read with ``convert_categoricals=True``.  A blank stays NA, never a\n    sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,\n    GH #1436).\"\"\"\n    out = pd.Series(labels).astype('string').str.strip()\n    return out.where(out != '', pd.NA)"
+      },
+      "tables": {
+        "harmonize_crop_condition_ehcvm1": [
+          [
+            "1",
+            "unshelled",
+            "Epis"
+          ],
+          [
+            "2",
+            "shelled",
+            "Grain"
+          ],
+          [
+            "3",
+            "shelled",
+            "Décortiqué"
+          ],
+          [
+            "4",
+            "unshelled",
+            "Non-décortiqué"
+          ],
+          [
+            "5",
+            "shell_not_applicable",
+            "Non concerné"
+          ]
+        ]
+      }
+    },
+    "Togo": {
+      "path": "lsms_library/countries/Togo/2018/_/crop_production.py",
+      "sha256": "c06949bb64f58fa65cf542bef5a4016399eb6b31f10d7f84ad592b5d469b5e2c",
+      "definitions": {
+        "_crop_conditions": "def _crop_conditions(codes):\n    \"\"\"Map raw \"Etat du produit\" codes (``convert_categoricals=False``) through\n    ``harmonize_crop_condition_ehcvm1`` (GH #1436).  The table is read strictly:\n    a missing table must not serve every row as the sentinel.  A blank or\n    off-scheme code becomes ``unknown_condition``, a real value and never NA,\n    because a null index key is deleted by the next ``groupby`` (GH #323 3b).\"\"\"\n    table = tools.get_categorical_mapping(\n        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',\n        **{'Preferred Label': 'Preferred Label'})\n    table = {int(code): token for code, token in table.items()}\n    assert sorted(table) == [1, 2, 3, 4, 5], f'harmonize_crop_condition_ehcvm1: {table}'\n    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)\n    return mapped.astype('string').fillna('unknown_condition')",
+        "_crop_condition_labels": "def _crop_condition_labels(labels):\n    \"\"\"The state as the survey recorded it, for ``condition_native``: *labels* is\n    the column read with ``convert_categoricals=True``.  A blank stays NA, never a\n    sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,\n    GH #1436).\"\"\"\n    out = pd.Series(labels).astype('string').str.strip()\n    return out.where(out != '', pd.NA)"
+      },
+      "tables": {
+        "harmonize_crop_condition_ehcvm1": [
+          [
+            "1",
+            "unshelled",
+            "Epis"
+          ],
+          [
+            "2",
+            "shelled",
+            "Grain"
+          ],
+          [
+            "3",
+            "shelled",
+            "Décortiqué"
+          ],
+          [
+            "4",
+            "unshelled",
+            "Non-décortiqué"
+          ],
+          [
+            "5",
+            "shell_not_applicable",
+            "Non concerné"
+          ]
+        ]
+      }
+    },
+    "Mali": {
+      "path": "lsms_library/countries/Mali/_/mali.py",
+      "sha256": "3e986862e74200fcaccb742d0fe7db9635ee639ed71eb36d4532b1878dceb0d1",
+      "definitions": {
+        "ehcvm_crop_conditions": "def ehcvm_crop_conditions(codes):\n    \"\"\"Raw \"Etat du produit\" codes (``convert_categoricals=False``) through\n    ``harmonize_crop_condition_ehcvm1`` (GH #1436).  The table is read strictly: a\n    missing table must not serve every row as the sentinel.  A blank or off-scheme\n    code becomes :data:`CONDITION_NA`.\"\"\"\n    table = tools.get_categorical_mapping(\n        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',\n        **{'Preferred Label': 'Preferred Label'})\n    table = {int(code): token for code, token in table.items()}\n    if sorted(table) != [1, 2, 3, 4, 5]:\n        raise ValueError(f'harmonize_crop_condition_ehcvm1: {table}')\n    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)\n    return mapped.astype('string').fillna(CONDITION_NA)",
+        "ehcvm_crop_condition_labels": "def ehcvm_crop_condition_labels(labels):\n    \"\"\"The state as the survey recorded it, for ``condition_native``: *labels* is the\n    column read with ``convert_categoricals=True``.  A blank stays NA, never a\n    sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,\n    GH #1436).\"\"\"\n    out = pd.Series(labels).astype('string').str.strip()\n    return out.where(out != '', pd.NA)",
+        "ehcvm_crop_sold_conditions": "def ehcvm_crop_sold_conditions(codes):\n    \"\"\"Own EHCVM sold-state fold, NA-bearing (ledger1528 §§2–4).\n\n    Both own sold dictionaries were checked, including 2021 s16dq05d; no\n    harvest answer supplies a sold state and no blank becomes an index sentinel.\n    \"\"\"\n    folded = ehcvm_crop_conditions(codes)\n    return folded.where(folded != CONDITION_NA, pd.NA)"
+      },
+      "tables": {
+        "harmonize_crop_condition_ehcvm1": [
+          [
+            "1",
+            "unshelled",
+            "Epis"
+          ],
+          [
+            "2",
+            "shelled",
+            "Grain"
+          ],
+          [
+            "3",
+            "shelled",
+            "Décortiqué"
+          ],
+          [
+            "4",
+            "unshelled",
+            "Non-décortiqué"
+          ],
+          [
+            "5",
+            "shell_not_applicable",
+            "Non concerné"
+          ]
+        ]
+      }
+    },
+    "Niger": {
+      "path": "lsms_library/countries/Niger/_/niger.py",
+      "sha256": "43282c8ec1c6b4918af834e43a1afc55e0f44d41f50d9e3384c6f1943b3dfec1",
+      "definitions": {
+        "_harmonized_codes": "def _harmonized_codes(tablename, key='Code', value='Preferred Label'):\n    \"\"\"Load a ``{int code -> Preferred Label}`` dict from\n    ``categorical_mapping.org`` for one of the plot_features harmonize_*\n    tables.  Codes whose Preferred Label is blank / '---' map to NA so\n    the corresponding column stays NaN.  Mirrors the Mali reference.\"\"\"\n    raw = tools.get_categorical_mapping(tablename=tablename, idxvars=key,\n                                        **{value: value})\n    out = {}\n    for k, v in raw.items():\n        try:\n            int_k = int(k)\n        except (TypeError, ValueError):\n            int_k = k\n        if pd.isna(v) or str(v).strip() in ('---', ''):\n            out[int_k] = pd.NA\n        else:\n            out[int_k] = str(v).strip()\n    return out",
+        "_map_codes": "def _map_codes(series, code_map):\n    \"\"\"Map a numeric (raw Stata integer-code) Series through ``code_map``,\n    returning a string Series with NA where the code is unmapped.  Source\n    files must be loaded with ``convert_categoricals=False`` so the codes\n    arrive as integers.\"\"\"\n    out = series.astype('Int64').map(code_map)\n    return out.astype('string').where(out.notna(), pd.NA)",
+        "_crop_conditions": "def _crop_conditions(codes, table):\n    \"\"\"Map raw state CODES (``convert_categoricals=False``) through a\n    ``harmonize_crop_condition_*`` table.  A blank or off-scheme code becomes\n    :data:`CONDITION_NA` -- a real value, never NA, because a null index key is\n    deleted by the next ``groupby`` (GH #323 3b).\"\"\"\n    mapped = _map_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table))\n    return mapped.fillna(CONDITION_NA)",
+        "_crop_condition_labels": "def _crop_condition_labels(labels):\n    \"\"\"The state as the survey recorded it, for the ``condition_native`` column.\n\n    *labels* is the state column read with ``convert_categoricals=True``, in\n    whatever language the survey labelled it.  A blank stays NA, never a sentinel:\n    a column has no NaN-key hazard, and NA says no state was recorded.  Only\n    surrounding whitespace is touched.  Ruling @ligon 2026-11-04 (GH #1436).\n    \"\"\"\n    out = pd.Series(labels).astype('string').str.strip()\n    return out.where(out != '', pd.NA)",
+        "_crop_sold_conditions": "def _crop_sold_conditions(codes, table):\n    \"\"\"The ``Condition_sold`` column (GH #1462): raw sold-state CODES through the\n    same ``harmonize_crop_condition_*`` table as the harvest level, so the two\n    speak one fold.  Unlike :func:`_crop_conditions`, a blank stays NA and never\n    takes the sentinel: it is a column, with no NaN-key hazard, and NA says no sale\n    or no state recorded (canonical ``data_info.yml``).\"\"\"\n    return _map_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table))"
+      },
+      "tables": {
+        "harmonize_crop_condition_ehcvm1": [
+          [
+            "1",
+            "unshelled",
+            "Epis"
+          ],
+          [
+            "2",
+            "shelled",
+            "Grain"
+          ],
+          [
+            "3",
+            "shelled",
+            "Décortiqué"
+          ],
+          [
+            "4",
+            "unshelled",
+            "Non-décortiqué"
+          ],
+          [
+            "5",
+            "shell_not_applicable",
+            "Non concerné"
+          ]
+        ],
+        "harmonize_crop_condition_ehcvm2": [
+          [
+            "1",
+            "unshelled",
+            "épis/coques,"
+          ],
+          [
+            "2",
+            "shelled",
+            "Grains"
+          ],
+          [
+            "3",
+            "shell_not_applicable",
+            "na"
+          ]
+        ]
+      }
+    }
+  },
+  "guinea_producer": {
+    "path": "lsms_library/countries/Guinea-Bissau/2018-19/_/crop_production.py",
+    "sha256": "77d6e011134c81f96de10bd9aca494adc1918d3245b5b63724b4c0e06dd20bc6"
+  }
+}

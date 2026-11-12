@@ -19,6 +19,8 @@ never as a purchase.
 
 Neither IHS5 ag_mod_d ships with the latin-1 bad byte that the IHS4
 cross-section had, so a plain get_dataframe read suffices.
+H quantity components also have acquisition-only Farm-level rows (GH #1190);
+planted Quantity/Applied and all legacy attached fields remain NA on those rows.
 See lsms_library/countries/Malawi/_/malawi.py.
 """
 import sys
@@ -30,12 +32,15 @@ import numpy as np
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
                     _seed_block, _seed_purchase_block, _seed_gift_block,
-                    assemble_plot_inputs, _seed_source_reference)
+                    assemble_plot_inputs, _seed_source_reference,
+                    _seed_acquisition_block, _append_seed_acquisitions)
 
 
 WAVE = '2019-20'
 G_XS_SOURCE = '../Data/Cross_Sectional/ag_mod_g.dta'
 G_PANEL_SOURCE = '../Data/Panel/ag_mod_g_19.dta'
+H_XS_SOURCE = '../Data/Cross_Sectional/ag_mod_h.dta'
+H_PANEL_SOURCE = '../Data/Panel/ag_mod_h_19.dta'
 
 
 def _plotkey(df):
@@ -88,7 +93,8 @@ all_pieces, all_seed_purchase, all_seed_gift = [], [], []
 # --- Cross-sectional half (cs-19 prefix) ---
 d_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_d.dta', convert_categoricals=False)
 g_xs = get_dataframe(G_XS_SOURCE, convert_categoricals=False)
-h_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_h.dta', convert_categoricals=False)
+h_xs = get_dataframe(H_XS_SOURCE, convert_categoricals=False)
+h_xs_rows = np.arange(len(h_xs))
 p, s, gft = _half(d_xs, g_xs, h_xs, lambda df: 'cs-19-' + df['case_id'].apply(format_id),
              seed_qty=['ag_h07a'],
              seed_unit=['ag_h07b'],
@@ -102,7 +108,8 @@ all_seed_gift += gft
 # --- Panel half (y4_hhid) ---
 d_pn = get_dataframe('../Data/Panel/ag_mod_d_19.dta', convert_categoricals=False)
 g_pn = get_dataframe(G_PANEL_SOURCE, convert_categoricals=False)
-h_pn = get_dataframe('../Data/Panel/ag_mod_h_19.dta', convert_categoricals=False)
+h_pn = get_dataframe(H_PANEL_SOURCE, convert_categoricals=False)
+h_pn_rows = np.arange(len(h_pn))
 p, s, gft = _half(d_pn, g_pn, h_pn, lambda df: df['y4_hhid'].apply(format_id),
              seed_qty=['ag_h16a', 'ag_h26a'],
              seed_unit=['ag_h16b', 'ag_h26b'],
@@ -114,6 +121,15 @@ all_seed_purchase += s
 all_seed_gift += gft
 
 df = assemble_plot_inputs(WAVE, all_pieces, all_seed_purchase, all_seed_gift)
+# H components never enter G ownership/attachment or Module D reducers.
+df = _append_seed_acquisitions(df, [
+    _seed_acquisition_block(h_xs, t=WAVE, source_half='Cross_Sectional',
+        row_positions=h_xs_rows,
+        source_ref=_seed_source_reference(H_XS_SOURCE, script_path=__file__)),
+    _seed_acquisition_block(h_pn, t=WAVE, source_half='Panel',
+        row_positions=h_pn_rows,
+        source_ref=_seed_source_reference(H_PANEL_SOURCE, script_path=__file__)),
+])
 
 assert df.index.is_unique, f"Non-unique source-observation grain in plot_inputs {WAVE}"
 assert len(df) > 0, f"plot_inputs {WAVE} produced no rows"

@@ -27,7 +27,7 @@ from .yaml_utils import load_yaml
 from .currency import CURRENCY_LEVEL, is_monetary_table
 from .paths import countries_root
 from .catalog import _is_registered
-from .errors import LabelUnavailableError, UnitsUnavailableError
+from .errors import LabelUnavailableError, UnitsUnavailableError, PeriodUnavailableError
 from . import population as _population
 from . import sampling as _sampling
 # NOT `from . import recall` / `from . import derivations`: the package binds
@@ -39,6 +39,15 @@ from . import sampling as _sampling
 # `__init__`'s import order ever changed.  Name the symbols instead.
 from .recall import ATTRS_KEY as _RECALL_ATTRS_KEY
 from .recall import merge_attrs as _recall_merge_attrs
+from .recall import PERIOD_ATTRS_KEY as _PERIOD_ATTRS_KEY
+from .recall import PERIOD_TABLES as _PERIOD_TABLES
+from .recall import merge_period_attrs as _period_merge_attrs
+from .recall import period_days as _period_days
+from .recall import period_refusal as _period_refusal
+from .recall import to_period as _to_period
+from .recall import attach as _recall_attach
+from .recall import _period_handoff, _take_period_continuation
+from .derivations import attach as _derivations_attach
 from .derivations import ATTRS_KEY as _DERIVATIONS_ATTRS_KEY
 from .derivations import merge_attrs as _derivations_merge_attrs
 # `country` is imported by `__init__` before this module, so this is not a cycle.
@@ -152,7 +161,80 @@ _ATTRS_CARRIERS: tuple[_AttrsCarrier, ...] = (
         (_sampling.ATTRS_KEY, _sampling.ATTRS_RESOLUTION_KEY),
         _sampling.merge_attrs,
     ),
+    # GH #851 Phase II: the `period=` conversion record, `{country: {...}}` on
+    # the Country frame (same shape as recall), so it needs no per-country wrap.
+    _AttrsCarrier(
+        "period",
+        (_PERIOD_ATTRS_KEY,),
+        _merge_into(_PERIOD_ATTRS_KEY, _period_merge_attrs),
+    ),
 )
+
+def _convert_convertible_waves(df: pd.DataFrame, country: str, table: str,
+                               period: str, convertible, *,
+                               known_waves=None) -> pd.DataFrame:
+    """The ``period=`` wave-grain degrade (GH #851): convert a SLICE.
+
+    *df* is the same invocation's full unconverted, normally postprocessed
+    result, handed over privately after typed availability refusal. Country's
+    strict period guards remained active; no second method call occurred.
+    Keep the rows whose wave is
+    in *convertible* and apply :func:`recall.to_period` to them, so every
+    kept row is that unconverted row times its wave's factor, exactly.
+
+    Why not re-call the country with ``waves=convertible`` (the first
+    version, red team r1, R3): ``food_quantities``' default ``units='kgs'``
+    infers kg factors by pooling over the REQUESTED waves (GH #850), so a
+    wave subset moved non-period numbers -- Mali 2014-15 +2.90% kg, Burkina
+    Faso 2014 +0.73%, Uganda 2019-20 44% of rows.  A slice moves none.
+
+    Exact because ``to_period`` is linear and per-``t``: the post-steps the
+    slice has already been through -- the ``labels=`` re-sum (within a
+    ``t``), ``market=`` (a re-key that keeps ``t``), ``numeraire=``
+    (a per-row divide) -- commute with a per-``t`` multiplication.
+    ``Country`` applies the same conversion BEFORE them; the two orders agree
+    up to the floating arithmetic of the existing post-steps.  The degraded
+    path's oracle is the unconverted full-read rows times their wave factors;
+    no real-data/backend parity claim follows from these pure controls.
+
+    The per-wave ``attrs`` records are re-attached for the slice, each by its
+    own module, so they describe the rows served rather than the rows read:
+    ``population``, ``recall`` and ``sampling`` (GH #793) by ``t`` --
+    *known_waves* is the country's ``Country.waves``, which ``sampling.attach``
+    needs to resolve an uncurated wave ``exact`` -- and ``derivations``
+    recounted from the slice's ``Derivation`` column.
+
+    NOT recomputed, and still describing the WHOLE unconverted read rather
+    than the slice: ``labels_unmatched`` (GH #787), and the ``kg_factor_*``
+    records ``food_quantities(units='kgs')`` / ``food_prices`` write
+    (``kg_factor_sources``, ``kg_factor_baseline_gate``,
+    ``kg_factor_wave_spread``, ``kg_factor_declared_none``; GH #850 / #1042).
+    Those partition and count the rows the kg inference RAN OVER, and the
+    inference pooled over every wave read -- the very reason the slice, not a
+    ``waves=`` re-call, is what gets converted -- so on a degraded
+    single-country call their row counts exceed the rows served (Uganda
+    ``food_quantities``: ~355k rows partitioned, 46,330 served; red team r2
+    §5.4).  They are left as the inference's own account of itself; a
+    recount over the slice would describe a run that never happened.  They
+    die at a multi-country concat anyway (no carrier), so only a
+    single-country ``Feature`` call sees them.
+
+    Nor is the per-household ask ``shortfall`` measured here (option A,
+    @ligon 2026-10-20): it is read off the served ``food_acquired``'s
+    ``visit`` level, which the degrade never reads, so the slice's
+    ``attrs['period'][country]`` carries ``shortfall_source:
+    'not-measured'`` and ``shortfall: None`` per wave; the ``Country`` call
+    for the same waves carries the numbers.
+    """
+    t = df.index.get_level_values("t").astype("string")
+    sliced = df.loc[t.isin([str(w) for w in convertible])]
+    sliced.attrs = dict(df.attrs)
+    _population.attach(sliced, country)
+    _recall_attach(sliced, country)
+    _derivations_attach(sliced, country, table)
+    _sampling.attach(sliced, country, known_waves=known_waves)
+    return _to_period(sliced, country, period, table=table)
+
 
 #: Every ``attrs`` key any carrier owns -- what the per-country capture keeps.
 _CARRIED_ATTRS_KEYS: tuple[str, ...] = tuple(
@@ -226,6 +308,17 @@ def _level_aliases(table_name: str) -> dict[str, str]:
     if not isinstance(aliases, dict):
         return {}
     return {str(k): str(v) for k, v in aliases.items()}
+
+
+def _required_index_levels(table_name: str) -> list[str]:
+    """Explicit provider requirements, separate from canonical shape (GH1588).
+
+    Canonical coordinates are not universally mandatory: some tables accept
+    reduced providers or fabricate optional detail. Only declared opt-ins are
+    validated; this does not change which healthy index shape wins.
+    """
+    spec = (_index_info_section().get("required_index_levels") or {}).get(table_name)
+    return list(spec) if isinstance(spec, list) else []
 
 
 def _missing_level_sentinels(table_name: str) -> dict[str, str]:
@@ -569,6 +662,65 @@ _ADDITIVE_MEASURE_COLUMNS = {
 }
 
 
+def _numeric_additive_operands(df: pd.DataFrame, columns: list[str],
+                               context: str) -> pd.DataFrame:
+    """Prepare consumed text operands without changing numeric inputs (GH1499).
+
+    Reuse pandas' numeric grammar, but never turn a nonmissing token into NA.
+    This is a view for the existing sums, not a schema or categorical cast;
+    the caller's frame, selection and audit still describe its original rows.
+    See .coder/ledger/1499-numeric-additive-collapse.md §§3–5.
+    """
+    if df.index.is_unique:
+        return df
+    converted = {}
+    for column in columns:
+        values = df[column]
+        if pd.api.types.is_numeric_dtype(values.dtype):
+            continue
+        textual = any(isinstance(value, (str, bytes)) for value in values)
+        if isinstance(values.dtype, pd.CategoricalDtype):
+            if not values.notna().any():
+                textual = any(isinstance(value, (str, bytes))
+                              for value in values.cat.categories)
+        else:
+            textual |= (pd.api.types.is_string_dtype(values.dtype)
+                        and not pd.api.types.is_object_dtype(values.dtype))
+        if not textual:
+            # In particular, object-carried numbers can exceed the parser's
+            # range or carry decimal precision. Keep their values and errors.
+            continue
+        message = (f"{context}: cannot aggregate {column!r}; "
+                   "nonmissing additive values must be numeric")
+        text_cells = values.map(lambda value: isinstance(value, (str, bytes)))
+        mixed_objects = (pd.api.types.is_object_dtype(values.dtype)
+                         and (values.notna() & ~text_cells).any())
+        operands = values[text_cells] if mixed_objects else values
+        try:
+            numeric = pd.to_numeric(operands, errors="raise")
+        except (TypeError, ValueError):
+            raise ValueError(message) from None
+        if (numeric.isna() & operands.notna()).any():
+            # errors='raise' alone accepts empty text as newly missing.
+            raise ValueError(message)
+        if mixed_objects:
+            # Parse only the text. Re-parsing native objects (e.g. Decimal)
+            # can lose precision; ordinary Series inference preserves the
+            # same native/text-converted numeric counterpart's carrier.
+            parsed = iter(numeric)
+            numeric = pd.Series(
+                [next(parsed) if is_text else value
+                 for value, is_text in zip(values, text_cells)],
+                index=values.index, name=values.name)
+        converted[column] = numeric
+    if not converted:
+        return df
+    out = df.copy()
+    for column, values in converted.items():
+        out[column] = values
+    return out
+
+
 def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
                               country: str | None = None) -> pd.DataFrame:
     """Collapse duplicate index tuples left after dropping an extra index level.
@@ -655,7 +807,9 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
     # max rel 4e-16, with totals, NA pattern and dtypes unchanged).  That is a
     # behaviour change #871 did not ask for; see the full note at
     # country._normalize_dataframe_index (GH #871).
-    grouped = df.groupby(level=levels, observed=True)
+    numeric = _numeric_additive_operands(
+        df, present, f"{country or '?'}/{table_name}")
+    grouped = numeric.groupby(level=levels, observed=True)
     sums = grouped[present].sum(min_count=1)
     overlay = {c: sums[c] for c in present}
     if _DERIVATION_COLUMN in df.columns:
@@ -1014,6 +1168,17 @@ class Feature:
                     f"Unknown numeraire {numeraire!r}; available: {conversion_targets()}"
                 )
         effective_trust_cache = trust_cache if trust_cache is not None else self.trust_cache
+        # period= (GH #851 Phase II) is refused UP FRONT on a table that does
+        # not take it.  Forwarding-by-signature would otherwise hand it to
+        # every country's generated method, each would raise TypeError, and
+        # the broad per-country catch below would turn one refusal into N
+        # "Failed to load" warnings and an empty frame -- which is not a
+        # refusal.  Same message as Country's, from recall.period_refusal.
+        period = kwargs.get("period")
+        if period is not None:
+            if self.table_name not in _PERIOD_TABLES:
+                raise TypeError(_period_refusal(self.table_name))
+            _period_days(period)
         # Reject an unknown / mistyped table name with a helpful error instead of
         # silently returning an empty DataFrame (e.g. Feature('food_expenditure')).
         if not self.countries:
@@ -1029,6 +1194,7 @@ class Feature:
         targets = countries if countries is not None else self.countries
         frames: list[pd.DataFrame] = []
         canonical_levels = _canonical_index_levels(self.table_name)
+        required_levels = _required_index_levels(self.table_name)
         fabricate_missing = _fabricates_missing_levels(self.table_name)  # #506
         aliases = _level_aliases(self.table_name)                       # #569
         sentinels = _missing_level_sentinels(self.table_name)           # #569/#775
@@ -1056,6 +1222,31 @@ class Feature:
             if "m" not in canonical_levels:
                 canonical_levels = canonical_levels + ["m"]
 
+        # Required identity is an opt-in contract, not a new canonical shape.
+        # Keep the existing harmonizer and healthy-provider vote unchanged,
+        # including food_expenditures' unregistered/optional-source shapes.
+        if required_levels:
+            if use_numeraire is not None or pass_currency == 'index':
+                if CURRENCY_LEVEL not in required_levels:
+                    required_levels.append(CURRENCY_LEVEL)
+            if kwargs.get("market") is not None:
+                required_levels = [lvl for lvl in required_levels if lvl != "v"]
+                if "m" not in required_levels:
+                    required_levels.append("m")
+        index_unavailable: dict[str, dict[str, Any]] = {}
+
+        def _reject_missing_index(name: str, df: pd.DataFrame,
+                                  allowed_missing: Mapping[str, Any]) -> bool:
+            missing = [lvl for lvl in required_levels
+                       if lvl not in df.index.names and lvl not in allowed_missing]
+            if not missing:
+                return False
+            index_unavailable[name] = {
+                "missing": missing, "required": list(required_levels),
+                "index": list(df.index.names), "rows": len(df),
+            }
+            return True
+
         # Countries dropped because they cannot honour a labels=X request (no
         # curated column).  Accumulated and reported ONCE after the loop, with a
         # df.attrs marker -- distinct from genuine per-country build failures.
@@ -1064,6 +1255,12 @@ class Feature:
         # lacks the column the requested basis needs (Price for the *price
         # modes) -- dropped, reported once, never concatenated as empties.
         units_unavailable: list[str] = []
+
+        # Same contract for period= (GH #851), at the WAVE grain: {country:
+        # [waves whose recall window is not established]}.  A country whose
+        # other waves convert can be kept, restricted to those waves. The
+        # final warning reports survival from the actual assembled result.
+        period_unavailable: dict[str, list[str]] = {}
 
         # The metadata records each country's frame arrived with: population
         # (GH #603), recall (GH #851) and derivations -- see _ATTRS_CARRIERS
@@ -1096,12 +1293,45 @@ class Feature:
                             f"{self.table_name}: {name}'s method does not accept "
                             f"{key!r}; ignored for this country"
                         )
-                df = method(**call_kwargs)
+                if period is None:
+                    df = method(**call_kwargs)
+                else:
+                    with _period_handoff(c, self.table_name, period) as handoff:
+                        try:
+                            df = method(**call_kwargs)
+                        except PeriodUnavailableError as e:
+                            # Preserve strict Country dispatch and its full
+                            # inference universe. Finish this SAME unconverted
+                            # read; never re-call the method with period=None
+                            # or a smaller wave set.
+                            period_unavailable[name] = sorted(e.unavailable)
+                            if not e.convertible:
+                                continue
+                            continuation = _take_period_continuation(handoff, e)
+                            if continuation is None:
+                                # A foreign/custom error supplied no matching
+                                # same-call result. Refuse, never retry/serve an
+                                # unscaled frame as converted.
+                                raise
+                            try:
+                                df = continuation()
+                            finally:
+                                del continuation
+                            df = _convert_convertible_waves(
+                                df, name, self.table_name, period, e.convertible,
+                                known_waves=c.waves)
                 if not isinstance(df, pd.DataFrame) or df.empty:
                     warnings.warn(
                         f"No data for {self.table_name} in {name}"
                     )
                     continue
+                if required_levels:
+                    # Check before harmonization can project/collapse detail or
+                    # fabricate missing levels (ledger1588 §§2–5). Existing
+                    # declared aliases/sentinels remain permitted.
+                    df = _rename_index_levels(df, aliases, name, self.table_name)
+                    if _reject_missing_index(name, df, sentinels):
+                        continue
                 captured_attrs[name] = {
                     k: ({name: df.attrs[k]} if carrier.per_country
                         else df.attrs[k])
@@ -1116,6 +1346,8 @@ class Feature:
                     aliases=aliases, sentinels=sentinels,
                     alignment_report=alignment_report,
                 )
+                if required_levels and _reject_missing_index(name, df, {}):
+                    continue
                 # Prepend country as an index level
                 df = pd.concat({name: df}, names=["country"])
                 frames.append(df)
@@ -1128,6 +1360,13 @@ class Feature:
                 # Same Contract B for units= (GH #828).  Record which column
                 # was missing so the aggregated warning can say so.
                 units_unavailable.append((name, tuple(e.missing)))
+                continue
+            except PeriodUnavailableError as e:
+                # No matching continuation, or represented-wave validation
+                # failed again in the continuation/slice. Drop the country;
+                # never retry or serve an unscaled frame.
+                period_unavailable[name] = sorted(
+                    set(period_unavailable.get(name, [])) | set(e.unavailable))
                 continue
             except Exception as e:  # broad catch intentional: surface per-country failures as warnings
                 # Cross-country aggregation must not crash on one country's
@@ -1170,9 +1409,50 @@ class Feature:
             result.attrs['units_unavailable'] = names
             return result
 
+        def _mark_period_unavailable(result: pd.DataFrame, n_kept: int) -> pd.DataFrame:
+            """Contract B for ``period=`` (GH #851): one aggregated warning +
+            ``df.attrs['period_unavailable'] = {country: [waves]}`` naming the
+            (country, wave) cells dropped because their recall window is not
+            established.  A country listed here may still be IN the result,
+            restricted to its convertible waves."""
+            if not period_unavailable:
+                return result
+            n_cells = sum(len(w) for w in period_unavailable.values())
+            kept_names = set(result.index.get_level_values("country"))
+            restricted = [c for c in period_unavailable if c in kept_names]
+            dropped_whole = [c for c in period_unavailable if c not in kept_names]
+            fates = []
+            if restricted:
+                fates.append(f"{restricted} kept their other waves, converted")
+            if dropped_whole:
+                fates.append(f"{dropped_whole} produced no converted result and "
+                             f"were dropped whole")
+            warnings.warn(
+                f"{self.table_name}: period={period!r} unavailable for "
+                f"{n_cells} (country, wave) cell(s) {period_unavailable} -- "
+                f"their recall window is not recorded, rests on a guess, or "
+                f"varies within the wave -- and those cells were dropped from "
+                f"the assembly; {'; '.join(fates)} (kept {n_kept} "
+                f"country(ies)).  See ll.recall() for each cell's record, or "
+                f"pass a country subset to silence this."
+            )
+            result.attrs['period_unavailable'] = {
+                c: list(w) for c, w in period_unavailable.items()}
+            return result
+
         def _mark_unavailable(result: pd.DataFrame, n_kept: int) -> pd.DataFrame:
-            return _mark_units_unavailable(
-                _mark_labels_unavailable(result, n_kept), n_kept)
+            if index_unavailable:
+                warnings.warn(
+                    f"{self.table_name}: missing required index level(s) for "
+                    f"{len(index_unavailable)} country(ies) {index_unavailable}; "
+                    f"they were dropped from the assembly (kept {n_kept}). "
+                    f"See df.attrs['index_unavailable']; access the excluded "
+                    f"data via Country(name).{self.table_name}()."
+                )
+                result.attrs['index_unavailable'] = dict(index_unavailable)
+            return _mark_period_unavailable(
+                _mark_units_unavailable(
+                    _mark_labels_unavailable(result, n_kept), n_kept), n_kept)
 
         if not frames:
             return _mark_unavailable(_empty_assembly(canonical_levels), 0)

@@ -400,3 +400,6 @@ shocks:
 # Do not reintroduce a wave-level block here.
 
 
+
+# GH #1483: own s16b household inputs, native use=Oui; not parcel allocated.
+plot_inputs:

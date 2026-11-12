@@ -13,6 +13,7 @@ Config-only: the helper is driven directly with gate reasons; no data read.
 """
 import ast
 import inspect
+import textwrap
 import warnings
 
 import pytest
@@ -97,13 +98,35 @@ def test_tables_and_countries_are_tracked_separately(c, tmp_path):
     assert not [x for x in w if isinstance(x.message, CacheRebuildWarning)]
 
 
-def test_called_once_at_the_top_of_the_rebuild_descent():
-    """Both install shapes pass through it: it precedes the Repo() try."""
-    src = inspect.getsource(Country._aggregate_wave_data)
-    call = src.index("self._report_rebuild(method_name, miss_reason, build_waves")
-    assert src.count("self._report_rebuild(") == 1
-    assert call < src.index("repo = Repo(")
-    assert call > src.index("build_waves = list(waves) if covered is None")
+def test_called_once_at_the_top_of_each_exclusive_rebuild_descent():
+    """Default and managed-Make routes each report once before building."""
+    tree = ast.parse(textwrap.dedent(inspect.getsource(Country._aggregate_wave_data)))
+    routes = {n.name: n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
+    for name, arg in [('load_dataframe_with_dvc', 'build_waves'),
+                      ('fresh_make_country', 'list(self.waves)')]:
+        route = routes[name]
+        calls = [n for n in ast.walk(route) if isinstance(n, ast.Call)
+                 and ast.unparse(n.func) == 'self._report_rebuild']
+        assert len(calls) == 1
+        call = calls[0]
+        assert [ast.unparse(a) for a in call.args] == ['method_name', 'miss_reason', arg, 'cache_path' if name == 'load_dataframe_with_dvc' else 'cache']
+        if name == 'load_dataframe_with_dvc':
+            body = ast.unparse(route)
+            assert body.index('build_waves = list(waves) if covered is None') < body.index('self._report_rebuild(') < body.index('repo = Repo(')
+        else:
+            # Private source preparation/producer entry happens only after it.
+            make_roots = [n for n in ast.walk(route) if isinstance(n, ast.Call)
+                          and ast.unparse(n.func) == 'self._make_build_root']
+            prepares = [n for n in ast.walk(route) if isinstance(n, ast.Call)
+                        and ast.unparse(n.func) == 'prepare_make_waves']
+            assert len(make_roots) == len(prepares) == 1
+            make_root, prepare = make_roots[0], prepares[0]
+            assert prepare.args and ast.unparse(prepare.args[0]) == 'root'
+            assert call.lineno < make_root.lineno < prepare.lineno
+    # The managed branch returns directly, so it cannot fall through to default.
+    assert any(isinstance(n, ast.Return) and isinstance(n.value, ast.Call)
+               and isinstance(n.value.func, ast.Name) and n.value.func.id == 'fresh_make_country'
+               for n in ast.walk(tree))
 
 
 def test_report_rebuild_is_excluded_from_the_build_fingerprint():

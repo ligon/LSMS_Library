@@ -8,6 +8,8 @@ imports nothing from ``Mali/_/``.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import warnings
 
 import numpy as np
@@ -27,6 +29,8 @@ TOTAL = "Mali::crop_production::harvest-from-dispositions"
 ROOT = countries_root() / COUNTRY
 WAVE = "2021-22"
 FILE = "s16c_me_mli2021.dta"
+# Reviewed namespace transport at d47ff849; ledger 1687-mali-namespace-oracle §3.
+UPDATED_IDS_SHA256 = "7c17086a611c44bdd1f99b79305636feb67c8273cd349b3e81a580cdbe6649dd"
 
 
 def _stamp():
@@ -71,8 +75,12 @@ class TestDeclared:
 
 
 def _household(frame):
-    return (frame["grappe"].astype(int).astype(str) + "0"
-            + frame["menage"].astype(int).astype(str).str.zfill(2))
+    ids = ("EHCVM21_" + frame["grappe"].astype(int).astype(str) + "0"
+           + frame["menage"].astype(int).astype(str).str.zfill(2))
+    payload = (ROOT / "_" / "updated_ids.json").read_bytes()
+    assert hashlib.sha256(payload).hexdigest() == UPDATED_IDS_SHA256, "unreviewed Mali panel map"
+    mapping = json.loads(payload)[WAVE]
+    return ids.map(lambda x: mapping.get(x, x))
 
 
 def _plot(frame):

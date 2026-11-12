@@ -208,7 +208,7 @@ class TestRegistry:
 
     def test_the_deletion_entry(self):
         rec = derivation_records(COUNTRY)[DEL]
-        assert rec.rows == 0
+        assert rec.rows is None
         assert rec.inputs.endswith(':inputs_sale_basis_unresolved')
         assert 'sale_basis_mismatch' in rec.rule
 
@@ -567,7 +567,8 @@ class TestAssemble:
                 [_sale([('h1', 11, KG, U, 4, 2500)])])
         # Re-pinned for GH #1457: refused from its harvest row, and on a Farm-level row.
         harvest_row = out[out.index.get_level_values('plot_id') != 'Farm-level']
-        assert harvest_row['Value_sold'].isna().all() and out['Derivation'].isna().all()
+        assert harvest_row['Value_sold'].isna().all() and harvest_row['Derivation'].isna().all()
+        assert out.xs('Farm-level', level='plot_id')['Derivation'].tolist() == [DEL]
         farm = out.xs('Farm-level', level='plot_id')
         assert farm['Value_sold'].tolist() == [2500.0] and farm['Condition_sold'].tolist() == [U]
         assert out.attrs['sale_basis_mismatch'] == {
@@ -740,13 +741,15 @@ class TestDelivered:
         assert (unkeyed['Value_sold'] > 0).sum() > 10_000
         assert (unkeyed['Value_sold'] == 0).sum() > 1_000
 
-    def test_attrs_summary_counts_the_labelled_rows_and_lists_the_deletion(self, delivered):
-        summ = delivered.attrs['derivations'][COUNTRY]
+    def test_attrs_summary_counts_the_labelled_rows_and_lists_the_deletion(self, delivered, country):
+        full = country.crop_production()
+        summ = full.attrs['derivations'][COUNTRY]
         assert set(summ) - OFF_LADDER == set(KEYS) | {DEL}
         for key in KEYS:
             assert summ[key]['rows'] == _keys_of(delivered).get(key, 0)
             assert summ[key]['in'] == 'crop_production'
-        assert summ[DEL]['rows'] == 0
+        assert summ[DEL]['rows'] == _keys_of(full).get(DEL, 0)
+        assert summ[DEL]['rows'] == sum(n for n, _ in UNRESOLVED.values())
 
     def test_the_two_new_keys_stamp_exactly_their_rows(self, delivered):
         """The overrule rung is Groundnut on a not-applicable harvest row

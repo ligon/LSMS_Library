@@ -403,3 +403,6 @@ interview_date:
             resolution: day
             calendar: gregorian
 
+
+# GH #1483: own s16b household inputs, native use=Oui; not parcel allocated.
+plot_inputs:

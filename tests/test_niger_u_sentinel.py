@@ -398,6 +398,10 @@ class TestNoNullUnitIsServed:
     @pytest.mark.parametrize("table", U_TABLES)
     def test_sentinel_counts_are_the_measured_ones(self, table):
         flat = self._serve(table)
+        if table == "plot_inputs":
+            oracle = _plot_input_source_oracle()
+            oracle._assert_plot_input_counts(flat, oracle._expected_plot_inputs())
+            return
         assert len(flat) == EXPECTED_ROWS[table], (
             f"{COUNTRY}.{table}() has {len(flat)} rows, measured "
             f"{EXPECTED_ROWS[table]}"
@@ -414,7 +418,22 @@ class TestNoNullUnitIsServed:
         flat = self._serve(table)
         got = (flat.assign(_s=flat["u"].astype("string") == SENTINEL)
                    .groupby("t")["_s"].sum().astype(int).to_dict())
+        if table == "plot_inputs":
+            oracle = _plot_input_source_oracle()
+            oracle._assert_plot_input_counts(flat, oracle._expected_plot_inputs(), by_wave=True)
+            return
         assert got == EXPECTED_SENTINEL_BY_WAVE[table], (
             f"{COUNTRY}.{table}() sentinel counts by wave are {got}, measured "
             f"{EXPECTED_SENTINEL_BY_WAVE[table]}"
         )
+
+
+def _plot_input_source_oracle():
+    # Load the test oracle by path: tests is not a stable import package here.
+    # No production helper, saved output count or +1067/+12 repin supplies it.
+    import importlib.util
+    path = Path(__file__).with_name("test_niger_npk_grade.py")
+    spec = importlib.util.spec_from_file_location("_niger_input_source_oracle", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module

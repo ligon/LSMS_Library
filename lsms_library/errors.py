@@ -67,6 +67,53 @@ class UnitsUnavailableError(ValueError):
                           country=country, table=self.table)
 
 
+class PeriodUnavailableError(ValueError):
+    """A country cannot honour a ``period=`` request for some of its waves.
+
+    Raised by :func:`lsms_library.recall.to_period` (and so by
+    ``Country(...).food_expenditures(period=...)`` /
+    ``food_quantities(period=...)``) when the frame holds a wave ``t`` whose
+    recall window is not established: no record, ``basis='not-recorded'`` or
+    another weak rung, a window that varies inside the wave
+    (``within_wave_variation``), or a record missing ``recall_days`` /
+    ``n_asks``.  GH #851 Phase II.
+
+    The third member of the Contract B family, after
+    :class:`LabelUnavailableError` and :class:`UnitsUnavailableError`:
+    ``Country`` raises, ``Feature`` catches it *specifically* and degrades --
+    at the grain of the WAVE, not the country: it consumes the same call's
+    private continuation for the full unconverted postprocessed result,
+    converts the rows of the ``convertible`` waves and drops unknown cells, with one
+    aggregated warning and ``df.attrs['period_unavailable']``.  Subclasses
+    :class:`ValueError` for the same reason ``UnitsUnavailableError`` does.
+
+    Attributes: ``country``, ``period``, ``table``, ``unavailable`` (a
+    ``{t: reason}`` dict) and ``convertible`` (the sorted ``t`` values in the
+    same frame whose window IS established -- pass them as ``waves=`` to get
+    the converted subset).
+    """
+
+    def __init__(self, *, country: str, period: str, table: str,
+                 unavailable: dict, convertible):
+        self.country = country
+        self.period = period
+        self.table = table
+        self.unavailable = dict(unavailable)
+        self.convertible = sorted(convertible)
+        why = "; ".join(f"{t}: {r}" for t, r in sorted(self.unavailable.items()))
+        hint = (f"Pass waves={self.convertible!r} to convert those, or omit "
+                f"period= to get the recorded window."
+                if self.convertible else
+                "No wave of this frame converts; omit period= to get the "
+                "recorded window.")
+        super().__init__(
+            f"{country}: {table}(period={period!r}) needs each wave's recall "
+            f"window, and it is not established for "
+            f"{len(self.unavailable)} wave(s) -- {why}.  Nothing was "
+            f"converted: scaling only the known waves would return one "
+            f"column on two clocks.  {hint}  See ll.recall({country!r}).")
+
+
 class UnregisteredCountryError(ValueError):
     """``Country(name)`` named a directory that is not a registered country.
 
@@ -106,9 +153,10 @@ class UnregisteredCountryError(ValueError):
 class WaveWorkerError(Exception):
     """A wave's build failed in a parallel worker and its exception could not cross back.
 
-    ``_parallel_waves`` returns a worker's exception object when it survives a pickle
-    round trip.  A class in a by-path ``mapping.py`` or country module does not (GH #1524),
-    and a worker the OOM killer took has none to return.  This carries the original class
+    ``_parallel_waves`` carries pickled bytes and reconstructs the exception in the
+    parent relay.  A class in a by-path or child-only module may not load there
+    (GH #1524 / #1591), and a worker the OOM killer took has none to return.
+    This carries the original class
     name and the text instead; the worker's traceback is in the exception's notes.
 
     Subclasses ``Exception``, not ``RuntimeError``: it stands for a failure of unknown kind,

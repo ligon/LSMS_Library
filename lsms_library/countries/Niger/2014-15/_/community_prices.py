@@ -36,10 +36,9 @@ from niger import (CS07_TRIPLES, _community_prices_maps,
 
 item_map, unit_map = _community_prices_maps()
 
-base = '../Data/NER_2014_ECVMA-II_v02_M_STATA8/'
-src = get_dataframe(base + 'comprixcs07.dta', convert_categoricals=True)
+src = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/comprixcs07.dta', convert_categoricals=True)
 # Same file, raw codes: the cs07q02 variety CODE (GH #840).
-codes = get_dataframe(base + 'comprixcs07.dta', convert_categoricals=False)
+codes = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/comprixcs07.dta', convert_categoricals=False)
 
 # 2014-15: one shared unit column (cs07q03) across the three (price, qty) pairs.
 triples = CS07_TRIPLES['2014-15']

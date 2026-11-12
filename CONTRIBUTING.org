@@ -398,11 +398,31 @@ Write access to the remote s3 repository requires additional credentials; contac
   4. Add other documentation useful for understanding the data to the
      =Documentation= sub-directory.
 
-  5. Add all the contents of the =Documentation= folder to the =git= repo;
-     e.g., 
+     Minimum holdings are =SOURCE.org= (catalog/release/citation), the
+     actual licence/terms or a cited terms location, and the questionnaires,
+     manuals/technical reports/BID and DDI published for that catalog entry.
+     A stub alone is not substantive documentation. Record documents not
+     listed by an inspected catalog separately from failed retrieval; neither
+     proves that no official document exists elsewhere. Public forms do not
+     alone establish fielded CAPI or released-column correspondence.
+
+     =data_access.add_wave()= fetches catalog documentation by default after
+     its existing raw acquisition. =documentation=False= explicitly retains
+     a data-only acquisition. For documentation-only backfill use
+     =data_access.fetch_documentation(country, wave, catalog_id, push=True)=;
+     it uses the same managed =push_to_cache_batch()= publisher. Inspect its
+     return and =Documentation/DOCUMENTS-<catalog_id>.json=: document failures
+     are explicit and do not change the raw release's held identity or the
+     raw-file list returned by =add_wave=. =push=False= records local-only
+     document bytes, not remote publication. Held receipt identity is not a
+     guarantee of current remote freshness.
+
+  5. Add textual provenance/terms/receipts and binary document =.dvc= pointers
+     to =git=; publish binary documents with =push_to_cache_batch()=, not as
+     Git blobs or hand-run DVC commands. Review the staged file list; e.g.,
      #+begin_src sh
      cd ./Uganda/2015-16/Documentation
-     git add .
+     git add SOURCE.org LICENSE DOCUMENTS-*.json *.dvc .gitignore
      git commit -m"Add Uganda 2015-16 documentation to repo."
      git push
      #+end_src

@@ -21,12 +21,15 @@ unchanged (kept visible; the GAP-1 reported-only rule).
 
 ``condition`` is the harvest's own "Etat du produit" (s16cq12c, GH #1436), read
 by code and folded from five answers to three tokens; the column
-``condition_native`` keeps the answer as recorded.
+``condition_native`` keeps the answer as recorded. The separate s16cq16c sold
+answer uses that same own-wave fold in ``Condition_sold`` and remains literal in
+``condition_sold_native`` (GH1528); a blank sold answer stays NA.
 """
 import sys
 
 sys.path.append('../../_/')
 import pandas as pd
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 
 from lsms_library.local_tools import (get_dataframe, to_parquet, format_id,
                                        get_categorical_mapping)
@@ -68,8 +71,7 @@ def _crop_conditions(codes):
         **{'Preferred Label': 'Preferred Label'})
     table = {int(code): token for code, token in table.items()}
     assert sorted(table) == [1, 2, 3, 4, 5], f'harmonize_crop_condition_ehcvm1: {table}'
-    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)
-    return mapped.astype('string').fillna('unknown_condition')
+    return crop_condition_codes(pd.to_numeric(codes, errors='coerce'), table).fillna('unknown_condition')
 
 
 def _crop_condition_labels(labels):
@@ -77,8 +79,13 @@ def _crop_condition_labels(labels):
     the column read with ``convert_categoricals=True``.  A blank stays NA, never a
     sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,
     GH #1436)."""
-    out = pd.Series(labels).astype('string').str.strip()
-    return out.where(out != '', pd.NA)
+    return crop_condition_labels(labels)
+
+
+def _crop_sold_conditions(codes):
+    """Reuse the own-wave harvest fold, with NA for a column (ledger1528 §3)."""
+    folded = _crop_conditions(codes)
+    return folded.where(folded != 'unknown_condition', pd.NA)
 
 
 def _finish_crop_production(df, t):
@@ -108,10 +115,14 @@ def _finish_crop_production(df, t):
         df['Unit_sold'] = pd.NA
     df['Unit_sold'] = df['Unit_sold'].astype('string')
     df['Unit_sold'] = df['Unit_sold'].where(df['Unit_sold'] != 'Unknown', pd.NA)
+    for col in ('Condition_sold', 'condition_sold_native'):
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = df[col].astype('string')
     df = df[df['crop'].notna()]
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'Quantity',
             'Quantity_sold', 'Value_sold', 'Unit_sold', 'harvest_month',
-            'intercropped', 'condition_native']
+            'intercropped', 'condition_native', 'Condition_sold', 'condition_sold_native']
     df = df[[c for c in keep if c in df.columns]]
     df['condition'] = df['condition'].astype('string')
     df['condition_native'] = df['condition_native'].astype('string')
@@ -149,6 +160,9 @@ df = pd.DataFrame({
     # The SOLD unit (s16cq16b), a second unit on the same line (GH #824);
     # identical 7-label set to the harvest unit s16cq12b, same `u` table.
     'Unit_sold':     _unit_labels(src['s16cq16b'], unit_map).values,
+    # Own SOLD answer; s16cq12c describes the harvest, not this sale (GH1528).
+    'Condition_sold': _crop_sold_conditions(src_codes['s16cq16c']).values,
+    'condition_sold_native': _crop_condition_labels(src['s16cq16c']).values,
     'intercropped':  intercropped.values,
 })
 

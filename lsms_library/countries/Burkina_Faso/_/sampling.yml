@@ -64,6 +64,21 @@ Sampling:
       source_file: null
       locator: 'measured 2026-10-23 through Country("Burkina_Faso").sample() and .cluster_features() on a cold build at development 9a0ed5f3c; draws quoted in CONTENTS.org, "2014 -- ... Sample design" and "2018-19 -- ... Sample-size figures"; no linkage: Burkina_Faso/_/panel_ids.py docstring'
 
+      cluster_id_measurement:
+        linked_households: 0
+        not_applicable: [clusters_renumbered]
+        note: |-
+          The dated 2026-10-23 source review records no household linkage
+          from EMC 2014 to EHCVM-1: the cover has no 2014 pointer and
+          panel_ids.py declares none. Historical unprefixed IDs had 583
+          collisions; the current EMC_ namespace removes those collisions
+          without establishing household links or cross-wave v continuity.
+          Shared v serials name unrelated independently drawn clusters,
+          not renumberings of linked clusters. No new count was measured.
+        source_type: derived-from-data
+        confidence: high
+        locator: '2026-10-23 cluster_id_note; Burkina_Faso/_/panel_ids.py; CONTENTS.org "v across wave boundaries" and the later GH #1244 EMC_ namespace checkpoint; historical review f1cf7d06f'
+
   '2021-22':
     panel:
       household_continuity: rotating-panel

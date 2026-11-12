@@ -29,10 +29,10 @@ from malawi import (_harvest_block, _sale_block, assemble_crop_production,
 WAVE = '2010-11'
 BASE = '../Data/Full_Sample/Agriculture/'
 
-g = get_dataframe(BASE + 'ag_mod_g.dta', convert_categoricals=False)
-p = get_dataframe(BASE + 'ag_mod_p.dta', convert_categoricals=False)
-i_mod = get_dataframe(BASE + 'ag_mod_i.dta', convert_categoricals=False)
-q = get_dataframe(BASE + 'ag_mod_q.dta', convert_categoricals=False)
+g = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_g.dta', convert_categoricals=False)
+p = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_p.dta', convert_categoricals=False)
+i_mod = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_i.dta', convert_categoricals=False)
+q = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_q.dta', convert_categoricals=False)
 
 # IHS3 ships exact repeat RECORDS (every column equal, `visit` and `ea_id`
 # included): G 9, P 1, I 61, Q 15.  A repeat is a duplicate entry, not a

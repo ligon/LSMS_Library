@@ -87,8 +87,14 @@ import hashlib
 import ssl
 import time
 import uuid
+import threading
+import socket
+from urllib.parse import urlsplit, unquote
 from importlib.resources import files
 from dvc.api import DVCFileSystem
+from ._dvc_runtime import (
+    DVCMetadataCompatibilityError, RuntimeDVCFileSystem,
+)
 import pyreadstat
 import inspect
 from typing import Any
@@ -183,7 +189,7 @@ def _s3_explicit_credentials() -> dict[str, str]:
     return {}
 
 
-def _build_dvcfs() -> DVCFileSystem:
+def _build_dvcfs() -> RuntimeDVCFileSystem:
     config: dict[str, Any] = {"cache": {"dir": os.fspath(_DVC_CACHE_DIR)}}
     # The remote override carries credentials but no ``url``; DVC validates
     # each config level on its own, so the stanza is only legal when the
@@ -201,7 +207,7 @@ def _build_dvcfs() -> DVCFileSystem:
                 **_s3_explicit_credentials(),
             },
         }
-    return DVCFileSystem(os.fspath(_COUNTRIES_DIR), config=config)
+    return RuntimeDVCFileSystem(os.fspath(_COUNTRIES_DIR), config=config)
 
 
 DVCFS = _build_dvcfs()
@@ -287,10 +293,313 @@ def _is_transient_fetch_error(exc: BaseException) -> bool:
     )
 
 
+# GH1051D; ledger §3–§5. Private advisory state, never a build/read gate.
+_FAST_CONNECT_SECONDS = 5.0
+_FAST_CONNECT_LIMIT = 16
+class _FastConnectState:
+    # Opaque runtime state, like the existing ContextVar state: never a
+    # serializable build constant. No fingerprint exclusion is needed.
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.pid = os.getpid()
+        self.epoch = 0
+        self.owner = None
+        self.windows = []
+
+
+_FAST_CONNECT_STATE = _FastConnectState()
+_FAST_PROBE_OUTCOME = contextvars.ContextVar("_fast_probe_outcome", default=None)
+
+
+def _reset_fast_connect_windows():
+    """Release references without closing clients another caller may own."""
+    state = _FAST_CONNECT_STATE
+    with state.lock:
+        state.epoch += 1
+        released, owner = state.windows, state.owner
+        state.windows = []
+        state.owner = None
+    # Drop last references outside the lock; SDK finalizers may perform IO.
+    del released, owner
+
+
+def _fast_connect_after_fork():
+    # Never acquire a lock inherited from a vanished parent's thread.
+    state = _FAST_CONNECT_STATE
+    state.lock = threading.Lock()
+    state.pid = os.getpid()
+    _reset_fast_connect_windows()
+
+
+if hasattr(os, 'register_at_fork'):
+    os.register_at_fork(after_in_child=_fast_connect_after_fork)
+
+
+def _fast_frozen(value):
+    """Opaque comparison only; never format/log this effective configuration."""
+    if value is None or type(value) in (str, bool, int, float):
+        return value
+    if isinstance(value, dict) and all(type(k) is str for k in value):
+        return tuple((k, _fast_frozen(v)) for k, v in sorted(value.items()))
+    if type(value) in (list, tuple):
+        return tuple(_fast_frozen(v) for v in value)
+    raise ValueError('unsupported advisory configuration')
+
+
+def _fast_authority(url):
+    parsed = urlsplit(url)
+    if (parsed.scheme not in ('http', 'https') or not parsed.hostname
+            or parsed.username or parsed.password or parsed.fragment):
+        raise ValueError('unsupported advisory authority')
+    return (parsed.scheme, parsed.hostname.lower(),
+            parsed.port or (443 if parsed.scheme == 'https' else 80))
+
+
+def _fast_scope(remote, fs):
+    """Resolve wrapper options normally, but NEVER touch a fresh native .fs."""
+    from dvc_s3 import S3FileSystem
+    if type(fs) is not S3FileSystem:
+        return None
+    try:
+        path = remote.path.removeprefix('s3://')
+        bucket, _, prefix = path.partition('/')
+        if (not re.fullmatch(r'[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]', bucket)
+                or '..' in bucket or ':' in path or '?' in path or '#' in path):
+            return None
+        args = fs.fs_args  # existing normal backend preparation, no native client
+        sdk_config = args.get('config_kwargs', {})
+        s3 = sdk_config.get('s3', {})
+        if (sdk_config.get('proxies') or any(os.environ.get(k) for k in (
+                'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'http_proxy', 'https_proxy', 'all_proxy'))):
+            return None  # a target URL does not prove the proxy route connected
+        if (s3.get('use_accelerate_endpoint') or s3.get('use_dualstack_endpoint')
+                or s3.get('addressing_style') not in (None, 'auto', 'path', 'virtual')):
+            return None
+        repo = DVCFS.repo
+        # Environment values stay opaque, including credentials/proxies. No files
+        # or credential getters are consulted. Static retained sessions do not
+        # reread a profile file during this finite window.
+        environment = tuple(sorted((k, v) for k, v in os.environ.items()
+                            if k.startswith('AWS_') or k.upper() in {
+                                'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'NO_PROXY',
+                                'SSL_CERT_FILE', 'SSL_CERT_DIR', 'REQUESTS_CA_BUNDLE'}))
+        owner = (DVCFS, repo, os.path.realpath(_COUNTRIES_DIR),
+                 os.path.realpath(_DVC_CACHE_DIR), environment)
+        config = _fast_frozen((repo.config, fs.config, args))
+        return (owner, repo.config['core'].get('remote'), remote.path,
+                type(fs), config, bucket, prefix, s3.get('addressing_style', 'auto'))
+    except (AttributeError, TypeError, ValueError, KeyError):
+        return None
+
+
+def _fast_route(fs, bucket):
+    """Already-populated S3 route/auth/session metadata only; no SDK getters."""
+    from aiobotocore.credentials import AioCredentials
+    from botocore.credentials import Credentials
+    from s3fs import S3FileSystem
+    try:
+        native = vars(fs).get('fs')
+        if type(native) is not S3FileSystem:
+            return None
+        state = vars(native)
+        session, general, creator = (state.get(k) for k in ('session', '_s3', '_s3creator'))
+        if session is None or general is None or creator is None:
+            return None
+        cached = state.get('cache_regions')
+        buckets = vars(creator).get('_buckets') if cached else None
+        if cached and (type(buckets) is not dict or vars(creator).get('_client') is not general):
+            return None
+        client = buckets.get(bucket, general) if cached else general
+        discovery = bool(cached and bucket not in buckets)
+        http = client._endpoint.http_session
+        sessions = vars(http).get('_sessions')
+        if sessions is None or (sessions and all(s.closed for s in sessions.values())):
+            return None
+        # s3fs can refresh the general client even when routing to a bucket client.
+        general_sessions = vars(general._endpoint.http_session).get('_sessions')
+        if general_sessions is None or (general_sessions and all(s.closed for s in general_sessions.values())):
+            return None
+        credentials = vars(client._request_signer).get('_credentials')
+        if state.get('anon') is True:
+            if credentials is not None:
+                return None
+        elif type(credentials) not in (AioCredentials, Credentials):
+            return None  # refreshable, deferred or unknown provider
+        elif credentials.method not in ('explicit', 'shared-credentials-file', 'config-file'):
+            return None
+        elif credentials.method != 'explicit' and vars(session).get('_credentials') is not credentials:
+            return None
+        authority = _fast_authority(client.meta.endpoint_url)
+        return (native, session, general, creator, client, credentials,
+                http, authority, discovery, cached)
+    except (AttributeError, TypeError, ValueError):
+        return None
+
+
+def _fast_same_route(left, right):
+    return (left is not None and right is not None
+            and all(a is b for a, b in zip(left[:7], right[:7]))
+            and left[7:] == right[7:])
+
+
+def _fast_connect_error(error, source, scope, route):
+    from botocore.exceptions import ConnectTimeoutError, EndpointConnectionError
+    from aiohttp import (ClientConnectorError, ClientConnectorSSLError,
+                         ClientConnectorCertificateError, ClientProxyConnectionError)
+    if type(error) not in (ConnectTimeoutError, EndpointConnectionError):
+        return False
+    if type(error) is EndpointConnectionError:
+        cause = error.kwargs.get('error')
+        if cause is None:
+            cause = error.__cause__
+        if not (type(cause) is socket.gaierror or (
+                isinstance(cause, ClientConnectorError)
+                and not isinstance(cause, (ClientConnectorSSLError,
+                                           ClientConnectorCertificateError,
+                                           ClientProxyConnectionError)))):
+            return False
+    if getattr(error, 'response', None) is not None or route is None:
+        return False
+    try:
+        url = error.kwargs['endpoint_url']
+        parsed = urlsplit(url)
+        authority = _fast_authority(url)
+        scheme, host, port = route[7]
+        bucket = scope[5]
+        virtual = (scheme, bucket + '.' + host, port)
+        if authority not in (route[7], virtual):
+            return False
+        if scope[7] == 'path' and authority != route[7]:
+            return False
+        if scope[7] == 'virtual' and authority != virtual and not host.startswith(bucket + '.'):
+            return False
+        if type(error) is EndpointConnectionError and isinstance(cause, ClientConnectorError):
+            if cause.host.lower() != authority[1] or (cause.port or port) != authority[2]:
+                return False
+        key = source.removeprefix('s3://').split('/', 1)[1]
+        expected = '/' + (key if authority == virtual else bucket + '/' + key)
+        # An explicit endpoint can already name the virtual-host bucket.
+        if host.startswith(bucket + '.') and authority == route[7]:
+            expected = '/' + key
+        allowed = {expected}
+        if route[8]:  # retained general client is about to discover this bucket
+            allowed.add('/' if authority == virtual else '/' + bucket)
+        return unquote(parsed.path) in allowed and not parsed.query
+    except (AttributeError, TypeError, ValueError, KeyError, IndexError):
+        return False
+
+
+class _FastProbeOutcome:
+    """Per invocation, never a persisted or source-memoized result."""
+    def __init__(self):
+        self.suppressed = False
+        self.scope = self.route = self.fs = self.remote = None
+        self.epoch = None
+        self.errors = 0
+        self.failure_authority = None
+        self.eligible = True
+
+    def observe(self, fs, source, destination, error):
+        self.errors += 1
+        route = _fast_route(fs, self.scope[5]) if self.scope else None
+        if self.route is None:
+            self.route = route
+        try:
+            # Before cleanup: even a zero-byte temp proves response/progress.
+            progressed = Path(destination).exists()
+        except OSError:
+            progressed = True
+        positive = _fast_connect_error(error, source, self.scope, route)
+        authority = _fast_authority(error.kwargs['endpoint_url']) if positive else None
+        if self.failure_authority is None:
+            self.failure_authority = authority
+        self.eligible &= (not progressed and _fast_same_route(self.route, route)
+                          and positive and authority == self.failure_authority)
+        if not self.eligible:
+            self.clear()
+
+    def clear(self):
+        # A response or unknown outcome conservatively invalidates old in-flight
+        # publishers too. No IO under the transition lock.
+        with _FAST_CONNECT_STATE.lock:
+            _FAST_CONNECT_STATE.epoch += 1
+            released = _FAST_CONNECT_STATE.windows
+            _FAST_CONNECT_STATE.windows = []
+        del released
+
+
+def _fast_window_select(outcome, remote, fs):
+    pid = os.getpid()
+    if pid != _FAST_CONNECT_STATE.pid:
+        _fast_connect_after_fork()
+    scope = _fast_scope(remote, fs)
+    outcome.remote = remote
+    now = time.monotonic()
+    # Route metadata is inspected outside the lock. Entries are immutable after
+    # insertion; publication verifies the epoch captured by this transition.
+    with _FAST_CONNECT_STATE.lock:
+        entries = list(_FAST_CONNECT_STATE.windows)
+    valid = [entry for entry in entries
+             if entry[0] > now and _fast_same_route(entry[4], _fast_route(entry[3], entry[2][5]))]
+    with _FAST_CONNECT_STATE.lock:
+        # Only the snapshot was validated. Preserve later publications, and
+        # retain ALL live entries as well as the snapshot until mutex exit:
+        # pruning or the owner/options transitions below may drop a last owner
+        # whose SDK finalizer can perform IO.
+        released = _FAST_CONNECT_STATE.windows
+        _FAST_CONNECT_STATE.windows = [e for e in released
+            if not any(e is s for s in entries) or any(e is v for v in valid)]
+        if scope is not None:
+            owner = scope[0]
+            old = _FAST_CONNECT_STATE.owner
+            if old is None or not (old[0] is owner[0] and old[1] is owner[1] and old[2:] == owner[2:]):
+                _FAST_CONNECT_STATE.windows.clear()
+                _FAST_CONNECT_STATE.epoch += 1
+                _FAST_CONNECT_STATE.owner = owner
+            # Same alias/path with changed effective options invalidates its old
+            # generation. Distinct routes may coexist up to the finite cap.
+            changed = [e for e in _FAST_CONNECT_STATE.windows if e[2][1:3] == scope[1:3] and e[2][3:] != scope[3:]]
+            if changed:
+                _FAST_CONNECT_STATE.windows[:] = [e for e in _FAST_CONNECT_STATE.windows if not any(e is c for c in changed)]
+                _FAST_CONNECT_STATE.epoch += 1
+            for entry in _FAST_CONNECT_STATE.windows:
+                # A late publication survives pruning for the next caller, but
+                # this caller may select only an identity it route-validated.
+                if any(entry is v for v in valid) and entry[2][1:] == scope[1:]:
+                    outcome.suppressed = True
+                    outcome.fs = entry[3]  # SELECT retained route, no fresh native
+                    return entry[3]
+        outcome.scope, outcome.fs = scope, fs
+        outcome.epoch = _FAST_CONNECT_STATE.epoch
+    return fs
+
+
+def _fast_window_publish(outcome):
+    if not (outcome.scope and outcome.eligible and outcome.errors >= 2
+            and _fast_same_route(outcome.route, _fast_route(outcome.fs, outcome.scope[5]))):
+        return
+    current = _fast_scope(outcome.remote, outcome.fs)
+    if (current is None or current[0][0] is not outcome.scope[0][0]
+            or current[0][1] is not outcome.scope[0][1] or current != outcome.scope):
+        return
+    now = time.monotonic()
+    deadline = now + _FAST_CONNECT_SECONDS
+    with _FAST_CONNECT_STATE.lock:
+        released = list(_FAST_CONNECT_STATE.windows)
+        _FAST_CONNECT_STATE.windows[:] = [e for e in released if e[0] > now]
+        if outcome.epoch != _FAST_CONNECT_STATE.epoch:
+            return
+        # No sliding extension, replacement or cross-scope eviction at capacity.
+        if (len(_FAST_CONNECT_STATE.windows) < _FAST_CONNECT_LIMIT
+                and not any(e[2][1:] == outcome.scope[1:] for e in _FAST_CONNECT_STATE.windows)):
+            _FAST_CONNECT_STATE.windows.append((deadline, outcome.epoch, outcome.scope,
+                                          outcome.fs, outcome.route))
+
+
 def _get_file_with_retry(fs, src: str, dst: str, *,
                          attempts: int | None = None,
                          base_delay: float = _FETCH_BASE_DELAY,
-                         sleep=time.sleep) -> None:
+                         sleep=time.sleep, _fast_probe=None) -> None:
     """``fs.get_file(src, dst)`` with bounded retry on transient TLS errors.
 
     Re-raises ``FileNotFoundError`` immediately (the caller then tries the next
@@ -305,9 +614,13 @@ def _get_file_with_retry(fs, src: str, dst: str, *,
         try:
             fs.get_file(src, dst)
             return
-        except FileNotFoundError:
+        except FileNotFoundError as exc:
+            if _fast_probe is not None:
+                _fast_probe.observe(fs, src, dst, exc)
             raise
         except Exception as exc:  # noqa: BLE001 -- classify, then retry or re-raise
+            if _fast_probe is not None:
+                _fast_probe.observe(fs, src, dst, exc)
             try:
                 Path(dst).unlink()
             except OSError:
@@ -317,7 +630,37 @@ def _get_file_with_retry(fs, src: str, dst: str, *,
             sleep(base_delay * (2 ** attempt))
 
 
-def _ensure_dvc_pulled(fn) -> None:
+def _local_cache_write_denied(error, temporary_path=None) -> bool:
+    """Positive EACCES/EROFS evidence for a known local cache operation.
+
+    With a get_file error, only its primary failing filename naming the exact
+    local destination qualifies. A remote/absent/ambiguous filename does not.
+    Callers omit temporary_path only for direct local mkdir/rename operations.
+    """
+    if not isinstance(error, OSError) or error.errno not in (errno.EACCES, errno.EROFS):
+        return False
+    if temporary_path is None:
+        return True
+    if error.filename is None:
+        return False
+    try:
+        return os.path.abspath(os.fsdecode(error.filename)) == os.path.abspath(os.fspath(temporary_path))
+    except (TypeError, ValueError):
+        return False
+
+
+def _remote_md5_available(fs, source_keys) -> bool:
+    """Best-effort metadata only, on the two already-resolved DVC keys."""
+    for source in source_keys:
+        try:
+            if fs.exists(source):
+                return True
+        except Exception:  # availability probe only; no extra retry or decoder
+            continue
+    return False
+
+
+def _ensure_dvc_pulled(fn, *, _metadata_on_local_write_denied: bool = False) -> bool | None:
     """Best-effort warm of the local DVC cache for a tracked path.
 
     The hot path (cache hit) is two ``os.path.exists`` calls and a tiny
@@ -351,10 +694,12 @@ def _ensure_dvc_pulled(fn) -> None:
     which was a big improvement, but still paid the index walk cost
     on every miss.  The current bypass eliminates it.
 
-    Every error is swallowed.  This function is best-effort warming
-    glue; the caller's ``DVCFS.open`` streaming fallback handles any
-    failure to populate the cache.
+    Every operational error is swallowed. Ordinary callers retain the
+    best-effort/None warming contract and streaming fallback. Only the fast
+    heal probe opts into metadata availability after positively local
+    EACCES/EROFS: at most two exists checks, not proof of decoding/rebuilding.
     """
+    _fast_probe = _FAST_PROBE_OUTCOME.get() if _metadata_on_local_write_denied else None
     try:
         # Try several interpretations of fn to find the .dvc sidecar.
         # Wave scripts pass cwd-relative paths like '../Data/foo.dta'.
@@ -468,16 +813,35 @@ def _ensure_dvc_pulled(fn) -> None:
         # blob concurrently (rare in practice; each contender wants a
         # different blob).
         dst = cache_layouts[0]
-        dst.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            dst.parent.mkdir(parents=True, exist_ok=True)
+        except OSError as error:
+            if _metadata_on_local_write_denied and _local_cache_write_denied(error):
+                available = _remote_md5_available(fs, src_candidates)
+                if available and _fast_probe is not None:
+                    _fast_probe.clear()
+                return available
+            raise
+        if _fast_probe is not None:
+            fs = _fast_window_select(_fast_probe, remote, fs)
+            if _fast_probe.suppressed:
+                return False
         tmp = dst.with_suffix(dst.suffix + f".tmp.{os.getpid()}")
         for src in src_candidates:
+            operation = 'fetch'
             try:
-                _get_file_with_retry(fs, src, str(tmp))
+                if _fast_probe is None:
+                    _get_file_with_retry(fs, src, str(tmp))
+                else:
+                    _get_file_with_retry(fs, src, str(tmp), _fast_probe=_fast_probe)
+                if _fast_probe is not None:
+                    _fast_probe.clear()
+                operation = 'rename'
                 tmp.rename(dst)
                 return
             except FileNotFoundError:
                 continue  # wrong layout -- try the other one
-            except Exception:  # noqa: BLE001
+            except Exception as error:  # noqa: BLE001
                 # Transient retries exhausted, or a non-transient remote / disk
                 # error (incl. aiohttp ClientPayloadError, not an OSError).
                 # Clean up any partial temp and fall through to the streaming
@@ -486,7 +850,15 @@ def _ensure_dvc_pulled(fn) -> None:
                     tmp.unlink()
                 except OSError:
                     pass
+                if (_metadata_on_local_write_denied
+                        and _local_cache_write_denied(error, None if operation == 'rename' else tmp)):
+                    available = _remote_md5_available(fs, src_candidates)
+                    if available and _fast_probe is not None:
+                        _fast_probe.clear()
+                    return available
                 continue
+        if _fast_probe is not None:
+            _fast_window_publish(_fast_probe)
         # Both layouts missed -- the blob is genuinely not on the
         # remote.  Fall through to streaming fallback at the call site.
         try:
@@ -567,10 +939,13 @@ def source_tier(path: str | Path) -> str | None:
     return None
 
 
-def source_fetchable_fast(path: str | Path) -> bool:
+def source_fetchable_fast(path: str | Path, *, _outcome=None) -> bool:
     """Can the source at absolute ``path`` be read from the FAST tiers -- an
     untracked local file, or the DVC sidecar plus its L1 blob (fetched into the
     blob cache under ``data_root()`` if absent, by ``_ensure_dvc_pulled``)?
+    After positively local cache-write EACCES/EROFS only, metadata existence on
+    either configured remote md5 key is also availability evidence. This does
+    not parse the source or prove a later rebuild will decode it successfully.
 
     Deliberately NOT the full ``get_dataframe`` chain: no ``DVCFS.open``
     streaming fallback (a sidecar-tree walk) and no World Bank download.  This
@@ -584,7 +959,16 @@ def source_fetchable_fast(path: str | Path) -> bool:
     if tier == "local":
         return True
     if tier == "dvc":
-        _ensure_dvc_pulled(path)
+        outcome = _outcome if _outcome is not None else _FAST_PROBE_OUTCOME.get()
+        if outcome is None:
+            outcome = _FastProbeOutcome()
+        token = _FAST_PROBE_OUTCOME.set(outcome)
+        try:
+            availability = _ensure_dvc_pulled(path, _metadata_on_local_write_denied=True)
+        finally:
+            _FAST_PROBE_OUTCOME.reset(token)
+        if availability is not None:
+            return availability
         return _dvc_cache_path(path) is not None
     return False
 
@@ -741,9 +1125,9 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
             if not block:
                 continue
             for fn in _collect_file_paths_from_block(block):
-                # Resolve relative to the wave's _/ directory (matches
-                # the convention wave scripts use).
-                abs_path = (wave_obj.file_path / "_" / fn).resolve()
+                # Match the YAML loader and Wave._input_hash (ledger1602§2),
+                # using the actual Wave's mapped physical folder.
+                abs_path = Path(os.path.normpath(wave_obj.file_path / "Data" / fn))
                 sidecar = abs_path.with_name(abs_path.name + ".dvc")
                 if not sidecar.exists():
                     continue  # untracked source — no DVC fetch needed
@@ -799,6 +1183,8 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
                     tmp.unlink()
                 except OSError:
                     pass
+    except DVCMetadataCompatibilityError:
+        raise
     except Exception:
         # Last-ditch swallow: never let pre-warm break a build.
         pass
@@ -806,17 +1192,31 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
 
 def _collect_file_paths_from_block(block):
     """Walk a data_info.yml feature block and yield every ``file:`` value
-    encountered, including those nested in ``dfs:`` sub-blocks."""
+    encountered, including those nested in ``dfs:`` sub-blocks.
+
+    A list member may override variables for one source. Match
+    ``Wave.column_mapping``: the first mapping key is the consumed path;
+    the override payload contains variables, not further declarations. Names
+    listed in ``dfs`` designate sibling subframes even when they happen to
+    spell ``file``, ``idxvars`` or ``myvars``.
+    """
     if isinstance(block, dict):
-        f = block.get("file")
+        names = block.get("dfs")
+        subframes = names if isinstance(names, (list, dict)) else ()
+        f = block.get("file") if "file" not in subframes else None
         if isinstance(f, str):
             yield f
         elif isinstance(f, list):
             for x in f:
                 if isinstance(x, str):
                     yield x
-        for v in block.values():
-            yield from _collect_file_paths_from_block(v)
+                elif isinstance(x, dict) and x:
+                    path = next(iter(x))
+                    if isinstance(path, str):
+                        yield path
+        for key, value in block.items():
+            if key in subframes or key not in {"file", "idxvars", "myvars"}:
+                yield from _collect_file_paths_from_block(value)
     elif isinstance(block, list):
         for item in block:
             yield from _collect_file_paths_from_block(item)
@@ -1764,12 +2164,96 @@ def _read_parquet_with_index_policy(f, *, read_errors=(), **kwargs):
     return _restore_parquet_index_string_policy(df, metadata), None
 
 
-def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
+def _read_managed_parquet_cache(path, *, open_errors=(), check_null=False, engine=None):
+    """Read one caller-owned cache, separating payload failure from policy.
+
+    Only initial pd.read_parquet OSError/ArrowInvalid is recoverable1071.
+    Open errors retain each gate's existing policy; footer/index restoration
+    and the former get_dataframe null audit remain outside that catch.
+    Engine is explicit only on former get_dataframe routes (pyarrow); wave
+    gates keep their previous pandas default. The opened identity lets the
+    owner reject precisely the old entry.
+    Raw/user files and newly produced outputs must keep their strict reader.
+    """
+    try:
+        stream = open(path, 'rb')
+    except open_errors as error:
+        return None, error, None
+    with stream:
+        identity = os.fstat(stream.fileno())
+        frame, error = _read_parquet_with_index_policy(
+            stream, read_errors=(OSError, ArrowInvalid),
+            **({'engine': engine} if engine is not None else {}))
+    if error is not None:
+        return None, error, identity
+    if check_null:
+        frame = check_read(frame, path)
+    return frame, None, identity
+
+
+def _validate_stata_missing_map(option):
+    """Validate the explicit source-column -> extended-tag -> label option."""
+    if option is None:
+        return {}
+    if not isinstance(option, dict):
+        raise ValueError('stata_missing_map must be a column/tag/label dictionary')
+    if not option:
+        return {}
+    for column, tags in option.items():
+        if not isinstance(column, str) or not column or not isinstance(tags, dict) or not tags:
+            raise ValueError('stata_missing_map needs named source columns and nonempty tag maps')
+        for tag, label in tags.items():
+            if (not isinstance(tag, str) or len(tag) != 2 or tag[0] != '.'
+                    or tag[1] not in 'abcdefghijklmnopqrstuvwxyz' or not isinstance(label, str)):
+                raise ValueError('stata_missing_map requires extended tags .a through .z and string labels')
+    return option
+
+
+def _overlay_stata_missing_map(frame, stream, option, release):
+    """Overlay only requested typed tags onto the ordinary decoder output.
+
+    Finite values, labels and encoding remain owned by normal from_dta.
+    Formats <=111 have only a single missing distinction in pandas' reader.
+    """
+    if release is None or release <= 111:
+        raise ValueError('stata_missing_map requires a Stata format supporting extended missing tags')
+    from pandas.io.stata import StataMissingValue
+    stream.seek(0)
+    with pd.io.stata.StataReader(stream) as reader:
+        native = reader.read(columns=list(option), convert_missing=True,
+                             convert_categoricals=False, convert_dates=False)
+    if (not isinstance(frame, pd.DataFrame) or len(native) != len(frame)
+            or not native.index.identical(frame.index)
+            or any(column not in frame.columns or column not in native.columns for column in option)):
+        raise ValueError('stata_missing_map native scan does not match decoded rows/index/columns')
+    out = frame.copy(deep=True)
+    for column, tags in option.items():
+        for tag, label in tags.items():
+            mask = native[column].map(lambda value: isinstance(value, StataMissingValue)
+                                      and value.string == tag)
+            if mask.any():
+                values = out[column]
+                if not (pd.api.types.is_object_dtype(values.dtype)
+                        or isinstance(values.dtype, pd.StringDtype)):
+                    values = values.astype(object)
+                out[column] = values.mask(mask, label)
+    return out
+
+
+def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False, stata_missing_map: dict[str, dict[str, str]] | None = None) -> pd.DataFrame:
     """From a file named fn, try to return a dataframe.
 
     Hope is that caller can be agnostic about file type,
     or if file is local or on a dvc remote.
+
+    stata_missing_map explicitly maps selected Stata source-column extended
+    tags (e.g. {"answer": {".d": "Not applicable"}}) to labels before
+    extraction. It adds one selected-column native scan; all other decoding
+    and the omitted/empty-option fallback remain unchanged.
     """
+    missing_map = _validate_stata_missing_map(stata_missing_map)
+    if missing_map and categories_only:
+        raise ValueError('stata_missing_map requires a data read, not categories_only')
     fn = _resolve_data_path(fn)
 
     def local_file(fn):
@@ -1854,6 +2338,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # chain below, unchanged.
         dct = _load_dct_for(fn)
         if dct is not None:
+            if missing_map:
+                raise ValueError('stata_missing_map is only supported for Stata data')
             if isinstance(f, str):
                 raw = Path(f).read_bytes()
             else:
@@ -1866,6 +2352,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # first bytes say the file is (see the block comment above
         # ``_sniff_head``).
         head = _sniff_head(f)
+        if missing_map and not _is_stata_dta(head):
+            raise ValueError('stata_missing_map is only supported for Stata data')
         if Path(fn).suffix.lower() == '.dta' and not _is_stata_dta(head):
             raise ValueError(f'{fn} has a .dta suffix but no Stata header')
         # GH #1070: likewise a ``.parquet``.  Its CSV fallback served a
@@ -1934,6 +2422,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 f.seek(0)
                 out = from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
             except (ValueError, struct.error) as exc:
+                if missing_map:
+                    raise ValueError('stata_missing_map cannot use a tag-losing fallback decoder') from exc
                 failure = exc
             else:
                 # GH #805: pandas decoded this file as latin-1; re-decode its
@@ -1941,6 +2431,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 release = _stata_release(head)
                 if encoding is None and release is not None and release < 118:
                     out = _redecode_cp1252(out, f)
+                if missing_map:
+                    out = _overlay_stata_missing_map(out, f, missing_map, release)
                 return out
 
             try:
@@ -2118,7 +2610,7 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
 #def regularize_string(s):
 
 @build_transform()  # build-path: extraction/formatting baked verbatim into the L2 parquet (#522)
-def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categoricals: bool = True, encoding: str | None = None, orgtbl: str | None = None, missing_ok: bool = False, **kwargs: Any) -> pd.DataFrame:
+def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categoricals: bool = True, encoding: str | None = None, orgtbl: str | None = None, missing_ok: bool = False, stata_missing_map: dict[str, dict[str, str]] | None = None, **kwargs: Any) -> pd.DataFrame:
     """From a file named fn, grab both index variables and additional variables
     specified in kwargs and construct a pandas dataframe.
 
@@ -2189,8 +2681,11 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
         raise ValueError(df_data_grabber.__doc__)
 
     if orgtbl is None:
-        df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+        options = {} if stata_missing_map is None else {'stata_missing_map': stata_missing_map}
+        df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding, **options)
     else:
+        if _validate_stata_missing_map(stata_missing_map):
+            raise ValueError('stata_missing_map is not supported for Org tables')
         df = df_from_orgfile(fn,name=orgtbl,encoding=encoding)
         if df.shape[0]==0:
             raise KeyError(f'No table {orgtbl} in {fn}.')
@@ -3277,13 +3772,46 @@ def cache_freshness(path: str | Path, expected_hash: str | None) -> str:
     return "fresh" if stored == expected_hash else "stale"
 
 
-def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
+def read_parquet_make_inputs(path: str | Path, *, _with_presence=False):
+    """Declared-input witness for direct Make reuse (GH1288); footer only."""
+    result, present = None, False
+    try:
+        import pyarrow.parquet as pq
+        md = pq.read_schema(str(path)).metadata or {}
+        present = b'lsms_make_inputs' in md
+        value = json.loads(md[b'lsms_make_inputs'])
+        if (isinstance(value, dict) and set(value) == {'sources', 'tables'}
+                and all(isinstance(part, dict)
+                        and all(isinstance(k, str) and isinstance(v, str)
+                                for k, v in part.items()) for part in value.values())):
+            result = value
+    except (OSError, ValueError, KeyError, TypeError, ArrowInvalid):
+        pass
+    return (result, present) if _with_presence else result
+
+
+def stamp_parquet_hash(path: str | Path, expected_hash: str | None, *,
+                       cache_waves: list[str] | None = None,
+                       make_inputs: dict | None = None,
+                       grain_audit: list[dict] | None = None,
+                       datetime_audit: list[dict] | None = None,
+                       build_drops: list[dict] | None = None) -> bool:
     """Best-effort: embed *expected_hash* into an existing parquet's
     schema metadata via an atomic rewrite.
 
     Used for trust-once-then-stamp migration of legacy / script-written
     parquets so subsequent reads are guarded.  Never raises; returns
     ``True`` on success (or when the stamp is already present).
+
+    ``cache_waves`` is explicit producer coverage, never inferred from rows.
+    The isolated Make transaction supplies it only AFTER verifying its inputs
+    and output (GH1288 repair ledger §4). Other callers retain the old behavior.
+    Arrow/pandas metadata and all audit stamps are retained verbatim.
+    ``make_inputs`` similarly records verified declared prerequisite/source
+    fingerprints, because a selected-table hash need not fold Other tables.
+    Optional audit records carry the verified producer's input evidence when
+    the native country builder did not relay its wave subprocesses' footers.
+    No DataFrame is serialized here; raw payload, attrs and other metadata stay.
     """
     if expected_hash is None:
         return False
@@ -3299,9 +3827,24 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
         import pyarrow.parquet as pq
         table = pq.read_table(str(path))
         md = dict(table.schema.metadata or {})
-        if md.get(_CACHE_HASH_KEY) == expected_hash.encode():
+        coverage = (json.dumps([str(w) for w in cache_waves]).encode()
+                    if cache_waves is not None else None)
+        inputs = (json.dumps(make_inputs, sort_keys=True).encode()
+                  if make_inputs is not None else None)
+        audits = {key: json.dumps(value).encode() for key, value in (
+            (_GRAIN_AUDIT_KEY, grain_audit), (_DATETIME_AUDIT_KEY, datetime_audit),
+            (_BUILD_DROPS_KEY, build_drops)) if value is not None}
+        if (md.get(_CACHE_HASH_KEY) == expected_hash.encode()
+                and (coverage is None or md.get(_CACHE_WAVES_KEY) == coverage)
+                and (inputs is None or md.get(b'lsms_make_inputs') == inputs)
+                and all(md.get(key) == value for key, value in audits.items())):
             return True
         md[_CACHE_HASH_KEY] = expected_hash.encode()
+        if coverage is not None:
+            md[_CACHE_WAVES_KEY] = coverage
+        if inputs is not None:
+            md[b'lsms_make_inputs'] = inputs
+        md.update(audits)
         table = table.replace_schema_metadata(md)
         _atomic_write_table(table, path)
         return True
@@ -3405,7 +3948,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         df = all
 
     fn = Path(fn)
-    if cache_hash is not None or grain_audit or cache_waves or datetime_audit or build_drops:
+    if cache_hash is not None or grain_audit or cache_waves is not None or datetime_audit or build_drops:
         import pyarrow as pa
         table = pa.Table.from_pandas(df, preserve_index=index)
         md = dict(table.schema.metadata or {})
@@ -3416,7 +3959,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
             # so the warm read can re-emit it (the pre-collapse frame that
             # proved the loss is long gone by then).
             md[_GRAIN_AUDIT_KEY] = json.dumps(grain_audit).encode()
-        if cache_waves:
+        if cache_waves is not None:
             # GH #891: carry the wave coverage with the data, so a request for
             # a subset of these waves is a hit rather than a rebuild.
             md[_CACHE_WAVES_KEY] = json.dumps([str(w) for w in cache_waves]).encode()

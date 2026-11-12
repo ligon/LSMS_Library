@@ -853,3 +853,153 @@ substitute the older =Data/= extracts or rename the wave.
 Only the existing 2018 declaration is changed. Registered but unfinished
 2021-22 wiring is outside this change. Other effects, coping strategies,
 row/index identity and timing are preserved.
+
+* 2026-11-08 — documented planned strata and capital-domain caveat (GH #1575)
+
+The own second-edition BID (September 2023),
+=2021-22/Documentation/tgo_ehcvm2_information_de_base.pdf=, section 4.1,
+PDF p. 12 / printed p. 11 (English edition p. 11), explicitly describes
+the *original 2018/19* design: "La strate est la combinaison région/milieu
+de résidence." Source: https://microdata.worldbank.org/index.php/catalog/6279/related-materials .
+Clusters were selected PPS within strata, then 12 households with equal
+probability within each cluster. The 2021/22 strategy revisits the same
+clusters and completes households to 12 where needed, rather than making
+a new independent first-stage draw. This is direct design evidence, not
+an inference from the weight shares behind the earlier region-only
+recommendation, which remains recorded above.
+
+The earlier own June 2021 BID p. 10 says "except Lome Commune where all
+respondents are from rural areas"
+(https://microdata.worldbank.org/catalog/4298/download/52590). The 2023
+retrospective Table 1a (French p. 12, English p. 12) labels *Grand Lomé*
+and allocates 98 urban / 0 rural clusters. Preserve both accounts: no
+equivalence between these geographic names, translation typo or formal
+planned-cell exclusion is established here. Eleven nonzero allocation
+cells in that table is a count, not a separately stated stratum count.
+
+No =strata=, native labels, weights or defaults change. The native wave
+remains =2018= with =Data1/= sources; 2021-22 is registered but unwired
+at this source pin. Household strata are separate from the price/NSU
+market samples. Geographic reconciliation and wiring require their own
+scope; exact document identities are in the GH #1575 evidence packet.
+
+* 2026-11-08 — original EHCVM2018 BID managed holding (GH #1575)
+
+The own original2018/19 Basic Information Document, a separate source from
+the second-edition BID discussed above, is now held at =2018/Documentation/basicinformationdocument_tgo.pdf=
+through its normal managed DVC sidecar. A fresh same-source reader tree,
+empty private L1 and read-only profile retrieved the exact public original
+via normal =get_data_file=; verified 2026-11-08T20:42:29.183666+00:00.
+MD5 =42ff0272d615674fde2f748e0639077e=; 344466 bytes. Exact public source and
+SHA256 provenance are appended to =2018/Documentation/SOURCE.org=.
+
+This adds document availability only. Existing planned2018-design versus
+2021-cluster-revisit distinctions and all prior notes remain intact.
+The Lomé Commune versus Grand Lomé domain/version discrepancy remains unresolved.
+No sample, strata, native labels, weights, schema or defaults change.
+No new download, PDF parse, microdata read or source/table campaign was
+needed for this holding; the earlier document-check evidence is reused.
+See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
+
+* 2026-11-10 — 2018 strata wiring selected (GH #1575)
+
+The user selected the documented combination on 2026-11-10. Only =2018=
+=sample.strata= now combines the own cover-page region label =s00q01= with
+the residence-milieu label =s00q04=, through the existing GH #812 helpers.
+This supersedes the earlier region-only recommendation for this construction;
+the historical weight measurements and all previous notes remain above.
+The own September 2023 BID's retrospective original-design definition,
+"La strate est la combinaison région/milieu de résidence", is the basis,
+not the variance of weights or a count of occupied cells.
+
+The native layout remains =2018/Data1/=: cover =s00_me_tgo2018.dta=,
+weights =ehcvm_ponderations_tgo2018.dta=. Existing household and cluster IDs,
+the =v= join, both raw =hhweight= columns and =Rural= extraction are retained.
+The labels are stripped and joined in region/milieu order; missing or blank
+either operand gives NA, and undecoded nonstring coding retains the existing
+dedicated refusal. No native geographic spelling table or crosswalk is added.
+Nonmissing strata carry =Togo::sample::region-milieu-stratum= in the existing
+optional =Derivation= column; raw inputs remain available by original name.
+
+The June 2021 BID p.10 wording "except Lome Commune where all respondents
+are from rural areas" remains beside the September 2023 retrospective
+Table 1a's *Grand Lomé*, 98 urban / 0 rural clusters. No equivalence between
+the names, typo correction or formal planned-cell exclusion is established.
+Neither that table's nonzero-cell arithmetic nor a future observed count is
+an enforced stratum count. Registered 2021-22 remains outside this wiring.
+
+Validation at construction: documentary definition and source wiring only;
+native cards/rows, missingness, cluster consistency, actual original/candidate
+Country/Feature and cold/fresh-warm acceptance are UNRUN. Focused invented-frame
+checks and their exact source/runtime receipts accompany the task delivery;
+they do not establish native coding, geography or production readiness.
+* 2026-11-10 — own printed GPS question47 and calendar/export caveats (GH #1531)
+
+All three declared own2018 household forms,
+=tgo_ehcvm1_qnr_household_excel_vague1.xls= (MD5
+=1b7b18d25fa7083ec894688339aeaab6=), =..._vague2.xls= (MD5
+=5a7cbeb59add0bdf74e9379621388603=), and =EHCVM_UEMOA_MEN_TOGO_V2.xls=
+(MD5 =7acdf05c8091675af9e9f2b23fd4da5c=), explicitly identify GPS question47
+at =S16a_Agri!EO5/EO6=: “superficie de la parcelle (en hectare) selon les
+mesures GPS”. These question45–48 blocks and farmer question9 =K5/K6= agree
+across the distinct objects. The farmer's ha/m² codebook and measured flag
+are separate questions and supply no GPS-export unit classifier.
+
+All three =couvert!A16= covers print2017/2018, while the own catalog/BID
+describe2018/19. Agriculture entry =S16a_Agri!B2= names campaign2017/2018
+in vague1 and2018/2019 in vague2/V2. These are actual wording/version
+differences, not silently corrected calendar labels or proof of which form
+was fielded with the held v02 export. The existing printed-versus-fielded
+crop-condition warning likewise remains intact.
+
+No q47a/export/cleaning relation was found in inspected S16a cells, covers,
+Observations, selected-sheet comments or defined names; no global absence is
+claimed. Actual released-field existence/labels were not read for this
+document result. The current source's q47-hectares assumption is not an
+export bridge. Do not transfer Guinea-Bissau, Benin or farmer-unit authority.
+The native wave remains2018 and its agriculture source is Data1;2021-22
+remains a registered unwired holding.
+
+Exact DOCUMENT MD5/SHA/custody, cells and limits are retained in
+=reports/review-1531-benin-togo-own-documents-20261110/=. Held private copies
+required no network retrieval or microdata/header/row/API. No area conversion,
+substitution, fallback, clamp, yield route, held-list, unit or default changes.
+
+* 2026-11-10 — separate released S16a header result (GH #1531)
+
+After the document-only note above, exactly one metadata-only context read
+the declared own =2018/Data1/s16a_me_tgo2018.dta= header, MD5
+=6292af8f5a1a30fce364a2994775b0c4=, with zero records returned. The complete
+237-name variable inventory contains =s16aq47= and no =s16aq47a=, =s16aq47b=,
+=s16aq47_1= or =s16aq47_2=. The bound q47 is double, format =%12.0g=; its own
+French GPS-area label states no unit and has no value-label link. This is
+explicit absence in this exact release, not evidence about another version.
+
+The own GPS-measured field45 links to =S16AQ45=:1 Oui/2 Non. Farmer-unit
+field09b links separately to =S16AQ09B=:1 Hectare (Ha)/2 Mètre Carré (m^2).
+Neither card assigns a unit to GPS47. No numeric records, magnitudes, ratios,
+presence counts or corrections were inspected. Own printed question47
+hectares wording and the calendar/version caveats remain separate from the
+unitless released label. Guinea-Bissau's distinct47a m² operand does not exist
+in this inventory and supplies no substitute or conversion here.
+
+Frozen scope, exact input/private custody, two total contexts and0records
+across both countries are retained in
+=reports/1531-benin-togo-own-header-20261110/=. Source and private copies sealed
+exact before/after. No2021 header, table/API or policy/held-list change. The
+remaining documentary question is this release's own q47 export/cleaning and
+fielded-version definition, not a presumed own47a relation.
+
+* 2026-11-10 — GH #1575 normal sample validation completed
+
+The construction-stage pending/UNRUN wording above records the state at
+that stage. For =2018 sample=, the own native cover and weights, cold
+baseline/candidate whole frames, unchanged IDs/weights/Rural, documented
+region or department × milieu strata and derivation inputs passed the
+finite normal validation. Four warm Country.sample returns and two scoped
+Feature.sample returns passed full typed frame/axes/attrs comparison from
+eight authenticated L2 parquets, with zero warm raw getters or writers.
+The cross-run cold and warm capture comparisons, source seals and prior
+failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
+=5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
+earlier job-local caches were reaped; source and survey values did not change.

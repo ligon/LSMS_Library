@@ -22,7 +22,7 @@ from malawi import _livestock_block, assemble_livestock
 WAVE = '2010-11'
 BASE = '../Data/Full_Sample/Agriculture/'
 
-r = get_dataframe(BASE + 'ag_mod_r1.dta', convert_categoricals=False)
+r = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_r1.dta', convert_categoricals=False)
 r['hhid'] = r['case_id'].apply(format_id)
 
 piece = _livestock_block(r, hhid='hhid', animalcode='ag_r0a', t=WAVE)
