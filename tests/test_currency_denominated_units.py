@@ -231,13 +231,15 @@ def test_food_prices_kgvalue_drops_currency_rows(canonical_frame):
     assert out.loc[u == 'kg', 'Price'].unique() == pytest.approx([5.0])
 
 
-def test_food_prices_unitvalue_unaffected(canonical_frame):
-    """``unitvalue`` never used a kg factor, so it is untouched (delta 0)."""
+def test_food_prices_unitvalue_drops_the_currency_tautology(canonical_frame):
+    """``unitvalue`` never used a kg factor, but its ``Value`` rows were the
+    constant 1.0 -- cedi per cedi.  Moved by GH #1129 (ruling @ligon
+    2026-11-12): they are dropped and counted in the ``currency`` bucket."""
     out = food_prices_from_acquired(canonical_frame, units='unitvalue')
     u = out.index.get_level_values('u').astype(str)
-    assert (u == 'Value').any()
-    # Expenditure / Quantity for a currency row is 1 -- cedi per cedi.
-    assert out[u == 'Value']['Price'].unique() == pytest.approx([1.0])
+    assert not (u == 'Value').any()
+    assert out.attrs['price_rows_dropped']['currency'] > 0
+    assert (u == 'Heap').any()                 # the physical units stay
 
 
 def _unpriceable_frame(labels):
@@ -367,22 +369,43 @@ def test_no_collision_warning_for_inert_known_metric_keys():
     assert factors['kg'] == 1                 # KNOWN_METRIC still wins
 
 
-def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
-    """``unitvalue`` CAN price a currency row, so nothing is excluded there.
+def test_drop_unpriceable_unitprice_keeps_currency_in_the_denominator():
+    """``unitprice`` reads a REPORTED price, so nothing is excluded there.
 
-    The exclusion is mode-conditional on purpose: it is licensed by "there is
-    no kg factor", which is true only of the ``kg*`` modes.
+    The exclusion is mode-conditional on purpose.  This test used to say the
+    same of ``unitvalue``; GH #1129 (ruling @ligon 2026-11-12) moved that mode
+    into the bucket, because there ``Expenditure / Quantity`` on a currency
+    row is the amount over itself -- see the next test.
     """
     from lsms_library.transformations import _drop_unpriceable
     v = _unpriceable_frame(['Value'] * 4)
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        out = _drop_unpriceable(v, 'unitvalue', np.array([True] * 4))
+        out = _drop_unpriceable(v, 'unitprice', np.array([True] * 4))
     tally = out.attrs['price_rows_dropped']
     assert tally['currency'] == 0
     assert tally['expected'] == 4
     assert tally['dropped_expected'] == 4
     assert tally['lost_fraction'] == 1.0
+
+
+def test_drop_unpriceable_unitvalue_drops_currency_by_label():
+    """GH #1129: in ``unitvalue`` a currency row is dropped even at Price 1.0,
+    and tallied in the same ``currency`` bucket the ``kg*`` modes use."""
+    from lsms_library.transformations import (
+        UnpriceableRowsWarning, _drop_unpriceable,
+    )
+    v = _unpriceable_frame(['Value'] * 4).assign(Price=1.0)
+    with warnings.catch_warnings(record=True) as rec:
+        warnings.simplefilter('always')
+        out = _drop_unpriceable(v, 'unitvalue', np.array([True] * 4))
+    assert len(out) == 0
+    tally = out.attrs['price_rows_dropped']
+    assert tally['currency'] == tally['currency_expected'] == 4
+    assert tally['expected'] == 0
+    assert tally['lost_fraction'] == 0.0
+    assert not [w for w in rec
+                if issubclass(w.category, UnpriceableRowsWarning)]
 
 
 # ---------------------------------------------------------------------------

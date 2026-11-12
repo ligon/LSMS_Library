@@ -3844,7 +3844,10 @@ before and after in every wave".
 *Victim 2 -- a fabricated price, and this one is undiminished.*  On
 =s='purchased'= with =u='Value'= the LCU-only convention sets
 =Quantity == Expenditure=, so the re-derived "price" is *1.0* --- the "Kwacha
-per Kwacha" quantity =CLAUDE.md= warns about:
+per Kwacha" quantity =CLAUDE.md= used to warn about (since GH #1129,
+2026-11-12, =food_prices(units='unitvalue')= drops =u='Value'= rows and counts
+them as =currency=, so GLSS1-3 serve no =unitvalue= rows; this trap is about
+=food_acquired.Price= in the core collapse, which that ruling does not touch):
 
 | wave    | =u='Value'= rows | =Quantity == Expenditure= |
 |---------+------------------+---------------------------|

@@ -157,6 +157,13 @@ a sentinel nor in its evidence ledger.
 
 Either way these rows still contribute to `food_expenditures`
 (unit-independent) and `food_prices(units='unitvalue')` (per-native-unit).
+The missing-unit sentinels and `Value` do NOT (GH #1068 / #1129, ruling
+@ligon 2026-11-12): `unitvalue` drops both and counts them in
+`attrs['price_rows_dropped']` (`unknown`, `currency`), and
+`food_quantities(units='units')` drops the sentinels and counts them in
+`attrs['quantity_rows_dropped']`. And since GH #1509 the kg price-ratio
+inference reads only `s == 'purchased'` rows as evidence; a produced or
+in-kind row is still served the factor its `(j, u)` gets from purchases.
 Changing the residual policy (e.g. refusing them a pooled factor) is a
 scientific decision with its own before/after accounting, not a doc fix.
 

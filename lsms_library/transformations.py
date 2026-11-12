@@ -67,6 +67,19 @@ S_VALUES = ('purchased', 'produced', 'inkind', 'other')
 # stays quiet on the ordinary long tail of unpriceable rows.
 PRICE_LOSS_WARN_THRESHOLD = 0.05
 
+#: ``food_prices`` modes in which a row on a currency-denominated unit
+#: (``u='Value'``) yields no price and is tallied as ``currency``: the ``kg*``
+#: modes because such a unit has no kg factor (GH #770), ``unitvalue`` because
+#: ``Expenditure / Quantity`` there is the amount over itself, 1.0 (GH #1129).
+_CURRENCY_UNPRICEABLE_MODES = ('kgvalue', 'kgprice', 'unitvalue')
+
+#: ``food_prices`` modes that drop a row BY ITS LABEL, whatever Price it
+#: computed: a currency-denominated unit (tallied ``currency``) and a missing
+#: unit (``U_UNKNOWN``, :func:`_unit_sentinel_mask`; tallied ``unknown``), GH
+#: #1129 / #1068.  Ruled for ``unitvalue`` only: ``unitprice`` and the ``kg*``
+#: modes keep their previous handling.
+_LABEL_DROP_MODES = ('unitvalue',)
+
 
 class UnpriceableRowsWarning(UserWarning):
     """Emitted when ``food_prices`` drops a large share of priceable rows.
@@ -299,9 +312,27 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     So currency rows in the ``kg*`` modes are excluded from BOTH ``lost``
     and ``expected`` and tallied separately as ``currency``: they were
     never expected to produce a kg price.  ``expected_gross`` keeps the
-    unadjusted denominator so nothing is hidden.  The ``unit*`` modes need
-    no adjustment -- a currency row is perfectly priceable there
-    (``Expenditure / Quantity``), so it stays in the denominator.
+    unadjusted denominator so nothing is hidden.
+
+    ``unitvalue`` drops them too, and an ``Unknown`` unit beside them (GH
+    #1129, #1068; ruling @ligon 2026-11-12, "drop and count")
+    -------------------------------------------------------------------
+    ``Expenditure / Quantity`` on a currency row is the currency amount over
+    itself: exactly 1.0 on every such row, a constant with no survey behind it
+    (GhanaLSS: 1,107,464 served rows, all seven waves).  On a missing unit
+    (:func:`_unit_sentinel_mask`: ``U_UNKNOWN``, legacy ``Manquant``, a NaN
+    ``u``) it is a "price per unit" of a unit nobody recorded.  Neither is a
+    price, and unlike the ``kg*`` modes such a row computes a FINITE Price, so
+    in ``unitvalue`` both are dropped BY LABEL, whatever Price they computed,
+    and tallied by design, each with its ``*_expected`` count and each out of
+    ``expected`` and ``lost`` exactly as ``currency`` is: ``currency`` (the
+    same bucket the ``kg*`` modes use, every expected row on such a unit) and
+    ``unknown`` beside it (the expected rows on a missing unit whose Price
+    was otherwise servable).  An ``Unknown`` row whose Price was already
+    ``inf``, NaN or zero keeps that cause, so a zero quantity stays the loud
+    GH #591 defect.  ``unitprice`` keeps both kinds of row (a reported Price
+    per unit was not ruled on), and the ``kg*`` modes keep their sentinel
+    rows in the residual ``nan`` count, as before.
 
     Money-only recall occasions are the second by-design bucket (GH #864)
     ----------------------------------------------------------------------
@@ -316,7 +347,11 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     inside a group that does report quantities stays what it is -- real,
     reportable loss.  Judged in the ``*value`` modes only; tallied as
     ``money_only`` / ``money_only_expected``; excluded from ``lost`` and
-    ``expected`` exactly as ``currency`` is.  A row is never in both.
+    ``expected`` exactly as ``currency`` is.  A row is never in two buckets:
+    ``currency`` first, then ``money_only``, then ``unknown``.  A money-only
+    row with an ``Unknown`` unit (Burkina Faso 2014 passages 2-4) is
+    ``money_only``: the missing quantity grid is why it cannot be priced in
+    any mode, and the missing unit follows from it.
 
     Parameters
     ----------
@@ -336,21 +371,28 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     is_inf = np.isinf(price)
     is_nan = np.isnan(price)
     is_zero = (price == 0)
-    dropped = is_inf | is_nan | is_zero
 
     expected = np.asarray(expected, dtype=bool)
+    no_rows = np.zeros(len(v), dtype=bool)
+    has_u = 'u' in (v.index.names or [])
 
     # Currency-denominated rows have no kg factor BY DESIGN (GH #770), so in
     # the kg* modes they are not rows that "ought to have produced a price".
     # Give them their own bucket and take them out of both sides of the
     # fraction, so what remains is the residual REAL loss -- the only number
-    # a threshold can usefully bite on.  In the unit* modes a currency row is
-    # priceable (Expenditure / Quantity), so nothing is excluded there.
-    if units in ('kgvalue', 'kgprice') and 'u' in (v.index.names or []):
-        currency = _is_currency_denominated(
-            v.index.get_level_values('u')) & expected
-    else:
-        currency = np.zeros(len(v), dtype=bool)
+    # a threshold can usefully bite on.  ``unitvalue`` joins them (GH #1129):
+    # there the row's Price is the tautology 1.0, so it is dropped by label.
+    on_currency = (_is_currency_denominated(v.index.get_level_values('u'))
+                   if has_u and units in _CURRENCY_UNPRICEABLE_MODES
+                   else no_rows)
+    # GH #1068: in ``unitvalue`` a missing unit is dropped by label too.  The
+    # same test the kg ladder uses for "no unit recorded".
+    by_label = units in _LABEL_DROP_MODES
+    on_unknown = (_unit_sentinel_mask(v) & ~on_currency
+                  if has_u and by_label else no_rows)
+    forced = (on_currency | on_unknown) if by_label else no_rows
+    dropped = is_inf | is_nan | is_zero | forced
+    currency = on_currency & expected
 
     # Money-only recall occasions are the SECOND by-design bucket (GH #864).
     # A survey module that records expenditure and fields no quantity grid
@@ -363,7 +405,12 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     # quantity keeps its NaN rows as the real, reportable loss they are
     # (item non-response, a quantity variable bound to nothing, ...).
     money_only = _money_only_rows(v, units, expected) & ~currency
-    by_design = currency | money_only
+    # Only the rows the label rule REMOVED: one whose Price was already inf,
+    # NaN or zero keeps that cause, so the GH #591 ``inf`` (a zero quantity)
+    # and item non-response stay in the residual loss they report.
+    servable = np.isfinite(price) & (price != 0)
+    unknown = on_unknown & expected & servable & ~money_only
+    by_design = currency | money_only | unknown
     effective = expected & ~by_design
 
     lost = int((dropped & effective).sum())
@@ -384,6 +431,10 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
         # `dropped_expected` / `lost_fraction`.
         'money_only': int((dropped & money_only).sum()),
         'money_only_expected': int(money_only.sum()),
+        # Dropped by design because the unit is missing (``unitvalue`` only,
+        # GH #1068); NOT counted in `dropped_expected` / `lost_fraction`.
+        'unknown': int((dropped & unknown).sum()),
+        'unknown_expected': int(unknown.sum()),
         'dropped_total': int(dropped.sum()),
         'dropped_expected': lost,
         'inf': int((is_inf & effective).sum()),
@@ -393,15 +444,27 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     }
 
     if n_expected and lost / n_expected > threshold:
+        currency_why = (
+            "Expenditure / Quantity on such a row is the amount over itself, "
+            "exactly 1.0 (GH #1129)" if units == 'unitvalue' else
+            "the factor is 1/price at (j, t, m) and no per-label constant "
+            "can represent it (GH #770)")
         currency_note = (
             f"  A further {tally['currency']:,} row(s) were dropped because "
             f"their unit is CURRENCY-DENOMINATED (u='Value': the survey "
             f"deliberately elicited value, not a physical amount).  Those "
-            f"are BY DESIGN -- the factor is 1/price at (j, t, m) and no "
-            f"per-label constant can represent it (GH #770) -- so they are "
+            f"are BY DESIGN -- {currency_why} -- so they are "
             f"EXCLUDED from the count and the fraction above, which report "
             f"the residual real loss."
             if tally['currency'] else ""
+        )
+        unknown_note = (
+            f"  A further {tally['unknown']:,} row(s) were dropped because "
+            f"their unit is MISSING (u='{U_UNKNOWN}' or another no-unit "
+            f"sentinel): a value per unrecorded unit is not a price (GH "
+            f"#1068).  Those are BY DESIGN and EXCLUDED from the count and "
+            f"the fraction above."
+            if tally['unknown'] else ""
         )
         money_only_note = (
             f"  A further {tally['money_only']:,} row(s) were dropped because "
@@ -423,8 +486,8 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
             f"Quantity -- typically a 0-as-missing sentinel or a quantity "
             f"variable mapped to the wrong survey question (GH #591).  A NaN "
             f"Price means the quantity was missing OR the unit has no kg "
-            f"factor.{currency_note}{money_only_note}  See GH #591, GH #770, "
-            f"GH #864.",
+            f"factor.{currency_note}{money_only_note}{unknown_note}  See GH "
+            f"#591, GH #770, GH #864, GH #1068.",
             UnpriceableRowsWarning,
             stacklevel=3,
         )
@@ -2424,6 +2487,80 @@ def _rows_older_than_their_table(df):
     return np.asarray(older), df.assign(Quantity_kg=df['Quantity_kg'].mask(read))
 
 
+#: The acquisition source whose rows are EVIDENCE for the food price-ratio
+#: inference (GH #1509; ruling @ligon 2026-11-12, "all purchase rows").  A
+#: ``S_VALUES`` spelling, matched exactly: ``produced``, ``inkind``, ``other``,
+#: an NA ``s`` and any non-canonical spelling are not known to be purchases.
+_KG_EVIDENCE_SOURCE = 'purchased'
+
+
+def _purchase_rows(df):
+    """Row mask of ``s == 'purchased'``, or ``None`` when *df* has no ``s``."""
+    if 's' in (df.index.names or []):
+        s = df.index.get_level_values('s')
+    elif 's' in df.columns:
+        s = df['s']
+    else:
+        return None
+    return np.asarray(pd.Index(s).isin([_KG_EVIDENCE_SOURCE]), dtype=bool)
+
+
+def _purchase_evidence(df):
+    """*df* with ``Expenditure`` blanked on every row that is not a purchase.
+
+    The eligibility filter of GH #1509.  The price ratio compares two prices
+    of one item, so both have to come from the purchase regime: own production
+    and gifts are valued, where they are valued at all, by the household
+    (Uganda ``value_own``) or by a derivation (GhanaLSS ``8h-farmgate``), and
+    below market on staples, so pooling them moves a cell by how often each
+    regime lands on the ``kg`` rows and on the bunch rows.
+
+    Blanked, not dropped: every row keeps its position, so a produced row is
+    still SERVED the factor its ``(j, u)`` cell gets from purchases.  An NA
+    price is what an absent one is to :func:`conversion_to_kgs`, so the row
+    enters neither the baseline nor step 2, and the floors count purchases.
+
+    A frame with no ``s`` level or column is returned unchanged and every row
+    stays evidence: there is nothing to filter on, and
+    ``attrs['kg_factor_evidence']['source_level']`` says so.  Every served
+    ``food_acquired`` carries ``s`` (``validate_acquisition_source`` refuses an
+    NA one on every Country read), so only a direct call reaches this branch.
+    """
+    purchased = _purchase_rows(df)
+    if purchased is None or purchased.all() or 'Expenditure' not in df.columns:
+        return df
+    return df.assign(Expenditure=df['Expenditure'].mask(~purchased))
+
+
+def _kg_evidence_ledger(df, *, read=True):
+    """What the price ratio read of *df*, and what the GH #1509 filter left out.
+
+    A PRICED row has a positive ``Expenditure`` and ``Quantity`` on a unit
+    that is not currency-denominated: a row that could enter the estimate.
+    With *read* false (no inference ran) both counts are zero.
+    """
+    purchased = _purchase_rows(df)
+    ledger = {'source': _KG_EVIDENCE_SOURCE,
+              'source_level': purchased is not None,
+              'priced_rows_read': 0, 'priced_rows_excluded': {}}
+    if not read or not {'Expenditure', 'Quantity'} <= set(df.columns):
+        return ledger
+    priced = (_as_float(df['Expenditure']) > 0) & (_as_float(df['Quantity']) > 0)
+    u = _level_or_column(df, 'u')
+    if u is not None:
+        priced = priced & ~_is_currency_denominated(u)
+    if purchased is None:
+        ledger['priced_rows_read'] = int(priced.sum())
+        return ledger
+    ledger['priced_rows_read'] = int((priced & purchased).sum())
+    s = pd.Series(_level_or_column(df, 's'), dtype=object)
+    left_out = s[priced & ~purchased]
+    ledger['priced_rows_excluded'] = {
+        ('<NA>' if pd.isna(k) else str(k)): int(n)
+        for k, n in left_out.value_counts(dropna=False).items()}
+    return ledger
+
+
 def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                     min_reports=FOOD_KG_MIN_REPORTS,
                     min_baseline=FOOD_KG_MIN_BASELINE,
@@ -2469,7 +2606,8 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         item.  Matched on stripped, lower-cased labels as this function sees
         them, which on the Country path are the served ones (see
         :func:`_size_pooled_frame`).  The declared rows still enter the
-        estimators as evidence: this refuses to SERVE a factor, it does not
+        estimators as evidence (the purchases among them, GH #1509): this
+        refuses to SERVE a factor, it does not
         re-estimate anyone
         else's.  A country declares its cells in ``_/no_kg_factor.yml``
         (read at read time by ``Country._no_kg_factor_cells``).  A declared
@@ -2504,9 +2642,34 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         marks: an unsized label served by an inferred rung whose estimate pooled
         the sizes of its base (GH #1450).  ``rows_served ==
         served_by_item_rung + served_by_unit_rung``; ``labels`` names them.
+        ``attrs['kg_factor_evidence']`` reports what the price ratio read (GH
+        #1509): ``source`` (``'purchased'``), ``source_level`` (the frame has
+        an ``s``), ``priced_rows_read`` and, by ``s``,
+        ``priced_rows_excluded``, over every row the estimators read (so not
+        restricted by ``serve_waves``).
 
     Notes
     -----
+    WHICH ROWS ARE EVIDENCE (GH #1509; ruling @ligon 2026-11-12, "all
+    purchase rows").  The inferred rungs estimate from rows whose ``s`` is
+    exactly ``'purchased'`` (:func:`_purchase_evidence`), and every row is
+    served: a produced or in-kind row reads the factor the purchases of its
+    ``(j, u)`` give it, and falls down the ladder where they give none.  The
+    floors count purchases.  ``produced``, ``inkind``, ``other`` and an NA
+    ``s`` are not purchases and do not enter.  ``survey_kg`` and ``metric``
+    read no price and do not move.  A frame without ``s`` is all evidence.
+
+    "All purchase rows" means a row the country LABELS a purchase, whatever
+    its quantity's construction.  Known case, the ``allocated-quantity``
+    caveat: Cambodia 2019-20 records one total quantity and two values, so
+    its purchased ``Quantity`` is ``total x spent / (spent + obtained)``
+    (#108).  Its purchased unit value is then ``(spent + obtained) / total``,
+    which still depends on the self-valued share; measured on the 2026-11-07
+    comparison, doubling only the obtained value moves 325 purchased
+    quantities and 2,574 ``Piece`` factors (0.1154 -> 0.1143 kg) even under
+    this filter.  Independently measured purchase prices only, the
+    alternative, was not selected.  See ``Cambodia/_/CONTENTS.org``.
+
     WHICH CELL A ROW READS.  A label carrying a size of the EHCVM instrument
     (``Tas (Petit)``, :func:`_unit_size_base`) reads that size alone, because a
     size is what the survey recorded.  An unsized label with sized siblings in
@@ -2566,13 +2729,16 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                  tight_tolerance=tight_tolerance,
                  baseline_max_spread=baseline_max_spread)
     infer = have_price and bool(group_levels)
-    rungs, size_pool_rows = _pooled_kg_rungs(df, units, seeded, group_levels,
+    # GH #1509 (ruling @ligon 2026-11-12, "all purchase rows"): the estimators
+    # read purchases only.  Every row is still served below.
+    priced = _purchase_evidence(df)
+    rungs, size_pool_rows = _pooled_kg_rungs(priced, units, seeded, group_levels,
                                              item_col, gates, infer)
     # GH #1452, option B (ruling @ligon 2026-11-05): a row of a wave no
     # wave-scoped table reached reads the estimate with that table's kilograms
     # taken out, so wiring a table to the newer waves leaves an older wave's
     # factors where they were.
-    older, tableless = _rows_older_than_their_table(df)
+    older, tableless = _rows_older_than_their_table(priced)
     if infer and older is not None:
         prior, _ = _pooled_kg_rungs(tableless, units, seeded, group_levels,
                                     item_col, gates, infer)
@@ -2588,6 +2754,9 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     # read); a declared no-kg cell is judged against the rows the estimators read.
     keep = _served_rows(df, serve_waves)
     evidence = df
+    # GH #1509.  Over the rows the estimators READ, like the floors, so a
+    # ``serve_waves=`` request reports the whole estimate.
+    evidence_ledger = _kg_evidence_ledger(evidence, read=infer)
     if keep is not None:
         served_labels = set(np.asarray(units)[keep])
         rungs['contradicting'] = {k: v for k, v in rungs['contradicting'].items()
@@ -2788,6 +2957,7 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
             {str(u) for u in (df.index.get_level_values('u')[pooled_served]
                               if pooled_served.any() else ())}),
     }
+    out.attrs['kg_factor_evidence'] = evidence_ledger
     out.attrs['kg_factor_baseline_gate'] = {
         'baseline_max_spread': baseline_max_spread,
         'rows_refused': int(refused.sum()),
@@ -3484,7 +3654,12 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
           kg from native rows.  Consumers wanting purely-kg rows do
           ``df.xs('kg', level='u')``.
         - ``'units'``: sum native ``Quantity`` per ``(t, v, i, j, u, s)``,
-          no kg conversion attempted.
+          no kg conversion attempted.  Rows on a missing unit
+          (``u='Unknown'``, :func:`_unit_sentinel_mask`) are DROPPED, not
+          summed into an ``Unknown`` pseudo-unit, and counted in
+          ``attrs['quantity_rows_dropped']['unknown']`` (GH #1068; ruling
+          @ligon 2026-11-12).  ``u='Value'`` rows are kept: their sum is the
+          recorded currency amount, the row the ``'kgs'`` carry rule keeps.
     serve_waves : collection of wave labels, optional
         Serve only these waves of *df* while the kg factors read all of it
         (GH #1487; see :func:`food_kg_factors`).  ``Country.food_quantities``
@@ -3538,10 +3713,24 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
         return q
 
     if units == 'units':
+        # GH #1068 (ruling @ligon 2026-11-12, "drop and count"): a row on a
+        # missing unit is not a quantity OF anything, and summing such rows
+        # adds amounts of units that differ and were not recorded.  Dropped
+        # and counted, never summed.  Currency rows (``u='Value'``) stay: the
+        # sum is the recorded amount in currency, not a ratio, and the
+        # ``'kgs'`` carry rule keeps them the same way.
+        unknown = _unit_sentinel_mask(df)
+        q = df[['Quantity']].replace(0, np.nan)
+        has_qty = q['Quantity'].notna().to_numpy()
         # `v` omitted; see `food_expenditures_from_acquired` for rationale.
         group_by = [n for n in ['t', 'i', 'j', 'u', 's'] if n in idx_names]
-        q = df[['Quantity']].replace(0, np.nan).dropna()
-        q = q.groupby(group_by).sum()
+        q = q[~unknown].dropna().groupby(group_by).sum()
+        q.attrs['quantity_rows_dropped'] = {
+            'units': units,
+            'rows_in': int(len(df)),
+            # Rows that carried a quantity and were dropped for their unit.
+            'unknown': int((unknown & has_qty).sum()),
+        }
         return q
 
     # units == 'kgs': carry rule
@@ -3586,6 +3775,7 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
     out.attrs['kg_factor_declared_none'] = dict(
         kgf.attrs['kg_factor_declared_none'])
     out.attrs['kg_factor_size_pool'] = dict(kgf.attrs['kg_factor_size_pool'])
+    out.attrs['kg_factor_evidence'] = dict(kgf.attrs['kg_factor_evidence'])
     return out
 
 
@@ -3618,10 +3808,13 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
           (currency / kg, derived).  Backward-compatible with the
           pre-Phase-4 implementation.
         - ``'unitvalue'``: ``Expenditure / Quantity`` (currency / native u,
-          derived).  For ``u='Value'`` rows (LCU-only goods) the formula
-          gives 1 — *Kwacha per Kwacha* — mathematically correct but
-          analytically useless; consumers should filter on ``u`` before
-          aggregating.
+          derived).  Rows on a currency-denominated unit (``u='Value'``,
+          LCU-only goods, where the formula is the amount over itself, 1.0)
+          and rows on a missing unit (``u='Unknown'``, a value per unrecorded
+          unit) are DROPPED and counted in ``attrs['price_rows_dropped']``
+          as ``currency`` and ``unknown`` (GH #1129, #1068; ruling @ligon
+          2026-11-12).  A wave whose rows are all ``u='Value'`` (GhanaLSS
+          1987-88, 1988-89, 1991-92) therefore serves no ``unitvalue`` rows.
         - ``'kgprice'``: reported ``Price`` × kg_factor (currency / kg).
           NaN where ``Price`` is missing or ``u`` is unconvertible to kg.
         - ``'unitprice'``: reported ``Price`` (currency / native u).
@@ -3803,6 +3996,7 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
         v.attrs['kg_factor_declared_none'] = dict(
             kgf.attrs['kg_factor_declared_none'])
         v.attrs['kg_factor_size_pool'] = dict(kgf.attrs['kg_factor_size_pool'])
+        v.attrs['kg_factor_evidence'] = dict(kgf.attrs['kg_factor_evidence'])
     return v
 
 
