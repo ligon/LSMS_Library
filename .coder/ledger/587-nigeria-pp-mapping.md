@@ -168,7 +168,7 @@ failed to connect).
 | W1 g/ml, N = 1 (963 + 80) | **held**, own key `pp-w1-metric-package-hold` | ruling; 144x household |
 | W1 Kg/l, N > 50 (128 + 204) | **held**, own key `pp-w1-count-as-size-hold`; N = 50 divides | ruling; 50-1000x under household |
 | W3 Kg/l, no size (4,120) | **served as recorded**, no key | ruling; 1.07 / 1.00x household.  PH W3 still drops its Kg/l: an asymmetry, recorded |
-| W5 g/cl, no size, `c2q2a` > 0 (208) | **served** `c2q3 / c2q2a`, key `pp-w5-metric-unit-quantity` | ruling; `c2q2a` = the package size in g / cl -- `c2q2b_os` agrees on 172 (174) of 176 g and, as ml / 10, on 32 of 32 cl; cvn 0.001 / 0.01; form and manual silent |
+| W5 g/cl, no size, `c2q2a` > 0 (208) | **served** `c2q3 / c2q2a`, key `pp-w5-metric-unit-quantity` | ruling; `c2q2a` = the package size in g / cl -- `c2q2b_os` agrees on 172 (175 at float precision; the 176th text is garbled) of 176 g and, as ml / 10, on 32 of 32 cl; cvn 0.001 / 0.01; form and manual silent |
 | W5 g/cl, no size, no `c2q2a` (23) | **held** (`pp-unrecorded-size-hold`) | nothing to divide by; their text has no number |
 | W2 cl (5) | **held** with W2 g | the ruling names W2 grams only |
 
@@ -176,3 +176,12 @@ failed to connect).
 1. The label judgement rows (unchanged from step 2), listed in the PR body.
 2. W5's 123 `c2q2a`-not-1 rows (63 BOTTLE/CAN with a coded metric size could be served by the PH division).
 3. PH W3's 3,433 Kg/l are still dropped; PP W3's are now served.  Re-measure PH W3 against household values?
+
+### Phase 3 -- verification (step 3)
+- Cold, private roots: base `e5fdd2fa8`, previous head `c541bf49f`, candidate `f79c2f854`.  PH rows frame-equal to
+  `c541bf49f` (146,792); `sample`, `household_roster`, `food_acquired` frame-equal to base.  PP keyed diff
+  previous -> candidate: 1,375 rows leave (all 2010Q3: 963 g, 80 ml, 128 Kg, 204 l), 4,328 arrive (2015Q3 Kg
+  3,075 / l 1,045; 2023Q3 g 176 / cl 32), 0 value differences on the 124,751 common rows.
+- Every PP registry key: constructions' inputs equal the stamped rows and reproduce Price; omissions' inputs are
+  disjoint from the served index, unique, at `rows: 0` in attrs.  Site B / I / Q: 0 / 0 / 0 on community_prices
+  in every arm; warnings identical to the previous head.
