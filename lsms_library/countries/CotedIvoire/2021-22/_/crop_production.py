@@ -1,4 +1,4 @@
-"""Build crop_production for CotedIvoire EHCVM 2021-22 (GH #552).
+"""Build crop_production for CotedIvoire EHCVM 2021-22 (GH #1697).
 
 The instrument splits the module 2018-19 kept together:
 

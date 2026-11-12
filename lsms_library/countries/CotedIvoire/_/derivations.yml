@@ -144,7 +144,7 @@ CotedIvoire::crop_production::hh-crop-sale-single-row:
       basis: modelling-choice
       evidence: >-
         ruling @ligon 2026-11-03, option (d), GH #824, for Mali 2021-22 and applied here by
-        the brief of GH #552; the Farm-level convention in lsms_library/data_info.yml.
+        the brief of GH #1697 (split from #552); the Farm-level convention in lsms_library/data_info.yml.
     - text: >-
         s16dq05b labels codes 1 to 7 and holds other codes of section 7B's list with no
         label (339, 340, 316, ...), 183 of the 8,467 sales.  They are read through this
@@ -204,12 +204,18 @@ CotedIvoire::crop_production::harvest-from-dispositions:
                   s16dq05b, s16dq13a, s16dq13b]
   assumptions:
     - text: >-
-        the rule of Mali 2021-22 (ruling @ligon 2026-11-04, GH #1437) holds for this file,
-        whose shape is sharper than Mali's: s16cq16a is on 3,595 of 21,737 crop rows and on
-        none of the 12,263 finished ones.  The ruling names Mali and Burkina Faso.  Without
-        it 2021-22 serves no harvest for a finished crop at all.
+        this extends Mali's ruled derivation, Mali::crop_production::harvest-from-dispositions
+        (ruling @ligon 2026-11-04, option (b) of GH #1437), to this file, whose shape is
+        sharper than Mali's: s16cq16a is on 3,595 of 21,737 crop rows and on none of the 12,263
+        finished ones.  The same rule, the same shared function and the same hold-outs.  The
+        extension is itself ruled (@ligon 2026-11-12, "Extend Mali's derivation").  Without it
+        2021-22 serves no harvest for a finished crop at all.  Why s16cq16a is blank is not
+        answered by it: GH #1437 stays open.
       basis: modelling-choice
-      evidence: GH #1437; Mali/_/CONTENTS.org, "the 2021-22 harvest total, and the window key"
+      evidence: >-
+        ruling @ligon 2026-11-12, "Harvest from dispositions in Benin / Cote d'Ivoire 2021-22",
+        option "Extend Mali's derivation (Recommended)"; GH #1437 (open); Mali/_/CONTENTS.org,
+        "the 2021-22 harvest total, and the window key"
     - text: >-
         consumed + given + sold + in stock is the harvest.  2018-19 of this country can test
         it, because it holds the harvest and all four dispositions on one row (s16cq12a;
@@ -237,7 +243,7 @@ CotedIvoire::crop_production::harvest-from-dispositions:
   since: '2026-11-04'
 
 CotedIvoire::sample::region-milieu-stratum:
-  waves: ['2018-19']
+  waves: ['2018-19', '2021-22']
   columns: [strata]
   rows: {}
   rule: >-
@@ -246,15 +252,23 @@ CotedIvoire::sample::region-milieu-stratum:
     Missing or blank either component gives NA; nonstring codes are refused.
     Preserve native labels without a geographic crosswalk or a region-only
     fallback. The existing shared GH812 construction supplies the value.
+    2021-22 (s00_me_civ2021.dta) upper-cases the region label first, by
+    2021-22/_/mapping.py:strata_label_upper_region, the wave's own spelling of
+    s00q01 that mapping.Region gives cluster_features.Region: the file labels
+    23 of its 33 regions in lower case (poro, gÔh) on 2018-19's codes, and
+    upper case is 2018-19's label on all 33. The registered function applied
+    to the raw 2021-22 inputs therefore gives the lower-case spelling of those
+    23 regions; upper-case the region to re-derive the served value.
   function: lsms_library.ehcvm:derive_region_milieu_stratum
   inputs: lsms_library.countries.CotedIvoire.2018-19._.mapping:inputs_strata
   raw_variables: [s00q01, s00q04]
   assumptions:
     - text: >-
         the original 2018/19 household sampling stratum is the combination of
-        region and milieu. Only the existing 2018-19 sample is wired here;
-        the later survey revisits the original clusters, rather than making
-        an independent new first-stage draw.
+        region and milieu. The later survey revisits the original clusters,
+        rather than making an independent new first-stage draw, so its
+        households carry their clusters' strata. 2018-19 was wired on
+        2026-11-10; 2021-22 on 2026-11-12, by the ruling "Same rule as #1575".
       basis: questionnaire
       evidence: >-
         Own INS Basic Information Document (survey design documentation,
@@ -262,6 +276,8 @@ CotedIvoire::sample::region-milieu-stratum:
         2021-22/Documentation/civ_ehcvm2_information_de_base.pdf, section 4.1,
         French PDF p.13 (English p.12): "La strate est la combinaison
         région/milieu." GH1575 documentary check; user selection 2026-11-10.
+        Extended to 2021-22 by ruling @ligon 2026-11-12, "Same rule as #1575
+        (Recommended)".
     - text: >-
         retain each cover's recorded labels and leave strata unknown when
         either component is missing or blank. No urban-only capital rule,

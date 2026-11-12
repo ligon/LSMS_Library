@@ -1,4 +1,4 @@
-"""Build plot_features for Benin EHCVM 2021-22 (GH #552).
+"""Build plot_features for Benin EHCVM 2021-22 (GH #1697).
 
 One source file, s16a_me_ben2021.dta, with the column names and code lists of 2018-19, checked
 label by label (s16aq10 code 3 and s16aq17 code 1 reword the same answers).

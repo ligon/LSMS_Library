@@ -1,9 +1,12 @@
-"""Togo/2018's selected GH1575 wiring, using invented frames only.
+"""Togo's selected GH1575 wiring, 2018 and 2021-22, using invented frames only.
 
 These controls exercise the actual YAML, column mapper, extraction, join and
 thin hooks. They establish no native card, population or allocation count.
 The baseline uses the same specification with the former region-only field
-and no new sample hook (ledger 1575-togo1575-stratawiring §§2–5).
+and no new sample hook (ledger 1575-togo1575-stratawiring §§2–5).  2021-22 has
+the same construction since the ruling of 2026-11-12 ("Same rule as #1575"),
+with its own cover and its own labels: code 6 is ``Grand Lomé`` there and
+``Lomé commune`` in 2018, and neither is renamed (GH #1697).
 """
 from copy import deepcopy
 import importlib
@@ -31,6 +34,13 @@ MAPPING_PATH = WAVE_DIR / "_" / "mapping.py"
 _module_spec = importlib.util.spec_from_file_location("_togo_2018_gh1575", MAPPING_PATH)
 MAPPING = importlib.util.module_from_spec(_module_spec)
 _module_spec.loader.exec_module(MAPPING)
+LATER = "2021-22"
+LATER_DIR = OWN / LATER
+LATER_SPEC = load_yaml(LATER_DIR / "_" / "data_info.yml")["sample"]
+LATER_MAPPING_PATH = LATER_DIR / "_" / "mapping.py"
+_later_spec = importlib.util.spec_from_file_location("_togo_2021_gh1575", LATER_MAPPING_PATH)
+LATER_MAPPING = importlib.util.module_from_spec(_later_spec)
+_later_spec.loader.exec_module(LATER_MAPPING)
 
 
 @pytest.fixture(autouse=True)
@@ -58,6 +68,10 @@ def synthetic(monkeypatch):
         OWN / "_" / "togo.py", name="_togo_country_gh1575")
     functions.update(local_tools.get_formatting_functions(
         MAPPING_PATH, name="_togo_mapping_gh1575"))
+    later_functions = local_tools.get_formatting_functions(
+        OWN / "_" / "togo.py", name="_togo_country_gh1575_later")
+    later_functions.update(local_tools.get_formatting_functions(
+        LATER_MAPPING_PATH, name="_togo_mapping_gh1575_later"))
     scheme = load_yaml(OWN / "_" / "data_scheme.yml")
     # Use the real Wave methods with a source-only parent, never Country APIs.
     parent = SimpleNamespace(name="Togo", resources=scheme)
@@ -77,17 +91,25 @@ def synthetic(monkeypatch):
 
     monkeypatch.setattr(local_tools, "get_dataframe", provider)
 
-    def bind(cover, weights, *, baseline=False):
-        block = deepcopy(SPEC)
-        wave._test_functions = dict(functions)
+    later = C.Wave(LATER, LATER, parent)
+
+    def bind(cover, weights, *, baseline=False, wave_label="2018"):
+        """Bind one wave's sample block to invented frames.  ``wave_label='2021-22'``
+        binds that wave's own block and functions instead, leaving 2018's frames bound."""
+        target, spec, fns, wdir = ((later, LATER_SPEC, later_functions, LATER_DIR)
+                                   if wave_label == LATER else
+                                   (wave, SPEC, functions, WAVE_DIR))
+        block = deepcopy(spec)
+        target._test_functions = dict(fns)
         if baseline:
             block["df_cover"]["myvars"]["strata"] = "s00q01"
-            wave._test_functions.pop("sample", None)
-        wave._test_resources = {"sample": block}
-        frames.clear()
+            target._test_functions.pop("sample", None)
+        target._test_resources = {"sample": block}
+        if wave_label != LATER:
+            frames.clear()
         for name, frame in (("df_cover", cover), ("df_weights", weights)):
-            frames[(WAVE_DIR / "Data" / block[name]["file"]).resolve()] = frame
-        return wave
+            frames[(wdir / "Data" / block[name]["file"]).resolve()] = frame
+        return target
 
     return bind, reads
 
@@ -105,6 +127,20 @@ def _cover():
 def _weights():
     # A cover-only cluster and a weight-only cluster exercise the existing outer join.
     return pd.DataFrame({"grappe": [8, 2, 99], "hhweight": [17.25, pd.NA, 41.5]})
+
+
+def _later_cover():
+    # 2021-22's own region-6 label beside an ordinary one; geography otherwise invented.
+    return pd.DataFrame({
+        "grappe": [8, 2, 8], "menage": [2, 1, 1],
+        "s00q01": ["Grand Lomé", "Invented Inland", " Grand Lomé "],
+        "s00q04": ["Urbain", "Rural", "Urbain"],
+    })
+
+
+def _later_weights():
+    # One row per household in 2021-22, keyed like the cover (merge_on: i).
+    return pd.DataFrame({"grappe": [8, 2, 8], "menage": [2, 1, 1], "poids": [3.5, 2.0, 3.5]})
 
 
 def test_only_the_strata_declaration_changes_the_sample_contract():
@@ -214,7 +250,7 @@ def test_registry_is_unique_scoped_and_uses_the_existing_optional_carrier():
     text = (OWN / "_" / "derivations.yml").read_text(encoding="utf-8")
     assert len(re.findall(rf"^{re.escape(KEY)}:", text, re.M)) == 1
     rec = derivations.derivation_records("Togo")[KEY]
-    assert list(rec.waves) == ["2018"] and list(rec.columns) == ["strata"]
+    assert list(rec.waves) == ["2018", LATER] and list(rec.columns) == ["strata"]
     assert rec.rows == {} and list(rec.raw_variables) == ["s00q01", "s00q04"]
     assert rec.resolve() is ehcvm.derive_region_milieu_stratum
     assert rec.resolve("inputs").__name__ == "inputs_strata"
@@ -227,33 +263,65 @@ def test_registry_is_unique_scoped_and_uses_the_existing_optional_carrier():
 
 def test_inputs_follow_own_literal_source_and_household_formatter_at_input_grain(synthetic, monkeypatch):
     bind, reads = synthetic
-    cover = _cover()
+    cover, later_cover = _cover(), _later_cover()
     wave = bind(cover, _weights())
+    later = bind(later_cover, _later_weights(), wave_label=LATER)
     visits = []
 
     class SourceOnlyCountry:
         def __getitem__(self, label):
             visits.append(label)
-            if label != "2018":
-                raise KeyError(label)
-            return wave
+            return {"2018": wave, LATER: later}[label]
 
     def country(name):
         assert name == "Togo"
         return SourceOnlyCountry()
 
     monkeypatch.setattr(C, "Country", country)
-    inputs = derivations.call_inputs(derivations.derivation_records("Togo")[KEY])
-    assert visits == ["2018"]
-    assert reads == [(WAVE_DIR / "Data1" / "s00_me_tgo2018.dta").resolve()]
+    rec = derivations.derivation_records("Togo")[KEY]
+    # The scoped call reads each wave of the record's scope from that wave's OWN cover,
+    # under that wave's own household formatter, with the labels as the file has them.
+    inputs = derivations.call_inputs(rec)
+    assert visits == ["2018", LATER]
+    assert reads == [(WAVE_DIR / "Data1" / "s00_me_tgo2018.dta").resolve(),
+                     (LATER_DIR / "Data" / "s00_me_tgo2021.dta").resolve()]
     assert inputs.index.names == ["t", "i"]
-    assert inputs.index.get_level_values("i").tolist() == ["8002", "2001", "8001", "5001"]
-    pd.testing.assert_frame_equal(inputs.reset_index(drop=True),
-                                  cover[["s00q01", "s00q04"]], check_exact=True)
-    # The invented provider refuses 2021-22, and the registry passes that through: it
-    # does not enforce `waves` on a named wave.  The REAL provider now serves 2021-22's
-    # cover (GH #552 wired the wave), so a real explicit call returns its answers for a
-    # wave no row of which carries the key: a residual, Togo/_/CONTENTS.org 2026-11-12.
-    with pytest.raises(KeyError, match="2021-22"):
-        derivations.call_inputs(derivations.derivation_records("Togo")[KEY], wave="2021-22")
-    assert visits == ["2018", "2021-22"] and len(reads) == 1
+    assert inputs.index.get_level_values("t").tolist() == ["2018"] * 4 + [LATER] * 3
+    assert inputs.index.get_level_values("i").tolist() == [
+        "8002", "2001", "8001", "5001", "E2_8002", "E2_2001", "E2_8001"]
+    pd.testing.assert_frame_equal(
+        inputs.reset_index(drop=True),
+        pd.concat([cover[["s00q01", "s00q04"]], later_cover[["s00q01", "s00q04"]]],
+                  ignore_index=True), check_exact=True)
+    # A named wave reads that wave alone.
+    only = derivations.call_inputs(rec, wave=LATER)
+    assert visits == ["2018", LATER, LATER] and len(reads) == 3
+    assert only.index.get_level_values("i").tolist() == ["E2_8002", "E2_2001", "E2_8001"]
+
+
+def test_2021_22_declares_the_same_construction_with_its_own_cover_and_hook():
+    later = LATER_SPEC["df_cover"]
+    assert later["file"] == "s00_me_tgo2021.dta"
+    assert later["myvars"]["strata"] == SPEC["df_cover"]["myvars"]["strata"] == [
+        "s00q01", "s00q04", {"mapping": "strata_label"}]
+    assert LATER_MAPPING.strata_label is ehcvm.strata_label
+    assert LATER_MAPPING._stamp_region_milieu_stratum is ehcvm.stamp_region_milieu_stratum
+    # Everything else in 2021-22's block is the wiring of GH #1697, unchanged.
+    assert set(LATER_SPEC) == {"dfs", "df_cover", "df_weights", "merge_on", "final_index"}
+    assert LATER_SPEC["merge_on"] == ["i"] and LATER_SPEC["final_index"] == ["i", "t"]
+    assert LATER_SPEC["df_weights"]["myvars"] == {"weight": "poids", "panel_weight": "poids"}
+
+
+def test_2021_22_serves_its_own_lome_label_and_conserves_every_other_field(synthetic):
+    bind, _ = synthetic
+    before = bind(_later_cover(), _later_weights(), baseline=True, wave_label=LATER).grab_data("sample")
+    after = bind(_later_cover(), _later_weights(), wave_label=LATER).grab_data("sample")
+    pd.testing.assert_frame_equal(after.drop(columns=["strata", "Derivation"]),
+                                  before.drop(columns="strata"), check_exact=True)
+    strata = after["strata"].to_dict()
+    assert strata == {("E2_2001", LATER): "Invented Inland Rural",
+                      ("E2_8001", LATER): "Grand Lomé Urbain",
+                      ("E2_8002", LATER): "Grand Lomé Urbain"}
+    # 2018's region-6 label is not 2021-22's, and nothing makes them one.
+    assert not any("Lomé commune" in v for v in strata.values())
+    assert after["Derivation"].eq(KEY).all()

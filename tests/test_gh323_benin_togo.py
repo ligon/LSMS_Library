@@ -46,7 +46,7 @@ from lsms_library.country import Country
 # Benin:  the wave script emits 10,605 reported line-items and ALL of them must
 #         survive.  Pre-fix the API returned 10,534 -- 71 destroyed.
 BENIN_ROWS = 10605
-# Benin 2021-22 (GH #552): every applied line of s16b_me_ben2021.dta.
+# Benin 2021-22 (GH #1697): every applied line of s16b_me_ben2021.dta.
 BENIN_2021_ROWS = 11368
 #
 # Togo:   the wave script emits 13,733 reported line-items.  Pre-fix the API
@@ -58,7 +58,7 @@ BENIN_2021_ROWS = 11368
 #         in country.py.  That is not a #323 collapse: it destroys no reported
 #         value, and it is not this fix's business to change it.
 TOGO_ROWS = 13730
-# Togo 2021-22 (GH #552): every applied line of s16b_me_tgo2021.dta.
+# Togo 2021-22 (GH #1697): every applied line of s16b_me_tgo2021.dta.
 TOGO_2021_ROWS = 16042
 
 # The three seed labels that actually occur in the s16b roster of BOTH

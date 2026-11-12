@@ -1,4 +1,4 @@
-"""Build nonfood_expenditures for Togo EHCVM 2021-22 (GH #552).
+"""Build nonfood_expenditures for Togo EHCVM 2021-22 (GH #1697).
 
 s09b..s09f, the five recall windows of section 9, as in 2018; see _/CONTENTS.org
 "nonfood_expenditures (EHCVM section 9)" for the instrument, for why the window is

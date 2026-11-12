@@ -17,7 +17,7 @@ Sampling:
         otherwise.  The library serves NO household link across this boundary: 2021-22's `i`
         is `E2_`-prefixed, because a recurring (grappe, menage) key, flagged panel or not, has
         the head of another household of its grappe as often as its own
-        (_/CONTENTS.org, "2021-22 wired"; GH #552).
+        (_/CONTENTS.org, "2021-22 wired"; GH #1697).
       source_type: local-documentation
       confidence: high
       source_file: 'lsms_library/countries/CotedIvoire/2021-22/Documentation/civ_ehcvm2_information_de_base_eng.pdf'

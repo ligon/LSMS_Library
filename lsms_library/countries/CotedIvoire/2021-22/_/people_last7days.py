@@ -1,4 +1,4 @@
-"""Build people_last7days for CotedIvoire EHCVM 2021-22 (GH #552).
+"""Build people_last7days for CotedIvoire EHCVM 2021-22 (GH #1697).
 
 s04a_me_civ2021.dta holds the 7-day answers and carries one row per member, where 2018-19's
 s04 is on the same grain: 9,575 rows here have no answer, and they are served with the

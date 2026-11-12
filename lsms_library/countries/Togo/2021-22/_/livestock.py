@@ -1,4 +1,4 @@
-"""Build livestock for Togo EHCVM 2021-22 (GH #552).
+"""Build livestock for Togo EHCVM 2021-22 (GH #1697).
 
 One source file, s17_me_tgo2021.dta, one row per (household, species), already owned
 only.  The species is s17q01 here and s17q02 in 2018, on one code list.  s17q06 head

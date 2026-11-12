@@ -191,7 +191,7 @@ Data Scheme:
     # two more, Fève and Autre à préciser, served `other_condition` (GH #1436; see
     # categorical_mapping.org).
     #
-    # 2021-22 (GH #552) splits the module: s16c holds the harvest and s16d, with no
+    # 2021-22 (GH #1697) splits the module: s16c holds the harvest and s16d, with no
     # plot, the dispositions.  A sale goes on the household's single harvest row for the
     # crop, keyed hh-crop-sale-single-row, else on one row with plot_id = 'Farm-level' and
     # u = 'Unknown' (option (d), @ligon 2026-11-03).  Unit_sold is the sold unit there;
@@ -238,7 +238,7 @@ Data Scheme:
     # 'Manquant' — non-null index levels so no row is lost to the framework's
     # NaN-key de-dup collapse.  Same i / path quirks as plot_features.
     #
-    # 2021-22 (GH #552) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
+    # 2021-22 (GH #1697) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
     # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018-19 still
     # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
     index: (t, i, input, crop, u)
@@ -267,7 +267,7 @@ Data Scheme:
     # are TRANSFORMATIONS over these rows, never columns here.
     #
     # 2021-22 is not served: its s16a ships only the six use flags (s16aq32 .. s16aq42), not
-    # the days or the wage its instrument asks (16A.33 .. 16A.43).  GH #552.
+    # the days or the wage its instrument asks (16A.33 .. 16A.43).  GH #1697.
     #
     # GRAIN (t, i, plot_id, source): source in {family, hired}.  EHCVM s16a
     # records family (member-day grids s16aq33b_/35b_/37b_) vs non-family /

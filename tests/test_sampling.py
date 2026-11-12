@@ -433,7 +433,7 @@ class TestFeatureCarriesTheRecord:
 
         monkeypatch.setattr(ll, "Country", lambda name, **kw: _FakeCountry(name))
         f = Feature("household_roster")
-        # Liberia, since Benin gained a sampling.yml with its 2021-22 wave (GH #552).
+        # Liberia, since Benin gained a sampling.yml with its 2021-22 wave (GH #1697).
         object.__setattr__(f, "_countries", ["Uganda", "Liberia"])
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")

@@ -1,4 +1,4 @@
-"""GH #552: Togo 2021-22 (EHCVM-2, WB 6279) is wired, under ids of its own.
+"""GH #1697: Togo 2021-22 (EHCVM-2, WB 6279) is wired, under ids of its own.
 
 The first class needs no microdata.  ``TestServed`` builds real tables and carries
 ``requires_s3``; its ORACLE reads the ``.dta`` files through ``get_dataframe``,
@@ -180,14 +180,31 @@ class TestServed:
         assert len(s) == len(cover) == 6462
         region = {1: "Maritime", 2: "Plateaux", 3: "Centrale", 4: "Kara", 5: "Savanes",
                   6: "Grand Lomé"}
-        by_id = dict(zip(_ids(cover), cover["s00q01"].map(region)))
+        milieu = {1: "Urbain", 2: "Rural"}
+        # GH #1575's region x milieu, extended to this wave on 2026-11-12: this file's own
+        # labels, so code 6 is `Grand Lomé`, never 2018's `Lomé commune`.
+        by_id = dict(zip(_ids(cover), cover["s00q01"].map(region) + " " + cover["s00q04"].map(milieu)))
         assert s["strata"].to_dict() == by_id
+        assert s["strata"].nunique() == 11
+        assert (s["Derivation"] == "Togo::sample::region-milieu-stratum").all()
         # Weights come back at mean 1 in the wave, each household keeping its share.
         raw = pd.Series(weights["poids"].to_numpy() / weights["poids"].mean(), index=_ids(weights))
         pd.testing.assert_series_equal(s["weight"].astype(float).sort_index(),
                                        raw.sort_index(), check_names=False)
         pd.testing.assert_series_equal(s["panel_weight"].astype(float).sort_index(),
                                        raw.sort_index(), check_names=False)
+
+    def test_the_registered_inputs_rederive_the_served_strata(self):
+        key = "Togo::sample::region-milieu-stratum"
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            inputs = ll.Country("Togo").derivation_inputs(key, wave=WAVE)
+        rec = ll.Country("Togo").derivations()[key]
+        rebuilt = pd.Series([rec.resolve()(r, m) for r, m in zip(inputs["s00q01"], inputs["s00q04"])],
+                            index=inputs.index.droplevel("t"))
+        served = _served("sample").droplevel("t")["strata"]
+        assert len(rebuilt) == len(served)
+        assert (rebuilt.reindex(served.index) == served).all()
 
     def test_the_cluster_point_is_constant_within_a_grappe(self):
         cover = _raw("s00_me_tgo2021.dta")

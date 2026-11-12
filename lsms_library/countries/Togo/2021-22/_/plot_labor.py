@@ -1,4 +1,4 @@
-"""Build plot_labor for Togo EHCVM 2021-22 (GH #552).
+"""Build plot_labor for Togo EHCVM 2021-22 (GH #1697).
 
 One source file, s16a_me_tgo2021.dta, with 2018's grids: family days s16aq33b_*,
 s16aq35b_*, s16aq37b_*, and hired s16aq39/41/43 {a workers, b days, c wage} over four

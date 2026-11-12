@@ -249,7 +249,7 @@
 # codes / unresolved items) are DROPPED so those Original Labels pass
 # through raw instead of mapping to ''.
 
-# 2021-22 (GH #552).  That file's labels are clean UTF-8 where 2018's keys above are
+# 2021-22 (GH #1697).  That file's labels are clean UTF-8 where 2018's keys above are
 # mojibake, its code list is longer, and its codes do not line up with 2018's.  Its
 # labels are appended at the end of this table, on Niger's rule (GH #833): a
 # respelling of a good 2018 names takes 2018's Preferred Label; two goods 2018

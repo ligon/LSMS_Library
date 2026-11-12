@@ -120,7 +120,7 @@ def test_api_row_count_is_the_cluster_count(benin):
     value-lossless now.  A change here means something else moved.
     """
     df = benin.cluster_features()
-    # Per wave since GH #552: 2021-22 revisits the same 670 grappes.
+    # Per wave since GH #1697: 2021-22 revisits the same 670 grappes.
     per_wave = df.groupby(level='t').size()
     assert (per_wave == N_CLUSTERS).all(), (
         f'Benin/cluster_features API returned {per_wave.to_dict()} rows, expected '

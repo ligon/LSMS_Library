@@ -1,4 +1,4 @@
-"""Build plot_inputs for Benin EHCVM 2021-22 (GH #552).
+"""Build plot_inputs for Benin EHCVM 2021-22 (GH #1697).
 
 One source file, s16b_me_ben2021.dta, a grid of 22 inputs for each of the 3,687 farming
 households plus 4,345 blank rows for the others.  11,368 rows answer s16bq02 = Oui.

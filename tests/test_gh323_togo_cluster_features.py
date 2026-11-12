@@ -137,7 +137,7 @@ def test_api_still_returns_every_cluster(togo):
     `test_hook_is_the_shipped_reducer_not_a_private_copy`.
     """
     df = togo.cluster_features()
-    # Per wave since GH #552: 2021-22 revisits the same 540 grappes.
+    # Per wave since GH #1697: 2021-22 revisits the same 540 grappes.
     per_wave = df.groupby(level='t').size()
     assert (per_wave == N_GRAPPES).all(), (
         f'Togo cluster_features returned {per_wave.to_dict()} rows, expected '

@@ -190,7 +190,7 @@ Benin::crop_production::hh-crop-sale-single-row:
       basis: modelling-choice
       evidence: >-
         ruling @ligon 2026-11-03, option (d), GH #824, for Mali 2021-22 and applied here
-        by the brief of GH #552; the Farm-level convention in lsms_library/data_info.yml.
+        by the brief of GH #1697 (split from #552); the Farm-level convention in lsms_library/data_info.yml.
     - text: >-
         identical s16d lines are one record.  The export repeats a crop's record once
         per harvest line: 627 of 8,328 rows are exact repeats, 392 of them sales, and
@@ -256,6 +256,17 @@ Benin::crop_production::harvest-from-dispositions:
                   s16dq05a, s16dq05b, s16dq13a, s16dq13b]
   assumptions:
     - text: >-
+        this extends Mali's ruled derivation, Mali::crop_production::harvest-from-dispositions
+        (ruling @ligon 2026-11-04, option (b) of GH #1437), to Benin 2021-22, whose file has
+        Mali's shape: s16cq16a is on 381 of 8,934 crop rows and 57 of the 7,964 finished ones.
+        The same rule, the same shared function and the same hold-outs; only the file differs.
+        The extension is itself ruled (@ligon 2026-11-12, "Extend Mali's derivation").  Why
+        s16cq16a is blank is not answered by it: GH #1437 stays open.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-12, "Harvest from dispositions in Benin / Cote d'Ivoire 2021-22",
+        option "Extend Mali's derivation (Recommended)"; Mali/_/derivations.yml; GH #1437 (open)
+    - text: >-
         a finished harvest was consumed, given, sold or stored, so the four dispositions
         add up to it.  The instrument asks the quantity of a finished harvest and the file
         lacks it on 7,907 of 7,964 finished rows, a fielded skip or a release loss.
@@ -318,15 +329,16 @@ Benin::crop_production::harvest-from-dispositions:
   since: '2026-11-04'
 
 Benin::sample::region-milieu-stratum:
-  waves: ['2018-19']
+  waves: ['2018-19', '2021-22']
   columns: [strata]
   rows: {}
   rule: >-
     strata = '<s00q01 label> <s00q04 label>', the department and residence
-    milieu recorded on the household cover s00_me_ben2018.dta. Strip each
-    label and join with one space; NA where either is missing or blank.
-    Nonstring codes are refused. Preserve the native labels without a
-    geographic crosswalk or a fallback to the former department-only value.
+    milieu recorded on each wave's household cover, s00_me_ben2018.dta and
+    s00_me_ben2021.dta. Strip each label and join with one space; NA where
+    either is missing or blank. Nonstring codes are refused. Preserve the
+    native labels without a geographic crosswalk or a fallback to the former
+    department-only value. The 2021-22 weights file's own `strat` is not read.
   function: lsms_library.ehcvm:derive_region_milieu_stratum
   inputs: lsms_library.countries.Benin.2018-19._.mapping:inputs_strata
   raw_variables: [s00q01, s00q04]
@@ -334,7 +346,9 @@ Benin::sample::region-milieu-stratum:
     - text: >-
         the original 2018/19 design stratum combines department and residence
         milieu. The second-edition BID explicitly describes that original
-        draw; 2021/22 revisits its clusters. This entry wires only 2018-19.
+        draw; 2021/22 revisits its clusters, so its households carry their
+        clusters' strata. 2018-19 was wired on 2026-11-10; 2021-22 on
+        2026-11-12, by the ruling "Same rule as #1575".
       basis: questionnaire
       evidence: >-
         Own INStaD Basic Information Document (survey design documentation,
@@ -342,6 +356,9 @@ Benin::sample::region-milieu-stratum:
         2021-22/Documentation/ben_ehcvm2_information_de_base.pdf, section 4.1,
         PDF p.13 (English edition p.14): "La strate est la combinaison
         département/milieu de résidence." GH #1575; approved 2026-11-10.
+        Extended to 2021-22 by ruling @ligon 2026-11-12, "Same rule as #1575
+        (Recommended)", which also records the weights file's `strat` as a
+        comparison and not the served value (Benin/_/CONTENTS.org, 2026-11-12).
     - text: >-
         the own DDI's planned 23 explicit strata and purely urban Littoral
         describe the design, not a rule for pruning recorded rows or forcing

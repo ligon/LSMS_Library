@@ -166,7 +166,7 @@ Data Scheme:
     # s16c); harvest_month all-NaN here (only 2014-15 ECVMA recorded it) but
     # carried for cross-wave schema parity; intercropped from s16cq07.
     #
-    # 2021-22 (GH #552) splits the module: s16c holds the harvest and s16d, with no
+    # 2021-22 (GH #1697) splits the module: s16c holds the harvest and s16d, with no
     # plot, the sales.  A sale goes on the household's single harvest row for the crop,
     # keyed hh-crop-sale-single-row, else on one row with plot_id = 'Farm-level' and
     # u = 'Unknown' (option (d), @ligon 2026-11-03).  Unit_sold is the sold unit there;
@@ -214,7 +214,7 @@ Data Scheme:
     # missing unit the 'Manquant' u label, both non-null so the framework's
     # canonical NaN-key de-dup collapse does not silently drop them.
     #
-    # 2021-22 (GH #552) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
+    # 2021-22 (GH #1697) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
     # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018 still
     # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
     index: (t, i, input, crop, u)

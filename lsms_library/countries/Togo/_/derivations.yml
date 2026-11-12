@@ -150,7 +150,7 @@ Togo::crop_production::hh-crop-sale-single-row:
       basis: modelling-choice
       evidence: >-
         ruling @ligon 2026-11-03, option (d), GH #824, for Mali 2021-22 and applied here
-        by the brief of GH #552; the Farm-level convention in lsms_library/data_info.yml.
+        by the brief of GH #1697 (split from #552); the Farm-level convention in lsms_library/data_info.yml.
     - text: >-
         identical s16d lines are one record.  The export repeats a crop's record once
         per harvest line: 1,111 of 10,325 rows are exact repeats, 782 of them sales, and
@@ -191,7 +191,7 @@ Togo::crop_production::harvest-to-date:
   since: '2026-11-04'
 
 Togo::sample::region-milieu-stratum:
-  waves: ['2018']
+  waves: ['2018', '2021-22']
   columns: [strata]
   rows: {}
   rule: >-
@@ -199,13 +199,20 @@ Togo::sample::region-milieu-stratum:
     residence-milieu labels, each stripped of surrounding whitespace. NA where
     either is missing or blank; nonmissing nonstring coding is refused. Native
     labels are preserved without a geographic crosswalk or an old-region fill.
+    Each wave reads its own cover (2018 s00_me_tgo2018.dta, 2021-22
+    s00_me_tgo2021.dta) with its own labels: region code 6 is 'Lomé commune' in
+    2018 and 'Grand Lomé' in 2021-22, on the same 98 grappes, and neither is
+    renamed to the other, so 'Lomé commune Urbain' and 'Grand Lomé Urbain' are
+    two labels.
   function: lsms_library.ehcvm:derive_region_milieu_stratum
   inputs: lsms_library.countries.Togo.2018._.mapping:inputs_strata
   raw_variables: [s00q01, s00q04]
   assumptions:
     - text: >-
         the original 2018/19 household sampling stratum is the combination of
-        region and residence milieu. Only the native 2018 wave is wired here.
+        region and residence milieu, and 2021/22 revisits the same clusters, so
+        its households carry their clusters' strata. 2018 was wired on
+        2026-11-10; 2021-22 on 2026-11-12, by the ruling "Same rule as #1575".
       basis: questionnaire
       evidence: >-
         Togo's own September 2023 Basic Information Document (survey design
@@ -214,7 +221,10 @@ Togo::sample::region-milieu-stratum:
         French PDF p.12 / printed p.11 (English edition p.11): "La strate est
         la combinaison région/milieu de résidence." This retrospectively
         describes the original 2018/19 design. GH #1575 documentary findings
-        merged in PR #1637; documented combination selected 2026-11-10.
+        merged in PR #1637; documented combination selected 2026-11-10. The
+        same section has 2021/22 revisit the 2018/19 clusters rather than draw
+        new ones; extended to 2021-22 by ruling @ligon 2026-11-12, "Same rule as
+        #1575 (Recommended)".
     - text: >-
         both recorded labels are used as written; no milieu is fabricated or
         excluded to reconcile documents or force an observed-cell count.

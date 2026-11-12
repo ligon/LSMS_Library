@@ -1,4 +1,4 @@
-"""Build crop_production for Togo EHCVM 2021-22 (GH #552).
+"""Build crop_production for Togo EHCVM 2021-22 (GH #1697).
 
 The instrument splits the module 2018 kept together:
 

@@ -1,4 +1,4 @@
-"""GH #552: CotedIvoire 2021-22 (EHCVM-2, WB 6273) is wired, under ids of its own.
+"""GH #1697: CotedIvoire 2021-22 (EHCVM-2, WB 6273) is wired, under ids of its own.
 
 The first class needs no microdata.  ``TestServed`` builds real tables and carries
 ``requires_s3``; its ORACLE reads the ``.dta`` files through ``get_dataframe``, imports
@@ -184,9 +184,10 @@ class TestDeclared:
 
     def test_the_region_is_spelled_as_in_2018_19(self):
         fns = ll.Country(COUNTRY)[WAVE].formatting_functions
-        assert fns["strata"]("gÔh") == "GÔH"
+        stratum = fns["strata_label_upper_region"]
+        assert stratum(pd.Series(["gÔh", "Urbain"])) == "GÔH Urbain"
         assert fns["Region"]("poro") == "PORO"
-        assert fns["strata"]("AUTONOME D'ABIDJAN") == "AUTONOME D'ABIDJAN"
+        assert stratum(pd.Series(["AUTONOME D'ABIDJAN", "Rural"])) == "AUTONOME D'ABIDJAN Rural"
 
     def test_the_unit_loses_its_code_and_keeps_its_words(self):
         fn = ll.Country(COUNTRY)[WAVE].formatting_functions["_unit_label"]
@@ -239,16 +240,44 @@ class TestServed:
                                        raw.sort_index(), check_names=False)
 
     def test_strata_are_2018_19s_labels_by_code(self):
+        # GH #1575's region x milieu, extended to this wave on 2026-11-12.  The region is
+        # this file's label upper-cased, which is 2018-19's label for the same code.
         new = _raw("s00_me_civ2021.dta", labels=True)
+        raw = _raw("s00_me_civ2021.dta")
         old = get_dataframe(countries_root() / COUNTRY / "2018-19" / "Data" / "Menage" / "s00_me_CIV2018.dta",
                             convert_categoricals=True)
-        s = _served("sample")
+        old_cells = set(old["s00q01"].astype(str).str.strip() + " " + old["s00q04"].astype(str).str.strip())
+        assert len(old_cells) == 66
+        s = _served("sample").droplevel("t")
+        interviewed = raw["s00q08"].isin([1, 2]).to_numpy()
+        labels = (new["s00q01"].astype(str).str.strip().str.upper() + " "
+                  + new["s00q04"].astype(str).str.strip())
+        by_id = dict(zip(_ids(raw[interviewed]), labels[interviewed]))
+        assert s["strata"].astype(str).to_dict() == by_id
         served = set(s["strata"].astype(str))
-        assert served == set(old["s00q01"].astype(str).str.strip())
-        assert len(served) == 33
-        codes = _raw("s00_me_civ2021.dta")["s00q01"]
+        assert served <= old_cells
+        codes = raw["s00q01"]
         by_code = new["s00q01"].astype(str).groupby(codes.to_numpy()).first()
-        assert {str(v).upper() for v in by_code} == served
+        old_by_code = old["s00q01"].astype(str).groupby(
+            get_dataframe(countries_root() / COUNTRY / "2018-19" / "Data" / "Menage" / "s00_me_CIV2018.dta",
+                          convert_categoricals=False)["s00q01"].to_numpy()).first()
+        assert {k: str(v).upper() for k, v in by_code.items()} == old_by_code.str.strip().to_dict()
+        assert (s["Derivation"] == "CotedIvoire::sample::region-milieu-stratum").all()
+
+    def test_the_registered_inputs_rederive_the_served_strata(self):
+        # The inputs are the file's labels; the served region is upper-cased (the rule says so).
+        key = "CotedIvoire::sample::region-milieu-stratum"
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            inputs = ll.Country(COUNTRY).derivation_inputs(key, wave=WAVE)
+        rec = ll.Country(COUNTRY).derivations()[key]
+        upper = lambda r: r.upper() if isinstance(r, str) else r  # noqa: E731
+        rebuilt = pd.Series([rec.resolve()(upper(r), m) for r, m in zip(inputs["s00q01"], inputs["s00q04"])],
+                            index=inputs.index.droplevel("t"))
+        served = _served("sample").droplevel("t")["strata"]
+        # The cover holds the 728 households not interviewed; the inputs keep them.
+        assert len(rebuilt) == 13693 and len(served) == 12965
+        assert (rebuilt.reindex(served.index) == served).all()
 
     def test_the_cluster_point_is_constant_within_a_grappe(self):
         cover = _raw("s00_me_civ2021.dta")

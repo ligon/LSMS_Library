@@ -243,7 +243,7 @@
 # tubercules' and bare '20' occur on no row and are left unchanged (Burkina
 # kept its unused cells too); the uniqueness guard before to_parquet in
 # 2018-19/_/plot_inputs.py catches any future collision.
-# 2021-22 (GH #552) fields code 20 and new slots, so each takes its own label, on the
+# 2021-22 (GH #1697) fields code 20 and new slots, so each takes its own label, on the
 # crop vocabulary of harmonize_food; no 2018-19 row reads any of them.
 
 #+NAME: harmonize_seed_crop
@@ -285,7 +285,7 @@
 # harmonize_food_acquired foods), deduped by Original Label; the
 # separate harmonize_food_acquired table is retired.
 
-# 2021-22 (GH #552) rows, the last block of the table: this file's labels carry the code
+# 2021-22 (GH #1697) rows, the last block of the table: this file's labels carry the code
 # ('1. Riz local gros grain') and its code list moved, so each row names its own label.  Niger's
 # #833 rule: a respelling of a good 2018-19 names takes 2018-19's Preferred Label, and two goods
 # 2018-19 bundles and this wave splits stay split, the 2018-19 bundle label staying on 2018-19

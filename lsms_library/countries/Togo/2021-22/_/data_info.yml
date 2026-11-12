@@ -4,7 +4,7 @@ Wave: 2021-22
 # EHCVM-2 (WB 6279).  Read _/CONTENTS.org "2021-22 wired" first.  The two facts
 # that shape every block here:
 #   - `i` is `E2_<grappe>0<menage>`, by mapping.i: the (grappe, menage) keys recur
-#     from 2018 and do not mean the same household (GH #552, no link is served);
+#     from 2018 and do not mean the same household (GH #1697, no link is served);
 #   - variable names survive where meanings do not: compare labels, not names.
 
 sample:
@@ -19,11 +19,14 @@ sample:
                 - grappe
                 - menage
         myvars:
-            # GH #812: region only.  2018's strata became region x milieu under GH #1575,
-            # which was ruled for 2018 only, so the two waves now differ: _/CONTENTS.org,
-            # 2026-11-12.  Code 6 is `Grand Lomé` here and `Lomé commune` in 2018, on the
-            # same 98 grappes: served as recorded.
-            strata: s00q01
+            # The documented stratum, region x milieu, as 2018's (GH #1575, extended to this
+            # wave by the ruling of 2026-11-12, "Same rule as #1575").  Code 6 is `Grand Lomé`
+            # here and `Lomé commune` in 2018, on the same 98 grappes: each wave's own label,
+            # served as recorded, so `Grand Lomé Urbain` and `Lomé commune Urbain` do not meet.
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
             Rural:
                 - s00q04
                 - mapping:

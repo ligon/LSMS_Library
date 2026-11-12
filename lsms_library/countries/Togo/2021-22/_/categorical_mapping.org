@@ -1,6 +1,6 @@
 #+title: Categorical mappings of Togo 2021-22 (read before the country's)
 
-# nonfood_items for THIS WAVE ONLY (GH #552).  Section 9's item codes moved: 2018's
+# nonfood_items for THIS WAVE ONLY (GH #1697).  Section 9's item codes moved: 2018's
 # table is keyed on code, and on this wave's codes it would call a washable face mask
 # Perfume (415) and a solar panel Crockery (618).  Every Preferred Label below is the
 # one 2018 serves for the same item, matched on the value labels of the two files; the

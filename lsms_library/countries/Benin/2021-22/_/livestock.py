@@ -1,4 +1,4 @@
-"""Build livestock for Benin EHCVM 2021-22 (GH #552).
+"""Build livestock for Benin EHCVM 2021-22 (GH #1697).
 
 One source file, s17_me_ben2021.dta, a grid of (household, species) for the households asked:
 6,416 of its 92,371 rows answer s17q03 = Oui.  The species is s17q01 here and s17q02 in

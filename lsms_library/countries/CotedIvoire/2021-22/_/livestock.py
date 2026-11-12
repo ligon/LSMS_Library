@@ -1,4 +1,4 @@
-"""Build livestock for CotedIvoire EHCVM 2021-22 (GH #552).
+"""Build livestock for CotedIvoire EHCVM 2021-22 (GH #1697).
 
 One source file, s17_me_civ2021.dta: the grid of 13 species codes on every household, of
 which 1 to 11 have labels and no row answers yes on 12 or 13.  The species code is s17q01

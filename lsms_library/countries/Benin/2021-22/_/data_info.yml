@@ -4,10 +4,13 @@ Wave: 2021-22
 # EHCVM-2 (WB 6272).  Read _/CONTENTS.org "2021-22 wired" first.  What shapes every
 # block here:
 #   - `i` is `E2_<grappe><menage:03d>`, by mapping.i: no link to 2018-19 is served
-#     (GH #552), so the ids must not be able to meet;
+#     (GH #1697), so the ids must not be able to meet.  The link is ruled (2026-11-12,
+#     "Make Benin a panel country") for a follow-up PR, GH #1705;
 #   - variable names survive where meanings do not: compare labels, not names;
 #   - the files are full grids where 2018-19's held only the answered lines, and s01
 #     and s04a carry 6,138 people who have left, with only why and when they left.
+#     They are left out, as ehcvm_individu leaves them; whether they belong in the
+#     roster is GH #1565's open decision.
 
 sample:
     dfs:
@@ -21,11 +24,14 @@ sample:
                 - grappe
                 - menage
         myvars:
-            # GH #812: region only.  2018-19's strata became department x milieu under
-            # GH #1575, ruled for 2018-19 only, so the two waves now differ:
-            # _/CONTENTS.org, 2026-11-12.  The weights file's `strat` (24 region x
-            # milieu cells) is not read.
-            strata: s00q01
+            # The documented stratum, department x milieu, as 2018-19's (GH #1575, extended
+            # to this wave by the ruling of 2026-11-12, "Same rule as #1575").  The weights
+            # file's own `strat` (24 numeric codes) is not read; _/CONTENTS.org, 2026-11-12,
+            # compares it with this construction.
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
             Rural:
                 - s00q04
                 - mapping:

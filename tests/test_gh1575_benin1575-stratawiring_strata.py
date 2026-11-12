@@ -1,7 +1,9 @@
-"""Benin 2018-19 GH1575 wiring, using invented frames and actual extractors only.
+"""Benin GH1575 wiring, 2018-19 and 2021-22, using invented frames and actual extractors only.
 
 No native coding/card, observed count, Country build or cache is an oracle here.
-Ledger: .coder/ledger/1575-benin1575-stratawiring.md §§2–5.
+Ledger: .coder/ledger/1575-benin1575-stratawiring.md §§2–5.  2021-22 has the same
+construction since the ruling of 2026-11-12 ("Same rule as #1575"), from its own cover
+(GH #1697); its weights file's own ``strat`` is not read.
 """
 from copy import deepcopy
 import importlib
@@ -20,8 +22,10 @@ from lsms_library.yaml_utils import load_yaml
 
 ROOT = countries_root()
 WAVE = "2018-19"
+LATER = "2021-22"
 KEY = "Benin::sample::region-milieu-stratum"
 MODULE = "lsms_library.countries.Benin.2018-19._.mapping"
+LATER_MODULE = "lsms_library.countries.Benin.2021-22._.mapping"
 
 # The exact pre-change sample declaration at source9f, independent of candidate.
 ORIGINAL = {
@@ -74,7 +78,35 @@ def wiring():
     return module, wave, spec
 
 
-def _extract(wave, block, frames, monkeypatch):
+def _later_wave(country):
+    """2021-22's own block and functions, on the same source-only seam as ``wiring``."""
+    module = importlib.import_module(LATER_MODULE)
+    spec = load_yaml(ROOT / "Benin" / LATER / "_" / "data_info.yml")["sample"]
+    wave = SimpleNamespace(
+        resources={"sample": spec}, year=LATER,
+        name="Benin/2021-22", file_path=ROOT / "Benin" / LATER, country=country,
+        formatting_functions={"i": module.i, "strata_label": module.strata_label,
+                              "sample": module.sample},
+    )
+    wave.column_mapping = MethodType(Wave.column_mapping, wave)
+    wave._cartesian_keys = MethodType(Wave._cartesian_keys, wave)
+    return module, wave, spec
+
+
+def _later_frames():
+    return {
+        "s00_me_ben2021.dta": pd.DataFrame({
+            "grappe": [42, 7, 42], "menage": [9, 2, 1],
+            "s00q01": ["littoral", " Autre inventé ", "littoral"],
+            "s00q04": ["Urbain", "Rural", "Urbain"],
+        }),
+        "ehcvm_ponderations_ben2021.dta": pd.DataFrame({
+            "grappe": [42, 7, 42], "menage": [9, 2, 1], "poids": [17.25, 4.5, 17.25],
+        }),
+    }
+
+
+def _extract(wave, block, frames, monkeypatch, t=WAVE):
     """Use actual YAML mapping/extraction/merge, with a closed invented provider."""
     seen = []
 
@@ -93,7 +125,7 @@ def _extract(wave, block, frames, monkeypatch):
         assert len(mapping) == 1
         filename, cols = next(iter(mapping.items()))
         frame = local_tools.df_data_grabber(filename, cols["idxvars"], **cols["myvars"])
-        frame["t"] = WAVE
+        frame["t"] = t
         extracted.append(frame.reset_index())
     flat = Wave._merge_subframes(
         wave, *extracted, ["t", *block["merge_on"]], "sample", *block["dfs"],
@@ -208,45 +240,79 @@ def test_registry_scope_optional_carrier_and_actual_input_callable(wiring, monke
     # Registry resolution loads country files by path, creating a fresh module.
     assert rec.inputs == MODULE + ":inputs_strata"
     assert rec.resolve("inputs").__code__ == module.inputs_strata.__code__
-    assert list(rec.waves) == [WAVE]
+    assert list(rec.waves) == [WAVE, LATER]
     assert list(rec.columns) == ["strata"] and rec.rows == {}
     assert list(rec.raw_variables) == ["s00q01", "s00q04"]
     assert "actual-row validation UNRUN" in rec.validated_against
     schema = load_yaml(ROOT.parent / "data_info.yml")
     assert schema["Columns"]["sample"]["Derivation"]["optional"] is True
     reads, visits = [], []
+    _, later, _ = _later_wave(wave.country)
+    sources = {
+        str(ROOT / "Benin" / WAVE / "Data" / "s00_me_ben2018.dta"): _frames()["s00_me_ben2018.dta"],
+        str(ROOT / "Benin" / LATER / "Data" / "s00_me_ben2021.dta"): _later_frames()["s00_me_ben2021.dta"],
+    }
 
     class InventedCountry:
         def __getitem__(self, selected_wave):
             visits.append(selected_wave)
-            if selected_wave == WAVE:
-                return wave
-            # The real unwired wave config supplies no sample; keep that error.
-            resources = load_yaml(ROOT / "Benin" / selected_wave / "_" / "data_info.yml")
-            return SimpleNamespace(resources=resources)
+            return {WAVE: wave, LATER: later}[selected_wave]
 
     def country(name):
         assert name == "Benin"
         return InventedCountry()
 
     def cover(path, **kwargs):
-        assert path == str(ROOT / "Benin" / WAVE / "Data" / "s00_me_ben2018.dta")
+        assert path in sources
         reads.append(path)
-        return _frames()["s00_me_ben2018.dta"].copy()
+        return sources[path].copy()
 
     monkeypatch.setattr(country_module, "Country", country)
     monkeypatch.setattr(local_tools, "get_dataframe", cover)
+    # The scoped call reads each wave of the record's scope from its OWN cover, under
+    # its own household formatter, with the labels as the file has them.
     inputs = call_inputs(rec)
-    assert visits == [WAVE] and len(reads) == 1
+    assert visits == [WAVE, LATER] and reads == list(sources)
     assert inputs.index.names == ["t", "i"]
-    assert inputs.index.get_level_values("i").tolist() == ["42009", "7002", "42001", "3004"]
-    expected = _frames()["s00_me_ben2018.dta"][["s00q01", "s00q04"]]
+    assert inputs.index.get_level_values("t").tolist() == [WAVE] * 4 + [LATER] * 3
+    assert inputs.index.get_level_values("i").tolist() == [
+        "42009", "7002", "42001", "3004", "E2_42009", "E2_7002", "E2_42001"]
+    expected = pd.concat([_frames()["s00_me_ben2018.dta"][["s00q01", "s00q04"]],
+                          _later_frames()["s00_me_ben2021.dta"][["s00q01", "s00q04"]]],
+                         ignore_index=True)
     assert_frame_equal(inputs.reset_index(drop=True), expected)
-    # 2021-22 is wired since GH #552 and keeps the region alone, so the scope is the
-    # record's `waves`, which excludes it; the scoped call above visited 2018-19 only.
-    # An EXPLICIT call_inputs(rec, wave="2021-22") is not refused centrally (it reads
-    # that wave's cover answers, for a wave where no row carries the key): a residual,
-    # recorded in Benin/_/CONTENTS.org 2026-11-12, not pinned here.
-    assert "2021-22" not in [str(w) for w in rec.waves]
-    assert "sample" in load_yaml(ROOT / "Benin" / "2021-22" / "_" / "data_info.yml")
-    assert visits == [WAVE] and len(reads) == 1
+    only = call_inputs(rec, wave=LATER)
+    assert visits == [WAVE, LATER, LATER] and len(reads) == 3
+    assert only.index.get_level_values("i").tolist() == ["E2_42009", "E2_7002", "E2_42001"]
+
+
+def test_2021_22_declares_the_same_construction_from_its_own_cover(wiring):
+    _, wave, spec = wiring
+    module, later, later_spec = _later_wave(wave.country)
+    assert later_spec["df_cover"]["file"] == "s00_me_ben2021.dta"
+    assert later_spec["df_cover"]["myvars"]["strata"] == spec["df_cover"]["myvars"]["strata"]
+    assert module.strata_label is ehcvm.strata_label
+    assert module._stamp_region_milieu_stratum is ehcvm.stamp_region_milieu_stratum
+    # The weights file's own `strat` is a comparison (CONTENTS.org), never a served column.
+    assert later_spec["df_weights"]["myvars"] == {"weight": "poids", "panel_weight": "poids"}
+    assert "'strat'" not in str(later_spec)
+    mapping = later.column_mapping("sample", later_spec["df_cover"])
+    assert mapping.pop("df_edit") is module.sample
+    assert mapping["s00_me_ben2021.dta"]["myvars"]["strata"][1] is ehcvm.strata_label
+
+
+def test_2021_22_extraction_and_hook_conserve_every_other_field(wiring, monkeypatch):
+    _, wave, _ = wiring
+    module, later, later_spec = _later_wave(wave.country)
+    old_spec = deepcopy(later_spec)
+    old_spec["df_cover"]["myvars"]["strata"] = "s00q01"
+    old, _ = _extract(later, old_spec, _later_frames(), monkeypatch, t=LATER)
+    new, seen = _extract(later, later_spec, _later_frames(), monkeypatch, t=LATER)
+    assert seen == ["s00_me_ben2021.dta", "ehcvm_ponderations_ben2021.dta"]
+    assert_frame_equal(new.drop(columns="strata"), old.drop(columns="strata"))
+    assert new["strata"].to_dict() == {("E2_42009", LATER): "littoral Urbain",
+                                       ("E2_7002", LATER): "Autre inventé Rural",
+                                       ("E2_42001", LATER): "littoral Urbain"}
+    out = module.sample(new)
+    assert_frame_equal(out.drop(columns="Derivation"), new)
+    assert out["Derivation"].eq(KEY).all()

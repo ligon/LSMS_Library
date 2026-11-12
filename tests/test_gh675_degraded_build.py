@@ -348,7 +348,7 @@ def _new_process():
 
 
 def _geo_absent(df):
-    """2018-19 lost its fix.  Re-pinned GH #552: 2021-22 reads the GPS off its cover, a file
+    """2018-19 lost its fix.  Re-pinned GH #1697: 2021-22 reads the GPS off its cover, a file
     this test leaves alone, so the column is present and null on the degraded wave."""
     return df.xs("2018-19", level="t")["Latitude"].isna().all()
 

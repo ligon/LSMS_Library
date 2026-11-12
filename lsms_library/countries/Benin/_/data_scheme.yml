@@ -221,7 +221,7 @@ Data Scheme:
     # for a blank code.  Five answers fold onto those tokens (ruled @ligon
     # 2026-11-04); condition_native below keeps what was answered.
     #
-    # 2021-22 (GH #552) splits the module: s16c holds the harvest and s16d, with no
+    # 2021-22 (GH #1697) splits the module: s16c holds the harvest and s16d, with no
     # plot, the sales.  A sale goes on the household's single harvest row for the crop,
     # keyed hh-crop-sale-single-row, else on one row with plot_id = 'Farm-level' and
     # u = 'Unknown' (option (d), @ligon 2026-11-03).  Unit_sold is the sold unit there;
@@ -288,7 +288,7 @@ Data Scheme:
     # writing, so a re-widened bucket fails the build instead of shipping
     # short.  API rows 10,534 -> 10,605 = every reported line-item.
     #
-    # 2021-22 (GH #552) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
+    # 2021-22 (GH #1697) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
     # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018-19 still
     # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
     index: (t, i, input, crop, u)

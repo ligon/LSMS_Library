@@ -4,7 +4,9 @@ Senegal, Mali, Niger and Burkina Faso serve region x milieu as a LABEL, the docu
 stratum, and register it as a derivation because no household file records a stratum.
 Niger 2014-15 reads ``strate``, which a file does record.  Mali 2014-15 stays empty.
 Benin, Togo, Guinea-Bissau and Cote d'Ivoire add their documented 2018
-region x milieu combination under the user-selected GH #1575 rollout (2026-11-10).
+region x milieu combination under the user-selected GH #1575 rollout (2026-11-10),
+and Benin, Togo and Cote d'Ivoire extend it to their 2021-22 waves under the ruling
+of 2026-11-12, "Same rule as #1575" (GH #1697).  Guinea-Bissau 2021-22 is not wired.
 
 The classes marked ``requires_s3`` read the covers directly and import nothing from
 ``countries/``; the allocation tables are transcribed from the BIDs.  The others use
@@ -40,6 +42,14 @@ EHCVM_WAVES = ("2018-19", "2021-22")
 COUNTRIES = ("Senegal", "Mali", "Niger", "Burkina_Faso")
 DOCUMENTED_2018 = {"Benin": "2018-19", "Togo": "2018", "Guinea-Bissau": "2018-19",
                "CotedIvoire": "2018-19"}
+#: The waves each documented country's registry entry covers (GH #1575; 2021-22 by the
+#: ruling of 2026-11-12, GH #1697).
+DOCUMENTED_SCOPE = {"Benin": ["2018-19", "2021-22"], "Togo": ["2018", "2021-22"],
+                    "Guinea-Bissau": ["2018-19"], "CotedIvoire": ["2018-19", "2021-22"]}
+#: The cell formatter each documented 2021-22 wave declares: Cote d'Ivoire's upper-cases
+#: the region first and calls the shared helper (its file labels 23 regions in lower case).
+DOCUMENTED_2021 = {"Benin": "strata_label", "Togo": "strata_label",
+                   "CotedIvoire": "strata_label_upper_region"}
 
 #: Every cover a wave's strata is built from.
 COVERS = {
@@ -166,11 +176,21 @@ class TestWiring:
         rec = records[key]
         assert rec.resolve() is derive_region_milieu_stratum
         assert callable(rec.resolve("inputs"))
-        assert list(rec.waves) == [wave]
+        assert list(rec.waves) == DOCUMENTED_SCOPE[country]
         assert list(rec.columns) == ["strata"]
         assert list(rec.raw_variables) == ["s00q01", "s00q04"]
         text = (ROOT / country / "_" / "derivations.yml").read_text(encoding="utf-8")
         assert len(re.findall(rf"^{re.escape(key)}:", text, flags=re.M)) == 1
+
+    @pytest.mark.parametrize("country, formatter", DOCUMENTED_2021.items())
+    def test_the_documented_2021_waves_use_the_same_combination(self, country, formatter):
+        block = _sample_block(country, "2021-22")
+        assert block["df_cover"]["myvars"]["strata"] == [
+            "s00q01", "s00q04", {"mapping": formatter}]
+        assert "2021-22" in derivation_records(country)[stratum_derivation_key(country)].waves
+
+    def test_guinea_bissau_2021_is_still_unwired(self):
+        assert "sample" not in load_yaml(ROOT / "Guinea-Bissau" / "2021-22" / "_" / "data_info.yml")
 
     def test_mali_2014_declares_no_strata(self):
         assert "strata" not in str(_sample_block("Mali", "2014-15"))
@@ -442,14 +462,19 @@ class TestTheFrameAgrees:
         carried = df.attrs["derivations"]
         assert stratum_derivation_key("Senegal") in carried["Senegal"]
         assert stratum_derivation_key("Togo") in carried["Togo"]
-        # The construction is scoped to the record's waves (GH #1575: 2018 only).  Togo
-        # 2021-22 (GH #552) serves the region alone and carries no stratum key.
+        # Both of Togo's waves are constructed (GH #1575; 2021-22 by the ruling of
+        # 2026-11-12), each from its own cover with its own labels.
         key = stratum_derivation_key("Togo")
-        scoped = [str(w) for w in derivation_records("Togo")[key].waves]
+        assert [str(w) for w in derivation_records("Togo")[key].waves] == ["2018", "2021-22"]
         togo = df.xs("Togo", level="country")
-        inside = togo.index.get_level_values("t").isin(scoped)
-        constructed = togo.loc[inside, "strata"].dropna().unique()
-        assert len(constructed) > 0
-        assert all(s.endswith(MILIEUX) for s in constructed)
-        outside = togo.loc[~inside, "Derivation"].astype("string").fillna("")
-        assert not outside.str.contains(key, regex=False).any()
+        waves = togo.index.get_level_values("t").astype(str)
+        assert set(waves) == {"2018", "2021-22"}
+        constructed = togo["strata"].dropna()
+        assert all(s.endswith(MILIEUX) for s in constructed.unique())
+        stamped = togo["Derivation"].astype("string").fillna("").str.contains(key, regex=False)
+        assert (stamped == togo["strata"].notna()).all()
+        # Region code 6 keeps each wave's label: no reconciliation, so the two do not meet.
+        by_wave = {w: set(constructed[waves[togo["strata"].notna()] == w]) for w in ("2018", "2021-22")}
+        assert "Lomé commune Urbain" in by_wave["2018"] and "Grand Lomé Urbain" in by_wave["2021-22"]
+        assert "Grand Lomé Urbain" not in by_wave["2018"]
+        assert "Lomé commune Urbain" not in by_wave["2021-22"]

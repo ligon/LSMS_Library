@@ -19,7 +19,7 @@ Sampling:
         found and the cluster completed otherwise.  The library serves NO household
         link across this boundary: 2021-22's `i` is `E2_`-prefixed, because 1,397 of
         the 5,441 recurring (grappe, menage) keys are at the wrong-household baseline
-        (_/CONTENTS.org, "2021-22 wired"; GH #552).
+        (_/CONTENTS.org, "2021-22 wired"; GH #1697).
       source_type: local-documentation
       confidence: high
       source_file: 'lsms_library/countries/Togo/2021-22/Documentation/tgo_ehcvm2_information_de_base_eng.pdf'

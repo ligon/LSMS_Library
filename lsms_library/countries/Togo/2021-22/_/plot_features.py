@@ -1,4 +1,4 @@
-"""Build plot_features for Togo EHCVM 2021-22 (GH #552).
+"""Build plot_features for Togo EHCVM 2021-22 (GH #1697).
 
 One source file, s16a_me_tgo2021.dta, with the column names and code lists of 2018,
 checked label by label.  togo.plot_features_for_wave builds it and spells 2018's bare

@@ -1,4 +1,4 @@
-"""Build plot_inputs for Togo EHCVM 2021-22 (GH #552).
+"""Build plot_inputs for Togo EHCVM 2021-22 (GH #1697).
 
 One source file, s16b_me_tgo2021.dta, which ships the applied inputs only: every row
 has s16bq02 = Oui.

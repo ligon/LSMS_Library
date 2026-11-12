@@ -1,4 +1,4 @@
-"""GH #552: Benin 2021-22 (EHCVM-2, WB 6272) is wired, under ids of its own.
+"""GH #1697: Benin 2021-22 (EHCVM-2, WB 6272) is wired, under ids of its own.
 
 ``TestDeclared``, ``TestHarvestRule`` and ``TestCopingHook`` need no microdata.
 ``TestServed`` builds real tables and carries ``requires_s3``; its ORACLE reads the
@@ -242,14 +242,32 @@ class TestServed:
         assert len(s) == len(cover)
         region = dict(enumerate(["alibori", "atacora", "atlantique", "borgou", "collines", "couffo",
                                  "donga", "littoral", "mono", "oueme", "plateau", "zou"], start=1))
-        by_id = dict(zip(_ids(cover), cover["s00q01"].map(region)))
+        milieu = {1: "Urbain", 2: "Rural"}
+        # GH #1575's department x milieu, extended to this wave on 2026-11-12, from this
+        # file's own labels; the weights file's `strat` is not read.
+        by_id = dict(zip(_ids(cover), cover["s00q01"].map(region) + " " + cover["s00q04"].map(milieu)))
         assert s["strata"].astype(str).to_dict() == by_id
+        assert s["strata"].nunique() == 23
+        assert "strat" not in s.columns
+        assert (s["Derivation"] == "Benin::sample::region-milieu-stratum").all()
         rural = dict(zip(_ids(cover), cover["s00q04"].map({1: "Urban", 2: "Rural"})))
         assert s["Rural"].astype(str).to_dict() == rural
         # Weights come back at mean 1 in the wave, each household keeping its share.
         raw = pd.Series(weights["poids"].to_numpy() / weights["poids"].mean(), index=_ids(weights))
         pd.testing.assert_series_equal(s["weight"].astype(float).sort_index(),
                                        raw.sort_index(), check_names=False)
+
+    def test_the_registered_inputs_rederive_the_served_strata(self):
+        key = "Benin::sample::region-milieu-stratum"
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            inputs = ll.Country("Benin").derivation_inputs(key, wave=WAVE)
+        rec = ll.Country("Benin").derivations()[key]
+        rebuilt = pd.Series([rec.resolve()(r, m) for r, m in zip(inputs["s00q01"], inputs["s00q04"])],
+                            index=inputs.index.droplevel("t"))
+        served = _served("sample").droplevel("t")["strata"]
+        assert len(rebuilt) == len(served)
+        assert (rebuilt.reindex(served.index) == served).all()
 
     def test_the_cluster_point_is_a_cluster_attribute(self):
         cover = _raw("s00_me_ben2021.dta")

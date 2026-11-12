@@ -1,4 +1,4 @@
-"""Build plot_features for CotedIvoire EHCVM 2021-22 (GH #552).
+"""Build plot_features for CotedIvoire EHCVM 2021-22 (GH #1697).
 
 One source file, s16a_me_civ2021.dta, with the column names and code lists of 2018-19,
 checked label by label.  The rules are 2018-19's (2018-19/_/plot_features.py).  5,396 rows

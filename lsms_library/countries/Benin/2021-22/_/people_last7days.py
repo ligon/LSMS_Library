@@ -1,4 +1,4 @@
-"""Build people_last7days for Benin EHCVM 2021-22 (GH #552).
+"""Build people_last7days for Benin EHCVM 2021-22 (GH #1697).
 
 s04a_me_ben2021.dta holds the 7-day answers and carries one row per person in s01, where
 2018-19's s04 holds only members 5 and over.  6,138 of its 48,798 rows are people who have left

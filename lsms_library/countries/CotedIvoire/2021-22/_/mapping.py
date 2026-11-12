@@ -8,8 +8,10 @@ import lsms_library.local_tools as tools
 
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
+    derive_region_milieu_stratum as _derive_region_milieu_stratum,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
 )
 
 # The same projection as Togo 2021-22: Region, Rural and the GPS point are constant
@@ -20,7 +22,7 @@ from lsms_library.transformations import (
 
 #: `i` of this wave.  11,589 of the 12,965 (grappe, menage) keys also occur in 2018-19,
 #: and the head of the household under a recurring key agrees with the head under another
-#: key of the same grappe as often as with its own (GH #552): the keys do not name the same
+#: key of the same grappe as often as with its own (GH #1697): the keys do not name the same
 #: household.  No link is served, so the ids must not be able to meet.
 ID_PREFIX = 'E2_'
 
@@ -43,14 +45,26 @@ def _upper(value):
     return value.upper() if isinstance(value, str) else value
 
 
-def strata(value):
-    '''s00q01, on 2018-19's spelling.  This file labels 23 of the 33 regions in lower case
-    (`poro`, `gÔh`), on the same codes; upper-casing gives 2018-19's label on all 33.'''
-    return _upper(value)
+def strata_label_upper_region(row):
+    '''[s00q01, s00q04]: GH #1575's region x milieu label, on 2018-19's spelling.
+
+    The shared helper ``ehcvm.derive_region_milieu_stratum`` builds it, with its rules
+    unchanged: NA where either label is missing or blank, a code refused.  Only the
+    region is upper-cased first.  This file labels 23 of the 33 regions in lower case
+    (`poro`, `gÔh`) on the same codes, and upper-casing gives 2018-19's label on all 33,
+    so the region part of `strata` is `cluster_features.Region` (mapping.Region).
+    '''
+    return _derive_region_milieu_stratum(_upper(row.iloc[0]), row.iloc[1])
+
+
+def sample(df):
+    '''Stamp the registry key on every row with a stratum (GH #1575, shared hook).'''
+    return _stamp_region_milieu_stratum(df, 'CotedIvoire')
 
 
 def Region(value):
-    '''s00q01, as `strata`.'''
+    '''s00q01, on 2018-19's spelling: this file labels 23 of the 33 regions in lower case
+    (`poro`, `gÔh`), on the same codes; upper-casing gives 2018-19's label on all 33.'''
     return _upper(value)
 
 

@@ -1,4 +1,4 @@
-"""Build people_last7days for Togo EHCVM 2021-22 (GH #552).
+"""Build people_last7days for Togo EHCVM 2021-22 (GH #1697).
 
 s04a_me_tgo2021.dta holds the 7-day answers and carries one row per member, where 2018's
 s04 holds only members 5 and over: 3,939 rows here have no answer, and they are served

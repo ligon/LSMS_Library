@@ -16,8 +16,22 @@ from lsms_library.transformations import (
     collapse_to_cluster_grain as cluster_features,
 )
 
+# GH #1575's construction, extended to this wave (ruling 2026-11-12, "Same rule as
+# #1575"): `strata` is the cover's region label and milieu label, by the shared
+# helper, and `sample` stamps the registry key on every row with a stratum.  The
+# registry's `inputs` callable is 2018's, which reads each wave's own cover.
+from lsms_library.ehcvm import (  # noqa: E402
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
+)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Togo')
+
+
 #: `i` of this wave.  5,441 of the 6,462 (grappe, menage) keys also occur in 2018,
-#: and 1,397 of those are at the wrong-household baseline (GH #552; Mali's #1494 is
+#: and 1,397 of those are at the wrong-household baseline (GH #1697; Mali's #1494 is
 #: the same trap).  No link is served, so the ids must not be able to meet.
 ID_PREFIX = 'E2_'
 

@@ -1,4 +1,4 @@
-"""Build plot_inputs for CotedIvoire EHCVM 2021-22 (GH #552).
+"""Build plot_inputs for CotedIvoire EHCVM 2021-22 (GH #1697).
 
 One source file, s16b_me_civ2021.dta: the grid of inputs, with s16bq02 = oui on 14,704
 rows, and 5,396 rows of households with no field.  Keep the applied rows.

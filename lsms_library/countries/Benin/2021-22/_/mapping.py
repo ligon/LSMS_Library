@@ -10,8 +10,23 @@ from lsms_library.ehcvm import (
     inputs_last_purchase as _inputs_last_purchase,
 )
 
+# GH #1575's construction, extended to this wave (ruling 2026-11-12, "Same rule as
+# #1575"): `strata` is the cover's department label and milieu label, by the shared
+# helper, and `sample` stamps the registry key on every row with a stratum.  The
+# registry's `inputs` callable is 2018-19's, which reads each wave's own cover.
+from lsms_library.ehcvm import (  # noqa: E402
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
+)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Benin')
+
+
 #: `i` of this wave.  6,994 of the 8,032 (grappe, menage) keys also occur in 2018-19.
-#: No link is served (GH #552), so the ids must not be able to meet.
+#: No link is served here (GH #1697), so the ids must not be able to meet.  The link is
+#: ruled (2026-11-12, "Make Benin a panel country") for a follow-up PR, GH #1705.
 ID_PREFIX = 'E2_'
 
 
