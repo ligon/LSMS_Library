@@ -575,14 +575,21 @@ Niger::food_acquired::computed-last-purchase-quantity:
         14,908 of the 15,264 carry 13 to 18 decimals, which is double-precision
         arithmetic; the same instrument in 2021-22 has 15 off-grid values in 112,923.
         The unit value s07bq08 / s07bq07a on these records is one value per (product,
-        unit, size, region) on 13,735 of them, and on 3,013 s07bq08 is not an integer
-        either, though the CAPI field is "NUMERIQUE: ENTIER".
+        unit, size, region) on 13,735 of them.  The instrument asks a decimal here, so
+        it does not rule an off-grid entry out; the reading rests on the data.
+      basis: modelling-choice
+      evidence: >-
+        Data checks of 2026-11-12 on s07b_me_ner2018.dta and s07b_me_ner2021.dta
+        (reports/ehcvm2-live-s07bq03a-check, reports/served-corrections).
+    - text: >-
+        s07bq08 is an integer field, enabled with s07bq07a only when s07bq06 is 1, 2 or
+        3, so the 3,013 flagged records whose s07bq08 is not an integer cannot have been
+        entered as distributed: there the value was rebuilt too.
       basis: questionnaire
       evidence: >-
         Niger EHCVM-1 CAPI household questionnaires, vague 1 and 2 (UEMOA NADA catalog
         48, download 191 / 192): s07Bq07a "NUMERIQUE: DECIMAL", s07Bq08 "NUMERIQUE:
-        ENTIER", both enabled under s07Bq06 in (1, 2, 3).  Data checks of 2026-11-12
-        (reports/ehcvm2-live-s07bq03a-check, reports/served-corrections).
+        ENTIER", both enabled under s07Bq06.InList(1,2,3).
     - text: >-
         the rows are flagged and served, not dropped or set NA: the drop decision is
         the maintainer's, and comes after the diagnosis.  How the values were built is

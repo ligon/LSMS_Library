@@ -84,8 +84,10 @@ AFTER = {
     ('Togo', '2018'): (31_676_794.87, 10_213),
     ('Benin', '2018-19'): (68_929_996.70, 18_645),
     ('Guinea-Bissau', '2018-19'): (57_552_942.85, 13_818),
-    ('Senegal', '2018-19'): (147_345_570.63, 10_802),
-    ('Senegal', '2021-22'): (182_628_314.17, 10_917),
+    # 2026-11-12: 2018-19 -6,000 FCFA (GH #1519: two near-zero quantities served NA);
+    # 2021-22 -17.78 FCFA and 5 gift rows (salt-per-capita-withheld).
+    ('Senegal', '2018-19'): (147_339_570.63, 10_802),
+    ('Senegal', '2021-22'): (182_628_296.39, 10_912),
     # 16,459 until GH #1513: its food labels now fold, and 46 gift rows sum into others.
     ('Mali', '2018-19'): (89_614_678.64, 16_413),
     ('Mali', '2021-22'): (97_178_691.52, 16_886),
@@ -305,8 +307,12 @@ class TestDelivered:
         got = x['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).to_numpy()
         assert (got == (s == 'purchased')).all()
         keys = set(x['Derivation'].dropna().str.split('+').explode())
+        # GH #1708: Niger 2018-19's purchased rows built from a computed s07bq07a also
+        # carry that flag.
+        flags = {'Niger::food_acquired::computed-last-purchase-quantity'} \
+            if (country, wave) == ('Niger', '2018-19') else set()
         assert keys - {derivation_key(country)} <= {
-            f'{country}::food_acquired::nsu-national-unit-weight'}
+            f'{country}::food_acquired::nsu-national-unit-weight'} | flags
 
     @pytest.mark.parametrize('country', sorted(NON_EHCVM_WAVES))
     def test_a_non_ehcvm_wave_of_the_same_country_carries_no_key(self, built, country):

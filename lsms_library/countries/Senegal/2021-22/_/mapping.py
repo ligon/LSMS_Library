@@ -50,9 +50,9 @@ def inputs_food_acquired_unit_weight(wave):
 
 
 def food_acquired(df):
-    marked = _withhold_salt_per_capita_rows(df)
+    df = _withhold_salt_per_capita_rows(df)   # marks the withheld records; see below
     out = _food_acquired_with_unit_weights(
-        marked, FOOD_ACQUIRED_DERIVATION, wave='2021-22')
+        df, FOOD_ACQUIRED_DERIVATION, wave='2021-22')
     return out[out.index.get_level_values('j') != _WITHHELD_J]
 
 

@@ -6,7 +6,7 @@ from lsms_library.transformations import U_UNKNOWN
 from lsms_library.ehcvm import (
     UnitSizeLabelError,
     derivation_key as _derivation_key,
-    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
+    food_acquired_with_unit_weights as _shared_food_acquired_with_unit_weights,
     inputs_last_purchase as _inputs_last_purchase,
     served_unit_labels as _served_unit_labels,
     sized_unit as _sized_unit,
@@ -50,11 +50,22 @@ def inputs_food_acquired(wave):
     return _inputs_last_purchase('Senegal', wave)
 
 
-def food_acquired(df):
+def _food_acquired_with_unit_weights(df, key, *, wave):
+    """The shared EHCVM hook, then the GH #1519 exact-value rule on its output.
+
+    Named for the shared function (imported as ``_shared_food_acquired_with_unit_weights``)
+    so that :func:`food_acquired` reads as it did before GH #1519; the GH #1500 tests run
+    that function with this name stubbed.  The near-zero records are found BEFORE the
+    shared hook, on the wide frame, which is still the file row for row.
+    """
     near_zero = _near_zero_positions(df)
+    out = _shared_food_acquired_with_unit_weights(df, key, wave=wave)
+    return _withhold_near_zero_quantities(out, df, near_zero)
+
+
+def food_acquired(df):
     out = _food_acquired_with_unit_weights(
         df, FOOD_ACQUIRED_DERIVATION, wave='2018-19')
-    out = _withhold_near_zero_quantities(out, df, near_zero)
     # GH #1500; ledger §4.  Fill only the final label, after size/NSU/value
     # processing: a size or last purchase cannot supply a missing unit answer.
     index = out.index

@@ -61,9 +61,9 @@ def inputs_food_acquired(wave):
 
 
 def food_acquired(df):
-    marked = _withhold_rice_ration_block(df)
+    df = _withhold_rice_ration_block(df)   # marks the withheld records; see below
     out = _food_acquired_with_unit_weights(
-        marked, FOOD_ACQUIRED_DERIVATION, wave='2018-19')
+        df, FOOD_ACQUIRED_DERIVATION, wave='2018-19')
     return out[out.index.get_level_values('j') != _WITHHELD_J]
 
 

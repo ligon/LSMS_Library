@@ -62,7 +62,10 @@ Senegal::food_acquired::7day-purchase-at-last-purchase-unit-value:
         the last purchase used a different unit CODE, 9,712 because it used
         the same code in a different SIZE (Petit / Moyen / Grand / Taille
         unique), which is a different container and so a different price per
-        unit.
+        unit.  Since 2026-11-12 (measured as a change against the build before
+        it, not re-counted from scratch): 2021-22 serves 95 fewer purchased
+        rows, 93 of them NA here (salt-per-capita-withheld), and 2018-19 2 more
+        NA (near-zero-quantity-withheld, whose quantity is now NA).
       basis: variable-label
       evidence: >-
         the 2018-19 waves distribute no unit-conversion table, and 2021-22's
