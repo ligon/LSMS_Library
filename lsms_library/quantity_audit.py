@@ -453,8 +453,11 @@ _SCREENED_COLUMNS: dict[str, tuple[str, ...]] = {
                   "HeadLostOrDied"),
     # `Quantity_kg` (GH #1436) is the survey's own total, read first by the crop
     # ladder and served as recorded, so this is the only place an impossible one
-    # is named.
-    "crop_production": ("Quantity", "Quantity_kg", "Quantity_sold", "Sale_price"),
+    # is named.  `Quantity_sold_kg` (GH #1560, ruling @ligon 2026-11-12) is its
+    # sold-side twin, a total served as recorded, screened the same way on the
+    # generic (t,u,j) ladder: report-only, as everywhere here.
+    "crop_production": ("Quantity", "Quantity_kg", "Quantity_sold", "Quantity_sold_kg",
+                        "Sale_price"),
     "food_acquired": ("Quantity",),
     # GH #879: the canonical schema declares plot_features.Area in
     # HECTARES with AreaUnit a PROVENANCE label, but six countries served
@@ -490,7 +493,8 @@ _SCREENED_COLUMNS: dict[str, tuple[str, ...]] = {
 #: Nor is ``food_prices.Price``: a low price is a high quantity, which the upper
 #: rule already names (1,965 of 5,347,847 rows would fire, 946 of them in Mali).
 _NEAR_ZERO_COLUMNS: dict[str, tuple[str, ...]] = {
-    "crop_production": ("Quantity", "Quantity_kg"),
+    # `Quantity_sold_kg` takes the lower tail as `Quantity_kg` does (GH #1560).
+    "crop_production": ("Quantity", "Quantity_kg", "Quantity_sold_kg"),
     "food_acquired": ("Quantity",),
 }
 

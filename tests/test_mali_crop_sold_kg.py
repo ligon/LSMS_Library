@@ -76,6 +76,11 @@ class TestDeclared:
         assert "Quantity_sold_kg" in record["columns"]
         assert "s16dq05c" in record["raw_variables"]
 
+    def test_site_q_screens_the_column(self):
+        from lsms_library import quantity_audit
+        assert "Quantity_sold_kg" in quantity_audit._SCREENED_COLUMNS["crop_production"]
+        assert "Quantity_sold_kg" in quantity_audit._NEAR_ZERO_COLUMNS["crop_production"]
+
     def test_the_estimate_key_is_registered(self):
         record = records_for(COUNTRY, TABLE)[SOLD_KG]
         assert list(record["waves"]) == [WAVE] and list(record["columns"]) == ["Quantity_sold_kg"]
@@ -141,6 +146,19 @@ class TestServed:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             assert "s16dq05c" in country.derivation_inputs(KEY, wave=WAVE).columns
+
+    def test_site_q_names_without_changing_anything(self, built):
+        """Report-only: every named value is served as recorded; the largest is still there."""
+        from lsms_library.quantity_audit import quantity_reports
+        _, df = built
+        served = df["Quantity_sold_kg"].astype("float64")
+        assert float(served.max()) == 1150000.0
+        for report in quantity_reports(country=COUNTRY, table=TABLE):
+            if report["column"] != "Quantity_sold_kg":
+                continue
+            assert report["wave"] == WAVE
+            for offender in report["offenders"]:
+                assert (served == offender["value"]).any()
 
     def test_the_sold_kilograms_carry_the_estimate_key(self, built):
         """Ruling 2026-11-12 (c): exactly the rows with a Quantity_sold_kg, Farm-level too."""

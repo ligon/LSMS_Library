@@ -1232,7 +1232,10 @@ Columns:
         CONTENTS.org.  Sold kilograms on a record with no positive sold
         quantity or value are not a sale's weight: Niger 2011-12 3E's seven
         are NA under the registered rule `dry-season-sold-kg-no-sale` (ruling
-        @ligon 2026-11-12), and no other served wave has one.  It rides with the sale wherever the sale is placed, a
+        @ligon 2026-11-12), and no other served wave has one.  A total is
+        served as recorded and at most NAMED: Site Q screens this column on
+        both tails, report-only (`quantity_audit._SCREENED_COLUMNS`, ruling
+        2026-11-12).  It rides with the sale wherever the sale is placed, a
         `plot_id = 'Farm-level'` row included.  The state of what was sold is
         `Condition_sold`, not `condition`.
     Unit_sold:

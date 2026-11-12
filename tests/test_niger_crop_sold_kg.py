@@ -142,6 +142,11 @@ class TestDeclared:
             text = (ROOT / wave / "_" / "crop_production.py").read_text(encoding="utf-8")
             assert "KgFactor_sold'" not in text and "KgFactor_sold\"" not in text
 
+    def test_site_q_screens_the_column(self):
+        from lsms_library import quantity_audit
+        assert "Quantity_sold_kg" in quantity_audit._SCREENED_COLUMNS["crop_production"]
+        assert "Quantity_sold_kg" in quantity_audit._NEAR_ZERO_COLUMNS["crop_production"]
+
     def test_the_sale_records_name_the_kilograms(self):
         sale = records_for(COUNTRY, TABLE)[SALE_KEY]
         assert "Quantity_sold_kg" in sale["columns"]
@@ -290,6 +295,16 @@ class TestServed:
         share = float((sub["Quantity_sold_kg"].astype("float64")
                        == sub["Quantity_sold"].astype("float64")).mean())
         assert len(sub) > 200 and share > 0.9
+
+    def test_site_q_names_without_changing_anything(self, built):
+        """Report-only: every named sold kilogram is served as recorded."""
+        from lsms_library.quantity_audit import quantity_reports
+        _, df = built
+        served = df["Quantity_sold_kg"].astype("float64")
+        for report in quantity_reports(country=COUNTRY, table=TABLE):
+            if report["column"] == "Quantity_sold_kg":
+                for offender in report["offenders"]:
+                    assert (served == offender["value"]).any()
 
     def test_the_2021_22_sold_kilograms_carry_the_estimate_key(self, built):
         """Ruling 2026-11-12 (c): exactly the rows with a Quantity_sold_kg, Farm-level too."""
