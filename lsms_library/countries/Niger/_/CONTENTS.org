@@ -3731,8 +3731,11 @@ Counted on the held files after each wave's existing drops (3E's one byte-identi
   2026-11-12, "Sold-kg details" (a)): masked under a registered rule*,
   =Niger::crop_production::dry-season-sold-kg-no-sale=: on a 3E record with no positive sold
   quantity and no positive value, =Quantity_sold_kg= is NA, whatever the flag, and the row (a
-  harvest) carries the key; =derivation_inputs= returns the seven records.  The Oui record is
-  masked too, because the rule is the missing sale.  So 3E serves 356 sold kilograms, 364,768 kg
+  harvest) carries the key; =derivation_inputs= returns the seven records.  Measured on the cold
+  build: the six Non records have sold quantity and value both missing, the Oui record has both 0
+  (and kilograms equal to its harvest's); all seven are one-cycle lines with no sold unit, and
+  exactly these seven rows carry the key.  The Oui record is masked too, because the rule is the
+  missing sale.  So 3E serves 356 sold kilograms, 364,768 kg
   (363 and 373,508 before the mask; the table above is after it).  No other wave has such a row
   once the codes are masked.
 - *2021-22's sold kilograms are the harvest's conversion.*  On a sale in the harvest's own unit,
@@ -3748,8 +3751,10 @@ Counted on the held files after each wave's existing drops (3E's one byte-identi
   =Farm-level= row, in 2014-15 and 2021-22 (GH #1457), so =hh-crop-sale-single-row= lists the
   column, its =inputs= return =AS02EQ12C= / =s16dq05c=, and both wave scripts assert that every
   recorded sold kilogram is on a served row.
-- *Not screened.*  Site Q's =_SCREENED_COLUMNS= do not include it, and nothing names a sold total
-  far from its unit's label (the harvest side has =kg_survey_off_label=).
+- *Screened by Site Q, report-only* (ruling @ligon 2026-11-12, "Sold-kg details" (d)): both tails,
+  on the generic =(t,u,j)= ladder, as =Quantity_kg= is.  Measured on the cold build: it names no
+  Niger row.  Nothing names a sold total far from its unit's label (the harvest side has
+  =kg_survey_off_label=).
 - *Farm-level price support, measured and not wired.*  "Usable" is a positive =Value_sold= over a
   positive kilogram denominator; "now" converts =Quantity_sold= through the existing sold-unit
   resolver (=transformations._sold_kg_factors=, which knows only stated masses: =Tiya=, =Botte= and
@@ -3772,8 +3777,11 @@ Counted on the held files after each wave's existing drops (3E's one byte-identi
   resolved unit and a masked or absent kilogram.  Nothing reads this by default.
 
 *Measured, cold, private roots, default backend* (base = development =e5fdd2fa8=): 49,042 rows
-before and after; the frame is =assert_frame_equal= to base once =Quantity_sold_kg= is dropped,
-columns in base order; only =attrs['derivations']= differs (the two records' =columns= lists).
+before and after; the frame is =assert_frame_equal= to base once =Quantity_sold_kg= and
+=Derivation= are dropped, columns in base order.  =Derivation= moves on 1,825 rows and only by an
+added key: =sold-kg-estimate= on 1,818 (2021-22, 553 of them Farm-level) and
+=dry-season-sold-kg-no-sale= on 7 (2011-12 Farm-level); no key is removed.  Against the first
+cut of this column (=c7cb7d625=), =Quantity_sold_kg= moves on exactly those 7 rows (8,740 kg).
 =tests/test_niger_crop_sold_kg.py= reads each wave against its source.
 
 *Cache.*  =niger.py=, =data_scheme.yml= and three wave scripts are build inputs of every Niger
@@ -3781,4 +3789,7 @@ table: one Niger re-warm.  Hash census, development =e5fdd2fa8= against this cha
 countries: all 25 Niger and all 24 Mali =Country._table_cache_hash= values move (49 of 555) and
 all 100 / 96 =Wave._input_hash= values (196 of 2,321), no other country's; 0 of 42
 =build_transforms_fingerprint= and 0 of 38 =framework_imports_fingerprint= values.  The
-=.yml= edits (=derivations.yml=, the canonical =data_info.yml=) move nothing.
+=.yml= edits (=derivations.yml=, the canonical =data_info.yml=) move nothing.  Re-measured after
+the 2026-11-12 follow-up rulings (head =3199f2f6b=): the same 49 / 196 and nothing else; the Site Q
+commit alone (=quantity_audit._SCREENED_COLUMNS= / =_NEAR_ZERO_COLUMNS=) moves 0 of 555, 0 of
+2,321, 0 of 42 and 0 of 38, because Site Q's callables are excluded from every fingerprint.

@@ -3976,7 +3976,12 @@ only as an explicit =kg_qty=.  The donor/recipient state question is GH #1698.
 - *Kg controls.*  All 495 sales in =Kg= have kilograms equal to the sold quantity (the total
   reading), and =Sac (100 Kg)= reads 100 per sack at the median.  The tail is served as recorded:
   the 1,150,000 kg sale, and sack rows whose kilograms equal the sack count (the =Sac (100 Kg)=
-  harvest-total row of GH #1437 reads 7,500 / 7,500).  Site Q does not screen this column.
+  harvest-total row of GH #1437 reads 7,500 / 7,500).  *Site Q screens it, report-only* (ruling
+  @ligon 2026-11-12, "Sold-kg details" (d)), both tails on the =(t,u,j)= ladder.  On the cold build
+  it names four 2021-22 rows and changes none: the 1,150,000 kg =Arachide= sale in =Sac (100 Kg)=
+  (511x its cell's reference of 2,250 kg), two =Riz= sales in =Sac (100 Kg)= of 437,500 and
+  400,000 kg (175x and 160x of 2,500), and, on the low tail, a 5 kg =Coton= sale in =Kg= (160x
+  below 800).
 - *It rides with the sale*, on the single =s16c= row (keyed =hh-crop-sale-single-row=) or the
   Farm-level row (GH #1457), so the record lists the column and its =inputs= return =s16dq05c=;
   the wave script asserts the kilograms are conserved onto the served rows.  Farm-level also
@@ -3996,11 +4001,13 @@ only as an explicit =kg_qty=.  The donor/recipient state question is GH #1698.
   ruling (GH #1267) is unchanged, and the column is NA in 2014-15, 2017-18 and 2018-19.
 
 *Measured, cold, private roots, default backend* (base = development =e5fdd2fa8=): 50,752 rows
-before and after; the frame is =assert_frame_equal= to base once =Quantity_sold_kg= is dropped;
-only =attrs['derivations']= differs.  =tests/test_mali_crop_sold_kg.py= reads the wave against
+before and after; the frame is =assert_frame_equal= to base once =Quantity_sold_kg= and
+=Derivation= are dropped.  =Derivation= moves on 1,136 rows, all 2021-22, each by the added
+=sold-kg-estimate= key alone (70 of them Farm-level); no key is removed.  =tests/test_mali_crop_sold_kg.py= reads the wave against
 its source.
 
 *Cache.*  =mali.py=, =data_scheme.yml= and the 2021-22 wave script: one Mali re-warm.  Hash
 census against development =e5fdd2fa8=: all 24 Mali =Country._table_cache_hash= values and all
 96 =Wave._input_hash= values move, with Niger's (the same change) and no other country's; 0 of 42
-=build_transforms_fingerprint= values.
+=build_transforms_fingerprint= values.  The same after the 2026-11-12 follow-up rulings; the Site Q
+column moves no hash anywhere.  It adds two =QuantityImplausibleWarning= lines to a Mali read.

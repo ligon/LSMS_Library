@@ -433,8 +433,10 @@ Niger::crop_production::dry-season-sold-kg-no-sale:
         missing and one with both 0, all without a sold unit.  Their own sold flag says Non
         on six, and six of the seven kilogram answers equal the line's own harvest
         kilograms as03eq09c, which reads as the harvest entered in the sale's column.  The
-        seventh's flag is Oui; it is masked under the same rule, because the rule is the
-        missing sale and not the flag.
+        six Non records have both as03eq11a and as03eq12 missing; the seventh, flag Oui, has
+        both 0 and kilograms equal to its harvest's.  It is masked under the same rule,
+        because the rule is the missing sale and not the flag.  All seven are one-cycle
+        lines with no sold unit.
       basis: modelling-choice
       evidence: >-
         measured on the held ecvmaas3e_p1.dta (GH #1560 investigation,
