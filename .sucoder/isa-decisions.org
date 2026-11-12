@@ -1,5 +1,27 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: GH1509 GhanaLSS consequence -- ANSWERED (amends the earlier #1509 entry)
+Shown after implementation: purchases-only evidence costs GhanaLSS 13.0% of kg
+(11.01M -> 9.57M), 237,029 produced rows lose their factor (pre-2016-17
+purchases are u='Value' only); Uganda -1.37% (18 rows).  The user explicitly
+selected: "Fallback rung, disclosed (Recommended)".  Purchases only, EXCEPT a
+(j, u) cell with no purchase evidence in any wave may fall back to
+non-purchase (self-valued) evidence on a NEW, separately labelled rung of the
+kg-factor ladder, so those rows are visibly weaker evidence.
+
+* 2026-11-12: GH587 W1 metric rows with a count -- ANSWERED
+The user explicitly selected: "Hold both groups (Recommended)".  Hold, under
+registered omissions with counts: W1 g/ml rows with Number of Units = 1
+(963 + 80; ~144x household unit values, package prices) and W1 kg/l rows with
+Number of Units > 50 (~332; 50-1000x below household after division, the count
+reads as a size).  All other W1 rows as ruled.
+
+* 2026-11-12: GH587 metric units with no recorded package size -- ANSWERED
+The user explicitly selected: "Serve W3 kg/l and W5 g/cl (Recommended)".
+Serve the 4,120 W3 kg/l rows as recorded (1.07x / 1.00x household); serve the
+208 W5 g/cl rows as price / c2q2a as a REGISTERED derivation (1.5x same-round
+community prices).  Keep W3 g/cl (150x / 57x) and W2 grams (2.2x, mixed) held.
+
 * 2026-11-12: Malawi stacked-sample weights, PR1604 -- ANSWERED
 Measured (candidate frames, mean-1 weights): retained IHPS households are 13%
 of 2024-25 rows and 33% of its weight; live 2016-17 17%/59%; live 2019-20
