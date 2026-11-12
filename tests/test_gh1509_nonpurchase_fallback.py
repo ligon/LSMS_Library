@@ -19,6 +19,12 @@ What these tests pin:
 - the partition still sums to the frame, and ``attrs['kg_factor_evidence']``
   carries the rung's own account.
 
+The second, unit-level rung below it (``unit_nonpurchase``, @ligon
+2026-11-12, "Add a unit-level rung") has its own file,
+``test_gh1509_unit_nonpurchase_rung.py``.  Where a frame here leaves the item
+fallback gated out and a household ratio is there to read, the row now lands
+on that rung rather than ``none``, and the tests below say so.
+
 Data-free: every frame here is synthetic.
 """
 from __future__ import annotations
@@ -32,6 +38,7 @@ import pytest
 from lsms_library.transformations import (
     FOOD_KG_FACTOR_LAYERS,
     FOOD_KG_NONPURCHASE_LAYER,
+    FOOD_KG_UNIT_NONPURCHASE_LAYER,
     U_UNKNOWN,
     food_kg_factors,
     food_prices_from_acquired,
@@ -40,6 +47,7 @@ from lsms_library.transformations import (
 
 IDX = ['t', 'i', 'j', 'u', 's']
 NP = FOOD_KG_NONPURCHASE_LAYER
+UNP = FOOD_KG_UNIT_NONPURCHASE_LAYER
 
 
 def frame(rows):
@@ -81,6 +89,10 @@ def factors(rows, **kw):
     fb = f.attrs['kg_factor_evidence']['fallback']
     assert fb['layer'] == NP
     assert fb['rows_served'] == counts[NP]
+    assert fb['unit_rung']['layer'] == UNP
+    assert fb['unit_rung']['rows_served'] == counts[UNP]
+    assert fb['rows_refused_spread'] == (fb['refused_spread_to_unit_nonpurchase']
+                                         + fb['refused_spread_to_none'])
     assert sum(fb['none_by_reason'].values()) == counts['none']
     return df, f
 
@@ -97,9 +109,11 @@ def rows_of(f, u, s=None):
 # ---------------------------------------------------------------------------
 
 def test_the_layer_tuple_and_the_rungs_place_in_it():
+    # Moved 2026-11-12: "Add a unit-level rung" puts unit_nonpurchase below
+    # item_unit_nonpurchase and above none.
     assert FOOD_KG_FACTOR_LAYERS == (
         'survey_kg', 'metric', 'item_unit', 'item_unit_tight', 'unit',
-        'item_unit_nonpurchase', 'none')
+        'item_unit_nonpurchase', 'unit_nonpurchase', 'none')
     assert NP == 'item_unit_nonpurchase'
 
 
@@ -110,6 +124,9 @@ def test_a_cell_without_purchases_reads_the_fallback_and_is_labelled(s):
     assert set(heap['KgFactorSource']) == {NP}
     assert heap['kg_per_unit'].to_numpy() == pytest.approx(np.full(20, 3.0))
     assert heap['kg_item_unit_nonpurchase'].to_numpy() == \
+        pytest.approx(np.full(20, 3.0))
+    # The unit-level candidate is there too; the item rung outranks it.
+    assert heap['kg_unit_nonpurchase'].to_numpy() == \
         pytest.approx(np.full(20, 3.0))
     assert not heap['kg_cell_has_purchase'].any()
     # No purchase rung read it.
@@ -143,12 +160,15 @@ def test_a_purchase_unit_rung_outranks_the_fallback():
     yam = f[f.index.get_level_values('j') == 'yam'].xs('Heap', level='u')
     assert set(yam['KgFactorSource']) == {'unit'}
     assert yam['kg_per_unit'].to_numpy() == pytest.approx(np.full(20, 2.0))
-    # The candidate is still there, beside the rung that won.
+    # The candidates are still there, beside the rung that won.
     assert yam['kg_item_unit_nonpurchase'].to_numpy() == \
+        pytest.approx(np.full(20, 3.0))
+    assert yam['kg_unit_nonpurchase'].to_numpy() == \
         pytest.approx(np.full(20, 3.0))
     cassava = f[f.index.get_level_values('j') == 'cassava'].xs('Heap', level='u')
     assert set(cassava['KgFactorSource']) == {'item_unit'}
     assert f.attrs['kg_factor_sources'][NP] == 0
+    assert f.attrs['kg_factor_sources'][UNP] == 0
 
 
 def test_the_fallback_ratio_is_self_valued_on_both_sides():
@@ -202,6 +222,9 @@ def test_a_cell_with_purchases_never_reads_the_fallback_even_below_the_floors():
     assert set(heap['KgFactorSource']) == {'none'}
     assert heap['kg_cell_has_purchase'].all()
     assert heap['kg_item_unit_nonpurchase'].isna().all()
+    # The produced households price a Heap at 3 kg, so a unit-level
+    # non-purchase factor exists for the label; the purchase cell never reads it.
+    assert heap['kg_unit_nonpurchase'].isna().all()
     reasons = f.attrs['kg_factor_evidence']['fallback']['none_by_reason']
     assert reasons['cell_has_purchase'] == 22
     assert reasons['no_estimate'] == 0
@@ -243,6 +266,8 @@ def test_a_purchase_cell_refused_by_the_dispersion_gate_falls_to_none():
     assert set(bunch['KgFactorSource']) == {'none'}
     assert bunch['baseline_refused_spread'].all()
     assert bunch['kg_item_unit_nonpurchase'].isna().all()
+    # Nor the unit-level one, although the produced households give it 3.0.
+    assert bunch['kg_unit_nonpurchase'].isna().all()
     gate = f.attrs['kg_factor_baseline_gate']
     assert gate['rows_refused'] == 30
     assert gate['rows_refused'] == gate['refused_to_unit'] + gate['refused_to_none']
@@ -320,10 +345,16 @@ def test_an_unsized_label_is_judged_on_its_size_pooled_family():
 # ---------------------------------------------------------------------------
 
 def test_min_baseline_gates_the_fallback():
+    # Moved 2026-11-12 ("Add a unit-level rung"): gated out of the item
+    # fallback, the rows fall to the ungated unit-level rung (as a gated
+    # purchase row falls to ``unit``), which the two kg households price at 3.
     _, f = factors(own(kg_hh=2))
-    assert set(rows_of(f, 'Heap')['KgFactorSource']) == {'none'}
+    heap = rows_of(f, 'Heap')
+    assert heap['kg_item_unit_nonpurchase'].isna().all()
+    assert set(heap['KgFactorSource']) == {UNP}
+    assert heap['kg_per_unit'].to_numpy() == pytest.approx(np.full(20, 3.0))
     reasons = f.attrs['kg_factor_evidence']['fallback']['none_by_reason']
-    assert reasons['no_estimate'] == 20
+    assert reasons['no_estimate'] == 0
 
 
 def test_the_tight_baseline_exception_serves_the_fallback_and_is_counted():
@@ -333,8 +364,12 @@ def test_the_tight_baseline_exception_serves_the_fallback_and_is_counted():
 
 
 def test_min_reports_gates_the_fallback():
+    # Moved 2026-11-12 ("Add a unit-level rung"): min_reports gates only the
+    # item fallback; the four rows fall to the ungated unit-level rung.
     _, f = factors(own(n=4, kg_hh=20))      # 20 kg reports, 4 Heap reports
-    assert set(rows_of(f, 'Heap')['KgFactorSource']) == {'none'}
+    heap = rows_of(f, 'Heap')
+    assert heap['kg_item_unit_nonpurchase'].isna().all()
+    assert set(heap['KgFactorSource']) == {UNP}
 
 
 def test_the_dispersion_gate_refuses_a_nonpurchase_baseline():
@@ -348,6 +383,10 @@ def test_the_dispersion_gate_refuses_a_nonpurchase_baseline():
     assert set(rows_of(f, 'Bag')['KgFactorSource']) == {NP}
     fb = f.attrs['kg_factor_evidence']['fallback']
     assert fb['rows_refused_spread'] == 20
+    # The Heap households report no kg, so no household ratio exists for the
+    # unit-level rung either: they stay none.
+    assert fb['refused_spread_to_none'] == 20
+    assert fb['refused_spread_to_unit_nonpurchase'] == 0
     assert fb['none_by_reason']['no_estimate'] == 20
     # The purchase rungs' gate ledger is about purchase baselines only.
     assert f.attrs['kg_factor_baseline_gate']['rows_refused'] == 0
@@ -362,6 +401,7 @@ def test_the_dispersion_gate_refuses_a_nonpurchase_baseline():
 def test_a_declared_no_kg_cell_refuses_the_fallback():
     _, f = factors(own(), no_kg=[('yam', 'Heap')])
     assert set(rows_of(f, 'Heap')['KgFactorSource']) == {'none'}
+    assert rows_of(f, 'Heap')['kg_unit_nonpurchase'].isna().all()
     declared = f.attrs['kg_factor_declared_none']
     assert declared['rows_matched'] == 20
     assert declared['rows_refused'] == 20        # the rung WOULD have served
@@ -372,6 +412,7 @@ def test_a_declared_no_kg_cell_refuses_the_fallback():
 def test_a_missing_unit_never_reads_the_fallback():
     _, f = factors(own(unit=U_UNKNOWN))
     assert set(rows_of(f, U_UNKNOWN)['KgFactorSource']) == {'none'}
+    assert rows_of(f, U_UNKNOWN)['kg_unit_nonpurchase'].isna().all()
     reasons = f.attrs['kg_factor_evidence']['fallback']['none_by_reason']
     assert reasons['missing_unit'] == 20
 
@@ -405,6 +446,7 @@ def test_a_frame_without_s_makes_no_second_estimate():
     df = frame(own()).reset_index('s', drop=True)
     f = quiet(food_kg_factors, df)
     assert NP not in set(f['KgFactorSource'])
+    assert UNP not in set(f['KgFactorSource'])
     fb = f.attrs['kg_factor_evidence']['fallback']
     assert fb['ran'] is False and fb['priced_rows_read'] == {}
     # Every row is evidence there, so the PURCHASE item rung serves the Heap.
@@ -421,6 +463,7 @@ def test_a_purchases_only_frame_makes_no_second_estimate():
     _, f = factors(rows)
     assert f.attrs['kg_factor_evidence']['fallback']['ran'] is False
     assert f.attrs['kg_factor_sources'][NP] == 0
+    assert f.attrs['kg_factor_sources'][UNP] == 0
 
 
 def test_a_subset_is_a_slice_of_the_all_waves_fallback():
