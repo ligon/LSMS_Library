@@ -436,8 +436,19 @@ class TestServed:
         got = pd.to_datetime(d["Interview start"])
         assert (got.sort_index() == expected.reindex(got.index).sort_index()).all()
 
+    @staticmethod
+    def _h_rows(q3):
+        """The oracle's own H rule (ruling 2026-11-12, "H to NA, flag L"): positive, off the
+        quarter grid, and not an integer at three decimals, relative tolerance 1e-6."""
+        q3 = q3.astype(float)
+        on = np.isclose(q3 * 4, (q3 * 4).round(), rtol=1e-6, atol=1e-6)
+        three = np.isclose(q3 * 1000, (q3 * 1000).round(), rtol=1e-6, atol=1e-6)
+        return (q3 > 0) & ~on & ~three, (q3 > 0) & ~on & three
+
     def test_food_acquired_sums_are_the_files(self):
         s07 = _raw("s07b_me_civ2021.dta")
+        h, _ = self._h_rows(s07["s07bq03a"])
+        s07 = s07[~h]
         qty = (s07["s07bq03a"].fillna(0) - s07["s07bq04"].fillna(0)
                - s07["s07bq05"].fillna(0)).clip(lower=0)
         same = ((s07["s07bq03b"] == s07["s07bq07b"]) & (s07["s07bq03c"] == s07["s07bq07c"])
@@ -445,17 +456,36 @@ class TestServed:
         value = (qty * s07["s07bq08"] / s07["s07bq07a"]).where(same)
         f = _served("food_acquired")
         side = f.groupby(level="s")[["Quantity", "Expenditure"]].sum()
-        assert side.loc["purchased", "Quantity"] == pytest.approx(qty.sum())
-        assert side.loc["purchased", "Expenditure"] == pytest.approx(value.sum())
-        assert side.loc["produced", "Quantity"] == pytest.approx(s07["s07bq04"].fillna(0).sum())
-        assert side.loc["inkind", "Quantity"] == pytest.approx(s07["s07bq05"].sum())
+        # An H row shares its served key with a non-H row a handful of times, and that row is
+        # withheld with it, so the served sums sit a hair below the file's non-H sums.
+        assert side.loc["purchased", "Quantity"] == pytest.approx(qty.sum(), rel=1e-4)
+        assert side.loc["purchased", "Expenditure"] == pytest.approx(value.sum(), rel=1e-4)
+        assert side.loc["produced", "Quantity"] == pytest.approx(s07["s07bq04"].fillna(0).sum(), rel=1e-4)
+        assert side.loc["inkind", "Quantity"] == pytest.approx(s07["s07bq05"].fillna(0).sum(), rel=1e-4)
         assert f.loc[f.index.get_level_values("s") != "purchased", "Expenditure"].isna().all()
         assert f.index.is_unique
+
+    def test_h_rows_are_withheld_and_l_rows_flagged(self):
+        s07 = _raw("s07b_me_civ2021.dta")
+        h, l_rows = self._h_rows(s07["s07bq03a"])
+        assert 20000 < int(h.sum()) < 21000 and 25000 < int(l_rows.sum()) < 26500
+        f = _served("food_acquired")
+        d = f["Derivation"].fillna("")
+        held = d.str.contains("s07bq03a-outlier-replaced-withheld", regex=False).to_numpy()
+        flagged = d.str.contains("s07bq03a-partial-triplet-conversion", regex=False).to_numpy()
+        assert f.loc[held, "Quantity"].isna().all() and f.loc[held, "Expenditure"].isna().all()
+        assert f.loc[~held, "Quantity"].notna().all()
+        assert int(held.sum()) >= int(h.sum()) and flagged.sum() >= l_rows.sum()
+        # 2018-19, the same instrument, has no H row.
+        old = get_dataframe(countries_root() / COUNTRY / "2018-19" / "Data" / "Menage" / "s07b_me_CIV2018.dta",
+                            convert_categoricals=False)
+        assert int(self._h_rows(old["s07bq03a"])[0].sum()) == 0
 
     def test_no_purchased_row_is_a_floating_point_residue(self):
         """A row with s07bq04 + s07bq05 = s07bq03a purchased nothing; 12 reach the reshape."""
         f = _served("food_acquired").xs("purchased", level="s")
-        assert (f["Quantity"].astype(float) >= 1e-9).all()
+        q = f["Quantity"].astype(float)
+        assert (q[q.notna()] >= 1e-9).all()
 
     def test_the_consumption_columns_move_together_in_every_region(self):
         """Not Togo's defect: q3/q4 is 1 at the mode on never-purchased own-production rows,

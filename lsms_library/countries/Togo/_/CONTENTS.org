@@ -467,16 +467,27 @@ see =slurm_logs/ehcvm_unit_codebook_2026-06-07.org=) is applied to =u= via
 Residual codes (=114, 659, 660, 662=) are *item-specific local units* --
 659 banana/plantain, 660 meat, 662 yam/cassava/plantain portions, 114
 tomato -- with the size in =s07bq03c= (Petit/Moyen/Grand).  They have no
-label in *any* EHCVM source =.dta=, and the household-questionnaire =Unites=
+label in any *2018-19* EHCVM source =.dta=, and the household-questionnaire =Unites=
 sheet is the generic 1--57 scheme, NOT the data's 100--700 coding (whose
-neighbours -- 663=Agoua, 664=Kpogban -- are specific local names).  No
-available source decodes them, so they are *accepted as undecodable* and
-left as codes (consistent with Malawi's residuals, #383).  [2026-11-04: the
-2021-22 file does label three of these codes, 659 =Main=, 660 =Quartier=, 662
-=Tête=, so "no source" no longer holds if the code book is one across the waves.
-2018 is not re-decoded: see "2021-22 wired".]  They still
-contribute valid food_expenditures and per-native-unit =unitvalue= prices;
-only the kg aggregate excludes them.
+neighbours -- 663=Agoua, 664=Kpogban -- are specific local names).
+[2026-11-12, CORRECTED (ruling @ligon, "Decode 2018 with 2021 labels (Recommended)", GH
+#1557): 659, 660 and 662 are no longer undecodable, and 2018 now serves them as =Main=,
+=Quartier= and =Tête=.  The evidence is Togo's own 2021-22 files: =s07b_me_tgo2021.dta=
+labels =s07bq03b= 659 =Main= (on Plantain, 60 rows), 660 =Quartier= (other meat, 5), 662
+=Tête= (Igname 1,215, Manioc 91, Taro 17), and the unit-weight file =ehcvm_nsu_tgo2021.dta=
+uses the same codes for the same goods (=uniteID= 659 =Main= on Banane douce 145 and
+Plantain 32; 660 =Quartier= on mutton 27, beef 18, goat 13, pork 12, chicken 3, game 3; 662
+=Tête= on Igname 111, Manioc 16, Taro 3).  2018 records them on those goods: 659 on Banane
+douce 437 and Plantain 77 source rows, 660 on goat 14, mutton 7, other meat 2, beef 1, 662
+on Igname 1,317, Manioc 148, Plantain 21.  So the code book is read as one across the waves.
+The decode is =2018/_/mapping.py:UNIT_CODES_DECODED_FROM_2021=, applied to the =u= level
+only, so =unit_match= still compares codes and no =Expenditure= moves; the served =u= is
+=Main (Moyen)= where it was =659 (Moyen)=.  Rows served: "2026-11-12 -- s07bq03a: the
+regional factor is divided out (GH #1697)" below.  Code 114 (one row, tomato) has no label in
+either wave and stays a code (consistent with Malawi's residuals, #383).]  They still
+contribute valid food_expenditures and per-native-unit =unitvalue= prices.  (The old
+clause "only the kg aggregate excludes them" was never true: an accepted residual takes
+the u-pooled =unit= rung, =tests/test_962_unit_sentinel.py=.)
 
 * Household Presence / MonthsSpent
 
@@ -938,7 +949,9 @@ serves =Expenditure= NA, silently.
 *=u=.*  This file labels its codes, unlike 2018's, in lower case for several.  The YAML
 maps nine labels onto what =ehcvm_units= calls the code, so =u= agrees across the waves.
 Three of the codes 2018 leaves undecoded have labels here (659 =Main=, 660 =Quartier=,
-662 =Tête=).  They are served as labels here and 2018 is not re-decoded.
+662 =Tête=).  They are served as labels here and 2018 is not re-decoded.  [2026-11-12:
+superseded by the ruling of GH #1557, "Decode 2018 with 2021 labels": 2018 serves them
+under these labels too; see "food_acquired units" above.]
 
 *=j=.*  This file's labels are clean UTF-8 and 2018's keys are mojibake, so 87 labels
 needed rows.  Niger's rule (#833): a respelling of a good 2018 names takes 2018's Preferred
@@ -963,7 +976,13 @@ siblings.  An earlier version of this file blamed the last purchase being filled
 within 30 days.  That is wrong: 2018 fills the same way (0 fills on =Jamais= or =Plus de 30
 jours=).  The difference is the rescaling below.
 
-** =s07bq03a= is rescaled by region (WAITING: with the maintainer)
+** =s07bq03a= is rescaled by region (ANSWERED 2026-11-12: "Invert, registered"; see "s07bq03a: the regional factor is divided out (GH #1697)" below)
+
+[2026-11-12: this section records the finding as it stood before the ruling, and two of its
+statements are wrong, corrected by the doc search (=burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md=
+§2b) and re-measured: =unité= rows ARE scaled, then floored to an integer, which is why they sit
+on the grid; and Grand Lomé purchase-only =unité= rows are floored at 0.9143, not unscaled.  The
+served table no longer carries the factor.]
 
 The consumption quantity carries an undocumented factor, and only that column does.  The
 values are the file's: no document held explains them, and a direct read agrees.  On the
@@ -1004,10 +1023,13 @@ was carried out, not that the column is what the household said.  Do not cite a 
 as proof that a quantity is raw.
 
 *As served, the wave is as filed*, so purchased =Quantity= and =Expenditure= of 2021-22 are
-not comparable across regions or waves.  Options with measured patches: in the PR.
+not comparable across regions or waves.  Options with measured patches: in the PR.  [2026-11-12:
+superseded; the factor is divided out, below.]
 
-*Kilograms.*  =ehcvm_nsu_tgo2021.dta= exists and is not wired (not ruled for single-wave
-countries).  So this wave's kilograms come from the price-ratio ladder, as 2018's do, on the
+*Kilograms.*  =ehcvm_nsu_tgo2021.dta= exists and is not wired: GH #1598 is *deferred, not
+unruled* [2026-11-12: corrected from "not ruled for single-wave countries", red team F4].  The
+2026-11-12 GO ruling names #1598's own-country NSU weights inside the food step; #1598 itself
+says to sequence it after the wave wiring, so it follows in its own PR and stays open.  So this wave's kilograms come from the price-ratio ladder, as 2018's do, on the
 scaled quantity above:
 =metric= 11,559 rows, =item_unit= 16,474, =unit= 108,174, =none= 7.  Because #1487 pools
 factors across a country's waves, wiring this table moved 2018's inferred kilograms at

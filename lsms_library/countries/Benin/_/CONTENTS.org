@@ -892,7 +892,7 @@ by the additive collapse, as core does.
 *=Expenditure=* is NA on 10.5% of purchased rows (2018-19 9.7%).  =ehcvm_conso='s =codpr= shares this file's codes, unlike 2018-19's, so the check runs: the rule x 365/7 is
 within 1% of =depan(Achat)= for 90.6% of 1,245 discriminating rows.  That validates the arithmetic, not the quantity: Togo's rescaled column passes it too.
 
-*Kilograms.*  =ehcvm_nsu_ben2021.dta= exists and is not wired (not ruled).  So this wave's kilograms come from the price-ratio ladder, as 2018-19's do: =metric= 25,831 rows, =item_unit= 85,075,
+*Kilograms.*  =ehcvm_nsu_ben2021.dta= exists and is not wired: GH #1598 is *deferred, not unruled* [2026-11-12: corrected from "not ruled", red team F4; the GO ruling names #1598's own-country NSU weights inside the food step, #1598 says to sequence it after the wave wiring, and it stays open for its own PR].  So this wave's kilograms come from the price-ratio ladder, as 2018-19's do: =metric= 25,831 rows, =item_unit= 85,075,
 =item_unit_tight= 435, =unit= 93,583, =none= 33.  Because #1487 pools factors across a country's waves, wiring this table moved 2018-19's inferred kilograms at read time: =food_quantities(units='kgs')= 168,465 -> 186,631
 (+10.8%), where 126,788 of 187,336 rows move, at a median of 1.22 among them (p10 0.92, p90 1.73); =food_prices= sum 158.4M -> 131.3M, where 92,147 of 133,112 rows move, at a median of 0.82 (p10 0.58, p90 1.09).  One more row
 in each, as 2 rows gain a factor.  Here the rungs move too: on 2018-19 =item_unit= 35,589 -> 65,116, =unit= 132,190 -> 102,387, =none= 155 -> 153, =metric= unchanged at 20,255, because a pair with too few reports in one wave clears

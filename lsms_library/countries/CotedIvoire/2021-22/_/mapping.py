@@ -290,12 +290,30 @@ def _shared(df):
     return out[~float_residue]
 
 
-def _add_key(out, key):
+def _add_key(out, key, rows=None):
     from lsms_library.derivations import union_keys
     current = out['Derivation'].astype(object).to_numpy()
-    out['Derivation'] = pd.Series([union_keys([c, key]) for c in current], index=out.index,
-                                  dtype='string')
+    rows = np.ones(len(out), dtype=bool) if rows is None else np.asarray(rows, dtype=bool)
+    out['Derivation'] = pd.Series([union_keys([c, key]) if r else c for c, r in zip(current, rows)],
+                                  index=out.index, dtype='string')
     return out
+
+
+def _withhold_collisions(out, key):
+    '''A withheld row that shares its served key (t, v, i, j, u, s) with another row -- two
+    items of the file under one served j -- would be summed with it by the core collapse,
+    which skips an NA, and the sum would be served as if whole.  So every row of such a
+    group is withheld and keyed: no NA quantity leaves a valued row.'''
+    keyed = out['Derivation'].fillna('').astype(str).str.split('+').apply(lambda ks: key in ks).to_numpy()
+    dup = out.index.duplicated(keep=False)
+    hit = keyed & dup
+    if not hit.any():
+        return out
+    group = out.index.isin(out.index[hit])
+    out = out.copy()
+    out.loc[group, 'Quantity'] = np.nan
+    out.loc[group, 'Expenditure'] = np.nan
+    return _add_key(out, key, group)
 
 
 def food_acquired(df):
@@ -324,7 +342,7 @@ def food_acquired(df):
         out['Quantity'] = np.nan
         out['Expenditure'] = np.nan
         parts.append(_add_key(out, KEY_REPLACED))
-    return pd.concat(parts)
+    return _withhold_collisions(pd.concat(parts), KEY_REPLACED)
 
 
 S07BQ03A_RAW_VARIABLES = ['s07bq03a', 's07bq03b', 's07bq03c', 's07bq04', 's07bq05']

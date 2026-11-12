@@ -85,7 +85,8 @@ BEFORE_SUM = {
 #: quantities and every Expenditure total are unchanged.
 AFTER = {
     ('Togo', '2018'): (31_676_794.87, 10_213),
-    ('Togo', '2021-22'): (34_464_072.25, 10_579),
+    # GH #1697 (2026-11-12): 34,464,072.25 before the producer's factor was divided out.
+    ('Togo', '2021-22'): (29_435_020.05, 10_579),
     ('Benin', '2018-19'): (68_929_996.70, 18_645),
     ('Benin', '2021-22'): (82_870_829.43, 27_522),
     ('Guinea-Bissau', '2018-19'): (57_552_942.85, 13_818),
@@ -99,7 +100,8 @@ AFTER = {
     ('Burkina_Faso', '2018-19'): (52_466_280.38, 9_386),
     ('Burkina_Faso', '2021-22'): (27_888_221.36, 6_148),
     ('CotedIvoire', '2018-19'): (105_011_084.65, 35_289),
-    ('CotedIvoire', '2021-22'): (121_393_491.0, 29_050),
+    # GH #1697 (2026-11-12): 121,393,491.0 before the H rows were withheld.
+    ('CotedIvoire', '2021-22'): (118_364_613.94, 29_050),
 }
 
 #: Keys a wave's food rows may carry beside this one (GH #1697, rulings of 2026-11-12):

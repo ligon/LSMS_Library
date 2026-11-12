@@ -47,6 +47,12 @@ CONDITION = {1: "unshelled", 2: "shelled", 3: "other_condition", 4: "other_condi
 CONDITION_LABEL = {1: "Epis", 2: "Grain", 3: "Tubercule", 4: "Gousse", 5: "Régime",
                    6: "Décortiqué", 7: "Non-décortiqué", 8: "Non concerné"}
 
+#: The producer's factor on s07bq03a by cover region (doc search T-TGO-1/-4), written out
+#: here so a wrong table cannot agree with itself.  Grand Lomé rows with own production or
+#: a gift carry 1.2 instead.
+FACTOR = {"Centrale": 1.6725, "Savanes": 1.338, "Plateaux": 1.2265, "Kara": 1.0035,
+          "Maritime": 1.0035, "Grand Lomé": 0.9143}
+
 
 class TestSaleRules:
     """The shared EHCVM-2 functions on synthetic frames, through the registry."""
@@ -327,10 +333,34 @@ class TestServed:
         got = pd.to_datetime(d["Interview start"])
         assert (got.sort_index() == expected.reindex(got.index).sort_index()).all()
 
-    def test_food_acquired_sums_are_the_files(self):
+    def _answer(self):
+        """The oracle's own inversion of the producer's factor (ruling 2026-11-12, "Invert,
+        registered"), from the codes and the cover's labels, with its own factor table."""
         s07 = _raw("s07b_me_tgo2021.dta")
-        qty = (s07["s07bq03a"].fillna(0) - s07["s07bq04"].fillna(0)
-               - s07["s07bq05"].fillna(0)).clip(lower=0)
+        cover = _raw("s00_me_tgo2021.dta", labels=True)[["grappe", "menage", "s00q01"]]
+        s07 = s07.merge(cover, on=["grappe", "menage"], how="left", validate="many_to_one")
+        q3 = s07["s07bq03a"].astype(float)
+        q4 = s07["s07bq04"].fillna(0).astype(float)
+        q5 = s07["s07bq05"].fillna(0).astype(float)
+        region = s07["s00q01"].astype(str)
+        own_or_gift = (q4 > 0) | (q5 > 0)
+        lome = region == "Grand Lomé"
+        f = region.map(FACTOR).where(~(lome & own_or_gift), 1.2)
+        count = s07["s07bq03b"] == 147
+        k = np.ceil(q3 / f - 1e-9)
+        floors = np.isclose(np.floor(k * f + 1e-9), q3) & np.isclose(q3, q3.round())
+        quarter = np.isclose(q3 / f * 4, (q3 / f * 4).round())
+        answer = (q3 / f).where(~count, k)
+        withheld = count & ((lome & ~own_or_gift) | (~lome & ~floors)
+                            | (lome & own_or_gift & ((q3 <= 0) | ~quarter)))
+        answer = answer.where(~(count & lome & own_or_gift), q3 / 1.2).where(~withheld)
+        answer = answer.where(~np.isclose(answer, q4 + q5, rtol=1e-6, atol=1e-6), q4 + q5)
+        implied = withheld & ((~own_or_gift) | (q3 - q4 - q5 > 1e-6))
+        return s07, answer, withheld, implied, q4, q5
+
+    def test_food_acquired_sums_are_the_files(self):
+        s07, answer, withheld, implied, q4, q5 = self._answer()
+        qty = (answer - q4 - q5).clip(lower=0)
         same = ((s07["s07bq03b"] == s07["s07bq07b"]) & (s07["s07bq03c"] == s07["s07bq07c"])
                 & (s07["s07bq07a"] > 0))
         value = (qty * s07["s07bq08"] / s07["s07bq07a"]).where(same)
@@ -341,7 +371,45 @@ class TestServed:
         assert side.loc["produced", "Quantity"] == pytest.approx(s07["s07bq04"].fillna(0).sum())
         assert side.loc["inkind", "Quantity"] == pytest.approx(s07["s07bq05"].sum())
         assert f.loc[f.index.get_level_values("s") != "purchased", "Expenditure"].isna().all()
+        purchased = f.xs("purchased", level="s")
+        assert int(purchased["Quantity"].isna().sum()) == int(implied.sum()) > 3000
+        assert purchased.loc[purchased["Quantity"].isna(), "Expenditure"].isna().all()
         assert f.index.is_unique
+
+    def test_the_factor_is_gone_from_the_residual(self):
+        """11,952 of 12,963 Jamais rows had a positive residual as filed (2018: 166); the
+        recovered answer leaves the genuine ones, each at least 0.01."""
+        s07, answer, withheld, implied, q4, q5 = self._answer()
+        jamais = s07["s07bq06"] == 5
+        filed = s07["s07bq03a"] - q4 - q5
+        assert int((jamais & (filed > 0)).sum()) > 11000
+        left = jamais & ((answer - q4 - q5) > 0)
+        assert int(left.sum()) < 400
+        assert ((answer - q4 - q5)[left] >= 0.01).all()
+
+    def test_the_new_keys_are_on_the_rows_they_name(self):
+        f = _served("food_acquired")
+        d = f["Derivation"].fillna("")
+        s = f.index.get_level_values("s")
+        for name in ("regional-factor-divided-out", "floored-count-recovered",
+                     "floored-count-withheld"):
+            on = d.str.contains(f"Togo::food_acquired::s07bq03a-{name}", regex=False)
+            assert on.any() and (s[on.to_numpy()] == "purchased").all(), name
+        held = d.str.contains("floored-count-withheld", regex=False).to_numpy()
+        assert f.loc[held, "Quantity"].isna().all() and f.loc[held, "Expenditure"].isna().all()
+        assert f.loc[~held, "Quantity"].notna().all()
+
+    def test_the_inputs_rederive_the_recovered_quantity(self):
+        c = ll.Country("Togo")
+        key = "Togo::food_acquired::s07bq03a-regional-factor-divided-out"
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            raw = c.derivation_inputs(key, wave=WAVE)
+        fn = c.derivations()[key].resolve()
+        got = fn(raw["s07bq03a"], raw["s07bq03b"], raw["s00q01"], raw["s07bq04"], raw["s07bq05"])
+        # The producer's value is recoverable: filed over recovered is the factor.
+        ratio = pd.Series(raw["s07bq03a"].to_numpy() / got).round(4)
+        assert set(ratio.unique()) <= set(FACTOR.values()) | {1.2}
 
     def test_the_purchase_unit_reads_as_the_code_says(self):
         """Without the wave's map, 15,412 rows read as another unit (all sachets)."""
