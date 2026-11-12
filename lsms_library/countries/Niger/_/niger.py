@@ -1064,6 +1064,62 @@ def stamp_survey_kg_estimate(df):
     return out
 
 
+# The SALE's kilograms in 2021-22, s16dq05c, carry the sibling key (GH #1560, ruling
+# @ligon 2026-11-12, "Sold-kg details" (c)): the same "Estimation Quantite totale UML en
+# kg", on the crop-level sale record rather than the harvest line, so its inputs are
+# s16d's and not s16c's.
+SOLD_KG_ESTIMATE = 'Niger::crop_production::sold-kg-estimate'
+
+
+def derive_sold_kg_estimate(kilograms):
+    """2021-22 s16dq05c -> ``Quantity_sold_kg``: THE IDENTITY, read as a total.
+
+    Registered as ``Niger::crop_production::sold-kg-estimate``.  Nothing is computed; the
+    registry says what the number is: the instrument's estimate of the sale in kilograms,
+    served as a total by ruling (2026-11-12, "Treat 2021 as totals").  Returns float64.
+    """
+    return pd.to_numeric(kilograms, errors='coerce').astype('float64')
+
+
+def stamp_sold_kg_estimate(df):
+    """The ``Derivation`` column of the finished 2021-22 frame with
+    :data:`SOLD_KG_ESTIMATE` APPENDED (``MULTI_SEP``, sorted) wherever ``Quantity_sold_kg``
+    holds a value, a Farm-level sale row included."""
+    out = (df['Derivation'].astype('string').copy() if 'Derivation' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    mask = df['Quantity_sold_kg'].notna().to_numpy(dtype=bool)
+    out[mask] = pd.array([union_keys((value, SOLD_KG_ESTIMATE)) for value in out[mask]],
+                         dtype='string')
+    return out
+
+
+def inputs_sold_kg_estimate(wave):
+    """The registry ``inputs`` callable of sold-kg-estimate: the s16d sale records whose
+    s16dq05c holds a value, as recorded, once each (the exact repeats dropped as the build
+    drops them), keyed by the served ``(t, i, crop)``."""
+    from lsms_library.paths import countries_root
+    if wave != '2021-22':
+        raise ValueError(f"sold-kg-estimate is ['2021-22'], not {wave!r}")
+    root = Path(countries_root()) / 'Niger' / wave
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        dirs=[f"{root / '_'}/", f"{Path(countries_root()) / 'Niger' / '_'}/"],
+        **{'Preferred Label': 'Preferred Label'})
+    path = str(root / 'Data' / 's16d_me_ner2021.dta')
+    lab = tools.get_dataframe(path, convert_categoricals=True)
+    code = tools.get_dataframe(path, convert_categoricals=False)
+    keep = ~code.duplicated(keep='first').to_numpy()
+    lab, code = lab[keep], code[keep]
+    out = code[['s16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq05c', 's16dq05d',
+                's16dq06']].copy()
+    out['t'] = wave
+    out['i'] = lab.apply(lambda r: i(pd.Series([r['grappe'], r['menage']],
+                                               index=['grappe', 'menage'])), axis=1).values
+    out['crop'] = _crop_labels(code['s16dq01'], lab['s16dq01'], crop_map).values
+    has_kg = pd.to_numeric(out['s16dq05c'], errors='coerce').notna().to_numpy()
+    return out[has_kg & out['crop'].notna().to_numpy()].set_index(['t', 'i', 'crop'])
+
+
 def inputs_survey_kg_estimate(wave):
     """The registry ``inputs`` callable of survey-kg-estimate: the quantity, unit, kg
     and state as recorded, keyed by the served ``(t, i, plot_id, production_obs)``."""

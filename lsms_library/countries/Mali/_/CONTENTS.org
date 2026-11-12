@@ -3983,6 +3983,10 @@ only as an explicit =kg_qty=.  The donor/recipient state question is GH #1698.
   holds EAC-I tree rows and derived harvests here; those carry no sold kilograms.
 - *Not independent of the survey's harvest conversion where both exist*: on the 32 sales in their
   harvest's own unit, sold kg per unit equals harvest kg per unit on 26.
+- *RULED (@ligon, 2026-11-12, "Sold-kg details" (c)): it carries the estimate key*, as the harvest
+  kilograms do: =Mali::crop_production::sold-kg-estimate=, a sibling of =survey-kg-estimate=
+  (whose rule, s16c inputs and tests are the harvest's), on every row with a =Quantity_sold_kg=,
+  the 70 Farm-level sale rows included, joined to any other key with sorted '+'.
 - *Farm-level price support, measured and not wired.*  Of the 70 Farm-level sales, 68 already
   have a positive price per kilogram through the sold-unit resolver (=Kg= and the sized sacks,
   which Mali's sales mostly use) and 70 do with =Value_sold / Quantity_sold_kg=: 2 gain.  On the

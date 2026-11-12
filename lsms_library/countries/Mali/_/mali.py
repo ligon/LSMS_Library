@@ -916,6 +916,10 @@ DERIVATION_HARVEST_DISPOSITIONS = 'Mali::crop_production::harvest-from-dispositi
 #: the instrument calls s16cq16c an estimate.
 DERIVATION_SURVEY_KG_ESTIMATE = 'Mali::crop_production::survey-kg-estimate'
 
+#: Its sibling on a 2021-22 row with a Quantity_sold_kg (GH #1560, ruling 2026-11-12 (c)):
+#: s16dq05c is the same "Estimation", on the crop-level sale record.
+DERIVATION_SOLD_KG_ESTIMATE = 'Mali::crop_production::sold-kg-estimate'
+
 #: What s16d records of a crop, each with its own quantity <var>a and unit <var>b:
 #: consumed, given away, sold, in stock.
 _DISPOSITIONS = ('s16dq02', 's16dq03', 's16dq05', 's16dq13')
@@ -1136,6 +1140,30 @@ def ehcvm_sold_kilograms(kilograms, quantity_sold):
     """
     kg = pd.to_numeric(kilograms, errors='coerce').astype('float64')
     return kg.mask(kg.eq(0) & pd.to_numeric(quantity_sold, errors='coerce').gt(0))
+
+
+def stamp_sold_kg_estimate(df):
+    """Key the rows whose ``Quantity_sold_kg`` holds a value (a Farm-level sale row too).
+
+    :data:`DERIVATION_SOLD_KG_ESTIMATE`, the sibling of the harvest's
+    ``survey-kg-estimate`` (ruling @ligon 2026-11-12, "Sold-kg details" (c)).
+    """
+    out = df.copy()
+    out['Derivation'] = _with_key(out['Derivation'], out['Quantity_sold_kg'].notna(),
+                                  DERIVATION_SOLD_KG_ESTIMATE)
+    return out
+
+
+def inputs_sold_kg_estimate(wave):
+    """The registry ``inputs`` callable of ``sold-kg-estimate``: the s16d sale records
+    whose ``Quantity_sold_kg`` holds a value, as recorded, at (t, i, crop)."""
+    year = {'2021-22': '2021'}[wave]
+    src = _ehcvm_keyed(wave, f's16d_me_mli{year}.dta', 's16dq01')
+    keep = (ehcvm_is_sale(src['s16dq05a'], src['s16dq06'])
+            & ehcvm_sold_kilograms(src['s16dq05c'], src['s16dq05a']).notna())
+    return src.loc[keep.to_numpy(), ['t', 'i', 'crop', 's16dq01', 's16dq04', 's16dq05a',
+                                     's16dq05b', 's16dq05c', 's16dq06']].set_index(
+        ['t', 'i', 'crop'])
 
 
 def stamp_survey_kg_estimate(df):

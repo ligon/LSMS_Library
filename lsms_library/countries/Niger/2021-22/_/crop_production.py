@@ -43,6 +43,7 @@ from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
                    _crop_conditions, _crop_sold_conditions,
                    _finish_crop_production, _crop_row_observations,
                    derive_survey_kg_estimate, stamp_survey_kg_estimate,
+                   derive_sold_kg_estimate, stamp_sold_kg_estimate,
                    derive_hh_crop_sale_attachment, served_harvest_lines, stamp_hh_crop_sale)
 
 
@@ -110,8 +111,9 @@ sold_df = pd.DataFrame({
     # sold (GH #1560 / #1571, ruling @ligon 2026-11-12 "Treat 2021 as totals"): the
     # released label and the file's Kg sales (kg == quantity on 45 of 48) say a total,
     # where both own vague forms instruct "poids en kg d'UNE UML".  Never divided into a
-    # per-unit factor.  No code in the column (max 8,000).
-    'Quantity_sold_kg': pd.to_numeric(soldn['s16dq05c'], errors='coerce').values,
+    # per-unit factor.  No code in the column (max 8,000).  Keyed sold-kg-estimate, the
+    # sibling of the harvest's survey-kg-estimate (ruling 2026-11-12 (c)).
+    'Quantity_sold_kg': derive_sold_kg_estimate(soldn['s16dq05c']).values,
     'Value_sold':    pd.to_numeric(sold['s16dq06'], errors='coerce').values,
     # The SOLD unit (s16dq05b), whose 8-label set is spelled DIFFERENTLY from
     # the harvest unit s16cq16b ('tiya', 'sac de 100kg', 'panier', ...); the
@@ -156,6 +158,7 @@ df = _finish_crop_production(df, '2021-22')
 # After the tail, so the stamps ride on served rows (CLAUDE.md "Derived Values").
 df['Derivation'] = stamp_survey_kg_estimate(df)
 df['Derivation'] = stamp_hh_crop_sale(df)
+df['Derivation'] = stamp_sold_kg_estimate(df)
 
 assert df.index.is_unique, 'crop_production 2021-22 repeats a native harvest line'
 # Conservation: the records' sums, on one row each.

@@ -419,8 +419,10 @@ Mali::crop_production::survey-kg-estimate:
     its local unit and not a weighing.  A 0 beside a positive quantity (3 rows) is no
     answer and is NA.  A row whose Quantity is harvest-from-dispositions
     has none: s16d's other "c" columns are the state of the product, and s16dq05c, the
-    sale's kilograms, is not served.  Shares a row with harvest-to-date and
-    hh-crop-sale-single-row through derivations.MULTI_SEP, in sorted order.
+    sale's kilograms, is served as Quantity_sold_kg under the sibling key
+    sold-kg-estimate (GH #1560).  Shares a row with harvest-to-date,
+    hh-crop-sale-single-row and sold-kg-estimate through derivations.MULTI_SEP, in sorted
+    order.
   function: lsms_library.countries.Mali._.mali:derive_survey_kg_estimate
   inputs: lsms_library.countries.Mali._.mali:inputs_survey_kg_estimate
   raw_variables: [s16cq16a, s16cq16b, s16cq16c, s16cq16d]
@@ -438,6 +440,39 @@ Mali::crop_production::survey-kg-estimate:
     nothing to validate but its rows.
   contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the survey harvest kilograms, 2021-22 (GH #1436)"'
   since: '2026-11-04'
+
+# GH #1560, ruling @ligon 2026-11-12 ("Sold-kg details" (c)): the sold kilograms carry the
+# "estimate" key the harvest kilograms carry -- a sibling, because survey-kg-estimate's rule,
+# inputs (s16c lines) and tests are the harvest's.
+Mali::crop_production::sold-kg-estimate:
+  waves: ['2021-22']
+  columns: [Quantity_sold_kg]
+  rule: >-
+    Identity on a 2021-22 row with a Quantity_sold_kg: 16D.05c s16dq05c, "Estimation Quantite
+    totale UML en kg", served as recorded as the TOTAL kilograms of the sale (ruling @ligon
+    2026-11-12, "Treat 2021 as totals"), with a 0 beside a positive s16dq05a NA (4 rows).
+    The key says what the number is: the instrument calls it an estimate.  It rides with the
+    sale, on the single s16c row or the Farm-level row, and joins any key already there with
+    sorted '+'.
+  function: lsms_library.countries.Mali._.mali:ehcvm_sold_kilograms
+  inputs: lsms_library.countries.Mali._.mali:inputs_sold_kg_estimate
+  raw_variables: [s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq05c, s16dq06]
+  assumptions:
+    - text: >-
+        s16dq05c is the sale's total in kilograms, as estimated, and not a factor per unit,
+        although both own vague forms instruct a weight per ONE unit: the released label says
+        a total, kg equals the sold quantity on all 495 sales in Kg and 1 on none, and the
+        median per 100 kg sack is 100.
+      basis: variable-label
+      evidence: >-
+        s16d_me_mli2021.dta s16dq05c "16D.05c. Estimation Quantite totale UML en kg";
+        mli_ehcvm2_qnr_men_excel_vague1.pdf and _vague2.pdf, PDF p. 88, 16D05; ruling @ligon
+        2026-11-12 (.sucoder/isa-decisions.org, "Sold kilograms" and "Sold-kg details" (c)).
+  validated_against: >-
+    tests/test_mali_crop_sold_kg.py, whose oracle reads s16d directly.  An identity has nothing
+    to validate but its rows.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-12 -- crop_production: the sold kilograms are served (GH #1560)"'
+  since: '2026-11-12'
 
 Mali::community_prices::gram-centilitre-poids:
   waves: ['2014-15']

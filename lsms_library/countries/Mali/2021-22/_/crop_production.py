@@ -61,7 +61,7 @@ from mali import (derive_hh_crop_harvest_total, derive_hh_crop_sale_attachment,
                   ehcvm_crop_labels, ehcvm_dispositions, ehcvm_household_ids,
                   ehcvm_intercropped, ehcvm_is_sale, ehcvm_plot_ids, ehcvm_unit_labels,
                   finish_ehcvm_crop_production, stamp_harvest_to_date,
-                  stamp_survey_kg_estimate)
+                  stamp_sold_kg_estimate, stamp_survey_kg_estimate)
 
 src = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=True)
 src_codes = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=False)
@@ -126,6 +126,8 @@ assert df.loc[~derived, 'Quantity'].sum() == recorded, 'crop_production 2021-22:
 assert df.loc[derived, 'Quantity_kg'].isna().all(), 'crop_production 2021-22: a derived row with kilograms'
 assert df['Quantity_kg'].sum() == src['s16cq16c'].sum(), 'crop_production 2021-22: kilograms moved'
 df = stamp_survey_kg_estimate(df)
+# The sale's kilograms are the same "Estimation": the sibling key (ruling 2026-11-12 (c)).
+df = stamp_sold_kg_estimate(df)
 
 df = finish_ehcvm_crop_production(df, '2021-22')
 

@@ -27,6 +27,7 @@ TABLE = "crop_production"
 SALE_KEY = "Niger::crop_production::hh-crop-sale-single-row"
 DRY_SALE = "Niger::crop_production::dry-season-sale-window"
 NO_SALE = "Niger::crop_production::dry-season-sold-kg-no-sale"
+SOLD_KG = "Niger::crop_production::sold-kg-estimate"
 RAINY_2011 = "NER_2011_ECVMA_v01_M_Stata8/ecvmaas2e_p2.dta"
 DRY_2011 = "NER_2011_ECVMA_v01_M_Stata8/ecvmaas3e_p1.dta"
 SALE_2014 = "NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta"
@@ -100,6 +101,14 @@ class TestRules:
         assert got[1] == "+".join(sorted(("Niger::crop_production::dry-season-cycle-total", NO_SALE)))
         assert pd.isna(got[2])
 
+    def test_the_sold_kg_estimate_key_appends(self, niger):
+        other = "Niger::crop_production::hh-crop-sale-single-row"
+        frame = pd.DataFrame({"Quantity_sold_kg": pd.array([5.0, None, 7.0], dtype="Float64"),
+                              "Derivation": pd.array([other, other, pd.NA], dtype="string")})
+        got = niger.stamp_sold_kg_estimate(frame).tolist()
+        assert got == ["+".join(sorted((other, SOLD_KG))), other, SOLD_KG]
+        assert niger.derive_sold_kg_estimate(pd.Series([2.5, None])).dtype == "float64"
+
     def test_a_farm_level_sale_carries_its_kilograms(self, niger):
         harvest = pd.DataFrame({"i": ["1", "1"], "crop": ["Mil", "Mil"], "plot_id": ["1_1", "1_2"],
                                 "Quantity": [4.0, 5.0], "Quantity_sold": [np.nan, np.nan],
@@ -139,6 +148,11 @@ class TestDeclared:
         assert {"AS02EQ12C", "s16dq05c"} <= set(sale["raw_variables"])
         dry = records_for(COUNTRY, TABLE)[DRY_SALE]
         assert "Quantity_sold_kg" in dry["columns"] and "as03eq11c" in dry["raw_variables"]
+        est = records_for(COUNTRY, TABLE)[SOLD_KG]
+        assert list(est["waves"]) == ["2021-22"] and list(est["columns"]) == ["Quantity_sold_kg"]
+        assert "s16dq05c" in est["raw_variables"] and "Estimation" in str(est["rule"])
+        assert callable(resolve_callable(est["function"]))
+        assert callable(resolve_callable(est["inputs"]))
         mask = records_for(COUNTRY, TABLE)[NO_SALE]
         assert list(mask["waves"]) == ["2011-12"] and list(mask["columns"]) == ["Quantity_sold_kg"]
         assert {"as03eq10", "as03eq11a", "as03eq11c", "as03eq12"} <= set(mask["raw_variables"])
@@ -276,6 +290,24 @@ class TestServed:
         share = float((sub["Quantity_sold_kg"].astype("float64")
                        == sub["Quantity_sold"].astype("float64")).mean())
         assert len(sub) > 200 and share > 0.9
+
+    def test_the_2021_22_sold_kilograms_carry_the_estimate_key(self, built):
+        """Ruling 2026-11-12 (c): exactly the rows with a Quantity_sold_kg, Farm-level too."""
+        country, df = built
+        for wave in ("2011-12", "2014-15", "2018-19", "2021-22"):
+            got = _wave(built, wave)
+            keyed = got["Derivation"].astype("string").str.contains(SOLD_KG, regex=False).fillna(False)
+            if wave == "2021-22":
+                assert (keyed == got["Quantity_sold_kg"].notna()).all() and int(keyed.sum()) == 1818
+                assert int((keyed & (got["plot_id"] == "Farm-level")).sum()) == 553
+            else:
+                assert not keyed.any()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            raw = country.derivation_inputs(SOLD_KG).reset_index()
+        got = _wave(built, "2021-22")
+        got = got[got["Quantity_sold_kg"].notna()]
+        assert sorted(zip(raw["i"], raw["crop"])) == sorted(zip(got["i"], got["crop"]))
 
     def test_the_registered_inputs_carry_the_raw_kilograms(self, built):
         country, _ = built

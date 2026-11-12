@@ -371,6 +371,44 @@ Niger::crop_production::dry-season-sale-window:
   contents: 'Niger/_/CONTENTS.org, "the dry season: read in 2011-12, not asked in 2014-15 (GH #1462)"'
   since: '2026-11-04'
 
+# GH #1560, ruling @ligon 2026-11-12 ("Sold-kg details" (c)): the 2021-22 SOLD kilograms carry
+# the "estimate" key the 2021-22 harvest kilograms carry.  A sibling of survey-kg-estimate,
+# not that key, because that key's rule, inputs (s16c harvest lines) and tests are the
+# harvest's: this one is s16d's crop-level sale record, on a line or a Farm-level row.
+Niger::crop_production::sold-kg-estimate:
+  waves: ['2021-22']
+  columns: [Quantity_sold_kg]
+  rule: >-
+    Identity on a 2021-22 row with a Quantity_sold_kg: 16D.05c s16dq05c, "Estimation Quantite
+    totale UML en kg", served as recorded as the TOTAL kilograms of the sale (ruling @ligon
+    2026-11-12, "Treat 2021 as totals").  The key says what the number is: the instrument
+    calls it an estimate, so a sale's kilograms are the survey's conversion of its local unit
+    and not a weighing.  It rides with the sale (hh-crop-sale-single-row on a line, none on a
+    Farm-level row) and joins any key already there with sorted '+'.  2011-12 and 2014-15
+    ask "quantite en kg" beside the sold unit, without that word, and carry no key.
+  function: lsms_library.countries.Niger._.niger:derive_sold_kg_estimate
+  inputs: lsms_library.countries.Niger._.niger:inputs_sold_kg_estimate
+  raw_variables: [s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq05c, s16dq05d, s16dq06]
+  assumptions:
+    - text: >-
+        s16dq05c is the sale's total in kilograms, as estimated, and not a factor per unit,
+        although both own vague forms instruct "poids en kg d'UNE UML": the released label
+        says a total, kg equals the sold quantity on 45 of 48 sales in Kg and 1 on none, and
+        within a unit kg scales with s16dq05a (log-log slope 0.97 on Tiya, 0.89 on Sac de
+        100kg).  On a sale in the harvest's own unit it equals the line's harvest kg per
+        unit on 939 of 1,134, the same conversion, not a second weighing.
+      basis: variable-label
+      evidence: >-
+        s16d_me_ner2021.dta s16dq05c "16D.05c. Estimation Quantite totale UML en kg";
+        ner_ehcvm2_qnr_men_excel_vague1.pdf and _vague2.pdf, PDF p. 83, 16D05; ruling
+        @ligon 2026-11-12 (.sucoder/isa-decisions.org, "Sold kilograms" and "Sold-kg
+        details" (c)).
+  validated_against: >-
+    tests/test_niger_crop_sold_kg.py, whose oracle reads s16d directly.  An identity has
+    nothing to validate but its rows.
+  contents: 'Niger/_/CONTENTS.org, "2026-11-12 -- crop_production: the sold kilograms are served (GH #1560, #1571)"'
+  since: '2026-11-12'
+
 # GH #1560 / #1571, ruling @ligon 2026-11-12 ("Sold-kg details" (a)).  A MASK on a served
 # row: the row is a harvest and stays; the key rides on it.
 Niger::crop_production::dry-season-sold-kg-no-sale:
