@@ -147,3 +147,32 @@ and registered.  Judgement rows implemented as MAPPING.org proposes, listed for 
 - `d61ed2d37`: the PP source paths are wave-script LITERALS (`PP_SOURCES`), so `Wave._input_hash` folds their sidecars
   (`scan_script_data_refs`); a computed path had been invisible to it.  Served rows re-checked cold at that head.
 - The 72 item-hold rows are all W2 code 15 (Semovita); code 0 has no priced row.
+
+## Step 3 -- the final two rulings (2026-11-12), Claude Opus 5.5
+
+Rulings ("GH587 W1 metric rows with a count" and "GH587 metric units with no recorded package size",
+`.sucoder/isa-decisions.org`) answer step 2's §6 questions 1-3.  Report
+`burst/isa-sm-20261112/reports/587-wiring-final/REPORT.md`.  Search tier: ripgrep + `ast` (GitNexus MCP
+failed to connect).
+
+### §2 Machinery used or added
+| symbol | path | decision |
+|---|---|---|
+| `pp_dispositions` | `Nigeria/_/pp_community_prices.py` | **extended**: three new dispositions (`w1-metric-package-hold`, `w1-count-as-size-hold`, `w5-metric-quantity`); W3 Kg/l leave `unrecorded-size-hold` |
+| `derive_pp_w5_metric_unit_price` | same | **new**, registered (`pp-w5-metric-unit-quantity`); same arithmetic as the W1 / PH divisions, own key and function so its inputs return its rows only |
+| `inputs_pp_w1_metric_package_hold`, `inputs_pp_w1_count_as_size_hold`, `inputs_pp_w5_metric_unit_quantity` | same | **new**, through the existing `pp_inputs` |
+
+### §5 Decisions
+| quantity | decision | reason |
+|---|---|---|
+| W1 g/ml, N = 1 (963 + 80) | **held**, own key `pp-w1-metric-package-hold` | ruling; 144x household |
+| W1 Kg/l, N > 50 (128 + 204) | **held**, own key `pp-w1-count-as-size-hold`; N = 50 divides | ruling; 50-1000x under household |
+| W3 Kg/l, no size (4,120) | **served as recorded**, no key | ruling; 1.07 / 1.00x household.  PH W3 still drops its Kg/l: an asymmetry, recorded |
+| W5 g/cl, no size, `c2q2a` > 0 (208) | **served** `c2q3 / c2q2a`, key `pp-w5-metric-unit-quantity` | ruling; `c2q2a` = the package size in g / cl -- `c2q2b_os` agrees on 172 (174) of 176 g and, as ml / 10, on 32 of 32 cl; cvn 0.001 / 0.01; form and manual silent |
+| W5 g/cl, no size, no `c2q2a` (23) | **held** (`pp-unrecorded-size-hold`) | nothing to divide by; their text has no number |
+| W2 cl (5) | **held** with W2 g | the ruling names W2 grams only |
+
+### §6 Open questions for the human
+1. The label judgement rows (unchanged from step 2), listed in the PR body.
+2. W5's 123 `c2q2a`-not-1 rows (63 BOTTLE/CAN with a coded metric size could be served by the PH division).
+3. PH W3's 3,433 Kg/l are still dropped; PP W3's are now served.  Re-measure PH W3 against household values?

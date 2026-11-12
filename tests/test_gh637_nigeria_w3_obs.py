@@ -151,12 +151,16 @@ def _aws_creds_available() -> bool:
 # post-planting quarters are served (W3's PP C2 also prices two locations,
 # obs 1 / 2), and 2024Q1 loses the 49 '4. CENTLITRES (CL)' rows the decoder
 # used to serve as litres (blank size -> c8-unrecorded-size-drop).
+# The final 2026-11-12 rulings moved the PP pins again: 2010Q3 holds W1's
+# 1,043 g / ml rows with N = 1 and 332 Kg / l rows with N > 50; 2015Q3
+# serves W3's 4,120 Kg / l rows (obs 1: 3,333, obs 2: 787); 2023Q3 serves
+# W5's 208 g / cl rows divided by c2q2a.
 EXPECTED = {'2011Q1': {1: 30628}, '2013Q1': {1: 31239},
             '2016Q1': {1: 17344, 2: 5809},
             '2019Q1': {1: 31757}, '2024Q1': {1: 30015},
-            '2010Q3': {1: 22214}, '2012Q3': {1: 21124},
-            '2015Q3': {1: 15032, 2: 5843},
-            '2018Q3': {1: 32246}, '2023Q3': {1: 29667}}
+            '2010Q3': {1: 20839}, '2012Q3': {1: 21124},
+            '2015Q3': {1: 18365, 2: 6630},
+            '2018Q3': {1: 32246}, '2023Q3': {1: 29875}}
 
 
 @pytest.mark.slow

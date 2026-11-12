@@ -29,6 +29,9 @@ questionnaire prices food too, in Section C2 (sectc2a_plantingw3.dta (1st locati
 this script also serves t = 2015Q3 through the PP adapter
 (../../_/pp_community_prices.py): j / u on Nigeria's shared labels, the native
 size in `Size`, Price on the form's own basis -- quantity of one (c2q2 unit, c2q2b other-unit text, c2q3 Naira).
+Unlike the PH rows above, the PP Kg / l rows with blank c2q2b are SERVED as
+recorded (ruling 2026-11-12: they measure as per-kg / per-litre prices); PP
+g / cl with blank c2q2b stay held (pp-unrecorded-size-hold).
 Distinct t per round (pp-ph skill).
 """
 import sys

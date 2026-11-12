@@ -157,6 +157,35 @@ def test_w1_count_rule():
     assert d.variety.iloc[0] == '10'        # W1 native item code
 
 
+def test_w1_metric_holds_follow_the_ruling():
+    """"Hold both groups" (2026-11-12): g / ml with N = 1, Kg / l with N > 50.
+    Every other W1 row is decided as before; N = 50 is still divided."""
+    d = _decide('W1', [
+        dict(price=500., quantity=1., unit=102.),     # 1 g: a package price
+        dict(price=300., quantity=1., unit=104.),     # 1 ml: a package price
+        dict(price=900., quantity=2., unit=102.),     # g, N = 2: divided
+        dict(price=6000., quantity=51., unit=101.),   # Kg, N = 51: a size
+        dict(price=6000., quantity=200., unit=103.),  # l, N = 200: a size
+        dict(price=5000., quantity=50., unit=101.),   # Kg, N = 50: divided
+        dict(price=400., quantity=1., unit=103.),     # l, N = 1: as recorded
+        dict(price=900., quantity=500., unit=104.),   # ml, N = 500: divided
+        dict(price=80., quantity=np.nan, unit=102.),  # g, no count: no-count first
+    ])
+    assert d.Disposition.tolist() == [
+        'w1-metric-package-hold', 'w1-metric-package-hold', 'w1-divided',
+        'w1-count-as-size-hold', 'w1-count-as-size-hold', 'w1-divided',
+        'served', 'w1-divided', 'w1-no-count']
+    assert d.u.tolist() == ['g', 'ml', 'g', 'Kg', 'l', 'Kg', 'l', 'ml', 'g']
+    assert d.Price.iloc[5] == 100. and d.Derivation.iloc[5] == pp.PP_W1_UNITS_KEY
+    assert d.Price.iloc[6] == 400. and pd.isna(d.Derivation.iloc[6])
+    assert d.Price.iloc[7] == 1.8
+    assert pp.PP_W1_COUNT_AS_SIZE_ABOVE == 50
+    for disposition in ('w1-metric-package-hold', 'w1-count-as-size-hold'):
+        assert disposition not in pp.PP_SERVED_DISPOSITIONS
+        assert pp.PP_OMISSION_KEYS[disposition] in D.derivation_records('Nigeria')
+    assert pp.PP_OMISSION_KEYS['w1-metric-package-hold'] != pp.PP_OMISSION_KEYS['w1-count-as-size-hold']
+
+
 def test_w1_division_reproduces_from_the_registered_function():
     raw = _raw('W1', [dict(price=900., quantity=3., unit=11.)])
     d = pp.pp_dispositions(raw, 'W1')
@@ -176,12 +205,19 @@ def test_w2_metric_units_are_held_and_kilograms_served():
     assert d.j.iloc[4] == 'Semovita'      # the held frame names the native item
 
 
-def test_w3_metric_block_is_held_and_unlabelled_31_is_large_mudu():
+def test_w3_grams_cl_held_kg_l_served_and_unlabelled_31_is_large_mudu():
+    """"Serve W3 kg/l" (2026-11-12): Kg / l with blank c2q2b are per-unit
+    prices, served as recorded; g / cl with blank c2q2b stay held."""
     for key, obs in (('W3-first', 1), ('W3-second', 2)):
         d = _decide(key, [dict(price=20., unit=2.), dict(price=300., unit=1.),
                           dict(price=200., unit=3.), dict(price=70., unit=31.),
-                          dict(price=70., unit=31., other='300gram')])
-        assert d.Disposition.tolist() == ['unrecorded-size-hold'] * 3 + ['served'] * 2
+                          dict(price=70., unit=31., other='300gram'),
+                          dict(price=150., unit=4.)])
+        assert d.Disposition.tolist() == ['unrecorded-size-hold', 'served', 'served',
+                                          'served', 'served', 'unrecorded-size-hold']
+        assert d.u.tolist()[:3] == ['g', 'Kg', 'l'] and d.u.iloc[5] == 'cl'
+        assert d.Price.tolist()[1:3] == [300., 200.]
+        assert d.Derivation.iloc[1:3].isna().all()
         assert d.u.iloc[3] == 'Mudu' and d.Size.iloc[3] == 'LARGE'
         assert set(d.obs) == {obs} and set(d.t) == {'2015Q3'}
         assert set(d.variety) == {'unknown_variety'}
@@ -206,15 +242,33 @@ def test_w5_quantity_rule():
     d = _decide('W5', [
         dict(price=100., unit=270., quantity=1.),            # served as recorded
         dict(price=100., unit=270., quantity=20.),           # price of 20 cubes?
-        dict(price=500., unit=2., quantity=250.),            # g, no coded size
+        dict(price=500., unit=2., quantity=250.),            # g, no coded size: 250 g
         dict(price=150., unit=240., quantity=75., size=24.), # restates the size
         dict(price=150., unit=4., size=24.),                 # cl WITH a coded size
-        dict(price=150., unit=4.),                           # cl, blank size
+        dict(price=150., unit=4.),                           # cl, blank size, no c2q2a
+        dict(price=300., unit=4., quantity=75.),             # cl, blank size: 75 cl
+        dict(price=500., unit=2., quantity=250., size=99.),  # g, one size only
     ])
-    assert d.Disposition.tolist() == ['served', 'w5-quantity-hold', 'unrecorded-size-hold',
-                                      'w5-quantity-hold', 'metric-size', 'unrecorded-size-hold']
+    assert d.Disposition.tolist() == ['served', 'w5-quantity-hold', 'w5-metric-quantity',
+                                      'w5-quantity-hold', 'metric-size', 'unrecorded-size-hold',
+                                      'w5-metric-quantity', 'w5-quantity-hold']
     assert d.u.iloc[4] == 'cl' and d.Price.iloc[4] == 2.
+    assert d.u.iloc[2] == 'g' and d.Price.iloc[2] == 2.
+    assert d.u.iloc[6] == 'cl' and d.Price.iloc[6] == 4.
+    assert (d.Derivation.iloc[[2, 6]] == pp.PP_W5_METRIC_QUANTITY_KEY).all()
+    assert d.Derivation.iloc[4] == pp.PP_METRIC_SIZE_KEY
     assert set(d.t) == {'2023Q3'}
+
+
+def test_w5_metric_quantity_reproduces_from_the_registered_function():
+    raw = _raw('W5', [dict(price=600., unit=2., quantity=400.),
+                      dict(price=90., unit=4., quantity=3.3)])
+    d = pp.pp_dispositions(raw, 'W5')
+    f = D.resolve_callable(D.derivation_records('Nigeria')[pp.PP_W5_METRIC_QUANTITY_KEY].function)
+    again = f(raw['c2q3'], raw['c2q2a'])
+    np.testing.assert_allclose(d.Price.to_numpy(), again)
+    np.testing.assert_allclose(again, [1.5, 90. / 3.3])
+    assert np.isnan(pp.derive_pp_w5_metric_unit_price([5.], [0.])[0])
 
 
 def test_every_omission_has_its_own_registered_deletion():
@@ -225,7 +279,8 @@ def test_every_omission_has_its_own_registered_deletion():
         assert records[key].table == 'community_prices'
     omitted = set(pp.PP_DISPOSITIONS) - set(pp.PP_SERVED_DISPOSITIONS) - {'unpriced'}
     assert omitted - set(pp.PP_OMISSION_KEYS) == {'unit-unplaced'}   # 0 rows; warns
-    for key in (pp.PP_W1_UNITS_KEY, pp.PP_METRIC_SIZE_KEY):
+    assert len(set(pp.PP_OMISSION_KEYS.values())) == len(pp.PP_OMISSION_KEYS)  # one key per group
+    for key in (pp.PP_W1_UNITS_KEY, pp.PP_METRIC_SIZE_KEY, pp.PP_W5_METRIC_QUANTITY_KEY):
         assert records[key].rows != 0
         D.resolve_callable(records[key].function)
         D.resolve_callable(records[key].inputs)

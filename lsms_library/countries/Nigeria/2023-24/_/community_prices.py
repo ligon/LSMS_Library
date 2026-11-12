@@ -19,6 +19,9 @@ questionnaire prices food too, in Section C2 (Post Planting Wave 5/Community/sec
 this script also serves t = 2023Q3 through the PP adapter
 (../../_/pp_community_prices.py): j / u on Nigeria's shared labels, the native
 size in `Size`, Price on the form's own basis -- quantity of one, ruled (c2q2b unit, c2q2c size, c2q3 Naira; c2q2a Quantity disclosed).
+On a GRAMS / CENTLITRES row with a blank size, c2q2a is the number of grams /
+centilitres priced, and Price = c2q3 / c2q2a (registered
+pp-w5-metric-unit-quantity, ruling 2026-11-12).
 Distinct t per round (pp-ph skill).
 """
 import sys

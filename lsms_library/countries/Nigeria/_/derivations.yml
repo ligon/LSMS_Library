@@ -345,8 +345,11 @@ Nigeria::community_prices::pp-w1-number-of-units:
   rule: >-
     Price = sc2q3a / sc2q3b on W1 post-planting (2010Q3) rows whose Number of
     Units sc2q3b exceeds 1: the price of ONE unit sc2q3c when the community
-    priced several.  Rows with sc2q3b = 1 are served as recorded (no key);
-    rows with no count are not served (pp-w1-no-count-hold).
+    priced several (6,867 rows).  Rows with sc2q3b = 1 are served as
+    recorded (no key), except g / ml (pp-w1-metric-package-hold); Kg / l
+    rows with sc2q3b above 50 are not divided but held
+    (pp-w1-count-as-size-hold); rows with no count are not served
+    (pp-w1-no-count-hold).
   function: lsms_library.countries.Nigeria._.pp_community_prices:derive_pp_w1_unit_price
   inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_number_of_units
   raw_variables: [state, lga, ea, item_cd, sc2q2, sc2q3a, sc2q3b, sc2q3c]
@@ -407,6 +410,70 @@ Nigeria::community_prices::pp-c2-metric-size:
   contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
   since: '2026-11-12'
 
+# W5 PP gram / centilitre rows with no SIZE: the package is stated in c2q2a.
+Nigeria::community_prices::pp-w5-metric-unit-quantity:
+  waves: ['2023-24']
+  columns: [Price]
+  rows: {t: '2023Q3', u: [g, cl]}
+  rule: >-
+    Price = c2q3 / c2q2a on W5 post-planting (2023Q3) rows whose unit c2q2b
+    is '2. GRAMS (G)' or '4. CENTLITRES (CL)', whose SIZE c2q2c is blank,
+    and which record a positive Quantity c2q2a (208 rows: 176 g, 32 cl):
+    the price of ONE gram / centilitre, `u` staying 'g' / 'cl'.  The 23 such
+    rows with no c2q2a stay held (pp-unrecorded-size-hold).  Ruled
+    2026-11-12, "Serve W3 kg/l and W5 g/cl".
+  function: lsms_library.countries.Nigeria._.pp_community_prices:derive_pp_w5_metric_unit_price
+  inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w5_metric_unit_quantity
+  raw_variables: [state, lga, ea, item_cd, c2q1, c2q2a, c2q2b, c2q2b_os, c2q2c,
+                  c2q2_cvn, c2q3]
+  assumptions:
+    - text: >-
+        c2q2a counts the unit c2q2b names: the .dta labels c2q2a "Quantity"
+        beside c2q2b "Unit of measurement", and c2q2_cvn "conversion factor
+        item-unit-size-zone" is 0.001 on every g row and 0.01 on every cl
+        row that carries it (196 of the 208), a per-gram / per-centilitre
+        kg / l factor.  No label states that the quantity is the package
+        priced.
+      basis: variable-label
+      evidence: >-
+        sectc2_plantingw5.dta variable labels and c2q2_cvn values
+        (aggregates in the GH #587 final wiring report, burst
+        isa-sm-20261112 reports/587-wiring-final).
+    - text: >-
+        on these rows c2q2a is the size of the package the Naira price c2q3
+        is for, in grams / centilitres.  No document says so: the printed
+        PP form has no quantity column (Section C2, PDF pp.6-11), and the
+        PP supervisor manual's C2 instructions ask for "the UNIT for ONE
+        quantity" and "the price for ONE quantity" (PDF pp.22-23).  The
+        file's Other-unit text c2q2b_os, non-blank on all 231 g / cl
+        no-size rows, states the package ('250G', '400 GRAMS TIN', '750ML
+        BOTTLE'): on the 176 g rows c2q2a equals the text's gram figure on
+        172 and a number in the text on 174; on the 32 cl rows the text
+        states millilitres and c2q2a equals that figure / 10 -- centilitres
+        -- on all 32, the ml-to-cl conversion the W5 household manual
+        instructs ("500ml is 50cl", PP interviewer manual PDF p.66).  The
+        23 rows without c2q2a have no number in their text.
+      basis: modelling-choice
+      evidence: >-
+        sectc2_plantingw5.dta values (aggregates in the GH #587 final
+        wiring report); ghs_panel_w5_pp_community_questionnaire.pdf;
+        ghs_panel_w5_pp_supervisor_manual.pdf "SECTION C2: FOOD PRICES";
+        ghs_panel_w5_pp_interviewer_manual.pdf p.66.
+    - text: >-
+        so the price of one gram / centilitre is c2q3 / c2q2a.  Divided,
+        the rows sit at 1.5x / 1.5x the same round's pp-c2-metric-size
+        per-unit prices (item medians, 6 g / 5 cl items) and 0.96x / 1.23x
+        PH 2024Q1's; as recorded they sit at 543x / 13x.  W5 has no
+        food_acquired, so there is no household comparator.  Ruled
+        2026-11-12, "Serve W3 kg/l and W5 g/cl".
+      basis: modelling-choice
+      evidence: >-
+        .sucoder/isa-decisions.org 2026-11-12 ("GH587 metric units with no
+        recorded package size"); GH #587 wiring report (burst
+        isa-sm-20261112 reports/587-wiring) section 6.
+  contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
+  since: '2026-11-12'
+
 # A DELETION: W1 PP priced rows with no Number of Units cannot be put on the
 # one-unit basis the W1 division needs.
 Nigeria::community_prices::pp-w1-no-count-hold:
@@ -434,35 +501,113 @@ Nigeria::community_prices::pp-w1-no-count-hold:
   contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
   since: '2026-11-12'
 
-# A DELETION, pending a ruling: metric UNITS whose package size is unrecorded.
+# A DELETION: W1 PP gram / millilitre rows priced as ONE unit are package prices.
+Nigeria::community_prices::pp-w1-metric-package-hold:
+  waves: ['2010-11']
+  columns: [Price]
+  rows: 0
+  rule: >-
+    W1 PP (2010Q3) priced rows on unit 102 "grams" or 104 "millilitre" whose
+    Number of Units sc2q3b is 1 (963 g + 80 ml = 1,043 rows) are not served:
+    the Naira figure is the price of a package of unrecorded size, not of
+    one gram / millilitre.  W1 g / ml rows with a count above 1 are divided
+    as usual (pp-w1-number-of-units); there the count is a gram / ml count.
+  function: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_metric_package_hold
+  inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_metric_package_hold
+  raw_variables: [state, lga, ea, item_cd, sc2q2, sc2q3a, sc2q3b, sc2q3c]
+  assumptions:
+    - text: >-
+        a "1 gram" / "1 millilitre" price is a package price.  Measured
+        against the same round's household unit value (food_acquired
+        purchased Expenditure / Quantity, matched (t, v, j, u) cells, median
+        community / household): W1 g with N = 1 at 144x (218 cells, 5%
+        within 2x), ml with N = 1 at 21.6x (2 cells; 265x nationally) --
+        where W1 g with N of 6-200 sits at 0.86-1.01x.  PH found the same of
+        its own quantity-of-one g / cl prices (1/189, 1/42).  Ruled
+        2026-11-12, "Hold both groups".
+      basis: modelling-choice
+      evidence: >-
+        .sucoder/isa-decisions.org 2026-11-12 ("GH587 W1 metric rows with a
+        count"); GH #587 wiring report (burst isa-sm-20261112
+        reports/587-wiring) section 6; CONTENTS.org "Post-planting community
+        prices (GH #587)".
+  validated_against: >-
+    derivation_inputs returns exactly the rows the build leaves out
+    (pp_dispositions 'w1-metric-package-hold').
+  contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
+  since: '2026-11-12'
+
+# A DELETION: W1 PP kilogram / litre rows whose "count" reads as a size.
+Nigeria::community_prices::pp-w1-count-as-size-hold:
+  waves: ['2010-11']
+  columns: [Price]
+  rows: 0
+  rule: >-
+    W1 PP (2010Q3) priced rows on unit 101 "kg" or 103 "litre" whose Number
+    of Units sc2q3b exceeds 50 (128 Kg + 204 l = 332 rows) are not served:
+    there the count reads as a package size, not a number of kilograms /
+    litres, and the division pp-w1-number-of-units would under-price them.
+    W1 Kg / l rows with a count of 2-50 are divided as usual; a count of 1
+    is served as recorded.
+  function: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_count_as_size_hold
+  inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_count_as_size_hold
+  raw_variables: [state, lga, ea, item_cd, sc2q2, sc2q3a, sc2q3b, sc2q3c]
+  assumptions:
+    - text: >-
+        above 50 the count is not a count of kilograms / litres.  Measured
+        against the same round's household unit value (matched cells,
+        median community / household), divided by N: Kg 0.33 / 0.23 / 0.009
+        for N of 6-50 / 51-200 / >200, l 0.014 / 0.001 for N of 51-200 /
+        >200 -- 50-1000x too low -- while undivided the litre rows sit at
+        1.05 / 0.85x (the kilogram rows at 4.8-22x, so no single reading fits
+        them).  The threshold 50 is the ruling's; N = 50 is still divided.
+        Ruled 2026-11-12, "Hold both groups".
+      basis: modelling-choice
+      evidence: >-
+        .sucoder/isa-decisions.org 2026-11-12 ("GH587 W1 metric rows with a
+        count"); GH #587 wiring report (burst isa-sm-20261112
+        reports/587-wiring) section 6.
+  validated_against: >-
+    derivation_inputs returns exactly the rows the build leaves out
+    (pp_dispositions 'w1-count-as-size-hold').
+  contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
+  since: '2026-11-12'
+
+# A DELETION: metric UNITS whose package size is unrecorded (ruled 2026-11-12).
 Nigeria::community_prices::pp-unrecorded-size-hold:
   waves: ['2012-13', '2015-16', '2023-24']
   columns: [Price]
   rows: 0
   rule: >-
-    PP rows on a metric unit with no recorded package size are not served
-    pending a ruling: g / cl in W2 (209 rows; the form has no size field),
-    W3 (12,934 rows over both locations; the other-unit text c2q2b is blank
-    on every one) and W5 (231 rows; the size c2q2c is blank on every one),
-    and W3's Kg / l (4,120 rows, the same blank field).  W4 records no g/cl
-    unit.  A coded metric size resolves the row instead (pp-c2-metric-size);
-    '99. ONE SIZE ONLY' is exempt, as in PH.
+    PP rows on a gram / centilitre unit with no recorded package size are
+    not served: W2 g / cl (209 rows: 204 g, 5 cl; the form has no size
+    field), W3 g / cl (12,934 rows over both locations; the other-unit text
+    c2q2b is blank on every one) and the 23 W5 g / cl rows (19 g, 4 cl)
+    whose size c2q2c is blank and which record no c2q2a either.  The other
+    208 W5 g / cl rows are divided by c2q2a (pp-w5-metric-unit-quantity),
+    and W3's Kg / l rows are served as recorded (ruled 2026-11-12).  W4
+    records no g/cl unit.  A coded metric size resolves the row instead
+    (pp-c2-metric-size); '99. ONE SIZE ONLY' is exempt, as in PH.
   function: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_unrecorded_size_hold
   inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_unrecorded_size_hold
-  raw_variables: [state, lga, ea, item_cd, c2q1, c2q2, c2q2b, c2q2a, c2q2c,
-                  c2q2_cvn, c2q3]
+  raw_variables: [state, lga, ea, item_cd, c2q1, c2q2, c2q2b, c2q2a, c2q2b_os,
+                  c2q2c, c2q2_cvn, c2q3]
   assumptions:
     - text: >-
-        under the forms' "quantity of one" a metric unit is one gram, one
-        centilitre, one kilogram or one litre, but the PH evidence is that
-        such a price is of an unrecorded package (PH 1/189 on g, 1/42 on cl
-        against the household unit value).  Not ruled for PP: held, and the
-        same-wave household comparison is in the GH #587 wiring report.
+        under the forms' "quantity of one" a metric unit is one gram or one
+        centilitre, but such a price is of an unrecorded package.  Measured
+        against the same round's household unit value (matched cells,
+        median community / household): W3 g 150x, W3 cl 57x; W2 g 2.24x
+        (70 cells, 39% within 2x -- mixed), W2 cl 1.13x on 3 cells.  PH
+        found the same (1/189 on g, 1/42 on cl).  Ruled 2026-11-12: "Keep W3
+        g/cl and W2 grams held"; the ruling does not name W2's 5 cl rows,
+        which stay held with W2's grams.  W5 has no household comparator.
       basis: modelling-choice
       evidence: >-
-        .sucoder/isa-decisions.org 2026-11-12 ("Still pending ... metric
-        units with no recorded package size"); CONTENTS.org "The C8 SIZE
-        field"; Nigeria::community_prices::c8-unrecorded-size-drop.
+        .sucoder/isa-decisions.org 2026-11-12 ("GH587 metric units with no
+        recorded package size"); GH #587 wiring report section 6;
+        CONTENTS.org "The C8 SIZE field";
+        Nigeria::community_prices::c8-unrecorded-size-drop.
   validated_against: >-
     derivation_inputs returns exactly the rows the build leaves out
     (pp_dispositions 'unrecorded-size-hold').
@@ -507,8 +652,9 @@ Nigeria::community_prices::pp-w5-quantity-not-one-hold:
     other entry already holds (123 rows: 41 CUBE, 65 BOTTLE/CAN -- 63 with a
     coded metric size -- 10 KILOGRAMS, 7 LITRES) are not served.  c2q2a is
     present on 350 priced rows; 19 equal 1 and are served as recorded; the
-    208 on GRAMS / CENTLITRES carry no coded size and are held by
-    pp-unrecorded-size-hold first.
+    208 on GRAMS / CENTLITRES carry no coded size, so there c2q2a is the
+    number of grams / centilitres priced and they are served divided by it
+    (pp-w5-metric-unit-quantity, decided first).
   function: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w5_quantity_not_one_hold
   inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w5_quantity_not_one_hold
   raw_variables: [state, lga, ea, item_cd, c2q1, c2q2a, c2q2b, c2q2b_os, c2q2c,

@@ -198,12 +198,18 @@ def pp_community_price_projection(report, *, item_map, unit_map):
 #     column (``Size``);
 #   * W1: Price of one unit = sc2q3a / sc2q3b where Number of Units > 1, a
 #     registered derivation; N = 1 as recorded; no count -> unserved,
-#     registered;
+#     registered.  Two W1 metric groups are held, each registered on its
+#     own ("Hold both groups", 2026-11-12): g / ml with N = 1 (package
+#     prices, ~144x the household unit value) and Kg / l with N > 50 (the
+#     count reads as a size; divided they sit 50-1000x below it);
 #   * W2-W4: the printed "PLEASE USE A QUANTITY OF ONE (1)" -- as recorded;
 #   * W5: "accept quantity of one"; the c2q2a Quantity is disclosed (below);
 #   * W4/W5 coded metric SIZE: the PH c8-metric-size division, for PP;
-#   * metric UNITS with no recorded package size (W2/W3/W5 g/cl, W3 Kg/l):
-#     NOT ruled -- held unserved, registered.
+#   * metric UNITS with no recorded package size ("Serve W3 kg/l and W5
+#     g/cl", 2026-11-12): W3 Kg / l served as recorded (per-kg / per-litre
+#     prices, 1.07x / 1.00x the household unit value); W5 g / cl that record
+#     c2q2a served as c2q3 / c2q2a, a registered derivation; W2 g / cl, W3
+#     g / cl and W5 g / cl with no c2q2a stay held, registered.
 #
 # Every unserved, priced row is in exactly one registered omission (a
 # ``rows: 0`` entry in ``_/derivations.yml``) whose ``inputs`` callable below
@@ -224,18 +230,29 @@ PP_W1_NO_COUNT_KEY = 'Nigeria::community_prices::pp-w1-no-count-hold'
 PP_UNRECORDED_SIZE_KEY = 'Nigeria::community_prices::pp-unrecorded-size-hold'
 PP_ITEM_HOLD_KEY = 'Nigeria::community_prices::pp-unharmonized-item-hold'
 PP_W5_QUANTITY_KEY = 'Nigeria::community_prices::pp-w5-quantity-not-one-hold'
+PP_W1_METRIC_PACKAGE_KEY = 'Nigeria::community_prices::pp-w1-metric-package-hold'
+PP_W1_COUNT_AS_SIZE_KEY = 'Nigeria::community_prices::pp-w1-count-as-size-hold'
+PP_W5_METRIC_QUANTITY_KEY = 'Nigeria::community_prices::pp-w5-metric-unit-quantity'
+
+#: W1 Number of Units above which a Kg / l count reads as a size, not a
+#: count (ruling 2026-11-12, "Hold both groups").  N = 50 is still divided.
+PP_W1_COUNT_AS_SIZE_ABOVE = 50
 
 #: The disposition of every native PP row, in the order they are decided.
-#: ``served`` / ``w1-divided`` / ``metric-size`` are served; ``unpriced``
-#: (no positive Naira -- not available, or not priced) is excluded exactly as
-#: PH excludes it; every other one is a registered omission.
+#: ``served`` / ``w1-divided`` / ``metric-size`` / ``w5-metric-quantity``
+#: are served; ``unpriced`` (no positive Naira -- not available, or not
+#: priced) is excluded exactly as PH excludes it; every other one is a
+#: registered omission.
 PP_DISPOSITIONS = ('unpriced', 'item-hold', 'unit-unplaced', 'w1-no-count',
-                   'unrecorded-size-hold', 'w5-quantity-hold', 'metric-size',
-                   'w1-divided', 'served')
-PP_SERVED_DISPOSITIONS = ('served', 'w1-divided', 'metric-size')
+                   'w1-metric-package-hold', 'w1-count-as-size-hold',
+                   'w5-metric-quantity', 'unrecorded-size-hold',
+                   'w5-quantity-hold', 'metric-size', 'w1-divided', 'served')
+PP_SERVED_DISPOSITIONS = ('served', 'w1-divided', 'metric-size', 'w5-metric-quantity')
 PP_OMISSION_KEYS = {
     'item-hold': PP_ITEM_HOLD_KEY,
     'w1-no-count': PP_W1_NO_COUNT_KEY,
+    'w1-metric-package-hold': PP_W1_METRIC_PACKAGE_KEY,
+    'w1-count-as-size-hold': PP_W1_COUNT_AS_SIZE_KEY,
     'unrecorded-size-hold': PP_UNRECORDED_SIZE_KEY,
     'w5-quantity-hold': PP_W5_QUANTITY_KEY,
 }
@@ -420,6 +437,24 @@ def derive_pp_w1_unit_price(price, number_of_units):
     return (p / n.where(n > 0)).to_numpy()
 
 
+def derive_pp_w5_metric_unit_price(price, quantity):
+    """W5 PP: the price of ONE gram / centilitre on a metric-unit row with no size.
+
+    W5's C2 export records the unit (``c2q2b``), the SIZE (``c2q2c``), a
+    ``c2q2a`` "Quantity" the printed form does not carry, and the Naira
+    price ``c2q3``.  On a row whose unit is '2. GRAMS (G)' or
+    '4. CENTLITRES (CL)' and whose SIZE is blank, ``c2q2a`` is the number of
+    grams / centilitres the price is for (the evidence is in the registry
+    entry ``pp-w5-metric-unit-quantity``), so one gram / centilitre costs
+    ``price / quantity`` (ruling 2026-11-12, "Serve W3 kg/l and W5 g/cl").
+    Vectorised; NaN where the quantity is missing or not positive (the build
+    serves no such row under this key).
+    """
+    p = pd.to_numeric(pd.Series(price), errors='coerce')
+    q = pd.to_numeric(pd.Series(quantity), errors='coerce')
+    return (p / q.where(q > 0)).to_numpy()
+
+
 def pp_dispositions(raw, source_key):
     """Every native row of one PP C2 source, decided.
 
@@ -468,38 +503,56 @@ def pp_dispositions(raw, source_key):
     price = reported.copy()
     derivation = pd.Series(pd.NA, index=index, dtype='string')
 
-    # Metric UNIT with no recorded package size: not ruled (item 7) -- held.
-    # W3's c2q2b is free text and blank on every metric-unit row (0 parse);
-    # W3 holds its Kg/l too (CONTENTS.org: PH W3's Kg/l rows are dropped for
-    # the same blank field).  W4 records no g/cl unit.  '99. ONE SIZE ONLY'
-    # is the questionnaire's own one-unit statement, exempt as in PH.
-    metric_units = {'W2': ('g', 'cl'), 'W3': ('g', 'cl', 'Kg', 'l'),
+    # Metric UNIT with no recorded package size (ruled 2026-11-12, "Serve
+    # W3 kg/l and W5 g/cl"): W3's c2q2b is free text and blank on every
+    # metric-unit row (0 parse); its Kg / l measure as per-kilogram /
+    # per-litre prices (1.07x / 1.00x the household unit value) and are
+    # SERVED as recorded -- unlike PH W3, which still drops its Kg / l for
+    # the same blank field.  g / cl with no size stay held in W2 and W3
+    # (package prices: W3 150x / 57x; W2 g 2.2x, mixed).  W5 g / cl are
+    # divided by c2q2a where it is recorded (below), held where it is not.
+    # W4 records no g/cl unit.  '99. ONE SIZE ONLY' is the questionnaire's
+    # own one-unit statement, exempt as in PH.
+    metric_units = {'W2': ('g', 'cl'), 'W3': ('g', 'cl'),
                     'W5': ('g', 'cl')}.get(group, ())
     no_size = u.isin(metric_units) & ~metric_size & ~one_size
 
-    # W5: c2q2a is "Quantity" on 350 priced rows, 19 of them 1.  The ruled
-    # basis is a quantity of one, so a row recording another quantity is
-    # contradicted by its own export -- not served (measured: on CUBE rows
-    # the price scales with c2q2a), and registered.
+    # W5: c2q2a is "Quantity" on 350 priced rows, 19 of them 1.  On a g / cl
+    # row with no size it is the number of grams / centilitres priced (208
+    # rows), so the price of one is c2q3 / c2q2a -- a registered derivation.
+    # Elsewhere the ruled basis is a quantity of one, so a row recording
+    # another quantity is contradicted by its own export -- not served
+    # (measured: on CUBE rows the price scales with c2q2a), and registered.
     if source_key == 'W5':
         q = pd.to_numeric(frame['ReportedQuantity'], errors='coerce')
         w5_quantity = q.notna() & q.ne(1)
+        w5_metric_quantity = no_size & q.gt(0)
     else:
-        w5_quantity = pd.Series(False, index=index)
+        q = None
+        w5_quantity = w5_metric_quantity = pd.Series(False, index=index)
 
     if source_key == 'W1':
         n = pd.to_numeric(frame['ReportedNumberOfUnits'], errors='coerce')
         no_count = n.isna() | n.lt(1)
+        # "Hold both groups" (2026-11-12): a single g / ml is a package
+        # price (144x the household per-gram price), and a Kg / l count
+        # above 50 reads as a size (divided: 50-1000x below household).
+        w1_metric_package = u.isin(('g', 'ml')) & n.eq(1)
+        w1_count_as_size = u.isin(('Kg', 'l')) & n.gt(PP_W1_COUNT_AS_SIZE_ABOVE)
         divide = n.gt(1)
     else:
         n = None
         no_count = divide = pd.Series(False, index=index)
+        w1_metric_package = w1_count_as_size = pd.Series(False, index=index)
 
     decided = pd.Series(False, index=index)
     for name, mask in (('unpriced', ~priced),
                        ('item-hold', item_held),
                        ('unit-unplaced', unit_unplaced),
                        ('w1-no-count', no_count),
+                       ('w1-metric-package-hold', w1_metric_package),
+                       ('w1-count-as-size-hold', w1_count_as_size),
+                       ('w5-metric-quantity', w5_metric_quantity),
                        ('unrecorded-size-hold', no_size),
                        ('w5-quantity-hold', w5_quantity),
                        ('metric-size', metric_size),
@@ -513,6 +566,10 @@ def pp_dispositions(raw, source_key):
     u[take & is_litre] = 'cl'
     u[take & ~is_litre] = 'g'
     derivation[take] = PP_METRIC_SIZE_KEY
+    take = disp.eq('w5-metric-quantity')
+    if take.any():
+        price[take] = derive_pp_w5_metric_unit_price(reported[take], q[take])
+        derivation[take] = PP_W5_METRIC_QUANTITY_KEY
     take = disp.eq('w1-divided')
     if take.any():
         price[take] = derive_pp_w1_unit_price(reported[take], n[take])
@@ -670,9 +727,24 @@ def inputs_pp_c2_metric_size(wave):
     return pp_inputs(wave, ('metric-size',))
 
 
+def inputs_pp_w5_metric_unit_quantity(wave='2023-24'):
+    """Registry inputs: W5 PP g / cl rows with no size whose Price is c2q3 / c2q2a."""
+    return pp_inputs(wave, ('w5-metric-quantity',))
+
+
 def inputs_pp_w1_no_count_hold(wave='2010-11'):
     """Registry inputs (deletion): W1 PP priced rows with no Number of Units."""
     return pp_inputs(wave, ('w1-no-count',))
+
+
+def inputs_pp_w1_metric_package_hold(wave='2010-11'):
+    """Registry inputs (deletion): W1 PP g / ml rows with Number of Units = 1."""
+    return pp_inputs(wave, ('w1-metric-package-hold',))
+
+
+def inputs_pp_w1_count_as_size_hold(wave='2010-11'):
+    """Registry inputs (deletion): W1 PP Kg / l rows with Number of Units > 50."""
+    return pp_inputs(wave, ('w1-count-as-size-hold',))
 
 
 def inputs_pp_unrecorded_size_hold(wave):

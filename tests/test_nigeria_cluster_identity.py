@@ -300,15 +300,30 @@ def test_community_prices_serves_each_round_at_its_own_quarter(nigeria):
     is_pp = r['t'].isin(PP_QUARTERS)
     pp_keys = set(r.loc[is_pp, 'Derivation'].dropna())
     assert pp_keys == {'Nigeria::community_prices::pp-w1-number-of-units',
-                       'Nigeria::community_prices::pp-c2-metric-size'}, pp_keys
+                       'Nigeria::community_prices::pp-c2-metric-size',
+                       'Nigeria::community_prices::pp-w5-metric-unit-quantity'}, pp_keys
     assert not set(r.loc[~is_pp, 'Derivation'].dropna()) & pp_keys
     assert r.loc[~is_pp, 'Size'].isna().all()
+    # Rulings 2026-11-12: every served PP gram / centilitre / millilitre row
+    # is a constructed per-unit price -- W1 g / ml with N = 1, W2 / W3 g / cl
+    # and W5 g / cl with no size and no c2q2a are all held -- bar a recorded
+    # '99. ONE SIZE ONLY', the form's own one-unit statement (as in PH).
+    one_size = r['Size'].astype('string').str.match(r'^\s*99\.', na=False)
+    pp_metric_small = r[is_pp & r['u'].isin(['g', 'cl', 'ml']) & ~one_size]
+    assert pp_metric_small['Derivation'].notna().all(), (
+        pp_metric_small.loc[pp_metric_small['Derivation'].isna(), ['t', 'u']].value_counts())
+    # W3 Kg / l are served as recorded (no key); W3 g / cl are not served.
+    w3 = r[r['t'].eq('2015Q3')]
+    assert w3['u'].isin(['Kg', 'l']).sum() > 0
+    assert not w3['u'].isin(['g', 'cl']).any()
+    assert w3.loc[w3['u'].isin(['Kg', 'l']), 'Derivation'].isna().all()
     assert r.loc[r['t'].isin(['2018Q3', '2023Q3']), 'Size'].notna().mean() > 0.5
 
 
 @pytest.mark.parametrize('key', [
     'Nigeria::community_prices::pp-w1-number-of-units',
     'Nigeria::community_prices::pp-c2-metric-size',
+    'Nigeria::community_prices::pp-w5-metric-unit-quantity',
 ])
 def test_pp_derivation_inputs_join_and_reproduce_the_served_rows(nigeria, key):
     """Each PP construction's `inputs` are keyed to the served rows, and the
@@ -325,6 +340,10 @@ def test_pp_derivation_inputs_join_and_reproduce_the_served_rows(nigeria, key):
     fn = D.resolve_callable(nigeria.derivations()[key].function)
     if key.endswith('number-of-units'):
         again = fn(inp['sc2q3a'], inp['sc2q3b'])
+    elif key.endswith('metric-unit-quantity'):
+        again = fn(inp['c2q3'], inp['c2q2a'])
+        assert set(inp.index.get_level_values('u')) == {'g', 'cl'}
+        assert set(inp.index.get_level_values('t')) == {'2023Q3'}
     else:
         from lsms_library.countries.Nigeria._ import pp_community_prices as pp
         labels = {}
@@ -340,6 +359,8 @@ def test_pp_derivation_inputs_join_and_reproduce_the_served_rows(nigeria, key):
 
 @pytest.mark.parametrize('key', [
     'Nigeria::community_prices::pp-w1-no-count-hold',
+    'Nigeria::community_prices::pp-w1-metric-package-hold',
+    'Nigeria::community_prices::pp-w1-count-as-size-hold',
     'Nigeria::community_prices::pp-unrecorded-size-hold',
     'Nigeria::community_prices::pp-unharmonized-item-hold',
     'Nigeria::community_prices::pp-w5-quantity-not-one-hold',
