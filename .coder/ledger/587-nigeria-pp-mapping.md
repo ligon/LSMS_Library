@@ -26,7 +26,7 @@ quantity/conversion basis, a default quantity of one, a PH size rule, or an infe
 | `pp_community_price_projection` | `countries/Nigeria/_/pp_community_prices.py:137` | unwired projection; demands explicit `item_map`/`unit_map`; refuses collisions; Price NA | same test | the consumer these maps are for |
 | `harmonized_food_labels(t=…)` / `_food_item_labels` | `nigeria.py:641`, `:680` | quarter-aware food decode (GH #1144) | food tests | **reuse** for W1/W2 `j` (required: codes collide across quarters) |
 | `harmonized_food_labels()` (no-arg Code contract) | `nigeria.py:641` | what PH C8 W3–W5 serve | `test_nigeria_community_*` | **reuse** for W3–W5 `j` (equals the quarter resolver on all 454 W3–W5 rows) |
-| `_W1W2_PRICE_ITEM`, `_W1W2_PRICE_UNIT` | `nigeria.py:3195`, `:3245` | PH W1/W2 community-OWN item scheme, fixed units | `test_gh637_nigeria_w1w2_variety.py` | **do not reuse**: a different codebook from PP C2 (63 colliding numbers) |
+| `_W1W2_PRICE_ITEM`, `_W1W2_PRICE_UNIT` | `nigeria.py:3195`, `:3245` | PH W1/W2 community-OWN item scheme, fixed units | `test_gh637_nigeria_w1w2_variety.py` | **do not reuse**: a different codebook from PP C2 -- 63 code numbers are shared, and only 30-37 (the roots block) mean the same thing |
 | `_canon_unit`, `_canon_community_unit`, `_COMMUNITY_UNIT_LABELS` | `nigeria.py:836`, `:986`, `:972` | size-agnostic base unit labels PH C8 serves | `test_nigeria_community_units.py` | reuse as default `u`, with 6 overrides where it is wrong (§4) |
 | `food_unit_labels(t)`, `sized_food_unit` | `nigeria.py:3633`, `:3675` | per-round household food unit decode (GH #607/#1033) | food tests | reuse for the sized alternative and as the W2–W4 unit comparator |
 | `harmonize_food`, `u` tables | `countries/Nigeria/_/categorical_mapping.org` (sha256 `e2466e48…`, unchanged since the prior matrix) | Preferred labels; per-quarter / per-wave columns | `test_categorical_mapping_resolution.py` | comparator; not edited |
@@ -42,7 +42,7 @@ quantity/conversion basis, a default quantity of one, a PH size rule, or an infe
 - W1 labels stay weightless; a stated weight is not a factor (GH #1035, CONTENTS.org L493-555).
 - W4-PH food "40. DERICA/TIN" / "120. SACHET" serve derica / packet/sachet (GH #1033 ruling, CONTENTS.org L341-347).
 - Add no attribute the source did not record: "Pepper", "Groundnuts", "Maize (shelled)" stay native (GH #1144, CONTENTS.org L20-25; #1537 L4059-4071).
-- Normalisation used for "same label" (`build_mapping.py: item_norm, unit_tokens`): strip a `NNN.` prefix and the W1 category prefix, casefold, drop `etc`, keep alphanumerics; units also drop parenthesised stated weights and alias kilograms→kg, grams→g, litres→l, centilitres→cl, millilitre→ml, pieces→piece.  Anything else is a judgement row, never silently equal.
+- Normalisation used for "same label" (`build_mapping.py: item_norm, unit_tokens`): strip a `NNN.` prefix and the W1 category prefix, casefold, drop `etc`, keep alphanumerics; units also drop parenthesised stated weights and alias kilograms→kg, grams→g, litres→l, centilitres→cl, millilitre→ml, pieces→piece.  Anything else is a judgement row, never silently equal.  Disclosed: dropping `etc` lets two truncated W1 item labels count as equal (105 "seafood (lobster, crab, prawns)", 140 "condiments,(salt, spices,pepper, "); W1 unit codes 11-95 are compared mechanically too -- 15 pass, 18 are same-card spelling judgements ("bunch of plantain/ffb: small" vs "Bunch Small").
 
 ## §4 Invariants and assumptions
 
@@ -68,7 +68,7 @@ quantity/conversion basis, a default quantity of one, a PH size rule, or an infe
 1. `u` axis: size-agnostic base (as PH) vs sized (as `food_acquired`).
 2. W1 Price = Naira ÷ Number of Units on 7,198 rows: register a derivation?
 3. W5: export `Quantity` / `c2q2_cvn` against a paper "quantity of one" — unresolved.
-4. Metric-unit g/cl rows under "quantity of one" (W2 209, W3 ≈12.9k, W5 231): hold, serve, or a PP deletion entry?
+4. Metric-unit rows under "quantity of one" with no recorded package size: g/cl (W2 209, W3 ≈12.9k, W5 231) AND W3 Kg/l.  CONTENTS.org L2110-2116 drops W3's Kg/l blank-text rows as "of an unrecorded package" (registered `c8-unrecorded-size-drop`), while L2121-2125 serves W4's blank-size KILOGRAMS rows as one kilogram.  Hold, serve, or a PP deletion entry?
 5. W4/W5 metric SIZE rows: apply PH's `c8-metric-size` division (a yes), or serve per container?
 6. Items: Pepper vs Fresh Pepper; W3 161 → Palm wine; W2 15 Semovita; W2 0.
 7. Units: W3 31/42/22/32; W1 congo/mudu, tomato cup; tin; bin/basket; 251; ml; W5 cl; W5 40/120/125.
@@ -80,4 +80,5 @@ quantity/conversion basis, a default quantity of one, a PH size rule, or an infe
 - Builder — OK (§4): no PP code is decoded through a `u` Code join; overrides cover exactly the six verified rule errors.
 - No REINVENTION: the projection's explicit-map contract (`pp_community_prices.py:137`) is the consumer; no parser or factor added.
 - CONTRADICTION recorded, not resolved: CONTENTS.org L2140-2152 ("C8 is POST-HARVEST ONLY … PP carries C1-C4 only … correctly empty") is contradicted by all five PP forms (Section 2 / C2 Food Prices).
+- STEMS / SEEDLING/PLANT (0 PP rows): no `u` row; plot_inputs serves "Stem" / "Seedling/Plant" unregistered (CONTENTS.org L2897-2910) -- recorded as the precedent, not adopted.
 - Out of scope, unverified: whether PH C8 W4/W5 serve "251. BAG OF 20 SACHETS" as Sack/Bag or W5 "4. CENTLITRES (CL)" as `l` (same rule, PH data not read).
