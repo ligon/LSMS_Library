@@ -250,6 +250,10 @@ def test_inputs_follow_own_literal_source_and_household_formatter_at_input_grain
     assert inputs.index.get_level_values("i").tolist() == ["8002", "2001", "8001", "5001"]
     pd.testing.assert_frame_equal(inputs.reset_index(drop=True),
                                   cover[["s00q01", "s00q04"]], check_exact=True)
+    # The invented provider refuses 2021-22, and the registry passes that through: it
+    # does not enforce `waves` on a named wave.  The REAL provider now serves 2021-22's
+    # cover (GH #552 wired the wave), so a real explicit call returns its answers for a
+    # wave no row of which carries the key: a residual, Togo/_/CONTENTS.org 2026-11-12.
     with pytest.raises(KeyError, match="2021-22"):
         derivations.call_inputs(derivations.derivation_records("Togo")[KEY], wave="2021-22")
     assert visits == ["2018", "2021-22"] and len(reads) == 1

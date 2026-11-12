@@ -1478,9 +1478,11 @@ development moved underneath it:
   144,660,803 -> 141,749,811 on 78,498 rows; rungs as recorded.  Summed over rows served with =u= = =kg=,
   2018-19 is 358,449 -> 359,122 kg and 2021-22 331,383 (the text gives 358,536 -> 359,170 and 331,409; its
   sum's definition is not recorded).
-- *=shocks=' collapse moved.*  With purchases and stock both read, the served warning reads 44 of 7,588 rows
-  destroyed on 23 conflicting tuples, plus 38 NaN-key rows deleted; the archived table above says 42 rows on
-  20 keys.  Not traced further.
+- *=shocks=' collapse count moved, its rows did not.*  With purchases and stock both read, the served warning
+  reads 44 of 7,588 rows destroyed on 23 conflicting tuples, plus 38 NaN-key rows deleted; the archived table
+  above says 42 rows on 20 keys.  The served table is still 7,528 rows, as the archive records, so no further
+  row is lost: the difference is in how many repeated pairs now DISAGREE (a pair can agree on the stock and
+  differ on the purchases), and possibly in which row of a pair is kept.  Not traced row by row.
 - *=s12q09= (GH #1566's check), measured, nothing changed.*  3,066 of 74,058 positive values (4.1%) are off
   the 25 grid, all integers (=2,374=, =2,502=, ...), spread over items (=Téléphone portable= 581 of 11,995,
   =Ventilateur sur pied= 353 of 6,036, =Radio= 199 of 2,814), 4.8% in vague 1 and 3.5% in vague 2.  Not a per-unit
