@@ -1,5 +1,30 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Senegal 2018-19 near-zero quantities, GH1519 -- ANSWERED
+The user explicitly selected: "Exact-value NA rule".  Set the quantity to NA on
+exactly the three product-132 rows whose released s07bq03a / s07bq07a are below
+1e-3 (about 1e-19 / 1e-20; s07bq03a = 40 x s07bq07a), under a registered rule
+(precedent: Mali 99,999,999 sentinel, GH1594).  One Senegal re-warm.
+
+* 2026-11-12: Nigeria generic Pepper, GH1537 -- ANSWERED
+The user explicitly selected: "Check codes, then Fresh (Recommended)".  Confirm
+served 'Pepper' rows all come from codes 76 / 2140 (Preferred 'Fresh Pepper');
+if so map to the Fresh Pepper Aggregate, else leave pass-through and report.
+
+* 2026-11-12: Malawi later-wave cowpea, GH1228 -- ANSWERED
+The user explicitly selected: "Join D, single-text only (Recommended)".  After
+a read-only check that Modules D and G share the season reference, relabel
+2016-17 / 2019-20 'Other' G rows to Cowpea (Khobwe) from Module D text only
+where the plot has exactly one 'Other Crop' text; move Module I code-48 sales by
+the same rule; local names stay unmapped.
+
+* 2026-11-12: EHCVM coping order, GH1562 -- QUESTION BACK, then direction (below)
+The user asked: "We would want these to be composable with the shocks
+features for other countries (e.g., Uganda); does that change the problem?"
+Measured: Uganda 2019-20 HowCoped0/1/2 = s16q04a/b/c, labelled "1st / 2nd / 3rd
+hh coping strategy" -- a respondent order.  EHCVM's code order is therefore not
+composable even if documented.
+
 * 2026-11-12: Undocumented producer constructions in EHCVM food quantities -- ANSWERED
 Evidence: reports/ehcvm2-s07bq03a-docsearch/REPORT.md and
 reports/ehcvm2-live-s07bq03a-check/REPORT.md.  Four selections:
