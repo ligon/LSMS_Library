@@ -103,3 +103,19 @@ guard_minted_from (reachable only without committed JSON).
 After each stream passes red team: one integration PR (one full data gate) if
 they are ready together; a lagging stream goes in the next batch.  #1502/#1518
 (Nigeria shipped tables) after #587, same Nigeria re-warm.
+
+* Update, 2026-11-12 evening -- batch status
+| Stream | Branch head | State |
+|---|---|---|
+| #1604 Malawi 2024-25 | fix/malawi-food-integration-20261107 @ 538eec00d | READY (verified, red-teamed, fixes applied); held for batch |
+| EHCVM-2 Togo/Benin/CIV 2021-22 | feature/552-ehcvm2-2021-wiring-20261112 (in progress past 6538bc8b8) | applying Togo inversion, CIV H->NA/L flag, F1 key, Togo 2018 659/660/662, disclosures; then re-review of delta |
+| #1509 + #1068/#1129 (+2 fallback rungs) | fix/1509-1068-1129-food-unit-evidence-20261112 @ 0966d62ef | red team running (reports/framework-1509-redteam/) |
+| #587 Nigeria PP community_prices | feature/587-nigeria-pp-mapping-20261112 @ e5940eaa9 | READY; red team running (reports/587-redteam/) |
+| served-wave corrections (Mali rice, Senegal salt + #1519, Niger q7a flag, Uganda ea) | fix/isa-served-wave-corrections-20261112 | in progress; red team owed |
+| #1560/#1571 sold kg + #1559 measurement | feature/1560-1571-sold-kg-20261112 (agent worktree) | in progress; red team owed |
+New issues today: #1696-#1709 (incl. #1704 Malawi weights, #1705 Benin panel,
+#1706 code-26, #1707 Mali rice, #1708 Niger q7a, #1709 CFE poverty idea).
+Rulings: isa-decisions.org through 9361c1905.  Not yet dispatched: #1562 coping
+audit + schema, #1577 strata tag (+#1134), #1537 Pepper and #1502/#1518 (next
+Nigeria batch), #1228 (next Malawi batch), GNB labels, Manquant, Burkina bundle,
+GNB 2021-22, Benin panel (#1705).
