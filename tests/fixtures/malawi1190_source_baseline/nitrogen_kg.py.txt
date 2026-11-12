@@ -1,0 +1,148 @@
+def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
+                unit_kg=None):
+    """Kilograms of nitrogen applied per plot (WB ``nitrogen_kg``).
+
+    MECHANICAL reduction (GAP 2).  For each fertilizer input row, convert
+    the reported ``Quantity`` (native unit ``u``) to kilograms, multiply by
+    the fertilizer's nitrogen share, and sum per plot.
+
+    Parameters
+    ----------
+    plot_inputs : pd.DataFrame
+        ``plot_inputs`` item feature, grain ``(t, i, plot_id, input, j)``, with
+        a reported ``Quantity`` column and a ``u`` column (Uganda stores the
+        input unit as a *column* ``u``, not an index level).
+    nitrogen_content : dict[str, float], optional
+        Override the class→N-share map (lowercased input label → kg N per kg
+        product).  Defaults to :data:`_NITROGEN_CONTENT`.
+    volume_as_mass : bool, default True
+        Forwarded to the unit→kg conversion.
+    unit_kg : mapping, optional
+        Declared unit masses, overriding metric/inferred unit factors.
+        Defaults to ``plot_inputs.attrs['unit_kg']``; an explicit empty
+        mapping disables declarations.  Accepts per-country records as in
+        :func:`harvest_kg_factors`.
+
+    Returns
+    -------
+    pd.DataFrame
+        One ``Nitrogen_kg`` column indexed by ``(t, i, plot_id)``.  If the
+        input carries ``country`` as an index level or column, the index is
+        ``(country, t, i, plot_id)``, including for one country or an empty
+        result.  Country labels must be non-null; country metadata alone
+        does not add an axis.  Rows without a convertible quantity do not
+        contribute; plots with no contributing fertilizer rows are absent.
+        Use-answer rows (an ``input`` label ending in ``'?'``,
+        :func:`is_use_answer_label`; e.g. Mali's ``Inorganic Fertilizer?``)
+        are SKIPPED before label matching: they add no mass and are neither
+        matched nor unmatched.  The conversion is unit to kg only: ``plot_inputs``
+        has no ``Quantity_kg``, and the ``survey_kg`` rung of
+        :func:`harvest_kg_factors` is not consulted (GH #1436).
+        ``attrs['nitrogen_input_match']``
+        carries the label-join tally -- ``matched_rows`` /
+        ``unmatched_rows`` / ``matched_labels`` / ``unmatched_labels``
+        (label -> row count, descending), and ``refused_organic_rows`` /
+        ``refused_organic_labels``, the organic subset of the unmatched
+        labels (refused a share by policy, GH #867) -- all over the rows
+        label matching saw; and ``use_answer_rows``, the number of use-answer rows
+        skipped (always present, ``0`` where there are none), so
+        ``matched_rows + unmatched_rows + use_answer_rows`` is every input
+        row.
+
+    Notes
+    -----
+    **Label matching is normalised, and what it cannot resolve is LOUD**
+    (2026-09-09).  The share is keyed off the ``input`` label through
+    :func:`_normalise_input_label`, which tries the normalised label, then
+    the label with a trailing ``' fertilizer'`` removed, then with one
+    added -- because the corpus writes the same product three ways
+    (``Urea`` in Benin, ``Urea Fertilizer`` in Malawi, ``Phosphate`` where
+    the key is ``phosphate fertilizer``).  Exact-equality matching alone
+    silently zeroed **53,210 Malawi rows** (``NPK`` / ``Urea`` / ``CAN`` /
+    ``DAP Fertilizer``), leaving ``Other Fertilizer`` at a nominal 0.0 as
+    the only match and returning 331 plots of exactly ``0.0`` -- a frame
+    that is non-empty, finite and non-negative, so nothing caught it.
+    A label that still resolves to nothing and *names itself* a fertilizer
+    input now raises :class:`NutrientCoverageWarning`; the full tally rides
+    on ``attrs`` either way.  Matching stays EXACT after normalisation: no
+    substring or fuzzy match, so ``Organic Fertilizer`` stays unmatched and
+    gets named rather than being assigned an invented nominal share.
+
+    **Blends and organics (GH #867, ruling @ligon 2026-10-18).**  Ethiopia's
+    ``NPS`` (0.19, grade 19-38-0+7S) and Malawi's ``D Compound Fertilizer``
+    (0.08) carry CITED shares -- publisher, document and table are in the
+    comment above :data:`_NITROGEN_CONTENT`; D Compound's 0.08 diverges
+    from the WB panel's uncited 0.07 and EPAR's 0.10 (Zimbabwe's and
+    Zambia's Compound D grades).  Malawi's ``NPK 23:21:0+4S Fertilizer``
+    (0.23, GH #1106) is Module D type code 1, whose source label in every
+    wave is ``23:21:0+4S/CHITOWE``; its citation is on its own map entry.
+    Niger's ECVMA ``NPK 15-15-15`` (0.15, GH #1445) is input code 5, labelled
+    ``NPK 15/15``.  The shared ``npk`` key stays NPK 17-17-17 everywhere else,
+    a nominal share where the instrument states no grade (EHCVM's
+    ``NPK/Formule unique``, Niger's two later waves included).
+    Organic inputs (manure, compost, organic fertilizer, in every corpus
+    language) are REFUSED a share: they stay unmatched, are counted on
+    ``refused_organic_*``, and are named in the warning as a refusal, not a
+    gap.
+    Divergence from WB: the WB code keys N-share off the *product* a survey
+    records (urea 0.46, DAP 0.18, NPK 0.17, …).  The UNPS questionnaire (and
+    therefore our ``plot_inputs.input``) records only nutrient *class*, so we
+    apply nominal class shares (:data:`_NITROGEN_CONTENT`).  ``Nitrogen_kg``
+    will diverge from the WB figure on plots whose product mix differs from
+    the class nominal, and shares the unit-conversion coverage caveat of
+    :func:`harvest_kg` (only metric-named ``u`` rows convert).  Pass an
+    explicit ``nitrogen_content`` to reproduce a particular country's table.
+    """
+    content = _NITROGEN_CONTENT if nitrogen_content is None else nitrogen_content
+    df = _plot_input_country_index(plot_inputs.copy())
+    if 'Quantity' not in df.columns:
+        raise ValueError("plot_inputs must have a 'Quantity' column")
+
+    # ``input`` is an index level in the canonical grain.
+    if 'input' in (df.index.names or []):
+        inp = df.index.get_level_values('input').astype(str)
+    elif 'input' in df.columns:
+        inp = df['input'].astype(str)
+    else:
+        raise ValueError("plot_inputs must have an 'input' level or column")
+    # Use-answer rows ('...?', see is_use_answer_label) are not inputs: drop
+    # them before matching so they neither match a share nor count as an
+    # unmatched fertilizer-shaped label.
+    answer = inp.map(is_use_answer_label).to_numpy(dtype=bool)
+    if answer.any():
+        df = df[~answer]
+        inp = inp[~answer]
+    # Labels are passed through VERBATIM (not pre-lowered) so the tally and
+    # the warning name them as the country writes them; the normalisation
+    # lives in _normalise_input_label, where the three candidate spellings
+    # are documented together.
+    n_share, _match_tally = _nitrogen_shares(inp, content)
+    # The skipped use answers are counted, not hidden: the partition is
+    # matched + unmatched + use_answer.
+    _match_tally['use_answer_rows'] = int(answer.sum())
+    n_share.index = df.index
+
+    if 'u' not in (df.index.names or []) and 'u' not in df.columns:
+        raise ValueError("plot_inputs must carry a 'u' unit level or column")
+    kg_per_unit = _kg_factor_series_with_declared(
+        df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
+
+    qty = pd.to_numeric(df['Quantity'], errors='coerce')
+    n_kg = qty * kg_per_unit * n_share
+    # Keep only rows with a defined N share (fertilizer rows); seed /
+    # pesticide rows map to NaN and drop.
+    n_kg = n_kg[n_share.notna()]
+
+    out = pd.DataFrame({'Nitrogen_kg': n_kg}).dropna()
+    plot_level = _resolve_plot_level(out.index.names)
+    group_by = [n for n in ['country', 't', 'i', plot_level]
+                if n is not None and n in out.index.names]
+    res = out.groupby(group_by).sum()
+    res = _canonicalise_plot_level(res, plot_level)
+    # A JOIN diagnostic, always present, taken before any reduction can hide
+    # it -- the twin of harvest_kg_factors' `shipped_matched`.
+    res.attrs['nitrogen_input_match'] = _match_tally
+    _warn_nitrogen_coverage(_match_tally,
+                            float(res['Nitrogen_kg'].sum()) if len(res) else 0.0,
+                            len(res))
+    return res

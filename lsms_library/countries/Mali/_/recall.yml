@@ -23,7 +23,7 @@ Recall:
     basis: variable-label
     ask_count_basis: declared
     recall_days: 7
-    n_asks: 1
+    n_asks: 2
     recall_verbatim: 'A consomme le produit au cours des 7 derniers jours'
     evidence: 'lsms_library/countries/Mali/2014-15/_/mapping.py:9 (s13q02 label)'
     n_items_delivered: 122

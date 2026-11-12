@@ -2503,7 +2503,10 @@ inputs: all 19 probed Niger hashes move (one Niger re-warm), 0 of 22 Malawi, 0 o
 24 Uganda, 0 of 6 =build_transforms_fingerprint= values.  Pinned by
 =tests/test_niger_crop_production_condition.py=.
 
-* 2026-11-03 -- crop_production: the survey's harvest kilograms are TOTALS, and unwired (GH #1436)
+* 2026-11-03 -- crop_production: the survey's harvest kilograms are TOTALS (GH #1436)
+
+They were unwired when this was written; "the survey harvest kilograms are served", below,
+is what now happens.  The tests here still hold.
 
 Three waves write the harvest in kilograms beside the native unit, and nothing
 reads it: 2011-12 =as02eq07c= ("quantité en kgs récoltée"), 2014-15 =AS02EQ07C=
@@ -2573,6 +2576,7 @@ the statement on #1360 that these two cells "still collapse" is stale.
 * 2026-11-04 -- the NPK slot's label, and strata by wave (GH #1445, #812)
 
 Read-only measurement: nothing is wired and no served value moved.
+/Wired the same day: see "EHCVM strata are region x milieu labels" at the end of this file./
 
 *NPK.*  Only the two ECVMA waves state a grade.  Code 5 is =engrais inorganiques
 - npk 15/15= (2011-12; the questionnaire asks "How much NPK(15/15)") and
@@ -2673,11 +2677,10 @@ They are the wave's only =Farm-level= rows; Niger has no =season= level, so that
 - *3E's codes are not the rainy module's.*  =as03eq09a= uses 99999 (1 row; =as03eq09c= 42 and
   =as03eq11c= 39 confirm the width) where =as02eq07a= uses 999999; =as03eq12= uses 9999999 (1 row).
 - *One row is byte-identical to another*, with one (hid, line), and is dropped as the s16d repeats are.
-- *=as03eq09c= is a line total, not per-unit, and stays unwired.*  Kg equals the quantity on 5 of 7
-  =Kg= rows, and kg / quantity is a median 86.7 on a 100 kg sack (187 rows, the code masked; 90 with it
-  in) and 50 on a 50 kg sack.  The same shape as its rainy twin, so it belongs with the =Quantity_kg=
-  ruling of GH #1436, and it is per cycle too, so that wiring must multiply it by =as03eq06= like
-  =Quantity=.
+- *=as03eq09c= is a line total, not per-unit.*  Kg equals the quantity on 5 of 7 =Kg= rows, and kg /
+  quantity is a median 86.7 on a 100 kg sack (187 rows, the code masked; 90 with it in) and 50 on a 50
+  kg sack.  The same shape as its rainy twin, and per cycle too, so =Quantity_kg= is =as03eq09c= x
+  =as03eq06= under =dry-season-cycle-total= (GH #1436, below).
 - *"Zero" harvests are not the rainy module's zeros.*  25 rows record =as03eq09a = 0= with no unit:
   =Quantity= 0, =u = 'Unknown'=, as recorded.  19 of the 25 show output elsewhere on the line (a sale
   value on 9, consumption on 13, gifts on 9, seed on 5, a sold quantity on 4, feed on 4, kilograms on 2),
@@ -2691,10 +2694,52 @@ to 1,285,568.5 kg, up 115.8%, and that is mostly coverage, not production.  =Sac
 at its nominal weight, and 3E's rows are sacks where the rainy module's are mostly =Tiya= and =Botte=,
 which have no factor: =metric= reads 21% of the rainy module's positive rows (1,885 of 8,822) and 60% of
 3E's (329 of 549).  On the survey's own kilograms (=as02eq07c= 1,583,324; =as03eq09c= x cycles 532,518) 3E
-is 25.2% of the wave, a rise of 33.6%, against 53.7% as served.  By unit, =Sac de 100 kg= is 564,700 of
-3E's 689,743 kg, and the survey says less: on 187 such rows the nominal weight gives 489,100 kg a cycle and
-=as03eq09c= 271,054.  Only 2011-12 gains a dry season, so its kilograms are not comparable across waves
-until the =survey_kg= rung of GH #1436 lands.  Nothing is trimmed.
+is at least 25.2% of the wave, a rise of at least 33.6%, against 53.7% as served; see the correction below for
+why that is a floor.  By unit, =Sac de 100 kg= is 564,700 of 3E's 689,743 kg, and the survey says less: on 187
+such rows the nominal weight gives 489,100 kg a cycle and =as03eq09c= 271,054.  Nothing is trimmed.
+
+CORRECTION (2026-11-04, on PR #1527).  This entry gave 25.2% and +33.6% as the figure.  They are a floor:
+=as02eq07c= is present on all 8,822 rainy harvests, and =as03eq09c= is unusable on 116 of 549 dry-season ones (0 on
+74, 99999 on 42), so the rainy side is whole and the dry side is not.  Against the rainy 1,583,324, with weights the
+API's within-wave normalised ones:
+
+| 3E's kilograms                                                   |      kg |    rise | share of wave | rise, weighted | share, weighted |
+|------------------------------------------------------------------+---------+---------+---------------+----------------+-----------------|
+| metric only, before GH #1436 (against the rainy 595,826)         | 689,743 | +115.8% |         53.7% |        +151.0% |           60.2% |
+| as recorded                                                      | 532,518 |  +33.6% |         25.2% |                |                 |
+| *as =harvest_kg= serves it, GH #1436: the 30 at nominal, 86 none* | *584,822* | *+36.9%* |      *27.0%* |      *+31.3%* |         *23.8%* |
+| + the 116 at crop-unit medians                                   | 692,256 |  +43.7% |         30.4% |                |                 |
+| + the 38 low-sack rows at crop-unit medians too                  | 819,147 |  +51.7% |         34.1% |                |                 |
+
+Only the italic row is served.  The medians are an illustration from the correction on PR #1527, read-only, and
+nothing imputes them.
+
+CORRECTION (2026-11-04, GH #1436).  This entry said 2011-12's kilograms "are not comparable across waves until the
+=survey_kg= rung of GH #1436 lands".  The rung has landed and *it does not make Niger's waves comparable*.
+
+*What landing does.*  It removes the artefact of =metric= reading 60% of 3E's rows and 21% of the rainy module's: 3E
+goes from 53.7% of the wave to 27.0% (weighted, 60.2% to 23.8%).  And it puts the rows of three waves on one footing:
+positive quantities with no kilogram go 7,157 -> 86, 7,333 -> 87 and 9,798 -> 0.
+
+*What it does not do.*
+- It does not reach 2018-19, whose =s16c= asks no kilograms, so that wave stays at 36,695 kg (GH #1555).
+- It cannot add a dry season to the waves that never asked one.  Filter =plot_id != 'Farm-level'= for the same season.
+- It does not make a total comparable, because a raw total is a sample sum and the samples differ.
+
+| wave            | sampled households | total, metric only -> rung | weighted kg per sampled household, metric only -> rung |
+|-----------------+--------------------+----------------------------+--------------------------------------------------------|
+| 2011-12 rainy   |              3,968 | 595,826 -> 1,583,324       | 115 -> 506                                             |
+| 2011-12 with 3E |              3,968 | 1,285,568 -> 2,168,146     | 288 -> 664                                             |
+| 2014-15         |              3,617 | 820,968 -> 2,455,341       | 136 -> 963                                             |
+| 2018-19         |              6,024 | 36,695 -> 36,695           | 2 -> 2                                                 |
+| 2021-22         |              6,622 | 814,859 -> 2,954,597       | 131 -> 617                                             |
+
+On the same season the raw totals read +55% then +20%.  Per household they read +90% then -36%.  *The cause of the
+fall from 2014-15 to 2021-22 is not established*: whether it is real or comes from the sample is not known.
+Conversions do not drive it.  At 2014-15's median crop-unit factors, 2021-22 is 2,797,583 kg against 2,954,597 served
+(-5.3%), and 814 kg per reporting household against 2014-15's 1,388, unweighted.  The other way, 2014-15 at 2021-22's
+factors is +3.0%, and 2011-12 rainy at 2014-15's is +10.9%.
+
 
 =Value_sold= goes 42,683,590 -> 132,213,940 FCFA, so 3E holds 67.7% of the wave's sale value.
 =crop_diversity(weight='count')= goes from 2,252 households, mean 0.916, to 2,274, mean 0.964: the 22 new
@@ -2720,8 +2765,10 @@ harvest's under other labels (=épis/coques/panicules=, =grains=, =na=).  Served
 =unshelled= -> =shelled=, 18 the reverse).  2021-22's sale is crop-level
 and reaches a row only where the pair has one harvest line (GH #1360), so its state does too; no pair
 sells in two states, so the sale attribution does not move.  2018-19's five answers fold to three here
-as on the level (ruling GH #1436), and no native sold column is served.  Burkina Faso and Mali carry
-the field unserved.
+as on the level (ruling GH #1436), and =condition_sold_native= (ruling @ligon, 2026-11-05) keeps the answer as recorded (Grain 1,195,
+Décortiqué 990, Non-décortiqué 478, Non concerné 319, Epis 244).  It is the same case as =condition_native=:
+199 sold answers differ from the harvest's, and 38 of those differences vanish in the fold.  2021-22 stays
+NA, because its three answers map one to one.  Burkina Faso and Mali carry the field unserved.
 * 2026-11-04 -- community_prices: a record entered twice serves its first entry (GH #1087)
 
 *RULED (@ligon, 2026-11-04, option (c) of #1087).*  The ECVMA second records are
@@ -2806,3 +2853,822 @@ now questionnaire grade: =ner_ehcvm2_qnr_men_excel_vague1.pdf= PDF p. 37, Sectio
 des 7 derniers jours?".  The BID's price component is a separate sample of markets
 (section 3.3), and the community files stop at =s04_co=.  No community questionnaire
 is listed on WB 6276, IHSN 12263 or INS Niger ANADO 173/191.
+
+* 2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)
+
+@ligon's ruling, option W2.  =sample.strata= in the EHCVM waves is ='<Region> Urbain|Rural'=,
+built from the cover's =s00q01= and =s00q04= labels by =ehcvm.derive_region_milieu_stratum=.
+No household file records a stratum, so it is a construction, registered as
+=Niger::sample::region-milieu-stratum= and stamped on every row it produced.  The new
+=strata= table in =_/categorical_mapping.org= is the =Region= table crossed with the
+two milieu labels, so the region part of =strata= is =cluster_features.Region=.
+
+| wave    | clusters | households | =strata=                                     |
+|---------+----------+------------+----------------------------------------------|
+| 2011-12 |      270 |      3,968 | =strate=, 25 recorded labels, unchanged      |
+| 2014-15 |      270 |      3,617 | =strate=, the same 25 labels (was empty)     |
+| 2018-19 |      504 |      6,024 | 16 region x milieu labels (was empty)        |
+| 2021-22 |      555 |      6,622 | 15 region x milieu labels (was empty)        |
+
+So the two programmes keep different schemes: ECVMA region x =zae=, as recorded (=Agadez
+pastorale=, =Tillaberi urbain=), and EHCVM region x milieu (=Agadez Rural=, =Tillabéri Urbain=).
+Not harmonised, because they are different stratifications.  The =strata= table's keys match no
+ECVMA label.
+
+*2014-15.*  =strate= is in =ECVMA2014_P1P2_Conso.dta=, a household x product x mode file
+(322,359 rows), constant within =GRAPPE=, on all 270 of =sample='s grappes and all 3,617
+households.  It is a recorded value, so no derivation.  =sample= became a =dfs:= block; the
+=df_strate= hook in =2014-15/_/mapping.py= reduces the sub-frame to one row per grappe through
+=reduce_to_agreed=, which refuses a grappe holding two strata, because merging the raw file on
+=v= would be a cartesian product.
+=merge_how: left= costs no signal here: no grappe is in one file and not the other, either way.
+
+*The fifteenth cell.*  BID Table 1 (=ner_ehcvm2_information_de_base_eng.pdf= p.9) equals
+2021-22's households cell by cell, wave by wave, except Tillabéri urban wave 1, printed 106 where
+the file holds 96.  The print is the error: that row's own total of 336 is 96 + 240, that
+column's total of 1,177 needs 96, and the BID's second table (p.11) prints 96.  That second table
+in turn differs from the file by one household in Diffa (156/227 against 155/228) and Maradi
+(97/394 against 96/395), and Table 1 does not.
+
+*What 15 of 15 proves.*  Table 1 is titled "initial sample" but totals to the delivered file (6,622),
+so it tabulates the same two cover variables.  The match checks this reading of the cover and does
+not corroborate that the cells are strata.  The BID's sentence is what names the stratum.
+
+*Across the EHCVM boundary.*  Each wave's label is its own cover's.  35 of the 5,055 households
+in both waves change stratum (3 clusters): Niamey Rural to Niamey Urbain 23, Diffa Rural to Diffa
+Urbain 12.
+
+*=Niamey Rural= is contested in 2021-22.*  It is 2 clusters on the 2018-19 cover and none on the 2021-22
+cover or welfare file, which is what =strata= serves.  But =ehcvm_ponderations_ner2021.dta= still codes 2
+Niamey clusters =Rural= (24 households, 12 per wave), exactly 2018-19's two, and =ehcvm_nsu_ner2021.dta=
+still lists =NiameyRural=.  Their weights do not settle it: log weight 5.82 and 6.11, against 5.73 (sd
+0.42) for the other 59 Niamey clusters.
+
+*More on the BID.*  The French version, p.12, says « La strate est la combinaison région/milieu »; the
+English "region/locality", p.9, is ambiguous.  Table 1 has a second misprint, a total: Tahoua wave 1
+prints 453, where 106 + 348 is 454.  Table 2's one-household differences in Diffa and Maradi are not noise:
+those cells equal the weight file's =milieu=, and they are the 2 grappes where that =milieu= varies
+within a grappe.  Table 2 still writes Niamey all urban, so it follows neither file throughout.
+
+Cost: a Niger re-warm.  Other countries' =strata= hold other things: see =docs/guide/feature.md=.
+
+* 2026-11-04 -- crop_production: the survey harvest kilograms are served (GH #1436)
+
+*RULED (@ligon, 2026-11-04, option A).*  =Quantity_kg= is served as an optional canonical column and read
+first by the crop ladder, as =survey_kg=.  A total for the line.  =KgFactor= stays a number the instrument
+wrote per unit, and Niger has none.
+
+| wave    | source                         | codes masked            | 0 beside q > 0, masked | served, all > 0 |
+|---------+--------------------------------+-------------------------+------------------------+-----------------|
+| 2011-12 | =as02eq07c=                    | 999999 x 11             |                      0 |           8,822 |
+| 2011-12 | =as03eq09c= x =as03eq06=       | 99999 x 42              |                     74 |             436 |
+| 2014-15 | =AS02EQ07C=                    | 999999 x 23, 999998 x 1 |                    101 |           8,324 |
+| 2018-19 | none: =s16cq16c= is sold state | --                      |                     -- |               0 |
+| 2021-22 | =s16cq16c=                     | none                    |                      0 |          11,942 |
+
+*2018-19 asks no kilograms.*  None of =s16c_me_ner2018.dta='s 50 columns does: =s16cq12a/b/c= are quantity, unit and
+state, and there is no =s16d=.  Of 13,280 positive rows (=Botte= 5,666, =Tia= 4,167, =Gros sac= 1,517, =Autre= 980, =Sac
+Moyen= 885, =Kg= 36), the 36 in =Kg= convert, 36,695 kg, and the rung changes nothing (GH #1555).  The neighbouring
+waves hold 2.5M and 3.0M.  =Gros sac= and =Sac Moyen= state no size in this wave's labels.
+
+*Idiosyncrasies.*
+- *2021-22 is an estimate, and carries a key.*  The instrument prints "Estimation Quantité totale UML en kg"
+  (=ner_ehcvm2_qnr_men_excel_vague1.pdf=, PDF p. 82), a NOMBRE field; who did the sum is not stated.  Share of rows at
+  the modal kg / q, by module, because 3E pulls 2011-12 down:
+
+  | unit          | 2011-12 rainy | 2011-12 3E    | 2014-15       | 2021-22        |
+  |---------------+---------------+---------------+---------------+----------------|
+  | =Tiya=        | 2.5 on 16.1%  | (22 rows)     | 2.5 on 14.8%  | 2.5 on 65.4%   |
+  | =Sac de 50=   | 50 on 45.0%   | 50 on 38.1%   | 50 on 54.4%   | 50 on 92.3%    |
+  | =Sac de 100=  | 100 on 51.9%  | 100 on 36.4%  | 100 on 44.5%  | 100 on 72.4%   |
+  | =Botte=       | 10 on 25.2%   | (5 rows)      | 10 on 11.3%   | 12.5 on 17.9%  |
+
+  The 2.5 per =Tiya= describes 13.7% of 2021-22's kilograms, and =Tiya= with the sacks 38.9%.  *=Botte= is the main
+  carrier, 54.7% of the wave's kilograms*, modal on only 17.9% of its rows, p10-p90 7.5-17.5.  So a weighed/estimated
+  split would cut through the wave, and the absence of a key on the ECVMA waves means only that their instrument does
+  not say "estimation", not that they were weighed: 2E.7c is a kilogram column beside the local unit.
+  The rung keeps the name =survey_kg= for all three.  It says the kilograms are the survey's, as on the food
+  ladder, whose Nigeria =s10bq2_cvn= and Malawi =cfactor= are conversions too; nothing on either ladder claims
+  a weighing.  What makes 2021-22 visible is =Niger::crop_production::survey-kg-estimate=, an identity on all
+  11,942 rows.  It reaches =Derivation=, =ll.derivations()=, =Feature=, and the =attrs['derivations']= of =harvest_kg= and
+  =yield_kg=, beside =attrs['survey_kg_rows_by_wave']= (9,258, 8,324, 0, 11,942).  =KgFactorSource= is one string across
+  waves, so neither of those is optional.  =kg_survey= in =harvest_kg_factors= is the per-row kg / q.
+- *A value treated as a code, and a correction.*  The 2026-11-03 entry calls 2014-15's one 999,998 kg "not the code and
+  not plausible".  It is treated as a code here and masked; no document says it is one, since the questionnaire
+  documents only 9999 and 99999.  The evidence: the next largest total in the column is 24,000 kg; the crop-level sibling
+  =AS02EQ110E= holds 9998 once beside 9999 ten times, and without those 11 totals 2,363,813 kg against these plot lines'
+  2,447,341; this wave's files use a "...98" family (=AS01Q20= holds 99999998 on 1,275 rows, 9999998 on 620, 999998 on 70);
+  and the line's own sale, 420,000 FCFA, would be 0.42 FCFA per kg.  The crop-level record's 0 kg is no evidence, under
+  the zero rule below.  The line is 280 =Unité= of crop code 48 =Autre= (sugar cane in the free text).  Served, it would be
+  29% of the wave.  Mali's EAC-I trees keep a 999998 by a ruling about those trees (GH #1267).  No other ...98 value is
+  served in any kilogram source here.
+- *A 0 beside a positive quantity is NA* (3E 74 rows, 2014-15 101): no answer, not a harvest of nothing.  With 3E's 42
+  codes, 116 of its 549 harvests have no kilogram, where the rainy module has one on all 8,822.  They fall down the
+  ladder.  Sacks and =Kg= read at nominal: =metric= holds 52,304 kg of 3E (30 rows) and 8,000 of 2014-15 (15 rows).  The
+  other 86 in 3E (=Planche= 49, =Panier= 17, =Tiya= 9, ...) contribute nothing.  So 3E mixes two sources and has a hole,
+  and the rung's 584,822 kg sits between the +33.6% floor and the +43.7% a fill would give (the correction above).
+  =KgFactorSource= shows which row is which.  =derivation_inputs= still returns the recorded 0.
+- *Three 3E lines state kilograms with no quantity*: 2 beside =as03eq09a = 0=, 1 beside its 99999.  They deliver
+  9,550 kg.
+- *The rung has no screen, while the simulated numbers the ruling was made on did.*  They ran through =reported='s
+  =KG_FACTOR_MAX= and its =Kg= rule; "no screen" is this implementation's reading, on which the ruling is silent.  Dropping
+  the screen adds the +32,129, +3,334 and +42,405 kg in the table below.  =KG_FACTOR_MAX= would refuse a tonne, and Site Q
+  reports only.
+- *The column has junk of its own, and is served.*  By module, on rows with a stated-mass label and both answers:
+
+  | module        | sized rows | survey / nominal  | under 0.1x label: rows, survey / nominal | over 10x label: rows, survey / nominal | under 20 kg per 100 kg sack |
+  |---------------+------------+-------------------+------------------------------------------+----------------------------------------+-----------------------------|
+  | 2011-12 rainy |      1,885 | 635,064 / 595,826 | 4, 58 / 1,400                            | 2, 3,300 / 200                         | 4 of 185                    |
+  | 2011-12 3E    |        299 | 406,931 / 637,439 | 23, 3,140 / 81,750                       | 1, 3,500 / 150                         | 38 of 187                   |
+  | 2014-15       |      1,078 | 622,557 / 812,968 | 22, 1,324 / 82,150                       | 8, 3,843 / 150                         | 44 of 528                   |
+  | 2021-22       |      2,144 | 758,373 / 814,859 | 13, 1,159 / 29,550                       | 2, 13,200 / 700                        | 19 of 1,233                 |
+
+  3E's kilogram column is also its weakest: its 38 low sacks, 1,451 sacks a cycle at about 7 kg each, say 10,619 kg
+  against 145,100 nominal (11,169 against 151,100 over all cycles), 14 of them paddy and 10 onion, and they are 20.3% of
+  its 100 kg sack rows against 2.2% in the rainy module.  They look wrong, they are read first, as ruled, and they are
+  not trimmed.  Site Q names none of these, at either tail, because it judges a total against totals and not against
+  the row's own quantity.  Only the masked 999998 would have fired.  =survey_kg_vs_metric=: 19.3% of 2,184 disagree by
+  more than 10% in 2011-12, 44.1% of 1,078 in 2014-15, 17.5% of 2,144 in 2021-22.
+- *A total far from its label is named, and served (ruling @ligon 2026-11-05).*  =kg_survey_off_label= in =harvest_kg_factors=
+  and =attrs['survey_kg_off_label']= name a total outside 0.1x-10x of what the unit's label states: the under and over
+  columns above, 75 of Niger's 5,406 sized rows (=Sac de 100 kg= 53, =Sac de 50 kg= 17, =Gramme= 5).  It refuses nothing, and
+  it is a flag and not a verdict: the 5 =Gramme= rows fire and the survey looks right there.  Two limits (GH #1559).  It names
+  21 of 3E's 38 low sacks, since the other 17 sit between 10 and 20 kg per sack.  And it cannot see a unit with no stated
+  mass, which is 24,115 rows and 67.7% of Niger's survey kilograms (=Botte=, =Tiya=, =Panier=).  Those stay unscreened against
+  their own quantity.
+- *One row can move a wave less than it could.*
+
+  | wave    | worst row against its label | share of wave | top row's share, metric only -> rung |
+  |---------+-----------------------------+---------------+--------------------------------------|
+  | 2011-12 | -15,900                     |          0.7% | 2.3% -> 1.4%                         |
+  | 2014-15 | -126,000                    |          5.1% | 18.3% -> 1.0%                        |
+  | 2021-22 | +18,000                     |          0.6% | 1.4% -> 0.7%                         |
+
+  The 2014-15 row looks like a correction, since at nominal it was 18.3% of the metric-only total.  Net of both tails
+  against the label: -3.4%, -3.1% and -0.5% of the wave.
+- *=yield_kg= 2021-22 moves more than its median says.*  219 -> 234 kg/ha is composition, 1,402 -> 5,546 rows.  On the
+  same 1,402 rows the median is 219 -> 330, p90 falls 1,580 -> 1,017 over each frame, and the 4,144 new rows have a
+  median of 202.  The maximum goes 102,000 -> 490,000 kg/ha; 11 rows exceed 20 t/ha and 2 exceed 100 t/ha.  Not trimmed.
+- *Within a unit kg scales with quantity*, so it is a total, where a factor would give a slope of 0.  Log-log slope on
+  units with 30 rows: rainy 0.91-1.05, 3E 0.63-0.89, 2014-15 0.78-1.01, 2021-22 0.91-1.07.  =Sac de 100 kg= is low in each
+  (0.91, 0.69, 0.78, 0.91).  In 2021-22 kg / q does not see the state: median 2.5 per =Tiya= and 100 per =Sac de 100kg= in
+  both grain and on the ear.
+- *More kilograms cross a state.*  =harvest_kg= sums across =condition= (GH #1460), and with the survey's kilograms read
+  53 plot-crops in 2021-22 hold kilograms in two states, 26,469 kg of the wave's 2,954,597, where it was 1 and 400 kg.
+- *=as03eq11c=, =as02eq12c=, =AS02EQ12C=, =s16dq05c=* are the sold kilograms in the same shape, and unread.  Only
+  the harvest is ruled.
+
+*Against the simulation that went to the ruling* (=KgFactor = kg / Quantity= through =reported=).  Reproduced to
+the kilogram on this build, then the differences:
+
+| wave    | simulated | rung      | screen no longer rejects | no median fill | no quantity |
+|---------+-----------+-----------+--------------------------+----------------+-------------|
+| 2011-12 | 2,145,676 | 2,168,146 |                  +32,129 |        -19,209 |      +9,550 |
+| 2014-15 | 2,469,889 | 2,455,341 |                   +3,334 |        -17,882 |           0 |
+| 2021-22 | 2,912,192 | 2,954,597 |                  +42,405 |              0 |           0 |
+
+The issue's 1,576,548 for 2011-12 predates section 3E.  "Screen" is a kg / q above =KG_FACTOR_MAX= or a =Kg= row off 1,
+which =reported= refuses and a total need not meet.  "No median fill": an implied factor enters no =survey_median=, so
+a masked 0 or code beside a =Tiya= stays =none=.
+* 2026-11-04 -- =shocks= 2021-22: =s14bq04d= is the livestock (GH #1556)
+
+By the file's labels and the questionnaire's column heads (=ner_ehcvm2_qnr_men_excel_vague1.pdf= p. 67),
+=s14bq04a..f= are revenu, avoirs, production agricole, effectif du cheptel, stock de
+produits alimentaires, achats.  =AffectedConsumption= read =d=, the livestock.  It now
+reads =e=, the stock.
+True share 0.429 -> 0.777; 1,389 of 2,876 rows change.
+
+=s14bq05__25= (=Autre stratégie=) alone has the Oui/Non label set; the other 25 hold
+ranks.  The hook's rank map never matched it, so all 52 rows that chose it lost it,
+and the 35 that chose nothing else served =HowCoped0= NA.  It now takes the rank no
+other strategy holds.  Ranks are otherwise gapless here, and Burkina's file, which
+keeps the raw rank of code 25, shows it always filling the next one.  On 2 rows the
+only other strategy is a Deuxième, so =Autre stratégie= is served first.
+
+The table serves 2,876 of the 6,055 reported shocks: the rest carry no follow-up, are all-NA
+and are dropped.  That is with the maintainer, and unchanged here.
+* 2026-11-04 -- multi-plot sales (GH #1457)
+
+2014-15 AS2E2 and 2021-22 s16d record a sale per household and crop.  Until now one reached the table only on a
+crop's single harvest line; the rest was unserved, which understated revenue most for households farming most land.
+The ruling on GH #843, option (d), extended in bulk on 2026-11-04, applies: the line, keyed
+=hh-crop-sale-single-row=, or else ONE =plot_id = 'Farm-level'= row, =u = 'Unknown'=, =condition = 'unknown_condition'=,
+=production_obs = 'unresolved_observation'=, no =Quantity=, in its own =Unit_sold= (and 2021-22 =Condition_sold=).
+
+| sale records, cold             | 2014-15 | FCFA        | 2021-22 | FCFA        |
+|--------------------------------+---------+-------------+---------+-------------|
+| on the one line                |     564 |  78,485,760 |   1,265 |  68,629,070 |
+| Farm-level, two+ plots state   |     467 |  32,932,300 |     397 |  31,049,050 |
+| Farm-level, two+ state, ONE plot|      0 |           0 |     144 |   4,585,225 |
+| Farm-level, ONE line states    |      31 |     694,450 |      12 |     696,200 |
+| Farm-level, no harvest row     |      19 |   1,057,000 |       0 |           0 |
+|--------------------------------+---------+-------------+---------+-------------|
+| all, equal to the raw sum      |   1,081 | 113,169,510 |   1,818 | 104,959,545 |
+
+*How it composes with the rules already here.*
+- =s16d='s repeated lines (GH #824): the exact-duplicate drop runs first, so a sale repeated once per harvest line is one
+  sale, on one row.  The raw sum above is after that drop; before it the file sums to 164,095,420.
+- One harvest line (GH #1360) is kept, not replaced with one plot: the 144 two-line sales on ONE plot go to Farm-level, and
+  their plot is knowable.  Nigeria's lane found the same (ruling pending there).  Reported, not resolved.
+- Nigeria's ruling A, the one row that STATES a harvest, is not extended, so 31 + 12 sales sit on Farm-level with one harvest
+  line among their rows.  A lone line stating no harvest keeps its sale (2 sales, 2,500 FCFA, 2014-15), which differs from Nigeria.
+- The dry-season Farm-level rows of 2011-12 (GH #1462) are a different thing on the same sentinel: they carry a harvest.  No wave has both.
+- =Value_sold= and =Quantity_sold= of a 0 on a one-line crop stay, with no key.  The all-nines codes (GH #865) mask before a record is judged a sale.
+- A pair that sold in two units or states would need two rows on one key; the wave's uniqueness assert refuses it.  Measured: none.
+
+=Derivation= moves on the 564 + 1,265 rows already holding a sale, which is the only column that moves on them.
+
+*Corrected, 19 of the 31 2014-15 sales above (433,900 FCFA, review of GH #1457).*  The script counted every s2e1 line of a crop, and each of these has
+two or more lines of which only ONE is served: the others hold no quantity or month, so =_finalize_result='s =dropna(how='all')= removes them at the API.
+=niger.served_harvest_lines= no longer counts such a line unless it is the crop's only one, so these 19 sit on their row: 2014-15 is 583 sales on a line
+(78,919,660 FCFA) and 498 on Farm-level (34,249,850 FCFA), rows 9,316 -> 9,297.  2021-22 has none, because its lines carry =intercropped=, and does not move.
+
+* 2026-11-04 -- =shocks= 2018-19: the =s14q04= labels are wrong (GH #1556)
+
+The =.dta= labels (and the DDI, which repeats them) read =d= stock, =e= achat, =f=
+achats again, with no livestock.  The questionnaire prints six columns (sheet
+=S14_Chocs= of both vague files): revenus, avoirs, production agricole, effectif du
+cheptel, stock, achats.  The file behaves like the questionnaire in both vagues, and
+=f= is filled in both.  Measured blind to the labels, per vague 1 / vague 2:
+P(Non-concerné | no animals in =s17=) - P(Non-concerné | animals) is 0.50 / 0.44 on
+=d= and 0.03 / 0.00 on =e=; P(Diminué | animal-disease shock) - P(Diminué | other
+shocks) is 0.44 / 0.58 on =d= and -0.14 / -0.36 on =e=.  2021-22, whose labels name
+=d= the cheptel, measures alike (0.51 / 0.63, 0.57 / 0.49).
+
+So =AffectedConsumption=, which read =d= on the label's word, served livestock here as
+well.  It now reads =e=.  True share 0.497 -> 0.692; 2,962 of 6,551 rows change.  Do
+not trust a =s14q04= label in this family without checking it this way: five siblings
+(Mali, Senegal, Burkina Faso, Benin, Togo) asked only five columns in vague 1, where
+the labels happen to be right.
+
+* 2026-11-05 -- Interview dates as a conversion key (GH #1585)
+
+=numeraire== now dates each household by its first dated =Interview start= row,
+which is visit 1 (=s00q23a=) for every household in both EHCVM waves.  Measured
+cold at =e5dd343d4= plus the fix: every =food_expenditures= household has a date,
+and every visit-1 date lies in its own =vague='s window in the World Bank catalog
+(4296: 2018-10 to 12 and 2019-04 to 07; 6276: 2021-11 to 2022-02 and 2022-06 to 08).
+
+In 2021-22, 24 of 6,622 households have a later visit starting before visit 1, and
+two later-visit rows (two households) are dated January 2021, ten months before
+fieldwork.  And 106 households' latest visit start falls in another calendar year
+from visit 1, so the visit chosen moves the rate: 2021-22
+=food_expenditures(numeraire='FX')= is -8.55% against wave-nominal dates on visit 1,
+-8.72% on each household's latest visit start.
+
+* 2026-11-06 -- shocks: purchases and food stocks are separate answers
+
+Ruling @ligon: =AffectedConsumption= means food purchases;
+=AffectedFoodStock= means food stocks, following Ethiopia. This supersedes
+the earlier semantic binding, quoted above as "reads =e=, the stock" under
+=AffectedConsumption=. It does not reverse the source-layout findings.
+
+ECVMA 2011-12 =ms11q04d/e= and 2014-15 =MS10Q04D/E= read
+stock/purchases. Their variable labels truncate before naming the object;
+the GH #1556 independent review, section 2, verified the column order from
+response behaviour. The held sources again show purchases Augmente/Increase
+far more often than stock. EXTENSION remains part of the 2014 household key,
+and panel walking and the EHCVM E_ namespace are unchanged.
+
+2018-19 uses =s14q04e= for stock and =s14q04f= for purchases in both
+vagues, despite the misleading released d/e labels.
+2021-22 reads =s14bq04e= for stock and =s14bq04f= for purchases; d remains
+the separate, unserved livestock question. Source-specific response maps
+remain unchanged: an increase or decrease is True, with existing unchanged,
+not-concerned and declared missing-code mappings preserved. A missing stock
+answer cannot fill purchases, or the reverse.
+
+Measured against development plus the ruling ledger, in a private data root:
+
+| wave | rows, unchanged | purchases differing from former stock binding |
+|------+-----------------+-----------------------------------------------|
+| 2011-12 | 4,298 | 637 |
+| 2014-15 | 3,781 | 650 |
+| 2018-19 | 6,551 | 1,202 |
+| 2021-22 | 2,876 | 325 |
+
+Every old key and every unrelated column, including coping, is exact-equal.
+=AffectedFoodStock= equals the former =AffectedConsumption= on every old row;
+no row was added or removed. Independent numeric-source tests verify both
+answers, with wrong-column controls; the prior layout/ownership and coping
+tests retain their assertions. The separate all-follow-up-missing shock-row
+policy is unchanged. These country/wave config edits invalidate this country
+through the normal hash checks; no shared cache was re-warmed.
+
+* 2026-11-04 -- EHCVM unit-weight table wired (GH #1452)
+
+*What.*  =food_acquired= 2018-19 and 2021-22 carry a per-row =Quantity_kg= from the survey's own unit-weight table, which the kg ladder reads first (=survey_kg=).  Registered as =Niger::food_acquired::nsu-national-unit-weight= (=_/derivations.yml=), one key for both waves; the function is =lsms_library.ehcvm.derive_nsu_kg_factor=, one function for the four countries that ship such a table.  No =Quantity=, =u= or household row changes.  Ruling @ligon 2026-11-04: 2018-19 reads the tables too, and a weighed table may overrule a stated label, with a report.
+
+*2018-19 joins the product by label, never by code.*  The table uses 2021-22's product numbering, which is not 2018-19's (126 of the 138 product codes the two waves' household files share here carry different labels, and all four countries have this trap).  =ehcvm.nsu_product_crosswalk= tries, in order: =label= (the same label up to spelling, against the table's and 2021-22's labels for a code), =harmonized= (the two meet through this country's =harmonize_food=), =parts= (a label listing goods the instrument later split reads all of them, at the median of their weights), =stem= (agreeing before the first =(=, =,= or =/=, for truncated labels).  Unit and size are read as codes, which do carry across the waves.  A row's tier is =nsu_join= in =derivation_inputs=.  On 2018-19's 107,216 consumed source rows: =label= 91,411, =parts= 1,889, =harmonized= 621, =stem= 401.  Served, 98.3% of non-metric rows (95,330 of 96,975) read the table.  By year of weighing, 60,526 read 2018 rows and 33,796 read 2021 rows: the wave reads the same whole file and the same latest-year rule as 2021-22, so a label carries one weight across the boundary.  Against 2018-19's own community price ratios: 0.148 / 98.4% on 61 cells, all =label=.  A 2018-19 build now needs two 2021-22 files, the table and that wave's section 7B, and raises =FileNotFoundError= if either cannot be fetched.
+
+*National, not by stratum.*  A key's weight is the median of its rows across the table.
+Against a household's last-purchase unit value over the same stratum's median =Kg= price
+(5+ reports each), the national weight's median absolute log error is 0.22 against the stratum cell's 0.24, and within 2x 92.2% against 85.9%.  Row by row this reverses, 0.31 against 0.24, though national stays ahead within 2x (87.8% against 81.8%).  Market =Tiya= weighings by stratum settle it: national 0.170 / 95.2%, stratum 0.186 / 92.0%, and a stratum's departure from the national weight predicts nothing (slope 0.014).  Stratum weights would add 7.3% to the kilograms on rows both serve.  Over the whole file 99.9% of consumed rows find a weight.  The check can rank the two table rules; it cannot rank the
+table against the price-ratio inference, which is built from the same prices.
+
+*What is not read.*  =Kg= and =Litre= keep their labels.  A row whose canonical key is
+duplicated at the build (8 rows in 4 groups, all =Sucre (poudre ou morceaux)=, the fold of GH #833, 1 kg) keeps =Quantity_kg= NA and stays on the inferred ladder,
+because =_normalize_dataframe_index= sums =Quantity= and =Expenditure= on such a key and
+selects any other column: =Quantity_kg= is not in =feature._ADDITIVE_MEASURE_COLUMNS=.
+
+*Idiosyncrasies, three of them in this one file.*
+- =annee= is not a filter.  The 2021 rows hold the keys of 43% of 2021-22's consumed rows, the whole file 99.9%, and the two years share 98 of 1,578 keys.  (Sel, Sachet, Petit), the commonest consumed key, exists only in the 2018 rows.  So the file is cumulative, and a key's weight comes from its latest =annee=.  The household check reads the 2018 rows about as well as the 2021 rows on 2021-22 prices (within 2x 92.1% of 126 cells, 96.2% of 79).  Mali's BID (s.2.3, Mali's document, not Niger's) describes a design that fits: NSU factors collected in 2018/19 "remain valid", supplemented in 2021.  On the 98 shared keys, 24 disagree by more than 1.5x; they carry 10,673 rows and 31,699 kg.  Of the 119,315 consumed rows with a table weight, 65,127 (115,462 kg) read a 2018 weighing and 54,188 (62,363 kg) a 2021 one, by source row.  A row's year is the =nsu_year= column of =derivation_inputs=, not a second key: the operation is one, reading the survey's table.
+- =p50= is scaled.  It reads 985.6 g on =Kg= rows: a constant 0.9856 on a median (=p50 / 0.9856= is an integer on 71% of rows, =p50= on 4%; =p50 / mu= is exactly 0.9856 on 3,772 of 9,518).  =mu= reads 1000, so =mu= is the column read, as shipped.  Earlier scores against this table (#1224, #1450) used =p50= and =annee == 2021=, and saw this wave's rows at a coverage of 43%.
+- Product 166, which the "food_acquired: cross-wave label drift" section above says nothing can name, is named here: this table's value labels call it =Yazi margamarga=.  That section's rows (468, =Sachet=, median 150 FCFA) fit a small packaged spice.  =j= still serves ='166'=; relabelling it is a separate call.
+
+The table's region labels would not have met the cover's (=gadez= there, =Tillabery= here); reading nationally avoids the join.  =tiya= is a useful check: =Mil= reads 545 / 1,325 / 2,461 g for Quart / Demi / Entier, in order and near the ~2.5 kg CLAUDE.md quotes.
+
+*What the join reads, disclosed and not patched.*  No cell is off by 4x or more in both waves against households' implied weight.  Sizes out of order by more than 5% (Petit, Moyen, Grand): 18 of 433 (product, unit) pairs, on 1.8% of consumed non-metric rows in 2021-22 and 1.6% in 2018-19.  A product reading several codes takes their median even where they disagree: =Aubergine, Courge/Courgette= at =Unité (Petit)= has parts 0.082 / 0.088 / 2.49 / 2.69 kg and serves 1.29 kg on 461 rows, and no such vegetable exists.  This file records those goods as different and leaves them unfolded (see =harmonize_food= above), so the median is the join's, not the survey's.  Whether to refuse such a median is open.  The =stem= tier's 401 rows are 399 =Huile d'arachide= reading =Huile d'arachide (Segal)= and 2 =Autres agrumes=, right by hand, with no outside check.
+
+*Measured, cold, development =4646a0fd2= against that plus this branch.*  =food_acquired= rows and every other column are unchanged, =food_expenditures= is frame-equal, and so is every other table of the country.
+| wave | =food_quantities= kg, all waves | lone-wave request |
+|---------+---------------------------------+-------------------|
+| 2018-19 | 158,279 -> 202,786 (+28.1%) | 138,369 -> 202,722 |
+| 2021-22 | 164,680 -> 208,880 (+26.8%) | 172,499 -> 208,947 |
+With #1487 a lone request serves the all-waves column.  =KgFactorSource=, =survey_kg= / =metric= / =item_unit= / tight / =unit= / =none=: 2018-19 0 / 11,365 / 25,962 / 299 / 70,622 / 85 -> 95,330 / 11,358 / 998 / 0 / 615 / 32; 2021-22 0 / 11,115 / 32,518 / 952 / 86,949 / 11 -> 120,290 / 11,115 / 22 / 0 / 110 / 8.  Median =food_prices= per kg: 2018-19 500 -> 811 (p90 1,350 -> 3,165); 2021-22 542 -> 800 (p90 1,500 -> 2,941).
+
+*The per-kg rise is method, not prices, and across the boundary it no longer shows.*  =Kg= rows move on 0 rows.  Matched items, 2021-22 over 2018-19, median / row-weighted: =Kg= rows 1.04 / 0.98, development 1.00 / 1.08, now 1.05 / 1.04.  The inference had erased differences between foods: 27% of items sat at exactly 500 FCFA/kg, and it priced millet at 615 against a market 319 (table 325).  The signed gap to households' own =Kg= price is small (2021-22 within 0.19 at every weight but the rows over 3 kg; 2018-19 +0.24 under 50 g, otherwise within 0.11 up to 3 kg).  The kilogram rise is mostly =Tiya (Entier)=, 1.30 -> 2.46 kg, 55,294 -> 99,422 kg in 2021-22; it now reads 2.46 in both waves.  *Staple cereals among consumers, median grams per person per day, 2018-19 -> 2021-22: development 262 -> 281, now 440 -> 442.*  All foods: 615 -> 592, now 793 -> 749.  These count roster lines, not residents, so read them as plausibility only.  What changes is that the two ends now agree, on the table's tiya.  That closure removes a method difference; it does not validate the weights.  A random factor per =(j, u)=, the same in both waves with =Kg= rows at 1, gives 1.00 / 0.95 (15 draws: medians 1.00-1.07, row-weighted 0.90-1.06), also near =Kg= rows, and the correlation of item ratios with =Kg= rows does not improve (development 0.50, now 0.47, on 17 items).  Evidence for the level is the market file below.  One table is not hiding shrinking units here: the 95 non-metric keys weighed in both years show a median 2021 / 2018 ratio of 1.000, 39% of them lighter in 2021.
+
+*No older wave to move.*  2011-12 and 2014-15 have no =food_acquired= here.
+
+*What could check this.*  =ehcvm_prix_ner2021= weighs market lots, independently of the table and of household prices.  Over 112 (product, unit) keys at the nearest size: median abs. log error 0.144, within 2x 94.6%, signed -0.001.  26 =Tiya= keys: 0.116 / 96.2% (=Mil= 2,521 g at market, 2,461 in the table).  Outliers: =Poivron frais= x2.04, =Sorgho= x1.28 (=Tiya (Entier)= 3,168 g against 2,469, read from 2018 rows only, recorded and not patched), =Piment séché= x0.60.  Table rows against market per-kg, median abs. log error / within 2x: 2021-22 0.735 / 47.6% -> 0.295 / 75.2%, item correlation 0.25 -> 0.84; 2018-19 against that 2021-22 market 0.664 / 50.8% -> 0.425 / 73.5%, item correlation 0.43 -> 0.85.  2018-19 community price ratios: 0.148 / 98.4% against the table.  The =Kg= purchase check cannot rank table against inference, since the inference is estimated from those prices.
+
+*Corrects the #876 section above*: "no EHCVM wave ships a unit-conversion table" is wrong for 2021-22.  The #876 NA on a last purchase in another unit stands; a table that weighs a unit is not what that construction uses, and whether it should be is a separate question.
+
+*A trap in this file's codes.*  Both =annee= use 2021-22's product numbering (2018 rows carry codes above 138, which do not exist in the 2018-19 household file), and that numbering is not 2018-19's: 126 of the 138 product codes the two waves' household files share name different foods (118 is =Sel= in 2018-19, =Pâte d'arachide= in 2021-22).  2018-19 therefore joins the product by label; a test pins it (code 118 reads =Sel='s weight).  Its codes 8500, 9400, 10022, 10048, 10049, 10300 and 10400 match no household code, and 2018-19 reads four of them by label: 9400 (=Courgette=) and 10022 (=Courge/courgette=) through =Aubergine, Courge/Courgette= (1,144 rows), 10048 through =Piment= (4,464 rows) and 10049 through =Gingembre= (1,235 rows).
+
+
+* 2026-11-08 -- Sold kilograms: own-form conflict and unruled source cases (GH #1560, #1571)
+
+This is a documentation of the bounded investigation at
+=investigate/1560-sold-kilograms-20261108=, frozen
+=8283ad309120e34f2e9822c3a3eee7651de49f8f=. Independent scientific review and a
+ruling remain necessary before selecting an interpretation. No sold-kg carrier,
+missing-code rule, sale eligibility, state/price policy or default is selected.
+The earlier note, "Only the harvest is ruled", still applies. Its description
+of sold kg "in the same shape" is qualified by the own 2021 forms below; it is
+not a reason to assume a questionnaire stale.
+
+*Own sources, not another wave's codes.* The authenticated numeric files are:
+
+| wave | sold-kg field | source under the wave's Data/ | byte MD5 |
+|------+---------------+--------------------------------+----------|
+| 2011-12 | as02eq12c | NER_2011_ECVMA_v01_M_Stata8/ecvmaas2e_p2.dta | ea4fa33e3be22bc3fd64f960e59e1734 |
+| 2011-12 | as03eq11c | NER_2011_ECVMA_v01_M_Stata8/ecvmaas3e_p1.dta | 6f56e3005ec0f78c538ca328adb801dd |
+| 2014-15 | AS02EQ12C | NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta | 2814e0cf3c9d245d0ced27bd57391826 |
+| 2021-22 | s16dq05c | s16d_me_ner2021.dta | 3ac98925eb5c253b9cb6b7c473c3cce5 |
+
+The own instruments under each wave's Documentation/ are:
+
+| wave | own PDF | PDF page / question | byte MD5 |
+|------+---------+---------------------+----------|
+| 2011-12 | ECVMA_Quest_AGR_P2_V10_eng.pdf | 12 / 2E12, parallel quantity, unit and kg for the parcel sale | 29230918513780268c8bace16c6fc1f1 |
+| 2011-12 | ECVMA_Quest_AGR_P1_V10_eng.pdf | 29 / 3E11, first-cycle sale; 3E12 value has no explicit window | 0c623fe015890207b98c669314219f70 |
+| 2014-15 | ecvma2_quest_ag_el_p2.pdf | 13 / 2E12, parallel quantity, UML and kg sold | fca944f35dfda9f1b3e4a1b50571d8c8 |
+| 2021-22 | ner_ehcvm2_qnr_men_excel_vague1.pdf | 83 / 16D05 | 465e2578b1706a76207e8687a25b6178 |
+| 2021-22 | ner_ehcvm2_qnr_men_excel_vague2.pdf | 83 / 16D05 | 40fdf4da6421061168807d17e269a146 |
+
+Both own 2021 vagues instruct "poids en kg d'UNE UML" and head the column as
+an equivalent for one UML. The released =s16dq05c= label instead says an
+estimated TOTAL. Its own kg-unit controls after the existing exact sale-repeat
+drop equal reported quantity on45/48 records and equal1 on0; this supports
+total-like stored values, but does not prove any CAPI/export multiplication.
+No resolving export/cleaning algorithm was located in the held declared-wave
+files or the inspected official variable/related-material metadata. This is a
+bounded search, not proof that none exists. Source/form disagreement remains
+open, and neither document is presumed obsolete.
+
+*Windows and codes remain separate decisions.* The own 3E form asks for the
+FIRST production cycle, while the Stata quantity label says an average per
+cycle. GH #1436 comment6648014838 says sold kg must be multiplied by
+=as03eq06=; the current sale-window derivation preserves recorded
+=Quantity_sold= and =Value_sold=, whose value window is unspecified. No cycle
+product is chosen here. Sold-kg zeros and nines need their own interpretation:
+after existing duplicate policy, rainy kg has10 exact9999, dry39 exact99999,
+and2014 eleven exact9999, some beside ordinary quantity/value answers. A
+harvest or native-quantity missing-code rule is not automatically a sold-kg rule.
+
+*All-source coverage includes contradictions.* Seven dry records have positive
+sold kg but no positive native sale quantity/value (8740 raw kg, all cycles1).
+Their own sold flag says Non on6/Oui on1, and6 weights equal own raw harvest kg.
+These are contradictory source answers, not seven established additional sales;
+all already have native harvest rows. Two rainy and seven2014 additional
+positive-kg/no-positive-sale cases are literal9999 beside current native
+quantity/value missing codes. One2014 code-like household-crop pair has no
+native row. A future carrier must account for these cases without silently
+restricting its source denominator, adding a row, or inventing quantity/zero.
+
+The existing exact duplicate-sale policy and single-served-line/Farm-level
+placement remain unchanged. =Condition_sold= describes a sale donor; =condition=
+describes a harvest recipient. A donor-state/recipient-state comparison is a
+separate policy question, including unknown states; no new pooling/fallback
+follows from improved raw-denominator coverage. Diagnostic price comparisons
+are raw-only sensitivities, with unresolved codes/windows/meaning, and carry no
+scientific price endorsement. =KgFactor_sold= remains kg per ONE unit: a total
+must not be inserted there or divided by quantity to invent a factor.
+
+Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1560-sold-kilograms-investigation-20261108/=
+(=REPORT.md=, =DECISION-PACKET.md=, =receipts/artifact-manifest.json=).
+The existing sanctioned captures/form projections were reused; no source/API,
+parquet or PDF replay was performed for this docs addition. The packet records
+all raw/deduplicated denominators, failed attempts and UNSENT questions. Its
+composed native-script replay is not a Default/Make/Feature/warm/full-CI oracle.
+
+* 2026-11-08 -- Dry3C native-input candidate (GH #1529; source correspondence pending)
+
+The earlier note, "Unread, and recorded as such. 3B, 3C and 3D", described
+unwired production modules. A bounded closed-capture diagnostic now inspected
+those modules; that does not by itself prove current serving. In particular,
+the statement that =nitrogen_kg= is rainy-only must not be replaced with a
+source/API acceptance claim from that diagnosis.
+
+Own =ecvmaas3c_p1.dta= (MD5 =2bd4194c4b82380e772e29bcf161c99d=) has
+7,860 raw rows and 1,067 explicit-Yes input lines from 272 households in the
+closed diagnostic. Fourteen of those households are absent from rainy input
+candidates. Its used and purchased quantities contain no literal 999 on the
+selected lines; thirteen literal 99 in each remain separate reported values,
+not a new missing-code rule. The unit code 99 is a different coordinate.
+
+The candidate in =.coder/ledger/1529-niger-native3c.md= transports own3C
+=as03cq03==1= lines through the existing recorded-slot input carrier, keeping
+the original2C contribution first. =as03cq05b= is the native unit;
+=as03cq08b= is TOTALFCFA and is never a unit/factor. The source-qualified
+= input_obs = distinguishes the same household/slot across2C and3C, preserving
+equal reported seed lines without parcel allocation. The own3C window is the
+stated whole2010/11 dry season (December2010--May2011), not a per-cycle amount.
+No season axis, cycle multiplication,3Bparcel join,3Dcost surface or3Earea/yield
+choice is included. Added coverage can change existing consumer totals; common
+wave =t= does not establish a common annual estimand.
+
+At this note's freeze only invented native-builder controls have run.
+Six-capture correspondence, actual reader-category fidelity, current serving,
+Default/Make/Feature/warm and independent review remain separate pending gates.
+No scientific factor, unit, window, sale/state/price or default is selected;
+all live GH #1560/#1571 qualifications above remain in force. Whole GH #1529
+remains open. Durable evidence/proposals are under
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1529-niger-native3c-implementation-20261108/=.
+
+* 2026-11-08 -- Four onion occurrences already in the two own 2021 sources (GH #1530)
+
+Bounded native diagnosis at =a63306951177cde76de21bdcefd4026eb382f5a3=,
+not a whole-country decline verdict or an API/producer replay. Own
+=s16c_me_ner2021.dta= (MD5 =d16c402cfadc395e6a684b2bf3d768a4=) has
+16,468 physical rows and 24 columns; own =s16d_me_ner2021.dta= (MD5
+=3ac98925eb5c253b9cb6b7c473c3cce5=) has 12,232 rows and 47 columns.
+All source crops were counted before onion. The SEPARATE native cards
+=s16cq04= / =cultures__id= and =s16dq01= / =culture_utilisation__id=
+each label code 33 =Oignon=, with FOUR source occurrences in each file.
+Each own card was checked against its actual unchanged reader return on
+every column/cell. The exact current label map sends all four harvests to
+=Oignon frais=; all four have positive quantities, survive the pure tail,
+and receive their own sale on a single harvest line. No onion occurrence
+is lost to the existing full-row sale-repeat rule, a missing crop/unit,
+an all-column-null payload, or Farm-level placement in this bounded cohort.
+This is pure-helper output, not final API serving.
+
+Historical own questionnaire text captures were admitted after launch,
+without reopening a PDF. Both project PDF p.70's =16A.00= as asking about
+the =campagne hivernale 2021/2022= and routing No to Section 17; p.81
+follows Section 16A's parcels and asks for all their crops, one per line;
+p.83 transfers the preceding section's crops into 16D. The own crop annex
+(p.101) also prints =33 Oignon=. This is the instrument's literal scope,
+not an agronomic explanation of the four rows. Actual 16A gate answers
+and the collection/export mechanism are outside these two admitted DTAs;
+no 2018 source or whole-country production inference was made.
+
+Idiosyncrasies worth retaining: the form has a crop NAME (16C.05) and an
+ordinal (16C.01), neither a column of the 24-column harvest release.
+Both captured annexes print code 55 TWICE (=Anacarde= and
+=Autre (a specifier)=, accents omitted here); both DTA cards give it
+=Autre (a preciser)=. Those are source/form conflicts, not a license to
+rename catch-all rows. The existing sold-kg ONE-UML versus TOTAL conflict
+above is independently visible in these own text captures and remains open.
+
+Across all crops, 12,933 harvest occurrences survive the missing-crop drop;
+the other 3,535 lack a reader-visible crop. System versus extended Stata
+missing tags cannot be separated by the sanctioned reader's public flags.
+All 38 full-row harvest repeats are retained as distinct occurrences.
+All 47 numeric-read sale columns, including string fields, define the
+3,329 dropped sale repeats; 8,903 retained rows form 8,691 crop/unit/state
+records. Their 1,818 positive sales conserve quantity and value under
+unchanged placement (1,265 harvest lines, 553 Farm-level rows).
+There are also eight positive harvest quantities whose own flag says
+=Recolte nulle= and lost area is 100%; these literal contradictory answers
+are retained. Nothing here changes a flag, source, scientific rule or default.
+
+The frozen author is =1b72c7ca523c779ab113170dc5fa9642f5f3859e=.
+The qualified independent review at
+=c18dfe77f2430f14bfa3f97cfb161d7199c842f1= corroborates the four source
+occurrences in each file, their own-card correspondence and the selected
+current pure-helper result. Its 127 passing checks used six closed-capture
+sessions (48 pickle and 12 historical form-JSON reads), with no raw/PDF
+parse. This is not a once-only capture review or fresh reader/API evidence.
+The peer's native process exited 0, but its supervisor exited 74 on the
+evidence cap; that dispatch remains FAILED, not successful SDK completion.
+Historical-source equality in that peer is qualified by the supplied custody
+assertion and its independently measured current-source bindings.
+
+Durable full reports and command/custody receipts, outside this Git tree:
+- Author: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/private/Niger-1530-two-source-a633-v1/dispatch/d4a9425a3d2141178993c245c51c238e/evidence/report.md=.
+- Peer: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/private/Niger-1530-independent-captures-current11714/dispatch/f9bcda9948b9468c839e25005839d217/evidence/report.md=.
+- Source admission: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/reports/1530-two-source-final-admission/= and =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/reports/COMPLETED-REFILL-SOURCE-ADMISSION-20261109/1530-independent-review-ADMISSION.json=.
+Typed full sources and all-position witnesses remain private. These paths
+identify durable evidence, not diagnostic files merged into this library.
+The earlier four =Oignon frais= rows remain unexplained upstream; no 2018
+comparison or agronomic decline is established. "Only the harvest is ruled"
+and the own sold-kg ONE-UML/TOTAL disagreement remain in force. Whole GH
+#1530 remains open; the finite residual is own16A inclusion and executed
+collection/export handling, not a demonstrated crop decoder or mapper defect.
+
+* 2026-11-09 -- Recorded onion planting months and module provenance (GH #1554)
+
+Bounded own-source diagnosis =a7536cfa330e16c6330f2107234ab324ebead2aa=,
+independently reviewed; no producer/API run or season reassignment. Raw 2011-12
+2E has 81 onion occurrences (79 households), versus 70 positive-quantity rows
+(68 households); raw 3E has 105 (103 households), versus 103 positive rows
+(101 households). Equal crop names do not identify a season or duplicate.
+
+All 81 2E onion occurrences link to exactly one own 2B record on the SIX released
+coordinates: =hid, grappe, menage, field, parcel, crop=. First planting month
+is June on 34, July on 31, August on 12, March on three and May on one: 77/81
+are June--August. This is not a household-only date attachment. Across ALL
+12,091 2E rows, 108 have no 2B candidate and 29 have two; no answer is selected
+for an ambiguous key. The full 2B source retains its 99 onion occurrences.
+
+Own =ECVMA_Quest_AGR_P1_V10_eng.pdf=, PDF p.19/printed p.18, 2B.11 asks first
+planting MONTH, not year/day; 2B.7 is pure/mixed cultivation, not irrigation.
+Own =ECVMA_Quest_AGR_P2_V10_eng.pdf=, PDF p.11, 2E.4/7 asks rainy-season parcel
+work and plot harvest, not planting/harvest dates. All 81 onion rows answer
+Yes to 2E.4. P1 PDF p.28/printed p.27, 3E.4/5 records first-sowing month/year
+and weeks to harvest, not an observed calendar harvest date. Dry onion sowing
+answers span January 2010--July 2011; earlier sowing can precede harvest within
+the named December 2010--May 2011 window. No day or harvest date is imputed.
+The P1 cover says English is for convenience and French was administered;
+the held English/source-label first-cycle-versus-average conflict remains.
+
+The own household source joins uniquely on =(hid, grappe, menage)=: 69 of 70
+positive rainy onion occurrences are in Agadez (67 households), one in Diffa.
+The Agadez household zone is =Pastorale=; neither region nor that household
+classification establishes a plot's irrigation or season. Two unmatched
+non-onion harvest rows remain retained. Dry onions span all eight regions.
+
+This qualifies the earlier "Filter plot_id != 'Farm-level' for the same season":
+that filter identifies 2E provenance, not verified calendar timing. Retain the
+recorded modules, quantities, IDs, weights and existing #1462 cycle rule.
+Administered French wording and export/window handling remain unresolved;
+#1529 crop-cycle area and #1560/#1571 sold-kg/window/state holds are unchanged.
+No crop-name, region or Farm-level rule can reassign these sources.
+
+* 2026-11-09 -- GH1555: own held crop form and release labels differ
+
+The two held 2018 household workbooks
+=ner_ehcvm1_qnr_household_excel_vague1.xls= (MD5
+=f81b8a683df527c0e6b7fed3af264c8a=) and =..._vague2.xls= (MD5
+=9348df36d0dc436796baaf6f1bbfaf28=) each have 39 sheets; their extracted
+cell values are identical although their binary hashes differ. The own
+=ddi-documentation-english_microdata-4296.pdf= (MD5
+=b427ee093362e2a1dbb8cf5a47c7e6b8=) has 938 pages.
+
+In both workbooks, =S16c_Agri!M5= and =M17:O17= ask harvest quantity in UML,
+unit and product state. =W5= and =W17:Y17= separately ask the sold quantity,
+unit and state. These are the release's =s16cq12a/b/c= versus =s16cq16a/b/c=;
+=s16cq16c= is SOLD state, not harvest kilograms or a harvest-factor key.
+The question retains the literal campaign 2017/18 wording; no window is renamed.
+
+The workbook's =S16c_Agri!M11= unit list has seven codes, ending at =7 Autre=.
+The released own card, corroborated by DDI pp. 649--650, instead has
+=7 Botte=, =8 Tia= and =9 Autre=. Workbook =M15= names state 5 =Entier=;
+release/DDI p. 650 names it =Non concerné=. No assumption that the form is
+stale, no replacement of released labels and no new condition fold is selected.
+DDI pp. 57--58 list the source's 50 fields; p. 654 separately lists sold state.
+
+=Unites!B9= tells INS to fill the country's unit list, but no entries or factors
+are filled. No crop conversion/calibration/weighing rule was found in the
+inspected 39-sheet cell values or 938-page DDI text. Workbook comments, macros,
+embedded objects and PDF images were not inspected. This does NOT establish
+that no official crop factor exists or that another protocol contains none.
+
+The remaining authority gap is the fielded-CAPI/export bridge and any separate
+kg-per-ONE-harvest-unit protocol keyed to crop, native HARVEST state and any
+required geography. Direct =Kg= is already mass; food NSU, another wave's sack
+size and sold state cannot supply that bridge. No data, mapping, conversion
+default or public API changed; whole GH1555 remains open.
+
+Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1555-held-protocol-followup-20261109/REPORT.md=;
+original diagnosis and its independent review remain separate.
+
+* 2026-11-09 -- Native cultivation and payment operands (GH #1529)
+
+The 2011-12 =cultivation_records= table now transports the complete own3B
+cultivation/seed/use roster: 768 rows and all26 numeric-reader source columns,
+including603 worked-Yes and165 No rows. =cultivation_obs= qualifies the recorded
+=as03bqa= household slot by its declared source; it is NOT a unique physical
+parcel. Field/parcel/subparcel/crop components remain native columns, not an
+allocation key. The eight =as03bq12a--h= use answers keep literal9 and missing
+answers; no household3C quantity is distributed onto these lines.
+
+The 2011-12 =farm_cost_operands= table transports all6,192 own3D rows and12
+source columns, including3690 missing charge/paid-code rows and2093 No rows,
+not just409 Yes rows. =cost_obs= is a CONSTRUCTED zero-based release position
+bound to the source sidecar, not a payment or transaction identifier. Native
+=as03dq04= is the number of payments; =as03dq05= is MEAN FCFA EACH PAYMENT.
+Own English P1 PDF p.27/printed p.26 names December2010--May2011. No total
+Cost/Expenditure, count-times-mean, annualization or plot/labor allocation is
+created. The two zero counts, one zero mean and literal count99 stay recorded.
+
+Both tables use standard household IDs and panel walking. The canonical
+=(t,i,cultivation_obs)= / =(t,i,cost_obs)= shapes have no =v=; they neither
+invent a cluster nor require a sample join. Raw =hid= and all native fields
+remain separate columns. A bounded held-source/default Country and singleton
+Feature check preserved every numeric-reader native field, dtype, NA mask and
+row order for these full universes, with unique observation coordinates.
+Country/Feature retain their normal index-level ordering and supported attrs;
+Feature's existing all-null-column policy still applies to future operands.
+This is native transport, not a universal raw-archive API.
+
+The household roster name is =cultivation_records=. =plot_cultivation= remains
+reserved by GH #862 for a separately designed per-season plot/person table;
+this native transport does not fill that grain or expose an old-name alias.
+
+Only the two2011-12 sources are wired; no source coverage in later waves is
+asserted. Existing3C and all other native table bodies are unchanged. The
+administered-French/window caveats,3E first/average-cycle/area/999/yield issues
+and1560/1571 factor/state/window holds remain. No new seasonal, sentinel,
+conversion or scientific default is selected; whole1529 remains open.
+
+Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1529-native3b3d-implementation-20261109/=;
+ledger =.coder/ledger/1529-niger-native3b3d.md= records exact scope and checks.
+
+* 2026-11-09 -- Livestock country-cache ID stage (GH #1288)
+
+Only the =_/livestock.py= country compiler now applies the existing single-pass
+=id_walk= to its complete native-ID frame BEFORE the unchanged =to_parquet=.
+The stored =id_converted= flag prevents a second API-time walk; the existing
+writer constructs the country index before full/subset/empty row selection.
+This follows CLAUDE's post-walk =i= convention for L2-country artifacts.
+Other Niger country compilers retain their existing raw-ID contracts.
+
+The earlier “whole-frame-finalizer unused-level failure” remains an actual
+historical failure, not a discarded result. Two invented parent cases reproduce
+the strict domain mismatch; the new two-country compiler/storage/selector
+controls pass all six strict pairs each, alongside the focused reader/ID tests.
+No new Niger raw/producer/API cohort was run for this change, so those earlier
+real cross-backend failures are not retroactively called fixed.
+
+No mapping/link, EXTENSION split-off, namespace guard, native row/value/quantity,
+weight or scientific rule changes. Full country-build ID errors now precede
+subset return; no invalid full-coverage artifact is accepted. Whole #1288 stays
+open. See =.coder/ledger/1288-livestock-compiler-walk.md=.
+
+* 2026-11-09 -- Released 16A gate and cover records (GH #1530)
+
+Two zero-row metadata sessions on the own 2021 release identify =s16aq00=
+in =s16a_me_ner2021.dta= (MD5 =8be60644b1bad81ece6df5c7f1ebc269=)
+as 16A.00, asking about cultivation during =campagne hivernale 2021/22=.
+Its native card =s16Aq00= is =1 Oui / 2 Non=. Native =grappe, menage, vague=
+and field/parcel ordinals =s16aq02/s16aq03= are present; metadata does not
+establish their uniqueness or actual answers. The cover source is
+=s00_me_ner2021.dta= (MD5 =274ab72da709b8ff5517b9647c731139=).
+
+A separately admitted TWO sanctioned numeric reads retained exactly six
+fields from each source, preserving every released row, order, dtype and
+missing value. All 5,729 released 16A rows record =Oui=; no =Non=, missing or
+other gate answer was observed IN THIS FILE. They form 3,468 complete,
+consistent valid =(grappe, menage, vague)= groups: 1,958 single-row groups
+and 1,510 repeated groups, with 1--9 released parcel rows per group. No row was
+deduplicated or household collapsed. Native =vague= values 1/2 remain literal,
+not assumed visit or campaign assignments.
+
+The cover has 6,622 unique valid raw-key groups. Full outer comparison gives
+3,468 matched, 3,154 cover-only and 0 agriculture-only groups; neither source
+has a missing raw key. Of the cover-only groups, =s00q27= is literally
+=1 Complet= for 3,049, =2 Partiel= for 84 and missing for 21. These statuses do
+NOT supply the absent agriculture gate answer. A cover-only record is NOT
+therefore =Non=, not-asked or ineligible; the released positive-only parcel
+slice cannot recover a full No/omission universe or its construction rule.
+
+The first numeric attempt stopped BEFORE any child/read because earlier
+metadata recorded UID 0 inside =unshare -r=, versus host UID 43292. The admitted
+replacement explicitly bound both namespaces and every other unchanged
+identity/content field; it completed exactly TWO full Stata parses, not a
+data repair/retry after decoded rows. Two later loads of sealed PRODUCED
+operand/coverage frames completed the status crosswalk with 0 new native/API
+reads. Original/private sources and operand frames remain unchanged; native
+IDs and row products stay private, with only aggregate findings reported.
+
+The earlier four C/D onion source positions, own crop-code/form/helper
+findings and the missing 16C.01 ordinal/16C.05 NAME remain untouched; no C/D
+replay or key link was performed. Existing export-cause prose and the later
+BID's unidentified executed export mechanism remain qualified history.
+Needed authority is a full gate No/omission roster or a version-bound fielded
+SurveySolutions GUID plus enable/roster/export specification tied to this
+release. No gate/filter, season, quantity, unit, ID, weight or scientific
+default changes; no 2018 decline or causal export explanation. Whole GH #1530 stays
+open. Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1530-niger-2021-gate-metadata-20261109/=
+and =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1530-niger-2021-gate-answers-20261109/=.
+
+* 2026-11-10 -- Own departure form versus released fields (GH #1565)
+
+Bounded documentary authority only; no native/API read or policy change.
+Both own 2021 household forms (vague1 MD5
+=465e2578b1706a76207e8687a25b6178=; vague2
+=40fdf4da6421061168807d17e269a146=), PDF/printed p.4,
+carry the same departure block. For 2018/2019 households the flap carries
+all first-edition residents and appends newcomers; new households list
+residents present OR absent at interview. This is a roster instruction,
+not proof of released person linkage or an executed CAPI enable rule.
+
+Form 1.00a asks whether the person still LIVES in the household: Yes goes
+to sex 1.01; No continues to reason 1.00b, then timing 1.00c and
+"Personne suivante". The 13 printed reasons include separate COVID-19
+and other deaths (4/5), study/work moves and migration. The timing cells
+are MONTH and YEAR, not elapsed months; no last-12-month window is
+printed. Native timing encoding and the printed 98/9998 meaning are not
+settled by this form block. There is no standalone other-specify box in
+its visually inspected departure-reason cell.
+
+Closed own-release HEADER JSON (64-name inventory, reused without a DTA
+open) establishes a different surface: =s01q00aa= asks whether the person
+is still a MEMBER, 1 oui/2 non, attached to label-set NAME =s01q00a=;
+that name is not a variable alias. Coded =s01q00b= is ABSENT.
+=s01q00b_autre= is string and cannot recover it. =s01q00c= is one int16
+without a timing-unit card; the form's two calendar cells do not decode it.
+A fielded questionnaire/version plus export bridge, and an authentic
+separate coded-reason source if reasons are desired, remain needed.
+
+The six-month questions are separate: own p.6 routes 1.12 Yes to 1.14,
+No to 1.13; 1.13 prints Yes/No but no explicit rejection instruction.
+The existing MonthsSpent 12/0 mapping is unchanged. Current roster YAML
+selects no departure operand, and its Age hook removes interview_date.
+The finalizer drops an entirely null non-index payload. Adding any populated
+reason/member operand could therefore change survival without editing that
+finalizer; carrier, eligibility and all-null choices remain ROOT/user-held.
+No reason is reconstructed and no historical row count is remeasured.
+
+Evidence (custody, six text pages/two rasters PER form, exact options and
+finite UNRUN follow-on controls):
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-queue-refill-20261109-v2/refill-country-authority-d47-20261110/workers/Niger1565/ba850e6737f44335b5cdfb2d7c1a3712/evidence/REPORT.md=.
+This completes only the own-form authority slice; whole #1565 remains open.
+
+
+* 2026-11-10 -- Independent French 3E review; two-document archival attempt (GH #1529)
+
+Independent review of candidate =711369830727b5a7842085e32ee80c96ba10a118=
+used its sealed excerpts, locator/read/custody/GET receipts, without another
+PDF parse. This reviewer personally read all 3,568 base Niger lines, including
+TODO/WAITING/LOGBOOK material present (SHA256
+=414c82eca0864d336287d6c11987aeda808fb7b779832238a7d29d86b96601c8=).
+The author's earlier full Tanzania read is not claimed as a full Niger read.
+
+Own French WB2050 questionnaire resource31148, PDF28, q3E.8:
+#+begin_quote
+Quelle est la superficie consacrée au premier cycle (de production) de culture ?
+#+end_quote
+The stated unit is square metres. Own manual resource31157, PDF89, q3E.8:
+#+begin_quote
+Superficie moyenne en mètre carré consacrée au premier cycle de culture.
+#+end_quote
+The word moyenne remains in that heading; its first-cycle qualifier and the
+reported explanatory sentence do not specify averaging across cycles. The
+sealed PDF89--91 evidence places production across household parcels and
+allows several harvests within one cycle. It supplies no 999 rule for q8.
+Neither a physical-parcel allocation nor a land-union/yield denominator follows.
+
+This supports the documentary target, with the released average-per-each-cycle
+label still in tension. Neither witness is presumed stale. Questionnaire V10
+metadata has July2011 creation and September2012 modification; the manual has
+Mai2011 cover/July2011 metadata. No fielded/export-version identity follows.
+The existing ruled harvest cycle product, zeros/literal999, sale windows and
+GH1560/1571 factor/state holds are unchanged. The six-native-column companion
+proposal and its six pure controls remain UNIMPLEMENTED/UNRUN; no native3E,
+Country/Feature/sample/producer or scientific test was run for this review.
+
+The earlier statement "The French instrument is not held" names the base
+managed roster. These two French PDFs were missing from its declarations and
+the exact prior private paths were absent. One capped GET per official URL
+returned exact authorized bytes on 2026-11-10. The ordinary batch helper added
+two local DVC pointers but its ONE push failed "Unable to locate credentials";
+no successful target was returned. Remote holding is UNCONFIRMED, and both
+fresh readbacks remain UNEXECUTED. Sidecars are local staging, not proof of
+remote durability. Existing English documents, raw release facts and License
+remain intact; public access does not establish an open redistribution licence.
+See =Documentation/SOURCE.org= for exact public identities and partial status.
+Evidence and choice brief: dispatch77b4ce99, ledger
+=1529-niger-primary-peer-archive-77b4ce99-20261110.md=; whole1529 stays open.
+
+** Two French documents now remotely verified after separate authorization
+
+The preceding failed-push/local-staging paragraph remains an actual first
+attempt. ROOT separately authorized the minimal operator context correction:
+remove the two injected absent AWS file-route variables so the unchanged
+normal helper's credentialpath/writer swap could operate. One corrected push
+returned both exact documents; two separate empty-private-cache, read-only
+get_data_file calls then verified all size/MD5/SHA seals. Questionnaire31148
+readback took 6.2315s; manual31157 took 5.6644s. Both PDFs are now managed and
+remote-held; no public resource was downloaded again or PDF content reparsed.
+Existing License/source/raw-release facts remain unchanged. See the completed
+continuation in Documentation/SOURCE.org and dispatch77b4ce99 evidence.
+This holding result does not resolve the first/average-cycle,999, physical
+land-grain/yield or fielded/export-version questions above. The six-native-
+column proposal remains UNIMPLEMENTED, its six pure controls UNRUN; no native
+3E/scientific tests or API table acceptance follows. Whole1529 stays open.

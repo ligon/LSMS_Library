@@ -408,9 +408,8 @@ def test_context_selection_is_keyed_on_the_requesting_table():
     ``_finalize_result`` re-enters itself: ``_join_v_from_sample`` fetches
     ``sample()`` from inside the finalize of some OTHER table.  If the stored
     selection were applied regardless of table, that nested read would be
-    relabelled too — and worse, an error raised inside it is swallowed by
-    ``_join_v_from_sample``'s ``except (…, KeyError, …)``, so the ``v`` join
-    would silently vanish.
+    relabelled too — and an error raised inside it would fail a table the
+    caller never asked to relabel (it used to be swallowed there, GH #1546).
     """
     fake = _fake_country({"Rural": _settlement_table()})
     captured = {}

@@ -153,6 +153,25 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-22 through Country("Uganda").sample() after GH #1133'
+      cluster_id_measurement:
+        linked_households: 2601
+        households_changed: 191
+        not_applicable: [clusters_renumbered]
+        note: |-
+          Historical measurement recorded 2026-10-22 after GH #1133, before
+          later cover/singleton extensions (GH #1120); not remeasured here.
+          2,607 households then linked across the boundary; 6 had no 2009-10
+          `v`, so 2,601 carried `v` on both sides. 2,410 kept it; the 191
+          that changed carried this wave's synthetic `@lat,lon` bins, with a
+          blank `comm`. The historical note described these as movers and
+          split-offs, mostly movers, but applied no movement classification;
+          the net-of-movers count remains unknown. A bin is not a cluster,
+          so a renumbered-cluster count does not apply. The historical record
+          reported no real EA id changes (0 of 0); this is not a numeric K.
+          These counts do not assert the current sample or singleton policy.
+        source_type: derived-from-data
+        confidence: high
+        locator: '79f5979cf8022e64928c5150950dfb00456994da:lsms_library/countries/Uganda/_/sampling.yml, Sampling.2009-10.panel.cluster_id_note (historical measurement 2026-10-22 after GH #1133); lsms_library/countries/Uganda/_/CONTENTS.org, "v across waves: three different defects (GH #942)"; reviewed GH #1135 source f1cf7d06f30367cd1e34a4b3db4012f951b2e497, supplied COUNTRY-INPUT.json rows[0].measurement_text'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -213,6 +232,25 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-22 through Country("Uganda").sample() after GH #1133'
+      cluster_id_measurement:
+        linked_households: 2640
+        households_changed: 433
+        not_applicable: [clusters_renumbered]
+        note: |-
+          Historical measurement recorded 2026-10-22 after GH #1133, before
+          later cover/singleton extensions (GH #1120); not remeasured here.
+          2,647 households then linked across the boundary; 7 had no 2009-10
+          `v`, so 2,640 carried `v` on both sides. 2,207 kept it; the 433
+          that changed had a synthetic `@lat,lon` bin in 2009-10 and their
+          original-sample EA here. No movement classification was applied,
+          so the net-of-movers count remains unknown. A bin is not a cluster,
+          so a renumbered-cluster count does not apply; the historical record
+          reported no real EA id changes. Before GH #1133 harmonised the
+          renderings of `comm`, a further 388 households changed `v`.
+          These counts do not assert the current sample or singleton policy.
+        source_type: derived-from-data
+        confidence: high
+        locator: '79f5979cf8022e64928c5150950dfb00456994da:lsms_library/countries/Uganda/_/sampling.yml, Sampling.2010-11.panel.cluster_id_note (historical measurement 2026-10-22 after GH #1133); lsms_library/countries/Uganda/_/CONTENTS.org, "v across waves: three different defects (GH #942)"; reviewed GH #1135 source f1cf7d06f30367cd1e34a4b3db4012f951b2e497, supplied COUNTRY-INPUT.json rows[1].measurement_text'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -329,6 +367,25 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
+      cluster_id_measurement:
+        linked_households: 1717
+        households_changed: 1717
+        not_applicable: [clusters_renumbered]
+        note: |-
+          Historical measurement recorded 2026-10-19; not remeasured here.
+          None of the 1,717 then-linked households kept `v`, because it
+          changed kind (EA code -> parish code): every household changed,
+          mover or not, so a renumbered-cluster count does not apply.
+          The reviewed record also reports 65 of the 212 earlier EA ids
+          mapping one-to-one to a parish id (measured 2026-10-23); a parish
+          is not an EA, so those pairs are not a renumbering count.
+          No movement classification was applied; the net count is unknown.
+          This concerns served `v`, not the separately recorded design PSU
+          `sample.ea` (GH #689). The counts are historical, not a claim
+          about the current sample.
+        source_type: derived-from-data
+        confidence: high
+        locator: '79f5979cf8022e64928c5150950dfb00456994da:lsms_library/countries/Uganda/_/sampling.yml, Sampling.2013-14.panel.cluster_id_note (historical measurement 2026-10-19); lsms_library/countries/Uganda/_/CONTENTS.org, "v across waves: three different defects (GH #942)"; reviewed GH #1135 source f1cf7d06f30367cd1e34a4b3db4012f951b2e497, supplied COUNTRY-INPUT.json rows[2].measurement_text; historical one-to-one pairs measured 2026-10-23: slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json (locator retained from reviewed record, not rerun)'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -438,6 +495,26 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
+      cluster_id_measurement:
+        linked_households: 2973
+        households_changed: 2973
+        not_applicable: [clusters_renumbered]
+        note: |-
+          Historical measurement recorded 2026-10-19; not remeasured here.
+          None of the 2,973 then-linked households kept `v`, because it
+          changed kind again (numeric parish code -> DISTRICT/PARISH name
+          composite): every household changed, mover or not, so a
+          renumbered-cluster count does not apply. The reviewed record
+          also reports 576 of the 788 earlier parish codes mapping
+          one-to-one to a name composite (measured 2026-10-23), described
+          there as possible renaming of the same parishes for most of the
+          sample. The existing `redefined` declaration is not revisited.
+          No movement classification was applied; the net count is unknown.
+          These counts do not assert the current sample, cover extensions
+          or the separately recorded `sample.ea` inheritance (GH #689).
+        source_type: derived-from-data
+        confidence: high
+        locator: '79f5979cf8022e64928c5150950dfb00456994da:lsms_library/countries/Uganda/_/sampling.yml, Sampling.2018-19.panel.cluster_id_note (historical measurement 2026-10-19); lsms_library/countries/Uganda/_/CONTENTS.org, "v across waves: three different defects (GH #942)"; reviewed GH #1135 source f1cf7d06f30367cd1e34a4b3db4012f951b2e497, supplied COUNTRY-INPUT.json rows[3].measurement_text; historical one-to-one pairs measured 2026-10-23: slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json (locator retained from reviewed record, not rerun)'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable

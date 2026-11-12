@@ -21,8 +21,43 @@ def original_function():
     return source
 
 
+
+# Exact source-context inverse only: all numerical oracles and hashes stay frozen.
+LABOR_SINGLETON_REDUCER = """    if not df.index.is_unique:
+        def _sum1(s):
+            return s.sum(min_count=1)
+        # Ledger 905-tanzania-labor-singletons-20261109 §5: only singleton
+        # keys may use grouped numeric sums. Restore EVERY multirow group's
+        # original scalar sequence, including all-NA and signed wage groups.
+        # A full substitution can exceed #905's unchanged four-ULP bound.
+        grouped = df.groupby(level=['t', 'i', 'plot_id', 'source'])
+        numeric = grouped[PLOT_LABOR_COLUMNS].sum(min_count=1)
+        duplicate_rows = df.index.duplicated(keep=False)
+        duplicate_sums = df.loc[duplicate_rows].groupby(
+            level=['t', 'i', 'plot_id', 'source']).agg({
+            'PersonDays': _sum1, 'Wage': _sum1,
+        })
+        numeric.loc[duplicate_sums.index, PLOT_LABOR_COLUMNS] = duplicate_sums
+        df = numeric
+"""
+LEGACY_LABOR_REDUCER = """    if not df.index.is_unique:
+        def _sum1(s):
+            return s.sum(min_count=1)
+        df = df.groupby(level=['t', 'i', 'plot_id', 'source']).agg({
+            'PersonDays': _sum1, 'Wage': _sum1,
+        })
+"""
+
+def restore_labor_reduction(source):
+    """Remove only the reviewed labor block before full-source hash checks."""
+    if LABOR_SINGLETON_REDUCER not in source:
+        return source
+    assert source.count(LABOR_SINGLETON_REDUCER) == 1
+    return source.replace(LABOR_SINGLETON_REDUCER, LEGACY_LABOR_REDUCER, 1)
+
 def restore_original_function(source):
     """Restore exact old production text; #905 still checks its whole digest."""
+    source = restore_labor_reduction(source)
     function = next(n for n in ast.parse(source).body
                     if isinstance(n, ast.FunctionDef) and n.name == 'plot_inputs_for_wave')
     lines = source.splitlines(keepends=True)

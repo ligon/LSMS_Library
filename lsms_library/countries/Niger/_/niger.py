@@ -1,12 +1,13 @@
 from pathlib import Path
 
 import pandas as pd
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 import numpy as np
 import json
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import lsms_library.local_tools as tools
-from lsms_library.derivations import MULTI_SEP
+from lsms_library.derivations import MULTI_SEP, union_keys
 
 
 Waves = {'2011-12': (),
@@ -615,8 +616,7 @@ def _crop_conditions(codes, table):
     ``harmonize_crop_condition_*`` table.  A blank or off-scheme code becomes
     :data:`CONDITION_NA` -- a real value, never NA, because a null index key is
     deleted by the next ``groupby`` (GH #323 3b)."""
-    mapped = _map_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table))
-    return mapped.fillna(CONDITION_NA)
+    return crop_condition_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table)).fillna(CONDITION_NA)
 
 
 def _crop_condition_labels(labels):
@@ -627,8 +627,7 @@ def _crop_condition_labels(labels):
     a column has no NaN-key hazard, and NA says no state was recorded.  Only
     surrounding whitespace is touched.  Ruling @ligon 2026-11-04 (GH #1436).
     """
-    out = pd.Series(labels).astype('string').str.strip()
-    return out.where(out != '', pd.NA)
+    return crop_condition_labels(labels)
 
 
 def _crop_sold_conditions(codes, table):
@@ -646,9 +645,20 @@ def _finish_crop_production(df, t):
     column set (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave
     that passes no ``condition`` gets :data:`CONDITION_NA`; one that passes no
     ``production_obs`` gets :data:`CROP_OBS_NA`; one that passes no
-    ``condition_native`` or ``Condition_sold`` carries NA there."""
+    ``condition_native``, ``Condition_sold``, ``condition_sold_native`` or
+    ``Quantity_kg`` carries NA there."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
+    # Quantity_kg (GH #1436): the survey's total for the line, where its harvest
+    # module asks one.  2018-19 does not.  A 0 beside a positive quantity is no answer,
+    # not a harvest of nothing (3E 74 rows, 2014-15 101), so it is NA and the row falls
+    # down the ladder.  A 0 beside a 0 would stay; the file has none.
+    if 'Quantity_kg' not in df.columns:
+        df['Quantity_kg'] = pd.NA
+    df['Quantity_kg'] = pd.to_numeric(df['Quantity_kg'], errors='coerce').astype('Float64')
+    no_answer = (df['Quantity_kg'].eq(0).fillna(False).astype(bool)
+                 & df['Quantity'].gt(0).fillna(False).astype(bool))
+    df['Quantity_kg'] = df['Quantity_kg'].mask(no_answer)
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
     # because >=1 wave has it).  planting_month / perennial are omitted from
     # the schema entirely — no Niger wave records them.
@@ -694,15 +704,160 @@ def _finish_crop_production(df, t):
     if 'Condition_sold' not in df.columns:
         df['Condition_sold'] = pd.NA
     df['Condition_sold'] = df['Condition_sold'].astype('string')
+    if 'condition_sold_native' not in df.columns:
+        df['condition_sold_native'] = pd.NA
+    df['condition_sold_native'] = df['condition_sold_native'].astype('string')
     if 'production_obs' not in df.columns:
         df['production_obs'] = CROP_OBS_NA
     df['production_obs'] = df['production_obs'].astype('string')
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs',
-            'Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold', 'Condition_sold',
-            'harvest_month', 'intercropped', 'condition_native']
+            'Quantity', 'Quantity_kg', 'Quantity_sold', 'Value_sold', 'Unit_sold',
+            'Condition_sold',
+            'harvest_month', 'intercropped', 'condition_native', 'condition_sold_native']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
     return df
+
+
+# ---------------------------------------------------------------------------
+# A household-crop sale: its one harvest line, or Farm-level (GH #1457)
+# ---------------------------------------------------------------------------
+#
+# 2014-15 AS2E2 and 2021-22 s16d record a sale per household and crop, with no plot.
+# The wave scripts attach one to the crop's single harvest LINE (GH #1360).  Any other
+# sale goes on ONE row with plot_id = FARM_LEVEL, no harvest Quantity and the sentinels
+# of a row with no harvest on the index (ruling on GH #843, option (d); in bulk here,
+# 2026-11-04).  No sale is split, summed or dropped.
+
+HH_CROP_SALE = 'Niger::crop_production::hh-crop-sale-single-row'
+
+
+def is_crop_sale(frame):
+    """A sale is a record with a positive sold quantity or a positive value."""
+    return (pd.to_numeric(frame['Quantity_sold'], errors='coerce').astype('float64').gt(0)
+            | pd.to_numeric(frame['Value_sold'], errors='coerce').astype('float64').gt(0))
+
+
+def served_harvest_lines(df):
+    """True on a harvest line a crop-level sale can sit on: one that will be SERVED.
+
+    A line with no quantity, month, stand or native state is all-NA on its columns, so
+    ``_finalize_result``'s ``dropna(how='all')`` removes it at the API unless a sale
+    keeps it.  So it does not count as a line of its crop, and does not take the sale,
+    where the crop has a line that does serve.  A crop with no such line keeps all of
+    its lines: one alone takes its sale, as a lone line always has, and two or more
+    mean a Farm-level row.  (GH #1457: 19 sales in 2014-15; none in 2021-22, whose
+    lines carry ``intercropped``.)
+    """
+    columns = [c for c in ('Quantity', 'harvest_month', 'intercropped', 'condition_native')
+               if c in df.columns]
+    content = df[columns].notna().any(axis=1)
+    keys = ['i', 'crop']
+    any_content = content.groupby([df[k] for k in keys], dropna=False).transform('any')
+    return (content | ~any_content).to_numpy(dtype=bool)
+
+
+def derive_hh_crop_sale_attachment(harvest, records):
+    """``harvest`` with ONE new row for each sale the line rule did not attach.
+
+    ``harvest`` is the wave's rows after the script's merge: a sale is on a crop's one
+    line, or nowhere.  ``records`` holds the crop-level records before that merge's
+    filters, one row per (i, crop, sold unit[, sold state]).  A pair that sold in two
+    units or states would need two rows on one key, which the script's uniqueness
+    assert refuses: measured, none does.  A sale's own unit and state ride on the row;
+    ``u``, ``condition`` and ``production_obs`` describe a harvest, which it does not
+    have.  A record that is not a sale serves nothing here.
+    """
+    keys = ['i', 'crop']
+    on_a_row = (harvest.loc[harvest['Quantity_sold'].notna() | harvest['Value_sold'].notna(), keys]
+                .drop_duplicates())
+    sales = records[is_crop_sale(records)]
+    placed = sales.merge(on_a_row, on=keys, how='left', indicator=True)['_merge'].eq('both')
+    farm = sales[~placed.to_numpy()].copy()
+    farm['plot_id'] = FARM_LEVEL
+    if 'production_obs' in harvest.columns:
+        farm['production_obs'] = CROP_OBS_NA
+    return pd.concat([harvest, farm], ignore_index=True)
+
+
+def stamp_hh_crop_sale(df):
+    """The ``Derivation`` column of a finished 2014-15 / 2021-22 frame, a ``string``
+    Series on its index: :data:`HH_CROP_SALE` on a harvest line holding a sale, beside
+    any key already on that row (``MULTI_SEP``, sorted), and every other row's own.  A
+    Farm-level row's index discloses it, and a 0 is not a sale."""
+    plotted = df.index.get_level_values('plot_id') != FARM_LEVEL
+    sold = is_crop_sale(df).astype('boolean').fillna(False).to_numpy(dtype=bool)
+    out = (df['Derivation'].astype('string').copy() if 'Derivation' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    hit = plotted & sold
+    out[hit] = pd.array([union_keys((key, HH_CROP_SALE)) for key in out[hit]], dtype='string')
+    return out
+
+
+def inputs_hh_crop_sale_single_row(wave):
+    """The raw sale answers behind one wave's keyed rows, at (t, i, crop), under their
+    own names.  Registry ``inputs``; re-reads the source.  One row per keyed served row:
+    an s16d line repeated once per harvest line is one record (see the 2021-22 script),
+    and it needs one line to carry the key."""
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    if wave not in _HH_SALE_SOURCE:
+        raise ValueError(f'hh-crop-sale-single-row is {sorted(_HH_SALE_SOURCE)}, not {wave!r}')
+    spec = _HH_SALE_SOURCE[wave]
+    root = Path(countries_root()) / 'Niger' / wave / 'Data'
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        dirs=[f"{Path(countries_root()) / 'Niger' / wave / '_'}/",
+              f"{Path(countries_root()) / 'Niger' / '_'}/"],
+        **{'Preferred Label': 'Preferred Label'})
+
+    def read(name, crop, hh):
+        lab = get_dataframe(str(root / name), convert_categoricals=True)
+        code = get_dataframe(str(root / name), convert_categoricals=False)
+        out = code.copy()
+        out['t'] = wave
+        out['i'] = lab.apply(lambda r: i(pd.Series([r[v] for v in hh], index=hh)), axis=1).values
+        out['crop'] = _crop_labels(code[crop], lab[crop], crop_map).values
+        return out
+
+    lines = read(spec['harvest'], spec['harvest_crop'], spec['hh']).dropna(subset=['i', 'crop'])
+    # The same count as the wave script's: the served lines.
+    lines = lines.assign(
+        Quantity=_na_exact(lines[spec['harvest_qty']], spec.get('qty_codes', ())),
+        harvest_month=(pd.to_numeric(lines[spec['harvest_month']], errors='coerce').where(
+            lambda m: m.between(1, 12)) if spec.get('harvest_month') else pd.NA),
+        intercropped=(pd.to_numeric(lines[spec['harvest_stand']], errors='coerce').where(
+            lambda v: v.isin([1, 2])) if spec.get('harvest_stand') else pd.NA))
+    lines = lines[served_harvest_lines(lines)]
+    per_pair = lines.groupby(['i', 'crop']).size().rename('_lines').reset_index()
+    sale = read(spec['sale'], spec['sale_crop'], spec['hh'])
+    if spec.get('drop_repeats'):
+        sale = sale[~get_dataframe(str(root / spec['sale']),
+                                   convert_categoricals=False).duplicated(keep='first').to_numpy()]
+    sale = sale.dropna(subset=['i', 'crop'])
+    qty = _na_exact(sale[spec['qty']], spec.get('qty_codes', ()))
+    value = _na_exact(sale[spec['value']], spec.get('value_codes', ()))
+    sold = (qty.astype('float64').gt(0) | value.astype('float64').gt(0)).to_numpy(dtype=bool)
+    kept = sale[sold].merge(per_pair, on=['i', 'crop'], validate='many_to_one')
+    kept = kept[kept['_lines'] == 1]
+    return kept[['t', 'i', 'crop'] + spec['raw']].set_index(['t', 'i', 'crop'])
+
+
+#: Each wave's two crop files, as the wave scripts name them.
+_HH_SALE_SOURCE = {
+    '2014-15': dict(harvest='NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E1P2.dta',
+                    sale='NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta',
+                    harvest_crop='CULTURE', sale_crop='AS02EQ110B',
+                    harvest_qty='AS02EQ07A', harvest_month='AS02EQ06A',
+                    hh=['GRAPPE', 'MENAGE', 'EXTENSION'],
+                    qty='AS02EQ12A', value='AS02EQ13', qty_codes=(9999,), value_codes=(9999999,),
+                    raw=['AS02EQ110B', 'AS02EQ12A', 'AS02EQ12B', 'AS02EQ13']),
+    '2021-22': dict(harvest='s16c_me_ner2021.dta', sale='s16d_me_ner2021.dta',
+                    harvest_crop='s16cq04', sale_crop='s16dq01', hh=['grappe', 'menage'],
+                    harvest_qty='s16cq16a', harvest_stand='s16cq07',
+                    qty='s16dq05a', value='s16dq06', drop_repeats=True,
+                    raw=['s16dq01', 's16dq05a', 's16dq05b', 's16dq05d', 's16dq06']),
+}
 
 
 # ---------------------------------------------------------------------------
@@ -723,10 +878,11 @@ def derive_dry_season_cycle_total(per_cycle, cycles):
     """A dry-season crop's harvest over its cycles: per-cycle harvest x cycles.
 
     Registered as ``Niger::crop_production::dry-season-cycle-total``, the Mali
-    tree precedent.  ``per_cycle`` is 3E.9a ``as03eq09a``, cleared of its code by
-    the caller; ``cycles`` is 3E.6 ``as03eq06``.  A zero answer is zero; a missing
-    answer or count is NA, and so is a positive answer beside a count of zero.  On
-    the 526 one-cycle lines this is the identity.  Returns float64.
+    tree precedent.  ``per_cycle`` is 3E.9a ``as03eq09a``, or its kilograms 3E.9c
+    ``as03eq09c`` for ``Quantity_kg`` (GH #1436), cleared of its code by the caller;
+    ``cycles`` is 3E.6 ``as03eq06``.  A zero answer is zero; a missing answer or
+    count is NA, and so is a positive answer beside a count of zero.  On the 526
+    one-cycle lines this is the identity.  Returns float64.
     """
     x = pd.to_numeric(per_cycle, errors='coerce').astype('float64')
     n = pd.to_numeric(cycles, errors='coerce').astype('float64')
@@ -788,7 +944,7 @@ def _dry_season_inputs(wave, columns):
 def inputs_dry_season_cycle_total(wave):
     """The registry ``inputs`` callable of dry-season-cycle-total."""
     return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
-                                     'as03eq09a', 'as03eq09b'])
+                                     'as03eq09a', 'as03eq09b', 'as03eq09c'])
 
 
 def inputs_dry_season_sale_window(wave):
@@ -796,6 +952,58 @@ def inputs_dry_season_sale_window(wave):
     is there so a user can rescale the sale."""
     return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
                                      'as03eq10', 'as03eq11a', 'as03eq11b', 'as03eq12'])
+
+
+# ---------------------------------------------------------------------------
+# Quantity_kg as an estimate: 2021-22 s16cq16c (GH #1436)
+# ---------------------------------------------------------------------------
+#
+# The instrument prints "Estimation Quantite totale UML en kg", and the file is
+# exactly 2.5 per Tiya on 2,881 of 4,402 rows.  So this is the survey's conversion,
+# served under a column that reads like a measured mass, and the key says so on the
+# row.  The ECVMA modules ask "quantite en kgs recoltee", carry no such word, and
+# carry no such key.  CONTENTS.org, "the survey's harvest kilograms".
+SURVEY_KG_ESTIMATE = 'Niger::crop_production::survey-kg-estimate'
+
+
+def derive_survey_kg_estimate(kilograms):
+    """2021-22 s16cq16c -> ``Quantity_kg``: THE IDENTITY.
+
+    Registered as ``Niger::crop_production::survey-kg-estimate``.  Nothing is computed;
+    the registry says what the number is.  Returns float64.
+    """
+    return pd.to_numeric(kilograms, errors='coerce').astype('float64')
+
+
+def stamp_survey_kg_estimate(df):
+    """The ``Derivation`` column of the finished 2021-22 frame, as a ``string`` Series
+    on its index.  The key is APPENDED wherever ``Quantity_kg`` holds a value, joined
+    with ``MULTI_SEP`` in sorted order to whatever the row already carries, as Mali's
+    ``_with_key`` does, so that a second key on this wave's rows loses neither."""
+    out = (df['Derivation'].astype('string').copy() if 'Derivation' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    mask = df['Quantity_kg'].notna().to_numpy(dtype=bool)
+    out[mask] = pd.array([union_keys((value, SURVEY_KG_ESTIMATE)) for value in out[mask]],
+                         dtype='string')
+    return out
+
+
+def inputs_survey_kg_estimate(wave):
+    """The registry ``inputs`` callable of survey-kg-estimate: the quantity, unit, kg
+    and state as recorded, keyed by the served ``(t, i, plot_id, production_obs)``."""
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Niger' / wave / 'Data' / 's16c_me_ner2021.dta'
+    src = tools.get_dataframe(str(path), convert_categoricals=False)
+    observations = _crop_row_observations(len(src), path, script_path=__file__)
+    keep = pd.to_numeric(src['s16cq16c'], errors='coerce').notna().to_numpy()
+    out = src[['s16cq04', 's16cq16a', 's16cq16b', 's16cq16c', 's16cq16d']].copy()
+    out['t'] = wave
+    out['i'] = src.apply(lambda r: i(pd.Series([r['grappe'], r['menage']],
+                                               index=['grappe', 'menage'])), axis=1).values
+    out['plot_id'] = (src['s16cq02'].apply(tools.format_id).astype(str) + '_'
+                      + src['s16cq03'].apply(tools.format_id).astype(str)).values
+    out['production_obs'] = observations.values
+    return out[keep].set_index(['t', 'i', 'plot_id', 'production_obs'])
 
 
 # ---------------------------------------------------------------------------

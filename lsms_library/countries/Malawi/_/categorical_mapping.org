@@ -589,7 +589,8 @@
 # 1800 / 1900 / 2000.  `_PERENNIAL_RECODE` in `malawi.py` maps the post-
 # offset codes 1100 -> 1001 and 1021 -> 1018, so those rows resolve to the
 # 1001 / 1018 rows below; the tree classes have no pre-recode identity, so
-# the table itself carries 2800 / 2900 / 3000 for them.  The 2016-17 and
+# the table itself carries 2800 / 2900 / 3000 for them.  1039 -> 39 folds sugar
+# cane, listed under its seasonal code in Modules P and Q (GH #1457).  The 2016-17 and
 # 2019-20 SALE module (Q) was NOT recoded -- it still codes cassava 1 and
 # other 18 -- so its post-offset codes (1001 / 1018) still hit the same
 # two rows; the recode lives in code, not here, precisely so this one

@@ -194,7 +194,7 @@ what a sample represents and what recall window a wave used.
 
 The registry is `countries/<C>/_/derivations.yml`, a sibling of
 `population.yml` and `recall.yml`. Framework-level entries (an empty country
-slot) live in `lsms_library/derivations.yml`, which is currently empty. One
+slot) live in `lsms_library/derivations.yml`. One
 entry per key:
 
 | field | meaning |
@@ -209,13 +209,19 @@ entry per key:
 | `since` | the date the entry landed |
 | `waves` | a list, or `all` — the wave scope |
 | `columns` | which served fields the derivation produces: data columns or named index levels |
-| `rows` | a selector saying which rows carry the key, e.g. `{s: produced}` |
+| `rows` | a selector saying which rows carry the key, e.g. `{s: produced}`, or `0` for a deletion, which `ll.derivations()` lists as `0` |
 
 The loader (`derivations.DerivationRecord.from_config`) **refuses** an entry
 missing `rule`, `function`, `inputs`, `raw_variables` or `assumptions`, or an
 assumption without a `basis` — the `PopulationRecord` discipline: a record that
 cannot say what it did, to what, and why is not a record. The remaining fields
 are optional.
+
+Both country and framework registries refuse explicitly repeated mapping keys,
+including nested fields, with the file, resolved key and both source locations.
+Anchors, aliases and intentional YAML merge overrides remain supported: an
+explicit field can override an inherited field. Two explicit declarations of
+that same field are refused. Generic YAML configuration loading is unchanged.
 
 `basis` is drawn from this module's own five-value vocabulary
 (`derivations.BASES`): `questionnaire`, `variable-label`, `config-comment`,

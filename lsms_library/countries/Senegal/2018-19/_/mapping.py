@@ -2,10 +2,11 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
+from lsms_library.transformations import U_UNKNOWN
 from lsms_library.ehcvm import (
     UnitSizeLabelError,
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
     inputs_last_purchase as _inputs_last_purchase,
     served_unit_labels as _served_unit_labels,
     sized_unit as _sized_unit,
@@ -18,6 +19,24 @@ from lsms_library.ehcvm import (
 # and stamps the registry key on every purchased row.  See lsms_library/ehcvm.py
 # and Senegal/_/derivations.yml.
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Senegal')
+
+# GH #812.  `strata` is the documented stratum, region x milieu, as a label.  It
+# is a construction, so `sample` carries its registry key: see
+# lsms_library/ehcvm.py and Senegal/_/derivations.yml.
+from lsms_library.ehcvm import (  # noqa: E402
+    inputs_region_milieu_stratum as _inputs_region_milieu_stratum,
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
+)
+
+
+def inputs_strata(wave):
+    """The registry `inputs` callable: the cover's region and milieu at (t, i)."""
+    return _inputs_region_milieu_stratum('Senegal', wave)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Senegal')
 
 
 def inputs_food_acquired(wave):
@@ -32,7 +51,24 @@ def inputs_food_acquired(wave):
 
 
 def food_acquired(df):
-    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    out = _food_acquired_with_unit_weights(
+        df, FOOD_ACQUIRED_DERIVATION, wave='2018-19')
+    # GH #1500; ledger §4.  Fill only the final label, after size/NSU/value
+    # processing: a size or last purchase cannot supply a missing unit answer.
+    index = out.index
+    unit_level = index.names.index('u')
+    codes = index.codes[unit_level]
+    missing = codes == -1
+    if missing.any():
+        units = index.levels[unit_level]
+        if U_UNKNOWN not in units:
+            if isinstance(units, pd.CategoricalIndex) and U_UNKNOWN not in units.categories:
+                units = units.add_categories([U_UNKNOWN])
+            units = units.insert(len(units), U_UNKNOWN)
+        filled = index.set_levels(units, level='u').set_codes(
+            np.where(missing, units.get_loc(U_UNKNOWN), codes), level='u')
+        out.index = filled
+    return out
 from collections import defaultdict
 
 def v(value):
@@ -133,7 +169,44 @@ COPING_LABELS = {
 }
 
 
+class ShockLayoutError(Exception):
+    """Section 14.04 of this file does not have the layout :func:`shocks` serves.
+
+    Subclasses ``Exception``, not ``ValueError`` / ``KeyError`` / ``RuntimeError``:
+    the derived-table paths catch those and would fall back to another build.
+    """
+
+
+def _food_stock_by_vague(df):
+    """Serve food stock and purchases from each vague's own columns (GH #1556).
+
+    Vague 1 asked five consequences (d = stock, e = achats, f blank) and vague 2
+    six (d = effectif du cheptel, e = stock, f = achats).  ``AffectedFoodStock``
+    arrives as d, ``StockVague2`` as e, and ``AffectedConsumption`` as f,
+    through the same Boolean mapping. ``PurchasesVague2`` retains raw f for the
+    guard, independent of whether a label maps to a Boolean. A blank f is what
+    tells the two apart in the file, so a release where it stops being one raises:
+    d is a different question on those rows and nothing else would say so.
+    """
+    vague = pd.to_numeric(df.pop('vague'))
+    stock_vague2 = df.pop('StockVague2')
+    purchases = df.pop('PurchasesVague2')
+    five = vague.eq(1)
+    asked = stock_vague2.notna() | df['AffectedFoodStock'].notna()
+    if not vague.isin([1, 2]).all() or purchases[five].notna().any() \
+            or purchases[~five & asked].isna().any():
+        raise ShockLayoutError(
+            f"s14q04f should be blank in vague 1 and filled in vague 2: "
+            f"{int(purchases[five].notna().sum())} filled in vague 1, "
+            f"{int(purchases[~five & asked].isna().sum())} blank in vague 2, "
+            f"vague values {sorted(vague.dropna().unique().tolist())}")
+    df['AffectedFoodStock'] = df['AffectedFoodStock'].where(five, stock_vague2)
+    df['AffectedConsumption'] = df['AffectedConsumption'].where(~five, stock_vague2)
+    return df
+
+
 def shocks(df):
+    df = _food_stock_by_vague(df)
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
     how_coped = {0: [], 1: [], 2: []}

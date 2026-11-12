@@ -1,11 +1,23 @@
 # Formatting Functions for Mali 2021-22
+from pathlib import Path as _Path
 import pandas as pd
 from lsms_library.local_tools import format_id
 import numpy as np
 import lsms_library.local_tools as tools
+
+# Own config-tree binding, identical to the existing EACI wave override pattern.
+_ehcvm21_i = tools.get_formatting_functions(
+    _Path(__file__).resolve().parents[2] / '_' / 'mali.py',
+    '_mali_ehcvm21_namespace')['ehcvm21_i']
+
+def i(value):
+    '''2021-22 raw key: EHCVM21_; only approved panel maps return bare IDs.'''
+    return _ehcvm21_i(value)
+
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
+    inputs_unit_weight as _inputs_unit_weight,
     inputs_last_purchase as _inputs_last_purchase,
 )
 
@@ -16,6 +28,21 @@ from lsms_library.ehcvm import (
 # and stamps the registry key on every purchased row.  See lsms_library/ehcvm.py
 # and Mali/_/derivations.yml.
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Mali')
+
+# GH #812.  `strata` is the documented stratum, region x milieu, as a label.  It
+# is a construction, so `sample` carries its registry key: see
+# lsms_library/ehcvm.py and Mali/_/derivations.yml.
+from lsms_library.ehcvm import (  # noqa: E402
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
+)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Mali')
+
+# GH #1452: `Quantity_kg` from the survey's own unit-weight table, national median;
+# which file and column, and why: lsms_library.ehcvm.NSU_TABLES.
 
 
 def inputs_food_acquired(wave):
@@ -29,8 +56,14 @@ def inputs_food_acquired(wave):
     return _inputs_last_purchase('Mali', wave)
 
 
+def inputs_food_acquired_unit_weight(wave):
+    """The registry `inputs` callable of the unit-weight derivation (GH #1452)."""
+    return _inputs_unit_weight('Mali', wave)
+
+
 def food_acquired(df):
-    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    return _food_acquired_with_unit_weights(
+        df, FOOD_ACQUIRED_DERIVATION, wave='2021-22')
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",
@@ -150,7 +183,8 @@ def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
     # For 2021-22: coping columns have ranked string values
-    # "Première stratégie", "Deuxième strategie", "Troisième stratégie", "Non"
+    # "Première stratégie", "Deuxième strategie", "Troisième stratégie", "Non";
+    # code 25 alone is "Oui"/"Non".
     rank_map = {
         'Première stratégie': 0,
         'Deuxième strategie': 1,
@@ -160,12 +194,24 @@ def shocks(df):
     how_coped = {0: [], 1: [], 2: []}
     for _, row in df[cope_cols].iterrows():
         ranked = [np.nan, np.nan, np.nan]
+        autre = None
         for c in cope_cols:
             num = int(c.replace('Cope', ''))
             val = row[c]
             if val in rank_map:
                 idx = rank_map[val]
                 ranked[idx] = COPING_LABELS.get(num, f'Strategy {num}')
+            elif str(val) == 'Oui':
+                autre = COPING_LABELS.get(num, f'Strategy {num}')
+        # Code 25 (Autre strategie) alone carries the Oui/Non label set, so its
+        # rank is not in the file (GH #1556).  It takes the first slot no other
+        # strategy holds: ranks are otherwise gapless, and Burkina, which keeps
+        # the raw rank, shows 25 always filling the next one.  The instrument
+        # allows three strategies, so a fourth has no slot and is dropped, as in
+        # Niger and Senegal (0 held rows).
+        free = [k for k in range(3) if pd.isna(ranked[k])]
+        if autre is not None and free:
+            ranked[free[0]] = autre
         for k in range(3):
             how_coped[k].append(ranked[k])
 

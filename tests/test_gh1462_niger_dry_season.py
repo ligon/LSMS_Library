@@ -14,6 +14,7 @@ reads the sources through ``get_dataframe`` and imports nothing from ``Niger/_/`
 from __future__ import annotations
 
 import warnings
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -33,6 +34,10 @@ DRY = "NER_2011_ECVMA_v01_M_Stata8/ecvmaas3e_p1.dta"
 EHCVM1 = {1: "unshelled", 2: "shelled", 3: "shelled", 4: "unshelled",
           5: "shell_not_applicable"}
 EHCVM2 = {1: "unshelled", 2: "shelled", 3: "shell_not_applicable"}
+#: The 2018-19 `s16cq16c` value labels, written out likewise: `condition_sold_native`
+#: (ruling @ligon 2026-11-05) must not read the helper it checks.
+RECORDED_2018 = {1: "Epis", 2: "Grain", 3: "Décortiqué", 4: "Non-décortiqué",
+                 5: "Non concerné"}
 #: 3E's unit codes, from the questionnaire's own list, and the 99 'manquant'.
 UNITS = {1: "Kg", 3: "Cope", 4: "Botte", 5: "Tiya", 6: "Tongolo", 7: "Sac de 50 kg",
          8: "Sac de 100 kg", 9: "Panier", 10: "Unité", 11: "Planche", 99: "Unknown"}
@@ -118,7 +123,17 @@ class TestDeclared:
         assert entry["Condition_sold"] == {"type": "str", "optional": True}
         assert "Condition_sold" not in entry["index"]
 
-    @pytest.mark.parametrize("key, columns", [(TOTAL, ["Quantity"]),
+    def test_condition_sold_native_is_declared_and_has_no_vocabulary(self):
+        with open(countries_root() / COUNTRY / "_" / "data_scheme.yml", encoding="utf-8") as f:
+            entry = yaml.safe_load(f.read().replace("!make", "make"))["Data Scheme"][TABLE]
+        assert entry["condition_sold_native"] == {"type": "str", "optional": True}
+        path = Path(__file__).resolve().parents[1] / "lsms_library" / "data_info.yml"
+        with open(path, encoding="utf-8") as f:
+            canonical = yaml.safe_load(f)["Columns"][TABLE]["condition_sold_native"]
+        assert canonical["optional"] is True and "spellings" not in canonical
+
+    # TOTAL gained Quantity_kg in GH #1436: as03eq09c is per cycle, like as03eq09a.
+    @pytest.mark.parametrize("key, columns", [(TOTAL, ["Quantity", "Quantity_kg"]),
                                               (SALE, ["Quantity_sold", "Value_sold"])])
     def test_the_keys_are_registered_for_the_one_wave(self, key, columns):
         record = records_for(COUNTRY, TABLE)[key]
@@ -211,10 +226,15 @@ class TestServed:
     def test_the_key_is_on_every_dry_row_and_no_rainy_one(self, built):
         _, df = built
         got = df.reset_index()
-        dry = got["plot_id"] == "Farm-level"
-        assert set(got.loc[dry, "t"]) == {WAVE}
+        # Re-pinned for GH #1457: 2014-15 / 2021-22 multi-plot sales share the sentinel,
+        # with no harvest and no dry-season key.  Dry-season rows are 2011-12's.
+        farm = got["plot_id"] == "Farm-level"
+        dry = farm & (got["t"] == WAVE)
+        assert got.loc[farm & ~dry, "Quantity"].isna().all()
         assert got.loc[dry, "Derivation"].str.contains(TOTAL, regex=False).all()
-        assert got.loc[~dry, "Derivation"].isna().all()
+        # This wave's only: 2021-22's Quantity_kg carries its own key since GH #1436.
+        assert got.loc[~dry & (got["t"] == WAVE), "Derivation"].isna().all()
+        assert not got.loc[~dry, "Derivation"].fillna("").str.contains("dry-season", regex=False).any()
         sold = (got["Quantity_sold"].fillna(0) > 0) | (got["Value_sold"].fillna(0) > 0)
         carries = got["Derivation"].fillna("").str.contains(SALE, regex=False)
         assert (carries == (dry & sold)).all()
@@ -237,8 +257,9 @@ class TestServed:
     def test_2014_15_has_no_dry_season_row(self, built):
         # Not missing: ECVMA2_AS03P1 is agricultural equipment, not a harvest.
         _, df = built
-        got = df.xs("2014-15", level="t").index.get_level_values("plot_id")
-        assert "Farm-level" not in set(got)
+        # Re-pinned for GH #1457: a sale's Farm-level row is here, and states no harvest.
+        got = df.xs("2014-15", level="t").reset_index()
+        assert got.loc[got["plot_id"] == "Farm-level", "Quantity"].isna().all()
         raw = _read("2014-15", "NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS03P1.dta",
                     convert_categoricals=False)
         assert not {"AS03EQ09A", "as03eq09a"} & set(raw.columns)
@@ -274,6 +295,32 @@ class TestServed:
         _, df = built
         for wave in ("2011-12", "2014-15"):
             assert df.xs(wave, level="t")["Condition_sold"].isna().all()
+
+    def test_condition_sold_native_is_the_recorded_answer(self, built):
+        _, df = built
+        got = df.xs("2018-19", level="t").reset_index()
+        raw = _read("2018-19", "s16c_me_ner2018.dta", convert_categoricals=False)
+        want = pd.to_numeric(raw["s16cq16c"], errors="coerce").map(RECORDED_2018)
+        assert got["condition_sold_native"].value_counts().to_dict() == want.value_counts().to_dict()
+
+    def test_condition_sold_is_the_fold_of_the_native_answer(self, built):
+        _, df = built
+        got = df.xs("2018-19", level="t").reset_index()
+        fold = {RECORDED_2018[c]: EHCVM1[c] for c in RECORDED_2018}
+        native = got["condition_sold_native"].astype(object).map(fold)
+        assert (native.fillna("-") == got["Condition_sold"].astype(object).fillna("-")).all()
+
+    @pytest.mark.parametrize("wave", ["2011-12", "2014-15", "2021-22"])
+    def test_condition_sold_native_is_na_where_nothing_was_folded(self, built, wave):
+        _, df = built
+        assert df.xs(wave, level="t")["condition_sold_native"].isna().all()
+
+    def test_condition_sold_native_is_a_column_and_moves_no_kilogram(self, built):
+        from lsms_library.transformations import harvest_kg
+        _, df = built
+        assert "condition_sold_native" not in df.index.names
+        pd.testing.assert_frame_equal(harvest_kg(df),
+                                      harvest_kg(df.drop(columns="condition_sold_native")))
 
     def test_declared_spellings_check_passes(self, built):
         from lsms_library.diagnostics import _check_declared_spellings

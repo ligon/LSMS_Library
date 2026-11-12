@@ -1777,9 +1777,150 @@ backend disagreed with itself.  =check_panel_consistency= under make goes from f
 livestock cover only.  W2's livestock cover holds 3 households on neither the HH
 nor the PP cover, each with a W1 baseline no other household claims; 1 reaches
 W3.  GH #1120's oracle read HH, PP and PH, so =sample()= and the crosswalk agree
-in leaving them out.  Part of the open question below.
+in leaving them out.  Part of the open question below.  /Since 2026-11-05 the crosswalk
+links them; =sample()= still leaves them out./
 
-** Open: 48 W3 households the survey counts as ESS1 and the crosswalk does not
+** W3 households the survey counts as ESS1: linked by rule (GH #1467, ruled 2026-11-04)
+
+*The ruling* (option (b) of GH #1467): link all 48 and the 1 PP-only, following the
+survey's accounting.  =_/panel_ids.py= does it by a rule, not a list: a rural or
+small-town W3 household off W2's map has =household_id2= less characters 7-10 as its
+W1 id.  49 =updated_ids['2015-16']= values change, each from an identity to that id,
+and nothing else in the file moves.  W3's map then has 3,726 moving ids (3,699 on the
+HH cover, 27 PP-only) and 1,255 identities, the three figures of the ESS3 BID (PDF p16).
+
+- *This rests on the BID, not on the rosters.*  "the total number of ESS1 households
+  with complete interviews in ESS3 is 3,699", and 3,726 at post-planting.  3,699 is also
+  W3's rural plus small-town total (3,272 + 427, BID p19), so 3,651 + 48 partitions that
+  total; it is the survey's accounting, not separate confirmation of these 48.
+- *The rosters support it without settling it.*  16 of the 48 have no roster line
+  agreeing with their W1 household on sex and an age gap of 2-6, against 11.5% of linked
+  households and 78.9% of another household in the same EA.  The closer control is the 201
+  W3 households also off W2's livestock cover, at 24.9% (P about 0.12 for 16 of 48 against
+  it).  That is a test on sex and age, not a finding that they share no person.
+- *The survey's own flag says the 48 look like linked households.*  W3's roster asks
+  =hh_s1q04_b=, "is [NAME] a new HH member" (1 yes, 2 no; label read from the =.dta=).
+  =individual_id= is only =household_id= plus the line number, so it carries nothing; the
+  flag's line set and sex do.  W3's preload for the 48 is not documented here, so what
+  "new" was asked against is an inference.
+  | W3 HH cover                          | the 48     | linked through W2 (3,651) | another W1 household, same EA (3,651) |
+  |--------------------------------------+------------+---------------------------+---------------------------------------|
+  | a not-new line                       | 47 of 48   | 99.7%                     | n/a                                   |
+  | not-new lines equal the W1 line set  | 47.9% (23) | 47.7%                     | 12.0%                                 |
+  | sex agrees on every shared line      | 68.8% (33) | 67.4%                     | 19.5%                                 |
+  Of the 16, 15 have a not-new line and 6 have a not-new set equal to W1's.  That fits
+  mostly true links plus some replaced households.  Nothing here says which, so a
+  roster-confirmed subset would be our judgement, and no list of them is kept.
+- *Why a rule can do it.*  The target is the truncated id on all 3,677 W3 links through
+  W2, and =panel_ids.py= refuses to run if one stops being so.  The only rural or
+  small-town households off W2's map are these 49.  Each target is a W1 household claimed
+  by no other W3 household.  Large towns entered at ESS2 and are excluded: the 3 whose
+  truncated id happens to be a W1 household stay unlinked (each is the other half of a
+  rural household's id, see "individual_education" above).
+- *The one check that can fail is locality.*  W1 and W3 record it separately (W1 labels
+  small towns 0, W3 labels them 2), and they agree on all 49 and on all 3,677 links
+  through W2; =panel_ids.py= refuses otherwise.  An EA check adds nothing.  W1's =ea_id=
+  is the id's first 11 characters (3,969 of 3,969), and so is W3's =ea_id= of the
+  truncated id (4,954 of 4,954).  W2's =ea_id2= to =ea_id= is the same truncation (335 of
+  335), so the "W2 bridge" line in the evidence below is not independent either.  What an
+  id cannot show is a replacement household at the same serial.
+- *The =panel_ids.json= entry says 2013-14, which is a false wave label.*
+  =local_tools.panel_ids= records the wave before in its frame, so the 49 read
+  =(2015-16, X) -> (2013-14, T)= although W2 holds T for only one of them.  It did so
+  before too, as =(2015-16, X) -> (2013-14, X)=, and it still does for the 7 large-town W3
+  households on no W2 cover: 55 of W3's 4,981 entries name a W2 pair the survey never
+  recorded (56 before).  So counting W3 entries as W2-W3 links gives 4,981 against 4,926
+  in =sample=.  No false household or chain follows, since no W3 target is itself a key,
+  and =updated_ids= is what moves served =i=.
+- *One target has three waves.*  One of the 49 has a W1 id that W2's map also targets,
+  from a W2 PP-only household whose PP row names that W1 id.  W3 does not hold that W2 id,
+  so this is no rename onto an occupied target: =i= is one household's id in W1, W2 and
+  W3, as far as the data can say.  The two raw ids differ only at characters 8-10, where
+  W2's PP row has the rural placeholder =888=, although that row's own =rural= says small
+  town, as W1 and W3 do.  So W2's =v= for it is a code no other household holds, while its
+  W3 EA holds 9 W2 and 8 W3 households.  This is a keying difference, not a different EA
+  and not a move, and it is why W2 -> W3 goes from 4,925 of 4,925 linked households keeping
+  =v= through =sample()= to 4,925 of 4,926.  =sampling.yml='s =stable= stands.
+- *W2's 3 livestock-only households are on W2's map too* (option (d) of the issue, ruled
+  by @ligon 2026-11-05, after the 49 had shipped in PR #1558).  They are on neither its HH
+  nor its PP cover.  Each has a baseline on the livestock cover that is a W1 household no
+  other household claims, and =panel_ids.py= refuses if holder rows disagree or the
+  baseline is not a W1 household.  1 of them is among the 49, whose W3 rows PR #1558 moved
+  to T while its W2 row kept the native id, so W2 and W3 shared 2,886 =i= in =livestock=
+  instead of 2,887.  Mapping all 3 restores that link, and 1 W1 -> W2 link.  3 W2
+  =livestock= rows move, one per household, and no other served table holds these ids in
+  W2.  =sample= still leaves them out of W2 (#1120 D1 reads HH and PP), and =livestock= has
+  no =v= level.
+
+*What moved, measured on cold builds* (=115b6ab71= against =6fe6fea4a=, each in its own
+empty root).  Every table has the same rows and values once the 49 are mapped: 24 tables,
+a fresh-instance =individual_education=, and =Feature= over Ethiopia, Malawi and Tanzania
+for =household_roster= and =sample=.  No duplicate index, and no new warning text in any
+of them.  The derived tables come back in a new row order, because they sort on =i=.
+
+| table                     |    rows | W3 rows moved | households |
+|---------------------------+---------+---------------+------------|
+| sample                    |  26,130 |            49 |         49 |
+| household_roster          | 126,376 |           222 |         48 |
+| shocks                    |  21,781 |            51 |         27 |
+| housing                   |  25,855 |            48 |         48 |
+| assets                    | 567,887 |         1,680 |         48 |
+| individual_education      |  63,181 |            91 |         38 |
+| food_acquired             | 326,456 |           524 |         47 |
+| food_coping               | 111,080 |           384 |         48 |
+| plot_features             | 132,694 |           119 |         34 |
+| crop_production           |  86,437 |            68 |         19 |
+| plot_inputs               | 180,526 |           141 |         19 |
+| plot_labor                | 272,925 |           207 |         19 |
+| livestock                 |  37,179 |            63 |         25 |
+| anthropometry             |  18,764 |            49 |         29 |
+| people_last7days          | 118,233 |           199 |         48 |
+| nutrition                 |  25,644 |            47 |         47 |
+| household_characteristics |  25,528 |            48 |         48 |
+| food_expenditures         | 264,091 |           412 |         46 |
+| food_prices               | 263,627 |           412 |         46 |
+| food_quantities           | 326,082 |           524 |         47 |
+
+=interview_date= and =food_security= have no W3 rows, and =cluster_features= and
+=community_prices= have no =i=, so those four are exact.
+
+Attrition, every cell that moves, from before GH #1467 to now, with W2's livestock-only
+households on the map.  W1 -> W3 in =sample= is the BID's 3,726.  W2 -> W3 moves only for
+the three-wave household above, in =sample= and =plot_features=.  W1 -> W2 moves only in
+=livestock=, for one of W2's livestock-only households.
+
+| cell     | table                                           | before | after |
+|----------+-------------------------------------------------+--------+-------|
+| W2 -> W3 | =sample=                                        |  4,925 | 4,926 |
+| W2 -> W3 | =plot_features=                                 |  3,418 | 3,419 |
+| W1 -> W2 | =livestock=                                     |  2,489 | 2,490 |
+| W1 -> W3 | =sample=                                        |  3,677 | 3,726 |
+| W1 -> W3 | =household_roster=                              |  3,630 | 3,677 |
+| W1 -> W3 | =assets=                                        |  3,651 | 3,699 |
+| W1 -> W3 | =people_last7days=                              |  3,651 | 3,699 |
+| W1 -> W3 | =housing=                                       |  3,624 | 3,670 |
+| W1 -> W3 | =food_acquired=, =food_quantities=, =nutrition= |  3,600 | 3,645 |
+| W1 -> W3 | =food_expenditures=                             |  3,529 | 3,573 |
+| W1 -> W3 | =food_prices=                                   |  3,524 | 3,568 |
+| W1 -> W3 | =food_coping=                                   |  3,479 | 3,524 |
+| W1 -> W3 | =household_characteristics=                     |  3,372 | 3,408 |
+| W1 -> W3 | =plot_features=                                 |  2,950 | 2,968 |
+| W1 -> W3 | =individual_education=                          |  2,677 | 2,705 |
+| W1 -> W3 | =plot_labor=                                    |  2,652 | 2,666 |
+| W1 -> W3 | =plot_inputs=                                   |  2,627 | 2,641 |
+| W1 -> W3 | =livestock=                                     |  2,480 | 2,494 |
+| W1 -> W3 | =crop_production=                               |  1,753 | 1,761 |
+| W1 -> W3 | =anthropometry=                                 |  1,635 | 1,648 |
+| W1 -> W3 | =shocks=                                        |  1,162 | 1,171 |
+
+=check_panel_consistency= passes on both sides.  =updated_ids_cover_waves= goes from warn
+to pass, because the baselines are now inferred as W1 and W4.  =panel_ids_targets_exist=
+stays a warning, 27+69 of 4,981 to 95+86 of 13,691: on the current side the 25, 27 and 40
+PP-only households of W2, W3 and W5 and W2's 3 livestock-only ones, which have no roster; on
+the previous side the 69 as before (the 49 and the 7 below among them) and the 17 W5
+households on W4's PP cover only.  =attrition_monotonic= now walks both chains.
+
+/The evidence as the ruling read it, kept as written:/
 
 W3's =household_id= is not independent evidence: it is =household_id2= with four
 characters dropped, on every row, which is why =_/panel_ids.py= chains through W2
@@ -1804,21 +1945,61 @@ they do not link to W1.
   not hold.
 
 Whether to link them changes served =i= for about 49 W3 households in every table
-and needs a ruling.  Left unchanged.
+and needs a ruling.  (Ruled above.)
 
-** Panel II in the crosswalk
+** Panel II and W2 -> W1 in the crosswalk (GH #1467, ruled 2026-11-04)
 
-=_/panel_ids.py='s docstring says W4 and W5 "draw entirely new samples with no
-backward link".  That is false for W5: the ESPS-5 "kept all the ESPS-4 samples except for
-those in the Tigray region and a few other places" (catalog 6161), =sampling.yml= declares =household_continuity: panel=, and 4,849
-of W5's 4,959 HH cover ids are on W4's.  No rename is needed, so served =i= links
-W4 and W5 already; only =panel_ids= is silent (Nigeria's W5 is recorded as identity
-links, GH #1264).  Likewise =panel_ids= has no W2 -> W1 keys, because the resolver
-records none for the first wave in its frame; those links are in =updated_ids=.
+=_/panel_ids.py= now puts all five waves in one frame.  W1 and W4 are baselines, every
+=previous_i= missing, so =updated_ids= holds an empty map for each and no link crosses
+from W4 to W3.  3,804 W2 -> W1 keys and 4,906 W5 -> W4 keys join =panel_ids.json=, which
+goes from 4,981 to 13,691 entries.  W2's and W3's =updated_ids= maps are dict-identical
+to before, and W5's is all identities, so no served =i= moves.
+
+*Which W5 households link*: those whose id is on W4's HH or PP cover, which is how W2's
+and W3's PP-only households are already treated.  That is 4,849 on both HH covers, 17 on
+W5's HH and W4's PP only, 40 on W5's PP and W4's HH: 4,906, exactly the ESPS-5 BID's
+"longitudinal respondent sample ... 4,906 households" (PDF p43).  The other 93 of W5's
+4,999 are the BID's "93 households selected within 8 new EAs" (PDF p32), freshly listed
+in EAs ESPS-4 selected and could not survey for security reasons (PDF p30-31).  7 of those
+8 EAs are on no W4 cover; the 8th is on W4's, and shares no household id.  The rosters
+agree, as they do not quite for the 48 above: of the 4,849 on both HH covers, 9.4% have
+no line agreeing on sex and an age gap of 1-5, against 77.5% for another W4 household of
+the same EA.  W5's cover does not ship the =pw_w5_Panel= the BID names (PDF p16).
+
+/Superseded note, kept as written:/ =_/panel_ids.py='s docstring said W4 and W5 "draw
+entirely new samples with no backward link".  That is false for W5: the ESPS-5 "kept all
+the ESPS-4 samples except for those in the Tigray region and a few other places" (catalog
+6161), =sampling.yml= declares =household_continuity: panel=, and 4,849 of W5's 4,959 HH
+cover ids are on W4's.
 
 *A string collision, not a link*: served =i= has 1 id in common between W2 and W4
 and 1 between W2 and W5, unrelated large-town households in the same character
 format.  =sampling.yml='s "0 shared =i=" at 2018-19 is about W3 and stands.
+
+/Measured 2026-11-04./  It is one id, shared by W2, W4 and W5, and W3 does not hold it.
+On the W2 side it is a large-town household with a blank W1 baseline, so nothing walks it;
+on the Panel II side it is one household, linked W4 -> W5.  =v= and Region agree because
+the EA code does: 3 EA codes are on both the W2/W3 and the W4/W5 covers, so ESS4's draw
+reached those EAs again, and in this one the region-to-kebele codes agree too.  The
+household is not the same.  The id's last three characters are a serial from each draw's
+own listing: in this EA W2's 15 are every 11th number and W4's every 12th, so the two
+series meet once by arithmetic.  The rosters do not agree either: W2 lists fewer people than
+W4, and no member matches on sex and an age gap of 3-7.  One more raw string coincides,
+in a rural EA, but its W2 household walks to its W1 id, so served =i= does not show it.
+Reported, not changed: =independent= stands, =groupby('i')= across the panels pools these
+two households, and =unobservable= keeps Site C silent about =v= in those 3 EAs.
+
+** Open: 7 W3 large-town households one digit from a W2 household W3 does not hold
+
+Found 2026-11-04 while reviewing what the #1467 rule leaves out; outside that ruling, so
+not linked.  7 W3 large-town households are on no W2 cover and keep an id that links to
+nothing, yet the ESS3 BID says W3's 1,255 urban households "were re-interviewed" (PDF p16).
+Each is in an EA W2 holds, and its id is one serial digit from a different W2 large-town
+household that W3 does not hold (7 of 7).  By roster line, W2 to W3 with sex equal and an age
+gap of 0-4: 6 of the 7 pairs have an agreeing line, and 0.591 of lines agree, against 0.794
+and 95.5% for the 1,248 large-town households with the same id in both waves, and 0.070 and
+15.9% for another household of the same EA.  This looks like mis-keyed ids.  One digit alone
+is weak evidence, since 581 of those 1,248 have another W2 household one digit away.
 
 * Food prices: what the ESS asks, and three defects (2026-09-08)
 
@@ -3731,7 +3912,8 @@ W3 are fieldwork too.
   that could not be visited for security reasons.  The remaining 15 were in different
   places and no respondent was available".  Measured: 27 on both PP and LS and not on
   HH, 26 matching that sentence and 1 also on PH; 10 in one EA absent from the HH
-  cover, and 17 each alone in their EA.  So 10 against the BID's 12, not reconciled.
+  cover, and 17 each alone in their EA.  So 10 against the BID's 12, not reconciled.  That
+  EA holds 12 households in W1 and in W2, none on W3's HH cover and 10 on its PP cover.
 - *W2, 25 (ESS2 BID, not held,
   https://microdata.worldbank.org/catalog/2247/download/40387, PDF p28)*: the same
   sentence with 30 households, ending "and were dropped from the entire ESS2 sample".
@@ -3747,6 +3929,19 @@ W3 are fieldwork too.
   12 in 2 EAs where 6 of 10 PP households have no HH row (4 do), and 48 in 36 EAs with
   at most 3 each.  Those 2 EAs are the nearest candidates for the BID's other two, but
   nothing confirms it, and "about 62" movers fits the 60 outside the 6 EAs better.
+
+/Updated 2026-11-04 (GH #1443)./  The three BIDs above that this section reads from the
+catalog are now held: sidecars in each wave's =Documentation/= from commit
+=11ed1b811= (=ESS2_Basic_Information_Document.pdf=, "Basic Information Document, Ethiopia
+Socioeconomic Survey 2018-19 V2.pdf", =ess5_basic_information_document_final.pdf=).  Every
+citation in this section was re-checked against the held copies, by pypdf text extraction:
+ESS2 p28, ESS3 p16, p23 and p31, ESS4 p13, p25 and p26, ESPS-5 p13 and p22.  All stand.
+
+- *The ESS4 "eight EAs" stays open, and no held document settles it.*  The ESPS-5 BID has
+  an eight of its own, and they are different EAs: "8 new EAs" (PDF p32), selected for
+  ESPS-4 but "not surveyed in 2018/19 for safety and security reasons" (PDF p30).  7 are on
+  no W4 cover; the 8th is on W4's HH cover with 12 households, none of them on W5's.  None
+  of #1359's 6 W4 agriculture-only EAs appears in W5 at all.
 
 * GH #1119 -- structural crop marker (2026-10-30)
 
@@ -4341,3 +4536,512 @@ See =.coder/ledger/1287-ethiopia-anthropometry-runtime-checkpoint.md= and
 Result review =1c2a8ac6= and root acceptance =cf21eec6= retain the linked scope
 and limitations. No inventory credit precedes reviewed docs merge; other country
 cells and #1287 remain open. All earlier CONTENTS bytes are retained.
+
+* 2026-11-04 -- sales no §9 line holds: Farm-level (GH #1457)
+
+§11 and §12 record a sale per holder and crop.  A sale on one §9 line goes on it (the SALES GRAIN CAVEAT); every other one was unserved.
+The ruling on GH #843, option (d), extended in bulk on 2026-11-04, gives it ONE row with =plot_id = 'Farm-level'=, no =Quantity=, =u = 'Unknown'=, its
+own =Unit_sold= (new, optional), =production_obs = 'reported:<s11|s12>:<holder>:<crop code>'=.
+
+| Birr, cold                         |    2011-12 |   2013-14 |   2015-16 |   2018-19 |    2021-22 |
+|------------------------------------+------------+-----------+-----------+-----------+------------|
+| on a served §9 line (§11 + §12)    |    600,749 | 3,118,955 | 2,581,435 | 2,821,001 |  7,648,678 |
+| Farm-level, §11                    |  1,011,908 | 1,801,422 | 1,420,999 | 4,720,764 | 13,738,189 |
+| Farm-level, §12                    |  1,986,089 | 2,110,676 | 2,810,439 |         0 |          0 |
+|------------------------------------+------------+-----------+-----------+-----------+------------|
+| served                             |  3,598,746 | 7,031,053 | 6,812,873 | 7,541,765 | 21,386,867 |
+| rows at Farm-level (§11 / §12)     | 1,058 / 1,811 | 1,122 / 1,049 | 955 / 1,206 | 1,075 / 0 | 1,219 / 0 |
+
+*Served lines (review of GH #1457).*  The caveat counts SERVED §9 lines (=_s9_line_is_served=): a line with no unit and no quantity is removed by the empty-row
+filter, so it does not count where the holder has another line of the crop, and it takes no sale there.  Counting raw lines passed over a holder's one served row for
+463 sales, 8 + 138 / 12 + 114 / 101 / 90 by wave (§11 + §12 in W2 and W3), and those now sit on their row.  So the line rule of GH #1461 no longer sends the 100-Birr
+Gishita sale to Farm-level (it has three =crop_id= lines, one with a harvest).  A holder-crop with no such line keeps all its lines: one alone takes its sale, which is what
+keeps that row, and two or more mean Farm-level.
+
+Served equals the raw =sect11= + =sect12= sum in every wave, less three things this does NOT serve:
+- §12's repeated pairs (W2 145,586, W3 1,315 Birr): which line or sum is the holder's sale is not something the survey says.  Class 2 of =_attach_sect12_sales=.
+- §12 lines of a pair also in §11 (W2 83,250, W3 19,504 Birr): §11 wins, the two may record one sale twice.  Class 3.
+- One W2 §11 line with no crop code (180 Birr).
+
+*Idiosyncrasies bearing on this.*
+- *The key is the HOLDER, and =i= is the household.*  A household with two holders who sold one crop (11 / 28 / 35 / 6 / 11 pairs by wave) keeps two rows; the holder is in =production_obs=.
+- *W4/W5's =harvestedcrop_id= does not link a sale to a §9 line.*  It is a per-holder ordinal, unique on (holder, id), and §9's =crop_id= has the same small range, so 2,618 and 2,117 lines agree by accident.  The source has no plot here, measured.
+- *W1 §9 is a 7,750-row file against §4's 29,317 (above, "Unexplained; recorded").*  So 821 of W1's 1,754 §11 sales (820,239 Birr) have no §9 row, and 774 of those 821 have a §4 line: they were planted.  The Farm-level row holds the sale as recorded.  It does NOT resolve why W1 §9 is short.
+- *W1 §12's 1,683 no-§9-row sales (1.83M Birr) are the expected ones* (§9 excludes those crops), and their HARVEST (§12 Q3) is still in no served table: the open decision above stands.  So a W1 tree crop now shows a sale and no harvest.  See the report.
+- *W5 §11 lists 84 (holder, crop) pairs twice* under two =harvestedcrop_id=, and the values differ on 80.  The sum predates this; =hh-crop-sale-records-summed= and =-two-units= name it, on Nigeria's ruling B.
+- *Two served lines of one crop on ONE plot (GH #1461, W4 1 sale 600 Birr; W5 7, 31,870 Birr) go to Farm-level.*  The plot is knowable.  Nigeria's ruling is pending on the same question.
+- *=Quantity_sold= on a §9 row stays as it is: only where the sale's unit equals =u=.*  That leaves 1 / 1,915 / 695 / 343 / 393 §9 rows with a value and no quantity, while a Farm-level row shows both, in its own =Unit_sold=.  Filling those rows would be a separate change.
+- *The window keys ride along.*  A §12 Farm-level row carries =sect12-sale-period=.  A W4/W5 Farm-level row carries =permanent-crop-12-month-window= where every §4 line of the (holder, crop) says permanent, because it has no plot for the row rule's join.
+- *Nigeria's ruling A is not extended.*  After the served-line count, 52 W1 §11 sales (46,703 Birr) sit on Farm-level with exactly one line stating a harvest among several served ones: every W1 line has a unit, because W1 fixes kilos, so a line with no quantity is still served.  No other wave has any.  212 + 182 sales on a lone line stating no harvest keep it, unlike Nigeria.
+
+=Derivation= gains =hh-crop-sale-single-row= on the §9 rows already holding a §11 sale, beside any window key, and that and =Unit_sold= are all that move on them.
+
+* 2026-11-08 -- W1 key representation and literal storage identity (GH #1570)
+
+The W1 producer formats household, holder, parcel and field through
+=format_id=, but converts =crop_code= through
+=to_numeric(errors=coerce).astype(Int64)=. Its planting attachment uses
+the encoded holder_parcel_field and numeric crop; it does not use household.
+Literal storage identity is a separate diagnostic: the two closed numeric
+captures of =2011-12/Data/sect9_ph_w1.dta= and
+=2011-12/Data/sect4_pp_w1.dta= carry floating and integer crop codes, respectively.
+
+A bounded formatter experiment retained all 7,750 section 9 and 29,317
+section 4 rows. Four section 9 crop keys were missing. Literal typed
+comparison over five coordinates found zero matches. The formatted diagnostic
+over five coordinates and the actual encoded plot/crop projection each found
+6,983 one-to-one shared keys, 763 unmatched valid section 9 keys, and 22,334
+unmatched section 4 keys. Applying the household formatter to section 4 was
+diagnostic only; the actual join projection omits household. The two inputs
+and complete typed frames, axes and attrs remained unchanged. This experiment
+ran the frozen source expressions, not the whole producer or API. Its
+historical source was fdec plus ledger head =ee880b046=; the relevant
+Ethiopia subtree and =local_tools.py= objects are also byte-exact on the
+documentation base =ebb65d191=. No latest whole-head runtime claim follows.
+
+These two captures had no full-record repeats, formatter-induced full-key
+aliases, encoded component collisions, or actual projection keys spanning
+multiple households. That is a bounded observation, not a general uniqueness
+guarantee: invented controls demonstrate the algorithm's fractional-ID and
+underscore ambiguity mechanisms.
+
+The earlier literal zero therefore does not establish absent common
+agricultural records or a broken production join. The new matches and
+unmatched counts do not establish harvest or planting eligibility, row loss,
+scientific linkage, or why section 9 is short. They also do not establish
+final labelled native keys or API output. The missing section 3 intercrop
+operand still prevents full W1 native parity. Section 12 Q3 harvest, its
+window, partial grams/Birr arithmetic, and the other #1457/#1570 decisions
+remain open. A Farm-level sale is not a harvest. No key, filter, allocation,
+unit, season, weight or other default changed. Earlier receipts retain their
+dates and scopes; whole #1570 remains open.
+
+Evidence and source limits are recorded in
+=.coder/ledger/1570-ethiopia-formatter-country-note.md= and the sealed
+aggregate report at
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1570-formatter-only-proposal-v1-20261108/CAPTURES-REPORT.md=
+(manifest SHA256 =1f8d920b9a8eb77779c6b23452bcc1f0dd92dfc7c6a067167ae20f8f2b661cae=).
+
+* 2026-11-09 -- W1 section 4/9 manual transfer rule (GH #1570)
+
+The exact official W1 enumerator manual was newly restored from catalog 2053,
+download 40404, and is now locally DVC-managed as
+=2011-12/Documentation/ERSS_Manual_HH_AG_COM_APRIL_30_ENGLISH.pdf=.
+Its SHA256 =e1fb422a6a2fb02f5743766410bd68230322b8d375d294299b1921ae775ea344=
+matches the earlier #1183 instrument record. The former missing-in-admission
+history is retained. A targeted DVC push and one fresh read-only managed
+retrieval from an empty private cache verify this document's remote availability;
+no broader documentation or survey-data holding is asserted.
+
+Manual PDF pp79--80 (printed pp78--79) explicitly transfers the parcel, field,
+crop ID/name/code from post-planting to section 9, lists the same crops as
+section 4 except tree/root crops, and forbids renumbering those IDs. PDF p81
+(printed p80) requires the holder's self-reported yield for every temporary
+crop whether selected for crop cutting or not; the small crop-cut weights are
+not to be extrapolated. Crop-cut selection is therefore not a documented
+restriction on that self-report roster. These are instrument instructions,
+not proof that each released source row follows them or that every section 4
+row belongs in section 9.
+
+Preserve the window tension: the PH form p6 asks about the last completed
+agricultural season and gives a clipped no-harvest-zero instruction; manual
+p81 asks for expected Meher harvest if harvesting is incomplete. Neither is
+silently chosen as a new harvest/default rule. The export-column bridge,
+source compliance and reason for the historical unmatched rows remain open.
+No old row/count/capture experiment was replayed, no harvest is allocated to
+plots, and section 12 Q3, grams/Birr and other #1570 residuals are unchanged.
+
+* 2026-11-09 -- W1/W2 harvest and sale component authority (GH #1570)
+
+Own W2 PH headers distinguish harvest quantity =ph_s9q04_a= from its
+14-code unit selector =ph_s9q04_b=; the latter is not a gram component.
+In =sect11_ph_w2.dta=, sale quantity has separate =ph_s11q03_a= (Kilo)
+and =ph_s11q03_b= (Grams), while total sales value is the single
+=ph_s11q04= (BIRR); no =ph_s11q04_b= is in that file's name inventory.
+These are own export metadata, not an instruction to combine partial answers.
+
+The additional W2 harvest field =ph_s9q04_b_other= is a 40-character
+other-specify string. The label of =ph_s9q04_b_cf= is “Conversion factor
+unit code (for merging with Crop_CF_Wave2)”: its 30 code-label choices
+identify conversion-table UNIT CODES, not per-row numeric kilogram factors.
+Table values, actual code correspondence and applicable conversion coverage
+were not measured. This does not contradict the earlier no-per-row-factor
+caveat or authorize a factor join; the separate lookup remains under review.
+
+The own W1 PH form =2b_Post_Harvest_English.pdf=, PDF p6 (section 9 Q12),
+prints harvest KILO/GRAM columns. PDF p10 (section 11 Q3/Q4) prints the sold
+KILO/GRAM pair and one total-value BIRR column, including in-kind valuation.
+No separate decimal/cents box or partial-component blank rule was observed.
+The released W1 labels still distinguish Kilos/Grams and BIRR/BIRR Decimal.
+Restored manual PDF p18 (printed p17, section 3.16) says no cents/round to
+Birr in general coding guidance with household examples; agriculture PDF p83
+(printed p82) says record sold quantity in kilograms and sales value in Birr.
+Their relation to the released BIRR Decimal field remains unresolved: neither
+a decimal denominator, blank-as-zero nor a data-rounding rule is selected.
+
+Keep the existing scoped tensions: “It adds no row” concerns the attachment
+helper, while the later Farm-level sale carrier has no harvest quantity;
+“=Quantity_sold= on a §9 row stays as it is: only where the sale's unit equals
+=u=.” Separate =Unit_sold= and holder identity remain essential. Multiple
+holders can reuse parcel numbers, and W2/W3 =household_id2= is not silently
+substituted for =household_id=. No sale becomes a harvest through this note.
+
+Version bindings: W2 section 9 MD5 =4795aa126d75569c77178231a61516ce=,
+section 11 =d74b4bd87496d6d98290a0a058e2355d=; own W1 PH form MD5
+=d9332d9f8332c8f25a9e7ee2030bf2be=, SHA256
+=eed6a8b9d2bd1995fcbd3b0a60a6a3a724b5f71430d75178597c47fdb1a74276=.
+The restored manual retains SHA256 =e1fb422a6a2fb02f5743766410bd68230322b8d375d294299b1921ae775ea344=.
+Evidence: =B/reports/1570-component-metadata-plan-current1c1ef-20261109/=
+with =header-results/=, =ph-pages/= and =additive-v2/=; B is the burst root
+recorded in =.coder/ledger/1570-component-authority-documentation.md=.
+The original PDF6/11/12 stage did not reach sale Q3/Q4; the separately
+recorded PDF9/10 stage did. Both receipts and page rasters are retained.
+Three header-only contexts read no records. No source-value effect, row-loss,
+harvest allocation, crop-window or GH #1457 policy conclusion follows.
+
+* 2026-11-09 -- Historical household-characteristics cells are the GH #594 repair (GH #587)
+
+GH #587's two Ethiopia rows are exactly =household_characteristics/2018-19=
+and =household_characteristics/2021-22=. Both are =dropped,declared= in the
+original coverage snapshot =23794a518= (merged in GH #586), not new findings
+on current source. The maintainer's corrective comment on #587 explicitly
+identifies them as fixed by GH #594, merge =68b942528=.
+
+| wave    | roster source       | native person/household keys | residence input |
+|---------+---------------------+------------------------------+-----------------|
+| 2018-19 | =sect1_hh_w4.dta=  | =individual_id/household_id= | =WeeksAway: s1q06= |
+| 2021-22 | =sect1_hh_w5.dta=  | =individual_id/household_id= | =WeeksAway: s1q06= |
+
+These are household-questionnaire rosters. Neither declaration concatenates
+PP and PH visits; the YAML wave builder supplies the logical wave label as
+=t=. Ethiopia's general PP/PH design does not explain these two losses.
+W1-W3 supply =MonthsAway: hh_s1q05= instead. Country concatenation therefore
+carries both residence columns, populated on different waves. The old
+=if/elif= selected the first column present, =MonthsAway=, whose values were
+all missing on W4/W5, and deleted those waves in the derived transform.
+
+The current =roster_to_characteristics= coalesces residence sources per row
+and reads W4/W5's weeks. Its residence-resolution block is byte-identical to
+GH #594's fix =85bdf4a57=. The historical PR reports 6,768 and 4,946 restored
+households, with the residence filter still active, not the all-missing-wave
+fallback. Those counts also appear in the committed coverage snapshot; they
+are dated receipts, not measurements repeated here or fixed future counts.
+Existing controls are =tests/test_roster_residence_filter.py=,
+=TestD1PerRowCoalesce=. This derived table is not registered in the country
+scheme and is not one of the nine GH #1287 country compilers. Their qualified
+receipts do not establish new roster/derived-table runtime acceptance.
+No eligibility, filter, round, key or coverage verdict is changed.
+
+* 2026-11-09 -- W5 documentation holding versus the old stub-only claim (GH #650)
+
+The earlier sentence "This wave has no local documentation whatsoever" and
+the old =2021-22 | no documentation at all= row describe the former holding.
+The later GH #1443 update above records the intervening acquisition:
+=11ed1b811=, merged through GH #1506 (=df8faa75f=), added
+=2021-22/Documentation/ess5_basic_information_document_final.pdf.dvc=.
+It records MD5 =4949ee8c911e8512458f64c5f57d5d3e=, 1,058,117 bytes,
+WB catalog 6161 resource 78630. GH #1443 is closed; both its closure and
+follow-up comment confirm the held BIDs and citation rechecks. Earlier
+catalog-only citations are not silently upgraded to new document readings.
+
+At source =4381d701f= this is W5's only tracked document sidecar. Provenance
+records held data release =ETH_2021_ESPS-W5_v03_M=; the older licence example
+=ETH_2021_ESS_v01= is a citation example, not a replacement release identity.
+No W5 household/agriculture questionnaire, DDI, manual or report sidecar is
+tracked. The acquisition commit explicitly left the questionnaires
+=(.xls/.xlsx)=, manual and report outside its scope. That is a missing
+managed-document holding, not proof the instruments were never published or
+that no external copy exists. W4's held household and PP/PH questionnaires
+do not identify or replace W5 instruments.
+
+An authorized read-only inventory of catalog 6161's Related Materials now
+identifies these English W5 resources; none of their download links was
+followed. Filenames come from the page's =data-filename= attributes, not
+guesses or downloaded bytes.
+
+| role | resource | filename | format |
+|------+----------+----------+--------|
+| Household | 78626 | =esps_w5_hh_questionnaire_english.xls= | XLS |
+| Agriculture post-planting/crop-cut/livestock | 78627 | =esps_w5_post_planting_crop_cut_livestock_questionnaire_english_final.xlsx= | XLSX |
+| Agriculture post-harvest | 78628 | =esps_w5_post_harvest_questionnaire_english_final.xls= | XLS |
+| Community | 78629 | =esps_w5_community_questionnaire_english_final.xlsx= | XLSX |
+| Combined W5 manual | 78631 | =manual_household_agriculture_and_community_questionnaires_wave_5.pdf= | PDF |
+| Survey report | 78643 | =ESS5_Survey_Report_webfile_06.pdf= | PDF |
+
+Metadata URL: https://microdata.worldbank.org/index.php/catalog/6161/related-materials
+The household form subtitle is =Form ESS5-H (21/22)=; both agriculture
+forms say =Form ESPSAGSS/(21/22)=. These form identifiers and the filename
+word =final= are not an explicit document version. No questionnaire date or
+document-version field is listed. The manual is dated 2022-03 and report
+2023-09; the already-held BID 78630 is dated 2023-12. Catalog =v03_M= names
+the data release, not independently each instrument's version. The page also
+offers generated =ddi-documentation-english_microdata-6161.pdf= at
+=/catalog/6161/pdf-documentation=, with no listed resource ID, and a separate
+tax-module report 98963, outside this instrument-restoration proposal.
+
+The finite restoration candidates for the immediate HH/agriculture gap are
+78626, 78627 and 78628 under the exact filenames above. They require a
+separate grant before any binary retrieval, hashing, managed-source placement
+or workbook parsing. A later read should first inventory those three
+workbooks' sheet identities; no sheet names or question coordinates are
+invented here. Community/manual/report/DDI are separately named residuals.
+The BID needs no repeat acquisition. Shared =add_wave= documentation policy,
+automatic fetching and other countries remain ROOT's GH #650 scope. No new
+PDF/workbook parse, document/data download, runtime, cache operation or
+scientific decision accompanies this metadata-only inventory.
+
+* 2026-11-10 -- Three own W5 questionnaires now held through DVC (GH #650)
+
+The preceding source4381 inventory's missing-managed-questionnaire statement
+and the older "no local documentation whatsoever" are preserved as dated
+history. After the already-held BID, exactly three public English W5 forms
+are now DVC-managed under =2021-22/Documentation/=: household resource78626
+(=esps_w5_hh_questionnaire_english.xls=), agriculture post-planting/crop-cut/
+livestock78627 (=esps_w5_post_planting_crop_cut_livestock_questionnaire_english_final.xlsx=)
+and post-harvest78628 (=esps_w5_post_harvest_questionnaire_english_final.xls=).
+
+The exact WB6161 public downloads total 2,357,558 bytes. Their respective
+MD5s are =3b06b79513c93bb5f0ae4bb5c98e31fe=,
+=02e32064e9dfe663eae0f4530e73ed24= and
+=f40efaca8a0865cea3a016bb5b32227a=. One targeted batch push succeeded;
+one normal read-only managed retrieval of each from its own initially empty
+private L1/data root returned the same size/MD5/SHA256, with the in-tree form
+absent. Only the exact document blob and document copy appeared in each data
+root. Read permissions and the getter's WB-permission gate excluded an
+archive fallback; no raw dataset or spreadsheet parser ran. SOURCE.org lists
+the literal resource URLs and per-document sizes. Existing data release
+=ETH_2021_ESPS-W5_v03_M= remains unchanged; this is no release refresh.
+
+Holding these binary forms establishes neither their detailed question text
+nor a fielded CAPI/GUID/version-to-export bridge. The metadata form subtitles
+and filename word =final= do not establish that bridge. No sheet names or
+question coordinates are asserted, no W4 instrument is substituted for W5,
+and no PP/PH/reference-window, household/holder/parcel identity, unit, harvest
+or eligibility decision changes. Community78629, manual78631, report78643,
+generated DDI and the shared automatic-documentation policy remain separate
+GH #650 residuals; the BID and W1 manual were not reacquired.
+
+Evidence: =B/reports/650-ethiopia-w5-managed-holding-20261110/=,
+=PUSH-RECEIPT.json= and =READBACK-78626/78627/78628.json=; original public
+HTTP/container receipts remain in =B/reports/650-ethiopia-w5-public-questionnaires-20261110/=.
+No workbook/macros/formulas, PDF, native survey rows/headers, Country/Feature,
+producer, cache census or broad acquisition was executed in this restoration.
+
+* 2026-11-10 -- Own W5 HH/PP questionnaire cells (GH #1570/#650, partial)
+
+The three newly held WB6161 forms remain separate instruments. Reading the
+household78626 and post-planting78627 forms adds these own W5 facts; it does
+not substitute W5 wording for W1/W2 released fields or resolve earlier counts.
+
+In PP =Cover Sheet!Y9/AC9=, household identity and holder identity are
+separate; AC9 says "Holder ID (Use Household Roster ID)". In
+=SEC 2 - Parcel Roster!A3=, the instruction retains W4-prefilled parcel names
+and entries even if disposed or rented out, then adds new parcels. The
+status/next-parcel skip remains visible at =F4/F7=. In contrast,
+=SEC 3 - Field Roster!C3= excludes fields rented out or given to other holders;
+=A2/B2= separately label parcel and field. These roster universes are not
+interchangeable, and a printed CAPI-prefill instruction does not authenticate
+a fielded application, GUID, instrument build or v03-export bridge.
+
+PP =SEC 4 - Crop Roster!A1= includes tree/root crops and vegetables. Its Q21
+(=AM2/AM3=) asks expected harvest for the "main rainy season" with a unit
+selector; Q22--24 (=AO2:AQ3=) ask intended sale, share/amount and expected
+Birr sales. They are expectation questions, not evidence of realised harvest
+or a numerical conversion rule. They do not resolve the old PH section-9
+shortfall, section-12 Q3, crop-cut eligibility or window/allocation questions.
+
+The HH =Cover!A3= identifies2021/22, while
+=Sect12C Basic Ag (Crop)!A5= literally says "2014 Meher season" and asks for
+a repeated field entry when a plot has multiple crops (=C5= identifies crop).
+The calendar/export relationship is not selected here. HH section12C is not
+silently equated to the agriculture PH section12. No explicit decimal/cents
+instruction was found in the bounded HH/PP currency-text inspection; that
+negative is not authority for /100, whole-Birr rounding or blank-as-zero.
+
+The authentic PH78628 bytes match their holding receipt, but the existing
+BIFF reader failed before worksheet content was available. Its section9/12
+and currency wording remain unread by this check; no absence is inferred.
+The earlier W1 PH/manual window and BIRR-Decimal tensions remain unchanged.
+No data/default/units/IDs/weights, released-column mapping or scientific
+eligibility decision follows. Both whole issues remain open.
+
+Sources: HH SHA256=a026d77fc204d9870c90122ec7958bbd77562330b4b5e43fd228b8a07d588c96=;
+PP SHA256=53be32284341cacf45266adf63d45c5b8534e3c9b12e4cd0f58c664b04154409=;
+PH SHA256=507a37b781aee277baf3d476f1e1249d8836978dc41350380c44754a3bc10e16=.
+Exact filenames/resource URLs remain in =2021-22/Documentation/SOURCE.org=.
+Evidence: =B/reports/1570-w5-questionnaire-cell-authority-20261110/=;
+B is the burst root recorded in =.coder/ledger/1570-w5-questionnaire-authority.md=.
+No macro/formula execution, external-link fetch, dependency install, native
+header/rows, Country/Feature, API/producer/cache or test/census run occurred.
+
+* 2026-11-10 -- Own W5 PH harvest/disposition wording (GH #1570, documentary)
+
+The preceding PH-reader gap is now closed for the same authenticated resource
+78628 bytes, using a separately authorized private read-only engine. The old
+xlrd failure and partial HH/PP inspection remain dated evidence, not deleted.
+This W5 PH workbook has seven worksheets, including sections9/10/11 and no
+section12-named worksheet. That is not absence of perennial-harvest questions.
+
+=SEC 9- Harvest by field!A1= says "INCLUDE TREE/ROOT CROPS". =C4= copies
+all post-planting crops/fields. Parcel/field IDs are =A4/B4=; Q5 (=H4/H8:I8=)
+asks harvested quantity with its unit, while Q6 (=J4/J8=) separately requests
+estimated kilograms when Q5 uses a nonstandard unit. =G7= specifies permanent
+crop harvest between March10,2021 and March9,2022. These printed rungs do not
+identify a released variable or authorize a conversion/attachment rule.
+
+=SEC 11 - Crop Disposition!A1= prints September11,2021--March9,2022 for
+temporary crops and March10,2021--March9,2022 for permanent crops. Q2 (=C3=)
+asks the last completed tree/fruit/root production period with the printed
+annual interval when no particular period exists; =C6/E6= mark "EC YEAR".
+Q3 (=G3/G6:H6=) asks total harvested amount over the last twelve months,
+with quantity/unit boxes. Keep that wording and the header windows together;
+no uniform crop-window interpretation or reconciliation is selected here.
+
+W5 section11 Q11 (=Q3/Q6:R6=) separately asks sold quantity/unit, and Q12
+(=S3/S6=) total sales value including in-kind payments, with one Birr box.
+Thus W5 Q3 is a harvest question; it must not be substituted for W1 section11
+Q3's sold role or W1 section12 Q3 merely by matching a question number.
+No decimal/cents scale or missing-component instruction was found in the
+inspected PH currency text. W1 released BIRR-Decimal representation and
+blank-component questions remain unresolved; single Birr boxes do not fix them.
+
+PH =Cover Sheet!X9/AB9= again separates household/holder; its HH roster
+=F4= asks for a separate agriculture questionnaire per holder. W5 HH
+=Sect12C Basic Ag (Crop)!A1= is for all urban EAs and rural EAs outside the
+main agriculture survey, not the PH perennial module. The preceding literal
+2014-Meher/2021/22 observation is NOT a contradiction or calendar-policy hold:
+nearby HH/PP date headers do not specify the calendar, and PH explicitly uses
+EC-year fields. No automatic year correction or new maintainer decision follows.
+
+Source: same PH SHA256=507a37b781aee277baf3d476f1e1249d8836978dc41350380c44754a3bc10e16=.
+Exact sheet/cell excerpts and engine/source receipts are in
+=B/reports/1570-w5-ph-calamine-capability-20261110/= (B as in the task ledger).
+This is public-instrument authority only: no fielded CAPI/GUID/v03-export
+bridge, actual released-row/column compliance, W1 coverage explanation,
+scientific/default/weight change or whole GH1570/GH650 closure is established.
+No native source/header/rows, API/producer/cache, test or census ran.
+
+* 2026-11-10 -- Remaining W5 public documentation held (GH #650)
+
+Community questionnaire78629, manual78631, report78643 and the catalog-generated
+DDI PDF are now managed holdings under =2021-22/Documentation/=. Exact names,
+URLs, bytes and MD5s are appended to =Documentation/SOURCE.org=; the generated
+DDI has no resource ID. All four passed fresh read-only retrievals. Earlier
+HH/PP/PH forms and BID were not reacquired; raw release provenance and licence
+are unchanged. Tax report98963 is outside this finite holding.
+
+No new document text/cells were parsed, so no manual/report content, fielded
+CAPI/export bridge, harvest-window/currency/unit/holder rule or whole GH650
+closure is claimed. Earlier dated residual statements remain historical.
+Evidence: =B/reports/650-ethiopia-w5-remaining-public-documents-20261110/=
+(B as in the task ledger); only public document transport/holding was verified.
+
+* 2026-11-10 -- Own W5 manual: instructions and instrument tensions (GH #1570)
+
+Newly read WB6161 manual78631 identifies ESS Wave5, Household/Agriculture/
+Community Questionnaires, Ethiopian Statistical Services & World Bank,
+March2022 (PDF p1, printed0). Exact2388652-byte PDF: MD5
+=8b6ffdd80355e075e90bc472d6ebe17a=; SHA256
+=872525aafb67b59fa4d1b117646f1c91e2b41ad254c89c6c2732f7d6e5ec6ff8=.
+Its PDF creation/modification metadata says April29,2023, and title names
+=ESS_Manual_Wave 5_Final.doc=; neither supplies a fielded/export revision.
+Only18 unique text pages and4 selected rasters were inspected, not the whole
+manual. Earlier three questionnaire and W5 wiring checks were not replayed.
+
+PDF p16 (printed15, general coding3.16) says "Record monetary amounts in
+birrs with no decimal point" and to round cents to the nearest birr; the
+example continues as a food-spending box on p17. This is new own W5 coding
+authority, not authority for W1's released BIRR Decimal scale, blank
+components, /100, or rounding released data. PH section11 Q12 on PDF p102
+(printed101) separately says to include in-kind sales and record value in Birr.
+The inspected parcel-rent instructions (pp71--72, printed70--71) explicitly
+distinguish zeros from blanks for those particular payment questions; that
+does not establish a universal component-blank rule.
+
+Retain this real conflict: manual PDF p99 (printed98), section9 Note1,
+says "Exclude TREE & ROOT CROPS", while the own W5 PH worksheet
+=SEC 9- Harvest by field!A1= says "INCLUDE TREE/ROOT CROPS". The manual
+also says to transfer PP parcel/field/crop coordinates without renumbering.
+Its Q5 permits quantity in any listed unit and Q6 asks kilograms using a
+local conversion; the form's =J4= explicitly conditions estimatedKG on a
+nonstandard Q5 unit. Neither difference authorizes an eligibility or conversion
+change. The delivered source check already binds native harvest to
+=s9q05a/b=; the actual released estimatedKG field remains unidentified.
+
+Manual PDF p98 (printed97) lists section12 "Crop Disposition: Permanent
+and Root Crops", although the held PH book has no section12-named worksheet.
+The manual ToC lists section11 but no section12 heading; consecutive pp101--103 describe
+section11 then the network roster. Under "TEMPORARY CROP DISPOSITION",
+p101 (printed100) Q1 nevertheless includes permanent harvest March10,2021--
+March9,2022; Q2 asks the last completed tree/fruit/root production period in
+Ethiopian Calendar, with a last12months fallback; Q3 asks last12months harvest.
+This supports the separate harvest/sale roles without resolving the section9
+exclusion or all crop-window wording. The form's additional temporary-crop
+September11,2021--March9,2022 header remains distinct. No new W5
+expected-if-incomplete instruction was established by these inspected pages;
+the earlier W1 manual/form expected-Meher/completed-season tension stands.
+
+PDF pp68/70/72/79--80 (printed67/69/71/78--79) separately identify household
+and roster-derived holder, retain W4 parcel IDs including disposed/rented-out
+parcels, serially number fields within a parcel, and repeat parcel/field for
+multiple crop IDs. These are instrument instructions, not proof of the
+released holder_id encoding or cross-household uniqueness. Current documented
+bindings remain household_id -> i, holder/parcel/field -> plot_id and crop_id
+-> production_obs. Manual p101 Q3 corresponds to the separately retained
+=s11q03a1/a2= harvest operands, not sold quantity; p102 Q11/Q12 correspond
+to the already-declared =s11q11a/b= and =s11q12= sale roles.
+
+Evidence: own ledger =.coder/ledger/1570-w5-manual-78631-b1b4e8e3.md=;
+its dispatch evidence contains exact page texts,4 visually checked PNGs and
+instruction/question/current-binding matrix. All4937 original lines and
+executable/config objects are retained. No native/header/row/API/producer/
+cache, new retrieval, arithmetic/default/weight/allocation change or whole
+GH1570/GH650 closure follows. Fielded CAPI/GUID/export correspondence and W1
+coverage/section12/component questions remain open.
+
+* 2026-11-10 -- Sold-source correspondence after #1257/#1274 (GH #824)
+
+A source-only audit at =c8e378920= traces the five current drivers and eight
+sale routes. The fields below feed sold amounts; section9 harvest operands
+and section11 Q3 harvest in W4/W5 remain separate. No producer changed.
+
+| wave | module | sold flag | sold quantity | sold unit input | sold value |
+|------+--------+-----------+---------------+-----------------+------------|
+| W1 | 11 | ph_s11q01 | ph_s11q03_a | implicit Kg | ph_s11q04_a |
+| W1 | 12 | ph_s12q06 | ph_s12q07 | implicit Kg | ph_s12q08 |
+| W2 | 11 | ph_s11q01 | ph_s11q03_a | implicit Kg | ph_s11q04 |
+| W2 | 12 | ph_s12q06 | ph_s12q07 | implicit Kg | ph_s12q08 |
+| W3 | 11 | ph_s11q01 | ph_s11q03_a | ph_s11q03_b | ph_s11q04 |
+| W3 | 12 | ph_s12q06 | ph_s12q07 | ph_s12q0b | ph_s12q08 |
+| W4 | 11 | s11q07 | s11q11a | s11q11b | s11q12 |
+| W5 | 11 | s11q07 | s11q11a | s11q11b | s11q12 |
+
+Own closed W1 metadata and W2 section11 header cards support their listed
+roles. W2/W3 section12 and W3/W4 section11 retain the historical own-wave
+label/form correspondence recorded above; this audit supplies no separate
+new export cards. Own W5 PH Q11/Q12 wording supports the sale roles, while
+its released-header/fielded-export correspondence remains qualified. Actual
+W5 sale crop code is =s11q01b=; the driver's prose says =s11q01=. That is a
+prose discrepancy, not evidence of a wrong executable binding.
+
+The closed =1570-crop-cf-wave2-metadata-20261109= report adds a narrower
+fact to the component-authority note above: all 30 ordered typed code/label
+pairs of section9 =ph_s9q04_b_cf= exactly equal =Crop_CF_Wave2.unit_cd=.
+Its label explicitly says "Conversion factor unit code (for merging with
+Crop_CF_Wave2)". It is outside the sold projection. The factor table's
+=mean_cf_nat= and regional =mean_cf*= fields are separate, unlabelled
+numeric columns. This literal codebook match establishes neither observed
+row-code coverage nor numeric factor direction, sale applicability or a
+national/regional choice. No factor mean or survey row was read here.
+
+W1/W2 section11 =ph_s11q03_b= remains the unread GRAMS component; W1
+=ph_s11q04_b= remains BIRR Decimal. No denominator, partial-blank completion
+or arithmetic change follows. =i= still comes from the household field
+(=household_id2= W2/W3); holder/parcel/field still describe plot identity.
+Holder/crop attachment alone does not prove released holder global uniqueness.
+Matched-unit section9 quantities and Farm-level sales with separate
+=Unit_sold= retain the existing rules. No concrete executable wrong-column
+repair is established by this packet. Exact authority tiers, missing export
+cards/component/factor operands and the residual proposal are in
+=.coder/ledger/824-ethiopia-sold-source-audit.md= and its private evidence.
+No native/header/document reparse, test/API/cache/provider or numeric run.

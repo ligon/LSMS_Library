@@ -16,6 +16,8 @@ Sources (flat Data/):
     in its own columns (GH #1190).
 
 i = format_id(y2_hhid), aligning with plot_features / crop_production.
+H quantity components also have acquisition-only Farm-level rows (GH #1190);
+planted Quantity/Applied and all legacy attached fields remain NA on those rows.
 See lsms_library/countries/Malawi/_/malawi.py.
 """
 import sys
@@ -27,16 +29,19 @@ import numpy as np
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
                     _seed_block, _seed_purchase_block, _seed_gift_block,
-                    assemble_plot_inputs, _seed_source_reference)
+                    assemble_plot_inputs, _seed_source_reference,
+                    _seed_acquisition_block, _append_seed_acquisitions)
 
 
 WAVE = '2013-14'
 G_SOURCE = '../Data/AG_MOD_G_13.dta'
+H_SOURCE = '../Data/AG_MOD_H_13.dta'
 
 d = get_dataframe('../Data/AG_MOD_D_13.dta', convert_categoricals=False)
 g = get_dataframe(G_SOURCE, convert_categoricals=False)
-h = get_dataframe('../Data/AG_MOD_H_13.dta', convert_categoricals=False)
+h = get_dataframe(H_SOURCE, convert_categoricals=False)
 g_rows = np.arange(len(g))
+h_rows = np.arange(len(h))
 
 d['hhid'] = d['y2_hhid'].apply(format_id)
 d['plotkey'] = d['ag_d00'].apply(format_id)
@@ -80,6 +85,10 @@ seed_gift = [_seed_gift_block(h, hhid='hhid', cropcode='ag_h0c',
                               source_half='single')]
 
 df = assemble_plot_inputs(WAVE, pieces, seed_purchase, seed_gift)
+# H components are household acquisitions, appended after legacy G/D assembly.
+df = _append_seed_acquisitions(df, [_seed_acquisition_block(
+    h, t=WAVE, source_half='single', row_positions=h_rows,
+    source_ref=_seed_source_reference(H_SOURCE, script_path=__file__))])
 
 assert df.index.is_unique, f"Non-unique source-observation grain in plot_inputs {WAVE}"
 assert len(df) > 0, f"plot_inputs {WAVE} produced no rows"

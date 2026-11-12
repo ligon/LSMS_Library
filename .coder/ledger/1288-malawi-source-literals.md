@@ -1,0 +1,111 @@
+# GH1288 — Malawi2010–11 finite source-literal closure
+
+## §1 Scope and authority
+Root authorizes ONLY nine proved BASE+filename getter substitutions across five
+2010–11 scripts, identical resolved source paths. New isolated branch from
+fb04f101dddc12ce975a41bc83f759e11a336e8c. This is a source-closure repair,
+not whole-GH1288 resolution. No source acquisition, raw reads or producer/API
+builds. Independent review follows. Original shortlist remains immutable at
+B/reports/1288-five-country-source-literal-shortlist-20261109, where B is
+/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103.
+
+## §2 Existing machinery / search tier
+Reuse git+rg+AST floor; STANDING §§2–4, 1288-zero-exit-freshness-repair.md and
+1237-malawi-make-prereqs.md. local_tools.scan_script_data_refs yields existing
+string literals, not evaluated expressions. Country._make_declared_inputs
+resolves them beside scripts and _make_build_root copies discovered available
+L1 blobs privately. Wave._input_hash resolves refs under wave/Data. Reuse these
+actual functions for metadata-only tests, not a new evaluator or path resolver.
+Niger GH1288 source-literal fix78ead26b is tested prior art (three focused
+controls); its actual backend MI-level-dictionary residual is separate.
+
+## §3 Country definitions and grounding
+Personal full5431-line Malawi CONTENTS prefix was authenticated byte-exact,
+SHA bfc5f1ab993dca73f5b9f1108b794ab91303814fe7fe5f8f90fcd6301752510a.
+Read all67 later lines: current5498 lines, SHA
+c7d16df45b55cb59bfc4ceed1674475bbbc88cd54ebcf9910f62c11c4527e208.
+This carries the earlier full TODO/WAITING/log reading. Quirk: ModuleR preserves
+reported household/species rows rather than the WB plot-cultivator binary;
+CONTENTS says the binary is only approximately roster.groupby(t,i).size()>0.
+The live H note contrasts ag_h07a OTHER SPECIFY / ag_h38a OTHER UNIT headers
+with current quantity interpretations. Those conflicts remain held; this patch
+resolves no quantities, attachment, eligibility, unit, season or weight policy.
+
+## §4 Invariants
+Five active registered materialize:make tables and explicit2010–11 Make rules:
+livestock, crop_production, plot_inputs, plot_labor, people_last7days. Their
+2010–11 YAML has no same-table raw blocks. Change nine getter path expressions
+only, preserving keyword arguments, call ordering and every other AST node.
+Leave discoverable G_SOURCE unchanged. BASE remains, including plot_labor's
+provenance expression; resolved source-reference identity must not change.
+No script helper, output, scientific processing, ID, gate, quantity/cost or
+registry/schema/default changes. All other modes/types/Git blobs exact base.
+
+## §5 Verification / reuse decisions
+Draft ten parameterized pure tests: five actual scanner/committed-sidecar and
+five actual _make_declared_inputs private-preparation metadata controls. Use
+metadata-only receiver, no Country constructor/native reader or producer.
+Record unchanged non-getter processing by AST inverse of exactly nine old
+expressions and byte replacement proof. Measure final candidate once with the
+existing closed census operator; admit closed6e baseline through actual
+excluded-document-only9514→fb04 object identity, no baseline replay. Compare
+complete maps and all nonhash metadata. Private config/data/nonsymlinkL1,
+false credentials, unshare-rn, mounted MAIN/import realpath, BLAS/build1,
+pytest2/loadfile. No expensive dataset/cold/warm/source campaign.
+
+## §6 Limits / next gates
+No scientific ruling needed for identical path spelling. Private preparation
+still sees plot_labor's old bare literal in its unchanged provenance argument;
+this is not the missing actual-source omission and will be reported explicitly.
+Country/wave/cache fingerprint impacts are unmeasured at this checkpoint.
+Focused tests, final metadata comparison and independent review remain pending.
+
+### Source and focused-control closure
+
+Ledger-first789552459 preceded code/test699b581de. Exactly nine getter path
+arguments changed. External PROCESSING-PROOF.json inverses those arguments and
+recovers every original script byte/AST; BASE, G_SOURCE and labor provenance
+remain exact. All eight distinct native source sidecars are untouched.
+
+First actual cohort: ten collected, five scanner PASS / five preparation FAIL.
+The new metadata oracle omitted the existing country compiler f-string suffix
+/_/<table>.parquet. That scanner artifact was unchanged and is separate from
+the actual raw-source omission. Test-onlyd393d3639 adds its precise missing
+marker, preserving full expected source sets and existing labor marker. No
+production/scanner fix was made. Only the five affected preparation controls
+were rerun: five PASS, zero failures/skips. Ten distinct controls are covered
+across the two runs; no final-head all-ten run is claimed. The unchanged five
+scanner test ASTs/product bytes carry from the first run. Three identities per
+run verify own package/config/MAIN; both private data/config file counts zero.
+Initial pytest cache-directory warnings are retained; the affected run uses an
+explicit private cache directory. Original failed log/JUnit remain immutable.
+
+This docs-only checkpoint records the country caveat before one final existing
+metadata census. Its measured impact and final independent review remain
+pending; no current Country/Feature data/producer, raw reader or cache warm ran.
+
+### Final metadata cost and scope (measured, no data build)
+
+The one candidate-only existing census onfd86ab23618c731ec185c672d249e5e6e250281c
+closed0 in122.480s. Operator source is byte-exact to the accepted Niger literal
+metadata operator. Closed baseline retains header6e1b26d4; actual object proof
+admits9514/fb04 through only excluded CONTENTS/ledger/AGENTS/skill prose, without
+a baseline replay. All450 country /1895 wave /35 BTF /186 FIF keys compared.
+Changes:22 country hashes, ALL Malawi;22 wave hashes, ALL Malawi2010–11;
+0 BTF and0 FIF. No keys added/removed. All nonhash fields match exactly,
+including public/registration/physical waves, overrides, closure paths,
+18 None wave cells, and zero errors/denials. Data/config files remain zero.
+The existing wave hash includes all wave module bytes, explaining the22-table
+wave footprint rather than only the five repaired tables. No hash exclusions
+were introduced to hide this measured cost.
+
+Final evidence is under
+/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1288-malawi-source-literals-20261109/.
+PROCESSING-PROOF.json, SOURCE-CONSERVATION.json, both focused logs/JUnits,
+identity/receipt files and metadata/COMPLETE-COMPARISON.json retain actual
+source/test/history limits. The original shortlist and first failed fixture
+run are immutable. The only later commit is this ledger closure; every product,
+configuration, mapping and test object remains exact the measured candidate.
+Independent review and Root-owned release/CI remain pending. No actual source,
+producer, default/Make cold/warm/backend parity, public API, shared cache warm
+or whole-GH1288 resolution is claimed.

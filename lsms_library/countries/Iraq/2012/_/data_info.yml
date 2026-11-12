@@ -97,7 +97,7 @@ shocks:
     # Shocks-and-coping roster, module 2012ihses20. LONG form: 23 shock
     # categories (shock_id, English-labeled) x ~25k households as a full
     # cross-product. q2001 ("Has hh experienced..?") flags the few that
-    # actually occurred; the `shocks` df_edit hook in _/mapping.py keeps
+    # actually occurred; the `shocks` df_edit hook in _/2012.py keeps
     # only q2001=='yes' rows (8812) and drops the temporary Experienced
     # column, yielding a true experienced-shock roster.
     #   i=questid (matches sample/housing/assets; the roster/file `hh`
@@ -106,8 +106,7 @@ shocks:
     #   Impact (q2002_1/2/3/5 "Did increase/decrease income/assets/food
     #     production/food purchases?"): DECREASE|INCREASE -> True (the shock
     #     moved the dimension), DID NOT CHANGE -> False. q2002_4 (food
-    #     stock) is dropped -- the canonical schema has no Affected* slot
-    #     for it.
+    #     stock) is served separately as AffectedFoodStock.
     #   Coping (q2003_1/2/3 "Response to shock"): -> HowCoped0/1/2 (text).
     file:
         - "../Data/2012ihses20_shocks.dta"
@@ -142,6 +141,12 @@ shocks:
                 DID NOT CHANGE: False
         AffectedConsumption:
             - q2002_5
+            - mapping:
+                DECREASE: True
+                INCREASE: True
+                DID NOT CHANGE: False
+        AffectedFoodStock:
+            - q2002_4
             - mapping:
                 DECREASE: True
                 INCREASE: True

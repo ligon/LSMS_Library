@@ -22,7 +22,8 @@ Ethiopia::crop_production::sect12-sale-period:
     both blank is a sale of 0, as section 11 reads it.  Attached only where
     the (holder, crop) is on ONE section-12 line, is not in section 11
     (section 11 wins and the two are never summed) and is on exactly one
-    section-9 line (the SALES GRAIN CAVEAT);
+    section-9 line (the SALES GRAIN CAVEAT; since GH #1457 a sale on none or
+    several has its own plot_id = 'Farm-level' row, which carries this key too);
     Quantity_sold only where Q7's unit (KG in W1/W2 by the instrument;
     ph_s12q0b in W3) equals the row's harvest u.  What is derived is the
     WINDOW, not the number: section 12 asks about the crop COLLECTED in the
@@ -189,3 +190,94 @@ Ethiopia::crop_production::permanent-crop-12-month-window:
     = 1 (GH #1256 test file; counts in Ethiopia/_/CONTENTS.org).
   contents: 'Ethiopia/_/CONTENTS.org, "W4/W5 permanent crops: a 12-month window (GH #1256)"'
   since: '2026-10-23'
+
+# GH #1457 (bulk ruling 2026-11-04, extending #843 option (d)).
+Ethiopia::crop_production::hh-crop-sale-single-row:
+  waves: ['2011-12', '2013-14', '2015-16', '2018-19', '2021-22']
+  columns: [Quantity_sold, Value_sold, Unit_sold]
+  rule: >-
+    Section 11 records a sale per holder and crop, with no plot.  A sale is a line with a
+    positive quantity or value.  Where the (holder, crop) is on exactly one SERVED section-9
+    line (a line with no unit and no quantity does not count where another does, because
+    the empty-row filter removes it) its sale is served on that row, as recorded, and the row carries this key: Value_sold
+    always, Quantity_sold only where the sale's unit is the row's u.  What is derived is the
+    ATTACHMENT, not the numbers.  Any other sale is served on ONE row with plot_id =
+    'Farm-level', u = 'Unknown', production_obs = 'reported:s11:<holder>:<crop code>', no
+    Quantity, and no key for the attachment, because its index discloses it.  It carries its
+    own Unit_sold.  No sale is split or dropped.  Section 12's sales go the same way under
+    sect12-sale-period.  Shares a row with permanent-crop-12-month-window through
+    derivations.MULTI_SEP, in sorted order; a Farm-level row takes that key where every
+    section-4 line of the (holder, crop) says permanent.
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_hh_crop_sale_single_row
+  raw_variables: [holder_id, crop_code, s11q01, s11q01b, ph_s11q01, s11q07, ph_s11q03_a, ph_s11q03_b,
+                  s11q11a, s11q11b, ph_s11q04, ph_s11q04_a, s11q12]
+  assumptions:
+    - text: >-
+        section 11 asks the sale once per holder and crop, with no parcel or field.  Where
+        the holder has one section-9 line of the crop, no other row can hold it.  The sale is not
+        thereby a share of that line's Quantity.
+      basis: variable-label
+      evidence: >-
+        sect11_ph_w{1..5}.dta carry holder_id and a crop code, and no parcel_id or field_id.
+        harvestedcrop_id in W4/W5 is a per-holder ordinal: it does not join section 9's crop_id
+        to a line (Ethiopia/_/CONTENTS.org, "2026-11-04 -- sales no §9 line holds").
+    - text: >-
+        a sale of a crop on two or more section-9 lines is not allocated among them, since any
+        split would be invented.  That includes two lines of one crop on ONE plot, whose plot is
+        knowable and lost here (W4 1 sale, 600 Birr; W5 7, 31,870 Birr).  A row with no stated
+        harvest but with a unit still counts as a line: Nigeria's further ruling A is not extended.
+      basis: modelling-choice
+      evidence: rulings @ligon 2026-11-03 and 2026-11-04, GH #843 option (d), GH #1457.
+  validated_against: >-
+    tests/test_gh1457_ethiopia_multi_plot_sales.py, whose oracle reads sections 11 and 12
+    directly.  Cold builds: value served equals the raw sum in all five waves, less section 12's
+    repeated and section-11-colliding lines (W2 228,836; W3 20,819 Birr) and one W2 section-11
+    line with no crop code (180 Birr), which stay unserved.  Not validated against an external
+    total: no document here reports one.
+  contents: 'Ethiopia/_/CONTENTS.org, "2026-11-04 -- sales no §9 line holds: Farm-level (GH #1457)"'
+  since: '2026-11-04'
+
+Ethiopia::crop_production::hh-crop-sale-records-summed:
+  waves: ['2013-14', '2021-22']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    Two or more section-11 lines of one (holder, crop), all with a sold quantity in one unit: the
+    row's Quantity_sold and Value_sold are their sums.  W5 lists a crop twice under two
+    harvestedcrop_id on 84 pairs (1 pair in W2), and the values differ on 80.  The build always
+    summed the value; this names it.
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_hh_crop_sale_records_summed
+  raw_variables: [holder_id, s11q01b, s11q07, s11q11a, s11q11b, s11q12, crop_code, ph_s11q01,
+                  ph_s11q03_a, ph_s11q04]
+  assumptions:
+    - text: >-
+        the lines are separate sales of one crop, not one sale listed twice.  Exact repeats
+        on quantity, unit and value are 5 of W5's 213 lines; they are not separated out.
+      basis: modelling-choice
+      evidence: GH #1461 (the sum predates this key); Nigeria's hh-crop-sale-records-summed.
+  validated_against: tests/test_gh1457_ethiopia_multi_plot_sales.py.
+  contents: 'Ethiopia/_/CONTENTS.org, "2026-11-04 -- sales no §9 line holds: Farm-level (GH #1457)"'
+  since: '2026-11-04'
+
+Ethiopia::crop_production::hh-crop-sale-two-units:
+  waves: ['2021-22']
+  columns: [Value_sold, Quantity_sold, Unit_sold]
+  rule: >-
+    Two or more section-11 lines of one (holder, crop) sold in two units: on a Farm-level row
+    Value_sold is their sum, since Birr add, and Quantity_sold and Unit_sold are NA, since no
+    sum across units is served (Nigeria's ruling B on GH #843).  On a section-9 row, as before,
+    Quantity_sold is the sum in the harvest's own unit.  The lines come back through
+    derivation_inputs.
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_hh_crop_sale_two_units
+  raw_variables: [holder_id, s11q01b, s11q07, s11q11a, s11q11b, s11q12]
+  assumptions:
+    - text: >-
+        one index key holds one row and the canonical Unit_sold note rejects a sold-unit level,
+        so two units cannot both be served.
+      basis: modelling-choice
+      evidence: ruling @ligon 2026-11-04 on GH #843, choice B.
+  validated_against: tests/test_gh1457_ethiopia_multi_plot_sales.py.
+  contents: 'Ethiopia/_/CONTENTS.org, "2026-11-04 -- sales no §9 line holds: Farm-level (GH #1457)"'
+  since: '2026-11-04'

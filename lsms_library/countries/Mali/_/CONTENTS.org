@@ -2610,6 +2610,8 @@ files and imports nothing from this directory.
 * 2026-11-04 -- the NPK slot, the EHCVM input files, and strata by wave (GH #1445, #812)
 
 Read-only measurement: nothing is wired and no served value moved.
+/The EHCVM strata were wired the same day: see "EHCVM strata are region x milieu labels"
+at the end of this file./
 
 *NPK.*  The served slot is bare: =s2cq25e= "Quantité de NPK appliquée sur la
 parcelle" (2014-15), =s7dq26c1= "Qté de NPK utilisée-Qté" (2017-18).  Grades appear
@@ -2704,11 +2706,11 @@ shared unit equals the harvest exactly on 91.1%, within 10% on 92.2%, median rat
 s16c row, 270 on several), 1,194 span units and cannot be summed without a factor, 199 record no
 disposition and 3 have no =s16d= row.  Not derived here: GH #1437 is waiting on a ruling.
 
-* 2026-11-04 -- EAC-I household ids carry =EACI_=, and =sampling.yml= declares the boundaries (GH #1494)
+* 2026-11-04 -- EAC-I household ids carry =EACI14_= and =EACI17_=, and =sampling.yml= declares the boundaries (GH #1494)
 
-Ruling @ligon 2026-11-04, on Burkina Faso's =EMC_= precedent (GH #1244).  =mali.eaci_i= is
-='EACI_' + i(value)=: the two EAC-I =mapping.py= override =i= for every YAML table, and their
-eleven wave scripts and =_tree_roster_inputs= use it directly.  =pid= is not prefixed: it is a key
+Ruling @ligon 2026-11-04, on Burkina Faso's =EMC_= precedent (GH #1244).  =mali.eaci14_i= and =mali.eaci17_i= are
+='EACI14_' + i(value)= and ='EACI17_' + i(value)=: the two EAC-I =mapping.py= override =i= for every YAML table, and their
+eleven wave scripts and =_tree_roster_inputs= use them directly.  =pid= is not prefixed: it is a key
 only inside =(t, i)=.  The EHCVM ids stay bare, as the panel lineage in =panel_ids= / =updated_ids=,
 and neither JSON moves (the EAC-I maps were already empty; the regenerated file is byte-identical).
 
@@ -2734,16 +2736,18 @@ the test does find a real panel.
 | *2014-15 / 2017-18*                      | 3,559 |      0.214 |   0.219 |        0.109 |   0.106 |
 | *2018-19 / 2021-22, =PanelHH= =Non=*     | 1,111 |      0.151 |   0.157 |        0.069 |   0.074 |
 
-*The last two rows are NOT fixed here, and are the same class of false link.*
+*The last two rows are the same class of false link.*  The 2014-15 / 2017-18 row is fixed by a prefix per wave; the =PanelHH= =Non=
+row is not, and is an open ruling.  Measured for the per-wave prefix, cold, =111b64ed7= against =a035b61e3=: 2014-15 / 2017-18 shared ids
+3,560 -> 0, and with the prefixes stripped all 23 frame tables are equal, row order and dtypes included.  =panel_ids.py= regenerates
+both JSON files byte-identical.
 
-- *2014-15 / 2017-18: 3,560 ids survive the prefix*, because both waves carry the same one.  They
+- *2014-15 / 2017-18: one prefix per wave, so these 3,560 ids go to 0 too* (ruling @ligon 2026-11-05, =EACI14_= and =EACI17_=).  They
   visit the same EAs (identical coordinates on all 920 recurring grappes), with households selected
   afresh and no pointer between the files.  *All 3,560 fall on 2017-18 Lourd households and none on
   Leger*: in rural EAs 2014-15's =menage= is 3, 6 or 9, and so is 2017-18's =exploitation= on the Lourd
   form (Leger is 1, 2, 4, 5, 7, 8), so the numbering itself makes them recur.  Roster size correlates
   at 0.18 on those ids, against 0.69 on the real panel; the score is 0.233 / 0.232 rural and 0.181 /
-  0.192 urban (review).  Whether to separate them is a decision the ruling did not take; a shared
-  =EACI_= is what was ruled, and the digits alone decide nothing.
+  0.192 urban (review).
 - *2018-19 / 2021-22: 1,111 of the 1,120 =PanelHH= =Non= households* spell the id of a 2018-19
   household they are not.  =panel_ids= and =updated_ids= do not link them, but =i= is the same string.
 
@@ -2784,13 +2788,12 @@ codes serve 84 labels.
 | household (j, u) cells with a community price, of 433 / 910 / 910 |     34 |    33 |    216 |
 | household rows in those cells, of 162,032                  | 28,167 | 25,392 | 68,830 |
 
-*216 of 910 is not the limit of the join.*  The remaining gap is on =j=, and only part of it is a different product list.  21
-of the 57 priced products share a source code with the household and carry a different =j=, because every =s07bq01= label of
-this wave carries seven leading spaces and so never reaches =harmonize_food=: those products pair at 98.4% on raw codes, and hold
-42,753 of the 117,453 code-level hits.  41,556 consumption rows are on products the form does not list.  That is a defect of its
-own, predating this change, and fixing it moves household labels, which this ruling excluded: GH #1513.  It would take the join to
-294 of 835 cells and 103,747 rows if the label is stripped before mapping, or 342 of 910 and 109,838 if community =j= is bridged by
-product code.
+*216 of 910 was not the limit of the join.*  The remaining gap was on =j=, and only part of it is a different product list.  21
+of the 57 priced products share a source code with the household and carried a different =j=, because every =s07bq01= label of
+this wave carries seven leading spaces and so never reached =harmonize_food=: those products pair at 98.4% on raw codes, and hold
+42,753 of the 117,453 code-level hits.  41,556 consumption rows are on products the form does not list.  That was a defect of its
+own, predating this change, and fixing it moved household labels, which this ruling excluded.  GH #1513 has since fixed it: 294 of
+835 cells, 103,360 rows; see the last section of this file.
 
 The joins pair the same units.  On the served label, 167 cells with a household unit value: median ratio 1.00, 94.6% in [0.5, 2],
 and Grand against Petit as a placebo gives 2.55 and 0.38.  Same-cluster, 41,963 household rows find a (v, j, u) price.  A price on
@@ -3035,7 +3038,7 @@ with EAC-I =plot_features=; the cost then is one Mali re-warm.
 
 * 2026-11-04 -- what these four changes moved, cold (GH #1494, #1453, #1437, #1179)
 
-Cold builds in private roots, every declared table, =115b6ab71= against =0f382b5f4=.  With =EACI_= stripped from =i=,
+Cold builds in private roots, every declared table, =115b6ab71= against =0f382b5f4=.  With the EAC-I prefix stripped from =i=,
 *21 of the 23 frame tables are equal, row order and dtypes included*: all but =community_prices= and =crop_production=.
 =panel_ids= has 5,011 entries and =updated_ids= four waves, equal on both sides.  At the #1494 commit alone all 23 are
 equal.  Those two commits predate #1476 on =development=; the merge differs from them only in =plot_id= on the 627 tree rows.  EAC-I rows prefixed: =sample= 12,194, =household_roster= 131,246, =food_acquired= 122,085.
@@ -3121,6 +3124,47 @@ PRIX A LA CONSOMMATION".  Mali's own community questionnaire is on neither WB 62
 IHSN 12257.  UEMOA's =MLI-EHCVM-V2.0= lists =Fichiers_Communautaire.rar=, which could
 not be read without its licence.
 
+* 2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)
+
+@ligon's ruling, option W2.  =sample.strata= in the EHCVM waves is ='<Region> Urbain|Rural'=,
+built from the cover's =s00q01= and =s00q04= labels by =ehcvm.derive_region_milieu_stratum=.
+No household file records a stratum, so it is a construction, registered as
+=Mali::sample::region-milieu-stratum= and stamped on every row it produced.  The new
+=strata= table in =_/categorical_mapping.org= is the =Region= table crossed with the
+two milieu labels, so the region part of =strata= is =cluster_features.Region=.
+
+| wave    | clusters | households | =strata=                            |
+|---------+----------+------------+-------------------------------------|
+| 2014-15 |      989 |      3,804 | empty, by the ruling                |
+| 2017-18 |      953 |      8,390 | =strate=, 47 codes, unchanged       |
+| 2018-19 |      551 |      6,602 | 20 region x milieu labels (was empty) |
+| 2021-22 |      513 |      6,143 | 17 region x milieu labels (was empty) |
+
+So =strata= holds three things across this country's waves, and they are not comparable:
+nothing, EAC-I's design codes and EHCVM's labels.  Site B now warns for 2014-15 alone.
+
+BID Table 1 (p.10) equals 2021-22 in all 17 cells; =tests/test_gh812_ehcvm_strata.py=
+transcribes it.  That checks this reading of the cover and does not corroborate that the cells are
+strata: Tables 1 and 2 are titled "initial sample" but total to the delivered file (513 clusters,
+6,143 households), so they tabulate the same two variables.  The BID's sentence is what names the
+stratum.  No held table states 2018-19's 20 cells.
+
+*Why 20 then 17.*  The 2018-19 cover has 11 regions and the 2021-22 cover 9: Menaka and
+Taoudenit, the regions the 51 EAs added in vague 2 were drawn to cover (see "Supplementary
+sample inside the wave"), are written under Gao and Tombouctou in 2021-22.  Each wave's label is
+its own cover's, so 429 of the 6,133 households in both waves change stratum (36 clusters):
+Menaka Rural to Gao Rural 204, Taoudenit Rural to Tombouctou Rural 155, Menaka Urbain to Gao
+Urbain 70.  All 513 clusters of 2021-22 are 2018-19 clusters, so 20 and 17 are a change of label, not
+of design: =ehcvm_nsu_mli2021.dta= keeps the 20 codes.
+
+*=Taoudénit=.*  The 2018-19 cover writes =Taoudénit= and =ehcvm_conso_mli2018.dta=, which
+=cluster_features= reads, writes =Taoudenit=.  The =strata= table folds to the served =Region=
+spelling, so no other table moves; it is the one row outside Region x milieu.  The =Region= table
+prefers accents (=Ségou=), so the better end is a =Region= row and dropping this pair, which
+moves =cluster_features= on 14 clusters.  Left for a separate change.
+
+Cost: a Mali re-warm.  Other countries' =strata= hold other things: see =docs/guide/feature.md=.
+
 * 2026-11-04 -- =crop_production= serves =condition= and the recorded answer (GH #1436)
 
 Ruling @ligon 2026-11-04, option (D), set on Niger in #1471: the fold stays on the
@@ -3175,3 +3219,728 @@ not compare across the two instruments in any case, because this list has no =Gr
 its own, the shelled share runs 0.38 for millet against 0.60 in 2018-19, and 0.48 for fonio against 0.92.
 
 *Cost:* one Mali re-warm (=data_scheme.yml=, =categorical_mapping.org=, =mali.py= and the wave scripts).
+* 2026-11-04 -- the survey harvest kilograms, 2021-22 (GH #1436)
+
+*RULED (@ligon, 2026-11-04, option A).*  =Quantity_kg= is served as an optional canonical column and read first
+by the crop ladder, as =survey_kg=.  In Mali it is =s16cq16c=, "Estimation Quantité totale UML en kg", on 306 of the
+309 of 7,247 =s16c= rows with a recorded =s16cq16a=, and NA in every other wave.  The instrument calls it an
+estimate, so all 306 carry the identity key =survey-kg-estimate=, joined with =harvest-to-date= on the unfinished
+ones, whose kilograms cover the same part of the season.
+
+*A derived harvest has no survey kilograms, and that is a fact of the file.*  The =s16d= columns ending in "c" are not
+kilograms: =s16dq02c=, =s16dq03c= and =s16dq13c= are "Etat du produit" (=s16dq02c= holds 1 to 5), and only =s16dq05c=
+is, for the sale.  So =harvest-from-dispositions= keeps =Quantity= and =u=, and =harvest_kg= reads it through =metric=
+as before: 6,715,918 kg on 2,792 rows.  The wave script asserts that no derived row carries kilograms, so a pair never
+holds both, which is what #1437's "a recorded quantity is never overridden" already gave.  =Farm-level= rows are NA.
+Sold quantities are untouched: =KgFactor_sold= stays NA, and =s16dq05c= (4.87M kg, largest 1,150,000) stays unread.
+
+*What moves.*  =harvest_kg= 2021-22, 6,977,513 -> 7,062,291 kg; 3,028 -> 3,098 plot-crops; every other wave unchanged.
+All of the movement is on the 309 rows, 261,596 -> 346,373 kg:
+
+| unit                 | rows | nominal, =metric= | survey |
+|----------------------+------+-------------------+--------|
+| =Kg=                 |  129 |           134,371 | 134,371 |
+| =Sac (100 Kg)=       |   81 |           110,850 | 142,873 |
+| =Sac (50 Kg)=        |   21 |            15,950 |  11,625 |
+| =Sac (25 Kg)=        |    5 |               425 |     235 |
+| carts, =Autre=, =Grenier=, others | 73 | none  |  57,269 |
+
+*Idiosyncrasies.*
+- *The survey's kilograms are 4.9% of the wave, and mostly a part of the season.*  346,373 of 7,062,291 kg; =metric= on the
+  derived harvests is the rest.  285 of the 306 rows are unfinished, so they carry =harvest-to-date= too.  This is a
+  small, different population from Niger's column, and no statement about Niger's carries over.
+- *One row is 23% of the survey's kilograms, 1.1% of the wave.*  4 sacks of 100 kg, unfinished, stated at 80,000 kg.  Site
+  Q does not name it: its cell's scale is a total's, and 80,000 is under 100 x the p90.  =kg_survey_off_label= does (ruling
+  @ligon 2026-11-05), with 31 others of the 236 sized rows, outside 0.1x-10x of the label.  Served, as recorded.  Without it
+  the sacks are 62,873 kg against a nominal 110,450.  The wave's largest row is a metric one, 750,200 kg, 10.6%.  70 rows,
+  16.5% of the survey's kilograms, are on units with no stated mass and cannot be named (GH #1559).
+- *Sacks barely scale.*  Log-log slope of kg on q on =Sac (100 Kg)= is 0.42, against 1.00 on =Kg= and 0.91 for Niger's
+  2021-22 sacks.  On 9 of the 81 rows and 4 of the 21 =Sac (50 Kg)= the kilograms equal the sack count, so the survey says
+  1 kg per sack; 35 of the 81 are exactly 100; 34 of the 81 are under 20 kg per sack.  On rows with a stated-mass label
+  and both answers the survey says 289,104 against 261,596 nominal: 30 under 0.1x the label (1,488 / 69,300), 2 over 10x
+  (92,000 / 1,000).  =survey_kg_vs_metric=: 62 of 236 disagree by more than 10%.
+- *=Autre= is where the column earns its keep.*  8 of the 11 rows specify tonnes in =s16cq16b_autre=, and 6 state 1,000
+  kg per unit.  A factor of 1,000 would fail =KG_FACTOR_MAX=; a total need not meet it.
+- *3 rows state 0 kg* beside a positive quantity (=Autre= 2, =Cart (donkey)= 1).  No answer, not a harvest of nothing,
+  so =Quantity_kg= is NA and the row falls down the ladder, as Niger's do.  Those units have no factor, so they contribute
+  nothing.
+* 2026-11-04 -- =shocks= 2021-22: =s14bq04d= is the livestock (GH #1556)
+
+By the file's labels and the questionnaire's column heads (=mli_ehcvm2_qnr_men_excel_vague1.pdf= p. 69),
+=s14bq04a..f= are revenu, avoirs, production agricole, effectif du cheptel, stock de
+produits alimentaires, achats.  =AffectedConsumption= read =d=, the livestock.  It now
+reads =e=, the stock.
+True share 0.494 -> 0.751; 1,968 of 4,884 rows change.
+
+=s14bq05__25= (=Autre stratégie=) alone has the Oui/Non label set; the other 25 hold
+ranks.  The hook's rank map never matched it, so all 72 rows that chose it served
+=HowCoped0= NA.  It now takes the first slot no other strategy holds.  Every one of
+the 72 chose nothing else, whereas in Burkina's file, which keeps the raw rank, 17 of
+62 code-25 choices are second or third.  =s14bq05_autre=, the text of the "autre", shows
+no blanked choice: it is filled on 71 of the 72 rows and on no other row (250 of 251
+code-25 rows across Niger, Mali, Senegal and Burkina, and no other row).  A source
+that blanked both would not show.
+
+The table serves 4,884 of the 8,760 reported shocks: the rest carry no follow-up, are all-NA
+and are dropped.  That is with the maintainer, and unchanged here.
+* 2026-11-04 -- 2017-18 multi-plot sales (GH #1457)
+
+=eaci17_s7gp2= records a sale per household and crop, with no plot.  Until now a sale reached the
+table only where the crop was on one plot, so a crop on two or more kept =Quantity_sold= and =Value_sold=
+NA: revenue was understated most among households farming most land.  The ruling on GH #843, option
+(d), extended in bulk on 2026-11-04, applies: the single =s7f= row, keyed =hh-crop-sale-single-row=, or
+else ONE =plot_id = 'Farm-level'= row with no =Quantity= or =u=.  The Farm-level row's =Unit_sold= and
+=KgFactor_sold= are the sale's own.  =derive_hh_crop_sale_attachment= is the same function as 2021-22.
+
+| where a sale goes (661 records, cold)     | records | =Value_sold=, FCFA |
+|-------------------------------------------+---------+--------------------|
+| the crop's one row                        |     459 |        132,259,405 |
+| Farm-level: two or more plots state one   |     200 |         47,819,050 |
+| Farm-level: two rows, ONE states a harvest|       2 |            650,000 |
+|-------------------------------------------+---------+--------------------|
+| all, equal to the raw =s7gq22= sum        |     661 |        180,728,455 |
+
+- *What stays.*  A record that is not a sale still serves a crop on one plot: =s7gq20 = 'Non'= as a filled-in
+  0 (ruling 2026-10-23), an unrecorded answer as NA.  The 1,607 Leger =Oui= rows have no quantity to carry,
+  so a multi-plot crop's yes-with-no-number serves nothing.  No zero is written on a Farm-level row.
+- *The key moved on the 459.*  They held the sale before, unkeyed; =Derivation= is the only column that moves.
+- *Tree rows share the sentinel.*  A sale's Farm-level row and a tree's sit on one =plot_id= and =crop_production_finalize=
+  sums a repeated key, so the wave script refuses a meeting (0 today: the tree roster and =s7f= share no crop in one household
+  among these).  =perennial= is NA on a sale's row and True on a tree's.
+- *The 2 rows that state a harvest are not attached.*  Nigeria's ruling A (the one row that STATES a harvest) was not extended; these
+  two (650,000 FCFA) go to Farm-level under "two or more rows".  No 2017-18 household states two lines on one plot: =s7f= has one row per plot-crop.
+
+* 2026-11-04 -- =shocks= 2018-19: section 14.04 changed between vagues (GH #1556)
+
+The =.dta= labels (and the DDI, which repeats them) read =s14q04d= stock, =e= achat,
+=f= achats again, with no livestock.  The questionnaire prints six columns (sheet
+=S14_Chocs= of both vague files): revenus, avoirs, production agricole, effectif du cheptel,
+stock, achats.  The file shows both layouts, split exactly by =vague=:
+
+- *Vague 1* asked five.  =f= is blank on every follow-up row, and =d= = stock, =e= = achats.
+- *Vague 2* asked the printed six.  =f= is filled on every row, and =d= = cheptel, =e= = stock, =f= = achats.
+
+Measured blind to the labels, vagues 1 (4,196 rows) / 2 (5,641):
+P(Diminué | animal-disease shock) - P(Diminué | other shocks) on =d= is -0.11 / 0.34;
+P(Non-concerné | no animals in =s17=) - P(Non-concerné | animals) on =d= is 0.04 / 0.28.
+The answer distribution of vague 1's =d= sits 0.032 against 0.158 (total variation) from vague 2's
+=e= and vague 2's =d=; vague 1's =e= sits 0.053 against 0.223 from vague 2's =f= and =e=.  No
+question about livestock was asked in vague 1, as far as this file shows; only the
+questionnaire says otherwise, and the sheet held for vague 1 does print the column.
+
+=AffectedConsumption= read =d= on the label's word, so vague 2 served livestock.  The
+hook now serves =d= in vague 1 and =e= in vague 2, and raises =ShockLayoutError= if a
+release stops showing this layout.  True share 0.632 -> 0.736; 2,197 of 9,837 rows change, all in
+vague 2.  So =AffectedConsumption= is comparable across vagues and with 2021-22 only
+from this change on.
+* 2026-11-05 -- 2018-19 food labels reach =harmonize_food= (GH #1513)
+
+Every =s07bq01= label of 2018-19 carries seven leading spaces, and the =mappings:= lookup in =data_info.yml= is exact, so =j= was served
+as the source's own label, padding stripped later by =format_id=, and never mapped.  Ruling @ligon 2026-11-05, in its own PR.
+=mapping.j= strips the label, and =Wave.column_mapping= chains a function named for the level before the lookup.  All 138 stripped
+labels are in the table, 57 of them rename, on 62,680 source rows.  No other Mali wave's file is padded.
+
+*The fold.*  Nine of the table's groups are many-to-one (=Arachide= takes 4 source labels, =Poisson frais= 4), as they already are in
+2021-22, so =j= goes 138 -> 125.  Core sums rows that meet on the declared index and joins their =Derivation=: conserved, not selected.
+
+Cold, =111b64ed7= against =309cc7b48=.  20 of the 23 frame tables are equal whole, row order and dtypes included, and =panel_ids= and
+=updated_ids= are equal.  Three derived food tables move with =food_acquired=:
+
+| table               | 2014-15                 | 2018-19                     | 2021-22                 |
+|---------------------+-------------------------+-----------------------------+-------------------------|
+| =food_acquired=     | equal                   | rows 162,032 -> 161,212     | equal                   |
+| =food_expenditures= | equal                   | rows 103,931 -> 102,968     | equal                   |
+| =food_quantities=   | 22.3% of rows, kg -0.09% | rows 162,032 -> 159,896, kg +0.54% | 16.1% of rows, kg -0.28% |
+| =food_prices=       | 21.8% of rows           | rows 103,931 -> 103,513     | 15.9% of rows, median 675 -> 674 |
+
+- *=food_acquired= moved by label and sum alone.*  =Quantity= and =Expenditure= are unchanged on every (t, v, i, u, s) cell of 2018-19, and
+  in total by =s= (=Expenditure= 89,614,678.64).  Purchased rows 129,598 -> 129,085, in-kind 16,459 -> 16,413, produced 15,975 -> 15,714.
+- *=food_quantities= and =food_prices= move in OTHER waves, and that is not a label.*  The kilograms are inferred per (j, u) pooled across
+  waves (GH #850, #1487), so 2018-19 rows now vote in the cells of the foods they share with 2014-15 and 2021-22.  Rows keep their
+  labels and their native quantities; only the inferred factor moves.  Median ratio on moved rows: quantity 1.002 and 1.012, p5 to p95 0.80
+  to 1.04 and 0.73 to 1.13, price 0.998 and 0.988.  Largest cells by rows: =Gombo=, =Thé en paquet ou en sachet=, =Oignon=, =Poisson fumé=.
+  Whether the new factors are better was not scored.
+- *=labels='Aggregate'= cannot move*: Mali's table has no such column, so =LabelUnavailableError= before and after.
+
+| 2018-19, on served frames                                  | before | now     |
+|------------------------------------------------------------+--------+---------|
+| household (j, u) cells with a community price              | 216 of 910 | 294 of 835 |
+| household rows in those cells                              | 68,830 of 162,032 | 103,360 of 161,212 |
+| community rows meeting a household cell, of 109,338        | 57,600 | 81,866  |
+| household rows with a same-cluster (v, j, u) price         | 41,963 | 65,037  |
+| rows whose =j= occurs in a neighbouring wave               | 58.2%  | 96.1%   |
+| crop rows on a same-wave food =j=, of 7,992                | 3,064  | 5,795   |
+
+The issue's 103,747 rows is the pre-sum count; these 103,360 are served rows.  A bridge by product code would reach further, 342 of 910, but
+the labels now agree without one.  =ehcvm_nsu= on =isa/ehcvm-1452-20261104=, if it merges, joins by source code and does not read =j=.
+
+* 2026-11-06 -- shocks: purchases and food stocks are separate answers
+
+Ruling @ligon: =AffectedConsumption= means food purchases;
+=AffectedFoodStock= means food stocks, following Ethiopia. This supersedes
+the earlier semantic binding, quoted above as "reads =e=, the stock" under
+=AffectedConsumption=. It does not reverse the source-layout findings.
+
+EAC-I 2014-15 =s11q04d/e= and 2017-18 =s5q04d/e= read stock/purchases.
+The 2017 labels explicitly name the two questions; 2014 labels truncate before
+the object. The GH #1556 independent review, section 2, verified that older
+column order from response behaviour; the held source again shows purchases
+Augmente far more often than stock. The EACI14_/EACI17_ namespaces are unchanged.
+
+2018-19 retains the documented split: vague 1 reads stock =s14q04d=
+and purchases =s14q04e=; vague 2 reads stock =s14q04e= and purchases
+=s14q04f=. The existing =ShockLayoutError= still refuses a populated f in
+vague 1, a missing f on an answered vague-2 row, or an unknown vague.
+Its f sentinel remains raw, independent of Boolean decoding.
+2021-22 reads =s14bq04e= for stock and =s14bq04f= for purchases; d remains
+the separate, unserved livestock question. Source-specific response maps
+remain unchanged: an increase or decrease is True, with existing unchanged,
+not-concerned and declared missing-code mappings preserved. A missing stock
+answer cannot fill purchases, or the reverse.
+
+Measured against development plus the ruling ledger, in a private data root:
+
+| wave | rows, unchanged | purchases differing from former stock binding |
+|------+-----------------+-----------------------------------------------|
+| 2014-15 | 5,837 | 830 |
+| 2017-18 | 6,216 | 505 |
+| 2018-19 | 9,837 | 1,744 |
+| 2021-22 | 4,884 | 834 |
+
+Every old key and every unrelated column, including coping, is exact-equal.
+=AffectedFoodStock= equals the former =AffectedConsumption= on every old row;
+no row was added or removed. Independent numeric-source tests verify both
+answers, with wrong-column controls; the prior layout/ownership and coping
+tests retain their assertions. The separate all-follow-up-missing shock-row
+policy is unchanged. These country/wave config edits invalidate this country
+through the normal hash checks; no shared cache was re-warmed.
+
+* 2026-11-04 -- EHCVM unit-weight table wired (GH #1452)
+
+*What.*  =food_acquired= 2018-19 and 2021-22 carry a per-row =Quantity_kg= from the survey's own unit-weight table, which the kg ladder reads first (=survey_kg=).  Registered as =Mali::food_acquired::nsu-national-unit-weight= (=_/derivations.yml=), one key for both waves; the function is =lsms_library.ehcvm.derive_nsu_kg_factor=, one function for the four countries that ship such a table.  No =Quantity=, =u= or household row changes.  Ruling @ligon 2026-11-04: 2018-19 reads the tables too, and a weighed table may overrule a stated label, with a report.
+
+*2018-19 joins the product by label, never by code.*  The table uses 2021-22's product numbering, which is not 2018-19's (123 of the 134 product codes the two waves' household files share here carry different labels, and all four countries have this trap).  =ehcvm.nsu_product_crosswalk= tries, in order: =label= (the same label up to spelling, against the table's and 2021-22's labels for a code), =harmonized= (the two meet through this country's =harmonize_food=), =parts= (a label listing goods the instrument later split reads all of them, at the median of their weights), =stem= (agreeing before the first =(=, =,= or =/=, for truncated labels).  Unit and size are read as codes, which do carry across the waves.  A row's tier is =nsu_join= in =derivation_inputs=.  On 2018-19's 159,968 consumed source rows: =label= 91,633, =harmonized= 15,468, =parts= 3,732 (sugar, =Aubergine, Courge/Courgette=, =Vinaigre /moutarde=), no =stem=.  Served, 94.8% of non-metric rows (112,113 of 118,259) read the table.  What stays inferred is mostly =Poisson frais type 1-4= and =Feuilles locales 1-4=, whose numbered names do not carry across waves.  =Piment= reads both of 2021-22's chillies, because this country's =harmonize_food= folds them.  Against 2018-19's own community price ratios, by tier: =label= 0.284 / 84.2%, =harmonized= 0.280 / 69.1%.  A 2018-19 build now needs two 2021-22 files, the table and that wave's section 7B, and raises =FileNotFoundError= if either cannot be fetched.
+
+*National, not by stratum.*  A key's weight is the median of its rows across the table.
+Against a household's last-purchase unit value over the same stratum's median =Kg= price
+(5+ reports each), the national weight's median absolute log error is 0.49 against the stratum cell's 0.51, and within 2x 64.5% against 59.2% (row by row 0.55 against 0.59); the slope of the household's deviation on the stratum's is +0.29, +0.08 with key effects.  Mali is the closest of the three: the stratum cell wins within-(stratum, product) dispersion, 0.187 against 0.198, and stratum weights would add 1.6% to the kilograms on rows both serve.  87.5% of consumed rows find a stratum cell, 100% a national weight (2 of 146,360 find none).  The check can rank the two table rules; it cannot rank the
+table against the price-ratio inference, which is built from the same prices.
+
+*What the documents say.*  This wave's BID: s.3.4, each product-unit-size is weighed at market; s.4.2, markets by reasoned choice, up to 3 urban and 3 rural per region; s.2.3 and s.5, NSU factors were collected in 2018/19, "remain valid", and were supplemented in June-July 2021 (the sections give different dates); s.7.3, "collected in 2018 and updated in 2021".  So the table is largely a 2018-19 instrument.
+
+*What is not read.*  =Kg= and =Litre= keep their labels.  A row whose canonical key is
+duplicated at the build (1,000 rows in 495 groups, =Gombo= and =Arachide= first, where =harmonize_food= folds two products onto one =j=; 891 of them, 521 kg or 0.54% of this table's kilograms, would otherwise read the table, the rest being =Kg= and =Litre= rows) keeps =Quantity_kg= NA and stays on the inferred ladder,
+because =_normalize_dataframe_index= sums =Quantity= and =Expenditure= on such a key and
+selects any other column: =Quantity_kg= is not in =feature._ADDITIVE_MEASURE_COLUMNS=.
+
+*Idiosyncrasies.*  =strate= is "Region*10+Milieu" with 20 values, 2018-19's cells; the hook needs no stratum, so the 2021-22 cover's 17 cells never meet them.  This file's =s07bq03b= gives two codes each to =Motte (boule)= (111, 472) and =Boite de lait concentré= (457, 470), and =Piece= likewise (469, 473), so a label cannot name its code; the join reads codes, and consumption and the table use only one code of each pair.  The table has 10 (stratum, key) cells with two disagreeing rows (=Sachet= of product 20 first); each contributes both rows.  The note under "The EHCVM waves DO ship a price file" calling this a "per-region unit-weight table that would replace the inferred kg factors" is right about the second half; the wiring is national.
+
+*The weakest join result is a table cell: sugar.*  =Sucre (poudre ou morceaux)= at =sachet industriel= (unit 139) reads 0.992 / 0.998 / 0.80 kg for =Petit= / =Moyen= / =Grand= in 2018-19 and 0.972 / 0.998 / 0.80 in 2021-22, where households' prices imply about 0.10 / 0.20 / 0.74.  2018-19: 861 rows, 5,037 kg at the table against 857 implied.  2021-22: 639 rows, 3,504 against 482.  Against the table-free household reference, the =parts= tier scores 2.294 / 8.4% (review of #1452).  This is not a join error: 2021-22 reads the same cell by code, and it is the median of 3-4 table rows, some of them 200-400 g.  The community test has no cells here, so it could not see this.  Disclosed, not patched.
+
+*Other cells to distrust, disclosed and not patched.*  Off by 4x or more in both waves against households' implied weight (last-purchase unit value over the item's =Kg= price, at least 100 rows across the waves): =Beurre de karité= / =Pot=, =Moyen= 4.63 kg against 0.56 and 0.50 (82 + 67 rows, 465 kg in 2018-19), =Petit= 41 g against 0.28 and 0.20 (101 + 122 rows).  A price ratio favours the inference, so this says suspect, not wrong.  Sizes out of order by more than 5% (Petit, Moyen, Grand): 59 of 414 (product, unit) pairs, on 10.0% of consumed non-metric rows in 2021-22 and 10.6% in 2018-19., the most of the four.
+
+*Where the join reaches furthest.*  These rows find the table through =harmonize_food=, so a later fold there changes kilograms with no signal but the rebuild; =tests/test_ehcvm_unit_weights.py= pins the list.  =Arachides décortiquées ou pilées= (233 rows) reads five peanut codes, 113-117, in-shell cells included, because the fold is to =Arachide=: the one over-reach the review found.  =Autres condiments= (827) reads a differently described catch-all, about 5x heavy.  =Piment= (4,528) reads fresh and dried: =Tas (Petit)= serves 0.027 against 0.025 implied, =Unité (Petit)= serves 0.013 where 89% of 2021-22 rows on that key are fresh at 0.006, so about 2x high, 295 kg on the rows that disagree (review of #1452).  =Pastèque, Melon= reads 78 alone (1,164), =Vinaigre /moutarde= mustard alone (1,058).
+
+*Measured, cold, development =4646a0fd2= against that plus this branch.*  =food_acquired= rows and every other column are unchanged, =food_expenditures= is frame-equal, and so is every other table of the country.
+| wave | =food_quantities= kg, all waves | lone-wave request |
+|---------+---------------------------------+-------------------|
+| 2014-15 | 12,562,371 -> 12,690,667 (+1.0%) | unchanged, 12,927,622 |
+| 2018-19 | 301,301 -> 302,761 (+0.5%) | 291,109 -> 302,916 |
+| 2021-22 | 224,837 -> 221,685 (-1.4%) | 234,255 -> 221,661 |
+With #1487 a lone request serves the all-waves column.  =KgFactorSource=, =survey_kg= / =metric= / =item_unit= / tight / =unit= / =none=: 2018-19 0 / 43,916 / 56,714 / 0 / 61,401 / 1 -> 112,113 / 43,773 / 2,754 / 0 / 3,392 / 0; 2021-22 0 / 40,457 / 52,443 / 1,216 / 53,076 / 0 -> 106,402 / 40,347 / 359 / 0 / 84 / 0; 2014-15's item rung 33,959 -> 33,466, =unit= 40,307 -> 40,800.  Median =food_prices= per kg: 2014-15 500 -> 485; 2018-19 500 -> 831 (p90 2,000 -> 3,448); 2021-22 675 -> 1,027 (p90 2,500 -> 3,777).
+
+*The per-kg rise is method, not prices, and across 2018-19 to 2021-22 it no longer shows.*  =Kg= rows move on 0 rows.  Matched items, 2021-22 over 2018-19, median / row-weighted: =Kg= rows 1.19 / 1.15, development 1.09 / 1.25, now 1.13 / 1.20.  The level does rise: a weighed unit does not absorb a small lot's premium the way the inference does.  The signed gap, log of the household-implied weight over the table's, runs by the table's weight: 2021-22 +1.14 under 50 g, +0.33 at 50-200 g, -0.05 at 200-500 g, -0.46 at 0.5-3 kg, -0.97 over 3 kg; 2018-19 +0.51, +0.39, +0.07, -0.63 and -0.29, -0.74.  That is premium or table error, not separated: household =Kg= lots show a gradient of only -0.026 per log-kg, and the market file has no weights to test it.  Over 3 kg it is not a bulk discount: =Panier (Moyen)= alone shows -1.54.  Totals hide this: 76,680 2018-19 rows and 72,384 2021-22 rows move their factor more than 1.5x (=Sachet (Petit)= 0.100 -> 0.038, =Tas (Moyen)= 0.40 -> 0.20).  That closure removes a method difference; it does not validate the weights.  A random factor per =(j, u)=, the same in both waves with =Kg= rows at 1, gives 1.17 / 1.23 (15 draws: medians 1.12-1.25, row-weighted 1.01-1.61), also near =Kg= rows, and the correlation of item ratios with =Kg= rows does not improve (development 0.40, now 0.31, on 28 items).  Evidence for the level is the market file and the labels that state a mass, below.
+
+*2014-15 reads what it read before (option B, ruling @ligon 2026-11-05).*  A table kilogram is a survey's answer about its own row, so it enters the kg estimator twice: as a reference for the per-kg baseline, and by leaving the per-unit estimate (=conversion_to_kgs=).  With both newer waves on the table, 2014-15 rows would estimate from their own wave alone, and in the build before this rule they did: matched items, 2018-19 over 2014-15, went 1.14 / 1.14 -> 1.25 / 1.79 against 1.25 / 1.20 on =Kg= rows, 12,871 rows moved their factor more than 1.5x, and =Piment= / =Tas=, a cell #1450 repaired, read 0.013 kg against the table's 41 g.  =transformations.food_kg_factors= now gives a row of a wave where no row carries this key the estimate from the frame with this key's =Quantity_kg= taken out (=_KG_WAVE_SCOPED_TABLES=), so 2014-15 is frame-equal to development (2017-18 has no food rows) and =Piment= / =Tas= reads its #1450 value on =item_unit= again; =tests/test_food_kg_size_pool.py= no longer marks it.  The rule is scoped to this key: any other survey kilogram keeps its vote (Malawi and Nigeria are frame-equal too), and a country with no older wave pays nothing.  It runs the estimator twice for a country with an older wave.  What stays is 2018-19's own level, and here it is all of the break: the 1.79 was 2018-19's level moving (+0.45 weighted log move against +0.001 for 2014-15, review of #1452), so the rule leaves it; the Measured section gives the figure.  Letting table rows vote was the alternative, not taken: simulated, 2014-15 12,690,667 -> 12,495,333 kg and the break 1.14 / 1.23, but those factors are effectively the table (0.176 / 86.4% against it) and would be reported as =item_unit= with no =Derivation= key.
+
+*What could check this.*  =ehcvm_prix_mli2021= is outside the household data, with per-=Kg= prices only; it holds no usable unit weights.  Table rows against market per-kg, median abs. log error / within 2x, 2021-22: 0.592 / 55.0% under the inference, 0.507 / 69.7% under the table, signed -0.46 to +0.39; correlation of item medians with the market 0.49 to 0.58, though at item medians the error goes 0.418 to 0.509.  2018-19 rows against that 2021-22 market: 0.701 / 47.6% -> 0.678 / 64.1%, item correlation 0.67 -> 0.86 on 22 items.  2018-19 community price ratios, table-free but price ratios: 0.284 / 82.2% against the table.  The rows whose label states the mass check the join.  The household =Kg= purchase check ranks table rules; it cannot rank table against inference, since the inference is estimated from those prices.
+
+*Corrects the #876 section above*: "no EHCVM wave ships a unit-conversion table" is wrong for 2021-22.  The #876 NA on a last purchase in another unit stands; a table that weighs a unit is not what that construction uses, and whether it should be is a separate question.
+
+* 2026-11-07 — own EHCVM sold condition (GH1528)
+2018-19 s16cq16c and 2021-22 s16dq05d each record the SOLD product's state.
+Each own released dictionary was checked independently: 1 Epis, 2 Grain,
+3 Décortiqué, 4 Non-décortiqué, 5 Non concerné. Condition_sold reuses the
+existing EHCVM fold as an optional NA-bearing column; condition_sold_native
+keeps the literal sold label. A blank is NA, never unknown_condition.
+The 2021 answer accompanies its sale through the existing exactly-one-row or
+Farm-level placement. No eligibility, quantity, unit, harvest-total, survey-kg,
+period or EAC-I rule changes. In particular 2021 s16cq16c remains the harvest
+KG TOTAL and is never read as sold state. A derived harvest can still mix states
+and retain unknown_condition even when its sale has a known state.
+
+Sanctioned numeric/labelled reads found 2,111 state answers / 7,992 records in
+2018 and 1,140 / 5,068 in the 2021 sale module. Every state answer accompanies
+a positive sale in its own module. The sold states were previously unread; this
+does not amend the older EAC-I tree-window ruling or wire its different state
+list. Verification retains all3,251 own EHCVM sold answers, including1,070 on
+the single harvest row and70 on Farm-level in2021. All old values/keys/types/NA
+patterns exact to cold baseline; zero added/removed rows (50,752 all-wave rows).
+Both EAC-I waves have the new optional fields entirelyNA. Cold Make/warm/Feature
+agree; current-framework integration repeats full frame/attrs equality.
+Receipts and separately qualified full CI/review: .coder/ledger/1528-sold-condition.md.
+
+* 2026-11-08 -- Taoudenit prefers the accented Region label (GH #1576)
+
+The earlier GH #812 note's “Left for a separate change” is addressed by the
+specified cosmetic fold: =Region= maps =Taoudenit= to =Taoudénit=.  The old
+=strata= exception folded the accented cover label backwards to =Taoudenit=;
+it is replaced by the ordinary =Region= table crossed with =Urbain|Rural=.
+Already accented cover labels pass through unchanged.  No administrative
+boundary, wave-specific design code, weight, household key or native amount is
+reinterpreted.  In particular, EAC-I 2014's empty strata and 2017's design codes
+remain distinct from the EHCVM region-milieu labels.
+
+Hermetic mapping/finalizer controls and the exact metadata hash footprint are
+recorded in =.coder/ledger/1576-mali-taoudenit.md=.  The earlier 14-cluster count
+is the issue's source expectation, not a new measurement here; independent
+source/API/warm verification is a separate coordinator-managed gate.  No shared
+cache has been re-warmed by this implementation.
+
+
+* 2026-11-08 -- Sold kilograms: both own 2021 forms retain the label/instruction conflict (GH #1560)
+
+The earlier note, "The label of =s16dq05c= says a total and the questionnaire
+says per unit", remains unresolved. Both own vagues were authenticated in the
+bounded investigation frozen at =8283ad309120e34f2e9822c3a3eee7651de49f8f=
+(=investigate/1560-sold-kilograms-20261108=). Independent scientific review and
+a ruling are still needed; this note selects no carrier, default or price rule.
+
+The own source is =2021-22/Data/s16d_me_mli2021.dta=, byte MD5
+=445edd178dd9ea19a327c8d4b3827ead=:5068 unique household-crop records,1140
+nonmissing =s16dq05c=,1136 positive and4 zero, raw sum4873574, max1150000.
+The own released label says estimated TOTAL. Both forms under
+=2021-22/Documentation/= retain the per-ONE-UML instruction, while the header
+itself says total:
+
+| own PDF | PDF page (printed) / question | byte MD5 |
+|---------+-------------------------------+----------|
+| mli_ehcvm2_qnr_men_excel_vague1.pdf | 88 (87) / 16D05 | 6c5baa2aacbc74ee3385dd985a9687fb |
+| mli_ehcvm2_qnr_men_excel_vague2.pdf | 88 (87) / 16D05 | 3a3e729a65810bbe712a27dbc721ba7d |
+
+The own kg-unit controls equal reported sold quantity on495/495 records and
+kg equals1 on0 (all quantities differ from1). This supports total-like stored
+values, not an identified CAPI/export algorithm, nor proof about every other
+unit. No resolving cleaning/export program was located in the held declared-wave
+files or inspected official variable/related-material metadata; this bounded
+search does not establish global absence. Neither the form nor release label
+is dismissed as stale. Do not borrow another country's/wave's unit codes.
+
+All-source accounting found no positive kg-only record outside the current
+positive native quantity/value sale class. Four reported zero kg sit beside
+positive sold quantity; zero/missingness and very large totals remain their own
+unruled questions, with no clipping or guessed factor. Native quantity/value,
+units, states, eligibility and the1070 single-harvest-row/70 Farm-level sale
+placement are unchanged. This does not amend the separate EAC-I tree/window
+rulings. =KgFactor_sold= is per ONE unit, so a reported total must not be put
+there or divided by quantity to fabricate a factor.
+
+=Condition_sold= is a donor answer, not a harvest recipient state. Many sold
+answers occur beside unknown harvest state, including Farm-level sales. Raw-only
+national donor-state/recipient-state diagnostics materially change coverage;
+they select no unknown-state/fallback, price pool or scientific price estimate.
+A literal carrier and any opt-in consumer require separate decisions after the
+form/release conflict is resolved.
+
+Evidence and exact own-source/form custody:
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1560-sold-kilograms-investigation-20261108/=
+(=REPORT.md=, =DECISION-PACKET.md=, =receipts/artifact-manifest.json=).
+This docs addition reuses the closed packet and performs no source/API, parquet
+or PDF replay. The packet distinguishes raw diagnostics, composed native-script
+replay and unperformed Default/Make/Feature/warm/full-CI gates; its questions
+remain UNSENT and no producer contact occurred.
+
+* 2014-15 purchased-food amount code: GH #1594 (2026-11-08)
+
+The maintainer interprets exact =99,999,999= in =s13q03c= as a conventional
+missing-value sentinel, in BOTH =EACIALI_p1.dta= and =EACIALI_p2.dta=.
+This is a recorded maintainer interpretation, not a newly located producer
+codebook rule. The wave mapper masks that raw purchased-expenditure component
+before the existing additive collapse. Native quantities, contribution keys
+and the original stream-eligibility rule remain; a sentinel-only value does
+not silently remove its raw contribution row. No other field, all-nines
+pattern or wave inherits this amount mask.
+
+A controlled mapper/additive-kernel comparison preserves all 122,085 canonical
+rows, keys, quantities, dtypes and attrs. Expenditure changes from
+5,652,532,205 to 152,532,260 XOF; the difference is 55 retained canonical
+code-equivalents. This is derived evidence, distinct from the older source
+count of 29 + 26 raw code rows. Ordinary amounts totalling 16,325 XOF in the
+affected household/item cells remain. Dropping whole large aggregate cells
+would lose those amounts and is not the rule. The existing pure expenditure
+helper drops 40 newly all-missing rows (90,925 -> 90,885), without invented
+zeros; canonical acquisition rows do not change. These are controlled mapper
+and pure-helper results, not a new public Country/Feature call. Source receipt
+failure, output recovery, exact scope and nominal FX/PPP traces are recorded
+in =.coder/ledger/1594-mali-s13-raw-sentinel.md= and [[https://github.com/ligon/LSMS_Library/issues/1594][GH #1594]].
+
+The repeated-passage/exposure question remains GH #851. This amount rule does
+not resolve the existing mapping comment that calls passage a “sample split,
+not a repeated measure”, nor authorize halving, annualizing, changing the
+observation unit/weights, or changing the aggregate-amount/aggregate-quantity
+Price rule. The already recorded own-production-value/manual conflict also
+remains; this purchased-field correction imputes no own-production value.
+
+* 2017-18 public BID documentation holding (recorded 2026-11-08T18:19:35.897403+00:00)
+
+The English Basic Information Document already quoted above (World Bank
+catalog 3409, resource 47785) is now held as
+=2017-18/Documentation/bid_eaci17.pdf= through its managed DVC sidecar.
+Normal =get_data_file('Mali/2017-18/Documentation/bid_eaci17.pdf')= in a fresh
+reader tree and empty private L1 returned bytes matching the public original
+(MD5 =a3c822057e8eb09ab756b82095595332=; 1,223,133 bytes). The earlier
+“NOT present in this repo” sentence records the preceding holding status;
+its sampling quotations and caveats remain intact.
+
+This adds documentation availability. GH #1574's 51-code stratum label list
+remains unresolved: the closed 32-page extracted-text search did not locate
+a complete list, and visual table confirmation is pending. No absence from
+all images/tables is inferred. No stratum label, source eligibility, weight,
+survey-design interpretation or data/schema/default changes accompany this
+holding. Exact provenance is in =2017-18/Documentation/SOURCE.org= and
+=.coder/ledger/1574-mali-public-bid-managed-ingestion.md=.
+
+
+* 2026-11-08 -- all 2021-22 raw household IDs have a namespace; only approved panel links map back (GH #1494)
+
+User ruling: “Namespace all 2021–22 raw IDs, then map back only approved
+panel links (recommended). Unlinked, unknown and orphan records retain
+distinct IDs.” The chosen raw prefix is =EHCVM21_=, applied to every
+2021-22 household through its own YAML formatter, scripted EHCVM plot/crop
+helpers and raw derivation-input keys. It does not classify every non-=Oui=
+answer as =Non=, drop a household, or alter its native coordinates, answers,
+weight, plot/person keys, eligibility, unit or season.
+
+The older entry above calls =PanelHH= =Non= an “open ruling” and says that
+“1,111 of the 1,120” replacement households spell a 2018-19 ID. That records
+the preceding state and historical counts; it is retained. This decision
+resolves the namespace policy rather than re-measuring those counts or
+asserting identity from numeric overlap. EACI14_/EACI17_ and 2018-19 IDs,
+person IDs and all other countries keep their existing rules.
+
+Only the already approved 2021-22 panel source keys acquire the prefix in
+=panel_ids.json= and =updated_ids.json=; every previous-wave target and
+approved edge stays the same. The generator still makes its identity,
+previous-pointer and occupied-slot decisions in BARE coordinates, then
+prefixes output source keys. Its old conservative omissions are preserved:
+this change does not restore the three chain-related or eight occupied-slot
+links held separately. Neither source covers nor the JSON generator were
+run for the prepared mechanical transport. The two committed files carried
+5,011 approved edges; removing the new source prefix reproduces both old
+files byte for byte, including ordering, targets and other waves.
+
+Implementation/test preparation is separate from actual source/API/cache
+acceptance. The finite source-free controls and later independent review
+must close before a new actual serving claim; no whole-country re-warm or
+source replay is implied. See =.coder/ledger/1494-mali-2021-namespace.md=.
+
+* 2026-11-09 -- GH #1574: held BID visual and sampling-header checks
+
+All 32 pages of the managed =2017-18/Documentation/bid_eaci17.pdf= were
+rendered with installed Poppler and personally inspected. PDF p.10 (printed
+p.7) states that 51 explicit strata were selected but does not enumerate
+their codes. Table 1 on PDF p.14 (printed p.11) gives eight-region sample
+counts, not a 51-code list. The questionnaire/file annex (PDF pp.17-29) and
+geovariable annex (pp.30-32) did not supply a complete crosswalk in this
+bounded review. This is not proof of absence from other official holdings.
+
+The BID's weights-file pointer, PDF p.16 (printed p.13), names
+=EACI17_ECHANTILLON.dta=, already declared by =sample.df_weights= with
+=strata: strate=. A single metadata-only read of the held 241,444-byte file
+(MD5 =2a14355a2a9f95588f78902fb8244f6f=) found =strate='s literal variable
+label =codestrate=, an empty value-label-set reference, and no value-label
+dictionaries in the file. No data rows were read; the historical occupied-code
+count was not repeated. Original bytes and the private copy stayed unchanged.
+
+The earlier text-search, unsuccessful browser render and zero page-13 embedded
+images remain separate history. This completed raster/header check still does
+not provide the authoritative 51-code list or its correspondence to =strate=.
+GH #1574 remains open; no label, stratum, weight, survey-design or default
+change follows. Closed reports under the 20261103 burst =reports/= are
+=1574-mali-bid-poppler-layout-20261109/= and
+=1574-mali-sampling-header-20261109/=.
+
+* 2026-11-09 -- GH #1437: own printed harvest routes; fielded CAPI still unknown
+
+Both own2021/2022 passage forms,
+=2021-22/Documentation/mli_ehcvm2_qnr_men_excel_vague1.pdf= and
+=mli_ehcvm2_qnr_men_excel_vague2.pdf=, PDF p.87 (printed86), show finished
+Q16C.11 =1 = Oui ► (16C.16)=. Q16C.16 asks quantity already harvested for the
+present2021/2022 campaign. PDF p.86 (printed85) identifies one crop per line
+per parcel; this is not the household-crop disposition total. Both forms also
+print zeroharvest(code3)→16C.14. Unfinished100% not-started and100% lost
+routes go to the next crop; do not infer every unfinished row was askedQ16.
+
+The old country report says “sparse because of how the questionnaire was
+routed” while admitting “I read no questionnaire or enumerator manual this
+round.” Preserve that tension beside the later note that paper routes finished
+harvests TO quantity. The five-document check confirms the printed statement,
+not the deployed CAPI rule or any released row's missingness cause.
+
+Covers identify Mali/EHCVM2021/2022 and passage1/2; the held PDFs have2024
+generation metadata. Passage2's metadata title mentions VAGUE1-Copia while
+its visible cover says VAGUE2. These are not authenticated fielded versions.
+An exact deployed CAPI project/export/version and change history remain needed.
+Mali's1515/ad44 total/window ruling is already settled in its existing scope;
+this check neither rederives it nor changes quantities, IDs, units or defaults.
+
+Closed sourcec88 documentary packet in the20261103 burst =reports/=:
+=1437-harvest-routing-document-stage-v1-20261109/=. Five held PDFs stayed
+MD5/SHA/size/identity-exact;60textpages and15rendered pages were produced,
+all15renders personally viewed.28rotated-text notices remain; this is not
+full-document visual or as-fielded CAPI certification. No raw/API replay.
+
+* 2026-11-09 -- GH #851: declared period conversion, collapsed EACI series retained
+
+The approved period denominator for 2014-15 is two seven-day asks, or 14
+days. This corrects recall metadata; the existing source mapper and collapsed
+public series are unchanged. Earlier sample-split wording does not establish
+a one-ask denominator for these two EACI passages. No visit axis is restored.
+The packaged record remains =ask_count_basis: declared=. Explicit period
+conversion reports =shortfall_source: no-visit-level= and no shortfall count;
+food rows cannot reconstruct household interview status. The current raw
+=s13q03c= sentinel interpretation, quantities, prices and weights are unchanged.
+
+=food_expenditures= and =food_quantities= accept an explicit target period
+under GH #851; =period=None= preserves recorded values and public grain.
+Unavailable windows raise from Country and degrade by wave from Feature.
+The evidence CSV retains this cell's variable-label rung and citation.
+See =docs/guide/recall.md= and =.coder/ledger/851-period-api-current-port.md=.
+
+* 2026-11-09 -- EACI 2017 harvest state: printed card versus export (GH #1436)
+
+The own second-passage French questionnaire
+=2017-18/Documentation/eaci17_p2_french.pdf= (committed sidecar MD5
+=5ebb8d492312926ef8045516300e2e27=, 857,409 bytes) was visually checked at
+PDF pages 29--30, printed pages 28--29. The retained English form agrees with
+the distinction below. These are documentary versions, not proof of the exact
+paper/tablet/CAPI instrument deployed for every released record.
+
+Q7F13 asks for production of the current 2017/2018 campaign, including the
+quantity already harvested if harvest is partial. Its four left-to-right
+subcolumns are =Production en UML=, =UML=, =Etat= and =Equivalent en Kg=.
+The printed state card has only =1 Epis/Panicules=, =2 Décortiqué= and
+=3 Non-Décortiqué=. No =a/b/c= export suffixes are printed. Q7F21 separately
+asks =Avez vous battu= the product before storing it, with =1 Oui= / =2 Non=
+and responsibility/date follow-ups. That operation is not the Q13 state answer.
+
+The own =bid_eaci17.pdf= annex (PDF pages 21--22; sidecar MD5
+=a3c822057e8eb09ab756b82095595332=) binds =7-F Production= to
+=eaci17_s7fp2= and =7-G Utilization= to =eaci17_s7gp2=. It does not supply
+a field-level dictionary linking the printed card to all export codes.
+
+Preserve the earlier note, "Recorded and not served", alongside the dated
+EHCVM condition implementation and the specific "2017-18 records a state, and
+it is not read" qualification. The recorded native =s7fq13b= card has four
+labels, including =4 Egrener=; the three-choice printed Q13 card does not
+explain that fourth answer. No fresh native header or row read was made for
+this documentary check. The existing 2017 quantity/unit bindings and unread
+state remain unchanged; EHCVM codes 3/4 cannot be substituted.
+
+The unresolved authority is an own-2017 release/form/CAPI/export dictionary or
+erratum binding =s7fq13b= (especially =4 Egrener=) to the printed state card
+and explaining its processing/shelling meaning. Q21, sale answers or a different
+wave cannot supply that bridge. No condition recode, kg factor, quantity,
+identifier, weight or default follows from this finding.
+
+* 2026-11-09 -- EHCVM input dictionaries: area is not a parcel key (GH #1483)
+
+The own published lists, WB 4295/F30--F31 and 6275/F29--F30, separately
+confirm =s16a= parcel input questions and =s16b= household input costs.
+The earlier claim "have no agriculture-input block" is contradicted by
+these dictionaries and the older NPK note in this file. The three current
+source comments now say unwired; the existing EAC-I declarations and
+callable code are unchanged. Prose edits to those build inputs are still
+an expected Mali cache invalidation, not measured in this source-only task.
+
+New detail: 2018's 19-variable =s16b= list carries area =s16aq09a/b= but no
+field/parcel IDs =s16aq02/03=. The 2021 17-variable list has neither the
+area fields nor parcel IDs. An area answer does not turn the household
+roster into a parcel roster. Both lists distinguish use =q03a/b=, gifts
+=q05/q07a/b= and purchases =q08/q09a/b/c=, each quantity with its own unit.
+
+The own input-identity dictionaries also differ: =s16bq01= code19 is
+=Plants/boutures de tubercules= in 2018 and =Semences d'arichide= in2021;
+code20 is =Autres semences= then =Plants/boutures de tubercules=. A numeric
+seed map cannot carry between them. Each wave's three published input-unit
+dictionaries was checked independently; their code1 is Gramme and code2
+Kilogramme, unlike the EAC-I community grid. These are published metadata
+facts, not fresh native inspection or new curated maps.
+
+GH #1483's "Decide whether to wire at plot grain" remains a ROOT decision.
+No household amount is allocated over plots, no NPK grade or DAP-catch-all
+composition is chosen, and EAC-I missing codes are not applied to EHCVM.
+The source contract, exact public locators, committed sidecar identities
+and bounded unexecuted controls are in =_/1483-input-source-contract.md=.
+
+* 2026-11-09 -- own poverty report adds a five-section community claim (GH #821)
+
+New primary-source lead: INSTAT's public August2023 report on poverty in
+Mali2021, =profil-determinants-pauvrete-mali-2021_pub.pdf=, has64PDFpages.
+The cover names INSTAT/August2023; PDFp3 explicitly binds its discussion to
+EHCVMII fieldwork October2021--July2022. Section1.2, PDFp15, describes a
+fifth community section collecting local food prices. The exact short
+quotation and public locator are in =_/821-community-price-authority.md=.
+
+Preserve this alongside the existing own-BID quote "four main sections"
+(recorded above, PDFp8) and its separate monthly market design (PDFp9).
+Neither is assumed stale. The report is an own-country lead, not the exact
+fielded community form, CAPI version or released cluster-price source.
+The existing =unsure= / =C1-partial;C4-notrun= position is unchanged.
+
+The initial dispatch's browser-only finding was independently checked by
+the coordinator on2026-11-10UTC. The same public PDF snapshot is1,456,311bytes,
+SHA256=cd86f5ebf0cc20ece8ad6dd4cb7eb20a62d370bb3a08feff5069a0a3de17bcd1=,
+64pages. One local Poppler context extracted text and rendered PDF1/3/15
+from those exact bytes; independent visual review confirmed the cover,
+own-wave dates and food-price sentence. The source remained unchanged.
+The visual scope is those three pages, with receipts in the coordinator's
+=reports/821-mali-public-report-three-pages-20261110= archive.
+Public locator, the contradictory claims, limitations and finite authority
+plan are in =_/821-community-price-authority.md=. No native/API/data replay,
+producer contact, closing verdict, crosswalk or new loader follows.
+
+* 2026-11-10 -- own s16b input wiring candidate prepared (GH #1483)
+
+Own authenticated headers confirm 19 fields/20 input labels in 2018-19 and
+17 fields/22 labels in 2021-22. q02 is use, q05 gift, q08 purchase; q03a/b,
+q07a/b and q09a/b/c stay distinct, each unit field with its own five-choice
+card. 2021 code19 is literally =Semences d'arichide=; 2018 code19 is tubers.
+q00 is respondent, not line identity; 2018 area fields identify no parcel.
+
+The private candidate wires both own s16b waves to the existing =plot_inputs=
+key with structural =Farm-level= and ONLY native q02=1. ROOT explicitly
+accepted this applied scope; No/blank/unlisted answers remain in the separate
+full raw adapter, not public applications. No amount/content gate, EAC-I
+reducer, unit conversion, parcel allocation or new nutrient fraction applies.
+The DAP catch-all stays its full native label, never pure DAP/0.18. Native
+input labels/codes and separate gift/purchase units remain explicit. Missing
+used units get existing Unknown; unknown public answers/key collisions refuse.
+2021 uses EHCVM21_ before the normal framework panel map. Improved stays NA
+without weakening its required declaration. Both EAC-I producers are unchanged;
+all-wave concat adds the optional fields as NA on those older rows.
+
+The historical scheme's "no agriculture-input block" contradicted the dated
+#1445 finding; its source comment and routes are now corrected. The original
+notes and season/coverage/sampling qualifications remain. Header-only results
+establish no observed key multiplicity, counts or native eligibility proof.
+Code and meaningful synthetic controls are prepared, UNRUN. Exact bindings,
+public effects/inverse route and finite next gate:
+=_/s16b-header-adapter-20261110.md= and
+=.coder/ledger/1483-mali-post-header-adapter-20261110.md=. No serving/runtime,
+source/Make/API/cache or scientific acceptance is claimed by preparation.
+
+** Integration qualification -- accepted household wiring is separate from parcels
+
+The earlier dated unwired/preparation/UNRUN findings remain historical
+checkpoints. Accepted1483 source now declares both own s16b household-input
+wrappers at Farm-level, selecting explicit q02=1 before strict selected-row
+validation. Its ledger preserves actual pure/native adapter checks separately
+from public API/data-CI acceptance. The s16a parcel questions stay a distinct
+route; no household-to-parcel allocation or new grade/factor policy follows.
+
+* 2026-11-10 -- EACI 2017 public dictionary bridge is partial (GH #1436)
+
+The bounded own-catalog 3409 public route returned ten Related Materials
+records, including two named own-2017 enumerator manuals not in the six
+committed PDF declarations: =eaci17_manuel_p1_french.pdf= (47786) and
+=eaci17_manuel_p2_french.pdf= (47787). No distinct electronic questionnaire,
+CAPI project or export syntax was listed on that returned page. The resources
+API separately returned HTTP400/ACCESS-DENIED; it was not an empty inventory.
+The manuals were not downloaded in this electronic/export-only check.
+
+The explicitly linked public DDI export,
+https://microdata.worldbank.org/metadata/export/3409/ddi,
+names =MLI_2017_EAC-I_v03_M= and file =F26/eaci17_s7fp2=. Its variables
+=V873--V876= bind =s7fq13a= to quantity, =s7fq13b= to Code Etat,
+=s7fq13c= to Code UML and =s7fq13d= to kilogram equivalent. =V874='s literal
+state labels are =1 Epis/Panicules=, =2 d=, =3 Non-D= and =4 Egrener=.
+Those shortened published labels do not replace the historical native labels
+recorded above. =V886/s7fq21= remains the separate threshing question.
+
+This is a published dictionary correspondence, not a fielded-version bridge.
+The link calls itself DDI Codebook (2.5), while the XML root declares 1.2.2;
+its January2020 document version mentions a geovariables update. It gives no
+explanation of code4 or deployment linkage reconciling the printed three-state
+card. Preserve that mismatch and the current quantity/unit/unread-state rules.
+Four metadata GETs, one selected XML context, no PDF/native/row/API replay;
+exact receipts and the one-P2-manual archival proposal are recorded in
+=.coder/ledger/1436-mali-own2017-electronic-export-route-7b5e95bf-20261110.md=.
+
+* 2026-11-10 -- own2017 P2 enumerator manual held; state bridge remains open (GH #1436)
+
+=2017-18/Documentation/eaci17_manuel_p2_french.pdf= is now DVC-managed:
+WB3409 resource47787,1,375,005bytes,rawMD5=b08ec8e623065e3a75dfab6a481cbafd=.
+One public GET, one exact-document managed push and one fresh empty-private
+normal read-only retrieval matched SHA256=73fe411b153da4df3af02260e88c1b00747c9b37ee47d139345175ee231c9394=.
+The returned official filename matches the local holding. Cover identifies
+EAC-I2017/second passage; PDF metadata names EACI17_MANUEL_P2.docx and dates
+creation/modification2019-02-04, not a certified fielded/export version.
+
+Bounded new-manual read:7unique text pages (PDF1--4/29--31),2personally
+viewed instruction pages (PDF30/31); none of the older forms/BID was reparsed.
+CompleteQ7F13 instruction on PDF30 describes Production en UML, UML and
+Equivalent en Kg, with its partial-harvest and worked-example instructions.
+It supplies no Etat card, fourth-answer explanation or native suffix binding
+in that inspected paragraph/layout. This is not absence from the whole manual.
+CompleteQ7F21 on PDF31 explicitly asks whether the product was threshed before
+storage (Oui toQ22; Non toQ29); it is a separate operation question.
+
+Preserve the existing three-choice printedQ13 versus four-choice released
+s7fq13b/Egrener tension and the ruralLourd/Leger scope. The already-closed
+publicDDI discovery supplies b=CodeEtat/c=UML association but no processing
+meaning/version bridge for code4; the preceding checkpoint records that separate metadata result. No EHCVM fold or Q21 answer is borrowed.
+The remaining operand is an own-release/fielded dictionary, instruction or
+erratum explaining nativecode4 and its correspondence to the printed card.
+No condition/unit/quantity/default/ID/weight/coverage ruling follows.
+Source/terms/byte custody and exact bounds are recorded in SOURCE.org and
+burst report =1436-mali-p2-manual-restoration-20261110/=.
+
+* 2026-11-10 -- current served-strata source trace (GH #1577)
+
+Source-only trace at =c8e378920968fde414767855186e64f5e36f54bb=; no data,
+header, PDF, API, cache or test execution. All four =sample= producers are
+YAML, not scripts: =_/data_scheme.yml:4-10= declares =strata: str= but
+does not supply its meaning or a missing wave's values.
+
+| Wave | Current producer (wave =_/data_info.yml=) | What =strata= supplies |
+|------+-----------------------------------------+-------------------------|
+| 2014-15 | lines 4-35: =EACICONTROLE_p1.dta= + =EACIPOIDS.dta=, join on =i= | No =strata= extraction or construction; missing in the pooled column |
+| 2017-18 | lines 4-36: =eaci17_s00p1.dta= + =EACI17_ECHANTILLON.dta=, join on =i= | Native =strate= from the weights file, formatted as a code string |
+| 2018-19 | lines 88-121: =s00_me_mli2018.dta= + =ehcvm_ponderations_mli2018.dta=, join on =v= | Cover label =s00q01= + space + cover label =s00q04= |
+| 2021-22 | lines 81-116: =s00_me_mli2021.dta= + =ehcvm_ponderations_mli2021.dta=, join on =i= | Cover label =s00q01= + space + cover label =s00q04= |
+
+The 2017 formatter is =2017-18/_/mapping.py:22-23= (=format_id=), not a
+code-to-name dictionary. The country =strata= table has only spelling keys
+for region-milieu labels (=categorical_mapping.org:25-33=); none decodes
+EAC-I codes. Preserve #1574's numeric 51-code gap and its completed bounded
+BID/header findings above. The historical code-nesting/occupied-count note
+is not a codebook. EHCVM names, geography, =deflator= or back-casting by
+=grappe= cannot fill that gap or the 2014 omission.
+
+Both EHCVM expressions call =ehcvm.strata_label= /
+=derive_region_milieu_stratum= (=ehcvm.py:821-849=): labels are stripped
+and joined; either missing/blank operand gives NA; numeric operands raise.
+Their =sample= hooks stamp =Mali::sample::region-milieu-stratum= only where
+=strata= exists. Read-time curation uses the six spelling pairs above,
+including =Taoudenit= to =Taoudénit= under #1576. Thus these are geographic
+constructions supported by the #812 W2 ruling and the existing BID quotation
+in =derivations.yml:503-550=, not native named-stratum variables. The older
+"20 and 17" cells remain historical measurements; no count is repeated here.
+
+For 2017, classification beyond "native code" needs an own-release complete
+51-code dictionary explicitly bound to =EACI17_ECHANTILLON.strate=. For
+2014, it needs an own-wave stratum field or authoritative assignment rule
+bound to the configured household/cluster keys and the design's 51 strata.
+The closed 2017 review supplies neither for 2014. No named native design
+stratum is established by this trace.
+
+Future placement recommendation only: keep a per-wave served-column account
+in the country's =_/sampling.yml=, separate from its =panel= boundary
+statements. The first wave currently has no boundary entry.
+#1577/#1134 must settle any extension to #793's frozen fields/vocabulary;
+no new field is specified here. Canonical column prose alone cannot express
+these four meanings. =sampling.py:76-83= documents the read-time placement
+advantage; the required future hash-cost measurement is not run here.
+Exact sidecar bindings and closed authority are in the external
+=Mali-served-strata.json= and =.coder/ledger/1577-mali-current-served-strata.md=.

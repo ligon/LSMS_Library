@@ -9,7 +9,7 @@ from lsms_library.transformations import (
 from lsms_library.ehcvm import (
     UnitSizeLabelError,
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
     inputs_last_purchase as _inputs_last_purchase,
     served_unit_labels as _served_unit_labels,
     sized_unit as _sized_unit,
@@ -22,6 +22,24 @@ from lsms_library.ehcvm import (
 # and stamps the registry key on every purchased row.  See lsms_library/ehcvm.py
 # and Burkina_Faso/_/derivations.yml.
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Burkina_Faso')
+
+# GH #812.  `strata` is the documented stratum, region x milieu, as a label.  It
+# is a construction, so `sample` carries its registry key: see
+# lsms_library/ehcvm.py and Burkina_Faso/_/derivations.yml.
+from lsms_library.ehcvm import (  # noqa: E402
+    inputs_region_milieu_stratum as _inputs_region_milieu_stratum,
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
+)
+
+
+def inputs_strata(wave):
+    """The registry `inputs` callable: the cover's region and milieu at (t, i)."""
+    return _inputs_region_milieu_stratum('Burkina_Faso', wave)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Burkina_Faso')
 
 
 def inputs_food_acquired(wave):
@@ -49,7 +67,8 @@ def food_acquired(df):
     No number changes here: one constant level is appended, nothing is summed,
     reduced or dropped.
     """
-    return add_visit_level(_food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION), visit=1)
+    return add_visit_level(_food_acquired_with_unit_weights(
+        df, FOOD_ACQUIRED_DERIVATION, wave='2018-19'), visit=1)
 
 def v(value):
     '''
@@ -133,6 +152,74 @@ def household_roster(df):
     return df
 
 
+# ---------------------------------------------------------------------------
+# cluster_features: fixes that are not a reading of their own grappe (GH #1057)
+# ---------------------------------------------------------------------------
+#
+# Every fix in grappe_gps_bfa2018.dta at one or two decimals is a rounded copy of
+# another grappe's reading: the same Timestamp to the second, the same Altitude, an
+# Accuracy differing only by rounding, a position that rounds to it, the same
+# province.  All seven are in vague 2.  The value is the grappe whose reading it
+# copies.  Ruling of 2026-11-05: a copied reading is not a reading of that grappe.
+# The lists are literal; tests/test_gh1057_burkina_copied_gps.py recomputes them from
+# the file.
+_GPS_COPIED_READINGS = {'216': '217', '218': '219', '226': '223', '237': '232',
+                        '240': '232', '350': '351', '365': '369'}
+
+# 6 m apart, both Namentenga and 109 km from that province's median fix, within 30 m
+# of Kadiogo grappes 89 and 136, and stamped the same day as them.  Withheld by the
+# same ruling.
+_GPS_KADIOGO_POINT_GRAPPES = ('103', '104')
+
+_GPS_WITHHELD_GRAPPES = (*_GPS_COPIED_READINGS, *_GPS_KADIOGO_POINT_GRAPPES)
+
+_GPS_WITHHELD_KEY = 'Burkina_Faso::cluster_features::copied-grappe-gps-withheld'
+
+_GPS_RAW_COLUMNS = ['grappe', 'vague', 'coordonnes_gps__Latitude', 'coordonnes_gps__Longitude',
+                    'coordonnes_gps__Accuracy', 'coordonnes_gps__Altitude',
+                    'coordonnes_gps__Timestamp']
+
+
+def withhold_copied_grappe_gps(df):
+    """Blank ``Latitude`` / ``Longitude`` on the withheld grappes.
+
+    Takes the merged frame: the ``v`` index level, and the coordinates from ``df_geo``.
+    Every other column and every row stay as they are, in order, and no row gets a key:
+    a withheld value is not a served one, so the registered entry is ``rows: 0``.  With
+    neither column present (``df_geo`` could not be fetched, which the GH #675 drop stamp
+    reports) there is nothing to withhold.
+    """
+    out = df.copy()
+    present = [c for c in ('Latitude', 'Longitude') if c in out.columns]
+    if not present:
+        return out
+    withheld = out.index.get_level_values('v').isin(_GPS_WITHHELD_GRAPPES)
+    out.loc[withheld, present] = np.nan
+    return out
+
+
+def cluster_features(df):
+    """``cluster_features`` post-processor: see :func:`withhold_copied_grappe_gps`."""
+    return withhold_copied_grappe_gps(df)
+
+
+def inputs_cluster_features(wave='2018-19'):
+    """The registry `inputs` callable: the file's own row for each withheld fix, at
+    ``(t, v)``, with ``copy_of`` naming the grappe whose reading it copies (NA for 103
+    and 104, which share a point rather than copy a reading).
+    """
+    if wave != '2018-19':
+        raise ValueError(f'{_GPS_WITHHELD_KEY} covers 2018-19 only, not {wave!r}')
+    from lsms_library.paths import countries_root
+    gps = tools.get_dataframe(countries_root() / 'Burkina_Faso' / wave / 'Data'
+                              / 'grappe_gps_bfa2018.dta')
+    v = gps['grappe'].map(tools.format_id)
+    keep = v.isin(_GPS_WITHHELD_GRAPPES)
+    out = gps.loc[keep, _GPS_RAW_COLUMNS].assign(t=wave, v=v[keep])
+    out['copy_of'] = out['v'].map(_GPS_COPIED_READINGS).astype('string')
+    return out.set_index(['t', 'v'])
+
+
 FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
               'AteLess', 'RanOut', 'Hungry', 'WholeDay']
 
@@ -190,7 +277,44 @@ COPING_LABELS = {
 }
 
 
+class ShockLayoutError(Exception):
+    """Section 14.04 of this file does not have the layout :func:`shocks` serves.
+
+    Subclasses ``Exception``, not ``ValueError`` / ``KeyError`` / ``RuntimeError``:
+    the derived-table paths catch those and would fall back to another build.
+    """
+
+
+def _food_stock_by_vague(df):
+    """Serve food stock and purchases from each vague's own columns (GH #1556).
+
+    Vague 1 asked five consequences (d = stock, e = achats, f blank) and vague 2
+    six (d = effectif du cheptel, e = stock, f = achats).  ``AffectedFoodStock``
+    arrives as d, ``StockVague2`` as e, and ``AffectedConsumption`` as f,
+    through the same Boolean mapping. ``PurchasesVague2`` retains raw f for the
+    guard, independent of whether a label maps to a Boolean. A blank f is what
+    tells the two apart in the file, so a release where it stops being one raises:
+    d is a different question on those rows and nothing else would say so.
+    """
+    vague = pd.to_numeric(df.pop('vague'))
+    stock_vague2 = df.pop('StockVague2')
+    purchases = df.pop('PurchasesVague2')
+    five = vague.eq(1)
+    asked = stock_vague2.notna() | df['AffectedFoodStock'].notna()
+    if not vague.isin([1, 2]).all() or purchases[five].notna().any() \
+            or purchases[~five & asked].isna().any():
+        raise ShockLayoutError(
+            f"s14q04f should be blank in vague 1 and filled in vague 2: "
+            f"{int(purchases[five].notna().sum())} filled in vague 1, "
+            f"{int(purchases[~five & asked].isna().sum())} blank in vague 2, "
+            f"vague values {sorted(vague.dropna().unique().tolist())}")
+    df['AffectedFoodStock'] = df['AffectedFoodStock'].where(five, stock_vague2)
+    df['AffectedConsumption'] = df['AffectedConsumption'].where(~five, stock_vague2)
+    return df
+
+
 def shocks(df):
+    df = _food_stock_by_vague(df)
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
     how_coped = {0: [], 1: [], 2: []}

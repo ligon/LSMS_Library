@@ -60,6 +60,7 @@ Data Scheme:
     AffectedAssets: bool
     AffectedProduction: bool
     AffectedConsumption: bool
+    AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
@@ -105,9 +106,7 @@ Data Scheme:
     v: str
     weight: float
     panel_weight: float
-    strata:
-      type: str
-      optional: true
+    strata: str
     Rural: str
 
   panel_ids: !make
@@ -217,6 +216,15 @@ Data Scheme:
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    # Own2021 only (GH #1483): separate acquisition roles, not used-unit amounts.
+    # The 2018 driver and its historical gift-as-purchase binding are unchanged.
+    Unit_purchased: {type: str, optional: true}
+    Received_as_gift: {type: bool, optional: true}
+    Quantity_received_as_gift: {type: float, optional: true}
+    Unit_received_as_gift: {type: str, optional: true}
+    Input_native: {type: str, optional: true}
+    # Own2021 slot identity, including full native uncurated seed descriptions.
+    input_code_native: {type: int, optional: true}
     materialize: make
 
   plot_labor:

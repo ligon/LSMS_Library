@@ -108,7 +108,8 @@ def cp():
                     f'{type(exc).__name__}: {exc}')
     if df is None or df.empty:                              # pragma: no cover
         pytest.skip('Malawi crop_production empty')
-    return df
+    # GH #1457: a sale's Farm-level row is not a harvest row; these pin harvest rows.
+    return df[df.index.get_level_values('plot_id') != 'Farm-level']
 
 
 def _strip_condition(cp):
@@ -500,9 +501,7 @@ class TestAgainstCropProduction:
         """A function of the crop code, so it is not a level.
 
         `production_obs` carries the code in the grain since #1373; putting
-        the variety there as well would only widen the index -- and widen the
-        index-shape divergence that already costs Malawi its place in
-        `Feature('crop_production')` (see the class below).
+        the variety there as well would only widen the index.
         """
         assert 'crop_variety' in cp.columns
         assert 'crop_variety' not in cp.index.names
@@ -584,12 +583,15 @@ class TestSaleSuppressionIsCounted:
         })
         with pytest.warns(malawi_mod.SaleAttachmentWarning, match='2,500 MWK'):
             out = malawi_mod.assemble_crop_production('2010-11', [harv], [sale])
-        assert out['production_obs'].tolist() == ['reported:G:1'] * 2
+        # Re-pinned for GH #1457: the sale is on neither harvest row, and on its own row.
+        harvest_rows = out[out.index.get_level_values('plot_id') != 'Farm-level']
+        assert harvest_rows['production_obs'].tolist() == ['reported:G:1'] * 2
         tally = out.attrs['sale_suppressed']
         assert tally == {'wave': '2010-11', 'sales': 1, 'rows': 2,
                          'value': 2500.0}
         # and the sale really is on neither row -- not on one of them
-        assert pd.isna(out['Value_sold']).all()
+        assert pd.isna(harvest_rows['Value_sold']).all()
+        assert out.xs('Farm-level', level='plot_id')['Value_sold'].tolist() == [2500.0]
 
     def test_a_single_condition_plot_crop_still_gets_its_sale(self, malawi_mod):
         """The gate must not fire on the ordinary case."""
@@ -623,9 +625,10 @@ class TestSaleSuppressionIsCounted:
 
 
 class TestFeatureExclusionIsRecordedNotAccidental:
-    """`condition` costs Malawi its place in `Feature('crop_production')`.
+    """`condition` cost Malawi its place in `Feature('crop_production')`, since fixed
+    (`Feature` serves Malawi's rows; CONTENTS.org says so above the record kept here).
 
-    That is a FRAMEWORK defect (`crop_production` is not in `index_info`, so
+    That was a FRAMEWORK defect (`crop_production` is not in `index_info`, so
     `Feature` falls through to the modal-index-shape filter), fixed separately
     on `fix/feature-canonical-index-crop-production` -- GH #775 / #569.  The
     level is kept ON PURPOSE: without it the shipped table is refused outright,
@@ -740,8 +743,11 @@ class TestSaleConditionIsRead:
                           match='CONTRADICTS'):
             out = malawi_mod.assemble_crop_production(
                 '2010-11', [self._harv(['shelled'])], [self._sale('unshelled')])
-        assert pd.isna(out['Value_sold']).all()
-        assert pd.isna(out['Quantity_sold']).all()
+        # Re-pinned for GH #1457: off the harvest row, on its own Farm-level row.
+        harvest_row = out[out.index.get_level_values('plot_id') != 'Farm-level']
+        assert pd.isna(harvest_row['Value_sold']).all()
+        assert pd.isna(harvest_row['Quantity_sold']).all()
+        assert out.xs('Farm-level', level='plot_id')['Value_sold'].tolist() == [2500.0]
         assert out.attrs['sale_basis_mismatch'] == {
             'wave': '2010-11', 'sales': 1, 'rows': 1, 'value': 2500.0}
         # a contradiction is NOT an ambiguity: the #854 tally stays at zero
@@ -796,7 +802,11 @@ class TestSaleConditionIsRead:
         with pytest.warns(malawi_mod.SaleAttachmentWarning, match='AMBIGUOUS'):
             out = malawi_mod.assemble_crop_production(
                 '2010-11', [self._harv(['shelled'])], [sale])
-        assert pd.isna(out['Value_sold']).all()
+        # Re-pinned for GH #1457: on neither the row nor one sale's row: each its own.
+        assert pd.isna(out[out.index.get_level_values('plot_id') != 'Farm-level']['Value_sold']).all()
+        farm = out.xs('Farm-level', level='plot_id')
+        assert farm['Value_sold'].sum() == 5000.0 and len(farm) == 2
+        assert farm['production_obs'].is_unique
         assert out.attrs['sale_suppressed'] == {
             'wave': '2010-11', 'sales': 2, 'rows': 1, 'value': 5000.0}
         assert out.attrs['sale_basis_mismatch']['sales'] == 0

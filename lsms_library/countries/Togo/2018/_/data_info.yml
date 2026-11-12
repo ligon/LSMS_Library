@@ -13,7 +13,10 @@ sample:
                 - grappe
                 - menage
         myvars:
-            strata: s00q01
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
             Rural:
                 - s00q04
                 - mapping:
@@ -185,13 +188,31 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        AffectedConsumption:
+        # Five columns in vague 1 (stock d, purchases e); six in vague 2
+        # (livestock d, stock e, purchases f). The hook selects per row.
+        AffectedFoodStock:
             - s14q04d
             - mapping:
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
+        StockVague2:
+            - s14q04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14q04f
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        PurchasesVague2: s14q04f  # raw layout sentinel, before boolean mapping
+        vague: vague
         Cope1: s14q05__1
         Cope2: s14q05__2
         Cope3: s14q05__3

@@ -88,7 +88,7 @@ def _planting():
 
 def _sale():
     return pd.DataFrame([("H4", 42, 1, 4.0, 40.0), ("H1", 72, 2, nan, nan)],
-                        columns=["holder_id", "crop_code", "sold", "sqty", "sval"])
+                        columns=["holder_id", "crop_code", "sold", "sqty", "sval"]).assign(household_id=lambda d: "H" + d["holder_id"].astype(str))  # the §11/§12 files name it (GH #1457)
 
 
 def _build(eth, colmap=COLMAP, wave="2018-19"):
@@ -115,17 +115,20 @@ def test_the_stamp_is_on_exactly_the_flagged_rows_that_serve_a_number(eth):
     assert teff["Derivation"].isna().all()
     assert _d(df, "H2")["Derivation"].isna().all(), got      # disagreeing §4 lines
     assert _d(df, "H3")["Derivation"].isna().all(), got      # no §4 line
-    assert list(_d(df, "H4")["Derivation"]) == [KEY], got    # a sale is a window value
+    # Re-pinned for GH #1457: its §11 sale carries the attachment key beside the window.
+    assert list(_d(df, "H4")["Derivation"]) == [
+        "+".join(sorted([KEY, eth.HH_CROP_SALE_SINGLE_ROW]))], got    # a sale is a window value
     assert _d(df, "H5")["Derivation"].isna().all(), got      # serves nothing
-    assert set(d.dropna()) == {KEY}
+    assert set(d.dropna().str.split("+").explode()) == {KEY, eth.HH_CROP_SALE_SINGLE_ROW}
 
 
 def test_the_stamp_moves_no_value_and_no_row(eth):
     """Built with and without the flag, every row and every value is equal."""
     with_flag = _build(eth)
     plain = _build(eth, colmap={k: v for k, v in COLMAP.items() if k != "pl_permanent"})
-    assert "Derivation" not in plain.columns
-    pd.testing.assert_frame_equal(with_flag.drop(columns="Derivation"), plain)
+    # Re-pinned for GH #1457: a §11 sale's key makes the column exist either way.
+    assert not plain["Derivation"].astype("string").str.contains(KEY, regex=False).any()
+    pd.testing.assert_frame_equal(with_flag.drop(columns="Derivation"), plain.drop(columns="Derivation"))
 
 
 def test_derive_permanent_crop_window_is_the_identity(eth):
@@ -177,8 +180,11 @@ def test_the_stamp_rides_to_the_served_table(cp):
     3,881 since GH #1461 serves a permanent crop's second line.)  The attrs
     summary counts them."""
     t = np.asarray(cp.index.get_level_values("t"), dtype=object)
-    d = (cp["Derivation"] == KEY).fillna(False).to_numpy(dtype=bool)
-    got = {w: int((d & (t == w)).sum()) for w in sorted(set(t))}
+    # GH #1457 re-pin: the key can share the column with a §11 sale's, and a Farm-level
+    # sale of a crop flagged permanent carries it too (638 W4, 676 W5 are perennial-coded).
+    d = cp["Derivation"].astype("string").str.contains(KEY, regex=False).fillna(False).to_numpy(dtype=bool)
+    plotted = (cp.index.get_level_values("plot_id") != "Farm-level")
+    got = {w: int((d & plotted & (t == w)).sum()) for w in sorted(set(t))}
     assert got == {"2011-12": 0, "2013-14": 0, "2015-16": 0,
                    "2018-19": 3799, "2021-22": 3881}, got
     assert cp.loc[d, ["Quantity", "Quantity_sold", "Value_sold"]].notna().any(axis=1).all()
@@ -223,11 +229,13 @@ def test_raw_oracle_stamped_rows_are_the_flagged_ones(cp, eth, wave):
     expected = set(pj[pj["all"]].index)
     ambiguous = set(pj[pj["any"] & ~pj["all"]].index)
     sv = cp[np.asarray(cp.index.get_level_values("t"), dtype=object) == wave].reset_index()
+    sv = sv[sv["plot_id"] != "Farm-level"]  # GH #1457: no §4 plot key on a sale's own row
     keys = list(zip(sv["plot_id"], sv["j"]))
     amb = np.array([k in ambiguous for k in keys])
     exp = (np.array([k in expected for k in keys])
            & sv[["Quantity", "Quantity_sold", "Value_sold"]].notna().any(axis=1).to_numpy())
-    stamped = (sv["Derivation"] == KEY).fillna(False).to_numpy(dtype=bool)
+    # GH #1457: the key can share the column with the §11 sale's.
+    stamped = sv["Derivation"].astype("string").str.contains(KEY, regex=False).fillna(False).to_numpy(dtype=bool)
     assert (stamped[~amb] == exp[~amb]).all(), int((stamped[~amb] != exp[~amb]).sum())
     assert int(stamped.sum()) > 3000
 
@@ -247,7 +255,9 @@ def test_derivation_inputs_are_the_raw_lines_and_join_to_the_served_rows(cp, wav
     assert {"s9q04", "s9q05a", "s9q05b", "s4q15", "s11q02a1", "s11q07",
             "s11q11a", "s11q12"} <= set(raw.columns)
     s9 = raw[(m == "sect9_ph").to_numpy() & (raw["s4q15"] == 1).fillna(False).to_numpy()]
-    served = cp[(cp["Derivation"] == KEY).fillna(False).to_numpy(dtype=bool)
+    # GH #1457: the §9 rows (a Farm-level row has no §9 row), key perhaps beside another.
+    served = cp[cp["Derivation"].astype("string").str.contains(KEY, regex=False).fillna(False).to_numpy(dtype=bool)
+                & (cp.index.get_level_values("plot_id") != "Farm-level")
                 & (np.asarray(cp.index.get_level_values("t"), dtype=object) == wave)]
     sk = set(served.reset_index().set_index(["t", "i", "j"]).index)
     missing = sk - set(s9.index)

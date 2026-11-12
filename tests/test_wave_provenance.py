@@ -2094,6 +2094,8 @@ def wb(countries, monkeypatch):
     import urllib.request
     from lsms_library import data_access as da
     state = {"zip": _zip("a.dta", "b.dta"), "fail": False}
+    # Raw-release transaction controls do not acquire catalog documents.
+    monkeypatch.setattr(da, 'fetch_documentation', lambda *a, **k: None)
 
     def urlopen(req, timeout=None):
         if state["fail"]:

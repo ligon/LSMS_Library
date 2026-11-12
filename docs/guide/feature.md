@@ -57,6 +57,24 @@ inputs; labels on only one input are refused, with no inference or
 broadcasting. An index level takes precedence over a redundant country
 column. Area keys may still be columns. Country-less calls keep their
 existing contract, and attrs alone do not add country.
+A nonempty fertilizer-rate result warns when an entire eligible `(country,t)`
+cell has fertilizer and positive-area rows but no matching keys. Anonymous
+warnings use no country from one-sided or conflicting metadata. The rates and
+join policy remain unchanged; unmatched plots within a surviving cell are outside
+this whole-cell check. Where both full plot vocabularies are known to agree,
+callers can explicitly choose `on='plot'`. The documented Ethiopia/Malawi literal
+route also uses known country provenance retained on both inputs. The warning
+discloses omissions and does not recover missing rates.
+The crop reducers `harvest_kg`, `gross_crop_revenue` and `crop_diversity`
+likewise prepend supplied country identity, including singleton and empty
+results. Crop conversion estimates are computed separately within each
+country; identical unit labels and household keys do not establish a shared
+conversion factor. `yield_kg` requires non-null country on both crop and area
+operands or neither, retains country through the land join, and selects each
+row's existing country-specific land route. Labels outrank scalar attrs;
+country-less inputs keep their existing behavior. This preserves each
+instrument's land keys and definitions, without making crop occurrence
+entropy or differently recorded harvest conditions comparable across countries.
 Other transforms have their own documented grouping and joining contracts.
 
 ## Design Decisions
@@ -82,6 +100,30 @@ All per-country harmonization (categorical mappings, kinship decomposition,
 canonical spellings, dtype coercion) is applied by each `Country` before
 concatenation. `Feature` delegates to each country's existing table method.
 
+### `strata` Is Not One Vocabulary
+
+`Feature('sample')` pools a column that means different things in different
+countries, and sometimes in different waves of one country. A region, a region
+crossed with urban and rural, a survey's own design code and a district are all
+served as `strata`, because that is what each survey's design or files offer:
+
+| `strata` holds | Where |
+|---|---|
+| Region x milieu, as a label | EHCVM waves of Senegal, Mali, Niger, Burkina Faso; Ethiopia |
+| Region alone | Benin, Togo, Guinea-Bissau, Cote d'Ivoire 2018-19; GhanaLSS 1998-99 onward |
+| The file's own stratum, a label | Niger 2011-12 and 2014-15 (region x agro-ecological zone) |
+| The file's own stratum, a code | Mali 2017-18, Burkina Faso 2014 |
+| Nothing | Mali 2014-15 |
+
+This table covers the cases measured for GH #812, not every country. So
+`strata` identifies a stratum within one wave of one country. Do not compare or
+group on it across countries, and check before doing so across waves. Spelling
+differs too: the EHCVM labels end in `Urbain` or `Rural`, as the surveys write
+them, and Ethiopia's in `Urban` or `Rural`. Where the
+label is a construction it is registered: `df.attrs['derivations']` names those
+countries, and `Country(c).derivations()` gives the rule and its evidence. Each
+country's `_/CONTENTS.org` records what its `strata` holds.
+
 ### Error Handling
 
 If a country's data fails to load, `Feature` emits a warning and continues
@@ -94,6 +136,24 @@ with warnings.catch_warnings(record=True) as w:
     df = roster()
     # Inspect w for any per-country failures
 ```
+
+`household_characteristics` and `food_expenditures` validate required provider
+index levels before comparing country shapes. A provider missing a required
+level is excluded with a warning; `df.attrs['index_unavailable']` records its
+missing and required levels, returned index names, and row count. A present
+level with null values is retained. The excluded frame remains available through
+the Country API.
+
+These requirements are declared separately under
+`Index Info > required_index_levels`: `(t, v, i)` for household characteristics
+and `(t, v, i, j)` for food expenditures. A requested `market` replaces required
+`v` with `m`; monetary index/numeraire modes require `currency`. Ordinary
+household characteristics may omit `m`, and legacy food expenditures may omit
+`s`. Their existing shape selection and source detail are preserved: this does
+not register a new canonical food-expenditure shape or combine incompatible
+source shapes. Other tables keep their existing reduced-index contracts. If
+every provider is excluded, Feature returns the existing empty assembly with
+the exclusion record.
 
 ## Available Tables
 

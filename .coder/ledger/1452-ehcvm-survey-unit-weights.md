@@ -1,0 +1,34 @@
+# #1452: recover EHCVM survey unit-weight wiring
+
+Search tier: git + ripgrep. Current base 8558fefe0; preserved candidate a0e31481a, based on 2a888bcea, plus saved option-B repair.
+
+## §1 Task
+Recover the approved survey NSU table wiring for Burkina Faso, Mali, Niger and Senegal 2018-19/2021-22. Keep earlier waves on the estimate without this table's Quantity_kg (approved option B), preserving #1450's unsized pooling and #1487's subset behavior.
+
+## §2 Existing machinery
+Reuse ehcvm.food_acquired_ehcvm, served_unit_labels, size_label and the country derivation registry/stamping path. The held candidate extends this module with one NSU hook and per-country registry keys; tests/test_ehcvm_unit_weights.py covers its source selection and joins. Reuse transformations.food_kg_factors, _inferred_kg_rungs, _size_pooled_frame, _KG_RUNG_ARRAYS and the existing survey_kg precedence. Existing tests/test_food_kg_size_pool.py and subset/request-dependence tests own those invariants. Preserve ehcvm.community_price_slots and the purchase-value construction. Inherit STANDING.md §2 for IO/cache machinery.
+
+## §3 Definitions and approved choices
+Quantity and u remain reported native values. Quantity_kg is a summable construction from source weights, registered with Derivation plus nsu_year/nsu_join inputs; survey_kg reads it before inferred factors. National medians across matched table codes, 2018 use of 2021 files, and the disclosed dependency are approved in the root brief. Older waves use a tableless estimate scoped to the NSU derivation only; unrelated survey kilograms are not removed. See CLAUDE.md, canonical data_info.yml and STANDING.md §3.
+
+## §4 Invariants
+Preserve native rows/indexes, Quantity/Expenditure and unrelated features. Do not reuse 2021 product codes for 2018; use the reviewed label join. Preserve #1450's strict older-cell assertions and #1487's subset slice invariants. No new xfails, fixtures/baselines/dependencies/lockfiles, shared L2 writes or LSMS_NO_CACHE. Sanctioned get_dataframe/get_data_file IO only, exact checkout import/config identity, private caches with shared L1. Old worktrees and saved artifacts remain untouched. Inherit STANDING.md §4.
+
+## §5 Reuse decision
+Extend the held NSU hook and derivation declarations, not a new loader. Recover only the task's net 28-file payload and option-B repair onto current development; do not import unrelated old tree differences. Factor the existing inference/size-pool calls for the scoped second estimate; retain its existing mathematics. Keep source defects and evidence limits disclosed.
+
+## §6 Open questions
+No new policy ruling requested. Verify the saved scope detection, test adequacy, source/metadata selection, and current-development replay before treating the old green reports as current evidence. Ambiguous new source findings must be reported, not guessed.
+
+## Verification
+Runtime/test freeze: `be1523490303a6523aa11f4028f4f8620981160e`, following recovered `88b46e71796b48d3faa90096168862a3b135cc03` on base `8558fefe0d26e3f26e4082e52684382df94887d5`. The three-file follow-up corrects the eight-cell module description and replaces a new oracle's nonexistent summary `waves` field with observed stamped-row wave/count assertions; original row/column assertions remain. Its saved diff was copied into a new isolated worktree, leaving the original dirty checkout untouched.
+
+- 401 synthetic/config/registry/size/hash tests passed on 88b46e717. Independent review passed 286 cases, including 11 adversarial checks through all eight actual wave pipelines; no implementation blocker. Its documentation finding is corrected in the follow-up. Positional matching's two-column guard remains a disclosed future-ordering risk; no current extraction-order failure was reproduced.
+- Source comparison on 88b46e717 versus base: 115 exact frame pairs, four unchanged non-frame statuses, and the 12 intended factor/kg-quantity/kg-price changes across the core four plus Malawi/Nigeria/Togo. Six older-wave slices are exact (Burkina/Mali factors, quantities and prices). Four old country caches rebuild to their cold counterparts. Native quantities, expenditure, indexes and unrelated features are preserved.
+- Exact runtime/test freeze, free co_carleton job 41004761: 201 source cases passed, zero failed/skipped, 189 warnings, 769.26s. Covers the NSU tables/market checks, eight wave join/input/summary oracles, older-wave estimates, strict #1450 and #1487 controls, and the existing twelve-wave EHCVM purchase-value controls. Original four summary-oracle failures and the corrected four-case run remain retained; the final complete suite is green.
+- Feature phases 1/2 completed for four food features and four countries: 301 records, zero build errors, six empty-assembly flags triaged as documented API degrade (four Aggregate requests lack the label column; kgprice/unitprice lack Price at both base and candidate). Native-unit/kg mode cardinalities differ as requested. The 230,340 collapsed rows are Burkina visits only; direct reassembly of closed operands conserves Quantity and Expenditure math.fsum exactly, and all four reassembled native frames are exact base/candidate. Raw warning payloads are permission-restricted; aggregate-only triage is available.
+- Bounded cold GhanaLSS control: exact base/candidate food_acquired and factor frames (5,328,568 rows each), kg quantities (1,623,676), and declared nutrition (34,798). No spillover behavior regression observed in these four controls.
+- Final complete metadata census: 97/450 country-table and 284/1,895 wave hashes move, including GhanaLSS's nutrition importer closure (18/126). All 35 tagged framework fingerprints remain unchanged. The follow-up moves zero hashes versus 88b46e717. This is not a four-country-only invalidation claim.
+- Broad offline suite on exact 88b46e717: 11,398 passed, 245 skipped, 4 xfailed in 1059.97s, empty private roots/network isolation/two loadfile workers. This is prior-freeze broad evidence, not a full-suite rerun on be1523490; the follow-up changes no runtime code/configuration. API audit passed. Final job completed 0:0 in 21m17s, with empty in-tree artifact check and clean checkout.
+
+Durable aggregate reports: `/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/ehcvm-1452-recovery-20261107/FINAL-REPORT.md` and adjacent comparison, warm-control, source-summary, Feature-triage, closed-frame proof, Ghana comparison and hash census files. Private immutable operands/snapshots remain separate. Source anomalies, national weighting/label-join assumptions, and 2018 dependencies on 2021 files remain disclosed. No new policy ruling, shared-cache re-warm, dependency/fixture change or GitHub write occurred. Root retains publication/check/merge authority; those are the remaining gates.

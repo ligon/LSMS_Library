@@ -78,15 +78,15 @@ makes the existing row-union work untouched, and keeps the table inert to the
 label auto-apply in =country.py=, which only fires on a =Preferred Label=
 column.
 
-*Composition happens in =Country=, not in =transformations=.*  The kg factor is
-computed BEFORE the categorical mapping is applied --- the derived-food dispatch
-is =_aggregate_wave_data= -> =transform_fn= -> =_finalize_result=, so
-=conversion_to_kgs= sees the RAW =u= (see the comment above
-=_CURRENCY_DENOMINATED_UNITS= in =transformations.py=, and GH #770, where a fix
-that assumed otherwise was rejected for exactly this reason).  So
-=Country._unit_kg_factors= composes =u= (raw -> Preferred Label) with =u_kg=
-(Preferred Label -> kg) into a raw-label-keyed dict and passes it down; nothing
-in =transformations= has to know about label harmonisation or about ordering.
+*Composition happens in =Country=, not in =transformations=.*  The derived-food
+dispatch is =_aggregate_wave_data= -> =transform_fn= -> =_finalize_result=, and
+=_aggregate_wave_data= has already finalized =food_acquired=.  The Country path
+therefore hands =conversion_to_kgs= the served =u=.  A direct transform call uses
+the labels on its input frame; an EHCVM cache can hold a mapped sized label beside
+a raw bare one (GH #1224).  =Country._unit_kg_factors= composes =u= (raw ->
+Preferred Label) with =u_kg= (Preferred Label -> kg) and returns keys for both raw
+and preferred spellings.  Nothing in =transformations= has to know which path
+supplied the labels.
 
 *Scope.*  Seeded with the units that are genuinely country-qualified and were
 previously wrong in =KNOWN_METRIC=.  Universal metric spellings (=kg=, =gram=,

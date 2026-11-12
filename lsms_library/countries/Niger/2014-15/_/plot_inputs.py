@@ -27,8 +27,8 @@ from niger import (i as niger_i, _input_maps, _input_labels,
 
 
 base = '../Data/NER_2014_ECVMA-II_v02_M_STATA8/'
-src = get_dataframe(base + 'ECVMA2_AS02CP1.dta', convert_categoricals=True)
-srcn = get_dataframe(base + 'ECVMA2_AS02CP1.dta', convert_categoricals=False)
+src = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS02CP1.dta', convert_categoricals=True)
+srcn = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS02CP1.dta', convert_categoricals=False)
 
 input_map, unit_map, _ = _input_maps()
 crop_map, _ = _crop_maps()

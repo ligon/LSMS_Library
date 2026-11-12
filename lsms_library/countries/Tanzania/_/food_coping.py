@@ -4,10 +4,15 @@ waves and apply panel-id walking.
 
 Each wave-level script writes a ``(t, i, Strategy)`` parquet with the household's
 day-counts for each coping strategy.  The 2008-15 folder's parquet carries the
-NPS rounds that fielded §H (rounds 2/3/4 -> waves 2010-11, 2012-13, 2014-15;
-round 1 / 2008-09 did not field the module); the 2019-20 / 2020-21 folders carry
-one wave each.  We load by folder (Waves.keys()), concatenate, then id_walk to
-harmonize household ids across waves.
+available released-UPD Food Security rounds (2/3/4 -> waves 2010-11, 2012-13,
+2014-15). Held retrospective UPD documents mark that module absent in round 1;
+this is not proof of original 2008-09 fielding. Original R1 H is Governance,
+and the bounded published K FOOD / R SHOCKS read concerns consumption/shared
+meals and severe shocks, not whole-form absence of the coping battery. Exact
+fielded revision/addenda and original-to-released-UPD linkage remain qualified
+(GH #587; Tanzania/_/CONTENTS.org). The 2019-20 / 2020-21 folders carry one wave
+each. We load by folder (Waves.keys()), concatenate, then id_walk to harmonize
+household ids across waves.
 """
 from lsms_library import Country
 from lsms_library.local_tools import to_parquet, get_dataframe

@@ -94,9 +94,10 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 import pandas as pd
+import yaml
 
 from .paths import countries_root
-from .yaml_utils import load_yaml
+from .yaml_utils import SchemeLoader
 
 __all__ = [
     "ATTRS_KEY", "COLUMN", "KEY_SEP", "BASES", "REQUIRED_FIELDS",
@@ -464,10 +465,72 @@ def framework_yml_path() -> Path:
     return Path(str(files("lsms_library") / "derivations.yml"))
 
 
+class _RegistryLoader(SchemeLoader):
+    """Refuse explicit duplicates before merge flattening can hide their origin.
+
+    SchemeLoader still constructs the document, including intentional inherited
+    merge overrides. The raw graph is checked once, so recursive/shared aliases
+    neither loop nor count a reused mapping as a duplicate declaration.
+    """
+
+    def __init__(self, stream):
+        self._key_marks = {}
+        super().__init__(stream)
+
+    def compose_node(self, parent, index):
+        # Alias nodes retain their anchor's mark. Capture the actual occurrence
+        # so a duplicate aliased key points to the repeated use, not its anchor.
+        mark = self.peek_event().start_mark
+        node = super().compose_node(parent, index)
+        if isinstance(parent, yaml.MappingNode) and index is None:
+            self._key_marks[id(parent), len(parent.value)] = mark
+        return node
+
+    def construct_document(self, node):
+        visited = set()
+
+        def check(node):
+            if id(node) in visited:
+                return
+            visited.add(id(node))
+            if isinstance(node, yaml.MappingNode):
+                seen = {}
+                for index, (key_node, value_node) in enumerate(node.value):
+                    mark = self._key_marks.get((id(node), index), key_node.start_mark)
+                    merge = key_node.tag == 'tag:yaml.org,2002:merge'
+                    if merge:
+                        key = '<<'  # SafeLoader handles this by tag, not key shape.
+                    elif key_node.tag == 'tag:yaml.org,2002:value':
+                        key = self.construct_scalar(key_node)
+                    else:
+                        key = self.construct_object(key_node, deep=True)
+                    try:
+                        token = (merge, key)
+                        hash(token)
+                    except TypeError:
+                        raise yaml.constructor.ConstructorError(
+                            'while constructing a mapping', node.start_mark,
+                            'found unhashable key', mark) from None
+                    if token in seen:
+                        raise yaml.constructor.ConstructorError(
+                            'while constructing a derivation registry mapping',
+                            seen[token], f'found duplicate key {key!r}', mark)
+                    seen[token] = mark
+                    check(key_node)
+                    check(value_node)
+            elif isinstance(node, yaml.SequenceNode):
+                for child in node.value:
+                    check(child)
+
+        check(node)
+        return super().construct_document(node)
+
+
 def _load(path: Path, file_country: str | None) -> dict[str, DerivationRecord]:
     if not path.exists():
         return {}
-    data = load_yaml(path) or {}
+    with path.open("r", encoding="utf-8") as handle:
+        data = yaml.load(handle, Loader=_RegistryLoader) or {}
     if not isinstance(data, Mapping):
         raise ValueError(f"{path}: top level must be a mapping of key -> entry")
     out: dict[str, DerivationRecord] = {}
@@ -689,7 +752,8 @@ def derivations_table(country: str | list[str] | None = None) -> pd.DataFrame:
             "key": r.key, "country": r.country, "table": r.table, "name": r.name,
             "waves": "all" if r.waves == "all" else ", ".join(r.waves),
             "columns": ", ".join(r.columns or []),
-            "rows": json.dumps(r.rows) if r.rows else None,
+            # 0 names a deletion, and is falsy: it must not read as "no selector".
+            "rows": json.dumps(r.rows) if r.rows or r.rows == 0 else None,
             "bases": "+".join(r.bases),
             "n_assumptions": len(r.assumptions or []),
             "validated_against": r.validated_against, "since": r.since,

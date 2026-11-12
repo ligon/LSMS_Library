@@ -6,9 +6,22 @@ from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
+    inputs_region_milieu_stratum as _inputs_region_milieu_stratum,
     served_unit_labels as _served_unit_labels,
     sized_unit as _sized_unit,
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
 )
+
+
+# GH #1575; reuse the GH #812 construction (ledger1575 §§2–5).
+def inputs_strata(wave):
+    return _inputs_region_milieu_stratum('Benin', wave)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Benin')
+
 
 # GH #876.  The wide frame's `Expenditure` used to be `s07bq08`, the value of
 # ONE purchase made up to 30 days ago, sitting beside a 7-day consumption
@@ -186,7 +199,40 @@ def food_security(df):
     return df
 
 
+class ShockLayoutError(Exception):
+    """Section 14.04 differs from the documented five/six-column layout.
+
+    Not a ValueError/KeyError/RuntimeError: build fallbacks must not hide it.
+    """
+
+
+def _food_effects_by_vague(df):
+    """Select stock and purchases per row, preserving mapped missing answers.
+
+    Vague 1: d = stock, e = purchases, f blank.  Vague 2: d = livestock,
+    e = stock, f = purchases (GH #1561).  The raw f sentinel checks this
+    layout independently of the answer-to-boolean mapping, as in the core
+    EHCVM 2018-19 hooks.  The same e is purchases in vague 1 and stock in 2.
+    """
+    vague = pd.to_numeric(df.pop('vague'))
+    stock_vague2 = df.pop('StockVague2')
+    purchases = df.pop('PurchasesVague2')
+    five = vague.eq(1)
+    asked = stock_vague2.notna() | df['AffectedFoodStock'].notna()
+    if not vague.isin([1, 2]).all() or purchases[five].notna().any() \
+            or purchases[~five & asked].isna().any():
+        raise ShockLayoutError(
+            f"s14q04f should be blank in vague 1 and filled in vague 2: "
+            f"{int(purchases[five].notna().sum())} filled in vague 1, "
+            f"{int(purchases[~five & asked].isna().sum())} blank in vague 2, "
+            f"vague values {sorted(vague.dropna().unique().tolist())}")
+    df['AffectedFoodStock'] = df['AffectedFoodStock'].where(five, stock_vague2)
+    df['AffectedConsumption'] = df['AffectedConsumption'].where(~five, stock_vague2)
+    return df
+
+
 def shocks(df):
+    df = _food_effects_by_vague(df)
     # Benin 2018-19 records at most 2 coping strategies per household.
     # (A probe over the full survey shows no household with a third
     # strategy flagged; HowCoped2 would be all-NaN and is therefore

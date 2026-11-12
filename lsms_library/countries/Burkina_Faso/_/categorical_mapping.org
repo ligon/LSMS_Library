@@ -470,6 +470,61 @@ script-path tables.  Not paid here; verified on the read path with
 | Sud Ouest         | Sud-Ouest         |
 | Sud-Ouest         | Sud-Ouest         |
 
+GH #812, 2026-11-04.  EHCVM =sample.strata= is region x milieu, as a label
+(=lsms_library/ehcvm.py=, =derive_region_milieu_stratum=).  This table is the
+=Region= table above crossed with the cover's two =s00q04= labels, row for row, so
+the region part of =strata= is =cluster_features.Region=.  No new judgement;
+=tests/test_gh812_ehcvm_strata.py= pins the identity.  Labels of any other wave's
+scheme match no key and pass through unchanged.
+
+#+name: strata
+| Alternate Spelling       | Preferred Label          |
+|--------------------------+--------------------------|
+| Boucle du Mouhoun Urbain | Boucle du Mouhoun Urbain |
+| Boucle du Mouhoun Rural  | Boucle du Mouhoun Rural  |
+| Boucle du Mouhoum Urbain | Boucle du Mouhoun Urbain |
+| Boucle du Mouhoum Rural  | Boucle du Mouhoun Rural  |
+| Cascade Urbain           | Cascades Urbain          |
+| Cascade Rural            | Cascades Rural           |
+| Cascades Urbain          | Cascades Urbain          |
+| Cascades Rural           | Cascades Rural           |
+| Centre Urbain            | Centre Urbain            |
+| Centre Rural             | Centre Rural             |
+| Centre Est Urbain        | Centre-Est Urbain        |
+| Centre Est Rural         | Centre-Est Rural         |
+| Centre-Est Urbain        | Centre-Est Urbain        |
+| Centre-Est Rural         | Centre-Est Rural         |
+| Centre Nord Urbain       | Centre-Nord Urbain       |
+| Centre Nord Rural        | Centre-Nord Rural        |
+| Centre-Nord Urbain       | Centre-Nord Urbain       |
+| Centre-Nord Rural        | Centre-Nord Rural        |
+| Centre Ouest Urbain      | Centre-Ouest Urbain      |
+| Centre Ouest Rural       | Centre-Ouest Rural       |
+| Centre-Ouest Urbain      | Centre-Ouest Urbain      |
+| Centre-Ouest Rural       | Centre-Ouest Rural       |
+| Centre sud Urbain        | Centre-Sud Urbain        |
+| Centre sud Rural         | Centre-Sud Rural         |
+| Centre-Sud Urbain        | Centre-Sud Urbain        |
+| Centre-Sud Rural         | Centre-Sud Rural         |
+| Est Urbain               | Est Urbain               |
+| Est Rural                | Est Rural                |
+| Hauts Bassins Urbain     | Hauts-Bassins Urbain     |
+| Hauts Bassins Rural      | Hauts-Bassins Rural      |
+| Hauts-Bassins Urbain     | Hauts-Bassins Urbain     |
+| Hauts-Bassins Rural      | Hauts-Bassins Rural      |
+| Nord Urbain              | Nord Urbain              |
+| Nord Rural               | Nord Rural               |
+| Plateau central Urbain   | Plateau-Central Urbain   |
+| Plateau central Rural    | Plateau-Central Rural    |
+| Plateau-Central Urbain   | Plateau-Central Urbain   |
+| Plateau-Central Rural    | Plateau-Central Rural    |
+| Sahel Urbain             | Sahel Urbain             |
+| Sahel Rural              | Sahel Rural              |
+| Sud Ouest Urbain         | Sud-Ouest Urbain         |
+| Sud Ouest Rural          | Sud-Ouest Rural          |
+| Sud-Ouest Urbain         | Sud-Ouest Urbain         |
+| Sud-Ouest Rural          | Sud-Ouest Rural          |
+
 * District
 
 GH #1059 (the #811 =Region= problem one level down), 2026-10-23.

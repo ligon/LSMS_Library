@@ -141,10 +141,13 @@ consumer as ='12.0'= across the outer merge.
 - /A repeated target raises =OriginEaError=./  Two children may name one parent, but one
   key may not name two households, and =gsec1= and =AGSEC1= may not give one household two
   =ea=.  The error counts and names no household.  It subclasses =Exception=, because
-  =_join_v_from_sample= catches =ValueError= (which the =MergeError= it replaces was) and would
-  have served every household table with no =v=.  One build worker raises the class itself.  Under
-  parallel workers a class in a by-path module does not pickle (GH #1524), so =__reduce__= sends
-  a plain =Exception= carrying its name and message, which the derived-table paths do not catch.
+  =_join_v_from_sample= used to catch =ValueError= (which the =MergeError= it replaces was) and would
+  have served every household table with no =v=; since GH #1546 it catches only a missing source.
+  One build worker raises the class itself.  Under parallel workers a class in a by-path module does
+  not pickle (GH #1524), so =__reduce__= sends a plain =Exception= carrying its name and message,
+  which the derived-table paths do not catch.  Since GH #1524 (2026-11-05) the relay would carry it
+  as =errors.WaveWorkerError= without that, so =__reduce__= looks redundant, by reading; removing it
+  edits =uganda.py= and moves every Uganda hash, so it waits for a re-warm, with the class's docstring.
   Measured by injecting one disagreeing household, one and two workers: =sample=, =household_roster=,
   =household_characteristics=, =food_expenditures= and =interview_date= all raise, on a wave subset
   and on all waves, and nothing is written.  =Feature= drops Uganda with a warning, and
@@ -5949,3 +5952,159 @@ ACCEPTANCE govern the scope. Original fourteen-country #1287/#1288 and broader
 backlog remain open.
 See =.coder/ledger/1287-uganda-food-acquired-runtime-checkpoint.md= and
 =slurm_logs/isa_recovery_2026-10-29/Uganda/1287-food-acquired-public-checkpoint/REPORT.md=.
+
+* Country-labeled parcel yield (GH #1475 / #1517, 2026-11-07)
+
+This extends the explicit country-axis restriction recorded under GH #1205;
+that older paragraph describes the previous protected boundary. A crop and
+area pair carrying row-level =country= on BOTH operands now retains that
+identity through conversion, reduction and joining. Uganda rows select the
+same validated =hhid-parcel-plot= constructor inverse after household walking;
+other countries' rows cannot acquire it from a stale scalar Uganda attribute.
+The nonempty ASCII-decimal parcel/plot suffix checks, matching common =i=,
+malformed/unmarked fallbacks, positive-area requirement and literal-plot mode
+are unchanged. A country axis on only one operand is refused, following the
+existing fertilizer-rate paired-identity rule. No native household or plot
+key is rewritten. This entry records the shared implementation and synthetic
+controls, not new source counts or a completed source verification campaign.
+
+* Explicit invariance comparison coverage (GH #1480, 2026-11-08)
+
+Ordinary pytest now reports the number of baseline entries and pinned fields
+actually compared, plus credential/setup skips, mismatches and not-run entries.
+It retains the data gate and adds no cache discovery/build to the terminal
+reporter. The former root-conftest header still described the retired automatic
+purge; its prose is corrected without reintroducing any purge.
+
+The opt-in read-only command is =scripts/check_uganda_invariance.py= with
+=--data-root /private/data --complete= (or =make uganda-invariance= with explicit
+=LSMS_DATA_DIR=). It reads only existing named Uganda cache files; no configured
+shared-root fallback, acquisition, build, cache stamp or baseline refresh.
+Optional JSON records every entry and each pinned comparison. The manifest is
+the dynamic scope, not a hard-coded53. Short wave manifests remain uncompared;
+missing metadata still follows the previous comparison contract, never a guess
+from observed t. Unknown keys/files and explicitly unpinned debt are separate.
+
+COMPLETE coverage is distinct from successful invariance: a fully compared
+mismatching cohort still fails. The original fingerprint, five assertions,
+dtype equivalences, approved nutrition primary/exact measured alternate and
+null-debt semantics are preserved. No baseline value or scientific rule is
+changed; current-source mismatches, if any, must be reported rather than
+regenerated. Verification and cost evidence: .coder/ledger/1480-uganda-invariance-coverage.md.
+
+* Demand input source aggregation (GH #1439 / #1526)
+
+=food_expenditures(market='Region')= retains acquisition-source =s=, including
+when =labels='Aggregate'= changes item =j=. CFE requires log expenditures on
+exactly =(i,t,m,j)=. The earlier Aggregate-split CFE result above therefore
+does not establish that the old unadapted demand-helper/skill recipe ran:
+GH #1526 records that its reviewer explicitly summed across =s=.
+
+The in-repository =lsms_library.demands.prepare_demand_inputs= now performs
+that consumer aggregation in monetary levels before logs, preserving every
+supplied source value. =basis='purchased'= remains the cash-outlay default;
+=basis='total'= explicitly requests all recorded acquisition values, without
+imputing an unreported own-production/in-kind value. All-missing groups stay
+missing; partially missing groups yield recorded subtotals. Keep the original
+food frame for per-source provenance and missingness.
+
+The adapter refuses absent/ambiguous market identities, repeated native keys
+and country axes rather than letting CFE silently drop or pool them. It does
+not repair the recorded missing Region labels, District vocabulary changes,
+EA/parish design, price provenance or sample/weight caveats. This entry records
+the adapter contract and source-free validation scope, not a new Uganda demand
+fit or source/cache build. Native food API, Aggregate buckets and invariance
+baselines remain unchanged. Ledger: =.coder/ledger/1439-demand-source-index.md=.
+
+* 2026-11-09 -- Anthropometry source declarations (GH #1288, partial)
+
+The seven 2009-10 through 2019-20 native anthropometry scripts obtain their
+raw paths from the authoritative =ANTHRO_FILES= map. The existing literal
+scanner does not follow imported dictionaries, so those raw sidecars were
+invisible to script-source fingerprinting/private Make input collection.
+Each script now declares its identical full source literal and raises before
+reading if it differs from =ANTHRO_FILES[t]=; the getter still uses that map.
+The explicit exception survives Python optimization. Neither the map nor any
+clinical/measurement, identifier, missingness, duplicate or output rule changes.
+This finite discovery fix adds no 2005 contribution and establishes no new
+raw/native/API parity or whole-GH1288 closure. The earlier fixed-STORAGE
+checkpoint's source-freshness/clinical limitations remain; see
+=.coder/ledger/1288-uganda-anthro-source-declarations.md=.
+
+* 2026-11-09 documentary clarification: cassava item key, not a state recode (GH #1525)
+
+The existing note remains the governing qualification: =1081/1082= are served
+as labelled, this is =not a clean swap=, and =nothing is swapped without a
+source=. Historical unit mixes, panel recurrence and purchased-row counts above
+were not remeasured for this documentary check.
+
+Own =2019-20/Documentation/unps2019_20_bid.pdf=, UBOS /Uganda National Panel
+Survey 2019/2020 Basic Information Document/ (566,821 bytes,
+MD5 =e491bd04efbd14658bd7e70050d0edfa=), supplies a narrower primary fact:
+*PDF page 16, Table 1* lists the food/beverages/tobacco consumption-item file
+=GSEC15B.dta= keyed by =hhid/CEB01=. The row alignment was checked visually.
+This supports the current driver's =CEB01= item field despite the own household
+forms' page-11 =CEB01= Description / =CEB02= Code grid; it is not authority to
+change the getter to =CEB02= or to infer either cassava state's meaning.
+
+At the current driver/helper, =CEB01= becomes =j= and the country
+=harmonize_food= table directly maps =1081= to dry and =1082= to flour.
+Only the mapping keys are integer-normalized; there is no paper-code
+underscore-removal/swap rule. A spelling change cannot supply the missing
+paper =108/108_1= to export =1081/1082= semantic bridge.
+
+BID PDF pages 8 and 30 identify /Survey Solutions/ for 2018/19 and 2019/20.
+Section 15 (page 14) gives consumption context, not that code bridge. All 38
+BID pages were read: no such food-state/export correction was found in this
+held document. Annex 1 (pages 35–37) is /unit/ codes (=108= is a medium 400g
+cup); Annex 2 (page 38) is /crop/ codes (=Cassava= =630=). Neither namespace
+may decode these food states. This is a bounded documentary finding, not a
+global absence claim or proof of the deployed CAPI roster.
+
+The cover's survey year and April 2021 PDF creation metadata do not identify
+every specific export version. =SOURCE.org= records WB catalog 3902 /
+=UGA_2019_UNPS_v03_M=; that catalog identity is not a version stamp in the BID.
+Still needed: the attributable own Survey Solutions food roster/questionnaire
+GUID + version/export specification or producer erratum connecting the printed
+fields/codes to the released fields/codes, with affected records and an explicit
+correction rule for both populations. Labels, units, Aggregate buckets, native
+values, weights and all scientific defaults remain unchanged. Whole #1525 is
+open; no native/header/API/build/cache or new statistical check ran here.
+
+* 2026-11-09 -- Remaining processing-state scope and current holds (#833 / #647 / #1000)
+
+The six-family Aggregate change above is already merged in PR #1534
+(=3aefbbedf7f59775c2ea6097fb4c0f8afa2d9c98=); it is not a new refill task.
+The narrowed #833 body leaves Beans, Peas, Rice, Ginger and Soybean unruled.
+[[file:PROCESSING_STATE_REVIEW.md][The residual-state memo]] binds their twelve current food-code rows and the
+separate crop namespace, without selecting a new fold or split.
+
+Two details matter before applying a general state rule. Food code 145 says
+only =Peas=, not fresh; =Peas (dry)= on 162 does not establish 145's state.
+Rice's one bucket holds unqualified 110, white/brown 1101/1102 and flour 1103.
+The crop table deliberately retains four pea species instead of folding them
+to food =Peas=. Numeric food/crop codes are not join keys either: food 141
+is Beans (dry), whereas crop 141 is Millet. These are committed mapping facts,
+not new native observations or proof of physical-state comparability.
+
+The [[https://github.com/ligon/LSMS_Library/issues/647#issuecomment-6639391906][2026-11-04 #647 ruling]] keeps the ordinary-only default pending a person's
+query to UBOS / World Bank about 5A1 routing. The earlier documentary checkpoint
+still supplies the question: additional versus cumulative Q6/Q7/Q8 amounts,
+and No/missing follow-up handling. No record append, replacement or factor-pool
+change is authorized by this note; the historical 97 rows are not remeasured.
+
+The [[https://github.com/ligon/LSMS_Library/issues/1000#issuecomment-6639392305][2026-11-04 #1000 ruling]] retains the current FCT and source note while
+the Kidmose source is obtained. A public [[https://www.academia.edu/15228942/Effect_of_home_preparation_practices_on_the_content_of_provitamin_A_carotenoids_in_coloured_sweet_potato_varieties_Ipomoea_batatas_Lam_from_Kenya][reproduction of the article]] now exposes
+methods beyond the earlier abstract: published p. 401, section 2.2 describes
+peeling the raw samples, and p. 403, section 2.7.1 measures dry matter on peeled
+raw samples. DOI =10.1016/j.ifset.2007.03.025=, journal 8(3), pp. 399--406.
+This supports the preparation question; it does not resolve the with-skin FCT
+assignment. Table 2's web text has scrambled column order. No cultivar cells,
+revised means or numeric correction are inferred from it; no original PDF
+bytes were acquired or authenticated. A readable table and electronic-FCT
+derivation/version remain needed. The #967 approval, container-mass caveats,
+#829 WAITING, sample-design qualifications and #1525 hold remain in force.
+
+This is source/document-only progress. No country table, native source/header,
+getter/provider, Make producer, tests, API/cache operation or new demand fit ran.
+No Preferred/Nutrition/Aggregate cell, FCT source note, value or default changed.

@@ -65,14 +65,49 @@ class EmcSampleError(Exception):
     """
 
 
+# GH #1573, user-approved 2026-11-10: decode the released EMC 2014 strata.
+# Exact own welfare (strate, region, milieu) triples were sealed in
+# R1573-burkina-welfare-crosswalk-20261110. Preferred Region spellings reuse
+# categorical_mapping.org. Native keys remain explicit and invertible;
+# matching labels do not imply equal PSUs or cross-wave sampling designs.
+_EMC_2014_STRATA_LABELS = {
+    '1': 'Hauts-Bassins Urbain',
+    '2': 'Hauts-Bassins Rural',
+    '3': 'Boucle du Mouhoun Urbain',
+    '4': 'Boucle du Mouhoun Rural',
+    '5': 'Sahel Urbain',
+    '6': 'Sahel Rural',
+    '7': 'Est Urbain',
+    '8': 'Est Rural',
+    '9': 'Sud-Ouest Urbain',
+    '10': 'Sud-Ouest Rural',
+    '11': 'Centre-Nord Urbain',
+    '12': 'Centre-Nord Rural',
+    '13': 'Centre-Ouest Urbain',
+    '14': 'Centre-Ouest Rural',
+    '15': 'Plateau-Central Urbain',
+    '16': 'Plateau-Central Rural',
+    '17': 'Nord Urbain',
+    '18': 'Nord Rural',
+    '19': 'Centre-Est Urbain',
+    '20': 'Centre-Est Rural',
+    '21': 'Centre Urbain',
+    '22': 'Centre Rural',
+    '23': 'Cascades Urbain',
+    '24': 'Cascades Rural',
+    '25': 'Centre-Sud Urbain',
+    '26': 'Centre-Sud Rural',
+}
+
+
 def sample(df):
     """``sample`` post-processor: extend the welfare file with the p1 households.
 
     ``df`` is the concatenation ``data_info.yml`` asks for, at ``(t, i)``: one row
     per welfare household (which carries ``hhweight``), then one row per food item of
     every household of ``emc2014_p1_conso7jours`` (which has no such column, so its
-    ``weight`` and ``panel_weight`` are NaN).  Returned: the welfare rows, unchanged
-    and first, then one row for each household the welfare file does not hold, in
+    ``weight`` and ``panel_weight`` are NaN).  Returned: the welfare rows first,
+    then one row for each household the welfare file does not hold, in
     first-seen order, with ``v`` = ``zd``, ``Rural`` from ``milieu``, ``weight`` and
     ``panel_weight`` NA.  Ethiopia's agriculture-cover households follow the same
     rules (GH #1120, ``ethiopia.with_agriculture_cover_households``), each enforced:
@@ -85,7 +120,9 @@ def sample(df):
       that is not one-to-one, or a code it does not reach, RAISES.
 
     Nothing is guessed, and no value here is a construction: each is the survey's own
-    answer for that household, in the welfare file's spelling.
+    answer for that household. After the proof and extension, only ``strata`` is
+    decoded from the welfare spelling through its own reversible #1573 lookup;
+    all other fields, NA weights, row order and attrs remain unchanged.
     """
     names = list(df.index.names)
     flat = df.reset_index()
@@ -119,6 +156,9 @@ def sample(df):
     new['strata'] = strata
     out = pd.concat([welfare, new], ignore_index=True).set_index(names)
     out.attrs = dict(df.attrs)
+    # Do not alter either operand of the food-to-welfare correspondence above.
+    # Unknown nonmissing codes and true NA pass through without a guessed label.
+    out['strata'] = out['strata'].replace(_EMC_2014_STRATA_LABELS)
     return out
 
 

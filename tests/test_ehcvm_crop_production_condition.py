@@ -38,6 +38,7 @@ import yaml
 
 import lsms_library.local_tools as tools
 from lsms_library.paths import countries_root
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 
 TABLE = "crop_production"
 SENTINEL = "unknown_condition"
@@ -118,18 +119,26 @@ def _helpers(country: str, *names: str) -> dict:
     keep = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in names]
     assert {n.name for n in keep} == set(names), f"{country}: {names}"
     namespace = {"pd": pd, "tools": tools,
-                 "get_categorical_mapping": tools.get_categorical_mapping}
+                 "get_categorical_mapping": tools.get_categorical_mapping,
+                 "crop_condition_codes": crop_condition_codes,
+                 "crop_condition_labels": crop_condition_labels}
     exec(compile(ast.Module(keep, []), f"{country}/{TABLE}.py", "exec"), namespace)
     return namespace
 
 
-def _call_read(source: str, helper: str) -> tuple[str, bool | None]:
+def _call_read(source: str, helper: str, expected_column: str | None = None) -> tuple[str, bool | None]:
     """What a script's one ``helper(<frame>['<column>'], ...)`` call reads: the
     column, and whether <frame> is the raw-code read (True), the labelled read
     (False) or neither (None).  Parsed, so prose naming a column cannot satisfy it."""
     tree = ast.parse(source)
     calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call)
              and getattr(n.func, "id", None) == helper]
+    # Harvest and sale may use the same literal-label helper. Select the
+    # required source column, still refusing missing or duplicate bindings.
+    if expected_column is not None:
+        calls = [n for n in calls if n.args and isinstance(n.args[0], ast.Subscript)
+                 and isinstance(n.args[0].slice, ast.Constant)
+                 and n.args[0].slice.value == expected_column]
     assert len(calls) == 1, f"{len(calls)} {helper} calls"
     column = calls[0].args[0]
     assert isinstance(column, ast.Subscript) and isinstance(column.value, ast.Name)
@@ -178,8 +187,8 @@ class TestDeclared:
 
     def test_script_reads_the_harvest_state_by_code_and_by_label(self, country):
         script = _script(country)
-        assert _call_read(script, "_crop_conditions") == (STATE, True)
-        assert _call_read(script, "_crop_condition_labels") == (STATE, False)
+        assert _call_read(script, "_crop_conditions", STATE) == (STATE, True)
+        assert _call_read(script, "_crop_condition_labels", STATE) == (STATE, False)
 
     def test_blank_and_off_scheme_codes_are_the_sentinel(self, country, monkeypatch):
         monkeypatch.chdir(_wave_dir(country))
@@ -204,6 +213,16 @@ class TestScriptReadHelper:
                   'src = get_dataframe("x.dta", convert_categoricals=True)\n'
                   'c = _crop_conditions(src["s16cq16c"])\n')
         assert _call_read(script, "_crop_conditions") == ("s16cq16c", False)
+
+    def test_required_column_cannot_be_satisfied_by_the_other_answer(self):
+        script = 'c = _crop_condition_labels(src["s16cq16c"])\n'
+        with pytest.raises(AssertionError, match="0 .* calls"):
+            _call_read(script, "_crop_condition_labels", STATE)
+
+    def test_duplicate_required_bindings_are_refused(self):
+        script = 'c = _crop_condition_labels(src["s16cq12c"])\n' * 2
+        with pytest.raises(AssertionError, match="2 .* calls"):
+            _call_read(script, "_crop_condition_labels", STATE)
 
 
 # ---------------------------------------------------------------------------
@@ -373,8 +392,8 @@ class TestMaliDeclared:
     def test_script_reads_its_own_state_by_code_and_by_label(self, wave):
         script = (_wave_dir("Mali", wave) / f"{TABLE}.py").read_text(encoding="utf-8")
         state = MALI[wave].state
-        assert _call_read(script, "ehcvm_crop_conditions") == (state, True)
-        assert _call_read(script, "ehcvm_crop_condition_labels") == (state, False)
+        assert _call_read(script, "ehcvm_crop_conditions", state) == (state, True)
+        assert _call_read(script, "ehcvm_crop_condition_labels", state) == (state, False)
 
     @pytest.mark.parametrize("wave", list(MALI))
     def test_table_is_the_ruled_fold_in_both_waves(self, wave, monkeypatch):

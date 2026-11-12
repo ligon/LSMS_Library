@@ -54,13 +54,15 @@ $(VAR_DIR)/crop_production.parquet: crop_production.py ../2014-15/_/crop_product
 	python crop_production.py
 
 # plot_inputs (item-level ag inputs, GAP 2 / parity loop).  The input
-# module lives in the EACI waves only (2014-15, 2017-18).  The wave pattern
+# modules are EACI plot rosters and EHCVM household s16b (GH #1483). The wave pattern
 # rule materializes each wave parquet; the country-level concatenator
 # (plot_inputs.py) aggregates into var/plot_inputs.parquet.
 ../%/_/plot_inputs.parquet: ../%/_/plot_inputs.py
 	(cd $(@D) && python plot_inputs.py)
 
-$(VAR_DIR)/plot_inputs.parquet: plot_inputs.py ../2014-15/_/plot_inputs.parquet ../2017-18/_/plot_inputs.parquet
+../2018-19/_/plot_inputs.parquet ../2021-22/_/plot_inputs.parquet: s16b_header_adapter.py
+
+$(VAR_DIR)/plot_inputs.parquet: plot_inputs.py ../2014-15/_/plot_inputs.parquet ../2017-18/_/plot_inputs.parquet ../2018-19/_/plot_inputs.parquet ../2021-22/_/plot_inputs.parquet
 	python plot_inputs.py
 
 # livestock (item-level animal roster, GAP 4 / parity loop).  The livestock

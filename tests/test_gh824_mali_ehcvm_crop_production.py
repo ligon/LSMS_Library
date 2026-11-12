@@ -33,6 +33,7 @@ crop_production wired (GH #824)".
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import warnings
 from pathlib import Path
@@ -55,6 +56,8 @@ KEY = "Mali::crop_production::hh-crop-sale-single-row"
 WINDOW = "Mali::crop_production::harvest-to-date"
 TOTAL = "Mali::crop_production::harvest-from-dispositions"
 FARM = "Farm-level"
+# Reviewed namespace transport at d47ff849; ledger 1687-mali-namespace-oracle §3.
+UPDATED_IDS_SHA256 = "7c17086a611c44bdd1f99b79305636feb67c8273cd349b3e81a580cdbe6649dd"
 
 #: The ONE unit code book of the EHCVM crop modules, written out here so the
 #: oracle owes nothing to any label or to the `u` table.  s16cq12b, s16cq16b,
@@ -64,8 +67,9 @@ UNIT_BY_CODE = {1: "Kg", 2: "Unité", 3: "Cart (donkey)", 4: "Cart (ox)",
                 9: "Botte", 10: "Gerbe", 11: "Baignoire", 12: "Panier", 13: "Autre",
                 14: "Tonne"}
 
-#: Rows of the EAC-I waves, which this change must not move.
-EACI_ROWS = {"2014-15": 10341, "2017-18": 24719}
+#: Rows of the EAC-I waves, which this change must not move.  Re-pinned for GH #1457:
+#: 2017-18 gains 202 Farm-level rows, the s7g sales of crops on two or more plots.
+EACI_ROWS = {"2014-15": 10341, "2017-18": 24719 + 202}
 #: 2018-19: the source's rows.  2021-22: the source's rows plus the Farm-level ones:
 #: 70 for a sale, and since GH #1437 181 more for a derived total with no sale there.
 WAVE_ROWS = {"2018-19": 7992, "2021-22": 7247 + 70 + 181}
@@ -206,8 +210,10 @@ class TestDeclared:
 
     def test_the_derivation_is_registered_and_resolves(self):
         rec = records_for(COUNTRY, TABLE)[KEY]
-        assert list(rec.waves) == ["2021-22"]
-        assert set(rec.columns) == {"Quantity_sold", "Unit_sold", "Value_sold"}
+        # Re-pinned for GH #1457: the same rule now serves the 2017-18 s7g sales.
+        assert list(rec.waves) == ["2017-18", "2021-22"]
+        assert set(rec.columns) == {"Quantity_sold", "Unit_sold", "KgFactor_sold", "Value_sold",
+                                    "Condition_sold", "condition_sold_native"}
         assert callable(rec.resolve("function")) and callable(rec.resolve("inputs"))
 
     def test_make_reaches_every_wave(self):
@@ -242,8 +248,14 @@ def _raw(wave, name):
 
 
 def _walk(wave, ids):
-    with open(_root() / "_" / "updated_ids.json", encoding="utf-8") as f:
-        mapping = json.load(f).get(wave, {})
+    payload = (_root() / "_" / "updated_ids.json").read_bytes()
+    if wave == "2021-22":
+        assert hashlib.sha256(payload).hexdigest() == UPDATED_IDS_SHA256, "unreviewed Mali panel map"
+        if not ids.str.fullmatch(r"[0-9]+").fillna(False).all():
+            raise ValueError("expected bare numeric raw household keys")
+        # All raw keys, including unlinked/unknown/orphan; no production formatter.
+        ids = "EHCVM21_" + ids
+    mapping = json.loads(payload).get(wave, {})
     return ids.map(lambda x: mapping.get(x, x))
 
 
@@ -482,9 +494,13 @@ class TestServed:
 
     def test_a_sack_converts_at_its_stated_weight(self, built):
         got = T.harvest_kg_factors(built)
-        flat = built.reset_index().assign(kg=got["kg_per_unit"].to_numpy())
+        flat = built.reset_index().assign(kg=got["kg_metric"].to_numpy(),
+                                          served=got["kg_per_unit"].to_numpy(),
+                                          source=got["KgFactorSource"].to_numpy())
         rows = flat[flat.t.isin(WAVE_ROWS) & (flat.u == "Sac (100 Kg)")]
         assert (rows.kg == 100.0).all()
+        # Since GH #1436 a row with the survey's own kilograms is served those instead.
+        assert (rows[rows.source != "survey_kg"].served == 100.0).all()
 
 
 @pytest.mark.requires_s3

@@ -18,8 +18,10 @@ Burkina_Faso::food_acquired::7day-purchase-at-last-purchase-unit-value:
     unit value of the household's LAST PURCHASE of the item.  NaN where
     s07bq07a is missing or not positive, and NaN where the last purchase was
     made in a different unit from the consumption unit (s07bq07b/s07bq07c vs
-    s07bq03b/s07bq03c): no EHCVM wave ships a unit-conversion table, so there
-    is no exact conversion and NA is the honest answer.  Units are compared on
+    s07bq03b/s07bq03c): this construction converts nothing between units, and
+    NA is the honest answer.  (This entry used to say no EHCVM wave ships a
+    unit-conversion table; 2021-22 does, GH #1452, and it is not used here.)
+    Units are compared on
     the EHCVM numeric code where the label carries one, else on the label with
     case, accents, padding and punctuation folded -- the two variables carry
     DIFFERENT value-label sets inside the same .dta.  Before GH #876 the served
@@ -62,7 +64,8 @@ Burkina_Faso::food_acquired::7day-purchase-at-last-purchase-unit-value:
         which is a different container and so a different price per unit.
       basis: variable-label
       evidence: >-
-        no EHCVM wave distributes a unit-conversion table;
+        the 2018-19 waves distribute no unit-conversion table, and 2021-22's
+        ehcvm_nsu is not applied to a price;
         lsms_library/categorical_mapping/ehcvm_units.org is a code->label
         codebook with no factors
     - text: >-
@@ -204,14 +207,13 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
   columns: [Latitude, Longitude]
   rule: >-
     Latitude, Longitude = the 2018-19 cluster fix of the same grappe
-    (grappe_gps_bfa2018.dta), on the 2021-22 row of a panel grappe: 519 of the
+    (grappe_gps_bfa2018.dta), on the 2021-22 row of a panel grappe: 516 of the
     550 panel grappes.  NA, with no key, for the 22 panel grappes other than 549
     that have no 2018-19 fix, for grappes 19, 365 and 549 (province changed), for
     grappes 103, 104, 226, 229, 237 and 240 (fix more than 25 km from the grappe's
-    own 2021-22 parcels), and for all 600 cross-section grappes.  The other values
-    are carried as recorded.  Three of them, 216, 218 and 350, are not readings of
-    their own grappe but rounded copies of a neighbouring grappe's reading
-    (CONTENTS.org, "Six carried GPS fixes withheld").
+    own 2021-22 parcels), for grappes 216, 218 and 350 (rounded copies of another
+    grappe's reading), and for all 600 cross-section grappes.  The other values are
+    carried as recorded.
   function: lsms_library.countries.Burkina_Faso.2021-22._.mapping:derive_panel_grappe_gps
   inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_cluster_features
   raw_variables: [grappe, grappe_EHCVM1, coordonnes_gps__Latitude, coordonnes_gps__Longitude]
@@ -231,8 +233,8 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
         Same grappe id means same EA, and the EA's location did not change between
         the waves, so the 2018-19 fix locates the 2021-22 row.  Rural differs on 7
         panel grappes (147, 150, 153, 154, 155, 180, 182), all carried: that is an
-        attribute recode, and the rulings exclude on province and on distance from the
-        grappe's own parcels, not on this.
+        attribute recode, and the rulings exclude on province, on distance from the
+        grappe's own parcels and on a copied reading, not on this.
       basis: modelling-choice
       evidence: >-
         GH #1057, ruling by @ligon 2026-11-03, option (b), tightened.
@@ -260,6 +262,16 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
         240 51.4 (26), 237 44.5 (14), 229 29.3 (17), 226 28.8 (15).  The parcels of each
         lie within a few km of their own median.
     - text: >-
+        Grappes 216, 218 and 350 are NOT carried.  Each fix is a rounded copy of a
+        neighbouring grappe's reading, so it is not a reading of this grappe, and they
+        stay NA.  They are withheld in 2018-19 too, under
+        Burkina_Faso::cluster_features::copied-grappe-gps-withheld.
+      basis: modelling-choice
+      evidence: >-
+        GH #1057, ruling by @ligon 2026-11-05.  grappe_gps_bfa2018.dta: 216 copies 217, 218
+        copies 219, 350 copies 351; same Timestamp and Altitude, and the source's position
+        rounds to the copy.  350 lies 6.4 km from its own parcels; 216 and 218 have none.
+    - text: >-
         The cross-section (grappes 586-1185) gets no fix.  It is a new draw from
         the 2019 census frame with no 2018-19 antecedent, and its cover's GPS__*
         are household positions (they differ within 578 of its 600 grappes).  A
@@ -268,13 +280,207 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
       evidence: GH #1057, ruling by @ligon 2026-11-03; GH #1276.
   validated_against: >-
     s16a_me_bfa2021.dta, s16aq46__latitude / __longitude, parcel positions recorded
-    in 2021-22 and independent of the fix: on the 271 carried grappes that have one,
+    in 2021-22 and independent of the fix: on the 270 carried grappes that have one,
     the median parcel position lies a median of 1.6 km from the carried fix (p90
-    4.9 km, maximum 21.8 km), against 213 km for a fix paired with another grappe's
+    4.7 km, maximum 21.8 km), against 213 km for a fix paired with another grappe's
     parcels.  The six grappes beyond 25 km are withheld (see the assumptions).  The
-    other 248 carried grappes have no parcel coordinate to compare.  The check reads
+    other 246 carried grappes have no parcel coordinate to compare.  The check reads
     the s16a file we hold; the current release of catalog 6224 no longer has these
     columns (CONTENTS.org, "what the World Bank states about 6224's versions"), so it
     can be repeated only on the held file.
   contents: 'Burkina_Faso/_/CONTENTS.org, "2021-22 GPS carried from 2018-19 (GH #1057)"'
   since: '2026-11-03'
+
+# A withheld value has nowhere to carry a Derivation key, so this entry is the only
+# place the withholding is disclosed: `rows: 0`, the attrs summary lists the key at 0,
+# and `derivation_inputs` returns the file's own rows for the nine.
+Burkina_Faso::cluster_features::copied-grappe-gps-withheld:
+  waves: ['2018-19']
+  columns: [Latitude, Longitude]
+  rows: 0
+  rule: >-
+    Latitude and Longitude are NA on the 2018-19 row of grappes 103, 104, 216, 218, 226,
+    237, 240, 350 and 365, whose fix in grappe_gps_bfa2018.dta is not a reading of that
+    grappe.  The rows stay, with every other column, and carry no key.  555 fixes in the
+    file, 546 served.
+  function: lsms_library.countries.Burkina_Faso.2018-19._.mapping:withhold_copied_grappe_gps
+  inputs: lsms_library.countries.Burkina_Faso.2018-19._.mapping:inputs_cluster_features
+  raw_variables: [grappe, vague, coordonnes_gps__Latitude, coordonnes_gps__Longitude,
+                  coordonnes_gps__Accuracy, coordonnes_gps__Altitude, coordonnes_gps__Timestamp]
+  assumptions:
+    - text: >-
+        A fix at one or two decimals that shares its reading with another grappe is a
+        copy of that reading, not a reading of its own grappe.  216 copies 217, 218 copies
+        219, 226 copies 223, 237 and 240 copy 232, 350 copies 351, 365 copies 369.  The file
+        does not say so; its variable label calls each the GPS position of the village or
+        quarter.
+      basis: modelling-choice
+      evidence: >-
+        GH #1057, ruling by @ligon 2026-11-05.  grappe_gps_bfa2018.dta: these seven are all
+        the fixes at two decimals or fewer, all in vague 2.  Each shares its Timestamp to
+        the second and its Altitude with its source, in the same province; its Accuracy
+        differs only by rounding, and the source's position rounds to it.  These are also
+        the only timestamps the file repeats.
+    - text: >-
+        103 and 104 hold a point in Kadiogo, not a reading of their grappes in Namentenga.
+        They copy no one reading, so this is a separate ground under the same ruling.
+      basis: modelling-choice
+      evidence: >-
+        GH #1057, ruling by @ligon 2026-11-05.  grappe_gps_bfa2018.dta and s00_me_bfa2018.dta:
+        the two fixes are 6 m apart, 109 km from Namentenga's median fix and 6 km from
+        Kadiogo's, within 30 m of Kadiogo grappes 89 and 136, and all four are stamped
+        2019-07-23 within about two hours.  No other fixes of different provinces meet within
+        100 m.
+  validated_against: >-
+    s16a_me_bfa2021.dta, s16aq46__latitude / __longitude, parcel positions recorded in
+    2021-22 and independent of the fix, where a withheld grappe has them: 365 85.1 km, 240
+    51.4, 237 44.5, 103 104.7, 104 103.7, 226 28.8, 350 6.4, against a median of 1.6 km for
+    the carried grappes.  Their sources 232 and 223 are 1.4 and 2.6 km from their own, 351
+    2.9.  216 and 218 have no parcel coordinate, so for them the copy pattern is the only
+    evidence.  The check reads the s16a file we hold; the current release of catalog 6224
+    no longer has these columns.
+  contents: 'Burkina_Faso/_/CONTENTS.org, "Copied 2018-19 fixes withheld, in both waves (GH #1057)"'
+  since: '2026-11-05'
+
+Burkina_Faso::sample::region-milieu-stratum:
+  waves: ['2018-19', '2021-22']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<s00q01 label> <s00q04 label>', the region and area of residence the
+    household cover page records, for example 'Cascades Urbain'.  Labels and never
+    codes.  NA where either is missing.  No household file of these waves records a
+    stratum.  The region part is then spelled through this country's `strata` table
+    in categorical_mapping.org, at read time, which is the `Region` table crossed
+    with the two milieu labels.
+  function: lsms_library.ehcvm:derive_region_milieu_stratum
+  inputs: lsms_library.countries.Burkina_Faso.2018-19._.mapping:inputs_strata
+  raw_variables: [s00q01, s00q04]
+  assumptions:
+    - text: >-
+        the strata of the panel design are the 13 regions crossed with the two areas
+        of residence.
+      basis: questionnaire
+      evidence: >-
+        bid_bfa_ehcvm2.pdf (held, 2021-22/Documentation), p.4: "The different strata
+        result from the combination of the 13 regions with the two areas of residence
+        (urban, rural)."  A Basic Information Document, not the instrument.
+    - text: >-
+        2018-19 has the same 26 strata.  Three documents give three stratifications, and
+        only bid_bfa_ehcvm2.pdf, p.4, of the later wave, states 13 x 2.  The French report
+        on 2018-19 (ehcvm_2018_rapport_general.pdf, section 1.3.1, printed p.16) says "La
+        stratification est faite avant le tirage des unités primaires et basée sur
+        l'urbanisation des agglomérations (urbain, rural)", and its Tableaux 1.1 and 1.2
+        allocate by region and by milieu separately.  basicinformationdocument_bfa.pdf,
+        p.10, says "representative for the strata of Ouagadougou, other urban areas and
+        rural areas".  Share of var(log cluster weight) between these 26 cells is 74.0%,
+        against 22.7% between urban and rural and 8.2% between regions.  The report plans
+        252 urban and 333 rural clusters where the cover has 263 and 322, so the cover
+        differs from the plan by 11 clusters on milieu even in the base wave.
+      basis: modelling-choice
+      evidence: >-
+        @ligon's ruling on GH #812, 2026-11-04, resting on the panel BID, the survey's 26
+        unit-table codes and the weights.  The memo ruled on said the report gives 26; it
+        does not.  Burkina_Faso/_/CONTENTS.org quotes the three documents.
+    - text: >-
+        the 2021-22 cross-section is stratified the same way.  Catalog 6277 names no
+        stratum; 76.1% of var(log cluster weight) lies between these cells.
+      basis: modelling-choice
+      evidence: Burkina_Faso/_/CONTENTS.org, "strata by wave" (GH #812).
+    - text: >-
+        the survey's own coding is the same cross.
+      basis: variable-label
+      evidence: >-
+        ehcvm_nsu_bfa2021.dta, a unit table: `strate`, "Code de la strate", labelled
+        BOUCLE DU MOUHOUN Urbain and so on; its 26 codes equal 10 x region + milieu of
+        ehcvm_welfare_2b_bfa2021.dta.
+    - text: >-
+        a cluster takes the cover page's label in each wave rather than carrying a
+        2018-19 label forward.  Of 3,227 households in both waves 42 (7 clusters)
+        change stratum: Plateau-Central Urbain to Rural, Nord Urbain to Rural.
+      basis: modelling-choice
+      evidence: Burkina_Faso/_/CONTENTS.org, GH #812 ruling option W2, 2026-11-04.
+  validated_against: >-
+    tests/test_gh812_ehcvm_strata.py, whose oracle reads the covers directly: 26 cells
+    in 2018-19 and in each 2021-22 component.  No held table states Burkina's allocation
+    by stratum.
+  contents: 'Burkina_Faso/_/CONTENTS.org, "EHCVM strata are region x milieu labels (GH #812)"'
+  since: '2026-11-04'
+
+Burkina_Faso::food_acquired::nsu-national-unit-weight:
+  waves: ['2018-19', '2021-22']
+  columns: [Quantity_kg]
+  rule: >-
+    Quantity_kg = Quantity x kg_factor, per acquisition source, where kg_factor is the
+    median over ehcvm_nsu_bfa2021.dta's rows of the row's (product, unit, size), in grams over 1000.
+    Unit and size are the row's s07bq03b and s07bq03c codes in both waves.  The product
+    is the s07bq01 code in 2021-22, whose numbering the table uses; in 2018-19, whose
+    numbering is a different one, it is found by LABEL, never by code (ehcvm.
+    nsu_product_crosswalk): the same label up to spelling, else through the country's
+    harmonize_food, else the parts of a label listing goods the instrument later split,
+    else the label's stem.  A product reading several table products takes the median of
+    their weights.  Each row's tier is nsu_join in derivation_inputs.  NA, with no key,
+    where no weight is found; where the served unit is Kg or Litre, whose kilograms the
+    label states; and where the row's canonical key is duplicated at the build, because
+    core sums Quantity on such a key and selects any other column.  Those rows stay on the
+    inferred ladder.  No Quantity or u changes.
+  function: lsms_library.ehcvm:derive_nsu_kg_factor
+  inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_food_acquired_unit_weight
+  raw_variables: [s07bq01, s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, strate, codpr, uniteID, tailleID, poids_moyen, poids_median]
+  assumptions:
+    - text: >-
+        a key's weight in the table is the weight of that unit of that product in
+        that size, for any row of the wave.  The survey ships the table; the served
+        row's own quantity is untouched.
+      basis: variable-label
+      evidence: >-
+        ehcvm_nsu_bfa2021.dta, read by code; unit and size codes agree with s07b_me's on
+        every code both files label, up to spelling.
+    - text: >-
+        national, not by stratum.  Against an independent implied weight, a household's
+        last-purchase unit value over the same stratum's median Kg price with 5+ reports each,
+        the national weight's median absolute log error is 0.27 against the stratum cell's 0.44,
+        within 2x 82.1% against 68.7%; row by row 0.45 against 0.46, within 2x 76.9% against
+        67.7%.  The slope of the household's deviation on the stratum's is -0.11, or -0.14 with
+        key effects.  74.7% of consumed rows find a stratum cell, 89.7% a national weight;
+        stratum weights would add 4.3% to the kilograms on rows both serve.  7,052 of 68,677
+        consumed rows find none, among them every Choux row (1,337; the product is not in the
+        table) and every Carreau row (140; nor the unit).
+      basis: modelling-choice
+      evidence: >-
+        GH #1452, 2026-11-04.  The check is noisy: a small lot's price per kg runs
+        above a kilogram's, so the implied weight runs high, and it compares the
+        two rules, not either with the truth.
+    - text: >-
+        poids_moyen, not poids_median: the two labels are swapped in the file.  A
+        median of gram weighings is an integer or a half.  Where poids_sd > 0,
+        poids_moyen is one on 98.4% of 15,843 rows and poids_median on 39.5%, and
+        poids_moyen reads exactly 1000 on 94.8% of Kg cells against 79.5%.  So the
+        column read is the file's median, under the label "moyen".
+      basis: modelling-choice
+      evidence: >-
+        ehcvm_nsu_bfa2021.dta, variable labels "Poids moyen ..." / "Poids median ...";
+        tests/test_ehcvm_unit_weights.py.
+    - text: >-
+        2018-19 reads the same weight per key as 2021-22, with the product found by label.
+        Of 2018-19's consumed rows 91,752 join on the label, 10,267 through harmonize_food
+        and 4,780 as the parts of a bundle; 90.7% of non-metric served rows read a weight.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-04.  Matched items, 2021-22 over 2018-19, median / row-weighted:
+        Kg rows 1.10 / 1.15, inference 1.05 / 1.16, both waves on the table 1.06 / 1.14.
+    - text: >-
+        Kg and Litre keep their labels.  Their table rows are not read: a kilogram is
+        a kilogram, and a table litre is not a density (in these tables most oils
+        read exactly 1000 g).
+      basis: modelling-choice
+      evidence: GH #1452, 2026-11-04.  Those rows are the check on the join instead.
+  validated_against: >-
+    the rows whose label states the mass, which the table was not fitted to: the
+    national weight of a Kg row is 1000 g at the median, and the delivered factor
+    reproduces the table read directly from the two files
+    (tests/test_ehcvm_unit_weights.py).  No ehcvm_prix file is held for this wave, so no market file checks
+    this table.  Table against 2018-19 community price ratios: 0.182 / 96.5%.
+    Measured kilograms are in Burkina_Faso/_/CONTENTS.org.
+  contents: 'Burkina_Faso/_/CONTENTS.org, "EHCVM unit-weight table wired (GH #1452)"'
+  since: '2026-11-04'

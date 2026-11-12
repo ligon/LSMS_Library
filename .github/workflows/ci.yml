@@ -4,7 +4,7 @@ on:
   # Pushes run CI only on the integration branches.  `branches: ["**"]` ran
   # every PR twice (one run for the push, one for the pull_request), which is
   # the doubled `unit-tests` check on every PR before 2026-10-14.  PR branches
-  # are covered by the pull_request event below; the merge queue by merge_group.
+  # are covered by pull_request; merge_group is retained for compatibility.
   push:
     branches: [development, master, separate_data]
     # Notes and ledgers do not need a 30-minute run.  Deliberately NOT applied
@@ -18,9 +18,8 @@ on:
       - '**.org'
       - '**.md'
   pull_request:
-  # The development merge queue (ruleset "development merge queue", 2026-10-14)
-  # tests each merge group once; without this trigger a queued PR never gets
-  # its required check and sits in the queue indefinitely.
+  # Compatibility trigger only: this User-owned repository has no merge queue.
+  # Required ready-PR validation lives in pr-data-validation.yml (GH #932).
   merge_group:
   schedule:
     # Weekly DVC remote reachability sweep (GH #750); see the job below.
@@ -110,7 +109,8 @@ jobs:
           --durations=25 --junitxml=unit-tests.xml
       # GH #932: say what this green check does NOT cover.  Every
       # `requires_s3` test skips here (no credentials), so a pass verifies
-      # code, not data.  The data tests gate the merge queue and run nightly.
+      # code, not data. Separate ready-PR validation and advisory data runs
+      # have distinct contexts; administrator rules control enforcement.
       - name: State what this check did not verify
         if: always()
         run: |
@@ -128,8 +128,9 @@ jobs:
           print("### unit-tests does not verify data\n")
           print(line)
           print("A green `unit-tests` check verifies the code paths that need no microdata.")
-          print("The data tests (`data-tests`) run in the `development` merge queue, nightly")
-          print("on `development`, on release pushes, and on manual dispatch (GH #932).")
+          print("Ready development PR data validation has its own `pr-data-validation` check;")
+          print("administrator rules control whether that context is required. The existing")
+          print("`data-tests` job remains nightly on development, on release pushes and manual dispatch.")
           PY
 
   # Windows reader smoke exercises platform defaults: cp1252 text encoding,
@@ -419,25 +420,16 @@ jobs:
       OPENBLAS_NUM_THREADS: "1"
       OMP_NUM_THREADS: "1"
       MKL_NUM_THREADS: "1"
-    # When this runs (GH #932, @ligon 2026-10-18):
-    #  - merge_group: every merge into `development` through the merge queue
-    #    is data-tested BEFORE it lands.  On pull_request events the job is
-    #    SKIPPED, and GitHub counts a skipped job as passing a required check,
-    #    so making `data-tests` required in the merge-queue ruleset gates the
-    #    queue without slowing PR pushes;
-    #  - the nightly schedule (`41 10 * * *`), against `development`: the
-    #    backstop for anything that bypassed the queue and for drift outside
-    #    the repo (S3 contents, WB downloads, dependency resolution);
-    #  - a push to a release branch, as before;
-    #  - a manual `workflow_dispatch` on any ref (GH #941).
-    # Before #932 only the last two applied, so every PR and every
-    # `development` push skipped ~4,250 `requires_s3` tests and reported green.
+    # Advisory/release/manual data job (GH #932); its PR skip is not a gate.
+    # Ready development PR validation has a unique context in the PR-only
+    # workflow. merge_group remains compatible but is unavailable on this
+    # User-owned repository. Nightly explicitly checks out development.
     if: >-
       github.event_name == 'workflow_dispatch'
       || github.event_name == 'merge_group'
       || github.event.schedule == '41 10 * * *'
       || (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/separate_data'))
-    # A hung data test must not hold the merge queue for the 6-hour default.
+    # Bound credentialed work rather than using the 6-hour job default.
     # The job takes ~57-63 min today (2026-10-15 runs).
     timeout-minutes: 120
     steps:
@@ -490,6 +482,17 @@ jobs:
           python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
           --stage data-prebuild -- poetry run make -j2
         timeout-minutes: 30
+      # The Make shocks compiler writes its reviewed (i,t) + Shock-column
+      # intermediate. Country.shocks() writes the pinned (i,t,Shock) cache that
+      # the invariance test compares. Run that normal path before xdist starts,
+      # so test scheduling cannot decide which of the two stages it reads.
+      - name: Finalize Uganda shocks cache for invariance
+        working-directory: lsms_library/countries/Uganda/_
+        run: >-
+          python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
+          --stage data-prebuild -- poetry run python -c
+          "import lsms_library as ll; ll.Country('Uganda').shocks()"
+        timeout-minutes: 15
       - name: Run full test suite
         # Capture both streams before Poetry/pytest starts. Assertion rewriting,
         # explicit messages, warnings and plugins can all contain row values;

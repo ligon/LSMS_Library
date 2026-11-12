@@ -705,4 +705,6 @@ def test_tanzania_2020_21_coconut_and_timber_rows_fire():
     real = {_key(o) for o in pos_reports[0]["offenders"]}
     assert len(real) == 14, sorted((k[2], k[3]) for k in real)
     assert real <= named_all, "a positive-reference offender stopped firing"
-    assert report["rows"] == 12_676
+    # GH #1457: a sale no plot holds adds a Farm-level row, which holds no harvest.
+    plots = df.reset_index()["plot_id"]
+    assert report["rows"] - int((plots == "Farm-level").sum()) == 12_676

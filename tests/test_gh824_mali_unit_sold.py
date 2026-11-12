@@ -60,7 +60,9 @@ TABLE = "crop_production"
 PRICED = {
     ("2014-15", "field"): (569, 568, 567, 95),
     ("2014-15", "tree"): (196, 194, 188, 40),
-    ("2017-18", "field"): (451, 451, 449, 87),
+    # Re-pinned for GH #1457: 196 priced sales of multi-plot crops now sit on Farm-level
+    # rows, where no harvest unit is known; the rows knowing both units do not move.
+    ("2017-18", "field"): (647, 647, 449, 87),
     ("2017-18", "tree"): (127, 127, 127, 18),
 }
 #: 2017-18 priced rows whose harvest unit is the HARVEST set's code 10
@@ -278,8 +280,9 @@ class TestServed:
         s7gq22 AS RECORDED (NA stays NA), single-plot rule, joined on the served
         (t, i, plot_id, crop)."""
         def hh(d, key):
-            # Re-pinned for GH #1494: the EAC-I id carries the EACI_ prefix.
-            return d.apply(lambda r: mali.eaci_i(pd.Series([r["grappe"], r[key]])), axis=1)
+            # Re-pinned for GH #1494: the EAC-I id carries its wave's prefix.
+            spell = mali.eaci14_i if key == "menage" else mali.eaci17_i
+            return d.apply(lambda r: spell(pd.Series([r["grappe"], r[key]])), axis=1)
 
         def plot(d, a, b):
             f = d[a].astype("Int64").astype("string")
@@ -304,7 +307,9 @@ class TestServed:
         x["t"] = "2017-18"
         x = x.dropna(subset=["crop"])[["t", "i", "plot_id", "crop", "eq", "ev"]]
         x = id_walk(x.set_index(["t", "i"]), ll.Country(COUNTRY).updated_ids).reset_index()
-        field = flat[(flat.t == "2017-18") & (flat.kind == "field")]
+        # GH #1457: a sale's Farm-level row has its own oracle
+        # (tests/test_gh1457_mali_multi_plot_sales.py); this is the plot rows' rule.
+        field = flat[(flat.t == "2017-18") & (flat.kind == "field") & (flat.plot_id != "Farm-level")]
         j = field.merge(x, on=["t", "i", "plot_id", "crop"], how="inner")
         assert len(j) == len(field)
         for col, e in (("Quantity_sold", "eq"), ("Value_sold", "ev")):
@@ -342,8 +347,9 @@ class TestServed:
                 lambda v: table.get(v, pd.NA) if pd.notna(v) else pd.NA).astype("string")
 
         def hh(d, key):
-            # Re-pinned for GH #1494: the EAC-I id carries the EACI_ prefix.
-            return d.apply(lambda r: mali.eaci_i(pd.Series([r["grappe"], r[key]])), axis=1)
+            # Re-pinned for GH #1494: the EAC-I id carries its wave's prefix.
+            spell = mali.eaci14_i if key == "menage" else mali.eaci17_i
+            return d.apply(lambda r: spell(pd.Series([r["grappe"], r[key]])), axis=1)
 
         def plot(d, a, b):
             f = d[a].astype("Int64").astype("string")
@@ -383,7 +389,9 @@ class TestServed:
         exp = id_walk(exp.set_index(["t", "i"]), upd).reset_index()
         # The EAC-I waves; the EHCVM rows have their own raw oracle
         # (tests/test_gh824_mali_ehcvm_crop_production.py).
-        field = flat[(flat.kind == "field") & flat.t.isin(["2014-15", "2017-18"])]
+        # GH #1457: not a sale's Farm-level row (tests/test_gh1457_mali_multi_plot_sales.py).
+        field = flat[(flat.kind == "field") & flat.t.isin(["2014-15", "2017-18"])
+                     & (flat.plot_id != "Farm-level")]
         j = field.merge(exp, on=["t", "i", "plot_id", "crop"], how="inner")
         assert len(j) == len(field)
         ok = ((j.Unit_sold == j.exp) | (j.Unit_sold.isna() & j.exp.isna())).fillna(False)

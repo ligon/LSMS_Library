@@ -39,9 +39,6 @@ from .local_tools import df_data_grabber, format_id, get_categorical_mapping, ge
 from .local_tools import (CATEGORICAL_KEY_ATTR, CATEGORICAL_MAPPING_DIR,
                           CATEGORICAL_MAPPING_FILE,
                           CATEGORICAL_RESERVED_COLUMNS,
-                          CategoricalKeyDeclarationError,
-                          CategoricalMappingConflictError,
-                          EmptyCategoricalTableError,
                           categorical_mapping_files,
                           load_categorical_level)
 from .local_tools import (
@@ -54,9 +51,11 @@ from .local_tools import (
     stamp_parquet_hash,
     read_parquet_grain_audit,
     read_parquet_cache_waves,
+    read_parquet_make_inputs,
     read_parquet_datetime_audit,
     read_parquet_build_drops,
     _read_parquet_with_index_policy,
+    _read_managed_parquet_cache,
     source_tier,
     _collect_file_paths_from_block,
 )
@@ -86,7 +85,7 @@ from .null_index_audit import check_index_levels
 from .null_index_audit import (NullIndexKeyError, NullIndexKeyWarning,
                                _NULL_INDEX_LEDGER,
                                _read_strict as _null_index_strict)
-from .quantity_audit import QuantityImplausibleError, check_quantities
+from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
 from .sampling import (attach as attach_sampling, check_cluster_identity,
@@ -109,11 +108,15 @@ import subprocess
 import tempfile
 import json
 from dataclasses import dataclass
-from functools import lru_cache
+from functools import cached_property, lru_cache
 from sys import stderr
 import sys
-from dvc.repo import Repo
+from ._dvc_runtime import DVCMetadataCompatibilityError, RuntimeDVCRepo as Repo
 from dvc.exceptions import DvcException, PathMissingError
+from botocore.exceptions import (
+    ConnectionClosedError, ConnectTimeoutError, EndpointConnectionError,
+    NoCredentialsError, ReadTimeoutError,
+)
 from pyarrow.lib import ArrowInvalid
 from datetime import datetime
 from typing import Any, Callable, Iterable, Mapping
@@ -208,7 +211,8 @@ def _make_target_is_missing(diagnostics: str | bytes, target: str | Path) -> boo
     Shared by the GH #1039 rule probe and GH #1288 strict country runner
     (ledger 1288 §2/§4). A missing prerequisite means a broken existing rule,
     and a nested make's no-rule message followed by a recipe failure does too.
-    Callers use the C locale; unfamiliar diagnostics are never absence.
+    The rule probe and strict caller use the C locale; unfamiliar
+    diagnostics on any route are never absence.
     """
     if isinstance(diagnostics, bytes):
         # Classify a copy; the original bytes remain on CalledProcessError and
@@ -312,6 +316,78 @@ def _build_wave_script_target(make_dir: Path, wave_target: Path, *,
                    check=True, env=env)
 
 
+def _reject_unreadable_cache(path: Path, observed, error: Exception, *,
+                             require_removal: bool = True,
+                             auxiliary_method: str | None = None,
+                             source_candidate: Path | None = None) -> None:
+    """Reject only the observed managed entry; never a replacement or source.
+
+    Caller supplies its existing data_root cache path. No recursive cleanup,
+    raw/L1 deletion, symlink-target deletion or generic get_dataframe recovery.
+    Reader failure is evidence of unreadability, not physical byte damage.
+    """
+    root = data_root().absolute()
+    try:
+        parts = path.absolute().relative_to(root).parts
+    except ValueError:
+        raise error
+    owned_shape = ((len(parts) == 3 and parts[1] == 'var')
+                   or (len(parts) == 4 and parts[2] == '_'))
+    if auxiliary_method is not None:
+        # Only the two runtime crosswalk caches opt into the country _/ tier.
+        # Their in-tree alternatives and declared sources remain sources.
+        owned_shape = (auxiliary_method in JSON_CACHE_METHODS
+                       and len(parts) == 3 and parts[1] == '_'
+                       and parts[2] == f'{auxiliary_method}.parquet')
+        source_candidate = countries_root() / parts[0] / '_' / path.name if parts else None
+    if source_candidate is not None:
+        sidecar = path.with_name(path.name + '.dvc')
+        source_sidecar = source_candidate.with_name(source_candidate.name + '.dvc')
+        if (path.resolve() != root.resolve().joinpath(*parts)
+                or path.resolve().is_relative_to(countries_root().resolve())
+                or sidecar.exists() or sidecar.is_symlink()
+                or source_sidecar.exists() or source_sidecar.is_symlink()
+                or (source_candidate.exists() and path.exists()
+                    and path.samefile(source_candidate))):
+            raise error
+    if (not owned_shape or path.suffix != '.parquet' or path.is_symlink()
+            or not path.resolve().is_relative_to(root.resolve())):
+        raise error
+    try:
+        current = path.lstat()
+    except FileNotFoundError:
+        warnings.warn(f'Unreadable managed cache at {path} ({error!r}); '
+                      'entry disappeared; rebuilding through the normal route',
+                      UserWarning, stacklevel=3)
+        return
+    # A cache-shaped name can alias an absent source's L1 inode. Ordinary L2
+    # writers/private copies do not require hardlinks; never unlink an alias.
+    if observed.st_nlink > 1 or current.st_nlink > 1:
+        raise error
+    fields = ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns')
+    if any(getattr(current, field) != getattr(observed, field) for field in fields):
+        raise RuntimeError(f'Managed cache changed while rejecting unreadable entry: {path}') from error
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        warnings.warn(f'Unreadable managed cache at {path} ({error!r}); '
+                      'entry disappeared; rebuilding through the normal route',
+                      UserWarning, stacklevel=3)
+        return
+    except OSError as unlink_error:
+        if require_removal:
+            raise unlink_error from error
+        # YAML builds directly from source and can return the healthy RAM
+        # frame even when the existing best-effort cache write also fails.
+        warnings.warn(f'Unreadable managed cache at {path} ({error!r}); '
+                      f'could not remove it ({unlink_error!r}); rebuilding '
+                      'from source with the existing best-effort cache write',
+                      UserWarning, stacklevel=3)
+        return
+    warnings.warn(f'Unreadable managed cache at {path} ({error!r}); '
+                  'rebuilding through the normal route', UserWarning, stacklevel=3)
+
+
 _RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
 
 # Derived food tables whose ``u`` level can carry the reserved sentinels.
@@ -347,8 +423,8 @@ _U_SENTINEL_PROTECTED_METHODS = frozenset({'food_quantities', 'food_prices'})
 # read-path feature that cannot change a single cached byte.  So that one hop
 # is carried out of band by the ContextVar below rather than by a parameter.
 # ``_finalize_result`` and ``_apply_categorical_mappings`` do take an explicit
-# ``labels=``; both are outside the build closure (``_finalize_result`` is in
-# ``_build_registry._EXCLUDED_CALLABLES`` by name).
+# ``labels=``; the normal finalizer subtree stays outside the build closure
+# (``_finalize_result`` is in ``_build_registry._EXCLUDED_CALLABLES`` by name).
 #
 # The stored value is ``(method_name, {target: variant})``.  The method name is
 # load-bearing, not decoration: ``_finalize_result`` RE-ENTERS itself via
@@ -830,6 +906,7 @@ class StageInfo:
     table: str
     fmt: str
     output_path: Path
+    lexical_output_path: Path | None = None
 
 
 @lru_cache(maxsize=4)
@@ -867,6 +944,10 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
         out_entry = outs[0]
         if isinstance(out_entry, dict):
             out_template = out_entry.get("path")
+            if "path" not in out_entry and len(out_entry) == 1:
+                # DVC's ordinary detailed form is {template: {cache: false}}.
+                # Extract identity only; real DVC still validates its flags.
+                out_template = next(iter(out_entry))
         else:
             out_template = out_entry
         if not out_template:
@@ -893,7 +974,8 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
                     .replace("${item.format}", fmt)
                 )
             output_rel = output_rel.replace("//", "/").strip()
-            output_path = (yaml_path.parent / output_rel).resolve()
+            lexical_output_path = Path(os.path.abspath(yaml_path.parent / output_rel))
+            output_path = lexical_output_path.resolve()
 
             yaml_rel = yaml_path.relative_to(root_path)
             stage_ref = f"{yaml_rel.as_posix()}:materialize@{stage_key}"
@@ -906,6 +988,7 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
                 table=table,
                 fmt=fmt,
                 output_path=output_path,
+                lexical_output_path=lexical_output_path,
             )
 
     return stage_map
@@ -992,6 +1075,17 @@ def _property_value(instance, prop_name):
     if isinstance(prop, property):
         return prop.__get__(instance, type(instance))
     raise AttributeError(f"'{type(instance).__name__}' has no attribute '{prop_name}'")
+
+
+#: What a failed derivation may read as "try the legacy path": the builtins THEMSELVES.
+#: A subclass is a statement by whoever raised it -- a strict lever's refusal
+#: (``GrainCollapseError``, ``NullReadError``, ``NullIndexKeyError``,
+#: ``QuantityImplausibleError``), a malformed mapping table, ``GrainConflict`` -- and a
+#: second attempt would answer a question nobody asked (GH #1532).  It is a whitelist so
+#: the next guard needs no entry.  ``_rebuild_failure_error`` is a bare ``RuntimeError``
+#: and stays on it.  Used only by the dispatch in ``Country.__getattr__``, which no build
+#: fingerprint reaches.
+_GENERIC_BUILD_FAILURES = frozenset({FileNotFoundError, KeyError, ValueError, RuntimeError})
 
 
 def _rebuild_failure_error(country_name: str, method_name: str) -> RuntimeError:
@@ -1199,6 +1293,16 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
     # skips a frame carrying this marker (see _CONSTRUCTED_EMPTY_ATTR).
     empty.attrs[_CONSTRUCTED_EMPTY_ATTR] = True
     return empty
+
+
+def _apply_build_categorical_mappings(country: str, frame: pd.DataFrame) -> pd.DataFrame:
+    """Use the normal mapper where its labels are baked into a build output.
+
+    Keep this delegation in the mapper's module so the existing build-closure
+    resolver sees the method and its helpers (GH1454; task ledger §2/§5).
+    The ordinary post-read mapper and its callers are unchanged.
+    """
+    return Country(country)._apply_categorical_mappings(frame)
 
 
 class Wave:
@@ -1613,8 +1717,14 @@ class Wave:
         idxvars_updated = {key: map_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
         myvars_updated = {key: map_formatting_function(key, value) for key, value in myvars.items()}
 
+        def file_record(index, variables, options):
+            record = {'idxvars': index, 'myvars': variables}
+            if 'stata_missing_map' in options:
+                record['stata_missing_map'] = options['stata_missing_map']
+            return record
+
         if isinstance(files, str):
-            final_mapping[files] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
+            final_mapping[files] = file_record(idxvars_updated, myvars_updated, data_info)
             return final_mapping
         
         if isinstance(files, list):
@@ -1623,7 +1733,11 @@ class Wave:
                     idxvars_override = idxvars_updated.copy()
                     myvars_override = myvars_updated.copy()
                     file_name, overrides = next(iter(i.items()))
+                    file_options = {key: data_info[key] for key in ('stata_missing_map',) if key in data_info}
                     for key, val in overrides.items():
+                        if key == 'stata_missing_map':
+                            file_options[key] = val
+                            continue
                         if key in datetime_specs or is_datetime_spec(val):
                             # GH #1045: the spec's temporary source columns
                             # were expanded once for every file; a per-file
@@ -1638,9 +1752,9 @@ class Wave:
                             idxvars_override[key] = map_formatting_function(key, val, format_id_function = True)
                         else:
                             myvars_override[key] = map_formatting_function(key, val)
-                    final_mapping[file_name] = {'idxvars': idxvars_override, 'myvars': myvars_override}
+                    final_mapping[file_name] = file_record(idxvars_override, myvars_override, file_options)
                 else:
-                    final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
+                    final_mapping[i] = file_record(idxvars_updated, myvars_updated, data_info)
                 
             return final_mapping
         
@@ -1852,15 +1966,11 @@ class Wave:
                 wave_drops, (self.country.name, request, self.year))
             if (cache_freshness(cache_path, expected_wave_hash) != "stale"
                     and degraded_verdict != "rebuild"):
-                try:
-                    cache_file = open(cache_path, 'rb')
-                except OSError:
-                    df_cached = None
-                else:
-                    with cache_file:
-                        df_cached, _ = _read_parquet_with_index_policy(
-                            cache_file, read_errors=(OSError, ArrowInvalid),
-                        )
+                df_cached, read_error, observed = _read_managed_parquet_cache(
+                    cache_path, open_errors=(OSError,))
+                if read_error is not None and observed is not None:
+                    _reject_unreadable_cache(cache_path, observed, read_error,
+                                             require_removal=False)
                 if df_cached is not None:
                     if (expected_wave_hash is not None
                             and read_parquet_cache_hash(cache_path) is None):
@@ -1879,10 +1989,12 @@ class Wave:
                     return df_cached
         return None
 
-    def _fresh_script_parquet(self, request: str, candidates: list[Path]) -> Path | None:
-        """The script-path READ GATE: the first existing, non-STALE candidate.
+    def _fresh_script_parquet(self, request: str, candidates: list[Path]) -> tuple[Path | None, pd.DataFrame | None, bool]:
+        """The script-path READ GATE: path/frame and whether Make must force.
 
-        ``None`` sends ``grab_data`` to Make.  A hashless candidate grades
+        An unreadable old cache is rejected once; the fresh output is read
+        strictly by grab_data. Returning the decoded hit avoids a second read.
+        A missing path sends ``grab_data`` to Make.  A hashless candidate grades
         ``legacy`` and is selected -- the v0.8.0 upgrade path for parquets
         under ``data_root`` and exactly why an in-tree file must never be a
         candidate (GH #803) -- and it is NOT stamped: script-written wave
@@ -1897,6 +2009,7 @@ class Wave:
         which paths are candidates is build logic and stays fingerprinted.
         """
         expected_wave_hash = self._input_hash(request)
+        force = False
         for candidate in candidates:
             if candidate.exists():
                 if cache_freshness(candidate, expected_wave_hash) == "stale":
@@ -1905,8 +2018,14 @@ class Wave:
                         f"will rebuild via Make"
                     )
                     continue
-                return candidate
-        return None
+                frame, error, observed = _read_managed_parquet_cache(candidate)
+                if error is not None:
+                    if observed is not None:
+                        _reject_unreadable_cache(candidate, observed, error)
+                        force = True
+                    continue
+                return candidate, frame, force
+        return None, None, force
 
     @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
     def grab_data(self, request: str, *, _with_origin: bool = False) -> pd.DataFrame | tuple[pd.DataFrame, str]:
@@ -1991,7 +2110,7 @@ class Wave:
                 last_error: Exception | None = None
                 for candidate in dict.fromkeys(candidates):
                     try:
-                        df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat, missing_ok=multiple_files)
+                        df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat, missing_ok=multiple_files, **({key: mappings[key] for key in ('stata_missing_map',) if key in mappings}))
                         break
                     except (FileNotFoundError, PathMissingError) as error:
                         last_error = error
@@ -2027,6 +2146,8 @@ class Wave:
             return df
 
         if data_info:
+            from .build_transforms import _input_lineage, _output_inputs
+            output_inputs = _output_inputs(data_info.get('output_inputs', {}))
             # Vertical Merge dfs
             if data_info.get('dfs'):
                 merge_dfs = []
@@ -2039,6 +2160,7 @@ class Wave:
                 # supplied, is recorded in the parquet this build writes -- the
                 # content hash cannot tell a degraded build from a complete one.
                 dropped: list[dict[str, Any]] = []
+                input_lineage = {}
                 _forget_wave_build_drops(self.country.name, request, self.year)
                 # GH #1063: the merge keys in a FIXED order -- 't' first, then
                 # the declared `merge_on` order.  This used to be
@@ -2091,7 +2213,9 @@ class Wave:
                         merge_dfs.append(sub_df.reset_index())
                         merged_names.append(i)
                     except (FileNotFoundError, PathMissingError, DvcException,
-                            KeyError) as exc:
+                            KeyError, NoCredentialsError, EndpointConnectionError,
+                            ConnectionError, TimeoutError, ConnectTimeoutError,
+                            ReadTimeoutError, ConnectionClosedError) as exc:
                         if idx == 0:
                             # The primary sub-df is required; re-raise
                             raise
@@ -2151,6 +2275,11 @@ class Wave:
                         if rec["kind"] == "config":
                             config_bugs.append((i, sub_file, exc, rec["cause"]))
                         dropped.append(rec)
+                        # Explicit lineage includes index-level providers too;
+                        # legacy direct-missing fields still use myvars only.
+                        for name in (set(sub_data_info.get('idxvars') or {})
+                                     | set(sub_data_info.get('myvars') or {})):
+                            input_lineage.setdefault(name, {})[i] = {name}
                         if rec["cause"] == "no-such-source":
                             warnings.warn(
                                 f"{self.name}/{request}: no such source for "
@@ -2195,7 +2324,12 @@ class Wave:
                 derived_spec = data_info.get('derived')
                 if derived_spec:
                     from .transformations import apply_derived
-                    df = apply_derived(df, derived_spec)
+                    df = apply_derived(df, derived_spec, _lineage=input_lineage)
+                # Snapshot all final-hook/direct declarations together: their
+                # order does not invent a chain. Self-input reads pre-hook data.
+                input_lineage.update({
+                    output: _input_lineage(inputs, input_lineage)
+                    for output, inputs in output_inputs.items()})
                 # `drop:` removes the temporary columns that existed only to
                 # feed the `derived:` transformers.  Listed columns that aren't
                 # present are silently skipped so YAML authors don't have to
@@ -2275,7 +2409,10 @@ class Wave:
                     _file_wave_drops(
                         self.country.name, request, dropped, df,
                         ((self.country.resources or {}).get('Data Scheme')
-                         or {}).get(request))
+                         or {}).get(request), input_lineage={
+                             output: input_lineage.get(output, {})
+                             for output in dict.fromkeys([
+                                 *(derived_spec or {}), *output_inputs])})
 
             else:
                 mapping_details = self.column_mapping(request, data_info)
@@ -2305,9 +2442,14 @@ class Wave:
             # script-path READ GATE, in its own method and excluded from the
             # build fingerprint (GH #1040).  Which paths are candidates is
             # still decided here (_script_parquet_candidates is build logic).
-            parquet_fn = self._fresh_script_parquet(request, candidates)
+            parquet_fn, df, unreadable_cache = self._fresh_script_parquet(request, candidates)
 
             if parquet_fn is None:
+                # GH #1468: crosswalk publishers are maintainer tools, never
+                # runtime fallbacks. YAML-derived and readable cached maps
+                # retain their ordinary paths above.
+                if request in JSON_CACHE_METHODS:
+                    return result(pd.DataFrame(), 'missing')
                 makefile_path = self.file_path.parent /'_'/ "Makefile"
                 if not makefile_path.exists():
                     warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
@@ -2320,7 +2462,7 @@ class Wave:
                 # and the no-make fallback (#968) all live in the helper, which
                 # is kept out of the build fingerprint.
                 _build_wave_script_target(cwd_path, relative_parquet_path,
-                                          force=intree_artefact)
+                                          force=intree_artefact or unreadable_cache)
                 logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
                 for candidate in candidates:
@@ -2332,8 +2474,10 @@ class Wave:
                 logger.warning(f"Parquet file for {request} still missing after running Makefile.")
                 return result(pd.DataFrame(), 'missing')
 
-            with open(parquet_fn, 'rb') as parquet_file:
-                df, _ = _read_parquet_with_index_policy(parquet_file)
+            if df is None:
+                # New output: no recovery loop around producer defects.
+                with open(parquet_fn, 'rb') as parquet_file:
+                    df, _ = _read_parquet_with_index_policy(parquet_file)
             origin = 'parquet'
             # GH #868: the wave script ran out of process; whatever its
             # reducer reported lives only in the stamp it wrote.
@@ -2360,7 +2504,7 @@ class Wave:
         # Write failures warn but don't propagate — the caller gets a
         # correct DataFrame either way.
         if (cache_path is not None
-                and not os.environ.get('LSMS_NO_CACHE')
+                and not _no_cache()
                 and isinstance(df, pd.DataFrame)
                 and not df.empty):
             try:
@@ -2463,7 +2607,7 @@ class Wave:
         return (df, origin) if _with_origin else df
     
     # GH #1455 (ruling @ligon, 2026-11-04): no reducer here, on any route.  A
-    # frame built in memory -- `LSMS_NO_CACHE` set to any non-empty string, or an
+    # frame built in memory -- historically any non-empty `LSMS_NO_CACHE` value, or an
     # L2-wave write that failed -- used to go through a `groupby(index).agg` that lost every column it did
     # not name (`Derivation`), turned NaN into 0 (`sum`, min_count=0) and deleted
     # NaN keys, and the country tier then wrote that frame stamped with the
@@ -2576,7 +2720,6 @@ class Country:
         # re-emit warnings) on every property access for countries that
         # don't declare panel_ids in data_scheme.yml.
         self._panel_ids_attempted = False
-        self.wave_folder_map = {}
         if trust_cache:
             warnings.warn(
                 "trust_cache is deprecated and will be removed in a future "
@@ -2823,6 +2966,17 @@ class Country:
                 resolved.append(info)
 
         return resolved
+
+    @cached_property
+    def wave_folder_map(self) -> dict[str, str]:
+        """Logical wave labels mapped to physical folders, resolved on first read.
+
+        Reuse ``waves``' metadata precedence. Keep its mapping object so public
+        assignment, mutation and later ``waves`` refreshes behave as before.
+        Countries without a declared map use the logical labels as folders.
+        """
+        _ = self.waves
+        return self.__dict__.get('wave_folder_map', {})
 
     @property
     def waves(self) -> list[str]:
@@ -3100,8 +3254,7 @@ class Country:
         # py_ls = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py']
 
         # # Customed
-        # replace_dic = {'food_prices_quantities_and_expenditures': ['food_expenditures', 'food_quantities', 'food_prices'],
-        #                 'unitvalues': ['food_prices'],
+        # replace_dic = {'unitvalues': ['food_prices'],
         #                 'other_features': ['cluster_features']}
         # # replace the key with the value in the dictionary
         # for key, value in replace_dic.items():
@@ -3154,10 +3307,17 @@ class Country:
             return cached
 
         cf_parts = []
+        needs_country_loader = False
         for wave in self.waves:
             try:
                 w = self[wave]
                 c = w.cluster_features()
+                if (c.empty and 'cluster_features' in w.data_scheme
+                        and not w.resources.get('cluster_features')):
+                    # A cold script wave can need the Country loader's existing
+                    # script fallback when there is no Makefile (GH #1440).
+                    needs_country_loader = True
+                    break
                 if not c.empty:
                     cf_parts.append(c.reset_index())
             except (FileNotFoundError, KeyError, ValueError) as exc:
@@ -3178,27 +3338,18 @@ class Country:
                 )
                 continue
 
-        if not cf_parts:
+        if needs_country_loader:
+            # Reuse the declared all-wave loader once, outside the wave-skip
+            # catch: its failures must reach Country/Feature callers. Its
+            # result already has categorical mappings; do not apply them twice.
+            cf = self.cluster_features().reset_index()
+        else:
+            if not cf_parts:
+                raise RuntimeError("cluster_features returned no data for any wave.")
+            cf = pd.concat(cf_parts, ignore_index=True)
+
+        if cf.empty:
             raise RuntimeError("cluster_features returned no data for any wave.")
-
-        cf = pd.concat(cf_parts, ignore_index=True)
-
-        # Wave-level cluster_features() returns raw data that has not
-        # been through _apply_categorical_mappings().  Apply the
-        # country's categorical mapping here so that market labels are
-        # normalised (e.g. "DODOMA" -> "Dodoma") before the lookup is
-        # cached and joined onto every downstream table.
-        cat_maps = self.categorical_mapping
-        if cat_maps:
-            lower_lookup_cm = {name.lower(): name for name in cat_maps}
-            key = lower_lookup_cm.get(column.lower())
-            if key is not None:
-                table = cat_maps[key]
-                if "Preferred Label" in table.columns:
-                    source = _categorical_key_column(table)
-                    if source is not None:
-                        rdict = table.set_index(source)["Preferred Label"].to_dict()
-                        cf[column] = cf[column].replace(rdict)
 
         if column not in cf.columns:
             available = [c for c in cf.columns if c not in ('i', 't', 'v')]
@@ -3206,6 +3357,11 @@ class Country:
                 f"'{column}' not in cluster_features columns. "
                 f"Available: {available}"
             )
+
+        if not needs_country_loader:
+            # Match the Country fallback exactly once, without relabelling
+            # identity keys or unrelated cluster attributes (GH1440).
+            cf[column] = self._apply_categorical_mappings(cf[[column]])[column]
 
         lookup = (cf[['t', 'v', column]]
                   .dropna(subset=[column])
@@ -3224,18 +3380,36 @@ class Country:
         ``i`` and ``t`` in its index but not ``v``.  The sample()
         result is cached on the Country instance for reuse across
         features.
+
+        **A sample that refuses raises (GH #1546).**  Two things leave *df*
+        without ``v``, both with a :class:`SampleUnavailableWarning` on every
+        table served that way: a source of ``sample`` that is not there, and a
+        ``sample`` with no ``v`` column.  Any other exception is ``sample``'s
+        own, and is not caught: this used to catch ``KeyError``, ``ValueError`` and
+        ``AttributeError`` and log them at INFO, which served every household
+        table of a country with no ``v`` when a guard fired or a hook had a bug.
         """
         cache = getattr(self, '_sample_v_cache', None)
         if cache is None:
             try:
                 s = self.sample()
-                cache = s[['v']].copy()
-                self._sample_v_cache = cache
-            except (FileNotFoundError, KeyError, ValueError, AttributeError) as exc:
-                logger.info("sample() unavailable for v-join on %s: %s", self.name, exc)
-                self._sample_v_cache = False
-                return df
+            except FileNotFoundError as exc:
+                cache = False
+                self._sample_v_gap = f"sample() could not read a source ({exc})"
+            else:
+                if 'v' in s.columns:
+                    cache = s[['v']].copy()
+                else:
+                    cache = False
+                    self._sample_v_gap = "sample() has no `v` column"
+            self._sample_v_cache = cache
         if cache is False:
+            warnings.warn(
+                f"{self.name}: served without `v`: "
+                f"{getattr(self, '_sample_v_gap', 'sample() is unavailable')}.  A later "
+                f"groupby on `v`, and any cluster-level table, will not see these rows "
+                f"by cluster.",
+                SampleUnavailableWarning, stacklevel=2)
             return df
 
         idx_names = list(df.index.names)
@@ -3402,6 +3576,10 @@ class Country:
         ``sample()`` doesn't expose ``column`` still get a market label
         (via the historical cluster-level path).
 
+        If ``sample()`` cannot read a source and *df* has no ``v``, its
+        original availability exception is raised: the cluster lookup needs
+        an existing household-to-cluster relation.
+
         A row that gets no label from either source is **kept, with ``m``
         NA** -- the shape ``groupby(..., dropna=False)`` would give -- and
         reported by :meth:`_report_unlabelled_markets`.  It used to be deleted
@@ -3431,16 +3609,19 @@ class Country:
         if 'sample' in self.data_scheme:
             try:
                 s = self.sample()
-            except (OSError, KeyError, ValueError, AttributeError,
-                    DvcException) as exc:
-                # Sample-table missing / mis-shaped / DVC-fetch failure ->
-                # fall back to wave-level region scan.  Programmer bugs
-                # (TypeError, NameError) surface unchanged.
-                logger.info(
-                    "_add_market_index: could not load sample() for HH-level "
-                    "lookup of column %r on %s: %s",
-                    column, self.name, exc,
-                )
+            except (OSError, DvcException) as exc:
+                if 'v' not in flat.columns:
+                    # The cluster lookup needs the input's existing identity.
+                    raise
+                # A source that cannot be fetched -> fall back to the wave-level
+                # region scan, and say so: the label then comes from the cluster,
+                # not the household.  Anything else is sample's own refusal or
+                # bug and is not caught (GH #1546).
+                warnings.warn(
+                    f"{self.name}: market={column!r} is attempting to label households from "
+                    f"cluster_features, because sample() could not read a source "
+                    f"({type(exc).__name__}: {exc}).",
+                    SampleUnavailableWarning, stacklevel=2)
                 s = None
             if isinstance(s, pd.DataFrame) and column in s.columns:
                 hh_lookup = s[column].rename('m_hh')
@@ -3577,12 +3758,9 @@ class Country:
             f"this fatal."
         )
         if _null_index_strict():
-            # NullIndexKeyError subclasses RuntimeError.  That is safe ONLY
-            # because all three _add_market_index call sites in the generated
-            # table method sit OUTSIDE the derived-path
-            # ``except (FileNotFoundError, KeyError, ValueError, RuntimeError)``
-            # blocks; moved inside one, a strict raise would be swallowed into
-            # the legacy fallback (CLAUDE.md, Site C).
+            # NullIndexKeyError subclasses RuntimeError.  The derived-path
+            # handlers re-raise a subclass (_GENERIC_BUILD_FAILURES, GH #1532),
+            # and all three _add_market_index call sites sit outside them.
             raise NullIndexKeyError(msg)
         # Point the warning at the first frame outside lsms_library (the
         # user's Country/Feature call), not at the generated method.
@@ -3608,9 +3786,29 @@ class Country:
             raise RuntimeError("Location lookup already in progress.")
 
         location_path = data_root(self.name) / "var" / "other_features.parquet"
+        build_location = True
         if location_path.exists():
-            location_df = get_dataframe(location_path)
-        else:
+            build_location = False
+            source_path = self.file_path / 'var' / 'other_features.parquet'
+            sidecar = location_path.with_name(location_path.name + '.dvc')
+            source_sidecar = source_path.with_name(source_path.name + '.dvc')
+            if (location_path.is_symlink()
+                    or location_path.resolve() != data_root().resolve() / self.name / 'var' / 'other_features.parquet'
+                    or location_path.resolve().is_relative_to(countries_root().resolve())
+                    or sidecar.exists() or sidecar.is_symlink()
+                    or source_sidecar.exists() or source_sidecar.is_symlink()
+                    or (source_path.exists() and location_path.samefile(source_path))):
+                location_df = get_dataframe(location_path)
+            else:
+                location_df, error, observed = _read_managed_parquet_cache(
+                    location_path, open_errors=(FileNotFoundError,),
+                    check_null=True, engine='pyarrow')
+                if error is not None:
+                    if observed is not None:
+                        _reject_unreadable_cache(location_path, observed, error,
+                                                 source_candidate=source_path)
+                    build_location = True
+        if build_location:
             self._location_lookup_inflight = True
             try:
                 location_df = self.other_features()
@@ -4741,7 +4939,9 @@ class Country:
                 or str(r["wave"]) in keep]
 
     def _read_l2_country_cache(self, method_name: str, cache_path: Path,
-                               waves: list[str]) -> tuple[pd.DataFrame | None, list[str] | None, str | None]:
+                               waves: list[str], *, _recover_unreadable: bool = True,
+                               _borrowed_input: bool = False
+                               ) -> tuple[pd.DataFrame | None, list[str] | None, str | None]:
         """The L2-country READ GATE: serve ``var/<table>.parquet`` or say why not.
 
         Returns ``(df, covered, miss_reason)``:
@@ -4773,6 +4973,8 @@ class Country:
         are read-path; both functions remain fingerprinted through their
         build-path call sites.)
         """
+        if _borrowed_input and _recover_unreadable:
+            raise ValueError('Borrowed Make input admission cannot evict a live cache')
         cache_exists = cache_path.exists()
 
         # v0.7.0/v0.8.0: best-effort cache read.  If a parquet exists
@@ -4888,8 +5090,27 @@ class Country:
             logger.debug(f"GH #675 cache MISS ({degraded_reason}): {method_name} at {cache_path}")
             return None, covered, degraded_reason
 
-        try:
-            cached_df = get_dataframe(cache_path)
+        def _serve_cached():
+            if _recover_unreadable or _borrowed_input:
+                cached_df, read_error, observed = _read_managed_parquet_cache(
+                    cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
+                if read_error is not None:
+                    if _borrowed_input:
+                        warnings.warn(f'v0.7.0 cache read failed for {method_name} '
+                                      f'({read_error!r}); leaving borrowed live input '
+                                      'unchanged and rebuilding privately',
+                                      UserWarning, stacklevel=3)
+                    elif observed is not None:
+                        _reject_unreadable_cache(cache_path, observed, read_error)
+                    else:
+                        warnings.warn(f'Cache open failed for {cache_path} ({read_error!r}); '
+                                      'rebuilding through the normal route',
+                                      UserWarning, stacklevel=3)
+                    return None, covered, f'read-error: {read_error!r}'
+            else:
+                # Explicit legacy mode retains its old strict decoder and
+                # outer error/miss policy, without unlink.
+                cached_df = get_dataframe(cache_path)
             cached_df = map_index(cached_df)
             # GH #323: this parquet was written POST-collapse, so its
             # index is unique and _normalize_dataframe_index can never
@@ -4928,26 +5149,28 @@ class Country:
             # were asked for.  Requested-wave semantics are enforced
             # here, on the serve path -- nothing downstream filters.
             return self._restrict_to_waves(cached_df, waves), covered, None
+
+        if _recover_unreadable or _borrowed_input:
+            # No policy/schema/index/audit exception is a decode miss.
+            return _serve_cached()
+        try:
+            return _serve_cached()
         except (OSError, ArrowInvalid) as cache_read_error:
-            # Stale / corrupted cache parquet -> rebuild from source.
-            # Surface to the user (not just debug log) so a silent
-            # cache-miss isn't mistaken for a healthy build.
-            # Programmer bugs (TypeError, AttributeError) propagate.
-            # stacklevel=3 (this method -> load_dataframe_with_dvc ->
-            # _aggregate_wave_data) names the same frame the pre-#908
-            # stacklevel=2 did from inside the closure.
+            # Original1071 pre-tranche behavior for the deferred live Other
+            # owner only. In particular ParquetFormatError remains fatal.
             warnings.warn(
                 f"v0.7.0 cache read failed for {method_name} "
                 f"({cache_read_error!r}); rebuilding from source",
-                category=UserWarning,
-                stacklevel=3,
-            )
+                category=UserWarning, stacklevel=3)
             return None, covered, f"read-error: {cache_read_error!r}"
 
     def _read_assumed_fresh_cache(self, method_name: str,
-                                  waves: list[str]) -> pd.DataFrame | None:
+                                  waves: list[str]) -> pd.DataFrame | tuple | None:
         """The ``assume_cache_fresh`` short-circuit: ``var/<table>.parquet``
-        served WITHOUT a hash check, or None to take the ordinary path.
+        served WITHOUT a hash check, or a miss to take the ordinary path.
+
+        An unreadable-cache miss carries (None, saved coverage, reason) to
+        this SAME invocation's normal loader; no state survives the call.
 
         A hit is returned pre-finalize, restricted to *waves* where the #891
         manifest says it covers them; ``_aggregate_wave_data`` finalizes it.
@@ -4982,33 +5205,42 @@ class Country:
                 # parquet), fall through to the normal path rather than guess.
                 covered = read_parquet_cache_waves(parquet_path)
 
-                def _replay_dates():
-                    # GH #1045: this short-circuit serves the parquet too, so
-                    # it replays the build-time date-parse report like every
-                    # other warm read.  (The grain audit is not replayed here;
-                    # that is a separate, pre-existing gap.)
+                def _replay_audits():
+                    # GH #1066: replay stored evidence like the normal
+                    # read gate, without asserting freshness or completeness.
+                    # Clear both ledgers before a strict grain report can raise.
+                    _GRAIN_LEDGER.pop((self.name, method_name), None)
                     _DATETIME_LEDGER.pop((self.name, method_name), None)
+                    _replay_grain_audit(
+                        self._grain_reports_for_waves(
+                            read_parquet_grain_audit(parquet_path), waves),
+                        self.name, method_name,
+                    )
                     replay_datetime_audit(read_parquet_datetime_audit(parquet_path),
                                           self.name, method_name, waves=waves)
 
+                def _read_cached():
+                    frame, error, observed = _read_managed_parquet_cache(
+                        parquet_path, open_errors=(FileNotFoundError,), check_null=True, engine='pyarrow')
+                    if error is not None and observed is not None:
+                        _reject_unreadable_cache(parquet_path, observed, error)
+                        return None, covered, f'read-error: {error!r}'
+                    return frame
+
                 if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
-                    try:
-                        df_cached = get_dataframe(parquet_path)
-                    except FileNotFoundError:
-                        # GH #778: another builder/clear can remove the cache
-                        # after the exists/footer checks. Use the ordinary path.
-                        return None
+                    df_cached = _read_cached()
+                    if df_cached is None or isinstance(df_cached, tuple):
+                        return df_cached
                     df_cached = map_index(df_cached)
                     df_cached = self._restrict_to_waves(df_cached, waves)
-                    _replay_dates()
+                    _replay_audits()
                     return df_cached
                 if covered is None and set(waves) == set(self.waves):
-                    try:
-                        df_cached = get_dataframe(parquet_path)
-                    except FileNotFoundError:
-                        return None
+                    df_cached = _read_cached()
+                    if df_cached is None or isinstance(df_cached, tuple):
+                        return df_cached
                     df_cached = map_index(df_cached)
-                    _replay_dates()
+                    _replay_audits()
                     return df_cached
                 logger.debug(
                     f"assume_cache_fresh short-circuit SKIPPED (coverage): "
@@ -5226,13 +5458,38 @@ class Country:
         if (not requested
                 or not requested < {str(w) for w in self.waves}
                 or method_name not in self.data_scheme
-                or method_name in JSON_CACHE_METHODS
-                or any(method_name in self[w].data_scheme for w in waves)):
+                or method_name in JSON_CACHE_METHODS):
             return False
+        return not self._legacy_can_build(method_name, waves)
+
+    def _legacy_can_build(self, method_name: str, waves: list[str] | None) -> bool:
+        """Can the legacy path build ``method_name`` for *waves*?
+
+        A requested wave declares the table, or the country level has a rule or a script
+        for it; ``True`` wherever a make rule cannot be inspected, so a table this cannot
+        answer for keeps its route.  ``False`` is the case a derived table must not fall
+        through: the legacy path could only answer 0 rows on a subset, which reads a failed
+        build as absence, or "Could not materialize", which hides the cause (GH #1516).
+        Measured on the 38 countries that have a config: no country has a legacy route for
+        ``household_characteristics``, and four have one for a food table (CotedIvoire,
+        Nigeria, Tanzania, Togo).  Asked directly on a cold root, none of those ten cells
+        built a row.
+        """
+        requested = self.waves if waves is None else waves
+        if any(method_name in self[w].data_scheme for w in requested):
+            return True
         if ((self.file_path / "_" / "Makefile").exists()
                 and not shutil.which("make", path=_script_subprocess_env().get("PATH"))):
-            return False
-        return not self._has_country_builder(method_name)
+            return True
+        return self._has_country_builder(method_name)
+
+    def _warn_legacy_fallback(self, table: str, source: str, exc: Exception) -> None:
+        """A derivation failed and the country's own build is about to answer for it."""
+        warnings.warn(
+            f"{self.name}/{table}: deriving it from {source} failed "
+            f"({type(exc).__name__}: {exc}), so the country's legacy build is being tried "
+            f"instead.  What it serves is not the derived table.",
+            LegacyFallbackWarning, stacklevel=4)
 
     def _has_country_builder(self, method_name: str) -> bool:
         """Can the COUNTRY level build ``method_name``?  GH #1039.
@@ -5340,10 +5597,364 @@ class Country:
                           f"{method_name}.parquet")
         return True
 
+    def _make_wave_inputs(self, method_name: str):
+        """Declared logical contributions and their physical output paths.
+
+        Reuse Wave's YAML/script distinction and folder map (GH1288 repair
+        ledger §2–§4). A shared script folder is ONE input; its logical wave
+        list is declaration evidence, independent of the output's t values.
+        """
+        inputs = {}
+        for w in self.waves:
+            wave = self[w]
+            if method_name not in wave.data_scheme:
+                continue
+            yaml_path = bool(wave.resources.get(method_name))
+            folder = str(w) if yaml_path else wave.wave_folder
+            relative = Path(self.name) / folder / '_' / f'{method_name}.parquet'
+            entry = inputs.setdefault(relative, ([], yaml_path))
+            entry[0].append(w)
+        return inputs
+
+    @build_transform()  # dispatched by isolated child command; keep its code fingerprinted
+    def _materialize_make_yaml(self, method_name: str, waves: list[str]) -> None:
+        """Isolated child's YAML inputs: actual getters and sanctioned writer.
+
+        No alternate extraction/aggregation implementation. Write the getter's
+        actual result, including a successful zero-row result, because the
+        ordinary wave cache writer deliberately skips empty frames.
+        """
+        for w in waves:
+            wave = self[w]
+            frame, origin = getattr(wave, method_name)(_with_origin=True)
+            if (not wave.resources.get(method_name)
+                    or origin not in ('memory', 'parquet', 'materialized')
+                    or not isinstance(frame, pd.DataFrame)):
+                raise RuntimeError(f'{self.name}/{method_name}/{w}: '
+                                   'no completed YAML contribution for Make')
+            path = data_root(self.name) / str(w) / '_' / f'{method_name}.parquet'
+            if not path.exists():
+                path.parent.mkdir(parents=True, exist_ok=True)
+                to_parquet(frame, path, absolute_path=True,
+                           cache_hash=wave._input_hash(method_name),
+                           grain_audit=_wave_grain_audit(self.name, method_name, w),
+                           datetime_audit=wave_datetime_audit(self.name, method_name, w),
+                           build_drops=_wave_build_drops(self.name, method_name, w))
+
+    @build_transform()  # child dispatch is explicit, so fingerprint its policy too
+    def _materialize_make_other(self, method_name: str, wave_inputs=(), *,
+                                country_input=True):
+        """Child-only dispatch to an Other table's existing authoritative API.
+
+        Retain genuine materialize:make country builders and their transforms;
+        otherwise the normal default loader writes its verified country cache.
+        The environment belongs to this isolated child, never the parent.
+        """
+        entry = self._materialization_entry(method_name)
+        backend = entry.get('materialize')
+        native = (isinstance(backend, str) and backend.lower() == 'make'
+                  and self._has_country_builder(method_name))
+        os.environ['LSMS_BUILD_BACKEND'] = 'make' if native else 'dvc'
+        if wave_inputs:
+            # A native country transaction promotes ONLY its country output;
+            # its temporary waves do not become this caller's wave inputs.
+            # Prepare explicitly referenced physical waves with the SAME
+            # runner instead of assuming a country build left companions.
+            self._aggregate_wave_data(method_name=method_name,
+                                      _make_wave_inputs_only=wave_inputs)
+        if country_input:
+            return self._aggregate_wave_data(method_name=method_name)
+
+    def _make_other_references(self, method_name: str):
+        """Literal managed prerequisites, using the existing source scanner.
+
+        Raw/reviewed inputs are not managed outputs. Computed paths are NOT
+        guessed: an unknown missing prerequisite retains its native failure.
+        """
+        declared = {}
+        registry = (self.resources or {}).get('Data Scheme') or {}
+        for table in registry:
+            if table == method_name or table in JSON_CACHE_METHODS:
+                continue
+            declared[Path(self.name) / 'var' / f'{table}.parquet'] = table
+            for relative in self._make_wave_inputs(table):
+                declared[relative] = table
+        scripts = {self.file_path / '_' / f'{method_name}.py'}
+        scripts.update(self[w].file_path / '_' / f'{method_name}.py' for w in self.waves)
+        found = {}
+        for script in sorted(scripts):
+            for ref in scan_script_data_refs(script):
+                if not ref.lower().endswith('.parquet'):
+                    continue
+                path = Path(os.path.normpath(script.parent / ref))
+                if path.with_name(path.name + '.dvc').is_file():
+                    continue  # declared raw/DVC provenance, not an Other cache
+                for base in (self.file_path, data_root(self.name)):
+                    try:
+                        relative = Path(self.name) / path.relative_to(base)
+                    except ValueError:
+                        continue
+                    if relative in declared:
+                        found[relative] = declared[relative]
+        return found
+
+    def _make_declared_inputs(self, method_name: str, *, _with_sources=False,
+                              _extra_tables=()):
+        """Existing fingerprints for the finite declared/literal input closure.
+
+        Other source sidecars and country-only raw literals need not occur in
+        the selected table hash. Keep their existing source_fingerprint/hash
+        values alongside it, rather than certifying stale warm reuse (§4).
+        """
+        registry = (self.resources or {}).get('Data Scheme') or {}
+        extra = set(_extra_tables)
+        if not extra <= set(registry) - JSON_CACHE_METHODS:
+            raise RuntimeError(f'{self.name}/{method_name}: unknown managed Make input record')
+        tables = {method_name, *extra}
+        pending = list(tables)
+        while pending:
+            for table in self._make_other_references(pending.pop()).values():
+                if table not in tables:
+                    tables.add(table)
+                    pending.append(table)
+        hashes = {table: self._table_cache_hash(table, self.waves)
+                  for table in sorted(tables - {method_name})}
+        if any(value is None for value in hashes.values()):
+            raise RuntimeError(f'{self.name}/{method_name}: unverifiable Other Make inputs')
+        sources, all_sources, covered_sources = {}, set(), set()
+        managed = {relative for table in tables for relative in self._make_wave_inputs(table)}
+        managed.update(Path(self.name) / 'var' / f'{table}.parquet' for table in tables)
+        for table in sorted(tables):
+            refs = set()
+            scripts = {self.file_path / '_' / f'{table}.py'}
+            for w in self.waves:
+                wave = self[w]
+                block = wave.resources.get(table)
+                if block:
+                    refs.update(Path(os.path.normpath(wave.file_path / 'Data' / ref))
+                                for ref in _collect_file_paths_from_block(block))
+                # Exactly the source paths already folded by Wave._input_hash.
+                # They need no second proof to reuse a valid default cache.
+                hashed_refs = (_collect_file_paths_from_block(block) if block else
+                               scan_script_data_refs(wave.file_path / '_' / f'{table}.py'))
+                covered_sources.update(
+                    Path(os.path.normpath(wave.file_path / 'Data' / ref)) for ref in hashed_refs)
+                scripts.add(wave.file_path / '_' / f'{table}.py')
+            for script in scripts:
+                refs.update(Path(os.path.normpath(script.parent / ref))
+                            for ref in scan_script_data_refs(script))
+            for path in refs:
+                is_managed = False
+                for base in (self.file_path, data_root(self.name)):
+                    try:
+                        is_managed |= Path(self.name) / path.relative_to(base) in managed
+                    except ValueError:
+                        pass
+                if not is_managed or path.with_name(path.name + '.dvc').is_file():
+                    all_sources.add(path)
+        for path in all_sources - covered_sources:
+            sources[str(path)] = source_fingerprint(path)
+        manifest = {'tables': hashes, 'sources': sources}
+        return (manifest, all_sources) if _with_sources else manifest
+
+    @contextmanager
+    def _make_build_root(self, method_name: str):
+        """Private output transaction for a direct country Make builder.
+
+        Only current DECLARED managed inputs or authenticated raw/DVC inputs
+        are copied. Selected country output is absent; unproven selected wave
+        caches are absent. Thus neither Make's
+        mtime/no-rule success nor a no-output producer can borrow old bytes.
+        Other VAR/wave files and grouped-rule companions remain available in
+        the live root and are never overwritten by this transaction (§4).
+
+        This is bounded by the existing declared-input hash: arbitrary dynamic
+        or arbitrary outside-root dependencies are not certified. An unknown
+        computed prerequisite is an availability boundary, not proved stale;
+        ordinary discoverable Other producers are tried privately.
+        """
+        from .local_tools import _dvc_cache_path
+
+        live = data_root()
+        expected = self._table_cache_hash(method_name, self.waves)
+        declared_inputs, source_paths = self._make_declared_inputs(method_name, _with_sources=True)
+        others = self._make_other_references(method_name)
+        contributing = {method_name, *others.values()}
+        if expected is None:
+            raise RuntimeError(f'{self.name}/{method_name}: cannot establish '
+                               'declared Make inputs; refusing unverified output')
+        selected = Path(self.name) / 'var' / f'{method_name}.parquet'
+        originals = {}
+        input_hashes = []
+        copied_tables = set()
+        for _, (logical, _) in self._make_wave_inputs(method_name).items():
+            if any(self[w]._input_hash(method_name) is None for w in logical):
+                raise RuntimeError(f'{self.name}/{method_name}: unverifiable '
+                                   f'declared Make wave input {logical}')
+
+        def signature(path):
+            if (path.is_symlink()
+                    or not path.resolve().is_relative_to(live.resolve())):
+                raise RuntimeError(f'{self.name}/{method_name}: unsafe linked Make input {path}')
+            if not path.exists():
+                return None
+            value = cached_file_hash(path)
+            if value is None:
+                raise RuntimeError(f'{self.name}/{method_name}: cannot snapshot '
+                                   f'Make input {path}')
+            return value
+
+        originals[live / selected] = signature(live / selected)
+
+        def verify():
+            if self._table_cache_hash(method_name, self.waves) != expected:
+                raise RuntimeError(f'{self.name}/{method_name}: declared inputs '
+                                   'changed during Make build; refusing promotion')
+            if self._make_declared_inputs(method_name, _extra_tables=copied_tables) != declared_inputs:
+                raise RuntimeError(f'{self.name}/{method_name}: declared prerequisite '
+                                   'sources changed during Make build; refusing promotion')
+            for path, before in originals.items():
+                if signature(path) != before:
+                    raise RuntimeError(f'{self.name}/{method_name}: live input '
+                                       f'changed during Make build: {path}')
+            for current_hash, before in input_hashes:
+                if current_hash() != before:
+                    raise RuntimeError(f'{self.name}/{method_name}: contributing '
+                                       'prerequisite inputs changed during Make build')
+
+        # Same filesystem as the final output: selected-only os.replace is
+        # atomic. This creates no symlink/hardlink into any live cache tier.
+        live.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix='.lsms_make_', dir=live) as tmp:
+            root = Path(tmp)
+
+            def copy_input(path, relative=None):
+                before = signature(path)
+                destination = root / (path.relative_to(live) if relative is None else relative)
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(path, destination)
+                # The destination is inside the private root, itself under
+                # live, but never a link to a live prerequisite.
+                if signature(destination) != before or signature(path) != before:
+                    raise RuntimeError(f'{self.name}/{method_name}: Make input '
+                                       f'changed while copying: {path}')
+                originals[path] = before
+
+            # Use the registry and each Wave's declared path, not Make text or
+            # a speculative dependency graph. Unused current copies are safe;
+            # no unverified cached parquet is offered to any producer.
+            for table in ((self.resources or {}).get('Data Scheme') or {}):
+                if table in JSON_CACHE_METHODS:
+                    continue
+                country_path = live / self.name / 'var' / f'{table}.parquet'
+                if country_path != live / selected and country_path.is_file():
+                    table_hash = self._table_cache_hash(table, self.waves)
+                    coverage = self._cache_covers_waves(country_path, self.waves, 'fresh')
+                    if (table_hash is not None
+                            and cache_freshness(country_path, table_hash) == 'fresh'
+                            and coverage is not None
+                            and set(map(str, coverage)) >= set(map(str, self.waves))):
+                        try:
+                            table_inputs = self._make_declared_inputs(table)
+                        except RuntimeError:
+                            table_inputs = None   # unproven; do not copy it
+                        record, present = read_parquet_make_inputs(country_path, _with_presence=True)
+                        proof_ok = (table_inputs is not None and
+                                    (record == table_inputs if present else
+                                     table_inputs == {'tables': {}, 'sources': {}}))
+                        reusable = False
+                        if proof_ok and table in contributing:
+                            reused, _, _ = self._read_l2_country_cache(
+                                table, country_path, self.waves,
+                                _recover_unreadable=False, _borrowed_input=True)
+                            reusable = reused is not None
+                        elif proof_ok:
+                            # Dynamic Make dependencies may use a complete,
+                            # verified copy. Do not replay unrelated audits or
+                            # probe unrelated dropped sources just to seed it.
+                            reusable = not read_parquet_build_drops(country_path)
+                        if reusable:
+                            copy_input(country_path)
+                            copied_tables.add(table)
+                            input_hashes.append((
+                                lambda table=table: self._table_cache_hash(table, self.waves),
+                                table_hash))
+                for relative, (logical, yaml_path) in self._make_wave_inputs(table).items():
+                    path = live / relative
+                    if (path.is_file()
+                            and all(self[w]._input_hash(table) is not None
+                                    and cache_freshness(path, self[w]._input_hash(table)) == 'fresh'
+                                    for w in logical)):
+                        if yaml_path:
+                            if table in contributing:
+                                # Input preparation is not an API serve. Grade
+                                # drops with the existing gate policy here;
+                                # replay only the selected served waves later.
+                                verdict, _ = _degraded_cache_verdict(
+                                    read_parquet_build_drops(path),
+                                    (self.name, table, logical[0]))
+                                if _no_cache() or verdict == 'rebuild':
+                                    continue
+                            elif read_parquet_build_drops(path):
+                                continue
+                        copy_input(path)
+                        if table != method_name:
+                            copied_tables.add(table)
+                        for w in logical:
+                            input_hashes.append((
+                                lambda w=w, table=table: self[w]._input_hash(table),
+                                self[w]._input_hash(table)))
+
+            # Include every offered managed input, even when a computed Make
+            # dependency (rather than a literal script ref) might consume it.
+            # Warm reuse must revalidate these source hashes too.
+            declared_inputs, source_paths = self._make_declared_inputs(
+                method_name, _extra_tables=copied_tables, _with_sources=True)
+
+            # Preserve offline access to ALREADY available declared source
+            # blobs without sharing a writable L1. The existing resolver owns
+            # sidecar parsing and both cache layouts. No download or new
+            # acquisition override is introduced here.
+            for ref in source_paths:
+                blob = _dvc_cache_path(ref)
+                if blob is not None:
+                    try:
+                        blob.relative_to(live / 'dvc-cache')
+                    except ValueError:
+                        raise RuntimeError(f'{self.name}/{method_name}: L1 lookup '
+                                           f'is outside the active data root: {blob}')
+                    copy_input(blob)
+                    # A declared raw parquet may have the same spelling as a
+                    # managed path. Its sidecar, not a harmonized-cache hash,
+                    # establishes provenance. Supply the authenticated blob at
+                    # the private redirected path without stamping it as L2.
+                    if ref.suffix.lower() == '.parquet':
+                        try:
+                            relative = Path(self.name) / ref.relative_to(self.file_path)
+                        except ValueError:
+                            pass
+                        else:
+                            copy_input(blob, relative)
+                elif ref.is_relative_to(live) and ref.is_file():
+                    # Explicit raw sources already in data_root are eligible
+                    # too. Unknown computed/unregistered cache paths are NOT
+                    # discovered by this loop or silently copied wholesale.
+                    copy_input(ref)
+            for table in set(others.values()):
+                table_hash = self._table_cache_hash(table, self.waves)
+                if table_hash is None:
+                    raise RuntimeError(f'{self.name}/{method_name}: cannot verify '
+                                       f'declared Other prerequisite {table}')
+                input_hashes.append((
+                    lambda table=table: self._table_cache_hash(table, self.waves), table_hash))
+            verify()
+            yield root, expected, verify, others, declared_inputs
+
     @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
                         # alignment+concat into the parquet, not re-applied on read (#522, round-6)
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
-                             currency: str | None = None) -> pd.DataFrame | dict[str, Any]:
+                             currency: str | None = None,
+                             _make_wave_inputs_only=None) -> pd.DataFrame | dict[str, Any]:
         """Aggregates data across multiple waves using a single dataset method.
 
         If the required `.parquet` file is missing, it requests `Makefile` to
@@ -5351,8 +5962,11 @@ class Country:
 
         ``currency`` is forwarded to :meth:`_finalize_result` to optionally
         attach the ISO 4217 currency label (monetary tables only).
+        ``_make_wave_inputs_only`` is internal child plumbing for explicit
+        physical Other-wave prerequisites; it prepares those paths and returns
+        without a country build, finalization or live cache promotion.
         """
-        if method_name not in self.data_scheme+['other_features', 'food_prices_quantities_and_expenditures', 'updated_ids']:
+        if method_name not in self.data_scheme+['other_features', 'updated_ids']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
             return pd.DataFrame()
 
@@ -5398,7 +6012,8 @@ class Country:
         # The `assume_cache_fresh` short-circuit: a READ GATE in its own method,
         # excluded from the build fingerprint (GH #1040).
         df_cached = self._read_assumed_fresh_cache(method_name, waves)
-        if df_cached is not None:
+        recovery_miss = df_cached if isinstance(df_cached, tuple) else None
+        if recovery_miss is None and df_cached is not None:
             return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
 
         if (
@@ -5407,6 +6022,9 @@ class Country:
         ):
             try:
                 _ = self.updated_ids
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                # A present but corrupt crosswalk is not optional absence.
+                raise
             except (FileNotFoundError, KeyError, ValueError):
                 pass  # updated_ids not available for this country
 
@@ -5442,15 +6060,40 @@ class Country:
 
             return pd.concat(aligned_dfs.values(), axis=0, sort=False)
 
+        def output_identity(path):
+            """Invocation-local write receipt, not source-content validation."""
+            try:
+                stat = path.stat()
+            except FileNotFoundError:
+                return None
+            return (stat.st_dev, stat.st_ino, stat.st_size,
+                    stat.st_mtime_ns, stat.st_ctime_ns)
+
         def run_make_target(method_name: str, wave: str | None = None, *,
-                            strict_country_make: bool = False):
+                            strict_country_make: bool = False,
+                            _with_output: bool = False,
+                            build_root: Path | None = None,
+                            wave_only: bool = False,
+                            _path_only: bool = False):
             """
             Execute legacy Makefile targets either at the country level or for a specific wave.
 
             Only the direct non-DVC materialize:make country-builder route
             opts into terminal recipe failures (GH #1288, ledger §4).
+            Its private transaction also uses wave_only for declared inputs;
+            legacy/default/JSON calls retain the original defaults.
             """
+            def result(value, produced=False):
+                return (value, produced) if _with_output else value
+
+            # GH #1468 / #914: committed crosswalks are sources. Neither a
+            # country nor a wave fallback may execute their offline publisher.
+            if method_name in JSON_CACHE_METHODS:
+                return result(None)
+
             base_path = self.file_path if wave is None else self[wave].file_path
+            managed_country = (data_root(self.name) if build_root is None
+                               else build_root / self.name)
             # Resolve the wave folder for path construction (e.g. '2008-09' -> '2008-15')
             wave_folder = self.wave_folder_map.get(wave, wave) if wave else None
             repo_root = self.file_path.parent
@@ -5465,7 +6108,8 @@ class Country:
             script_candidates: list[Path] = []
             if wave is not None:
                 script_candidates.append(base_path / "_" / f"{method_name}.py")
-            script_candidates.append(self.file_path / "_" / f"{method_name}.py")
+            if not wave_only:
+                script_candidates.append(self.file_path / "_" / f"{method_name}.py")
             script_path = next((p for p in script_candidates if p.exists()), None)
 
             output_candidates: list[Path] = []
@@ -5481,8 +6125,9 @@ class Country:
                 # writes there, so a parquet found in-tree is an artefact of
                 # the write-side .pth trap: reported, never read.
                 if wave is not None:
-                    output_candidates.append(data_root(self.name) / wave_folder / "_" / f"{method_name}.parquet")
-                output_candidates.append(data_root(self.name) / "var" / f"{method_name}.parquet")
+                    output_candidates.append(managed_country / wave_folder / "_" / f"{method_name}.parquet")
+                if not wave_only:
+                    output_candidates.append(managed_country / "var" / f"{method_name}.parquet")
                 intree_names = [
                     self.file_path / "var" / f"{method_name}.parquet",
                     self.file_path / "_" / f"{method_name}.parquet",
@@ -5502,9 +6147,27 @@ class Country:
                 seen.add(cand)
                 unique_candidates.append(cand)
 
+            # A wave fallback can read the shared country parquet. Its mere
+            # presence does not prove this invocation produced the missing
+            # wave: both make and a no-output script may exit zero and leave
+            # it untouched (GH #1590). Keep the legacy data-return path, but
+            # certify this ambiguous output only if the producer changed it.
+            # Wave-specific outputs remain attributable to their wave/folder;
+            # direct country builders retain their existing contract (#866,
+            # #1039). No output is evicted here and t values are not evidence.
+            country_output = unique_candidates[-1]
+
+            def prior_output():
+                return (output_identity(country_output)
+                        if wave is not None and _with_output else None)
+
+            def produced_output(path, prior):
+                return (wave is None or path != country_output
+                        or output_identity(path) != prior)
+
             if makefile_path is None and script_path is None:
                 warnings.warn(f"No Makefile or script found for {self.name}/{wave or '_'} {method_name}.")
-                return pd.DataFrame()
+                return None if _path_only else result(pd.DataFrame())
 
             cwd_path = makefile_dir if makefile_dir is not None else script_path.parent
             if method_name in JSON_CACHE_METHODS:
@@ -5520,9 +6183,18 @@ class Country:
                 # whatever the interpreter's .pth pinned.  Keep it (callers
                 # have always had it on the path) but lead with the package
                 # parent, which is what actually fixes import identity.
-                return _script_subprocess_env(repo_root)
+                env = _script_subprocess_env(repo_root)
+                if build_root is not None:
+                    env.update(LSMS_DATA_DIR=str(build_root),
+                               LSMS_DATA_ROOT=str(build_root),
+                               VAR_DIR=str(managed_country / 'var'),
+                               LSMS_COUNTRIES_ROOT=str(self.file_path.parent),
+                               LSMS_MAKE_BUILD_STACK=json.dumps(
+                                   json.loads(env.get('LSMS_MAKE_BUILD_STACK', '[]'))
+                                   + [[self.name, method_name]]))
+                return env
 
-            def try_make(make_dir: Path) -> Path | None:
+            def try_make(make_dir: Path) -> tuple[Path, bool] | None:
                 if make_dir is None or not (make_dir / "Makefile").exists():
                     return None
                 makefile = make_dir / "Makefile"
@@ -5538,46 +6210,58 @@ class Country:
                 else:
                     # data_root() targets first (matches Makefile VAR_DIR default)
                     if wave is not None:
-                        make_targets.append(data_root(self.name) / wave_folder / "_" / f"{method_name}.parquet")
-                    make_targets.append(data_root(self.name) / "var" / f"{method_name}.parquet")
+                        make_targets.append(managed_country / wave_folder / "_" / f"{method_name}.parquet")
+                    if not wave_only:
+                        make_targets.append(managed_country / "var" / f"{method_name}.parquet")
                     # In-tree fallbacks
                     if wave is not None:
                         make_targets.append(base_path / "_" / f"{method_name}.parquet")
-                    make_targets.append(self.file_path / "var" / f"{method_name}.parquet")
-                    make_targets.append(self.file_path / "_" / f"{method_name}.parquet")
+                    if not wave_only:
+                        make_targets.append(self.file_path / "var" / f"{method_name}.parquet")
+                        make_targets.append(self.file_path / "_" / f"{method_name}.parquet")
 
                 for target in make_targets:
                     make_cmd = ["make", "-s"]
                     jobs_flag = _make_jobs_flag()
                     if jobs_flag:
                         make_cmd.append(jobs_flag)
+                    if build_root is not None:
+                        make_cmd.extend([f'LSMS_DATA_ROOT={build_root}',
+                                         f'VAR_DIR={managed_country / "var"}'])
                     make_cmd.append(str(target))
                     make_env = build_env()
-                    run_options = {}
+                    # GH #381: classify a proven missing requested target
+                    # before emitting misleading build-failure diagnostics.
+                    # Keep the legacy environment and stdout streaming; only
+                    # strict execution forces C locale as before. Unknown or
+                    # non-English diagnostics remain conservative failures.
+                    run_options = {"stderr": subprocess.PIPE}
                     if strict_country_make:
                         make_env.update(LC_ALL="C", LANGUAGE="C")
-                        # Keep stdout streamed. Replay actual stderr on both
-                        # success and failure; the private CI wrapper remains
-                        # the publication boundary, not this classifier.
-                        run_options = {"stderr": subprocess.PIPE}
+                    prior = prior_output()
                     try:
                         built = subprocess.run(make_cmd, cwd=make_dir, check=True,
                                                env=make_env, **run_options)
-                        if strict_country_make and built.stderr:
+                        if built.stderr:
                             _reemit_make_stderr(built.stderr)
                         logger.info(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {method_name}...")
                     except subprocess.CalledProcessError as error:
+                        diagnostics = error.stderr or ""
+                        if _make_target_is_missing(diagnostics, target):
+                            logger.debug("No Make rule for requested target %s; trying fallbacks.", target)
+                            continue
+                        if diagnostics:
+                            _reemit_make_stderr(diagnostics)
                         if strict_country_make:
-                            diagnostics = error.stderr or ""
-                            if diagnostics:
-                                _reemit_make_stderr(diagnostics)
-                            if not _make_target_is_missing(diagnostics, target):
-                                raise RuntimeError(
-                                    f"Make build failed for {self.name}/{method_name} "
-                                    f"at target {target}; refusing cached output "
-                                    "and alternate/Python fallbacks after a "
-                                    "failed country recipe or prerequisite."
-                                ) from error
+                            selected_context = (
+                                f" (selected cache {data_root(self.name) / 'var' / f'{method_name}.parquet'})"
+                                if build_root is not None else "")
+                            raise RuntimeError(
+                                f"Make build failed for {self.name}/{method_name} "
+                                f"at target {target}{selected_context}; refusing cached output "
+                                "and alternate/Python fallbacks after a "
+                                "failed country recipe or prerequisite."
+                            ) from error
                         warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
                         continue
                     except FileNotFoundError as error:
@@ -5587,22 +6271,21 @@ class Country:
                     # Check the data_root candidate locations (GH #803: never in-tree)
                     for candidate in unique_candidates:
                         if candidate.exists():
-                            return candidate
+                            return candidate, produced_output(candidate, prior)
                 return None
 
-            def try_script(script: Path) -> Path | None:
+            def try_script(script: Path) -> tuple[Path, bool] | None:
                 if script is None or not script.exists():
                     return None
                 python_bin = sys.executable or "python3"
-                try:
-                    subprocess.run([python_bin, str(script)], cwd=script.parent, check=True, env=build_env())
-                    logger.info(f"Python fallback executed for {script.parent.name}.{method_name}.")
-                except subprocess.CalledProcessError as error:
-                    warnings.warn(f"Python fallback failed for {script}: {error}")
-                    return None
+                # A selected producer exiting nonzero is a failed build,
+                # never proof that this wave lacks the table (GH #1590).
+                prior = prior_output()
+                subprocess.run([python_bin, str(script)], cwd=script.parent, check=True, env=build_env())
+                logger.info(f"Python fallback executed for {script.parent.name}.{method_name}.")
                 for candidate in unique_candidates:
                     if candidate.exists():
-                        return candidate
+                        return candidate, produced_output(candidate, prior)
                 return None
 
             # Pre-warm the DVC cache for this feature's source files
@@ -5617,37 +6300,188 @@ class Country:
             # ``_ensure_dvc_pulled`` (defense in depth).
             try:
                 from .local_tools import _warm_dvc_cache_for_feature
-                _warm_dvc_cache_for_feature(self, method_name, wave=wave)
+                if build_root is None:
+                    _warm_dvc_cache_for_feature(self, method_name, wave=wave)
+            except DVCMetadataCompatibilityError:
+                raise
             except Exception:
                 # Pre-warm must never break a build.  The retry loop
                 # downstream is the safety net.
                 pass
 
-            output_path: Path | None = None
+            output: tuple[Path, bool] | None = None
             if makefile_path is not None:
-                output_path = try_make(makefile_path.parent)
+                output = try_make(makefile_path.parent)
 
-            if output_path is None and script_path is not None:
-                output_path = try_script(script_path)
+            if output is None and script_path is not None:
+                output = try_script(script_path)
 
-            if output_path is None:
+            if output is None:
                 logger.warning(f"Data file {target_path} still missing after running fallbacks.")
-                return None
+                return result(None)
 
+            output_path, output_produced = output
+            if _path_only:
+                return output_path
             if output_path.suffix == ".json":
                 with open(output_path, "r", encoding="utf-8") as json_file:
-                    return json.load(json_file)
+                    return result(json.load(json_file), output_produced)
 
             df_local = get_dataframe(str(output_path))
             # GH #868: a wave script's grain report exists only in its stamp.
             _replay_wave_stamp(output_path, self.name, method_name, wave)
             df_local = map_index(df_local)
-            return df_local
+            return result(df_local, output_produced)
 
-        def load_from_waves(waves, *, evict_country_cache=False, country_builder=True):
+        def private_raw_inputs(root, extra_tables=()):
+            # The manifest omits sources already covered by wave hashes;
+            # ownership needs the COMPLETE existing source closure instead.
+            _, sources = self._make_declared_inputs(
+                method_name, _extra_tables=extra_tables, _with_sources=True)
+            private_sources = set()
+            for source in sources:
+                if source.is_relative_to(self.file_path):
+                    private_sources.add(root / self.name / source.relative_to(self.file_path))
+                elif source.is_relative_to(data_root()):
+                    private_sources.add(root / source.relative_to(data_root()))
+            return private_sources
+
+        def inspect_private_input(root, relative, table, raw_inputs, verify_inputs=None):
+            """Validate a named OLD private input; fresh outputs stay strict.
+
+            This root is the caller's transaction, not the live data_root used
+            by the core rejection helper. Never grant live deletion.
+            """
+            path = root / relative
+            parts = relative.parts
+            if (relative.is_absolute() or not parts or parts[0] != self.name
+                    or relative.name != f'{table}.parquet'
+                    or not ((len(parts) == 3 and parts[1] == 'var')
+                            or (len(parts) == 4 and parts[2] == '_'))
+                    or path.is_symlink()
+                    or path.resolve() != root.resolve() / relative):
+                raise RuntimeError(f'{self.name}/{method_name}: unsafe private Make input {path}')
+            if not path.is_file():
+                return False
+            source = self.file_path / relative.relative_to(self.name)
+            sidecars = [p.with_name(p.name + '.dvc') for p in (source, path)]
+            if (path in raw_inputs or path.stat().st_nlink > 1
+                    or path.resolve().is_relative_to(countries_root().resolve())
+                    or any(p.exists() or p.is_symlink() for p in sidecars)
+                    or (source.exists() and path.samefile(source))):
+                get_dataframe(str(path))  # source errors retain the strict reader
+                return True
+            _, error, observed = _read_managed_parquet_cache(
+                path, check_null=True, engine='pyarrow')
+            if error is None:
+                return True
+            if verify_inputs is not None:
+                verify_inputs()
+            # Recheck provenance and opened identity before removing ONLY the
+            # private old entry. New producer output never enters this branch.
+            if (path in raw_inputs or path in private_raw_inputs(root)
+                    or path.is_symlink() or path.resolve() != root.resolve() / relative
+                    or any(p.exists() or p.is_symlink() for p in sidecars)
+                    or (source.exists() and path.exists() and path.samefile(source))):
+                raise error
+            try:
+                current = path.lstat()
+            except FileNotFoundError:
+                return False
+            if observed.st_nlink > 1 or current.st_nlink > 1:
+                raise error
+            fields = ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns')
+            if any(getattr(current, field) != getattr(observed, field) for field in fields):
+                raise RuntimeError(f'Private Make input changed while rejecting unreadable entry: {path}') from error
+            path.unlink()
+            warnings.warn(f'Unreadable private Make input at {path} ({error!r}); '
+                          'rebuilding through its normal private owner', UserWarning, stacklevel=3)
+            return False
+
+        def prepare_make_waves(root, selected_paths=None, verify_inputs=None):
+            # One authoritative preparation route for selected and Other wave
+            # inputs (ledger §2/§4). Physical dedup retains every logical label.
+            inputs = self._make_wave_inputs(method_name)
+            if selected_paths is not None and not set(selected_paths) <= {str(p) for p in inputs}:
+                raise RuntimeError(f'{self.name}/{method_name}: unknown declared Make wave input')
+            raw_inputs = private_raw_inputs(root)
+            prepared = []
+            for relative, (logical, yaml_path) in inputs.items():
+                if selected_paths is not None and str(relative) not in selected_paths:
+                    continue
+                path = root / relative
+                validated = inspect_private_input(
+                    root, relative, method_name, raw_inputs, verify_inputs)
+                if not validated:
+                    if yaml_path:
+                        env = _script_subprocess_env(self.file_path.parent)
+                        env.update(LSMS_DATA_DIR=str(root), LSMS_DATA_ROOT=str(root),
+                                   VAR_DIR=str(root / self.name / 'var'),
+                                   LSMS_COUNTRIES_ROOT=str(self.file_path.parent),
+                                   LSMS_MAKE_BUILD_STACK=json.dumps(
+                                       json.loads(env.get('LSMS_MAKE_BUILD_STACK', '[]'))
+                                       + [[self.name, method_name]]))
+                        code = (
+                            'import json, sys; from lsms_library.country import Country; '
+                            'Country(sys.argv[1], preload_panel_ids=False)'
+                            '._materialize_make_yaml(sys.argv[2], json.loads(sys.argv[3]))')
+                        subprocess.run([sys.executable, '-c', code, self.name,
+                                        method_name, json.dumps(logical)],
+                                       cwd=self.file_path, env=env, check=True)
+                    else:
+                        run_make_target(method_name, wave=logical[0],
+                                        strict_country_make=True, wave_only=True,
+                                        build_root=root, _path_only=True)
+                if (not path.is_file() or path.is_symlink()
+                        or path.resolve() != root.resolve() / relative):
+                    raise RuntimeError(f'{self.name}/{method_name}: declared '
+                                       f'Make wave {logical} produced no safe output at {path}')
+                if not validated:
+                    get_dataframe(str(path))  # fresh output: strict, never a second repair
+                prepared.append(path)
+            return prepared
+
+        if _make_wave_inputs_only is not None:
+            # Internal child-only entry: never used by default/JSON/legacy
+            # callers, and never finalizes or promotes a country table.
+            prepare_make_waves(data_root(), _make_wave_inputs_only)
+            return None
+
+        def load_from_waves(waves, *, evict_country_cache=False, country_builder=True,
+                            _with_coverage=False):
+            completed_waves = []
+
+            def result(value, coverage=None):
+                if not _with_coverage:
+                    return value
+                return value, list(completed_waves if coverage is None else coverage)
+
             empty = absent_subset_frame()
             if empty is not None:
-                return empty
+                return result(empty)
+            # GH #381: prove missing current wiring before impossible fallback
+            # work. Cache hits and healthy unsupported subsets returned above.
+            # A partial DVC stage map is still a configured producer: the
+            # existing multiwave resolver is all-or-none, so ask per wave.
+            unwired = False
+            if (waves and method_name in self.data_scheme
+                    and method_name not in JSON_CACHE_METHODS
+                    and requested_wave_set >= {str(w) for w in self.waves}):
+                try:
+                    unwired = (
+                        not self._legacy_can_build(method_name, waves)
+                        and not any(self._resolve_materialize_stages(method_name, [w])
+                                    for w in waves))
+                except Exception:
+                    # Optional diagnostic proof must not replace an uncertain
+                    # inspection with absence; retain the original build route.
+                    pass
+            if unwired:
+                raise RuntimeError(
+                    f"Could not materialize {self.name}/{method_name}: no configured "
+                    "wave source or country builder for requested waves "
+                    f"{list(waves)}. This describes current table wiring, not "
+                    "upstream data availability.")
             # Hashless (script-written) L2-wave parquets can't self-invalidate,
             # so evict them at the start of every wave-rebuild descent; the loop
             # below then re-runs Make/the script from source rather than reusing
@@ -5668,13 +6502,14 @@ class Country:
             def build_wave(w):
                 """Stage 1 -- the expensive, wave-independent part of the
                 walk: the YAML extraction or the ``make``/script run for ONE
-                wave.  Everything content-determining about a wave's build
-                lives here; ``_parallel_waves`` only decides which process
-                runs it (GH #797)."""
+                wave. Legacy fallbacks that may target the shared country
+                output run later in the ordered parent loop (GH #1590).
+                ``_parallel_waves`` only schedules these primary getters."""
                 wave_obj = self[w]
                 wave_has_table = method_name in wave_obj.data_scheme
                 wave_result = None
                 successful_empty = False
+                completed = not wave_has_table
 
                 if wave_has_table:
                     try:
@@ -5697,6 +6532,9 @@ class Country:
                                 and len(wave_result) == 0)
                         else:
                             wave_result = getter()
+                        completed = successful_empty or (
+                            isinstance(wave_result, pd.DataFrame) and not wave_result.empty
+                        ) or isinstance(wave_result, dict)
                     except KeyError as error:
                         # GH #1281 (ledger §4): a declared wave's config or
                         # hook failure is not absence. Stop before concat can
@@ -5706,37 +6544,13 @@ class Country:
                             f"failed with KeyError: {error}. Check this wave's "
                             "configuration and source columns."
                         ) from error
-                    except AttributeError as error:
-                        warnings.warn(str(error))
+                    # AttributeError from a declared getter/hook is a build
+                    # defect, not absence. Let the original error propagate,
+                    # including through the parallel-wave relay (GH #1590).
 
-                use_legacy = wave_has_table and not successful_empty and (
-                    wave_result is None
-                    or (isinstance(wave_result, pd.DataFrame) and wave_result.empty)
-                )
-
-                if use_legacy:
-                    wave_result = run_make_target(method_name, wave=w)
-                    # GH #535: run_make_target reads the whole shared folder's
-                    # script output, so for a country whose ``waves`` splits one
-                    # folder into several quarter-waves (Nigeria PP/PH share one
-                    # folder, e.g. 2010Q3 + 2011Q1 -> 2010-11) every quarter
-                    # re-injects the same script-tagged rows -- an exact doubling
-                    # at concat that surfaces as a false-positive GH #323
-                    # "duplicate tuple(s)" warning (plus a wasted 2x build).
-                    # Mirror grab_data's per-wave t-filter (~country.py:1092):
-                    # keep only the rows whose ``t`` matches the requested wave
-                    # ``w``.  No-op for single-t-per-folder tables and for
-                    # Tanzania's multi-round folder (``t == wave`` holds there);
-                    # ``w`` is never None on this in-loop path.
-                    if (isinstance(wave_result, pd.DataFrame)
-                            and not wave_result.empty
-                            and 't' in (wave_result.index.names or [])):
-                        wave_result = wave_result[
-                            wave_result.index.get_level_values('t') == w
-                        ]
                 # _parallel_waves keeps this second payload opaque. Proof is
                 # per invocation, not a worker-local mutable closure or attrs.
-                return wave_has_table, (wave_result, successful_empty)
+                return wave_has_table, (wave_result, successful_empty, completed)
 
             # GH #797: fan stage 1 out over a fork pool, one worker per
             # distinct make target (waves sharing a folder build serially in
@@ -5748,10 +6562,7 @@ class Country:
             # index augmentation, the grain-audited normalisation, concat)
             # runs HERE, in the parent, in wave order.
             # The folder map is resolved through ``self[w]`` (the same lookup
-            # ``grab_data`` uses for its make target), not read off
-            # ``self.wave_folder_map`` -- that attribute is populated as a side
-            # effect of the ``waves`` property and is still ``{}`` when a
-            # caller passed ``waves`` explicitly.  ``getattr`` with the wave
+            # ``grab_data`` uses for its make target).  ``getattr`` with the wave
             # itself as fallback: tests stub ``__getitem__`` with bare
             # namespaces that carry no ``wave_folder``.
             prebuilt = _parallel_waves.prebuild(
@@ -5772,7 +6583,39 @@ class Country:
                         prebuilt[w], country=self.name, table=method_name)
                 else:
                     wave_has_table, outcome = build_wave(w)
-                wave_result, successful_empty = outcome
+                wave_result, successful_empty, completed = outcome
+
+                # GH #1590: legacy fallbacks can all name the SAME country
+                # output. Run them only here, after primary workers have all
+                # joined, so a sibling's write cannot certify a no-op call.
+                # Primary getters and shared wave-folder grouping stay parallel;
+                # this deliberately serializes only the legacy fallback work.
+                use_legacy = wave_has_table and not successful_empty and (
+                    wave_result is None
+                    or (isinstance(wave_result, pd.DataFrame) and wave_result.empty)
+                )
+
+                if use_legacy:
+                    wave_result, completed = run_make_target(
+                        method_name, wave=w, _with_output=True)
+                    # GH #535: run_make_target reads the whole shared folder's
+                    # script output, so for a country whose ``waves`` splits one
+                    # folder into several quarter-waves (Nigeria PP/PH share one
+                    # folder, e.g. 2010Q3 + 2011Q1 -> 2010-11) every quarter
+                    # re-injects the same script-tagged rows -- an exact doubling
+                    # at concat that surfaces as a false-positive GH #323
+                    # "duplicate tuple(s)" warning (plus a wasted 2x build).
+                    # Mirror grab_data's per-wave t-filter (~country.py:1092):
+                    # keep only the rows whose ``t`` matches the requested wave
+                    # ``w``.  No-op for single-t-per-folder tables and for
+                    # Tanzania's multi-round folder (``t == wave`` holds there);
+                    # ``w`` is never None on this in-loop path.
+                    if (isinstance(wave_result, pd.DataFrame)
+                            and not wave_result.empty
+                            and 't' in (wave_result.index.names or [])):
+                        wave_result = wave_result[
+                            wave_result.index.get_level_values('t') == w
+                        ]
 
                 if isinstance(wave_result, pd.DataFrame):
                     if (
@@ -5793,6 +6636,11 @@ class Country:
                     wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w, method_name,
                                                             country=self.name)
 
+                # Coverage is producer evidence, not the surviving t values.
+                # An unsupported wave and a proven zero-row result complete;
+                # a declared wave with no produced output does not (GH #1590).
+                if completed:
+                    completed_waves.append(w)
                 barren_outcomes.append(
                     (not wave_has_table and wave_result is None) or successful_empty)
                 if successful_empty:
@@ -5813,17 +6661,17 @@ class Country:
                     if dict_payloads and not df_payloads:
                         combined: dict[str, Any] = {}
                         combined.update(dict_payloads)
-                        return combined
+                        return result(combined)
                     results = {k: v for k, v in df_payloads.items() if not v.empty}
                     if not results:
-                        return pd.DataFrame()
+                        return result(pd.DataFrame())
 
                 non_empty_df = {k: df for k, df in results.items() if not df.empty}
                 if not non_empty_df:
-                    return pd.DataFrame()
+                    return result(pd.DataFrame())
                 if len(non_empty_df) > 1:
-                    return safe_concat_dataframe_dict(non_empty_df)
-                return pd.concat(non_empty_df.values(), axis=0, sort=False)
+                    return result(safe_concat_dataframe_dict(non_empty_df))
+                return result(pd.concat(non_empty_df.values(), axis=0, sort=False))
 
             if (empty_witnesses and all(barren_outcomes) and requested_wave_set
                     and requested_wave_set < {str(w) for w in self.waves}
@@ -5836,7 +6684,7 @@ class Country:
                 # checks it. Never fabricate declared payload columns here.
                 witness = pd.concat(empty_witnesses, axis=0, sort=False)
                 witness.attrs[_CONSTRUCTED_EMPTY_ATTR] = True
-                return witness
+                return result(witness)
 
             # GH #1039 (red team r1): the make backend came here because
             # `_has_country_builder` found NO country-level rule or script, so
@@ -5856,7 +6704,7 @@ class Country:
                 if (empty_witnesses
                         or {str(w) for w in waves} >= {str(w) for w in self.waves}):
                     raise _rebuild_failure_error(self.name, method_name)
-                return _empty_declared_frame(scheme_entry)
+                return result(_empty_declared_frame(scheme_entry))
 
             # GH #866: no wave produced rows, so the country-level
             # make/script fallback is about to run -- and `try_make` would
@@ -5870,23 +6718,30 @@ class Country:
                 self._evict_stale_country_cache(method_name)
 
             country_fallback = run_make_target(method_name, wave=None)
+            # The country builder remains the producer for its whole request.
+            # Its internal concatenation is opaque here (GH1287/1292); never
+            # infer completion from its observed t values. Wave producers above
+            # have finer, explicit evidence and must not borrow this contract.
             if isinstance(country_fallback, dict):
                 if country_fallback:
-                    return country_fallback
-                return {}
+                    return result(country_fallback, waves)
+                return result({}, waves)
             if isinstance(country_fallback, pd.DataFrame) and not country_fallback.empty:
-                return country_fallback
+                return result(country_fallback, waves)
 
             raise _rebuild_failure_error(self.name, method_name)
 
         def load_json_cache(method_name):
             cache_path = data_root(self.name) / "_" / f"{method_name}.json"
+            parquet_path = data_root(self.name) / "_" / f"{method_name}.parquet"
+            source_parquet = self.file_path / "_" / f"{method_name}.parquet"
+            source_sidecar = source_parquet.with_name(source_parquet.name + '.dvc')
             # Also check in-tree for legacy caches, and parquet variants
             candidates = [
                 cache_path,
                 self.file_path / "_" / f"{method_name}.json",
-                data_root(self.name) / "_" / f"{method_name}.parquet",
-                self.file_path / "_" / f"{method_name}.parquet",
+                parquet_path,
+                source_parquet,
             ]
             for candidate in candidates:
                 if candidate.exists():
@@ -5895,7 +6750,21 @@ class Country:
                         with open(candidate, 'r', encoding="utf-8") as json_file:
                             return json.load(json_file)
                     else:
-                        df = get_dataframe(candidate)
+                        sidecar = candidate.with_name(candidate.name + '.dvc')
+                        if (candidate == parquet_path and not candidate.is_symlink()
+                                and candidate.resolve() == data_root().resolve() / self.name / '_' / candidate.name
+                                and not candidate.resolve().is_relative_to(countries_root().resolve())
+                                and not sidecar.exists() and not sidecar.is_symlink()
+                                and not source_sidecar.exists() and not source_sidecar.is_symlink()
+                                and not (source_parquet.exists() and candidate.samefile(source_parquet))):
+                            df, error, observed = _read_managed_parquet_cache(
+                                candidate, check_null=True, engine='pyarrow')
+                            if error is not None:
+                                _reject_unreadable_cache(candidate, observed, error,
+                                                         auxiliary_method=method_name)
+                                continue
+                        else:
+                            df = get_dataframe(candidate)
                         # Convert back to dict format expected by panel_ids consumers
                         if hasattr(df, 'to_dict'):
                             return df
@@ -5938,6 +6807,7 @@ class Country:
             Load data using DVC materialize stages. Falls back to load_from_waves if stages are missing.
             """
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
+            strict_stage_read_failure = False
 
             # GH #323: start this table's grain ledger clean.  It is repopulated
             # either by the cold build (the collapse audit) or by replaying the
@@ -5953,8 +6823,8 @@ class Country:
             # The v0.8.0 / GH #809 / GH #891 L2-country READ GATE lives in its
             # own method, excluded from the build fingerprint (GH #908): it
             # decides WHETHER to serve the parquet, never what a build writes.
-            cached_df, covered, miss_reason = self._read_l2_country_cache(
-                method_name, cache_path, waves)
+            cached_df, covered, miss_reason = (recovery_miss if recovery_miss is not None
+                else self._read_l2_country_cache(method_name, cache_path, waves))
             if miss_reason is None:
                 return cached_df
             # A coverage-short or bypassed cache may hold valid other-wave
@@ -5964,8 +6834,6 @@ class Country:
             empty = absent_subset_frame()
             if empty is not None:
                 return empty
-            cache_exists = cache_path.exists()
-
             # GH #891: single-wave and all-wave requests share this one path, so
             # the cache carries a manifest of the waves it was BUILT from and is
             # served only to a request it covers.  On a miss we rebuild the
@@ -6027,7 +6895,8 @@ class Country:
                     if not stage_infos:
                         # GH #891: build the union, cache the union (stamped with
                         # its coverage), return only what was asked for.
-                        df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
+                        df, completed_waves = load_from_waves(build_waves, evict_country_cache=evict_country_cache,
+                                                              _with_coverage=True)
                         if _is_constructed_empty(df):
                             # GH #1218 / #1221 follow-up: absence of the
                             # REQUESTED waves, constructed -- it must not be
@@ -6040,7 +6909,7 @@ class Country:
                             to_parquet(df, cache_path,
                                        cache_hash=self._table_cache_hash(method_name, build_waves),
                                        grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
-                                       cache_waves=build_waves,
+                                       cache_waves=completed_waves,
                                        datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                        build_drops=build_drops)
                             _mark_degraded_written((self.name, method_name), build_drops)
@@ -6057,26 +6926,184 @@ class Country:
                         deduped_infos.append(info)
                     stage_infos = deduped_infos
 
-                    def collect_stage_outputs(stage_list):
+                    rejected_country_output = output_identity(cache_path)
+                    initial_stage_outputs = {info.stage_ref: output_identity(info.output_path)
+                                             for info in stage_infos}
+                    loaded_by_ref = {}
+                    attempted_refs = set()
+                    recovery_attempted_refs = set()
+                    unreadable_refs = {}
+                    rejected_stage_outputs = {}
+                    stage_frame_cache = {}
+
+                    def stage_owns_outputs(info):
+                        """Recovery authority, not a replacement for DVC validation.
+
+                        force removes ALL outs. Unknown/nonlocal/source/frozen
+                        outputs retain their old strict read route.
+                        """
+                        stage = loaded_by_ref.get(info.stage_ref)
+                        lexical = getattr(info, 'lexical_output_path', None)
+                        if (stage is None or lexical is None or not getattr(stage, 'cmd', None)
+                                or getattr(stage, 'frozen', None) is not False
+                                or getattr(stage, 'is_import', None) is not False
+                                or info.country != self.name or info.table != method_name):
+                            return False
+                        root = data_root().absolute()
+                        tables = set(self.data_scheme) - JSON_CACHE_METHODS
+                        folders = set(map(str, self.waves)) | set(map(str, self.wave_folder_map.values()))
+                        outputs = getattr(stage, 'outs', ())
+                        if not outputs:
+                            return False
+                        paths = []
+                        output_tables = set()
+                        for out in outputs:
+                            if getattr(getattr(out, 'fs', None), 'protocol', None) != 'local':
+                                return False
+                            path = Path(os.path.abspath(out.fs_path))
+                            if any(other.stage_ref != info.stage_ref and other.output_path == path.resolve()
+                                   for other in stage_infos):
+                                return False  # one force cannot borrow another selected stage's proof
+                            try:
+                                relative = path.relative_to(root)
+                            except ValueError:
+                                return False
+                            parts = relative.parts
+                            if (not parts or parts[0] != self.name or path.stem not in tables
+                                    or path.suffix != '.parquet'
+                                    or not ((len(parts) == 3 and parts[1] == 'var')
+                                            or (len(parts) == 4 and parts[2] == '_'
+                                                and parts[1] in folders))
+                                    or path.is_symlink()
+                                    or path.resolve() != root.resolve() / relative
+                                    or path.resolve().is_relative_to(countries_root().resolve())
+                                    or (path.exists() and path.stat().st_nlink > 1)):
+                                return False
+                            source = self.file_path / relative.relative_to(self.name)
+                            if (any(p.with_name(p.name + '.dvc').exists()
+                                    or p.with_name(p.name + '.dvc').is_symlink()
+                                    for p in (path, source))
+                                    or (source.exists() and path.exists() and path.samefile(source))):
+                                return False
+                            paths.append(path)
+                            output_tables.add(path.stem)
+                        # The Make closure omits already-hashed inputs. Request
+                        # its complete source set, and keep explicit YAML files
+                        # even when their names resemble a managed cache.
+                        try:
+                            _, raw_sources = self._make_declared_inputs(
+                                method_name, _extra_tables=output_tables - {method_name},
+                                _with_sources=True)
+                        except RuntimeError:
+                            # The finite Make ownership proof can be unknown
+                            # (e.g. an unverifiable Other hash). Retain the
+                            # original strict reader; this is not a cache miss.
+                            return False
+                        raw_sources = set(raw_sources)
+                        for table in output_tables:
+                            for wave in self.waves:
+                                owner = self[wave]
+                                block = owner.resources.get(table)
+                                if block:
+                                    raw_sources.update(
+                                        Path(os.path.normpath(owner.file_path / 'Data' / ref))
+                                        for ref in _collect_file_paths_from_block(block))
+                        declared = set()
+                        for source in raw_sources:
+                            declared.update((source.absolute(), source.resolve()))
+                            try:
+                                projected = root / self.name / source.relative_to(self.file_path)
+                            except ValueError:
+                                continue
+                            declared.update((projected.absolute(), projected.resolve()))
+                        if any(path in declared or path.resolve() in declared for path in paths):
+                            return False
+                        return (Path(lexical).absolute() in paths
+                                and Path(lexical).resolve() == info.output_path)
+
+                    def all_output_identities(info):
+                        return tuple((os.path.abspath(out.fs_path),
+                                      output_identity(Path(out.fs_path)))
+                                     for out in loaded_by_ref[info.stage_ref].outs)
+
+                    def collect_stage_outputs(stage_list, proven_stage_refs):
+                        nonlocal strict_stage_read_failure
                         stage_results: dict[str, pd.DataFrame] = {}
+                        readable_refs = set()
                         for stage in stage_list:
                             if stage.fmt != "parquet":
                                 raise ValueError(f"Unsupported format {stage.fmt} for {method_name}")
                             output_path = stage.output_path
                             if output_path.exists():
-                                df_wave = get_dataframe(output_path)
-                                df_wave = map_index(df_wave)
-                                df_wave = self._augment_index_from_related_tables(
-                                    df_wave,
-                                    scheme_entry,
-                                    stage.wave,
-                                )
-                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave, method_name,
-                                                                    country=self.name)
+                                # A stage may name the country cache itself.
+                                # The read gate rejected that file; clean DVC
+                                # status cannot certify it through another
+                                # path. A newly written/replaced stage output
+                                # retains the producer's ordinary authority.
+                                if (output_path == cache_path
+                                        and output_identity(output_path) == rejected_country_output):
+                                    continue
+                                if (output_path in rejected_stage_outputs
+                                        and output_identity(output_path) == rejected_stage_outputs[output_path]):
+                                    continue
+                                cached = stage_frame_cache.get(stage.stage_ref)
+                                if (cached is not None and stage.stage_ref not in attempted_refs
+                                        and output_identity(output_path) == cached[0]):
+                                    stage_results[stage.wave or "ALL"] = cached[1]
+                                    readable_refs.add(stage.stage_ref)
+                                    continue  # preserve one read/audit for an unchanged clean sibling
+                                recoverable = (stage.stage_ref not in attempted_refs
+                                               and initial_stage_outputs[stage.stage_ref] is not None
+                                               and output_identity(output_path) == initial_stage_outputs[stage.stage_ref]
+                                               and stage_owns_outputs(stage))
+                                try:
+                                    if recoverable:
+                                        admitted_outputs = all_output_identities(stage)
+                                        df_wave, error, observed = _read_managed_parquet_cache(
+                                            output_path, check_null=True, engine='pyarrow')
+                                        if error is not None:
+                                            identity = (observed.st_dev, observed.st_ino, observed.st_size,
+                                                        observed.st_mtime_ns, observed.st_ctime_ns)
+                                            if (observed.st_nlink > 1 or not stage_owns_outputs(stage)
+                                                    or output_identity(output_path) != identity
+                                                    or all_output_identities(stage) != admitted_outputs):
+                                                raise error
+                                            unreadable_refs[stage.stage_ref] = (identity, error, admitted_outputs)
+                                            rejected_stage_outputs[output_path] = identity
+                                            proven_stage_refs.discard(stage.stage_ref)
+                                            continue
+                                    else:
+                                        df_wave = get_dataframe(output_path)
+                                    df_wave = map_index(df_wave)
+                                    df_wave = self._augment_index_from_related_tables(
+                                        df_wave, scheme_entry, stage.wave)
+                                    df_wave = _normalize_dataframe_index(
+                                        df_wave, scheme_entry, stage.wave, method_name, country=self.name)
+                                except BaseException:
+                                    if recoverable or stage.stage_ref in recovery_attempted_refs:
+                                        strict_stage_read_failure = True
+                                    raise
                                 stage_results[stage.wave or "ALL"] = df_wave
-                        return stage_results
+                                readable_refs.add(stage.stage_ref)
+                                stage_frame_cache[stage.stage_ref] = (output_identity(output_path), df_wave)
+                        # The retired stage route is a different producer from
+                        # load_from_waves. An existing output after a failed
+                        # reproduce is available data under its legacy fallback
+                        # policy, but is not proof of completed coverage (#1590).
+                        completed_refs = readable_refs & proven_stage_refs
+                        completed_waves = []
+                        for w in build_waves:
+                            relevant = [s for s in stage_list if s.wave is None or s.wave == w]
+                            if relevant:
+                                complete = all(s.stage_ref in completed_refs for s in relevant)
+                            else:
+                                complete = method_name not in self[w].data_scheme
+                            if complete:
+                                completed_waves.append(w)
+                        return stage_results, completed_waves
 
-                    def consolidate_stage_outputs(stage_results: dict[str, pd.DataFrame]) -> pd.DataFrame | None:
+                    def consolidate_stage_outputs(stage_results: dict[str, pd.DataFrame],
+                                                  completed_waves) -> pd.DataFrame | None:
                         if not stage_results:
                             return None
                         non_empty_df = {k: v for k, v in stage_results.items() if not v.empty}
@@ -6092,7 +7119,7 @@ class Country:
                         to_parquet(combined_df, cache_path,
                                    cache_hash=self._table_cache_hash(method_name, build_waves),
                                    grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
-                                   cache_waves=build_waves,
+                                   cache_waves=completed_waves,
                                    datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                    build_drops=build_drops)
                         _mark_degraded_written((self.name, method_name), build_drops)
@@ -6106,93 +7133,97 @@ class Country:
 
                     loaded_stages = []
                     dirty = True
+                    proven_stage_refs = set()
                     try:
                         for info in stage_infos:
                             stage = _load_stage(info.stage_ref)
                             loaded_stages.append(stage)
+                            loaded_by_ref[info.stage_ref] = stage
                         with repo.lock, _redirect_stdout_to_stderr():
                             stage_status = [
                                 stage.status(check_updates=False)
                                 for stage in loaded_stages
                             ]
                         dirty = any(stage_status)
+                        proven_stage_refs = {
+                            info.stage_ref for info, status in zip(stage_infos, stage_status)
+                            if not status
+                        }
                     except (OSError, ValueError, KeyError) as status_error:
                         warnings.warn(
                             f"DVC status failed for {method_name}: {status_error!r}. Assuming dirty outputs."
                         )
                         dirty = True
 
-                    if cache_exists and not dirty:
-                        try:
-                            logger.debug(f"Reading {method_name} from cache {cache_path}")
-                            cached_df = get_dataframe(cache_path)
-                            cached_df = map_index(cached_df)
-                            # GH #323: the OTHER warm-read path.  Same argument as at
-                            # the v0.8.0 fast-path read above -- this parquet is
-                            # post-collapse, so nothing downstream can re-detect the
-                            # loss; replay what the cold build stamped.  (Largely dead
-                            # since the DVC stage layer was retired in v0.7.0, but a
-                            # silent warm read is exactly the hole being closed, so it
-                            # does not get to stay open on a technicality.)
-                            _replay_grain_audit(
-                                read_parquet_grain_audit(cache_path),
-                                self.name, method_name,
-                            )
-                            replay_datetime_audit(
-                                read_parquet_datetime_audit(cache_path),
-                                self.name, method_name, waves=waves,
-                            )
-                            wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
-                            cached_df = self._augment_index_from_related_tables(
-                                cached_df,
-                                scheme_entry,
-                                wave_hint,
-                            )
-                            cached_df = _normalize_dataframe_index(
-                                cached_df,
-                                scheme_entry,
-                                wave_hint,
-                                method_name,
-                                country=self.name,
-                            )
-                            # GH #891: this reads the SAME shared cache_path as
-                            # the v0.8.0 fast path above, so it needs the same
-                            # coverage discipline.  Unlike that path it is not
-                            # hash-gated (DVC stage status decided freshness), so
-                            # serve it only when the manifest proves coverage.
-                            _cov = read_parquet_cache_waves(cache_path)
-                            if _cov is None or not set(map(str, waves)) <= set(map(str, _cov)):
-                                logger.debug(
-                                    f"stage-cache read SKIPPED (coverage): {method_name} "
-                                    f"covers {_cov}; request needs {sorted(waves)}"
-                                )
-                                dirty = True
-                            else:
-                                return self._restrict_to_waves(cached_df, waves)
-                        except (FileNotFoundError, PathMissingError):
-                            dirty = True  # fall through to repro if cache missing unexpectedly
+                    # This country cache already failed the hash/coverage/
+                    # degraded gate above. Clean DVC statuses can certify the
+                    # stage outputs below, never override that rejected read
+                    # with an old aggregate (GH #1590).
 
                     stage_outputs: dict[str, pd.DataFrame] | None = None
+                    stage_coverage = []
+                    recovery_only = False
                     if not dirty:
-                        stage_outputs = collect_stage_outputs(stage_infos)
-                        if not stage_outputs:
+                        stage_outputs, stage_coverage = collect_stage_outputs(
+                            stage_infos, proven_stage_refs)
+                        if unreadable_refs:
+                            dirty = True
+                            recovery_only = True
+                        elif not stage_outputs:
                             dirty = True
 
                     if dirty:
                         stage_iter = loaded_stages or [_load_stage(info.stage_ref) for info in stage_infos]
+                        fallback_to_waves = False
                         with repo.lock, _redirect_stdout_to_stderr():
-                            for stage in stage_iter:
+                            for info, stage in zip(stage_infos, stage_iter):
+                                force = info.stage_ref in unreadable_refs
+                                if recovery_only and not force:
+                                    continue
+                                if force:
+                                    identity, error, admitted_outputs = unreadable_refs[info.stage_ref]
+                                    if (not stage_owns_outputs(info)
+                                            or output_identity(info.output_path) != identity
+                                            or all_output_identities(info) != admitted_outputs):
+                                        strict_stage_read_failure = True
+                                        raise error
+                                    warnings.warn(
+                                        f'Unreadable managed stage cache {info.output_path} '
+                                        f'({error!r}); rebuilding once through {info.stage_ref}',
+                                        UserWarning, stacklevel=3)
+                                    recovery_attempted_refs.add(info.stage_ref)
+                                attempted_refs.add(info.stage_ref)
+                                proven_stage_refs.discard(info.stage_ref)
                                 try:
-                                    stage.reproduce()
+                                    if force:
+                                        # This is a fresh recovery producer, not
+                                        # the ordinary dirty-stage legacy route.
+                                        # Its error must not start another owner.
+                                        strict_stage_read_failure = True
+                                        stage.reproduce(force=True)
+                                    else:
+                                        stage.reproduce()
+                                    proven_stage_refs.add(info.stage_ref)
                                 except (OSError, ValueError, RuntimeError) as reproduce_error:
+                                    if force:
+                                        raise
                                     warnings.warn(f"DVC reproduce failed for {stage.addressing}: {reproduce_error!r}. Falling back to legacy loaders.")
-                                    stage_outputs = collect_stage_outputs(stage_infos)
-                                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                                    stage_outputs, stage_coverage = collect_stage_outputs(
+                                        stage_infos, proven_stage_refs)
+                                    combined_outputs = consolidate_stage_outputs(
+                                        stage_outputs, stage_coverage)
                                     if combined_outputs is not None:
                                         return combined_outputs
-                                    return load_from_waves(waves, evict_country_cache=evict_country_cache)
+                                    fallback_to_waves = True
+                                    break
 
-                        stage_outputs = collect_stage_outputs(stage_infos)
+                        if not fallback_to_waves:
+                            stage_outputs, stage_coverage = collect_stage_outputs(
+                                stage_infos, proven_stage_refs)
+                        if not stage_outputs and any(info.output_path == cache_path for info in stage_infos):
+                            fallback_to_waves = True
+                        if fallback_to_waves:
+                            return load_from_waves(waves, evict_country_cache=evict_country_cache)
                         if not stage_outputs:
                             raise KeyError(f"No data produced for {method_name} via DVC.")
 
@@ -6207,11 +7238,13 @@ class Country:
                         return self._restrict_to_waves(
                             next(iter(stage_outputs.values())), waves)
 
-                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                    combined_outputs = consolidate_stage_outputs(stage_outputs, stage_coverage)
                     if combined_outputs is None:
                         raise KeyError(f"No data produced for {method_name} via DVC.")
                     return combined_outputs
             except (DvcException, FileNotFoundError) as e:
+                if strict_stage_read_failure:
+                    raise  # never turn a new recovery's fresh/postread error into another build
                 # GH #920(a): this line is the only signal a pip-install user
                 # gets that the call is about to be expensive, so it says WHY
                 # the cache was not served and that what follows is a full
@@ -6231,7 +7264,8 @@ class Country:
                 # countries (Uganda, Senegal, etc.) whose stages fail at
                 # reproduce never populate the cache and rebuild from
                 # source on every call.
-                df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
+                df, completed_waves = load_from_waves(build_waves, evict_country_cache=evict_country_cache,
+                                                      _with_coverage=True)
                 if _is_constructed_empty(df):
                     return df  # never cached; see the no-stage write above
                 if isinstance(df, pd.DataFrame):
@@ -6241,7 +7275,7 @@ class Country:
                     to_parquet(df, cache_path,
                                cache_hash=self._table_cache_hash(method_name, build_waves),
                                grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
-                               cache_waves=build_waves,
+                               cache_waves=completed_waves,
                                datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                build_drops=build_drops)
                     _mark_degraded_written((self.name, method_name), build_drops)
@@ -6269,8 +7303,194 @@ class Country:
         data_scheme = resources.get('Data Scheme') if isinstance(resources, dict) else {}
         has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
 
+        def finish_frame(frame):
+            successful_empty = _is_constructed_empty(frame)
+            finalized = self._finalize_result(frame, scheme_entry, method_name, currency=currency)
+            is_script_path = self._is_script_path(method_name, materialize_backend, waves)
+            self._assert_built_required_columns(
+                finalized, method_name, scheme_entry, is_script_path,
+                successful_empty=successful_empty)
+            return finalized
+
+        def fresh_make_country():
+            # GH1288 repair ledger §4: valid reuse or an isolated productive
+            # build, never exit0/existence/mtime as evidence of current inputs.
+            cache = data_root(self.name) / 'var' / f'{method_name}.parquet'
+            # As at the existing country gate, reports describe THIS load,
+            # not a previous load in this process. No other table is cleared.
+            _GRAIN_LEDGER.pop((self.name, method_name), None)
+            _BUILD_DROP_LEDGER.pop((self.name, method_name), None)
+            _DATETIME_LEDGER.pop((self.name, method_name), None)
+            # A cheap invocation-local race check, NOT freshness evidence:
+            # reuse below still requires current declared hashes + coverage.
+            cache_before = output_identity(cache)
+            expected = self._table_cache_hash(method_name, self.waves)
+            recorded_inputs, record_present = read_parquet_make_inputs(cache, _with_presence=True)
+            extra = recorded_inputs['tables'] if recorded_inputs is not None else ()
+            registry = (self.resources or {}).get('Data Scheme') or {}
+            known_record = set(extra) <= set(registry) - JSON_CACHE_METHODS
+            declared_inputs = self._make_declared_inputs(
+                method_name, _extra_tables=extra if known_record else ())
+            proof_ok = (known_record and (recorded_inputs == declared_inputs
+                        or (not record_present
+                            and declared_inputs == {'tables': {}, 'sources': {}})))
+            miss_reason = (recovery_miss[2] if recovery_miss is not None
+                           else 'STALE: declared Make input evidence is missing or changed')
+            if recovery_miss is None and expected is not None and (proof_ok or cache_freshness(cache, expected) != 'fresh'):
+                reused, _, miss_reason = self._read_l2_country_cache(method_name, cache, waves)
+                if reused is not None:
+                    if (self._table_cache_hash(method_name, self.waves) != expected
+                            or self._make_declared_inputs(method_name, _extra_tables=extra) != declared_inputs
+                            or output_identity(cache) != cache_before):
+                        raise RuntimeError(f'{self.name}/{method_name}: inputs changed during Make reuse')
+                    return finish_frame(reused.copy(deep=True))
+
+            if expected is None:
+                raise RuntimeError(f'{self.name}/{method_name}: cannot establish '
+                                   'declared Make inputs; refusing unverified output')
+
+            stack = json.loads(os.environ.get('LSMS_MAKE_BUILD_STACK', '[]'))
+            key = [self.name, method_name]
+            if key in stack:
+                raise RuntimeError(f'{self.name}/{method_name}: cyclic managed Make prerequisites')
+            self._report_rebuild(method_name, miss_reason, list(self.waves), cache)
+            # Keep the runner's existing best-effort acquisition/cache warming
+            # in the normal data root, before private copies are made. Otherwise
+            # newly fetched L1 blobs would live only in a disposable transaction.
+            # This reuses the sanctioned helper; no acquisition override or new
+            # raw-source reader is introduced.
+            try:
+                from .local_tools import _warm_dvc_cache_for_feature
+                for table in [method_name, *self._make_declared_inputs(method_name)['tables']]:
+                    _warm_dvc_cache_for_feature(self, table)
+            except DVCMetadataCompatibilityError:
+                raise
+            except Exception:
+                pass  # unchanged best-effort policy; producer reads are authoritative
+            with self._make_build_root(method_name) as (root, expected, verify, others, declared_inputs):
+                raw_inputs = private_raw_inputs(root, declared_inputs['tables'])
+                verify()
+                # A hashless OTHER is unproven, not proved stale. For literal
+                # registered dependencies, try its actual builder/API privately
+                # rather than copying old bytes or declaring it unavailable.
+                for table in dict.fromkeys(others.values()):
+                    relative_needed = [p for p, owner in others.items() if owner == table]
+                    needed = [root / p for p in relative_needed]
+                    if any(p.is_symlink() or not p.resolve().is_relative_to(root.resolve())
+                           for p in needed):
+                        raise RuntimeError(f'{self.name}/{method_name}: unsafe Other Make prerequisite {table}')
+                    ready = [inspect_private_input(root, relative, table, raw_inputs, verify)
+                             for relative in relative_needed]
+                    if all(ready):
+                        continue
+                    country_input = Path(self.name) / 'var' / f'{table}.parquet' in relative_needed
+                    wave_inputs = [str(p) for p in relative_needed if p.parent.name == '_']
+                    env = _script_subprocess_env(self.file_path.parent)
+                    env.update(LSMS_DATA_DIR=str(root), LSMS_DATA_ROOT=str(root),
+                               VAR_DIR=str(root / self.name / 'var'),
+                               LSMS_COUNTRIES_ROOT=str(self.file_path.parent),
+                               LSMS_MAKE_BUILD_STACK=json.dumps(stack + [key]))
+                    code = (
+                        'import json, sys; from lsms_library.country import Country; '
+                        'Country(sys.argv[1], preload_panel_ids=False)'
+                        '._materialize_make_other(sys.argv[2], json.loads(sys.argv[3]), '
+                        'country_input=json.loads(sys.argv[4]))')
+                    subprocess.run([sys.executable, '-c', code, self.name, table,
+                                    json.dumps(wave_inputs), json.dumps(country_input)],
+                                   cwd=self.file_path, env=env, check=True)
+                    # A wave-only prerequisite needs its physical producer,
+                    # not an unrelated all-country cache as a surrogate.
+                    built = root / self.name / 'var' / f'{table}.parquet'
+                    table_hash = self._table_cache_hash(table, self.waves)
+                    coverage = read_parquet_cache_waves(built)
+                    country_verified = (not country_input or (
+                        cache_freshness(built, table_hash) == 'fresh'
+                        and coverage is not None
+                        and set(map(str, self.waves)) <= set(coverage)))
+                    if (not all(p.is_file() and not p.is_symlink()
+                                and p.resolve() == root.resolve() / p.relative_to(root)
+                                for p in needed)
+                            or table_hash is None or not country_verified):
+                        raise RuntimeError(f'{self.name}/{method_name}: Other '
+                                           f'prerequisite {table} did not establish current coverage')
+                    for path in needed:
+                        get_dataframe(str(path))  # fresh Other outputs are strict
+                prepared = prepare_make_waves(root, verify_inputs=verify)
+                prepared_hashes = {p: cached_file_hash(p) for p in prepared}
+
+                verify()
+                target = root / self.name / 'var' / f'{method_name}.parquet'
+                if not target.resolve().is_relative_to(root.resolve()):
+                    raise RuntimeError(f'{self.name}/{method_name}: Make output escaped build root')
+                # A grouped wave recipe may have made the country companion.
+                # Only the selected PRIVATE output is removed before the actual
+                # country build. Live prerequisites remain byte-for-byte intact.
+                target.unlink(missing_ok=True)
+                output = run_make_target(method_name, strict_country_make=True,
+                                         build_root=root, _path_only=True)
+                if (output is None or not output.is_file() or output.is_symlink()
+                        or not output.resolve().is_relative_to(root.resolve())):
+                    raise RuntimeError(f'{self.name}/{method_name}: country Make '
+                                       'produced no safe output; refusing stale candidates')
+                verify()
+                for path, before in prepared_hashes.items():
+                    if cached_file_hash(path) != before:
+                        raise RuntimeError(f'{self.name}/{method_name}: prepared wave input '
+                                           f'changed during country Make build: {path}')
+
+                # Freeze the producer's bytes before validation. No child knows
+                # this fresh parent-owned directory; the footer rewrite and
+                # promotion operate on the SAME isolated pre-finalize snapshot.
+                # A later producer/sibling write cannot substitute other bytes
+                # between the DataFrame read and the freshness stamp.
+                with tempfile.TemporaryDirectory(prefix='.verified_', dir=root) as verified_dir:
+                    candidate = Path(verified_dir) / output.name
+                    output_before = cached_file_hash(output)
+                    shutil.copy2(output, candidate)
+                    if (output_before is None or cached_file_hash(candidate) != output_before
+                            or cached_file_hash(output) != output_before):
+                        raise RuntimeError(f'{self.name}/{method_name}: Make output changed while snapshotting')
+                    frame = get_dataframe(str(candidate))
+                    # Collect surviving native AND prepared-wave evidence. A
+                    # native concatenator need not know how to stamp reports
+                    # filed in separate wave processes. Values/attrs stay raw.
+                    def reports(reader):
+                        merged = []
+                        for path in [*prepared, candidate]:
+                            for report in reader(path) or []:
+                                if report not in merged:
+                                    merged.append(report)
+                        return merged or None
+                    grain = reports(read_parquet_grain_audit)
+                    dates = reports(read_parquet_datetime_audit)
+                    drops = reports(read_parquet_build_drops)
+                    _replay_grain_audit(self._grain_reports_for_waves(grain, waves),
+                                        self.name, method_name)
+                    replay_datetime_audit(dates, self.name, method_name, waves=waves)
+                    _replay_build_drops(drops, self.name, method_name)
+                    _warn_degraded_serve(self.name, method_name, drops, candidate)
+                    frame = map_index(frame)
+                    finalized = finish_frame(self._restrict_to_waves(frame.copy(deep=True), waves))
+                    verify()
+                    if cached_file_hash(output) != output_before:
+                        raise RuntimeError(f'{self.name}/{method_name}: Make output changed during validation')
+                    # Explicit producer coverage includes known unsupported and
+                    # successfully empty logical waves, never observed t values.
+                    if not stamp_parquet_hash(candidate, expected, cache_waves=list(self.waves),
+                                              make_inputs=declared_inputs, grain_audit=grain,
+                                              datetime_audit=dates, build_drops=drops):
+                        raise RuntimeError(f'{self.name}/{method_name}: cannot stamp '
+                                           'verified Make output; refusing promotion')
+                    verify()
+                    if cached_file_hash(output) != output_before:
+                        raise RuntimeError(f'{self.name}/{method_name}: Make output changed before promotion')
+                    cache.parent.mkdir(parents=True, exist_ok=True)
+                    os.replace(candidate, cache)
+                    _mark_degraded_written((self.name, method_name), drops)
+                return finalized
+
         if not use_dvc and method_name in JSON_CACHE_METHODS:
-            df = load_from_waves(waves)
+            df = load_json_cache(method_name)
         else:
             try:
                 if use_dvc:
@@ -6288,6 +7508,8 @@ class Country:
                         and self._has_country_builder(method_name)):
                     df = load_from_waves(waves, country_builder=not prefer_make_backend)
                 else:
+                    if has_data_scheme_entry and prefer_make_backend:
+                        return fresh_make_country()
                     df = run_make_target(
                         method_name,
                         strict_country_make=(has_data_scheme_entry
@@ -6304,37 +7526,21 @@ class Country:
                 # the issues tracker before the exception propagates.
                 _log_issue(self.name, method_name, waves, error)
                 raise
-        successful_empty = _is_constructed_empty(df)
-        result = self._finalize_result(df, scheme_entry, method_name, currency=currency)
-        # Loud schema gate (GH #479): for script-path tables (whose hashless
-        # wave parquets can shadow a wave-script fix), fail with an actionable
-        # message if a required declared column is missing post-finalize, rather
-        # than silently returning wrong data.  ``materialize_backend`` is an
-        # unreliable signal -- a table can be script-built without declaring
-        # ``materialize: make``: GhanaLSS ``food_acquired`` is built by per-wave
-        # ``{wave}/_/food_acquired.py`` scripts through run_make_target's
-        # wave-script fallback, and since GH #808 has NO country-level
-        # concatenator -- so a country-level ``_/{table}.py`` OR any wave-level
-        # ``{wave}/_/{table}.py`` counts as script-path.  Wave folders are
-        # resolved through wave_folder_map (Tanzania ``2008-15``, Nigeria
-        # round dirs), without constructing a Wave.
-        is_script_path = self._is_script_path(method_name, materialize_backend, waves)
-        self._assert_built_required_columns(result, method_name, scheme_entry,
-                                            is_script_path, successful_empty=successful_empty)
-        return result
+        return finish_frame(df)
 
     def _compute_panel_ids(self) -> None:
         """
         Compute and cache both panel_ids and updated_ids.
 
-        Records the attempt via ``self._panel_ids_attempted`` regardless of
-        outcome so the property accessors don't re-run the miss path on
-        every access.  Countries that don't declare ``panel_ids`` in their
+        Records completed attempts via ``self._panel_ids_attempted`` so the
+        property accessors don't re-run a legitimate miss on every access.
+        Unexpected failures remain retryable, including corrupt JSON.
+        Countries that don't declare ``panel_ids`` in their
         data_scheme are silently absent (no warning); countries that
         declare it but fail to materialize trigger the loud warning, which
         is the case worth surfacing.
         """
-        # Mark the attempt up front so any return path counts.
+        # Also guards recursive table loads while this computation is active.
         self._panel_ids_attempted = True
 
         # Declared-absent: no panel_ids in data_scheme means the country
@@ -6346,23 +7552,34 @@ class Country:
             self._updated_ids_cache = None
             return
 
-        panel_ids_dic = self._aggregate_wave_data(None, 'panel_ids')
-        if isinstance(panel_ids_dic, dict):
-            updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
-            self._panel_ids_cache = panel_ids_dic
-            self._updated_ids_cache = updated_ids_dic
-        elif isinstance(panel_ids_dic, pd.DataFrame) and not panel_ids_dic.empty:
-            panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
-            self._panel_ids_cache = panel_ids_dic
-            self._updated_ids_cache = updated_ids_dic
-        else:
-            # Declared but materialization failed — this IS noteworthy.
-            logger.warning(
-                f"Panel IDs declared in data_scheme but not materialized "
-                f"for {self.name}."
-            )
-            self._panel_ids_cache = None
-            self._updated_ids_cache = None
+        try:
+            panel_ids_dic = self._aggregate_wave_data(None, 'panel_ids')
+            if isinstance(panel_ids_dic, dict):
+                updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
+                self._panel_ids_cache = panel_ids_dic
+                self._updated_ids_cache = updated_ids_dic
+            elif isinstance(panel_ids_dic, pd.DataFrame) and not panel_ids_dic.empty:
+                panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
+                self._panel_ids_cache = panel_ids_dic
+                self._updated_ids_cache = updated_ids_dic
+            else:
+                # Declared but materialization failed — this IS noteworthy.
+                logger.warning(
+                    f"Panel IDs declared in data_scheme but not materialized "
+                    f"for {self.name}."
+                )
+                self._panel_ids_cache = None
+                self._updated_ids_cache = None
+        except Exception as error:
+            # Preserve the historical optional-absence classes consumed by
+            # _aggregate_wave_data, except malformed/undecodable JSON (both
+            # ValueErrors): present corrupt input is never absence (#1590).
+            if (isinstance(error, (json.JSONDecodeError, UnicodeDecodeError))
+                    or not isinstance(error, (FileNotFoundError, KeyError, ValueError))):
+                self._panel_ids_attempted = False
+                self._panel_ids_cache = None
+                self._updated_ids_cache = None
+            raise
 
     @property
     def panel_ids(self) -> dict[str, Any] | None:
@@ -6622,7 +7839,7 @@ class Country:
         if name in self.data_scheme or name in self._FOOD_DERIVED or name in self._ROSTER_DERIVED:
             def method(waves=None, market=None, labels='Preferred', age_cuts=None,
                        units=None, volume_as_mass=True, currency=None, numeraire=None,
-                       basis=None, valuation=None):
+                       basis=None, valuation=None, period=None):
                 # `labels` has two faces; see _split_labels_arg.  `j_labels` is
                 # the historical scalar (food's fine->coarse rename of the `j`
                 # level); `map_labels` is the {target: variant} selection
@@ -6672,6 +7889,20 @@ class Country:
                             "basis='purchased' drops the very rows valuation= "
                             "exists to value, so it would silently do nothing."
                         )
+                if period is not None:
+                    # GH #851 Phase II.  Refused EARLY, like basis=: the
+                    # derive path's broad except would otherwise swallow it.
+                    # food_prices gets its own sentence (a price is not a
+                    # flow); the message lives in recall.py so Feature's
+                    # up-front refusal says the same thing.
+                    from .recall import (PERIOD_TABLES, period_days, period_refusal,
+                                         _claim_period_handoff,
+                                         _offer_period_continuation)
+                    from .errors import PeriodUnavailableError
+                    if name not in PERIOD_TABLES:
+                        raise TypeError(period_refusal(name))
+                    period_days(period)
+                    period_ticket = _claim_period_handoff(self, name, period)
                 if (volume_as_mass is not True
                         and name not in {'food_prices', 'food_quantities'}):
                     raise TypeError(
@@ -6712,6 +7943,8 @@ class Country:
                 # derived fallback can touch data (ledger 1210, sections 2/4).
                 if waves is not None:
                     waves = self._validate_waves(waves)
+                # Set when a derivation failed and the legacy path is being tried.
+                derive_failure = None
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
@@ -6781,19 +8014,14 @@ class Country:
                         # be honoured by the legacy path, so it re-raises.
                         # Only a bare call (all three defaulted) keeps the
                         # pre-#828 legacy fall-through, and not on a kilogram
-                        # subset (GH #1487, see below).
-                        if units is not None or map_labels or valuation is not None or subset_kg:
+                        # subset (GH #1487, see below) or where there is
+                        # nothing to fall through to (GH #1516).
+                        if (units is not None or map_labels or valuation is not None
+                                or period is not None or subset_kg or not self._legacy_can_build(name, waves)):
                             raise exc.for_country(self.name) from exc
-                        logger.info(
-                            "Deriving %s from food_acquired failed (%s); "
-                            "falling back to legacy aggregation", name, exc)
+                        self._warn_legacy_fallback(name, 'food_acquired', exc)
+                        derive_failure = exc.for_country(self.name)
                         derived = None
-                    except (EmptyCategoricalTableError, CategoricalMappingConflictError,
-                            CategoricalKeyDeclarationError, QuantityImplausibleError):
-                        # GH #1493: the strict screen is a RuntimeError, and the
-                        # legacy path would report it as "no wave-level build
-                        # succeeded", after rebuilding what it could.
-                        raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         if subset_kg:
                             # GH #1512: the failure can name a wave the caller
@@ -6806,16 +8034,21 @@ class Country:
                                 "reads no factor stays on the request: "
                                 "units='units' or units='unitvalue'.")
                         if (units is not None or map_labels or valuation is not None
-                                or subset_kg or self._proven_absent(name, waves)):
+                                or period is not None or subset_kg or type(exc) not in _GENERIC_BUILD_FAILURES
+                                or not self._legacy_can_build(name, waves)):
+                            # GH #1532: a named class is a statement, never a
+                            # failed build; see _GENERIC_BUILD_FAILURES.
+                            #
                             # GH #1487: a kilogram subset also raises when it was
                             # a default call, whichever wave failed.  Its waves
                             # declare no `food_quantities`, so the legacy path
                             # reads the failure as proven absence and serves 0
                             # rows with no error (Mali, 2018-19 with 2014-15
-                            # broken: 162,032 rows on base).  GH #1512: the same
-                            # for any subset the legacy path would answer that
-                            # way, `food_expenditures` with or without `basis=`
-                            # above all, whose requested wave had failed.
+                            # broken: 162,032 rows on base).  GH #1512 / #1516:
+                            # the same wherever the legacy path cannot build the
+                            # table, whose subset answer is 0 rows and whose
+                            # all-waves answer ("Could not materialize") hides
+                            # this exception.
                             #
                             # Caller explicitly asked for canonical units= /
                             # labels= / valuation= behaviour; the legacy
@@ -6829,9 +8062,8 @@ class Country:
                             # looking exactly like one that ran and changed
                             # nothing, which is the worse failure of the two.)
                             raise
-                        logger.info(
-                            "Deriving %s from food_acquired failed (%s); "
-                            "falling back to legacy aggregation", name, exc)
+                        self._warn_legacy_fallback(name, 'food_acquired', exc)
+                        derive_failure = exc
                         derived = None
                     if derived is not None:
                         # Relabel is outside the except so user-facing KeyErrors
@@ -6839,34 +8071,59 @@ class Country:
                         # through to the legacy aggregation path.
                         _assert_label_targets_present(derived, map_labels,
                                                       country=self.name, table=name)
-                        # BELT-AND-BRACES, and the reason matters because a
-                        # wrong one is exactly the failure CLAUDE.md corrects
-                        # for _join_v_from_sample.  Measured 2026-09-09: the
-                        # post-steps below already re-attach `attrs`
-                        # themselves (_add_market_index at country.py:2547,
-                        # _relabel_j at :2899, and `convert` likewise), and on
-                        # THIS path `v` is already an index level so
-                        # _join_v_from_sample skips rather than merging -- so
-                        # nothing in the current pipeline would drop the
-                        # tallies without this line.  It is kept anyway: the
-                        # governing rule is that `attrs` survive only when
-                        # every input AGREES (CLAUDE.md, "Panel ID Transitive
-                        # Chains"), so a future post-step that grows a second,
-                        # disagreeing input would drop them SILENTLY.  Do not
-                        # read this as "the merges below drop attrs"; they do
-                        # not, today.
-                        _val_attrs = {k: v for k, v in derived.attrs.items()
-                                      if k.startswith('valuation')}
-                        reagg = name in {'food_expenditures', 'food_quantities'}
-                        derived = self._relabel_j(derived, j_labels, reaggregate=reagg)
-                        if market is not None:
-                            derived = self._add_market_index(derived, column=market, table=name)
-                        if numeraire is not None:
-                            from .conversion import convert as _convert
-                            derived = _convert(derived, to=numeraire, country=self.name)
-                        if _val_attrs:
-                            derived.attrs.update(_val_attrs)
-                        return derived
+                        def _finish_food_result(value):
+                            # BELT-AND-BRACES, and the reason matters because a
+                            # wrong one is exactly the failure CLAUDE.md corrects
+                            # for _join_v_from_sample.  Measured 2026-09-09: the
+                            # post-steps below already re-attach `attrs`
+                            # themselves (_add_market_index at country.py:2547,
+                            # _relabel_j at :2899, and `convert` likewise), and on
+                            # THIS path `v` is already an index level so
+                            # _join_v_from_sample skips rather than merging -- so
+                            # nothing in the current pipeline would drop the
+                            # tallies without this line.  It is kept anyway: the
+                            # governing rule is that `attrs` survive only when
+                            # every input AGREES (CLAUDE.md, "Panel ID Transitive
+                            # Chains"), so a future post-step that grows a second,
+                            # disagreeing input would drop them SILENTLY.  Do not
+                            # read this as "the merges below drop attrs"; they do
+                            # not, today.
+                            _val_attrs = {k: v for k, v in value.attrs.items()
+                                          if k.startswith('valuation')}
+                            reagg = name in {'food_expenditures', 'food_quantities'}
+                            value = self._relabel_j(value, j_labels, reaggregate=reagg)
+                            if market is not None:
+                                value = self._add_market_index(value, column=market, table=name)
+                            if numeraire is not None:
+                                from .conversion import convert as _convert
+                                value = _convert(value, to=numeraire, country=self.name)
+                            if _val_attrs:
+                                value.attrs.update(_val_attrs)
+                            return value
+                        if period is not None:
+                            # GH #851 Phase II.  Outside the except for the
+                            # same reason as the relabel: a PeriodUnavailable-
+                            # Error (a ValueError) must reach the caller, never
+                            # fall through to the legacy path, which cannot
+                            # honour period=.  Linear and per-t, so applying it
+                            # BEFORE the relabel re-sum, market= and
+                            # numeraire= is exact.
+                            # `fa` is the served food_acquired, with its
+                            # `visit` level where the country declares one:
+                            # to_period measures the per-household ask
+                            # shortfall from it (option A, @ligon 2026-10-20)
+                            # and discloses it on attrs['period'].
+                            from .recall import to_period
+                            try:
+                                derived = to_period(derived, self.name, period,
+                                                    table=name, visits=fa)
+                            except PeriodUnavailableError as exc:
+                                _offer_period_continuation(
+                                    period_ticket, exc,
+                                    lambda frame=derived, finish=_finish_food_result:
+                                        finish(frame))
+                                raise
+                        return _finish_food_result(derived)
 
                 # Derive household_characteristics from household_roster
                 if (name in self._ROSTER_DERIVED
@@ -6885,13 +8142,16 @@ class Country:
                             if age_cuts is not None:
                                 rc_kwargs['age_cuts'] = tuple(age_cuts)
                             derived = roster_to_characteristics(roster, **rc_kwargs)
-                    except (EmptyCategoricalTableError, CategoricalMappingConflictError,
-                            CategoricalKeyDeclarationError):
-                        raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
-                        logger.info(
-                            "Deriving %s from household_roster failed (%s); "
-                            "falling back to legacy aggregation", name, exc)
+                        # GH #1532: a named class is never a failed build.
+                        # GH #1516: no country has a legacy route for this
+                        # table, so falling through answered 0 rows on a
+                        # subset and "Could not materialize" on all waves.
+                        if (type(exc) not in _GENERIC_BUILD_FAILURES
+                                or not self._legacy_can_build(name, waves)):
+                            raise
+                        self._warn_legacy_fallback(name, 'household_roster', exc)
+                        derive_failure = exc
                         derived = None
                     if derived is not None:
                         # This path never calls _finalize_result, so a mapping-site
@@ -6921,21 +8181,56 @@ class Country:
                 # _LABEL_SELECTION): _aggregate_wave_data is @build_transform()-
                 # tagged, so widening its signature would move every table's
                 # lsms_cache_hash for a change that cannot alter a cached byte.
-                with _label_selection(name, map_labels):
-                    result = self._aggregate_wave_data(waves, name, currency=currency)
+                try:
+                    with _label_selection(name, map_labels):
+                        result = self._aggregate_wave_data(waves, name, currency=currency)
+                except Exception as legacy_failure:
+                    # A legacy build that fails too does not get to replace the
+                    # reason it was tried with "Could not materialize" (GH #1532).
+                    if derive_failure is None:
+                        raise
+                    derive_failure.add_note(
+                        f"The legacy build of {name} was tried and failed as well: "
+                        f"{type(legacy_failure).__name__}: {legacy_failure}")
+                    raise derive_failure
+                if (derive_failure is not None
+                        and (not isinstance(result, pd.DataFrame) or result.empty)):
+                    # Nor does it get to answer a failed derivation with 0 rows.
+                    raise derive_failure
                 _assert_label_targets_present(result, map_labels,
                                               country=self.name, table=name)
-                # Apply relabeling to any table with a j index level
-                if (isinstance(result, pd.DataFrame) and not result.empty
-                        and 'j' in (result.index.names or [])):
-                    reagg = name in {'food_expenditures', 'food_quantities'}
-                    result = self._relabel_j(result, j_labels, reaggregate=reagg)
-                if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
-                    result = self._add_market_index(result, column=market, table=name)
-                if numeraire is not None and isinstance(result, pd.DataFrame) and not result.empty:
-                    from .conversion import convert as _convert
-                    result = _convert(result, to=numeraire, country=self.name)
-                return result
+                def _finish_legacy_result(value):
+                    # Apply relabeling to any table with a j index level
+                    if (isinstance(value, pd.DataFrame) and not value.empty
+                            and 'j' in (value.index.names or [])):
+                        reagg = name in {'food_expenditures', 'food_quantities'}
+                        value = self._relabel_j(value, j_labels, reaggregate=reagg)
+                    if market is not None and isinstance(value, pd.DataFrame) and not value.empty:
+                        value = self._add_market_index(value, column=market, table=name)
+                    if numeraire is not None and isinstance(value, pd.DataFrame) and not value.empty:
+                        from .conversion import convert as _convert
+                        value = _convert(value, to=numeraire, country=self.name)
+                    return value
+                if (period is not None and isinstance(result, pd.DataFrame)
+                        and not result.empty):
+                    # Only a food-derived table reaches here with period= set
+                    # (validated above), and only when the derivation from
+                    # food_acquired produced nothing.  The record describes
+                    # the country's food module whichever path built the
+                    # table, so the same strict conversion applies; an
+                    # unscaled legacy frame is never returned under period=.
+                    # No food_acquired is in scope here, so the ask shortfall
+                    # is not measured (attrs['period'] says 'not-measured').
+                    from .recall import to_period
+                    try:
+                        result = to_period(result, self.name, period, table=name)
+                    except PeriodUnavailableError as exc:
+                        _offer_period_continuation(
+                            period_ticket, exc,
+                            lambda frame=result, finish=_finish_legacy_result:
+                                finish(frame))
+                        raise
+                return _finish_legacy_result(result)
             doc_parts = [
                 f"Return {name} as a DataFrame, aggregated across *waves*.\n\n",
                 "Parameters\n----------\n",
@@ -7036,6 +8331,34 @@ class Country:
                     "    wave, so the result is the all-waves result restricted\n"
                     "    to *waves*, and a cold call builds every wave of\n"
                     "    ``food_acquired`` (GH #1487).\n"
+                )
+            if name in {'food_expenditures', 'food_quantities'}:
+                doc_parts.append(
+                    "period : {'day', 'week', 'month', 'year'}, optional\n"
+                    "    Rescale each wave from the window its survey recorded\n"
+                    "    to this one (``month`` = 365.25/12 days, ``year`` =\n"
+                    "    365.25): value x period_days / exposure_days, where\n"
+                    "    exposure is ``recall_days * n_asks`` from\n"
+                    "    ``ll.recall()`` -- or the column's own count where the\n"
+                    "    record has ``n_asks_by_column`` (Burkina Faso 2014\n"
+                    "    quantities: 1 ask of 4).  Default ``None`` returns the recorded\n"
+                    "    window unchanged.  Raises ``PeriodUnavailableError``\n"
+                    "    (a ``ValueError``) naming every wave whose window is\n"
+                    "    not established -- not recorded, a weak rung, or\n"
+                    "    varying within the wave -- and the waves that do\n"
+                    "    convert (pass them as ``waves=``); ``Feature`` drops\n"
+                    "    only the unknown waves, with one warning and\n"
+                    "    ``attrs['period_unavailable']``.  The conversion is\n"
+                    "    recorded on ``attrs['period']``, which also discloses,\n"
+                    "    per wave, how many households the served\n"
+                    "    ``food_acquired`` ``visit`` level shows asked FEWER\n"
+                    "    times than declared and the understatement that\n"
+                    "    implies (``shortfall``; the exposure is still one\n"
+                    "    constant per wave, option A, @ligon 2026-10-20) --\n"
+                    "    an upper bound, since a food-row count understates\n"
+                    "    the asks: a visit with no purchases has no rows.\n"
+                    "    GH #851; see ``docs/guide/recall.md``.\n"
+                    "    ``food_prices`` refuses it: a price is not a flow.\n"
                 )
             if name in self._ROSTER_DERIVED:
                 doc_parts.append(
@@ -8036,6 +9359,23 @@ def merge_label_pass_through_reports(sources) -> dict:
     return merged
 
 
+class SampleUnavailableWarning(UserWarning):
+    """``sample`` could not be read, so a table is served without what it supplies.
+
+    ``v`` (``Country._join_v_from_sample``) or the household-level market label
+    (``Country._add_market_index``).  Only for a source that is not there or a ``sample``
+    with no ``v``; a refusal from ``sample`` raises instead (GH #1546).
+    """
+
+
+class LegacyFallbackWarning(UserWarning):
+    """A derived table's derivation failed and the country's legacy build answered instead.
+
+    Only where a legacy route exists (``Country._legacy_can_build``); anywhere else the
+    failure itself is raised.  This used to be an INFO log line (GH #1516).
+    """
+
+
 class CacheRebuildWarning(UserWarning):
     """A table is being rebuilt from source for a reason the user did not ask for (GH #920(a)).
 
@@ -8088,12 +9428,10 @@ class GrainCollapseWarning(RuntimeWarning):
 def _no_cache() -> bool:
     """Whether ``LSMS_NO_CACHE`` is on: ``1``, ``true`` or ``yes``, in any case.
 
-    How both L2 read gates read this flag (GH #1455, @ligon 2026-11-04), spelled
-    as :func:`_grain_strict` spells its lever.  ``0``, ``false``, ``no``, an empty
-    string and anything else leave it off.  The L2-wave WRITE gate in
-    :meth:`Wave.grab_data` does not read it through here yet: it still tests the
-    string's truthiness, because any edit to ``grab_data`` moves every table's
-    fingerprint (GH #1501).  Route every new read through this.
+    Both L2 read gates (GH #1455) and the YAML-path L2-wave write gate
+    (GH #1501) use this predicate, spelled as :func:`_grain_strict` spells its
+    lever.  ``0``, ``false``, ``no``, an empty string and anything else leave it
+    off.  Route every new read through this.
     """
     return os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}
 
@@ -8474,26 +9812,34 @@ def _wave_grain_audit(country: str, table: str, wave: str | None) -> list[dict] 
 # ---------------------------------------------------------------------------
 
 class DegradedCacheWarning(UserWarning):
-    """A cached table is served WITHOUT a required column, because a source
-    file could not be read when it was built and still cannot (GH #675).
+    """A cached table has direct absence or declared coverage-unknown evidence.
 
     ``country``, ``table``, ``missing`` (the REQUIRED columns absent),
     ``missing_optional`` (the ``optional: true`` columns absent -- graded too
     since 675-b, when the cause was an unavailable source) and ``files`` (the
     unavailable sources, relative to the countries root) say what is wrong.
+    ``coverage_unknown_required`` / ``coverage_unknown_optional`` name outputs
+    affected by an explicit input interruption; ``input_drops`` retains their
+    input names, present/absent state and source/drop provenance (GH1051E).
+    This evidence does not establish lost rows or incorrect values.
     The table rebuilds by itself in the first process that can fetch the file;
     ``lsms-library cache clear --country <C>`` forces it.
     """
 
     def __init__(self, message: str, *, country: str, table: str,
                  missing: tuple = (), files: tuple = (),
-                 missing_optional: tuple = ()):
+                 missing_optional: tuple = (),
+                 coverage_unknown_required: tuple = (),
+                 coverage_unknown_optional: tuple = (), input_drops: tuple = ()):
         super().__init__(message)
         self.country = country
         self.table = table
         self.missing = missing
         self.missing_optional = missing_optional
         self.files = files
+        self.coverage_unknown_required = coverage_unknown_required
+        self.coverage_unknown_optional = coverage_unknown_optional
+        self.input_drops = input_drops
 
 
 # (country, table) -> drop records filed during this process's builds.
@@ -8562,6 +9908,10 @@ def _drop_record(wave: str, sub: str, exc: Exception, paths: list[Path],
                  supplies: Any) -> dict[str, Any]:
     """One dropped sub-df, classified (GH #675).
 
+    Multi-file unavailable drops also carry ``files``: ordered, deduplicated
+    tracked paths whose L1 blobs were absent. Legacy single-file stamps keep
+    their original shape; old ambiguous multi-file stamps are not migrated.
+
     ``kind`` is ``config`` -- with ``cause`` ``missing-column`` (a ``KeyError``:
     the file loaded but lacks a column the YAML names) or ``no-such-source``
     (the ``file:`` names no file on disk AND no ``.dvc`` sidecar: a typo'd path)
@@ -8571,31 +9921,49 @@ def _drop_record(wave: str, sub: str, exc: Exception, paths: list[Path],
     the file readable, rebuild, drop again and trip the GH #920 repeat
     detector every process.  Config drops are fixed at their source (#1050).
     """
-    norm = [Path(os.path.normpath(p)) for p in paths]
+    norm = list(dict.fromkeys(Path(os.path.normpath(p)) for p in paths))
+    tiers = {p: source_tier(p) for p in norm}
     if isinstance(exc, KeyError):
         kind, cause = "config", "missing-column"
-    elif not any(source_tier(p) for p in norm):
+    elif any(tier is None for tier in tiers.values()):
         kind, cause = "config", "no-such-source"
     else:
         kind, cause = "unavailable", None
-    # Name the file that failed: the first with no source, else the first.
-    target = next((p for p in norm if source_tier(p) is None), norm[0])
+    # Retain the legacy representative file, including for older readers.
+    target = next((p for p in norm if tiers[p] is None), norm[0])
     try:
         rel = target.relative_to(countries_root()).as_posix()
     except ValueError:
         rel = str(target)
-    return {"wave": wave, "sub": sub, "file": rel, "kind": kind, "cause": cause,
-            "error": f"{type(exc).__name__}: {exc}"[:300],
-            "supplies": [str(c) for c in (supplies or {})]}
+    record = {"wave": wave, "sub": sub, "file": rel, "kind": kind, "cause": cause,
+              "error": f"{type(exc).__name__}: {exc}"[:300],
+              "supplies": [str(c) for c in (supplies or {})]}
+    if kind == "unavailable" and len(norm) > 1:
+        # GH1051(B): get_data stops at the first failed file, but the whole
+        # subframe is dropped. Inspect all declared sidecars/L1 paths only;
+        # never fetch or parse while recording this evidence.
+        from .local_tools import _dvc_cache_path
+        missing = []
+        for path in norm:
+            if tiers[path] == "dvc" and _dvc_cache_path(path) is None:
+                try:
+                    missing.append(path.relative_to(countries_root()).as_posix())
+                except ValueError:
+                    missing.append(str(path))
+        if missing:
+            record["files"] = missing
+    return record
 
 
 def _file_wave_drops(country: str, table: str, dropped: list[dict],
-                     df: Any, scheme_entry: Any) -> None:
+                     df: Any, scheme_entry: Any, *, input_lineage=None) -> None:
     """File one wave build's drops with the DECLARED columns each cost --
     ``missing_required`` and ``missing_optional`` -- judged against the frame
     after ``derived:``/``drop:``/``df_edit``, the same moment as the #323/#515
     guard.  A column a sibling sub-df supplies is not "missing"; a temporary
-    column the scheme does not declare is never counted."""
+    column the scheme does not declare is never counted. Explicit lineage adds
+    separate coverage-unknown fields, never recategorizing presence as absence.
+    """
     have = (set(map(str, df.columns)) | {
         str(n) for n in df.index.names if n is not None}
         if isinstance(df, pd.DataFrame) else set())
@@ -8605,12 +9973,25 @@ def _file_wave_drops(country: str, table: str, dropped: list[dict],
         supplies = set(rec.pop("supplies", []) or [])
         rec["missing_required"] = sorted((required & supplies) - have)
         rec["missing_optional"] = sorted((optional & supplies) - have)
+        # Separate evidence from direct absence: even a fully supplied sibling
+        # cannot disprove an explicitly declared provider interruption (§3/§4).
+        affected = {
+            output: {"inputs": sorted(providers[rec["sub"]]),
+                     "present": output in have}
+            for output, providers in (input_lineage or {}).items()
+            if output in required | optional and rec["sub"] in providers}
+        if affected:
+            rec["coverage_unknown_required"] = sorted(required & affected.keys())
+            rec["coverage_unknown_optional"] = sorted(optional & affected.keys())
+            rec["affected_outputs"] = affected
         _file_build_drop(country, table, rec)
 
 
 def _drop_missing(d: dict) -> list[str]:
-    """Declared columns one drop record cost, required first."""
-    return list(d.get("missing_required") or []) + list(d.get("missing_optional") or [])
+    """Directly absent columns or explicitly interrupted declared outputs."""
+    return (list(d.get("missing_required") or []) + list(d.get("missing_optional") or [])
+            + list(d.get("coverage_unknown_required") or [])
+            + list(d.get("coverage_unknown_optional") or []))
 
 
 def _degraded_drops(drops: Any) -> list[dict]:
@@ -8635,8 +10016,10 @@ def _probe_source(rel: str) -> bool:
     """Can the source at ``rel`` (relative to the countries root) be fetched now?
 
     FAST tiers only (``local_tools.source_fetchable_fast``): an untracked local
-    file, or the DVC sidecar plus its L1 blob -- no ``DVCFS.open`` streaming
-    and no World Bank download, and the file is not parsed.  Measured on a
+    file, or the DVC sidecar plus its L1 blob. After positively local cache-write
+    EACCES/EROFS only, remote metadata existence is also availability evidence,
+    not decode/rebuild proof. No ``DVCFS.open`` streaming or World Bank download
+    runs here, and the file is not parsed.  Measured on a
     first probe per process: 0.01 s for a sidecar whose blob is cached; ~1 s
     for a blob absent locally (one direct remote GET, whether it fetches or
     finds nothing -- 1.10 s / 1.04 s; bounded by ``_ensure_dvc_pulled``'s
@@ -8647,8 +10030,9 @@ def _probe_source(rel: str) -> bool:
     narrowing: a source reachable ONLY through the WB download does not
     auto-heal -- but with no sidecar and no file such a ``file:`` is classed
     ``config`` at build time (:func:`_drop_record`) and is never probed.
-    Memoised per process; looked up on the module at call time so a test can
-    patch the one seam.
+    Completed probes are memoised per process. A deferred advisory False is
+    transient and is not memoised. Looked up on the module at call time so a
+    test can patch the one seam.
     """
     if rel in _SOURCE_PROBES:
         return _SOURCE_PROBES[rel]
@@ -8656,11 +10040,18 @@ def _probe_source(rel: str) -> bool:
     path = Path(rel)
     if not path.is_absolute():
         path = countries_root() / rel
+    outcome = _lt._FastProbeOutcome()
+    token = _lt._FAST_PROBE_OUTCOME.set(outcome)
     try:
         ok = bool(_lt.source_fetchable_fast(path))
+    except DVCMetadataCompatibilityError:
+        raise
     except Exception:  # noqa: BLE001 -- any failure to fetch is "still unavailable"
         ok = False
-    _SOURCE_PROBES[rel] = ok
+    finally:
+        _lt._FAST_PROBE_OUTCOME.reset(token)
+    if not outcome.suppressed:
+        _SOURCE_PROBES[rel] = ok
     return ok
 
 
@@ -8677,12 +10068,25 @@ def _degraded_cache_verdict(drops: Any, key: tuple) -> tuple[str, str | None]:
         return "complete", None
     if key in _DEGRADED_ATTEMPTED:
         return "serve", None
-    healed = sorted({d.get("file") for d in degraded
-                     if d.get("file") and _probe_source(str(d["file"]))})
+    healed = set()
+    for drop in degraded:
+        if "files" in drop:
+            sources = drop["files"]
+            # Do not let malformed metadata or vacuous all([]) claim healing.
+            if (not isinstance(sources, list) or not sources
+                    or not all(isinstance(p, str) and p for p in sources)):
+                continue
+        else:
+            sources = [str(drop["file"])] if drop.get("file") else []
+        if sources and all(_probe_source(path) for path in sources):
+            healed.update(sources)
+    healed = sorted(healed)
     if not healed:
         return "serve", None
     _DEGRADED_ATTEMPTED.add(key)
-    return "rebuild", (f"degraded: built without {_describe_missing(degraded)} "
+    condition = ("built with " if any(d.get("affected_outputs") for d in degraded)
+                 else "built without ")
+    return "rebuild", (f"degraded: {condition}{_describe_missing(degraded)} "
                        f"because {', '.join(healed)} could not be read; it can "
                        f"be read now (GH #675)")
 
@@ -8693,6 +10097,13 @@ def _describe_missing(degraded: list[dict]) -> str:
     opt = sorted({c for d in degraded for c in d.get("missing_optional") or []})
     parts = ([f"required column(s) {req}"] if req else []) + (
         [f"optional column(s) {opt}"] if opt else [])
+    if any(d.get("affected_outputs") for d in degraded):
+        parts = [f"entirely absent {part}" for part in parts]
+    for field, label in (("coverage_unknown_required", "required"),
+                         ("coverage_unknown_optional", "optional")):
+        affected = sorted({c for d in degraded for c in d.get(field) or []})
+        if affected:
+            parts.append(f"coverage unknown for {label} output(s) {affected}")
     return " and ".join(parts)
 
 
@@ -8711,22 +10122,47 @@ def _warn_degraded_serve(country: str, table: str, drops: Any,
     missing = tuple(sorted({c for d in degraded for c in d.get("missing_required") or []}))
     missing_optional = tuple(sorted(
         {c for d in degraded for c in d.get("missing_optional") or []}))
-    files = tuple(sorted({str(d.get("file")) for d in degraded}))
+    unknown_required = tuple(sorted(
+        {c for d in degraded for c in d.get("coverage_unknown_required") or []}))
+    unknown_optional = tuple(sorted(
+        {c for d in degraded for c in d.get("coverage_unknown_optional") or []}))
+    input_drops = tuple(d for d in degraded if d.get("affected_outputs"))
+    locations = []
+    multifile = False
+    for drop in degraded:
+        sources = drop.get("files")
+        if (isinstance(sources, list) and sources
+                and all(isinstance(p, str) and p for p in sources)):
+            locations.append(sources)
+            multifile = True
+        else:
+            locations.append([str(drop.get("file"))])
+    files = tuple(sorted({path for sources in locations for path in sources}))
     detail = "; ".join(
-        f"wave {d.get('wave')}: sub-df '{d.get('sub')}' ({d.get('file')}) "
-        f"-> {_drop_missing(d)} [{d.get('error')}]" for d in degraded)
+        f"wave {d.get('wave')}: sub-df '{d.get('sub')}' ({', '.join(sources)}) "
+        f"-> {_drop_missing(d)} [{d.get('error')}]"
+        + (f"; declared input interruption: {d['affected_outputs']}"
+           if d.get('affected_outputs') else "")
+        for d, sources in zip(degraded, locations))
+    status = ("and those required sources have not all been restored to this "
+              "cached build in this process. " if multifile else
+              "and that file still cannot be fetched in this process. ")
     where = f"{country}/{wave}/{table}" if wave else f"{country}/{table}"
+    condition = ("with " if input_drops else "WITHOUT declared ")
+    qualification = (" This is coverage-unknown evidence, not proof of lost rows "
+                     "or wrong values." if input_drops else "")
     warnings.warn(DegradedCacheWarning(
-        f"{where}: serving a cached table WITHOUT declared "
-        f"{_describe_missing(degraded)}.  The build that wrote {path} could "
+        f"{where}: serving a cached table {condition}"
+        f"{_describe_missing(degraded)}.{qualification}  The build that wrote {path} could "
         f"not read {', '.join(files)} and dropped it (the GH #515 "
-        f"optional-sub-df fallback), and that file still cannot be fetched in "
-        f"this process.  It will be rebuilt automatically by the first process "
+        f"optional-sub-df fallback), {status} It will be rebuilt automatically by the first process "
         f"that can fetch it from disk or the DVC blob cache; `lsms-library "
         f"cache clear --country {country}` forces a rebuild now (GH #675).  "
         f"Detail: {detail}",
         country=country, table=table, missing=missing, files=files,
-        missing_optional=missing_optional),
+        missing_optional=missing_optional,
+        coverage_unknown_required=unknown_required,
+        coverage_unknown_optional=unknown_optional, input_drops=input_drops),
         stacklevel=stacklevel)
 
 
@@ -9055,10 +10491,18 @@ def _normalize_dataframe_index(
     # Aggregate duplicates if any remain
     if not df.index.is_unique:
         present_levels = [lvl for lvl in declared if lvl in df.index.names]
+        from .feature import _ADDITIVE_MEASURE_COLUMNS, _numeric_additive_operands
+        additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
+        present_additive = [c for c in (additive or ()) if c in df.columns]
         # Convert unordered categoricals to strings so the groupby below works
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
-                df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
+                if col in present_additive:
+                    # Preserve real NA separately from literal 'nan'/'None':
+                    # the checked operand path must refuse those tokens.
+                    df[col] = df[col].astype('string')
+                else:
+                    df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
         # GH #514/#323: collapsing a non-unique canonical index silently
         # DISCARDS the dropped rows.  For additive-measure tables
         # (food_acquired, whose source legitimately records the same item across
@@ -9068,10 +10512,6 @@ def _normalize_dataframe_index(
         # one observed row of the group (GH #871).
         # Single source of truth for the additive column map lives in feature.py
         # (imported lazily to avoid an import cycle).
-        from .feature import _ADDITIVE_MEASURE_COLUMNS
-        additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
-        present_additive = [c for c in (additive or ()) if c in df.columns]
-
         # GH #323: AUDIT BEFORE DESTROYING.  This is the only moment at which the
         # evidence exists -- one line further down the dropped rows are gone, and
         # the parquet we cache is written from the collapsed frame, which is why
@@ -9162,7 +10602,9 @@ def _normalize_dataframe_index(
             # double: measured on GhanaLSS 1998-99 `food_acquired`, 392 of
             # 161,176 groups differ, at a maximum relative difference of 4e-16.
             # Column totals, the NA pattern and every dtype are unchanged.
-            grouped = df.groupby(level=present_levels, observed=True)
+            numeric = _numeric_additive_operands(
+                df, present_additive, f"{country or '?'}/{table_name}")
+            grouped = numeric.groupby(level=present_levels, observed=True)
             sums = grouped[present_additive].sum(min_count=1)
             overlay = {c: sums[c] for c in present_additive}
             if _DERIVATION_COLUMN in df.columns:

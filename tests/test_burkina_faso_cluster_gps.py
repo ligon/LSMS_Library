@@ -233,7 +233,8 @@ def test_2018_19_clusters_carry_gps(clusters):
     w = _wave(clusters, "2018-19")
     assert len(w) == 585 and not w["v"].duplicated().any()
     fixed = w.dropna(subset=["Latitude"])
-    assert len(fixed) == 555, len(fixed)
+    # 555 in the file; 9 are withheld as not readings of their grappe (ruling of 2026-11-05).
+    assert len(fixed) == 546, len(fixed)
     assert fixed["Longitude"].notna().all()
     assert fixed["Latitude"].between(*LAT).all()
     assert fixed["Longitude"].between(*LON).all()

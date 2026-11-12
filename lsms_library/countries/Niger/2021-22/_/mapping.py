@@ -15,7 +15,8 @@ from lsms_library.transformations import (
 
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
+    inputs_unit_weight as _inputs_unit_weight,
     inputs_last_purchase as _inputs_last_purchase,
 )
 
@@ -27,6 +28,21 @@ from lsms_library.ehcvm import (
 # and Niger/_/derivations.yml.
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Niger')
 
+# GH #812.  `strata` is the documented stratum, region x milieu, as a label.  It
+# is a construction, so `sample` carries its registry key: see
+# lsms_library/ehcvm.py and Niger/_/derivations.yml.
+from lsms_library.ehcvm import (  # noqa: E402
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
+)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Niger')
+
+# GH #1452: `Quantity_kg` from the survey's own unit-weight table, national median;
+# which file and column, and why: lsms_library.ehcvm.NSU_TABLES.
+
 
 def inputs_food_acquired(wave):
     """The registry `inputs` callable: raw section-7B answers at (t, i, j).
@@ -37,6 +53,11 @@ def inputs_food_acquired(wave):
     fingerprint.
     """
     return _inputs_last_purchase('Niger', wave)
+
+
+def inputs_food_acquired_unit_weight(wave):
+    """The registry `inputs` callable of the unit-weight derivation (GH #1452)."""
+    return _inputs_unit_weight('Niger', wave)
 from collections import defaultdict
 
 
@@ -58,7 +79,8 @@ def food_acquired(df):
     reported a Quantity with no unit and were served with ``u`` NaN (2018-19
     has none).
     """
-    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    df = _food_acquired_with_unit_weights(
+        df, FOOD_ACQUIRED_DERIVATION, wave='2021-22')
     return _fill_missing_u(df)
 
 
@@ -192,6 +214,7 @@ def shocks(df):
         # In 2021-22, cope columns contain rank strings instead of binary indicators.
         # Collect (rank, label) pairs and sort by rank to get ordered coping strategies.
         ranked = []
+        unranked = []
         for c in cope_cols:
             num = int(c.replace('Cope', ''))
             val = row[c]
@@ -200,6 +223,20 @@ def shocks(df):
             rank = _STRATEGY_RANK.get(str(val))
             if rank is not None:
                 ranked.append((rank, COPING_LABELS.get(num, f'Strategy {num}')))
+            elif str(val) == 'Oui':
+                unranked.append(COPING_LABELS.get(num, f'Strategy {num}'))
+
+        # Code 25 (Autre strategie) alone carries the Oui/Non label set, so its
+        # rank is not in the file (GH #1556).  It takes the rank no other
+        # strategy holds: ranks are otherwise gapless, and Burkina, which keeps
+        # the raw rank, shows 25 always filling the next one.  The instrument
+        # allows three strategies, so a fourth falls off the three served slots
+        # below and is dropped (0 held rows).
+        held = {rank for rank, _ in ranked}
+        for label in unranked:
+            rank = min(set(range(1, len(held) + 2)) - held)
+            held.add(rank)
+            ranked.append((rank, label))
 
         ranked.sort(key=lambda x: x[0])
         found = [label for _, label in ranked]

@@ -29,7 +29,7 @@ if not hasattr(_ligon_dataframes, "from_dta"):
     _ligon_dataframes.from_dta = _dummy_from_dta
 
 from lsms_library.country import Country, StageInfo, _normalize_dataframe_index
-from lsms_library.local_tools import to_parquet as write_parquet
+from lsms_library.local_tools import to_parquet as write_parquet, _read_managed_parquet_cache
 
 
 @pytest.fixture
@@ -270,7 +270,7 @@ class TestDVCCaching:
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "_augment_index_from_related_tables", new=_augment_passthrough), \
-            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)) as mock_get_df, \
+            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_get_df, \
             patch("lsms_library.country.map_index", side_effect=lambda dataframe: dataframe) as mock_map_index, \
             patch("lsms_library.country.Repo") as mock_repo:
 
@@ -282,7 +282,7 @@ class TestDVCCaching:
             result = country._aggregate_wave_data(None, "test_data")
 
         mock_repo.assert_not_called()
-        mock_get_df.assert_called_once_with(cache_path)
+        mock_get_df.assert_called_once_with(cache_path, open_errors=(FileNotFoundError,), check_null=True, engine='pyarrow')
         mock_map_index.assert_called_once()
         pd.testing.assert_frame_equal(
             result.reset_index(drop=True),
@@ -438,9 +438,11 @@ class TestDVCCaching:
 
         cache_path = mock_country_structure / "var" / "test_data.parquet"
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-        cache_path.touch()
-
         cached_df = pd.DataFrame({"col1": [1, 2]})
+        cache_hash = "valid-cache-fixture"
+        # A healthy hit needs real decodable bytes and proven coverage.
+        write_parquet(cached_df, cache_path, cache_hash=cache_hash,
+                      cache_waves=["2020-21"])
 
         stage_key = "testcountry::2020_21::test_data"
         stage_info = StageInfo(
@@ -456,6 +458,8 @@ class TestDVCCaching:
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe", return_value=cached_df) as mock_get_dataframe, \
+            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_read_cache, \
+            patch.object(Country, "_table_cache_hash", return_value=cache_hash), \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
             patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
@@ -494,8 +498,10 @@ class TestDVCCaching:
             result = country._aggregate_wave_data(method_name="test_data")
 
         pd.testing.assert_frame_equal(result, cached_df)
-        # Note: The actual implementation reads from cache, assertion may need adjustment
-        # mock_get_dataframe.assert_called_once_with(cache_path)
+        mock_repo_class.assert_not_called()
+        mock_get_dataframe.assert_not_called()
+        mock_read_cache.assert_called_once_with(
+            cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
 
     def test_dvc_cache_applies_location_index(
         self,
@@ -512,6 +518,11 @@ class TestDVCCaching:
         cache_path.touch()
 
         cached_df = pd.DataFrame({"col1": [1]}).set_index(pd.Index([0], name="i"))
+        # The touched country cache has no hash and is rejected by the read
+        # gate. A same-path stage must actually produce its declared output;
+        # clean status plus an unchanged file is not a build receipt (GH1590).
+        reproduce = Mock(side_effect=lambda: write_parquet(
+            cached_df, cache_path, absolute_path=True))
 
         stage_key = "testcountry::::test_data"
         stage_info = StageInfo(
@@ -555,6 +566,7 @@ class TestDVCCaching:
                 mock_stage = Mock()
                 mock_stage.addressing = f"{file_part}:{stage_name}"
                 mock_stage.status = Mock(return_value=[])  # clean status
+                mock_stage.reproduce = reproduce
                 return mock_stage
 
             mock_repo.stage = Mock()
@@ -571,49 +583,64 @@ class TestDVCCaching:
         pd.testing.assert_frame_equal(result, cached_df)
         # Note: assertions may need adjustment based on implementation
         assert mock_augment.called
+        reproduce.assert_called_once_with()
 
     def test_panel_ids_dict_cache_written_as_json(
         self,
         mock_country_structure,
+        monkeypatch,
     ):
-        """panel_ids dictionary results should persist as JSON."""
+        """A legitimate wave dictionary persists privately, without a publisher."""
+        from lsms_library.paths import countries_root
+
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
         panel_ids_json = mock_country_structure / "_" / "panel_ids.json"
         panel_ids_parquet = mock_country_structure / "_" / "panel_ids.parquet"
+        expected = {"2020-21": {"A": "B"}}
+        wave_dictionary = {"A": "B"}
+        wave_getter = Mock(return_value=wave_dictionary)
+        source_root = Path(countries_root()) / "TestCountry"
+        (source_root / "_" / "Makefile").write_text("# maintainer-only publisher\n")
+        (source_root / "_" / "panel_ids.py").write_text("# offline publisher\n")
 
-        def fake_make(cmd, cwd, check, **kwargs):
-            target = Path(cwd) / cmd[-1]
-            data = {"2020-21": {"A": "B"}}
-            target.write_text(json.dumps(data))
+        def source_state():
+            return {str(p.relative_to(source_root)):
+                    (p.stat().st_mode, p.stat().st_mtime_ns, p.read_bytes())
+                    for p in source_root.rglob("*") if p.is_file()}
 
-        # Ensure Makefile exists so loader attempts to run it
-        makefile_path = mock_country_structure / "_" / "Makefile"
-        makefile_path.write_text("# dummy makefile\n")
-
-        with patch("lsms_library.country.files") as mock_files, \
-            patch("lsms_library.country.Repo") as mock_repo_class, \
-            patch("lsms_library.country.subprocess.run", side_effect=fake_make) as _mock_make, \
+        source_before = source_state()
+        assert not panel_ids_json.exists() and not panel_ids_parquet.exists()
+        with patch("lsms_library.country.Repo", side_effect=AssertionError("no DVC build")) as mock_repo, \
+            patch("lsms_library.country.subprocess.run", side_effect=AssertionError("no Make/Python publisher")) as mock_process, \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
-            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path:
-
-            mock_files.return_value = mock_country_structure.parent.parent
-
-            mock_repo = Mock()
-            mock_repo.status.return_value = {}
-            mock_repo_class.return_value = mock_repo
-
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(
+                panel_ids=wave_getter, data_scheme=["panel_ids"])):
             mock_waves.return_value = ["2020-21"]
             mock_scheme.return_value = ["panel_ids"]
             mock_resources.return_value = {"Data Scheme": {"panel_ids": {}}}
-            mock_file_path.return_value = mock_country_structure
-
             country = Country("TestCountry", preload_panel_ids=False)
             result = country._aggregate_wave_data(method_name="panel_ids")
+            assert result == expected
+            assert json.loads(panel_ids_json.read_text()) == expected
+            stored = panel_ids_json.read_bytes()
+            stored_mtime = panel_ids_json.stat().st_mtime_ns
+            second = country._aggregate_wave_data(method_name="panel_ids")
+            assert second == expected
+            assert panel_ids_json.read_bytes() == stored
+            assert panel_ids_json.stat().st_mtime_ns == stored_mtime
+            wave_getter.assert_called_once_with()
+            mock_process.assert_not_called()
+            mock_repo.assert_not_called()
 
         assert isinstance(result, dict)
         assert panel_ids_json.exists()
         assert not panel_ids_parquet.exists()
+        assert wave_dictionary == {"A": "B"}
+        assert source_state() == source_before
+        assert not list(source_root.rglob("*.json"))
+        assert not list(source_root.rglob("*.parquet"))
 
     def test_panel_ids_dataframe_cache_written_as_parquet(
         self,
@@ -722,6 +749,7 @@ class TestDVCCaching:
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe") as mock_get_dataframe, \
+            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_read_cache, \
             patch("lsms_library.country.map_index", side_effect=lambda frame: frame), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
             patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
@@ -784,7 +812,9 @@ class TestDVCCaching:
             pd.testing.assert_frame_equal(second, expected_df)
         # Second call should use cache without reproducing - first stage reproduce count should still be 1
         assert mock_stages[0].reproduce.call_count == 1, "Second call should not rerun DVC stage"
-        assert mock_get_dataframe.call_args_list[-1][0][0] == cache_path
+        mock_get_dataframe.assert_called_once_with(build_output_path)
+        mock_read_cache.assert_called_once_with(
+            cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
 
     # ------------------------------------------------------------------
     # v0.7.0 cache-read fix coverage
@@ -821,7 +851,7 @@ class TestDVCCaching:
 
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
-            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)) as mock_get_df, \
+            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_get_df, \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
             patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
@@ -845,7 +875,7 @@ class TestDVCCaching:
         # The top read should have returned without ever opening Repo or
         # asking for stages.
         mock_repo_class.assert_not_called()
-        # get_dataframe should have been called exactly once on cache_path
+        # The cache-only payload reader is called exactly once on cache_path
         # (the top read).  No subsequent rebuild.
         assert mock_get_df.call_count == 1
         assert mock_get_df.call_args[0][0] == cache_path

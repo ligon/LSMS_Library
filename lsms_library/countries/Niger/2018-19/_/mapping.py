@@ -6,7 +6,7 @@ from lsms_library.transformations import food_acquired_to_canonical as _food_acq
 
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
     inputs_last_purchase as _inputs_last_purchase,
 )
 
@@ -17,6 +17,24 @@ from lsms_library.ehcvm import (
 # and stamps the registry key on every purchased row.  See lsms_library/ehcvm.py
 # and Niger/_/derivations.yml.
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Niger')
+
+# GH #812.  `strata` is the documented stratum, region x milieu, as a label.  It
+# is a construction, so `sample` carries its registry key: see
+# lsms_library/ehcvm.py and Niger/_/derivations.yml.
+from lsms_library.ehcvm import (  # noqa: E402
+    inputs_region_milieu_stratum as _inputs_region_milieu_stratum,
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
+)
+
+
+def inputs_strata(wave):
+    """The registry `inputs` callable: the cover's region and milieu at (t, i)."""
+    return _inputs_region_milieu_stratum('Niger', wave)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Niger')
 
 
 def inputs_food_acquired(wave):
@@ -151,8 +169,8 @@ def food_acquired(df):
     """
     # GH #1224: `decode` -- the served base unit of a sized row is read
     # through the same repair the sweep below applies to every other row.
-    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION,
-                              decode=_decode_mojibake)
+    df = _food_acquired_with_unit_weights(df, FOOD_ACQUIRED_DERIVATION, wave='2018-19',
+                                          decode=_decode_mojibake)
     df = _decode_mojibake_in_df(df)
     # Fill a missing unit with the `Unknown` sentinel, AFTER the mojibake
     # sweep so the two never fight over the same value.

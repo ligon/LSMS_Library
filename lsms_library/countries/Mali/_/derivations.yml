@@ -18,8 +18,10 @@ Mali::food_acquired::7day-purchase-at-last-purchase-unit-value:
     unit value of the household's LAST PURCHASE of the item.  NaN where
     s07bq07a is missing or not positive, and NaN where the last purchase was
     made in a different unit from the consumption unit (s07bq07b/s07bq07c vs
-    s07bq03b/s07bq03c): no EHCVM wave ships a unit-conversion table, so there
-    is no exact conversion and NA is the honest answer.  Units are compared on
+    s07bq03b/s07bq03c): this construction converts nothing between units, and
+    NA is the honest answer.  (This entry used to say no EHCVM wave ships a
+    unit-conversion table; 2021-22 does, GH #1452, and it is not used here.)
+    Units are compared on
     the EHCVM numeric code where the label carries one, else on the label with
     case, accents, padding and punctuation folded -- the two variables carry
     DIFFERENT value-label sets inside the same .dta.  Before GH #876 the served
@@ -48,8 +50,9 @@ Mali::food_acquired::7day-purchase-at-last-purchase-unit-value:
         denominator -- purchased rows of the delivered table, after the
         canonical reshape and the (t, v, i, j, u, s) collapse -- because that
         is the number a user sees; the source-row counts are smaller and were
-        what an earlier version of this entry quoted. 2018-19: 25,667 of the
-        129,598 SERVED purchased rows (19.8%) -- 10,771 because no last
+        what an earlier version of this entry quoted. 2018-19: 25,572 of the
+        129,085 SERVED purchased rows (19.8%), since GH #1513 folded its food labels;
+        before that 25,667 of 129,598 -- 10,771 because no last
         purchase was reported at all (s07bq08 or s07bq07a missing / not
         positive), 6,731 because the last purchase used a different unit CODE,
         8,165 because it used the same code in a different SIZE (Petit / Moyen
@@ -62,7 +65,8 @@ Mali::food_acquired::7day-purchase-at-last-purchase-unit-value:
         which is a different container and so a different price per unit.
       basis: variable-label
       evidence: >-
-        no EHCVM wave distributes a unit-conversion table;
+        the 2018-19 waves distribute no unit-conversion table, and 2021-22's
+        ehcvm_nsu is not applied to a price;
         lsms_library/categorical_mapping/ehcvm_units.org is a code->label
         codebook with no factors
     - text: >-
@@ -83,7 +87,7 @@ Mali::food_acquired::7day-purchase-at-last-purchase-unit-value:
         people who built the aggregate rather than an answer anybody gave -- so
         it is checked and not served.  Own production keeps the identical
         treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
-        2018-19: 16,459 inkind rows carrying 58,639 units, 0 with an Expenditure.  2021-22: 16,869 inkind rows carrying 59,567 units, 0 with an Expenditure.
+        2018-19: 16,413 inkind rows carrying 58,639 units, 0 with an Expenditure.  2021-22: 16,869 inkind rows carrying 59,567 units, 0 with an Expenditure.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
@@ -217,24 +221,33 @@ Mali::crop_production::tree-sale-window:
   since: '2026-10-23'
 
 Mali::crop_production::hh-crop-sale-single-row:
-  waves: ['2021-22']
-  columns: [Quantity_sold, Unit_sold, Value_sold]
+  waves: ['2017-18', '2021-22']
+  columns: [Quantity_sold, Unit_sold, KgFactor_sold, Value_sold, Condition_sold, condition_sold_native]
   rule: >-
     s16d records a sale for the household and crop, with no plot.  A sale is a
     record with a positive s16dq05a or s16dq06.  Where the household has exactly
     one s16c row for the crop -- one served row, not merely one plot -- the sale
     is served on that row: Quantity_sold = s16dq05a, Unit_sold = s16dq05b,
-    Value_sold = s16dq06, as recorded, and that row carries this key.  What is
+    Value_sold = s16dq06, as recorded, and that row carries this key. The own
+    s16dq05d sold state accompanies that same sale as Condition_sold and
+    condition_sold_native (GH1528), without supplying a harvest state. What is
     derived is the ATTACHMENT, not the numbers.  Any other sale is served on one
     row of that household and crop with plot_id = 'Farm-level' and no key for the
     sale, because its index value already discloses it.  No sale is split, summed,
     scaled or dropped, and a record that is not a sale serves nothing: no zero is
+    written.  This key shares a row with harvest-to-date, harvest-from-dispositions or
+    survey-kg-estimate through derivations.MULTI_SEP, in sorted order.
     written.  This key shares a row with harvest-to-date or harvest-from-dispositions
-    through derivations.MULTI_SEP, in sorted order.
+    through derivations.MULTI_SEP, in sorted order.  2017-18 is the same rule on s7g
+    and s7f (GH #1457): s7gq21a, s7gq21b, s7gq21d (kg per sold unit) and s7gq22, a
+    quantity code 99 / 9999 masked as on every field row.  One difference, from the
+    ruling of 2026-10-23: a 2017-18 record that is not a sale still serves a crop on
+    one plot, s7gq20 = 'Non' as Quantity_sold = Value_sold = 0, with no key.
   function: lsms_library.countries.Mali._.mali:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Mali._.mali:inputs_hh_crop_sale_single_row
-  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b,
-                  s16dq06]
+  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq05d,
+                  s16dq06, s7fq01, s7fq02, s7fq03, s7gq01, s7gq20, s7gq21a, s7gq21b,
+                  s7gq21d, s7gq22]
   assumptions:
     - text: >-
         s16d asks the sale once per crop, with no plot, and s16c records no sale.
@@ -255,9 +268,10 @@ Mali::crop_production::hh-crop-sale-single-row:
         put one there, so harvest_kg reads such a row only then.
       basis: modelling-choice
       evidence: >-
-        ruling @ligon 2026-11-03, option (d), GH #824; the rule of Niger 2021-22
-        after GH #1360 for the single row; the Farm-level convention in
-        lsms_library/data_info.yml, top of file.
+        ruling @ligon 2026-11-03, option (d), GH #824; extended to 2017-18 by the bulk
+        ruling of 2026-11-04, GH #1457; the rule of Niger 2021-22 after GH #1360 for
+        the single row; the Farm-level convention in lsms_library/data_info.yml, top of
+        file.
     - text: >-
         s16dq05c, "Estimation Quantite totale UML en kg", is not served.  It is a
         total (it equals s16dq05a on 495 of 495 rows sold in Kg, and 100 x
@@ -271,25 +285,29 @@ Mali::crop_production::hh-crop-sale-single-row:
     directly.  Cold build of 2021-22: 1,070 keyed rows and 70 Farm-level rows (58 of
     crops on two rows, 12 on three or more, 0 on none) hold the 1,140 sale records, no
     sale on two rows; Value_sold 394,396,600 + 24,301,375 = 418,697,975 FCFA, the raw sum.
+    tests/test_gh1457_mali_multi_plot_sales.py, the same for 2017-18: 459 keyed rows and
+    202 Farm-level rows hold the 661 sale records; Value_sold 132,259,405 + 48,469,050 =
+    180,728,455 FCFA, the raw s7gq22 sum (the build lost the 48,469,050 before GH #1457).
     Not validated against an external total: no document here reports one.
-  contents: 'Mali/_/CONTENTS.org, "2026-11-03 -- EHCVM crop_production wired (GH #824)"'
+  contents: 'Mali/_/CONTENTS.org, "2026-11-03 -- EHCVM crop_production wired (GH #824)"; "2026-11-04 -- 2017-18 multi-plot sales (GH #1457)"'
   since: '2026-11-03'
 
 Mali::crop_production::harvest-to-date:
   waves: ['2018-19', '2021-22']
-  columns: [Quantity]
+  columns: [Quantity, Quantity_kg]
   rule: >-
     Identity on a row whose harvest is not finished and which records a quantity:
     2018-19 s16cq10 = Non with s16cq12a, 2021-22 s16cq11 = Non with s16cq16a.  The value
     is served as recorded.  The key names its WINDOW: the question asks the quantity
     ALREADY harvested, so the row covers a part of the season under a column that
-    otherwise means all of it.  A row with no recorded quantity carries no key.  This
-    key shares a row with hh-crop-sale-single-row through derivations.MULTI_SEP, in
-    sorted order, and never with harvest-from-dispositions, which needs a finished crop
-    and no recorded quantity.
+    otherwise means all of it, and so does the row's Quantity_kg in 2021-22 (s16cq16c,
+    GH #1436).  A row with no recorded quantity carries no key.  This
+    key shares a row with hh-crop-sale-single-row and survey-kg-estimate through
+    derivations.MULTI_SEP, in sorted order, and never with harvest-from-dispositions,
+    which needs a finished crop and no recorded quantity.
   function: lsms_library.countries.Mali._.mali:derive_harvest_to_date
   inputs: lsms_library.countries.Mali._.mali:inputs_harvest_to_date
-  raw_variables: [s16cq10, s16cq11, s16cq12, s16cq12a, s16cq12b, s16cq16a, s16cq16b]
+  raw_variables: [s16cq10, s16cq11, s16cq12, s16cq12a, s16cq12b, s16cq16a, s16cq16b, s16cq16c]
   assumptions:
     - text: >-
         the recorded quantity on an unfinished row is what has been harvested so far,
@@ -388,6 +406,36 @@ Mali::crop_production::harvest-from-dispositions:
   contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)"'
   since: '2026-11-04'
 
+Mali::crop_production::survey-kg-estimate:
+  waves: ['2021-22']
+  columns: [Quantity_kg]
+  rule: >-
+    Identity on a 2021-22 row with a Quantity_kg: 16C.16c s16cq16c, served as recorded and
+    read first by the crop ladder (survey_kg).  The key says what the number is.  The
+    instrument calls it an estimate, so a row's kilograms are the survey's conversion of
+    its local unit and not a weighing.  A 0 beside a positive quantity (3 rows) is no
+    answer and is NA.  A row whose Quantity is harvest-from-dispositions
+    has none: s16d's other "c" columns are the state of the product, and s16dq05c, the
+    sale's kilograms, is not served.  Shares a row with harvest-to-date and
+    hh-crop-sale-single-row through derivations.MULTI_SEP, in sorted order.
+  function: lsms_library.countries.Mali._.mali:derive_survey_kg_estimate
+  inputs: lsms_library.countries.Mali._.mali:inputs_survey_kg_estimate
+  raw_variables: [s16cq16a, s16cq16b, s16cq16c, s16cq16d]
+  assumptions:
+    - text: >-
+        s16cq16c is the total for the line in kilograms, as estimated, and not a factor per
+        unit.  On the 129 Kg rows it equals s16cq16a on all 129; on 81 rows in 100 kg sacks
+        it is 100 x s16cq16a on 35, equals s16cq16a on 9, and otherwise neither.  Whether
+        the interviewer or the form did the conversion is not stated.
+      basis: variable-label
+      evidence: >-
+        s16c_me_mli2021.dta s16cq16c "16C.16c. Estimation Quantite totale UML en kg".
+  validated_against: >-
+    tests/test_mali_crop_survey_kg.py, whose oracle reads s16c directly.  An identity has
+    nothing to validate but its rows.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the survey harvest kilograms, 2021-22 (GH #1436)"'
+  since: '2026-11-04'
+
 Mali::community_prices::gram-centilitre-poids:
   waves: ['2014-15']
   columns: [Quantity]
@@ -450,4 +498,130 @@ Mali::community_prices::gram-centilitre-poids:
     tests/test_gh1179_mali_community_quantity.py, whose oracle reads EACIS04_p1/p2 directly.  The
     per-kg price on a stated-size variety is not validated against any external price.
   contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- community_prices.Quantity is kilograms by rule (GH #1179 memo)"'
+  since: '2026-11-04'
+
+Mali::sample::region-milieu-stratum:
+  waves: ['2018-19', '2021-22']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<s00q01 label> <s00q04 label>', the region and area of residence the
+    household cover page records, for example 'Sikasso Rural'.  Labels and never
+    codes.  NA where either is missing.  No household file of these waves records a
+    stratum.  The region part is then spelled through this country's `strata` table
+    in categorical_mapping.org, at read time, which is the `Region` table crossed
+    with the two milieu labels.
+  function: lsms_library.ehcvm:derive_region_milieu_stratum
+  inputs: lsms_library.countries.Mali.2018-19._.mapping:inputs_strata
+  raw_variables: [s00q01, s00q04]
+  assumptions:
+    - text: >-
+        the stratum of the design is the combination of region and area of
+        residence, and 2021-22 keeps the 2018-19 plan.
+      basis: questionnaire
+      evidence: >-
+        mli_ehcvm2_information_de_base_eng.pdf (held, 2021-22/Documentation), section
+        4.1, p.10: "The survey is a panel cluster survey, and the sampling plan is
+        based on that of the 2018/2019 survey ... The stratum is the combination of
+        region and residence area."  A Basic Information Document, not the instrument.
+    - text: >-
+        the survey's own coding is the same cross.
+      basis: variable-label
+      evidence: >-
+        ehcvm_nsu_mli2021.dta, a unit table: `strate`, labelled "Strate
+        (Region*10+Milieu)".  Its 20 values are 2018-19's 20 cells.
+    - text: >-
+        Menaka and Taoudenit are served as the 2018-19 cover records them, and as the
+        2021-22 cover records the same clusters, under Gao and Tombouctou: a label is
+        the cover's own in each wave and is not carried across.  Of 6,133 households
+        in both waves 429 (36 clusters) change stratum on this account, Menaka to Gao
+        and Taoudenit to Tombouctou.  So 2018-19 has 20 cells and 2021-22 has 17.
+      basis: modelling-choice
+      evidence: Mali/_/CONTENTS.org, GH #812 ruling option W2, 2026-11-04.
+  validated_against: >-
+    the BID's sentence above and the weights: share of var(log cluster weight) between
+    these cells 72.5% (2018-19) and 71.9% (2021-22), against 56.2% and 34.4% between
+    regions alone.  BID Tables 1 and 2 equal 2021-22 in all 17 cells
+    (tests/test_gh812_ehcvm_strata.py transcribes Table 1), but they do not corroborate
+    that the cells are strata: titled "initial sample", they total to the delivered file
+    (513 clusters, 6,143 households), so they tabulate the same two cover variables.  The
+    match checks this reading of the cover.  No held table states 2018-19's allocation.
+  contents: 'Mali/_/CONTENTS.org, "EHCVM strata are region x milieu labels (GH #812)"'
+  since: '2026-11-04'
+
+Mali::food_acquired::nsu-national-unit-weight:
+  waves: ['2018-19', '2021-22']
+  columns: [Quantity_kg]
+  rule: >-
+    Quantity_kg = Quantity x kg_factor, per acquisition source, where kg_factor is the
+    median over ehcvm_nsu_mli2021.dta's rows of the row's (product, unit, size), in grams over 1000.
+    Unit and size are the row's s07bq03b and s07bq03c codes in both waves.  The product
+    is the s07bq01 code in 2021-22, whose numbering the table uses; in 2018-19, whose
+    numbering is a different one, it is found by LABEL, never by code (ehcvm.
+    nsu_product_crosswalk): the same label up to spelling, else through the country's
+    harmonize_food, else the parts of a label listing goods the instrument later split,
+    else the label's stem.  A product reading several table products takes the median of
+    their weights.  Each row's tier is nsu_join in derivation_inputs.  NA, with no key,
+    where no weight is found; where the served unit is Kg or Litre, whose kilograms the
+    label states; and where the row's canonical key is duplicated at the build, because
+    core sums Quantity on such a key and selects any other column.  Those rows stay on the
+    inferred ladder.  No Quantity or u changes.
+  function: lsms_library.ehcvm:derive_nsu_kg_factor
+  inputs: lsms_library.countries.Mali.2021-22._.mapping:inputs_food_acquired_unit_weight
+  raw_variables: [s07bq01, s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, produitID, uniteID, tailleID, strate, poids]
+  assumptions:
+    - text: >-
+        a key's weight in the table is the weight of that unit of that product in
+        that size, for any row of the wave.  The survey ships the table; the served
+        row's own quantity is untouched.
+      basis: variable-label
+      evidence: >-
+        ehcvm_nsu_mli2021.dta, read by code; unit and size codes agree with s07b_me's on
+        every code both files label, up to spelling.  Mali's BID: s.3.4, each product-unit-size
+        is weighed at market; s.4.2, markets by reasoned choice, up to 3 urban and 3 rural per
+        region; s.2.3 and s.5, NSU factors collected in 2018/19 "remain valid", supplemented in
+        June-July 2021 (the two sections give different dates); s.7.3, "collected in 2018 and
+        updated in 2021".
+    - text: >-
+        national, not by stratum.  Against an independent implied weight, a household's
+        last-purchase unit value over the same stratum's median Kg price with 5+ reports each,
+        the national weight's median absolute log error is 0.49 against the stratum cell's 0.51,
+        within 2x 64.5% against 59.2%; row by row 0.55 against 0.59.  The closest of the
+        countries: the slope of the household's deviation on the stratum's is +0.29, or +0.08
+        with key effects, and the stratum weight wins within-(stratum, product) dispersion,
+        0.187 against 0.198.  87.5% of consumed rows find a stratum cell, 100% a national
+        weight; stratum weights would add 1.6% to the kilograms on rows both serve.
+      basis: modelling-choice
+      evidence: >-
+        GH #1452, 2026-11-04.  The check is noisy: a small lot's price per kg runs
+        above a kilogram's, so the implied weight runs high, and it compares the
+        two rules, not either with the truth.
+    - text: >-
+        2018-19 reads the same weight per key as 2021-22, with the product found by label.
+        The table was largely collected in that round, by this country's own BID.  Of
+        2018-19's consumed rows 91,633 join on the label, 15,468 through harmonize_food and
+        3,732 as the parts of a bundle; 94.8% of non-metric served rows read a weight.
+        Weakest join result of the four: sugar in a sachet industriel reads about 1 kg
+        against households' 0.10-0.20, a table cell in both waves, disclosed and not patched.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-04.  Matched items, 2021-22 over 2018-19, median / row-weighted:
+        Kg rows 1.19 / 1.15, inference 1.09 / 1.25, both waves on the table 1.13 / 1.20.
+    - text: >-
+        Kg and Litre keep their labels.  Their table rows are not read: a kilogram is
+        a kilogram, and a table litre is not a density (in these tables most oils
+        read exactly 1000 g).
+      basis: modelling-choice
+      evidence: GH #1452, 2026-11-04.  Those rows are the check on the join instead.
+  validated_against: >-
+    the rows whose label states the mass, which the table was not fitted to: the
+    national weight of a Kg row is 1000 g at the median, and the delivered factor
+    reproduces the table read directly from the two files
+    (tests/test_ehcvm_unit_weights.py).  Outside the survey's households: ehcvm_prix_mli2021.dta has no
+    usable unit weights, so it checks per-Kg prices only.  Table rows against market per-kg,
+    median abs. log error / within 2x, go from 0.592 / 55.0% under the inference to 0.507 /
+    69.7% under the table (signed -0.46 to +0.39), and item medians' correlation with the
+    market from 0.49 to 0.58.  Table against 2018-19 community price ratios: 0.141 / 89.8%.
+    Measured kilograms are in Mali/_/CONTENTS.org.
+  contents: 'Mali/_/CONTENTS.org, "EHCVM unit-weight table wired (GH #1452)"'
   since: '2026-11-04'

@@ -60,11 +60,16 @@ def test_farm_level_rows_are_the_producing_roster(built, wave):
     flat = built.reset_index()
     flat = flat[flat['t'].astype(str) == wave]
     farm = flat[flat['plot_id'].astype('string').eq('Farm-level')]
-    assert 0 < len(farm) <= n                     # the crop-label fold only reduces
-    assert n - len(farm) <= 1                     # 2014-15: one all-zero fold
-    assert farm['perennial'].astype('boolean').fillna(False).all()
-    # and a seasonal row is never on the sentinel
-    seasonal = flat[~flat['perennial'].astype('boolean').fillna(False)]
+    # Re-pinned for GH #1457: 2017-18's multi-plot s7g sales sit on this sentinel too.
+    # They have perennial NA and no harvest, so a harvest here is still a tree's.
+    trees = farm[farm['perennial'].astype('boolean').fillna(False)]
+    assert 0 < len(trees) <= n                    # the crop-label fold only reduces
+    assert n - len(trees) <= 1                    # 2014-15: one all-zero fold
+    sales = farm.drop(trees.index)
+    assert sales['Quantity'].isna().all()
+    assert len(sales) == (202 if wave == '2017-18' else 0)
+    # and a seasonal row with a harvest is never on the sentinel
+    seasonal = flat[flat['perennial'].astype('boolean').eq(False).fillna(False)]
     assert not seasonal['plot_id'].astype('string').eq('Farm-level').any()
 
 

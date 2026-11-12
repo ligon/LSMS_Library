@@ -63,6 +63,14 @@ Weights are at the cluster level in =ehcvm_ponderations_CIV2018.dta= (variable
 =panel_weight= both point to =hhweight=.
 
 Strata are identified via =s00q01= (Region) combined with =s00q04= (Urban/Rural).
+The own =s00_me_CIV2018.dta= cover has one =grappe= with 12 households in a
+single region and vague but two recorded milieu answers (11 Rural, one Urbain).
+The 2018-19 =sample= table therefore has two nonmissing region × milieu
+strata within that one =v=; each household keeps its recorded stratum, Rural,
+ID and weight. Do not force one stratum per =v= or silently recode the outlier.
+This source finding was checked from the sealed 2018-19 cold captures for #1575
+without a new raw read (2026-11-10); the sampling design documentation still
+identifies the planned stratification as region × milieu.
 
 ** household_roster Note
 
@@ -1014,3 +1022,175 @@ harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).  202
 not wired (GH #552), so the level reaches no 2021-22 row.
 
 *Cost:* one CotedIvoire re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
+
+* Shocks: food purchases and food stocks (2026-11-06, GH #1561)
+
+The maintainer ruling is =AffectedConsumption= for food *purchases* and
+=AffectedFoodStock= for food stocks, following Ethiopia. Neither field
+measures food eaten. Both are nullable booleans using the existing answer
+map: increases and decreases are True, unchanged and ordinary
+not-concerned answers False, and missing answers stay missing.
+
+Both vagues have six consequences: =s14q04d= is livestock, =e= food
+stock, =f= food purchases. This is not the five/six-column split in Benin
+and Togo; the same e/f selectors apply in both vagues.
+
+The source variable label still calls d "Stock Produit Alimentaire" and e
+"Achat de Produit Alimentaire"; these labels conflict with the fielded
+six-column layout. The independent 2026-11-05 EHCVM shocks review
+(=reports/review-ehcvm-shocks/VERDICT.md= in the isa-sm-20261103 burst)
+identifies the layouts using source structure, animal disease/ownership
+contrasts and purchase responses, not the misleading labels. The source
+controls in =tests/test_shocks_extension_food_effects.py= independently
+select the expected columns and check the livestock-specific behaviour
+of d. No contradictory shocks-layout statement was found in this file.
+
+The source remains =Data/Menage/s14_me_CIV2018.dta=. Its Stata special
+missing =.d= (labelled =Non concerné=) still reaches these effects as NA,
+as it does for the other effects. Decoding that sentinel consistently is
+a separate GH #1561 residual; this change does not turn missing answers
+into False. Historical CILSS waves do not gain a shocks declaration.
+
+Only the existing 2018-19 declaration is changed. Registered but unfinished
+2021-22 wiring is outside this change. Other effects, coping strategies,
+row/index identity and timing are preserved.
+
+* 2026-11-08 — documented EHCVM region/milieu strata (GH #1575)
+
+The own INS second-edition BID (September 2023),
+=2021-22/Documentation/civ_ehcvm2_information_de_base.pdf=, section 4.1,
+PDF p. 13 (English edition p. 12), explicitly describes the *original
+2018/19* design: "La strate est la combinaison région/milieu."
+Source: https://microdata.worldbank.org/index.php/catalog/6273/related-materials .
+Clusters were selected PPS within strata, then 12 households with equal
+probability within each cluster. The 2021/22 strategy revisits these
+clusters and supplements households to 12 where needed; it is not a new
+independent first-stage draw.
+
+Initial-allocation Tables 1a/1b (French pp. 12–13, English pp. 10–11)
+contain 33 regional/autonomous-district rows with both milieux: 66
+nonzero cells by our count, not a separately quoted official count.
+Abidjan has 80 urban + 4 rural clusters, and Yamoussoukro also has both
+milieux. Do not import a capital urban-only rule from another country.
+Reporting domains, precision targets and market/NSU samples are distinct
+from household sampling strata.
+
+Preserve the conflicting notes above: the early section says "Strata are
+identified via =s00q01= (Region) combined with =s00q04= (Urban/Rural)",
+while the later section says "sample.strata is wired from the cover-page
+region code". The exact 2018-19 YAML wires =strata: s00q01=; this note
+records the own planned definition without changing that wiring or using
+the weight-variance shares as design evidence. The uppercase =CIV= /
+nested =Data/Menage/= convention remains; 2021-22 is registered but
+unwired at this source pin. Older CILSS waves have a different design.
+No sample, strata, weights or defaults change. Exact document identities
+are in the GH #1575 evidence packet.
+
+* 2026-11-08 — original EHCVM2018 BID managed holding (GH #1575)
+
+The own original2018/19 Basic Information Document, a separate source from
+the second-edition BID discussed above, is now held at =2018-19/Documentation/basicinformationdocument_civ.pdf=
+through its normal managed DVC sidecar. A fresh same-source reader tree,
+empty private L1 and read-only profile retrieved the exact public original
+via normal =get_data_file=; verified 2026-11-08T20:47:32.115435+00:00.
+MD5 =d59df2bd076ce061ed4c0e54162cb292=; 399631 bytes. Exact public source and
+SHA256 provenance are appended to =2018-19/Documentation/SOURCE.org=.
+
+This adds document availability only. Existing planned2018-design versus
+2021-cluster-revisit distinctions and all prior notes remain intact.
+The household sampling design remains separate from price/NSU market samples and the older CILSS design.
+No sample, strata, native labels, weights, schema or defaults change.
+No new download, PDF parse, microdata read or source/table campaign was
+needed for this holding; the earlier document-check evidence is reused.
+See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
+
+* 2026-11-09 -- scoped Stata =.d= transport for shocks (GH #1561)
+
+Only the existing 2018-19 =Menage/s14_me_CIV2018.dta= declaration opts
+into =stata_missing_map=. On =s14q04a/b/c/e/f= only, typed Stata =.d=
+becomes the existing =Non-concerné= dictionary key, then False. Ordinary
+missing and other tags remain unknown. This does not alter d (livestock),
+the six-column layout, coping answers, selectors or the unresolved #1562
+order interpretation. The earlier field-label/layout conflict remains.
+
+The actual own file is format 118 with byte storage on these fields. Each
+field's own value-label set associates =.d= with =Non concerné= (long
+value-label key 2147483625). Recognition uses the reader's typed tag,
+not that storage integer. Current measured =.d= cells are:
+
+| source field | effect | =.d= cells |
+|--------------+--------+------------|
+| s14q04a | AffectedIncome | 904 |
+| s14q04b | AffectedAssets | 1724 |
+| s14q04c | AffectedProduction | 3440 |
+| s14q04e | AffectedFoodStock | 2516 |
+| s14q04f | AffectedConsumption | 1820 |
+
+The bounded check retains all 285,824 declared Wave rows, with unique,
+nonmissing full keys. Each effect retains 272,046 ordinary-missing cells
+at that boundary. Existing =to_parquet= converts object carriers to
+strings with their missing masks preserved; the ordinary public finalizer
+then returns nullable booleans. This existing carrier behavior is unchanged.
+Country and singleton Feature each returned 13,778 rows under their existing
+post-read pipeline, with no further raw reads. This is not a baseline public
+row-count comparison or a new occurrence/eligibility rule.
+
+The opt-in costs one additional selected-column native scan; the normal
+finite-value/label/encoding decoder is reused. The actual check used four
+full row reads total; a later two-produced-frame comparison and public warm
+checks used zero more. Expected carrier/public comparisons reuse the
+unchanged writer, normalizer and finalizer, rather than independently
+validating those helpers. Both earlier harness failures remain recorded.
+
+Shared reader fingerprints move broadly; no schema bump, exclusion or
+shared rewarm is applied. Other countries/waves and unfinished 2021-22
+wiring gain no opt-in. Evidence and exact source/read limits are in
+=.coder/ledger/1561-scoped-stata-missing-map.md= and
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1561-scoped-stata-missing-map-20261109-revision-v2/=.
+
+* 2026-11-10 — selected 2018-19 strata wiring (GH #1575)
+
+The user selected the documented combination: only =2018-19 sample.strata=
+now uses the own cover's =s00q01= region label plus =s00q04= milieu label,
+through the existing GH812 helper. It strips both labels and joins them
+with one space. Missing or blank either component gives NA; nonstring
+codes retain the dedicated refusal. No country categorical table or
+geographic alias is added. The optional =Derivation= carrier names
+=CotedIvoire::sample::region-milieu-stratum= only on nonmissing strata;
+the registry inputs callable returns both original fields at =(t, i)=.
+
+This selected wiring supersedes only the earlier region-only guidance
+("Treat the design as region-stratified for inference" and
+"sample.strata is wired from the cover-page region code"). All earlier
+text is preserved as history, including the original region/milieu note
+and the GH1575 documentary qualification. No new sampling-design finding
+is inferred from weights. Abidjan and Yamoussoukro retain both milieux;
+no allocation zeros or arithmetic cell count become an exclusion or a
+fixed observed-count requirement.
+
+Uppercase =CIV= and nested =Menage/= remain literal: the cover is
+=Menage/s00_me_CIV2018.dta= and the weight source remains
+=Menage/ehcvm_ponderations_CIV2018.dta=. All joins, household/cluster
+identifiers, weights, panel weights, Rural and unrelated fields are kept.
+Older CILSS design/frame/panel/weight caveats and registered but unwired
+2021-22 are unchanged.
+
+This private construction reuses the completed own BID evidence. Actual
+native label-card verification and row/missingness/cluster checks, normal
+cold/warm/Feature acceptance and the final metadata/full gates are UNRUN
+at this stage; invented-frame checks do not establish observed counts or
+production readiness. See =.coder/ledger/1575-cotedivoire1575-stratawiring.md=.
+
+* 2026-11-10 — GH #1575 normal sample validation completed
+
+The construction-stage pending/UNRUN wording above records the state at
+that stage. For =2018-19 sample=, the own native cover and weights, cold
+baseline/candidate whole frames, unchanged IDs/weights/Rural, documented
+region or department × milieu strata and derivation inputs passed the
+finite normal validation. Four warm Country.sample returns and two scoped
+Feature.sample returns passed full typed frame/axes/attrs comparison from
+eight authenticated L2 parquets, with zero warm raw getters or writers.
+The cross-run cold and warm capture comparisons, source seals and prior
+failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
+=5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
+earlier job-local caches were reaped; source and survey values did not change.

@@ -2528,10 +2528,13 @@ Neither is a defect of =cluster_features=.
   has frame households in more than one cluster, raising =SplitOffClusterError=.  It
   cannot fire today: 858 frame households sit on 858 distinct =y4_hhid=.  Injected in
   a throwaway clone, nothing is served without =v=.  With =LSMS_BUILD_WORKERS=1= the
-  error reaches the caller.  With parallel workers it arrives as a =RuntimeError=
-  naming it, because a class in a by-path =mapping.py= does not pickle; the derived
-  tables then retry and end in "Could not materialize", which is loud but hides the
-  cause.  =Feature= drops the country with a warning.
+  error reaches the caller.  With parallel workers it arrives as =errors.WaveWorkerError=
+  naming it, because a class in a by-path =mapping.py= does not pickle.  The derived
+  tables raise that too (GH #1524, 2026-11-05); they used to retry and end in "Could not
+  materialize", which took about 105 s on =food_expenditures= and hid the cause.
+  =Feature= drops the country with a warning.  The class's docstring in
+  =2019-20/_/mapping.py= still describes the old catch; editing that file moves every
+  Tanzania hash, so it waits for a re-warm.
 - *Measured cold against the same code without the two follow-ups:* exactly 238 =v=
   change in =sample=, all 2019-20, and no other column or household.  17 other tables
   carry the new =v= and are otherwise frame-equal, 5 have no =v= and are equal, and
@@ -2994,3 +2997,324 @@ national wave.
 Not in =Country.waves=: =tanzania.py= fixes the list and is byte-pinned by
 =tests/test_gh905_tanzania_signed_sums.py=.  To register it, move the list out of that module
 first, then decide whether a six-region supplement belongs on the =t= axis.
+
+* 2026-11-04 -- multi-plot sales (GH #1457)
+
+=AG_SEC_5A= / =7A= / =7B= record a sale per household and crop code, in the sale module asking about one harvest module.  The
+single-plot rule served one only where the code was on one plot of its module; the GH #637 entry above records the rest,
+"still not allocated".  The ruling on GH #843, option (d), extended in bulk on 2026-11-04, now serves it: the code's single row,
+keyed =hh-crop-sale-single-row=, or else ONE =plot_id = 'Farm-level'= row with no =Quantity= or =u=.
+
+| sale records, cold            | 2019-20 | TSh         | kg        | 2020-21 | TSh           | kg         |
+|-------------------------------+---------+-------------+-----------+---------+---------------+------------|
+| on the code's one plot        |     617 | 192,091,250 | 1,414,644 |   2,345 |   867,363,600 | 11,885,924 |
+| Farm-level, two+ plots state  |     159 | 117,148,650 |   119,229 |     629 |   442,307,920 |    779,842 |
+| Farm-level, one plot states   |      30 |  16,205,000 |   106,255 |      91 |    45,328,800 |    310,820 |
+|-------------------------------+---------+-------------+-----------+---------+---------------+------------|
+| all, equal to the raw sum     |     806 | 325,444,900 | 1,640,128 |   3,065 | 1,355,000,320 | 12,976,586 |
+
+- *=tanzania.py= did not change.*  Its digest is pinned (=tests/test_gh905_tanzania_signed_sums.py=), so this lives in
+  =_/_hh_crop_sales.py=, after =crop_production_for_wave=; a new =_/*.py= still moves every Tanzania hash, as =_upd_district.py= did.
+- *=production_obs=.*  A Farm-level row names the sale's own record, =reported:5A:<code>= (7A, 7B), so lumped codes and two modules of one
+  code stay apart and it never repeats a harvest row's =reported:4A:<code>=.
+- *=Unit_sold= is new, a constant =kg= on a row with a sold quantity.*  This reverses "Tanzania needs no such column" in =data_info.yml=:
+  =u= here describes the harvest and is NA where there is none, and =median_price_valuation= needs a unit for the sold kilograms.
+- *One plot stating a harvest is not attached.*  =ag4a_19 == 2= serves a recorded 0, and a plot of that kind still counts as a row, so 30 + 91 sales
+  with one harvesting plot sit on Farm-level (61.5M TSh).  Nigeria's ruling A was not extended.  Largest in this lane; see the report.
+- *Two lines of one crop on one plot cannot happen here.*  A module has one row per (household, plot, crop code), a repeat raises.
+- *Four rounds in one folder.*  =2008-15/= builds no =crop_production=, so sales cannot cross a round here.  Each wave reads only its own sale modules.
+
+Key on the 617 + 2,345 rows that already held a sale: =Derivation= and =Unit_sold= are new columns, and nothing else on those rows moves.
+
+* 2026-11-08 -- GH #1497: household continuation is distinct from parent-cluster inheritance
+
+Read-only diagnosis on development =c780562b299bb100cdd006037ba424c8ad3264e9=;
+no committed crosswalk, helper, sampling variable or served identity changed.
+This qualifies the earlier note: "=updated_ids= links the split-off rather than
+the frame household for 13; the lineage is the same, so =v= is unaffected."
+The existing =v= ruling remains separate from which household inherits canonical =i=.
+
+** Own keys and instruments
+
+- NPS4 EXT cover/roster: =2014-15-EXT/Data/TZA_2014_NPS-R4_v03_M_v03_A_EXT_STATA11/hh_sec_a.dta=
+  (MD5 =5eb390e355ac3e19a62612ef9086ce03=) and =hh_sec_b.DTA=
+  (=2e595aa2b81b6631cc6f77df614c83ef=): 989 households, 4,742 people.
+  All 989 roster heads (=hh_b05= code 1, HEAD) have own person number =indidy4= 1.
+- SDD =2019-20/Data/HH_SEC_A.dta= (=9179d7f5e7621d642b79034cf9cec238=),
+  =HH_SEC_B.dta= (=96aab692dbc65fe97240a2b182f58015=), and
+  =npssdd.panel.key.dta= (=12160235dd5c5c94b4664ca360ee7b5b=):
+  1,184 cover households, 5,587 roster people, 30,852 panel-key rows across rounds.
+  Full own current/previous person keys have zero duplicates. Absent-round
+  household IDs in the panel key are empty strings while person numbers are NA;
+  household =notna()= alone does not identify a present person key.
+- SDD roster =hh_b06= is the previous NPS4 person number, with 99 meaning NOT
+  PREVIOUSLY PRESENT. Its own =y4_hhid= and person number agree with the individual
+  panel key on all 3,846 previously present people. Thirty have a previous household
+  different from their current household cover's =y4_hhid=. The SDD BID below,
+  PDF p.14, explicitly describes people from different previous households merging:
+  use each person's full previous-household/person key, not cover ID plus person1.
+- Own forms =2014-15-EXT/Documentation/nps_household_qx_y4_final_english_.pdf=
+  (=e415e74e1e6cece7c0fb1a5b7b7497cd=) and
+  =2019-20/Documentation/nps_sdd_household_qx_final_english_.pdf=
+  (=e6b3ba0b53ee3d182037ee89d565bb5a=), PDF p.4, instruct head on line1.
+  SDD BID =2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf=
+  (=6d791f6953f8efb0d04ce7ca4bddb3f4=), PDF p.12, defines the suffix using the
+  lowest retained previous member number. An ORIGINAL household need not retain
+  suffix001; neither suffix nor ORIGINAL status selects canonical continuation.
+
+** All 238 split-off/frame pairs, not 238 distinct families
+
+The exact native parent-cluster derivation identifies 238 pairs across 175 previous
+households. Full-cover/roster replay reproduces all 907 committed SDD links; the
+UPD R4 chain reproduces all 636 committed entries. Independent person keys confirm
+previous-head locations: frame210, this split7, another sibling4, not observed17.
+The pair-specific continuation counts are frame218, split13, other sibling7.
+All 221 occurrences with an observed previous head select that person's household.
+
+The 13 split continuations are six whose current head is the previous head, one
+with the previous head present as a non-head (first-cover-row fallback), and six
+with no observed previous head (fallback). The seven links to neither member of
+a pair select another sibling: four with the previous head, three via fallback.
+The remaining frame links are 208 current-head/person1 choices and ten fallbacks
+(two previous heads now non-head; eight previous heads not observed).
+
+Maintainer commit =f8a26df995492b789e2ab15de3634a6ac4d3ec1f= says the split
+"containing the original head" inherits the ID. The existing helper instead first
+filters CURRENT HEAD before testing previous member1; with none it selects the
+first input cover row. Invented controls show that fallback depends on row order
+and multiple eligible current heads can both inherit. Observed 20 fallback pair
+occurrences span 17 families; the 17 absent-head pairs span 14 families. No death,
+migration, or correct fallback policy follows from absence. No ID repair is
+established by these diagnostics; a fallback interpretation remains for ruling.
+
+** Retained document tensions and limits
+
+The SDD BID PDF pp.7–9 describes previously missed people and distance tracking;
+p.11 says only close-proximity tracking and p.37 says no previously missed
+household was tracked. Preserve these internal tensions; do not assume a page is
+stale or infer why a particular old head is absent. The held 2014/15 BID
+=2014-15-EXT/Documentation/tznps_2014_2015_bid_06_27_2017.pdf=
+(=53be2a92e13dd6512803a49a105b33ba=), PDF p.7, describes the initial release
+without EXT; the separately held EXT source above exists and all989 households
+are in current UPD R4. This is not authority to register EXT as another wave.
+
+Sealed source capture job41017857: six numeric plus six category reader roles,
+12 actual full Stata parses, four PDFs; warnings and failed earlier harness
+attempts retained. PDF extraction recovered object-pointer warnings, so no full
+visual completeness claim. Diagnostic case IDs remain private. Durable aggregate
+packet: =reports/1497-tanzania-head-tracking-20261108/= in the 20261103 burst
+workspace; reproducible classifier and invented controls in
+=bench/research/tanzania_1497/=. No Country/Feature/Make/warm/source-policy or
+scientific price endorsement is claimed; library and build inputs stay unchanged.
+
+* 2026-11-09 -- GH #587: held UPD evidence does not settle original R1 fielding
+
+Completed held-document review, source =86077a65f225c42e2b03005e4b5eb15ec8a509a8=;
+this note uses its sealed text/layout witnesses, not a new PDF or data read.
+All page citations below are one-based PDF pages. The three held files are in
+=2008-15/Documentation/=:
+
+- =nps_upq_questionnaire.pdf= (UPQ; MD5 =348766362d76a96f4c39674e8c254d70=), pp.68–70.
+- =NPS_UPD_Basic_Information_Document.pdf= (BID; MD5 =38a095404848139cacbb4244cef24626=), pp.5–7,17,29; cover2019.
+- =ddi-documentation-english_microdata-3814.pdf= (DDI; MD5 =0da1ef7bfca74ae4dbb2dbb62b767046=), p.9.
+
+UPQ68–70 literally marks the R1 Food Security panel
+“THIS MODULE NOT PRESENT IN R1”. UPQ68 supplies the eight household
+past-seven-day day counts; BID17 lists R2–R4 and R1: Not present.
+This is positive evidence of *retrospective harmonized instrument/release
+absence*, not an independently authenticated original2008/09 fielding verdict.
+BID29 calls R1 H =Governance= and R2 Food Security =I= (R3/R4/UPD =H=):
+a generic claim that R1 had no Section H would be wrong.
+
+BID5 calls the lower panels the “original form at time of its respective
+dissemination”, while its footnote redirects skips to UPD variable names;
+pp.6–7 explain unification/recoding. Preserve both statements. The upper U
+panel is a union model, not an additional fielded round. BID17's Module G
+control relocates an R1 question from E despite its original-file Not present
+line: module/file absence alone cannot prove a concept was never asked elsewhere.
+DDI9 identifies the supplied UPQ but lists a *2018* BID named
+=nps_upq_basic_information_document.pdf=; that is not the admitted
+*2019-cover* =NPS_UPD_Basic_Information_Document.pdf=. Their identities remain
+distinct; the DDI does not authenticate the held BID as its listed version.
+
+The earlier wording “food_coping's UPD declaration still omits round 1”
+remains above. The closed860 diagnostic instead reports the producer maps
+round1 and the historical snapshot declares the logical wave: this wording
+tension is retained, without a new data-side coverage measurement or regrade.
+No authenticated original2008/09 household field instrument was among these
+three files. Matching original version/date/language, full routing and any
+applicable addenda remain the prerequisite to settle original fielding. Do not
+infer =not-asked=, =correctly-empty= or a new table from the UPD annotation,
+union questions, annual insufficiency grids or shock-response menus.
+
+Closed packet: =reports/587-UPD-documentary-disposition-20261109/= in the
+20261103 country-workers-refill workspace; its =EVIDENCE.json= binds the
+canonical report, primary text/layout pages and PDF custody seals. Text/layout
+is not raster/blackout completeness; parser recovery messages remain retained.
+This completes the held-UPD check only. GH #587 and its original-round authority
+gap remain open; NPS backcasting, WAITING #114, panel/ID/weight rules and all
+source/code/defaults are unchanged.
+
+* 2026-11-09 -- GH #905: singleton-only plot-input reducer candidate (source stage)
+
+The current =plot_inputs_for_wave= nonunique-index branch sends *every* group
+through two scalar numeric callbacks whenever any key repeats. This includes
+coded native seed rows, which the GH #637 repeat guard already makes unique.
+Thus even one repeated inorganic-fertilizer product makes unrelated singleton
+seed rows pay for scalar sums. This is a source control-flow finding, not a
+new measurement of duplicates or survey runtime.
+
+A bounded candidate now uses the grouped numeric result only for singleton
+keys. EVERY multirow key is overwritten with its existing scalar
+=Series.sum(min_count=1)= result, including all-NA groups. The purchase-unit
+agreement check, flags, keys, seed gate and all operand values are unchanged.
+The earlier entry, “The proposed =plot_inputs_for_wave= and
+=plot_labor_for_wave= optimizations are HELD”, refers to replacing multirow
+sums too; that full substitution remains held. The signed
+=[1e16, 1, 1, -1e16]= counterexample and four-ULP bound remain binding.
+=plot_labor_for_wave= and the existing #905 reference/assertions are unchanged.
+
+ROOT superseded worker execution permission with SOURCE ONLY before any
+package import, mount, collection or pytest run. The uniquely named pure
+controls in =tests/test_tanzania_queue_refill_20261109.py= are prepared and
+*UNRUN*: they reconstruct the exact dispatch-base module (SHA256
+=138fd458056125ccb354c620591311756595789277e520e24b05d62ad87b3040=),
+compare both modern colmaps and inspect complete duplicate operands versus
+singleton callback removal. Only stdlib AST/source reconstruction was checked.
+No numerical parity, performance, API/cache or whole-issue acceptance is
+claimed. ROOT must review and run these controls before accepting the candidate.
+Any country-module edit carries the existing Tanzania-wide hash coupling;
+no live hash probe, cache clear or re-warm was performed. The #114 WAITING,
+UPHI back-casting, Extended/Refresh and #1497 fallback decisions stay separate.
+
+* 2026-11-09 -- GH #905: singleton-only plot-labor candidate (source stage)
+
+Whenever one =(t, i, plot_id, source)= key repeats, the current labor reducer
+sends every group, including unrelated singletons, through two scalar sum
+callbacks. This is a source control-flow finding, not a native duplicate count
+or a measured runtime cost. The candidate reuses PR #1682's input strategy:
+grouped numeric results serve only singleton groups; EVERY multirow group's
+=PersonDays= and =Wage= are overwritten with their exact existing scalar
+=Series.sum(min_count=1)= results. Groupby defaults, keys and operand order stay
+unchanged. The signed Wage counterexample =[1e16, 1, 1, -1e16]= and unchanged
+four-ULP bound still rule out replacing multirow sums. The earlier “HELD” entry
+remains evidence about that full substitution, not a new scientific decision.
+
+Both modern wave scripts and all family/hired construction are unchanged.
+In particular, the source-documented 2019 worker-roster-ID block is not a day
+measure and still yields no family rows; the candidate makes no new instrument
+or fielding claim. Empty/wholly gated-out sources still reach =pd.concat([])=
+and refuse; no healthy-empty behavior is introduced.
+
+=tests/test_tanzania_labor_singletons_20261109.py= is prepared but UNRUN under
+the dispatch's source-only restriction. It binds the exact dispatch-base module
+and the unchanged independent #905 public digest, compares actual old/new
+helpers on invented inputs, and checks complete frames, inputs, callbacks and
+refusals. Stdlib source/AST checks are separate from numerical execution. The
+existing #905 loader restores inputs/livestock only; ROOT must review labor
+restoration when combining with the pending input patch, without repinning.
+No native parity, Country/Feature/API/cache, speed or live-hash claim is made.
+Changing this shared country module retains Tanzania-wide hash coupling.
+All historical failures, WAITING #114, UPHI/r_hhid grain, Extended/Refresh,
+and #1497 continuation decisions remain separate and unchanged.
+
+* 2026-11-10 -- Original R1/R2 household instruments held as documents (GH #1441)
+
+Two already-authenticated public instruments are now DVC-managed under
+=2008-15/Documentation/NPS-R1/= and =NPS-R2/=, preserving their original names:
+- WB76/resource11558: =NPS Household Qx - English (Year 1).xls=,
+  2,419,200 bytes, MD5 =0beef1bba8018606e995b138edcd505f=.
+- WB1050/resource30525: =NPS_Household_Qx_English_Year_2.pdf=,
+  1,097,377 bytes, MD5 =ed342639649c2cfbe8a4972dd77747d8=.
+Each own SOURCE records the official URL, published date and exact SHA256.
+One targeted =push_to_cache_batch= published only these two documents;
+separate initially empty private read-only =get_data_file= retrievals each
+passed exact byte seals, with no in-tree binary or WB fallback. No redownload,
+new document parse, native data read or shared-cache write occurred.
+
+The original R1 CODES sheet and R2 printed CODES48 dictionaries were already
+read in the closed documentary investigation; their transcription remains
+public evidence, not an active map (=1441_PUBLIC_AUTHORITY_ROUTE.md=). This
+expands the earlier bounded statement “no document scanned lists the codes”.
+It does not settle the specific original-cover-to-UPD =ha_01_1/ha_02_1= bridge:
+UPD BID6–7 describes recoding, and p.6 says response codes “will not necessarily
+correspond to each original round-specific response code value.” Exact fielded
+revision beyond the published resource metadata also remains qualified.
+
+The parent SOURCE still identifies UPD3814 and its CATALOG_COVERS unchanged;
+these are supporting original-round documents, not acquisition of the original
+round microdata. Four logical waves sharing2008-15, UPHI/r_hhid backcasting,
+Extended/Refresh cohorts, WAITING114 and all served district/ID/weight rules
+remain unchanged. No labels/crosswalk/default or whole1441 closure is implied.
+
+* 2026-11-10 -- Original R1 food-section authority, bounded read (GH #587)
+
+The newly held original WB76/resource11558 XLS was retrieved once through a
+fresh private read-only managed cache, with its exact 2,419,200 bytes,
+MD5 =0beef1bba8018606e995b138edcd505f= and previously recorded SHA256.
+This new section read used existing xlrd2.0.2, without rereading CODES/COVER or
+the UPD PDFs. Existing closed COVER cells identify the NBS National Panel
+Survey household/individual questionnaire; the catalog date is2008-01-01.
+An exact fielded revision/addendum is still not authenticated by that date.
+
+In sheet =K FOOD=, cells A1/B4/E4/G4/I4/J4/L4 establish a past-seven-day
+consumption/acquisition module (questions1–6). A83/G84/C87/G87 establish
+questions7–9 about meals shared with *non-household* people, including a No
+route to the next section. In =R SHOCKS=, B4/D4/E9 establish a past-five-year
+severe-event question and follow-ups limited to the three worst events.
+The inspected R question regions are questions1–5, not the UPD eight-strategy
+past-seven-day day-count battery. Workbook sheet names include =H GOVERNANCE=.
+Cell citations are one-based worksheet cells, not invented printed page numbers.
+
+These positive original-form facts narrow the documentary question, but the
+bounded K/R inspection is not a whole-form negative keyword/fielding verdict.
+The current producer's wording “did NOT field §H” remains a stronger fielding
+claim than this evidence proves; the earlier UPD-absence/round1-declaration
+tension above is preserved. No table/coverage regrade, code/default/ID/weight
+change or whole587 closure follows. Exact fielded revision/routing/addenda and
+the original-to-released-UPD relationship remain qualified. Source cells,
+inspection bounds and custody: =B/reports/587-tanzania-r1-original-food-authority-20261110/=
+(B as in the task ledger). No raw/header/row, Country/Feature, Make or census ran.
+
+
+* 2026-11-10 -- GH #449: official native key semantics, separate release binding
+
+The held UPD BID, PDF p.12 “Naming Convention for r_hhid”, explicitly says
+original =hhid= (R1), =y2_hhid= (R2), =y3_hhid= (R3), =y4_hhid= (R4) were
+condensed into =r_hhid= and require =round= to distinguish them. This is a
+producer-defined semantic bridge, beyond matching column names or geography;
+it does not make =UPHI=, canonical =i= or sampling =v= the original key.
+Existing closed #587 text was authenticated and reused, without a PDF reparse.
+Current official WB3814/resource48979 reproduces the already DVC-managed BID
+exactly: 857,525 bytes, MD5 =38a095404848139cacbb4244cef24626=, SHA256
+=13832fd7d25894e3ad306db3fe7aef3530fbe0431a39e4b175f3168c58bf71c8=.
+The older DDI's 2018 BID description remains distinct from these current bytes.
+
+Held official v2.0 =Reproduction_v2.zip= was reproduced byte-exact from its
+public code asset (426,082 bytes, SHA256
+=f09c704695c110551f6bdce95f487faec131ba3b938471c4d4b19832837c4660=).
+Selected =TZA_NPS1/2/3.do= blocks read the original household geovariables on
+=hhid=/=y2_hhid=/=y3_hhid= and distinguish plot sources with =plotnum=.
+W1 names =Plot.Geovariables_Y1_revised2=, corroborating the already-held member
+missing from the catalog roster. These cleaners do not construct UPD =r_hhid=;
+no program ran and no harmonised data asset was read. Their common
+=dist_market= alias also masks a source distinction: W1 DDI says nearest
+Market, W2/W3 nearest Agricultural Market. Preserve the source concepts.
+
+Current W1/W2 DDI notes attribute household-geovariables revision to Version02
+and community-file addition to Version03. This explains the metadata chronology,
+not byte identity or supersession of the two held W2 household/plot pairs.
+The W2 cleaner names =HH.Geovariables_Y2=/=Plot.Geovariables_Y2=; it does not
+select them over =TZY2.HH.Geovariables=/=TZY2.PlotGeovaribales= for this library.
+The eight existing sidecars and all version/default/grain choices stay held.
+
+The remaining precise source operand is the UPD_v01_M original-input manifest
+and =r_hhid= assignment/recode program (or attributable preservation statement),
+plus the W2 alternate-pair revision relationship. No such program was listed
+on the inspected3814 related-materials page; this is not a nonexistence claim.
+See =_/449_OFFICIAL_BRIDGE.md= for exact DDI variable/program locators,
+source seals and a minimal conditional native-extraction/bridge plan. Six
+metadata and three selected public resource requests stayed below10MB each;
+no raw payload/header/row, Country/Feature, source join, test or census ran.
+WAITING114, back-casting,1441 code frames,587 fielding,1497 continuation,
+Extended/Refresh and all ID/weight/cluster rules remain separate and unchanged.

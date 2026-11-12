@@ -58,6 +58,7 @@ Data Scheme:
     AffectedAssets: bool
     AffectedProduction: bool
     AffectedConsumption: bool
+    AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
@@ -113,6 +114,22 @@ Data Scheme:
     Interview end: datetime
     aggregation:
       visit: first
+
+  # Native ECVMA2011-12 rosters: all source columns are retained WITHOUT
+  # dtype declarations, recoding or monetary-total aliases (GH1529).
+  # No v: these own household observations do not require a sample join.
+  cultivation_records:
+    # 3B field/parcel/subparcel/crop/seed/use answers. cultivation_obs is the
+    # recorded household/slot scoped to the declared source, not a plot ID.
+    index: (t, i, cultivation_obs)
+    materialize: make
+
+  farm_cost_operands:
+    # 3D incurred flag, payment count, MEAN FCFA/payment, financing and all
+    # original fields. cost_obs is a constructed PREfilter release position;
+    # no transaction identity, multiplication, Cost or Expenditure is implied.
+    index: (t, i, cost_obs)
+    materialize: make
 
   plot_features:
     # Lasting parcel-level characteristics from the EHCVM agriculture
@@ -175,7 +192,10 @@ Data Scheme:
     # plot_id (verified 100% join on the EHCVM waves).  Quantity_sold /
     # Value_sold are at plot-crop grain only where the survey records them
     # there (2011-12, 2018-19); in 2014-15 / 2021-22 the sale block is
-    # crop-level and is attributed only to single-plot crops, else NaN.
+    # crop-level: a sale goes on the crop's single harvest line, keyed
+    # hh-crop-sale-single-row, and otherwise on ONE plot_id = 'Farm-level' row
+    # with no harvest Quantity (GH #1457).  EXCLUDE plot_id == 'Farm-level' for
+    # plot-grain work; KEEP it for household or crop totals.
     # Columns intentionally OMITTED (no Niger wave records them, so an
     # all-NaN column would just trip the sanity checker — GAP rule "only
     # include columns the source actually records"): planting_month (no
@@ -202,6 +222,18 @@ Data Scheme:
     # (ruled @ligon 2026-11-04); `condition_native` below keeps what was answered.
     index: (t, i, plot_id, crop, u, condition, production_obs)
     Quantity: float
+    # Quantity_kg (GH #1436, ruling @ligon 2026-11-04) is the survey's own kilograms
+    # for the line, a TOTAL and not a factor: 2011-12 as02eq07c and, on Farm-level
+    # rows, as03eq09c x as03eq06; 2014-15 AS02EQ07C; 2021-22 s16cq16c, which the
+    # instrument calls an estimate and a Derivation key says so.  2018-19 asks none:
+    # its s16cq16c is the sold state.  Codes are NA, and so is a 0 beside a positive
+    # quantity.  harvest_kg reads it first (survey_kg).  `optional` because the canonical
+    # column is: it holds what an instrument asks, and most never do.  So Site B does not
+    # police it, and a wave losing it would be silent; tests/test_niger_crop_survey_kg.py
+    # reads each wave against its source instead.
+    Quantity_kg:
+      type: float
+      optional: true
     Quantity_sold: float
     Value_sold: float
     # THE SALE HAS ITS OWN UNIT (GH #824).  `u` is the HARVEST unit; every
@@ -212,9 +244,9 @@ Data Scheme:
     # data_info.yml, Unit_sold note): exclude or resolve, and report the
     # count.  NA-bearing, never sentinel-filled -- a column has no NaN-key
     # hazard, and NA means "no sale, or no sold unit recorded".  In 2014-15
-    # and 2021-22 the sale block is crop-level; the sale is attributed only to
-    # a crop reported on ONE harvest line (hence one plot) and sold in ONE
-    # unit, so it lands on one served row (GH #1360).  `optional` because a
+    # and 2021-22 the sale block is crop-level, so a sale lands on one served
+    # row: the crop's ONE harvest line (GH #1360) or a Farm-level row, whose `u`
+    # is `Unknown` and whose sold unit is here (GH #1457).  `optional` because a
     # row with no sale has no sold unit.
     Unit_sold:
       type: str
@@ -235,6 +267,12 @@ Data Scheme:
     # the ECVMA waves ask no state, and 2021-22's three answers map one to one.
     # NA on a blank state, never a sentinel.
     condition_native:
+      type: str
+      optional: true
+    # condition_sold_native (ruling @ligon 2026-11-05) is the 2018-19 sold state as
+    # recorded (s16cq16c), the answer the Condition_sold fold cannot show.  `optional` for the reason
+    # condition_native is; NA on no sale, never a sentinel.
+    condition_sold_native:
       type: str
       optional: true
     materialize: make

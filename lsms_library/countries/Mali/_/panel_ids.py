@@ -4,10 +4,10 @@
 Mali has four waves: 2014-15 EACI, 2017-18 EACI, 2018-19 EHCVM,
 2021-22 EHCVM. Only the two EHCVM waves are panel-linked; EACI
 and EHCVM are different survey programs with no household overlap.
-The EACI ids carry an 'EACI_' prefix (mali.eaci_i, GH #1494), so they
-share no string with the EHCVM ids this script reads.  2014-15 and
-2017-18 are not linked either: they visit the same EAs, and the 3,560
-ids they still share are not the same households (CONTENTS.org).
+The EACI ids carry an 'EACI14_' or 'EACI17_' prefix (mali.eaci14_i,
+mali.eaci17_i, GH #1494), so they share no string with the EHCVM ids this
+script reads or with each other.  2014-15 and 2017-18 are not linked: they
+visit the same EAs, with households selected afresh (CONTENTS.org).
 
 The 2021-22 cover sheet (``s00_me_mli2021.dta``) has a mixed panel
 structure that is more heterogeneous than Niger's or Senegal's:
@@ -40,7 +40,8 @@ The ID construction uses Mali's ``i()`` formatter from
 ``mali.py``: ``format_id(grappe) + '0' + format_id(menage, zp=2)``.
 For ``(grappe=1, menage=1)`` this gives ``'1001'``; for
 ``(grappe=74, menage=12)`` it gives ``'74012'``. Matches what
-``Country('Mali').household_roster()`` emits.
+the2018-19 raw formatter emits. The2021-22 raw formatter adds EHCVM21_;
+only already-approved links are mapped back to these bare targets (GH1494).
 """
 
 import json
@@ -51,11 +52,16 @@ import pandas as pd
 
 sys.path.append('../../_')
 from lsms_library.local_tools import RecursiveDict, get_dataframe  # noqa: E402
-from mali import i as mali_i  # noqa: E402
+from mali import i as mali_i, EHCVM21_PREFIX  # noqa: E402
 
 
 def _canonical_i(grappe, menage) -> str | None:
-    """Wrap mali.i() for the scalar inputs this script deals with."""
+    """BARE coordinates for old linkage/identity/occupancy guards and targets.
+
+    GH1494: prefix ONLY output currentkeys after the approvedmembership is
+    decided. Comparing prefixedcurrentkeys to baretargets here would make the
+    old occupied/chain guards vacuous and incorrectly restore held links.
+    """
     if pd.isna(grappe) or pd.isna(menage):
         return None
     return mali_i(pd.Series([int(grappe), int(menage)], index=['grappe', 'menage']))
@@ -151,12 +157,13 @@ updated_ids = {
     '2014-15': {},
     '2017-18': {},
     '2018-19': {},
-    '2021-22': ehcvm_21_to_18,
+    # Membership/targets came from the UNCHANGED bare-coordinate guards above.
+    '2021-22': {EHCVM21_PREFIX + cur: prev for cur, prev in ehcvm_21_to_18.items()},
 }
 
 recursive_D: RecursiveDict = RecursiveDict()
 for cur, prev in ehcvm_21_to_18.items():
-    recursive_D[('2021-22', cur)] = ('2018-19', prev)
+    recursive_D[('2021-22', EHCVM21_PREFIX + cur)] = ('2018-19', prev)
 
 
 # -----------------------------------------------------------------------

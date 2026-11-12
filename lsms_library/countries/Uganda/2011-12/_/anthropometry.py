@@ -20,6 +20,11 @@ from uganda import anthropometry_for_wave, ANTHRO_COLMAPS, ANTHRO_FILES
 t = os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 colmap = ANTHRO_COLMAPS[t]
 
+_DECLARED_ANTHRO_SOURCE = '../Data/GSEC6A.dta'
+if ANTHRO_FILES[t] != _DECLARED_ANTHRO_SOURCE:
+    raise RuntimeError(
+        f'Uganda/{t}: anthropometry source declaration differs from ANTHRO_FILES')
+
 df = get_dataframe(ANTHRO_FILES[t])
 
 out = anthropometry_for_wave(t, df, colmap)

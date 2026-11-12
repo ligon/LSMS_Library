@@ -95,6 +95,10 @@ sample:
                 - mapping:
                     Rural: Rural
                     Urbain: Urban
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
     df_weights:
         file: ehcvm_ponderations_mli2021.dta
         idxvars:
@@ -191,6 +195,10 @@ household_roster:
 
 food_acquired:
     file: s07b_me_mli2021.dta
+    # GH #1452.  Read by mapping.py's food_acquired hook, not by the grabber; declared
+    # so the table's DVC sidecar is in this table's input hash.
+    unit_weights:
+        file: ehcvm_nsu_mli2021.dta
     idxvars:
         v: grappe
         visit: vague
@@ -345,8 +353,16 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
+        # s14bq04d is "Effectif du cheptel"; the food stock is s14bq04e (GH #1556).
+        AffectedFoodStock:
+            - s14bq04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
         AffectedConsumption:
-            - s14bq04d
+            - s14bq04f
             - mapping:
                 Diminué: True
                 Augmenté: True
@@ -384,3 +400,6 @@ shocks:
 # Do not reintroduce a wave-level block here.
 
 
+
+# GH #1483: own s16b household inputs, native use=Oui; not parcel allocated.
+plot_inputs:

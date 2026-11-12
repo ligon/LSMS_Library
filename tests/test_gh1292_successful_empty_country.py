@@ -303,7 +303,8 @@ def test_capture_relay_preserves_receipt_and_original_empty_attrs(survey, monkey
     assert len(got) == 0 and survey.legacy == []
     assert got.attrs['survey_note'] == 'retain original witness'
     assert captured[0]['result'][1] is True
-    assert captured[1]['result'] == (None, False)
+    assert captured[0]['result'][2] is True
+    assert captured[1]['result'] == (None, False, True)
 
 
 @pytest.mark.parametrize('case', ['unsupported', 'missing', 'none', 'row-no-columns', 'script'])

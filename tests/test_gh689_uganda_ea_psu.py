@@ -168,8 +168,8 @@ class TestTheNamedError:
             .formatting_functions["_follow_key"].__globals__
 
     def test_no_path_that_swallows_a_build_failure_catches_it(self):
-        """``_join_v_from_sample`` and the derived-table paths catch these four, and the
-        GH #515 handler catches the first two."""
+        """The GH #515 handler catches the first two.  ``_join_v_from_sample`` and the
+        derived-table paths caught all four until GH #1546 and #1532."""
         err = self._module()["OriginEaError"]
         assert issubclass(err, Exception)
         for swallowed in (KeyError, FileNotFoundError, ValueError, RuntimeError):
@@ -190,8 +190,8 @@ class TestTheNamedError:
         from lsms_library._parallel_waves import _pack_exception
         err = self._module()["OriginEaError"]("Uganda sample: 1 household")
         carried, type_name, _, _ = _pack_exception(err)
-        assert carried is err and type_name == "OriginEaError"
-        back = pickle.loads(pickle.dumps(carried))
+        assert isinstance(carried, bytes) and type_name == "OriginEaError"
+        back = pickle.loads(carried)
         assert type(back) is Exception
         assert str(back) == "OriginEaError: Uganda sample: 1 household"
 

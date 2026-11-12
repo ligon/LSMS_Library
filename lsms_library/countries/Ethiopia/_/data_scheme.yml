@@ -195,10 +195,23 @@ Data Scheme:
     # reported:crop_code:<n> in W1-W3 (no documented line id is shipped; the code
     # is unique within a plot), reported:crop_id:<n> in W4/W5 ("Unique Crop
     # Identifier").
+    #
+    # A §11 or §12 sale on exactly one §9 line is on that row (the SALES GRAIN CAVEAT).
+    # Any other sale has ONE row of its own, plot_id = 'Farm-level', no Quantity,
+    # u = Unknown, production_obs = 'reported:<s11|s12>:<holder>:<crop code>' (one
+    # household can hold two holders who sold one crop): GH #1457, option (d) of #843.
+    # EXCLUDE plot_id == 'Farm-level' for plot-grain work; KEEP it for household or
+    # crop totals.
     index: (t, i, plot_id, j, u, production_obs)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
+    # The sale's own unit, on a row with a sold quantity.  On a §9 row Quantity_sold is
+    # served only in the harvest unit, so there it is `u`; a Farm-level row has no
+    # harvest unit, so this is what states it (GH #1457).
+    Unit_sold:
+      type: str
+      optional: true
     planting_month: int
     harvest_month: int
     intercropped: bool

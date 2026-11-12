@@ -440,3 +440,32 @@ The only food-stress signal is a single bespoke food-difficulty item
 (=q2005=) embedded in the shocks module, which is already captured by
 the wired =shocks= feature.  =food_security_hfias=, =food_coping=, and
 =months_food_inadequate= are therefore not implementable for Iraq.
+
+* 2026-11-06 -- shocks: retain the separate food-stock answer
+
+IHSES 2012 Section 20 asks =q2002_4= "Did increase/decrease food stock?"
+and =q2002_5= "Did increase/decrease food purchases?" (held source variable
+labels, read through =get_data_file=).  Both use 1 INCREASE, 2 DECREASE,
+3 DID NOT CHANGE.  =AffectedConsumption= keeps the purchases answer from
+=q2002_5=; =AffectedFoodStock= now exposes the previously dropped =q2002_4=.
+Either direction is True, unchanged is False, and missing answers stay NA.
+
+Idiosyncrasy retained: the source contains all 23 shock categories per
+household.  The =2012/_/2012.py= hook keeps only =q2001= yes, with =questid=
+as the household key.  Section 20 is not one of the planned one-third
+submodules described above.  The distinct 2006-07 risks instrument remains
+unwired, with no invented food-stock column.
+
+Private cold comparison against =174671bca=: all 8,812 experienced-shock
+rows, their index, and every existing column are identical.  The added stock
+answer is True on 5,076 rows, False on 3,736, and missing on none; purchases
+remain True on 6,445 and False on 2,367.  Synthetic regression rows also
+check missing answers and the experience gate; the source oracle compares
+every effect and coping answer by household and shock in
+=tests/test_shocks_malawi_iraq_food_effects.py=.
+
+Documentation discrepancy found during this check: the food-security note
+above says =q2005= is already captured by =shocks=.  The current declaration
+reads the experience gate, =q2002_1..5= and =q2003_1..3=, not =q2005=.
+That pre-existing claim is not evidence that this separate food-difficulty
+item is served; its wiring is outside this purchases/stock correction.

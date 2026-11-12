@@ -99,6 +99,7 @@ Data Scheme:
     AffectedAssets: bool
     AffectedProduction: bool
     AffectedConsumption: bool
+    AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
@@ -157,8 +158,8 @@ Data Scheme:
     #
     # plot = "{field}_{parcel}" for seasonal crops and for every EHCVM
     # harvest row; 'Farm-level' for perennial trees (the EAC-I perennial roster is
-    # not on the seasonal field grid, GH #1476) and for a 2021-22 sale or derived
-    # harvest with no single harvest row (below).
+    # not on the seasonal field grid, GH #1476), for a 2017-18 or 2021-22 sale, or a
+    # 2021-22 derived harvest, with no single harvest row (below).
     # crop = harmonize_food Preferred Label (food crops REUSE the consumed-
     # food label so crop_production.j joins food_acquired.j; non-food crops
     # — Coton, Soja, Voandzou, Dah/Fibre, tree species — get new labels).
@@ -166,9 +167,10 @@ Data Scheme:
     #
     # NO harvest_kg / yield / main_crop / value-share columns — those are
     # transformations.py rollups over these item rows.  2017-18 sold qty/
-    # value is recorded at (household, crop) grain (module s7g), so it is
-    # attached at the plot level only for single-plot crops; multi-plot
-    # crops carry NaN sold (see the wave script).  intercropped is recorded
+    # value is recorded at (household, crop) grain (module s7g): a sale goes on
+    # the crop's single harvest row, keyed hh-crop-sale-single-row, and otherwise
+    # on ONE plot_id = 'Farm-level' row (GH #1457; see the wave script).
+    # intercropped is recorded
     # in 2014-15 (s1cq05 Pure/Association) and in both EHCVM waves (s16cq07);
     # NaN in 2017-18.
     #
@@ -226,6 +228,15 @@ Data Scheme:
     # codes 3 and 4 invert the EHCVM table; not read yet: CONTENTS.org.
     index: (t, i, plot_id, crop, condition)
     Quantity: float
+    # Quantity_kg (GH #1436, ruling @ligon 2026-11-04) is the survey's own kilograms
+    # for the line, a TOTAL and not a factor: 2021-22 s16cq16c, which the instrument
+    # calls an estimate, on the 306 rows that record a quantity and more than 0 kg,
+    # keyed survey-kg-estimate.  NA on a derived harvest (s16d's kg column is the
+    # sale's) and in the other waves.  On an unfinished row it covers what Quantity covers,
+    # harvest-to-date.  harvest_kg reads it first (survey_kg).
+    Quantity_kg:
+      type: float
+      optional: true
     u: str
     Quantity_sold: float
     Unit_sold:
@@ -251,14 +262,26 @@ Data Scheme:
     condition_native:
       type: str
       optional: true
+    # Sold-side own answer, separate from harvest condition (GH1528).
+    Condition_sold:
+      type: str
+      optional: true
+    condition_sold_native:
+      type: str
+      optional: true
+
     materialize: make
   plot_inputs:
-    # Item-level agricultural inputs, GAP 2 (parity loop).  One row per
-    # (t, i, plot_id, input, crop): the REPORTED inputs the survey records, NOT
-    # aggregates.  The input module lives in the EACI waves only (2014-15
-    # EACI14 s1e/s2c, 2017-18 EACI17 s11c/s7d).  The EHCVM waves (2018-19,
-    # 2021-22) have no agriculture-input block — deferred.
-    #
+    # EACI: reported plot applications and separate group-use answer rows.
+    # EHCVM (GH #1483): own s16b household input slots, q02=1 only, on
+    # plot_id='Farm-level'. No amount gate, parcel allocation or EACI reducer.
+    # Quantity/u=q03a/b, Purchased/Quantity_purchased=q08/q09a; gifts and
+    # purchase units have independent optional carriers below. q09c stays raw.
+    # Input_native/input_code_native retain own type identity; the injective
+    # source-label projection preserves each known slot on this existing key.
+    # DAP catch-all stays literal, never pure DAP; NPK grade is not inferred.
+    # Earlier no-block wording was incorrect; EACI-only described pre1483 wiring.
+    # s16a parcel questions remain separate; following plot/group details are EACI.
     # plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
     #         plot_features.  crop is the seed's crop on SEED rows: the
     #         harmonize_food Preferred Label, or the recorded label itself
@@ -309,6 +332,26 @@ Data Scheme:
     Quantity_purchased: float
     Improved: bool
     Applied: bool
+    # EHCVM Applied is the per-type Oui answer; EACI keeps its group-only
+    # interpretation above. Improved is NA in s16b and remains REQUIRED/loud.
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
+    Input_native:
+      type: str
+      optional: true
+    input_code_native:
+      type: int
+      optional: true
     materialize: make
   livestock:
     # Item-level animal roster, GAP 4 (parity loop).  One row per
@@ -317,7 +360,7 @@ Data Scheme:
     # over these rows).  The livestock module lives in the EACI waves only
     # (2014-15 EACIS4A_p2 / s4a; 2017-18 eaci17_s8ap2 + eaci17_s8b1p2 /
     # s8a+s8b1).  The EHCVM waves (2018-19, 2021-22) carry no livestock
-    # roster — deferred (the same split as plot_inputs).
+    # roster — deferred; the new household s16b plot_inputs route is separate.
     #
     # animal = harmonize_species Preferred Label, keyed on the survey's own
     # integer species code (s4aq02 / s8aq02; identical across both EACI
@@ -359,7 +402,7 @@ Data Scheme:
     # waves only (2014-15 EACIMAINOUVRE_p1 [PP, s2b] + EACIS2F_p2 [PH, s2f];
     # 2017-18 eaci17_s11ep1 [PP, s11e] + eaci17_s7ep2 [PH, s7e]).  The EHCVM
     # waves (2018-19, 2021-22) carry no plot-labor roster — deferred (the
-    # same wave split as plot_inputs / livestock).
+    # same EACI-only wave split as livestock; s16b household inputs are separate).
     #
     # plot   = "{field}_{parcel}" — the SAME plot id as crop_production /
     #          plot_inputs / plot_features (join on (t, i, plot_id)).

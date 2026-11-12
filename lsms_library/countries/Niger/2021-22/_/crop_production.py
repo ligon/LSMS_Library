@@ -2,8 +2,9 @@
 
 The 2021-22 instrument SPLITS the crop module that 2018-19 kept together:
   - s16c_me_ner2021.dta : plot-crop level — harvest qty + unit (s16cq16a /
-    s16cq16b) and the intercrop flag (s16cq07).  One row per reported
-    (field, parcel, crop) harvest line.
+    s16cq16b), the survey's estimate of the line in kg (s16cq16c -> the
+    ``Quantity_kg`` column, GH #1436, keyed survey-kg-estimate) and the intercrop
+    flag (s16cq07).  One row per reported (field, parcel, crop) harvest line.
   - s16d_me_ner2021.dta : CROP level (no plot) — sold qty + unit (s16dq05a /
     s16dq05b -> the ``Unit_sold`` column, GH #824), sold state (s16dq05d -> the
     ``Condition_sold`` column, GH #1462) and sale value (s16dq06).
@@ -12,10 +13,13 @@ The 2021-22 instrument SPLITS the crop module that 2018-19 kept together:
 
 Because the sale block has no plot dimension, its qty/value can only be
 attributed to a plot-crop row when the household reports that crop on a
-SINGLE harvest line (a 1:1 (i, crop) -> served row).  Where the crop spans
+SINGLE harvest line (a 1:1 (i, crop) -> served row), which then carries the
+key Niger::crop_production::hh-crop-sale-single-row.  Where the crop spans
 several plots, or several harvest lines of one plot, the sale cannot be split
-without inventing an allocation, so Quantity_sold / Value_sold are left NaN
-for those rows (reported-only discipline -- no fabricated split).  Until
+without inventing an allocation, so it goes on ONE row with plot_id = 'Farm-level',
+no harvest Quantity and the sentinels of a row with no harvest on the index (GH
+#1457: 553 of the 1,818 sales, 36,330,475 of 104,959,545 FCFA, of which 144 sales,
+4,585,225 FCFA, are two lines of one crop on ONE plot).  Until
 GH #1360 the rule asked for a single PLOT; the extra lines of a single plot
 were then either collapsed away by the framework or served carrying the same
 sale twice.
@@ -36,7 +40,9 @@ import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
                    _crop_conditions, _crop_sold_conditions,
-                   _finish_crop_production, _crop_row_observations)
+                   _finish_crop_production, _crop_row_observations,
+                   derive_survey_kg_estimate, stamp_survey_kg_estimate,
+                   derive_hh_crop_sale_attachment, served_harvest_lines, stamp_hh_crop_sale)
 
 
 crop_map, unit_map = _crop_maps()
@@ -64,6 +70,8 @@ df = pd.DataFrame({
     'condition':    _crop_conditions(srcn['s16cq16d'],
                                      'harmonize_crop_condition_ehcvm2').values,
     'Quantity':     src['s16cq16a'].values,
+    # A total for the line, not a factor per unit (GH #1436).
+    'Quantity_kg':  derive_survey_kg_estimate(srcn['s16cq16c']).values,
     'intercropped': intercropped.values,
 })
 
@@ -114,13 +122,15 @@ sold_df = sold_df.dropna(subset=['i', 'crop'])
 sold_one = (sold_df.groupby(['i', 'crop', 'Unit_sold', 'Condition_sold'],
                             as_index=False, dropna=False)
             [['Quantity_sold', 'Value_sold']].sum(min_count=1))
+records = sold_one
 
 # Attribute ONLY to (i, crop) pairs with exactly one harvest LINE in the
 # harvest block -- one plot, one line, so the sale lands on one served row
 # (no fabricated split across plots or lines; GH #1360) -- AND sold in a
 # single unit and state (no fabricated conversion -- a second one would
 # duplicate the harvest row).  Measured: no pair sells in two units or states.
-lines_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()
+serving = served_harvest_lines(df)     # a line the API would remove does not count
+lines_per = df[serving].dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()
 single = lines_per[lines_per == 1].index
 units_per = sold_one.groupby(['i', 'crop']).size()
 one_unit = units_per[units_per == 1].index
@@ -128,9 +138,21 @@ sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)
                     & sold_one.set_index(['i', 'crop']).index.isin(one_unit)]
 
 df = df.merge(sold_one, on=['i', 'crop'], how='left')
+sale_columns = [c for c in sold_one.columns if c not in ('i', 'crop')]
+df.loc[~serving, sale_columns] = pd.NA
+
+# Any other sale: ONE Farm-level row (GH #1457).  After the s16d de-duplication
+# above, so a line repeated once per harvest line is one sale here.
+df = derive_hh_crop_sale_attachment(df, records)
 
 df = _finish_crop_production(df, '2021-22')
+# After the tail, so the stamps ride on served rows (CLAUDE.md "Derived Values").
+df['Derivation'] = stamp_survey_kg_estimate(df)
+df['Derivation'] = stamp_hh_crop_sale(df)
 
 assert df.index.is_unique, 'crop_production 2021-22 repeats a native harvest line'
+# Conservation: the records' sums, on one row each.
+assert df['Value_sold'].sum() == records['Value_sold'].sum(), 'a sale value moved'
+assert df['Quantity_sold'].sum() == records['Quantity_sold'].sum(), 'a sold quantity moved'
 assert len(df) > 0, 'crop_production 2021-22 produced no rows'
 to_parquet(df, 'crop_production.parquet')

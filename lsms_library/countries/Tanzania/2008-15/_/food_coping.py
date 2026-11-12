@@ -11,8 +11,14 @@ past 7 days, how many days have you or someone in your household had to [...]".
 The module is HOUSEHOLD-level (one row per (round, r_hhid)); ``i = r_hhid``
 matches the wave's household_roster ``i``.
 
-NB the round-1 (2008-09) survey did NOT field §H -- the multi-round file only
-carries rounds 2/3/4 (waves 2010-11, 2012-13, 2014-15) for this module.
+The released-UPD Food Security evidence covers rounds 2/3/4 (waves 2010-11,
+2012-13, 2014-15); the held retrospective UPD questionnaire/BID marks this
+module absent in round 1. This does not establish original 2008-09 fielding.
+The published original R1 workbook calls H Governance; its bounded K FOOD /
+R SHOCKS question-region read establishes consumption/shared meals and severe
+shocks, not whole-form absence of the coping battery. Exact fielded revision,
+addenda and original-to-released-UPD linkage remain qualified (GH #587;
+see Tanzania/_/CONTENTS.org).
 
 The 8 day-count items ``hh_02_1 .. hh_02_8`` carry the same battery, in the
 same order, as the later NPS waves' ``hh_h02a .. hh_h02h`` (whose full variable

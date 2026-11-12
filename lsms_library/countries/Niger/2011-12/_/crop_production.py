@@ -9,7 +9,8 @@ Two source files, one per season:
 
 The rainy module: one
 row per reported (field, parcel, crop) harvest line; harvest qty + unit
-(as02eq07a / as02eq07b), sold qty + unit (as02eq12a / as02eq12b -> the
+(as02eq07a / as02eq07b), the survey's own kilograms for the line (as02eq07c -> the
+``Quantity_kg`` column, GH #1436), sold qty + unit (as02eq12a / as02eq12b -> the
 ``Unit_sold`` column, GH #824) and sale value (as02eq13) are all at this
 plot-crop grain; the module's unlabelled
 "don't know" codes (999999 on the quantities, 9999999 on the value) are
@@ -44,7 +45,8 @@ from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
 # values only.  Raw counts, ecvmaas2e_p2.dta (12,091 rows): as02eq07a ==
 # 999999 on 11 rows (all with unit code 99 'manquant', four crops: mil 3,
 # sorgho 3, niebe 3, riz paddy 2), as02eq12a == 999999 on 3, as02eq13 ==
-# 9999999 on 2 (both hid 20607, which carries all three codes).
+# 9999999 on 2 (both hid 20607, which carries all three codes).  as02eq07c ==
+# 999999 on the same 11 rows as as02eq07a (GH #1436).
 QTY_SENTINELS = (999999,)
 VALUE_SENTINELS = (9999999,)
 # Section 3E's quantity code, a different width (GH #1462).  ecvmaas3e_p1.dta (576
@@ -75,6 +77,8 @@ df = pd.DataFrame({
     'crop':          _crop_labels(srcn['as02eq06'], src['as02eq06'], crop_map).values,
     'u':             _unit_labels(src['as02eq07b'], unit_map).values,
     'Quantity':      _na_exact(srcn['as02eq07a'], QTY_SENTINELS).values,
+    # A total for the line, not a factor per unit (GH #1436).
+    'Quantity_kg':   _na_exact(srcn['as02eq07c'], QTY_SENTINELS).values,
     'Quantity_sold': _na_exact(srcn['as02eq12a'], QTY_SENTINELS).values,
     'Value_sold':    _na_exact(srcn['as02eq13'], VALUE_SENTINELS).values,
     # The SOLD unit (as02eq12b), a second unit on the same line (GH #824);
@@ -88,7 +92,10 @@ df = pd.DataFrame({
 # "the first cycle"; the Stata label "en moyenne pour chaque cycle" is a template, the
 # rainy as02eq07a has it too) beside the count as03eq06.  as03eq09c, "Quantity in Kgs",
 # is a line total and not per-unit (kg equals the quantity on 5 of 7 Kg lines, a median
-# 86.7 per 100 kg sack), so it stays unwired, as its rainy twin does (GH #1436).
+# 86.7 per 100 kg sack), and per cycle like as03eq09a, so Quantity_kg takes the same
+# product under the same key.  Its 99999 (42 rows) is masked first, and the tail masks
+# its 0 beside a positive quantity (74 rows), so 116 of 549 harvests here have no
+# kilogram (GH #1436).  as03eq11c, the sold kilograms (per cycle, 99999 on 39), is not read.
 # One row of 576 is byte-identical to another, with one (hid, line): the same
 # record, dropped as the s16d repeats are, or the line token would repeat.
 dry = get_dataframe(
@@ -110,6 +117,8 @@ dry_df = pd.DataFrame({
     'crop':          _crop_labels(dryn['as03eq03'], dry['as03eq03'], crop_map).values,
     'u':             _unit_labels(dry['as03eq09b'], unit_map).values,
     'Quantity':      derive_dry_season_cycle_total(_na_exact(dryn['as03eq09a'], DRY_QTY_SENTINELS),
+                                                   dryn['as03eq06']).values,
+    'Quantity_kg':   derive_dry_season_cycle_total(_na_exact(dryn['as03eq09c'], DRY_QTY_SENTINELS),
                                                    dryn['as03eq06']).values,
     'Quantity_sold': dry_sale['Quantity_sold'].values,
     'Value_sold':    dry_sale['Value_sold'].values,

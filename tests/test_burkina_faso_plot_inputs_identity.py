@@ -208,10 +208,14 @@ def test_source21_is_unlabelled_and_qualified_only_in_its_current_wave(actual_co
     cats = local_tools.get_dataframe(
         _root() / '2018-19' / 'Data' / 's16b_me_bfa2018.dta', categories_only=True)
     assert 21 not in cats['s16bq01'] and cats['s16bq01'][20] == 'Autres semences'
-    result = actual_country.plot_inputs()
+    result = actual_country.plot_inputs(waves=['2018-19'])
     selected = result.index.get_level_values('crop') == CODE_21_CROP
     assert int(np.count_nonzero(selected)) == 602
     assert set(result.index.get_level_values('t')[selected]) == {'2018-19'}
     assert set(result.index.get_level_values('input')[selected]) == {'Seed'}
-    for wave in ['2014', '2021-22']:
-        assert actual_country.plot_inputs(waves=[wave]).empty
+    assert actual_country.plot_inputs(waves=['2014']).empty
+    # GH1483 adds the own2021 applied-input source. Keep the2018 source-code
+    # oracle above scoped to2018; groundnut now also has its own2021 slot19.
+    current = actual_country.plot_inputs(waves=['2021-22'])
+    assert not current.empty
+    assert set(current.index.get_level_values('t')) == {'2021-22'}

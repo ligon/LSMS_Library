@@ -123,3 +123,50 @@ Tanzania::sample::split-off-parent-cluster:
   validated_against: tests/test_tanzania_1441_followups.py reads HH_SEC_A.dta directly.
   contents: 'Tanzania/_/CONTENTS.org, "District and Region labels for market= (GH #1441)"'
   since: '2026-11-04'
+
+# GH #1457 (bulk ruling 2026-11-04, extending #843 option (d)).  Own module because
+# tests/test_gh905_tanzania_signed_sums.py pins tanzania.py's digest.
+Tanzania::crop_production::hh-crop-sale-single-row:
+  waves: ['2019-20', '2020-21']
+  columns: [Quantity_sold, Value_sold, Unit_sold]
+  rule: >-
+    AG_SEC_5A / 7A / 7B record a sale per household and crop code, with no plot, each
+    asking about one harvest module (5A -> 4A, 7A -> 6A, 7B -> 6B).  A sale is a record
+    with a positive quantity or value.  Where the code is on exactly one plot of that
+    module the sale is served on that row, as recorded, and the row carries this key.
+    What is derived is the ATTACHMENT, not the numbers.  Any other sale is served on ONE
+    row with plot_id = 'Farm-level', production_obs = 'reported:<5A|7A|7B>:<crop code>',
+    no Quantity or u, and no key, because its index value discloses it.  No sale is
+    split, summed or dropped.  Unit_sold is the instrument's kg on any row with a sold
+    quantity: the sale variables are labelled in kg.
+  function: lsms_library.countries.Tanzania._._hh_crop_sales:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.Tanzania._._hh_crop_sales:inputs_hh_crop_sale_single_row
+  raw_variables: [ag5a_02, ag5a_03, ag7a_03, ag7a_04, ag7b_03, ag7b_04, cropid]
+  assumptions:
+    - text: >-
+        each sale module asks the sale once per crop code, with no plot.  Where the code
+        has one row in the module the sale asks about, no other row can hold it.  The sale
+        is not thereby a share of that row's Quantity.
+      basis: variable-label
+      evidence: >-
+        AG_SEC_5A, 7A and 7B carry no plot variable; ag5a_02 and its siblings are the
+        quantity sold in KG, ag5a_03 and its siblings the value (Tanzania/_/CONTENTS.org,
+        "Native records").
+    - text: >-
+        a sale of a code on two or more plots of its module is not allocated among them,
+        since any split would be invented.  A row of those with a recorded 0 ("did not
+        harvest") still counts as a row: Nigeria's further ruling A, the one row that
+        STATES a harvest, is not extended here, and 30 sales (16,205,000 TSh, 2019-20)
+        and 91 (45,328,800 TSh, 2020-21) sit on Farm-level with one harvesting plot among
+        their rows.
+      basis: modelling-choice
+      evidence: rulings @ligon 2026-11-03 and 2026-11-04, GH #843 option (d), GH #1457.
+  validated_against: >-
+    tests/test_gh1457_tanzania_multi_plot_sales.py, whose oracle reads the sale modules
+    directly.  Cold builds: 2019-20 617 keyed rows and 189 Farm-level rows hold the 806
+    sales, 192,091,250 + 133,353,650 = 325,444,900 TSh and 1,414,644 + 225,484 kg; 2020-21
+    2,345 and 720 hold the 3,065, 867,363,600 + 487,636,720 = 1,355,000,320 TSh and
+    11,885,924 + 1,090,662 kg, each the raw sum.  Not validated against an external total:
+    no document here reports one.
+  contents: 'Tanzania/_/CONTENTS.org, "2026-11-04 -- multi-plot sales (GH #1457)"'
+  since: '2026-11-04'
