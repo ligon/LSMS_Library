@@ -1,5 +1,27 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Undocumented producer constructions in EHCVM food quantities -- ANSWERED
+Evidence: reports/ehcvm2-s07bq03a-docsearch/REPORT.md and
+reports/ehcvm2-live-s07bq03a-check/REPORT.md.  Four selections:
+- Togo 2021-22 s07bq03a (factor = 1.115 x regional multiplier, every unit;
+  unite rows then floored): "Invert, registered (Recommended)".  Divide out the
+  exact factor as a registered derivation to recover the household's answers;
+  Lome count rows that were rounded cannot be inverted and are served NA under
+  a registered omission.
+- Cote d'Ivoire 2021-22 H rows (outlier-replaced by region x milieu median per
+  UEMOA/WB Document de travail no 4, undocumented in the distributed file):
+  "H to NA, flag L (Recommended)".  H quantity NA under a registered key; L
+  rows (partial triplet conversion) flagged with their own key.
+- Mali 2018-19 rice block (3,357 rows, q3 = 1.4 kg x hhsize, no vague, served
+  as purchases; #1707) and Senegal 2021-22 salt (100 rows, 0.02 kg x hhsize):
+  "Remove, registered (Recommended)".  Stop serving them, under a registered
+  omission whose inputs return them.
+- Niger 2018-19 s07bq07a on 14.2% of rows (CAPI disables it there; #1708):
+  "Flag now, diagnose (Recommended)".  Registered key, keep serving; diagnose
+  the construction; the drop decision comes back to the user.
+Principle (user, 2026-11-12): "Without a very good reason we don't want to
+serve up someone else's undocumented imputations."
+
 * 2026-11-12: Sold kilograms, GH1560 + GH1571 -- ANSWERED
 The user explicitly selected: "Treat 2021 as totals".  Serve Niger 2011, 2014
 and 2021 and Mali 2021 reported sold kilograms (as02eq12c / as03eq11c /
