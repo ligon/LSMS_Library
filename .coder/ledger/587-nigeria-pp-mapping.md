@@ -168,7 +168,7 @@ failed to connect).
 | W1 g/ml, N = 1 (963 + 80) | **held**, own key `pp-w1-metric-package-hold` | ruling; 144x household |
 | W1 Kg/l, N > 50 (128 + 204) | **held**, own key `pp-w1-count-as-size-hold`; N = 50 divides | ruling; 50-1000x under household |
 | W3 Kg/l, no size (4,120) | **served as recorded**, no key | ruling; 1.07 / 1.00x household.  PH W3 still drops its Kg/l: an asymmetry, recorded |
-| W5 g/cl, no size, `c2q2a` > 0 (208) | **served** `c2q3 / c2q2a`, key `pp-w5-metric-unit-quantity` | ruling; `c2q2a` = the package size in g / cl -- `c2q2b_os` agrees on 172 (175 at float precision; the 176th text is garbled) of 176 g and, as ml / 10, on 32 of 32 cl; cvn 0.001 / 0.01; form and manual silent |
+| W5 g/cl, no size, `c2q2a` > 0 (208) | **served** `c2q3 / c2q2a`, key `pp-w5-metric-unit-quantity` | ruling; `c2q2a` = the package size in g / cl -- `c2q2b_os` agrees on 172 (175 at float precision; the 176th is unresolved, its garbled text plausibly ~12x its `c2q2a`) of 176 g and, as ml / 10, on 32 of 32 cl; cvn 0.001 / 0.01; form and manual silent |
 | W5 g/cl, no size, no `c2q2a` (23) | **held** (`pp-unrecorded-size-hold`) | nothing to divide by; their text has no number |
 | W2 cl (5) | **held** with W2 g | the ruling names W2 grams only |
 

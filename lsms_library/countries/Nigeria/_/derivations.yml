@@ -449,13 +449,15 @@ Nigeria::community_prices::pp-w5-metric-unit-quantity:
         no-size rows, states the package ('250G', '400 GRAMS TIN', '750ML
         BOTTLE'): on the 176 g rows c2q2a equals the text's gram figure on
         172 and a number in the text on 175 (one only to float32
-        precision); the 176th's text has a letter inside its number, so it
-        neither agrees nor disagrees.  On the 32 cl rows the text states
-        millilitres and c2q2a equals that figure / 10 -- centilitres -- on
-        all 32, the ml-to-cl conversion the W5 household manual instructs
-        ("500ml is 50cl", PP interviewer manual PDF p.66).  No row's text
-        contradicts its c2q2a.  The 23 rows without c2q2a have no number in
-        their text.
+        precision).  On the 32 cl rows the text states millilitres and
+        c2q2a equals that figure / 10 -- centilitres -- on all 32, the
+        ml-to-cl conversion the W5 household manual instructs ("500ml is
+        50cl", PP interviewer manual PDF p.66).  One g row is unresolved:
+        its text has a letter inside its number and most plausibly states
+        a package about 12x its c2q2a, so its served price may be about 12x
+        high (it sits above the p90 of the divided g rows); it is served as
+        ruled, with the other 207.  No text states a unit other than the
+        row's.  The 23 rows without c2q2a have no number in their text.
       basis: modelling-choice
       evidence: >-
         sectc2_plantingw5.dta values (aggregates in the GH #587 final

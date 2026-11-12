@@ -4332,8 +4332,9 @@ The PP cards are NOT the PH C8 cards:
   just 'GRAM' / 'ML').  Where it carries a number, =c2q2a= restates it in the
   row's unit: on 172 of the 176 =g= rows that record =c2q2a= it equals the
   text's gram figure (a number in the text on 175, one only to float32
-  precision; the last row's text has a letter inside its number, so it
-  settles nothing either way); on all 32 =cl= rows the
+  precision; the last row is unresolved -- its text has a letter inside its
+  number and most plausibly states a package about 12x its =c2q2a=, so its
+  served price may be about 12x high); on all 32 =cl= rows the
   text is in millilitres and =c2q2a= is that figure / 10, i.e. centilitres
   (the household manual's "500ml is 50cl").  The 23 rows with no =c2q2a=
   have no number in their text.  So =c2q2a= is the package size in g / cl --
