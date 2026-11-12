@@ -2495,10 +2495,11 @@ verdict:
 (Two figures in this table moved on 2026-11-12.  Since GH #1129, =unitvalue= drops
 =u='Value'= rows, so 1987-88 and 1988-89 are empty in that mode too.  Since GH #1509
 the kg factors read purchases only, and 1991-92 =kgprice= served 15,028 rows, not
-28,754; the same day's amendment added the disclosed =item_unit_nonpurchase= rung
+28,754; the same day's amendments added the disclosed =item_unit_nonpurchase= rung
 (a (j, u) cell with no purchase in any wave reads the 8H valuations on their own
-rung), and it serves 26,854.  Neither changes a verdict: 1991-92 still serves rows
-in =kgprice=.)
+rung), which served 26,854, and below it the unit-level =unit_nonpurchase= rung
+(the u-pooled estimate on the same rows), which brings it back to 28,754.  Neither
+changes a verdict: 1991-92 still serves rows in =kgprice=.)
 
 1991-92 is *not* correctly empty: only the default =kgvalue= mode is
 empty, and only because 8H is "deliberately NOT wired" (the farmgate

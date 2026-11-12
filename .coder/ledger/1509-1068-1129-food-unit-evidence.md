@@ -130,8 +130,8 @@ evidence on a NEW, separately labelled rung of the kg-factor ladder.
 
 | quantity | decision | reason |
 |---|---|---|
-| rung | `item_unit_nonpurchase`, between `unit` and `none` in `FOOD_KG_FACTOR_LAYERS` | below every purchase rung (`unit` included), above `none`; the ruling is per `(j, u)` and the gates live on the item arm, so it is item-keyed only (no `unit_nonpurchase`: nothing pooled across items) |
-| estimator | reuse `_pooled_kg_rungs` / `_inferred_kg_rungs` (item arm only, `unit_arm=False`) on `_nonpurchase_evidence(df)` | same floors, tight exception and dispersion gate, same size pool and #1452 overlay; self-valued on BOTH sides of the ratio (a purchase baseline under a self-valued numerator is the mixing #1509 removed) |
+| rung | `item_unit_nonpurchase`, between `unit` and `none` in `FOOD_KG_FACTOR_LAYERS` | below every purchase rung (`unit` included), above `none`; the ruling is per `(j, u)` and the gates live on the item arm, so it is item-keyed (its u-pooled twin, `unit_nonpurchase`, came with the second amendment below) |
+| estimator | reuse `_pooled_kg_rungs` / `_inferred_kg_rungs` (item arm only, `unit_arm=False`; the switch was removed by the second amendment, which reads the u arm too) on `_nonpurchase_evidence(df)` | same floors, tight exception and dispersion gate, same size pool and #1452 overlay; self-valued on BOTH sides of the ratio (a purchase baseline under a self-valued numerator is the mixing #1509 removed) |
 | eligibility | new `cell_priced` array in `_KG_RUNG_ARRAYS`, computed on the purchase frame | "the row's cell holds one priced purchase in any wave", on the item arm's join key, before `serve_waves` slicing, and through the size pool for an unsized label; independent of every floor, so a gated-out purchase cell never reaches the rung |
 | disclosure | `kg_factor_sources` (the partition), per-row `kg_item_unit_nonpurchase` / `kg_cell_has_purchase`, and `kg_factor_evidence['fallback']` (incl. `none_by_reason`) | separate label = visibly weaker evidence |
 | cost guard | no second estimate without `s`, without a priced non-purchase row, or when every cell has purchases | purchases-only countries pay nothing and cannot move |
@@ -162,3 +162,42 @@ report at `burst/isa-sm-20261112/reports/framework-1509-1068-final/REPORT.md`.
 - Closure (§4) — OK: footprint identical to head's (GhanaLSS only: 22/555, 154/2,321, 1/38, 0/42).
 - Movement, not correction: the recovered factors are the pre-#1509 self-valued ones; no
   external unit weight scored.
+
+---
+### Second amendment (2026-11-12) — the unit-level non-purchase rung
+
+Ruling (`docs/isa-sweep-20261103:.sucoder/isa-decisions.org`, "GH1509 second
+(unit-level) non-purchase rung"): "Add a unit-level rung".  Below the per-item
+non-purchase rung, a separately labelled unit-level non-purchase rung (pooled across
+items per unit), same no-purchase-evidence condition, to recover GhanaLSS's remaining
+28,939 rows.
+
+| quantity | decision | reason |
+|---|---|---|
+| rung | `unit_nonpurchase` (`FOOD_KG_UNIT_NONPURCHASE_LAYER`), between `item_unit_nonpurchase` and `none` | named by the rule of the first: the `unit` estimator on `nonpurchase` evidence; `item_unit` : `unit` :: `item_unit_nonpurchase` : `unit_nonpurchase` |
+| estimator | the same one non-purchase `_pooled_kg_rungs` call, now with its u arm (`conversion_to_kgs(item_col=None)`); `unit_arm` removed | the size pool and #1452 overlay come with it, as on the purchase side; one estimate, two candidates |
+| gates | the purchase `unit` rung's: currency labels out, sentinel / `no_kg` refuse, survey_kg / metric / every rung above outrank, survey-kg rows anchor the baseline only, finite positive factors | `unit` has none of the item floors (`conversion_to_kgs`: "gating a fallback would leave rows with nothing"), so neither does its twin; a row the item fallback refuses lands here, as a refused purchase row lands on `unit` |
+| evidence pool | every non-purchase row of the label, any item | the twin of `unit`, which pools every purchase of the label; only the SERVED row's own `(j, u)` cell must have no purchase |
+| eligibility | `~cell_priced`, unchanged | "same no-purchase-evidence condition" |
+| disclosure | partition, `KgFactorSource`, per-row `kg_unit_nonpurchase`, `kg_factor_evidence['fallback']['unit_rung']`; `rows_refused_spread == refused_spread_to_unit_nonpurchase + refused_spread_to_none`; `kg_factor_size_pool.served_by_unit_rung` | as the first rung; the gate ledger mirrors `kg_factor_baseline_gate` |
+| not reported | the non-purchase estimate's stated-vs-inferred contradictions | the warning stays the purchase rungs', like `kg_factor_wave_spread` |
+
+#### Second amendment — Phase 3 verification
+
+Measured cold in private roots, three arms: base `e5fdd2fa8`, item fallback head
+`5b2496a12`, unit rung `ee9d6cd23` (jobs 41244889 / 41244890 / 41245126; comparison
+41247107); report at `burst/isa-sm-20261112/reports/framework-1509-unit-rung/REPORT.md`.
+
+- Eligibility — OK: 0 priced purchases in the 89 GhanaLSS and 10 Uganda cells the rung
+  serves (independent recount over all waves); 0 rows with `kg_cell_has_purchase`.
+- Ladder position — OK: head -> cand source changes are `none -> unit_nonpurchase` only;
+  no factor moves off the new rung.
+- Recovery (GhanaLSS) — all 28,939 rows, each at its `e5fdd2fa8` factor (to 1e-9);
+  +10,063 kg (9.909M -> 9.919M, -9.89% against base); `food_prices()` 560,023 and
+  `kgprice` 187,096 (1991-92 28,754), both back at base.  23,156 of the rows are the item
+  fallback's dispersion refusals.  41 rows stay `no_estimate`; the `none` count equals base's, 3,571,848.
+- Uganda — moves: 15 of 18 rows (5 labels), +65 kg, factors within 2x of base's (median
+  ratio 0.77).  3 stay `none` (2 purchase cells, 1 no estimate).
+- Unchanged — Cambodia, Serbia, Burkina Faso, Malawi, Niger, EthiopiaRHS frame-equal to head.
+- Closure (§4) — OK: GhanaLSS only (22/555, 154/2,321, 1/38, 0/42), as before.
+- Movement, not correction: no external unit weight scored.
