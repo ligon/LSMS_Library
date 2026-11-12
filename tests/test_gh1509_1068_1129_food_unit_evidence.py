@@ -119,16 +119,23 @@ def test_an_na_source_is_not_evidence():
     assert f.attrs['kg_factor_evidence']['priced_rows_excluded'] == {'<NA>': 40}
 
 
-def test_no_purchase_in_a_cell_means_no_item_factor_and_no_fallback():
-    """Nothing is borrowed from produced rows when purchases are absent."""
+def test_no_purchase_in_a_cell_means_no_purchase_factor_only_the_disclosed_one():
+    """No purchase rung reads produced rows when purchases are absent.
+
+    Until the 2026-11-12 amendment ("Fallback rung, disclosed") such a row was
+    ``none``.  It is now served by the separately labelled
+    ``item_unit_nonpurchase`` rung, never by a purchase rung; the fallback's
+    own tests are in ``test_gh1509_nonpurchase_fallback.py``.
+    """
     rows = []
     for k in range(20):
         rows += [('2020', f'h{k}', 'yam', 'kg', 'produced', 2, 200),
                  ('2020', f'h{k}', 'yam', 'Heap', 'produced', 1, 300)]
     f = quiet(food_kg_factors, frame(rows))
     heap = f.xs('Heap', level='u')
-    assert heap['kg_per_unit'].isna().all()
-    assert set(heap['KgFactorSource']) == {'none'}
+    assert heap['kg_item_unit'].isna().all()
+    assert heap['kg_unit'].isna().all()
+    assert set(heap['KgFactorSource']) == {'item_unit_nonpurchase'}
     # The read rungs still serve the produced kg rows.
     assert set(f.xs('kg', level='u')['KgFactorSource']) == {'metric'}
     assert f.attrs['kg_factor_evidence']['priced_rows_read'] == 0
