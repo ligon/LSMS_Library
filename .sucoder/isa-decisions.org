@@ -1,5 +1,33 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Sold kilograms, GH1560 + GH1571 -- ANSWERED
+The user explicitly selected: "Treat 2021 as totals".  Serve Niger 2011, 2014
+and 2021 and Mali 2021 reported sold kilograms (as02eq12c / as03eq11c /
+AS02EQ12C / s16dq05c) as TOTAL kg sold, following the released label and the
+stored kg-unit controls (Niger 45/48, Mali 495/495 equal the sold quantity),
+not the own forms' "poids en kg d'UNE UML".  Carrier per #1571 option (a), a
+literal Quantity_sold_kg column; KgFactor_sold stays kg per ONE unit and a total
+must not be inserted there.  Whether a consumer (median_price_valuation) uses it
+is a separate step; the condition-key question (#1698) stays separate.
+
+* 2026-11-12: Survey-kg screen, GH1559 -- QUESTION BACK
+Offered: report-only 0.1x-10x band, band + Site Q channels, none.  The user
+asked: "Can we not use the same idea as with units for food_quantities, where we
+infer units from expenditures (assuming quantity prices the same within a
+period-region)?"  Sue answered (price-implied kg per unit from crop sales) and
+proposed measuring coverage/agreement on Niger and Mali first.  Not decided.
+
+* 2026-11-12: Uganda 2009-10 ea, GH1536 -- ANSWERED
+The user explicitly selected: "Fill, registered (Recommended)".  Fill the 569
+missing 2009-10 ea from the same household's label in another wave, as a
+registered derivation stamped per filled row (one Uganda re-warm).
+
+* 2026-11-12: Togo 2018 unit codes 659/660/662, GH1557 -- ANSWERED
+The user explicitly selected: "Decode 2018 with 2021 labels (Recommended)".
+Apply the 2021-22 labels (Main, Quartier, Tete) to Togo 2018's bare codes,
+record the codebook evidence (Togo 2021 unit-weight file uses the codes for the
+same goods), and correct Togo/_/CONTENTS.org:466.  Lands with the EHCVM-2 batch.
+
 * 2026-11-12: Malawi code-26 buckets with no released factor, PR1604 -- ANSWERED
 The user explicitly selected: "Keep, disclose, file issue (Recommended)".
 1,783 unmatched 2024-25 '5 Litre Bucket(Chigoba)' rows stay at the shared
