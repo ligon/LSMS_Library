@@ -26,8 +26,9 @@ all: $(parquet) food_acquired $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_f
 # stem, so a wave with no script answers "No rule to make target" rather
 # than running a recipe that cannot work: every wave named in a *_waves
 # list below must carry the script (tests/test_gh1237_malawi_make_prereqs.py).
-# A wave without the script is not asked for: 2024-25 is held and registered
-# ahead of its tables (GH #1275), and naming it here failed the whole target.
+# A wave without the script is not asked for: a wave can be registered ahead
+# of its tables (2024-25 was, GH #1275), and naming it here failed the whole
+# target.
 food_acquired_parquet := $(foreach r,$(rounds),$(if $(wildcard $(r)/_/food_acquired.py),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(notdir $(r))/_/food_acquired.parquet))
 
 # GH #1209: build the native waves here; Country assembles them through the
@@ -38,6 +39,11 @@ food_acquired: $(food_acquired_parquet)
 
 $(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/food_acquired.parquet: ../%/_/food_acquired.py malawi.py categorical_mapping.org
 	(cd ../$(*)/_/ && python food_acquired.py)
+
+# 2024-25's script delegates to a wave-local helper that reads a wave-local
+# dictionary (PR #1604, IHS5 factor borrowing).  Prerequisites only: the
+# pattern rule above still supplies the recipe (GH #1237 class).
+$(LSMS_DATA_ROOT)/$(COUNTRY)/2024-25/_/food_acquired.parquet: ../2024-25/_/food_borrowing.py ../2024-25/_/borrow_dictionaries.json
 
 # --- non-FIES food security (GH #332) -------------------------------------
 # food_coping and months_food_inadequate are built only for the four IHS3+/

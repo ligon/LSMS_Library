@@ -135,6 +135,21 @@ def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
 
 
 @needs_make
+@pytest.mark.parametrize("helper", ["food_borrowing.py", "borrow_dictionaries.json"])
+def test_2024_25_food_helper_edit_rebuilds_the_wave_parquet(tmp_path, helper):
+    """PR #1604: 2024-25's food script imports a wave-local helper that reads a
+    wave-local dictionary; an edit to either must rebuild the wave parquet."""
+    target = _warm_target(tmp_path, "food_acquired", "2024-25")
+    recipe = "cd ../2024-25/_/ && python food_acquired.py"
+    plain = _make(["-n", str(target)], tmp_path)
+    assert plain.returncode == 0, plain.stderr
+    assert recipe not in plain.stdout, plain.stdout
+    edited = _make(["-n", "-W", f"../2024-25/_/{helper}", str(target)], tmp_path)
+    assert edited.returncode == 0, edited.stderr
+    assert recipe in edited.stdout, edited.stdout + edited.stderr
+
+
+@needs_make
 @pytest.mark.parametrize("table,wave", _cases())
 def test_requested_wave_has_script_and_builds_cold(tmp_path, table, wave):
     # A missing prerequisite would make the pattern rule inapplicable here.
