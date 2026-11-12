@@ -402,4 +402,4 @@ shocks:
 
 
 # GH #1483: own s16b household inputs, native use=Oui; not parcel allocated.
-plot_inputs: !make
+plot_inputs:

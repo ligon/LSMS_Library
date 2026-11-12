@@ -469,11 +469,11 @@ Malawi::crop_production::contradiction-price-harvest:
 Malawi::crop_production::sale-basis-unresolved:
   waves: ['2010-11', '2013-14', '2016-17', '2019-20']
   columns: [Quantity_sold, Value_sold]
-  rows: 0
   rule: >-
     A REFUSAL.  Until GH #1457 a deletion; the sale is now served on its own
-    plot_id = 'Farm-level' row with its own unit and state, and no row carries this
-    key, because the index discloses it.  A sale with a candidate harvest row
+    plot_id = 'Farm-level' row with its own unit and state, carrying this key.
+    Farm-level alone does not distinguish refusal from the other causes.
+    A sale with a candidate harvest row
     (single-plot crop, same unit) that no rung admits is attached to no harvest
     row, and is COUNTED in
     attrs['sale_basis_mismatch'] and in the SaleAttachmentWarning the build
@@ -491,7 +491,9 @@ Malawi::crop_production::sale-basis-unresolved:
     an exact match already claimed (`claimed_by_tier_a`).  Ambiguous
     pairings (more than one compatible row or sale) are a separate count,
     attrs['sale_suppressed'] (GH #854), not this entry.
-    `derivation_inputs` returns the lines.
+    `derivation_inputs` retains the refused lines and adds the served crop and
+    production_obs where a Farm-level row exists. Refused non-sales remain
+    retrievable without a served observation coordinate.
   function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
   inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_unresolved
   raw_variables:
@@ -523,6 +525,49 @@ Malawi::crop_production::sale-basis-unresolved:
     harvest-side / 550,400 MWK); claimed by tier A 0.  See CONTENTS.org.
   contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
   since: '2026-09-24'
+
+# User selected R1 on 2026-11-10; retained implementation cd76e550f (GH #1457).
+Malawi::crop_production::sale-other-unit-single-row:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold, Unit_sold, Condition_sold]
+  rule: >-
+    Module I / Q records a sale per household and crop code in its own unit. A sale with
+    a nonmissing reported unit and no harvest row in that unit goes on the household-crop's
+    ONE harvest row where the row names a plot, its state is compatible (equal, or either unknown) and the row holds no
+    other record, and that row carries this key.  Quantity_sold is in Unit_sold, not u.  What
+    is derived is the ATTACHMENT, not the numbers.  A sale on another basis, or of a crop on
+    two or more rows, or that a second sale competes for the row with, goes to Farm-level.
+    An actual missing sale-unit label stays NA on Farm-level: it is not a reported different
+    unit and moving it would enable the existing harvest-unit fallback. Nonmissing Other,
+    unconvertible and explicit Unknown labels remain eligible; no kg factor is required.
+  function: lsms_library.countries.Malawi._.malawi:derive_other_unit_sale
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_other_unit_single_row
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g13b, ag_g13c; ag_mod_p.ag_p09b
+  assumptions:
+    - text: >-
+        Unit_sold is the sale's denominator, so a sale in another unit can sit on the row: the
+        canonical note says both shapes are correct, and #824's "cannot be expressed at the
+        grain" predates Unit_sold.  Historically measured by the #1457 review (not remeasured here): on 2,106 other-unit sales
+        with both units convertible, the sold unit is closer to the same-unit price on 90.4%
+        (median |log| 0.357 against 3.792), so Uganda's 40.5% caveat does not carry over.
+      basis: modelling-choice
+      evidence: >-
+        User approval of R1 on 2026-11-10, following the historical #1457 own-unit review; the
+        ruling of 2026-10-23 on GH #824.
+    - text: >-
+        a sale on another basis stays off the row, per GH #833: 975 records (21,897,879 MWK)
+        contradict shelled against unshelled, and 101 (11,142,265 MWK) are not-applicable against
+        either in that historical review; those counts were not remeasured here,
+        and a price cannot decide across units.
+      basis: modelling-choice
+      evidence: GH #833, Malawi/_/CONTENTS.org, "The rule".
+  validated_against: >-
+    tests/test_gh1457_malawi_farm_level_sales.py; value equals the raw modules in all four waves.
+  contents: 'Malawi/_/CONTENTS.org, "2026-11-04 -- sales no harvest row holds: Farm-level (GH #1457)"'
+  since: '2026-11-10'
 
 # GH #827 (2026-10-23).  community_prices: the Module CK form strikes out the
 # NUMBER OF UNITS and UNIT CODES cells on 17 items whose text names the unit.

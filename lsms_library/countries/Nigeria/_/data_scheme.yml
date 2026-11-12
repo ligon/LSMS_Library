@@ -251,8 +251,9 @@ Data Scheme:
   plot_features:
     # Lasting plot characteristics from the post-planting Agriculture
     # module (GH #167).  Nigeria is post-planting/post-harvest; lasting
-    # attributes are recorded only in the PP round, so each wave maps to
-    # a single t = PP quarter (2010Q3, 2012Q3, 2015Q3, 2018Q3, 2023Q3).
+    # historical PP blocks map to their PP quarters. GH587 additionally
+    # binds W1–W3 PH A1 source records to2011Q1/2013Q1/2016Q1.
+    # W4 unknown-unit current area and W5 prior GPS remain separate holds.
     # Area (sect11a1) is joined onto plot detail (sect11b/sect11b1) on
     # (hhid, plotid) -- two files per wave -> materialize: make.
     # Latitude / Longitude deferred (no decimal-degree parcel coords;
@@ -268,6 +269,121 @@ Data Scheme:
     # WB srtmslp_nga is percent (GH #1150 source-label reconciliation).
     PlotSlope:
       type: float
+      optional: true
+    # Own PH raw/routing operands; source-qualified to avoid W1 text/GPS collisions.
+    PHReportedAreaUnit:
+      type: str
+      optional: true
+    PHReportedAcquisition:
+      type: str
+      optional: true
+    NativePH_W1_hhid:
+      type: int
+      optional: true
+    NativePH_W1_plotid:
+      type: int
+      optional: true
+    NativePH_W1_sa1q3:
+      type: int
+      optional: true
+    NativePH_W1_sa1q4:
+      type: int
+      optional: true
+    NativePH_W1_sa1q5a:
+      type: int
+      optional: true
+    NativePH_W1_sa1q7a:
+      type: int
+      optional: true
+    NativePH_W1_sa1q9a:
+      type: float
+      optional: true
+    NativePH_W1_sa1q9b:
+      type: int
+      optional: true
+    NativePH_W1_sa1q9c:
+      type: str
+      optional: true
+    NativePH_W1_sa1q9d:
+      type: float
+      optional: true
+    NativePH_W1_sa1q12:
+      type: int
+      optional: true
+    NativePH_W2_hhid:
+      type: int
+      optional: true
+    NativePH_W2_plotid:
+      type: int
+      optional: true
+    NativePH_W2_sa1q3:
+      type: int
+      optional: true
+    NativePH_W2_sa1q4:
+      type: int
+      optional: true
+    NativePH_W2_sa1q5:
+      type: int
+      optional: true
+    NativePH_W2_sa1q7:
+      type: int
+      optional: true
+    NativePH_W2_sa1q9a:
+      type: float
+      optional: true
+    NativePH_W2_sa1q9b:
+      type: int
+      optional: true
+    NativePH_W2_sa1q9c:
+      type: float
+      optional: true
+    NativePH_W2_sa1q12:
+      type: int
+      optional: true
+    NativePH_W3_hhid:
+      type: int
+      optional: true
+    NativePH_W3_plotid:
+      type: int
+      optional: true
+    NativePH_W3_sa1q1a:
+      type: int
+      optional: true
+    NativePH_W3_sa1q3:
+      type: int
+      optional: true
+    NativePH_W3_sa1q4:
+      type: int
+      optional: true
+    NativePH_W3_sa1q4b:
+      type: int
+      optional: true
+    NativePH_W3_sa1q5:
+      type: int
+      optional: true
+    NativePH_W3_sa1q7:
+      type: int
+      optional: true
+    NativePH_W3_sa1q9a:
+      type: float
+      optional: true
+    NativePH_W3_sa1q9b:
+      type: int
+      optional: true
+    NativePH_W3_sa1q9c:
+      type: float
+      optional: true
+    NativePH_W3_sa1q10a:
+      type: int
+      optional: true
+    NativePH_W3_sa1q10b:
+      type: int
+      optional: true
+    NativePH_W3_sa1q10c:
+      type: int
+      optional: true
+    NativePH_W3_sa1q12:
+      type: int
       optional: true
     materialize: make
 

@@ -191,10 +191,39 @@ def test_nonfertilizer_channels_and_native_namespaces_stay_independent(drive,
     ids = set(result.index.get_level_values('i'))
     assert ids == HHIDS[wave]
     seed = result[result.index.get_level_values('input') == 'Seed']
-    assert (seed.index.get_level_values('u') == 'Gram').all()
-    assert seed.Quantity.eq(3.0).all()
-    assert seed.Quantity_purchased.eq(5.0).all()
-    assert seed.Purchased.eq(True).all()
+    # The existing G observations remain plot-level application rows.  The
+    # separate H observations are acquisition-only Farm-level rows (#1190).
+    old_seed = seed[seed.Carrier_role.isna()]
+    acquired_seed = seed[seed.Carrier_role.eq('reported_H_component').fillna(False)]
+    assert len(seed) == len(old_seed) + len(acquired_seed)
+    assert len(old_seed) == len(acquired_seed) == (2 if wave in TWO_HALVES else 1)
+    assert (old_seed.index.get_level_values('u') == 'Gram').all()
+    assert old_seed.Quantity.eq(3.0).all()
+    assert old_seed.Quantity_purchased.eq(5.0).all()
+    assert old_seed.Purchased.eq(True).all()
+    assert (acquired_seed.index.get_level_values('plot_id') == 'Farm-level').all()
+    assert (acquired_seed.index.get_level_values('u') == 'Unknown').all()
+    assert acquired_seed.Quantity.isna().all()
+    assert acquired_seed.Applied.isna().all()
+    assert acquired_seed.Improved.isna().all()
+    assert acquired_seed.Quantity_purchased.isna().all()
+    assert acquired_seed.Purchased.isna().all()
+    assert acquired_seed.Acquisition_quantity.eq(5.0).all()
+    assert acquired_seed.Acquisition_unit.eq('3 kg Bag').all()
+    assert acquired_seed.Acquisition_flag.isna().all()
+    assert acquired_seed.Acquisition_value.eq(10.0).all()
+    expected_h = {
+        '2010-11': [('Malawi/2010-11/Data/Full_Sample/Agriculture/ag_mod_h.dta', 'ag_h16a')],
+        '2013-14': [('Malawi/2013-14/Data/AG_MOD_H_13.dta', 'ag_h16a')],
+        '2016-17': [('Malawi/2016-17/Data/Cross_Sectional/ag_mod_h.dta', 'ag_h07a'),
+                    ('Malawi/2016-17/Data/Panel/ag_mod_h_16.dta', 'ag_h16a')],
+        '2019-20': [('Malawi/2019-20/Data/Cross_Sectional/ag_mod_h.dta', 'ag_h07a'),
+                    ('Malawi/2019-20/Data/Panel/ag_mod_h_19.dta', 'ag_h16a')],
+    }
+    assert list(zip(acquired_seed.Source_path, acquired_seed.Component_field)) == expected_h[wave]
+    assert acquired_seed.Source_row.eq(0).all()
+    assert acquired_seed.Source_sidecar_sha256.notna().all()
+    assert acquired_seed.Source_sidecar_sha256.str.fullmatch('[0-9a-f]{64}').all()
     pesticide = result[result.index.get_level_values('input') == 'Insecticide']
     assert (pesticide.index.get_level_values('u') == 'Liter').all()
     assert pesticide.Quantity.eq(2.0).all()

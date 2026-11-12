@@ -5566,3 +5566,189 @@ callback already removed by =af4338784c75fa838bf9d8205518566a66294e0e=
 this refill changes no reducer, precision or unit-pooling rule. GH #1228's
 D/I crop identities and GH #1190's acquisition carrier/third-source admission
 remain held. See =.coder/ledger/malawi-queue-refill-20261109-v2.md=.
+
+* 2026-11-10 -- Later D/G/I printed identity links; export bridges remain held (GH #1228)
+
+Bounded own-form reading adds authority to the existing diagnostic checkpoint,
+without rerunning its sources or changing the delivered 2010 own-text repair.
+The admitted agriculture forms have MD5 =15107f083eac4477bd4d25fc0e33fc2b=
+(2016) and =86cc1f419c1320eb969d11a6d24a63e0= (2019). PDF and printed page
+numbers agree at the locators below; the 2019 contents page is outdated for G/I.
+
+D20 (2016 p10; 2019 p8) asks crops planted in the reference rainy season,
+ordered by importance, excluding cassava, tea, coffee and fruits. Its actual
+printed table has five code cells, =1ST= through =5TH=, without separately
+labelled Other-name text cells. It cannot bind =ag_d20_oth= or =ag_d20b_oth=
+to a fixed crop slot or first/second Other occurrence. This is not evidence
+that the electronic questionnaire never asked specify text.
+
+The viewed 2019 G p27 crop column says "PRE-POPULATED WITH CROPS THAT ARE
+LISTED IN MODULE D (question 20)". I p35 says "PRE-POPULATED WITH CROPS THAT
+ARE LISTED IN MODULE H (CROP/SEED TYPE)", while its top instruction refers
+to G's harvested crop names/codes. H p29 refers to G names/codes and totals
+seed across plots; H02 permits G/H01 adjustments. These are the paper's
+D-to-G-to-H-to-I links, not a released-field crosswalk. In particular, the
+checkpoint's 2019 I label "Id in ag_H_seed_roster" still needs the actual
+I-to-H roster-ID-to-crop-code bridge for each held source half.
+
+D-0/G-0/I-0 offer =2014/2015= or =2015/2016= in the 2016 form (p10/28/36),
+and =2017/2018= or =2018/2019= in the 2019 form (p8/27/35). D is planted
+crops; G13 is harvest in that reference season (2016 p29; 2019 p28).
+Panel D/G begin in visit 1; the later G harvest block and I are visit 2.
+Thus their printed interval design agrees; the selected household seasons,
+visit/export variables and fielded electronic revisions still need binding.
+Both forms explicitly route panel and cross-sectional households, but that
+does not certify every field in catalog 3819's held re-release.
+
+Only a proved slot/text, period and released-ID binding can support a later
+resolver. A plot's name cannot name every household sale. No mapping, native
+code, local-name equivalence, unit, amount, sale/harvest lineage, filter,
+weight or default changes here. Scientific controls are proposed and UNRUN;
+whole #1228 remains open. Exact custody/pages, version limits and missing
+operands: =.coder/ledger/1228-malawi-dgi-authority-20261110-739b1579.md=.
+
+* 2026-11-10 -- Housing IHS3 current cold/warm contribution check (GH #1281)
+
+One new private current pair at source =c8e378920968fde414767855186e64f5e36f54bb=
+ran the ordinary =Country('Malawi').housing(waves=['2010-11'])= request,
+then the same request in a fresh process. The declared Module F source is
+=Full_Sample/Household/hh_mod_f.dta=, =case_id=, Roof =hh_f08= and Floor =hh_f09=.
+The producer returned =origin=materialized=, =completed=True=,
+=successful_empty=False= and 12,271 rows; both normal housing writers returned
+12,271 rows. This is actual contribution evidence, separate from the requested
+wave manifest. The ordinary hash gate subsequently graded that cache fresh.
+
+The default cluster join built =sample()= normally: seven cover files for the
+five source-bearing waves, plus an undeclared-table visit to registered
+2024-25. As the 2026-11-04 entry above says, that wave declares no table;
+its manifest membership supplies no row contribution. No 2024-25 source was
+read and no new wave, ID map, weight or panel policy was selected.
+
+Cold made eight full native reads (the housing file plus seven covers), six
+wave writes and two country writes. Fresh warm made zero native reads,
+producer calls or writes and left the private data inventory unchanged.
+The unchanged GH #1196 strict comparator passed for the served frames,
+including axes and unused levels, dtypes, masks, order and typed attrs, without
+normalization. Each served 12,271 rows at =(i,t,v)= with string Roof/Floor,
+no missing =v=, no missing Roof and one missing Floor.
+
+Only the healthy declared housing outcome was reached; no healthy-empty,
+configuration-error or unavailable-source housing outcome was exercised.
+All eight existing sidecar-bound objects were copied from exact MD5 layouts
+into private storage. No retrieval, acquisition or shared cache write occurred.
+This pair establishes this cell now, not a historical warm snapshot or a
+poisoned-cache frequency. Whole GH #1281 and corpus health remain unmeasured.
+See =.coder/ledger/1281-malawi-housing-current-pair.md= and worker evidence
+=Malawi1281-HousingWarm/4f7331dee1304a1dba00917e1f9894f4/evidence=.
+
+* 2026-11-10 -- Refused Farm-level sales carry their provenance key (GH #1457 R3)
+
+The dated Farm-level account says "a Farm-level row carries no key (its index
+discloses it)" while the refusal "stops being a deletion". R3 corrects this
+provenance contradiction: ONLY existing unresolved Farm-level sale rows now
+carry =Malawi::crop_production::sale-basis-unresolved=; its registry entry no
+longer declares =rows: 0=. Other Farm-level causes remain unkeyed. The ladder,
+attachment/eligibility, quantities, own units/SU, warnings and tallies do not move.
+
+The input accessor retains its complete original refused I/Q line selection,
+native payload, multiplicity and outcome/rung/basis annotations. It LEFT-enriches
+served crop/production_obs from the existing Farm-level row; suffixes are made
+on the FULL Farm-level set before refusal filtering. Both key joins enforce
+many-to-one cardinality. Unresolved0/0 inputs without a served row remain
+retrievable with missing production_obs. The sale's own u stays a column, not
+the served harvest u=Unknown. Existing household Cowpea naming is reused.
+No land/plot allocation, R1/R2a/R2b, price-pool, quantity, unit, ID, weight or
+scientific-default choice is made; those decisions remain held. See ledger
+=1457-malawi-r3-provenance.md= for the applied-source pure verification scope.
+
+* 2026-11-10 -- User-selected sole-row other-unit attachment (GH #1457 R1)
+
+The user selected "Attach to the sole row, preserving the sale’s own unit".
+This supersedes only the dated R1 holding for a household/nativecrop with ONE
+known-plot harvest row, compatible state (equal or either unknown), no occupied
+sale and no competing eligible sale. The sale retains its own Unit_sold and
+Condition_sold, exact quantities/value and the sale-other-unit-single-row key.
+No unit conversion, cross-crop/household borrowing or price-pool change follows.
+
+R3 refusal inputs replay this same R1 stage BEFORE constructing the complete
+current Farm-level suffix set. R1 inputs retain native I/Q multiplicity/payload
+and outcome/rung/basis, LEFT-enriched with the served crop/production_obs; no
+native input is collapsed. R3 zero-sale inputs remain retrievable without a
+served observation. Earlier68 R3 pure passes remain their historical result.
+
+The user separately chose "Keep ambiguous sales on Farm-level rows" (R2a),
+rejecting selection of a sole positive-Quantity row among multiple harvest rows,
+including other0/NA rows. Current multirow treatment stays unchanged. R2b's
+singleplot zero/NA choice remains HELD. No historical R2a patch or new source,
+ID, weight, quantity, eligibility, state-fold or scientific default is adopted.
+
+** R1 reported-unit constraint clarified before integration (2026-11-10)
+
+The user's DIFFERENT UNIT / NO BORROWING choice requires an actual nonmissing
+sale-unit label. Missing Unit_sold remains NA on its existing Farm-level row;
+placing it beside a known harvest u would enable the unchanged approved824
+consumer fallback, borrowing a unit this attachment has no authority to supply.
+The only R1 eligibility addition is the exact =u.notna()= inverse of that
+consumer's missing-label test. Reported Other, unconvertible and explicit
+Unknown labels remain eligible under the original state/single-row/free gates;
+no factor requirement or NA-to-Unknown normalization is added. Historical cd76
+executable R1 now differs only by that necessary predicate. R2a and R2b status,
+all amounts, raw inputs, R3 enrichment and shared consumer code stay unchanged.
+
+
+* 2026-11-10 -- User-selected Farm-level H acquisition components (GH #1190)
+
+The explicit user selection supersedes the earlier carrier/third-gate holding:
+serve acquisition-only Farm-level rows in =plot_inputs=, ALL admitted H quantity
+components, and literal recorded H36 quantities regardless of H34 Yes/No/missing.
+The earlier design recommendation A (separate view, residual support) remains
+historical; no =seed_acquisitions= API is added. Flag/unit-only records remain
+outside the selected quantity-bearing support.
+
+Four existing drivers append these rows AFTER unchanged G/D assembly. First/second
+purchases keep their exact recorded quantity + own recorded nonzero value gate
+(including negative value and zero/negative quantity). Gift keeps recorded quantity
+and native crop regardless of H37. Third keeps recorded H36 quantity/native crop
+regardless of H34, where its own block exists; later XS blocks are not invented.
+No G match or unique plot owner is required for these household observations.
+Original H physical positions precede the unchanged 2010 full-record repeat policy;
+distinct equal-payload records and different quantity slots retain distinct keys.
+
+New =input_obs= is the existing declared-sidecar-qualified H release-row coordinate
+plus =/field:<own quantity field>=. =plot_id=Farm-level= and planted =u=Unknown=.
+=Quantity=, =Applied=, =Improved= and ALL legacy purchase/gift fields are NA on
+additions. =Carrier_role=reported_H_component= makes acquisition explicit.
+=Acquisition_quantity/unit/value/kind/flag= carry the own component; value exists
+only for the existing first/second bindings. Third/gift value stays NA. H36_1
+payers and H09/H40 transport are never borrowed. Missing own unit is Unknown;
+unlisted units keep the existing source-qualified decoder label and raw scalar.
+
+=Source_path/Source_sidecar_sha256/Source_half/Source_row= and named field columns
+identify provenance; all native H scalar columns are retained literally, including
+blank source text and contradictory flags. Only the closed H35/H35__0 source
+binding supplies =Acquisition_source=; other source answers remain under original
+native names, without a new semantic binding. =Binding_status= discloses 2013
+truncations, 2016 H07a/H38a label contradictions and 2019 H36a truncation. Earlier
+unqualified quantity-label statements above are not erased or adjudicated here.
+These are current field bindings with documentary limitations, not a questionnaire
+routing claim or a new interpretation of the labels.
+
+Old attached summaries remain alternate projections of some of these components:
+never add legacy purchase/gift fields to Acquisition quantities as transactions.
+Acquisition is not application, plot allocation, inferred expenditure or a mass
+conversion. =seed_kg= already drops missing application quantities. =nitrogen_kg=
+now excludes only this explicit new role before its application-input label tally;
+all old/role-absent behavior is preserved. =fertilizer_rate= delegates unchanged.
+No quantity, factor, weight, ID map, state/default, application, R1/R3 or other
+country's source behavior changes.
+
+Verification is SOURCE/PURE with invented operands: independent row/field oracle,
+exact old rows/types/masks/attrs, all four actual extracted driver assemblies and
+writer captures, real finalizer/ID and Feature canonical alignment, and application
+consumer comparisons. Initial failures and focused repairs remain in the dispatch
+evidence; no old failure is reclassified as a clean initial run. No new native,
+header, capture, source build, served Country/Feature API or cache cohort ran.
+The historical seven-group/zero-attachment evidence retains its original scope;
+it is not an added-row target or a current native acceptance claim. Integration
+owns independent review, final metadata footprint and any separately admitted
+actual validation. Ledger: =.coder/ledger/1190-selected-farm-carrier.md=.

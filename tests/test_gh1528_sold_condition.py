@@ -189,7 +189,9 @@ def test_served_answers_equal_own_raw_codes_and_literal_labels(country, wave, fi
                        table["Preferred Label"].astype(str).str.strip()))
     ids = (numeric.grappe.astype(int).astype(str) + "0"
            + numeric.menage.astype(int).astype(str).str.zfill(2))
-    walk = json.loads((ROOT / country / "_/updated_ids.json").read_text()).get(wave, {})
+    if country == "Mali" and wave == "2021-22":
+        ids = "EHCVM21_" + ids
+    walk = json.loads((ROOT / country / "_/updated_ids.json").read_text(encoding="utf-8")).get(wave, {})
     ids = ids.map(lambda value: walk.get(value, value))
     labels = literal[crop].astype("string").str.strip()
     crops = labels.map(mapping)

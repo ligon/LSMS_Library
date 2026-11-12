@@ -17,3 +17,62 @@ https://microdata.worldbank.org/index.php/catalog/2050
 
 * Notes (preserved from the original SOURCE.org)
 (source URL not recorded)
+
+
+* 2026-11-10 -- Two public French first-passage documents: local DVC staging only
+
+Catalog2050, Niger ECVM/A2011 (library2011-12), INS/Ministry of Finance,
+French first passage. These document identities do not change any raw release,
+CATALOG_IDNO/DOI, provenance validation or existing document/licence fact above.
+
+- Questionnaire: ECVMA_Quest_AGR_P1_V10.pdf; resource31148;
+  https://microdata.worldbank.org/index.php/catalog/2050/download/31148
+  1853683bytes; MD5d718c078ba313032c787d762d0ca4b84;
+  SHA25695199c091a784127544fc3ffcd80ead3800a07056aba9f8bed5f12e1a490745b.
+- Interviewer manual: ECVMA_Manuel_Enqueteur_P1_V10.pdf; resource31157;
+  https://microdata.worldbank.org/index.php/catalog/2050/download/31157
+  1748799bytes; MD503779dd8f01eda8f8f2f00be40e35841;
+  SHA25683615608417d951ca53b54e4364293e59afb8d91ff263e07e227f8aaf53ebbe0.
+
+Exact prior private copies were absent; one ordinary capped public GET per URL
+returned HTTP200 and matched these size/MD5/SHA/PDF-magic seals. Ordinary
+push_to_cache_batch was invoked ONCE for exactly these two documents. DVC add
+created their pointers/ignore entries; push failed with Unable to locate
+credentials and returned no successful target. REMOTE HOLDING UNCONFIRMED;
+two separate fresh empty-private-cache get_data_file readbacks UNEXECUTED.
+The pointers are local staging only. No generic discovery, raw release refresh,
+other document fetch or new PDF parse occurred. Full PDFs are not stored in Git
+or review evidence. Existing License and Source files remain authoritative
+recorded terms/source locations; public availability is not an open licence.
+The questionnaire's cover restriction on distribution without INS permission
+and its public-disclosure marking are both retained qualifications. Neither
+public V10 filenames nor timestamps prove the exact fielded/export revision.
+Detailed receipts: dispatch77b4ce99 evidence/PUBLIC-GET-RECEIPT.json,
+PUSH-RECEIPT.json, ACTOR-TERMINALS.json and REPORT.md.
+
+** Separate authorized continuation completed: two managed holdings verified
+
+The preceding failed attempt remains historical. ROOT authorized the frozen
+source-bound context correction: omit only the operator-injected absent
+AWS_SHARED_CREDENTIALS_FILE/AWS_CONFIG_FILE paths, which preempted the normal
+DVC credentialpath via setdefault. Existing ordinary helpers, real credential
+resolver/writer swap, source and document bytes were unchanged; no new GET.
+One corrected exact-two-document push returned both successful targets.
+Private config.local was restored exactly and its prior absence restored.
+
+Two separate fresh empty-private-cache read-only get_data_file checks then
+returned exactly the questionnaire31148 (1853683bytes, 6.2315s) and manual31157
+(1748799bytes, 5.6644s), matching every MD5/SHA256 above and each declared
+sidecar. Workspace PDFs were absent; each private data root gained only its
+matching DVC blob and document copy. Normal read permissions were open, with
+no WB API permission/fallback. Both PDFs are now DVC-managed and remote-held
+with fresh readback verification. The first failed push and first-phase
+unexecuted readback receipts are not relabelled successful.
+
+Final receipts: dispatch77b4ce99 evidence/continuation1/PUSH-RECEIPT.json,
+READBACK-31148.json, READBACK-31157.json and POST-CUSTODY-CLEANUP.json.
+Original public bytes/mode/inode/mtime remain exact (atime excluded); the
+private reader copy was removed after all actors. No document content was
+reparsed, and no native/source/scientific/API table test ran. This changes only
+these two documentary holdings, not raw HELD/version facts or fielded/export
+correspondence, licence qualifications or the unresolved 3E interpretation.

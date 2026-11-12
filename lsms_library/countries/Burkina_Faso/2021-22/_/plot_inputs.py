@@ -14,6 +14,11 @@ from lsms_library.local_tools import (get_dataframe, to_parquet,
 from burkina_faso import i
 from s16b_2021 import build_s16b_candidate
 
-build_s16b_candidate(read=get_dataframe, write=to_parquet,
+def _write_wave(frame, filename):
+    # Keep sanctioned caller inference in this wave, not the country helper.
+    return to_parquet(frame, filename)
+
+
+build_s16b_candidate(read=get_dataframe, write=_write_wave,
                      get_map=get_categorical_mapping, id_fn=i, format_id=format_id,
                      source_path='../Data/s16b_me_bfa2021.dta')

@@ -378,16 +378,21 @@ def test_driver_reads_only_own_numeric_source_and_writes_after_validation(adapte
     # Execute the actual serving wrapper's final call with only injected leaves.
     # No package imports, sys.path changes or source-provider code executes.
     wrapper = COUNTRY / '2021-22' / '_' / 'plot_inputs.py'
-    call = ast.parse(wrapper.read_text()).body[-1]
+    body = ast.parse(wrapper.read_text()).body
+    writer = next(node for node in body
+                  if isinstance(node, ast.FunctionDef) and node.name == '_write_wave')
+    call = body[-1]
     assert isinstance(call, ast.Expr) and isinstance(call.value, ast.Call)
     assert isinstance(call.value.func, ast.Name) and call.value.func.id == 'build_s16b_candidate'
+    writer_arg = next(item.value for item in call.value.keywords if item.arg == 'write')
+    assert isinstance(writer_arg, ast.Name) and writer_arg.id == writer.name
     source_arg = next(item.value for item in call.value.keywords if item.arg == 'source_path')
     assert isinstance(source_arg, ast.Constant)
     assert source_arg.value == '../Data/s16b_me_bfa2021.dta'
     namespace = dict(build_s16b_candidate=adapter.build_s16b_candidate,
                      get_dataframe=read, to_parquet=write, get_categorical_mapping=get_map,
                      i=bindings[0]['id_fn'], format_id=bindings[1])
-    exec(compile(ast.Module(body=[call], type_ignores=[]), str(wrapper), 'exec'), namespace)
+    exec(compile(ast.Module(body=[writer, call], type_ignores=[]), str(wrapper), 'exec'), namespace)
     got = writes[0]
     assert len(writes) == 1
     assert got.index.get_level_values('i').tolist() == ['2126'] * 4

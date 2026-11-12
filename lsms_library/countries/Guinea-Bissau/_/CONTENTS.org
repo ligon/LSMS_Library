@@ -831,3 +831,59 @@ or serving claim is transferred to it.
 Diagnosis frozen at =d41aa628ea929cd49bf9414a4c78bcbe3b693bba=;
 see =.coder/ledger/1531-remote-task.md=. Durable report:
 =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/private/Guinea-Bissau-1531-GPS-unit-audit-6d/dispatch/2172b44031b04472ade9414bade8d4fc/evidence/report.md=.
+
+* 2026-11-10 — Selected 2018-19 region/milieu strata (GH #1575)
+
+The user selected the documented combination on 2026-11-10. Only the
+existing =2018-19= sample now derives =strata= from its own cover-page
+=s00q01= region label and =s00q04= residence-milieu label through the
+unchanged shared EHCVM helpers. The retrospective INE BID definition and
+its original-2018-design versus 2021-cluster-revisit qualification are in
+the earlier planned-strata note. The older "Treat the design as
+region-stratified for inference" recommendation and the earlier statement
+that served Region/strata vocabularies are identical remain as history;
+the selected construction now uses a composite whose *region part* shares
+the established Region spelling.
+
+The country-specific spelling consequence is that a bare alias such as
+=bafata -> Bafata= does not match =bafata Urbano=. The strata spelling table
+therefore adds the full existing Region alias pairs crossed with the own
+Portuguese =Urbano=/=Rural= suffixes, as required by the approved binding.
+Every bare alias and the Region table are preserved. These spelling rows
+are not observed-cell assertions or eligibility rules: in particular,
+=sab Rural -> SAB Rural= does not assert that SAB has a rural sample.
+SAB's documented urban-only design and the qualification that nonzero
+allocation arithmetic is not a formally quoted stratum count remain.
+No new native label card or code meanings are claimed by this source edit;
+the full managed-cover metadata-card request is with the manager/deputy.
+
+Missing or blank either component gives NA, without filling from the old
+region-only value or other households. Nonstring codes retain the shared
+=StratumError= refusal. The new registered key is
+=Guinea-Bissau::sample::region-milieu-stratum=, only for =2018-19=, carried
+in nullable =Derivation= only where strata exists. Raw operands remain
+retrievable by their original names through the registered inputs helper.
+
+Source and invented-frame checks cover the actual YAML/thin hooks/shared
+helpers, non-strata rows/order/IDs/v/weights/Rural, attrs and typed provenance.
+They are not native-data acceptance. Full native cards, observed missingness
+and cluster consistency, the reserved existing vocabulary test, original
+versus candidate normal sample, cold/warm/Feature acceptance and final
+metadata footprint/full gates remain UNRUN here. No normal Country/Feature
+sample data was read. Existing sources, joins, extraction of every other
+field, weights, panel/ID behavior and registered-but-unwired 2021-22 are
+unchanged. See =.coder/ledger/1575-guineabissau1575-stratawiring.md=.
+
+* 2026-11-10 — GH #1575 normal sample validation completed
+
+The construction-stage pending/UNRUN wording above records the state at
+that stage. For =2018-19 sample=, the own native cover and weights, cold
+baseline/candidate whole frames, unchanged IDs/weights/Rural, documented
+region or department × milieu strata and derivation inputs passed the
+finite normal validation. Four warm Country.sample returns and two scoped
+Feature.sample returns passed full typed frame/axes/attrs comparison from
+eight authenticated L2 parquets, with zero warm raw getters or writers.
+The cross-run cold and warm capture comparisons, source seals and prior
+failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
+=5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
+earlier job-local caches were reaped; source and survey values did not change.

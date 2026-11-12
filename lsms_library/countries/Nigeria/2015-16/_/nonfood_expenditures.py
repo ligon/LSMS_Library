@@ -20,6 +20,27 @@ files = {'2016Q1':['Nigeria/2015-16/Data/sect11a_harvestw3.csv',
                    'Nigeria/2015-16/Data/sect8b_plantingw3.csv',
                    'Nigeria/2015-16/Data/sect8c_plantingw3.csv']}
 
+# Private Make discovery anchors literals beside this script. Keep the reader's
+# countries-root paths authoritative, with checked script-relative declarations
+# (the guarded declaration pattern used by Uganda anthropometry, GH #1288).
+_DECLARED_NONFOOD_SOURCES = {
+    '2016Q1': ['../Data/sect11a_harvestw3.csv',
+               '../Data/sect11b_harvestw3.csv',
+               '../Data/sect11c_harvestw3.csv',
+               '../Data/sect11d_harvestw3.csv',
+               '../Data/sect11e_harvestw3.csv'],
+    '2015Q3': ['../Data/sect8a_plantingw3.csv',
+               '../Data/sect8b_plantingw3.csv',
+               '../Data/sect8c_plantingw3.csv'],
+}
+if (any(not path.startswith('../Data/')
+        for paths in _DECLARED_NONFOOD_SOURCES.values() for path in paths)
+        or list(files.items()) != [
+        (t, ['Nigeria/2015-16/' + path.removeprefix('../') for path in paths])
+        for t, paths in _DECLARED_NONFOOD_SOURCES.items()]):
+    raise RuntimeError(
+        'Nigeria/2015-16: nonfood source declaration differs from files')
+
 # GH #817: `hhid` is the HOUSEHOLD (`i`) and `item_cd` the ITEM (`j`).  These
 # two were mapped the other way round, and every consumer downstream
 # compensated; the canonical names are used here instead.

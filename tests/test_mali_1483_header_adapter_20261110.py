@@ -1,7 +1,7 @@
 """Frozen source-free controls for own Mali s16b adapters and driver wiring.
 
 UNRUN by the source-only author. Coordinator selection is exactly this file,
---noconftest, -n 2 --dist=loadfile. No LSMS import, Country, provider or writer.
+--noconftest, -n 2 --dist=loadfile. No real data, Country data API, provider or writer; own loader/route metadata only.
 Expected cards/frames are stated independently of adapter constants/helpers.
 Only current production household/format_id definitions are AST-extracted.
 """
@@ -346,7 +346,14 @@ def test_header_provenance_and_exact_country_wiring(adapter):
         assert module.SOURCE_BINDINGS[wave]['columns'] == INVENTORIES[wave]
         assert (COUNTRY / wave / '_/plot_inputs.py').is_file()
         text = (COUNTRY / wave / '_/data_info.yml').read_text(encoding='utf-8')
-        assert text.count('\nplot_inputs: !make\n') == 1
+        # A wave script is discovered by its file; !make is a country-scheme
+        # marker and is a truthy extraction mapping at this wave boundary.
+        from lsms_library.country import Wave
+        from lsms_library.yaml_utils import load_yaml
+        assert load_yaml(COUNTRY / wave / '_/data_info.yml')['plot_inputs'] is None
+        declared = Wave(wave, wave, SimpleNamespace(name='Mali'))
+        assert 'plot_inputs' in declared.data_scheme
+        assert declared.resources['plot_inputs'] is None
     tree = yaml.compose((COUNTRY / '_/data_scheme.yml').read_text())
     data_scheme = next(value for key, value in tree.value if key.value == 'Data Scheme')
     input_node = next(value for key, value in data_scheme.value if key.value == 'plot_inputs')

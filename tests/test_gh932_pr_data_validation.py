@@ -1,6 +1,7 @@
 """Source-bound PR guards with invented events; no tokens, data or API calls."""
 from copy import deepcopy
 import importlib.util
+import re
 from pathlib import Path
 import textwrap
 
@@ -188,8 +189,8 @@ def test_required_job_is_always_run_and_metadata_has_separate_name_and_concurren
     assert classify_job['permissions'] == {} and len(classify_job['steps']) == 1
     assert 'uses' not in classify_job['steps'][0]
     assert validation['if'] == '${{ always() }}' and validation['needs'] == 'classify'
-    assert validation['name'] == "${{ needs.classify.outputs.mode == 'metadata' && 'pr-data-metadata-edit' || 'pr-data-validation' }}"
-    assert validation['concurrency']['group'] == "pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.outputs.mode == 'metadata' && 'metadata' || 'validation' }}"
+    assert validation['name'] == "${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'pr-data-metadata-edit' || 'pr-data-validation' }}"
+    assert validation['concurrency']['group'] == "pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'validate' && 'validation' || (needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'metadata' || format('refused-{0}', github.run_id)) }}"
     assert validation['concurrency']['cancel-in-progress'] == 'true'
     steps = validation['steps']
     assert steps[0]['id'] == 'guard' and 'uses' not in steps[0]
@@ -218,8 +219,89 @@ def test_existing_data_recipe_is_reused_without_weaker_test_or_credential_gate()
     # This wrapper-only diagnostic option changes no child command or gate.
     assert full['run'].count(' ' + flag + ' ') == 1
     full['run'] = full['run'].replace(' ' + flag + ' ', ' ', 1)
+    # Only the dedicated PR workflow uses bounded, file-grouped workers.
+    parallel = 'poetry run pytest -n 2 --dist=loadfile '
+    assert full['run'].count(parallel) == 1
+    full['run'] = full['run'].replace(parallel, 'poetry run pytest ', 1)
     assert reused == existing['jobs']['data-tests']['steps'][1:]
     assert workflow['jobs']['validation']['env'] == existing['jobs']['data-tests']['env']
     assert workflow['jobs']['validation']['timeout-minutes'] == '360'
     assert int(workflow['jobs']['validation']['timeout-minutes']) >= int(
         existing['jobs']['data-tests']['timeout-minutes'])
+
+
+def _render_job_field(field, result, mode, run_id, number=17):
+    """Evaluate this workflow's string/boolean subset, not arbitrary Actions syntax."""
+    values = {'needs.classify.result': result, 'needs.classify.outputs.mode': mode,
+              'github.run_id': run_id, 'github.event.pull_request.number': number}
+    template = _workflow()['jobs']['validation'][field] if field == 'name' else (
+        _workflow()['jobs']['validation']['concurrency']['group'])
+
+    def expression(match):
+        text = re.sub(r"(?:needs|github)\.[A-Za-z_.]+",
+                      lambda key: repr(values[key.group()]), match.group(1))
+        text = text.replace('&&', ' and ').replace('||', ' or ')
+        return str(eval(text, {'__builtins__': {},
+                              'format': lambda template, *args: template.format(*args)}))
+
+    return re.sub(r"\$\{\{ (.*?) \}\}", expression, template)
+
+
+def test_late_draft_refusal_cannot_cancel_ready_validation(classify):
+    draft = event('edited')
+    draft['pull_request']['draft'] = True
+    draft['changes'] = {'body': {'from': 'before'}}
+    with pytest.raises(ValueError, match='draft'):
+        classify(draft, 'owner/project', 'pull_request')
+    ready = classify(event('ready_for_review'), 'owner/project', 'pull_request')
+    ready_group = _render_job_field('group', 'success', ready['mode'], 200)
+    # Older event's dependent job arrives after the ready job, as in the incident.
+    late_refusal = _render_job_field('group', 'failure', '', 199)
+    assert ready_group == 'pr-data-17-validation'
+    assert late_refusal == 'pr-data-17-refused-199'
+    assert late_refusal != ready_group
+    assert _render_job_field('name', 'failure', '', 199) == 'pr-data-validation'
+    with pytest.raises(ValueError):
+        _inline('PR_DATA_RESULT_GATE')['guard_mode']('failure', '')
+
+
+@pytest.mark.parametrize('result,mode', [
+    ('failure', ''), ('failure', 'validate'), ('failure', 'metadata'), ('cancelled', ''),
+    ('skipped', ''), ('', ''), (None, None), ('success', ''),
+    ('success', 'unexpected'),
+])
+def test_refused_or_uncertain_requests_have_run_specific_groups_and_fail(result, mode):
+    group = _render_job_field('group', result, mode, 199)
+    assert group == 'pr-data-17-refused-199'
+    assert _render_job_field('name', result, mode, 199) == 'pr-data-validation'
+    assert group != _render_job_field('group', result, mode, 200)
+    assert group != _render_job_field('group', 'success', 'validate', 200)
+    assert group != _render_job_field('group', 'success', 'metadata', 200)
+    with pytest.raises(ValueError):
+        _inline('PR_DATA_RESULT_GATE')['guard_mode'](result, mode)
+
+
+@pytest.mark.parametrize('change', ['head', 'base'])
+def test_new_valid_head_or_base_retains_same_validation_cancellation_group(classify, change):
+    earlier = event('synchronize')
+    later = deepcopy(earlier)
+    later['pull_request'][change]['sha'] = 'c' * 40
+    first = classify(earlier, 'owner/project', 'pull_request')
+    second = classify(later, 'owner/project', 'pull_request')
+    assert first[change] != second[change]
+    assert _render_job_field('group', 'success', first['mode'], 199) == (
+        _render_job_field('group', 'success', second['mode'], 200))
+    assert _workflow()['jobs']['validation']['concurrency']['cancel-in-progress'] == 'true'
+
+
+def test_successful_metadata_group_remains_isolated_and_nonrequired(classify):
+    value = event('edited')
+    value['changes'] = {'body': {'from': None}}
+    decision = classify(value, 'owner/project', 'pull_request')
+    assert _render_job_field('group', 'success', decision['mode'], 199) == (
+        'pr-data-17-metadata')
+    assert _render_job_field('group', 'success', decision['mode'], 199) != (
+        _render_job_field('group', 'success', 'validate', 200))
+    assert _render_job_field('name', 'success', decision['mode'], 199) == (
+        'pr-data-metadata-edit')
+    assert _inline('PR_DATA_RESULT_GATE')['guard_mode']('success', decision['mode']) is False

@@ -4140,3 +4140,98 @@ open. Closed documentary/header evidence is in the 20261103 burst reports
 =587-nigeria-own-round-documents-20261109/= and
 =587-nigeria-W3PH-coping-source-binding-20261109/=; actual-row/API acceptance
 is separate from those source bindings.
+
+** [2026-11-10] Own PH plot records contradict the PP-only premise (GH587)
+
+The earlier plot_features note says lasting attributes are recorded "only in
+the POST-PLANTING round". Preserve that historical premise alongside the GH587
+maintainer finding that the five PH omissions are real half-missing features.
+Own PH agriculture forms and released =secta1_harvestw1/2/3.dta= now establish
+PH area/acquisition operands with NEW/current-access/lost-access routing, not
+an instruction to duplicate PP plots. W1 PDF4 and W3 PDF5(printed4) visually
+confirm the skips; W1/W2 A1 PDF4–9 and W3 A1 PDF5–7 are source-qualified.
+
+The source-qualified W1–W3 append uses =2011Q1/2013Q1/2016Q1= and preserves the
+original PP blocks. W1 PH GPS is =sa1q9d=; W2/W3 use =sa1q9c=. W1 PH unit8
+means Other/specify with a separate string operand, not PP's square-foot code8.
+All three PH acquisition cards include native5 family/inheritance; W1/W2 PP
+maps do not. Keep that exact report and native4 community-or-family wording;
+neither establishes a narrower canonical tenure. Preserve raw operands and
+unknowns, including existing/lost-access records with no canonical area.
+
+Five zero-row headers and then five separately authorized numeric reads retained
+all38495 released records unchanged (6316/6124/5918/10961/9176), complete integral
+unique keys within each source. These are not cross-round uniqueness, eligibility
+or as-fielded CAPI claims. The three repaired sources have6316/6124/5918 records;
+source/pure controls do not themselves prove normal Wave/Country/Feature serving.
+
+W4 =prefilled_gps_area= and W5 =sa1q1c= explicitly refer to a previous/PP visit.
+W4's additional =sa1q11= has1066 positive values but the inspected printed A1
+and native label provide no unit/routing/version bridge. W5 has no corresponding
+fresh-area field in this inspected112-variable export. Keep both cells held
+separately: no current-area units, PP carry, fielding or whole587 closure inferred.
+W4's own cover/A1 says W4 while its ToC footer says W3; retain that version tension.
+Closed forms/sidecars/typed-header/numeric evidence is in burst report
+=587-nigeria-five-PH-plot-features-authority-20261110/=; no PP native replay,
+new local-unit factors, sample/panel/weights or geovar policy is selected.
+
+** [2026-11-10] Physical PP/PH plots and managed Make targets (GH587)
+
+Ten logical quarters share five physical =_/plot_features.py= producers.
+An actual cold Make attempt on9763 ran each physical producer twice: strict
+private preparation wrote managed parquets, but the country Make rule still
+named absent in-tree parquet prerequisites. It timed out900s during ordinary
+sample construction before returning a Country frame; warm/Feature were UNRUN.
+The Make rule now names managed wave outputs and preserves legacy names as
+dependency aliases to the same producer. This changes build routing only;
+normal sample/ID/area/tenure policy and both held PH cells remain unchanged.
+A separately authorized actual backend retry is required after pure graph checks.
+
+* 2026-11-10 -- W1–W3 nonfood source declarations are anchored beside their scripts (GH #1288)
+
+The W1/W2/W3 =nonfood_expenditures.py= loops already contain all 10/10/8
+countries-root CSV path literals. A variable =get_dataframe(fn)= does not hide
+those literals from =scan_script_data_refs=. However, private Make preparation
+resolves literals beside the script, and the wave hash resolves them under
+=wave/Data=. Neither anchor resolves =Nigeria/<wave>/Data/...= to its actual
+committed sidecar. Seeing a filename is not the same as authenticating its source.
+
+The three scripts now add script-relative =../Data/...= declarations, checked
+against the complete ordered original round/file dictionaries before the first
+source getter. This follows the guarded Uganda anthropometry declaration
+pattern. The original reader arguments, loops, kwargs, mappings, positive-value
+filter, IDs, assertions and writer remain intact. Original root-qualified
+scanner artifacts remain too; they are not relabelled as authenticated sources.
+The per-round label file remains the existing =_/nonfood_items.json= build input.
+
+This is source-only engineering, with no actual CSV/header/row, producer, Make,
+Country/Feature, cache or hash-census acceptance. After the initial static proof,
+Root clarified that the bootstrap runtime label did not limit the explicit pure
+grant. All 39 focused scanner/collector-metadata/order/drift cases passed on the
+verified MAIN image, with three active observer profiles, zero denials and empty
+private data/config. The guards refuse actual readers, constructors, builders,
+writers and providers. This does not validate the scientific producer or API.
+The country compiler still enumerates four physical folders. Its W4 sibling
+retains the same anchoring problem for seven CSVs and is outside this three-wave
+repair. No complete country nonfood closure or whole #1288 closure is claimed.
+The WAITING pooled-recall-window question above remains unchanged.
+
+* 2026-11-10 -- W4 nonfood source-declaration residual completed (GH #1288)
+
+The separate W4 follow-on anchors its four harvest and three planting CSVs
+with the same checked =../Data/...= declaration idiom. The scanner already
+sees all seven original root-qualified strings; this repairs preparation/hash
+anchoring, not a measured row loss. Every original reader argument, order,
+kwargs/default, dictionary, processing/reducer, assertion and writer remains
+byte/AST-exact after removing only the added declarations/guard/comment.
+The seven committed sidecars are bound by metadata only.
+
+Exactly13 NEW W4 pure cases pass once at =46b1bfdaeae58fa836e3533437d05709883652a1=;
+the accepted W1–W3 product, original test bodies and old39 proof remain intact
+and those39 were not replayed. Three observer profiles remain active with zero
+denials, private data/config files0, and the actor closes normally. JUnit
+retains all13 cases; the reused plugin's shared callspec filenames leave11
+per-case call receipts, a recorded evidence limitation without a test replay.
+No actual CSV/header/row, producer, Make, Country/Feature, cache/census or
+scientific acceptance follows. Whole1288, exact conservative hash footprint
+and the WAITING pooled-recall-window question remain separate.

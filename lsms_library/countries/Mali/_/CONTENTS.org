@@ -3838,3 +3838,109 @@ wrappers at Farm-level, selecting explicit q02=1 before strict selected-row
 validation. Its ledger preserves actual pure/native adapter checks separately
 from public API/data-CI acceptance. The s16a parcel questions stay a distinct
 route; no household-to-parcel allocation or new grade/factor policy follows.
+
+* 2026-11-10 -- EACI 2017 public dictionary bridge is partial (GH #1436)
+
+The bounded own-catalog 3409 public route returned ten Related Materials
+records, including two named own-2017 enumerator manuals not in the six
+committed PDF declarations: =eaci17_manuel_p1_french.pdf= (47786) and
+=eaci17_manuel_p2_french.pdf= (47787). No distinct electronic questionnaire,
+CAPI project or export syntax was listed on that returned page. The resources
+API separately returned HTTP400/ACCESS-DENIED; it was not an empty inventory.
+The manuals were not downloaded in this electronic/export-only check.
+
+The explicitly linked public DDI export,
+https://microdata.worldbank.org/metadata/export/3409/ddi,
+names =MLI_2017_EAC-I_v03_M= and file =F26/eaci17_s7fp2=. Its variables
+=V873--V876= bind =s7fq13a= to quantity, =s7fq13b= to Code Etat,
+=s7fq13c= to Code UML and =s7fq13d= to kilogram equivalent. =V874='s literal
+state labels are =1 Epis/Panicules=, =2 d=, =3 Non-D= and =4 Egrener=.
+Those shortened published labels do not replace the historical native labels
+recorded above. =V886/s7fq21= remains the separate threshing question.
+
+This is a published dictionary correspondence, not a fielded-version bridge.
+The link calls itself DDI Codebook (2.5), while the XML root declares 1.2.2;
+its January2020 document version mentions a geovariables update. It gives no
+explanation of code4 or deployment linkage reconciling the printed three-state
+card. Preserve that mismatch and the current quantity/unit/unread-state rules.
+Four metadata GETs, one selected XML context, no PDF/native/row/API replay;
+exact receipts and the one-P2-manual archival proposal are recorded in
+=.coder/ledger/1436-mali-own2017-electronic-export-route-7b5e95bf-20261110.md=.
+
+* 2026-11-10 -- own2017 P2 enumerator manual held; state bridge remains open (GH #1436)
+
+=2017-18/Documentation/eaci17_manuel_p2_french.pdf= is now DVC-managed:
+WB3409 resource47787,1,375,005bytes,rawMD5=b08ec8e623065e3a75dfab6a481cbafd=.
+One public GET, one exact-document managed push and one fresh empty-private
+normal read-only retrieval matched SHA256=73fe411b153da4df3af02260e88c1b00747c9b37ee47d139345175ee231c9394=.
+The returned official filename matches the local holding. Cover identifies
+EAC-I2017/second passage; PDF metadata names EACI17_MANUEL_P2.docx and dates
+creation/modification2019-02-04, not a certified fielded/export version.
+
+Bounded new-manual read:7unique text pages (PDF1--4/29--31),2personally
+viewed instruction pages (PDF30/31); none of the older forms/BID was reparsed.
+CompleteQ7F13 instruction on PDF30 describes Production en UML, UML and
+Equivalent en Kg, with its partial-harvest and worked-example instructions.
+It supplies no Etat card, fourth-answer explanation or native suffix binding
+in that inspected paragraph/layout. This is not absence from the whole manual.
+CompleteQ7F21 on PDF31 explicitly asks whether the product was threshed before
+storage (Oui toQ22; Non toQ29); it is a separate operation question.
+
+Preserve the existing three-choice printedQ13 versus four-choice released
+s7fq13b/Egrener tension and the ruralLourd/Leger scope. The already-closed
+publicDDI discovery supplies b=CodeEtat/c=UML association but no processing
+meaning/version bridge for code4; the preceding checkpoint records that separate metadata result. No EHCVM fold or Q21 answer is borrowed.
+The remaining operand is an own-release/fielded dictionary, instruction or
+erratum explaining nativecode4 and its correspondence to the printed card.
+No condition/unit/quantity/default/ID/weight/coverage ruling follows.
+Source/terms/byte custody and exact bounds are recorded in SOURCE.org and
+burst report =1436-mali-p2-manual-restoration-20261110/=.
+
+* 2026-11-10 -- current served-strata source trace (GH #1577)
+
+Source-only trace at =c8e378920968fde414767855186e64f5e36f54bb=; no data,
+header, PDF, API, cache or test execution. All four =sample= producers are
+YAML, not scripts: =_/data_scheme.yml:4-10= declares =strata: str= but
+does not supply its meaning or a missing wave's values.
+
+| Wave | Current producer (wave =_/data_info.yml=) | What =strata= supplies |
+|------+-----------------------------------------+-------------------------|
+| 2014-15 | lines 4-35: =EACICONTROLE_p1.dta= + =EACIPOIDS.dta=, join on =i= | No =strata= extraction or construction; missing in the pooled column |
+| 2017-18 | lines 4-36: =eaci17_s00p1.dta= + =EACI17_ECHANTILLON.dta=, join on =i= | Native =strate= from the weights file, formatted as a code string |
+| 2018-19 | lines 88-121: =s00_me_mli2018.dta= + =ehcvm_ponderations_mli2018.dta=, join on =v= | Cover label =s00q01= + space + cover label =s00q04= |
+| 2021-22 | lines 81-116: =s00_me_mli2021.dta= + =ehcvm_ponderations_mli2021.dta=, join on =i= | Cover label =s00q01= + space + cover label =s00q04= |
+
+The 2017 formatter is =2017-18/_/mapping.py:22-23= (=format_id=), not a
+code-to-name dictionary. The country =strata= table has only spelling keys
+for region-milieu labels (=categorical_mapping.org:25-33=); none decodes
+EAC-I codes. Preserve #1574's numeric 51-code gap and its completed bounded
+BID/header findings above. The historical code-nesting/occupied-count note
+is not a codebook. EHCVM names, geography, =deflator= or back-casting by
+=grappe= cannot fill that gap or the 2014 omission.
+
+Both EHCVM expressions call =ehcvm.strata_label= /
+=derive_region_milieu_stratum= (=ehcvm.py:821-849=): labels are stripped
+and joined; either missing/blank operand gives NA; numeric operands raise.
+Their =sample= hooks stamp =Mali::sample::region-milieu-stratum= only where
+=strata= exists. Read-time curation uses the six spelling pairs above,
+including =Taoudenit= to =Taoudénit= under #1576. Thus these are geographic
+constructions supported by the #812 W2 ruling and the existing BID quotation
+in =derivations.yml:503-550=, not native named-stratum variables. The older
+"20 and 17" cells remain historical measurements; no count is repeated here.
+
+For 2017, classification beyond "native code" needs an own-release complete
+51-code dictionary explicitly bound to =EACI17_ECHANTILLON.strate=. For
+2014, it needs an own-wave stratum field or authoritative assignment rule
+bound to the configured household/cluster keys and the design's 51 strata.
+The closed 2017 review supplies neither for 2014. No named native design
+stratum is established by this trace.
+
+Future placement recommendation only: keep a per-wave served-column account
+in the country's =_/sampling.yml=, separate from its =panel= boundary
+statements. The first wave currently has no boundary entry.
+#1577/#1134 must settle any extension to #793's frozen fields/vocabulary;
+no new field is specified here. Canonical column prose alone cannot express
+these four meanings. =sampling.py:76-83= documents the read-time placement
+advantage; the required future hash-cost measurement is not run here.
+Exact sidecar bindings and closed authority are in the external
+=Mali-served-strata.json= and =.coder/ledger/1577-mali-current-served-strata.md=.
