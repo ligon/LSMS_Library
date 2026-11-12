@@ -19,7 +19,9 @@ exactly one (1,070; the Niger 2021-22 rule after GH #1360, and the key
 Mali::crop_production::hh-crop-sale-single-row).  Otherwise it
 goes on ONE row with plot_id = 'Farm-level' (70: 58 of crops on two rows and 12
 on three or more).  No sale is split, summed or dropped.  s16dq05c is an equivalent
-TOTAL in kg, so KgFactor_sold stays NA.
+TOTAL in kg, so KgFactor_sold stays NA; it is served as Quantity_sold_kg and rides
+with the sale (GH #1560, ruling @ligon 2026-11-12, "Treat 2021 as totals"), with a 0
+beside a positive sold quantity (4 rows) NA.
 
 THE SURVEY'S KILOGRAMS (GH #1436, ruling 2026-11-04).  Quantity_kg is s16cq16c, the
 instrument's "Estimation Quantite totale UML en kg", on the 306 of the 309 rows with a
@@ -55,7 +57,7 @@ import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet
 from mali import (derive_hh_crop_harvest_total, derive_hh_crop_sale_attachment,
                   derive_survey_kg_estimate, ehcvm_crop_condition_labels, ehcvm_crop_conditions,
-                  ehcvm_crop_sold_conditions,
+                  ehcvm_crop_sold_conditions, ehcvm_sold_kilograms,
                   ehcvm_crop_labels, ehcvm_dispositions, ehcvm_household_ids,
                   ehcvm_intercropped, ehcvm_is_sale, ehcvm_plot_ids, ehcvm_unit_labels,
                   finish_ehcvm_crop_production, stamp_harvest_to_date,
@@ -84,6 +86,9 @@ sales = pd.DataFrame({
     'i':             ehcvm_household_ids(sold, wave='2021-22').astype('string').values,
     'crop':          ehcvm_crop_labels(sold['s16dq01']).values,
     'Quantity_sold': pd.to_numeric(sold['s16dq05a'], errors='coerce').values,
+    # 16D.05c, the sale's kilograms, served as a TOTAL (GH #1560, ruling 2026-11-12).
+    'Quantity_sold_kg': ehcvm_sold_kilograms(records_codes.loc[sold.index, 's16dq05c'],
+                                             sold['s16dq05a']).values,
     'Unit_sold':     ehcvm_unit_labels(sold['s16dq05b']).values,
     'Value_sold':    pd.to_numeric(sold['s16dq06'], errors='coerce').values,
     'Condition_sold': ehcvm_crop_sold_conditions(
@@ -94,7 +99,7 @@ sales = pd.DataFrame({
 # Transport each own sale answer through the existing placement, without
 # changing EAC-I/default sale columns or any attachment gate (ledger1528 §4).
 df = derive_hh_crop_sale_attachment(
-    harvest, sales, columns=['Quantity_sold', 'Unit_sold', 'Value_sold',
+    harvest, sales, columns=['Quantity_sold', 'Quantity_sold_kg', 'Unit_sold', 'Value_sold',
                              'Condition_sold', 'condition_sold_native'])
 
 # Conservation: every sale record is on exactly one served row, unchanged.
@@ -102,6 +107,11 @@ on_a_row = df[df['Quantity_sold'].notna() | df['Value_sold'].notna()]
 assert len(on_a_row) == len(sales), 'crop_production 2021-22: a sale moved or doubled'
 assert on_a_row['Value_sold'].sum() == sales['Value_sold'].sum()
 assert on_a_row['Quantity_sold'].sum() == sales['Quantity_sold'].sum()
+# Every sold kilogram is on its sale's row, and no sold kilogram is anywhere else: s16d
+# holds no positive s16dq05c on a record that is not a sale (GH #1560).
+assert on_a_row['Quantity_sold_kg'].sum() == sales['Quantity_sold_kg'].sum()
+assert df['Quantity_sold_kg'].sum() == pd.to_numeric(
+    records_codes['s16dq05c'], errors='coerce').sum(), 'crop_production 2021-22: sold kg moved'
 
 recorded = pd.to_numeric(df['Quantity'], errors='coerce').astype('float64').sum()
 df = stamp_harvest_to_date(df)

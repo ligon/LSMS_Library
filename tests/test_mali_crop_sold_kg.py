@@ -1,0 +1,135 @@
+"""GH #1560 (ruling @ligon 2026-11-12, "Treat 2021 as totals"): Mali 2021-22's sold kilograms.
+
+``Quantity_sold_kg`` is ``s16dq05c``, "Estimation Quantite totale UML en kg", served as the
+TOTAL kilograms of the sale it rides with, on the single harvest row or the Farm-level row.
+A 0 beside a positive sold quantity (4 rows) is NA.  ``KgFactor_sold`` stays NA in this
+wave: the total is never divided into a factor.  The other waves carry NA.  ``TestRules``
+and ``TestDeclared`` need no microdata; ``TestServed`` does (``requires_s3``), and its oracle
+reads the ``.dta`` and imports nothing from ``Mali/_/``.
+"""
+from __future__ import annotations
+
+import warnings
+
+import numpy as np
+import pandas as pd
+import pytest
+
+from lsms_library.derivations import records_for, resolve_callable
+from lsms_library.paths import countries_root
+from lsms_library.yaml_utils import load_yaml
+
+COUNTRY = "Mali"
+TABLE = "crop_production"
+KEY = "Mali::crop_production::hh-crop-sale-single-row"
+ROOT = countries_root() / COUNTRY
+WAVE = "2021-22"
+FILE = "s16d_me_mli2021.dta"
+
+
+def _mali(name):
+    return resolve_callable(f"lsms_library.countries.Mali._.mali:{name}")
+
+
+class TestRules:
+    def test_a_zero_beside_a_positive_sale_is_no_answer(self):
+        got = _mali("ehcvm_sold_kilograms")(pd.Series([0.0, 0.0, 700.0, np.nan]),
+                                             pd.Series([4.0, np.nan, 7.0, 2.0]))
+        assert got.dtype == "float64"
+        assert np.isnan(got.iloc[0]) and got.iloc[1] == 0.0 and got.iloc[2] == 700.0
+        assert np.isnan(got.iloc[3])
+
+    def test_the_sale_carries_its_kilograms_wherever_it_goes(self):
+        attach = _mali("derive_hh_crop_sale_attachment")
+        harvest = pd.DataFrame({"i": ["1", "2", "2"], "crop": ["Mil"] * 3,
+                                "plot_id": ["1_1", "1_1", "1_2"], "Quantity": [5.0, 1.0, 2.0]})
+        sales = pd.DataFrame({"i": ["1", "2"], "crop": ["Mil", "Mil"],
+                              "Quantity_sold": [2.0, 3.0], "Quantity_sold_kg": [200.0, 75.0],
+                              "Unit_sold": ["Sac (100 Kg)", "Kg"], "Value_sold": [9.0, 8.0]})
+        got = attach(harvest, sales, columns=["Quantity_sold", "Quantity_sold_kg",
+                                              "Unit_sold", "Value_sold"])
+        assert got.loc[got["plot_id"] == "1_1", "Quantity_sold_kg"].tolist()[0] == 200.0
+        farm = got[got["plot_id"] == "Farm-level"]
+        assert farm["Quantity_sold_kg"].tolist() == [75.0]
+        assert float(got["Quantity_sold_kg"].sum()) == 275.0
+
+    def test_the_finished_frame_types_the_column(self):
+        finish = _mali("finish_ehcvm_crop_production")
+        frame = pd.DataFrame({"i": ["1"], "plot_id": ["1_1"], "crop": ["Mil"], "u": ["Kg"],
+                              "Quantity": [4.0], "Quantity_sold": [2.0], "Quantity_sold_kg": [2.0],
+                              "Value_sold": [100.0], "intercropped": [False]})
+        got = finish(frame, WAVE)
+        assert got["Quantity_sold_kg"].dtype == "float64" and got["Quantity_sold_kg"].tolist() == [2.0]
+        got = finish(frame.drop(columns="Quantity_sold_kg"), "2018-19")
+        assert got["Quantity_sold_kg"].isna().all()
+
+
+class TestDeclared:
+    def test_the_column_is_optional_and_not_a_level(self):
+        entry = load_yaml(ROOT / "_" / "data_scheme.yml")["Data Scheme"][TABLE]
+        assert entry["Quantity_sold_kg"] == {"type": "float", "optional": True}
+        assert "Quantity_sold_kg" not in entry["index"]
+
+    def test_the_sale_record_names_the_kilograms(self):
+        record = records_for(COUNTRY, TABLE)[KEY]
+        assert "Quantity_sold_kg" in record["columns"]
+        assert "s16dq05c" in record["raw_variables"]
+
+
+def _read(name, **kw):
+    from lsms_library.local_tools import get_dataframe
+    return get_dataframe(str(ROOT / WAVE / "Data" / name), **kw)
+
+
+@pytest.fixture(scope="module")
+def built():
+    import lsms_library as ll
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        country = ll.Country(COUNTRY)
+        df = country.crop_production()
+    return country, df
+
+
+@pytest.mark.requires_s3
+class TestServed:
+    def test_2021_22_is_s16dq05c_with_its_zeros_masked(self, built):
+        raw = _read(FILE, convert_categoricals=False)
+        kg = pd.to_numeric(raw["s16dq05c"], errors="coerce")
+        sold = pd.to_numeric(raw["s16dq05a"], errors="coerce")
+        assert int(((kg == 0) & (sold > 0)).sum()) == 4
+        _, df = built
+        got = df.xs(WAVE, level="t")["Quantity_sold_kg"].astype("float64")
+        assert int(got.notna().sum()) == int(kg.gt(0).sum()) == 1136
+        assert float(got.sum()) == float(kg.sum()) == 4873574.0
+        assert not (got == 0).any()
+
+    def test_every_sold_kilogram_is_on_a_sale_row(self, built):
+        _, df = built
+        got = df.xs(WAVE, level="t")
+        sale = (got["Quantity_sold"].fillna(0) > 0) | (got["Value_sold"].fillna(0) > 0)
+        assert not (got["Quantity_sold_kg"].fillna(0).gt(0) & ~sale).any()
+        farm = got.index.get_level_values("plot_id") == "Farm-level"
+        assert got.loc[farm & sale.to_numpy(), "Quantity_sold_kg"].notna().all()
+
+    def test_no_total_becomes_a_factor(self, built):
+        _, df = built
+        assert df.xs(WAVE, level="t")["KgFactor_sold"].isna().all()
+
+    def test_in_kilograms_the_total_is_the_quantity(self, built):
+        _, df = built
+        got = df.xs(WAVE, level="t")
+        kg = got["Unit_sold"].astype("string").eq("Kg").fillna(False) & got["Quantity_sold_kg"].notna()
+        assert int(kg.sum()) == 495
+        assert (got.loc[kg, "Quantity_sold_kg"] == got.loc[kg, "Quantity_sold"]).all()
+
+    def test_the_other_waves_carry_no_sold_kilograms(self, built):
+        _, df = built
+        other = df[df.index.get_level_values("t") != WAVE]
+        assert other["Quantity_sold_kg"].isna().all()
+
+    def test_the_registered_inputs_carry_the_raw_kilograms(self, built):
+        country, _ = built
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            assert "s16dq05c" in country.derivation_inputs(KEY, wave=WAVE).columns

@@ -333,18 +333,22 @@ Niger::crop_production::dry-season-cycle-total:
 
 Niger::crop_production::dry-season-sale-window:
   waves: ['2011-12']
-  columns: [Quantity_sold, Value_sold]
+  columns: [Quantity_sold, Value_sold, Quantity_sold_kg]
   rule: >-
     Identity on dry-season rows with a positive sale: Quantity_sold is as03eq11a and
     Value_sold as03eq12, as recorded after their exact codes (as03eq12 == 9999999, 1
-    row).  Nothing is multiplied by as03eq06.  The quantity is asked per cycle, and
+    row), and Quantity_sold_kg is as03eq11c, the sale in kilograms asked beside
+    as03eq11a and so in its window, after its code 99999 (39 rows) and with a 0 beside
+    a positive Quantity_sold NA (36 rows) (GH #1560, ruling @ligon 2026-11-12).  Nothing
+    is multiplied by as03eq06, so Quantity_sold_kg is per cycle where Quantity_kg is
+    over all cycles.  The quantity is asked per cycle, and
     the value states no window.  Quantity remains a total over cycles, so on a
     multi-cycle row Quantity_sold / Quantity is not a sold share.  A zero sale
     carries no key.  Joined to dry-season-cycle-total with sorted '+'.
   function: lsms_library.countries.Niger._.niger:derive_dry_season_sale_window
   inputs: lsms_library.countries.Niger._.niger:inputs_dry_season_sale_window
   raw_variables: [hid, as03eq01, as03eq03, as03eq06, as03eq10, as03eq11a, as03eq11b,
-                  as03eq12]
+                  as03eq11c, as03eq12]
   assumptions:
     - text: >-
         preserve the reported sale without choosing a window for the value.  Stata
@@ -398,10 +402,11 @@ Niger::crop_production::survey-kg-estimate:
 # GH #1457 (bulk ruling 2026-11-04, extending #843 option (d)).
 Niger::crop_production::hh-crop-sale-single-row:
   waves: ['2014-15', '2021-22']
-  columns: [Quantity_sold, Value_sold, Unit_sold, Condition_sold]
+  columns: [Quantity_sold, Quantity_sold_kg, Value_sold, Unit_sold, Condition_sold]
   rule: >-
     2014-15 AS2E2 and 2021-22 s16d record a sale for the household and crop, with no
-    plot.  A sale is a record with a positive quantity or value.  Where the crop has
+    plot.  Its kilograms, AS02EQ12C and s16dq05c, ride with it as Quantity_sold_kg, a
+    total (GH #1560, ruling @ligon 2026-11-12).  A sale is a record with a positive quantity or value.  Where the crop has
     exactly one served harvest line -- one served row, not merely one plot (GH #1360),
     and a line with no quantity, month or stand does not count where another does, since
     the API removes it -- the sale is served on it as recorded, in its own Unit_sold, and
@@ -412,8 +417,8 @@ Niger::crop_production::hh-crop-sale-single-row:
     or dropped.  A recorded 0 on a one-line crop stays, with no key: it is not a sale.
   function: lsms_library.countries.Niger._.niger:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Niger._.niger:inputs_hh_crop_sale_single_row
-  raw_variables: [CULTURE, AS02EQ110B, AS02EQ12A, AS02EQ12B, AS02EQ13, s16cq04, s16dq01,
-                  s16dq05a, s16dq05b, s16dq05d, s16dq06]
+  raw_variables: [CULTURE, AS02EQ110B, AS02EQ12A, AS02EQ12B, AS02EQ12C, AS02EQ13, s16cq04,
+                  s16dq01, s16dq05a, s16dq05b, s16dq05c, s16dq05d, s16dq06]
   assumptions:
     - text: >-
         the crop module asks the sale once per crop, with no plot.  Where the crop has one

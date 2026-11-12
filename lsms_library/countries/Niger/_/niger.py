@@ -645,8 +645,8 @@ def _finish_crop_production(df, t):
     column set (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave
     that passes no ``condition`` gets :data:`CONDITION_NA`; one that passes no
     ``production_obs`` gets :data:`CROP_OBS_NA`; one that passes no
-    ``condition_native``, ``Condition_sold``, ``condition_sold_native`` or
-    ``Quantity_kg`` carries NA there."""
+    ``condition_native``, ``Condition_sold``, ``condition_sold_native``,
+    ``Quantity_kg`` or ``Quantity_sold_kg`` carries NA there."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     # Quantity_kg (GH #1436): the survey's total for the line, where its harvest
@@ -659,6 +659,19 @@ def _finish_crop_production(df, t):
     no_answer = (df['Quantity_kg'].eq(0).fillna(False).astype(bool)
                  & df['Quantity'].gt(0).fillna(False).astype(bool))
     df['Quantity_kg'] = df['Quantity_kg'].mask(no_answer)
+    # Quantity_sold_kg (GH #1560 / #1571, ruling @ligon 2026-11-12, "Treat 2021 as
+    # totals"): the survey's kilograms for the SALE, a TOTAL in the window of
+    # Quantity_sold, read literally.  The wave script clears each column's own code.
+    # The harvest rule applies on the sale side: a 0 beside a positive Quantity_sold is
+    # no answer, not a sale of nothing.  A 0 beside no positive sold quantity stays.
+    # It is never a factor: KgFactor_sold, kg per ONE sold unit, is not Niger's.
+    if 'Quantity_sold_kg' not in df.columns:
+        df['Quantity_sold_kg'] = pd.NA
+    df['Quantity_sold_kg'] = pd.to_numeric(df['Quantity_sold_kg'],
+                                           errors='coerce').astype('Float64')
+    no_sold_answer = (df['Quantity_sold_kg'].eq(0).fillna(False).astype(bool)
+                      & df['Quantity_sold'].gt(0).fillna(False).astype(bool))
+    df['Quantity_sold_kg'] = df['Quantity_sold_kg'].mask(no_sold_answer)
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
     # because >=1 wave has it).  planting_month / perennial are omitted from
     # the schema entirely — no Niger wave records them.
@@ -711,8 +724,8 @@ def _finish_crop_production(df, t):
         df['production_obs'] = CROP_OBS_NA
     df['production_obs'] = df['production_obs'].astype('string')
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs',
-            'Quantity', 'Quantity_kg', 'Quantity_sold', 'Value_sold', 'Unit_sold',
-            'Condition_sold',
+            'Quantity', 'Quantity_kg', 'Quantity_sold', 'Quantity_sold_kg', 'Value_sold',
+            'Unit_sold', 'Condition_sold',
             'harvest_month', 'intercropped', 'condition_native', 'condition_sold_native']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
@@ -851,12 +864,12 @@ _HH_SALE_SOURCE = {
                     harvest_qty='AS02EQ07A', harvest_month='AS02EQ06A',
                     hh=['GRAPPE', 'MENAGE', 'EXTENSION'],
                     qty='AS02EQ12A', value='AS02EQ13', qty_codes=(9999,), value_codes=(9999999,),
-                    raw=['AS02EQ110B', 'AS02EQ12A', 'AS02EQ12B', 'AS02EQ13']),
+                    raw=['AS02EQ110B', 'AS02EQ12A', 'AS02EQ12B', 'AS02EQ12C', 'AS02EQ13']),
     '2021-22': dict(harvest='s16c_me_ner2021.dta', sale='s16d_me_ner2021.dta',
                     harvest_crop='s16cq04', sale_crop='s16dq01', hh=['grappe', 'menage'],
                     harvest_qty='s16cq16a', harvest_stand='s16cq07',
                     qty='s16dq05a', value='s16dq06', drop_repeats=True,
-                    raw=['s16dq01', 's16dq05a', 's16dq05b', 's16dq05d', 's16dq06']),
+                    raw=['s16dq01', 's16dq05a', 's16dq05b', 's16dq05c', 's16dq05d', 's16dq06']),
 }
 
 
@@ -891,7 +904,7 @@ def derive_dry_season_cycle_total(per_cycle, cycles):
     return total.mask(x.gt(0) & n.eq(0))
 
 
-def derive_dry_season_sale_window(quantity_sold, value_sold):
+def derive_dry_season_sale_window(quantity_sold, value_sold, kilograms_sold=None):
     """A dry-season sale -> ``Quantity_sold`` / ``Value_sold``: THE IDENTITY.
 
     Registered as ``Niger::crop_production::dry-season-sale-window``, the Mali
@@ -900,11 +913,19 @@ def derive_dry_season_sale_window(quantity_sold, value_sold):
     pair is served as recorded beside a ``Quantity`` over all cycles, and on a
     multi-cycle line ``Quantity_sold / Quantity`` is not a sold share.  Both inputs
     are cleared of their codes by the caller.
+
+    ``kilograms_sold`` is 3E.11c ``as03eq11c`` (GH #1560), the sale in kilograms,
+    asked beside 3E.11a and so in its window: served as recorded, a TOTAL for that
+    window, and like ``Quantity_sold`` NOT multiplied by the cycle count, which the
+    harvest's ``Quantity_kg`` is.  Returned as ``Quantity_sold_kg`` when given.
     """
-    return pd.DataFrame({
+    out = pd.DataFrame({
         'Quantity_sold': pd.to_numeric(quantity_sold, errors='coerce').astype('float64'),
         'Value_sold': pd.to_numeric(value_sold, errors='coerce').astype('float64'),
     })
+    if kilograms_sold is not None:
+        out['Quantity_sold_kg'] = pd.to_numeric(kilograms_sold, errors='coerce').astype('float64')
+    return out
 
 
 def stamp_dry_season_derivations(df):
@@ -951,7 +972,8 @@ def inputs_dry_season_sale_window(wave):
     """The registry ``inputs`` callable of dry-season-sale-window; the cycle count
     is there so a user can rescale the sale."""
     return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
-                                     'as03eq10', 'as03eq11a', 'as03eq11b', 'as03eq12'])
+                                     'as03eq10', 'as03eq11a', 'as03eq11b', 'as03eq11c',
+                                     'as03eq12'])
 
 
 # ---------------------------------------------------------------------------

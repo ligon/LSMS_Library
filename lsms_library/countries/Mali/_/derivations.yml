@@ -222,13 +222,16 @@ Mali::crop_production::tree-sale-window:
 
 Mali::crop_production::hh-crop-sale-single-row:
   waves: ['2017-18', '2021-22']
-  columns: [Quantity_sold, Unit_sold, KgFactor_sold, Value_sold, Condition_sold, condition_sold_native]
+  columns: [Quantity_sold, Quantity_sold_kg, Unit_sold, KgFactor_sold, Value_sold, Condition_sold,
+            condition_sold_native]
   rule: >-
     s16d records a sale for the household and crop, with no plot.  A sale is a
     record with a positive s16dq05a or s16dq06.  Where the household has exactly
     one s16c row for the crop -- one served row, not merely one plot -- the sale
     is served on that row: Quantity_sold = s16dq05a, Unit_sold = s16dq05b,
-    Value_sold = s16dq06, as recorded, and that row carries this key. The own
+    Value_sold = s16dq06, as recorded, and that row carries this key.  Its kilograms,
+    s16dq05c, ride with it as Quantity_sold_kg, a total (GH #1560, ruling @ligon
+    2026-11-12), a 0 beside a positive s16dq05a NA. The own
     s16dq05d sold state accompanies that same sale as Condition_sold and
     condition_sold_native (GH1528), without supplying a harvest state. What is
     derived is the ATTACHMENT, not the numbers.  Any other sale is served on one
@@ -245,8 +248,8 @@ Mali::crop_production::hh-crop-sale-single-row:
     one plot, s7gq20 = 'Non' as Quantity_sold = Value_sold = 0, with no key.
   function: lsms_library.countries.Mali._.mali:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Mali._.mali:inputs_hh_crop_sale_single_row
-  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq05d,
-                  s16dq06, s7fq01, s7fq02, s7fq03, s7gq01, s7gq20, s7gq21a, s7gq21b,
+  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq05c,
+                  s16dq05d, s16dq06, s7fq01, s7fq02, s7fq03, s7gq01, s7gq20, s7gq21a, s7gq21b,
                   s7gq21d, s7gq22]
   assumptions:
     - text: >-

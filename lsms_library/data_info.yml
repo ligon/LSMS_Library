@@ -1199,6 +1199,35 @@ Columns:
         Tree total-equivalent fields are not per-unit factors. The existing
         sold-quantity consumer screens supplied factors and retains its
         Unit_sold/fallback/disagreement policy; wiring does not change it.
+    Quantity_sold_kg:
+      type: float
+      optional: true
+      note: |
+        The SALE in kilograms, AS THE SURVEY WROTE IT DOWN: the sold-side twin
+        of `Quantity_kg`.  A TOTAL for the sale this row carries, in the window
+        of `Quantity_sold`, not a factor per sold unit; within a sold unit it
+        scales with `Quantity_sold`.  First instances (GH #1560 / #1571, ruling
+        @ligon 2026-11-12, "Treat 2021 as totals"): Niger 2011-12 `as02eq12c`
+        and `as03eq11c`, 2014-15 `AS02EQ12C`, Niger and Mali 2021-22
+        `s16dq05c` ("Estimation Quantite totale UML en kg"), which is served as
+        a total on its released label and its Kg controls although the own
+        vague forms instruct kg per ONE unit.
+
+        NEVER CONVERTED INTO `KgFactor_sold`.  That column is kg per ONE sold
+        unit and only what an instrument wrote per unit; dividing this total
+        by `Quantity_sold` to fill it would be a number no instrument wrote.
+        `Value_sold / Quantity_sold_kg` is a price per kilogram on the same
+        row, and nothing computes it by default: `median_price_valuation`
+        reads it only when a caller passes it as `kg_qty=` (an explicit kg
+        denominator bypasses all unit work).
+
+        A "don't know" code is NA, and so is a 0 beside a positive
+        `Quantity_sold`, as on the harvest side; count both in the country's
+        CONTENTS.org.  A positive value on a record with no positive sold
+        quantity or value is served as recorded (the record is not thereby a
+        sale).  It rides with the sale wherever the sale is placed, a
+        `plot_id = 'Farm-level'` row included.  The state of what was sold is
+        `Condition_sold`, not `condition`.
     Unit_sold:
       type: str
       optional: true

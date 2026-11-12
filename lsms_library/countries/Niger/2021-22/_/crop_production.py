@@ -6,8 +6,9 @@ The 2021-22 instrument SPLITS the crop module that 2018-19 kept together:
     ``Quantity_kg`` column, GH #1436, keyed survey-kg-estimate) and the intercrop
     flag (s16cq07).  One row per reported (field, parcel, crop) harvest line.
   - s16d_me_ner2021.dta : CROP level (no plot) — sold qty + unit (s16dq05a /
-    s16dq05b -> the ``Unit_sold`` column, GH #824), sold state (s16dq05d -> the
-    ``Condition_sold`` column, GH #1462) and sale value (s16dq06).
+    s16dq05b -> the ``Unit_sold`` column, GH #824), sold kilograms (s16dq05c -> the
+    ``Quantity_sold_kg`` column, read as a total, GH #1560), sold state (s16dq05d ->
+    the ``Condition_sold`` column, GH #1462) and sale value (s16dq06).
     Its crop-level lines are REPLICATED once per plot; exact duplicates are
     dropped before the sale is attributed (see the comment in the sale block).
 
@@ -105,6 +106,12 @@ sold_df = pd.DataFrame({
     'i':             sold_i.values,
     'crop':          sold_crop.values,
     'Quantity_sold': pd.to_numeric(sold['s16dq05a'], errors='coerce').values,
+    # 16D.05c, "Estimation Quantite totale UML en kg", served as the TOTAL kilograms
+    # sold (GH #1560 / #1571, ruling @ligon 2026-11-12 "Treat 2021 as totals"): the
+    # released label and the file's Kg sales (kg == quantity on 45 of 48) say a total,
+    # where both own vague forms instruct "poids en kg d'UNE UML".  Never a factor:
+    # KgFactor_sold is kg per ONE unit.  No code in the column (max 8,000).
+    'Quantity_sold_kg': pd.to_numeric(soldn['s16dq05c'], errors='coerce').values,
     'Value_sold':    pd.to_numeric(sold['s16dq06'], errors='coerce').values,
     # The SOLD unit (s16dq05b), whose 8-label set is spelled DIFFERENTLY from
     # the harvest unit s16cq16b ('tiya', 'sac de 100kg', 'panier', ...); the
@@ -121,7 +128,7 @@ sold_df = pd.DataFrame({
 sold_df = sold_df.dropna(subset=['i', 'crop'])
 sold_one = (sold_df.groupby(['i', 'crop', 'Unit_sold', 'Condition_sold'],
                             as_index=False, dropna=False)
-            [['Quantity_sold', 'Value_sold']].sum(min_count=1))
+            [['Quantity_sold', 'Quantity_sold_kg', 'Value_sold']].sum(min_count=1))
 records = sold_one
 
 # Attribute ONLY to (i, crop) pairs with exactly one harvest LINE in the
@@ -154,5 +161,8 @@ assert df.index.is_unique, 'crop_production 2021-22 repeats a native harvest lin
 # Conservation: the records' sums, on one row each.
 assert df['Value_sold'].sum() == records['Value_sold'].sum(), 'a sale value moved'
 assert df['Quantity_sold'].sum() == records['Quantity_sold'].sum(), 'a sold quantity moved'
+# Every recorded sold kilogram is on a served row (GH #1560).
+assert abs(float(df['Quantity_sold_kg'].sum()) - float(records['Quantity_sold_kg'].sum())) < 1e-6, \
+    'a sold kilogram moved'
 assert len(df) > 0, 'crop_production 2021-22 produced no rows'
 to_parquet(df, 'crop_production.parquet')

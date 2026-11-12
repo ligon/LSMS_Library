@@ -879,7 +879,9 @@ def crop_production_finalize(df):
 # shape that keeps the EAC-I tree equivalents unwired.  s16cq16c is served as the
 # harvest's Quantity_kg (GH #1436), only on the row that recorded it: s16d's other
 # "c" columns (s16dq02c, s16dq03c, s16dq13c) are the state of the product, so a
-# dispositions-derived Quantity has no survey kilograms, and s16dq05c is a sale's.
+# dispositions-derived Quantity has no survey kilograms, and s16dq05c is a sale's: it is
+# served as the sale's Quantity_sold_kg, a total, riding with the sale (GH #1560, ruling
+# @ligon 2026-11-12, "Treat 2021 as totals"; ehcvm_sold_kilograms).
 # planting_month,
 # harvest_month, months_harvested and perennial are NA: s16c asks none of them,
 # and it lists tree crops (Manguier, Anacarde) on the field grid without saying
@@ -1121,6 +1123,21 @@ def derive_survey_kg_estimate(kilograms, quantity):
     return kg.mask(kg.eq(0) & pd.to_numeric(quantity, errors='coerce').gt(0))
 
 
+def ehcvm_sold_kilograms(kilograms, quantity_sold):
+    """2021-22 s16dq05c -> ``Quantity_sold_kg``: the sale's kilograms, a TOTAL.
+
+    GH #1560 / #1571, ruling @ligon 2026-11-12 ("Treat 2021 as totals"): the released
+    label says "Estimation Quantite totale UML en kg", and on all 495 sales in Kg the
+    kilograms equal the sold quantity, where both own vague forms instruct a weight per
+    ONE unit.  Read literally, as ``Quantity_kg`` is; never divided into a factor, and
+    never put in ``KgFactor_sold``, which is kg per ONE sold unit.  A 0 beside a positive
+    sold quantity (4 rows) is no answer, not a sale of nothing, and is NA.  The column
+    has no code (max 1,150,000, no all-nines value).  Returns float64.
+    """
+    kg = pd.to_numeric(kilograms, errors='coerce').astype('float64')
+    return kg.mask(kg.eq(0) & pd.to_numeric(quantity_sold, errors='coerce').gt(0))
+
+
 def stamp_survey_kg_estimate(df):
     """Key the rows whose ``Quantity_kg`` holds a value."""
     out = df.copy()
@@ -1220,7 +1237,8 @@ def finish_ehcvm_crop_production(df, wave):
     """
     out = df.copy()
     out['t'] = wave
-    for col in ('Quantity', 'Quantity_kg', 'Quantity_sold', 'Value_sold', 'KgFactor_sold'):
+    for col in ('Quantity', 'Quantity_kg', 'Quantity_sold', 'Quantity_sold_kg', 'Value_sold',
+                'KgFactor_sold'):
         if col not in out.columns:
             out[col] = pd.NA
         out[col] = pd.to_numeric(out[col], errors='coerce').astype('float64')
@@ -1245,8 +1263,8 @@ def finish_ehcvm_crop_production(df, wave):
     if out.duplicated(['i', 'plot_id', 'crop']).any():
         raise ValueError(f'crop_production {wave}: a repeated (i, plot_id, crop)')
     out = out.set_index(['t', 'i', 'plot_id', 'crop', 'condition'])
-    return out[['Quantity', 'Quantity_kg', 'u', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold',
-                'Value_sold', 'months_harvested', 'planting_month',
+    return out[['Quantity', 'Quantity_kg', 'u', 'Quantity_sold', 'Quantity_sold_kg', 'Unit_sold',
+                'KgFactor_sold', 'Value_sold', 'months_harvested', 'planting_month',
                 'harvest_month', 'intercropped', 'perennial', 'condition_native',
                 'Condition_sold', 'condition_sold_native', 'Derivation']].sort_index()
 
@@ -1312,7 +1330,7 @@ def inputs_hh_crop_sale_single_row(wave):
         harvest = _ehcvm_keyed(wave, f's16c_me_mli{year}.dta', 's16cq04')
         sold = _ehcvm_keyed(wave, f's16d_me_mli{year}.dta', 's16dq01')
         sold = sold[ehcvm_is_sale(sold['s16dq05a'], sold['s16dq06'])]
-        names = ['s16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq05d', 's16dq06']
+        names = ['s16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq05c', 's16dq05d', 's16dq06']
         plot = ['s16cq02', 's16cq03']
     lines = harvest.groupby(_SALE_KEYS).size()
     single = lines[lines == 1].index
