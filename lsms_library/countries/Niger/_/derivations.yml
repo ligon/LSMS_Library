@@ -340,8 +340,9 @@ Niger::crop_production::dry-season-sale-window:
     row), and Quantity_sold_kg is as03eq11c, the sale in kilograms asked beside
     as03eq11a and so in its window, after its code 99999 (39 rows) and with a 0 beside
     a positive Quantity_sold NA (36 rows) (GH #1560, ruling @ligon 2026-11-12).  Nothing
-    is multiplied by as03eq06, so Quantity_sold_kg is per cycle where Quantity_kg is
-    over all cycles.  The quantity is asked per cycle, and
+    is multiplied by as03eq06, so Quantity_sold_kg is the recorded FIRST-cycle sale where
+    Quantity_kg is over all cycles (ruled @ligon 2026-11-12, "First cycle, as recorded";
+    any multiplication waits on GH #1529's cycle-semantics ruling).  The quantity is asked per cycle, and
     the value states no window.  Quantity remains a total over cycles, so on a
     multi-cycle row Quantity_sold / Quantity is not a sold share.  A zero sale
     carries no key.  Joined to dry-season-cycle-total with sorted '+'.

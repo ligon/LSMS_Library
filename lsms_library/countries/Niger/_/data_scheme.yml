@@ -237,8 +237,11 @@ Data Scheme:
     Quantity_sold: float
     # Quantity_sold_kg (GH #1560 / #1571, ruling @ligon 2026-11-12 "Treat 2021 as
     # totals") is the survey's kilograms for the SALE, a TOTAL in Quantity_sold's own
-    # window, read literally: 2011-12 as02eq12c and, on Farm-level rows, as03eq11c
-    # (per cycle, like as03eq11a: NOT multiplied by as03eq06); 2014-15 AS02EQ12C;
+    # window, read literally: 2011-12 as02eq12c and, on Farm-level rows, as03eq11c,
+    # which is PER FIRST PRODUCTION CYCLE (3E.11's window, like as03eq11a), NOT over
+    # the season and NOT multiplied by as03eq06 (ruled @ligon 2026-11-12; any cycle
+    # product waits on GH #1529), while Quantity_kg on those rows is over all cycles;
+    # 2014-15 AS02EQ12C;
     # 2021-22 s16dq05c, whose released label says a total where both vague forms say
     # kg per ONE unit.  2018-19 asks none.  Codes are NA (9999, 99999, 9999 by module),
     # and so is a 0 beside a positive Quantity_sold.  It rides with the sale: on its

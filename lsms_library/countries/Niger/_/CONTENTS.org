@@ -3722,8 +3722,10 @@ Counted on the held files after each wave's existing drops (3E's one byte-identi
   (the first cycle), so it shares =Quantity_sold='s footing, and =dry-season-sale-window= now lists
   it.  =Quantity_kg= on the same rows IS multiplied (=dry-season-cycle-total=), so on the 43
   multi-cycle 3E sales =Quantity_sold_kg / Quantity_kg= is not a sold share.  This departs from
-  GH #1436 comment 6648014838 ("multiply by =as03eq06="); the per-cycle reading follows the served
-  sale window, and a cycle product is a point for a ruling.
+  GH #1436 comment 6648014838 ("multiply by =as03eq06=").  *RULED (@ligon, 2026-11-12, "First
+  cycle, as recorded"):* 3E's =Quantity_sold_kg= is the recorded sale of the FIRST production
+  cycle and is disclosed as such (=data_scheme.yml=, the canonical =data_info.yml= note,
+  =dry-season-sale-window=); any multiplication waits on GH #1529's cycle-semantics ruling.
 - *Seven 3E records state sold kilograms and no sale* (8,740 kg, on their native Farm-level rows):
   the sold flag says Non on 6 and Oui on 1, and 6 equal the line's harvest kg.  They are served as
   recorded, as this file serves 3E's "no sale" values (3,728,500 FCFA above), and the record is

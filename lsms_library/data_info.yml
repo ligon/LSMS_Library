@@ -1213,6 +1213,12 @@ Columns:
         a total on its released label and its Kg controls although the own
         vague forms instruct kg per ONE unit.
 
+        ITS WINDOW IS THE SALE'S, NOT THE SEASON'S.  Niger 2011-12 section 3E
+        (the dry season, `plot_id = 'Farm-level'`) asks the sale for the FIRST
+        production cycle, so its `Quantity_sold_kg` is per first cycle, beside
+        a `Quantity_kg` over all cycles: not a sold share there (ruling @ligon
+        2026-11-12; any cycle product waits on GH #1529).
+
         NEVER CONVERTED INTO `KgFactor_sold`.  That column is kg per ONE sold
         unit and only what an instrument wrote per unit; dividing this total
         by `Quantity_sold` to fill it would be a number no instrument wrote.
