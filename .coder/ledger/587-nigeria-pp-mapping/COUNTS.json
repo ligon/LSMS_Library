@@ -27,7 +27,7 @@
  },
  "units": {
   "identity": {
-   "W1": 33,
+   "W1": 15,
    "W2": 15,
    "W3-first": 38,
    "W3-second": 38,
@@ -35,7 +35,7 @@
    "W5": 21
   },
   "identity-but-judgement": {
-   "W1": 0,
+   "W1": 18,
    "W2": 0,
    "W3-first": 2,
    "W3-second": 2,

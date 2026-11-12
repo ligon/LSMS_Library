@@ -277,9 +277,11 @@ UNIT_CURATED = {
     ('W4', 160): ('Bundle', '', 'label-match', OKF, 'No u[2018Q3] entry; u Preferred Bundle (1003).  0 rows.'),
     ('W4', 180): ('Pick-up', '', 'label-match', OKF, 'u Preferred Pick-up (1015).  0 rows.'),
     ('W4', 190): ('Jerry Can', '', 'label-match', J, '"JERRY CAN/RUBBER" -> Jerry Can (PH rule); 0 rows.'),
-    ('W4', 210): ('', '', 'none', UN, '"STEMS": no u row (plot_inputs serves "Stem" via _INPUT_UNIT_LABELS).  0 rows; '
-                  'if one appears, the GH #1095 ruling keeps the recorded label.'),
-    ('W4', 260): ('', '', 'none', UN, '"SEEDLING/PLANT": no u row.  0 rows; as code 210.'),
+    ('W4', 210): ('', 'Stem', 'none', UN, '"STEMS": no u row.  Precedent spelling: plot_inputs serves "Stem" via '
+                  '_canon_input_unit, unregistered in u (CONTENTS.org L2897-2910).  0 PP rows; if one appears, the '
+                  'GH #1095 ruling keeps the recorded label.'),
+    ('W4', 260): ('', 'Seedling/Plant', 'none', UN, '"SEEDLING/PLANT": no u row.  Precedent: plot_inputs serves '
+                  '"Seedling/Plant" (CONTENTS.org L2897-2910).  0 PP rows; as code 210.'),
     ('W5', 2): ('g', '', 'label-match', OKF, 'Native-only vs the held printed PP card (p.12) and the W4 PP card.  195 rows.'),
     ('W5', 4): ('cl', '', 'label-match', J,
                 'Native label "4. CENTLITRES (CL)" (typo).  _canon_community_unit returns "l" (substring "litres") '
@@ -325,7 +327,7 @@ for src in SRC_ORDER:
         if src == 'W5':
             comparator, cmp_lab = 'W4 PP native card', w4card.get(c, '')
         elif src == 'W1' and 11 <= c <= 95:
-            comparator, cmp_lab = 'u[2010-11] (W1-PH food card, CONTENTS.org L504-512)', hh
+            comparator, cmp_lab = 'u[2010-11] (W1-PH food card SP10BQ2B, CONTENTS.org L504-521)', hh
         elif src == 'W1':
             comparator, cmp_lab = 'none (W1-PP household card 1-6 is a different code space)', ''
         else:
@@ -340,14 +342,19 @@ for src in SRC_ORDER:
                 basis = basis.replace('u[2018Q3]', 'W4-PP-card') if basis.startswith('same') else basis
         else:
             same = bool(cmp_lab) and unit_tokens(lab) == unit_tokens(cmp_lab)
-            if src == 'W1' and 11 <= c <= 95:
-                same = True       # same SP10BQ2B card; household spelling is its weightless clean-up
             ub, us = rule, (hh if src != 'W5' else hh_label('W4', c) if w4card.get(c) == lab else '')
             if same:
                 basis = f'same-code-same-label-as-{"W4-PP-card" if src == "W5" else comparator.split(" ")[0]}'
                 flag, note = OKF, ''
                 if src == 'W1':
                     note = 'Stated weight stays in the native label only (GH #1035 precedent: W1 labels weightless).'
+            elif src == 'W1' and 11 <= c <= 95:
+                # Same SP10BQ2B card (CONTENTS.org L504-521: same codes, same stated weights, same three
+                # Stata-truncated Bundle labels), but the household spelling is not token-equal to the
+                # native label ("bunch of plantain/ffb: small" vs "Bunch Small"): a spelling judgement.
+                basis, flag = 'same-code-same-card-as-u[2010-11] (label spelling differs)', J
+                note = (f'Same W1-PH SP10BQ2B card; native label is not token-equal to household "{cmp_lab}". '
+                        'Stated weight stays in the native label only (GH #1035).')
             else:
                 raise AssertionError(f'uncurated unit row {src} {c} {lab!r} vs {cmp_lab!r} rule={rule!r}')
         assert ub == '' or ub in U_PREFERRED or ub in ('ml', 'Congo/Mudu'), (src, c, ub)
