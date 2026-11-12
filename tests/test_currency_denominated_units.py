@@ -501,10 +501,11 @@ def test_drop_unpriceable_unitvalue_drops_currency_by_label():
 #: non-purchase rows alone), so 208,090 produced rows of 1991-92 to 2012-13
 #: get their factor back, each equal to its e5fdd2fa8 value.  538,099 ->
 #: 557,502 (1998-99 25,392, 2005-06 28,703, 2012-13 48,449, 2016-17 454,958);
-#: kgprice 151,446 -> 182,675 (1991-92 26,854).  The rest of the gap to
-#: 560,023 is cells that DO have purchases (served by the purchase rungs) and
-#: 28,939 rows whose u-pooled factor no item rung replaces.  Measured cold in
-#: private roots, three arms (e5fdd2fa8 / 6c14097e9 / 322530074).
+#: kgprice 151,446 -> 182,675 (1991-92 26,854).  The 2,521 rows still short
+#: of 560,023 (1998-99 1,098, 2005-06 1,210, 2012-13 213) are rows still
+#: ``none``: 28,939 produced rows whose e5fdd2fa8 factor was u-pooled, which no
+#: item-keyed rung replaces.  Measured cold in private roots, three arms
+#: (e5fdd2fa8 / 6c14097e9 / 322530074).
 GHANALSS_FOOD_PRICES_ROWS = 557_502
 GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
