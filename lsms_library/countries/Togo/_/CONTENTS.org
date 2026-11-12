@@ -862,7 +862,10 @@ is noise in reported age, not a weak link.  The BID's merge variables =s00q07f1=
 and on the 55 where they differ from the current key their overlap sits at the baseline
 while the current key's does not, so they do not rescue a link.  Linking is a decision:
 memo in the PR of this change.  It would make Togo a panel country, with committed
-crosswalks under =test_panel_ids_persistence=.
+crosswalks under =test_panel_ids_persistence=.  [2026-11-12: the day's link ruling covers
+Benin only ("Make Benin a panel country", GH #1705); Togo's link is not ruled, and none is
+served (GH #1697).  Note that GH #1705's text says Togo's flagged keys sit at the baseline:
+that is true of =panel= = 2 (1,397) and not of =panel= = 1, measured above at real-link level.]
 
 *Clusters are the same.*  All 540 grappes recur; region, prefecture and milieu agree on
 540 of 540 and the point agrees on all 535 2018 fixes.  Region code 6 is =Lomé commune=
@@ -870,7 +873,9 @@ in 2018 and =Grand Lomé= here, on the same 98 grappes; =strata= and =Region= se
 wave's label, so a cross-wave group on them splits that region.  =strata= is region only
 (#812).  [2026-11-12: 2018's =strata= is now region x milieu (GH #1575, ruled for 2018 only),
 so the two waves' =strata= no longer share a construction.  See "2026-11-12 -- 2021-22 restored
-onto development".]  The record is =_/sampling.yml=.
+onto development".]  [Later 2026-11-12: they share it again.  2021-22's =strata= is region x
+milieu by the same rule (ruled "Same rule as #1575"), with =Grand Lomé= kept as this wave's
+label: see "2026-11-12 -- 2021-22 strata on the #1575 rule, and the day's other rulings (GH #1697)".]  The record is =_/sampling.yml=.
 
 *Weights.*  =poids= takes two values in most grappes, by =panel= (one value in each of the
 1,054 (grappe, panel) pairs), and no longitudinal weight is shipped, so =panel_weight= is
@@ -1283,7 +1288,8 @@ wire").  What changed in the 2021-22 wiring because development moved underneath
   value changes.  The coping hook is unchanged: no row has a non-contiguous rank, and
   =Autre stratégie= (26 rows) never sits beside another strategy, so its first-empty-slot rule
   and the core waves' "rank no other strategy holds" give the same slots.
-- *Strata are NOT aligned with 2018, and this is a question for the maintainer.*  GH #1575
+- [Superseded the same day: ruled "Same rule as #1575", and 2021-22 now has 2018's construction;
+  see the next section.]  *Strata are NOT aligned with 2018, and this is a question for the maintainer.*  GH #1575
   rewired 2018's =strata= to the documented region x milieu label and scoped the registry
   entry =Togo::sample::region-milieu-stratum= to =2018= alone ("no 2021 integration";
   =tests/test_gh1575_togo1575-stratawiring_strata.py= pins =waves == ['2018']=).  2021-22 keeps
@@ -1311,7 +1317,9 @@ wire").  What changed in the 2021-22 wiring because development moved underneath
   =Main= on =Banane douce= and =Plantain= (177 rows), 660 =Quartier= on six meats (76), 662 =Tête= on
   =Manioc=, =Igname=, =Taro, macabo= (130): the goods the 2018 notes above give for the same bare codes.  That
   supports one code book across the waves; the decode of 2018 is still the maintainer's decision.
-- *An explicit out-of-scope =derivation_inputs= call is not refused.*
+- [Moot for Togo since the next section: 2021-22 is inside the entry's =waves=.  The framework
+  behaviour, =call_inputs= not checking =waves= on a named wave, is unchanged.]
+  *An explicit out-of-scope =derivation_inputs= call is not refused.*
   =Country('Togo').derivation_inputs('Togo::sample::region-milieu-stratum', wave='2021-22')= returns that wave's
   6,462 cover answers, though no 2021-22 row carries the key: =derivations.call_inputs= does not check the
   entry's =waves= when a wave is named.  Before this wiring the same call raised =KeyError= (no =sample=
@@ -1319,3 +1327,53 @@ wire").  What changed in the 2021-22 wiring because development moved underneath
 - *Not wired, residuals:* the own-country =ehcvm_nsu_tgo2021.dta= weights (GH #1598); the
   decode of 2018's bare codes 659, 660, 662 (GH #1557); the =s12q09= grid (GH #1566, recorded in
   the PR report, nothing changed).
+
+* 2026-11-12 -- 2021-22 strata on the #1575 rule, and the day's other rulings (GH #1697)
+
+The wiring of 2021-22 is tracked in GH #1697, split from GH #552 on 2026-11-12; #552 is now about
+acquisition only.  The "GH #552" in the 2026-11-04 sections above is the issue as it stood then.
+
+*Ruling (@ligon, 2026-11-12): "Same rule as #1575".*  2021-22's =sample.strata= is now the documented
+region x milieu label, =<s00q01 label> <s00q04 label>=, by the same shared helper, cell formatter and
+=sample= stamp hook as 2018 (=ehcvm.strata_label=, =ehcvm.stamp_region_milieu_stratum=), and
+=Togo::sample::region-milieu-stratum= now has =waves: ['2018', '2021-22']=.  Its =inputs= callable is
+still 2018's =mapping:inputs_strata=, which reads each wave's own cover.  A missing or blank label gives
+NA; a code is refused.  This supersedes the region-only 2021-22 =strata= of the section above.
+
+*Lomé commune / Grand Lomé, preserved literally.*  Each wave serves its own label for region code 6, on
+the same 98 grappes: =Lomé commune Urbain= in 2018, =Grand Lomé Urbain= in 2021-22.  Nothing renames
+either, and no Lomé =Rural= cell exists in either cover (both quoted accounts above stand).  So the two
+waves share 10 of their 11 labels, and a cross-wave group on =strata= splits that one stratum and no
+other.  Measured, cold =sample()= (burst job 41240821), households per label:
+| =strata=            |  2018 | 2021-22 |
+|---------------------+-------+---------|
+| Centrale Rural      |   609 |     633 |
+| Centrale Urbain     |   210 |     228 |
+| Grand Lomé Urbain   |     0 |   1,169 |
+| Kara Rural          |   788 |     804 |
+| Kara Urbain         |   339 |     348 |
+| Lomé commune Urbain | 1,034 |       0 |
+| Maritime Rural      |   719 |     744 |
+| Maritime Urbain     |   227 |     240 |
+| Plateaux Rural      |   855 |     887 |
+| Plateaux Urbain     |   246 |     259 |
+| Savanes Rural       |   930 |     935 |
+| Savanes Urbain      |   214 |     215 |
+No label is NA, every row with a stratum carries the key and only those, and no grappe holds two
+strata in either wave.  The region part equals =cluster_features.Region= and the milieu part =Rural=
+on every grappe of both waves.  2018 is frame-equal to base =e5fdd2fa8= on every column, =strata= and
+=Derivation= included; 2021-22's =v=, =Rural=, =weight= and =panel_weight= are frame-equal to the
+wiring before this change (=df1df60ed=), on the same household ids.
+
+*The link.*  The day's link ruling covers Benin only ("Make Benin a panel country", GH #1705).  Togo's
+is not ruled; none is served.  See the note under "2021-22 wired": =panel= = 1 sits at real-link level
+here, =panel= = 2 at the baseline.
+
+*Issue numbers.*  GH #1697 is the wiring (this branch "Addresses #1697"); GH #552 acquisition only;
+GH #1556's shock ruling is applied (purchases =s14bq04f=, stock =s14bq04e=, above); GH #791 is the UEMOA
+source, untouched (this wave is a World Bank release); GH #1598 the own-country NSU weights, still not
+wired; GH #1557 and #1566 as recorded above.
+
+*Cost.*  Config-only, base =e5fdd2fa8= against this change: =Country._table_cache_hash= Togo 22 of 22,
+=Wave._input_hash= 44 of 44, =build_transforms_fingerprint= 0 of 40; the only other countries that move
+are Benin, Cote d'Ivoire and GhanaLSS (=Très grand=), as before this change.

@@ -791,7 +791,10 @@ keys at the baseline: the 116 sit between.  The BID (7.1) says the same thing: "
 as panel in the "PanelHH" variable will have valid values for merging".  =s00q07d= is 6,996 Oui, 6,994 of
 them recurring, so it separates nothing.  6,889 households are flagged Panel and 11 of them have no 2018-19 key, so any
 link is 6,878.  Linking would make Benin a panel country, with committed crosswalks under
-=test_panel_ids_persistence=: a decision, memo in the PR.
+=test_panel_ids_persistence=: a decision, memo in the PR.  [2026-11-12: ruled, "Make Benin a
+panel country": a committed crosswalk (=panel_ids.json= / =updated_ids.json=, Design A) from
+=PanelHH=, built in a follow-up PR with its own verification, GH #1705.  Not built in the wiring
+of GH #1697, which keeps the =E2_= ids unlinked.]
 
 *Do not run this test on =ehcvm_individu.age=.*  On 3,662 members, 3,636 of them on the 2018-19 roster, that
 variable is not the answers: it differs from the birth year by more than a year, and of the 3,647 matched to 2018-19,
@@ -801,7 +804,8 @@ disagreeing with them.)  On that variable the panel row reads 83.2%, which is th
 no such rows.  =household_roster= serves the answers, as 2018-19 does.
 
 *Clusters are the same.*  All 670 grappes recur; region and milieu agree on 670 of 670, and the point on all
-670.  =strata= is region only (#812).  [2026-11-12: 2018-19's =strata= is now department x milieu (GH #1575, ruled
+670.  =strata= is region only (#812).  [Later 2026-11-12: 2021-22's =strata= is department x milieu too, by the
+same rule (ruled "Same rule as #1575"); see "2026-11-12 -- 2021-22 strata on the #1575 rule, and the day's other rulings (GH #1697)".]  [2026-11-12: 2018-19's =strata= is now department x milieu (GH #1575, ruled
 for 2018-19 only), so the two waves' =strata= no longer share a construction; see the 2026-11-12 section.]  The
 record is =_/sampling.yml=.
 
@@ -836,7 +840,9 @@ Compare labels, never names.
 - *=s01= and =s04a= list 6,138 people who have left* (=s01q00aa= = non).  Sex, relationship, age and =s01q12= are blank on all of
   them, and all of =s04a='s answers.  What is filled is why and when they left: =s01q00b= on 6,137, =s01q00c= on 6,135, free text
   on 345; =s01q07= on 4.  703 of the reasons are deaths, which no table serves.  =ehcvm_individu= leaves them out, and so do
-  =household_roster= and =people_last7days=: 42,660 members of 48,798 rows.  =s04a='s =membres__id= is labelled "Qui est le répondant", wrongly: it joins =s01= one to one.
+  =household_roster= and =people_last7days=: 42,660 members of 48,798 rows.  [2026-11-12: whether they belong in the
+  roster, and where a departure reason would be served, is GH #1565's open decision, which that issue says should precede
+  this =household_roster= step.  This wiring serves =ehcvm_individu='s choice, as Senegal 2021-22 does, until it is ruled.]  =s04a='s =membres__id= is labelled "Qui est le répondant", wrongly: it joins =s01= one to one.
 - =s17q01= is the species; 2018-19's =s17q02= is gone.  Code 12 has no label and is not on the questionnaire's list; it is on
   the grid of vague 2 only and 5 households answer Oui.  Served as =12=.
 - =s16bq05= is the GIFT question in both waves; the purchase is =s16bq08=.  This wave reads both.  2018-19's script serves
@@ -899,7 +905,8 @@ the floor with two.  A single-wave request is still an exact slice.  2018-19's n
 finished crop to the quantity ("1 = Oui ►(16C.16)", PDF p. 87; 16C.16 on p. 88), so the defect is the one GH #1437 records in Mali and Burkina Faso, between the instrument and the
 release.  646 unfinished rows have no quantity, and the form sends a crop with 100% left (651 rows) on to the next crop.  =s16cq11= has no =Récolte nulle= in this file, unlike Togo's.
 
-*The harvest is derived on the #1437 ruling*, which names Mali and Burkina Faso, so its reach to Benin is put to the maintainer in the PR and the step is one commit.  Keys:
+*The harvest is derived on the #1437 ruling*, which names Mali and Burkina Faso, so its reach to Benin is put to the maintainer in the PR and the step is one commit.  [2026-11-12:
+ruled, "Extend Mali's derivation": the entry extends =Mali::crop_production::harvest-from-dispositions= to this wave, as wired.  GH #1437, why =s16cq16a= is blank, stays open.]  Keys:
 =harvest-from-dispositions=, =harvest-to-date=, in =derivations.yml=.
 | household-crop pairs, of 8,243                       | pairs | served               |
 |------------------------------------------------------+-------+----------------------|
@@ -1124,7 +1131,8 @@ underneath it:
   2,380 in vague 2), so there is no per-vague layout here, unlike 2018-19.  So 2021-22 reads
   =f= and =e=, as the core 2021-22 waves do.  Affected (Augmenté or Diminué): =f= 3,777 rows,
   =e= 3,668, =d= 1,872.  No 2018-19 value changes.  The coping hook is unchanged.
-- *Strata are NOT aligned with 2018-19, and this is a question for the maintainer.*  GH #1575
+- [Superseded the same day: ruled "Same rule as #1575", and 2021-22 now has 2018-19's construction;
+  see the next section, which also corrects what this bullet says of =strat=.]  *Strata are NOT aligned with 2018-19, and this is a question for the maintainer.*  GH #1575
   wired 2018-19's =strata= as department x milieu and scoped
   =Benin::sample::region-milieu-stratum= to =2018-19= alone ("no 2021 integration").  2021-22
   keeps the archived region-only =s00q01=, so =strata= now means department x milieu in 2018-19
@@ -1143,10 +1151,99 @@ underneath it:
   186,631; its sum's definition is not recorded).
 - *=s12q09= (GH #1566's check), measured, nothing changed.*  25 of 40,220 positive values are off the 25 grid
   (one is the sentinel-shaped 9,999), against Togo's 3.7% and Cote d'Ivoire's 4.1%; 2018-19: 1 of 37,551.
-- *An explicit out-of-scope =derivation_inputs= call is not refused*:
+- [Moot for Benin since the next section: 2021-22 is inside the entry's =waves=.  The framework
+  behaviour is unchanged.]  *An explicit out-of-scope =derivation_inputs= call is not refused*:
   =Country('Benin').derivation_inputs('Benin::sample::region-milieu-stratum', wave='2021-22')= returns 8,032
   cover answers for a wave whose rows carry no key (=derivations.call_inputs= checks =waves= only when no wave
   is named).  It raised =KeyError= before this wiring.  =tests/test_gh1575_benin1575-stratawiring_strata.py=
   no longer pins that =KeyError=.  A framework residual, not patched here.
 - *Not wired, residuals:* the own-country =ehcvm_nsu_ben2021.dta= weights (GH #1598); the
   survey-kg =Quantity_kg= of =crop_production= (=s16cq16c= / =s16dq05c=, see "2021-22 wired").
+
+* 2026-11-12 -- 2021-22 strata on the #1575 rule, and the day's other rulings (GH #1697)
+
+The wiring of 2021-22 is tracked in GH #1697, split from GH #552 on 2026-11-12; #552 is now about
+acquisition only.  The "GH #552" in the 2026-11-04 sections above is the issue as it stood then.
+Three rulings of @ligon, 2026-11-12 (=.sucoder/isa-decisions.org=), applied here:
+
+- *Strata: "Same rule as #1575".*  2021-22's =sample.strata= is now the documented department x
+  milieu label, =<s00q01 label> <s00q04 label>=, by the same shared helper, cell formatter and
+  =sample= stamp hook as 2018-19 (=ehcvm.strata_label=, =ehcvm.stamp_region_milieu_stratum=), and
+  =Benin::sample::region-milieu-stratum= now has =waves: ['2018-19', '2021-22']=.  Its =inputs=
+  callable is still 2018-19's =mapping:inputs_strata=, which reads each wave's own cover, so
+  =derivation_inputs(key, wave='2021-22')= returns this wave's 8,032 cover answers, now for rows
+  that carry the key.  A missing or blank label gives NA; a code is refused.  This supersedes the
+  region-only 2021-22 =strata= of the section above.
+- *Harvest: "Extend Mali's derivation".*  =Benin::crop_production::harvest-from-dispositions= is
+  kept as wired; its entry now says it extends =Mali::crop_production::harvest-from-dispositions=,
+  and cites the ruling.  GH #1437 (why =s16cq16a= is blank) stays open.
+- *Link: "Make Benin a panel country".*  A committed crosswalk from =PanelHH= (Design A) in a
+  FOLLOW-UP PR, GH #1705, with its own verification.  Not built here: 2021-22's =E2_= ids still
+  meet no 2018-19 id.  =_/sampling.yml= says so.
+
+*What is served, measured.*  Cold =sample()=, each side in its own private root (burst job
+41240821): base =e5fdd2fa8=, the wiring before this change =df1df60ed=, and this change.
+| wave    | households | =strata= labels | NA | =Derivation= keyed |
+|---------+------------+-----------------+----+--------------------|
+| 2018-19 |      8,012 |              23 |  0 |              8,012 |
+| 2021-22 |      8,032 |              23 |  0 |              8,032 |
+The two waves have the same 23 labels (=littoral Urbain= is the only Littoral cell in both, as
+the DDI's "purely urban Littoral" says), and this file spells the departments as 2018-19's does
+(lower case, the same twelve), so a cross-wave group on =strata= no longer splits any stratum.
+No grappe holds two strata in either wave.  The department part equals =cluster_features.Region=
+and the milieu part =Rural= on every grappe of both waves.  2018-19 is frame-equal to base on
+every column, =strata= and =Derivation= included; 2021-22's =v=, =Rural=, =weight= and
+=panel_weight= are frame-equal to =df1df60ed='s, on the same household ids.
+
+*=strat=, the weights file's own variable: recorded, not served.*  =ehcvm_ponderations_ben2021.dta=
+carries =strat= (=int16=, no value labels), 24 codes.  Measured on all 8,032 households:
+=strat= = 10 x department code + =vague=, exactly, on 8,032 of 8,032 (10 x department + the milieu
+code holds on 3,965, about half, as chance would give).  It is constant within each of the 670
+grappes, as =vague= is.  So its second digit is the VISIT, not the milieu: =strat= is department
+x vague, 12 x 2 = 24, and that is why it has one cell more than the DDI's 23.  The earlier notes
+here, in the YAML and in the 2026-11-12 PR text called it "24 region x milieu cells"; that is
+wrong.  Against the constructed strata:
+| constructed =strata= | =strat=, vague 1 | =strat=, vague 2 | households |
+|----------------------+------------------+------------------+------------|
+| alibori Rural     | 11: 180    | 12: 168    |   348 |
+| alibori Urbain    | 11: 60     | 12: 72     |   132 |
+| atacora Rural     | 21: 180    | 22: 168    |   348 |
+| atacora Urbain    | 21: 108    | 22: 120    |   228 |
+| atlantique Rural  | 31: 288    | 32: 276    |   564 |
+| atlantique Urbain | 31: 240    | 32: 252    |   492 |
+| borgou Rural      | 41: 168    | 42: 156    |   324 |
+| borgou Urbain     | 41: 166    | 42: 180    |   346 |
+| collines Rural    | 51: 216    | 52: 204    |   420 |
+| collines Urbain   | 51: 96     | 52: 96     |   192 |
+| couffo Rural      | 61: 216    | 62: 216    |   432 |
+| couffo Urbain     | 61: 95     | 62: 96     |   191 |
+| donga Rural       | 71: 180    | 72: 180    |   360 |
+| donga Urbain      | 71: 131    | 72: 144    |   275 |
+| littoral Urbain   | 81: 347    | 82: 347    |   694 |
+| mono Rural        | 91: 192    | 92: 192    |   384 |
+| mono Urbain       | 91: 214    | 92: 204    |   418 |
+| oueme Rural       | 101: 144   | 102: 156   |   300 |
+| oueme Urbain      | 101: 276   | 102: 276   |   552 |
+| plateau Rural     | 111: 156   | 112: 156   |   312 |
+| plateau Urbain    | 111: 144   | 112: 144   |   288 |
+| zou Rural         | 121: 144   | 122: 144   |   288 |
+| zou Urbain        | 121: 72    | 122: 72    |   144 |
+Every constructed stratum splits across its department's two =strat= codes, and every =strat=
+code but Littoral's holds both milieux.  What =strat= was built for is not established here (no
+document was searched for it).  The ruled construction is served; =strat= is read nowhere.
+
+*Leavers (GH #1565).*  =household_roster= and =people_last7days= leave out the 6,138 people =s01=
+lists as gone, as =ehcvm_individu= does.  GH #1565 asks whether they belong in the roster and says
+that decision should precede this wave's =household_roster= step.  It has not been made, so this
+wiring serves =ehcvm_individu='s choice, the de facto result in Senegal 2021-22, and is revisited
+when it is.
+
+*Issue numbers.*  GH #1697 is the wiring (this branch "Addresses #1697"); GH #552 acquisition only;
+GH #1556's shock ruling is applied here (purchases =s14bq04f=, stock =s14bq04e=, above); GH #791 is
+the UEMOA source, untouched (these waves are World Bank releases); GH #1705 the link; GH #1437 the
+blank harvest; GH #1565 the leavers; GH #1598 the own-country NSU weights, still not wired.
+
+*Cost.*  Measured, config-only, base =e5fdd2fa8= against this change: =Country._table_cache_hash=
+Benin 22 of 22 (and Togo 22 of 22, Cote d'Ivoire 21 of 21, GhanaLSS 21 of 21, through =Très grand=),
+=Wave._input_hash= Benin 44 of 44, =build_transforms_fingerprint= 0 of 40, every other country 0.
+The same scope the restored wiring already had: the strata edit adds no country to it.

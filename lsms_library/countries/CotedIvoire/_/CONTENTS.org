@@ -1058,7 +1058,9 @@ does not ship them, where Togo's does; nor is section 21, which the BID says mat
 *Clusters are the same.*  1,081 of 2018-19's 1,084 grappes recur and none is new; region agrees on
 all and milieu on 99.9%.  =_/sampling.yml= has the record.  =strata= is region only (#812).
 [2026-11-12: 2018-19's =strata= is now region x milieu (GH #1575, ruled for 2018-19 only), so the
-two waves' =strata= no longer share a construction; see the 2026-11-12 section.]
+two waves' =strata= no longer share a construction; see the 2026-11-12 section.]  [Later 2026-11-12:
+they share it again; 2021-22 is region x milieu by the same rule, with the region upper-cased as
+below: see "2026-11-12 -- 2021-22 strata on the #1575 rule, and the day's other rulings (GH #1697)".]
 The file labels 23 of the 33 regions in lower case (=poro=, =gÔh=) on the same codes; upper-casing
 gives 2018-19's label on all 33, so =strata= and =Region= do not split a region across waves.
 
@@ -1143,7 +1145,8 @@ Served: 7,528.  168 households have the 22-row block two or more times.  Each re
 sends a finished crop to that question (16C.11: 1 = Oui goes to 16C.16, PDF p. 89).  So:
 - the 3,595 are served as recorded, keyed =harvest-to-date=;
 - a finished crop takes the sum of its dispositions where they state one unit, keyed =harvest-from-dispositions=, on its
-  single row or its one =Farm-level= row: the rule ruled for Mali (#1437).  The ruling names Mali and Burkina Faso;
+  single row or its one =Farm-level= row: the rule ruled for Mali (#1437).  [2026-11-12: its extension to this wave is
+  ruled, "Extend Mali's derivation"; GH #1437, why =s16cq16a= is blank, stays open.]  The ruling names Mali and Burkina Faso;
   this wave applies it because without it 2021-22 serves no finished harvest at all.
 | household-crop pairs, of 19,704                 | pairs | served |
 |-------------------------------------------------+-------+--------|
@@ -1458,7 +1461,8 @@ development moved underneath it:
   Diminué) on those rows: =f= 5,294, =e= 4,867, =d= 1,228.  No 2018-19 value changes.  The coping
   hook is unchanged: no row has a non-contiguous rank, and =Autre stratégie= (15 rows) never sits
   beside another strategy.
-- *Strata are NOT aligned with 2018-19, and this is a question for the maintainer.*  GH #1575
+- [Superseded the same day: ruled "Same rule as #1575", and 2021-22 now has 2018-19's construction;
+  see the next section.]  *Strata are NOT aligned with 2018-19, and this is a question for the maintainer.*  GH #1575
   wired 2018-19's =strata= as region x milieu (one source-recorded mixed-milieu grappe kept
   literal) and scoped =CotedIvoire::sample::region-milieu-stratum= to =2018-19= alone.  2021-22
   keeps the archived region-only =s00q01= (upper-cased by =mapping.strata=), so =strata= now
@@ -1491,7 +1495,55 @@ development moved underneath it:
 - *The own NSU file is not a weight table.*  =ehcvm_nsu_civ2021.dta= holds 53,078 market weighings (grams, a
   =ipoids= imputation, =unite_corr= / =taille_corr= corrections, =id_2018=), not a key -> weight table like
   Senegal's =_nat=.  GH #1598 therefore needs its own construction here.
-- *An explicit out-of-scope =derivation_inputs= call is not refused* (13,693 cover answers for =wave='2021-22'=;
+- [Moot for Cote d'Ivoire since the next section: 2021-22 is inside the entry's =waves=.  The framework
+  behaviour is unchanged.]  *An explicit out-of-scope =derivation_inputs= call is not refused* (13,693 cover answers for =wave='2021-22'=;
   see Benin's note).  A framework residual.
 - *Not wired, residuals:* the own-country =ehcvm_nsu_civ2021.dta= weights (GH #1598); crop codes
   56 to 60 (unlabelled, see "2021-22 wired"); the survey-kg =Quantity_kg= of =crop_production=.
+
+* 2026-11-12 -- 2021-22 strata on the #1575 rule, and the day's other rulings (GH #1697)
+
+The wiring of 2021-22 is tracked in GH #1697, split from GH #552 on 2026-11-12; #552 is now about
+acquisition only.  The "GH #552" in the 2026-11-04 sections above is the issue as it stood then.
+Two rulings of @ligon, 2026-11-12 (=.sucoder/isa-decisions.org=), applied here:
+
+- *Strata: "Same rule as #1575".*  2021-22's =sample.strata= is now the documented region x milieu
+  label, by the same shared helper and =sample= stamp hook as 2018-19, and
+  =CotedIvoire::sample::region-milieu-stratum= now has =waves: ['2018-19', '2021-22']=.  Its =inputs=
+  callable is still 2018-19's =mapping:inputs_strata=, which reads each wave's own cover.
+- *Harvest: "Extend Mali's derivation".*  =CotedIvoire::crop_production::harvest-from-dispositions=
+  is kept as wired; its entry now says it extends =Mali::crop_production::harvest-from-dispositions=
+  and cites the ruling.  GH #1437 (why =s16cq16a= is blank) stays open.
+
+*One difference from 2018-19, and why: the region is upper-cased first.*  This file labels 23 of its
+33 regions in lower case (=poro=, =gÔh=) on 2018-19's codes; upper case is 2018-19's label for every
+code, and =mapping.Region= already upper-cases =cluster_features.Region=.  So the cell formatter is
+=2021-22/_/mapping.py:strata_label_upper_region=, which upper-cases =s00q01= and then calls the shared
+=ehcvm.derive_region_milieu_stratum= unchanged: NA where either label is missing or blank, a code
+refused.  Without it 23 regions would be served as =poro Rural= beside 2018-19's =PORO Rural= and this
+wave's own =Region= =PORO=, splitting 46 of the 66 strata by case alone.  The registry =rule= says so,
+and the registered function applied to the raw inputs gives the lower case: upper-case the region to
+re-derive the served value.  The name-bound =strata= formatter that served the region alone is gone.
+
+*What is served, measured.*  Cold =sample()=, each side in its own private root (burst job 41240821):
+base =e5fdd2fa8=, the wiring before this change =df1df60ed=, and this change.
+| wave    | households | =strata= labels | NA | =Derivation= keyed | grappes with two strata |
+|---------+------------+-----------------+----+--------------------+-------------------------|
+| 2018-19 |     12,992 |              66 |  0 |             12,992 | 1 (648, as recorded)    |
+| 2021-22 |     12,965 |              66 |  0 |             12,965 | 0                       |
+The two waves have the same 66 labels, so a cross-wave group on =strata= no longer splits any
+stratum.  The region part equals =cluster_features.Region= and the milieu part =Rural= on every grappe
+of both waves.  2018-19 and the four CILSS waves are frame-equal to base on every column; 2021-22's
+=v=, =weight=, =panel_weight= and =Rural= are frame-equal to =df1df60ed='s, on the same household ids.
+=derivation_inputs(key, wave='2021-22')= returns 13,693 rows, the cover's: the 728 households not
+interviewed are in it and not served.
+
+*Issue numbers.*  GH #1697 is the wiring (this branch "Addresses #1697"); GH #552 acquisition only;
+GH #1556's shock ruling is applied (purchases =s14bq04f=, stock =s14bq04e=, above); GH #791 is the UEMOA
+source, untouched (this wave is a World Bank release); GH #1598 the own-country NSU weights, still not
+wired.  The day's link ruling covers Benin
+only (GH #1705); no Cote d'Ivoire link is served.
+
+*Cost.*  Config-only, base =e5fdd2fa8= against this change: =Country._table_cache_hash= Cote d'Ivoire
+21 of 21, =Wave._input_hash= 126 of 126, =build_transforms_fingerprint= 0 of 40; the only other countries
+that move are Togo, Benin and GhanaLSS (=Très grand=), as before this change.
