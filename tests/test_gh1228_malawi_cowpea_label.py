@@ -182,4 +182,5 @@ def test_the_label_joins_food_acquired_in_every_wave():
     fa = Country('Malawi').food_acquired().reset_index()
     waves = set(fa.loc[fa['j'].astype(str).eq(LABEL), 't'].astype(str))
     assert waves == set(fa['t'].astype(str))
-    assert len(waves) == 5
+    # Six food waves since 2024-25 was wired (GH #1275, PR #1604).
+    assert len(waves) == 6
