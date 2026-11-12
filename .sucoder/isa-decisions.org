@@ -1,5 +1,49 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Intake resumed; merge on green (Sue, Claude Opus 5.5)
+The user wrote: "Resume intake; start with the drafts and put R2b/#587 to me.
+Merge to development on green."  The 2026-11-11 queue freeze is lifted.  Merge
+authority: a PR into development may be merged once the required checks
+(unit-tests, pr-data-validation) are green on its current head.  Standing holds
+are unchanged: no master release, no shared-cache rebuild, and no production
+weight or panel-ID change except as #1604 below.  Drafts #1688 and #1689
+landed through integration PR #1690 (ed1df1ea2, 6b3b09ea6, both ancestors of
+1e549e96a); they are closed as superseded, not re-merged.
+
+* 2026-11-12: Single-plot zero/missing-harvest sales, GH1457 R2b -- ANSWERED
+The user explicitly selected: "Keep on plot row (Recommended)".
+A sale attached to a household-crop's SOLE plot row stays on that row when the
+row's harvest Quantity is zero or missing.  No country changes: Malawi, Niger,
+Mali 2017-18, Tanzania and Ethiopia keep today's placement, and the 2026-10-23
+Ethiopia ruling (a row carrying a sale is never dropped) stands.  Consistent
+with R2a: zero/missing quantities do not establish no production.  Nigeria's
+different handling is left as is.  The r2b_* patches are not applied.
+
+* 2026-11-12: Nigeria PP community_prices, GH587 -- ANSWERED (not either option)
+Offered: serve native PP reports with codebook-qualified native j/u tokens and
+Price NA, or leave the five PP cells unwired.  The user answered instead: "We
+should develop the item and unit code mapping, then provide community_prices
+using those harmonized labels."  So: build reviewed crosswalks from each PP
+wave's own C2 item and unit codes to Nigeria's shared harmonize_food Preferred
+Label (j) and shared unit labels (u), then wire PP community_prices on those
+labels, keeping the j/u promise in Nigeria data_scheme.yml.  This does NOT
+authorize inferring the W5 Quantity/conversion basis, a default quantity of
+one, a PH size rule or an inferred factor; an unresolved price basis stays
+unresolved and is brought back as a question, not guessed.
+
+* 2026-11-12: Malawi 2024-25 food, PR1604 -- hold LIFTED
+The user explicitly selected: "Lift hold, rebase, merge" for PR #1604, offered
+with: serves Malawi 2024-25 food_acquired and a 2024-25 sample (weight =
+hh_wgt (IHS6) / wt_cross (IHPS), panel_weight = wt_long), adds 1,948 new
+2024-25 panel links with no existing link changed, materially moves older
+waves' inferred kg factors and kg prices, and its country.py/local_tools.py ID
+guard moves every build fingerprint (corpus-wide re-warm, not performed here).
+Bring development into the branch by merge (no force-push), re-verify against
+#1694, independent red team, one full data gate, merge on green.  This lifts
+the decision-48 / whole-wave-promotion hold FOR THIS PR'S CONTENT ONLY; it does
+not settle decision 48's joint-inclusion question or change any other wave's
+weights.
+
 * 2026-11-10: Malawi1190 acquisition carrier and coverage
 User explicitly selected "Acquisition-only Farm-level rows" for the carrier
 and "All admitted quantity components (Recommended)" for support. This is
@@ -85,7 +129,7 @@ positive Quantity. Other zero/missing quantities do not establish no production.
 Retain current Farm-level treatment and reference-pool semantics; the recovered
 R2a positive-quantity candidate expansion is rejected.
 
-* Pending single-plot zero/missing-harvest choice, GH1457 R2b
+* Single-plot zero/missing-harvest choice, GH1457 R2b -- answered 2026-11-12 above
 Root submitted a separate question about moving an already attached single-plot
 sale solely because its harvest Quantity is zero/missing. No answer yet; no
 positive-quantity eligibility filter or Ethiopia retention reversal is approved.
@@ -130,7 +174,7 @@ synthetic verification is pending; this withdrawal is not runtime acceptance.
 The user explicitly selected: "Require full data validation on every ready development PR (Recommended)" in response to the replacement-policy question. This supersedes the unavailable merge-queue strategy and the pending A/B/C choice. Implement a dedicated PR-only, unique required full-data check, with strict base freshness and explicit non-success for ineligible draft/fork cases; preserve nightly advisory coverage and all unrelated rules/bypass actors. Full data validation may take1–2h and must be revalidated when development advances. Proposal: reports/932-compatible-pr-data-gate-policy-20261109/PROPOSAL.md, manifest89c165d8283877c018bab72a625bf4daffd9c1bcdee88b418d6ce934ac114aef.
 This authorizes building and enabling the selected policy after concrete source review and actual check-wiring verification; no additional policy/permission question is needed for its necessary preserved-rules delta. No settings changed or full-data run triggered at decision time. Root owns publication/readiness/settings after review; source-only implementation delegated to finish_1452 on4381. No master release, shared local cache rebuild or production-weight change follows.
 
-* Pending Nigeria PP raw-report serving preference, GH587 (2026-11-10)
+* Nigeria PP raw-report serving preference, GH587 (2026-11-10) -- answered 2026-11-12 above
 Root async question submitted: retain original price/quantity/unit/size reports
 while leaving standardized Price missing where unresolved (recommended), versus
 serve only reports with resolved standardized Price. No user answer received.
