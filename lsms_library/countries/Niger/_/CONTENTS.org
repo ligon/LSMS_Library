@@ -3704,8 +3704,8 @@ Counted on the held files after each wave's existing drops (3E's one byte-identi
   =as03eq09c= = 99999 on the same line.  2014-15's 9999 is that wave's quantity code; it is the
   column's maximum, 7 of the 11 are all-code lines (=AS02EQ12A= 9999, =AS02EQ13= 9999999, unit
   and sold flag =Manquant=), and 8 sit beside =AS02EQ110E= = 9999.  The rainy module writes
-  999999 on its quantities, so its 9999 is NARROWER and unlabelled, and it is *treated as* a code
-  on the file's own evidence: 10 rows at exactly 9999 against 13 anywhere in 5,000-9,998 and 1
+  999999 on its quantities, so its 9999 is NARROWER and unlabelled.  *RULED (@ligon, 2026-11-12,
+  "Sold-kg details" (b)): it is a code and stays masked*, on the file's own evidence: 10 rows at exactly 9999 against 13 anywhere in 5,000-9,998 and 1
   above (the max is 11,000); 2 are all-code lines; the 7 with a sold quantity would be 500-5,000
   kg per =Tiya= or =Botte=; 7 of the 8 beside a harvest kg exceed the SAME line's =as02eq07c=
   (24 of 1,286 other sales do); and the one sold in Kg would break kg = quantity, which holds on

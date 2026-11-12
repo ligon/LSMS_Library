@@ -56,7 +56,8 @@ VALUE_SENTINELS = (9999999,)
 DRY_QTY_SENTINELS = (99999,)
 # The rainy SOLD kilograms' code (GH #1560, ruling 2026-11-12: sold kg are served as
 # totals).  as02eq12c == 9999 on 10 of its 1,296 answers, NARROWER than the module's
-# 999999 and unlabelled, and TREATED AS a code on the file's own evidence: 10 rows sit
+# 999999 and unlabelled, and a code by RULING (@ligon 2026-11-12, "Sold-kg details"
+# (b)), on the file's own evidence: 10 rows sit
 # on exactly 9999 against 13 anywhere in 5,000-9,998 and 1 above (max 11,000); 2 of the
 # 10 are all-code lines (as02eq12a 999999, as02eq13 9999999); the other 7 with a sold
 # quantity would be 500-5,000 kg per Tiya / Botte; 7 of the 8 beside a harvest kg exceed
