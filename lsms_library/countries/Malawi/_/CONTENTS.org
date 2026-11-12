@@ -50,7 +50,9 @@ bucket states a capacity, not a mass, so =food_borrowing.py= now admits code 26
 admitted factor states a mass and stays at the choke point.  Of 5,814 active
 code-26 contributions, 4,031 borrow: 5,950 buckets are served natively with
 22,563 kg, where density 1 gave 29,751 kg.  The other 1,783 have no admitted
-factor and are still served =u='kg'= at 5 kg, as 2019-20's one such row is.
+factor, so they still reach the shared choke point and are served =u='kg'= at
+5 kg.  That choke point applies the same rule in every wave; how many 2019-20
+code-26 rows reach it was not measured.
 Old head to new head, 2024-25 =food_acquired= differs on exactly 4,031 rows,
 which move from =u='kg'= to the bucket label; nothing else changes.  The wave's
 =food_quantities(units='kgs')= falls from 713,917 to 706,492 kg (-1.04%), and

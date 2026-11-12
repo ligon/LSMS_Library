@@ -95,7 +95,11 @@ Malawi::food_acquired::borrow-ihs5-factor:
     quantity/expenditure/units and older-wave Quantity_kg exact; private cold
     base-vs-candidate builds on development e5fdd2fa8 (jobs 41232294/41232295,
     2026-11-12) reproduce 169,995 borrowed rows with every pre-2024 wave
-    unchanged. No external accuracy check of the borrowed factors.
+    unchanged. After unit code 26 was admitted (PR #1604 review F1), a private
+    cold build at 1ca84789a (job 41240388) serves 174,026 borrowed rows;
+    derivation_inputs joins them one-to-one and rederives all 174,026, the
+    4,031 bucket rows included. No external accuracy check of the borrowed
+    factors.
   contents: 'Malawi/_/CONTENTS.org, 2026-11-07 food follow-ups 49/50'
   since: '2026-11-07'
 
