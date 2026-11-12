@@ -2492,6 +2492,11 @@ verdict:
 | 1988-89 | =correctly-empty=         | same form (see below)                                                                                 |
 | 1991-92 | =empty-pending-machinery= | 8H records a quantity and a per-unit price; =food_prices(units='kgprice')= already serves 28,754 rows  |
 
+(Two figures in this table moved on 2026-11-12.  Since GH #1129, =unitvalue= drops
+=u='Value'= rows, so 1987-88 and 1988-89 are empty in that mode too.  Since GH #1509
+the kg factors read purchases only, and 1991-92 =kgprice= serves 15,028 rows, not
+28,754.  Neither changes a verdict: 1991-92 still serves rows in =kgprice=.)
+
 1991-92 is *not* correctly empty: only the default =kgvalue= mode is
 empty, and only because 8H is "deliberately NOT wired" (the farmgate
 section above).  It stays in the queue until that decision is taken.  The

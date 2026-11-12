@@ -493,6 +493,7 @@ def test_drop_unpriceable_unitvalue_drops_currency_by_label():
 #: section-8H farmgate valuations of produced rows no longer set factors, and
 #: cells only they estimated get none (1998-99 26,490 -> 20,142, 2005-06
 #: 29,913 -> 18,296, 2012-13 48,662 -> 44,703, 2016-17 454,958 unchanged).
+#: kgprice moves with it, 187,096 -> 151,446 (1991-92 28,754 -> 15,028).
 #: Measured cold in private roots, base e5fdd2fa8 vs candidate.
 GHANALSS_FOOD_PRICES_ROWS = 538_099
 GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
