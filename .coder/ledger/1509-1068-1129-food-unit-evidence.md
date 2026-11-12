@@ -95,3 +95,27 @@ Two rulings by @ligon, 2026-11-12, both read-time code in
   2016-17 produced rows).  Not ruled.
 - `units='units'` keeps `u='Value'` rows (recorded currency amount; no ratio).
 - Cambodia's allocated quantity stays evidence by the ruling.
+
+---
+### Phase 3 — verification
+
+Measured cold in private roots, base `e5fdd2fa8` vs candidate (jobs 41236013 / 41236014,
+census 41236015, data tests 41236531 / 41236522); report at
+`burst/isa-sm-20261112/reports/framework-1509-1068/REPORT.md`.
+
+- `_purchase_evidence` / `_purchase_rows` / `_KG_EVIDENCE_SOURCE` — OK (§3 purchase): the
+  `S_VALUES` spelling, matched exactly; `food_expenditures_from_acquired` spells the same test
+  inline (`astype(str) == 'purchased'`), so no tested helper existed to reuse — not REINVENTION.
+  Non-purchase x1000 moves 0 factor rows in all nine measured countries (base: up to 704,055).
+- `food_kg_factors` wiring — OK (§4 blank-not-drop; §5 off `conversion_to_kgs`): partitions still
+  sum to the frame; `serve_waves` ledger over all rows read (synthetic test).
+- `_kg_evidence_ledger` — OK (§5): a diagnostic beside the partition, not a layer.
+- `_drop_unpriceable` — OK (§2 reuse `currency`; §4 disjoint buckets): Burkina 405,127
+  `money_only` unchanged, 178 `unknown`; `inf` on an `Unknown` row stays loss (synthetic test).
+- `food_quantities_from_acquired(units='units')` — OK (§3 missing unit = `_unit_sentinel_mask`).
+- Closure invariant (§4) — OK: only GhanaLSS moves (22/555 table, 154/2,321 wave, 1/38 fwimp,
+  0/42 btf).
+- §6 open questions stand: kgs carries `Unknown` natively; `unitprice` keeps `Unknown`; `units`
+  keeps `Value` (Q == E on every GhanaLSS / Uganda `Value` row); Cambodia allocated quantity.
+- Movement, not correction: GhanaLSS kg -13.0% (237,029 produced rows to `none`), Uganda -1.37%;
+  no external unit weight scored.
