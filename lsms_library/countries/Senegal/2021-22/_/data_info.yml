@@ -173,6 +173,11 @@ food_acquired:
     # so the table's DVC sidecar is in this table's input hash.
     unit_weights:
         file: ehcvm_nsu_sen2021_nat.dta
+    # Read by mapping.py's food_acquired hook for `hhsize`, which identifies the
+    # salt records withheld under `Senegal::food_acquired::salt-per-capita-withheld`
+    # (ruling @ligon 2026-11-12); declared so the sidecar is in this table's hash.
+    household_size:
+        file: ehcvm_welfare_sen2021.dta
     idxvars:
         v: grappe
         visit: vague

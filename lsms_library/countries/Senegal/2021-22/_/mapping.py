@@ -50,8 +50,131 @@ def inputs_food_acquired_unit_weight(wave):
 
 
 def food_acquired(df):
-    return _food_acquired_with_unit_weights(
-        df, FOOD_ACQUIRED_DERIVATION, wave='2021-22')
+    marked = _withhold_salt_per_capita_rows(df)
+    out = _food_acquired_with_unit_weights(
+        marked, FOOD_ACQUIRED_DERIVATION, wave='2021-22')
+    return out[out.index.get_level_values('j') != _WITHHELD_J]
+
+
+# ---------------------------------------------------------------------------
+# Salt in kg at a fixed amount per person is not served (ruling @ligon
+# 2026-11-12, "Remove, registered")
+# ---------------------------------------------------------------------------
+#
+# 100 records of s07b_me_sen2021.dta, all product 139 (`Sel`) in kg, size-free,
+# have s07bq03a = 0.0199997 kg x the household's `hhsize` (ehcvm_welfare_sen2021),
+# to within 1e-12 on every one; 34% of the wave's 294 salt-in-kg records.  No other
+# record of any product or unit meets that constant.  It reads as "0.02 kg a person"
+# rounded, which is how the 2026-11-12 data check reported it; no record equals
+# 0.02 x hhsize.  No document explains them.  The source records go, every row they
+# become with them; a deletion, disclosed by
+# `Senegal::food_acquired::salt-per-capita-withheld` (`rows: 0`).
+SALT_PER_CAPITA_KEY = 'Senegal::food_acquired::salt-per-capita-withheld'
+#: The fixed amount, kg per household member, as the file holds it.
+SALT_KG_PER_PERSON = 0.0199997
+#: The records' cell in s07b's own codes: product, consumption unit, size.
+_SALT_CELL = {'s07bq01': 139, 's07bq03b': 100, 's07bq03c': 0}
+_SALT_TOLERANCE = 1e-9
+_SALT_SOURCE = 's07b_me_sen2021.dta'
+#: Declared in data_info.yml (`household_size:`), so its sidecar is hashed.
+_SALT_HOUSEHOLD_SIZE = 'ehcvm_welfare_sen2021.dta'
+#: The withheld rows' `j` while the shared reshape runs; never served.
+_WITHHELD_J = '\x00withheld: salt per capita'
+
+
+class SaltPerCapitaJoinError(Exception):
+    """The wide frame or the household-size file is not what the rule reads.
+
+    Subclasses ``Exception``: a derived food table must not read it as a failed
+    build (GH #1546)."""
+
+
+def _salt_raw(wave='2021-22'):
+    """``s07b`` in its codes, with each record's welfare ``hhsize`` beside it."""
+    if wave != '2021-22':
+        raise ValueError(f'{SALT_PER_CAPITA_KEY} covers 2021-22 only, not {wave!r}')
+    from lsms_library.paths import countries_root
+    data = countries_root() / 'Senegal' / wave / 'Data'
+    raw = tools.get_dataframe(str(data / _SALT_SOURCE), convert_categoricals=False)
+    welfare = tools.get_dataframe(str(data / _SALT_HOUSEHOLD_SIZE), convert_categoricals=False)
+
+    def key(frame):
+        return pd.MultiIndex.from_arrays(
+            [pd.to_numeric(frame[c], errors='coerce') for c in ('grappe', 'menage')])
+
+    size = pd.Series(pd.to_numeric(welfare['hhsize'], errors='coerce').to_numpy(),
+                     index=key(welfare))
+    if size.index.duplicated().any():
+        raise SaltPerCapitaJoinError(f'{_SALT_HOUSEHOLD_SIZE} repeats a (grappe, menage)')
+    raw = raw.copy()
+    raw['hhsize'] = size.reindex(key(raw)).to_numpy()
+    return raw
+
+
+def salt_per_capita_rows(raw):
+    """Boolean ndarray: salt in kg at 0.0199997 kg x ``hhsize`` (to 1e-9).
+
+    ``raw`` is s07b in its codes with the welfare ``hhsize`` per record
+    (:func:`_salt_raw`).  A record with no ``hhsize`` is never selected.
+    """
+    def col(name):
+        return pd.to_numeric(raw[name], errors='coerce').to_numpy(dtype=float)
+
+    q = col('s07bq03a')
+    with np.errstate(invalid='ignore'):
+        hit = (q > 0) & (np.abs(q - SALT_KG_PER_PERSON * col('hhsize')) < _SALT_TOLERANCE)
+        for name, code in _SALT_CELL.items():
+            hit &= col(name) == code
+    return hit
+
+
+def _withhold_salt_per_capita_rows(df):
+    """The wide frame with the withheld records' ``j`` set to :data:`_WITHHELD_J`.
+
+    Marked, not dropped: the shared hook's unit-weight join reads the source by
+    position and refuses a frame that is not the file row for row.  Every row a
+    marked record becomes carries the mark, and :func:`food_acquired` drops them.
+    """
+    raw = _salt_raw()
+    served = pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
+    held = pd.to_numeric(raw['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    if len(raw) != len(df) or not np.array_equal(served, held, equal_nan=True):
+        raise SaltPerCapitaJoinError(
+            f'the wide food_acquired frame is not {_SALT_SOURCE} row for row')
+    hit = salt_per_capita_rows(raw)
+    if not hit.any():
+        return df
+    idx = df.index.to_frame(index=False)
+    j = idx['j'].astype(object).to_numpy(copy=True)
+    j[hit] = _WITHHELD_J
+    try:
+        idx['j'] = pd.array(j, dtype=idx['j'].dtype)
+    except (TypeError, ValueError):
+        idx['j'] = j
+    out = df.copy()
+    out.index = pd.MultiIndex.from_frame(idx)
+    return out
+
+
+def inputs_salt_per_capita(wave='2021-22'):
+    """The registry ``inputs`` callable: the withheld records at ``(t, i, j)``.
+
+    The file's own names and codes, with ``hhsize`` from the welfare file, indexed
+    as the served table is (:func:`inputs_food_acquired` supplies the index).
+    """
+    raw = _salt_raw(wave)
+    frame = _inputs_last_purchase('Senegal', wave)
+    held = pd.to_numeric(raw['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    keyed = pd.to_numeric(frame['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    if len(raw) != len(frame) or not np.array_equal(held, keyed, equal_nan=True):
+        raise SaltPerCapitaJoinError(f'the input frame is not {_SALT_SOURCE} row for row')
+    hit = salt_per_capita_rows(raw)
+    columns = ['vague', 's07bq01', 's07bq03a', 's07bq03b', 's07bq03c', 's07bq04',
+               's07bq05', 's07bq06', 's07bq07a', 's07bq07b', 's07bq07c', 's07bq08',
+               'hhsize']
+    out = raw.loc[hit, columns].copy()
+    out.index = frame.index[hit]
+    return out
 from collections import defaultdict
 
 def v(value):

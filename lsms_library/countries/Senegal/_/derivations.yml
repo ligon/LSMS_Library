@@ -291,3 +291,45 @@ Senegal::food_acquired::nsu-national-unit-weight:
     Measured kilograms are in Senegal/_/CONTENTS.org.
   contents: 'Senegal/_/CONTENTS.org, "EHCVM unit-weight table wired (GH #1452)"'
   since: '2026-11-04'
+
+# A DELETION: the records are not served, so none can carry a key.  This entry is
+# the disclosure (`rows: 0`), and `derivation_inputs` returns the records.
+Senegal::food_acquired::salt-per-capita-withheld:
+  waves: ['2021-22']
+  columns: [Quantity, Expenditure]
+  rows: 0
+  rule: >-
+    A record of s07b_me_sen2021.dta for product 139 (Sel) in kg, size-free, whose
+    s07bq03a equals 0.0199997 kg times the household's hhsize in
+    ehcvm_welfare_sen2021.dta, to within 1e-9, is not served: not its purchased
+    row, its own-production row or its gift row.  100 records meet it (34% of the
+    wave's 294 salt-in-kg records), each within 1e-12; no record of any other
+    product or unit does.  No record equals 0.02 x hhsize; the 2026-11-12 data
+    check's "0.02" was the constant at 4 significant digits.
+  function: lsms_library.countries.Senegal.2021-22._.mapping:salt_per_capita_rows
+  inputs: lsms_library.countries.Senegal.2021-22._.mapping:inputs_salt_per_capita
+  raw_variables: [vague, s07bq01, s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05,
+                  s07bq06, s07bq07a, s07bq07b, s07bq07c, s07bq08, hhsize]
+  assumptions:
+    - text: >-
+        a quantity that is one constant times household size on 100 records, and
+        on no record of any other good, is a fill by the file's producers, not a
+        household's answer.  The households' own median is 0.0278 kg a person, and
+        none of the 28 region x milieu medians is the constant, so it is not the
+        harmonised rule's region x milieu median either.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-12, "Remove, registered", on the principle that
+        undocumented imputations are not served without a very good reason.  No
+        document held or public mentions salt, a per-capita norm or a 7B
+        imputation (BID FR p.19 and EN, ANSD Rapport final 2021-22, World Bank DDI
+        6278, the EHCVM-2 enumerator manual; documentation search 2026-11-12).
+        A typed answer cannot meet the rule by chance: 0.0199997 x an integer
+        carries 6-7 significant digits (0.099998 kg for 5 persons), and the
+        constant is met to 1e-12 or not at all.
+  validated_against: >-
+    the base build: the 100 records were 100 served rows (95 purchased, 5 in kind;
+    17.04 kg, 17.78 FCFA of Expenditure on the 2 that had one), all gone, and no
+    other row of the table changes (Senegal/_/CONTENTS.org).
+  contents: 'Senegal/_/CONTENTS.org, "2021-22 salt at a fixed amount per person withheld"'
+  since: '2026-11-12'
