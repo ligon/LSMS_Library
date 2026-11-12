@@ -1,5 +1,31 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Nigeria PP community_prices representation, GH587 (second round) -- ANSWERED
+Put after the mapping report (reports/587-mapping/REPORT.md; tables committed
+on feature/587-nigeria-pp-mapping-20261112 at 2b4a3632c).  Four selections:
+- Unit axis: "Base u, size column (Recommended)".  PP rows get the PH
+  size-agnostic base unit labels; the native size stays in its own column.  A
+  sized axis is decided for PP and PH together later.
+- W1 (2010Q3): "Register the division (Recommended)".  Price of one unit =
+  sc2q3a / sc2q3b where Number of Units > 1 (7,198 rows), as a registered
+  derivation; N = 1 rows (15,014) served as recorded; 105 priced rows with no
+  count stay unserved.
+- W5 (2023Q3): "Accept quantity of one".  Follow the printed PP form ("please
+  use a quantity of one"): every W5 PP price is the price of one unit.  THIS
+  LIFTS the earlier "no default quantity of one" restriction FOR W5 PP ONLY.
+  The c2q2a Quantity present on 350 rows (19 equal to 1) must be disclosed, not
+  silently ignored; the rows where it is present and not 1 need an explicit
+  treatment in the PR (recommend: serve as recorded with the quantity in its
+  column and flag, or exclude with a count -- bring the choice back if unclear).
+- W4/W5 metric-size containers: "Reuse PH c8-metric-size".  Register the PH
+  metric-size division for PP, so PP and PH treat these rows alike.  THIS LIFTS
+  the earlier "no PH size rule" restriction for this rule only.
+Still pending (not asked): metric units with no recorded package size (g/cl:
+W2 209, W3 ~12.9k, W5 231; plus W3 Kg/l) -- test against household unit values
+first, then decide; and the item/unit label judgements in MAPPING.org (Pepper,
+Palm wine 161, Semovita unserved, W3 31/42/22/32, congo/mudu, tomato cup, tin,
+251 Bag of 20 Sachets, ml/cl), to be shown with the wiring PR.
+
 * 2026-11-12: Kg-factor evidence rows, GH1509 -- ANSWERED
 The user explicitly selected: "All purchase rows (Recommended)".
 food_kg_factors' price-ratio inference uses only source-labelled PURCHASE rows
