@@ -2139,6 +2139,18 @@ registry entry cites them):
 
 *** C8 is POST-HARVEST ONLY -- why community_prices grades =dropped= on every PP round
 
+/Contradicted, and superseded (GH #587, 2026-11-12)./  The paragraph below is
+kept as a contradiction of record.  "The post-planting community questionnaire
+carries sections C1-C4 only" is true, but the conclusion drawn from it is not:
+every one of the five PP community forms prices food in its OWN section 2 --
+W1 PDF p.5 "Section 2: Food Prices", W2 p.5 "Section 2: Food Prices", W3 p.5
+and p.11 "Food Prices - 1st / 2nd Location", W4 p.5 "C2: FOOD PRICES", W5 p.6
+"SECTION C2. FOOD PRICES" -- and the released =sectc2*_planting*= files carry
+the price (W1 =sc2q3a= "What is the price for [ITEM]? (Naira)", W2-W5 =c2q3=).
+The search for =*c8*= could not find them because the PP module is C2, not C8.
+So the five =dropped= cells were a real omission, not a grader artefact.  They
+are served since GH #587: see [[*2026-11-12 -- Post-planting community prices (GH #587)][Post-planting community prices (GH #587)]].
+
 =.coder/coverage/latest.csv= grades =Nigeria/community_prices= =dropped=
 ("declared for wave but absent from built t-index") in 2010Q3, 2012Q3,
 2015Q3, 2018Q3 and 2023Q3, and =sane= in the five PH quarters.  Those cells
@@ -4264,3 +4276,125 @@ Two exact aliases in =_COMMUNITY_UNIT_LABELS=, nothing else: the shared
 cards too (W4 103 + W5 464 priced =251= rows, W5 36 =CENTLITRES= rows),
 where the same decoder would have placed them the same wrong way; see the
 next section.
+
+* 2026-11-12 -- Post-planting community prices (GH #587)
+
+/Rulings (@ligon, 2026-11-12, three GH587 entries in the decision log)./
+"Develop the item and unit code mapping, then provide community_prices using
+those harmonized labels."  Base =u=, native size in its own column.  W1:
+register the division by the Number of Units.  W5: accept the printed
+quantity of one.  W4/W5 metric sizes: reuse PH's =c8-metric-size=.  Metric
+units with no recorded package size: not ruled, held.
+
+*The idiosyncrasy.*  The PP community questionnaire prices food in Section
+C2, not C8 (the entry "C8 is POST-HARVEST ONLY" above concluded otherwise).
+Six sources, because W3 prices two physical locations:
+=sectc2_plantingw1= / =w2= / =w4= / =w5=, =sectc2a= / =sectc2b_plantingw3=.
+The PP cards are NOT the PH C8 cards:
+
+- W1/W2 PP item codes are the HOUSEHOLD consumption numbering of their
+  quarter (2010Q3 / 2012Q3), not the community-own numbering PH W1/W2 use
+  (=_W1W2_PRICE_ITEM=): 63 code numbers are shared and only 30-37 mean the
+  same thing (10 is guinea corn in PP, biscuits in PH).  The W1 printed PP
+  list is a third numbering; the data follow the native card.
+- Codes collide across quarters (GH #1144), so =j= comes from
+  =harmonized_food_labels(t=<PP quarter>)=; the wave-blind Code contract
+  is wrong on 7 W1 and 6 W2 codes.  W3-W5 equal the Code contract on every
+  carded code (pinned by test).  W5's item card is byte-identical to W4's
+  and the food codebook has no 2023Q3 column, so W5 reads 2018Q3.
+- W1's unit card is its own: 1-7 cups / congo-mudu / tiya with stated
+  weights, 11-95 the W1-PH sized containers, 101-106 kg/g/l/ml/pieces/other.
+  Household W1 code 1 is Kg; PP W1 code 1 is a tomato cup.  Never join a PP
+  unit code to the =u= table by number.
+- W3's native unit card lacks 31 and 42, which its data use (707+53, 66+1
+  priced rows) and the printed PP card and =u[2015-16]= call Mudu Large /
+  Derica Large; it carries 22 / 32 instead, the PH W3 printed card's
+  numbers.  Item 161 is labelled "Palm oil" natively; every printed card says
+  Palm wine, and Palm oil is code 50 -- served as Palm wine.
+- W4's printed PP list lacks the alcoholic-drinks block 160-164 and its
+  cover/footer disagree (W4 PP vs "Wave 3 Post-Harvest"); the data follow
+  the native card.
+- W5's C2 file carries PH-style label sets (=c8aq7a_1=, =c8aq7b_1=) and a
+  =c2q2a= "Quantity" on 350 priced rows (19 equal to 1) that the printed
+  form does not have.
+
+*What is served* (cold build, private root, =03fe9034c=):
+
+| PP t | served | Derivation | held (registered) |
+|-+-+-+-|
+| 2010Q3 | 22,214 | 7,199 =pp-w1-number-of-units= | 105 W1 no count |
+| 2012Q3 | 21,124 | -- | 209 g/cl no size; 72 items with no =j= (15 Semovita, 0) |
+| 2015Q3 | 20,875 (obs 1 15,032, obs 2 5,843) | -- | 17,054 g/cl/Kg/l no size |
+| 2018Q3 | 32,246 | 3,156 =pp-c2-metric-size= | none |
+| 2023Q3 | 29,667 | 4,556 =pp-c2-metric-size= | 231 g/cl no size; 123 =c2q2a= not 1 |
+
+Unpriced rows (no positive Naira: not available, or unpriced) are excluded
+as PH excludes them.  =u= is the PH base label; the six PP-only overrides
+are W1 =Tomatoes cup=, =Congo/Mudu=, =ml= (=millilitre=, which the decoder
+reads as litres), W2 =Derica= for the typo =MEDIUM DERCA=, W3 31 =Mudu= and
+42 =Derica=.  A PP row with no unit recorded is =Unknown= (390 W1, 9 W3
+rows), where PH drops a blank unit.  =Size= keeps what base =u= folds away:
+the W4/W5 SIZE label verbatim (='0. SMALL'=, ='34. 250 GRAMS'=), the size word
+W1-W3 code into the unit (='small'=, ='LARGE'=); NA on PH rows.  PH rows are
+unchanged except the decoder fix in the previous section.
+
+*Measured against the same round's household unit value* (=food_acquired=
+purchased Expenditure / Quantity, matched =(t, v, j, u)= cells, median
+community / household):
+
+| stratum | cells | median | within 2x |
+|-+-+-+-|
+| W2 g, held | 70 | 2.24 | 39% |
+| W2 cl, held | 3 | 1.13 | 100% |
+| W3 g, held | 1,699 | 150 | 9% |
+| W3 cl, held | 1,256 | 57 | 4% |
+| W3 Kg, held | 719 | 1.07 | 82% |
+| W3 l, held | 328 | 1.00 | 85% |
+| W4 cl, =pp-c2-metric-size= | 460 | 1.00 | 97% |
+| W2 / W4 Kg served (control) | 3,697 / 649 | 0.90 / 1.00 | 55% / 96% |
+| W1 g, N = 1, served as recorded | 218 | 144 | 5% |
+| W1 g, N >= 6, divided | 656 | 0.73-1.01 | 44-59% |
+| W1 Kg, N > 50, divided | 79 | 0.009-0.23 | 0-42% |
+| W1 l, N > 50, divided | 89 | 0.001-0.014 | 0-6% |
+
+So W3's g/cl "quantity of one" prices are package prices (as PH W3's are),
+W3's Kg/l prices are per-kilogram / per-litre prices, and W2 g is unclear.
+W5 has no =food_acquired=, so no same-wave household comparator exists; 208
+of its 231 held g/cl rows record a gram/centilitre count in =c2q2a= (the
+package quantity, by its =c2q2_cvn= of 0.001 / 0.01 and by price not scaling
+with it).  Against the community's own per-gram / per-centilitre prices
+(item medians, 6 g and 5 cl items), the held rows as recorded sit at 543x /
+13x the same round's =pp-c2-metric-size= rows and 307x / 11x PH 2024Q1's;
+divided by =c2q2a= they sit at 1.5x / 1.5x and 0.96x / 1.23x.  *Two ruled W1 treatments measure badly*: the 963 W1 =g= (and 80
+=ml=) rows with N = 1, served as recorded per the ruling, are package
+prices (144x); and dividing W1 Kg/l by an N above 50 under-prices by 50-1000x,
+because there N reads more like a size than a count (undivided, the litre
+rows sit at 0.85-1.05x the household price; the kilogram rows at 4.8-22x,
+so neither reading fits them).  Both are open maintainer questions; the
+numbers are re-measurable with the wiring report's scripts.
+
+*W5 =c2q2a= (the PR's treatment).*  350 priced rows record it; 19 equal 1
+(18 CUBE, 1 LITRES) and are served.  The other 331: 208 are on GRAMS /
+CENTLITRES with a blank size and are held for size first; the remaining 123
+(41 CUBE, 65 BOTTLE/CAN -- 63 with a coded metric size -- 10 KILOGRAMS, 7
+LITRES) are not served, registered as
+=Nigeria::community_prices::pp-w5-quantity-not-one-hold=.  On CUBE the price
+scales with =c2q2a= (price / same item-unit-size median = 0.7-1.0 x
+=c2q2a=), so "one cube" would overstate it up to ~1,400x; on BOTTLE/CAN
+=c2q2a= equals the coded size on 8 of 63 rows.
+
+*Registered* (=_/derivations.yml=): =pp-w1-number-of-units=,
+=pp-c2-metric-size= (the PH function; its own key because the PH entry's
+=inputs= return PH rows only), and four =rows: 0= omissions --
+=pp-w1-no-count-hold=, =pp-unrecorded-size-hold=,
+=pp-unharmonized-item-hold=, =pp-w5-quantity-not-one-hold= -- each of whose
+=inputs= returns its rows with their original variables under the served
+=(t, v, j, u, variety, obs)= labels.  The crosswalk lives in
+=_/pp_community_prices.py=, not in =categorical_mapping.org= (where a table
+named like a column would auto-apply to every Nigeria =u=); proposals and
+every judgement row are in =.coder/ledger/587-nigeria-pp-mapping/MAPPING.org=.
+
+*Not changed.*  PH C8, its size rule and its first-row / variety contracts;
+=Size= is not filled for PH; =labels='Aggregate'= still collapses W3-W5 items
+onto one label without making the index unique (pre-existing, base too);
+W1/W2 PP =Pepper= passes through =Aggregate= (837 rows, GH #1537).

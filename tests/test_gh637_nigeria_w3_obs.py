@@ -147,9 +147,16 @@ def _aws_creds_available() -> bool:
 # W1/W2 are the authenticated1095 report's eligible PRE-first source counts
 # (30,628/31,239), not new measurements from this source-only implementation.
 # Full native-key uniqueness must now admit all those eligible source rows.
+# GH #587 (2026-11-12) moved this pin twice, both measured cold: the five
+# post-planting quarters are served (W3's PP C2 also prices two locations,
+# obs 1 / 2), and 2024Q1 loses the 49 '4. CENTLITRES (CL)' rows the decoder
+# used to serve as litres (blank size -> c8-unrecorded-size-drop).
 EXPECTED = {'2011Q1': {1: 30628}, '2013Q1': {1: 31239},
             '2016Q1': {1: 17344, 2: 5809},
-            '2019Q1': {1: 31757}, '2024Q1': {1: 30064}}
+            '2019Q1': {1: 31757}, '2024Q1': {1: 30015},
+            '2010Q3': {1: 22214}, '2012Q3': {1: 21124},
+            '2015Q3': {1: 15032, 2: 5843},
+            '2018Q3': {1: 32246}, '2023Q3': {1: 29667}}
 
 
 @pytest.mark.slow
