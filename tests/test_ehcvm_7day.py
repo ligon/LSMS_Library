@@ -102,6 +102,19 @@ AFTER = {
     ('CotedIvoire', '2021-22'): (121_393_491.0, 29_050),
 }
 
+#: Keys a wave's food rows may carry beside this one (GH #1697, rulings of 2026-11-12):
+#: Togo 2021-22's s07bq03a is recovered from the producer's regional factor before the
+#: residual is formed, and Cote d'Ivoire 2021-22's H rows are withheld and its L rows
+#: flagged.  The purchased row joins the key of its rule to the 7-day key with '+'.
+OTHER_KEYS = {
+    ('Togo', '2021-22'): {'Togo::food_acquired::s07bq03a-regional-factor-divided-out',
+                          'Togo::food_acquired::s07bq03a-floored-count-recovered',
+                          'Togo::food_acquired::s07bq03a-floored-count-withheld'},
+    ('CotedIvoire', '2021-22'): {
+        'CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld',
+        'CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion'},
+}
+
 #: The unit sizes each country may serve in `u` (GH #1224): each instrument's own
 #: labels, case normalised.  Togo's `98` is a code its files and questionnaires
 #: never label (`Togo/_/CONTENTS.org`).  Guinea-Bissau's are Portuguese.
@@ -313,7 +326,7 @@ class TestDelivered:
         assert (got == (s == 'purchased')).all()
         keys = set(x['Derivation'].dropna().str.split('+').explode())
         assert keys - {derivation_key(country)} <= {
-            f'{country}::food_acquired::nsu-national-unit-weight'}
+            f'{country}::food_acquired::nsu-national-unit-weight'} | OTHER_KEYS.get((country, wave), set())
 
     @pytest.mark.parametrize('country', sorted(NON_EHCVM_WAVES))
     def test_a_non_ehcvm_wave_of_the_same_country_carries_no_key(self, built, country):
@@ -363,7 +376,10 @@ class TestDelivered:
         _, n = AFTER[(country, wave)]
         assert len(inkind) == n
         assert inkind['Expenditure'].isna().all()
-        assert (inkind['Quantity'] > 0).all()
+        # GH #1697: Cote d'Ivoire 2021-22's H rows are served with no quantity, and only those.
+        withheld = inkind['Derivation'].fillna('').str.contains('withheld', regex=False)
+        assert (inkind.loc[~withheld, 'Quantity'] > 0).all()
+        assert inkind.loc[withheld, 'Quantity'].isna().all()
         # A reported quantity, not a derivation of it.  GH #1452: its kilograms can be.
         assert not inkind['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).any()
 

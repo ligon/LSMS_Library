@@ -114,6 +114,154 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
   contents: 'Togo/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
 
+# GH #1697, ruling @ligon 2026-11-12, "Invert, registered (Recommended)".  Three keys on
+# 2021-22's s07bq03a, one per rule a row takes.  Each sits on the purchased row beside the
+# 7-day key above, joined with '+': the purchased residual is formed from the recovered
+# s07bq03a, then valued.  The produced and in-kind rows read s07bq04 and s07bq05, which
+# carry no factor, and take no key.
+Togo::food_acquired::s07bq03a-regional-factor-divided-out:
+  waves: ['2021-22']
+  columns: [Quantity]
+  rows: {s: purchased}
+  rule: >-
+    s07bq03a is divided by the factor this file carries on it before the
+    purchased residual (s07bq03a - s07bq04 - s07bq05).clip(0) is formed:
+    f = 1.115 x {Centrale 1.5, Savanes 1.2, Plateaux 1.1, Kara 0.9, Maritime 0.9,
+    Grand Lomé 0.82} = 1.6725, 1.338, 1.2265, 1.0035, 1.0035, 0.9143, by the
+    cover's region s00q01, except a Grand Lomé row reporting own production or a
+    gift (s07bq04 or s07bq05 positive), which carries 1.2.  Applies to every
+    unit but `unité` (code 147), and to a Grand Lomé `unité` with own production
+    or a gift whose quotient lands on the quarter grid.  A recovered value
+    within a millionth (relative) of s07bq04 + s07bq05 is that sum, so a row
+    with no purchase leaves no residual of single-precision storage.
+  function: lsms_library.countries.Togo.2021-22._.mapping:recover_s07bq03a
+  inputs: lsms_library.countries.Togo.2021-22._.mapping:inputs_regional_factor_divided_out
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s00q01]
+  assumptions:
+    - text: >-
+        s07bq03a, and no other column, is the household's answer multiplied by a
+        constant per region that no document explains, applied after
+        collection: on never-purchased own-production rows s07bq03a / s07bq04 is
+        that constant exactly (to 6 decimals, in both vagues, in rural and urban
+        areas and in every unit), while s07bq04, s07bq05 and s07bq07a sit on the
+        quarter grid as 2018's s07bq03a does.  The enumerator manual asks
+        s07bq04 and s07bq05 in the unit of s07bq03a, so a factor on one alone is
+        post-collection by construction.  Dividing it out returns 84.8-99.7% of
+        each region's non-`unité` rows to the quarter grid (lowest: Grand Lomé
+        rows at 1.2), against 0.0-3.5% before.
+      basis: derived-from-data
+      evidence: >-
+        doc search burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md
+        §2b (T-TGO-1, -3, -4, -6); re-measured 2026-11-12, burst job 41248473
+        (probe.py): s07bq03a = s07bq04 x f on 96.5-98.5% of own-production-only
+        non-`unité` rows of the five regions besides Grand Lomé, 94.6% there at
+        1.2.  EHCVM-2 enumerator manual (held under Burkina_Faso 2021-22), PDF
+        pp. 82-83.
+    - text: >-
+        the factor is read as the producer's adjustment of unknown purpose, and
+        what is served is what the household reported, before it.  The doc
+        search's best reading is an under-reporting correction: the regional
+        multipliers follow, in rank order, each region's fall since 2018 in the
+        number of foods a household reports (Spearman 0.93 over six regions).
+        Its approximate estimate is that without the factor poverty in Centrale
+        would rise about 20 points from 2018, where the official published
+        change is +2.9; that figure is the doc search's, not measured here.  So
+        a 2018 against 2021-22 comparison through the library shows a much
+        steeper fall in consumption than the official statistics.  The filed
+        value is recoverable: Country('Togo').derivation_inputs(<this key>)
+        returns each keyed row's s07bq03a as the file holds it, beside s00q01,
+        s07bq04 and s07bq05, and s07bq03a / recover_s07bq03a(...) is the factor.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-12, "Invert, registered (Recommended)"; the
+        maintainer's principle, "Without a very good reason we don't want to
+        serve up someone else's undocumented imputations"; doc search REPORT.md
+        §2c-2d (H6; T-TGO-12, -15, -16), whose 20-point figure holds the 2021
+        poverty line fixed and is approximate by its own account.  UEMOA
+        Document de travail no 4, §2.2-2.3, confines corrections to analysis
+        files.
+  validated_against: >-
+    The forward mechanics on the file (above).  ehcvm_conso_tgo2021.dta carries
+    the factor (the 7-day key's validated_against), so the recovered quantity
+    does NOT reproduce depan(Achat), by design, and no document validates it.
+  contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
+  since: '2026-11-12'
+
+Togo::food_acquired::s07bq03a-floored-count-recovered:
+  waves: ['2021-22']
+  columns: [Quantity]
+  rows: {s: purchased}
+  rule: >-
+    A `unité` (count, code 147) row outside Grand Lomé carries floor(k x f),
+    the count k scaled by its region's factor f >= 1.0035 and then truncated to
+    an integer.  floor(k x f) is one-to-one on integers when f >= 1, so the
+    count served is the one integer k whose floor reproduces s07bq03a.  Where no
+    integer does, or s07bq03a is not an integer, the row is withheld (the
+    withheld key).  The purchased residual is formed from k.
+  function: lsms_library.countries.Togo.2021-22._.mapping:recover_s07bq03a
+  inputs: lsms_library.countries.Togo.2021-22._.mapping:inputs_floored_count_recovered
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s00q01]
+  assumptions:
+    - text: >-
+        `unité` alone was floored after scaling: on own-production-only rows of
+        Centrale, Savanes and Plateaux, 730 of its 767 are floor(s07bq04 x f)
+        and none is s07bq04 x f, while every other unit is exact (Tête 247 of
+        252 exact, Bol 3,356 of 3,417).
+      basis: derived-from-data
+      evidence: measured 2026-11-12, burst job 41248473 (probe.py); doc search REPORT.md §2b (T-TGO-6, -10)
+    - text: >-
+        the household's count was an integer: the inversion is exact only then.
+        2018, the same instrument with no factor, has 99.5% of its positive
+        `Unité` s07bq03a integer (16,410 rows), so about one recovered count in
+        two hundred may have been a fraction, served as its nearest consistent
+        integer.
+      basis: modelling-choice
+      evidence: doc search REPORT.md §2e (T-TGO-14)
+  validated_against: >-
+    The round trip floor(k x f) = s07bq03a on every recovered row, by
+    construction; 12,833 of the 12,850 integer `unité` rows with f >= 1 pass it.
+  contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
+  since: '2026-11-12'
+
+Togo::food_acquired::s07bq03a-floored-count-withheld:
+  waves: ['2021-22']
+  columns: [Quantity, Expenditure]
+  rows: {s: purchased}
+  rule: >-
+    A `unité` row whose count cannot be recovered is served no quantity: a
+    Grand Lomé `unité` with neither own production nor a gift (factor 0.9143,
+    floored, so 1 became 0 and 11 and 12 both became 10), a `unité` elsewhere
+    that no integer reproduces, and a Grand Lomé `unité` with own production or
+    a gift whose s07bq03a / 1.2 is off the quarter grid or zero.  Its produced
+    and in-kind rows are served from s07bq04 and s07bq05 as filed.  One
+    purchased row with Quantity NA and Expenditure NA, and this key, is served
+    where a purchase is implied: the row reports neither own production nor a
+    gift (the 607 Grand Lomé rows the floor sent to 0 included), or its filed
+    residual is positive.  Downstream, the derived food tables drop an NA
+    before they sum, so these rows are absent there, never a zero.
+  function: lsms_library.countries.Togo.2021-22._.mapping:classify_s07bq03a
+  inputs: lsms_library.countries.Togo.2021-22._.mapping:inputs_floored_count_withheld
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s00q01]
+  assumptions:
+    - text: >-
+        a truncated count with f < 1 cannot be inverted, and its pre-floor value
+        is not guessed.  3,848 Grand Lomé purchase-only `unité` rows, 607 of them
+        filed as 0 though the household reported consuming the item.  For a
+        filed count of 0 to 9 the truncation sends k to k - 1 for k up to 11, so
+        those could be read as filed + 1 under the integer assumption; the
+        ruling withholds them all.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-12, "Lome count rows that were rounded cannot be
+        inverted and are served NA under a registered omission"; doc search
+        REPORT.md §2b (T-TGO-6/-10: Grand Lomé purchase-only `unité` rows are
+        floor(q x 0.9143)); probe counts, burst job 41248473.
+  validated_against: >-
+    derivation_inputs returns each withheld row's filed s07bq03a, s07bq04,
+    s07bq05 and s00q01, joining the keyed served rows at (t, i, j).
+  contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
+  since: '2026-11-12'
+
 Togo::crop_production::hh-crop-sale-single-row:
   waves: ['2021-22']
   columns: [Quantity_sold, Unit_sold, Value_sold]

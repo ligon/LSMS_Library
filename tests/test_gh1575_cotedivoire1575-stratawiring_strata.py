@@ -29,6 +29,8 @@ ROOT = countries_root() / COUNTRY
 COVER = "Menage/s00_me_CIV2018.dta"
 WEIGHTS = "Menage/ehcvm_ponderations_CIV2018.dta"
 KEY = "CotedIvoire::sample::region-milieu-stratum"
+# 2021-22 has its own key since F1 of the GH #1697 red team: its function upper-cases the region.
+LATER_KEY = "CotedIvoire::sample::region-milieu-stratum-upper-region"
 MODULE = ROOT / WAVE / "_" / "mapping.py"
 LATER = "2021-22"
 LATER_COVER = "s00_me_civ2021.dta"
@@ -132,7 +134,8 @@ def test_only_strata_changes_in_the_complete_sample_declaration():
     assert later["df_cover"]["myvars"]["strata"] == [
         "s00q01", "s00q04", {"mapping": "strata_label_upper_region"}]
     assert later["dfs"] == ["df_weights", "df_cover"] and later["merge_how"] == "left"
-    assert list(derivation_records(COUNTRY)[KEY].waves) == [WAVE, LATER]
+    assert list(derivation_records(COUNTRY)[KEY].waves) == [WAVE]
+    assert list(derivation_records(COUNTRY)[LATER_KEY].waves) == [LATER]
 
 
 def test_real_yaml_extraction_merge_and_hook_conserve_every_other_field(monkeypatch, make_wave):
@@ -232,7 +235,11 @@ def test_registry_is_unique_scoped_optional_and_resolves_unchanged_helpers():
     text = (ROOT / "_" / "derivations.yml").read_text()
     assert len(re.findall(rf"^{re.escape(KEY)}:", text, flags=re.M)) == 1
     rec = derivation_records(COUNTRY)[KEY]
-    assert rec.waves == [WAVE, LATER] and rec.columns == ["strata"] and rec.rows == {}
+    assert rec.waves == [WAVE] and rec.columns == ["strata"] and rec.rows == {}
+    later = derivation_records(COUNTRY)[LATER_KEY]
+    assert later.waves == [LATER] and later.columns == ["strata"] and later.rows == {}
+    assert later.raw_variables == ["s00q01", "s00q04"] and later.inputs == rec.inputs
+    assert all(a["basis"] in BASES for a in later.assumptions)
     assert rec.raw_variables == ["s00q01", "s00q04"]
     assert rec.resolve() is ehcvm.derive_region_milieu_stratum
     assert rec.inputs == "lsms_library.countries.CotedIvoire.2018-19._.mapping:inputs_strata"
@@ -269,9 +276,10 @@ def test_registered_inputs_use_own_cover_and_original_names_only(monkeypatch, ma
     before, later_before = cover.copy(deep=True), later_cover.copy(deep=True)
     calls = _providers(monkeypatch, cover, pd.DataFrame(), later_cover=later_cover)
     rec = derivation_records(COUNTRY)[KEY]
-    actual = call_inputs(rec)
+    later_rec = derivation_records(COUNTRY)[LATER_KEY]
+    actual = pd.concat([call_inputs(rec), call_inputs(later_rec)])
     # Each wave's OWN cover, original names, and the labels AS THE FILE HAS THEM: the
-    # upper-casing is the served value's, not the inputs'.
+    # upper-casing is the served value's, not the inputs'.  Each key reads its own wave.
     expected = pd.concat([before[["s00q01", "s00q04"]], later_before[["s00q01", "s00q04"]]],
                          ignore_index=True)
     expected.index = pd.MultiIndex.from_tuples(
@@ -279,9 +287,12 @@ def test_registered_inputs_use_own_cover_and_original_names_only(monkeypatch, ma
     pd.testing.assert_frame_equal(actual, expected)
     pd.testing.assert_frame_equal(cover, before)
     assert calls == [COVER, LATER_COVER] and requested == [WAVE, LATER]
-    only = call_inputs(rec, wave=LATER)
+    only = call_inputs(later_rec, wave=LATER)
     assert only.index.get_level_values("i").tolist() == ["E2_7003", "E2_2008"]
     assert requested == [WAVE, LATER, LATER] and calls == [COVER, LATER_COVER, LATER_COVER]
+    # The registered function re-derives the served value from those inputs.
+    got = [later_rec.resolve()(r, m) for r, m in zip(only["s00q01"], only["s00q04"])]
+    assert got == ["PORO Rural", "GÔH Urbain"]
 
 
 def _later_weights(grappes, menages):
@@ -312,7 +323,7 @@ def test_2021_22_upper_cases_the_region_and_conserves_every_other_field(monkeypa
     region = make_wave(label=LATER).formatting_functions["Region"]
     assert {region(r) for r in ["poro", "gÔh"]} == {"PORO", "GÔH"}
     assert (new["Derivation"].isna() == new["strata"].isna()).all()
-    assert (new.loc[new["strata"].notna(), "Derivation"] == KEY).all()
+    assert (new.loc[new["strata"].notna(), "Derivation"] == LATER_KEY).all()
 
 
 @pytest.mark.parametrize("region,milieu", [
@@ -339,7 +350,15 @@ def test_2021_22_refuses_a_code(monkeypatch, make_wave, region, milieu, operand)
 def test_2021_22_formatter_and_hook_are_the_shared_helpers():
     module = _module(LATER_MODULE)
     assert module._derive_region_milieu_stratum is ehcvm.derive_region_milieu_stratum
-    assert module._stamp_region_milieu_stratum is ehcvm.stamp_region_milieu_stratum
+    # F1 of the GH #1697 red team: this wave stamps its own key, whose function upper-cases
+    # the region and calls the shared helper, so the shared stamp (2018-19's key) is not used.
+    assert not hasattr(module, "_stamp_region_milieu_stratum")
+    assert module.KEY_STRATUM == LATER_KEY
+    rec = derivation_records(COUNTRY)[LATER_KEY]
+    assert rec.resolve() is module.derive_upper_region_milieu_stratum or (
+        rec.function == "lsms_library.countries.CotedIvoire.2021-22._.mapping:"
+                        "derive_upper_region_milieu_stratum")
+    assert rec.resolve()("gÔh", "Urbain") == "GÔH Urbain"
     row = pd.Series(["gÔh", "Urbain"])
     assert module.strata_label_upper_region(row) == "GÔH Urbain"
     assert module.strata_label_upper_region(pd.Series(["poro", pd.NA])) is pd.NA

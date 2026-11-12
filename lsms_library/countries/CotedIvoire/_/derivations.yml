@@ -108,6 +108,107 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
   contents: 'CotedIvoire/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
 
+# GH #1697, ruling @ligon 2026-11-12, "H to NA, flag L (Recommended)".  Two per-row keys
+# on 2021-22's s07bq03a.  The first WITHHOLDS a value (Quantity and Expenditure NA on the
+# served rows); the second changes nothing and flags.
+CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld:
+  waves: ['2021-22']
+  columns: [Quantity, Expenditure]
+  rows: {}
+  rule: >-
+    A positive s07bq03a off the quarter grid with four or more decimals (H) is
+    not served: every row the source row serves -- purchased (s07bq03a -
+    s07bq04 - s07bq05 positive as filed), produced (s07bq04 positive) and in-kind
+    (s07bq05 positive) -- carries Quantity NA and Expenditure NA, and this key.
+    The served row set is the filed one; only the values are withheld.  "Off the
+    grid" and "d decimals" are judged at relative tolerance 1e-6.  Downstream,
+    food_expenditures, food_quantities and food_prices drop an NA before they
+    sum, so an H row is absent there, never a zero; a household-item total that
+    also has a non-H row is that row's alone.
+  function: lsms_library.countries.CotedIvoire.2021-22._.mapping:classify_s07bq03a
+  inputs: lsms_library.countries.CotedIvoire.2021-22._.mapping:inputs_outlier_replaced
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05]
+  assumptions:
+    - text: >-
+        an H value is the producer's replacement of the household's answer, not
+        the answer: the per-item outlier rule of the harmonised UEMOA / World
+        Bank programme replaces a per-capita outlier by "la médiane dans la
+        région et le milieu de résidence", and these rows fit that median per
+        adult equivalent within item x region x milieu, re-expressed in the
+        reported unit.  No document says the rule was written into the
+        distributed s07b file, or which rows; the programme's own protocol
+        confines such corrections to analysis files and requires a correction
+        in a distributed file to be documented.  So the household's answer is
+        gone and is not recoverable, and it is not served as an answer.
+      basis: derived-from-data
+      evidence: >-
+        Document de travail no 4, "Mesure de la pauvreté" (UEMOA PHMECV,
+        September 2019), §2.2-2.3; doc search
+        burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md §3
+        (T-CIV-1: q3/eqadu1 equals its item x region x milieu cell's mode on
+        57.4% of H rows, 29.2% on household size; T-CIV-4b: 32.5% of H rows
+        share one kg per adult equivalent across two or more reported units,
+        against 0.5% of on-grid rows and 0.0% of L rows; T-CIV-5b: that value
+        is the cell median, ratio p50 1.000).  The H share falls from 22.6% of
+        rows of one-person households to 1.7% at 13 or more.
+    - text: >-
+        the row's s07bq04 and s07bq05 are replaced with it, so the produced and
+        in-kind rows are withheld too: on H rows s07bq04 is off the grid with
+        four or more decimals on 2,721 of the 2,722 where it is positive, and
+        s07bq05 off the grid on 2,047 of 2,047.
+      basis: derived-from-data
+      evidence: measured 2026-11-12, burst job 41248473 (probe.py), s07b_me_civ2021.dta
+    - text: >-
+        the split is a rule on the value, and a heuristic: 20,507 of the 303,274
+        positive s07bq03a are H at the stated tolerance (256,983 on the grid,
+        25,784 L); between 1e-7 and 1e-5 the H count moves by 244.  2018-19, the
+        control, has 0 H rows at every tolerance.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-12 (H to NA); tolerance chosen here; counts
+        measured 2026-11-12, burst job 41248473
+  validated_against: >-
+    The 2018-19 control (0 H of 292,741 positive rows); the doc search's tests
+    cited above.  derivation_inputs returns every H source row with its filed
+    s07bq03a, s07bq04 and s07bq05, joining the keyed served rows at (t, i, j).
+  contents: 'CotedIvoire/_/CONTENTS.org, "s07bq03a: H withheld, L flagged (GH #1697)"'
+  since: '2026-11-12'
+
+CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion:
+  waves: ['2021-22']
+  columns: [Quantity, Expenditure]
+  rows: {}
+  rule: >-
+    A positive s07bq03a off the quarter grid with three decimals or fewer (L) is
+    served as filed, and every row its source row serves carries this key.  It
+    is a flag: no value is changed.
+  function: lsms_library.countries.CotedIvoire.2021-22._.mapping:classify_s07bq03a
+  inputs: lsms_library.countries.CotedIvoire.2021-22._.mapping:inputs_partial_triplet_conversion
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05]
+  assumptions:
+    - text: >-
+        some L values are the producer's conversion of the row between unit
+        triplets (item, unit, size), so the quantity may not be in the unit the
+        household named; which rows cannot be identified, and the confidence is
+        low to moderate.  The row's s07bq04 is off the grid with it on 8,679 of
+        the 8,681 where it is positive, so the flag goes on every row it serves.
+        Some L values are ordinary answers: 2018-19, which has no conversion,
+        has 2,868 L-shaped rows of its 292,741 positive ones, against 25,784 of
+        303,274 here.
+      basis: derived-from-data
+      evidence: >-
+        ANStat, "Profil de pauvreté de la Côte d'Ivoire 2021", §2.7.1, printed
+        pp.34-35: "la correction du référentiel des triplets de la section 7B"
+        and "la correspondance avec la base des relevés NSU a été analysée";
+        doc search REPORT.md §3b T-CIV-7 (an excess of about 8 points, about
+        2,000 rows, over a jittered null); the review's mango, honey and salt
+        cases in CONTENTS.org.
+  validated_against: >-
+    None possible: the conversion, where it happened, left no record.  The
+    2018-19 control is the baseline for an ordinary off-grid answer.
+  contents: 'CotedIvoire/_/CONTENTS.org, "s07bq03a: H withheld, L flagged (GH #1697)"'
+  since: '2026-11-12'
+
 CotedIvoire::crop_production::hh-crop-sale-single-row:
   waves: ['2021-22']
   columns: [Quantity_sold, Unit_sold, Value_sold]
@@ -245,7 +346,7 @@ CotedIvoire::crop_production::harvest-from-dispositions:
   since: '2026-11-04'
 
 CotedIvoire::sample::region-milieu-stratum:
-  waves: ['2018-19', '2021-22']
+  waves: ['2018-19']
   columns: [strata]
   rows: {}
   rule: >-
@@ -254,23 +355,15 @@ CotedIvoire::sample::region-milieu-stratum:
     Missing or blank either component gives NA; nonstring codes are refused.
     Preserve native labels without a geographic crosswalk or a region-only
     fallback. The existing shared GH812 construction supplies the value.
-    2021-22 (s00_me_civ2021.dta) upper-cases the region label first, by
-    2021-22/_/mapping.py:strata_label_upper_region, the wave's own spelling of
-    s00q01 that mapping.Region gives cluster_features.Region: the file labels
-    23 of its 33 regions in lower case (poro, gÔh) on 2018-19's codes, and
-    upper case is 2018-19's label on all 33. The registered function applied
-    to the raw 2021-22 inputs therefore gives the lower-case spelling of those
-    23 regions; upper-case the region to re-derive the served value.
+    2021-22 upper-cases the region first and so is a different rule, with a
+    key of its own: CotedIvoire::sample::region-milieu-stratum-upper-region.
   function: lsms_library.ehcvm:derive_region_milieu_stratum
   inputs: lsms_library.countries.CotedIvoire.2018-19._.mapping:inputs_strata
   raw_variables: [s00q01, s00q04]
   assumptions:
     - text: >-
         the original 2018/19 household sampling stratum is the combination of
-        region and milieu. The later survey revisits the original clusters,
-        rather than making an independent new first-stage draw, so its
-        households carry their clusters' strata. 2018-19 was wired on
-        2026-11-10; 2021-22 on 2026-11-12, by the ruling "Same rule as #1575".
+        region and milieu. 2018-19 was wired on 2026-11-10.
       basis: questionnaire
       evidence: >-
         Own INS Basic Information Document (survey design documentation,
@@ -297,12 +390,58 @@ CotedIvoire::sample::region-milieu-stratum:
     non-strata conservation, typed inputs and normal cold/warm/Feature
     acceptance require the separately frozen data-validation stage. (That is the
     2026-11-10 construction stage; see CONTENTS.org for its completed validation.)
-    2021-22, extended 2026-11-12: a cold sample() in a private root serves a
-    stratum on all 12,965 interviewed households, from this wave's own cover,
-    the key on every one, no grappe holding two strata, the region part equal
-    to cluster_features.Region and the milieu part to Rural on every grappe,
-    every label one 2018-19 serves, and v, Rural and both weights unchanged from
-    the wiring before the extension; tests/test_civ_2021_wave.py re-derives the
-    served value from the inputs, with the region upper-cased.
   contents: 'CotedIvoire/_/CONTENTS.org, "selected 2018-19 strata wiring (GH #1575)"'
   since: '2026-11-10'
+
+# F1 of the GH #1697 red team: 2021-22 used to share the key above, whose function does
+# not upper-case, so `rec.resolve()(derivation_inputs(...))` missed 23 of the 33 regions.
+CotedIvoire::sample::region-milieu-stratum-upper-region:
+  waves: ['2021-22']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<s00q01 label, upper-cased> <s00q04 label>', from the household
+    cover page s00_me_civ2021.dta, each stripped and joined with one space, by
+    2021-22/_/mapping.py:derive_upper_region_milieu_stratum, which upper-cases
+    the region and calls the shared GH812 construction unchanged.  Missing or
+    blank either component gives NA; nonstring codes are refused.  The file
+    labels 23 of its 33 regions in lower case (poro, gÔh) on 2018-19's codes,
+    and their upper case is 2018-19's label on all 33, so the region part is
+    the spelling 2018-19 serves and mapping.Region gives cluster_features.Region.
+  function: lsms_library.countries.CotedIvoire.2021-22._.mapping:derive_upper_region_milieu_stratum
+  inputs: lsms_library.countries.CotedIvoire.2018-19._.mapping:inputs_strata
+  raw_variables: [s00q01, s00q04]
+  assumptions:
+    - text: >-
+        the original 2018/19 household sampling stratum is the combination of
+        region and milieu. 2021/22 revisits the original clusters, rather than
+        making an independent new first-stage draw, so its households carry
+        their clusters' strata. Wired on 2026-11-12, by the ruling "Same rule as
+        #1575".
+      basis: questionnaire
+      evidence: >-
+        Own INS Basic Information Document, September 2023, held as
+        2021-22/Documentation/civ_ehcvm2_information_de_base.pdf, section 4.1,
+        French PDF p.13 (English p.12): "La strate est la combinaison
+        région/milieu." Ruling @ligon 2026-11-12, "Same rule as #1575
+        (Recommended)".
+    - text: >-
+        the region's case is folded: upper case, which is 2018-19's label for
+        the same code on all 33 codes.  A spelling normalisation on identical
+        codes, not a geographic crosswalk.  The milieu label and every rule of
+        the shared construction are kept as recorded.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-12, "Accept the case fold (Recommended)", with
+        "the registry must reproduce it (own key)". Red team (GH #1697, Q3):
+        upper-cased 2021-22 equals the 2018-19 label on 33 of 33 codes, and all
+        1,081 grappes common to the two waves keep their code.
+  validated_against: >-
+    A cold sample() in a private root serves a stratum on all 12,965
+    interviewed households, from this wave's own cover, the key on every one, no
+    grappe holding two strata, the region part equal to cluster_features.Region
+    and the milieu part to Rural on every grappe, and every label one 2018-19
+    serves.  tests/test_civ_2021_wave.py re-derives the served value from
+    derivation_inputs with this function alone.
+  contents: 'CotedIvoire/_/CONTENTS.org, "2021-22 strata on the #1575 rule, and the day''s other rulings (GH #1697)"'
+  since: '2026-11-12'

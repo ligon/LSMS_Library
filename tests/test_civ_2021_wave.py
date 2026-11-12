@@ -261,17 +261,19 @@ class TestServed:
             get_dataframe(countries_root() / COUNTRY / "2018-19" / "Data" / "Menage" / "s00_me_CIV2018.dta",
                           convert_categoricals=False)["s00q01"].to_numpy()).first()
         assert {k: str(v).upper() for k, v in by_code.items()} == old_by_code.str.strip().to_dict()
-        assert (s["Derivation"] == "CotedIvoire::sample::region-milieu-stratum").all()
+        # This wave's own key (F1 of the GH #1697 red team), not 2018-19's.
+        assert (s["Derivation"] == "CotedIvoire::sample::region-milieu-stratum-upper-region").all()
 
     def test_the_registered_inputs_rederive_the_served_strata(self):
-        # The inputs are the file's labels; the served region is upper-cased (the rule says so).
-        key = "CotedIvoire::sample::region-milieu-stratum"
+        # The inputs are the file's labels; the registered function upper-cases the region,
+        # so it re-derives the served value with nothing added (F1 of the GH #1697 red team).
+        key = "CotedIvoire::sample::region-milieu-stratum-upper-region"
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             inputs = ll.Country(COUNTRY).derivation_inputs(key, wave=WAVE)
         rec = ll.Country(COUNTRY).derivations()[key]
-        upper = lambda r: r.upper() if isinstance(r, str) else r  # noqa: E731
-        rebuilt = pd.Series([rec.resolve()(upper(r), m) for r, m in zip(inputs["s00q01"], inputs["s00q04"])],
+        assert rec.waves == [WAVE]
+        rebuilt = pd.Series([rec.resolve()(r, m) for r, m in zip(inputs["s00q01"], inputs["s00q04"])],
                             index=inputs.index.droplevel("t"))
         served = _served("sample").droplevel("t")["strata"]
         # The cover holds the 728 households not interviewed; the inputs keep them.

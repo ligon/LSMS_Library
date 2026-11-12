@@ -169,14 +169,274 @@ def LastPurchaseUnitCode(value):
     return _PURCHASE_UNIT_AS_CONSUMPTION_UNIT.get(value, value)
 
 
-def food_acquired(df):
-    '''GH #876: purchased Quantity x s07bq08 / s07bq07a, keyed; size in u (GH #1224).'''
-    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
-
-
 def inputs_food_acquired(wave):
     """The registry `inputs` callable: raw section-7B answers at (t, i, j)."""
     return _inputs_last_purchase('Togo', wave)
+
+
+# --- s07bq03a: the producer's regional factor, divided out (GH #1697) ---------------
+#
+# Ruling @ligon 2026-11-12, "Invert, registered (Recommended)", on the evidence of
+# burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md §2 and
+# _/CONTENTS.org "s07bq03a: the regional factor is divided out".  This file's s07bq03a,
+# and no other column, is the household's answer times 1.115 x a regional multiplier
+# that no document explains.  It is divided out here, before the purchased residual
+# s07bq03a - s07bq04 - s07bq05 is formed, so the residual no longer leaves phantom
+# purchases.  A count (`unité`) was scaled and then floored to an integer: where the
+# floor is injective (f >= 1) the count is recovered exactly; where it is not (Grand
+# Lomé, f < 1) the quantity is withheld, NA, and never guessed.
+
+KEY_DIVIDED = 'Togo::food_acquired::s07bq03a-regional-factor-divided-out'
+KEY_COUNT_RECOVERED = 'Togo::food_acquired::s07bq03a-floored-count-recovered'
+KEY_COUNT_WITHHELD = 'Togo::food_acquired::s07bq03a-floored-count-withheld'
+
+#: The common scalar and the round regional multipliers (doc search T-TGO-4/-6A).
+COMMON_FACTOR = 1.115
+REGIONAL_MULTIPLIER = {'Centrale': 1.5, 'Savanes': 1.2, 'Plateaux': 1.1, 'Kara': 0.9,
+                       'Maritime': 0.9, 'Grand Lomé': 0.82}
+#: The products, typed to four decimals as the file carries them: 1.6725, 1.338,
+#: 1.2265, 1.0035, 1.0035, 0.9143.
+REGIONAL_FACTOR = {r: round(COMMON_FACTOR * m, 4) for r, m in REGIONAL_MULTIPLIER.items()}
+LOME = 'Grand Lomé'
+#: Grand Lomé's other factor, on a row reporting own production or a gift.
+LOME_OWN_OR_GIFT_FACTOR = 1.2
+#: The one unit the producer floored after scaling: s07bq03b code 147, labelled `unité`.
+#: Measured on own-production-only rows of Centrale, Savanes and Plateaux: 730 of its 767
+#: are floor(s07bq04 x f) and none is s07bq04 x f, while every other unit is exact.
+COUNT_UNIT = 'unité'
+COUNT_CODE = 147
+#: Two numbers within this relative distance are the same number: the file carries
+#: some values at single precision, so q3/f and q4 + q5 differ by up to 5e-8 where the
+#: household reported no purchase.  No purchase is a millionth of a consumption.
+SAME_NUMBER = 1e-6
+
+BRANCH_DIVIDED = 'divided'
+BRANCH_COUNT_RECOVERED = 'count-recovered'
+BRANCH_WITHHELD = 'withheld'
+
+
+def regional_factor(s00q01, s07bq04, s07bq05):
+    '''The factor on each row's s07bq03a: 1.115 x the region's multiplier, except a Grand
+    Lomé row reporting own production or a gift, which carries 1.2.  A region the table
+    does not name is refused: its mechanics are unknown.'''
+    region = pd.Series(np.ravel(s00q01), dtype='string').str.strip()
+    produced = pd.to_numeric(pd.Series(np.ravel(s07bq04)), errors='coerce').fillna(0)
+    gift = pd.to_numeric(pd.Series(np.ravel(s07bq05)), errors='coerce').fillna(0)
+    unknown = sorted(set(region.dropna()) - set(REGIONAL_FACTOR)) + (
+        ['<missing>'] if region.isna().any() else [])
+    if unknown:
+        raise LookupError(f'Togo 2021-22 s07bq03a: no regional factor for {unknown}; the '
+                          f'known regions are {sorted(REGIONAL_FACTOR)} (GH #1697)')
+    factor = region.map(REGIONAL_FACTOR).astype(float).to_numpy()
+    lome_own_or_gift = (region.eq(LOME) & ((produced > 0) | (gift > 0))).to_numpy(dtype=bool)
+    return np.where(lome_own_or_gift, LOME_OWN_OR_GIFT_FACTOR, factor)
+
+
+def _on_grid(x, step):
+    k = np.asarray(x, dtype=float) / step
+    return np.abs(k - np.round(k)) <= SAME_NUMBER * np.maximum(1.0, np.abs(k))
+
+
+def _recover(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
+    '''(recovered s07bq03a, branch) for each row; see `recover_s07bq03a`.'''
+    q3 = pd.to_numeric(pd.Series(np.ravel(s07bq03a)), errors='coerce').to_numpy(dtype=float)
+    q4 = pd.to_numeric(pd.Series(np.ravel(s07bq04)), errors='coerce').fillna(0).to_numpy()
+    q5 = pd.to_numeric(pd.Series(np.ravel(s07bq05)), errors='coerce').fillna(0).to_numpy()
+    f = regional_factor(s00q01, s07bq04, s07bq05)
+    region = pd.Series(np.ravel(s00q01), dtype='string').str.strip().to_numpy()
+    unit = pd.Series(np.ravel(s07bq03b), dtype=object)
+    count = (unit.astype('string').str.strip().str.lower().eq(COUNT_UNIT).fillna(False)
+             | pd.to_numeric(unit, errors='coerce').eq(COUNT_CODE)).to_numpy(dtype=bool)
+    lome = region == LOME
+    own_or_gift = (q4 > 0) | (q5 > 0)
+    has = ~np.isnan(q3)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        divided = q3 / f
+
+    value = np.full(q3.shape, np.nan)
+    branch = np.full(q3.shape, None, dtype=object)
+
+    # Every unit but the count: q3 = answer x f exactly.  So is a Grand Lomé count with
+    # own production or a gift (x 1.2, not floored); there the answer must land on the
+    # quarter grid, or the row did not follow that rule.
+    plain = has & ~count
+    value[plain], branch[plain] = divided[plain], BRANCH_DIVIDED
+    lome_og_count = has & count & lome & own_or_gift
+    ok = lome_og_count & (q3 > 0) & _on_grid(divided, 0.25)
+    value[ok], branch[ok] = divided[ok], BRANCH_DIVIDED
+    branch[lome_og_count & ~ok] = BRANCH_WITHHELD
+
+    # A count elsewhere: q3 = floor(k x f) with f >= 1.0035, injective on integers k.
+    # The integer k whose floor reproduces q3 is the answer; if none does, or q3 is not
+    # an integer, the row did not follow the rule and is withheld.
+    floored = has & count & ~lome
+    k0 = np.ceil(np.where(floored, q3, 0) / np.where(floored, f, 1) - 1e-9)
+    found = np.full(q3.shape, np.nan)
+    hits = np.zeros(q3.shape, dtype=int)
+    for k in (k0 - 1, k0, k0 + 1):
+        trip = floored & (k >= 0) & (np.abs(np.floor(k * f + 1e-9) - q3) <= 1e-9)
+        hits += trip
+        found = np.where(trip & np.isnan(found), k, found)
+    rec = floored & _on_grid(q3, 1) & (hits == 1)
+    value[rec], branch[rec] = found[rec], BRANCH_COUNT_RECOVERED
+    branch[floored & ~rec] = BRANCH_WITHHELD
+
+    # A Grand Lomé count with neither: floor(k x 0.9143) sends 1 to 0 and 11 and 12 to 10.
+    # Withheld, as ruled; never guessed.
+    branch[has & count & lome & ~own_or_gift] = BRANCH_WITHHELD
+
+    # Where the answer and q4 + q5 are the same number, no purchase was reported: make
+    # the residual exactly zero, not the 1e-8 of single-precision storage.
+    total = q4 + q5
+    same = ~np.isnan(value) & (np.abs(value - total) <= SAME_NUMBER * np.maximum(1.0, total))
+    value = np.where(same, total, value)
+    return value, branch
+
+
+def recover_s07bq03a(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
+    '''The household's own 7-day consumption quantity, with the producer's factor
+    divided out.  The registered function of the `...-divided-out` and
+    `...-floored-count-recovered` keys.
+
+    * a unit other than `unité`, or a Grand Lomé `unité` reporting own production or a
+      gift: s07bq03a / f, f from `regional_factor`;
+    * an `unité` outside Grand Lomé: the integer k with floor(k x f) = s07bq03a;
+    * NaN where it cannot be recovered: a Grand Lomé `unité` with neither own production
+      nor a gift, an `unité` no integer reproduces, or a Grand Lomé `unité` with own
+      production or a gift whose quotient is off the quarter grid;
+    * a value within `SAME_NUMBER` of s07bq04 + s07bq05 is that sum exactly.
+
+    No options, by design (``SkunkWorks/derived_values.org``).  The producer's filed
+    value is s07bq03a in ``Country('Togo').derivation_inputs(key)``.
+    '''
+    return _recover(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05)[0]
+
+
+def classify_s07bq03a(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
+    '''Which rule each row's s07bq03a takes: 'divided', 'count-recovered', 'withheld',
+    or None where it is missing.  The registered function of the `...-withheld` key.'''
+    return _recover(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05)[1]
+
+
+def _wave_data():
+    from pathlib import Path
+
+    from lsms_library.paths import countries_root
+    return Path(countries_root()) / 'Togo' / '2021-22' / 'Data'
+
+
+def _cover_regions():
+    '''s00q01 per grappe, as the cover labels it; one region per grappe, or refused.'''
+    cover = tools.get_dataframe(str(_wave_data() / 's00_me_tgo2021.dta'), convert_categoricals=True)
+    grappe = cover['grappe'].map(tools.format_id)
+    region = cover['s00q01'].astype('string').str.strip()
+    per = region.groupby(grappe.to_numpy()).nunique()
+    if (per > 1).any():
+        raise LookupError(f'Togo 2021-22: grappes {list(per[per > 1].index[:5])} hold two regions')
+    return region.groupby(grappe.to_numpy()).first()
+
+
+def _shared(df):
+    '''GH #876's hook on one part of the wave: Expenditure, keyed; size in u (GH #1224).'''
+    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+
+
+def _add_key(out, key, rows):
+    from lsms_library.derivations import union_keys
+    current = out['Derivation'].astype(object).to_numpy()
+    stamped = [union_keys([c, key]) if r else c for c, r in zip(current, rows)]
+    out['Derivation'] = pd.Series(stamped, index=out.index, dtype='string')
+    return out
+
+
+def _purchased(out):
+    return out.index.get_level_values('s').to_numpy() == 'purchased'
+
+
+def food_acquired(df):
+    '''GH #876's construction on s07bq03a with the regional factor divided out (GH #1697).
+
+    Each row's s07bq03a is first recovered (`recover_s07bq03a`); the shared hook then
+    forms the purchased residual and values it at the last purchase's unit value.  The
+    purchased row carries the 7-day key and the key of the rule its s07bq03a took.  A
+    withheld row keeps its produced and in-kind rows, which read s07bq04 and s07bq05 as
+    filed, and is served one purchased row with Quantity and Expenditure NA where a
+    purchase is implied: the row reports neither own production nor a gift, or its filed
+    residual is positive.
+    '''
+    regions = _cover_regions()
+    region = pd.Series(df.index.get_level_values('v')).map(regions).to_numpy()
+    filed = pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
+    value, branch = _recover(filed, df['ConsumptionUnitCode'], region,
+                             df['Produced'], df['GiftQuantity'])
+    df = df.assign(Quantity=value)
+    parts = []
+    for name, key in ((BRANCH_DIVIDED, KEY_DIVIDED), (BRANCH_COUNT_RECOVERED, KEY_COUNT_RECOVERED)):
+        part = df[branch == name]
+        if len(part):
+            out = _shared(part)
+            parts.append(_add_key(out, key, _purchased(out)))
+    if pd.isna(branch).any():
+        parts.append(_shared(df[pd.isna(branch)]))
+    held = branch == BRANCH_WITHHELD
+    if held.any():
+        # Quantity is NA here, so the shared hook serves the produced and in-kind rows only.
+        parts.append(_shared(df[held]))
+        q4 = df['Produced'].fillna(0).to_numpy()
+        q5 = df['GiftQuantity'].fillna(0).to_numpy()
+        implied = held & (((q4 <= 0) & (q5 <= 0)) | (filed - q4 - q5 > SAME_NUMBER))
+        if implied.any():
+            # The shared reshape builds the purchased row's index (sized u included), from
+            # a placeholder quantity it never serves.
+            out = _shared(df[implied].assign(Quantity=1.0, Produced=0.0, GiftQuantity=0.0))
+            out = out[_purchased(out)].copy()
+            out['Quantity'] = np.nan
+            out['Expenditure'] = np.nan
+            parts.append(_add_key(out, KEY_COUNT_WITHHELD, np.ones(len(out), dtype=bool)))
+    return pd.concat(parts)
+
+
+S07BQ03A_RAW_VARIABLES = ['s07bq03a', 's07bq03b', 's07bq03c', 's07bq04', 's07bq05', 's00q01']
+
+
+def _inputs_s07bq03a(wave):
+    '''The raw answers behind the three s07bq03a keys at (t, i, j): the 7-day key's
+    inputs, with the cover's region beside them, and the rule each row takes.'''
+    raw = _inputs_last_purchase('Togo', wave)
+    cover = tools.get_dataframe(str(_wave_data() / 's00_me_tgo2021.dta'), convert_categoricals=True)
+    region = pd.Series(cover['s00q01'].astype('string').str.strip().to_numpy(),
+                       index=household_ids(cover).astype('string').to_numpy())
+    raw = raw.assign(s00q01=region.reindex(raw.index.get_level_values('i')).to_numpy())
+    raw = raw[S07BQ03A_RAW_VARIABLES].copy()
+    args = [raw[c] for c in ('s07bq03a', 's07bq03b', 's00q01', 's07bq04', 's07bq05')]
+    value, branch = _recover(*args)
+    q4 = pd.to_numeric(raw['s07bq04'], errors='coerce').fillna(0).to_numpy()
+    q5 = pd.to_numeric(raw['s07bq05'], errors='coerce').fillna(0).to_numpy()
+    filed = pd.to_numeric(raw['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    return raw, branch, value - q4 - q5, filed - q4 - q5, q4, q5
+
+
+def inputs_regional_factor_divided_out(wave):
+    '''Registry `inputs`: the rows divided by the factor that are served a purchased row,
+    one per keyed row, at (t, i, j).  s07bq03a is the producer's filed value.'''
+    raw, branch, residual, _, _, _ = _inputs_s07bq03a(wave)
+    return raw[(branch == BRANCH_DIVIDED) & (residual > 0)]
+
+
+def inputs_floored_count_recovered(wave):
+    '''Registry `inputs`: the `unité` rows whose count was recovered from its floor and
+    are served a purchased row, at (t, i, j).'''
+    raw, branch, residual, _, _, _ = _inputs_s07bq03a(wave)
+    return raw[(branch == BRANCH_COUNT_RECOVERED) & (residual > 0)]
+
+
+def inputs_floored_count_withheld(wave):
+    '''Registry `inputs`: the withheld rows that are served a purchased row with Quantity
+    and Expenditure NA, at (t, i, j): those reporting neither own production nor a gift,
+    and those whose filed residual is positive.'''
+    raw, branch, _, filed_residual, q4, q5 = _inputs_s07bq03a(wave)
+    implied = ((q4 <= 0) & (q5 <= 0)) | (filed_residual > SAME_NUMBER)
+    return raw[(branch == BRANCH_WITHHELD) & implied]
 
 
 # --- the wave's scripts, and the registry's raw inputs ------------------------------

@@ -223,12 +223,15 @@ Anchors, aliases and intentional YAML merge overrides remain supported: an
 explicit field can override an inherited field. Two explicit declarations of
 that same field are refused. Generic YAML configuration loading is unchanged.
 
-`basis` is drawn from this module's own five-value vocabulary
+`basis` is drawn from this module's own six-value vocabulary
 (`derivations.BASES`): `questionnaire`, `variable-label`, `config-comment`,
-`filename`, `modelling-choice`. The first four are the recall ladder's evidence
-rungs. The fifth **names a choice no document supplies**; it is not evidence
-and is deliberately not laundered into one. `recall.BASIS_LADDER` is not
-reused, for exactly that reason.
+`filename`, `derived-from-data`, `modelling-choice`. The first four are the
+recall ladder's evidence rungs. `derived-from-data` says the distributed file
+itself shows the regularity (Togo 2021-22's exact regional multiplier on
+`s07bq03a`, GH #1697) and that no document states it: it is a measurement, not
+a document. The last **names a choice no document supplies**; it is not
+evidence and is deliberately not laundered into one. `recall.BASIS_LADDER` is
+not reused, for exactly that reason.
 
 ### The key
 

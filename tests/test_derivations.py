@@ -108,6 +108,9 @@ class TestLoaderRefuses:
         assert "modelling-choice" in BASES
         assert "modelling-choice" not in BASIS_LADDER
         assert "not-recorded" not in BASES
+        # GH #1697: a measured regularity of the file, which is not a document either.
+        assert "derived-from-data" in BASES
+        assert "derived-from-data" not in BASIS_LADDER
 
     @pytest.mark.parametrize("field", ["function", "inputs"])
     def test_callables_are_dotted(self, field):

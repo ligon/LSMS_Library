@@ -11,7 +11,6 @@ from lsms_library.ehcvm import (
     derive_region_milieu_stratum as _derive_region_milieu_stratum,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
-    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
 )
 
 # The same projection as Togo 2021-22: Region, Rural and the GPS point are constant
@@ -45,21 +44,34 @@ def _upper(value):
     return value.upper() if isinstance(value, str) else value
 
 
-def strata_label_upper_region(row):
-    '''[s00q01, s00q04]: GH #1575's region x milieu label, on 2018-19's spelling.
+#: This wave's own strata key (F1 of the GH #1697 red team; the maintainer accepted the
+#: case fold on 2026-11-12, "the registry must reproduce it (own key)").  2018-19 keeps
+#: `CotedIvoire::sample::region-milieu-stratum`, whose function serves the labels as filed.
+KEY_STRATUM = 'CotedIvoire::sample::region-milieu-stratum-upper-region'
 
-    The shared helper ``ehcvm.derive_region_milieu_stratum`` builds it, with its rules
-    unchanged: NA where either label is missing or blank, a code refused.  Only the
-    region is upper-cased first.  This file labels 23 of the 33 regions in lower case
-    (`poro`, `gÔh`) on the same codes, and upper-casing gives 2018-19's label on all 33,
-    so the region part of `strata` is `cluster_features.Region` (mapping.Region).
-    '''
-    return _derive_region_milieu_stratum(_upper(row.iloc[0]), row.iloc[1])
+
+def derive_upper_region_milieu_stratum(region, milieu):
+    '''GH #1575's region x milieu label with the region upper-cased first: the registered
+    function of `KEY_STRATUM`, which reproduces the served value from the raw s00q01 and
+    s00q04.  The shared ``ehcvm.derive_region_milieu_stratum`` does the rest, with its
+    rules unchanged: NA where either label is missing or blank, a code refused.  This file
+    labels 23 of the 33 regions in lower case (`poro`, `gÔh`) on 2018-19's codes, and
+    upper case is 2018-19's label on all 33.'''
+    return _derive_region_milieu_stratum(_upper(region), milieu)
+
+
+def strata_label_upper_region(row):
+    '''[s00q01, s00q04]: `derive_upper_region_milieu_stratum`, as a cell formatter.  The
+    region part of `strata` is therefore `cluster_features.Region` (mapping.Region).'''
+    return derive_upper_region_milieu_stratum(row.iloc[0], row.iloc[1])
 
 
 def sample(df):
-    '''Stamp the registry key on every row with a stratum (GH #1575, shared hook).'''
-    return _stamp_region_milieu_stratum(df, 'CotedIvoire')
+    '''Stamp this wave's strata key on every row with a stratum, and on no other.'''
+    out = df.copy()
+    key = pd.Series(KEY_STRATUM, index=out.index, dtype='string')
+    out['Derivation'] = key.where(out['strata'].notna())
+    return out
 
 
 def Region(value):
@@ -209,20 +221,130 @@ def _unit_label(value):
     return _UNIT_SPELLING.get(label, label)
 
 
-def food_acquired(df):
-    '''GH #876: purchased Quantity x s07bq08 / s07bq07a, keyed; size in u (GH #1224).
+# --- s07bq03a: the producer's H and L rows (GH #1697) --------------------------------
+#
+# Ruling @ligon 2026-11-12, "H to NA, flag L (Recommended)", on the evidence of
+# burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md §3 and _/CONTENTS.org
+# "s07bq03a: H withheld, L flagged".  A positive s07bq03a off the quarter grid with four or
+# more decimals (H) is read as the household's answer replaced by the producer with a
+# region x milieu median per adult equivalent, re-expressed in the reported unit (UEMOA /
+# World Bank, EHCVM Document de travail no 4, "Mesure de la pauvreté", 2019, §2.2: "la
+# valeur aberrante sera remplacée par la médiane dans la région et le milieu de
+# résidence"), which no document says was written into this file.  The row's s07bq04 and
+# s07bq05 are off the grid with it (2,721 of 2,722 and 2,047 of 2,047 rows), so every
+# quantity the row serves is withheld.  Off the grid with at most three decimals (L) is
+# flagged and served: partly a conversion between unit triplets, low-to-moderate
+# confidence.  2018-19, the control, has no H row and 2,868 L-shaped ones.
 
-    `u` is respelled here because a one-column idxvar binds format_id, not a formatter;
-    ConsumptionUnitCode and LastPurchaseUnitCode keep the code, which unit_match reads.
+KEY_REPLACED = 'CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld'
+KEY_CONVERTED = 'CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion'
+
+#: The recording grid of the instrument (2018-19: 99.0% of positive s07bq03a on it).
+GRID = 0.25
+#: The fewest decimals that mark a replaced value.
+REPLACED_DECIMALS = 4
+#: Relative tolerance of "is an integer" when counting decimals: the file holds some values
+#: at single precision.  Between 1e-7 and 1e-5 the H count moves by 244 of 20,507 rows.
+DECIMAL_TOLERANCE = 1e-6
+CLASS_REPLACED = 'replaced'
+CLASS_CONVERTED = 'converted'
+
+
+def _decimals(x, most=8):
+    x = np.asarray(x, dtype=float)
+    out = np.full(x.shape, most + 1)
+    for d in range(most, -1, -1):
+        y = x * 10 ** d
+        ok = np.abs(y - np.round(y)) <= DECIMAL_TOLERANCE * np.maximum(1.0, np.abs(y))
+        out = np.where(ok, d, out)
+    return out
+
+
+def classify_s07bq03a(s07bq03a):
+    ''''replaced' (H), 'converted' (L) or None for each s07bq03a.  The registered function
+    of both keys.
+
+    H: positive, off the quarter grid, and four or more decimals; L: positive, off the
+    quarter grid, three decimals or fewer.  "On the grid" and "d decimals" are judged at
+    the relative tolerance `DECIMAL_TOLERANCE`.
+    '''
+    q3 = pd.to_numeric(pd.Series(np.ravel(s07bq03a)), errors='coerce').to_numpy(dtype=float)
+    k = q3 / GRID
+    off = (q3 > 0) & ~(np.abs(k - np.round(k)) <= DECIMAL_TOLERANCE * np.maximum(1.0, np.abs(k)))
+    d = _decimals(np.where(np.isnan(q3), 0.0, q3))
+    out = np.full(q3.shape, None, dtype=object)
+    out[off & (d >= REPLACED_DECIMALS)] = CLASS_REPLACED
+    out[off & (d < REPLACED_DECIMALS)] = CLASS_CONVERTED
+    return out
+
+
+def _shared(df):
+    '''GH #876: purchased Quantity x s07bq08 / s07bq07a, keyed; size in u (GH #1224).
 
     A row where s07bq04 + s07bq05 = s07bq03a exactly purchased nothing.  The shared hook
     subtracts in two orders, so 12 such rows reach the reshape at 1.1e-16 instead of 0; the
     file's own residual has no value between 0 and 0.001.  They go the way a true zero goes.
     '''
-    df = df.rename(index=_unit_label, level='u')
     out = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
     float_residue = (out.index.get_level_values('s') == 'purchased') & (out['Quantity'] < 1e-9).to_numpy()
     return out[~float_residue]
+
+
+def _add_key(out, key):
+    from lsms_library.derivations import union_keys
+    current = out['Derivation'].astype(object).to_numpy()
+    out['Derivation'] = pd.Series([union_keys([c, key]) for c in current], index=out.index,
+                                  dtype='string')
+    return out
+
+
+def food_acquired(df):
+    '''GH #876's construction, with the H rows withheld and the L rows flagged (GH #1697).
+
+    `u` is respelled here because a one-column idxvar binds format_id, not a formatter;
+    ConsumptionUnitCode and LastPurchaseUnitCode keep the code, which unit_match reads.
+
+    Every served row of an H source row (purchased, produced, in-kind, as the filed
+    quantities make them) carries Quantity NA and Expenditure NA under `KEY_REPLACED`: no
+    NA quantity leaves a valued purchase.  Every served row of an L source row is served
+    as filed under `KEY_CONVERTED`.
+    '''
+    df = df.rename(index=_unit_label, level='u')
+    kind = classify_s07bq03a(df['Quantity'])
+    parts = []
+    rest = pd.isna(kind)
+    if rest.any():
+        parts.append(_shared(df[rest]))
+    converted = kind == CLASS_CONVERTED
+    if converted.any():
+        parts.append(_add_key(_shared(df[converted]), KEY_CONVERTED))
+    replaced = kind == CLASS_REPLACED
+    if replaced.any():
+        out = _shared(df[replaced])
+        out['Quantity'] = np.nan
+        out['Expenditure'] = np.nan
+        parts.append(_add_key(out, KEY_REPLACED))
+    return pd.concat(parts)
+
+
+S07BQ03A_RAW_VARIABLES = ['s07bq03a', 's07bq03b', 's07bq03c', 's07bq04', 's07bq05']
+
+
+def _inputs_s07bq03a(wave, kind):
+    '''The raw rows of one class, at (t, i, j), that are served at least one row.'''
+    raw = _inputs_last_purchase('CotedIvoire', wave)
+    raw = raw[classify_s07bq03a(raw['s07bq03a']) == kind]
+    return raw[S07BQ03A_RAW_VARIABLES].copy()
+
+
+def inputs_outlier_replaced(wave):
+    '''Registry `inputs`: the H rows, s07bq03a, s07bq04 and s07bq05 as filed.'''
+    return _inputs_s07bq03a(wave, CLASS_REPLACED)
+
+
+def inputs_partial_triplet_conversion(wave):
+    '''Registry `inputs`: the L rows, as filed.'''
+    return _inputs_s07bq03a(wave, CLASS_CONVERTED)
 
 
 def inputs_food_acquired(wave):

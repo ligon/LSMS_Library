@@ -61,10 +61,14 @@ without importing anything.  A drift test keeps the two honest in both
 directions.
 
 The ``basis`` vocabulary is this file's OWN (:data:`BASES`): the recall
-ladder's four evidence rungs plus ``modelling-choice``, for an assumption no
-document can supply.  ``recall.BASIS_LADDER`` is deliberately not reused --
-its loader rejects anything outside its ladder, and a modelling choice is not
-evidence and must not be laundered into one.  Naming it is the point.
+ladder's four evidence rungs, ``derived-from-data`` for a regularity measured
+in the distributed file itself that no document states (an exact multiplier
+written into one column, GH #1697), and ``modelling-choice``, for an
+assumption no document can supply.  ``recall.BASIS_LADDER`` is deliberately
+not reused -- its loader rejects anything outside its ladder, and a modelling
+choice is not evidence and must not be laundered into one.  Naming it is the
+point.  ``derived-from-data`` is not documentation either, as in
+``sampling.py``: it says the file shows it, never that a producer says so.
 
 The loader refuses an entry missing ``rule``, ``function``, ``inputs``,
 ``raw_variables`` or ``assumptions``, or an assumption without a ``basis`` --
@@ -122,6 +126,7 @@ BASES = (
     "variable-label",    # a Stata variable label states it
     "config-comment",    # a maintainer asserted it in repo config or prose
     "filename",          # inferred from a source filename -- a GUESS
+    "derived-from-data", # measured in the distributed file itself; no document states it
     "modelling-choice",  # no document supplies it; the library chose it
 )
 
