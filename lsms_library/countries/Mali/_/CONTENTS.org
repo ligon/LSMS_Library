@@ -2907,6 +2907,8 @@ a median 30%.  The brief's "=s16cq11= = =Non=" is right for 2021-22 only: the va
 The two harvest keys never meet: one needs a recorded quantity on an unfinished row, the other a finished
 crop with none.  A consumer asking "is this =Quantity= derived?" must test for containment, not equality.
 A =Farm-level= row carries a key only for its total; the sale on it is still disclosed by the index.
+[2026-11-12, GH #1560 (c): a 2021-22 Farm-level sale row now also carries =sold-kg-estimate= on its
+sold kilograms; the sale's ATTACHMENT still has no key there.]
 
 *Farm-level now holds harvests in EHCVM too.*  =harvest_kg= reads the 173 of these 221 rows in a metric unit,
 as it reads the EAC-I trees; =yield_kg= does not, since no plot has that id; =crop_diversity(weight='count')= drops all of them,
@@ -3978,10 +3980,12 @@ only as an explicit =kg_qty=.  The donor/recipient state question is GH #1698.
   the 1,150,000 kg sale, and sack rows whose kilograms equal the sack count (the =Sac (100 Kg)=
   harvest-total row of GH #1437 reads 7,500 / 7,500).  *Site Q screens it, report-only* (ruling
   @ligon 2026-11-12, "Sold-kg details" (d)), both tails on the =(t,u,j)= ladder.  On the cold build
-  it names four 2021-22 rows and changes none: the 1,150,000 kg =Arachide= sale in =Sac (100 Kg)=
-  (511x its cell's reference of 2,250 kg), two =Riz= sales in =Sac (100 Kg)= of 437,500 and
-  400,000 kg (175x and 160x of 2,500), and, on the low tail, a 5 kg =Coton= sale in =Kg= (160x
-  below 800).
+  it names four 2021-22 rows and changes none: the 1,150,000 kg =Arachide= sale on a row whose =u=
+  is =Sac (100 Kg)= (511x its cell's reference of 2,250 kg), two =Riz= sales of 437,500 and 400,000
+  kg on rows whose =u= is =Sac (100 Kg)= (175x and 160x of 2,500), and, on the low tail, a 5 kg
+  =Coton= sale on a row whose =u= is =Kg= (160x below 800).  The cells key on the row's harvest =u=,
+  as =Quantity_kg='s do, where =Quantity_sold='s key on =Unit_sold=: a choice about which rows are
+  named, not about a value.
 - *It rides with the sale*, on the single =s16c= row (keyed =hh-crop-sale-single-row=) or the
   Farm-level row (GH #1457), so the record lists the column and its =inputs= return =s16dq05c=;
   the wave script asserts the kilograms are conserved onto the served rows.  Farm-level also
