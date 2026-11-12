@@ -3944,3 +3944,51 @@ these four meanings. =sampling.py:76-83= documents the read-time placement
 advantage; the required future hash-cost measurement is not run here.
 Exact sidecar bindings and closed authority are in the external
 =Mali-served-strata.json= and =.coder/ledger/1577-mali-current-served-strata.md=.
+
+* 2026-11-12 -- 2018-19 rice-ration block withheld (GH #1707)
+
+/Ruling @ligon 2026-11-12, "Remove, registered"./  The maintainer's principle: "Without a very good
+reason we don't want to serve up someone else's undocumented imputations."
+
+*The idiosyncrasy.*  =s07b_me_mli2018.dta= holds 3,357 records with no =vague=; every other record
+of the file has one.  All 3,357 are =Riz local Gambiaka= (product 1) in kg, size-free, one per
+household of the wave's 6,596; every one answers =s07bq06= =Plus de 30 jours=, with =s07bq04=,
+=s07bq05=, =s07bq07a= and =s07bq08= empty: nothing produced, given or bought.  =s07bq03a= is a
+whole multiple of 1.4 kg on all of them, and 1.4 x =ehcvm_welfare_mli2018.dta='s =hhsize= (0.2 kg
+a person a day for 7 days) on 3,348.  On the other 9 it is 1.4 x a different integer, and 3 of those
+households are in neither the welfare file nor =s00=.  It cannot be a household's answer: a fixed
+ration, no passage, no purchase.  No document explains it.  The World Bank DDI (catalog 4295,
+=Documentation.pdf= p.487) counts 3,357 missing =vague= in this file without comment; the CAPI
+questionnaires list the product only as an ordinary roster item; neither copy of the 2018-19
+poverty profile mentions it (documentation search of 2026-11-12).  2021-22 has no record without a
+=vague=.
+
+*What is served now.*  None of it.  The missing =vague= selects the block; the fingerprint above is
+checked on every such record and =RiceRationBlockError= is raised if one lacks it, so a release
+that changes the block stops the build.  =hhsize= is deliberately not read: on records WITH a
+=vague=, 1.4 x =hhsize= holds by coincidence for 284 rice-kg answers, so it could not select the
+block.  The rows cannot leave before the shared EHCVM hook (its unit-weight join reads the source by
+position), so =2018-19/_/mapping.py= marks their =j= in the wide frame and drops the rows they become
+after it.  Disclosed as =Mali::food_acquired::rice-ration-block-withheld= (=rows: 0=);
+=Country('Mali').derivation_inputs(key, wave='2018-19')= returns the 3,357 records at the served
+=(t, i, j)=, with the file's own names and codes.
+
+*Measured, cold, development =e5fdd2fa8= against the candidate (burst job 41249476).*
+
+| 2018-19                                   | before            | after            |
+|-------------------------------------------+-------------------+------------------|
+| =food_acquired= rows (all =s=)            | 161,212           | 157,856          |
+| purchased rows                            | 129,085           | 125,729          |
+| purchased rows with =Expenditure= NA      | 25,572            | 22,216           |
+| =Riz local Gambiaka= / =Kg= purchased rows | 5,632             | 2,276            |
+| ... their =Quantity=, kg                  | 55,895.1          | 23,581.7         |
+| purchased =Expenditure=, FCFA             | 89,614,678.64     | 89,614,678.64    |
+
+3,356 rows go.  The 3,357th record shared its served key with the same household's own rice-kg
+purchase, which core summed with it (the 2026-11-12 data check said no block row was summed; one
+was): that row now serves the household's answer alone, 5.6 kg less.  Every other row and column of
+=food_acquired= is equal, in all three waves.  =food_expenditures= and =food_prices= are
+frame-equal (the block carried no =Expenditure= and no kilogram rung reads it);
+=food_quantities= loses the same 3,356 rows and changes the same one.  Cost: one Mali re-warm
+(=2018-19/_/mapping.py=): 23 of 23 Mali table hashes and the 23 2018-19 wave hashes move, no other
+country's, no build fingerprint.

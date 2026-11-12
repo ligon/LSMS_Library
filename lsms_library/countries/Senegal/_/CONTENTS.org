@@ -1258,3 +1258,37 @@ cache parquets were unchanged by warm/Feature reads, and no in-tree parquet
 was written. No sample-unavailable warning occurred. These checks establish
 the held-source path and ordinary serving for this wave; they do not assert
 a Make build, a complete cache census or survey-wide scientific validation.
+
+* 2026-11-12 -- 2021-22 salt at a fixed amount per person withheld
+
+/Ruling @ligon 2026-11-12, "Remove, registered"./  Found by the 2026-11-12 data check of EHCVM
+food quantities (reported as "100 salt-in-kg rows at exactly 0.02 kg x hhsize").
+
+*The idiosyncrasy, measured exactly.*  100 records of =s07b_me_sen2021.dta=, all product 139
+(=Sel=) in kg (unit 100), size-free, hold =s07bq03a= = 0.0199997 kg x the household's =hhsize=
+in =ehcvm_welfare_sen2021.dta=, to within 1e-12 on every one (0.099998 kg for 5 persons).  That is
+34% of the wave's 294 salt-in-kg records, and no record of any other product or unit meets the
+constant.  It is NOT 0.02: no record equals 0.02 x =hhsize= (an exact test finds 0 rows, 7 within
+1e-6); "0.02" was the constant at 4 significant digits.  The households' own median is 0.0278 kg a
+person, and none of the 28 region x milieu medians is the constant, so it is not the UEMOA rule's
+region x milieu median either.  No document held or public mentions salt, a per-capita norm or an
+imputation of 7B quantities (BID FR p.19 and EN, ANSD Rapport final 2021-22, World Bank DDI 6278,
+the EHCVM-2 enumerator manual).  In 2018-19 one salt-kg record equals 0.02 x =hhsize= (0.12 kg
+for 6), which proves nothing; the 0.0199997 constant was not tested on that wave, and the rule is
+scoped to 2021-22.
+
+*What is served now.*  None of the 100: =2021-22/_/mapping.py= marks them in the wide frame and drops
+every row they become after the shared hook (95 purchased, 5 in kind, the latter where the whole
+quantity was a gift).  =hhsize= is read from the welfare file, now declared in the wave's
+=food_acquired= block (=household_size:=) so its sidecar is in the table's hash; the welfare file's
+(grappe, menage) is unique and covers every salt record.  Disclosed as
+=Senegal::food_acquired::salt-per-capita-withheld= (=rows: 0=); =derivation_inputs= returns the 100
+records with =hhsize= beside them.
+
+*Measured, cold, development =e5fdd2fa8= against the candidate (burst job 41249476).*
+=food_acquired= 2021-22: 220,955 -> 220,855 rows; the 100 carried 17.04 kg and, on the 2 that had
+one, 17.78 FCFA of =Expenditure= (182,628,314.17 -> 182,628,296.39).  Every other row and column is
+equal.  =food_expenditures= and =food_prices= lose the 2 valued rows, =food_quantities= the 100;
+nothing else moves, so no kilogram factor of another row depended on them.  Cost, with GH #1519
+above: one Senegal re-warm, 22 of 22 Senegal table hashes and 44 of 44 wave hashes, no other
+country's.
