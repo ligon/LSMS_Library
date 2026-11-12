@@ -46,3 +46,36 @@ every run must use a private LSMS_DATA_DIR (shared-cache rebuild is on hold).
   already filed, and check CONTENTS.org files that may still call R2b open.
 - Archived branches with unpublished work: fix/851-recall-period (+7, no PR),
   fix/866-stale-country-parquet-not-laundered (+2 after #924).
+
+* Update, 2026-11-12 ~17:00Z
+** Rulings added (isa-decisions.org 3d914f7f4, fc590da59)
+#1509 all purchase rows; #1068+#1129 drop and count; #1502+#1518 wire W2+W3
+tables; EHCVM-2 2021-22 wiring GO; #587 second round (base u + size column,
+W1 registered division, W5 quantity of one, PP reuses c8-metric-size).
+** #1604
+Verifier READY.  Head 7735489cceb0fd68acf273eff850a5974d71cc58 (pushed to
+GitHub, still draft): 4 CI-interaction fixes (recall regenerated, #1190 AST
+pin, PARTIALLY_WIRED_SAMPLE, #1228 wave pin) plus held->ruled comment text.
+Old waves of all 21 Malawi tables frame-equal to base; panel-ids
+byte-identical; 2024-25 sample 14,836 / food 331,677 / borrowed 169,995;
+older-wave kg +0.08%..+1.40%.  Report reports/1604-reverify/REPORT.md.
+Red team in flight -> reports/1604-redteam/VERDICT.md.
+** Reconcile
+reports/reconcile-20261112/ (137 issues).  Independent draft check
+reports/reconcile-apply-check/ (34 APPLY, 21 APPLY-WITH-EDIT, 1 DROP #1148).
+Apply agent in flight -> reports/reconcile-apply/LOG.tsv.
+** Agents in flight
+| Stream | Where | Report |
+|---|---|---|
+| EHCVM-2 2021-22 restore (Togo->Benin->CIV) | /local/job41201840/worktrees/ehcvm2-2021, feature/552-ehcvm2-2021-wiring-20261112 | reports/ehcvm2-2021/ |
+| #1509 + #1068/#1129 | agent worktree, fix/1509-1068-1129-food-unit-evidence-20261112 | reports/framework-1509-1068/ |
+| #587 PP wiring | /local/job41201840/worktrees/587-mapping | reports/587-wiring/ |
+| #1604 red team | read-only | reports/1604-redteam/ |
+| reconcile apply | GitHub issue writes | reports/reconcile-apply/ |
+** Not yet dispatched
+#1502/#1518 Nigeria tables (after #587 wiring, same Nigeria re-warm);
+Q1 Guinea-Bissau labels; Q3 Manquant (6 EHCVM); Burkina Q6/Q7 (+#1442 after
+#1509); GNB 2021-22 wiring; R2b CONTENTS sentences (3) and CLAUDE.md:161.
+** Merge order
+#1604 first (moves every fingerprint; strict up-to-date gate).  Then batch the
+rest into one integration PR where possible.
