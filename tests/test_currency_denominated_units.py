@@ -506,7 +506,13 @@ def test_drop_unpriceable_unitvalue_drops_currency_by_label():
 #: ``none``: 28,939 produced rows whose e5fdd2fa8 factor was u-pooled, which no
 #: item-keyed rung replaces.  Measured cold in private roots, three arms
 #: (e5fdd2fa8 / 6c14097e9 / 322530074).
-GHANALSS_FOOD_PRICES_ROWS = 557_502
+#: Moved back to 560,023 by the second amendment ("Add a unit-level rung"):
+#: those 28,939 rows read the separately labelled unit_nonpurchase rung (the
+#: u-pooled ``unit`` estimator on the non-purchase rows), so every wave is at
+#: its e5fdd2fa8 count again; kgprice 182,675 -> 187,096 (1991-92 28,754).
+#: Measured cold in private roots, three arms (e5fdd2fa8 / 5b2496a12 /
+#: ee9d6cd23).
+GHANALSS_FOOD_PRICES_ROWS = 560_023
 GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
 
