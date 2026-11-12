@@ -488,7 +488,13 @@ def test_drop_unpriceable_unitvalue_drops_currency_by_label():
 #: ``s8hq1 != 2`` removes only price-only rows with no unit (the "No" fills),
 #: which never carried a kg factor, and the ``Unknown`` sentinel rows get
 #: none -- so kgvalue stays 560,023 and kgprice 187,096 (measured, cold).
-GHANALSS_FOOD_PRICES_ROWS = 560_023
+#: Moved by GH #1509 (ruling @ligon 2026-11-12, "all purchase rows"): 560,023
+#: -> 538,099 (-21,924).  The kg price ratio now reads purchases only, so the
+#: section-8H farmgate valuations of produced rows no longer set factors, and
+#: cells only they estimated get none (1998-99 26,490 -> 20,142, 2005-06
+#: 29,913 -> 18,296, 2012-13 48,662 -> 44,703, 2016-17 454,958 unchanged).
+#: Measured cold in private roots, base e5fdd2fa8 vs candidate.
+GHANALSS_FOOD_PRICES_ROWS = 538_099
 GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
 
@@ -601,9 +607,16 @@ def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
     # quantity); 1,694,623 -> 1,695,046 (+423).  Every added row is 2016-17
     # u='Unknown'.  (The `== 1` spelling, red-teamed in r2 and superseded,
     # served 1,676,470 / 190,514 / 1,695,001.)
-    assert len(c.food_prices(units='unitvalue')) == 1_676_514
+    # GH #1129 / #1068 (ruling @ligon 2026-11-12, "drop and count") moves
+    # unitvalue and units by rows DROPPED BY LABEL, not by a factor:
+    # unitvalue 1,676,514 -> 568,130 (the 1,107,464 u='Value' rows, every one
+    # at exactly 1.0, and 920 u='Unknown' rows; GLSS1-3 serve none), units
+    # 1,695,046 -> 1,694,111 (935 u='Unknown' rows: 1998-99 36, 2005-06 242,
+    # 2012-13 234, 2016-17 423).  unitprice was not ruled on and stays.
+    # Measured cold in private roots, base e5fdd2fa8 vs candidate.
+    assert len(c.food_prices(units='unitvalue')) == 568_130
     assert len(c.food_prices(units='unitprice')) == 190_575
-    assert len(c.food_quantities(units='units')) == 1_695_046
+    assert len(c.food_quantities(units='units')) == 1_694_111
 
 
 @pytest.mark.requires_s3
@@ -631,4 +644,8 @@ def test_panama_kgprice_loses_its_currency_rows():
     # null keys; they now carry the `Unknown` sentinel cold and warm, and keep
     # their own key (none shares (t, v, i, j, s) with a genuine 'unit' row).
     # Measured on the cold integration build of 2026-10-23.
-    assert len(c.food_prices(units='unitvalue')) == 490_846
+    # MOVED 490_846 -> 483_661 by GH #1129 / #1068 (ruling @ligon
+    # 2026-11-12): the 6,795 u='Value' rows served at exactly 1.0 and the 390
+    # u='Unknown' rows are dropped and counted (currency 17,409 / unknown 390
+    # input rows in price_rows_dropped).  Measured cold in a private root.
+    assert len(c.food_prices(units='unitvalue')) == 483_661
