@@ -1398,4 +1398,110 @@ wired; GH #1557 and #1566 as recorded above.
 
 *Cost.*  Config-only, base =e5fdd2fa8= against this change: =Country._table_cache_hash= Togo 22 of 22,
 =Wave._input_hash= 44 of 44, =build_transforms_fingerprint= 0 of 40; the only other countries that move
-are Benin, Cote d'Ivoire and GhanaLSS (=Très grand=), as before this change.
+are Benin, Cote d'Ivoire and GhanaLSS (=Très grand=), as before this change.  [2026-11-12, red team F3:
+GhanaLSS moves at BOTH tiers, 21 of 21 =_table_cache_hash= and 147 of 147 =Wave._input_hash=, a full cold
+re-warm of GhanaLSS through =nutrition.py='s import of =transformations=; no GhanaLSS served value changes
+(measured, burst job 41240822).]
+
+* 2026-11-12 -- s07bq03a: the regional factor is divided out (GH #1697)
+
+*Ruling (@ligon, 2026-11-12): "Invert, registered (Recommended)".*  It answers the WAITING entry
+"=s07bq03a= is rescaled by region" above, on the doc search
+=burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md= §2, under the principle "Without a very
+good reason we don't want to serve up someone else's undocumented imputations."  The ruled text: "Divide
+out the exact factor as a registered derivation to recover the household's answers; Lome count rows that
+were rounded cannot be inverted and are served NA under a registered omission."
+
+*The mechanics, re-measured on the file before wiring them* (burst job 41248473, =probe.py=):
+- The factor is 1.115 x {Centrale 1.5, Savanes 1.2, Plateaux 1.1, Kara 0.9, Maritime 0.9, Grand Lomé 0.82} =
+  1.6725, 1.338, 1.2265, 1.0035, 1.0035, 0.9143, by the cover's region =s00q01= (one region per grappe on
+  all 540).  A Grand Lomé row reporting own production or a gift carries 1.2.  =s07b= carries no region, so
+  the hook reads it from =s00_me_tgo2021.dta=.
+- Every unit is exact, =s07bq03a= = answer x f, except =unité= (code 147): on own-production-only rows of
+  Centrale, Savanes and Plateaux, 730 of its 767 are floor(=s07bq04= x f) and none is =s07bq04= x f; every
+  other unit is exact (Tête 247 of 252, Bol 3,356 of 3,417).  This corrects "=unité= rows are not scaled"
+  above.  A Grand Lomé =unité= with own production or a gift is x 1.2, not floored.
+- After dividing, 84.8-99.7% of each region and class's non-=unité= rows sit on the quarter grid, against
+  0.0-3.5% as filed.
+
+*What is served* (=2021-22/_/mapping.py=; three keys in =_/derivations.yml=, each beside the 7-day key on
+the purchased row, joined with =+=):
+| source rows (110,686)                         | rule                                         | key                                     |
+|-----------------------------------------------+----------------------------------------------+-----------------------------------------|
+| 93,986, every unit but =unité=, and 497 Grand Lomé =unité= with own production or a gift | =s07bq03a= / f | =s07bq03a-regional-factor-divided-out= |
+| 12,665 =unité= outside Grand Lomé              | the one integer k with floor(k x f) = =s07bq03a= | =s07bq03a-floored-count-recovered=       |
+| 4,035 =unité= that cannot be recovered         | Quantity and Expenditure NA                   | =s07bq03a-floored-count-withheld=        |
+The withheld rows are the 3,848 Grand Lomé purchase-only =unité= rows (floor(k x 0.9143) sends 1 to 0,
+607 of them filed as 0 though the household reported consuming the item, and 11 and 12 both to 10), 182
+Grand Lomé own-production or gift =unité= rows filed at 0 or with =s07bq03a= / 1.2 off the quarter grid,
+and 5 =unité= elsewhere that no integer reproduces (Plateaux 3, Centrale 1, Kara 1).  A withheld row keeps
+its produced and in-kind rows, which read =s07bq04= and =s07bq05= as filed; it is served one purchased row
+with Quantity and Expenditure NA where a purchase is implied (no own production and no gift, or a positive
+filed residual): 3,895 rows.  A recovered value within a millionth (relative) of =s07bq04= + =s07bq05= is
+that sum, so a row with no purchase leaves no single-precision residue (the file's residual otherwise runs to
+5e-8).  4,508 recovered counts differ from the filed count.  For a filed Grand Lomé count of 0 to 9 the floor
+sends k to k - 1 (k up to 11), so those could be read as filed + 1 on the integer assumption; the ruling
+withholds them all, and this is recorded as an option, not served.
+
+*Measured effect* (cold, private roots, base =e5fdd2fa8=, previous head =6538bc8b8=; burst jobs 41248474,
+41249059; candidate =81ea0576e= re-measured in 41249521):
+- *Phantom purchases on =Jamais= rows*: 11,952 of 12,963 -> 305 (2018: 166).  The smallest residual left is
+  0.03, so these are answers, not residue.  By region, before -> after: Centrale 2,121 -> 33, Grand Lomé 438
+  -> 5, Kara 1,829 -> 73, Maritime 1,817 -> 83, Plateaux 2,803 -> 53, Savanes 2,944 -> 58.
+- *Purchased rows* 107,841 -> 83,264; produced 17,794 and in-kind 10,579 unchanged.  *=Expenditure= NA*
+  on 38,092 of 107,841 purchased rows (35.3%) -> 17,525 of 83,264 (21.0%), of which 3,895 are the withheld
+  counts; on the other 79,369 it is 13,630 (17.2%), against 19.0% in 2018.
+- *Purchased =Expenditure=* 34,464,072 -> 29,435,020 FCFA (=food_expenditures= the same).  By region, before
+  -> after: Centrale 4,999,457 -> 3,002,467; Savanes 5,633,891 -> 4,212,402; Plateaux 7,166,796 -> 5,922,533;
+  Kara 4,274,783 -> 4,260,494; Maritime 5,836,244 -> 5,818,926; Grand Lomé 6,552,901 -> 6,218,198 (its
+  withheld counts carry no value).
+- *=food_quantities(units='kgs')=* 2021-22, summed: 70,309 -> 58,744; =food_quantities(units='units')=
+  rows 136,214 -> 107,742 (the withheld rows are absent, never a zero: every derived table drops an NA
+  before it sums).  =sample= is unchanged.
+- *Grand Lomé's split is by the predicate, not by fit.*  Of the 2,394 positive Grand Lomé rows with own
+  production or a gift, 122 land on the 0.01 grid at 0.9143 and not at 1.2, and 22 at neither; all are
+  divided by 1.2, as the predicate says.  21 recovered rows fall below =s07bq04= + =s07bq05= (13 counts, 8
+  others); their residual clips to 0, as a filed one would.
+
+*Disclosure, to read before comparing waves* (coordinator, 2026-11-12).  The doc search's best reading of
+the factor is an under-reporting correction by the producer: its regional multipliers follow, in rank
+order, each region's fall since 2018 in the number of foods a household reports (Spearman 0.93 over six
+regions; REPORT.md §2c, T-TGO-15).  Its approximate estimate (T-TGO-12, holding the 2021 poverty line fixed;
+not measured here) is that without the factor poverty in Centrale would rise about 20 points from 2018,
+where the official published change is +2.9.  So a 2018 against 2021-22 comparison through the library
+shows a much steeper fall in consumption, in Centrale above all, than the official statistics: the library
+serves what households reported, before the producer's adjustment.  The producer's filed values stay
+recoverable: =Country('Togo').derivation_inputs('Togo::food_acquired::s07bq03a-regional-factor-divided-out')=
+(and the two count keys) returns each keyed row's =s07bq03a= as the file holds it, with =s00q01=,
+=s07bq04= and =s07bq05=; =s07bq03a= / =recover_s07bq03a(...)= is the factor, and the 7-day key's inputs
+return every source row as filed.
+
+*derivation_inputs joins* at =(t, i, j)=: the withheld key 3,895 to 3,895, one to one.  The divided-out key
+joins 67,992 of its 69,330 served rows to exactly one input row, and the count key 10,035 of 10,039; the
+rest share their =(t, i, j)= with a second row because two file items map to one served =j= (the
+=harmonize_food= folds, e.g. the two sugars), and are told apart by =u=.  On the one-to-one rows the
+registered function re-derives the served purchased quantity exactly (max |diff| 0.0).
+
+*Kilograms: the pooled factors move* (GH #1487 pools them across the waves).  A row's unit value
+=Expenditure= / =Quantity= does not move under the division, but the evidence row set does: phantom
+purchases that carried a value leave, the withheld counts leave, and 2018's decoded =Main= / =Quartier= /
+=Tête= rows now pool with 2021-22's.  Measured against the previous head (burst job 41249521): 2018
+=food_quantities(units='kgs')= on =u= = =kg= 66,944 -> 68,062 (+1.7%; base =e5fdd2fa8= 63,577), 27,478 of
+110,742 rows move, at a median ratio of 1.036 (p10 0.992, p90 1.167), most in =Unité= (8,599 rows) and =Bol
+(Grand)= (7,105); 2018 =food_prices= 14,266 of 67,434 rows move, median 0.966.  2018's native =Quantity= and
+=Expenditure= do not move.  #1598 is deferred, not unruled.
+
+*Togo 2018 =u=, GH #1557* (ruling "Decode 2018 with 2021 labels (Recommended)"): =food_acquired= 2018 is
+frame-equal to base =e5fdd2fa8= once base's =659=, =660= and =662= are read as =Main=, =Quartier= and
+=Tête=; that is 2,059 served rows (=Tête= 1,512, =Main= 518, =Quartier= 25, =Tête (98)= 4), by item
+Igname 1,342, Banane douce 441, Manioc 153, Plantain 98, goat 14, mutton 8, other meat 2, beef 1.  No
+=Expenditure= moves.  The evidence is in "food_acquired units" above.
+
+*Still WAITING (not ruled):* =crop_production= =condition= codes 3-5 (=Tubercule=, =Gousse=, =Régime=;
+1,032 served rows) map to =other_condition=, outside the ruled fold of #1436, with the answer kept in
+=condition_native= (red team F6).
+
+*Cost.*  Config-only for every country but Togo and Cote d'Ivoire: against the previous head, Togo 22 of 22
+=_table_cache_hash= and 44 of 44 =Wave._input_hash=, Cote d'Ivoire 21 of 21 and 21 of 126, every other
+country 0, =build_transforms_fingerprint= 0 of 40 (burst job 41249059).  =derived-from-data= in
+=derivations.BASES= moves no hash.

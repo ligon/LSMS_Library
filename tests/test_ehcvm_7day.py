@@ -101,7 +101,7 @@ AFTER = {
     ('Burkina_Faso', '2021-22'): (27_888_221.36, 6_148),
     ('CotedIvoire', '2018-19'): (105_011_084.65, 35_289),
     # GH #1697 (2026-11-12): 121,393,491.0 before the H rows were withheld.
-    ('CotedIvoire', '2021-22'): (118_364_613.94, 29_050),
+    ('CotedIvoire', '2021-22'): (118_357_863.94, 29_050),
 }
 
 #: Keys a wave's food rows may carry beside this one (GH #1697, rulings of 2026-11-12):

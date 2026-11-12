@@ -55,7 +55,8 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
         CODE, 11,935 because it used the same code in a different SIZE (Petit
         / Moyen / Grand / Taille unique), which is a different container and
         so a different price per unit.  2021-22: 40,847 of the 232,969 SERVED purchased
-        rows (17.5%).
+        rows (17.5%) as filed; 53,914 (23.1%) since 2026-11-12, 15,769 of them H rows
+        withheld with no quantity (GH #1697, the s07bq03a-outlier-replaced-withheld key).
       basis: variable-label
       evidence: >-
         no EHCVM wave distributes a unit-conversion table;
@@ -69,7 +70,7 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
         7-day consumption s07bq03a (which would put the value of own-produced
         and gifted food into Expenditure) and B = net of own production only.
         2018-19: A 109,767,959, B 108,747,218, C (served) 105,011,085 FCFA, against a raw s07bq08 total of 119,107,505.
-        2021-22: A 124,699,154, B 123,793,766, C (served) 121,393,491 FCFA, against a raw s07bq08 total of 170,793,500.
+        2021-22, every row as filed: A 124,699,154, B 123,793,766, C 121,393,491 FCFA, against a raw s07bq08 total of 170,793,500; with the H rows withheld (GH #1697) C (served) is 118,357,864.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
     - text: >-
@@ -81,7 +82,8 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
         it is checked and not served.  Own production keeps the identical
         treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
         2018-19: 35,289 inkind rows carrying 106,756 units, 0 with an Expenditure.
-        2021-22: 29,050 inkind rows carrying 88,393 units, 0 with an Expenditure.
+        2021-22: 29,050 inkind rows carrying 88,393 units, 0 with an Expenditure; since
+        2026-11-12, 2,045 of them are H rows served with no quantity (GH #1697).
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
@@ -105,6 +107,7 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
     equivalent and 8.6% look at least partly converted to another unit, inferred, with no
     document saying so, and depan is built on those figures (_/CONTENTS.org, "2021-22 wired").
     The unit value s07bq08 / s07bq07a is clean; the quantity it multiplies is not, on those rows.
+    Since 2026-11-12 the H rows are withheld and the L rows flagged (the two s07bq03a-* keys).
   contents: 'CotedIvoire/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
 
@@ -170,7 +173,11 @@ CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld:
   validated_against: >-
     The 2018-19 control (0 H of 292,741 positive rows); the doc search's tests
     cited above.  derivation_inputs returns every H source row with its filed
-    s07bq03a, s07bq04 and s07bq05, joining the keyed served rows at (t, i, j).
+    s07bq03a, s07bq04 and s07bq05, joining the 20,536 keyed served rows (15,769
+    purchased, 2,722 produced, 2,045 in-kind) at (t, i, j), every one with
+    Quantity and Expenditure NA; they held 3,035,627 FCFA, 2.5% of purchased
+    Expenditure (burst job 41249521).  A served key an H row shares with another
+    row is withheld whole (12 rows on the first candidate).
   contents: 'CotedIvoire/_/CONTENTS.org, "s07bq03a: H withheld, L flagged (GH #1697)"'
   since: '2026-11-12'
 
@@ -205,7 +212,9 @@ CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion:
         cases in CONTENTS.org.
   validated_against: >-
     None possible: the conversion, where it happened, left no record.  The
-    2018-19 control is the baseline for an ordinary off-grid answer.
+    2018-19 control is the baseline for an ordinary off-grid answer.  25,852
+    served rows carry the key (12,354 purchased, 8,681 produced, 4,817 in-kind),
+    values unchanged, 1.9% of purchased Expenditure (burst job 41249521).
   contents: 'CotedIvoire/_/CONTENTS.org, "s07bq03a: H withheld, L flagged (GH #1697)"'
   since: '2026-11-12'
 

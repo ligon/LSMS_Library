@@ -1221,7 +1221,10 @@ row for this wave; the verdict is =asked-not-distributed=, =.coder/coverage/abse
 
 =ehcvm_nsu=, =ehcvm_prix=, =s00_co=..=s04_co=, as 2018-19 declares no community table; section 9, as above.
 
-** =food_acquired= and =s07bq03a= (WAITING: with the maintainer)
+** =food_acquired= and =s07bq03a= (ANSWERED 2026-11-12: "H to NA, flag L"; see "s07bq03a: H withheld, L flagged (GH #1697)" below)
+
+[2026-11-12: this section records the finding before the ruling.  "Served as filed" below no
+longer holds: H rows are withheld and L rows flagged, by registered keys.]
 
 *15.2% of the positive =s07bq03a= rows are off the quarter grid, and they are two different things, both inferred: no document says either.*  The BID mentions imputation only for the analysis files.
 2018-19 is 99.0% on the grid, with no row of 4 or more decimals off it.  Not Togo's defect, and Togo's checks pass: =s07bq03a/s07bq04= on never-purchased own-production rows has mode 1.0 in all 33 regions (19,413 of 19,717 rows),
@@ -1546,4 +1549,70 @@ only (GH #1705); no Cote d'Ivoire link is served.
 
 *Cost.*  Config-only, base =e5fdd2fa8= against this change: =Country._table_cache_hash= Cote d'Ivoire
 21 of 21, =Wave._input_hash= 126 of 126, =build_transforms_fingerprint= 0 of 40; the only other countries
-that move are Togo, Benin and GhanaLSS (=Très grand=), as before this change.
+that move are Togo, Benin and GhanaLSS (=Très grand=), as before this change.  [2026-11-12, red team F3:
+GhanaLSS moves at BOTH tiers, 21 of 21 =_table_cache_hash= and 147 of 147 =Wave._input_hash=, a full cold
+re-warm of GhanaLSS; no GhanaLSS served value changes (measured, burst job 41240822).]
+
+*Strata key (red team F1).*  [2026-11-12, ruling "Accept the case fold (Recommended)", with "the registry
+must reproduce it (own key)".]  2021-22 now carries its own key,
+=CotedIvoire::sample::region-milieu-stratum-upper-region=, whose function
+=2021-22/_/mapping.py:derive_upper_region_milieu_stratum= upper-cases the region and calls the shared
+construction; =CotedIvoire::sample::region-milieu-stratum= is 2018-19's alone.  The served value is
+unchanged; =rec.resolve()= applied to =derivation_inputs= now re-derives it on all 12,965 served
+households with nothing added (0 mismatches, burst job 41249059).
+
+* 2026-11-12 -- s07bq03a: H withheld, L flagged (GH #1697)
+
+*Ruling (@ligon, 2026-11-12): "H to NA, flag L (Recommended)"*, on the doc search
+=burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md= §3 and the principle "Without a very
+good reason we don't want to serve up someone else's undocumented imputations."  The ruled text: "H
+quantity NA under a registered key; L rows (partial triplet conversion) flagged with their own key."
+
+*The documented rule and the undocumented application.*  UEMOA / World Bank, EHCVM Document de travail no
+4, "Mesure de la pauvreté" (September 2019), §2.2: a per-item per-capita outlier "sera remplacée par la
+médiane dans la région et le milieu de résidence"; §2.2-2.3 confine such corrections to analysis files and
+require any in a distributed file to be documented.  ANStat's 2021 poverty profile (§2.7.1, printed pp.
+34-35) records section 7B "partiellement apurée" and "la correction du référentiel des triplets".  No
+document says either was written into =s07b= or which rows.  The data fit H as that median per adult
+equivalent within item x region x milieu (T-CIV-1, -4b, -5b), so the household's answer is gone.
+
+*The split* (=2021-22/_/mapping.py:classify_s07bq03a=): positive =s07bq03a= off the quarter grid, with
+four or more decimals (H) or three or fewer (L), at relative tolerance 1e-6.  Measured (burst job 41248473):
+of 303,274 positive values, 256,983 on the grid, H 20,507, L 25,784; between 1e-7 and 1e-5 the H count
+moves by 244.  2018-19, the control: 0 H at every tolerance, 2,868 L-shaped of 292,741 (ordinary
+off-grid answers such as 0.1), so the L flag over-covers by about that baseline.  On H rows =s07bq04= is
+off the grid with 4+ decimals on 2,721 of the 2,722 where it is positive and =s07bq05= off the grid on
+2,047 of 2,047: the row was rescaled as a whole.  So is an L row's =s07bq04= (8,679 of 8,681).
+
+*What is served.*  Every row an H source row serves -- purchased (a positive filed residual), produced,
+in-kind -- carries Quantity NA and Expenditure NA and =CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld=;
+the row set is the filed one.  A served key =(t, v, i, j, u, s)= that an H row shares with another row
+(two file items under one served =j=) is withheld whole, or the core collapse would sum the other row
+alone and serve it as if whole (12 rows on the first candidate).  Every row an L source row serves is
+served as filed with =CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion=.  Downstream,
+=food_expenditures=, =food_quantities= and =food_prices= drop an NA before they sum, so an H row is absent
+there, never a zero, and a household-item total that also has a non-H row is that row's alone.
+
+*Measured* (cold, private roots, previous head =6538bc8b8= against the candidate, burst job 41249521):
+- H keys 20,536 served rows (purchased 15,769, produced 2,722, in-kind 2,045), every one with Quantity NA;
+  L keys 25,852 (12,354, 8,681, 4,817).
+- Purchased =Expenditure= 121,393,491 -> 118,357,864 FCFA: H rows were 3,035,627 (2.5%) of it; L rows
+  carry 2,359,643 (1.9%), unchanged.  =Expenditure= NA on 40,847 -> 53,914 of the 232,969 purchased rows
+  (17.5% -> 23.1%; 16.2% in 2018-19), 15,769 of them H.
+- =food_quantities(units='units')= rows 305,482 -> 284,946; =food_expenditures= rows 192,026 -> 178,975;
+  =food_prices= rows 192,113 -> 179,049.  The L rows stay in all three.
+- =derivation_inputs=: the H key's inputs are the 20,507 H source rows, joining the keyed rows at =(t, i, j)=
+  (one input row serves up to three rows, one per =s=; 7 served rows share =(t, i, j)= with a second H row);
+  the L key's 25,784 rows likewise.
+
+*Kilograms: the pooled factors move.*  GH #1487 pools factors across the waves, and withholding H rows
+removes their unit values from the 2021-22 evidence.  Measured against the previous head (burst job
+41249521): 2018-19 =food_quantities(units='kgs')= on =u= = =kg= 359,122 -> 361,326 (+0.6%; base
+=e5fdd2fa8= 358,449), 66,494 of 296,942 rows move, median ratio 1.032 (p10 0.933, p90 1.25), and 3 rows
+change between kg and their native unit; 2018-19 =food_prices= 40,452 of 182,890 rows move, median 0.969.
+2018-19's native =Quantity= and =Expenditure= do not move.  #1598 (own-country NSU weights) is deferred,
+not unruled.
+
+*Cost.*  Against the previous head: Cote d'Ivoire 21 of 21 =_table_cache_hash=, 21 of 126 =Wave._input_hash=
+(the 2021-22 wave), Togo 22 of 22 and 44 of 44 for its own change, every other country 0,
+=build_transforms_fingerprint= 0 of 40 (burst job 41249059).

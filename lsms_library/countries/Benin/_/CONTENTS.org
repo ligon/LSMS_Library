@@ -1247,4 +1247,19 @@ blank harvest; GH #1565 the leavers; GH #1598 the own-country NSU weights, still
 *Cost.*  Measured, config-only, base =e5fdd2fa8= against this change: =Country._table_cache_hash=
 Benin 22 of 22 (and Togo 22 of 22, Cote d'Ivoire 21 of 21, GhanaLSS 21 of 21, through =Très grand=),
 =Wave._input_hash= Benin 44 of 44, =build_transforms_fingerprint= 0 of 40, every other country 0.
-The same scope the restored wiring already had: the strata edit adds no country to it.
+The same scope the restored wiring already had: the strata edit adds no country to it.  [2026-11-12, red
+team F3: GhanaLSS moves at BOTH tiers, 21 of 21 =_table_cache_hash= and 147 of 147 =Wave._input_hash=, a
+full cold re-warm of GhanaLSS; no GhanaLSS served value changes (measured, burst job 41240822).]
+
+* 2026-11-12 -- must-states from the red team (GH #1697)
+
+- *Leavers are dropped pending GH #1565* (red team F5).  =household_roster= and =people_last7days= of
+  2021-22 leave out the 6,138 people =s01= lists as gone (=s01q00aa= = non; 6,138 of 48,798 =s01= rows),
+  matching =ehcvm_individu= (42,660).  That is a de facto choice made before #1565's decision, which the
+  issue says should precede this step; it is reversible and revisited when #1565 is ruled.  Togo and Cote
+  d'Ivoire =s01= carry no leavers.
+- *#1598 is deferred, not unruled* (red team F4): see "Kilograms" above.
+- *No served Benin value moves with the Togo / Cote d'Ivoire =s07bq03a= rulings of the same day*:
+  =sample=, =food_acquired=, =food_expenditures=, =food_quantities= (kgs and units) and =food_prices= of
+  both waves are frame-equal to the previous head =6538bc8b8= (cold, private roots, burst job 41249059),
+  and no Benin hash moves.

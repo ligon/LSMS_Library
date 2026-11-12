@@ -45,7 +45,10 @@ DOCUMENTED_2018 = {"Benin": "2018-19", "Togo": "2018", "Guinea-Bissau": "2018-19
 #: The waves each documented country's registry entry covers (GH #1575; 2021-22 by the
 #: ruling of 2026-11-12, GH #1697).
 DOCUMENTED_SCOPE = {"Benin": ["2018-19", "2021-22"], "Togo": ["2018", "2021-22"],
-                    "Guinea-Bissau": ["2018-19"], "CotedIvoire": ["2018-19", "2021-22"]}
+                    "Guinea-Bissau": ["2018-19"], "CotedIvoire": ["2018-19"]}
+#: A documented 2021-22 wave whose rule differs, and so has a key of its own (red team F1 of
+#: GH #1697, ruling 2026-11-12): Cote d'Ivoire upper-cases the region first.
+OWN_2021_KEY = {"CotedIvoire": "CotedIvoire::sample::region-milieu-stratum-upper-region"}
 #: The cell formatter each documented 2021-22 wave declares: Cote d'Ivoire's upper-cases
 #: the region first and calls the shared helper (its file labels 23 regions in lower case).
 DOCUMENTED_2021 = {"Benin": "strata_label", "Togo": "strata_label",
@@ -187,7 +190,14 @@ class TestWiring:
         block = _sample_block(country, "2021-22")
         assert block["df_cover"]["myvars"]["strata"] == [
             "s00q01", "s00q04", {"mapping": formatter}]
-        assert "2021-22" in derivation_records(country)[stratum_derivation_key(country)].waves
+        key = OWN_2021_KEY.get(country, stratum_derivation_key(country))
+        rec = derivation_records(country)[key]
+        assert "2021-22" in rec.waves
+        if country in OWN_2021_KEY:
+            # Its own function re-derives the served label from the raw inputs alone.
+            assert list(rec.waves) == ["2021-22"]
+            assert rec.resolve()("gÔh", "Urbain") == "GÔH Urbain"
+            assert "2021-22" not in derivation_records(country)[stratum_derivation_key(country)].waves
 
     def test_guinea_bissau_2021_is_still_unwired(self):
         assert "sample" not in load_yaml(ROOT / "Guinea-Bissau" / "2021-22" / "_" / "data_info.yml")

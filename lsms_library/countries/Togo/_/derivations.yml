@@ -57,11 +57,15 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
         different price per unit.  2021-22: 38,092 of the 107,841 SERVED purchased
         rows (35.3%).  On source rows with a purchased quantity, 38,182 of 108,057:
         34,510 with no last purchase, 1,303 in a different unit code, 2,369 in the
-        same code at a different size.  The share is higher than 2018's because
-        s07bq03a is rescaled by region in this file, which leaves a phantom purchased
+        same code at a different size.  The share was higher than 2018's because
+        s07bq03a is rescaled by region in this file, which left a phantom purchased
         residual on rows with no purchase (11,952 of 12,963 Jamais rows; 166 in 2018);
-        it is not the fill rule, which 2018 shares.  See _/CONTENTS.org, "s07bq03a is
-        rescaled by region".
+        it is not the fill rule, which 2018 shares.  Since 2026-11-12 (GH #1697) the
+        residual is formed from s07bq03a with the factor divided out (the
+        s07bq03a-* keys): 305 Jamais rows keep a residual, and 17,525 of the 83,264
+        served purchased rows (21.0%) carry Expenditure NA, 3,895 of them withheld
+        counts with no quantity; 13,630 of the other 79,369 (17.2%).  See
+        _/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)".
       basis: variable-label
       evidence: >-
         no EHCVM wave distributes a unit-conversion table;
@@ -75,7 +79,7 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
         7-day consumption s07bq03a (which would put the value of own-produced
         and gifted food into Expenditure) and B = net of own production only.
         2018: A 32,656,157, B 32,224,365, C (served) 31,676,795 FCFA, against a raw s07bq08 total of 44,452,024.
-        2021-22: A 35,429,400, B 35,230,935, C (served) 34,464,072 FCFA, against a raw s07bq08 total of 45,908,210.
+        2021-22, on the filed s07bq03a: A 35,429,400, B 35,230,935, C 34,464,072 FCFA, against a raw s07bq08 total of 45,908,210; with the factor divided out (GH #1697) C (served) is 29,435,020.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
     - text: >-
@@ -110,7 +114,9 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
     69,875 joined rows 1.00000.  THIS VALIDATES THE ARITHMETIC AND NOT THE 2021-22
     QUANTITY: ehcvm_conso carries the same regional scaling as s07bq03a (Achat on 91.6%
     of Jamais rows; its Achat/Autoconso equals residual/s07bq04), so the agreement could
-    not have revealed it.  See _/CONTENTS.org, "s07bq03a is rescaled by region".
+    not have revealed it.  Measured on the filed s07bq03a, before the factor was divided
+    out (GH #1697, 2026-11-12); the served 2021-22 quantity no longer matches depan, by
+    design.  See _/CONTENTS.org, "s07bq03a is rescaled by region".
   contents: 'Togo/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
 
@@ -181,9 +187,13 @@ Togo::food_acquired::s07bq03a-regional-factor-divided-out:
         Document de travail no 4, §2.2-2.3, confines corrections to analysis
         files.
   validated_against: >-
-    The forward mechanics on the file (above).  ehcvm_conso_tgo2021.dta carries
-    the factor (the 7-day key's validated_against), so the recovered quantity
-    does NOT reproduce depan(Achat), by design, and no document validates it.
+    The forward mechanics on the file (above).  After the division 305 of the
+    12,963 Jamais rows keep a purchased residual (11,952 as filed; 2018: 166), the
+    smallest 0.03.  69,330 served purchased rows carry the key; on the 67,992 that
+    join their input row one to one the registered function re-derives the served
+    quantity exactly (burst job 41249521).  ehcvm_conso_tgo2021.dta carries the
+    factor (the 7-day key's validated_against), so the recovered quantity does NOT
+    reproduce depan(Achat), by design, and no document validates it.
   contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
   since: '2026-11-12'
 
@@ -219,7 +229,11 @@ Togo::food_acquired::s07bq03a-floored-count-recovered:
       evidence: doc search REPORT.md §2e (T-TGO-14)
   validated_against: >-
     The round trip floor(k x f) = s07bq03a on every recovered row, by
-    construction; 12,833 of the 12,850 integer `unité` rows with f >= 1 pass it.
+    construction: 12,665 of the 12,670 `unité` rows outside Grand Lomé pass it (4
+    integers fail it and 1 value is not an integer; those 5 are withheld).  10,039
+    served purchased rows carry the key; on the 10,035 that join their input row one
+    to one, the registered function re-derives the served quantity exactly (burst
+    job 41249521).  4,508 recovered counts differ from the filed count.
   contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
   since: '2026-11-12'
 
@@ -258,7 +272,8 @@ Togo::food_acquired::s07bq03a-floored-count-withheld:
         floor(q x 0.9143)); probe counts, burst job 41248473.
   validated_against: >-
     derivation_inputs returns each withheld row's filed s07bq03a, s07bq04,
-    s07bq05 and s00q01, joining the keyed served rows at (t, i, j).
+    s07bq05 and s00q01, joining the 3,895 keyed served rows at (t, i, j) one to one
+    (burst job 41249521); every one has Quantity and Expenditure NA.
   contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
   since: '2026-11-12'
 
