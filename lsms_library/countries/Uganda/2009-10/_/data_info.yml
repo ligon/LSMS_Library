@@ -57,6 +57,8 @@ sample:
         - locating_cover
         - df_geo
         - locating_frame
+        - ea_comm_waves
+        - ea_2013_14
     locating_cover:
         file: ../Data/GSEC1.dta
         idxvars:
@@ -108,6 +110,30 @@ sample:
             i: HHID
         myvars:
             _frame: HHID
+    # GH #1536 (ruling @ligon 2026-11-12, "Fill, registered").  A household whose
+    # own comm is blank (movers, split-offs) takes `ea` from its label in another
+    # wave: the comm waves first, by HHID, which is unchanged 2005-06 .. 2011-12,
+    # then 2013-14's GSEC1.ea by HHID_old.  The hooks (uganda.ea_comm_waves,
+    # uganda.ea_2013_14) keep only this wave's cover households with a blank comm,
+    # so the outer merge adds no row; uganda.sample fills and stamps
+    # `Uganda::sample::ea-same-household`.  A lost cover costs the fill, not `v`.
+    ea_comm_waves:
+        file:
+            - ../../2005-06/Data/GSEC1.dta
+            - ../../2010-11/Data/GSEC1.dta
+            - ../../2011-12/Data/GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _ea_comm_waves:
+                - comm
+                - mappings: comm_ea
+    ea_2013_14:
+        file: ../../2013-14/Data/GSEC1.dta
+        idxvars:
+            i: HHID_old
+        myvars:
+            _ea_2013_14: ea
     merge_on:
         - i
     final_index:
