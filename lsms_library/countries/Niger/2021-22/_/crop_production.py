@@ -109,8 +109,8 @@ sold_df = pd.DataFrame({
     # 16D.05c, "Estimation Quantite totale UML en kg", served as the TOTAL kilograms
     # sold (GH #1560 / #1571, ruling @ligon 2026-11-12 "Treat 2021 as totals"): the
     # released label and the file's Kg sales (kg == quantity on 45 of 48) say a total,
-    # where both own vague forms instruct "poids en kg d'UNE UML".  Never a factor:
-    # KgFactor_sold is kg per ONE unit.  No code in the column (max 8,000).
+    # where both own vague forms instruct "poids en kg d'UNE UML".  Never divided into a
+    # per-unit factor.  No code in the column (max 8,000).
     'Quantity_sold_kg': pd.to_numeric(soldn['s16dq05c'], errors='coerce').values,
     'Value_sold':    pd.to_numeric(sold['s16dq06'], errors='coerce').values,
     # The SOLD unit (s16dq05b), whose 8-label set is spelled DIFFERENTLY from
