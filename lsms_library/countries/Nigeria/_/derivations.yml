@@ -330,6 +330,210 @@ Nigeria::community_prices::c8-unrecorded-size-drop:
   contents: Nigeria/_/CONTENTS.org, "The C8 SIZE field" (GH #834)
   since: '2026-09-13'
 
+# ---------------------------------------------------------------------------
+# GH #587 (rulings @ligon 2026-11-12): the POST-PLANTING community prices.
+# Every PP community form prices food in Section C2 (CONTENTS.org corrects the
+# old "C8 is post-harvest only" entry).  PP rows are built by
+# _/pp_community_prices.py; each served construction and each priced row left
+# unserved is one entry below.  The PH entries above are untouched: their
+# `inputs` return PH rows only, so PP rows get their own keys.
+# ---------------------------------------------------------------------------
+Nigeria::community_prices::pp-w1-number-of-units:
+  waves: ['2010-11']
+  columns: [Price]
+  rows: {t: '2010Q3'}
+  rule: >-
+    Price = sc2q3a / sc2q3b on W1 post-planting (2010Q3) rows whose Number of
+    Units sc2q3b exceeds 1: the price of ONE unit sc2q3c when the community
+    priced several.  Rows with sc2q3b = 1 are served as recorded (no key);
+    rows with no count are not served (pp-w1-no-count-hold).
+  function: lsms_library.countries.Nigeria._.pp_community_prices:derive_pp_w1_unit_price
+  inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_number_of_units
+  raw_variables: [state, lga, ea, item_cd, sc2q2, sc2q3a, sc2q3b, sc2q3c]
+  assumptions:
+    - text: >-
+        the W1 PP form records the price in three columns -- "What is the
+        price for the item?  Naira | Number of Units | Unit Codes" -- and,
+        unlike W2-W5, prints no "quantity of one" instruction.
+      basis: questionnaire
+      evidence: >-
+        2010-11 Community_Questionnaire_Final (1).pdf, Section 2 "Food
+        Prices", PDF pp.5-8; sectc2_plantingw1.dta variable labels "What is
+        the price for [ITEM]? (Naira)" / "(Number of units)" / "(unit code)".
+    - text: >-
+        the Naira figure is the price of all sc2q3b units together, so one
+        unit costs sc2q3a / sc2q3b.  Ruled by the maintainer ("Register the
+        division", 2026-11-12); the form does not state it in words.
+      basis: modelling-choice
+      evidence: >-
+        .sucoder/isa-decisions.org, 2026-11-12 GH587 second round; GH #587
+        mapping report (burst isa-sm-20261112 reports/587-mapping) section 4.
+  contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
+  since: '2026-11-12'
+
+Nigeria::community_prices::pp-c2-metric-size:
+  waves: ['2018-19', '2023-24']
+  columns: [Price]
+  rows: {t: ['2018Q3', '2023Q3'], u: [g, cl]}
+  rule: >-
+    The PH c8-metric-size division, applied to the post-planting C2 rows
+    (ruling 2026-11-12, "Reuse PH c8-metric-size"): where the W4/W5 PP SIZE
+    field c2q2c states a metric quantity ('24. 75 CL', '34. 250 GRAMS',
+    '11. 50 KG', ...), Price = c2q3 / size_quantity with the quantity in g
+    or cl, and `u` becomes 'g' / 'cl'.  The same decoder
+    (nigeria._c8_size_metric_grams) and the same function as the PH entry.
+    Ordinal sizes and '99. ONE SIZE ONLY' are not divided.  `Size` keeps the
+    recorded size label.
+  function: lsms_library.countries.Nigeria.2018-19._.mapping:derive_c8_metric_package_unit_price
+  inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_c2_metric_size
+  raw_variables: [state, lga, ea, item_cd, c2q1, c2q2, c2q2b, c2q2c, c2q2a,
+                  c2q2_cvn, c2q3]
+  assumptions:
+    - text: >-
+        the PP C2 form prints the PH C8 wording -- "PLEASE USE A QUANTITY OF
+        ONE (1) FOR [ITEM] AND THE UNIT OF MEASURE YOU ARE USING" over UNIT
+        and SIZE, then "What is the price for the item?" in NAIRA -- so the
+        price beside a metric size is of one package of that size.
+      basis: questionnaire
+      evidence: >-
+        pp_w4_community_quest.pdf, C2 Food Prices, PDF pp.5-9 (size card
+        p.13); ghs_panel_w5_pp_community_questionnaire.pdf, Section C2, PDF
+        pp.6-11; the PH entry Nigeria::community_prices::c8-metric-size.
+    - text: >-
+        PP and PH treat these rows alike: the PH rule is reused, not
+        re-derived.  Ruled by the maintainer 2026-11-12 for this rule only.
+      basis: modelling-choice
+      evidence: .sucoder/isa-decisions.org, 2026-11-12 GH587 second round.
+  contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
+  since: '2026-11-12'
+
+# A DELETION: W1 PP priced rows with no Number of Units cannot be put on the
+# one-unit basis the W1 division needs.
+Nigeria::community_prices::pp-w1-no-count-hold:
+  waves: ['2010-11']
+  columns: [Price]
+  rows: 0
+  rule: >-
+    W1 PP (2010Q3) rows with a positive Naira price sc2q3a but no Number of
+    Units sc2q3b (105 rows) are not served: without the count the price of
+    one unit is unknown.  (A count below 1 would be held the same way; the
+    file has none.)
+  function: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_no_count_hold
+  inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_no_count_hold
+  raw_variables: [state, lga, ea, item_cd, sc2q2, sc2q3a, sc2q3b, sc2q3c]
+  assumptions:
+    - text: >-
+        a price with no recorded count has no one-unit basis; serving it as
+        the price of one unit would assume the count is 1.  Ruled 2026-11-12
+        ("105 priced rows with no count stay unserved").
+      basis: modelling-choice
+      evidence: .sucoder/isa-decisions.org, 2026-11-12 GH587 second round.
+  validated_against: >-
+    derivation_inputs returns exactly the rows the build leaves out
+    (pp_dispositions 'w1-no-count'), indexed by the labels they would carry.
+  contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
+  since: '2026-11-12'
+
+# A DELETION, pending a ruling: metric UNITS whose package size is unrecorded.
+Nigeria::community_prices::pp-unrecorded-size-hold:
+  waves: ['2012-13', '2015-16', '2023-24']
+  columns: [Price]
+  rows: 0
+  rule: >-
+    PP rows on a metric unit with no recorded package size are not served
+    pending a ruling: g / cl in W2 (209 rows; the form has no size field),
+    W3 (12,934 rows over both locations; the other-unit text c2q2b is blank
+    on every one) and W5 (231 rows; the size c2q2c is blank on every one),
+    and W3's Kg / l (4,120 rows, the same blank field).  W4 records no g/cl
+    unit.  A coded metric size resolves the row instead (pp-c2-metric-size);
+    '99. ONE SIZE ONLY' is exempt, as in PH.
+  function: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_unrecorded_size_hold
+  inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_unrecorded_size_hold
+  raw_variables: [state, lga, ea, item_cd, c2q1, c2q2, c2q2b, c2q2a, c2q2c,
+                  c2q2_cvn, c2q3]
+  assumptions:
+    - text: >-
+        under the forms' "quantity of one" a metric unit is one gram, one
+        centilitre, one kilogram or one litre, but the PH evidence is that
+        such a price is of an unrecorded package (PH 1/189 on g, 1/42 on cl
+        against the household unit value).  Not ruled for PP: held, and the
+        same-wave household comparison is in the GH #587 wiring report.
+      basis: modelling-choice
+      evidence: >-
+        .sucoder/isa-decisions.org 2026-11-12 ("Still pending ... metric
+        units with no recorded package size"); CONTENTS.org "The C8 SIZE
+        field"; Nigeria::community_prices::c8-unrecorded-size-drop.
+  validated_against: >-
+    derivation_inputs returns exactly the rows the build leaves out
+    (pp_dispositions 'unrecorded-size-hold').
+  contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
+  since: '2026-11-12'
+
+# A DELETION: PP items with no harmonize_food label.
+Nigeria::community_prices::pp-unharmonized-item-hold:
+  waves: ['2012-13']
+  columns: [Price]
+  rows: 0
+  rule: >-
+    W2 PP (2012Q3) rows on item code 15 "Semovita" and code 0 "No more
+    option" are not served: harmonize_food has no row meaning Semovita, and
+    0 is a questionnaire sentinel.  The held frame is indexed by the native
+    item label in place of j.
+  function: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_unharmonized_item_hold
+  inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_unharmonized_item_hold
+  raw_variables: [state, lga, ea, item_cd, c2q1, c2q2, c2q3]
+  assumptions:
+    - text: >-
+        an item is served only under an existing harmonize_food Preferred
+        Label; the wave-blind Code contract would serve code 15 as "Bread"
+        (W1's code 15), which is wrong.
+      basis: modelling-choice
+      evidence: >-
+        GH #587 MAPPING.org (W2 items 0 and 15); harmonize_food 2012Q3
+        column.
+  validated_against: >-
+    derivation_inputs returns exactly the rows the build leaves out
+    (pp_dispositions 'item-hold').
+  contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
+  since: '2026-11-12'
+
+# A DELETION: W5 PP rows whose own Quantity contradicts "quantity of one".
+Nigeria::community_prices::pp-w5-quantity-not-one-hold:
+  waves: ['2023-24']
+  columns: [Price]
+  rows: 0
+  rule: >-
+    W5 PP (2023Q3) rows recording a Quantity c2q2a other than 1 that no
+    other entry already holds (123 rows: 41 CUBE, 65 BOTTLE/CAN -- 63 with a
+    coded metric size -- 10 KILOGRAMS, 7 LITRES) are not served.  c2q2a is
+    present on 350 priced rows; 19 equal 1 and are served as recorded; the
+    208 on GRAMS / CENTLITRES carry no coded size and are held by
+    pp-unrecorded-size-hold first.
+  function: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w5_quantity_not_one_hold
+  inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w5_quantity_not_one_hold
+  raw_variables: [state, lga, ea, item_cd, c2q1, c2q2a, c2q2b, c2q2b_os, c2q2c,
+                  c2q2_cvn, c2q3]
+  assumptions:
+    - text: >-
+        the ruled W5 basis is a quantity of one (the printed PP form); a row
+        whose export records another quantity contradicts it.  On the CUBE
+        rows the price scales with c2q2a (price / same-cell median = 0.7-1.0 x
+        c2q2a), so serving it as one cube would overstate the price up to
+        ~1,400x; on the BOTTLE/CAN rows c2q2a equals the coded size on 8 of
+        63.  Excluded with a count rather than served under a basis the row
+        itself contradicts; the alternative (serve with a flag) is in the
+        GH #587 wiring report for the maintainer.
+      basis: modelling-choice
+      evidence: >-
+        .sucoder/isa-decisions.org 2026-11-12 (W5: "the rows where it is
+        present and not 1 need an explicit treatment"); GH #587 wiring report,
+        W5 c2q2a measurement.
+  validated_against: >-
+    derivation_inputs returns exactly the rows the build leaves out
+    (pp_dispositions 'w5-quantity-hold').
+  contents: Nigeria/_/CONTENTS.org, "Post-planting community prices (GH #587)"
+  since: '2026-11-12'
+
 # GH #1035 (rulings @ligon 2026-10-18, amended 2026-10-19 after red team r1).
 # A served Quantity_kg the survey did not record: the W1-PH food module's
 # sized unit codes are the agriculture production-unit card, which states

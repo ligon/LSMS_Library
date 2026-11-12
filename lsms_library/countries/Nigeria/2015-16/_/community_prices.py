@@ -23,12 +23,20 @@ c8q2b the free-text SIZE (GH #834: blank on 13,767 of the 13,768 g/cl rows
 AND on all 3,433 Kg/l rows -- those package prices are dropped; the handful
 stating '300gram' / 'one 75cl bottle' are normalised to per-g / per-cl).
 t = 2016Q1 (post-harvest quarter).
+
+Post-planting round (GH #587, rulings 2026-11-12): the PP COMMUNITY
+questionnaire prices food too, in Section C2 (sectc2a_plantingw3.dta (1st location, obs 1) + sectc2b_plantingw3.dta (2nd, obs 2)), so
+this script also serves t = 2015Q3 through the PP adapter
+(../../_/pp_community_prices.py): j / u on Nigeria's shared labels, the native
+size in `Size`, Price on the form's own basis -- quantity of one (c2q2 unit, c2q2b other-unit text, c2q3 Naira).
+Distinct t per round (pp-ph skill).
 """
 import sys
 
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet
 from nigeria import PH_QUARTER, community_prices_for_wave, _crop_labels
+from pp_community_prices import combine_rounds, pp_community_prices_for_folder
 
 crop_labels = _crop_labels()
 
@@ -45,6 +53,10 @@ for obs, f in ((1, '../Data/sectc8a_harvestw3.dta'),
 
 df = community_prices_for_wave(t, frames, mode='codes',
                               crop_labels=crop_labels)
+
+# The post-planting round's Section C2 (GH #587), its own t (2015Q3).
+df = combine_rounds(df, pp_community_prices_for_folder(
+    '2015-16', lambda f: get_dataframe(f, convert_categoricals=False)))
 
 assert df.index.is_unique, "community_prices W3: (t,v,j,u,obs) not unique"
 assert len(df) > 0

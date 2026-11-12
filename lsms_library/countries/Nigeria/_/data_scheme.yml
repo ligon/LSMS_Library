@@ -733,9 +733,14 @@ Data Scheme:
   community_prices:
     # Item-level reported community food prices (GAP C) at natural grain
     # (t, v, j, u).  CLUSTER-level: one row per (cluster/EA x food-item x
-    # unit) from the post-harvest COMMUNITY questionnaire's food-price
-    # module (Section C8 "Food Prices", file sectc8_harvest{wN}; W3 splits
-    # it across sectc8a / sectc8b; W5 under Post Harvest Wave 5/Community/).
+    # unit) from the COMMUNITY questionnaire's food-price module, in BOTH
+    # rounds (GH #587, rulings 2026-11-12): post-harvest Section C8 "Food
+    # Prices" (file sectc8_harvest{wN}; W3 splits it across sectc8a /
+    # sectc8b; W5 under Post Harvest Wave 5/Community/) at the PH quarter,
+    # and post-planting Section C2 "Food Prices" (sectc2_planting{wN}; W3
+    # sectc2a / sectc2b) at the PP quarter -- distinct t per round.  The PP
+    # rows are built by _/pp_community_prices.py (its own item/unit
+    # crosswalk; see CONTENTS.org "Post-planting community prices").
     # There is NO household i, so _join_v_from_sample does NOT apply -- `v`
     # is declared in the index here and carried NATIVELY: it is the
     # community questionnaire's EA id (v = cluster_id(state, lga, ea) -- the
@@ -746,8 +751,14 @@ Data Scheme:
     #
     # Stores the REPORTED surveyed field ONLY:
     #   Price   prevailing price of one unit `u` of item `j` in cluster `v`
-    #           at the present time (Naira).  W1/W2 sc8q2 / c8q2; W3-W5
-    #           c8q3 / c8aq3.
+    #           at the present time (Naira).  PH W1/W2 sc8q2 / c8q2; W3-W5
+    #           c8q3 / c8aq3.  PP c2q3 (W1 sc2q3a, divided by the Number of
+    #           Units sc2q3b where it exceeds 1 -- the registered
+    #           pp-w1-number-of-units).
+    #   Size    the native size the base `u` folds away (GH #587 unit-axis
+    #           ruling): PP W4/W5 the recorded SIZE label verbatim ('0. SMALL',
+    #           '34. 250 GRAMS'); PP W1-W3 the size their unit code carries
+    #           ('small', 'LARGE').  NA on PH rows (not carried there yet).
     # NOT an index, NOT a cross-cluster median/mean, NOT an HH-median
     # imputation -- those are transformations over these rows.  (The WB
     # panel surveys NO community prices: their crop_price_EA is an HH-median
@@ -761,12 +772,15 @@ Data Scheme:
     #        scheme, mapped by NAME in nigeria.py (_W1W2_PRICE_ITEM), reusing
     #        existing food labels; the 16 genuinely-new prepared-food/drink
     #        price items are registered in harmonize_food (codes 4001-4016).
-    #   u -> the SHARED `u` table base Preferred Label via _canon_unit (all
-    #        30 units used already exist in `u` -- no extension needed).  W3-W5
+    #   u -> the SHARED `u` table base Preferred Label via _canon_unit.  W3-W5
     #        record the unit per row; W1/W2 carry no unit column, so the unit
     #        is the questionnaire's per-item fixed unit (_W1W2_PRICE_UNIT).
-    # t = PH_QUARTER[wave] (the price module sits in the post-harvest round,
-    # matching crop_production / anthropometry).
+    #        "All units used already exist in `u`" is no longer true: the PP
+    #        rows add 'Tomatoes cup', 'Congo/Mudu' and 'ml' (W1, for
+    #        maintainer review), 'Unknown' (a PP row with no unit recorded),
+    #        and '210. STEMS' / '260. SEEDLING/PLANT' would stay verbatim
+    #        (GH #1095; 0 rows).  j adds W1/W2's native 'Pepper' (GH #1144).
+    # t = PH_QUARTER[wave] for C8 rows, PP_QUARTER[wave] for C2 rows.
     #
     # GH #834 (C8 SIZE field, W3-W5): where the coded size states a metric
     # quantity (W4 c8q2c / W5 c8aq2_c; W3's c8q2b is free text and blank on
@@ -797,8 +811,13 @@ Data Scheme:
     # W1/W2 variety is the FULL source item/size code, per GH #637 ruling
     # 2026-10-23; W3-W5 carry their existing unknown_variety sentinel.
     # Every complete native key is asserted unique; no first-kept price.
+    # PP W1/W2 variety is the native item code, W3-W5 unknown_variety; W3's
+    # PP 1st / 2nd location (sectc2a / sectc2b) is obs 1 / 2 (GH #587).
     index: (t, v, j, u, variety, obs)
     Price: float
+    Size:
+      type: str
+      optional: true
     materialize: make
 
   nonfood_expenditures:
