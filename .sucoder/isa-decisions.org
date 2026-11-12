@@ -1,5 +1,51 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Kg-factor evidence rows, GH1509 -- ANSWERED
+The user explicitly selected: "All purchase rows (Recommended)".
+food_kg_factors' price-ratio inference uses only source-labelled PURCHASE rows
+as evidence (a one-line eligibility filter); self-valued own-production and gift
+rows no longer enter the estimate.  Record an 'allocated-quantity' caveat for
+Cambodia, whose purchased quantity is total x spent/(spent+obtained).  Measure
+Uganda and GhanaLSS before landing (GhanaLSS hashes move through nutrition.py).
+Offered measurements: Cambodia -1.08% kg, Serbia -2.12% kg, no factor lost.
+Not selected: directly-observed-quantity purchases only (needs a per-country
+provenance flag) and keeping the current pooling.  Unblocks the archived #1442
+Burkina implementation (d81358091) and #1509's archived fix (cc962ee15), both of
+which need fresh review on current development.
+
+* 2026-11-12: Native-unit modes on Unknown and currency units, GH1068 + GH1129 -- ANSWERED
+The user explicitly selected: "Drop and count (Recommended)".
+In food_prices(units='unitvalue'), and food_quantities(units='units') for
+Unknown, rows with u='Unknown' (U_UNKNOWN) or a currency-denominated unit
+(_CURRENCY_DENOMINATED_UNITS, e.g. 'Value') are dropped and tallied in
+attrs['price_rows_dropped'] (existing 'currency' bucket; an Unknown bucket
+alongside), as kgvalue already does.  GhanaLSS GLSS1-3 unitvalue becomes empty,
+consistent with their correctly-empty / empty-pending-machinery verdicts.
+Correct CLAUDE.md's derived-tables "gives 1 = Kwacha per Kwacha" sentence in the
+same PR.  Not selected: keep rows as NaN; keep and document.
+
+* 2026-11-12: Nigeria shipped conversion tables, GH1502 + GH1518 -- ANSWERED
+The user explicitly selected: "Wire W2 and W3 (Recommended)".
+Serve the World Bank's own W2 (separate PP and PH tables) and W3 food conversion
+tables as per-row Quantity_kg (the survey_kg rung, the #1452 EHCVM precedent),
+by round, after a bounded measurement of W2's table and of the effect on
+food_prices; the harvest-side W3 table ag_conv_w3 (#1518) is included.  Offered
+evidence: W3 inference serves 164,823 kg against 330,793 kg at the table on
+106,152 rows (0.556x); W4's own cvn matches the W3 table at median ratio 1.000.
+One Nigeria re-warm; bundle with the #587 PP wiring if timing allows.
+
+* 2026-11-12: EHCVM-2 2021-22 wiring, Benin / Cote d'Ivoire / Togo / Guinea-Bissau -- GO
+The user explicitly selected: "Go: restore and wire (Recommended)".
+Restore refs/archive/2026-11-11/isa/wire-{togo,benin,civ}-2021-20261104 onto
+current development with fresh review, Togo/Benin/CIV first, then wire
+Guinea-Bissau 2021-22 fresh.  Order per country: sample, household_roster,
+cluster_features, then food (with #1598's own-country NSU weights), shocks
+(#1556's ruling), assets (#1566's s12q09 check).  Serves four new waves with
+their own weights; no existing wave's weights or panel IDs change; adding a wave
+moves that country's cross-wave kg inference pool (disclosed, as Malawi 2024-25).
+Each country gets its own red team and data gate.  Preserve Togo's Lome
+Commune/Grand Lome domain discrepancy and the 2021 same-cluster revisit design.
+
 * 2026-11-12: Intake resumed; merge on green (Sue, Claude Opus 5.5)
 The user wrote: "Resume intake; start with the drafts and put R2b/#587 to me.
 Merge to development on green."  The 2026-11-11 queue freeze is lifted.  Merge
