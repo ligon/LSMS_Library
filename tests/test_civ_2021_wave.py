@@ -346,19 +346,22 @@ class TestServed:
         served = set(s.index.get_level_values("i"))
         assert set(_ids(junk)) <= served
 
-    def test_consumption_effect_reads_the_food_stock_not_the_herd(self):
+    @pytest.mark.parametrize("column,letter", [("AffectedConsumption", "f"),
+                                               ("AffectedFoodStock", "e")])
+    def test_food_effects_read_purchases_and_stock_not_the_herd(self, column, letter):
+        """Ruling GH #1556 / #1561: purchases (s14bq04f) and stock (s14bq04e)."""
         fu = self._followups(labels=True)
         fu = fu[fu["menage"].notna()].copy()
         effect = {"Diminué": True, "Augmenté": True, "Inchangé": False, "Non-concerné": False}
-        food = fu["s14bq04e"].astype(str).map(effect)
+        source = fu[f"s14bq04{letter}"].astype(str).map(effect)
         herd = fu["s14bq04d"].astype(str).map(effect)
-        assert food.sum() != herd.sum()
+        assert source.sum() != herd.sum()
         s = _served("shocks")
         unique = ~pd.Series(list(zip(fu["grappe"], fu["menage"], fu["s14bq01"]))).duplicated(keep=False).to_numpy()
-        got = pd.Series(s["AffectedConsumption"].astype(bool).to_numpy(),
+        got = pd.Series(s[column].astype(bool).to_numpy(),
                         index=pd.MultiIndex.from_arrays([s.index.get_level_values("i"),
                                                          s.index.get_level_values("Shock")]))
-        want = pd.Series(food[unique].astype(bool).to_numpy(),
+        want = pd.Series(source[unique].astype(bool).to_numpy(),
                          index=pd.MultiIndex.from_arrays([_ids(fu[unique]),
                                                           fu.loc[unique, "s14bq01"].astype(str)]))
         assert got.reindex(want.index).astype(bool).equals(want)

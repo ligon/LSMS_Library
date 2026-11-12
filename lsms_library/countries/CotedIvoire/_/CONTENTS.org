@@ -1057,6 +1057,8 @@ does not ship them, where Togo's does; nor is section 21, which the BID says mat
 
 *Clusters are the same.*  1,081 of 2018-19's 1,084 grappes recur and none is new; region agrees on
 all and milieu on 99.9%.  =_/sampling.yml= has the record.  =strata= is region only (#812).
+[2026-11-12: 2018-19's =strata= is now region x milieu (GH #1575, ruled for 2018-19 only), so the
+two waves' =strata= no longer share a construction; see the 2026-11-12 section.]
 The file labels 23 of the 33 regions in lower case (=poro=, =gÔh=) on the same codes; upper-casing
 gives 2018-19's label on all 33, so =strata= and =Region= do not split a region across waves.
 
@@ -1115,7 +1117,7 @@ serves 13,778 of its 15,762 reported shocks, so a cross-wave incidence reads as 
 | one (household, shock) twice or more                                     |   42 | 20 keys; core's audited collapse keeps the most complete row |
 Served: 7,528.  168 households have the 22-row block two or more times.  Each read warns
 =GrainCollapseWarning=, on purpose: no document says which row is right.
-- =AffectedConsumption= reads =s14bq04e=, the food stock by this file's label and by its behaviour.  =s14bq04d= is the herd here.
+- =AffectedConsumption= reads =s14bq04e=, the food stock by this file's label and by its behaviour.  =s14bq04d= is the herd here.  [2026-11-12: now =s14bq04f=, the purchases; =AffectedFoodStock= reads =s14bq04e=.]
   *WAITING: the column is not the same variable across the waves.*  2018-19's label calls =s14q04d= the stock, and the data contradict it: it behaves as this
   wave's herd.  Measured, changed share of answers / =Non-concerné= share / changed among the concerned under animal disease and under drought:
   | column | 2018-19 | 2021-22 |
@@ -1125,6 +1127,10 @@ Served: 7,528.  168 households have the 22-row block two or more times.  Each re
   | =q04f= | 0.821 / 4.0% / 0.663, 0.876 | 0.698 / 11.1% / 0.522, 0.849 |
   So 2018-19's served column reads as the herd and this wave's as the stock, and served =AffectedConsumption= goes 0.187 to 0.641, a false jump.  Not changed here: the fix
   is with the maintainer, with the family (Togo's record repeats the label).
+  [2026-11-12: answered.  The ruling (GH #1556 / #1561) is =AffectedConsumption= = food purchases and =AffectedFoodStock= = food
+  stocks.  Development rewired 2018-19 to =s14q04f= / =s14q04e= (six columns in both vagues, above), and this restore rewires
+  2021-22 to =s14bq04f= / =s14bq04e=, so both waves now read the same two questions and the =q04d= / =q04e= mix-up above is
+  gone from the served columns.  See the 2026-11-12 section.]
 - =Non-concerné= is code 4 in all five columns read here.  2018-19 also stores it as Stata =.d=, read as NaN (6,463 rows of
   =s14q04d=); this file has none.  2018-19 is not changed here.
 - Column 25, =Autre stratégie=, has the Oui/Non label set where the other 25 hold ranks.  All 15 of its rows name no
@@ -1438,3 +1444,31 @@ failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SA
 =5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
 earlier job-local caches were reaped; source and survey values did not change.
 
+* 2026-11-12 -- 2021-22 restored onto development (GH #552)
+
+The 2026-11-04 wiring ("2021-22 wired", above) was held on
+=refs/archive/2026-11-11/isa/wire-civ-2021-20261104= and is merged here onto development
+(ruling @ligon 2026-11-12, "Go: restore and wire"), after Togo and Benin.  What changed because
+development moved underneath it:
+
+- *Shocks, on the ruling (GH #1556 / #1561).*  =AffectedConsumption= is food PURCHASES and
+  =AffectedFoodStock= food STOCKS.  This file labels =s14bq04d= the herd, =e= the food stock and
+  =f= the food purchases, all three filled on the same 7,588 follow-up rows.  So 2021-22 reads
+  =f= and =e=, as development's 2018-19 now reads =s14q04f= / =s14q04e=.  Affected (Augmenté or
+  Diminué) on those rows: =f= 5,294, =e= 4,867, =d= 1,228.  No 2018-19 value changes.  The coping
+  hook is unchanged: no row has a non-contiguous rank, and =Autre stratégie= (15 rows) never sits
+  beside another strategy.
+- *Strata are NOT aligned with 2018-19, and this is a question for the maintainer.*  GH #1575
+  wired 2018-19's =strata= as region x milieu (one source-recorded mixed-milieu grappe kept
+  literal) and scoped =CotedIvoire::sample::region-milieu-stratum= to =2018-19= alone.  2021-22
+  keeps the archived region-only =s00q01= (upper-cased by =mapping.strata=), so =strata= now
+  means region x milieu in 2018-19 and region in 2021-22.
+- *=harvest_totals= / =derive_hh_crop_harvest_total=.*  Benin's and this branch each added a copy to
+  =lsms_library/ehcvm.py=; git merged both silently.  Benin's copy is kept (same rule, line for
+  line, plus a =.astype(bool)= on the plot mask); this wave's =crop_production.py= imports its
+  =DISPOSITIONS= under the old name.
+- *Population record.*  The archive edited the generated =_/population.yml= by hand; its note is
+  now in =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=, the generator's source, so a re-run
+  reproduces it.
+- *Not wired, residuals:* the own-country =ehcvm_nsu_civ2021.dta= weights (GH #1598); crop codes
+  56 to 60 (unlabelled, see "2021-22 wired"); the survey-kg =Quantity_kg= of =crop_production=.

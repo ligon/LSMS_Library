@@ -34,8 +34,10 @@ sample:
                 - grappe
                 - menage
         myvars:
-            # GH #812: region only, as 2018-19.  mapping.strata spells 23 of the 33
-            # labels as 2018-19 does; the codes are the same.
+            # GH #812: region only.  2018-19's strata became region x milieu under
+            # GH #1575, ruled for 2018-19 only, so the two waves now differ:
+            # _/CONTENTS.org, 2026-11-12.  mapping.strata spells 23 of the 33 labels as
+            # 2018-19 does; the codes are the same.
             strata: s00q01
             Rural:
                 - s00q04
@@ -190,13 +192,20 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        # s14bq04e is the food stock, by label and by behaviour; s14bq04d is the herd.
-        # NOT 2018-19's s14q04d, which that file labels the stock and which behaves as the
-        # herd, so this column jumps 0.187 to 0.641 across the waves, falsely: _/CONTENTS.org,
-        # with the maintainer.  Non-concerné is code 4 in all five columns of this file,
+        # s14bq04d is the herd, s14bq04e the food stock and s14bq04f the food purchases,
+        # by this file's labels.  Ruling (GH #1556 / #1561): AffectedConsumption is food
+        # PURCHASES and AffectedFoodStock food STOCKS, which is also how 2018-19 now reads
+        # its s14q04f / s14q04e.  Non-concerné is code 4 in every column of this file,
         # where 2018-19 also stores it as Stata .d.
-        AffectedConsumption:
+        AffectedFoodStock:
             - s14bq04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14bq04f
             - mapping:
                 Diminué: True
                 Augmenté: True
