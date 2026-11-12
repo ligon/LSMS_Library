@@ -976,6 +976,60 @@ def inputs_dry_season_sale_window(wave):
                                      'as03eq12'])
 
 
+# Sold kilograms on a 3E record that states no sale (GH #1560 / #1571, ruling @ligon
+# 2026-11-12, "Sold-kg details" (a)).  Seven records give as03eq11c but no positive
+# as03eq11a or as03eq12; their own sold flag says Non on six, and six equal the line's
+# harvest kilograms.  The kilograms are masked; the row, a harvest, is served.
+DRY_SEASON_SOLD_KG_NO_SALE = 'Niger::crop_production::dry-season-sold-kg-no-sale'
+#: 3E's codes, the wave script's DRY_QTY_SENTINELS and VALUE_SENTINELS.
+_DRY_SOLD_KG_CODES = (99999,)
+_DRY_VALUE_CODES = (9999999,)
+
+
+def derive_dry_season_sold_kg_no_sale(kilograms_sold, quantity_sold, value_sold):
+    """3E.11c ``as03eq11c`` -> ``Quantity_sold_kg``, NA on a record that states no sale.
+
+    Registered as ``Niger::crop_production::dry-season-sold-kg-no-sale``.  A sale is a
+    positive sold quantity (3E.11a) or a positive value (3E.12), the test every Niger
+    wave uses (:func:`is_crop_sale`); all three inputs are cleared of their codes by the
+    caller.  Where there is none, the sold kilograms are NA, whatever the sold flag
+    (3E.10) says.  Elsewhere the identity.  Returns float64.
+    """
+    kg = pd.to_numeric(kilograms_sold, errors='coerce').astype('float64')
+    q = pd.to_numeric(quantity_sold, errors='coerce').astype('float64')
+    v = pd.to_numeric(value_sold, errors='coerce').astype('float64')
+    return kg.where(q.gt(0) | v.gt(0))
+
+
+def stamp_dry_season_sold_kg_no_sale(df, masked):
+    """The ``Derivation`` column of the finished 2011-12 frame with
+    :data:`DRY_SEASON_SOLD_KG_NO_SALE` joined (``MULTI_SEP``, sorted) onto the Farm-level
+    rows whose ``(i, production_obs)`` is in *masked*: the records whose sold kilograms
+    the rule removed.  The row keeps its other keys."""
+    out = df['Derivation'].astype('string').copy()
+    idx = df.index
+    hit = ((idx.get_level_values('plot_id') == FARM_LEVEL)
+           & pd.MultiIndex.from_arrays([idx.get_level_values('i'),
+                                        idx.get_level_values('production_obs')]).isin(
+               list(masked)))
+    out[hit] = pd.array([union_keys((key, DRY_SEASON_SOLD_KG_NO_SALE)) for key in out[hit]],
+                        dtype='string')
+    return out
+
+
+def inputs_dry_season_sold_kg_no_sale(wave):
+    """The registry ``inputs`` callable of dry-season-sold-kg-no-sale: the 3E records
+    whose sold kilograms are masked, as recorded, with their sold flag, sale and harvest
+    kilograms, keyed by the served ``(t, i, plot_id, production_obs)``."""
+    raw = _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06', 'as03eq09a',
+                                    'as03eq09b', 'as03eq09c', 'as03eq10', 'as03eq11a',
+                                    'as03eq11b', 'as03eq11c', 'as03eq12'])
+    kg = _na_exact(raw['as03eq11c'], _DRY_SOLD_KG_CODES)
+    kept = derive_dry_season_sold_kg_no_sale(kg, _na_exact(raw['as03eq11a'], _DRY_SOLD_KG_CODES),
+                                             _na_exact(raw['as03eq12'], _DRY_VALUE_CODES))
+    return raw[(kg.notna() & kept.isna()).to_numpy()]
+
+
 # ---------------------------------------------------------------------------
 # Quantity_kg as an estimate: 2021-22 s16cq16c (GH #1436)
 # ---------------------------------------------------------------------------

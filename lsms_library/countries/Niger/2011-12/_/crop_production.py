@@ -40,7 +40,8 @@ from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
                    _finish_crop_production, _na_exact,
                    _crop_reported_observations, FARM_LEVEL,
                    derive_dry_season_cycle_total, derive_dry_season_sale_window,
-                   stamp_dry_season_derivations)
+                   stamp_dry_season_derivations, derive_dry_season_sold_kg_no_sale,
+                   stamp_dry_season_sold_kg_no_sale, DRY_SEASON_SOLD_KG_NO_SALE)
 
 # "Don't know" codes of this module, unlabelled in the .dta (GH #865).  Exact
 # values only.  Raw counts, ecvmaas2e_p2.dta (12,091 rows): as02eq07a ==
@@ -113,7 +114,9 @@ df = pd.DataFrame({
 # kilogram (GH #1436).  as03eq11c, the sold kilograms, is Quantity_sold_kg (GH #1560): a
 # total in the window of as03eq11a, the first cycle, so NOT multiplied by as03eq06; its
 # 99999 (39 rows, 33 of them beside as03eq09c's own 99999) is masked, and the tail masks
-# its 0 beside a positive sold quantity (36 rows).
+# its 0 beside a positive sold quantity (36 rows).  Sold kilograms on a record with no
+# positive sold quantity or value (7 rows, 8,740 kg) are masked by a registered rule
+# (dry-season-sold-kg-no-sale, ruling 2026-11-12); those rows keep their harvest.
 # One row of 576 is byte-identical to another, with one (hid, line): the same
 # record, dropped as the s16d repeats are, or the line token would repeat.
 dry = get_dataframe(
@@ -129,6 +132,12 @@ dry_hh = dryn['hid'].apply(lambda x: niger_i(x) if pd.notna(x) else pd.NA)
 dry_sale = derive_dry_season_sale_window(_na_exact(dryn['as03eq11a'], DRY_QTY_SENTINELS),
                                          _na_exact(dryn['as03eq12'], VALUE_SENTINELS),
                                          _na_exact(dryn['as03eq11c'], DRY_QTY_SENTINELS))
+# Sold kilograms on a record that states no sale are masked, by a registered rule
+# (ruling @ligon 2026-11-12, "Sold-kg details" (a); dry-season-sold-kg-no-sale).
+_recorded_sold_kg = dry_sale['Quantity_sold_kg'].copy()
+dry_sale['Quantity_sold_kg'] = derive_dry_season_sold_kg_no_sale(
+    dry_sale['Quantity_sold_kg'], dry_sale['Quantity_sold'], dry_sale['Value_sold'])
+_sold_kg_masked = (_recorded_sold_kg.notna() & dry_sale['Quantity_sold_kg'].isna()).to_numpy()
 dry_df = pd.DataFrame({
     'i':             dry_hh.values,
     'plot_id':       FARM_LEVEL,
@@ -144,11 +153,16 @@ dry_df = pd.DataFrame({
     'Value_sold':    dry_sale['Value_sold'].values,
     'Unit_sold':     _unit_labels(dry['as03eq11b'], unit_map).values,
 })
+masked_sold_kg = set(zip(dry_df.loc[_sold_kg_masked, 'i'],
+                         dry_df.loc[_sold_kg_masked, 'production_obs']))
 df = pd.concat([df, dry_df], ignore_index=True)
 
 df = _finish_crop_production(df, '2011-12')
 # After the tail, so the stamp rides on served rows (CLAUDE.md "Derived Values").
 df['Derivation'] = stamp_dry_season_derivations(df)
+df['Derivation'] = stamp_dry_season_sold_kg_no_sale(df, masked_sold_kg)
+assert int(df['Derivation'].str.contains(DRY_SEASON_SOLD_KG_NO_SALE, regex=False)
+           .fillna(False).sum()) == len(masked_sold_kg), 'a masked sold-kg record is not served'
 
 assert df.index.is_unique, 'crop_production 2011-12 repeats a native harvest line'
 assert len(df) > 0, 'crop_production 2011-12 produced no rows'

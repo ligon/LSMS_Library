@@ -371,6 +371,43 @@ Niger::crop_production::dry-season-sale-window:
   contents: 'Niger/_/CONTENTS.org, "the dry season: read in 2011-12, not asked in 2014-15 (GH #1462)"'
   since: '2026-11-04'
 
+# GH #1560 / #1571, ruling @ligon 2026-11-12 ("Sold-kg details" (a)).  A MASK on a served
+# row: the row is a harvest and stays; the key rides on it.
+Niger::crop_production::dry-season-sold-kg-no-sale:
+  waves: ['2011-12']
+  columns: [Quantity_sold_kg]
+  rule: >-
+    On a 2011-12 section 3E (dry-season, Farm-level) record that states no sale -- no
+    positive as03eq11a and no positive as03eq12, after their codes (99999, 9999999) --
+    the sold kilograms as03eq11c are NA, whatever the sold flag as03eq10 says.  A sale is
+    the test every Niger wave uses (is_crop_sale).  The record's harvest, Quantity and
+    Quantity_kg, is served unchanged, and the row carries this key.  Every other 3E record
+    keeps its sold kilograms (dry-season-sale-window).  No other Niger wave has such a
+    record once its codes are masked.
+  function: lsms_library.countries.Niger._.niger:derive_dry_season_sold_kg_no_sale
+  inputs: lsms_library.countries.Niger._.niger:inputs_dry_season_sold_kg_no_sale
+  raw_variables: [hid, as03eq01, as03eq03, as03eq06, as03eq09a, as03eq09b, as03eq09c, as03eq10,
+                  as03eq11a, as03eq11b, as03eq11c, as03eq12]
+  assumptions:
+    - text: >-
+        a sold kilogram on a record with no sold quantity and no sale value is not a sale's
+        weight.  Seven records match (8,740 kg): six with both as03eq11a and as03eq12
+        missing and one with both 0, all without a sold unit.  Their own sold flag says Non
+        on six, and six of the seven kilogram answers equal the line's own harvest
+        kilograms as03eq09c, which reads as the harvest entered in the sale's column.  The
+        seventh's flag is Oui; it is masked under the same rule, because the rule is the
+        missing sale and not the flag.
+      basis: modelling-choice
+      evidence: >-
+        measured on the held ecvmaas3e_p1.dta (GH #1560 investigation,
+        source-case-details-v7.json, and this branch's census); ruling @ligon 2026-11-12,
+        .sucoder/isa-decisions.org "Sold-kg details" (a).
+  validated_against: >-
+    tests/test_niger_crop_sold_kg.py, whose oracle reads ecvmaas3e_p1.dta directly and
+    finds the same seven records.
+  contents: 'Niger/_/CONTENTS.org, "2026-11-12 -- crop_production: the sold kilograms are served (GH #1560, #1571)"'
+  since: '2026-11-12'
+
 Niger::crop_production::survey-kg-estimate:
   waves: ['2021-22']
   columns: [Quantity_kg]

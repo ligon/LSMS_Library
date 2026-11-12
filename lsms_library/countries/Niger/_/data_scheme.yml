@@ -244,7 +244,8 @@ Data Scheme:
     # 2014-15 AS02EQ12C;
     # 2021-22 s16dq05c, whose released label says a total where both vague forms say
     # kg per ONE unit.  2018-19 asks none.  Codes are NA (9999, 99999, 9999 by module),
-    # and so is a 0 beside a positive Quantity_sold.  It rides with the sale: on its
+    # and so is a 0 beside a positive Quantity_sold, and so are 3E's sold kilograms on a
+    # record with no sale (dry-season-sold-kg-no-sale, ruling 2026-11-12).  It rides with the sale: on its
     # line, or the crop's one line, or the Farm-level row.  NOT a factor (no
     # KgFactor_sold here), and nothing reads it by default: median_price_valuation(
     # kg_qty=...) is the caller's opt-in.  `optional` as Quantity_kg is.

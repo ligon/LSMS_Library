@@ -26,6 +26,7 @@ COUNTRY = "Niger"
 TABLE = "crop_production"
 SALE_KEY = "Niger::crop_production::hh-crop-sale-single-row"
 DRY_SALE = "Niger::crop_production::dry-season-sale-window"
+NO_SALE = "Niger::crop_production::dry-season-sold-kg-no-sale"
 RAINY_2011 = "NER_2011_ECVMA_v01_M_Stata8/ecvmaas2e_p2.dta"
 DRY_2011 = "NER_2011_ECVMA_v01_M_Stata8/ecvmaas3e_p1.dta"
 SALE_2014 = "NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta"
@@ -78,6 +79,27 @@ class TestRules:
         got = niger.derive_dry_season_sale_window(pd.Series([3.0]), pd.Series([900.0]))
         assert list(got.columns) == ["Quantity_sold", "Value_sold"]
 
+    def test_sold_kilograms_without_a_sale_are_masked(self, niger):
+        got = niger.derive_dry_season_sold_kg_no_sale(
+            pd.Series([150.0, 80.0, 40.0, 30.0, np.nan]),
+            pd.Series([np.nan, 0.0, 2.0, np.nan, 3.0]),
+            pd.Series([np.nan, 0.0, np.nan, 500.0, 900.0]))
+        assert got.dtype == "float64"
+        assert np.isnan(got.iloc[0]) and np.isnan(got.iloc[1])     # no quantity, no value
+        assert got.iloc[2] == 40.0 and got.iloc[3] == 30.0          # either one is a sale
+        assert np.isnan(got.iloc[4])
+
+    def test_the_mask_key_joins_the_row_keys(self, niger):
+        idx = pd.MultiIndex.from_tuples(
+            [("1", niger.FARM_LEVEL, "reported:3E:1"), ("1", niger.FARM_LEVEL, "reported:3E:2"),
+             ("1", "1_1", "reported:1")], names=["i", "plot_id", "production_obs"])
+        df = pd.DataFrame({"Derivation": pd.array(["Niger::crop_production::dry-season-cycle-total"] * 2
+                                                  + [pd.NA], dtype="string")}, index=idx)
+        got = niger.stamp_dry_season_sold_kg_no_sale(df, {("1", "reported:3E:2")}).tolist()
+        assert got[0] == "Niger::crop_production::dry-season-cycle-total"
+        assert got[1] == "+".join(sorted(("Niger::crop_production::dry-season-cycle-total", NO_SALE)))
+        assert pd.isna(got[2])
+
     def test_a_farm_level_sale_carries_its_kilograms(self, niger):
         harvest = pd.DataFrame({"i": ["1", "1"], "crop": ["Mil", "Mil"], "plot_id": ["1_1", "1_2"],
                                 "Quantity": [4.0, 5.0], "Quantity_sold": [np.nan, np.nan],
@@ -117,6 +139,11 @@ class TestDeclared:
         assert {"AS02EQ12C", "s16dq05c"} <= set(sale["raw_variables"])
         dry = records_for(COUNTRY, TABLE)[DRY_SALE]
         assert "Quantity_sold_kg" in dry["columns"] and "as03eq11c" in dry["raw_variables"]
+        mask = records_for(COUNTRY, TABLE)[NO_SALE]
+        assert list(mask["waves"]) == ["2011-12"] and list(mask["columns"]) == ["Quantity_sold_kg"]
+        assert {"as03eq10", "as03eq11a", "as03eq11c", "as03eq12"} <= set(mask["raw_variables"])
+        assert callable(resolve_callable(mask["function"]))
+        assert callable(resolve_callable(mask["inputs"]))
 
 
 def _read(wave, name, **kw):
@@ -167,17 +194,41 @@ class TestServed:
         raw = _read("2011-12", DRY_2011, convert_categoricals=False)
         raw = raw[~raw.duplicated()]
         kg, sold = _numeric(raw, "as03eq11c"), _numeric(raw, "as03eq11a")
+        value = _numeric(raw, "as03eq12")
         assert int((kg == 99999).sum()) == 39
         no_answer = (kg == 0) & (sold > 0) & (sold != 99999)
         assert int(no_answer.sum()) == 36
-        want = kg.where((kg != 99999) & ~no_answer)    # NOT x as03eq06
+        sale = ((sold > 0) & (sold != 99999)) | ((value > 0) & (value != 9999999))
+        no_sale = kg.notna() & (kg != 99999) & ~sale
+        # Ruling 2026-11-12 (a): seven records state sold kilograms and no sale.
+        assert int(no_sale.sum()) == 7 and float(kg[no_sale].sum()) == 8740.0
+        want = kg.where((kg != 99999) & ~no_answer & sale)    # NOT x as03eq06
         want = pd.Series(want.to_numpy(), index=pd.MultiIndex.from_arrays(
             [_id(raw["hid"]), "reported:3E:" + _id(raw["as03eq01"])], names=["i", "production_obs"]))
         got = _wave(built, "2011-12")
         got = got[got["plot_id"] == "Farm-level"].set_index(["i", "production_obs"])["Quantity_sold_kg"]
         np.testing.assert_array_equal(got.sort_index().to_numpy(),
                                       want.reindex(got.index).sort_index().to_numpy())
-        assert int(got.gt(0).sum()) == 363 and float(got.sum()) == 373508.0
+        assert int(got.gt(0).sum()) == 356 and float(got.sum()) == 364768.0
+
+    def test_the_no_sale_mask_is_keyed_on_exactly_its_seven_rows(self, built):
+        country, _ = built
+        got = _wave(built, "2011-12")
+        keyed = got["Derivation"].astype("string").str.contains(NO_SALE, regex=False).fillna(False)
+        assert int(keyed.sum()) == 7
+        rows = got[keyed]
+        assert (rows["plot_id"] == "Farm-level").all() and rows["Quantity_sold_kg"].isna().all()
+        assert not ((rows["Quantity_sold"].astype("float64").fillna(0) > 0)
+                    | (rows["Value_sold"].astype("float64").fillna(0) > 0)).any()
+        # The row is a harvest and keeps its dry-season key.
+        assert rows["Derivation"].str.contains(
+            "Niger::crop_production::dry-season-cycle-total", regex=False).all()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            raw = country.derivation_inputs(NO_SALE).reset_index()
+        on = ["i", "plot_id", "production_obs"]
+        assert sorted(map(tuple, raw[on].to_numpy())) == sorted(map(tuple, rows[on].to_numpy()))
+        assert float(pd.to_numeric(raw["as03eq11c"]).sum()) == 8740.0
 
     def test_2014_15_is_AS02EQ12C_with_9999_masked(self, built):
         raw = _read("2014-15", SALE_2014, convert_categoricals=False)
@@ -208,9 +259,10 @@ class TestServed:
         assert not ((kg == 0) & (q > 0)).any()
         assert "KgFactor_sold" not in df.columns
 
-    def test_every_sale_kilogram_rides_on_a_sale_row_in_the_crop_level_waves(self, built):
-        """2014-15 / 2021-22: no sold kilogram sits on a row with no positive sale."""
-        for wave in ("2014-15", "2021-22"):
+    def test_every_sale_kilogram_rides_on_a_sale_row(self, built):
+        """No sold kilogram sits on a row with no positive sale, in any wave (3E's seven
+        such records are masked by the 2026-11-12 rule)."""
+        for wave in ("2011-12", "2014-15", "2021-22"):
             got = _wave(built, wave)
             sale = (got["Quantity_sold"].astype("float64").fillna(0) > 0) | (
                 got["Value_sold"].astype("float64").fillna(0) > 0)

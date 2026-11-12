@@ -3690,7 +3690,7 @@ uses it only if a caller passes it as =kg_qty=.  The state question (#1698) is s
 | wave    | source      | window                       | code masked | 0 beside a sale, NA | served > 0 |      kg |
 |---------+-------------+------------------------------+-------------+---------------------+------------+---------|
 | 2011-12 | =as02eq12c= | the line's sale (2E12)       | 9999 x 10   |                   0 |      1,286 | 333,568 |
-| 2011-12 | =as03eq11c= | 3E's sale, per (first) cycle | 99999 x 39  |                  36 |        363 | 373,508 |
+| 2011-12 | =as03eq11c= | 3E's sale, the first cycle   | 99999 x 39  |                  36 |        356 | 364,768 |
 | 2014-15 | =AS02EQ12C= | the crop's sale (2E12)       | 9999 x 11   |                  26 |      1,051 | 467,963 |
 | 2018-19 | none        | --                           | --          |                  -- |          0 |       0 |
 | 2021-22 | =s16dq05c=  | the crop's sale (16D.05)     | none        |                   0 |      1,818 | 380,476 |
@@ -3727,11 +3727,14 @@ Counted on the held files after each wave's existing drops (3E's one byte-identi
   cycle and is disclosed as such (=data_scheme.yml=, the canonical =data_info.yml= note,
   =dry-season-sale-window=); any multiplication waits on GH #1529's cycle-semantics ruling.
 - *Seven 3E records state sold kilograms and no sale* (8,740 kg, on their native Farm-level rows):
-  the sold flag says Non on 6 and Oui on 1, and 6 equal the line's harvest kg.  They are served as
-  recorded, as this file serves 3E's "no sale" values (3,728,500 FCFA above), and the record is
-  not thereby a sale: =is_crop_sale= reads quantity and value only, so no key moves.  Whether to NA
-  sold kilograms on a record with no positive sale is an eligibility question the ruling did not
-  make.  No other wave has such a row once the codes are masked.
+  the sold flag says Non on 6 and Oui on 1, and 6 equal the line's harvest kg.  *RULED (@ligon,
+  2026-11-12, "Sold-kg details" (a)): masked under a registered rule*,
+  =Niger::crop_production::dry-season-sold-kg-no-sale=: on a 3E record with no positive sold
+  quantity and no positive value, =Quantity_sold_kg= is NA, whatever the flag, and the row (a
+  harvest) carries the key; =derivation_inputs= returns the seven records.  The Oui record is
+  masked too, because the rule is the missing sale.  So 3E serves 356 sold kilograms, 364,768 kg
+  (363 and 373,508 before the mask; the table above is after it).  No other wave has such a row
+  once the codes are masked.
 - *2021-22's sold kilograms are the harvest's conversion.*  On a sale in the harvest's own unit,
   sold kg per unit equals the line's harvest kg per unit on 939 of 1,134 (median ratio 1.000;
   2011-12 1,107 of 1,574; 2014-15 337 of 499), and =Tiya= is exactly 2.5 on 61% of sales, as it is

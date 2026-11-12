@@ -1229,9 +1229,10 @@ Columns:
 
         A "don't know" code is NA, and so is a 0 beside a positive
         `Quantity_sold`, as on the harvest side; count both in the country's
-        CONTENTS.org.  A positive value on a record with no positive sold
-        quantity or value is served as recorded (the record is not thereby a
-        sale).  It rides with the sale wherever the sale is placed, a
+        CONTENTS.org.  Sold kilograms on a record with no positive sold
+        quantity or value are not a sale's weight: Niger 2011-12 3E's seven
+        are NA under the registered rule `dry-season-sold-kg-no-sale` (ruling
+        @ligon 2026-11-12), and no other served wave has one.  It rides with the sale wherever the sale is placed, a
         `plot_id = 'Farm-level'` row included.  The state of what was sold is
         `Condition_sold`, not `condition`.
     Unit_sold:
