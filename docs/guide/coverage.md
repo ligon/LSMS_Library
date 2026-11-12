@@ -307,7 +307,7 @@ Worked example — GhanaLSS `food_prices`:
 | wave | verdict | why |
 |---|---|---|
 | 1987-88, 1988-89 | `correctly-empty` | Section 12A asks *"How much have they spent?"* and 12B *"How much would it cost to buy the amount they ate?"* — amounts only. Every `food_acquired` row is `u='Value'`; every `food_prices` mode is empty, `unitvalue` included since GH #1129 (it used to serve the identical 1.0 of `Value / Value`). |
-| 1991-92 | `empty-pending-machinery` | Purchases are value-only, but Section 8H records a quantity and a per-unit sale price for own produce, and `food_prices(units='kgprice')` already serves 15,028 rows (28,754 until GH #1509, 2026-11-12, made the kg factors read purchases only). Only the default `kgvalue` mode is empty, because the 8H farmgate valuation was deliberately not extended to GLSS3. |
+| 1991-92 | `empty-pending-machinery` | Purchases are value-only, but Section 8H records a quantity and a per-unit sale price for own produce, and `food_prices(units='kgprice')` already serves 26,854 rows (28,754 before GH #1509, 2026-11-12, made the kg factors read purchases only; most of the difference came back with that ruling's disclosed non-purchase fallback rung, `item_unit_nonpurchase`). Only the default `kgvalue` mode is empty, because the 8H farmgate valuation was deliberately not extended to GLSS3. |
 
 A feature that is empty in **every** wave grades `broken`, not `dropped`, and
 is not adjudicable here.

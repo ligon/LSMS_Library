@@ -119,3 +119,46 @@ census 41236015, data tests 41236531 / 41236522); report at
   keeps `Value` (Q == E on every GhanaLSS / Uganda `Value` row); Cambodia allocated quantity.
 - Movement, not correction: GhanaLSS kg -13.0% (237,029 produced rows to `none`), Uganda -1.37%;
   no external unit weight scored.
+
+---
+### Amendment (2026-11-12) — the disclosed non-purchase fallback rung
+
+Ruling (`docs/isa-sweep-20261103:.sucoder/isa-decisions.org`, "GH1509 GhanaLSS
+consequence"): "Fallback rung, disclosed".  Purchases only, EXCEPT a `(j, u)` cell
+with no purchase evidence in any wave may fall back to non-purchase (self-valued)
+evidence on a NEW, separately labelled rung of the kg-factor ladder.
+
+| quantity | decision | reason |
+|---|---|---|
+| rung | `item_unit_nonpurchase`, between `unit` and `none` in `FOOD_KG_FACTOR_LAYERS` | below every purchase rung (`unit` included), above `none`; the ruling is per `(j, u)` and the gates live on the item arm, so it is item-keyed only (no `unit_nonpurchase`: nothing pooled across items) |
+| estimator | reuse `_pooled_kg_rungs` / `_inferred_kg_rungs` (item arm only, `unit_arm=False`) on `_nonpurchase_evidence(df)` | same floors, tight exception and dispersion gate, same size pool and #1452 overlay; self-valued on BOTH sides of the ratio (a purchase baseline under a self-valued numerator is the mixing #1509 removed) |
+| eligibility | new `cell_priced` array in `_KG_RUNG_ARRAYS`, computed on the purchase frame | "the row's cell holds one priced purchase in any wave", on the item arm's join key, before `serve_waves` slicing, and through the size pool for an unsized label; independent of every floor, so a gated-out purchase cell never reaches the rung |
+| disclosure | `kg_factor_sources` (the partition), per-row `kg_item_unit_nonpurchase` / `kg_cell_has_purchase`, and `kg_factor_evidence['fallback']` (incl. `none_by_reason`) | separate label = visibly weaker evidence |
+| cost guard | no second estimate without `s`, without a priced non-purchase row, or when every cell has purchases | purchases-only countries pay nothing and cannot move |
+
+Not changed: `conversion_to_kgs`, `_kg_inference_frame`, `_get_kg_factors`,
+`_unit_sentinel_mask`, `_is_currency_denominated` (shared with the crop ladder).
+Pre-existing, not changed: the dispersion gate's counterfactual
+(`baseline_refused_spread`) is estimated only when the gated estimate leaves some
+item cell, so a frame whose only cell the gate refuses reports 0 refused rows.
+
+#### Amendment — Phase 3 verification
+
+Measured cold in private roots, three arms: base `e5fdd2fa8`, purchases-only head
+`6c14097e9`, rung `322530074` (jobs 41240317 / 41240318 / 41241044; comparison 41242351);
+report at `burst/isa-sm-20261112/reports/framework-1509-1068-final/REPORT.md`.
+
+- Eligibility (§ amendment) — OK: 0 rows on the rung whose cell has purchase evidence, in
+  every measured country; GhanaLSS `none_by_reason.cell_has_purchase` = 1.
+- Ladder position — OK: head -> cand source changes are `none -> item_unit_nonpurchase` only
+  (208,090 GhanaLSS rows), and no factor moves off the new rung.
+- Recovery — the item-keyed ceiling exactly: 208,090 = the 166,548 + 41,542 rows purchases
+  alone had moved from `item_unit` / `item_unit_tight` to `none`; every one at its `e5fdd2fa8`
+  factor.  28,939 rows (u-pooled on base) stay `none` (`no_estimate`).  kg 9.57M -> 9.91M
+  (23.4% of the purchases-only kg loss).
+- Purchases-only countries — Cambodia, Serbia, Uganda, Burkina Faso, Malawi, Niger frame-equal
+  to head (0 rows on the rung).
+- Gates — the rung's own dispersion refusals: 23,156 GhanaLSS rows; tight baselines 41,542.
+- Closure (§4) — OK: footprint identical to head's (GhanaLSS only: 22/555, 154/2,321, 1/38, 0/42).
+- Movement, not correction: the recovered factors are the pre-#1509 self-valued ones; no
+  external unit weight scored.

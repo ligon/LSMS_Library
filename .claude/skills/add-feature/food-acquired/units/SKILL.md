@@ -125,7 +125,7 @@ a NaN `u` and the spellings in `transformations._U_SENTINELS`
 | `u` is… | kg factor | in `units='kgs'`? |
 |---|---|---|
 | metric / stated size (`Kg`, `Sack (50 kgs)`) | `metric` | yes |
-| native or count unit, **or accepted residual code** | `item_unit` / `item_unit_tight` / `unit` / `none` | yes, where a rung serves it |
+| native or count unit, **or accepted residual code** | `item_unit` / `item_unit_tight` / `unit` / `item_unit_nonpurchase` / `none` | yes, where a rung serves it |
 | missing-unit sentinel (NaN, `_U_SENTINELS`) | `none` (or `survey_kg`) | only via `survey_kg` |
 | declared in `_/no_kg_factor.yml` (an `(item, unit)` cell) | `none` (or `survey_kg` / `metric`) | only via those |
 | `Value` | `none` | no |
@@ -164,6 +164,10 @@ The missing-unit sentinels and `Value` do NOT (GH #1068 / #1129, ruling
 `attrs['quantity_rows_dropped']`. And since GH #1509 the kg price-ratio
 inference reads only `s == 'purchased'` rows as evidence; a produced or
 in-kind row is still served the factor its `(j, u)` gets from purchases.
+The one exception is a separately labelled rung (amendment, @ligon
+2026-11-12): a `(j, u)` cell with NO priced purchase in any wave, and no
+purchase rung serving it, reads `item_unit_nonpurchase`, the item estimator
+run on the non-purchase rows alone. A cell with any purchase never reads it.
 Changing the residual policy (e.g. refusing them a pooled factor) is a
 scientific decision with its own before/after accounting, not a doc fix.
 
