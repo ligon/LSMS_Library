@@ -1,5 +1,9 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT — bounded four-stream wrap complete, 2026-11-11 06:15 UTC
+* CURRENT -- intake resumed, 2026-11-12 (Sue, Claude Opus 5.5, job 41201840 n0035)
+See [[file:tasks/isa-handoff-20261112.org]].  Rulings: [[file:isa-decisions.org]]
+(2026-11-12 entries).  Freeze lifted; merge-on-green authority; other holds stand.
+
+* PREVIOUS — bounded four-stream wrap complete, 2026-11-11 06:15 UTC
 See [[file:tasks/isa-wrap-up-20261110.org]] for exact source, validation and
 CI receipts. Queue remains FROZEN to the four approved streams; no new issue
 intake, master release, shared-cache rebuild or production-weight change.

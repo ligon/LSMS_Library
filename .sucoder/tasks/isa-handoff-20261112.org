@@ -1,0 +1,48 @@
+#+title: LSMS-ISA coordinator handoff, 2026-11-12
+#+author: Sue (Claude Opus 5.5), Slurm job 41201840 on n0035.savio4
+
+* State at start
+GitHub/mirror/clone development = e5fdd2fa831c4d03a247d264be7f339da459e6b0.
+Previous Claude job 40825266 ended 2026-11-12 16:21 (not 11-15); its /local
+clone and worktrees are gone.  What survives: refs/salvage/2026-11-11/*,
+refs/archive/2026-11-11/* and scratch burst/branch_tidy_2026-11-11_preserved/.
+
+* User instruction (verbatim)
+"Resume intake; start with the drafts and put R2b/#587 to me.  Merge to
+development on green."  Rulings recorded in isa-decisions.org (0c6004fbc).
+
+* Done this session
+- #1688 closed as superseded (landed as ed1df1ea2 through #1690).
+- #1689 closed as superseded (landed as 6b3b09ea6 through #1690).
+- #1457 closed: R1/R3 landed in b90ec6e40 (ancestor of 1e549e96a); R2a
+  declined 11-10; R2b declined 11-12 (keep on plot row).
+- #587 body narrowed with the 11-12 mapping ruling and #1688's merge state.
+- The R2b option text called Nigeria's handling "Farm-level"; that came from
+  the 11-05 memo's wording and was NOT re-checked in Nigeria's code.  The
+  ruling does not depend on it.
+
+* In flight
+| Stream | Worktree (n0035 /local) | Branch / head | Agent |
+|---|---|---|---|
+| #1604 re-verify after merging development | /local/job41201840/worktrees/pr1604 | fix/malawi-food-integration-20261107 @ 621833da3 (pushed to GitHub, draft) | verifier |
+| #587 PP item/unit mapping (no wiring) | /local/job41201840/worktrees/587-mapping | feature/587-nigeria-pp-mapping-20261112 @ 13956851f (archive 6809d9dae + development) | mapper |
+| coordinator records | /local/job41201840/worktrees/isa-docs | docs/isa-sweep-20261103 | Sue |
+
+Evidence: /global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261112/reports/{1604-reverify,587-mapping,reconcile-20261112}/
+
+* #1604 gate plan
+Verifier READY -> independent red team (diff, not verifier report; ID guard vs
+id_walk exactly-once on 2024-25) -> rewrite PR body (drop "under hold") while
+draft -> gh pr ready once -> pr-data-validation (1-2 h, strict up-to-date) ->
+merge with --match-head-commit -> narrow #1275.  Merge nothing else to
+development while that gate runs.  The head moves every build fingerprint:
+every run must use a private LSMS_DATA_DIR (shared-cache rebuild is on hold).
+
+* Next
+- Bring the #587 mapping and per-wave price-basis questions to the user.
+- Reconcile the ~45 open issues the 11-10 reviewer did not reach (read-only).
+  Also: file the #1457 round-2 side findings (Site Q sold columns, Niger
+  KgFactor_sold, Malawi 2010-11 Value_sold 9,999,999, Ethiopia W1 s9) if not
+  already filed, and check CONTENTS.org files that may still call R2b open.
+- Archived branches with unpublished work: fix/851-recall-period (+7, no PR),
+  fix/866-stale-country-parquet-not-laundered (+2 after #924).
