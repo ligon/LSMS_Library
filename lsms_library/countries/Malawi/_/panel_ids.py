@@ -132,7 +132,11 @@ def build_frame():
 
 
 def guard_from():
-    """``Panel IDs: guard_minted_from`` in data_scheme.yml, as the library reads it."""
+    """``Panel IDs: guard_minted_from`` in data_scheme.yml.
+
+    This script is its only reader: ``Country`` serves the JSON written here and
+    does not read the opt-in (PR #1604 review).
+    """
     with open(_HERE / 'data_scheme.yml', encoding='utf-8') as f:
         block = (yaml.safe_load(f) or {}).get('Panel IDs') or {}
     guard = block.get('guard_minted_from') if isinstance(block, dict) else None

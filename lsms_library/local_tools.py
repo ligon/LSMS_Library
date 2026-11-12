@@ -4268,9 +4268,12 @@ def panel_ids_guarding(frame: pd.DataFrame, *, guard_from: str
     Waves before ``guard_from`` go through ``update_id`` itself, so their maps
     are byte-identical to :func:`panel_ids`'s.  A country opts in with
     ``Panel IDs: guard_minted_from: <wave>`` in its ``data_scheme.yml``, read
-    by ``Country._compute_panel_ids`` and by the country's ``panel_ids.py``,
-    so the committed crosswalk and the ``LSMS_BUILD_BACKEND=make`` route agree
-    (GH #1275).
+    only by the country's ``panel_ids.py``, which writes the committed
+    crosswalk that both build backends serve (GH #1275).
+    ``Country._compute_panel_ids`` does not read it: its DataFrame fallback,
+    reached only when a country ships no committed JSON, builds with
+    :func:`panel_ids` (PR #1604 review -- a guarded branch there moved every
+    table's build fingerprint corpus-wide for a route production never takes).
     '''
     updated_wave: dict[str, dict[str, str]] = {}
     check_id_split: dict[str, int] = {}

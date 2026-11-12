@@ -41,8 +41,10 @@ def panel_ids(df):
 
     `y4_hhid` is blank on them.  `_/panel_ids.py` reads it through `format_id`,
     which makes a blank missing, but `previous_i` is a `myvars` column, and those
-    are not formatted, so under `LSMS_BUILD_BACKEND=make` (which reads this block
-    directly) it arrived as '' and minted 815 links to an id '' (review of GH
-    #1275: 8,449 entries against 7,634 committed).
+    are not formatted, so a route that reads this block directly saw it as ''
+    and minted 815 links to an id '' (review of GH #1275: 8,449 entries against
+    7,634 committed).  That route is the wave-level `Country['2024-25']
+    .panel_ids()`, or `Country._compute_panel_ids` if the committed JSON were
+    absent; with the JSON present both backends serve it (PR #1604 review).
     """
     return df[df['previous_i'].map(format_id).notna().to_numpy()]

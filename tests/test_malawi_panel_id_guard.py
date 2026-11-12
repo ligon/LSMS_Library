@@ -2,8 +2,14 @@
 
 The opt-in protects an earlier-issued split ID while leaving the unguarded
 path and every pre-guard wave identical (ledger malawi-food-followups §4).
+
+Only ``Malawi/_/panel_ids.py`` reads the opt-in, and it writes the committed
+crosswalk.  ``Country._compute_panel_ids`` does not read it (PR #1604 red team
+F3): both backends serve the committed JSON, and a guarded branch there moved
+every build fingerprint in the corpus for a route production never reaches.
+Its DataFrame fallback therefore ignores ``guard_minted_from``; that residual
+is pinned below and recorded in ``Malawi/_/CONTENTS.org``.
 """
-import json
 import random
 from types import SimpleNamespace
 
@@ -34,7 +40,6 @@ def _country(resources, payload):
 
     country = SimpleNamespace(resources=resources, data_scheme={'panel_ids': {}},
                               _aggregate_wave_data=aggregate)
-    country._panel_id_guard_from = lambda: Country._panel_id_guard_from(country)
     return country, calls
 
 
@@ -72,8 +77,13 @@ def test_future_guard_is_identical_to_legacy_panel_builder():
 
 
 @pytest.mark.parametrize('resources', [None, {}, {'Panel IDs': None},
-                                     {'Panel IDs': {}}, {'Panel IDs': {'other': 1}}])
-def test_country_without_opt_in_keeps_legacy_mapping(resources):
+                                     {'Panel IDs': {}}, {'Panel IDs': {'other': 1}},
+                                     {'Panel IDs': {'guard_minted_from': 'w3'}}])
+def test_country_dataframe_fallback_uses_the_legacy_builder(resources):
+    """With or without the opt-in: Country never reads ``guard_minted_from``.
+
+    Reachable only when a country ships no committed JSON (none does).
+    """
     frame = _frame()
     country, calls = _country(resources, {'panel_ids': frame})
     Country._compute_panel_ids(country)
@@ -82,16 +92,6 @@ def test_country_without_opt_in_keeps_legacy_mapping(resources):
     assert country._updated_ids_cache == expected_updated
     assert calls == ['panel_ids']
     assert country._panel_ids_attempted
-
-
-def test_country_opt_in_uses_the_same_guard_as_the_committed_map_builder():
-    frame = _frame()
-    country, _ = _country({'Panel IDs': {'guard_minted_from': 'w3'}},
-                          {'panel_ids': frame})
-    Country._compute_panel_ids(country)
-    expected_raw, expected_updated = panel_ids_guarding(frame, guard_from='w3')
-    assert country._panel_ids_cache == expected_raw
-    assert country._updated_ids_cache == expected_updated
 
 
 def test_committed_map_path_does_not_recompute_even_when_opted_in():
@@ -105,43 +105,3 @@ def test_committed_map_path_does_not_recompute_even_when_opted_in():
     assert country._panel_ids_cache is raw
     assert country._updated_ids_cache is updated
     assert calls == ['panel_ids', 'updated_ids']
-
-
-@pytest.mark.parametrize('error', [
-    json.JSONDecodeError('broken', '{', 0),
-    UnicodeDecodeError('utf-8', b'\xff', 0, 1, 'invalid byte'),
-    RuntimeError('unexpected source failure'),
-])
-def test_guard_keeps_current_failure_cleanup_and_successful_retry(error):
-    """The opt-in lives inside #1590's unchanged retry/raise boundary."""
-    frame = _frame()
-    country, _ = _country({'Panel IDs': {'guard_minted_from': 'w3'}},
-                          {'panel_ids': frame})
-    country.name = 'Malawi'
-    country._panel_ids_attempted = False
-    country._panel_ids_cache = None
-    country._updated_ids_cache = None
-    calls = []
-
-    def aggregate(waves, table):
-        calls.append(table)
-        if len(calls) == 1:
-            raise error
-        return frame
-
-    country._aggregate_wave_data = aggregate
-    country._compute_panel_ids = lambda: Country._compute_panel_ids(country)
-    with pytest.raises(type(error)) as caught:
-        Country.panel_ids.fget(country)
-    assert caught.value is error
-    assert country._panel_ids_attempted is False
-    assert country._panel_ids_cache is None
-    assert country._updated_ids_cache is None
-
-    updated = Country.updated_ids.fget(country)
-    expected_raw, expected_updated = panel_ids_guarding(frame, guard_from='w3')
-    assert updated == expected_updated
-    assert country._panel_ids_cache == expected_raw
-    assert country._panel_ids_attempted is True
-    assert calls == ['panel_ids', 'panel_ids']
-    assert updated['w3']['r'] == 'A_2'

@@ -145,7 +145,6 @@ def test_cold_design_b_panel_ids_never_shells_out(cold_private_root, monkeypatch
 
     assert isinstance(result, Mapping) and len(result) > 0, "Design B must still derive the crosswalk"
     assert isinstance(c.updated_ids, Mapping) and len(c.updated_ids) > 0
-    assert c.updated_ids['2024-25']['0200-001'] == '101012150028'
     offending = [r.getMessage() for r in caplog.records if "Makefile build failed" in r.getMessage()]
     assert not offending, offending
 
@@ -174,10 +173,8 @@ def test_cold_design_b_panel_ids_with_no_make_on_path(cold_private_root, monkeyp
         monkeypatch.setattr(subprocess, name, no_make)
     caplog.set_level(logging.WARNING, logger="lsms_library.country")
 
-    c = ll.Country(COUNTRY)
-    result = c.panel_ids
+    result = ll.Country(COUNTRY).panel_ids
     assert isinstance(result, Mapping) and len(result) > 0
-    assert c.updated_ids['2024-25']['0200-001'] == '101012150028'
     assert not [r for r in caplog.records if "Makefile build failed" in r.getMessage()]
     # ``run_make_target`` would catch the FileNotFoundError and downgrade it
     # to a *different* warning ("Makefile execution failed"), so the only

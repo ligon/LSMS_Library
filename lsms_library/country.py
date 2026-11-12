@@ -35,7 +35,7 @@ import yaml
 from importlib.resources import files
 import importlib
 from collections import defaultdict
-from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, panel_ids_guarding, id_walk, all_dfs_from_orgfile, to_parquet
+from .local_tools import df_data_grabber, format_id, get_categorical_mapping, get_dataframe, map_index, get_formatting_functions, panel_ids, id_walk, all_dfs_from_orgfile, to_parquet
 from .local_tools import (CATEGORICAL_KEY_ATTR, CATEGORICAL_MAPPING_DIR,
                           CATEGORICAL_MAPPING_FILE,
                           CATEGORICAL_RESERVED_COLUMNS,
@@ -7528,15 +7528,6 @@ class Country:
                 raise
         return finish_frame(df)
 
-    def _panel_id_guard_from(self) -> str | None:
-        """The opt-in wave from which minted ids avoid all earlier-issued ids."""
-        resources = self.resources if isinstance(self.resources, dict) else {}
-        block = resources.get('Panel IDs')
-        if not isinstance(block, dict):
-            return None
-        guard = block.get('guard_minted_from')
-        return str(guard) if guard else None
-
     def _compute_panel_ids(self) -> None:
         """
         Compute and cache both panel_ids and updated_ids.
@@ -7568,12 +7559,7 @@ class Country:
                 self._panel_ids_cache = panel_ids_dic
                 self._updated_ids_cache = updated_ids_dic
             elif isinstance(panel_ids_dic, pd.DataFrame) and not panel_ids_dic.empty:
-                guard_from = self._panel_id_guard_from()
-                if guard_from:
-                    panel_ids_dic, updated_ids_dic = panel_ids_guarding(
-                        panel_ids_dic, guard_from=guard_from)
-                else:
-                    panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
+                panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
                 self._panel_ids_cache = panel_ids_dic
                 self._updated_ids_cache = updated_ids_dic
             else:
