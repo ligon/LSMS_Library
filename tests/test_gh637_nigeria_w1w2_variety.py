@@ -131,6 +131,15 @@ def test_codes_modes_exact_frozen_payload_axes_masks_and_empty_dtype(
     fr = codes_frame(unit, size, text, index)
     old = call(original, wave, [fr], 'codes')
     new = call(nigeria.community_prices_for_wave, wave, [fr], 'codes')
+    if unit == 'KILOGRAMS (KG)':
+        # GH #587 (ruling 2026-11-12, "Measure PH, then align"): a Kg row whose
+        # free-text size is blank was dropped by the frozen builder and is now
+        # served at its reported price, per kilogram.
+        assert old.empty
+        assert new.index.get_level_values('u').tolist() == ['Kg', 'Kg']
+        assert sorted(new['Price']) == [300., 500.]
+        assert new.index.get_level_values('variety').tolist() == ['unknown_variety'] * 2
+        return
     _exact(new, with_constant_variety(old))
     _exact(new.droplevel('variety'), old)
 

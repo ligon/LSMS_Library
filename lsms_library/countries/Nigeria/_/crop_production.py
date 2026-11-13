@@ -2,9 +2,10 @@
 """Build item-level crop_production for Nigeria GHS-Panel (GAP 1).
 
 Natural grain (t, i, plot_id, crop, production_obs): one row per harvest line of
-the post-harvest crop module (secta3*).  Stores REPORTED item-level fields only
--- no kg conversion, no yield, no main_crop, no value shares (those are
-transformations).
+the post-harvest crop module (secta3*).  Stores REPORTED item-level fields --
+no yield, no main_crop, no value shares (those are transformations) -- plus one
+construction: W3's Quantity_kg from the World Bank's own ag_conv_w3 table
+(GH #1518, below).
 
 production_obs (GH #1433) names the line, because harmonize_food folds several codes
 onto one label (Yam--roots is 1120-1124) and the W1-W3 rosters can repeat a code on
@@ -91,8 +92,8 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, source_fingerprint, to_parquet
-from nigeria import (PH_QUARTER, crop_production_for_wave, _crop_labels,
-                     format_id, hh_crop_sale_records)
+from nigeria import (PH_QUARTER, W3_HARVEST_UNIT_OVERRIDE, crop_production_for_wave,
+                     _crop_labels, format_id, hh_crop_sale_records)
 
 crop_labels = _crop_labels()
 
@@ -178,18 +179,22 @@ pieces.append(crop_production_for_wave(t, [dict(
 
 # ----------------------------- W3 2015-16 -----------------------------
 # secta3i: annual plot-crop harvest.  Sold/value are hh-crop grain (secta3ii);
-# hh_sales places them per the GH #843 ruling.
+# hh_sales places them per the GH #843 ruling.  GH #1518: the shipped
+# ag_conv_w3.dta gives the line's Quantity_kg on its native (crop, sized unit,
+# zone) key (nigeria.crop_conversion_table; never a KgFactor).
 t = PH_QUARTER['2015-16']
 f = '../2015-16/Data/secta3i_harvestw3.dta'
 raw = get_dataframe(f, convert_categoricals=False)
 dec = get_dataframe(f, convert_categoricals=True)
+ag_conv = get_dataframe('../2015-16/Data/ag_conv_w3.dta', convert_categoricals=False)
 inter = _align_intercropped(
     raw, 'hhid', 'plotid', 'cropcode',
     '../2015-16/Data/sect11f_plantingw3.dta')
 pieces.append(crop_production_for_wave(t, [dict(
     df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode', line='cropid',
     qty='sa3iq6i', unit='sa3iq6ii', value_harvested='sa3iq6a',
-    harv_m='sa3iq6c1', harv_y='sa3iq6c2',
+    harv_m='sa3iq6c1', harv_y='sa3iq6c2', conversion=ag_conv, zone='zone',
+    unit_override=W3_HARVEST_UNIT_OVERRIDE,
     intercropped=inter, perennial=False)], crop_labels,
     hh_sales=hh_crop_sale_records('2015-16', crop_labels)))
 

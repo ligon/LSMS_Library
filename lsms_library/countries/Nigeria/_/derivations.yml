@@ -288,14 +288,17 @@ Nigeria::community_prices::c8-unrecorded-size-drop:
   columns: [Price]
   rows: 0
   rule: >-
-    Rows whose unit is metric (g / cl, and in W3 also Kg / l) but whose
+    Rows whose unit is g / cl but whose
     package SIZE is unrecorded are dropped from community_prices rather than
     served as a per-unit price: with no size, the recorded Naira figure is
     the price of a package of unknown quantity, and no division can recover
-    a per-unit price.  The set is all of W3's 13,767 g/cl rows whose
-    free-text c8q2b is blank (the 13,768th parses '50cl' and is derived,
-    not dropped) plus all 3,433 of W3's Kg/l rows (the same blank free
-    text), and W5's 182 rows -- 133 on '2. GRAMS (G)' and 49 on
+    a per-unit price.  The set is all of W3's g/cl rows whose free-text
+    c8q2b is blank: 11,170 of the files' 11,171 g/cl rows (8,557 at the 1st
+    location, 2,614 at the 2nd; the 11,171st parses '50cl' and is derived,
+    not dropped).  An earlier version of this entry said "13,767 of 13,768";
+    the held files, decoded by today's _canon_community_unit, hold 11,171
+    (measured 2026-11-13, burst job 41275442), which is also what the build
+    drops and these inputs return, and W5's 182 rows -- 133 on '2. GRAMS (G)' and 49 on
     '4. CENTLITRES (CL)' (served as 'l' until GH #587 corrected the decoder)
     -- whose coded size c8aq2_c is blank.  W4 drops NOTHING under this rule: its 1,191 rows on raw unit
     code 1 read '1. KILOGRAMS (KG)' in sectc8_harvestw4.dta (pre-#834 prose
@@ -304,7 +307,13 @@ Nigeria::community_prices::c8-unrecorded-size-drop:
     kilogram, and those rows are served.  W4/W5 rows carrying the
     questionnaire's own '99. ONE SIZE ONLY' code are EXEMPT -- that code is
     the survey's statement that the item is priced in one size only, so the
-    price IS of one unit.
+    price IS of one unit.  W3's 3,433 Kg / l rows with the same blank free
+    text (2,597 Kg, 836 l) were in this set until GH #587's "Measure PH,
+    then align" (ruling @ligon 2026-11-12): measured 2026-11-13 against the
+    same round's household unit value they price per kilogram / per litre
+    (median 1.000 / 1.14 on matched (v, j) cells), so they are served as
+    recorded, as PP W3's 4,120 are; a blank size beside a base metric unit
+    reads as one unit, as W4's does.
   function: lsms_library.countries.Nigeria.2018-19._.mapping:inputs_c8_unrecorded_size_drop
   inputs: lsms_library.countries.Nigeria.2018-19._.mapping:inputs_c8_unrecorded_size_drop
   raw_variables: [c8q2, c8q2b, c8q2c, c8q3, c8aq2_b, c8aq2_c, c8aq3,
@@ -323,8 +332,8 @@ Nigeria::community_prices::c8-unrecorded-size-drop:
         records the same drop from the serving side.
   validated_against: >-
     the build's own drop predicate: `derivation_inputs` returns exactly the
-    source rows the wave scripts remove -- 14,603 rows for 2015-16 (13,767
-    g/cl + 2,597 Kg + 836 l), 0 for 2018-19, 182 for 2023-24 (133 g + 49
+    source rows the wave scripts remove -- 11,170 rows for 2015-16 (g / cl
+    only since GH #587, 2026-11-13; 14,603 with the Kg / l rows before), 0 for 2018-19, 182 for 2023-24 (133 g + 49
     cl, GH #587) -- and every
     served row of community_prices under a metric unit either carries the
     c8-metric-size key or sits on a base unit whose blank size reads as one
@@ -1076,3 +1085,342 @@ Nigeria::food_acquired::w4-last-purchase-30d:
     Nigeria/_/CONTENTS.org, "Reference-period caveat -- W4 (2018Q3 / 2019Q1)
     only" (GH #881)
   since: '2026-11-03'
+
+# GH #1502 (ruling @ligon 2026-11-12, "Wire W2 and W3").  The World Bank's own
+# food conversion tables, served as the row's Quantity_kg (the survey_kg rung,
+# the #1452 EHCVM precedent), one key per table so the path taken is countable.
+Nigeria::food_acquired::w2-pp-food-conversion: &w2_food_conversion
+  waves: ['2012-13']
+  columns: [Quantity_kg]
+  rows: {t: '2012Q3'}
+  rule: >-
+    Quantity_kg = Quantity x kg_per_unit, where kg_per_unit is the round's own
+    shipped table at the row's native key: the item code and the acquisition
+    source's OWN unit code (q3b purchased, q6b produced, q7b in kind).  W2's
+    tables give `conv` per unit with a class flag g_cl: g_cl = 1 grams
+    (kg_per_unit = conv / 1000); g_cl = 0 centilitres, read as litres
+    (kg_per_unit = conv / 100, at 1 l = 1 kg) ONLY for the reviewed liquid
+    items of nigeria.W2_CL_CLASS_LIQUID_ITEMS (the oils: 2012Q3 codes 50, 52,
+    53; 2013Q1 50, 52) -- every other g_cl = 0 cell is a solid read as grams
+    under Nigeria::food_acquired::w2-cl-class-read-as-grams.  Conversely the
+    g_cl = 1 cells of LIQUID items listed in
+    nigeria.W2_GRAMS_FLAG_LIQUID_CELLS (tinned milk, fresh milk, bottled water,
+    palm wine, pito, honey, butter/margarine; explicit (item, unit) cells per
+    round) are read as conv / 100 litres under this key.  Post-planting (2012Q3) reads
+    food_conv_w2pp.csv, keyed on the item and the planting unit code s7bq2b;
+    post-harvest (2013Q1) reads food_conv_w2ph.csv, keyed on nsu_cd.  The
+    tables cover only the non-metric codes 5-16 (mudu, olodo, congo, paint
+    rubber, three derica sizes, milk cup, cigarette cup, tiya, kobiowu,
+    piece); the metric codes 1-4 keep their label rung.  Every other row
+    keeps Quantity_kg NA.  Stamped after the build's duplicate-key collapse;
+    a served key whose contributors the table does not all cover keeps
+    Quantity_kg NA (0 such keys).
+  function: lsms_library.countries.Nigeria._.nigeria:derive_food_conversion_kg
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_food_acquired_w2_pp_conversion
+  raw_variables: [hhid, item_cd, zone, s7bq3a, s7bq3b, s7bq4, s7bq6a, s7bq6b,
+                  s7bq7a, s7bq7b, s10bq3a, s10bq3b, s10bq4, s10bq6a, s10bq6b,
+                  s10bq7a, s10bq7b, conv, g_cl, nsu_cd, s7bq2b]
+  assumptions:
+    - text: >-
+        the table's `conv` is grams (g_cl = 1) or centilitres (g_cl = 0) per
+        ONE unit of the row's unit code for that item, the World Bank's own
+        standard-unit conversion for the round.
+      basis: variable-label
+      evidence: >-
+        World Bank catalog 1952, food_conv_w2ph variable g_cl (V3262):
+        0 = centiliters, 1 = grams, matching the 69 / 384 held cases.
+    - text: >-
+        the post-planting table's g_cl and conv mean what the post-harvest
+        table's do.  Its own documentation does not survive: the catalog
+        describes 385 cases keyed nsu_cd, the held file has 417 keyed s7bq2b.
+      basis: derived-from-data
+      evidence: >-
+        on all 336 (item, unit) keys the two held W2 tables share with the same
+        item meaning in both rounds (GH #1144 quarter labels), conv and g_cl are
+        identical (51 cl / cl, 285 g / g); measured 2026-11-13, burst job
+        41271653, reports/nigeria/out/m1/m1.json (tables_describe).
+    - text: >-
+        a centilitre row of a LIQUID item is served in LITRES as kilograms
+        (1 l = 1 kg), the Kg/L convention of W3's table and W4's per-row
+        *_cvn.  It cannot be declined with volume_as_mass=False, which acts on
+        unit labels, not on survey_kg.  Differs from the W1 card-weight
+        decision (GH #1035), which leaves litre containers to the inference.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-13, "Serve tabled litres both sides"; the oils'
+        cl reading fits: 2012Q3 Palm oil cell median 1.49x the inference and
+        1.99x W3's table (0.149 / 0.199 under grams), Groundnut oil 1.49 / 1.99;
+        a mudu of palm oil is 1.272 l and a milk cup 0.159 l in both tables.
+    - text: >-
+        on the listed g_cl = 1 cells of liquid items the flag is wrong and
+        conv is the container's own volume in centilitres: conv / 100 litres,
+        at 1 l = 1 kg.  Only cells where the container volume shows it; the
+        beverage powders (tea, Milo, coffee) are not liquids and stay grams.
+      basis: derived-from-data
+      evidence: >-
+        ruling @ligon 2026-11-13, "Read as centilitres" (red team delta D1).
+        Against the container volumes the oil rows imply (mudu 1.272 l, milk
+        cup 0.159 l, paint rubber 3.657 l, medium / large derica 0.358 / 0.716
+        l), each listed cell's conv is 0.79-0.96 of its container in
+        centilitres (tinned milk / milk cup 15: 0.94; pito / paint rubber 345:
+        0.94; honey / paint rubber 350: 0.96; a mudu of 100: 0.79), so the
+        grams reading serves 0.08-0.10 kg per litre of container.  On the
+        served rows (64 in 2012Q3, 42 in 2013Q1) the centilitre reading gives
+        114.7 / 16.8 kg against the inference's 99.0 / 14.6 and the grams
+        reading's 11.5 / 1.7 (burst job 41279390, reports/nigeria/out/m13/).
+        The same screen also picks Pepper (76, 2012Q3) and Dry Pepper (77,
+        2013Q1); they are solids at 0.157 kg/l, and are not listed.
+  validated_against: >-
+    two independent references, measured on the base build's raw rows
+    (f138a3d61, 2026-11-13) for the W2 tables as now read -- this key and
+    w2-cl-class-read-as-grams together (burst job 41276128,
+    reports/nigeria/out/m10/m10.json).  The household's own price-implied kg
+    per unit (its Naira per unit over the item's same-round Kg-row median
+    Naira per kg, purchased rows): table / implied median 1.01 (2012Q3) and
+    0.93 (2013Q1), within 2x on 82.4% and 78.1% of 10,102 / 11,675 rows
+    (1.03 / 0.96 and 82.6% / 79.1% under the flag's own cl reading), against
+    0.93 / 0.875 and 85.9% / 82.2% for the inference it replaces.  W4's *_cvn
+    on the same served (item, unit) label (93 / 126 cells, the rest have no
+    same-label W4 cell): median ratio 0.92 / 0.94, within 2x on 72% / 74% of
+    cells (0.94 / 0.99, 69% / 65% under the cl reading; both measured before
+    the D1 liquid cells, 106 served rows, were read as centilitres).  The three derica
+    sizes fit worst on both references (table about half: 0.34-0.62
+    price-implied, 0.41-0.54 against W4; measured before the re-read).
+  contents: >-
+    Nigeria/_/CONTENTS.org, "food_acquired: the World Bank's own W2 / W3 food
+    conversion tables" (GH #1502)
+  since: '2026-11-13'
+
+Nigeria::food_acquired::w2-ph-food-conversion:
+  <<: *w2_food_conversion
+  rows: {t: '2013Q1'}
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_food_acquired_w2_ph_conversion
+
+# GH #1502 red team F1 (ruling @ligon 2026-11-13, "Re-read solids as grams").
+Nigeria::food_acquired::w2-cl-class-read-as-grams:
+  waves: ['2012-13']
+  columns: [Quantity_kg]
+  rows: {t: ['2012Q3', '2013Q1']}
+  rule: >-
+    Quantity_kg = Quantity x conv / 1000 on W2 rows whose table cell is flagged
+    g_cl = 0 ("centilitres") but whose item is NOT a liquid: the flag is read
+    as GRAMS there.  The liquid items are an explicit, reviewed item-code list
+    per round, nigeria.W2_CL_CLASS_LIQUID_ITEMS (2012Q3: 50 Palm oil, 52
+    Groundnut oil, 53 Other oils and fats; 2013Q1: 50, 52), which keep conv /
+    100 under the round's own key; every other item carrying a g_cl = 0 cell
+    -- groundnuts, other nuts, tomatoes, tomato puree, onions, eggs, beef,
+    mutton, fish (dried), snails, baby milk powder, chocolate drinks, coffee,
+    tea, mangoes, cassava, yam -- is read here.  Same native key, collapse and
+    stamping as the round keys.
+  function: lsms_library.countries.Nigeria._.nigeria:derive_food_conversion_kg
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_food_acquired_w2_cl_as_grams
+  raw_variables: [hhid, item_cd, zone, s7bq3a, s7bq3b, s7bq6a, s7bq6b, s7bq7a,
+                  s7bq7b, s10bq3a, s10bq3b, s10bq6a, s10bq6b, s10bq7a, s10bq7b,
+                  conv, g_cl]
+  assumptions:
+    - text: >-
+        on a non-liquid item the table's `conv` is GRAMS per unit whatever its
+        g_cl flag says.  The flag contradicts the table: one class gives a mudu
+        of palm oil 1.272 and a mudu of tomatoes 10 (litres under the flag's
+        reading), a milk cup of oil 0.159 and of groundnuts 1.0.  Read as
+        grams, the solids sit near the inference, W3's table and W4's *_cvn;
+        read as centilitres, about 10x above them.  The household
+        price-implied reference does NOT agree (validated_against below).
+        Which field the World Bank got wrong is not established.
+      basis: derived-from-data
+      evidence: >-
+        GH #1502 red team (reports/nigeria-redteam/VERDICT.md, F1): cell
+        medians against the inference 12.2x / 11.8x under cl, 1.22 / 1.18 under
+        grams; 8.4x against W3's table.  Per item, burst job 41275442
+        (reports/nigeria/out/m8/w2_gcl0_items.csv) and Nigeria/_/CONTENTS.org.
+    - text: >-
+        the liquid list is decided item by item on what the item is, with the
+        evidence displayed, never by name pattern: the oils' cl reading fits
+        all three references and the grams reading sits ~0.05-0.2x.  Every
+        other item is read as grams, as the ruling says for non-liquids,
+        INCLUDING the items where a reference prefers the cl reading, which are
+        named for review: 121 Chocolate drinks (inference both rounds,
+        price-implied 2012Q3), 120 Coffee (inference, 1 row) and 122 Tea (both
+        references, both rounds); 71 Tomato puree, 84 Local eggs and, in
+        2013Q1, 44 Groundnuts (shelled) on the price-implied reference only;
+        43 Groundnuts (2012Q3, 431 rows, the class's largest item) fits neither
+        reading on the price-implied reference (0.31 grams, 3.08 cl).
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-13 ("non-liquid items are read as grams; liquids
+        stay conv/100 litres"); reports/nigeria/out/m8/w2_gcl0_items.csv, the
+        per-item table in CONTENTS.org.
+  validated_against: >-
+    measured on the base build's raw tabled rows (f138a3d61) under this
+    reading, 2026-11-13, burst job 41276128 (reports/nigeria/out/m10/m10.json).
+    The 884 / 637 served rows (2012Q3 / 2013Q1): the base inference over the
+    re-read table, median 0.67 (within 2x on 93% / 92% of rows; 15x under
+    cl); W4's *_cvn on the same served label (6 / 12 cells), table over W4
+    0.76 / 0.83 (within 2x on 67% / 92% of cells; about 8x under cl).  The
+    household price-implied kg per unit (purchased rows, 573 / 338) disagrees:
+    table over implied 0.31 / 0.175 under grams (within 2x on 30% / 17%),
+    3.08 / 1.75 under cl (34% / 53%) -- a weak reference where an item's
+    Kg-labelled purchases are not the same product (groundnuts carry most of
+    these rows).  The kilograms: 64,666 / 12,593 kg on these rows under cl,
+    6,467 / 1,259 under grams.
+  contents: >-
+    Nigeria/_/CONTENTS.org, "food_acquired: the World Bank's own W2 / W3 food
+    conversion tables" (GH #1502)
+  since: '2026-11-13'
+
+Nigeria::food_acquired::w3-food-conversion:
+  waves: ['2015-16']
+  columns: [Quantity_kg]
+  rows: {t: ['2015Q3', '2016Q1']}
+  rule: >-
+    Quantity_kg = Quantity x kg_per_unit, where kg_per_unit is food_conv_w3.dta
+    (one table for both W3 rounds; kilograms, or litres, per ONE unit) at the
+    row's native key -- the item code, the acquisition source's OWN unit code
+    (q3b / q6b / q7b) and, on code 900 'other specify', that source's own
+    Other text (q3b_os / q6b_os / q7b_os), matched literally; a blank Other
+    is no key -- in the household's OWN-ZONE column (conv_NC_1 ... conv_SW_6
+    by `zone`).  No national fill for a row with no zone, no fill from another
+    item, unit or wave.  The metric codes 1-4 (Kg, g, l, cl) keep their label
+    rung; the table's two rows with no factor give none.  Every other row
+    keeps Quantity_kg NA.  Stamped after the build's duplicate-key collapse;
+    a served key whose contributors the table does not all cover keeps
+    Quantity_kg NA (0 such keys).
+  function: lsms_library.countries.Nigeria._.nigeria:derive_food_conversion_kg
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_food_acquired_conversion
+  raw_variables: [hhid, item_cd, zone, s7bq3a, s7bq3b, s7bq3b_os, s7bq4, s7bq6a,
+                  s7bq6b, s7bq6b_os, s7bq7a, s7bq7b, s7bq7b_os, s10bq3a,
+                  s10bq3b, s10bq3b_os, s10bq4, s10bq6a, s10bq6b, s10bq6b_os,
+                  s10bq7a, s10bq7b, s10bq7b_os, unit_other, conv_NC_1,
+                  conv_NE_2, conv_NW_3, conv_SE_4, conv_SS_5, conv_SW_6, note]
+  assumptions:
+    - text: >-
+        the table's factor is the kilograms (litres on a volume unit) of ONE
+        unit of the row's unit code for that item and zone, the World Bank's
+        own standard-unit conversion for W3.
+      basis: variable-label
+      evidence: >-
+        2015-16/Documentation/ddi-documentation-english_microdata-2734.pdf
+        (food_conv_w3: 1,029 cases, food conversion to standard units); its
+        metric controls are Kg 1, g 0.001, l 1, cl 0.01.
+    - text: >-
+        the household's own zone column, not conv_national.  W4's per-row
+        *_cvn is the World Bank applying this table: on the W4 rows where the
+        two columns differ it equals the own-zone value on 16,595 of 16,595
+        (2018Q3) and 13,476 of 13,489 (2019Q1) rows, the national value on
+        83 and 45.  The choice moves little: on the tabled W3 rows, 171,499
+        against 171,633 kg (2015Q3) and 160,477 against 160,576 (2016Q1).
+        The zone columns are stored float32 (conv_national float64) and read
+        as float64 unrounded: at most 5.7e-8 relative from their printed
+        six-decimal value (burst job 41276356).
+      basis: derived-from-data
+      evidence: >-
+        measured 2026-11-13 on the raw W4 sect7b / sect10b CSVs joined to
+        food_conv_w3.dta through the W3 sized label (burst job 41271653,
+        reports/nigeria/out/m1/m1.json, vs_w4_cvn).  The #1452 EHCVM
+        precedent chose national medians on its own evidence.
+    - text: >-
+        the table's own notes record a conversion assumption on 167 of its
+        1,029 rows ("Used milk cup ratio, garri" 103, "Used milk cup ratio,
+        wheat flour, for bowl" 30, "Used salt conversions" 20, "Used 3, 5, 7
+        medium pieces for heaps" 9, "Used leaves (item_cd==78) for bunch" 5).
+        They are served as the World Bank recorded them and named in the
+        inputs (`note`).
+      basis: modelling-choice
+      evidence: >-
+        food_conv_w3.dta `note`; 2,380 (2015Q3) and 2,153 (2016Q1) tabled
+        rows reach a noted cell (measured 2026-11-13).
+    - text: >-
+        a volume unit's litres are served as kilograms (1 l = 1 kg), as W4's
+        *_cvn are; the table carries no mass / volume flag to separate them.
+      basis: modelling-choice
+      evidence: >-
+        W4 s7bq2_cvn / s10bq2_cvn ("Kg/L conversion factor").
+  validated_against: >-
+    W4's *_cvn on the same served (item, unit) label, against the table's
+    national column: median cell ratio 1.000,
+    within 2x on 99.1% of 554 (2015Q3) and 99.0% of 496 (2016Q1) cells.  The
+    household's own price-implied kg per unit: table / implied median 0.81 /
+    0.885, within 2x on 64.1% / 67.4% of 31,103 / 23,590 purchased rows,
+    against 0.46 / 0.50 and 43.8% / 47.7% for the inference it replaces
+    (whose median is 0.59 / 0.56 of the national column).  Measured 2026-11-13 on the
+    base build (f138a3d61).
+  contents: >-
+    Nigeria/_/CONTENTS.org, "food_acquired: the World Bank's own W2 / W3 food
+    conversion tables" (GH #1502)
+  since: '2026-11-13'
+
+# GH #1518 (ruling @ligon 2026-11-12, decided with #1502): the harvest-side W3
+# table, as the line's Quantity_kg (the harvest ladder's survey_kg rung).
+Nigeria::crop_production::w3-ag-conversion:
+  waves: ['2015-16']
+  columns: [Quantity_kg]
+  rows: {t: '2016Q1'}
+  rule: >-
+    Quantity_kg = Quantity x kg_per_unit on 2016Q1 (W3 post-harvest) harvest
+    lines, where kg_per_unit is ag_conv_w3.dta at the line's NATIVE key: the
+    crop code (cropcode), the harvest unit code as recorded (sa3iq6ii, which
+    carries the size: 130 SACK/BAG SMALL, 131 MEDIUM, 132 LARGE, ...) and the
+    household's own zone column (conv_NC_1 ... conv_SW_6), never the
+    size-collapsed served u.  Not read: the metric units (KILOGRAM, GRAMS,
+    LITRE), which keep their label rung, and the 9 table rows whose unit_name
+    contradicts the harvest file's own card for that code (codes 160-162 of
+    crops 2190, 2191 and 2194).  The jerry cans that state litres (codes
+    190-192, 10 / 20 / 25 l; oil palm, palm oil) ARE read, at 1 l = 1 kg.
+    Every other line keeps Quantity_kg NA.  KgFactor is not written: W3 asks
+    no factor beside the quantity.
+  function: lsms_library.countries.Nigeria._.nigeria:derive_crop_conversion_kg
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_crop_production_conversion
+  raw_variables: [hhid, plotid, cropcode, cropid, zone, sa3iq6i, sa3iq6ii,
+                  crop_cd, unit_cd, unit_name, conv_NC_1, conv_NE_2, conv_NW_3,
+                  conv_SE_4, conv_SS_5, conv_SW_6, note]
+  assumptions:
+    - text: >-
+        the table's factor is the kilograms of ONE unit of the harvest card's
+        code for that crop and zone, the World Bank's own conversion for W3,
+        matched to the harvest row by the card's code; where the table's
+        unit_name differs from the harvest file's own label for the code, the
+        row is held (the identity is unresolved).
+      basis: variable-label
+      evidence: >-
+        ag_conv_w3.dta (crop_cd, unit_cd, unit_name, conv_national, six zone
+        columns; 711 rows) against the secta3i_harvestw3.dta value labels of
+        sa3iq6ii; the opt-in GH #1518 helper lsms_library.nigeria_harvest
+        holds the same 9 identity rows (and its 7 fluid rows, which this key
+        serves: the jerry cans at density 1, the LITRE rows by their label).
+    - text: >-
+        the litres of a jerry can are served as kilograms (1 l = 1 kg), as the
+        food side serves the tables' litre containers; harvest_kg's
+        volume_as_mass=False cannot decline them (it acts on unit labels, and
+        survey_kg outranks them).
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-13, "Serve tabled litres both sides".  71 native
+        positive-quantity rows (oil palm, palm oil): 17 / 21 / 33 on the 10 /
+        20 / 25 l cans.  Not held before the ruling but served WRONG:
+        _canon_unit tests 'litre' before 'jerry', so "JERRY CAN/RUBBER 25
+        LITRES" was served u = 'l' and harvest_kg's metric rung read one can as
+        one litre (645 kg); this key serves 14,310 kg, and since red team delta
+        D2 the rows are served u = 'Jerry Can' (W3_HARVEST_UNIT_OVERRIDE).
+        volume_as_mass=False leaves all 71 on survey_kg at 14,310 kg (burst
+        jobs 41276093 / 41276349, reports/nigeria/out/m9, m11).
+    - text: >-
+        the household's own zone column, not conv_national, as on the food
+        side: W4's reported crop factor sa3iq6_conv, matched to the W3 card
+        through its unit and size labels, equals the own-zone value on 319 and
+        the national value on 40 of the 366 W4 rows where the two columns
+        differ.
+      basis: derived-from-data
+      evidence: >-
+        measured 2026-11-13 on secta3i_harvestw4.dta / ag_conv_w3.dta (burst
+        job 41271791, reports/nigeria/out/m1/m1.json, crop_vs_w4).
+  validated_against: >-
+    W4's reported per-row factor on the same crop and sized unit: median ratio
+    1.000, 83% of 1,908 rows exactly equal to the own-zone value (68% to the
+    national one).  Nothing independent checks the 2016Q1 kilograms
+    themselves.  The zone columns are stored float32 in ag_conv_w3.dta (and
+    food_conv_w3.dta; conv_national is float64) and are read as float64
+    without rounding, so an own-zone factor differs from its printed
+    six-decimal value by at most 5.7e-8 relative (burst job 41276356).
+  contents: >-
+    Nigeria/_/CONTENTS.org, "W3 shipped harvest factors" (GH #1518)
+  since: '2026-11-13'

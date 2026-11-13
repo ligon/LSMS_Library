@@ -161,7 +161,10 @@ def _aws_creds_available() -> bool:
 # 2012Q3 serves W2's 72 Semovita rows (code 15); 2023Q3 serves W5's 63
 # Bottle/Can rows with a coded metric size whose c2q2a is not 1.
 EXPECTED = {'2011Q1': {1: 30628}, '2013Q1': {1: 31239},
-            '2016Q1': {1: 17344, 2: 5809},
+            # GH #587 (ruling 2026-11-12, "Measure PH, then align"): PH W3's
+            # blank-size Kg / l are served since 2026-11-13 -- 17,344 / 5,809
+            # before, +2,969 / +464 (2,597 Kg + 836 l), measured cold.
+            '2016Q1': {1: 20313, 2: 6273},
             '2019Q1': {1: 31757}, '2024Q1': {1: 30015},
             '2010Q3': {1: 20326}, '2012Q3': {1: 21196},
             '2015Q3': {1: 18365, 2: 6630},
@@ -194,9 +197,11 @@ class TestBuilt:
     def test_location_pairs_are_both_served(self, cp):
         w3 = cp.xs('2016Q1', level='t')['Price'].unstack('obs')
         both = w3.dropna()
-        # the 2,591 cells both locations priced -- 983 at a different price
-        assert len(both) == 2591
-        assert int((both[1] != both[2]).sum()) == 983
+        # the 2,591 cells both locations priced -- 983 at a different price --
+        # plus, since GH #587's PH Kg / l alignment (2026-11-13), 204 Kg and 57 l
+        # cells: 2,852, 1,134 at a different price (measured cold).
+        assert len(both) == 2852
+        assert int((both[1] != both[2]).sum()) == 1134
 
     def test_derivation_inputs_join_the_served_grain(self):
         path = countries_root() / 'Nigeria' / '2015-16' / '_' / 'mapping.py'

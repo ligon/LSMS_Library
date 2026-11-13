@@ -50,6 +50,18 @@
   serves W4's under that label.  (GhanaLSS 2016-17 folds "Wheat semolina,
   suji" into Wheat Flour instead.)
 
+  Pepper (GH #1537; ruling 2026-11-12 "Check codes, then Fresh").  The
+  W1 PP / W1 PH / W2 PP household food cards and the W1 / W2 PP community
+  cards name code 76 only "Pepper" (GH #1144 serves that native name
+  unqualified).  Measured 2026-11-13 on a cold build of f138a3d61: every
+  served j = Pepper row is code 76 -- food_acquired 2010Q3 3,496, 2011Q1
+  3,496, 2012Q3 3,454 (10,446), community_prices 2010Q3 396, 2012Q3 412
+  (808) -- and no other code decodes to Pepper in any food quarter or
+  community route (crop code 2140, whose quarter cells also say Pepper,
+  never occurs in a food file).  Code 76 Preferred Label is Fresh
+  Pepper, so a label-only row gives Pepper the Fresh Pepper Aggregate;
+  the served j stays Pepper and no fresh/dry attribute is added to it.
+
 #+NAME: harmonize_food
 | Code | Preferred Label                         | Aggregate Label              | 2010Q3                                        | 2011Q1                                        | 2012Q3                                        | 2013Q1                                        | 2015Q3                                        | 2016Q1                                        | 2018Q3                                        | 2019Q1                                        |
 |------+-----------------------------------------+------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|
@@ -314,6 +326,7 @@
 |  | Groundnuts | Groundnuts |  |  |  |  |  |  |  |  |
 |  | Maize (shelled) | Maize |  |  |  |  |  |  |  |  |
 |  | Semovita | Other grains and flour |  |  |  |  |  |  |  |  |
+|  | Pepper | Fresh Pepper |  |  |  |  |  |  |  |  |
 
 * Units
 
@@ -1003,6 +1016,7 @@ Level collapse (mirrors Uganda's grade collapse):
 | 24. SENIOR SECONDARY 1 (SS 1)                                      | Upper secondary              |
 | 25. SENIOR SECONDARY 2 (SS 2)                                      | Upper secondary              |
 | lower 6                                                            | Upper secondary              |
+| LOWER 6                                                            | Upper secondary              |
 | 27. LOWER 6                                                        | Upper secondary              |
 | 27. LOWER 6 (HSE 1)                                                | Upper secondary              |
 | ss3                                                                | Upper secondary complete     |
@@ -1010,6 +1024,7 @@ Level collapse (mirrors Uganda's grade collapse):
 | 26. SS3                                                            | Upper secondary complete     |
 | 26. SENIOR SECONDARY 3 (SS 3)                                      | Upper secondary complete     |
 | upper 6                                                            | Upper secondary complete     |
+| UPPER 6                                                            | Upper secondary complete     |
 | 28. UPPER 6                                                        | Upper secondary complete     |
 | 28. UPHER 6                                                        | Upper secondary complete     |
 | 28. UPPER 6 (HSE 2)                                                | Upper secondary complete     |
@@ -1025,6 +1040,8 @@ Level collapse (mirrors Uganda's grade collapse):
 | 35. NURSING SCHOOL                                                 | Tertiary certificate/diploma |
 | 35. NURSING SCHOOL (NON-UNIVERSITY)                                | Tertiary certificate/diploma |
 | 31. TEACHER TRAINING                                               | Tertiary certificate/diploma |
+| teacher training                                                   | Tertiary certificate/diploma |
+| TEACHER TRAINING                                                   | Tertiary certificate/diploma |
 | 31. TEACHER CERTIFICATE GRADE II (TCGDII)                          | Tertiary certificate/diploma |
 | poly/prof                                                          | Tertiary certificate/diploma |
 | POLY/PROF                                                          | Tertiary certificate/diploma |
@@ -1046,15 +1063,18 @@ Level collapse (mirrors Uganda's grade collapse):
 | 424. UNIVERSITY  - 600 LEVEL                                       | Bachelor                     |
 | 424. UNIVERSITY - 600 LEVEL                                        | Bachelor                     |
 | higher degree                                                      | Postgraduate                 |
+| HIGHER DEGREE                                                      | Postgraduate                 |
 | 43. HIGHER DEGREE                                                  | Postgraduate                 |
 | 43. HIGHER DEGREE / POST-GRADUATE DEGREE                           | Postgraduate                 |
 | quaranic                                                           | Informal                     |
 | QUARANIC                                                           | Informal                     |
 | 51. QUARANIC                                                       | Informal                     |
 | integrated quaranic                                                | Informal                     |
+| quaranic integrated                                                | Informal                     |
 | INTEGRATED QUARANIC                                                | Informal                     |
 | 52. INTEGRATED QUARANIC                                            | Informal                     |
 | 52. INTEGRATED ISLAMIC EDUCATION (ISLAMIYYA, TSANGAYA, OR QUR'ANIC) | Informal                    |
 | 61. ADULT EDUCATION                                                | Informal                     |
+| adult education                                                    | Informal                     |
 | 62. BASIC LITERACY PROGRAM                                         | Informal                     |
 | 64. POST LITERACY II                                               | Informal                     |
