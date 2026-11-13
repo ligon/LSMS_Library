@@ -86,9 +86,11 @@ def _finish_plot_inputs(df, t):
     """Common tail: coerce numeric columns, guarantee the full schema column
     set, build the (t, i, input, crop, u) index.  Drops rows with no input
     identity.  The `crop` index level is filled with the CROP_NA sentinel
-    wherever no crop applies; the native unit `u` with the 'Manquant' label —
-    so neither index level is null and no row is lost to the framework's
-    NaN-key duplicate collapse."""
+    wherever no crop applies; the native unit `u` with the corpus missing-unit
+    sentinel 'Unknown' (GH #1118; it was the minted 'Manquant', and no applied
+    2018-19 line lacks a unit, so the fill serves 0 rows today) — so neither
+    index level is null and no row is lost to the framework's NaN-key
+    duplicate collapse."""
     for col in ['Quantity', 'Quantity_purchased']:
         if col not in df.columns:
             df[col] = pd.NA
@@ -101,7 +103,7 @@ def _finish_plot_inputs(df, t):
     if 'crop' not in df.columns:
         df['crop'] = pd.NA
     df['crop'] = df['crop'].astype('string').fillna(CROP_NA)
-    df['u'] = df['u'].astype('string').fillna('Manquant')
+    df['u'] = df['u'].astype('string').fillna('Unknown')
     df = df[df['input'].notna()]
     keep = ['t', 'i', 'input', 'crop', 'u',
             'Quantity', 'Purchased', 'Quantity_purchased']

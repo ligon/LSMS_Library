@@ -238,8 +238,8 @@ def test_public_first20_existing_maps_native_key_and_no_parcel_allocation(adapte
         'Urea', 'Phosphate', 'NPK', 'DAP et autres engrais inorganiques', 'Pesticide',
         'Herbicide', 'Fungicide', 'Other phytosanitary'] + ['Seed'] * 10
     assert out.index.get_level_values('crop').tolist() == ['(not crop-specific)'] * 10 + [
-        'Mil', 'Sorgho', 'Maïs en grain', 'Riz Paddy', 'Autre céréale', 'Coton',
-        'Sésame', 'Niébé/Haricots secs', 'Arachide', 'Autre tubercule']
+        'Mil', 'Sorgho', 'Maïs', 'Riz Paddy', 'Autre céréale', 'Coton',
+        'Sésame', 'Niébé', 'Arachide', 'Autre tubercule']
     assert out.index.is_unique and len(out) == 20
     assert out['Input_native'].tolist() == MENU[:20]
     assert not {'plot_id', 'v', 'Quantity_kg', 'KgFactor', 'Applied'} & set(out)
@@ -278,8 +278,8 @@ def test_full36_public_projection_preserves_each_slot_and_all_role_payloads(adap
         'DAP et autres engrais inorganiques', 'Pesticide', 'Herbicide',
         'Fungicide', 'Other phytosanitary'] + ['Seed'] * 26
     assert got.index.get_level_values('crop').tolist() == ['(not crop-specific)'] * 10 + [
-        'Mil', 'Sorgho', 'Maïs en grain', 'Riz Paddy', 'Autre céréale', 'Coton',
-        'Sésame', 'Niébé/Haricots secs', 'Arachide', 'Autre tubercule',
+        'Mil', 'Sorgho', 'Maïs', 'Riz Paddy', 'Autre céréale', 'Coton',
+        'Sésame', 'Niébé', 'Arachide', 'Autre tubercule',
         "Plants d'hévéa, de teck", "Semences d'ognon", 'Semences de Carotte',
         "Semences d'aubergine", 'Semences de Combo', 'Semences de Piment',
         'Semences de Pastéque', 'Semences de poivron', 'Semences de courge/courgette',

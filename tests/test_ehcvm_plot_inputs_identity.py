@@ -175,6 +175,9 @@ _INPUTS = {1: 'Organic manure', 2: 'Organic compost', 3: 'Urea', 4: 'Phosphate',
            10: 'Other phytosanitary'}
 _NAMED = {11: 'Mil', 12: 'Sorgho', 13: 'Maïs en grain', 14: 'Riz Paddy',
           16: 'Coton', 17: 'Sésame', 18: 'Niébé/Haricots secs'}
+# GH #1119 (2026-11-13): Senegal's maize and cowpea seed rows take the labels
+# its crop_production serves (the Burkina Faso #1203 pattern).
+_SENEGAL_CROP_LABELS = {13: 'Maïs', 18: 'Niébé'}
 _HHID = {
     'Niger': lambda g, m: 'E_' + local_tools.format_id(g) + '0' + local_tools.format_id(m, zeropadding=2),
     'Senegal': lambda g, m: local_tools.format_id(g) + '0' + local_tools.format_id(m, zeropadding=2),
@@ -186,6 +189,8 @@ def _expected_input_crop(country, wave, code):
     code = int(code)
     if code in _INPUTS:
         return _INPUTS[code], '(not crop-specific)'
+    if country == 'Senegal' and code in _SENEGAL_CROP_LABELS:
+        return 'Seed', _SENEGAL_CROP_LABELS[code]
     if code in _NAMED:
         return 'Seed', _NAMED[code]
     if country == 'Senegal' and code == 21:

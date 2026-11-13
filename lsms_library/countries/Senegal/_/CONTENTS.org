@@ -769,7 +769,8 @@ First entry for this table.  =plot_inputs= is a script-path table
 - =s16bq03b= has six unit labels: =Gramme=, =Kilogramme=, =Tonne=, =Litre=,
   =Charrette= and an unsized =Sac=.  No applied line lacks a unit, so the
   script's ='Manquant'= =u= fill (not migrated to Niger's =Unknown=) never
-  fires today.
+  fires today.  [2026-11-13: migrated; the fill is =Unknown= (GH #1118), still
+  0 rows.  See the 2026-11-13 section at the end of this file.]
 - =i= is =grappe + '0' + menage= (two-digit menage), no =E_= prefix, matching
   =sample()=; 2,760 households, injective.
 - The native key (=grappe=, =menage=, =s16bq01=) is unique and non-null over
@@ -777,7 +778,9 @@ First entry for this table.  =plot_inputs= is a script-path table
   component.
 - =Purchased= / =Quantity_purchased= read =s16bq05= / =s16bq07a=, which the
   file labels as the GIFT flag and gift quantity (the Burkina finding of
-  #1188 applies by inspection).  Not changed here.
+  #1188 applies by inspection).  Not changed here.  [2026-11-13: still not
+  changed.  The ruling "Fix all three now" names Guinea-Bissau, Togo and Benin,
+  not Senegal; measured on the file, see the 2026-11-13 section.]
 
 *The collapse, and the fix.*  The three catch-all seed slots -- 15 ="Semences
 d'autres céréales"= (27 lines), 19 =Plants/boutures= (98), 20 =Autres
@@ -1307,3 +1310,51 @@ equal.  =food_expenditures= and =food_prices= lose the 2 valued rows, =food_quan
 nothing else moves, so no kilogram factor of another row depended on them.  Cost, with GH #1519
 above: one Senegal re-warm, 22 of 22 Senegal table hashes and 44 of 44 wave hashes, no other
 country's.
+
+* 2026-11-13 -- =plot_inputs=: =Unknown=, the harvest's crop names, and a refusing =plot_features= concatenator (GH #1118, #1119, #1287)
+
+Three changes in one Senegal re-warm, as the 2026-11-12 reconcile queue bundles them (Q3).
+
+*GH #1118, the minted unit.*  =2018-19/_/plot_inputs.py= filled a blank used unit with ='Manquant'=;
+it now writes =Unknown=, the corpus missing-unit sentinel.  Measured on the held source and the
+served table (burst job 41275616): 0 of 9,916 applied 2018-19 lines and 0 of 9,368 applied 2021-22
+lines lack =s16bq03b=, and no =s16bq03b= value label is a missing-marker, so the fill serves 0 rows in
+both waves and no served row moves.  The 2021-22 adapter (=_/s16b_2021.py=) already wrote =Unknown=.
+
+*GH #1119, maize and cowpea (the Burkina Faso #1203 pattern).*  =harmonize_seed_crop= sent =Semences de
+maïs= to =Maïs en grain= and =Semences de haricots/niébé= to =Niébé/Haricots secs=: the FOOD labels of
+=harmonize_food=, which =crop_production= never serves.  Its =s16cq04= answers are =Maïs= (882 lines, 881
+served) and =Niébé= (715, 713), passed through unmapped, and each is one label (no split).  The two cells
+now read =Maïs= and =Niébé=; every other cell and every key is unchanged, and the map stays injective over
+the slots in use.  Measured on the cold base frames (burst jobs 41275616, 41275746):
+| wave    | seed rows relabelled | maize: seed rows with a harvest row of the same (t, i, crop), before -> after | cowpea, the same |
+|---------+----------------------+------------------------------------------------------------------------------+------------------|
+| 2018-19 | 735 maize, 460 cowpea | 0 -> 723 of 735 | 0 -> 448 of 460 |
+| 2021-22 | 555 maize, 386 cowpea | (no =crop_production= this wave) | |
+The 2021-22 rows move because =_/s16b_2021.py= reads the same table.  This is a household/crop existence
+join: the input roster has no parcel axis, so a seed quantity must not be allocated to a harvest plot.
+=seed_kg= is a household total and does not read =crop=.  =harmonize_food= keeps =Maïs en grain= and
+=Niébé/Haricots secs= as food labels.
+
+*GH #1287, the =plot_features= concatenator.*  =_/plot_features.py= looped over a hardcoded
+=['2018-19', '2021-22']= with =try: get_dataframe(...) except Exception: continue=, so a declared wave
+whose script failed or never ran was dropped and the other served alone (=assert pieces= fired only when
+both were missing).  It now takes the Burkina Faso form of the #1241 refusal: every wave whose own
+metadata declares =plot_features= (=Wave.data_scheme=: a wave script or a YAML entry) must have its
+parquet under =data_root()=, or the script raises =FileNotFoundError= naming the wave before it writes;
+an undeclared wave is skipped before any read.  Both of Senegal's waves declare the table.  Whether the
+default =Country('Senegal').plot_features()= route reached the skip, and the broken-wave repro, are in
+the stream report (=burst/isa-sm-20261113/reports/manquant/=).  Synthetic tests:
+=tests/test_senegal_plot_concatenator_refusal.py=.
+
+*Not changed: the gift/purchase binding of 2018-19.*  =Purchased= / =Quantity_purchased= still read
+=s16bq05= / =s16bq07a=, the gift question ("16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de
+don?"; the purchase is =s16bq08= "16B.08. Avez-vous acheté [INTRANT]?").  The 2026-11-13 ruling covers
+Guinea-Bissau, Togo and Benin only.  Measured on the file: =s16bq05= Oui on 536 applied lines, =s16bq08=
+Oui on 4,956; gift x purchase Non/Non 4,504, Non/Oui 4,876, Oui/Non 456, Oui/Oui 80.  2021-22 reads the
+purchase (GH #1483), so the two columns mean different things across this country's waves.  A question
+for the maintainer.
+
+*Cost.*  =_/categorical_mapping.org= and =_/plot_features.py= are build inputs of every Senegal table: one
+Senegal re-warm (census in the stream report).
+

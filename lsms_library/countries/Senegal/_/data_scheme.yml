@@ -210,8 +210,9 @@ Data Scheme:
     # pesticide; unresolved seed crops) carry the sentinel
     # '(not crop-specific)' rather than NaN — a NaN index level would be
     # silently dropped by the framework's canonical NaN-key de-dup collapse.
-    # A missing unit is filled with the 'Manquant' u label for the same
-    # non-null reason.
+    # A missing unit is filled with the corpus missing-unit sentinel 'Unknown'
+    # for the same non-null reason (GH #1118; it was the minted 'Manquant').
+    # Seed crops speak crop_production's labels ('Maïs', 'Niébé'; GH #1119).
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool
