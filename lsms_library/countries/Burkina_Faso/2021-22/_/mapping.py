@@ -424,13 +424,14 @@ def _raw_crop_frames():
         lab['i'] = _crop_household_ids(num).to_numpy()
         lab['crop_code'] = pd.to_numeric(num[field], errors='coerce').astype('Int64').to_numpy()
         lab['crop'] = pd.array([table[int(c)] for c in lab['crop_code']], dtype='string')
+    c_lab['plot_id'] = _crop_plot_ids(c_num).astype(str).to_numpy()
     return c_lab, d_lab
 
 
 def inputs_hh_crop_sale(wave):
     """Registry `inputs`: the s16d sale as recorded, with the field and parcel of the one
     s16c line of the same crop CODE it went on, one row per keyed served row, at
-    (t, i, crop)."""
+    (t, i, plot_id, crop), the served line's grain."""
     if wave != _CROP_WAVE:
         raise ValueError(f'{KEY_HH_CROP_SALE} covers {_CROP_WAVE} only, not {wave!r}')
     from lsms_library.ehcvm import is_crop_sale
@@ -440,19 +441,19 @@ def inputs_hh_crop_sale(wave):
     single = lines[lines == 1].index
     harvest = harvest[harvest.set_index(['i', 'crop_code']).index.isin(single)]
     out = sold[['t', 'i', 'crop', 'crop_code', 's16dq01', 's16dq04', 's16dq05a', 's16dq05b',
-                's16dq06']].merge(harvest[['i', 'crop_code', 's16cq02', 's16cq03']],
+                's16dq06']].merge(harvest[['i', 'crop_code', 'plot_id', 's16cq02', 's16cq03']],
                                   on=['i', 'crop_code'], how='inner', validate='one_to_one')
-    return out.set_index(['t', 'i', 'crop'])
+    return out.set_index(['t', 'i', 'plot_id', 'crop'])
 
 
 def inputs_harvest_to_date(wave):
     """Registry `inputs`: the unfinished s16c rows with a recorded quantity, at
-    (t, i, crop)."""
+    (t, i, plot_id, crop), the served line's grain."""
     if wave != _CROP_WAVE:
         raise ValueError(f'{KEY_HARVEST_TO_DATE} covers {_CROP_WAVE} only, not {wave!r}')
     harvest, _ = _raw_crop_frames()
     keep = (harvest['s16cq11'].astype('string').str.strip().eq('Non').fillna(False)
             & pd.to_numeric(harvest['s16cq16a'], errors='coerce').notna())
-    return harvest.loc[keep.to_numpy(), ['t', 'i', 'crop', 's16cq02', 's16cq03', 's16cq11',
-                                         's16cq12', 's16cq16a', 's16cq16b']].set_index(
-                                             ['t', 'i', 'crop'])
+    return harvest.loc[keep.to_numpy(), ['t', 'i', 'plot_id', 'crop', 's16cq02', 's16cq03',
+                                         's16cq11', 's16cq12', 's16cq16a', 's16cq16b']].set_index(
+                                             ['t', 'i', 'plot_id', 'crop'])

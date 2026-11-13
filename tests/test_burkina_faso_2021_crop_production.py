@@ -201,6 +201,40 @@ def test_no_household_is_off_sample(served):
     assert set(served.index.get_level_values("i")) <= set(s.index.get_level_values("i"))
 
 
+def _keyed(served, key):
+    flat = served.reset_index()
+    return flat[flat["Derivation"].astype("string").str.contains(key, regex=False).fillna(False)]
+
+
+@requires_s3
+@pytest.mark.parametrize("key", [KEY_SALE, KEY_TO_DATE])
+def test_inputs_join_one_to_one_to_the_keyed_served_rows(served, raw, key):
+    """`derivation_inputs` returns the raw answers of each keyed row, at the served line
+    grain (t, i, plot_id, crop) after the id walk: one input row per keyed served row, and
+    no other (COMMON-RULES)."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        got = ll.Country(COUNTRY).derivation_inputs(key, wave=WAVE)
+    levels = ["t", "i", "plot_id", "crop"]
+    assert list(got.index.names) == levels
+    assert got.index.is_unique
+    keyed = _keyed(served, key)
+    want = set(zip(*(keyed[n].astype(str) for n in levels)))
+    have = set(zip(*(got.index.get_level_values(n).astype(str) for n in levels)))
+    assert len(got) == len(keyed)
+    assert have == want
+    c, d = raw
+    if key == KEY_SALE:
+        lines = c.groupby(["hh", "s16cq04"]).size()
+        sales = _sales(d)
+        n = lines.reindex(pd.MultiIndex.from_arrays([sales["hh"], sales["s16dq01"]])).fillna(0)
+        assert len(got) == int((n == 1).sum())
+        # The inputs carry the sale as recorded: the same money as the keyed rows.
+        assert got["s16dq06"].astype("float64").sum() == pytest.approx(keyed["Value_sold"].sum())
+    else:
+        assert len(got) == int(pd.to_numeric(c["s16cq16a"], errors="coerce").notna().sum())
+
+
 @requires_s3
 def test_2018_19_is_untouched_by_the_new_wave():
     with warnings.catch_warnings():
