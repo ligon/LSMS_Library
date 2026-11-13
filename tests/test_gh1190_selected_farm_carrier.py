@@ -256,12 +256,32 @@ def test_old_helper_and_r1_r3_source_inverse_exact():
     # addition after this fixture's baseline.  Named exactly, so any other
     # change to malawi.py still fails the inverse.
     added|={'CS_24','ihps24_refreshed','_ihps24_refreshed','drop_ihps24_refreshed'}
+    # GH #1228 later waves (ruling 2026-11-12): the Module D join helpers, added ...
+    added|={'_D20_SLOTS','_D20_TEXTS','D20_COLUMNS','D20_SINGLE','_D20_REASONS',
+            'module_d_other_crop_text','read_module_d_columns','household_crop_labels',
+            'D20_TEXT_COL','D20_REASON_COL','attach_module_d_text','_D20_TEXT_48',
+            # its registration (ruling 2026-11-13, "Register all waves")
+            'CROP_TEXT_KEYS','CROP_TEXT_WAVES','derive_cowpea_from_crop_text',
+            'union_derivation_key','_assert_label_is_text_only',
+            'inputs_cowpea_from_crop_text',
+            # GH #1712 (ruling 2026-11-13, "Drop the six")
+            '_H_EMPTY_IN_RELEASE','_blank'}
+    # ... and the definitions it changed, named exactly and dropped from BOTH sides,
+    # so every other definition of malawi.py is still compared byte for byte.
+    changed={'_CROP_TEXT_RECODE','_crop_text_labels','_harvest_block',
+             'assemble_crop_production','_CROP_SALE_SOURCES','_crop_pieces',
+             'assemble_plot_inputs'}
     added_imports={'functools'}
+    def named(n,names):
+        return getattr(n,'name',None) in names or isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id in names for t in n.targets)
     def owned(n):
         if isinstance(n,ast.Import) and {a.name for a in n.names}<=added_imports and not any(a.asname for a in n.names):
             return True
-        return getattr(n,'name',None) in added or isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id in added for t in n.targets)
+        return named(n,added|changed)
+    for tree in (old,new):      # a mistyped name must not silently widen the exception
+        assert {c for c in changed if any(named(n,{c}) for n in tree.body)}==changed
     new.body=[n for n in new.body if not owned(n)]
+    old.body=[n for n in old.body if not named(n,changed)]
     assert ast.dump(new,include_attributes=False)==ast.dump(old,include_attributes=False)
 
 
@@ -269,7 +289,10 @@ def driver_inputs(wave,half):
     hh='case_id' if half in ('Full_Sample','Cross_Sectional') else 'y2_hhid' if wave=='2013-14' else 'y3_hhid' if wave=='2016-17' else 'y4_hhid'
     d=pd.DataFrame({hh:['h'], 'ag_d00':['p'], 'gardenid':['g'], 'plotid':['p'],
                     'ag_d39a':[4], 'ag_d39d':[4.], 'ag_d39f':[4], 'ag_d39i':[5.],
-                    'ag_d39g':[4], 'ag_d39j':[5.], 'ag_d36':[2], 'ag_d38':[1], 'ag_d40':[2]})
+                    'ag_d39g':[4], 'ag_d39j':[5.], 'ag_d36':[2], 'ag_d38':[1], 'ag_d40':[2],
+                    # GH #1228: question 20, joined onto G by the 2016-17 / 2019-20 drivers.
+                    **{c:[np.nan] for c in ('ag_d20a','ag_d20b','ag_d20c','ag_d20d','ag_d20e',
+                                            'ag_d20_oth','ag_d20b_oth')}})
     g=pd.DataFrame({hh:['h','h','h','z'], 'ag_g0b':['p','p','p2',None] if wave=='2010-11' else [1,1,1,1],
         'ag_g0d':[1,1,1,1], 'ag_g00':['p','p','p2',None], 'gardenid':['g']*4,
         'plotid':['p','p','p2',None], 'crop_code':[1]*4, 'ag_g04a':[3.,3.,np.nan,np.nan],
@@ -385,3 +408,45 @@ def test_nitrogen_exact_old_role_absent_and_other_country_behavior(mw,role):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         exact(tr.nitrogen_kg(frame),ns['nitrogen_kg'](expected))
+
+
+# GH #1712 (ruling @ligon 2026-11-13, "Drop the six").  Six native H columns are left
+# out of the carrier, and only while each is blank (NA or whitespace) on EVERY row of its
+# file.  The condition reads the file, not the carried rows (red team D2, accepted): a
+# value on a row the carrier does not keep brings the column back, blank on every served
+# row.  An independent list, checked against the production constant.
+H_EMPTY_IN_RELEASE = {'ag_h17_os': ('2010-11', 'Full_Sample'), 'ag_h26b_os': ('2010-11', 'Full_Sample'),
+                      'ag_h27_os': ('2010-11', 'Full_Sample'), 'ag_h36b_os': ('2010-11', 'Full_Sample'),
+                      'ag_h26_1b': ('2019-20', 'Panel'), 'ag_h36_1b': ('2019-20', 'Panel')}
+
+
+def test_the_six_are_the_ruled_six(mw):
+    assert set(mw._H_EMPTY_IN_RELEASE) == set(H_EMPTY_IN_RELEASE)
+
+
+@pytest.mark.parametrize('col', sorted(H_EMPTY_IN_RELEASE) + ['ag_h33'])
+@pytest.mark.parametrize('case,values,served,cells', [
+    ('all NA', [np.nan] * 9, False, 0),
+    ('all empty strings', [''] * 9, False, 0),
+    ('all whitespace', ['  '] * 9, False, 0),
+    ('a value on a carried row', ['BICYCLE'] + [np.nan] * 8, True, None),
+    ('a value only on a row not carried', [''] * 8 + ['CAR'], True, 0),
+])
+def test_an_empty_native_h_column_is_dropped_only_while_blank_in_the_file(mw, col, case, values, served, cells):
+    wave, half = H_EMPTY_IN_RELEASE.get(col, ('2010-11', 'Full_Sample'))
+    h = hframe()
+    h[col] = np.array(values, dtype=object)   # positional: hframe's index is [44] * n
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        out = components(mw, h, wave, half)
+    assert len(out) and out.index.get_level_values('input_obs').str.contains(':0/field:').any()
+    if col not in H_EMPTY_IN_RELEASE:     # not one of the six: served however blank it is
+        assert col in out.columns, case
+        return
+    assert (col in out.columns) is served, case
+    if served:
+        text = out[col].astype('string').str.strip().replace('', pd.NA).dropna()
+        if cells is None:                 # the carried row's value, under its own name
+            assert len(text) and text.eq('BICYCLE').all(), case
+        else:
+            assert len(text) == cells, case

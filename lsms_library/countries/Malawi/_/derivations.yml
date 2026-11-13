@@ -795,3 +795,132 @@ Malawi::plot_inputs::nonseed-group-no-payload:
     replay are recorded in the task ledger and source validation receipts.
   contents: 'Malawi/_/CONTENTS.org, "Nonseed deletion provenance"'
   since: '2026-11-07'
+
+# GH #1228 (ruling @ligon 2026-11-13, "Register all waves").  Seasonal Module G has no
+# cowpea code (until IHS6's code 50, a wave not built here), so cowpea is coded 48
+# OTHER (SPECIFY) and its name is in a specify text.  The relabel to harmonize_food's
+# `Cowpea (Khobwe)` is a construction of the LABEL from that text, so it is registered.
+# One rule, served in two tables: the same name under each table's key (an empty table
+# slot would list the key at rows 0 in every other Malawi table's summary).
+Malawi::crop_production::cowpea-from-crop-text:
+  waves: ['2010-11', '2016-17', '2019-20']
+  columns: [crop]
+  rule: >-
+    A seasonal Module G line coded 48 OTHER (SPECIFY) is served crop = 'Cowpea (Khobwe)'
+    where its crop text is exactly COWPEAS or COW PEAS (stripped, whitespace collapsed,
+    upper case).  The text is, in 2010-11, the line's own ag_g0d_os (ruling 2026-11-04,
+    PR #1523) and, in 2016-17 / 2019-20, its plot's Module D question-20 "Other Crop" text
+    ag_d20_oth, joined on (household, gardenid, plotid) and taken only where the plot has
+    exactly one D row, exactly one "Other Crop" text (ag_d20_oth or ag_d20b_oth), that text
+    in ag_d20_oth (code 48's; ag_d20b_oth names code 49's crop), one D code-48 slot and one
+    G code-48 line (ruling 2026-11-12, "Join D, single-text only").  The code stays 48:
+    production_obs (reported:G:48) and crop_variety still say what was recorded, and a sale
+    attaches by the code exactly as before.  A Farm-level code-48 sale row takes the label
+    only where every code-48 harvest line of its household carries it (the GH #1457 rule).
+    Every other code-48 line keeps 'Other'; local names (NKHOBWE, NSEULA, MSEWULA, and the
+    one COWPEAS(NSEULA)) are not mapped; 2013-14 holds no text.  The key sits beside any
+    sale-basis key the row already carries, joined with '+'.
+  function: lsms_library.countries.Malawi._.malawi:derive_cowpea_from_crop_text
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_cowpea_from_crop_text
+  raw_variables:
+    - 2010-11 Full_Sample/Agriculture/ag_mod_g.ag_g0d (crop code), ag_g0d_os (crop specify text)
+    - 2016-17 / 2019-20 ag_mod_g.crop_code, gardenid, plotid
+    - 2016-17 / 2019-20 ag_mod_d.gardenid, plotid, ag_d20a .. ag_d20e (question 20's crop codes), ag_d20_oth ("Other Crop", code 48), ag_d20b_oth ("Other Crop 2", code 49; 2019-20 Cross_Sectional only)
+    - ag_mod_i.ag_i0b / crop_code (a code-48 sale follows its household's lines)
+  assumptions:
+    - text: >-
+        COWPEAS / COW PEAS, written in the specify field of a crop coded OTHER (SPECIFY),
+        names cowpea, the crop the food side labels Cowpea (khobwe) in every wave.
+      basis: questionnaire
+      evidence: >-
+        The specify field is the form's own: IHS3 Module G crop OTHER (SPECIFY) 48 with its
+        specify column; IHS4 / IHS5 Module D question 20 and its "Other Crop" text.
+        harmonize_food's Cowpea (Khobwe) row (categorical_mapping.org).
+    - text: >-
+        In 2016-17 / 2019-20 the plot's ag_d20_oth names the G line coded 48: Module G's
+        crop list for a plot is Module D question 20's, and ag_d20_oth is code 48's text
+        (ag_d20b_oth code 49's).
+      basis: questionnaire
+      evidence: >-
+        IHS5 agriculture questionnaire, Module G p. 27: crop column "PRE-POPULATED WITH CROPS
+        THAT ARE LISTED IN MODULE D (question 20)"; D20 value labels in 2019-20
+        Cross_Sectional 48 OTHER SPECIFY 1, 49 OTHER SPECIFY 2.  Measured: 2019-20 XS
+        32,651 of 32,651 G (plot, crop) pairs are D20 entries; the texts pair exactly with
+        the slots (963 plots slot 48 / text ag_d20_oth, 39 slot 49 / ag_d20b_oth, 27 both).
+        IHS4's printed G form lists the plot's crops instead of pre-filling them; 2016-17
+        matches D20 on the collapsed code (XS 24,555 of 25,975), and its G code-48 lines
+        are D20 code-48 entries 369 of 371 (XS) and 110 of 111 (Panel).
+    - text: >-
+        Modules D and G refer to one reference season, the household's.
+      basis: questionnaire
+      evidence: >-
+        IHS4 agriculture questionnaire B_A-1, "ENUMERATOR: REFER TO THE HOUSEHOLD
+        QUESTIONNAIRE, MODULE X. WHAT WAS THE REFERENCE RAINY SEASON FOR THIS HOUSEHOLD?";
+        IHS4 / IHS5 D-0, G-0 and I-0 restate it; IHS5 Basic Information Document p. 18 (one
+        reference season per household, set by interview date); Module X hh_x02 exported in
+        the cross-sections (not in the Panel halves, which rest on the forms and the IHPS
+        2016 BID).  Measured: the season of each G line's planting date equals hh_x02 on
+        24,664 of 25,938 (2016-17 XS) and 31,065 of 32,646 (2019-20 XS) dated lines, and on
+        228 of 238 and 563 of 584 relabelled lines (CONTENTS.org, 2026-11-13).  Accepted as
+        met (@ligon, 2026-11-13).
+    - text: >-
+        single text only: a plot whose question 20 names two Other crops keeps 'Other', even
+        where the slot pairing would name code 48's; and a Farm-level code-48 sale follows
+        its household's lines only where they all agree.
+      basis: modelling-choice
+      evidence: >-
+        Rulings @ligon 2026-11-12 ("Join D, single-text only") and 2026-11-13; GH #1457.
+  validated_against: >-
+    An independent oracle reading Modules G and D directly
+    (tests/test_gh1228_malawi_cowpea_label.py): 157 (2010-11), 302 (2016-17: 238 + 64) and
+    697 (2019-20: 584 + 113) harvest lines, keys and quantities equal to the served rows;
+    every keyed plot row joins its own line on (t, i, crop, plot_id), and every keyed
+    Farm-level sale its household's lines on (t, i, crop).  Cold builds, CONTENTS.org
+    2026-11-13.
+  contents: 'Malawi/_/CONTENTS.org, "2026-11-13 -- GH #1228 later waves"'
+  since: '2026-11-13'
+
+Malawi::plot_inputs::cowpea-from-crop-text:
+  waves: ['2010-11', '2016-17', '2019-20']
+  columns: [crop]
+  rule: >-
+    The seed row (input = Seed) of a Module G line that
+    Malawi::crop_production::cowpea-from-crop-text relabels carries the same label, crop =
+    'Cowpea (Khobwe)', by the same rule from the same text, so that crop joins the two
+    tables on these lines too.  Stamped only on a row with a payload: a line with no seed
+    answer is deleted as before (Malawi::plot_inputs::seed-line-no-payload).  Module H's
+    acquisition-only Farm-level rows keep their code's label.
+  function: lsms_library.countries.Malawi._.malawi:derive_cowpea_from_crop_text
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_cowpea_from_crop_text
+  raw_variables:
+    - as Malawi::crop_production::cowpea-from-crop-text (the same Module G lines and Module D question 20)
+    - ag_mod_g.ag_g04a, ag_g04b, ag_g0f (2016-17+) (the seed answers the row serves, unchanged)
+  assumptions:
+    - text: >-
+        the seed answer of a Module G line names the same crop as its harvest answer: one
+        line, one crop.
+      basis: questionnaire
+      evidence: >-
+        Module G asks seed planted (G04) and harvest (G13) on the same crop line; the 2010-11
+        precedent (CONTENTS.org, "2010-11: the lines whose own text says cowpea").
+    - text: >-
+        the crop text names cowpea, ag_d20_oth names the G line coded 48, and Modules D and G
+        refer to the household's one reference season, as under
+        Malawi::crop_production::cowpea-from-crop-text.
+      basis: questionnaire
+      evidence: >-
+        Malawi::crop_production::cowpea-from-crop-text, its first three assumptions (the
+        specify field, the D20 pre-population and slot pairing, Module X hh_x02 and the
+        IHS4 / IHS5 forms).
+    - text: >-
+        single text only, as under Malawi::crop_production::cowpea-from-crop-text.
+      basis: modelling-choice
+      evidence: >-
+        Malawi::crop_production::cowpea-from-crop-text, its fourth assumption (rulings
+        @ligon 2026-11-12, "Join D, single-text only", and 2026-11-13).
+  validated_against: >-
+    The served seed rows' (t, i, plot_id) are a subset of the same oracle's lines in every
+    wave; every keyed row joins its own line on (t, i, crop, plot_id).  CONTENTS.org
+    2026-11-13.
+  contents: 'Malawi/_/CONTENTS.org, "2026-11-13 -- GH #1228 later waves"'
+  since: '2026-11-13'

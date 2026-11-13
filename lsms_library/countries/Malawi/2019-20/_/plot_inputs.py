@@ -19,6 +19,10 @@ never as a purchase.
 
 Neither IHS5 ag_mod_d ships with the latin-1 bad byte that the IHS4
 cross-section had, so a plain get_dataframe read suffices.
+A Module G seed line coded 48 OTHER (SPECIFY) carries the label its
+crop_production harvest line carries: the plot's single Module D question-20
+"Other Crop" text, joined by ``malawi.attach_module_d_text`` (GH #1228), so
+COW PEAS is served ``Cowpea (Khobwe)``.
 H quantity components also have acquisition-only Farm-level rows (GH #1190);
 planted Quantity/Applied and all legacy attached fields remain NA on those rows.
 See lsms_library/countries/Malawi/_/malawi.py.
@@ -33,7 +37,8 @@ from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
                     _seed_block, _seed_purchase_block, _seed_gift_block,
                     assemble_plot_inputs, _seed_source_reference,
-                    _seed_acquisition_block, _append_seed_acquisitions)
+                    _seed_acquisition_block, _append_seed_acquisitions,
+                    attach_module_d_text, D20_TEXT_COL)
 
 
 WAVE = '2019-20'
@@ -52,6 +57,7 @@ def _half(d, g, h, hh_of, seed_qty, seed_unit, seed_value, source_ref, source_ha
     g_rows = np.arange(len(g))
     for df in (d, g, h):
         df['hhid'] = hh_of(df)
+    attach_module_d_text(g, d, cropcode='crop_code')
     d['plotkey'] = _plotkey(d)
     g['plotkey'] = _plotkey(g)
     # Q39 (IHS5 agriculture questionnaire p.10) labels d/j TOTAL KGs.
@@ -76,7 +82,7 @@ def _half(d, g, h, hh_of, seed_qty, seed_unit, seed_value, source_ref, source_ha
         _seed_block(g, hhid='hhid', plotkey='plotkey', cropcode='crop_code',
                     qty='ag_g04a', unit='ag_g04b', improved='ag_g0f', t=WAVE,
                     source_ref=source_ref, source_half=source_half,
-                    row_positions=g_rows),
+                    row_positions=g_rows, crop_text=D20_TEXT_COL),
     ]
     seed_purchase = [
         _seed_purchase_block(h, hhid='hhid', cropcode='crop_code',
