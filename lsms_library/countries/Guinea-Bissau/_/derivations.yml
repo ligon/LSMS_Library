@@ -7,7 +7,7 @@
 # Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
 
 Guinea-Bissau::food_acquired::7day-purchase-at-last-purchase-unit-value:
-  waves: ['2018-19']
+  waves: ['2018-19', '2021-22']
   columns: [Expenditure]
   rows: {s: purchased}
   rule: >-
@@ -89,7 +89,11 @@ Guinea-Bissau::food_acquired::7day-purchase-at-last-purchase-unit-value:
     0.0% for the gross 7-day quantity.  s07bq05 * uv reproduces depan(Don)
     within 1% for 100% of 149 rows -- an imputation at the same unit value,
     checked and deliberately not served.  (Togo 2018, the same way: 99.5% /
-    13.1% / 0.0%, Don 99.7% of 1,255.)
+    13.1% / 0.0%, Don 99.7% of 1,255.)  2021-22 (wired 2026-11-13): the rule
+    x 365/7 reproduces depan(Compra) within 1% for 91.3% of the rows that join
+    one to one -- arithmetic only, since the rule is invariant to q3 and q7a
+    moving TOGETHER, and this wave's quantities are rounded (separately); see
+    Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even.
   contents: 'Guinea-Bissau/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
 
@@ -139,7 +143,7 @@ Guinea-Bissau::community_prices::one-item-per-price:
   since: '2026-11-04'
 
 Guinea-Bissau::sample::region-milieu-stratum:
-  waves: ['2018-19']
+  waves: ['2018-19', '2021-22']
   columns: [strata]
   rows: {}
   rule: >-
@@ -154,8 +158,13 @@ Guinea-Bissau::sample::region-milieu-stratum:
   assumptions:
     - text: >-
         the original 2018/19 design defines a stratum as region combined with
-        residence milieu. The later survey revisits the original clusters;
-        this entry wires only the existing 2018-19 sample.
+        residence milieu. The later survey revisits the original clusters, so
+        its households carry their clusters' strata. 2018-19 was wired on
+        2026-11-10; 2021-22 on 2026-11-13 (gnb stream), by the rule of the
+        2026-11-12 ruling "EHCVM-2 2021-22 strata, GH1575 extension: Same rule
+        as #1575", which names Togo, Benin and Cote d'Ivoire; the 2021-22
+        weights file's own `strate` (17 codes) is recorded as a comparison,
+        not served (Guinea-Bissau/_/CONTENTS.org).
       basis: questionnaire
       evidence: >-
         Own INE Basic Information Document (survey design documentation, not a
@@ -177,6 +186,187 @@ Guinea-Bissau::sample::region-milieu-stratum:
   validated_against: >-
     Documentary definition and static wiring only. Actual-row validation,
     missingness, cluster consistency, non-strata conservation, normal cold/warm
-    sample and Feature acceptance are UNRUN in this source/pure worker.
+    sample and Feature acceptance are UNRUN in this source/pure worker. (That
+    sentence is the 2026-11-10 construction stage; CONTENTS.org records its completed
+    2018-19 validation.) 2021-22, extended 2026-11-13: the weights file's own `strate`
+    (17 codes) is one-to-one with this construction on all 5,351 households (measured,
+    gnb stream); a cold sample() serves it on every household with the key, and
+    tests/test_gnb_2021_wave.py re-derives the served value from the inputs.
   contents: 'Guinea-Bissau/_/CONTENTS.org, "Selected 2018-19 region/milieu strata (GH #1575)"'
   since: '2026-11-10'
+
+Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even:
+  waves: ['2021-22']
+  columns: [Quantity, Expenditure]
+  rows: {}
+  rule: >-
+    Every food_acquired row of 2021-22 with a quantity (purchased, produced, in kind) is
+    served from the release's s07b quantities AS RELEASED (ruling 2026-11-13, "Serve, registered key"),
+    and those quantities are not the households' answers: they are rounded to even
+    integers by a step no document records.  Quantity is the released s07bq03a net of
+    s07bq04 and s07bq05 (purchased), s07bq04 (produced) or s07bq05 (in kind); the
+    purchased Expenditure is the 7-day key's Quantity x s07bq08 / s07bq07a, so it is
+    derived from rounded quantities too.  Nothing is recovered: the identity is applied.
+    The consumed rows the release rounds to 0 are not served as released: they carry
+    Guinea-Bissau::food_acquired::s07bq03a-rounded-to-zero-withheld instead.
+  function: lsms_library.countries.Guinea-Bissau.2021-22._.mapping:quantity_as_released
+  inputs: lsms_library.countries.Guinea-Bissau.2021-22._.mapping:inputs_quantities_rounded
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s07bq07a, s07bq07b,
+                  s07bq07c, s07bq08]
+  assumptions:
+    - text: >-
+        the release rounds every 7-day quantity to an even integer.  Every positive
+        s07bq03a (128,229) and s07bq07a (96,262) is even, in every unit (Unidade
+        counts included); s07bq04 / s07bq05 are even but for 23 rows each, the same 23,
+        where s07bq03a = s07bq04 + s07bq05.  2018-19 has 70,949 odd and 6,119
+        fractional values of 125,483, and Benin, Togo, Cote d'Ivoire, Senegal, Niger and
+        Mali 2021-22 have odd and fractional values everywhere; the same 2021-22 GNB
+        release holds halves in s16b and s16c, so the CAPI took decimals.  The quantities
+        are stored as Stata byte (int8; 2018-19: double).  s07bq08, the value, carries no
+        rounding signature (6.5% odd against 7.3% in 2018-19).
+      basis: derived-from-data
+      evidence: >-
+        gnb stream, isa-sm-20261113 (burst jobs 41271796, 41271889, 41272010, 41272061,
+        reports/gnb/out/{integer,even,w21f-180307740}.json); red team
+        reports/gnb-redteam/VERDICT.md, which repeated the counts and the cross-country
+        comparison.
+    - text: >-
+        the rounding is 2 x round-half-up(x / 2), the nearest even integer, halves up
+        (Stata's round(x, 2) gives exactly this, which would make it a processing slip
+        rather than an imputation: unverified).  Applied to 2018-19's answers it
+        reproduces 2021-22's distribution, notably the Kg and Litro zeros (0 / 2 / 4
+        shares 12.6 / 44.9 / 10.9% against 13.8 / 45.4 / 8.8% for Kg).  A FIT, not a
+        proof: ceiling to even fits Unidade and Monte as well, and only the Kg / Litro
+        zeros tell them apart.  It maps 1, 2 and 2.5 all to 2 and 0.5 to 0, so it
+        CANNOT be inverted, and the served quantities are the rounded ones.
+      basis: derived-from-data
+      evidence: >-
+        the fitted-rule comparison (reports/gnb/out/w21f-180307740.json F2, four candidate
+        rules); red team F3 (total variation distances by unit).
+    - text: >-
+        the purchased Expenditure inherits the rounding.  The 7-day rule is invariant
+        only to q3 and q7a moving together, and the rounding moves them separately; 1,760
+        rows carry s07bq07a = 0 beside a positive s07bq08 and serve Expenditure NA (no
+        positive last-purchase quantity).  That ehcvm_conso_gnb2021 reproduces the rule
+        on 91.3% of joined rows shows UEMOA built its aggregate from these same rounded
+        quantities, not that they are raw.
+      basis: derived-from-data
+      evidence: >-
+        reports/gnb/out/even.json (E5) and the red team's food follow-up (job 41274097).
+    - text: >-
+        no document records the rounding: the English BID (section 2.2 on 7B, section 7
+        on processing), the EHCVM-2 enumerator manual (Q7B.03-Q7B.08 ask the quantity
+        actually consumed, in its unit), and the World Bank DDI (dataProcessing empty).
+        Served anyway, as the user ruled, under this key.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-13, "Wave-1 stream rulings after red team"
+        (.sucoder/isa-decisions.org); documentation search in
+        burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch and this stream.
+  validated_against: >-
+    The key is on every served 2021-22 row but the withheld ones, which carry the
+    withheld key, and on no 2018-19 row (tests/test_gnb_2021_wave.py); its inputs, the
+    positive-quantity rows, join the
+    served rows at (t, i, j).
+  contents: 'Guinea-Bissau/_/CONTENTS.org, "food_acquired 2021-22: served as released, the rounding registered"'
+  since: '2026-11-13'
+
+# A WITHHELD QUANTITY (GH #1519's rule; ruling 2026-11-13, "Serve NA, as Togo"): the
+# rows stay, their quantity is NA, so no reported item disappears.  It replaces the
+# registered deletion `...::s07b-consumed-quantity-rounded-to-zero` (rows: 0) of the same
+# day.  Togo 2021-22's `s07bq03a-floored-count-withheld` is the template.
+Guinea-Bissau::food_acquired::s07bq03a-rounded-to-zero-withheld:
+  waves: ['2021-22']
+  columns: [Quantity, Expenditure]
+  rows: {s: [purchased, other]}
+  rule: >-
+    A row of s07b whose household says it consumed the item in the last 7 days
+    (s07bq02 = Oui) but whose released s07bq03a is 0 is served one row with Quantity NA
+    and Expenditure NA, and this key: a purchased row, or, where the household says it
+    never bought the item (s07bq06 = Nunca, 685 rows), a row at s='other' (ruling
+    2026-11-13, "GNB 'Nunca' rows").  The other 3,260 are purchased.  The 0 is the release's rounding of a
+    small quantity (see Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even),
+    which cannot be inverted, so the quantity is withheld rather than served as 0 or
+    guessed; the purchase value goes with it, because the served Expenditure would be
+    derived from the withheld quantity (GH #1519).  A purchased row is served where a
+    purchase is implied by Togo's test, the row reporting neither own production nor a
+    gift, and every one of the 3,945 passes it.  A purchased row carries the 7-day key too
+    (the shared reshape stamps every purchased row); an 'other' row does not.  Neither
+    carries the as-released key: nothing on it is served as released.  Downstream, the derived food tables drop an NA before they sum,
+    so these rows are absent there, never a zero.
+  function: lsms_library.countries.Guinea-Bissau.2021-22._.mapping:zero_quantity_withheld
+  inputs: lsms_library.countries.Guinea-Bissau.2021-22._.mapping:inputs_zero_quantity_withheld
+  raw_variables: [s07bq02, s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s07bq06,
+                  s07bq07a, s07bq07b, s07bq07c, s07bq08]
+  assumptions:
+    - text: >-
+        a consumed row with s07bq03a = 0 is a small quantity rounded down, not an
+        answer: 2018-19 has none, the EHCVM-1 CAPI refused a zero there, and 1,881 of the
+        3,945 are Kg and 1,682 Litro (palm oil, lemon vinegar, sugar, ground groundnut).
+        q3 = 0 occurs on no other row of the file (836,167 not-consumed rows and 181
+        unanswered carry no q3).
+      basis: derived-from-data
+      evidence: >-
+        reports/gnb/out/{integer,w21-180307740,zero_probe}.json (E3, F1); the
+        isa-sm-20261112 docsearch on the EHCVM-1 CAPI (self > 0).
+    - text: >-
+        the source is purchase by Togo's test: s07bq04 is 0 on 3,717 of the rows and NA
+        on 228, s07bq05 0 on all 3,945, so none reports own production or a gift.  But
+        here s07bq04 and s07bq05 are rounded too, so the test is weaker than in Togo,
+        where they were exact.  s07bq06 (when last bought): Ultimos 7 dias 1,897, Ontem
+        206, Ultimos 30 dias 636, Ha mais de 30 dias 521, Nunca 685.  The 2,739 rows with
+        a purchase value (s07bq08 > 0, median 750 FCFA) are all among the first three;
+        the 685 whose household says it never bought the item, and the 521 whose last
+        purchase is over 30 days old, carry none.  Togo's precedent covered no row whose
+        household says it never bought the item (its 11: 7 derniers jours 6, 30 derniers
+        jours 1, Plus de 30 jours 4).  The 685 Nunca rows are served at s='other': the
+        source is not a purchase, by the household's own answer, and whether it is own
+        production or a gift is not known, both being rounded to 0.
+      basis: modelling-choice
+      evidence: >-
+        rulings @ligon 2026-11-13, "Guinea-Bissau 2021-22 follow-ups and Burkina
+        confirmations": "Serve NA, as Togo (Recommended)", and "GNB 'Nunca' rows":
+        "s='other' (Recommended)" (.sucoder/isa-decisions.org); probe counts, gnb stream burst job 41279256 (reports/gnb/out/zero_probe.json).
+  validated_against: >-
+    The inputs are the 3,945 rows, and each is served exactly one row with Quantity and
+    Expenditure NA that joins it at (t, i, j): 3,260 purchased, 685 at s='other'; no other row carries the key
+    (tests/test_gnb_2021_wave.py).  No household holds both sugar codes in one unit and
+    size, so the Togo collision rule withholds no other row.
+  contents: 'Guinea-Bissau/_/CONTENTS.org, "food_acquired 2021-22: served as released, the rounding registered"'
+  since: '2026-11-13'
+
+# A WITHHELD ANSWER (ruling 2026-11-13, "Exclude from HH size (Recommended)").
+Guinea-Bissau::household_roster::departed-monthsspent-withheld:
+  waves: ['2021-22']
+  columns: [MonthsSpent]
+  rule: >-
+    A person s01q00aa says has left the household is served in the roster, with
+    `Departed` True, and with MonthsSpent NA, so household_characteristics counts the
+    household the survey counts.  12 of the 341 leavers answered s01q12 ("lived here 6
+    months or more in the last 12?"; all Sim, served 12), in 3 households; their answer
+    is withheld and these 12 rows carry this key.  The other 329 have no answer to
+    withhold and carry no key.
+  function: lsms_library.countries.Guinea-Bissau.2021-22._.mapping:withhold_departed_months
+  inputs: lsms_library.countries.Guinea-Bissau.2021-22._.mapping:inputs_departed_monthsspent_withheld
+  raw_variables: [s01q00aa, s01q12]
+  assumptions:
+    - text: >-
+        a leaver is not a member of the household the survey describes: ehcvm_individu
+        (41,160 people) and ehcvm_welfare.hhsize leave all 341 out.  Before the
+        withholding, 9 of the 12, in 2 households, entered household_characteristics
+        (+9 persons, Sex x age counts 40,322 -> 40,331); the other 3 carry no sex and no
+        age and fell in no bracket.  An s01q12 Sim is a true answer for a recent leaver
+        (6 months or more of the last 12), so the answer is withheld, not corrected:
+        the recorded value is in derivation_inputs.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-13, "Guinea-Bissau 2021-22 follow-ups and Burkina
+        confirmations": "Exclude from HH size (Recommended)" (.sucoder/isa-decisions.org);
+        gnb stream burst jobs 41275945 and 41278042; red team
+        reports/gnb-redteam/VERDICT-delta.md, point 3.
+  validated_against: >-
+    MonthsSpent is NA on every Departed row; the key is on exactly the 12 rows whose
+    s01q12 is answered, and the inputs join them at (t, i, pid)
+    (tests/test_gnb_2021_wave.py).
+  contents: 'Guinea-Bissau/_/CONTENTS.org, "2021-22 wired", household_roster'
+  since: '2026-11-13'

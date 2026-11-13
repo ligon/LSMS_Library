@@ -486,6 +486,14 @@ Columns:
         unrelated: []
         guest: []
         servant: []
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`: the registry key of a constructed
+        or withheld field on this person's row (its `columns` entry names which
+        one).  First instance: Guinea-Bissau 2021-22, a leaver's MonthsSpent
+        withheld (`departed-monthsspent-withheld`).
   sample:
     # `sample` was historically absent from this section, which made
     # _enforce_canonical_spellings a complete no-op on sample() -- it did not

@@ -382,6 +382,14 @@ _S05_SOURCE = 's05_co_gnb2018.dta'
 _S05_HOUSEHOLD = 's07b_me_gnb2018.dta'
 _S05_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
 
+#: s05 product code -> the household s07bq01 code whose label it is served under.
+#: GH #1226, ruled by the maintainer 2026-11-04: "Bridge Guinea-Bissau product 94
+#: (`Feijão seco`) to the household's 95 (`Feijão-frade, feijão seco`)".  94 is on the
+#: price form only, 95 in the household file only (s05 holds 348 records of 94 and
+#: none of 95), so the bridge lumps no two priced codes and `variety` stays
+#: `unknown_variety`.  `Description` keeps the form's own `Feijão seco`.
+_S05_PRODUCT_BRIDGE = {94: 95}
+
 
 def _s05_labels(categories, name):
     return {int(code): str(label).strip() for code, label in categories.get(name, {}).items()
@@ -441,7 +449,9 @@ def _s05_base(codes, community, household):
 
     ``j`` is the household's ``s07bq01`` label of the same product code through
     ``harmonize_food`` and the mojibake repair.  Product 94 (`Feijão seco`) is
-    priced but has no household label, so it takes its own.  ``Description`` is
+    priced but has no household label; it takes household code 95's
+    (:data:`_S05_PRODUCT_BRIDGE`, GH #1226).  A code with no household label
+    and no bridge would take its own.  ``Description`` is
     the s05 label with the mojibake repaired, as every other table of this wave
     serves its labels.  The form names nothing finer than ``j``, so ``variety``
     is the canonical ``unknown_variety``, unless ``harmonize_food`` lumps two
@@ -460,7 +470,7 @@ def _s05_base(codes, community, household):
     unit = codes['s05q02'].astype(int)
 
     def item(code):
-        raw = hh_items.get(code, s05_items[code])
+        raw = hh_items.get(_S05_PRODUCT_BRIDGE.get(code, code), s05_items[code])
         return _decode_mojibake(item_map.get(raw, raw)).strip()
     j_by_code = {c: item(c) for c in product.unique()}
     lumped = pd.Series(j_by_code).value_counts()

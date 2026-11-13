@@ -24,6 +24,13 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+    # 2021-22 only (ruling 2026-11-13, "Serve leavers"): True for the 341 people s01q00aa
+    # says have left the household, who are served; False for everyone else.  NA in
+    # 2018-19, which does not ask.  No canonical flag exists (GH #1565 is open), so this
+    # is a proposal: one optional bool, country-level.
+    Departed:
+      type: bool
+      optional: true
 
   individual_education:
     index: (t, i, pid)
@@ -162,10 +169,11 @@ Data Scheme:
     # from s16c_me_gnb2018.dta — REPORTED values only; harvest_kg / yield /
     # main_crop / value-shares are transformations, never columns here.
     # Single EHCVM wave: 2018-19 (script-path).  crop joins food via the
-    # harmonize_food Preferred Labels where that table exists; Guinea-Bissau
-    # has NO harmonize_food table, so the raw Portuguese crop labels
-    # ('Cajueiro', 'Arroz paddy', 'Mancarra', ...) pass through unchanged
-    # (visible / flagged), never silently mis-mapped to the `u` fallback.
+    # harmonize_food Preferred Labels: _/categorical_mapping.org has carried a
+    # harmonize_food table since 2026-06-15 (an earlier version of this note
+    # said it had none), whose crop rows map the s16cq04 labels ('Cajueiro' ->
+    # 'Noix de cajou', 'Arroz paddy' -> 'Riz Paddy', ...); a label it does not
+    # name passes through raw, never mis-mapped to the `u` fallback.
     # u via the Portuguese `u` table.  ``u`` is in the index (as in
     # food_acquired) because one (plot, crop) can be reported in several
     # units.  plot = "{field_no}_{parcel_no}" aligns with plot_features'
@@ -197,20 +205,37 @@ Data Scheme:
     # rule forbids.  So `plot_id` is NOT in the index; the feature keeps the
     # GAP-2 name `plot_inputs`.
     #
-    # LABEL NOTE: Guinea-Bissau has NEITHER harmonize_input NOR
-    # harmonize_seed_crop, so the raw Portuguese input labels ('Sementes de
-    # arroz', 'Adubos inorgânicos - ureia', ...) pass through unchanged
-    # (visible / flagged) and seed crops resolve to the '(not crop-specific)'
-    # sentinel — never silently mis-mapped to the `u` fallback.  Non-crop-
-    # specific rows carry the sentinel rather than NaN so the index level is
-    # non-null and survives the framework's canonical NaN-key de-dup collapse.
-    # `u` via the Portuguese `u` table; a missing unit is filled with
-    # 'Manquant' for the same non-null reason.  Purchased from s16bq05
-    # ('Sim' / 'Não').
+    # LABEL NOTE (2026-11-13, GH #1107 / #1119 / #1118): harmonize_input
+    # maps the three inorganic labels with a product named (ureia -> Urea,
+    # fosfatos -> Phosphate, NPK/Fórmula única -> NPK); every other input
+    # label, `DAP e outros adubos inorgânicos` included, passes through as the
+    # raw Portuguese label.  harmonize_seed_crop gives each seed record (s16bq01
+    # codes 11-20) its crop, spelled as crop_production serves it; an unmapped
+    # seed label passes through.  Fertilizer and phytosanitary rows are
+    # structural non-crop records and carry '(not crop-specific)' — a non-null
+    # token, so the index level survives the framework's NaN-key collapse.
+    # `u` via the Portuguese `u` table; `Quilograma` / `Grama` take their mass
+    # from the country `u_kg` table; a missing unit is the sentinel `Unknown`
+    # (none in the held file).  Purchased / Quantity_purchased / Unit_purchased read the
+    # PURCHASE, s16bq08 / s16bq09a / s16bq09b; the gift question s16bq05 / s16bq07a /
+    # s16bq07b, which Purchased read until 2026-11-13, is served under Benin's and
+    # Togo's gift names (ruling 2026-11-13, "Fix all three now"): CONTENTS.org.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
     materialize: make
 
   plot_labor:

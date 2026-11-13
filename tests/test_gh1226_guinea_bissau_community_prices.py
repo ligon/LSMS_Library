@@ -117,6 +117,17 @@ class TestRows:
         assert row['j'] == 'Feijão seco'
         assert not out['Description'].str.contains('Ã').any()
 
+    def test_product_94_is_served_under_the_households_95(self, mapping):
+        """GH #1226, ruled 2026-11-04: 94 (`Feijão seco`, price form only) takes the
+        household label of 95.  95 is not priced, so nothing is lumped."""
+        household = {**HOUSEHOLD, 's07bq01': {**HOUSEHOLD['s07bq01'],
+                                              95: 'FeijÃ£o-frade, feijÃ£o seco'}}
+        out = mapping.community_prices_s05(source(), COMMUNITY, household).reset_index()
+        row = out[out['Description'] == 'Feijão seco'].iloc[0]
+        assert row['j'] == 'Niébé/Haricots secs'
+        assert set(out['variety']) == {'unknown_variety'}
+        assert mapping._S05_PRODUCT_BRIDGE == {94: 95}
+
     def test_repeated_key_is_obs_3_4_and_nothing_is_dropped(self, mapping):
         rows = [(12, 1, 17, 4131, 100., 125.), (12, 1, 17, 4131, 100., 130.)]
         out = mapping.community_prices_s05(source(rows), COMMUNITY, HOUSEHOLD)
