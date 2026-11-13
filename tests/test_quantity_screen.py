@@ -524,6 +524,43 @@ def test_the_message_names_country_table_wave_and_the_lever():
         assert token in msg, f"{token!r} missing from the warning"
 
 
+def test_a_sold_kilogram_total_is_not_printed_as_a_count_of_the_harvest_unit():
+    """GH #1560 red team F2.  ``Quantity_sold_kg`` is a kilogram TOTAL screened in
+    the row's HARVEST-unit cell; ``u=Sac (100 Kg) 1,150,000`` read as 1,150,000
+    sacks.  The message now says kilograms sold and names the unit ``harvest_u``.
+    Wording only: the structured report is what it was, and ``Quantity`` on the
+    same frame keeps its old wording (the control)."""
+    rows = [{"t": "2021-22", "i": f"hh{k:04d}", "plot": "1", "j": "Arachide",
+             "u": "Sac (100 Kg)", "Quantity": 10.0 * (1 + k % 10),
+             "Quantity_sold_kg": 100.0 * (1 + k % 10)} for k in range(60)]
+    rows.append({"t": "2021-22", "i": "hh9999", "plot": "1", "j": "Arachide",
+                 "u": "Sac (100 Kg)", "Quantity": 9e6, "Quantity_sold_kg": 1.15e6})
+    df = pd.DataFrame(rows).set_index(["t", "i", "plot", "j"])
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        check_quantities(df, country="Testland", table="crop_production")
+    by_column = {}
+    for w in caught:
+        text = str(w.message)
+        if issubclass(w.category, QuantityImplausibleWarning) and "report a '" in text:
+            by_column[text.split("report a '", 1)[1].split("'", 1)[0]] = text
+    sold = by_column["Quantity_sold_kg"]
+    assert "harvest_u=Sac (100 Kg) 1,150,000 kg sold (x" in sold
+    assert "TOTAL kilograms sold" in sold and "not the sale's Unit_sold" in sold
+    assert "cell keyed on t,harvest_u,j" in sold
+    assert " u=Sac" not in sold
+    control = by_column["Quantity"]
+    assert " u=Sac (100 Kg) 9,000,000 (x" in control
+    assert "cell keyed on t,u,j" in control and "kg sold" not in control
+    assert "same wave, unit and crop" in control
+
+    report = next(r for r in quantity_reports(country="Testland")
+                  if r["column"] == "Quantity_sold_kg")
+    offender = report["offenders"][0]
+    assert (offender["u"], offender["rung"], offender["value"]) == (
+        "Sac (100 Kg)", "t,u,j", 1.15e6)
+
+
 def test_a_broken_audit_never_breaks_a_read(monkeypatch):
     """The read is the job.  A failure inside the audit must warn, not raise --
     and must still hand the frame back.  An instrument that fails silently and

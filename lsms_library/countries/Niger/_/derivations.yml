@@ -333,18 +333,23 @@ Niger::crop_production::dry-season-cycle-total:
 
 Niger::crop_production::dry-season-sale-window:
   waves: ['2011-12']
-  columns: [Quantity_sold, Value_sold]
+  columns: [Quantity_sold, Value_sold, Quantity_sold_kg]
   rule: >-
     Identity on dry-season rows with a positive sale: Quantity_sold is as03eq11a and
     Value_sold as03eq12, as recorded after their exact codes (as03eq12 == 9999999, 1
-    row).  Nothing is multiplied by as03eq06.  The quantity is asked per cycle, and
+    row), and Quantity_sold_kg is as03eq11c, the sale in kilograms asked beside
+    as03eq11a and so in its window, after its code 99999 (39 rows) and with a 0 beside
+    a positive Quantity_sold NA (36 rows) (GH #1560, ruling @ligon 2026-11-12).  Nothing
+    is multiplied by as03eq06, so Quantity_sold_kg is the recorded FIRST-cycle sale where
+    Quantity_kg is over all cycles (ruled @ligon 2026-11-12, "First cycle, as recorded";
+    any multiplication waits on GH #1529's cycle-semantics ruling).  The quantity is asked per cycle, and
     the value states no window.  Quantity remains a total over cycles, so on a
     multi-cycle row Quantity_sold / Quantity is not a sold share.  A zero sale
     carries no key.  Joined to dry-season-cycle-total with sorted '+'.
   function: lsms_library.countries.Niger._.niger:derive_dry_season_sale_window
   inputs: lsms_library.countries.Niger._.niger:inputs_dry_season_sale_window
   raw_variables: [hid, as03eq01, as03eq03, as03eq06, as03eq10, as03eq11a, as03eq11b,
-                  as03eq12]
+                  as03eq11c, as03eq12]
   assumptions:
     - text: >-
         preserve the reported sale without choosing a window for the value.  Stata
@@ -365,6 +370,83 @@ Niger::crop_production::dry-season-sale-window:
     (tests/test_gh1462_niger_dry_season.py).
   contents: 'Niger/_/CONTENTS.org, "the dry season: read in 2011-12, not asked in 2014-15 (GH #1462)"'
   since: '2026-11-04'
+
+# GH #1560, ruling @ligon 2026-11-12 ("Sold-kg details" (c)): the 2021-22 SOLD kilograms carry
+# the "estimate" key the 2021-22 harvest kilograms carry.  A sibling of survey-kg-estimate,
+# not that key, because that key's rule, inputs (s16c harvest lines) and tests are the
+# harvest's: this one is s16d's crop-level sale record, on a line or a Farm-level row.
+Niger::crop_production::sold-kg-estimate:
+  waves: ['2021-22']
+  columns: [Quantity_sold_kg]
+  rule: >-
+    Identity on a 2021-22 row with a Quantity_sold_kg: 16D.05c s16dq05c, "Estimation Quantite
+    totale UML en kg", served as recorded as the TOTAL kilograms of the sale (ruling @ligon
+    2026-11-12, "Treat 2021 as totals").  The key says what the number is: the instrument
+    calls it an estimate, so a sale's kilograms are the survey's conversion of its local unit
+    and not a weighing.  It rides with the sale (hh-crop-sale-single-row on a line, none on a
+    Farm-level row) and joins any key already there with sorted '+'.  2011-12 and 2014-15
+    ask "quantite en kg" beside the sold unit, without that word, and carry no key.
+  function: lsms_library.countries.Niger._.niger:derive_sold_kg_estimate
+  inputs: lsms_library.countries.Niger._.niger:inputs_sold_kg_estimate
+  raw_variables: [s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq05c, s16dq05d, s16dq06]
+  assumptions:
+    - text: >-
+        s16dq05c is the sale's total in kilograms, as estimated, and not a factor per unit,
+        although both own vague forms instruct "poids en kg d'UNE UML": the released label
+        says a total, kg equals the sold quantity on 45 of 48 sales in Kg and 1 on none, and
+        within a unit kg scales with s16dq05a (log-log slope 0.97 on Tiya, 0.89 on Sac de
+        100kg).  On a sale in the harvest's own unit it equals the line's harvest kg per
+        unit on 939 of 1,134, the same conversion, not a second weighing.
+      basis: variable-label
+      evidence: >-
+        s16d_me_ner2021.dta s16dq05c "16D.05c. Estimation Quantite totale UML en kg";
+        ner_ehcvm2_qnr_men_excel_vague1.pdf and _vague2.pdf, PDF p. 83, 16D05; ruling
+        @ligon 2026-11-12 (.sucoder/isa-decisions.org, "Sold kilograms" and "Sold-kg
+        details" (c)).
+  validated_against: >-
+    tests/test_niger_crop_sold_kg.py, whose oracle reads s16d directly.  An identity has
+    nothing to validate but its rows.
+  contents: 'Niger/_/CONTENTS.org, "2026-11-12 -- crop_production: the sold kilograms are served (GH #1560, #1571)"'
+  since: '2026-11-12'
+
+# GH #1560 / #1571, ruling @ligon 2026-11-12 ("Sold-kg details" (a)).  A MASK on a served
+# row: the row is a harvest and stays; the key rides on it.
+Niger::crop_production::dry-season-sold-kg-no-sale:
+  waves: ['2011-12']
+  columns: [Quantity_sold_kg]
+  rule: >-
+    On a 2011-12 section 3E (dry-season, Farm-level) record that states no sale -- no
+    positive as03eq11a and no positive as03eq12, after their codes (99999, 9999999) --
+    the sold kilograms as03eq11c are NA, whatever the sold flag as03eq10 says.  A sale is
+    the test every Niger wave uses (is_crop_sale).  The record's harvest, Quantity and
+    Quantity_kg, is served unchanged, and the row carries this key.  Every other 3E record
+    keeps its sold kilograms (dry-season-sale-window).  No other Niger wave has such a
+    record once its codes are masked.
+  function: lsms_library.countries.Niger._.niger:derive_dry_season_sold_kg_no_sale
+  inputs: lsms_library.countries.Niger._.niger:inputs_dry_season_sold_kg_no_sale
+  raw_variables: [hid, as03eq01, as03eq03, as03eq06, as03eq09a, as03eq09b, as03eq09c, as03eq10,
+                  as03eq11a, as03eq11b, as03eq11c, as03eq12]
+  assumptions:
+    - text: >-
+        a sold kilogram on a record with no sold quantity and no sale value is not a sale's
+        weight.  Seven records match (8,740 kg): six with both as03eq11a and as03eq12
+        missing and one with both 0, all without a sold unit.  Their own sold flag says Non
+        on six, and six of the seven kilogram answers equal the line's own harvest
+        kilograms as03eq09c, which reads as the harvest entered in the sale's column.  The
+        six Non records have both as03eq11a and as03eq12 missing; the seventh, flag Oui, has
+        both 0 and kilograms equal to its harvest's.  It is masked under the same rule,
+        because the rule is the missing sale and not the flag.  All seven are one-cycle
+        lines with no sold unit.
+      basis: modelling-choice
+      evidence: >-
+        measured on the held ecvmaas3e_p1.dta (GH #1560 investigation,
+        source-case-details-v7.json, and this branch's census); ruling @ligon 2026-11-12,
+        .sucoder/isa-decisions.org "Sold-kg details" (a).
+  validated_against: >-
+    tests/test_niger_crop_sold_kg.py, whose oracle reads ecvmaas3e_p1.dta directly and
+    finds the same seven records.
+  contents: 'Niger/_/CONTENTS.org, "2026-11-12 -- crop_production: the sold kilograms are served (GH #1560, #1571)"'
+  since: '2026-11-12'
 
 Niger::crop_production::survey-kg-estimate:
   waves: ['2021-22']
@@ -398,10 +480,11 @@ Niger::crop_production::survey-kg-estimate:
 # GH #1457 (bulk ruling 2026-11-04, extending #843 option (d)).
 Niger::crop_production::hh-crop-sale-single-row:
   waves: ['2014-15', '2021-22']
-  columns: [Quantity_sold, Value_sold, Unit_sold, Condition_sold]
+  columns: [Quantity_sold, Quantity_sold_kg, Value_sold, Unit_sold, Condition_sold]
   rule: >-
     2014-15 AS2E2 and 2021-22 s16d record a sale for the household and crop, with no
-    plot.  A sale is a record with a positive quantity or value.  Where the crop has
+    plot.  Its kilograms, AS02EQ12C and s16dq05c, ride with it as Quantity_sold_kg, a
+    total (GH #1560, ruling @ligon 2026-11-12).  A sale is a record with a positive quantity or value.  Where the crop has
     exactly one served harvest line -- one served row, not merely one plot (GH #1360),
     and a line with no quantity, month or stand does not count where another does, since
     the API removes it -- the sale is served on it as recorded, in its own Unit_sold, and
@@ -412,8 +495,8 @@ Niger::crop_production::hh-crop-sale-single-row:
     or dropped.  A recorded 0 on a one-line crop stays, with no key: it is not a sale.
   function: lsms_library.countries.Niger._.niger:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Niger._.niger:inputs_hh_crop_sale_single_row
-  raw_variables: [CULTURE, AS02EQ110B, AS02EQ12A, AS02EQ12B, AS02EQ13, s16cq04, s16dq01,
-                  s16dq05a, s16dq05b, s16dq05d, s16dq06]
+  raw_variables: [CULTURE, AS02EQ110B, AS02EQ12A, AS02EQ12B, AS02EQ12C, AS02EQ13, s16cq04,
+                  s16dq01, s16dq05a, s16dq05b, s16dq05c, s16dq05d, s16dq06]
   assumptions:
     - text: >-
         the crop module asks the sale once per crop, with no plot.  Where the crop has one

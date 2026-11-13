@@ -133,8 +133,10 @@ class TestDeclared:
         assert canonical["optional"] is True and "spellings" not in canonical
 
     # TOTAL gained Quantity_kg in GH #1436: as03eq09c is per cycle, like as03eq09a.
+    # SALE gained Quantity_sold_kg in GH #1560: as03eq11c is in as03eq11a's window.
     @pytest.mark.parametrize("key, columns", [(TOTAL, ["Quantity", "Quantity_kg"]),
-                                              (SALE, ["Quantity_sold", "Value_sold"])])
+                                              (SALE, ["Quantity_sold", "Value_sold",
+                                                      "Quantity_sold_kg"])])
     def test_the_keys_are_registered_for_the_one_wave(self, key, columns):
         record = records_for(COUNTRY, TABLE)[key]
         assert list(record["waves"]) == [WAVE]

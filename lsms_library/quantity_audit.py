@@ -453,8 +453,11 @@ _SCREENED_COLUMNS: dict[str, tuple[str, ...]] = {
                   "HeadLostOrDied"),
     # `Quantity_kg` (GH #1436) is the survey's own total, read first by the crop
     # ladder and served as recorded, so this is the only place an impossible one
-    # is named.
-    "crop_production": ("Quantity", "Quantity_kg", "Quantity_sold", "Sale_price"),
+    # is named.  `Quantity_sold_kg` (GH #1560, ruling @ligon 2026-11-12) is its
+    # sold-side twin, a total served as recorded, screened the same way on the
+    # generic (t,u,j) ladder: report-only, as everywhere here.
+    "crop_production": ("Quantity", "Quantity_kg", "Quantity_sold", "Quantity_sold_kg",
+                        "Sale_price"),
     "food_acquired": ("Quantity",),
     # GH #879: the canonical schema declares plot_features.Area in
     # HECTARES with AreaUnit a PROVENANCE label, but six countries served
@@ -490,7 +493,8 @@ _SCREENED_COLUMNS: dict[str, tuple[str, ...]] = {
 #: Nor is ``food_prices.Price``: a low price is a high quantity, which the upper
 #: rule already names (1,965 of 5,347,847 rows would fire, 946 of them in Mali).
 _NEAR_ZERO_COLUMNS: dict[str, tuple[str, ...]] = {
-    "crop_production": ("Quantity", "Quantity_kg"),
+    # `Quantity_sold_kg` takes the lower tail as `Quantity_kg` does (GH #1560).
+    "crop_production": ("Quantity", "Quantity_kg", "Quantity_sold_kg"),
     "food_acquired": ("Quantity",),
 }
 
@@ -1043,8 +1047,23 @@ def _reports_for(df, column, named, flagged, ratio, q, reference, rung, *,
 # Reporting -- one choke point, mirroring null_read_audit._emit_null_read_report
 # ---------------------------------------------------------------------------
 
+#: ``{(table, column): what the value is}`` for a screened column that holds a
+#: KILOGRAM TOTAL while its cell is keyed on the row's harvest ``u`` (GH #1560,
+#: red team F2).  Printed as ``u=Sac (100 Kg) 1,150,000``, a total of kilograms
+#: sold read as 1,150,000 sacks.  For these the message names the unit
+#: ``harvest_u`` and puts the value's own unit after the value and the reference.
+#: The unit stays in the message because the reference IS that harvest-unit
+#: cell's.  Wording only: which rows are named, and the structured report
+#: (``u``, ``rung``, ``value``), do not depend on it.  ``Quantity_kg`` reads the
+#: same way and is left as it was.
+_KG_TOTAL_ON_HARVEST_U: dict[tuple[str, str], str] = {
+    ("crop_production", "Quantity_sold_kg"): "kg sold",
+}
+
+
 def _format_offender(offender: dict[str, Any], direction: str = "high",
-                     quantile: float = QUANTITY_REFERENCE_QUANTILE) -> str:
+                     quantile: float = QUANTITY_REFERENCE_QUANTILE,
+                     kg_total: str | None = None) -> str:
     parts = [f"i={offender['i']}"]
     if offender["plot"] is not None:
         parts.append(f"plot={offender['plot']}")
@@ -1061,13 +1080,17 @@ def _format_offender(offender: dict[str, Any], direction: str = "high",
             if offender.get(axis) is not None:
                 parts.append(f"{axis}={offender[axis]}")
     elif offender["u"] is not None:
-        parts.append(f"u={offender['u']}")
+        parts.append(f"{'harvest_u' if kg_total else 'u'}={offender['u']}")
     scale = (f"x{offender['ratio']:,.1f} its" if direction == "high"
              else f"1/{offender['ratio']:,.1f} of its")
-    parts.append(f"{offender['value']:,.10g} ({scale} "
+    unit = f" {kg_total}" if kg_total else ""
+    rung = offender["rung"]
+    if kg_total and rung:
+        rung = ",".join("harvest_u" if a == "u" else a for a in str(rung).split(","))
+    parts.append(f"{offender['value']:,.10g}{unit} ({scale} "
                  f"cell's p{quantile * 100:.0f} of "
-                 f"{offender['reference']:,.10g}, cell keyed on "
-                 f"{offender['rung']})")
+                 f"{offender['reference']:,.10g}{unit}, cell keyed on "
+                 f"{rung})")
     return " ".join(parts)
 
 
@@ -1079,8 +1102,10 @@ def _format_quantity_report(report: dict[str, Any]) -> str:
     shown = offenders[:_MAX_NAMED]
     more = len(offenders) - len(shown)
     direction = report.get("direction", "high")
+    kg_total = _KG_TOTAL_ON_HARVEST_U.get((report["table"], report["column"]))
     listed = "; ".join(
-        _format_offender(o, direction, report["reference_quantile"]) for o in shown)
+        _format_offender(o, direction, report["reference_quantile"], kg_total)
+        for o in shown)
     if direction == "high":
         tail = (f"more than {report['k']:,.0f}x the "
                 f"{report['reference_quantile'] * 100:.0f}th percentile")
@@ -1112,6 +1137,12 @@ def _format_quantity_report(report: dict[str, Any]) -> str:
         answers = ("Sale_price means Value_sold / Quantity_sold per Unit_sold, "
                    "not per harvest u or per kg; disagreeing unit labels "
                    "remain unreliable, and no sentinel or source correction is inferred")
+    if kg_total is not None:
+        comparison = (
+            "each value is the TOTAL kilograms sold on its row, not a count of "
+            "any unit; comparable rows share the wave, the row's HARVEST unit "
+            "(harvest_u, not the sale's Unit_sold) and the crop where at least "
+            f"{report['min_cell']} such rows exist; zeros never set the scale")
     return (
         f"{where}: {report['n_implausible']:,} of {report['rows']:,} row(s) "
         f"report a '{report['column']}' {tail} of comparable rows "
