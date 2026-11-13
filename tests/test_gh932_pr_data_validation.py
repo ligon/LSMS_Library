@@ -75,8 +75,11 @@ def test_no_edit_of_title_body_or_base_triggers_a_run():
     assert 'edited' not in triggers['types']
     # The documented ways to re-validate after a retarget without a push.
     assert {'synchronize', 'reopened', 'ready_for_review'} <= set(triggers['types'])
-    # The fail-closed argument for a retarget rests on the strict ruleset
-    # setting; the workflow must keep saying so where it can be checked.
+    # This pins only the workflow's WRITTEN statement that reusing an earlier
+    # validation after a retarget relies on the ruleset's strict setting, so
+    # the statement is not deleted silently.  It does not check the ruleset
+    # itself: that lives in GitHub settings, which tests cannot read (it was
+    # read from the rulesets API on 2026-11-13).
     assert 'strict_required_status_checks_policy: true' in WORKFLOW.read_text()
 
 

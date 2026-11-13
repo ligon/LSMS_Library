@@ -15,24 +15,28 @@ on:
     # What a base change does now.  Per GitHub's webhook docs a base change
     # emits only `edited` ("...or the base branch of a pull request was
     # changed"; `synchronize` is "head branch was updated"), so retargeting to
-    # development without a push starts no run here.  That fails closed:
-    #   - If no successful pr-data-validation exists on the head commit, the
-    #     required check stays "Expected" and the merge is blocked until a
-    #     push, a close/reopen, or draft -> ready for review starts a run.
-    #   - If one does exist (validated earlier against development, then
-    #     retargeted away and back), it validated exactly the tree that would
-    #     merge.  The classifier only ever validates a development base, and
-    #     ruleset 25124452 sets strict_required_status_checks_policy: true, so
-    #     the merge needs development's tip in the head's history.  The base
-    #     that run validated is an ancestor of that tip (ruleset 9389899 bans
-    #     non-fast-forward, with no bypass), so both merges have the head's
-    #     tree.  A development move without a head update is blocked as "out
-    #     of date"; updating the branch is a push, so it re-validates.
-    # This argument depends on the strict setting, read from the rulesets API
-    # on 2026-11-13.  If that setting is ever cleared, a retarget reuses an
-    # older validation, as the other required check, unit-tests (ci.yml,
-    # default types), always has.  The base-change-only-emits-edited premise
-    # is from the docs and was not tested here.
+    # development without a push starts no run here.  Two cases:
+    #   - FAILS CLOSED.  If no successful pr-data-validation exists on the
+    #     head commit (e.g. a PR opened against another branch), the required
+    #     check stays "Expected" and the merge is blocked until a push, a
+    #     close/reopen, or draft -> ready for review starts a run.
+    #   - REUSES AN EARLIER VALIDATION: neither re-validates nor fails closed.
+    #     If the head was already validated against development (retargeted
+    #     away and back with no push), that success still satisfies the check.
+    #     That is safe because it validated exactly the tree that would merge.
+    #     The classifier only ever validates a development base.  Ruleset
+    #     25124452 sets strict_required_status_checks_policy: true, so the
+    #     merge needs development's tip in the head's history.  The base that
+    #     run validated is an ancestor of that tip (ruleset 9389899 bans
+    #     non-fast-forward on development, with no bypass), so both merges
+    #     have the head's tree.  A development move without a head update is
+    #     blocked as "out of date"; updating the branch is a push, so it
+    #     re-validates.
+    # The second case depends on the strict setting, read from the rulesets
+    # API on 2026-11-13.  If it is ever cleared, a retarget reuses an older
+    # validation against an older development, as the other required check,
+    # unit-tests (ci.yml, default types), always has.  The premise that a base
+    # change emits only `edited` comes from the docs and was not tested here.
     types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
 
 # No workflow concurrency: a later event must not replace a pending
