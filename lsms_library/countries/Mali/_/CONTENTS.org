@@ -4097,7 +4097,9 @@ mass (survey / implied 0.30).  It names none.  The cold frame is =assert_frame_e
 jobs 41275992, 41276357 and 41276727), nothing served:
 - 2017-18 is mostly unconverted today (23,160 of 24,921 rows on =none=; 1.66M kg served).  A
   price-implied =Sac= (=Mil= 120 kg, =Maïs= 105, =Arachide= 60, =Coton= 100) would serve 9,052 of them
-  and the wave would gain 14.8M kg; the top 1% of served rows carry 27.3% of it, and one row whose
+  and the wave would gain 14.8M kg.  Its baselines sit at the floor: the =Arachide=, =Mil= and =Maïs=
+  cells (8,673 rows, 10.9M kg) rest on 5, 5 and 7 =Kg= sales, because the EAC-I sold sacks state no
+  size.  The top 1% of served rows carry 27.3% of the 14.8M kg, and one row whose
   =Quantity= Site Q already names would carry 857k kg (5.8%).
 - *The instrument's own sold factors agree with prices.*  =KgFactor_sold= (=s3aq23c=, =s7gq21d=,
   field sales) over the price-implied kilograms per sold unit: median 1.00 in 2014-15 (48 sales) and
