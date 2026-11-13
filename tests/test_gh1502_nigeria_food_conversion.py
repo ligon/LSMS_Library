@@ -5,7 +5,9 @@ tables, and the harvest-side ag_conv_w3, as a per-row Quantity_kg -- the
 survey_kg rung); "Measure PH, then align" (PH W3's blank-size Kg / l);
 "Register tokens, keep Unknown" (a blank PH unit is 'Unknown').
 
-Synthetic inputs through the real builders; no survey source is read.
+Synthetic inputs through the real builders; no survey source is read, except
+by the one cached-source check of the W2 tables' centilitre class, which skips
+unless the table is already in local L1 (no acquisition).
 """
 import ast
 import importlib.util
@@ -104,6 +106,36 @@ def test_w2_liquid_list_is_explicit_and_per_round(nigeria):
     for t, codes in nigeria.W2_CL_CLASS_LIQUID_ITEMS.items():
         labels = nigeria.harmonized_food_labels(t)
         assert all('oil' in labels[c].lower() for c in codes), (t, codes)
+
+
+#: Every OTHER item code that carries a g_cl = 0 cell in the held W2 tables,
+#: reviewed item by item (Nigeria/_/CONTENTS.org, the per-item evidence table of
+#: the GH #1502 section) and read as grams.  With W2_CL_CLASS_LIQUID_ITEMS this
+#: makes both sides of the split explicit: a new item in the class fails here.
+W2_CL_CLASS_SOLID_ITEMS = {
+    '2012Q3': frozenset({31, 43, 44, 70, 71, 72, 83, 84, 85, 90, 91, 103, 104,
+                         112, 121, 122}),
+    '2013Q1': frozenset({30, 31, 43, 44, 62, 70, 71, 72, 83, 85, 103, 120,
+                         121, 122}),
+}
+
+
+@pytest.mark.parametrize('t, rel', [('2012Q3', '2012-13/Data/food_conv_w2pp.csv'),
+                                    ('2013Q1', '2012-13/Data/food_conv_w2ph.csv')])
+def test_held_w2_cl_class_is_liquids_plus_reviewed_solids(nigeria, t, rel):
+    from lsms_library import local_tools as L
+    path = NG / rel
+    if L._dvc_cache_path(path) is None:
+        pytest.skip(f'{rel} is not cached locally; no acquisition')
+    tab = nigeria.food_conversion_table(
+        L.get_dataframe(path, convert_categoricals=False), t)
+    cl_class = set(tab.loc[tab['g_cl'] == 0, 'item_cd'].astype(int))
+    assert cl_class == set(nigeria.W2_CL_CLASS_LIQUID_ITEMS[t]) | W2_CL_CLASS_SOLID_ITEMS[t]
+    assert set(tab.loc[tab['as_grams'], 'item_cd'].astype(int)) == W2_CL_CLASS_SOLID_ITEMS[t]
+    liquid = tab[(tab['g_cl'] == 0) & ~tab['as_grams']]
+    np.testing.assert_allclose(liquid['kg_per_unit'], liquid['conv'] / 100.0)
+    solid = tab[tab['as_grams']]
+    np.testing.assert_allclose(solid['kg_per_unit'], solid['conv'] / 1000.0)
 
 
 def w2_food_csv(tmp_path, rows):

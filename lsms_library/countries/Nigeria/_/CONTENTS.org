@@ -718,20 +718,90 @@ served =u=:
   conversions" 20, "Used 3, 5, 7 medium pieces for heaps" 9, "Used leaves
   (item_cd==78) for bunch" 5); 4,533 served rows reach one.  They are served as
   the World Bank recorded them and named in =derivation_inputs= (=note=).
-- *Volume rows are litres served as kilograms* (1 l = 1 kg): W2's =g_cl= = 0
-  rows (=conv= / 100; 1,124 rows in 2012Q3, 843 in 2013Q1) and W3's liquid
-  containers, as W4's =*_cvn= already are.  This differs from the W1
-  card-weight decision (GH #1035), which leaves litre containers to the
-  inference; for maintainer review.
+- *Volume rows are litres served as kilograms* (1 l = 1 kg; ruling @ligon
+  2026-11-13, "Serve tabled litres both sides"): W2's =g_cl= = 0 rows of the
+  LIQUID items only (=conv= / 100: the oils, 240 rows in 2012Q3, 206 in
+  2013Q1) and W3's liquid containers, as W4's =*_cvn= already are.  This
+  differs from the W1 card-weight decision (GH #1035), which leaves litre
+  containers to the inference.  =volume_as_mass=False= cannot decline them:
+  it acts on unit labels and the =survey_kg= rung outranks it (measured: the
+  308,062 =survey_kg= rows are the same rows, at the same factors, under
+  either setting; burst jobs 41276285 / 41276349, =reports/nigeria/out/m11/=).
+- *W2's =g_cl= = 0 ("centilitre") class is read as GRAMS for every non-liquid
+  item* (ruling @ligon 2026-11-13, "Re-read solids as grams"; red team F1).
+  The class is not one physical kind: the PH table gives a mudu of palm oil
+  127.2 and a mudu of tomatoes 1,000, a milk cup of oil 15.9 and of
+  groundnuts 100.  Read as centilitres the solids sat about 10x above the
+  inference, W3's table and W4's =*_cvn=.  So =conv= / 100 (litres) stays
+  only for an explicit, reviewed list of liquid item codes,
+  =nigeria.W2_CL_CLASS_LIQUID_ITEMS= (per round, because W2's item codes
+  collide between its rounds, GH #1144); every other item's =g_cl= = 0 cell
+  is =conv= / 1000 under its own key,
+  =Nigeria::food_acquired::w2-cl-class-read-as-grams= (884 served rows in
+  2012Q3, 637 in 2013Q1).  The list was decided item by item on what the item
+  is, with this evidence (burst job 41275442, =reports/nigeria/out/m8/=;
+  table / reference, median over served rows, cl reading / grams reading):
+
+  | item (code) | rows 2012Q3 / 2013Q1 | inference | W3 table | price-implied | read as |
+  |-+-+-+-+-+-|
+  | 50 Palm oil | 144 / 156 | 1.49 / 0.149 | 1.99 / 0.199 | 0.85 / 0.085; 0.74 / 0.074 | litres |
+  | 52 Groundnut oil | 74 / 50 | 1.49 / 0.149 | 1.99 / 0.199 | 0.53 / 0.053; 0.80 / 0.080 | litres |
+  | 53 Other oils and fats | 22 / -- | 1.75 / 0.175 | -- | -- | litres |
+  | 43 Groundnuts (2012Q3) | 431 / -- | 15.2 / 1.52 | -- | 3.08 / 0.31 | grams (price-implied fits neither) |
+  | 43 Groundnuts (unshelled) (2013Q1) | -- / 143 | 5.0 / 0.50 | 6.41 / 0.64 | -- | grams |
+  | 44 Other nuts/seeds/pulses (2012Q3) | 93 / -- | 8.69 / 0.87 | -- | -- | grams |
+  | 44 Groundnuts (shelled) (2013Q1) | -- / 237 | 19.1 / 1.91 | 7.87 / 0.79 | 2.13 / 0.21 | grams (price-implied prefers cl) |
+  | 70 Tomatoes | 136 / 84 | 12.5 / 1.25; 13.4 / 1.34 | 8.70 / 0.87 | 10.0 / 1.0 | grams |
+  | 71 Tomato puree (canned) | 130 / 125 | 15.0 / 1.5 | 11.05 / 1.11 | 1.5 / 0.15; 1.75 / 0.175 | grams (price-implied prefers cl) |
+  | 72 Onions | 46 / 9 | 7.69 / 0.77; 11.5 / 1.15 | -- | 6.1 / 0.61; 6.0 / 0.60 | grams |
+  | 83 Agricultural eggs | 1 / 2 | 18.75 / 1.875 | -- | 571 / 57 (1 row) | grams |
+  | 84 Local eggs | 9 / -- | 3.75 / 0.375 | -- | 1.0 / 0.1 | grams (price-implied prefers cl) |
+  | 85 Other eggs (not chicken) | 2 / 1 | 8.0 / 0.8 | -- | 17.8 / 1.78 | grams |
+  | 90 Beef; 91 Mutton | 1; 1 / -- | 12.5 / 1.25 | -- | 20 / 2.0; 32 / 3.2 | grams |
+  | 103 Fish--dried | 12 / 9 | 24 / 2.4 | -- | 26 / 2.6; 26.7 / 2.67 | grams |
+  | 104 Snails | 2 / -- | 38.7 / 3.87 | -- | 12 / 1.2 | grams |
+  | 112 Baby milk powder | 2 / -- | 11.8 / 1.18 | -- | -- | grams |
+  | 120 Coffee | -- / 1 | 1.875 / 0.19 | -- | -- | grams (inference prefers cl) |
+  | 121 Chocolate drinks (incl. Milo) | 4 / 2 | 1.875 / 0.19 | -- | 0.55 / 0.055; 5.06 / 0.51 | grams (inference prefers cl; price-implied cl in 2012Q3, grams in 2013Q1) |
+  | 122 Tea | 14 / 21 | 0.20 / 0.020; 0.19 / 0.019 | -- | 0.072 / 0.007; 0.05 / 0.005 | grams (both prefer cl) |
+  | 30 Cassava--roots (2013Q1) | -- / 1 | 41.7 / 4.17 | -- | 30.2 / 3.0 | grams |
+  | 62 Mangoes (2013Q1) | -- / 2 | 30.7 / 3.07 | -- | -- | grams |
+  | 31 Yam--roots | 0 / 0 | -- | -- | -- | grams |
+
+  The oils' cl reading fits all three references.  Every other item is read
+  as grams, as the ruling says for non-liquids, INCLUDING the six where a
+  reference prefers cl (120, 121, 122 on the inference; 44 (2013Q1), 71, 84
+  on the price-implied reference only) -- named for maintainer review, not
+  decided here.  Across the class the price-implied reference disagrees with
+  the re-read (=reports/nigeria/out/m10/=, burst job 41276128): on its 573 /
+  338 purchased rows, table over implied is 0.31 / 0.175 under grams (within
+  2x on 30% / 17%) and 3.08 / 1.75 under cl (34% / 53%); the inference (0.67,
+  within 2x on 93% / 92% of the 884 / 637 rows; read as inference over the
+  re-read table, 15x lower under cl) and W4's =*_cvn= (table over W4 0.76 /
+  0.83 on 6 / 12 same-label cells; about 8x under cl) agree with it.  The
+  price-implied reference is weakest exactly here: an item's Kg-labelled
+  purchases need not be the same product (groundnuts carry most of these
+  rows).  Kilograms on the class: 64,666 / 12,593 under cl, 6,467 / 1,259
+  under grams.  Which field the World Bank got wrong (=g_cl= or =conv=) is
+  not established.
+- *The W3 tables' ZONE columns are stored as Stata =float= (float32)* in
+  both =food_conv_w3.dta= and =ag_conv_w3.dta= (=conv_national= is float64),
+  and are read as float64 without rounding, so a served own-zone factor
+  differs from its printed six-decimal value by at most 5.7e-8 relative
+  (median 2e-8; burst job 41276356, =reports/nigeria/out/m12/=; red team F6).
+  The national column carries no such rounding; the own-zone choice is kept.
 
 *What the code does.*  =nigeria.food_acquired_for_wave(..., conversion=path)=
 joins each source row's native key -- item code, that source's OWN unit code
 (q3b / q6b / q7b) and on W3 its own Other text -- to the round's table
 (=food_conversion_table=), and serves =Quantity_kg = Quantity x kg_per_unit=
 with =Derivation= =Nigeria::food_acquired::w2-pp-food-conversion= /
-=w2-ph-food-conversion= / =w3-food-conversion= (=_/derivations.yml=), stamped
-after the duplicate-key collapse.  A served key whose contributors the table
-does not all cover would keep =Quantity_kg= NA (0 such keys in W2 / W3).  The
+=w2-ph-food-conversion= / =w3-food-conversion=, or
+=w2-cl-class-read-as-grams= on a W2 row its table reads as a re-read solid
+(=_/derivations.yml=), stamped after the duplicate-key collapse as the union
+of the contributors' keys (=derivations.union_keys_by_group=; no served W2 key
+mixes the two today).  A served key whose contributors the table does not all
+cover would keep =Quantity_kg= NA (0 such keys in W2 / W3).  The
 unwired =2012-13/_/units.py= / =2015-16/_/units.py= are not reused: the W2 one
 swaps PP and PH and ignores =g_cl=, the W3 one drops the Other key and keeps
 the first of a duplicate.
@@ -753,6 +823,10 @@ it replaces does not have:
 ("Price-implied" = the row's Naira per unit over the item's same-round
 median Naira per kg on its Kg-labelled purchases; it is a weak reference where
 an item's Kg purchases are not the same product, e.g. cassava roots by the heap.)
+The W2 rows are scored under the flag's own cl reading.  Under the re-read
+above (both W2 keys together; =reports/nigeria/out/m10/=), W2's price-implied
+score is 1.01 / 0.93, within 2x on 82.4% / 78.1% of rows, and its W4 score
+0.92 / 0.94, within 2x on 72% / 74% of cells.
 The inference served W3 at a median 0.556 of the table's national column (0.84 on =item_unit=, 0.30 on =unit=), the #1502
 headline reproduced on 106,851 rows: 164,939 kg against 332,209.  W2's table
 is close to the inference and to W4 overall, but its three *derica* sizes sit
@@ -761,40 +835,49 @@ on 1,250 rows; served as tabled, for maintainer review.  W2's unsized units
 (mudu, congo, tiya, olodo, kobiowu ...) have no same-label W4 cell and are
 unscored there, not disagreeing.
 
-*What carries W2's rise* (decomposed per row, =reports/nigeria/out/m6/=,
-=m7/=).  2012Q3's +70,963 kg is paint rubber +32,385, mudu +25,509, tiya
-+11,443; 42 rows reporting 100 or more units carry 47,795 kg of it, and the 20
-largest rows 69%.  Its largest cells are vegetables at a factor far above both
-the inference and the household price-implied value: Tomatoes / paint rubber
-30 kg (inference 1.6, price-implied 2.5; two rows of 500 and 600 paint
-rubbers add 31,240 kg), Tomatoes / mudu 10 kg (0.84, 1.0), Onions / mudu 7.5
-kg (0.975, 1.5), Groundnuts / tiya 16 kg (1.05, 5.2).  Grain cells sit near
-both (Guinea corn / tiya 2.4 against 1.66 and 1.8; Rice--local / mudu 1.35
-against 1.0 and 1.0).  2013Q1's +22,151 kg is spread wider (the 11 rows of 100+
-units carry 4,866).  Served as tabled; for maintainer review.  W3's largest
+*What carries W2's rise* (decomposed per row under the re-read,
+=reports/nigeria/out/m10/=, burst job 41276128).  On the tabled rows the
+kilograms go from the base inference's 67,355 to 80,476 (2012Q3) and from
+56,482 to 68,186 (2013Q1): +13,121 / +11,704, of which the grams class
+(=g_cl= = 1) is +11,034 / +11,038, the re-read solids +1,813 / +429 and the
+oils +274 / +237.  By unit it is tiya +6,821 / +6,273 and mudu +5,190 / +5,846,
+the GRAIN cells, where the table sits 1.2-1.7x the inference (Guinea corn /
+tiya 2.4 against 1.66, Rice--local / tiya 2.7 against 2.0, Maize (shelled) /
+tiya 2.5 against 1.43, Guinea corn / mudu 1.2 against 0.95, Rice--local / mudu
+1.35 against 1.0); the derica sizes and the milk cup fall.  The 20 largest
+rows carry 21% / 11% of the rise and rows of 100+ units 1,956 / 816 kg.
+Served as tabled; for maintainer review.  /Superseded:/ under the flag's cl
+reading (2026-11-13, before the ruling) the rise was +70,963 / +22,151 kg,
+carried by cl-class solids -- Tomatoes / paint rubber at 30 kg (two rows of
+500 and 600 paint rubbers added 31,240 kg), Groundnuts / tiya at 16 kg --
+which now read 3.0 and 1.6 kg.  W3's largest
 cells are roots by the heap (Cassava--roots / medium heap 21.6 kg against
 1.0 and 1.0), where W4's =*_cvn= carries the same values.
 
-*Movement, base =f138a3d61= -> =1c906836a=, cold, private roots* (burst jobs
-41271653 / 41272041; =reports/nigeria/out/v1-1c906836a/=).  =food_acquired=
+*Movement, base =f138a3d61= -> =f6361d068=, cold, private roots* (burst jobs
+41271653 / 41275807; =reports/nigeria/out/v1-f6361d068/=).  =food_acquired=
 rows, keys, =Quantity= and =Expenditure= do not move; 139,621 rows gain
-=Quantity_kg= and their key.
+=Quantity_kg= and their key (1,521 of them, in W2, the grams key).
 
 | =t= | =food_quantities(units='kgs')= kg, before -> after | =KgFactorSource=, before -> after | =food_prices()= median Naira/kg |
 |-+-+-+-|
 | 2010Q3 | 191,707 -> 192,250 (+0.3%) | unchanged (3,679 factors move, median x1.13) | 187.5 -> 187.5 |
 | 2011Q1 | 245,539 -> 245,539 | unchanged | 200 -> 200 |
-| 2012Q3 | 189,161 -> 260,124 (+37.5%) | =item_unit= 14,444 -> 37, =unit= 763 -> 444, =survey_kg= 0 -> 14,726 | 250 -> 250 |
-| 2013Q1 | 147,523 -> 169,675 (+15.0%) | =item_unit= 17,582 -> 57, =unit= 653 -> 134, =survey_kg= 0 -> 18,044 | 266.7 -> 266.7 |
-| 2015Q3 | 119,919 -> 206,722 (+72.4%) | =item_unit= 35,507 -> 785, =unit= 21,572 -> 728, =none= 14 -> 16, =survey_kg= 0 -> 55,564 | 400 -> 260.9 |
-| 2016Q1 | 108,068 -> 189,117 (+75.0%) | =item_unit= 32,646 -> 567, =unit= 19,737 -> 529, =survey_kg= 0 -> 51,287 | 400 -> 272.1 |
-| 2018Q3 | 251,251 -> 251,489 (+0.09%) | unchanged (308 factors move, median x2.53) | 390.6 -> 389.6 |
-| 2019Q1 | 214,080 -> 214,135 (+0.03%) | unchanged (213 factors move, median x1.93) | 372.1 -> 370.4 |
-| total | 1,467,249 -> 1,729,051 (+17.8%) | | |
+| 2012Q3 | 189,161 -> 201,888 (+6.7%) | =item_unit= 14,444 -> 37, =unit= 763 -> 444, =survey_kg= 0 -> 14,726 | 250 -> 250 |
+| 2013Q1 | 147,523 -> 158,307 (+7.3%) | =item_unit= 17,582 -> 57, =unit= 653 -> 134, =survey_kg= 0 -> 18,044 | 266.7 -> 266.7 |
+| 2015Q3 | 119,919 -> 206,721 (+72.4%) | =item_unit= 35,507 -> 785, =unit= 21,572 -> 728, =none= 14 -> 16, =survey_kg= 0 -> 55,564 | 400 -> 260.9 |
+| 2016Q1 | 108,068 -> 189,116 (+75.0%) | =item_unit= 32,646 -> 567, =unit= 19,737 -> 529, =survey_kg= 0 -> 51,287 | 400 -> 272.1 |
+| 2018Q3 | 251,251 -> 251,487 (+0.09%) | =item_unit= 1,784 -> 1,778, =unit= 742 -> 748 (308 factors move, median x2.50) | 390.6 -> 389.6 |
+| 2019Q1 | 214,080 -> 214,134 (+0.03%) | =item_unit= 69 -> 61, =unit= 318 -> 326 (213 factors move, median x1.93) | 372.1 -> 370.4 |
+| total | 1,467,249 -> 1,659,443 (+13.1%) | | |
 
-=food_prices()= keeps every row (481,191 key-for-key); its Price changes on
-3,389 (2010Q3), 10,900 / 12,718 (W2), 43,391 / 40,255 (W3) and 188 / 128 (W4)
-rows.  W3's per-kg medians used to equal W4's (400 against 372-391, as if
+The phase-1 version of this table (=1c906836a=, before the re-read) had W2 at
+260,124 (+37.5%) and 169,675 (+15.0%) and a total of 1,729,051 (+17.8%); it
+also called W4's partition "unchanged", which it was not then either (15
+rows moved from =item_unit= to =unit=, one back).  =food_prices()= keeps every
+row (481,191 key-for-key); its Price changes on 3,389 (2010Q3), 10,886 /
+12,709 (W2; median new / old 0.90 / 0.92 on the changed rows), 43,391 / 40,255
+(W3) and 188 / 128 (W4) rows.  W3's per-kg medians used to equal W4's (400 against 372-391, as if
 prices had not risen 2016-19) and now sit below them.  =food_expenditures=
 and the native-unit modes read no kilogram factor, so they cannot move (not
 re-measured).
@@ -3850,7 +3933,7 @@ and actual PH Wave extraction using locally cached data only. It skips when
 that declared blob is absent and never acquires it. No new eligibility,
 attainment, sample-link or PP carry-forward rule is introduced here.
 
-** 2026-11-13 -- which post-planting rounds field education (GH #1713; nothing changed)
+** 2026-11-13 -- which post-planting rounds field education (GH #1713)
 
 GH #1713: the five PP quarters grade =dropped= since the v0.17.0 regrade,
 because =individual_education= is dated post-harvest only and the coverage
@@ -3869,14 +3952,35 @@ script or the YAML block removes the PH quarter too.  Measured 2026-11-13
 | 2023Q3 | none | =ghs_panel_w5_pp_household_questionnaire.pdf=: sections 1, 1A-1E, 3-11, 16, no education (PH prints "SECTION 2: EDUCATION") |
 
 So W1 / W2 PP record attainment for every member aged 5+ -- far more than the
-served PH new-member blocks (643 / 313 rows) -- and are unwired, while W3-W5
-PP do not ask it.  The questionnaire text was read through a crude text-layer
-extraction of the held PDFs (the W2 PDFs did not extract).  The fit for the
-three W3-W5 cells is a =correctly-empty= verdict (D1 + C4 above); for W1 / W2
-it is =empty-pending-machinery= or wiring the PP series.  Neither is done
-here: the brief asked for the declaration's removal, and which of the three
-is wanted is a question (drafted rows: =reports/nigeria/out/1713-draft-verdicts.csv=
-in the 2026-11-13 batch).
+served PH new-member blocks (643 / 313 rows) -- while W3-W5 PP do not ask it.
+The questionnaire text was read through a crude text-layer extraction of the
+held PDFs (the W2 PDFs did not extract).
+
+/Ruling (@ligon, 2026-11-13, "Wire W1/W2 PP + verdicts")/, done the same day:
+
+- *W1 / W2 PP are served.*  Each wave's =individual_education= =file:= list
+  gains its PP section-2 file with a per-file override (=t:= the PP quarter,
+  =Educational Attainment= read from =s2q7= in W1, =s2q8= in W2, through
+  =harmonize_education=), so =Wave.column_mapping= reads it only for that
+  quarter; the PH entry is unchanged.  Measured cold (burst job 41275807,
+  =reports/nigeria/out/v1-f6361d068/=): 2010Q3 gains 17,116 rows, 2012Q3
+  17,403 (no duplicate =(i, pid)=); 2011Q1's 643, 2013Q1's 313 and W3-W5 are
+  unchanged (0 values differ).  The PP and PH series are different questions
+  to different members and are not pooled.
+- *Seven PP spellings joined =harmonize_education=* under its documented
+  collapse (no new level): =teacher training= / =TEACHER TRAINING= ->
+  Tertiary certificate/diploma; =HIGHER DEGREE= -> Postgraduate; =quaranic
+  integrated=, =adult education= -> Informal; =LOWER 6= -> Upper secondary;
+  =UPPER 6= -> Upper secondary complete.  =categorical_mapping.org= is a
+  build input, so this is part of Nigeria's re-warm.
+- *Three W2 PP cells carry a code the file's own value labels do not define*
+  (4, 19, 20; one member each).  They pass through as recorded (served as
+  ="4.0"=, ="19.0"=, ="20.0"=), like any unmapped label (GH #1292 pins that
+  pass-through); mapping them needs the W2 PP code list, which the held PDF
+  does not yield.  For review.
+- *W3-W5 PP are =correctly-empty=*: three rows in
+  =.coder/coverage/absent_verdicts.csv= (D1, D2, C4; the evidence is the
+  table above).  =latest.csv= is not regenerated here.
 
 * 2026-10-30 -- Household roster actual runtime checkpoint (GH #1287)
 
@@ -4263,26 +4367,44 @@ value on 319 and the national value on 40 of the 366 W4 rows where the two
 differ (median ratio 1.000, 83% exact against zone, 68% against national, on
 1,908 rows; burst job 41271791).
 
-*Held, as the opt-in helper holds them (the ruling lifts neither)*: the 9
-table rows whose =unit_name= contradicts the harvest file's own card for the
-code (pumpkin, pumpkin leave, green vegetable on 160-162: table BUNDLE LARGE /
-BUNCH MEDIUM / BUNCH LARGE, card BUNDLE SMALL / MEDIUM / LARGE; 69 native
-positive-quantity rows), and the fluid units (LITRE, and jerry cans of 10 / 20
-/ 25 litres; the #1035 litre decision; 71 native positive-quantity jerry-can
-rows).  The metric units keep their
-label rung.  *Observed, not acted on*: W4's =BUNDLE SMALL / MEDIUM / LARGE=
+*Held, as the opt-in helper holds them*: the 9 table rows whose =unit_name=
+contradicts the harvest file's own card for the code (pumpkin, pumpkin leave,
+green vegetable on 160-162: table BUNDLE LARGE / BUNCH MEDIUM / BUNCH LARGE,
+card BUNDLE SMALL / MEDIUM / LARGE; 69 native positive-quantity rows; the
+coordinator's default, 2026-11-13).  The metric units (KILOGRAM, GRAMS,
+LITRE) keep their label rung.
+
+*The jerry cans are served at 1 l = 1 kg* (ruling @ligon 2026-11-13, "Serve
+tabled litres both sides", as the food side serves the tables' litre
+containers): 71 native positive-quantity rows (oil palm, palm oil; 17 / 21 /
+33 on the 10 / 20 / 25 l cans) now carry =Quantity_kg= from the table (10 /
+20 / 25 per can, 14,310 kg).  *They were not held before the ruling: they
+were served wrong.*  =_canon_unit= tests ='litre'= before ='jerry'=, so ="190.
+JERRY CAN/RUBBER 10 LITRES"= is served =u = 'l'=, and =harvest_kg='s
+=metric= rung read one can as one litre: 645 kg on those 71 rows in the base
+build (burst job 41276093, =reports/nigeria/out/m9/=).  Only W3's labels say
+LITRES; W1 / W2 / W5's jerry cans (41 / 93 / 36 rows) are served =Jerry Can=.
+*Still open*: the served =u= of the 71 W3 rows is still ='l'= with
+=Quantity= counting cans, so a native-unit consumer reads 4 cans as 4 litres;
+fixing the fold changes =u= (a key) and is outside the ruling -- a question
+for the maintainer.  =harvest_kg(volume_as_mass=False)= leaves all 71 on
+=survey_kg= at 14,310 kg (it acts on unit labels; burst job 41276349).  *Observed, not acted on*: W4's =BUNDLE SMALL / MEDIUM / LARGE=
 rows carry exactly the held rows' factors (0.48 / 0.62 / 0.83, 27 / 92 / 46
 rows, 100% exact), and those factors rise with the card's sizes, so the
 table's =unit_name= reads like a labelling slip -- a question for the
 maintainer, not a release of the hold.
 
-*Measured, base =f138a3d61= -> =1c906836a=, cold* (=reports/nigeria/out/v1-1c906836a/=).
-=crop_production= rows, keys and every reported column are unchanged;
-8,436 2016Q1 lines gain =Quantity_kg= (8,507,708 kg; 2,511 of them also carry
-a GH #843 sale key, joined with =+=), and every other wave's =Quantity_kg= is
-NA.  =harvest_kg= 2016Q1: 365,707 -> 8,873,416 kg; =KgFactorSource= =none=
-12,144 -> 3,708, =survey_kg= 0 -> 8,436, =metric= 564 unchanged.  Other waves
-unchanged (2011Q1 5.04M, 2013Q1 4.00M, 2019Q1 7.67M, 2024Q1 5.31M kg).  The
+*Measured, base =f138a3d61= -> =f6361d068=, cold* (burst job 41275807,
+=reports/nigeria/out/v1-f6361d068/=).  =crop_production= rows, keys and every
+reported column are unchanged; 8,507 2016Q1 lines gain =Quantity_kg=
+(8,522,018 kg; 2,522 of them also carry a GH #843 sale key, joined with =+=),
+and every other wave's =Quantity_kg= is NA.  =harvest_kg= 2016Q1: 365,707 ->
+8,887,081 kg; =KgFactorSource= =none= 12,144 -> 3,708, =survey_kg= 0 -> 8,507,
+=metric= 564 -> 493 (the 71 jerry cans).  Other waves unchanged (2011Q1 5.04M,
+2013Q1 4.00M, 2019Q1 7.67M, 2024Q1 5.31M kg).  Before the litres ruling
+(=1c906836a=) it was 8,436 lines, 8,507,708 kg and =harvest_kg= 8,873,416.
+*Consumers move with it, unmeasured*: anything built on 2016Q1 harvest
+kilograms (yields, kg-valued production) moves about 24x for that wave.  The
 opt-in =lsms_library.nigeria_harvest.native_w3_harvest_kg= is untouched.
 
 *Contradiction of record.*  =lsms_library/data_info.yml= =crop_production.
@@ -4291,7 +4413,11 @@ by =harvest_kg(shipped_factors=...)=, as its own =shipped= layer", and
 =Quantity_kg= is "the harvest of this LINE in kilograms, AS THE SURVEY WROTE IT
 DOWN".  The ruling puts the table in =Quantity_kg= instead, so =survey_kg=
 here means a World Bank table at the line's native key, not a written total;
-the registry entry says so.  The canonical note is not edited here.
+the registry entry says so.  /Resolved 2026-11-13 (coordinator default)/: both
+canonical notes now admit this exception by name, and Nigeria's
+=data_scheme.yml= declares =Quantity_kg= =optional: true= under
+=crop_production= with its "REPORTED fields only" comment corrected.  The
+canonical edit moves no cache hash (census: 0 of 531 non-Nigeria tables).
 
 *Still open (GH #1518 residual)*: W1 / W2 harvest kilograms.  Their own
 =w1agnsconversion.csv= / =w2agnsconversion.csv= are unwired, and the food
