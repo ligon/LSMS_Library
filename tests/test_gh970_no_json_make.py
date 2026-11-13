@@ -20,8 +20,8 @@ These tests pin that on a private, empty ``LSMS_DATA_DIR``:
   written to the JSON-tier cache under the private root (never in-tree).
 
 The per-wave extraction is monkeypatched (``Wave.grab_data``) so the test is
-hermetic -- no microdata, no DVC, no S3.  Malawi has three waves declaring
-``panel_ids`` (2013-14, 2016-17, 2019-20).
+hermetic -- no microdata, no DVC, no S3. Malawi has four waves declaring
+``panel_ids`` (2013-14, 2016-17, 2019-20, 2024-25).
 
 Since GH #894 no country is Design B: Malawi ships a committed
 ``_/panel_ids.json`` that the cached-candidate lookup would find first.  The
@@ -54,6 +54,7 @@ def _fake_panel_ids_frame(wave: str) -> pd.DataFrame:
         "2013-14": [("0001-001", "101012150028"), ("0002-001", "101015620053")],
         "2016-17": [("0010-001", "0001-001"), ("0011-001", "0002-001")],
         "2019-20": [("0100-001", "0010-001")],
+        "2024-25": [("0200-001", "0100-001")],
     }[wave]
     idx = pd.MultiIndex.from_tuples([(wave, i) for i, _ in rows], names=["t", "i"])
     return pd.DataFrame({"previous_i": [p for _, p in rows]}, index=idx)

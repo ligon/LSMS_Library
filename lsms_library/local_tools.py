@@ -4211,6 +4211,93 @@ def panel_ids(Waves: dict[str, Any] | pd.DataFrame) -> tuple[RecursiveDict, dict
         updated_wave[wave_year] = wave_matches
     return recursive_D, updated_wave
 
+def update_id_reserving(d: dict[str, str], id_splits: dict[str, int],
+                        reserved: set[str]) -> tuple[dict[str, str], dict[str, int]]:
+    '''
+    :func:`update_id`, with one more guard: a minted split suffix ``k_N`` also
+    avoids every id in ``reserved``.
+
+    ``update_id`` guards a mint only against the ids live in the CURRENT wave
+    (GH #504).  An id issued in an EARLIER wave to a lineage that has since
+    left the panel is not live, and ``id_splits[k]`` is reset to 0 whenever
+    ``k`` has a single claimant, so a later wave can mint it again for a
+    different household.  Malawi 2024-25 did so 25 times, 17 of them with
+    2019-20 ids (GH #1275 review).
+    Pass the ids earlier waves issued as ``reserved``.
+
+    Kept separate from ``update_id`` on purpose: ``update_id``'s source is in
+    every panel country's cache fingerprint (their ``panel_ids.py`` imports
+    it), and only the waves a country opts into should move.  With an empty
+    ``reserved`` the two agree (tests/test_malawi_panel_id_guard.py::
+    test_empty_reservations_preserve_legacy_values_and_split_counters).
+    '''
+    D_inv: dict[str, list[str]] = {}
+    for k, v in d.items():
+        D_inv.setdefault(v, []).append(k)
+    live = set(d.values()) | set(reserved)
+    emitted: set[str] = set()
+    updated_id: dict[str, str] = {}
+    for k, v in D_inv.items():
+        if len(v) == 1:
+            updated_id[v[0]] = k
+            id_splits[k] = 0
+            emitted.add(k)
+        else:
+            for it, v_element in enumerate(v):
+                if it == 0:
+                    cand = k
+                else:
+                    split = id_splits.get(k, 0) + it
+                    cand = '%s_%d' % (k, split)
+                    while cand in live or cand in emitted:
+                        split += 1
+                        cand = '%s_%d' % (k, split)
+                updated_id[v_element] = cand
+                emitted.add(cand)
+            id_splits[k] = id_splits.get(k, 0) + len(v) - 1
+    return updated_id, id_splits
+
+
+def panel_ids_guarding(frame: pd.DataFrame, *, guard_from: str
+                       ) -> tuple[RecursiveDict, dict[str, dict[str, str]]]:
+    '''
+    :func:`panel_ids` for a ``(t, i) -> previous_i`` frame, except that from
+    wave ``guard_from`` on, a minted split suffix also avoids every id an
+    earlier wave issued (:func:`update_id_reserving`).
+
+    Waves before ``guard_from`` go through ``update_id`` itself, so their maps
+    are byte-identical to :func:`panel_ids`'s.  A country opts in with
+    ``Panel IDs: guard_minted_from: <wave>`` in its ``data_scheme.yml``, read
+    only by the country's ``panel_ids.py``, which writes the committed
+    crosswalk that both build backends serve (GH #1275).
+    ``Country._compute_panel_ids`` does not read it: its DataFrame fallback,
+    reached only when a country ships no committed JSON, builds with
+    :func:`panel_ids` (PR #1604 review -- a guarded branch there moved every
+    table's build fingerprint corpus-wide for a route production never takes).
+    '''
+    updated_wave: dict[str, dict[str, str]] = {}
+    check_id_split: dict[str, int] = {}
+    issued: set[str] = set()
+    sorted_waves = sorted(frame.index.get_level_values('t').unique())
+    recursive_D = RecursiveDict()
+    for n, wave_year in enumerate(sorted_waves):
+        df = frame[frame.index.get_level_values('t') == wave_year].copy().reset_index()
+        wave_matches = df[['i', 'previous_i']].dropna().set_index('i')['previous_i'].to_dict()
+        previous_wave = sorted_waves[n - 1] if n > 0 else None
+        if previous_wave:
+            previous_wave_matches = updated_wave[previous_wave]
+            wave_matches = {k: previous_wave_matches.get(v, v) for k, v in wave_matches.items()}
+            recursive_D.update({(wave_year, k): (previous_wave, v) for k, v in wave_matches.items()})
+        if wave_year >= guard_from:
+            wave_matches, check_id_split = update_id_reserving(
+                wave_matches, check_id_split, issued)
+        else:
+            wave_matches, check_id_split = update_id(wave_matches, check_id_split)
+        updated_wave[wave_year] = wave_matches
+        issued |= set(wave_matches.values())
+    return recursive_D, updated_wave
+
+
 class IdWalkError(Exception):
     """``id_walk`` cannot tell whether a wave's household ids are raw or walked.
 
