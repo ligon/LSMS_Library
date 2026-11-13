@@ -3872,7 +3872,11 @@ def response_status_label(code):
 #   W2_CL_CLASS_LIQUID_ITEMS.  The class's solids (tomatoes, groundnuts,
 #   eggs, puree, powders, ...) sit ~10x above every reference under conv / 100
 #   and are read as GRAMS (conv / 1000) under their own registered key
-#   (ruling @ligon 2026-11-13, "Re-read solids as grams").
+#   (ruling @ligon 2026-11-13, "Re-read solids as grams").  Conversely the
+#   LIQUID cells of W2_GRAMS_FLAG_LIQUID_CELLS are flagged g_cl = 1 but hold
+#   the container's volume in centilitres, and are read as conv / 100 litres
+#   under the round's own key (ruling @ligon 2026-11-13, "Read as
+#   centilitres").
 # * A served key two source rows share must have every contributor tabled,
 #   or its Quantity_kg is left NA (no partial sum).  W2 / W3 have no such key
 #   today (0 duplicate keys).
@@ -3906,6 +3910,31 @@ W2_CL_CLASS_LIQUID_ITEMS = {
 }
 W2_CL_AS_GRAMS_KEY = 'Nigeria::food_acquired::w2-cl-class-read-as-grams'
 
+#: GH #1502 red team delta D1 (ruling @ligon 2026-11-13, "Read as
+#: centilitres"): the mirror image.  These W2 cells of LIQUID items are flagged
+#: g_cl = 1 ("grams"), but their conv is the container's own volume in
+#: centilitres -- measured against the container volumes the tables' oil rows
+#: imply (mudu 1.272 l, milk cup 0.159 l, paint rubber 3.657 l, medium / large
+#: derica 0.358 / 0.716 l): a milk cup of tinned milk is conv 15, 0.94 of the
+#: cup.  So they are conv / 100 litres, at 1 l = 1 kg, under the round's own
+#: key.  Explicit (item_cd, unit_cd) cells per round (W2 item codes collide
+#: between rounds, GH #1144; unit codes 5 mudu, 8 paint rubber, 9 large derica,
+#: 10 medium derica, 12 milk cup), each with its evidence in CONTENTS.org.
+#: Beverage powders (tea, Milo, coffee) are not liquids and stay grams.
+W2_GRAMS_FLAG_LIQUID_CELLS = {
+    '2012Q3': frozenset({(113, 12),                       # Milk tinned (unsweetened)
+                         (110, 5), (110, 12),             # Fresh milk
+                         (150, 5), (150, 9), (150, 10), (150, 12),  # Bottled water
+                         (161, 5), (161, 12),             # Palm wine
+                         (162, 8),                        # Pito
+                         (132, 8), (132, 12),             # Honey
+                         (51, 12)}),                      # Butter/Margarine
+    '2013Q1': frozenset({(113, 12),                       # Milk tinned (unsweetened)
+                         (110, 5), (110, 12),             # Fresh milk
+                         (132, 8), (132, 12),             # Honey
+                         (51, 12)}),                      # Butter/Margarine
+}
+
 #: The W3 table's zone columns, by the household file's numeric `zone`.
 W3_CONVERSION_ZONES = {1: 'conv_NC_1', 2: 'conv_NE_2', 3: 'conv_NW_3',
                        4: 'conv_SE_4', 5: 'conv_SS_5', 6: 'conv_SW_6'}
@@ -3920,8 +3949,9 @@ def food_conversion_table(table, t):
     ``table`` is the file as read (``convert_categoricals=False``).  Returns
     one row per (item_cd, unit_cd, other, zone) with ``kg_per_unit`` (kg, or
     litres on a volume row), ``g_cl`` and the raw ``conv`` (W2), ``as_grams``
-    (W2: a g_cl = 0 cell of a non-liquid item, read as grams) and ``note``
-    (W3).  ``zone`` is 0 on W2, whose tables carry no zone.  Rows with no
+    (W2: a g_cl = 0 cell of a non-liquid item, read as grams),
+    ``as_centilitres`` (W2: a g_cl = 1 cell of a liquid item listed in
+    `W2_GRAMS_FLAG_LIQUID_CELLS`, read as centilitres) and ``note`` (W3).  ``zone`` is 0 on W2, whose tables carry no zone.  Rows with no
     positive finite factor are dropped; metric codes are dropped (see the
     block comment above).
     """
@@ -3930,14 +3960,20 @@ def food_conversion_table(table, t):
         unit = 's7bq2b' if t == '2012Q3' else 'nsu_cd'
         conv, g_cl = num(table['conv']), num(table['g_cl'])
         item = num(table['item_cd'])
+        unit_cd = num(table[unit])
         as_grams = ((g_cl == 0) & ~item.isin(W2_CL_CLASS_LIQUID_ITEMS[t])).to_numpy(dtype=bool)
-        kg = np.where((g_cl == 1) | as_grams, conv / 1000.0,
-                      np.where(g_cl == 0, conv / 100.0, np.nan))
+        cells = W2_GRAMS_FLAG_LIQUID_CELLS[t]
+        as_cl = ((g_cl == 1).to_numpy(dtype=bool)
+                 & np.array([(int(a), int(b)) in cells if pd.notna(a) and pd.notna(b)
+                             else False for a, b in zip(item, unit_cd)], dtype=bool))
+        kg = np.where(((g_cl == 1).to_numpy(dtype=bool) & ~as_cl) | as_grams, conv / 1000.0,
+                      np.where((g_cl == 0).to_numpy(dtype=bool) | as_cl, conv / 100.0, np.nan))
         out = pd.DataFrame({'item_cd': item,
-                            'unit_cd': num(table[unit]),
+                            'unit_cd': unit_cd,
                             'other': _NO_OTHER, 'zone': 0,
                             'kg_per_unit': kg, 'g_cl': g_cl, 'conv': conv,
-                            'as_grams': as_grams, 'note': pd.NA})
+                            'as_grams': as_grams, 'as_centilitres': as_cl,
+                            'note': pd.NA})
     elif t in ('2015Q3', '2016Q1'):
         unit_cd = num(table['unit_cd'])
         is900 = (unit_cd == _OTHER_SPECIFY_UNIT).to_numpy(dtype=bool)
@@ -3953,7 +3989,8 @@ def food_conversion_table(table, t):
             'item_cd': num(table['item_cd']), 'unit_cd': unit_cd,
             'other': other, 'zone': z,
             'kg_per_unit': num(table[col]).astype('float64'),
-            'g_cl': np.nan, 'conv': np.nan, 'as_grams': False, 'note': note})
+            'g_cl': np.nan, 'conv': np.nan, 'as_grams': False,
+            'as_centilitres': False, 'note': note})
             for z, col in W3_CONVERSION_ZONES.items()], ignore_index=True)
     else:
         raise KeyError(f'Nigeria: no shipped food conversion table for {t!r}')
@@ -3996,12 +4033,13 @@ def food_conversion_match(table, t, item, unit, other=None, zone=None):
     rows['other'] = rows['other'].astype('string')
     tab['other'] = tab['other'].astype('string')
     m = rows.merge(tab[['item_cd', 'unit_cd', 'other', 'zone', 'kg_per_unit',
-                        'g_cl', 'conv', 'as_grams', 'note']],
+                        'g_cl', 'conv', 'as_grams', 'as_centilitres', 'note']],
                    how='left', on=['item_cd', 'unit_cd', 'other', 'zone'],
                    validate='m:1')
     m.index = u.index
-    m['as_grams'] = m['as_grams'].fillna(False).astype(bool)
-    return m[['kg_per_unit', 'g_cl', 'conv', 'as_grams', 'note']]
+    for c in ('as_grams', 'as_centilitres'):
+        m[c] = m[c].fillna(False).astype(bool)
+    return m[['kg_per_unit', 'g_cl', 'conv', 'as_grams', 'as_centilitres', 'note']]
 
 
 def food_conversion_kg_per_unit(table, t, item, unit, other=None, zone=None):
@@ -4251,7 +4289,7 @@ def inputs_food_acquired_conversion(wave, rounds=None, key=None):
             match = food_conversion_match(
                 table, t, df['item_cd'], df[spec['unit']],
                 df[spec['other']] if spec.get('other') else None, df.get('zone'))
-            for c in ('kg_per_unit', 'conv', 'g_cl', 'as_grams', 'note'):
+            for c in ('kg_per_unit', 'conv', 'g_cl', 'as_grams', 'as_centilitres', 'note'):
                 piece[c] = match[c].to_numpy()
             piece.index = pd.MultiIndex.from_arrays(
                 [[t] * len(df), i.values, j.values, u.values, [s] * len(df)],

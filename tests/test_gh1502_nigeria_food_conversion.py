@@ -100,6 +100,23 @@ def test_w2_table_reads_g_cl(nigeria):
     assert match['conv'].tolist()[:2] == [1200.0, 50.0]
 
 
+def test_w2_grams_flagged_liquid_cell_is_read_as_centilitres(nigeria):
+    # GH #1502 red team delta D1 (ruling @ligon 2026-11-13, "Read as
+    # centilitres"): a listed g_cl = 1 cell of a liquid (113 tinned milk per
+    # milk cup, 12) is conv / 100; an unlisted g_cl = 1 cell stays grams.
+    tab = pd.DataFrame({'item_cd': [113, 113, 13], 'nsu_cd': [12, 5, 12],
+                        'conv': [15.0, 1300.0, 250.0], 'g_cl': [1, 1, 1]})
+    match = nigeria.food_conversion_match(
+        tab, '2013Q1', item=pd.Series([113, 113, 13]), unit=pd.Series([12, 5, 12]))
+    np.testing.assert_allclose(match['kg_per_unit'], [0.15, 1.3, 0.25])
+    assert match['as_centilitres'].tolist() == [True, False, False]
+    assert not match['as_grams'].any()
+    for t, cells in nigeria.W2_GRAMS_FLAG_LIQUID_CELLS.items():
+        items = {i for i, _ in cells}
+        assert not items & set(nigeria.W2_CL_CLASS_LIQUID_ITEMS[t]), t
+        assert not items & {120, 121, 122}, t       # beverage powders stay grams
+
+
 def test_w2_liquid_list_is_explicit_and_per_round(nigeria):
     assert nigeria.W2_CL_CLASS_LIQUID_ITEMS == {
         '2012Q3': frozenset({50, 52, 53}), '2013Q1': frozenset({50, 52})}
@@ -136,6 +153,30 @@ def test_held_w2_cl_class_is_liquids_plus_reviewed_solids(nigeria, t, rel):
     np.testing.assert_allclose(liquid['kg_per_unit'], liquid['conv'] / 100.0)
     solid = tab[tab['as_grams']]
     np.testing.assert_allclose(solid['kg_per_unit'], solid['conv'] / 1000.0)
+    # The g_cl = 1 class: the listed liquid cells are conv / 100, every other
+    # cell conv / 1000 (D1, ruling "Read as centilitres").
+    g1 = tab[tab['g_cl'] == 1]
+    listed = set(zip(g1.loc[g1['as_centilitres'], 'item_cd'].astype(int),
+                     g1.loc[g1['as_centilitres'], 'unit_cd'].astype(int)))
+    assert listed == set(nigeria.W2_GRAMS_FLAG_LIQUID_CELLS[t])
+    np.testing.assert_allclose(g1.loc[g1['as_centilitres'], 'kg_per_unit'],
+                               g1.loc[g1['as_centilitres'], 'conv'] / 100.0)
+    np.testing.assert_allclose(g1.loc[~g1['as_centilitres'], 'kg_per_unit'],
+                               g1.loc[~g1['as_centilitres'], 'conv'] / 1000.0)
+    # The evidence, embedded: container volumes from the oil rows (50 / 52,
+    # g_cl = 0, conv / 100 l).  A listed cell's conv is 0.75-1.0 of its
+    # container in centilitres; the cells the same screen also picks that
+    # are NOT listed are the solids Pepper (76, 2012Q3) / Dry Pepper (77,
+    # 2013Q1), whose centilitre reading would be 1.57 kg/l.
+    oil = tab[tab['item_cd'].isin([50, 52]) & (tab['g_cl'] == 0)]
+    cap = (oil['conv'] / 100.0).groupby(oil['unit_cd'].astype(int)).median()
+    g1 = g1.assign(cap=g1['unit_cd'].astype(int).map(cap))
+    dens_cl = g1['conv'] / 100.0 / g1['cap']
+    screen = (g1['conv'] / 1000.0 / g1['cap'] < 0.25) & dens_cl.between(0.5, 1.6)
+    hits = set(zip(g1.loc[screen, 'item_cd'].astype(int), g1.loc[screen, 'unit_cd'].astype(int)))
+    assert listed <= hits
+    assert {i for i, _ in hits - listed} == {'2012Q3': {76}, '2013Q1': {77}}[t]
+    assert dens_cl[g1['as_centilitres']].between(0.75, 1.0).all()
 
 
 def w2_food_csv(tmp_path, rows):

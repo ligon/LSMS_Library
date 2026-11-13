@@ -1102,7 +1102,11 @@ Nigeria::food_acquired::w2-pp-food-conversion: &w2_food_conversion
     (kg_per_unit = conv / 100, at 1 l = 1 kg) ONLY for the reviewed liquid
     items of nigeria.W2_CL_CLASS_LIQUID_ITEMS (the oils: 2012Q3 codes 50, 52,
     53; 2013Q1 50, 52) -- every other g_cl = 0 cell is a solid read as grams
-    under Nigeria::food_acquired::w2-cl-class-read-as-grams.  Post-planting (2012Q3) reads
+    under Nigeria::food_acquired::w2-cl-class-read-as-grams.  Conversely the
+    g_cl = 1 cells of LIQUID items listed in
+    nigeria.W2_GRAMS_FLAG_LIQUID_CELLS (tinned milk, fresh milk, bottled water,
+    palm wine, pito, honey, butter/margarine; explicit (item, unit) cells per
+    round) are read as conv / 100 litres under this key.  Post-planting (2012Q3) reads
     food_conv_w2pp.csv, keyed on the item and the planting unit code s7bq2b;
     post-harvest (2013Q1) reads food_conv_w2ph.csv, keyed on nsu_cd.  The
     tables cover only the non-metric codes 5-16 (mudu, olodo, congo, paint
@@ -1147,6 +1151,25 @@ Nigeria::food_acquired::w2-pp-food-conversion: &w2_food_conversion
         cl reading fits: 2012Q3 Palm oil cell median 1.49x the inference and
         1.99x W3's table (0.149 / 0.199 under grams), Groundnut oil 1.49 / 1.99;
         a mudu of palm oil is 1.272 l and a milk cup 0.159 l in both tables.
+    - text: >-
+        on the listed g_cl = 1 cells of liquid items the flag is wrong and
+        conv is the container's own volume in centilitres: conv / 100 litres,
+        at 1 l = 1 kg.  Only cells where the container volume shows it; the
+        beverage powders (tea, Milo, coffee) are not liquids and stay grams.
+      basis: derived-from-data
+      evidence: >-
+        ruling @ligon 2026-11-13, "Read as centilitres" (red team delta D1).
+        Against the container volumes the oil rows imply (mudu 1.272 l, milk
+        cup 0.159 l, paint rubber 3.657 l, medium / large derica 0.358 / 0.716
+        l), each listed cell's conv is 0.79-0.96 of its container in
+        centilitres (tinned milk / milk cup 15: 0.94; pito / paint rubber 345:
+        0.94; honey / paint rubber 350: 0.96; a mudu of 100: 0.79), so the
+        grams reading serves 0.08-0.10 kg per litre of container.  On the
+        served rows (64 in 2012Q3, 42 in 2013Q1) the centilitre reading gives
+        114.7 / 16.8 kg against the inference's 99.0 / 14.6 and the grams
+        reading's 11.5 / 1.7 (burst job 41279390, reports/nigeria/out/m13/).
+        The same screen also picks Pepper (76, 2012Q3) and Dry Pepper (77,
+        2013Q1); they are solids at 0.157 kg/l, and are not listed.
   validated_against: >-
     two independent references, measured on the base build's raw rows
     (f138a3d61, 2026-11-13) for the W2 tables as now read -- this key and
@@ -1159,7 +1182,8 @@ Nigeria::food_acquired::w2-pp-food-conversion: &w2_food_conversion
     0.93 / 0.875 and 85.9% / 82.2% for the inference it replaces.  W4's *_cvn
     on the same served (item, unit) label (93 / 126 cells, the rest have no
     same-label W4 cell): median ratio 0.92 / 0.94, within 2x on 72% / 74% of
-    cells (0.94 / 0.99, 69% / 65% under the cl reading).  The three derica
+    cells (0.94 / 0.99, 69% / 65% under the cl reading; both measured before
+    the D1 liquid cells, 106 served rows, were read as centilitres).  The three derica
     sizes fit worst on both references (table about half: 0.34-0.62
     price-implied, 0.41-0.54 against W4; measured before the re-read).
   contents: >-
@@ -1374,9 +1398,9 @@ Nigeria::crop_production::w3-ag-conversion:
         positive-quantity rows (oil palm, palm oil): 17 / 21 / 33 on the 10 /
         20 / 25 l cans.  Not held before the ruling but served WRONG:
         _canon_unit tests 'litre' before 'jerry', so "JERRY CAN/RUBBER 25
-        LITRES" is served u = 'l' and harvest_kg's metric rung read one can as
-        one litre (645 kg); this key serves 14,310 kg.  The served u is still
-        'l' on these rows (Quantity counts cans), an open question.
+        LITRES" was served u = 'l' and harvest_kg's metric rung read one can as
+        one litre (645 kg); this key serves 14,310 kg, and since red team delta
+        D2 the rows are served u = 'Jerry Can' (W3_HARVEST_UNIT_OVERRIDE).
         volume_as_mass=False leaves all 71 on survey_kg at 14,310 kg (burst
         jobs 41276093 / 41276349, reports/nigeria/out/m9, m11).
     - text: >-

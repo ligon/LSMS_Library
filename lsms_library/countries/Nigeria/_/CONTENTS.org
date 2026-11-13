@@ -786,6 +786,35 @@ served =u=:
   rows).  Kilograms on the class: 64,666 / 12,593 under cl, 6,467 / 1,259
   under grams.  Which field the World Bank got wrong (=g_cl= or =conv=) is
   not established.
+- *OPEN, awaiting a ruling (red team delta D1, 2026-11-13): W2 LIQUIDS whose
+  cells are flagged =g_cl= = 1 ("grams") are served about 10x low.*  The
+  mirror image of the solids above: a milk cup of tinned milk is =conv= 15,
+  which is the milk cup's own volume in centilitres (the oils put a milk cup
+  at 0.159 l), so conv / 1000 serves 0.094 kg per litre of container.
+  Screened numerically on every W2 =g_cl= = 1 cell against the container
+  volumes the oil rows imply (grams reading below 0.25 kg/l, centilitre
+  reading 0.5-1.6 kg/l; burst job 41279390, =reports/nigeria/out/m13/=),
+  served rows, kg:
+
+  | item (code) | cells (=conv=) | 2012Q3 rows: served / cl reading / inference kg | 2013Q1 rows: served / cl / inference kg |
+  |-+-+-+-|
+  | 113 Milk tinned (unsweetened) | milk cup 15 | 45: 6.33 / 63.3 / 71.7 | 34: 0.98 / 9.75 / 11.1 |
+  | 110 Fresh milk | mudu 100, milk cup 15 | 4: 0.48 / 4.75 / 3.73 | 2: 0.23 / 2.3 / 1.81 |
+  | 150 Bottled water | mudu 100, milk cup 15, derica 33 / 67 | 8: 0.62 / 6.15 / 4.69 | -- |
+  | 161 Palm wine | mudu 100, milk cup 15 | 2: 1.59 / 15.9 / 12.6 | -- |
+  | 162 Pito | paint rubber 345 | 3: 2.42 / 24.2 / 5.92 | -- |
+  | 132 Honey | milk cup 15, paint rubber 350 | 1: 0.015 / 0.15 / 0.11 | 5: 0.46 / 4.55 / 1.59 |
+  | 51 Butter/Margarine | milk cup 15 | 1: 0.03 / 0.3 / 0.21 | 1: 0.015 / 0.15 / 0.11 |
+  | total | | 64: 11.5 / 114.7 / 99.0 | 42: 1.68 / 16.8 / 14.6 |
+
+  The centilitre reading sits near the inference (114.7 against 99.0 kg; 16.8
+  against 14.6).  Their =food_prices()= per-kg values are about 10x high
+  (median Naira/kg, base -> served: tinned milk 706 -> 8,000; palm wine 276
+  -> 2,000; bottled water 188 -> 1,500).  Not changed here.  The same screen
+  also picks Pepper (76, 2012Q3, 183 rows) and Dry Pepper (77, 2013Q1, 313
+  rows), at 0.157 kg/l under grams: those are solids, and the centilitre
+  reading (1.57 kg/l, denser than water) is impossible for them, so they are
+  not part of D1.
 - *The W3 tables' ZONE columns are stored as Stata =float= (float32)* in
   both =food_conv_w3.dta= and =ag_conv_w3.dta= (=conv_national= is float64),
   and are read as float64 without rounding, so a served own-zone factor
@@ -3980,7 +4009,9 @@ held PDFs (the W2 PDFs did not extract).
   (4, 19, 20; one member each).  They pass through as recorded (served as
   ="4.0"=, ="19.0"=, ="20.0"=), like any unmapped label (GH #1292 pins that
   pass-through); mapping them needs the W2 PP code list, which the held PDF
-  does not yield.  For review.
+  does not yield.  OPEN, awaiting a ruling (red team delta D4): the canonical
+  note makes =Unknown= the sentinel for an unmappable value, and at the least
+  the float spelling is wrong.
 - *W3-W5 PP are =correctly-empty=*: three rows in
   =.coder/coverage/absent_verdicts.csv= (D1, D2, C4; the evidence is the
   table above).  =latest.csv= is not regenerated here.
@@ -4387,11 +4418,22 @@ JERRY CAN/RUBBER 10 LITRES"= is served =u = 'l'=, and =harvest_kg='s
 =metric= rung read one can as one litre: 645 kg on those 71 rows in the base
 build (burst job 41276093, =reports/nigeria/out/m9/=).  Only W3's labels say
 LITRES; W1 / W2 / W5's jerry cans (41 / 93 / 36 rows) are served =Jerry Can=.
-*Still open*: the served =u= of the 71 W3 rows is still ='l'= with
-=Quantity= counting cans, so a native-unit consumer reads 4 cans as 4 litres;
-fixing the fold changes =u= (a key) and is outside the ruling -- a question
-for the maintainer.  =harvest_kg(volume_as_mass=False)= leaves all 71 on
-=survey_kg= at 14,310 kg (it acts on unit labels; burst job 41276349).  *Observed, not acted on*: W4's =BUNDLE SMALL / MEDIUM / LARGE=
+*Served as cans since red team delta D2 (2026-11-13)*: the three W3 harvest
+codes 190-192 are served =u = 'Jerry Can'=, the label W1 / W2 / W5's cans
+decode to (=nigeria.W3_HARVEST_UNIT_OVERRIDE=, a per-frame =unit_override=);
+=_canon_unit= is NOT reordered, because it also canonicalises sold units,
+=plot_inputs= and community prices.  Measured cold (burst job 41279394,
+=reports/nigeria/out/m14/=): exactly 71 =crop_production= rows change =u=
+(='l' -> 'Jerry Can'=, all 2016Q1); =harvest_kg= and its =KgFactorSource=
+are unchanged; every other Nigeria table is frame-equal; and the two
+=survey_kg= audits that fired on all 71 (=survey_kg_off_label= 54 high of 71
+sized; =survey_kg_vs_metric= 71 of 71 disagreeing) now have nothing to judge
+(0 sized, 0 compared).  *Residual, not changed*: W3's household SALE records
+(A3.ii) carry the same card, so 15 sale records on a 20 / 25 l can (4 / 11)
+still decode =Unit_sold = 'l'= (20 served 2016Q1 rows carry =Unit_sold=
+='l'=, some of them genuine litres).  =harvest_kg(volume_as_mass=False)=
+leaves all 71 on =survey_kg= at 14,310 kg (it acts on unit labels; burst job
+41276349).  *Observed, not acted on*: W4's =BUNDLE SMALL / MEDIUM / LARGE=
 rows carry exactly the held rows' factors (0.48 / 0.62 / 0.83, 27 / 92 / 46
 rows, 100% exact), and those factors rise with the card's sizes, so the
 table's =unit_name= reads like a labelling slip -- a question for the
