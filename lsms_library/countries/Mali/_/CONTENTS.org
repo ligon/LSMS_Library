@@ -4094,14 +4094,19 @@ mass (survey / implied 0.30).  It names none.  The cold frame is =assert_frame_e
 =f138a3d61=.  Cost: 41 ms of a 658 ms warm read; cache: none.
 
 *For the rung (part (2), a design memo only), Mali's EAC-I waves are the case.*  Measured cold (burst
-jobs 41275992 and 41276357), nothing served:
+jobs 41275992, 41276357 and 41276727), nothing served:
 - 2017-18 is mostly unconverted today (23,160 of 24,921 rows on =none=; 1.66M kg served).  A
-  price-implied =Sac= (median 105 kg) would serve 9,052 of them and the wave would gain 14.8M kg.
+  price-implied =Sac= (=Mil= 120 kg, =Maïs= 105, =Arachide= 60, =Coton= 100) would serve 9,052 of them
+  and the wave would gain 14.8M kg; the top 1% of served rows carry 27.3% of it, and one row whose
+  =Quantity= Site Q already names would carry 857k kg (5.8%).
 - *The instrument's own sold factors agree with prices.*  =KgFactor_sold= (=s3aq23c=, =s7gq21d=,
   field sales) over the price-implied kilograms per sold unit: median 1.00 in 2014-15 (48 sales) and
-  0.95 in 2017-18 (264), 96-98% within 2x; =Sac= 1.00 / 0.95, =Charretée= 0.98 / 1.17.
+  0.95 in 2017-18 (264), 96-98% within 2x; =Sac= 1.00 / 0.95, =Charretée= 0.98 / 1.17.  Without
+  cotton (72 of the 312 sales) 0.95; by crop =Maïs= 0.95, =Mil= 0.83, =Sésame= 1.00, and =Arachide=
+  1.50 (83 sales): a state-blind wave mixes in-shell and shelled groundnut.
 - *Stated sacks held out of the baseline*: =Sac (100 Kg)= is inferred at 0.80 of its label, =Sac (50
-  Kg)= at 1.00, =Tonne= at 1.00 (=Sac (25 Kg)= 1.94, on 12 sales).
+  Kg)= at 1.00 (=Sac (25 Kg)= 1.94, on 12 sales).  =Tonne= reads 1.00, but 222 of its 231 sales are
+  cotton at what looks like one fixed price, so it is not evidence.
 - *Carts exceed the reported-factor ceiling*: =Charretée= 2014-15 255 kg and =Cart (donkey)= 2018-19
   317 kg, above =KG_FACTOR_MAX= (250).
 - The tree sales (331 rows keyed =tree-sale-window=, a monthly quantity beside a total value) are

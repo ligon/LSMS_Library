@@ -4026,9 +4026,11 @@ total keyed against a small unit's label; that is not established.  Served as re
   keys (=dry-season-sale-window=) would allow a data-driven one, which is a question in the memo.
 - *The state rung decides 4,187 of 2021-22's 9,020 rows*, and removes 2 low names (state-blind: 4).
   2011-12 and 2014-15 record no state.
-- *2018-19 has nothing to judge* (no kilograms), and for a rung its 21 =Kg= sales are a poor
-  baseline: they imply a =Gros sac= of 21 kg and a =Sac Moyen= of 28 kg, a big sack lighter than a
-  medium one.  Recorded in the memo; nothing is served from it.
+- *2018-19 has nothing to judge* (no kilograms), and its 21 =Kg= sales are a thin baseline for a
+  rung: every cell one could serve rests on exactly 5 of them, all roselle (=Oseille=) and fresh
+  tomato, and within roselle a =Gros sac= (21 kg, 37 sales) reads lighter than a =Sac Moyen= (28 kg,
+  6 sales).  Whether those masses are wrong is not established (roselle is light); the size
+  inversion is recorded in the memo, and nothing is served from it.
 - *Region* is not a rung (it lives in =cluster_features=): a region-then-national ladder names 155
   rows against the screen's 157.
 - *A one-wave read names the same rows* as the all-waves read (pinned in
