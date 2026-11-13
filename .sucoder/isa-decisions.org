@@ -1,5 +1,16 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: GH1509 fixture, eligibility grain and attrs naming -- ANSWERED
+- Uganda nutrition invariance fixture: "Approve the new baseline
+  (Recommended)".  Update tests/test_uganda_invariance.py's var/nutrition.parquet
+  entry (shape [23777, 15]; content_hash e9fb4c67b2463694a2ec7b46ee5e6df1ef424db19753a74c2b82ad6a48a6a600)
+  with a note citing #1509 and this approval (#967 precedent).
+- Self-valued eligibility: "Keep per food x unit cell (Recommended)": a
+  purchase of one food does not bar another food's self-valued evidence.
+- Attrs: "Accept, document the asymmetry (Recommended)": keep
+  price_rows_dropped / quantity_rows_dropped; docstrings state that 'currency'
+  counts input rows and 'unknown' counts rows that would otherwise be served.
+
 * 2026-11-12: Togo recovered zeros and the derived-from-data basis -- ANSWERED
 - "NA row only for the 11 (Recommended)": of 21 Togo 2021-22 counts outside
   Grand Lome that recover to 0, only the 11 with no other served row get an NA
