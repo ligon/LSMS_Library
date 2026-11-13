@@ -2305,7 +2305,7 @@ C8, p. 13).  The data carry the SIZE:
 | wave   | unit column | size / quantity column(s)             | read by the build? |
 |--------+-------------+---------------------------------------+--------------------|
 | W1, W2 | *none*      | *none* (unit printed per item on form)  | n/a                |
-| W3     | =c8q2= (size baked into the label, e.g. "Heap Small") | =c8q2b= free text ('250g', '75cl', 'wrap') | =c8q2b= parsed since #834 -- but it is BLANK on 13,767 of 13,768 metric-unit rows, so W3's g/cl rows are now DROPPED (only the one '50cl' row survives) |
+| W3     | =c8q2= (size baked into the label, e.g. "Heap Small") | =c8q2b= free text ('250g', '75cl', 'wrap') | =c8q2b= parsed since #834 -- but it is BLANK on 13,767 of 13,768 metric-unit rows (/superseded 2026-11-13: 11,170 of the 11,171 g / cl rows the held files decode to today, GH #587 note below/), so W3's g/cl rows are now DROPPED (only the one '50cl' row survives) |
 | W4     | =c8q2= ("90. HEAP")  | =c8q2c= coded ("0. SMALL", "34. 250 GRAMS") | YES since #834 |
 | W5     | =c8aq2_b=   | =c8aq2_a= (quantity), =c8aq2_c= (size), =c8aq2_cvn= (kg/l factor) | YES since #834 (the coded =c8aq2_c= quantity; =c8aq2_a= and =c8aq2_cvn= agree with it and are a cross-check) |
 
@@ -2339,7 +2339,8 @@ registry entry cites them):
    price is divided by it, and the row's =u= becomes the metric base unit,
    with the derivation key in the =Derivation= column (5,393 rows 2019Q1,
    5,339 2024Q1, 1 2016Q1).  A metric-*unit* row whose package size is
-   UNRECORDED -- all of W3's 13,768 g/cl rows bar one (c8q2b blank) PLUS
+   UNRECORDED -- all of W3's 13,768 g/cl rows bar one (/superseded
+   2026-11-13: 11,171 on today's decode, 11,170 dropped/) (c8q2b blank) PLUS
    all 3,433 of W3's Kg/l rows (the same blank free text; the
    deletion-entry sweep found these -- the pre-#834 prose dropped them
    without ever counting them), and W5's 133 rows on '2. GRAMS (G)'
