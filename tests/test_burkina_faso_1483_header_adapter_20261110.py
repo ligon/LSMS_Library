@@ -167,7 +167,9 @@ def test_complete_literal_frame_keys_types_masks_and_raw_answers(adapter, bindin
                            'Unknown [Burkina_Faso 2021-22 s16bq01=99]'], dtype='string'),
         'crop': pd.array(['(not crop-specific)', 'Arachide', '(not crop-specific)',
                           '(not crop-specific)'], dtype='string'),
-        'u': pd.array(['Kilogramme', 'Sac (25 kg)', 'Manquant',
+        # A blank unit is the missing-unit sentinel `Unknown` (GH #1118); an unlabelled
+        # code keeps its source-qualified identity.
+        'u': pd.array(['Kilogramme', 'Sac (25 kg)', 'Unknown',
                        'Unknown [Burkina_Faso 2021-22 s16bq03b=99]'], dtype='string'),
         'Quantity': pd.array([1.25, 0., -3., None], dtype='Float64'),
         'Purchased': pd.array([False, True, None, False], dtype='boolean'),

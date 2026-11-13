@@ -268,7 +268,8 @@ Data Scheme:
     # harmonize_input; u -> the u table; the EHCVM roster has no crop
     # column so seed crop is resolved from the seed label via
     # harmonize_seed_crop.  Non-crop-specific rows carry the sentinel
-    # '(not crop-specific)' and a missing unit carries 'Manquant' — a NaN
+    # '(not crop-specific)' and a missing unit carries 'Unknown' (the corpus
+    # missing-unit sentinel, GH #1041 / #1118; it was a minted 'Manquant') — a NaN
     # index level would be dropped by the framework's canonical NaN-key
     # de-dup collapse. 2018 i uses burkina_faso.ehcvm_i; own2021 uses
     # burkina_faso.i before the framework walk; no new sample reconcile is claimed.
