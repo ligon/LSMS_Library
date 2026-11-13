@@ -246,17 +246,22 @@ def test_own_source_cards_keep_w1_w2_and_w3_semantics_separate():
 
 
 def test_existing_ph_builder_retains_its_separate_metric_size_policy():
-    raw = pd.DataFrame({'state': [1], 'lga': [101], 'ea': [1], 'item_cd': [10],
-                        'c8q2': [1], 'c8q2b': [''], 'c8q3': [50.]})
+    # GH #587 (ruling 2026-11-12, "Measure PH, then align"; measured 2026-11-13):
+    # PH W3's blank-size Kg / l price per unit, so they are now served as PP's
+    # are.  The PH policy that remains separate is g / cl with no size: dropped.
+    raw = pd.DataFrame({'state': [1, 1], 'lga': [101, 101], 'ea': [1, 2],
+                        'item_cd': [10, 10], 'c8q2': [1, 2], 'c8q2b': ['', ''],
+                        'c8q3': [50., 60.]})
     decoded = raw.copy()
-    decoded['c8q2'] = '1. KILOGRAMS (KG)'
+    decoded['c8q2'] = ['1. KILOGRAMS (KG)', '2. GRAMS (G)']
     before = deepcopy(raw)
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         out = nigeria.community_prices_for_wave('2016Q1', [dict(
             df=raw, dec=decoded, ea='ea', item='item_cd', unit='c8q2',
             size_text='c8q2b', price='c8q3', obs=1)], 'codes', {10: 'Toy item'})
-    assert len(out) == 0  # existing PH missing-package-size refusal remains
+    assert out.index.get_level_values('u').tolist() == ['Kg']   # g, no size: dropped
+    assert out['Price'].tolist() == [50.]
     _exact(raw, before)
 
 

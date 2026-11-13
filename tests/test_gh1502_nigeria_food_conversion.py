@@ -126,7 +126,7 @@ def test_partly_tabled_key_gets_no_partial_sum(nigeria, tmp_path):
     ])
     conv = tmp_path / 'conv.csv'
     w3_table().to_csv(conv, index=False)
-    with pytest.warns(UserWarning, match='do not all cover'):
+    with pytest.warns(UserWarning, match='does not all cover'):
         out = nigeria.food_acquired_for_wave(fn, '2016Q1', W3_SOURCES, 's10bq4',
                                              conversion=str(conv))
     assert len(out) == 1 and out['Quantity'].iloc[0] == 3.0
