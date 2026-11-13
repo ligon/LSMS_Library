@@ -193,10 +193,14 @@ Data Scheme:
     # Item-level crop harvest (GAP 1; EHCVM parity loop 2026-06-15, cloned
     # self-contained from Niger).  One row per REPORTED (field, parcel,
     # crop) harvest line — REPORTED values only (harvest_kg / yield /
-    # main_crop are transformations, never columns).  2018-19 only: s16c
+    # main_crop are transformations, never columns).  2018-19: s16c
     # records harvest qty+unit (s16cq12a/b), sold qty+unit (s16cq16a/b),
     # sale value (s16cq17) and the intercrop flag (s16cq07) at this plot-crop
-    # grain.  crop joins food via harmonize_food Preferred Labels; u via
+    # grain.  2021-22 (panel only, GH #1436): s16c holds the harvest (s16cq16a/b,
+    # blank on every finished row, GH #1437) and s16d the sale per household-crop,
+    # attached to the crop's single line or a Farm-level row (option (d)), matched by
+    # crop CODE; see 2021-22/_/crop_production.py.  2014 is not built.
+    # crop joins food via harmonize_food Preferred Labels; u via
     # the u table; unmapped labels pass through unchanged.  u is in the
     # index because one (plot, crop) can be reported in several units.
     # plot = "{field_no}_{parcel_no}" aligns with plot_features' plot_id.
@@ -207,7 +211,8 @@ Data Scheme:
     #
     # condition (GH #1436) is "Etat du produit", s16cq12c, the state of the crop
     # when the harvest Quantity was measured, read by code through
-    # harmonize_crop_condition_ehcvm1 in categorical_mapping.org.  The instrument
+    # harmonize_crop_condition_ehcvm1 in categorical_mapping.org (2021-22: s16cq16d,
+    # the same five codes and labels).  The instrument
     # asks the form and never the dryness, so the values are the BARE FORM tokens
     # `shelled` / `unshelled` / `shell_not_applicable`, plus `unknown_condition`
     # for a blank code.  Five answers fold onto those tokens (ruled @ligon
