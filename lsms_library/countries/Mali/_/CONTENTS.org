@@ -4109,7 +4109,9 @@ set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical co
   time; the read-time rule drops it from the set beside a real strategy.  43 rows mark three options.
 - *2014-15 and 2017-18: positions.*  Ranked 1ère/2ème/3ème (questionnaires; 2014-15's variable labels
   say "après le 1er/2ème/3ème CHOC", audit F9).  =Manquant= (code 99, 177 cells in 2014-15) is a
-  missing code: served NA in its position and never in the set (=_/coping.yml=).  2017-18 fills unused
+  missing code: served NA in its position and never in the set (=_/coping.yml=).  On 3 rows of household
+  =EACI14_299003= every position is =Manquant= and nothing else is recorded: they are served with no
+  content (kept, not deleted; a question in the GH #1562 report).  2017-18 fills unused
   slots with "Aucune stratégie" on almost every row; those positions keep what was recorded, per the
   ruling, and the set drops it beside a real strategy.
 - *2021-22: positions by rank.*  Option 25 (Oui/Non) is chosen on 72 rows, all alone, so nothing is

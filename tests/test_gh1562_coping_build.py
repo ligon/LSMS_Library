@@ -17,6 +17,7 @@ measured in the stream report and in the ``requires_s3`` tests at the bottom.
 from __future__ import annotations
 
 import importlib.util
+import re
 import warnings
 
 import numpy as np
@@ -282,26 +283,34 @@ def _raw_grid(country, wave):
 @pytest.mark.requires_s3
 @pytest.mark.parametrize('country', EHCVM_2018)
 def test_the_served_2018_sets_are_the_grid_positives(country):
-    """Oracle: per served set size, the counts equal the raw file's positive-cell
-    counts per row (an independent read, no hook imported).  Set members are
-    the hook's labels, so the oracle counts, it does not relabel."""
+    """Oracle: an independent read of the raw grid (no hook imported for the
+    counts).  The BUILT set (the parquet, before the read-time rules) has, per
+    size, exactly as many rows as the raw file has rows with that many
+    positive cells; and for every code k, exactly as many built sets contain
+    code k's label as the raw column k has positive cells.  The served
+    positions are all NA."""
     import lsms_library as ll
+    from lsms_library.paths import data_root
     wave = EHCVM_2018[country]
     raw = _raw_grid(country, wave)
-    grid = raw[[c for c in raw if c.startswith('s14q05__')]].apply(pd.to_numeric, errors='coerce')
-    n_pos = (grid > 0).sum(axis=1)
-    expected = n_pos[n_pos > 0].value_counts().sort_index()
+    cols = sorted((c for c in raw if re.fullmatch(r's14q05__\d+', c)), key=lambda c: int(c.split('__')[1]))
+    grid = raw[cols].apply(pd.to_numeric, errors='coerce')
+    positive = grid > 0
+    n_pos = positive.sum(axis=1)
+    expected_sizes = n_pos[n_pos > 0].value_counts().sort_index()
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         served = ll.Country(country).shocks(waves=[wave])
-    assert not [c for c in served if str(c).startswith('HowCoped') and c != COPING_SET_COLUMN
-                and served[c].notna().any()]
-    # Before the did-nothing rule: the parquet holds what the build wrote.
-    from lsms_library.paths import data_root
+    positions = [c for c in served if str(c).startswith('HowCoped') and c != COPING_SET_COLUMN]
+    assert positions and served[positions].isna().all().all()
     built = pd.read_parquet(data_root() / country / 'var' / 'shocks.parquet')
-    built = built[built.index.get_level_values('t') == wave]
-    sizes = built[COPING_SET_COLUMN].dropna().str.split('+').str.len().value_counts().sort_index()
-    # the hook drops nothing the grid marks, but the served frame drops
-    # rows with no follow-up and the core collapse can delete broken keys
-    assert int(sizes.sum()) <= int(expected.sum())
-    assert set(sizes.index) <= set(expected.index)
+    built = built[built.index.get_level_values('t').astype(str) == wave][COPING_SET_COLUMN].dropna()
+    members = built.str.split('+')
+    sizes = members.str.len().value_counts().sort_index()
+    pd.testing.assert_series_equal(sizes, expected_sizes, check_names=False, check_dtype=False)
+    labels = _module(country, wave).COPING_LABELS
+    for col in cols:
+        code = int(col.split('__')[1])
+        n_raw = int(positive[col].sum())
+        n_built = int(members.apply(lambda m, lab=labels[code]: lab in m).sum())
+        assert n_built == n_raw, (country, code, labels[code], n_built, n_raw)

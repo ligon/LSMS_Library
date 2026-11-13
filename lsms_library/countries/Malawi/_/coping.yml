@@ -24,10 +24,13 @@ filler:
   - label: Dont know
     waves: ['2004-05']
     evidence: >-
-      A labelled non-answer of ab07a/b/c, 185 served cells; listed with the
-      fillers and missing codes in the audit's F3, which the ruling's
-      question 3 put to the user ("Do positions keep recorded fillers and
-      missing codes, or serve NA in their place?").
+      A LABELLED non-response of ab07a/b/c (the value label says the household
+      did not know), 185 served cells: a missing code in the ruling's sense.
+      Distinct from an UNLABELLED numeric code (Ethiopia W1, Nigeria W2), whose
+      meaning is undocumented and which is not classed.  It is what leaves 26
+      shocks with no recorded content ("Dont know" then "No other response
+      given" twice, every Affected column NA): kept, not deleted.  A reading of
+      the ruling, flagged in the GH #1562 report.
 
 did_nothing:
   - label: Did not do anything
