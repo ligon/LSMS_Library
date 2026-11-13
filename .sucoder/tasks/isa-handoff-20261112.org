@@ -191,3 +191,8 @@ reports/*/work/private, */data.
   pytest step skipped as redundant (master tree 47ce9ffd8 == gated head
   3ccfbcd0c tree).  Next: publish the GitHub Release (web UI preferred);
   docs/releases/v0.17.0.md to land in the next development PR with #1716.
+- 2026-11-13 14:15Z: GitHub Release v0.17.0 created (gh CLI, notes from
+  reports/release-v0.17.0/RELEASE_NOTES.md); publish.yml run 43440985001 fired on
+  the release event, build + publish success.  PyPI: LSMS-Library 0.17.0
+  (wheel + sdist).  Follow-up: docs/releases/v0.17.0.md + #1716 pin fix in the
+  next development PR (sync release history, as #1169 did for v0.16.0).
