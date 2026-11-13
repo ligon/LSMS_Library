@@ -357,7 +357,8 @@ quoted as authority for how vague and grappe relate.
 (Per =data_scheme.yml=: sample, cluster_features, household_roster,
 individual_education, food_acquired, assets, housing,
 interview_date, shocks, food_expenditures, food_prices,
-food_quantities.)
+food_quantities.)  [2026-11-13: a stale list; =data_scheme.yml= is the record.  =panel_ids= is
+declared since GH #1705, with the committed =_/panel_ids.json= / =_/updated_ids.json=.]
 
 * Known data issues
 
@@ -776,6 +777,9 @@ silently, so read this before copying from either.
 
 =i= is =E2_<grappe><menage:03d>=, by =2021-22/_/mapping.py:i=, which the wave's scripts import.  =pid= is
 =membres__id=, =numind= in =ehcvm_individu=, the same number on all 42,660 members.  =v= is the bare =grappe=.
+[2026-11-13, GH #1705: the link is now served.  The ids are still BUILT this way, but the 6,878 linked
+households are served under their 2018-19 id through the committed crosswalk; see "2026-11-13 -- Benin is a
+panel country".  This heading describes the wiring of GH #1697.]
 
 *Measured*, the head of each household against the 2018-19 head of the same key.  Sex, and sex with
 age 1 to 6 years older, on the RAW answers (=s01q01=; =s01q04a=, else the household's interview year less =s01q03c=):
@@ -794,7 +798,8 @@ link is 6,878.  Linking would make Benin a panel country, with committed crosswa
 =test_panel_ids_persistence=: a decision, memo in the PR.  [2026-11-12: ruled, "Make Benin a
 panel country": a committed crosswalk (=panel_ids.json= / =updated_ids.json=, Design A) from
 =PanelHH=, built in a follow-up PR with its own verification, GH #1705.  Not built in the wiring
-of GH #1697, which keeps the =E2_= ids unlinked.]
+of GH #1697, which keeps the =E2_= ids unlinked.]  [2026-11-13: built, GH #1705: "2026-11-13 -- Benin
+is a panel country".]
 
 *Do not run this test on =ehcvm_individu.age=.*  On 3,662 members, 3,636 of them on the 2018-19 roster, that
 variable is not the answers: it differs from the birth year by more than a year, and of the 3,647 matched to 2018-19,
@@ -847,7 +852,9 @@ Compare labels, never names.
   the grid of vague 2 only and 5 households answer Oui.  Served as =12=.
 - =s16bq05= is the GIFT question in both waves; the purchase is =s16bq08=.  This wave reads both.  2018-19's script serves
   =s16bq05= and =s16bq07a= under =Purchased= and =Quantity_purchased=, the same defect as Togo 2018, recorded and not changed
-  here, so those columns mean different things across this country's waves until it is corrected.
+  here, so those columns mean different things across this country's waves until it is corrected.  [2026-11-13: corrected
+  on the ruling "Fix all three now": 2018-19 reads =s16bq08= / =s16bq09a= as this wave does.  See "2026-11-13 --
+  2018-19 =plot_inputs=: the purchase, the gift and the blank unit".]
 - =s16bq03b= code 6 has no label, on 160 rows.  The questionnaire prints 1 to 5.  =s16bq09b='s list has 6 = Sachet, which does
   not fit: 97 of the 160 are cuttings, up to 100,000 of them.  Served as =6=.
 - =s09=: 49 of 122 item codes moved to another item against 2018-19 (=415= was Parfums and is a washable face mask here) and 9
@@ -1179,7 +1186,7 @@ Three rulings of @ligon, 2026-11-12 (=.sucoder/isa-decisions.org=), applied here
   and cites the ruling.  GH #1437 (why =s16cq16a= is blank) stays open.
 - *Link: "Make Benin a panel country".*  A committed crosswalk from =PanelHH= (Design A) in a
   FOLLOW-UP PR, GH #1705, with its own verification.  Not built here: 2021-22's =E2_= ids still
-  meet no 2018-19 id.  =_/sampling.yml= says so.
+  meet no 2018-19 id.  =_/sampling.yml= says so.  [2026-11-13: built, GH #1705; see the last section.]
 
 *What is served, measured.*  Cold =sample()=, each side in its own private root (burst job
 41240821): base =e5fdd2fa8=, the wiring before this change =df1df60ed=, and this change.
@@ -1267,3 +1274,157 @@ full cold re-warm of GhanaLSS; no GhanaLSS served value changes (measured, burst
   and new waves alike (2021-22: 1,871 duplicated entries) because the =harmonize_assets= relabel of =j=
   runs in =_finalize_result= after the index collapse; no =GrainCollapseWarning= fires.  Pre-existing,
   extended to 2021-22 by this wiring; filed as GH #1710.
+
+* 2026-11-13 -- Benin is a panel country (GH #1705)
+
+Ruling @ligon, 2026-11-12, "Make Benin a panel country": a committed crosswalk from =PanelHH=
+(design A), in its own PR with its own verification.  This authorizes a panel-ID change for
+Benin only.  =_/panel_ids.py= writes =_/panel_ids.json= and =_/updated_ids.json=; =make panel-ids=
+regenerates them; no Make rule has either file as its target (GH #914).
+
+** The rule, and what the files offer
+
+A 2021-22 household is linked to the 2018-19 household with the SAME =(grappe, menage)= when the
+2021-22 cover flags it =PanelHH= = =Panel= ("Ménage panel") and that key is a 2018-19 household.
+
+- *No 2021-22 file records a 2018-19 id.*  The cover =s00_me_ben2021.dta= has =PanelHH=,
+  =s00q07d= ("Le ménage a t-il été interviewé lors de l'enquête ménage en 2018/2019 ?") and =s00q07e=
+  ("... le même logement ...?"), and no =s00q07f= (Mali, Niger) or =grappe_EHCVM1= / =menage_EHCVM1=
+  (Burkina Faso).  =hhid= in =ehcvm_menage=, =ehcvm_welfare= and =ehcvm_individu= is a 2021-22 id.
+  So the link is the key itself, as the BID (7.1) says: "only households marked as panel in the
+  "PanelHH" variable will have valid values for merging".
+- *What does point back is the roster.*  =s01_me_ben2021.dta= is pre-loaded: =s01q00aa= ("[NOM]
+  est-il toujours un membre de ce ménage?") is answered in 99.7% of linked households, and every one
+  of their 36,825 pre-loaded members is a 2018-19 member of the same key under the same number
+  (=membres__id= = 2018-19's =s01q00a=), of the same sex on 98.5% of those still members.
+- *=s00q07d= is not the rule.*  It is Oui on all 6,878 linked households, on all 116 recurring keys
+  flagged Non panel and on 2 new keys, and Non on the 11 flagged Panel that have no 2018-19 key.
+
+| 2021-22 households, of 8,032                  | count | served =i=           |
+|-----------------------------------------------+-------+----------------------|
+| =PanelHH= = Panel, key in 2018-19             | 6,878 | the 2018-19 id       |
+| =PanelHH= = Panel, key not in 2018-19         |    11 | own =E2_= id         |
+| =PanelHH= = Non panel, key in 2018-19         |   116 | own =E2_= id         |
+| =PanelHH= = Non panel, new key                | 1,027 | own =E2_= id         |
+Duplicate targets: 0.  Every linked household kept its =vague= (3,306 in vague 1, 3,572 in vague 2).
+
+** The ids, and the single-pass hazards
+
+=updated_ids['2021-22']= maps =E2_<key>= to =<key>=, for the 6,878; =updated_ids['2018-19']= is empty.
+The =E2_= prefix (=2021-22/_/mapping.py:ID_PREFIX=) is kept on the ids the wave BUILDS, which is what
+makes =id_walk= safe here: every key of the map carries the prefix and no target does, so no key is
+also a target (no CHAIN, CLAUDE.md "Panel ID Transitive Chains") and no target is a 2021-22 household's
+own id (no RENAME-ONTO-OCCUPIED).  =panel_ids.py= asserts both, over the full cover, as Burkina Faso's
+does; =tests/test_benin_panel_ids.py= pins them on the committed JSON through
+=local_tools._walk_partition= (chained empty, raw-only = the keys, walked-only = the targets).  The
+same prefix keeps the 116 recurring Non-panel keys from meeting their 2018-19 namesakes.  Do not
+remove it.
+
+** Verification, on the raw files
+
+Each 2021-22 household against the 2018-19 household it is linked to, and, as a control, against
+another 2018-19 household of the same grappe (=reports/benin/scripts/explore.py=, burst job 41275630;
+heads by =s01q02= = 1; age the answer =s01q04a=, else the interview year less =s01q03c=, NEVER
+=ehcvm_individu.age=, which UEMOA set from 2018-19 for panel members, "2021-22 wired" above):
+| group                                   |     n | head sex | head age +1..+5 | size equal | size within 2 |
+|-----------------------------------------+-------+----------+-----------------+------------+---------------|
+| linked                                  | 6,878 |    94.8% |           60.4% |      36.0% |         86.2% |
+| recurring key, =PanelHH= = Non panel    |   116 |    83.6% |           43.1% |      33.6% |         78.4% |
+| control: another household, same grappe | 8,032 |    67.6% |           10.9% |      12.8% |         53.6% |
+Head age moves by a median of exactly 3 years on the linked; |d - 3| <= 1 on 54.1%.  A head who
+changed (a widow succeeding, a son taking over) is a real event and stays linked.  Cluster identity
+is by construction: the same grappe, and region and milieu agree on 6,878 of 6,878 (=s00q02= is
+2018-19's department and 2021-22's arrondissement, so it is not compared).
+
+** NOT linked, and why that is a question
+
+- *The 116 recurring keys flagged Non panel* sit between the link and the control on the head
+  (83.6% sex), and their rosters are pre-loaded too: 82.8% of them answer =s01q00aa=, and 98.9% of
+  their 465 pre-loaded members are 2018-19 members of the same key, of the same sex on 94.5%.  That
+  reads as a mix with many genuine panel households in it.  The ruling says "from PanelHH" and the BID
+  says only =PanelHH= marks a valid merge, so they are not linked here; whether to link them (all, or
+  those with a pre-loaded roster) is the maintainer's.
+- *The 11 flagged Panel with no 2018-19 key* answer =s00q07d= Non and have pre-loaded rosters (18
+  members) under a key that is no 2018-19 household.  With no recorded 2018-19 id there is nothing to link to.
+- *96 of the 1,027 new keys* also answer =s01q00aa= on 422 members, none of them a 2018-19 member of the
+  key.  Not investigated: possibly split-offs.  No link is possible without a recorded origin.
+
+** What moved, measured
+
+Every table, cold, base =f138a3d61= against the branch, each in its own empty private root (burst
+jobs 41275931 / 41275932; =reports/benin/scripts/build_side.py= and =compare.py=).  The base frame is
+mapped through the committed crosswalk and compared with the branch on every column: *equal on every
+table but =plot_inputs= 2018-19* (next section), and no row count moves anywhere.  2018-19 rows are
+untouched; on 2021-22 exactly the rows of the 6,878 linked households change =i=:
+| table                      | rows, both | 2021-22 rows re-keyed |
+|----------------------------+------------+-----------------------|
+| sample                     |     16,044 |                 6,878 |
+| household_roster           |     85,003 |                37,387 |
+| individual_education       |     85,003 |                37,387 |
+| people_last7days           |     77,702 |                37,387 |
+| household_characteristics  |     16,009 |                 6,869 |
+| housing                    |     16,044 |                 6,878 |
+| food_security              |     16,028 |                 6,863 |
+| subjective_well_being      |     15,868 |                 6,781 |
+| interview_date             |     48,129 |                20,632 |
+| assets                     |     78,526 |                33,452 |
+| shocks                     |     17,061 |                 4,136 |
+| food_acquired              |    393,306 |               176,180 |
+| food_expenditures          |    271,639 |               118,593 |
+| food_prices                |    273,676 |               119,674 |
+| food_quantities            |    390,741 |               174,852 |
+| plot_features              |     15,142 |                 6,858 |
+| plot_inputs                |     21,973 |                10,486 |
+| plot_labor                 |     20,992 |                 9,345 |
+| crop_production            |     18,374 |                 8,428 |
+| livestock                  |     13,750 |                 5,926 |
+| cluster_features           |      1,340 |          no =i=: 0 |
+| community_prices           |    222,296 |          no =i=: 0 |
+=v= = =Mover= rows: 0 before and after in every table that carries =v=.  =nitrogen_kg= and =seed_kg=
+over =plot_inputs= are equal after the mapping (1,474,131.9 kg N, 10,772,713.0 kg seed).  Per-wave
+calls (=waves=['2018-19']= / =['2021-22']=) of =sample=, =household_roster=, =plot_inputs=,
+=food_acquired=, =household_characteristics=, =food_quantities= and =shocks= behave the same.  A warm
+read in the same process, under =assume_cache_fresh=True= and in a fresh process serves the cold frame
+on every table, with no =IdWalkError= (=interview_date='s =visit= level is =int64= cold and =Int64=
+warm on base and branch alike, the known CLAUDE.md quirk).  =check_panel_consistency= passes all
+eight checks: 6,878 chain endpoints present, 2018-19 -> 2021-22 attrition 6,878 households (86%),
+=id_walk= idempotent on 16,044 roster households.
+
+** What is still open
+
+- *=panel_weight=* is still =poids=, the cross-sectional weight, on every 2021-22 household ("2021-22
+  wired", Weights): no longitudinal weight is shipped, and the ruling covers ids, not weights.  The
+  library's convention is a NaN or zero =panel_weight= for a household outside the panel; whether the
+  1,154 unlinked households get one is a question for the maintainer.
+- *Cost.*  Every Benin hash moves (=data_scheme.yml=, three new =_/= files, the Makefile): 22 of 22
+  existing =Country._table_cache_hash= and 44 of 44 =Wave._input_hash=, plus the new =panel_ids=
+  entries; no other country, =build_transforms_fingerprint= 0 of 42, =framework_imports_fingerprint=
+  0 of 38.  One Benin re-warm.
+- *The Makefile is Benin's first* (=_/Makefile=).  It exists for =make panel-ids=, but once it exists
+  =Wave.grab_data= builds every script-path wave table through =make=, so it carries one rule per wave
+  script, with the recipe the framework ran directly before.  The cold comparison above is the check
+  that the route changed nothing; the visible difference is that the "Makefile not found" warning is
+  gone, and that a failing wave script now fails the build instead of being skipped.
+
+* 2026-11-13 -- 2018-19 =plot_inputs=: the purchase, the gift and the blank unit
+
+Two fixes in =2018-19/_/plot_inputs.py=, measured on the same cold builds as above.
+
+- *The purchase is =s16bq08=* (ruling @ligon 2026-11-13, "Fix all three now", for Guinea-Bissau 2018-19,
+  Togo 2018 and Benin 2018-19).  The file's own labels: =s16bq05= "16B.05. Avez-vous obtenu [INTRANT]
+  sous forme de cadeau ou de don?", =s16bq07a= "16B.07a. Selon vous, quantité en [INTRANT] reçue sous
+  forme de cadeau ou de don?", =s16bq08= "16B.08. Avez-vous acheté [INTRANT]?", =s16bq09a= "16B.09a.
+  Quelles sont la quantité et la valeur totale de [INTRANT] achetées?".  =Purchased= /
+  =Quantity_purchased= / =Unit_purchased= now read =s16bq08= / =s16bq09a= / =s16bq09b=, and the gift
+  answers are served under =Received_as_gift= / =Quantity_received_as_gift= / =Unit_received_as_gift=
+  (=s16bq05= / =s16bq07a= / =s16bq07b=), as 2021-22 and Burkina Faso 2018-19 (GH #1188) read them.  On
+  the 10,605 applied lines: purchases 383 -> 4,719 (=s16bq05= x =s16bq08=: 4,676 bought and not given,
+  340 given and not bought, 43 both); =Quantity_purchased= 383 values summing to 21,714.25 -> 4,719
+  summing to 354,908.23; 5,015 =Purchased= and 5,048 =Quantity_purchased= cells change; the gift columns,
+  NA on 2018-19 before, now hold the 383 gifts.  An acquisition unit is left NA where its question is
+  blank (one purchase has no =s16bq09b=).  No library transform reads these columns; the purchase VALUE
+  =s16bq09c= is not served, in either wave.
+- *A blank unit of use is =Unknown=* (GH #1118).  Counted first: one applied line, 100 of "Autres
+  semences" (grappe 166, menage 133), has no =s16bq03b=; it was served =u= = =Manquant=, a label the
+  survey never wrote (no raw label reads =Manquant=), and is now the canonical =Unknown=.  That row is
+  the only index change; =nitrogen_kg= and =seed_kg= do not move (no unit, no kilograms either way).

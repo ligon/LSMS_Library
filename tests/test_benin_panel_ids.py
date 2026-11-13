@@ -133,8 +133,10 @@ class TestAgainstTheFiles:
     def test_the_link_agrees_with_the_2018_roster(self, covers):
         """Linked heads against another 2018-19 household of the same grappe."""
         new, old = covers
-        s18 = get_dataframe(countries_root() / "Benin" / OLD / "Data" / "s01_me_ben2018.dta")
-        s21 = get_dataframe(countries_root() / "Benin" / NEW / "Data" / "s01_me_ben2021.dta")
+        s18 = get_dataframe(countries_root() / "Benin" / OLD / "Data" / "s01_me_ben2018.dta",
+                            convert_categoricals=False)
+        s21 = get_dataframe(countries_root() / "Benin" / NEW / "Data" / "s01_me_ben2021.dta",
+                            convert_categoricals=False)
         s21 = s21[s21["s01q00aa"] != 2]          # those who have left
         h18 = s18[s18["s01q02"] == 1].assign(key=lambda d: [_key(g, m) for g, m in zip(d["grappe"], d["menage"])])
         h21 = s21[s21["s01q02"] == 1].assign(key=lambda d: [_key(g, m) for g, m in zip(d["grappe"], d["menage"])])
