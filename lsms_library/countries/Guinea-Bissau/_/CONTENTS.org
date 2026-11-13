@@ -887,3 +887,49 @@ The cross-run cold and warm capture comparisons, source seals and prior
 failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
 =5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
 earlier job-local caches were reaped; source and survey values did not change.
+
+* shocks: coping strategies, the set and the positions (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 "Coping-strategy contract, GH1562" (positions are the
+household's REPORTED order; every shocks country also gets an unordered set; EHCVM 2018-19 fills the
+set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical contract:
+=lsms_library/data_info.yml= =shocks= (=HowCoped0..3=, =HowCopedSet=); read-time rules:
+=lsms_library/coping.py=, labels in =_/coping.yml=.
+
+- *2018-19: the set only.*  =s14q05__N= is a grid, one column per option, recording WHICH strategies
+  were chosen and not their order: the paper form asks for strategies "par ordre d'importance", but
+  the release holds {0, 1, 3} per option.  The hook now writes =HowCopedSet= from the grid
+  (=ehcvm.coping_set_from_grid=) and no =HowCoped<n>=.  Until GH #1562 it listed the positive options
+  in CODE order as =HowCoped0..2=, which disagrees with the value order on 165 rows.  Chosen = a
+  positive cell (1, 2 or 3); 0 = offered and not chosen (every answered row carries 0 on all its unchosen
+  options); NA = not asked; any other value, or a chosen code with no label, is refused
+  (=CopingGridError=).  What a positive value says about ORDER is not established, which is why no
+  position is filled.  Evidence per country: the GH #1562 audit, =out/raw/=.
+- *Site B now warns* that =HowCoped0= / =HowCoped1= are empty in 2018-19.  That is the honest report of
+  a wave that records no order; do not silence it with =optional:=, which is country-grain.
+- *Three positives on 5 rows, two 1s on 47.*  The other seven countries never hold two 1s; here
+  (1, 1) occurs on 47 rows and (1, 1, 3) on 5.  Both still count as chosen; neither changes the set.
+- *Positions are optional for this country.*  2018-19 is the only wave wired, so =HowCoped0..2= are
+  declared =optional: true= in =_/data_scheme.yml= and =HowCopedSet= is declared.  When 2021-22 is
+  wired (it ranks strategies), that =optional:= becomes a one-wave silencing of the 2018-19 gap; revisit
+  it then.
+- *Codes 18-25 follow the PORTUGUESE questionnaire, not the release's variable labels* (coordinator
+  default under the 2026-11-13 ruling; =derivations.BASES= puts questionnaire above variable-label).
+  The release labels =s14q05__1..25= with the French template's first 25 options (18 = "Louer/mettre
+  ses terres en gages", 25 = "Autre stratégie"), and the hook copied them.  The Guinea-Bissau form
+  (=gnb_ehcvm1_qnr_household_excel_vague1.xlsx= and =_vague2.xlsx=, sheet =S14_Chocs=, column N)
+  drops "Louer", so every later option moves down one: it prints 18 "Venda das existências de
+  provisões", 19 "Prática mais importante de atividades de pesca", 20 "Venda de gado", 21 "Confiar os
+  filhos a outros agregados familiares", 22 "Praticante de atividades espirituais" and 25 "Nenhuma
+  estratégia" (cells N30-N34, N36).  It prints NO 23 or 24 -- there is no cell N35 in either workbook
+  -- so those two are the template's next two options by elimination: 23 "Pratique de la culture de
+  contre saison", 24 "Autre stratégie".  GNB 2021-22's form (=gnb_ehcvm2_qnr_men_excel_vague1.pdf=
+  p68) prints the full 26-option template, with "Aluguer / penhora do seu terreno" back at 18.  The
+  data agree with the shifted alignment where they can discriminate (audit F1, per mille of positive
+  cells, the other seven countries against GNB): French 20 "pêche" 0-2 against GNB 27, French 21
+  "bétail" 9-149 against GNB 3; GNB 25 is positive on 1,540 rows and never beside another option, as
+  the others' "Aucune stratégie" is.  No 2018-19 =s14= file carries an "autre, préciser" text column,
+  so code 24 cannot be checked against one.  Served in the template's French labels so one strategy
+  has one label across the EHCVM countries.  /Codes 23 and 24 are an inference, not a printed label:/
+  question to the user in the GH #1562 report.
+- *Read time.*  Code 25, now "Aucune stratégie", is a "did nothing" answer (=_/coping.yml=).

@@ -483,6 +483,8 @@ households reporting 3+ strategies, the script (loop range) and
 the scheme (add =HowCoped2=) need to be extended in tandem.
 [2026-11-04: 2021-22 does, on 337 rows.  =HowCoped2= is in the scheme, optional, and
 2018-19's hook is unchanged, so the column is NA there.]
+[2026-11-13, GH #1562: 2018-19 now fills NO position -- its grid records which strategies, not their
+order -- and serves =HowCopedSet= only.  See "shocks: coping strategies, the set and the positions".]
 
 History: prior to the 2026-04-12 cleanup (commit =9d677f25=),
 =HowCoped2= was declared in the scheme and emitted by the script,
@@ -1267,3 +1269,33 @@ full cold re-warm of GhanaLSS; no GhanaLSS served value changes (measured, burst
   and new waves alike (2021-22: 1,871 duplicated entries) because the =harmonize_assets= relabel of =j=
   runs in =_finalize_result= after the index collapse; no =GrainCollapseWarning= fires.  Pre-existing,
   extended to 2021-22 by this wiring; filed as GH #1710.
+
+* shocks: coping strategies, the set and the positions (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 "Coping-strategy contract, GH1562" (positions are the
+household's REPORTED order; every shocks country also gets an unordered set; EHCVM 2018-19 fills the
+set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical contract:
+=lsms_library/data_info.yml= =shocks= (=HowCoped0..3=, =HowCopedSet=); read-time rules:
+=lsms_library/coping.py=, labels in =_/coping.yml=.
+
+- *2018-19: the set only.*  =s14q05__N= is a grid, one column per option, recording WHICH strategies
+  were chosen and not their order: the paper form asks "jusqu'à 3 stratégies par ordre d'importance",
+  but the release holds {0, 1, 3} (and one 2, on option 26) per option.  The hook now writes =HowCopedSet= from the grid
+  (=ehcvm.coping_set_from_grid=) and no =HowCoped<n>=.  Until GH #1562 it listed the positive options
+  in CODE order as =HowCoped0..2=, which disagrees with the value order on 326 rows.  Chosen = a
+  positive cell (1, 2 or 3); 0 = offered and not chosen (every answered row carries 0 on all its unchosen
+  options); NA = not asked; any other value, or a chosen code with no label, is refused
+  (=CopingGridError=).  What a positive value says about ORDER is not established, which is why no
+  position is filled.  Evidence per country: the GH #1562 audit, =out/raw/=.
+- *Site B now warns* that =HowCoped0= / =HowCoped1= are empty in 2018-19.  That is the honest report of
+  a wave that records no order; do not silence it with =optional:=, which is country-grain.
+- Benin never marks more than two options (the "at most 2" passage above still describes the grid);
+  one row holds a lone 3.
+- *2021-22: positions by rank; option 25 registered.*  =s14bq05__N= holds a rank, except option 25
+  ("Autre stratégie"), labelled Oui/Non.  The hook keeps the position it infers (the least rank no other
+  strategy holds) and, where option 25 sits beside a ranked strategy (13 of the 34 rows that choose
+  it), stamps =Benin::shocks::code25-rank-inferred= (=_/derivations.yml=; ruling "Keep slot,
+  registered").  Alone, option 25 is the only answer and is not stamped.
+- *Read time.*  "Aucune stratégie" (option 26) is a "did nothing" answer: alone it is the set; beside a
+  real strategy (1 row of the 2018-19 grid, 27 rows in 2021-22) it leaves the set and keeps its
+  position.

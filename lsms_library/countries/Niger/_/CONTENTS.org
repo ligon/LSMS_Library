@@ -3983,3 +3983,31 @@ own private root).*  Niger serves =food_acquired= in 2018-19 and 2021-22 only.
   hashes, no build fingerprint; against development, the same as the flag's.
 - *The first scope, superseded.*  Region floor 1, all 15,014 flagged rows: cluster 1,361, region
   11,661, NA 1,992; wave total 52,486,790.70, flagged rows 13,025,201.60 (24.82%), 13,022 valued.
+
+* shocks: coping strategies, the set and the positions (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 "Coping-strategy contract, GH1562" (positions are the
+household's REPORTED order; every shocks country also gets an unordered set; EHCVM 2018-19 fills the
+set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical contract:
+=lsms_library/data_info.yml= =shocks= (=HowCoped0..3=, =HowCopedSet=); read-time rules:
+=lsms_library/coping.py=, labels in =_/coping.yml=.
+
+- *2018-19: the set only.*  =s14q05__N= is a grid, one column per option, recording WHICH strategies
+  were chosen and not their order: the paper form asks for strategies "par ordre d'importance", but
+  the release holds {0, 1, 3} per option.  The hook now writes =HowCopedSet= from the grid
+  (=ehcvm.coping_set_from_grid=) and no =HowCoped<n>=.  Until GH #1562 it listed the positive options
+  in CODE order as =HowCoped0..2=, which disagrees with the value order on 249 rows.  Chosen = a
+  positive cell (1, 2 or 3); 0 = offered and not chosen (every answered row carries 0 on all its unchosen
+  options); NA = not asked; any other value, or a chosen code with no label, is refused
+  (=CopingGridError=).  What a positive value says about ORDER is not established, which is why no
+  position is filled.  Evidence per country: the GH #1562 audit, =out/raw/=.
+- *Site B now warns* that =HowCoped0= / =HowCoped1= are empty in 2018-19.  That is the honest report of
+  a wave that records no order; do not silence it with =optional:=, which is country-grain.
+- *2011-12 and 2014-15: positions.*  Ranked 1ère/2ème/3ème (questionnaires).  Missing codes are served
+  NA in their position and never in the set (=_/coping.yml=): 2011-12's unlabelled code 99, served as
+  ='99.0'= (317 cells), and 2014-15's =Manquant= (code 99, 207 cells).  2011-12's "Nothing" (code 24)
+  and 2014-15's "Aucune stratégie" are "did nothing" answers and keep their positions.
+- *2021-22: positions by rank; option 25 registered.*  Option 25 ("Autre stratégie", Oui/Non) is
+  chosen on 52 rows, 17 of them beside a ranked strategy; those carry
+  =Niger::shocks::code25-rank-inferred= (=_/derivations.yml=; ruling "Keep slot, registered").  On 2 of
+  them the only other strategy is a Deuxième, so option 25 is served first.

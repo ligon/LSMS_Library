@@ -4549,3 +4549,42 @@ is GH #1537's ruling ("Check codes, then Fresh"), a separate batch.
   names them.
 - *One W5 gram row* is served at about 12x its item median under
   =pp-w5-metric-unit-quantity= (its text's number is garbled), as ruled.
+
+* shocks: once per wave, four ranked positions, W4 a set (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 "Coping-strategy contract, GH1562" and 2026-11-13
+"Coping-strategy implementation, GH1562" ("Add HowCoped3"; "Pin to post-harvest t"; "check assets").
+Canonical contract: =lsms_library/data_info.yml= =shocks=; read-time rules =lsms_library/coping.py=,
+labels in =_/coping.yml=.  This file had no shocks passage before.
+
+- *Served once, under the post-harvest quarter.*  Each wave's =sect15a_harvestw*= (post-harvest
+  section 15A) was read by a YAML block with no round pin, and a block "reads one file and is stamped
+  with every round of its directory" (see =Why not YAML= under the panel crosswalk above), so every
+  household-shock was served under BOTH quarters: 22,550 rows for 11,275, the two copies identical row
+  for row (=assert_frame_equal= per wave on base =f138a3d61=: 2,200 / 2,882 / 2,323 / 3,870).  The
+  block now pins =t= to =2011Q1= / =2013Q1= / =2016Q1= / =2019Q1= exactly as =individual_education=
+  does (a file-list =t:= override plus =t: hhid= in =idxvars=), and the post-planting quarters carry
+  no =shocks= rows.  Like =individual_education= (GH #1292, above), a request for a post-planting
+  quarter ALONE is a #1309 case: no wave there builds rows.
+- *=assets= had the same defect and is pinned the same way*, to the post-planting quarter its
+  =sect5_planting*= files belong to: =2010Q3= / =2012Q3= / =2015Q3= / =2018Q3= (both W2 =dfs:=
+  sub-frames carry the pin, so the merge on =t= still lines up).  On base the two quarters were
+  identical row for row: 38,947 / 161,125 / 188,229 / 44,358 duplicated rows, 432,659 in all.  The
+  per-quarter Value totals are unchanged (2012Q3 N576,299,043 cold, base and candidate): W2's per-unit
+  =item_seq= rows are summed on Value since PR #629, so the =data_scheme.yml= "KNOWN OPEN DEFECT" note
+  now describes Age only.
+- *W1-W3 rank four strategies.*  The questionnaires head four columns 1st..4th
+  (=GHS_PANEL_HOUSEHOLD_POST_HARVEST_FINAL.pdf= p70; =W2_PH_HH_Questionnaire.pdf= p76;
+  =PH_W3_Household_Quest.pdf= p63), and =s15aq5d= was not wired: 274 / 165 / 150 rows lost their
+  fourth.  It is now =HowCoped3= (optional canonical column, Nigeria only).  The W1-W3 labels call the
+  question a "consequence"; the answers are coping codes.
+- *W4 is "select all that apply".*  =ph_w4_household_quest.pdf= p62: "How did your household cope
+  with the most recent [SHOCK]? SEE CODES. SELECT ALL THAT APPLY".  So =s15aq7_1..4= are entry order,
+  not a rank (63% of the two-or-more-code rows ascend, so it is not code-sorted either): no position is
+  served, and =2018-19/_/mapping.py= =shocks= writes =HowCopedSet= from all four (=s15aq7_4=, 31 rows,
+  was not wired).  Site B warns that 2019Q1's =HowCoped0..2= are empty; that is correct.
+- *Read time.*  "did nothing" / "DID NOTHING" / "21. DID NOTHING" are "did nothing" answers (code 21;
+  =_/coping.yml=).  W2 serves unlabelled codes as ='31.0'=, ='41.0'=, ='51.0'= (10 cells); they are
+  NOT classed as missing codes (undocumented, not documented-missing; the ruling names only ='99.0'=)
+  and stay as recorded, a question to the user in the GH #1562 report.  =s15aq7_os= (W4 "other,
+  specify" text, 14 rows) is not wired.

@@ -6232,3 +6232,24 @@ weight.  =sample= has the same index; every column but =ea= and =Derivation= is 
 households, and every stamped row joins them.  Cost: one Uganda re-warm (=uganda.py= and the
 2009-10 =data_info.yml=): 27 of 27 Uganda table hashes and 216 of 216 Uganda wave hashes, no other
 country's, no build fingerprint.  =var/sample= is re-pinned in =tests/fixtures/uganda_baseline.json=.
+
+* shocks: coping fillers and the set (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 and 2026-11-13 "Coping-strategy ... GH1562".  =HowCoped0..2=
+are the household's ranked answers ("UP TO 3 ANSWERS WITH RANK" in the 2010-11 to 2019-20
+questionnaires; 2005-06 and 2009-10 on their variable labels "first/second/third" and "1st/2nd/3rd").
+Nothing changes at build time.  At READ time (=lsms_library/coping.py=, labels in =_/coping.yml=):
+
+- *Code 40 "Nothing else" is a slot terminator* (2013-14, 2015-16): served NA in its position and never
+  in =HowCopedSet=.  It is in the file's value labels but not in the printed code list
+  (=unps_2013_14_household_qx.pdf= p32 prints 1-15 and 96).  1,035 / 1,065 slot cells; "Nothing else"
+  in all three slots on 55 / 41 rows, which therefore serve no strategy at all.
+- *Unlabelled code 99*, served ='99.0'= (2009-10, 1 cell): a missing code, NA.
+- *Code 96 "Other (specify)" STAYS a strategy* (ruling), although 2010-11 and 2011-12 use it in filler
+  patterns (('k','96','96') on 165 / 131 rows, ('96','96','96') on 129 / 72): the positions keep it, and
+  the set counts it once.
+- *"Did nothing"* (2018-19, 2019-20) is a "did nothing" answer: alone it is the set; beside a strategy
+  (69 / 70 rows) it leaves the set and keeps its position.
+- *Not fixed:* 2005-06's relabel map folds formal and informal borrowing into "Obtained credit" and crop
+  choice and technology into "Changed cropping practices" (14 rows repeat a label the source does not;
+  audit F6).  The set de-duplicates them, which hides the fold rather than repairing it.

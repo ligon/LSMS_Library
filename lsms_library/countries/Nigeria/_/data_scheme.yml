@@ -181,7 +181,11 @@ Data Scheme:
     # (2012Q3 and 2013Q1 both return the same truncated N429,001,558).
     # [2026-11-13, GH #1562: assets is now served once per wave, under the
     # post-planting quarter its sect5 files belong to (2010Q3, 2012Q3, 2015Q3,
-    # 2018Q3), so the W2 truncation is now in 2012Q3 alone.]
+    # 2018Q3); it was served under both quarters.  Measured cold, base and
+    # candidate alike: the served 2012Q3 Value sums to N576,299,043, the true
+    # total above -- Value is summed per item now (feature._ADDITIVE_MEASURE_
+    # COLUMNS["assets"], PR #629), so the N147M loss described here is closed
+    # for Value; Age still keeps one unit's value.]
     #
     # `item_seq` is exactly the missing level -- but declaring it here does NOT
     # close the bug, and that was verified rather than assumed:

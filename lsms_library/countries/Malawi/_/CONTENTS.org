@@ -5898,3 +5898,17 @@ The historical seven-group/zero-attachment evidence retains its original scope;
 it is not an added-row target or a current native acceptance claim. Integration
 owns independent review, final metadata footprint and any separately admitted
 actual validation. Ledger: =.coder/ledger/1190-selected-farm-carrier.md=.
+
+* shocks: coping fillers and the set (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 and 2026-11-13 "Coping-strategy ... GH1562".  Every held
+questionnaire asks for up to 3 responses "BY ORDER OF IMPORTANCE", so =HowCoped0..2= are ranked;
+nothing changes at build time.  At READ time (=lsms_library/coping.py=, labels in =_/coping.yml=):
+
+- *2004-05 code 99 "No other response given" is a slot filler* in slots 2-3 (49,158 served cells on
+  27,046 rows): served NA in its position and never in =HowCopedSet=.
+- *2004-05 "Dont know"* (185 cells) is a missing code: NA.  It is in the audit's F3 list of fillers and
+  missing codes that the ruling answered; flagged in the GH #1562 report as a reading of that ruling.
+- *"Did not do anything"* / *"DID NOT DO ANYTHING"*: alone it is the set; beside a strategy (257-530
+  rows per wave) it leaves the set and keeps its position.
+- Not wired, as before: the "other, specify" text (=ab07*oth=, =hh_u04*_os=).
