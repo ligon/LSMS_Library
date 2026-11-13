@@ -196,9 +196,14 @@ _NIGER_RECORDS = [
     (1, 1, 1, 1.0, 0.0, 0.0, 2.0, "Kg", "Bol", 70.0),        # 10 genuine Bol price 35
     (1, 1, 1, 2.0, 2.0, 0.0, 1 / 3, "Kg", "Kg", 50.0),       # 11 flagged, all own-produced
     (1, 1, 1, 3.0, 0.0, 1.0, 1 / 3, "Kg", "Kg", 50.0),       # 12 flagged, one unit a gift
+    (3, 2, 1, 2.0, 0.0, 0.0, 1.0, "Kg", "Kg", 300.0),        # 13 genuine, cluster 3, region 2
+    (3, 2, 1, 2.0, 0.0, 0.0, 1.0, "Kg", "Kg", 310.0),        # 14 genuine, cluster 3, region 2
 ]
-#: The served Expenditure of each record's purchased row after the revaluation.
-_NIGER_EXPECTED = {"h4": 220.0, "h5": 345.0, "h6": np.nan, "h7": 120.0, "h12": 220.0}
+#: The served Expenditure of each revalued record's purchased row.  Record 6 has 2
+#: genuine reports in its cluster and its region: NA under the region floor of 3 (305
+#: under a floor of 1).  Record 7 is flagged, but #876 serves it NA (consumed in Bol,
+#: last bought in Kg), so it is not revalued ("Only previously valued").
+_NIGER_EXPECTED = {"h4": 220.0, "h5": 345.0, "h6": np.nan, "h12": 220.0}
 
 
 def _niger_frames(niger):
@@ -228,10 +233,26 @@ class TestNigerRule:
         assert niger.computed_last_purchase_rows(x).tolist() == [
             False, False, True, True, True, False, False, False, True]
 
-    def test_the_floors_and_the_gate(self, niger):
+    def test_the_floors(self, niger):
+        """Rulings @ligon 2026-11-12: cluster floor 3, and "Region floor of 3"."""
         assert niger.LOCAL_MEDIAN_MIN_CLUSTER_REPORTS == 3
-        assert niger.LOCAL_MEDIAN_MIN_REGION_REPORTS == 1
-        assert niger.LOCAL_MEDIAN_REVALUES_EVERY_FLAGGED_PURCHASE is True
+        assert niger.LOCAL_MEDIAN_MIN_REGION_REPORTS == 3
+        # "Only previously valued" is the rule, not a switch.
+        assert not hasattr(niger, "LOCAL_MEDIAN_REVALUES_EVERY_FLAGGED_PURCHASE")
+
+    def test_only_previously_valued_rows_are_revalued(self, niger):
+        """Ruling "Only previously valued": a flagged purchase #876 serves NA stays NA."""
+        from lsms_library.ehcvm import derive_ehcvm_purchase_value
+        raw, wide, region = _niger_frames(niger)
+        frame = niger._valuation_frame(raw, wide, region)
+        hit = niger._revalued_records(frame)
+        assert np.flatnonzero(hit).tolist() == [4, 5, 6, 12]
+        value_876 = derive_ehcvm_purchase_value(
+            niger._purchased_quantity(frame), frame["s07bq03b"], frame["s07bq03c"],
+            frame["s07bq07a"], frame["s07bq07b"], frame["s07bq07c"], frame["s07bq08"])
+        flagged_purchase = frame["flagged"].to_numpy() & (niger._purchased_quantity(frame) > 0)
+        assert (hit == (flagged_purchase & np.isfinite(value_876))).all()
+        assert flagged_purchase[7] and np.isnan(value_876[7]) and not hit[7]
 
     def test_the_registered_function_on_synthetic_inputs(self, niger):
         raw, wide, region = _niger_frames(niger)
@@ -244,9 +265,9 @@ class TestNigerRule:
         np.testing.assert_allclose(got["Expenditure"].to_numpy(dtype=float),
                                    list(_NIGER_EXPECTED.values()), equal_nan=True)
         assert got["level"].astype(object).where(got["level"].notna(), None).tolist() == [
-            "cluster", "region", None, "cluster", "cluster"]
-        assert got["cluster_reports"].tolist() == [3, 1, 0, 3, 3]
-        assert got["region_reports"].tolist() == [4, 4, 0, 3, 4]
+            "cluster", "region", None, "cluster"]
+        assert got["cluster_reports"].tolist() == [3, 1, 2, 3]
+        assert got["region_reports"].tolist() == [4, 4, 2, 4]
 
     def test_a_flagged_record_never_prices_another(self, niger):
         """The flagged records' own s07bq08 / s07bq07a (150 here) is the producer's
@@ -276,6 +297,7 @@ class TestNigerRule:
         assert _carries(got[stamped], niger.FOOD_ACQUIRED_DERIVATION).all()
         assert purchased.loc["h0", "Expenditure"] == 200.0
         assert np.isnan(purchased.loc["h8", "Expenditure"])   # #876: Kg against a Bol price
+        assert np.isnan(purchased.loc["h7", "Expenditure"])   # flagged, #876 NA: stays NA
 
     def test_the_hook_refuses_rows_out_of_order(self, niger):
         from lsms_library.ehcvm import food_acquired_ehcvm
@@ -391,13 +413,18 @@ class TestServed:
         assert set(fa.index.get_level_values("t")[has].astype(str)) == {"2018-19"}
         assert set(fa.index.get_level_values("s")[has].astype(str)) == {"purchased"}
 
-    def test_niger_revalues_exactly_the_flagged_purchases(self, served):
-        """Ruling "Revalue at local median": every flagged purchased row, and no other."""
+    def test_niger_revalues_only_the_previously_valued_flagged_purchases(self, served):
+        """Rulings "Revalue at local median" and "Only previously valued": the 12,227
+        flagged purchased rows #876 values carry the key (15,014 under the first scope);
+        the 2,787 it serves NA stay NA and carry the flag alone."""
         fa = served("Niger")
         flagged = _carries(fa, "Niger::food_acquired::computed-last-purchase-quantity")
         revalued = _carries(fa, "Niger::food_acquired::flagged-purchase-local-median")
-        assert int(revalued.sum()) == 15_014
-        assert (flagged == revalued).all()
+        assert int(revalued.sum()) == 12_227
+        assert not (revalued & ~flagged).any()
+        left = flagged & ~revalued
+        assert int(left.sum()) == 2_787
+        assert fa.loc[left, "Expenditure"].isna().all()
 
     def test_niger_the_registered_function_reproduces_the_served_value(self, served):
         """`derivation_inputs` returns every record (the genuine ones are the prices),
@@ -412,7 +439,7 @@ class TestServed:
             inputs = c.derivation_inputs(key, wave="2018-19")
         assert len(inputs) == 107_269 and int(inputs["flagged"].sum()) == 15_264
         derived = c.derivations()[key].resolve()(inputs)
-        assert len(derived) == 15_014
+        assert len(derived) == 12_227                  # 15,014 under the first scope
         fa = served("Niger")
         x = fa[_carries(fa, key)]
         got = x["Expenditure"].groupby(level=["t", "i", "j"]).sum(min_count=1).sort_index()

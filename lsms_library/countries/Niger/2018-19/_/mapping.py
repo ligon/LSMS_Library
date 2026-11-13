@@ -168,9 +168,9 @@ def food_acquired(df):
     2021-22); the fill is here so the two EHCVM waves cannot drift apart.
 
     GH #1708: the purchased rows built from a record with a computed
-    ``s07bq07a`` are revalued at a local median of genuine last-purchase unit
-    values (:func:`_revalue_flagged_purchases`) and flagged
-    (:func:`_stamp_computed_last_purchase`).
+    ``s07bq07a`` are flagged (:func:`_stamp_computed_last_purchase`), and those
+    #876 values are revalued at a local median of genuine last-purchase unit
+    values (:func:`_revalue_flagged_purchases`).
     """
     raw = _computed_raw()
     flagged = _computed_last_purchase_positions(df, raw)
@@ -205,9 +205,9 @@ def food_acquired(df):
 # i.e. it passed through the reconstructed unit value (26.0% of 2018-19's).  Each
 # purchased row built from such a record carries
 # `Niger::food_acquired::computed-last-purchase-quantity` beside its #876 key, and
-# since the second ruling `Niger::food_acquired::flagged-purchase-local-median`
-# too, with its Expenditure revalued (below).  How the values were built is in
-# Niger/_/CONTENTS.org.
+# since the second ruling, where #876 values it, `Niger::food_acquired::
+# flagged-purchase-local-median` too, with its Expenditure revalued (below).  How
+# the values were built is in Niger/_/CONTENTS.org.
 COMPUTED_LAST_PURCHASE_KEY = 'Niger::food_acquired::computed-last-purchase-quantity'
 _COMPUTED_SOURCE = 's07b_me_ner2018.dta'
 
@@ -311,13 +311,20 @@ def inputs_computed_last_purchase(wave='2018-19'):
 # from a flagged record, Expenditure = the served purchased Quantity x the median
 # GENUINE last-purchase unit value, s07bq08 / s07bq07a over the records that are
 # NOT flagged, for the same product x unit x size in the same cluster (grappe),
-# else in the same region (s00q01 of the cover, s00_me_ner2018.dta); NA where the
-# region has no genuine price either.  The unit rule is #876's: a genuine record
+# else in the same region (s00q01 of the cover, s00_me_ner2018.dta); NA where
+# neither has enough genuine reports.  The unit rule is #876's: a genuine record
 # prices the cell of its OWN last-purchase unit and size, the flagged row reads the
 # cell of its consumption unit and size, and the two are compared through the
 # identity `ehcvm.unit_match` uses (`ehcvm._unit_key`); nothing is converted
 # between units.  The product is the s07bq01 code.  Consumed quantities are not
 # touched, and the producer's values stay recoverable from derivation_inputs.
+#
+# Two details were ruled afterwards (@ligon 2026-11-12, "GH1708 revaluation details,
+# and the release plan"): "Region floor of 3": a local median needs >= 3 genuine
+# reports at cluster AND at region level; otherwise NA.  "Only previously valued":
+# revalue only flagged rows that already carried a served Expenditure under #876;
+# rows the library left NA (2,787) stay NA.  "The ruling corrects a construction, it
+# does not add new values."
 LOCAL_MEDIAN_KEY = 'Niger::food_acquired::flagged-purchase-local-median'
 #: Genuine reports a CLUSTER median needs; with fewer the region's is used.  Held-out
 #: genuine prices (each record against the median of the OTHER genuine reports in its
@@ -327,17 +334,14 @@ LOCAL_MEDIAN_KEY = 'Niger::food_acquired::flagged-purchase-local-median'
 #: the cluster median is about as good as the region's or better, and 3 is the
 #: smallest median one stray report cannot move.
 LOCAL_MEDIAN_MIN_CLUSTER_REPORTS = 3
-#: Genuine reports a REGION median needs; with fewer the row is served NA.  The
-#: ruling withholds only where there is "no genuine local price", and the region is
-#: the last level it names, so one genuine report is enough here.  The counts behind
-#: every value are in derivation_inputs (`cluster_reports`, `region_reports` of the
-#: function's output), so a stricter floor is a re-derivation away.
-LOCAL_MEDIAN_MIN_REGION_REPORTS = 1
-#: The one gate on WHICH flagged rows are revalued.  The ruling reads "for the
-#: flagged rows", so every purchased row built from a flagged record is, including
-#: the 2,787 that #876 leaves NA (2,786 whose own last purchase used another unit or
-#: size, 1 with no s07bq08).  False would revalue only the rows #876 values.
-LOCAL_MEDIAN_REVALUES_EVERY_FLAGGED_PURCHASE = True
+#: Genuine reports a REGION median needs; with fewer the row is served NA.  Ruled
+#: "Region floor of 3" (@ligon 2026-11-12): the same floor as the cluster's.  For a
+#: genuine report whose cluster has fewer than 3 others, a region median of 1 or 2
+#: other reports was within 25% of it only 48.5% / 43.1% of the time.  The counts
+#: behind every value are in the function's output (`cluster_reports`,
+#: `region_reports`), so another floor is a re-derivation from derivation_inputs,
+#: not a rebuild.
+LOCAL_MEDIAN_MIN_REGION_REPORTS = 3
 _REGION_SOURCE = 's00_me_ner2018.dta'
 #: The raw variables the revaluation reads, with the file's own names.
 LOCAL_MEDIAN_RAW_VARIABLES = ['grappe', 's00q01', 's07bq01', 's07bq03a', 's07bq03b',
@@ -483,16 +487,28 @@ def local_median_unit_values(frame):
                         index=frame.index)
 
 
+def _value_876(frame):
+    """The #876 value of each record's purchased row: purchased Quantity x its OWN
+    ``s07bq08 / s07bq07a`` where the last purchase used the consumption unit and size,
+    else NA (:func:`ehcvm.derive_ehcvm_purchase_value`, the function itself)."""
+    from lsms_library.ehcvm import derive_ehcvm_purchase_value
+    return np.asarray(derive_ehcvm_purchase_value(
+        _purchased_quantity(frame), frame['s07bq03b'], frame['s07bq03c'],
+        frame['s07bq07a'], frame['s07bq07b'], frame['s07bq07c'], frame['s07bq08']),
+        dtype=float)
+
+
 def _revalued_records(frame):
-    """Boolean ndarray: the records whose purchased row the ruling revalues."""
-    hit = frame['flagged'].to_numpy(dtype=bool) & (_purchased_quantity(frame) > 0)
-    if not LOCAL_MEDIAN_REVALUES_EVERY_FLAGGED_PURCHASE:
-        from lsms_library.ehcvm import unit_match
-        own = unit_match(frame['s07bq03b'], frame['s07bq03c'],
-                         frame['s07bq07b'], frame['s07bq07c']).to_numpy()
-        hit &= (own & (frame['s07bq07a'].to_numpy(dtype=float) > 0)
-                & np.isfinite(frame['s07bq08'].to_numpy(dtype=float)))
-    return hit
+    """Boolean ndarray: the records whose purchased row the ruling revalues.
+
+    A flagged record with a positive purchased Quantity whose #876 value is not NA
+    (:func:`_value_876`): ruled "Only previously valued" (@ligon 2026-11-12).  The
+    2,787 flagged purchased rows #876 serves NA (2,786 whose own last purchase used
+    another unit or size, 1 with no ``s07bq08``) are not revalued; they stay NA and
+    carry no :data:`LOCAL_MEDIAN_KEY`.
+    """
+    return (frame['flagged'].to_numpy(dtype=bool) & (_purchased_quantity(frame) > 0)
+            & np.isfinite(_value_876(frame)))
 
 
 def derive_flagged_purchase_local_median(inputs):
@@ -522,9 +538,11 @@ def _revalue_flagged_purchases(out, df, frame):
     file order (``ehcvm.food_acquired_ehcvm`` -> ``food_acquired_to_canonical``).
     That is checked -- the count, the ``s`` level, each row's Quantity, #876
     Expenditure and household -- and :class:`LocalMedianJoinError` is raised if it
-    does not hold, so the value is written by position, never by key.  Each revalued
-    row gains :data:`LOCAL_MEDIAN_KEY` beside the keys it carries, NA-valued ones
-    included: the rule produced that NA.
+    does not hold, so the value is written by position, never by key.  Only the rows
+    #876 values are revalued (:func:`_revalued_records`).  Each revalued row gains
+    :data:`LOCAL_MEDIAN_KEY` beside the keys it carries, including one the region
+    floor serves NA: the rule produced that NA.  A flagged row #876 serves NA is left
+    as it is.
     """
     from lsms_library.derivations import union_keys
     from lsms_library.ehcvm import derive_ehcvm_purchase_value
@@ -540,7 +558,10 @@ def _revalue_flagged_purchases(out, df, frame):
     n = int(keep.sum())
     s = np.asarray(out.index.get_level_values('s'), dtype=object)
     is_purchased = s == 'purchased'
-    ok = (int(is_purchased.sum()) == n and bool(is_purchased[:n].all())
+    # The scope ("Only previously valued") is read off the valuation frame; it must be
+    # the #876 value the hook itself served.
+    ok = (np.array_equal(_value_876(frame), np.asarray(value_876, dtype=float), equal_nan=True)
+          and int(is_purchased.sum()) == n and bool(is_purchased[:n].all())
           and np.array_equal(_num(out['Quantity'].to_numpy()[:n]), quantity[keep])
           and np.array_equal(_num(out['Expenditure'].to_numpy()[:n]), value_876[keep],
                              equal_nan=True)
