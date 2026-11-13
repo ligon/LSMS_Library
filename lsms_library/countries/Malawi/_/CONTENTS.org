@@ -1,6 +1,121 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* 2026-11-13 -- GH #1228 later waves: the season check and the Module D join, measured
+
+Read-only, on development =f138a3d61= (burst jobs 41271534, 41271583, 41271657;
+scripts and JSON in the batch's =reports/malawi/=).  The ruling (@ligon, 2026-11-12,
+"Join D, single-text only") makes a season check the precondition of the relabel.
+
+*Idiosyncrasy: the reference season is not exported.*  No held 2016-17, 2019-20 or
+2024-25 file -- Modules D, G, I, A, the agriculture meta files, the household cover --
+carries the D-0 / G-0 / I-0 season answer.  The labels carry only the CAPI token
+=[RS]= (2016-17 / 2019-20), or interpolate =%ag_d0%=, =%ag_g0%=, =%ag_i_0%= (2024-25),
+and none of those variables ships.  So the check cannot be a per-household D-vs-G
+comparison.  It passes by inference from three released measures:
+
+- *One season per interview.*  A G line's season is derived from its planting month
+  and year (=ag_g05a= / =ag_g05b=; July-December of Y is season Y/Y+1).  Households
+  whose dated G lines all fall in one season: 8,876 of 9,463 (2016-17 XS), 1,780 of
+  1,880 (Panel), 8,022 of 8,771 (2019-20 XS), 2,184 of 2,333 (Panel).  Every mixed
+  household holds two ADJACENT seasons, which is what a planting month near the July
+  boundary gives.
+- *A step by interview date.*  Against the agriculture meta file's Module G start date,
+  2016-17 XS households interviewed April-August 2016 report the 2014/15 season (2,251
+  of 2,404), those interviewed October 2016-May 2017 the 2015/16 season (5,965 of
+  6,172), September 2016 is the changeover (373 / 494).  2019-20 XS: April-July 2019 is
+  2017/18 (2,187 of 2,304), September 2019-April 2020 is 2018/19 (5,218 of 5,474),
+  August 2019 the changeover (380 / 603).  The Panels are nearly one season
+  (2015/16; 2018/19).  This is why "about a quarter of G lines were planted a year
+  earlier": the cross-sections straddle two reference seasons by design (the printed
+  forms offer =2014/2015= or =2015/2016=, =2017/2018= or =2018/2019=).
+- *D and G in the same sitting.*  The meta files' Module D and Module G start dates are
+  the same day for 9,368 of 9,604 (2016-17 XS), 1,733 of 1,801 (Panel), 8,487 of 8,813
+  (2019-20 XS), 2,289 of 2,368 (Panel) households; most of the rest differ by 1-2 days.
+  On the households holding a code-48 G line: 324 / 335, 85 / 89, 778 / 820, 181 / 191.
+
+*A separate fact, not the season check: G's roster IS D20's.*  The IHS5 form prints G's
+crop column as "PRE-POPULATED WITH CROPS THAT ARE LISTED IN MODULE D (question 20)",
+and the release shows it: G (plot, crop code) pairs found among the plot's D20 codes,
+2019-20 XS 32,651 of 32,651, Panel 9,947 of 9,978.  2016-17's D20 uses the COLLAPSED
+code: matched on G's =crop_code_collapsed= it is XS 24,555 of 25,975, Panel 6,174 of
+6,289 (on =crop_code= 18,426 / 4,425: maize and groundnut varieties).  G code-48 pairs
+in D20: 369 / 371, 110 / 111, 990 / 990, 231 / 234.
+
+*Idiosyncrasy: the D text columns differ by half.*  2016-17 (both halves) and 2019-20
+Panel ship ONE "Other Crop" text, =ag_d20_oth=; 2019-20 Cross_Sectional ships two,
+=ag_d20_oth= / =ag_d20b_oth= "Other Crop 2", against one code-48 slot.
+
+*The join, per G code-48 line*, on (household, =gardenid=, =plotid=): 0 incomplete
+keys, 0 lines without a D row, 0 non-unique D rows, 0 plots with two code-48 G lines.
+
+| half          | G code-48 lines | one text, one D code-48 slot | of which cowpea | no text | two texts | text, no D code-48 slot |
+|---------------+-----------------+------------------------------+-----------------+---------+-----------+-------------------------|
+| 2016-17 XS    |             371 |                          369 | 238 =COWPEAS=   |       2 |         0 |                       0 |
+| 2016-17 Panel |             111 |                          110 | 64 =COWPEAS=    |       0 |         0 |                       1 |
+| 2019-20 XS    |             990 |                          963 | 584 =COW PEAS=  |       0 |        27 |                       0 |
+| 2019-20 Panel |             234 |                          231 | 113 =COW PEAS=  |       0 |         0 |                       3 |
+
+Each wave writes cowpea ONE way (2016-17 =COWPEAS=, 2019-20 =COW PEAS=, 2010-11's own G
+text =COWPEAS= -- no other spelling on code 48 there).  These are the checkpoint's
+238 / 64 / 584 / 113 exactly.  Text naming cowpea that the rule leaves =Other=: 2016-17
+XS one =COWPEAS(NSEULA)= (a local name in the text; not on the exact list); 2016-17 Panel
+one =COWPEAS= on a D row with no code-48 slot; 2019-20 XS 25 two-text plots with cowpea
+in one text (=COW PEAS | NKHAKA= 6, =| CUCUMBER= 5, ..., =COW PEAS | COW PEAS= 2).  The
+rest of the single texts is the familiar tail (=MUCUNA=, =SESAME=, =CASSAVA=,
+=NKHUNGUDZU=, =CHITOWE=, =CUCUMBER=, ...).
+
+*Module I.*  2016-17 labels I's =crop_code= "Consistent CC across Modules", the same
+value-label set as G (=crop_complete=).  2019-20 labels it "Id in ag_H_seed_roster" (set
+=ag_H_seed_roster__id=, G's =ag_G_crop_roster__id=), but the two sets' labels are
+identical code for code, and I's (household, code) pairs are G's: 25,891 of 26,120 (XS),
+7,162 of 7,264 (Panel); sold pairs 7,516 of 7,572 and 2,039 of 2,064 (2016-17: 21,681 /
+22,189, 4,268 / 4,717; sold 5,456 / 5,552, 1,031 / 1,150).  So "Id in ag_H_seed_roster"
+is a CAPI roster-id name whose ids are the crop codes.  The later I files carry NO crop
+specify text (their =_oth= columns are units, transport, loss, storage).  Code-48 sale
+lines with a positive value: 50 / 25 / 187 / 62 (2016-17 XS / Panel, 2019-20 XS / Panel);
+of those, the household's every G code-48 line resolves to cowpea for 16 / 14 / 58 / 20,
+some but not all for 1 / 2 / 6 / 0, none for 28 / 9 / 114 / 39, and 5 / 0 / 9 / 3
+households have no G code-48 line.
+
+*2024-25 (IHS6 / IHPS 2024), measured and NOT relabelled* (outside the ruling;
+=crop_production= is not wired for this wave).  *Idiosyncrasy: IHS6 has a cowpea code.*
+Module G lists =48 OTHER (SPECIFY) 1=, =49 OTHER (SPECIFY) 2= and =50 COW PEAS (KHOBWE)=
+(1,223 XS / 273 Panel G rows on 50), and D's two texts pair with 48 and 49 (160 / 9
+plots carry both).  The residue the ruling targets is smaller: one text on a 48-only
+plot saying =COW PEAS= 106 / 17, and 7 / 0 on a code-49 plot.  The season inference
+holds as for the earlier waves (one season 8,836 of 9,570 and 1,848 of 2,054; D and G
+the same day 9,257 of 9,627 and 1,958 of 2,068).
+
+* 2026-11-13 -- plot_inputs: the six all-null native Module H columns (GH #1712, diagnosis)
+
+GH #1190's carrier copies every native =ag_h*= column of the H file onto the
+acquisition rows (the ruling of 2026-11-10: "all native H scalar columns are retained
+literally, including blank source text").  Six of them are empty in the whole country,
+so =plot_inputs= fails =no_all_null_columns= and grades =builds=.  Measured on the raw
+file (=pyreadstat=), through =get_dataframe=, and on the rows the carrier keeps: each is
+present under its own release name and label, and empty on EVERY row of the one source
+that carries it.  No wiring error and no filter:
+
+| column       | source                 | label (abridged)                                    | parent answer routing to it          |
+|--------------+------------------------+-----------------------------------------------------+--------------------------------------|
+| =ag_h17_os=  | 2010-11 Full_Sample H  | transport mode, 1st purchase source (O/S)           | =ag_h17= = 5 Other (Specify) on 21 rows, all carried |
+| =ag_h26b_os= | 2010-11 Full_Sample H  | 2nd-source purchase UNIT (O/S)                      | =ag_h26b= = 9 Other on 0 rows        |
+| =ag_h27_os=  | 2010-11 Full_Sample H  | transport mode, 2nd source (O/S)                    | =ag_h27= = 5 Other on 0 rows         |
+| =ag_h36b_os= | 2010-11 Full_Sample H  | 3rd-source purchase UNIT (O/S)                      | =ag_h36b= = 9 Other on 0 rows        |
+| =ag_h26_1b=  | 2019-20 Panel H        | "Who in your household paid for the purchase of SEED 2nd" | =ag_h26_1a= (1st payer) answered on 14 rows |
+| =ag_h36_1b=  | 2019-20 Panel H        | same label                                          | =ag_h36_1a= answered on 1 row        |
+
+*Idiosyncrasy: 21 "Other (Specify)" transport answers have no text.*  The 21 =ag_h17=
+= 5 rows carry no text in any string column, and the unread 2010-11 =Panel/Agriculture=
+H file has the same 21 rows, equally blank.  The release does keep specify text
+elsewhere in that file (=ag_h43_os= 1,063 rows, =ag_h0b_os= 434, =ag_h42b_os= 54,
+=ag_h38b_os= 27, =ag_h07b_os= 12, =ag_h16b_os= 9).  The other five columns are empty
+because no row routes to them.  Absence in the shipped extract is not absence in the
+instrument; what to serve (drop, =optional:=, or accept =builds=) is a question for the
+maintainer, since the #1190 ruling retains the columns literally.  =optional:= is
+country-grain and each column exists in one wave only.
+
 * 2026-11-12 -- PR #1604 review: what 2024-25 serves, and four disclosures
 
 Measured on private cold builds (development =e5fdd2fa8=, the reviewed head
