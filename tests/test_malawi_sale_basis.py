@@ -62,6 +62,9 @@ KEYS = (W, P, OV, N, NR, CS, CH)
 #: row for, in the rulings queued on the #1457 review.
 OFF_LADDER = {'Malawi::crop_production::sale-other-unit-single-row',
               'Malawi::crop_production::sale-one-row-states-harvest'}
+#: Not a rung: the GH #1228 relabel's key, on cowpea rows beside any rung key
+#: (MULTI_SEP).  Counted apart, and no row is dropped for carrying it.
+LABEL_KEYS = {'Malawi::crop_production::cowpea-from-crop-text'}
 SINCE = {OV: '2026-09-25', NR: '2026-09-25'}
 
 #: Delivered ROWS carrying each key, per wave -- first measured on the cold
@@ -175,12 +178,19 @@ def _ladder():
     Scoped to the table: the country file also registers other tables'
     derivations (community_prices, GH #827), which are not rungs."""
     return {k: r for k, r in derivation_records(COUNTRY).items()
-            if r.table == 'crop_production' and k not in OFF_LADDER}
+            if r.table == 'crop_production' and k not in OFF_LADDER | LABEL_KEYS}
 
 
 def _keys_of(frame):
     """Rows per key.  A row can carry two (`Derivation` is MULTI_SEP-joined)."""
     return frame['Derivation'].astype('string').str.split('+').explode().value_counts().to_dict()
+
+
+def _carrying(frame, key):
+    """The rows whose `Derivation` holds ``key``, alone or joined with another (GH #1228:
+    a relabelled cowpea row carries its sale-basis key beside the crop-text key)."""
+    keys = frame['Derivation'].astype('string').str.split('+')
+    return frame[keys.map(lambda ks: isinstance(ks, list) and key in ks).to_numpy(dtype=bool)]
 
 
 def _without(frame, keys):
@@ -693,7 +703,7 @@ class TestDelivered:
     def test_rows_per_key_per_wave(self, delivered, wave):
         x = delivered.xs(wave, level='t', drop_level=False)
         assert len(x) == TOTAL_ROWS[wave]
-        got = _keys_of(_without(x, OFF_LADDER))
+        got = {k: n for k, n in _keys_of(_without(x, OFF_LADDER)).items() if k not in LABEL_KEYS}
         assert {k: got.get(k, 0) for k in KEYS} == ROWS[wave]
         assert set(got) <= set(KEYS)
 
@@ -747,7 +757,7 @@ class TestDelivered:
     def test_attrs_summary_counts_the_labelled_rows_and_lists_the_deletion(self, delivered, country):
         full = country.crop_production()
         summ = full.attrs['derivations'][COUNTRY]
-        assert set(summ) - OFF_LADDER == set(KEYS) | {DEL}
+        assert set(summ) - OFF_LADDER - LABEL_KEYS == set(KEYS) | {DEL}
         for key in KEYS:
             assert summ[key]['rows'] == _keys_of(delivered).get(key, 0)
             assert summ[key]['in'] == 'crop_production'
@@ -758,17 +768,17 @@ class TestDelivered:
         """The overrule rung is Groundnut on a not-applicable harvest row
         with an S/U sale; the no-reference rung never lands on a Groundnut
         row (every wave has a Groundnut reference)."""
-        ov = delivered[delivered['Derivation'] == OV]
+        ov = _carrying(delivered, OV)
         assert len(ov) == sum(r[OV] for r in ROWS.values()) == 4
         assert set(ov.index.get_level_values('crop')) == {'Groundnut'}
         assert set(ov.index.get_level_values('condition')) == {'shell_not_applicable'}
         assert (ov['Value_sold'] > 0).all()
         assert ov['Value_sold'].sum() == pytest.approx(157_000.0)
-        nr = delivered[delivered['Derivation'] == NR]
+        nr = _carrying(delivered, NR)
         assert len(nr) == sum(r[NR] for r in ROWS.values()) == 296
         assert 'Groundnut' not in set(nr.index.get_level_values('crop'))
         assert nr['Value_sold'].sum() == pytest.approx(13_270_507.0)
-        n = delivered[delivered['Derivation'] == N]
+        n = _carrying(delivered, N)
         assert len(n) == sum(r[N] for r in ROWS.values()) == 114
         assert n['Value_sold'].sum() == pytest.approx(25_416_200.0)
         # Cotton is entirely no-reference; Tobacco is split across the two
@@ -778,7 +788,7 @@ class TestDelivered:
 
     def test_registry_lists_every_key(self, country):
         import lsms_library as ll
-        assert set(country.derivations('crop_production')) - OFF_LADDER == set(KEYS) | {DEL}
+        assert set(country.derivations('crop_production')) - OFF_LADDER - LABEL_KEYS == set(KEYS) | {DEL}
         tbl = ll.derivations()
         assert set(KEYS) | {DEL} <= set(tbl.index)
 

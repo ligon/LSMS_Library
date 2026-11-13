@@ -259,11 +259,18 @@ def test_old_helper_and_r1_r3_source_inverse_exact():
     # GH #1228 later waves (ruling 2026-11-12): the Module D join helpers, added ...
     added|={'_D20_SLOTS','_D20_TEXTS','D20_COLUMNS','D20_SINGLE','_D20_REASONS',
             'module_d_other_crop_text','read_module_d_columns','household_crop_labels',
-            'D20_TEXT_COL','D20_REASON_COL','attach_module_d_text'}
-    # ... and the six definitions it changed, named exactly and dropped from BOTH
-    # sides, so every other definition of malawi.py is still compared byte for byte.
+            'D20_TEXT_COL','D20_REASON_COL','attach_module_d_text','_D20_TEXT_48',
+            # its registration (ruling 2026-11-13, "Register all waves")
+            'CROP_TEXT_KEYS','CROP_TEXT_WAVES','derive_cowpea_from_crop_text',
+            'union_derivation_key','_assert_label_is_text_only',
+            'inputs_cowpea_from_crop_text',
+            # GH #1712 (ruling 2026-11-13, "Drop the six")
+            '_H_EMPTY_IN_RELEASE','_blank'}
+    # ... and the definitions it changed, named exactly and dropped from BOTH sides,
+    # so every other definition of malawi.py is still compared byte for byte.
     changed={'_CROP_TEXT_RECODE','_crop_text_labels','_harvest_block',
-             'assemble_crop_production','_CROP_SALE_SOURCES','_crop_pieces'}
+             'assemble_crop_production','_CROP_SALE_SOURCES','_crop_pieces',
+             'assemble_plot_inputs'}
     added_imports={'functools'}
     def named(n,names):
         return getattr(n,'name',None) in names or isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id in names for t in n.targets)

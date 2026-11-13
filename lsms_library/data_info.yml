@@ -1393,6 +1393,15 @@ Columns:
         grain, in the survey's own words, with no `spellings` block because the
         labels are not a vocabulary.  NA on a row with no sale, and where nothing
         was folded.  First instance: Niger 2018-19 `s16cq16c`.
+  plot_inputs:
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`: the registry key of the
+        construction behind a served value, NA on a reported row.  First
+        instance here: `Malawi::plot_inputs::cowpea-from-crop-text` (GH #1228),
+        a seed row whose `crop` label a crop specify text set.
   food_acquired:
     # Acquisition source 's' is an INDEX level (see Index Info above),
     # not a column.  Canonical values: purchased, produced, inkind,

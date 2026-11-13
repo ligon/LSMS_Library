@@ -164,7 +164,11 @@ def _gd(texts, slot_codes, g_codes=(48,), d_rows=1):
 @pytest.mark.parametrize('texts, slots, g_codes, d_rows, reason', [
     (['COW PEAS'], [1, 48], (48,), 1, 'single'),
     (['COWPEAS'], [48], (48,), 1, 'single'),
-    (['COW PEAS', 'NKHAKA'], [48], (48,), 1, 'multi_text'),   # 2019-20 XS "Other Crop 2"
+    # 2019-20 XS: "Other Crop 2" (ag_d20b_oth) is code 49's text (D20: 48 OTHER SPECIFY 1,
+    # 49 OTHER SPECIFY 2), so a plot naming both Other crops has two texts and keeps 'Other'.
+    (['COW PEAS', 'NKHAKA'], [48, 49], (48,), 1, 'multi_text'),
+    # ag_d20b_oth never names code 48's crop (red team F2, 2026-11-13).
+    (['', 'COW PEAS'], [48], (48,), 1, 'text_not_for_code_48'),
     ([], [48], (48,), 1, 'no_text'),
     (['COWPEAS'], [36], (48,), 1, 'text_no_other_slot'),
     (['COWPEAS'], [48, 48], (48,), 1, 'text_multi_other_slot'),
@@ -206,6 +210,51 @@ def test_the_harvest_line_takes_the_d_text_label(malawi, texts, expected):
     assert sum(left.values()) == int(expected != LABEL)
     if len(texts) == 2:
         assert left == {'multi_text': 1}
+
+
+KEY = 'Malawi::crop_production::cowpea-from-crop-text'
+SEED_KEY = 'Malawi::plot_inputs::cowpea-from-crop-text'
+
+
+@pytest.mark.parametrize('existing, add, expected', [
+    (None, True, KEY), ('', True, KEY), (None, False, None),
+    ('Malawi::crop_production::sale-basis-no-reference', True,
+     'Malawi::crop_production::cowpea-from-crop-text+Malawi::crop_production::sale-basis-no-reference'),
+    (KEY, True, KEY),                                      # never doubled
+    ('Malawi::crop_production::sale-basis-unresolved', False,
+     'Malawi::crop_production::sale-basis-unresolved'),
+])
+def test_the_key_joins_an_existing_one_in_sorted_order(malawi, existing, add, expected):
+    out = malawi.union_derivation_key(pd.Series([existing], dtype='string'), [add], KEY)
+    if expected is None:
+        assert pd.isna(out[0])
+    else:
+        assert out[0] == expected
+
+
+def test_the_relabelled_rows_carry_the_key_beside_a_ladder_key(malawi):
+    """A single-plot cowpea line whose sale lands on the unknown wildcard carries both keys."""
+    g, d = _gd(['COW PEAS'], [48])
+    g['unit'], g['cond'] = 9, float('nan')              # an unanswered S/U: the wildcard
+    malawi.attach_module_d_text(g, d, cropcode='crop_code')
+    h = malawi._harvest_block(g, hhid='hhid', plotkey='plotkey', cropcode='crop_code', qty='q',
+                              unit='unit', condition='cond', t='2019-20',
+                              crop_text=malawi.D20_TEXT_COL, crop_text_reason=malawi.D20_REASON_COL)
+    out = malawi.assemble_crop_production('2019-20', [h], _sale(malawi, [48]))
+    assert out['Derivation'].tolist() == ['+'.join(sorted([KEY, malawi.SALE_BASIS_WILDCARD]))]
+    plain = malawi.assemble_crop_production('2019-20', [_harvest(malawi, _g([48], ['MUCUNA']))], [])
+    assert plain['Derivation'].isna().all()
+
+
+def test_the_registry_names_the_rule_and_its_inputs(malawi):
+    from lsms_library.derivations import derivation_records
+    recs = derivation_records('Malawi')
+    for key in (KEY, SEED_KEY):
+        r = recs[key]
+        assert tuple(r.waves) == malawi.CROP_TEXT_WAVES
+        assert r.resolve('function').__name__ == 'derive_cowpea_from_crop_text'
+        assert r.resolve('inputs').__name__ == 'inputs_cowpea_from_crop_text'
+    assert set(malawi.CROP_TEXT_KEYS.values()) == {KEY, SEED_KEY}
 
 
 def test_the_seed_line_takes_the_same_d_text_label(malawi):
@@ -426,3 +475,29 @@ def test_the_label_joins_food_acquired_in_every_wave():
     assert waves == set(fa['t'].astype(str))
     # Six food waves since 2024-25 was wired (GH #1275, PR #1604).
     assert len(waves) == 6
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize('table, key', [('crop_production', KEY), ('plot_inputs', SEED_KEY)])
+def test_every_relabelled_row_carries_the_key_and_joins_its_inputs(table, key):
+    """Ruling 2026-11-13, "Register all waves": the key on exactly the rows the label
+    names, beside any other key, and the D (or own G) text behind each one."""
+    from lsms_library.country import Country
+    malawi = Country('Malawi')
+    served = getattr(malawi, table)().reset_index()
+    keys = served['Derivation'].astype('string').str.split('+')
+    keyed = keys.map(lambda ks: isinstance(ks, list) and key in ks).to_numpy(dtype=bool)
+    cowpea = served['crop'].astype(str).eq(LABEL).to_numpy()
+    if table == 'plot_inputs':      # Module H's acquisition rows keep their code's label
+        cowpea &= served['input'].astype(str).eq('Seed').to_numpy()
+    assert (keyed == cowpea).all()
+    assert set(served.loc[keyed, 't'].astype(str)) == {'2010-11', '2016-17', '2019-20'}
+    for wave, rows in served[keyed].groupby(served.loc[keyed, 't'].astype(str)):
+        inputs = malawi.derivation_inputs(key, wave=wave)
+        assert list(inputs.index.names) == ['t', 'i', 'crop']
+        have = set(zip(inputs.index.get_level_values('i').astype(str),
+                       inputs.index.get_level_values('crop').astype(str)))
+        assert set(zip(rows['i'].astype(str), rows['crop'].astype(str))) <= have, wave
+        if wave != '2010-11':
+            assert inputs['ag_d20_oth'].astype('string').str.strip().str.upper() \
+                .isin(['COWPEAS', 'COW PEAS']).all(), wave

@@ -1315,9 +1315,19 @@ _CROP_OTHER_SPECIFY = 48
 _CROP_TEXT_RECODE = {'COWPEAS': 'Cowpea (Khobwe)', 'COW PEAS': 'Cowpea (Khobwe)'}
 
 
-def _crop_text_labels(label, df, cropcode, crop_text):
+#: GH #1228, ruling @ligon 2026-11-13 ("Register all waves"): the relabel is a
+#: registered derivation (`_/derivations.yml`), one rule served in two tables, so one
+#: name under each table's key.  Stamped on every row whose `crop` it set.
+CROP_TEXT_KEYS = {'crop_production': 'Malawi::crop_production::cowpea-from-crop-text',
+                  'plot_inputs': 'Malawi::plot_inputs::cowpea-from-crop-text'}
+#: The waves whose code-48 lines have a crop text the build reads.
+CROP_TEXT_WAVES = ('2010-11', '2016-17', '2019-20')
+
+
+def derive_cowpea_from_crop_text(label, df, cropcode, crop_text):
     """Relabel the code-48 lines whose crop specify text is in `_CROP_TEXT_RECODE`.
 
+    The registered rule ``Malawi::{crop_production,plot_inputs}::cowpea-from-crop-text``.
     Returns ``(label, named)``: the labels, and a boolean array of the lines
     relabelled.  ``crop_text`` names the line's crop text: its own Module G
     specify column in 2010-11 (``ag_g0d_os``), the plot's single Module D
@@ -1335,33 +1345,74 @@ def _crop_text_labels(label, df, cropcode, crop_text):
     return out, named
 
 
+def _crop_text_labels(label, df, cropcode, crop_text):
+    """`derive_cowpea_from_crop_text`, under the name the blocks have always called."""
+    return derive_cowpea_from_crop_text(label, df, cropcode, crop_text)
+
+
+def union_derivation_key(existing, add, key):
+    """``existing`` Derivation values with ``key`` joined in where ``add`` is true.
+
+    Two keys on one row are their sorted distinct union, joined by
+    ``derivations.MULTI_SEP`` (the registry's own rule), so a row the sale-basis
+    ladder already keyed keeps that key beside this one.  Returns a ``string`` array.
+    """
+    from lsms_library.derivations import MULTI_SEP
+    out = []
+    for value, more in zip(existing, np.asarray(add, dtype=bool)):
+        keys = (set() if value is None or pd.isna(value) or str(value) == ''
+                else set(str(value).split(MULTI_SEP)))
+        if more:
+            keys.add(key)
+        out.append(MULTI_SEP.join(sorted(keys)) if keys else pd.NA)
+    return pd.array(out, dtype='string')
+
+
+def _assert_label_is_text_only():
+    """The stamp rule reads `crop == 'Cowpea (Khobwe)'` as "set from a crop text".
+
+    That holds only while no crop code maps to the label (the #1523 decision, pinned by
+    ``test_the_label_is_the_food_tables_and_reserves_no_code``); refuse otherwise.
+    """
+    labels = set(_malawi_code_map('harmonize_crop').values())
+    if set(_CROP_TEXT_RECODE.values()) & labels:
+        raise ValueError('a harmonize_crop code now carries a crop-text label; '
+                         'the cowpea-from-crop-text stamp can no longer read crop alone')
+
+
 # --- GH #1228, 2016-17 / 2019-20: the crop name is in Module D -------------
 #
 # Ruling (@ligon, 2026-11-12, "Join D, single-text only"): after a read-only
 # check that Modules D and G share the season reference, relabel the later
 # waves' 'Other' G lines from Module D's text, only where the plot has exactly
 # one 'Other Crop' text; Module I code-48 sales move by the same rule; local
-# names stay unmapped.  The check passed by inference (the season answer is not
-# exported; one season per interview, a step by interview date, D and G started
-# the same day for 96-97.5% of households): CONTENTS.org, 2026-11-13.
+# names stay unmapped.  The season precondition is accepted as met (@ligon,
+# 2026-11-13): the household's reference season is Module X hh_x02, to which the
+# IHS4 / IHS5 forms tie D-0, G-0 and I-0 (CONTENTS.org, 2026-11-13).
 #
 # After 2013-14 Module G carries no crop-name text.  Module D question 20 lists
-# the plot's crops in five code slots and names an OTHER (SPECIFY) crop in its
-# "Other Crop" text: ag_d20_oth (2016-17 both halves, 2019-20 Panel), plus
-# ag_d20b_oth "Other Crop 2" (2019-20 Cross_Sectional).  G's crop roster is
-# pre-populated from D20, so a G line coded 48 is the plot's D20 code-48 entry
-# and D's text names it.  A line is named only where the join is unambiguous:
-# exactly one D row for the plot, exactly one text, and exactly one code-48
-# slot in D and one code-48 line in G.  Everything else keeps 'Other', counted
-# by reason on `attrs['crop_text_left_other']`.
+# the plot's crops in five code slots and names each OTHER (SPECIFY) crop in its
+# own text: ag_d20_oth "Other Crop" for code 48 (all four later halves), and,
+# in 2019-20 Cross_Sectional only, ag_d20b_oth "Other Crop 2" for code 49
+# (D20's value labels there: 48 OTHER SPECIFY 1, 49 OTHER SPECIFY 2).  A G line
+# coded 48 is the plot's D20 code-48 entry, so ag_d20_oth names it, and only
+# ag_d20_oth: ag_d20b_oth never feeds a code-48 line.  A line is named only
+# where the join is unambiguous: exactly one D row for the plot, exactly one
+# text on the plot (the ruling's words, so a plot naming both its Other crops
+# keeps 'Other'), that text in ag_d20_oth, exactly one code-48 slot in D and one
+# code-48 line in G.  Everything else keeps 'Other', counted by reason on
+# `attrs['crop_text_left_other']`.
 _D20_SLOTS = ('ag_d20a', 'ag_d20b', 'ag_d20c', 'ag_d20d', 'ag_d20e')
-_D20_TEXTS = ('ag_d20_oth', 'ag_d20b_oth')
+#: The text naming code 48's crop, and the one naming code 49's (2019-20 XS only).
+_D20_TEXT_48 = 'ag_d20_oth'
+_D20_TEXTS = (_D20_TEXT_48, 'ag_d20b_oth')
 #: The columns `module_d_other_crop_text` reads, beside the household id.
 D20_COLUMNS = ('gardenid', 'plotid', *_D20_SLOTS, *_D20_TEXTS)
 #: Why a G line got no single Module D text (`module_d_other_crop_text`).
 D20_SINGLE = 'single'
 _D20_REASONS = ('key_incomplete', 'no_d_row', 'd_not_unique', 'no_text', 'multi_text',
-                'text_no_other_slot', 'text_multi_other_slot', 'g_multi_other_on_plot')
+                'text_not_for_code_48', 'text_no_other_slot', 'text_multi_other_slot',
+                'g_multi_other_on_plot')
 
 
 def module_d_other_crop_text(g, d, *, cropcode, hhid='hhid'):
@@ -1378,7 +1429,7 @@ def module_d_other_crop_text(g, d, *, cropcode, hhid='hhid'):
     """
     texts = [c for c in _D20_TEXTS if c in d.columns]
     slots = [c for c in _D20_SLOTS if c in d.columns]
-    if not texts or len(slots) != len(_D20_SLOTS):
+    if _D20_TEXT_48 not in texts or len(slots) != len(_D20_SLOTS):
         raise KeyError(f'Module D question 20 columns missing: texts {texts}, slots {slots}')
     keys = ['_k_h', '_k_g', '_k_p']
 
@@ -1392,7 +1443,8 @@ def module_d_other_crop_text(g, d, *, cropcode, hhid='hhid'):
     words = pd.DataFrame({c: _normalise_unit_text(d[c]).values for c in texts})
     dk['_n_other'] = codes.eq(_CROP_OTHER_SPECIFY).sum(axis=1).values
     dk['_n_text'] = words.notna().sum(axis=1).values
-    dk['_text'] = words.bfill(axis=1).iloc[:, 0].astype('string').values
+    # Code 48's own text, never another slot's (red team F2, 2026-11-13).
+    dk['_text'] = words[_D20_TEXT_48].astype('string').values
     dk = dk[dk[keys].notna().all(axis=1).to_numpy()]
     dk['_n_rows'] = dk.groupby(keys)['_k_h'].transform('size')
     dk = dk.drop_duplicates(keys)
@@ -1407,9 +1459,10 @@ def module_d_other_crop_text(g, d, *, cropcode, hhid='hhid'):
     n = {c: pd.to_numeric(m[c], errors='coerce').astype('float64').to_numpy()
          for c in ('_n_rows', '_n_text', '_n_other', '_n_g48')}
     incomplete = ~complete[m['_pos'].to_numpy()]
+    own = pd.Series(m['_text'].to_numpy(), dtype='string').notna().to_numpy()
     reason = np.select(
         [incomplete, np.isnan(n['_n_rows']), n['_n_rows'] > 1,
-         n['_n_text'] == 0, n['_n_text'] >= 2,
+         n['_n_text'] == 0, n['_n_text'] >= 2, ~own,
          n['_n_other'] == 0, n['_n_other'] >= 2, n['_n_g48'] > 1],
         list(_D20_REASONS), default=D20_SINGLE)
     reason = pd.Series(reason, index=g.index, dtype='string')
@@ -2681,6 +2734,14 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         [pd.NA if (b is None or pd.isna(b) or b == '') else str(b) for b in branch],
         dtype='string')
     harv = harv.drop(columns=['_branch'])
+    # GH #1228 ("Register all waves"): every row whose crop a crop text set -- a code-48
+    # harvest line, or a Farm-level code-48 sale that took its household's label --
+    # carries the relabel's key, beside any ladder key the row already holds.
+    _assert_label_is_text_only()
+    named = harv['crop'].astype('string').isin(sorted(set(_CROP_TEXT_RECODE.values()))) \
+        .fillna(False).to_numpy(dtype=bool)
+    harv['Derivation'] = union_derivation_key(harv['Derivation'], named,
+                                              CROP_TEXT_KEYS['crop_production'])
 
     out = harv.set_index(['t', 'i', 'plot_id', 'crop'])
     # Readable by a test without parsing a warning message.  It does NOT
@@ -2874,6 +2935,68 @@ def sale_basis_decisions(wave):
     harv = _consolidate_harvest(harvest)
     _, dec, _ = _attach_sales(wave, harv, pd.concat(sale, ignore_index=True))
     return dec
+
+
+def inputs_cowpea_from_crop_text(wave):
+    """The Module G lines the crop-text relabel named, with the text that named them.
+
+    Inputs of ``Malawi::{crop_production,plot_inputs}::cowpea-from-crop-text`` (GH #1228).
+    One row per relabelled code-48 Module G line: every column of the line under its
+    original name, ``plot_id`` as served, ``source``; in 2016-17 / 2019-20 also the
+    plot's Module D question-20 answers (``ag_d20a`` .. ``ag_d20e``, ``ag_d20_oth``,
+    ``ag_d20b_oth`` where the file has it) and ``d_source``.  Indexed ``(t, i, crop)``,
+    on which a relabelled harvest line, its seed row and a Farm-level code-48 sale
+    that took its household's label all join.  Re-reads the files through
+    ``get_dataframe``; nothing is cached.
+    """
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    if wave not in CROP_TEXT_WAVES:
+        raise ValueError(f'the crop-text relabel covers {list(CROP_TEXT_WAVES)}, not {wave!r}')
+    root = countries_root() / 'Malawi' / wave
+    keys = ['_hh', '_k_g', '_k_p']
+    out = []
+    for h in _CROP_SALE_SOURCES[wave]:
+        d = root / h['dir']
+        # As the wave scripts read them (2010-11 drops its exact repeat records).
+        g = drop_repeated_records(get_dataframe(str(d / h['g']), convert_categoricals=False)).copy()
+        g['_hh'] = h['prefix'] + g[h['hhid']].apply(format_id)
+        text_col, dq = h.get('gcrop_text'), None
+        if h.get('d'):
+            if h.get('d_restricted'):
+                dmod = read_module_d_columns(d / h['d'], [h['hhid'], *D20_COLUMNS])
+            else:
+                dmod = get_dataframe(str(d / h['d']), convert_categoricals=False)
+            dmod = dmod.copy()
+            dmod['_hh'] = h['prefix'] + dmod[h['hhid']].apply(format_id)
+            text, _ = module_d_other_crop_text(g, dmod, cropcode=h['gcrop'], hhid='_hh')
+            g['_crop_text'] = text
+            text_col = '_crop_text'
+            answers = [c for c in D20_COLUMNS if c in dmod.columns and c not in ('gardenid', 'plotid')]
+            dq = dmod[['_hh', *answers]].assign(
+                _k_g=dmod['gardenid'].apply(format_id).astype('string'),
+                _k_p=dmod['plotid'].apply(format_id).astype('string'))
+            dq = dq[~dq.duplicated(keys, keep=False)]
+        label, named = derive_cowpea_from_crop_text(
+            pd.Series(pd.NA, index=g.index, dtype='string'), g, h['gcrop'], text_col)
+        lines = g[named].copy()
+        lines['crop'] = label[named].to_numpy()
+        if h['plot'] == 'garden':
+            lines['plot_id'] = (lines['gardenid'].apply(format_id) + '_'
+                                + lines['plotid'].apply(format_id)).astype('string')
+        else:
+            lines['plot_id'] = _plot_ids(lines[h['gplot']].apply(format_id)).to_numpy()
+        lines['source'] = f"{h['dir']}/{h['g']}"
+        if dq is not None:
+            lines = lines.assign(_k_g=lines['gardenid'].apply(format_id).astype('string'),
+                                 _k_p=lines['plotid'].apply(format_id).astype('string'))
+            lines = lines.merge(dq, on=keys, how='left', validate='m:1')
+            lines['d_source'] = f"{h['dir']}/{h['d']}"
+        lines['t'] = wave
+        lines['i'] = lines['_hh'].astype('string')
+        out.append(lines.drop(columns=[c for c in ('_hh', '_k_g', '_k_p', '_crop_text')
+                                       if c in lines.columns]))
+    return pd.concat(out, ignore_index=True).set_index(['t', 'i', 'crop'])
 
 
 def _inputs_sale_basis(wave, outcome):
@@ -4181,6 +4304,22 @@ _SEED_LINE_SOURCES = {
 
 SEED_ACQUISITION_ROLE = 'reported_H_component'
 
+#: GH #1712 (ruling @ligon 2026-11-13, "Drop the six"): native Module H columns that are
+#: empty on every row of the one source that carries them, measured raw (pyreadstat),
+#: through get_dataframe and on the carried rows (CONTENTS.org, 2026-11-13).  2010-11
+#: Full_Sample H: ag_h17_os (21 rows answer ag_h17 = 5 Other (Specify), none with text,
+#: here or in the unread Panel/Agriculture file), ag_h26b_os, ag_h27_os, ag_h36b_os (no
+#: row routes to them); 2019-20 Panel H: ag_h26_1b, ag_h36_1b (a second payer, never
+#: recorded).  Dropped only while still empty: a release that fills one serves it.
+_H_EMPTY_IN_RELEASE = frozenset({'ag_h17_os', 'ag_h26b_os', 'ag_h27_os', 'ag_h36b_os',
+                                 'ag_h26_1b', 'ag_h36_1b'})
+
+
+def _blank(series):
+    """True where a raw cell holds no answer: missing, or a blank string."""
+    s = pd.Series(series)
+    return s.isna() | s.astype('string').str.strip().eq('').fillna(False)
+
 
 def _seed_acquisition_block(df, *, t, source_ref, source_half, row_positions):
     """Literal quantity-bearing H components, without a plot/application claim.
@@ -4225,6 +4364,7 @@ def _seed_acquisition_block(df, *, t, source_ref, source_half, row_positions):
         slots.append(('ag_h36a', 'ag_h36b', None, 'ag_h34', source, 'purchase:third'))
     slots.append(('ag_h38a', 'ag_h38b', None, 'ag_h37', None, 'gift'))
     pieces = []
+    empty = {name for name in _H_EMPTY_IN_RELEASE if name in raw and _blank(raw[name]).all()}
     for order, (qcol, ucol, vcol, flag, source, kind) in enumerate(slots):
         if qcol not in raw:
             continue
@@ -4266,7 +4406,7 @@ def _seed_acquisition_block(df, *, t, source_ref, source_half, row_positions):
         # No cross-wave source-name inference: only H35's closed binding above
         # supplies Acquisition_source; other source/payer/text answers remain raw.
         for name in raw:
-            if name.startswith('ag_h') or name == binding['hcrop']:
+            if (name.startswith('ag_h') or name == binding['hcrop']) and name not in empty:
                 piece[name] = raw[name]
         pieces.append(piece.loc[keep])
     keys = ['t', 'i', 'plot_id', 'input', 'crop', 'u', 'input_obs']
@@ -4597,6 +4737,18 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
         grp['Quantity'] = quantities['Quantity'].array
     grp = grp.set_index(keys)
     out = pd.concat([grp, native[list(grp.columns)]])
+    # GH #1228 ("Register all waves"): the seed rows whose crop a crop text set carry
+    # the relabel's key.  Only a row with a payload: a key on an all-NA row would keep
+    # it past _finalize_result's dropna(how='all'), undoing seed-line-no-payload.
+    _assert_label_is_text_only()
+    level = lambda name: pd.Series(out.index.get_level_values(name), dtype='string')  # noqa: E731
+    named = (level('input').eq('Seed').fillna(False).to_numpy(dtype=bool)
+             & level('crop').isin(sorted(set(_CROP_TEXT_RECODE.values()))).fillna(False)
+             .to_numpy(dtype=bool))
+    payload = out.notna().any(axis=1).to_numpy(dtype=bool)
+    out['Derivation'] = union_derivation_key(
+        pd.Series(pd.NA, index=out.index, dtype='string'),
+        named & payload, CROP_TEXT_KEYS['plot_inputs'])
     # Readable by a test; the warning above is what a build log sees.
     out.attrs['seed_purchase_mixed_units'] = int(refused_purchases)
     return out

@@ -224,7 +224,8 @@ Data Scheme:
     # code 48 lines whose crop text says cowpea are `Cowpea (Khobwe)` -- 2010-11
     # from the line's own G text, 2016-17 / 2019-20 from the plot's single
     # Module D "Other Crop" text -- with production_obs and crop_variety still
-    # the recorded code; a code-48 sale follows its household's lines).  THAT
+    # the recorded code; a code-48 sale follows its household's lines; keyed
+    # Malawi::crop_production::cowpea-from-crop-text in Derivation).  THAT
     # IS A SHARED AXIS, NOT A JOIN (GH #839; this comment used to claim
     # the crop labels "JOIN food_acquired.j", and 20 of 44 do not).
     # Measured on the 2026-09-24 build: 24 of the 44 crop labels also occur
@@ -329,7 +330,9 @@ Data Scheme:
     # (NPK/DAP/CAN/Urea/D-Compound/Other fertilizer, Organic Fertilizer,
     # Insecticide/Herbicide/Fungicide/Fumigant/Other Pesticide, Seed).
     # `crop` is the harmonize_crop->harmonize_food label for seed rows
-    # (unknown_crop when missing; recorded unmapped identities pass through).
+    # (unknown_crop when missing; recorded unmapped identities pass through;
+    # a code-48 line whose crop text says cowpea is `Cowpea (Khobwe)`, keyed
+    # Malawi::plot_inputs::cowpea-from-crop-text, GH #1228).
     # Module D uses (not crop-specific). `u` is the reported native unit
     # label. Organic units use their own ag_d37b dictionary; missing units
     # are Unknown and unlisted recorded codes are source-qualified raw
@@ -382,7 +385,9 @@ Data Scheme:
       optional: true
     # H components are alternate representations of the attached summaries,
     # never additional applications/transactions. All old fields are NA on H rows.
-    # Own native H scalar columns pass through under their original names.
+    # Own native H scalar columns pass through under their original names, but for
+    # six that are empty on every row of their one source (GH #1712, ruling
+    # 2026-11-13 "Drop the six"; malawi._H_EMPTY_IN_RELEASE).
     Carrier_role:
       type: str
       optional: true
