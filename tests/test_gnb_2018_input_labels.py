@@ -37,7 +37,7 @@ class TestConfig:
                        "Adubos inorgânicos - NPK/Fórmula única": "NPK"}
         # #1107: the DAP catch-all stays unmatched until #1696 is ruled; organics are
         # refused a share by the #867 ruling whatever they are called.
-        assert not any("DAP" in k or "orgânicos" in k for k in got)
+        assert not any("DAP" in k or k.startswith("Adubos orgânicos") for k in got)
 
     def test_each_mapped_input_keys_a_nitrogen_share(self):
         from lsms_library import transformations as T
