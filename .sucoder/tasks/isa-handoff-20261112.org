@@ -119,3 +119,29 @@ Rulings: isa-decisions.org through 9361c1905.  Not yet dispatched: #1562 coping
 audit + schema, #1577 strata tag (+#1134), #1537 Pepper and #1502/#1518 (next
 Nigeria batch), #1228 (next Malawi batch), GNB labels, Manquant, Burkina bundle,
 GNB 2021-22, Benin panel (#1705).
+
+* Update, 2026-11-12 late night -- integration and release
+** Final component heads
+| Component | Head |
+|---|---|
+| #1604 Malawi 2024-25 | 538eec00d9eb354d0dd7f296660295a8488f61bd |
+| sold kg #1560/#1571 | 5fca3904e1919bd11fdbe9c4ab7eaa426f72a7be |
+| #587 Nigeria PP | 9e74f2cf9b5961d2c6873f791967166e8eb40dad |
+| #1509 + #1068/#1129 | 30f461b04ed1f3c9e2a1c3d989506c3cdda3714e |
+| EHCVM-2 #1697 | ef76430aa16d8c44038ec638ccde93e2f5e8da9a |
+| served-wave corrections | e338fedba -> #1708 floor/scope fix-up running, then delta re-review |
+** Integration
+Worktree /local/job41201840/worktrees/integration, branch
+integration/isa-batch-20261112 (mirror only until Sue pushes to GitHub).  Agent
+merging the five; known conflicts: recall regeneration (#1604 vs EHCVM-2),
+tests/test_sample.py, Mali/Niger CONTENTS (served vs sold kg).  Adds Uganda
+nutrition fixture (approved) + attrs docstring.  Report:
+reports/integration/.
+** Release v0.17.0 (user: "One release after batch")
+Read-only prep agent -> reports/release-v0.17.0/ (CLOSES.tsv, RELEASE_NOTES.md,
+MERGE_PR_BODY.md, CHECKLIST.md).  Order: integration PR -> data gate -> merge
+-> fill batch notes, close/narrow batch issues -> development->master PR ->
+merge -> user publishes GitHub Release.  Open: coverage regrade before release.
+** Cleanup pending user "go" after merge
+Private data roots under burst/isa-sm-20261112/private/ (26 GB+) and
+reports/*/work/private, */data.
