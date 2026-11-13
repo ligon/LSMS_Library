@@ -310,10 +310,13 @@ def test_a_two_wave_roster_keeps_2018s_whole_months():
     assert r.xs(WAVE, level="t")["Departed"].notna().all()
 
 
+DEPARTED_MONTHS = "Guinea-Bissau::household_roster::departed-monthsspent-withheld"
+
+
 @pytest.mark.requires_s3
 def test_the_departed_keep_their_recorded_sex_and_nothing_is_invented():
     """The 341 leavers: 246 carry a sex in s01q01, the other 95 none, and none is given
-    one; s01q12 is served as recorded (NA where blank)."""
+    one."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         r = ll.Country(COUNTRY).household_roster(waves=[WAVE])
@@ -322,17 +325,49 @@ def test_the_departed_keep_their_recorded_sex_and_nothing_is_invented():
     assert gone["Sex"].notna().sum() == 246
 
 
+def test_the_departed_months_key_is_registered():
+    rec = ll.Country(COUNTRY).derivations()[DEPARTED_MONTHS]
+    assert list(rec.waves) == [WAVE] and list(rec.columns) == ["MonthsSpent"]
+    f = rec.resolve()
+    got = f(pd.Series([12, 12, 0, None]), np.array([True, False, True, False]))
+    assert got.isna().tolist() == [True, False, True, True]
+    assert got.iloc[1] == 12
+
+
+@pytest.mark.requires_s3
+def test_a_leavers_months_are_withheld_and_keyed():
+    """Ruling 2026-11-13, "Exclude from HH size": MonthsSpent is NA on every leaver, and
+    the 12 rows whose s01q12 the survey recorded carry the key; their answers are the
+    registry inputs, which join them at (t, i, pid)."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = ll.Country(COUNTRY).household_roster(waves=[WAVE])
+        inp = ll.Country(COUNTRY).derivation_inputs(DEPARTED_MONTHS, wave=WAVE)
+    gone = r["Departed"].astype("boolean").fillna(False)
+    assert r.loc[gone, "MonthsSpent"].isna().all()
+    assert r.loc[~gone, "MonthsSpent"].notna().any()
+    keyed = r["Derivation"].fillna("").str.contains(DEPARTED_MONTHS, regex=False)
+    assert int(keyed.sum()) == 12 and not (keyed & ~gone).any()
+    assert len(inp) == 12 and (inp["s01q12"].astype(str) == "Sim").all()
+    served = set(zip(r.index.get_level_values("i")[keyed.to_numpy()].astype(str),
+                     r.index.get_level_values("pid")[keyed.to_numpy()].astype(str)))
+    assert served == set(zip(inp.index.get_level_values("i").astype(str),
+                             inp.index.get_level_values("pid").astype(str)))
+
+
 ROUNDED = "Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even"
-ROUNDED_TO_ZERO = "Guinea-Bissau::food_acquired::s07b-consumed-quantity-rounded-to-zero"
+ZERO_WITHHELD = "Guinea-Bissau::food_acquired::s07bq03a-rounded-to-zero-withheld"
 
 
 class TestFoodDeclared:
     def test_the_two_rounding_keys_are_registered(self):
         recs = ll.Country(COUNTRY).derivations()
-        r, z = recs[ROUNDED], recs[ROUNDED_TO_ZERO]
+        r, z = recs[ROUNDED], recs[ZERO_WITHHELD]
         assert list(r.waves) == list(z.waves) == [WAVE]
-        assert r.rows == {} and z.rows == 0
+        assert r.rows == {} and z.rows == {"s": "purchased"}
         assert r.resolve()(7.0) == 7.0                      # served as released
+        assert z.resolve()([0, 2]).isna().tolist() == [True, False]   # a 0 is withheld
+        assert "Guinea-Bissau::food_acquired::s07b-consumed-quantity-rounded-to-zero" not in recs
         m = _mapping_module()
         assert list(m.round_half_up_to_even([0.5, 1, 1.5, 2.5, 3, 7])) == [0, 2, 2, 2, 4, 8]
 
@@ -349,10 +384,34 @@ class TestFoodServed:
     def fa(self):
         return _served("food_acquired", waves=(OLD, WAVE))
 
-    def test_every_2021_row_carries_the_rounding_key_and_no_2018_row_does(self, fa):
+    def test_every_2021_row_carries_one_of_the_two_keys_and_no_2018_row_does(self, fa):
         new, old = fa.xs(WAVE, level="t"), fa.xs(OLD, level="t")
-        assert new["Derivation"].fillna("").str.contains(ROUNDED, regex=False).all()
-        assert not old["Derivation"].fillna("").str.contains(ROUNDED, regex=False).any()
+        d = new["Derivation"].fillna("")
+        rounded = d.str.contains(ROUNDED, regex=False)
+        held = d.str.contains(ZERO_WITHHELD, regex=False)
+        assert (rounded ^ held).all()
+        for key in (ROUNDED, ZERO_WITHHELD):
+            assert not old["Derivation"].fillna("").str.contains(key, regex=False).any()
+
+    def test_the_zeroed_rows_are_served_one_purchased_row_na(self, fa):
+        """Ruling 2026-11-13, "Serve NA, as Togo": each of the 3,945 consumed rows the
+        release rounds to 0 is served one purchased row with Quantity and Expenditure NA,
+        and the registry inputs, which carry s07bq06, are those rows."""
+        new = fa.xs(WAVE, level="t")
+        held = new[new["Derivation"].fillna("").str.contains(ZERO_WITHHELD, regex=False)]
+        assert len(held) == 3945
+        assert set(held.index.get_level_values("s")) == {"purchased"}
+        assert held["Quantity"].isna().all() and held["Expenditure"].isna().all()
+        assert new.index.is_unique
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            z = ll.Country(COUNTRY).derivation_inputs(ZERO_WITHHELD, wave=WAVE)
+        assert len(z) == 3945 and "s07bq06" in z.columns
+        assert (pd.to_numeric(z["s07bq03a"], errors="coerce") == 0).all()
+        assert (z["s07bq02"] == "Oui").all()
+        pairs = lambda f: set(zip(f.index.get_level_values("i").astype(str),
+                                  f.index.get_level_values("j").astype(str)))
+        assert pairs(held) == pairs(z)
 
     def test_the_served_quantities_are_the_releases_even_integers(self, fa):
         """Every served quantity is an integer, and even but for 46: the 23 rows where
@@ -368,19 +427,12 @@ class TestFoodServed:
         s = pd.Series(odd.index.get_level_values("s")).value_counts().to_dict()
         assert s == {"produced": 23, "inkind": 23}
 
-    def test_the_zeroed_consumed_rows_are_a_registered_deletion(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            z = ll.Country(COUNTRY).derivation_inputs(ROUNDED_TO_ZERO, wave=WAVE)
-        assert len(z) == 3945
-        assert (pd.to_numeric(z["s07bq03a"], errors="coerce") == 0).all()
-        assert (z["s07bq02"] == "Oui").all()
-
     def test_the_rounding_inputs_join_the_served_rows(self, fa):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             inp = ll.Country(COUNTRY).derivation_inputs(ROUNDED, wave=WAVE)
         new = fa.xs(WAVE, level="t")
+        new = new[new["Derivation"].fillna("").str.contains(ROUNDED, regex=False)]
         served = set(zip(new.index.get_level_values("i").astype(str),
                          new.index.get_level_values("j").astype(str)))
         keys = set(zip(inp.index.get_level_values("i").astype(str),

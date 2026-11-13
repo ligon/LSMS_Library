@@ -127,9 +127,12 @@ OTHER_KEYS = {
     ('CotedIvoire', '2021-22'): {
         'CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld',
         'CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion'},
-    # 2026-11-13 ("Serve, registered key"): every row of the wave is served as released
-    # and keyed, its quantities rounded to even integers by the producer.
-    ('Guinea-Bissau', '2021-22'): {'Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even'},
+    # 2026-11-13 ("Serve, registered key"): every row of the wave with a quantity is
+    # served as released and keyed, its quantities rounded to even integers by the
+    # producer; a consumed row rounded to 0 is served one purchased row NA ("Serve NA,
+    # as Togo").
+    ('Guinea-Bissau', '2021-22'): {'Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even',
+                                  'Guinea-Bissau::food_acquired::s07bq03a-rounded-to-zero-withheld'},
 }
 
 #: The unit sizes each country may serve in `u` (GH #1224): each instrument's own

@@ -72,8 +72,11 @@ def household_roster(df):
     has `Departed` False, including the 9,727 rows the question was not put to (new
     members, all of them in ehcvm_individu).  No canonical flag existed, so `Departed` is
     a country-level optional column (data_scheme.yml).  Benin 2021-22 still drops its
-    leavers, so the two waves differ until GH #1565 settles the family.  Ages as
-    2018-19's hook: 9999 is no answer, and a birth date after the interview gives NA.
+    leavers, so the two waves differ until GH #1565 settles the family.  A leaver's
+    MonthsSpent is NA (ruling 2026-11-13, "Exclude from HH size"), so
+    household_characteristics counts the survey's household; the 12 rows whose s01q12 is
+    withheld carry KEY_DEPARTED_MONTHS_WITHHELD in `Derivation`.  Ages as 2018-19's hook:
+    9999 is no answer, and a birth date after the interview gives NA.
     '''
     still = df['StillMember'].astype('string').str.strip().str.lower()
     unknown = sorted(set(still.dropna()) - set(_STILL))
@@ -83,7 +86,14 @@ def household_roster(df):
     df['Departed'] = (~still.map(_STILL).fillna(True).astype(bool)).astype('boolean')
     # s01q12 is blank on most leavers, so MonthsSpent holds NA: nullable whole numbers
     # (2018-19 has none, and a two-wave read serves its column as Int64, values unchanged).
-    df['MonthsSpent'] = pd.to_numeric(df['MonthsSpent'], errors='coerce').astype('Int64')
+    # A leaver's answer is withheld (ruling 2026-11-13, "Exclude from HH size"), and the
+    # 12 rows where one was recorded carry KEY_DEPARTED_MONTHS_WITHHELD.
+    months = pd.to_numeric(df['MonthsSpent'], errors='coerce').astype('Int64')
+    departed = df['Departed'].fillna(False).to_numpy(dtype=bool)
+    df['MonthsSpent'] = withhold_departed_months(months, departed)
+    df['Derivation'] = pd.Series(np.where(departed & months.notna().to_numpy(dtype=bool),
+                                          KEY_DEPARTED_MONTHS_WITHHELD, None),
+                                 index=df.index, dtype='string')
 
     def _known(x):
         return None if (pd.isna(x) or int(float(x)) == 9999) else x
@@ -96,6 +106,40 @@ def household_roster(df):
 
     df['Age'] = df.apply(age, axis=1)
     return df.drop(columns=['interview_date', 'StillMember'])
+
+
+#: Ruling @ligon 2026-11-13, "Exclude from HH size (Recommended)": the leavers are served
+#: in the roster, flagged `Departed`, but their s01q12 answer is not, so
+#: household_characteristics counts the household the survey counts (ehcvm_individu,
+#: ehcvm_welfare.hhsize).  12 leavers answered s01q12 (all Sim, 12); their answer is
+#: withheld and the rows carry this key.  The other 329 leavers have no answer to withhold.
+KEY_DEPARTED_MONTHS_WITHHELD = 'Guinea-Bissau::household_roster::departed-monthsspent-withheld'
+
+
+def withhold_departed_months(months, departed):
+    '''The registered function of KEY_DEPARTED_MONTHS_WITHHELD: MonthsSpent, NA wherever
+    the person has left the household (`Departed` True).  No options, by design.'''
+    m = pd.to_numeric(pd.Series(months), errors='coerce').astype('Int64')
+    gone = pd.Series(departed, index=m.index).fillna(False).astype(bool).to_numpy()
+    return m.mask(gone)
+
+
+def inputs_departed_monthsspent_withheld(wave):
+    '''Registry `inputs` of KEY_DEPARTED_MONTHS_WITHHELD: the s01 rows of the leavers
+    whose s01q12 is answered, with the raw s01q00aa and s01q12, at (t, i, pid).'''
+    from pathlib import Path
+
+    from lsms_library.paths import countries_root
+    s01 = tools.get_dataframe(str(Path(countries_root()) / 'Guinea-Bissau' / wave / 'Data'
+                                  / 's01_me_gnb2021.dta'), convert_categoricals=True)
+    still = s01['s01q00aa'].astype('string').str.strip().str.lower()
+    departed = (~still.map(_STILL).fillna(True).astype(bool)).to_numpy(dtype=bool)
+    raw = s01[departed & s01['s01q12'].notna().to_numpy(dtype=bool)]
+    ids = [ID_PREFIX + tools.format_id(g) + '0' + tools.format_id(m, zeropadding=2)
+           for g, m in zip(raw['grappe'], raw['menage'])]
+    pid = [tools.format_id(p) for p in raw['membres__id']]
+    index = pd.MultiIndex.from_arrays([[wave] * len(raw), ids, pid], names=['t', 'i', 'pid'])
+    return raw[['s01q00aa', 's01q12']].set_axis(index)
 
 
 def cluster_features(df):
@@ -206,9 +250,10 @@ def shocks(df):
 # odd each, on the 23 rows where q3 = q4 + q5), 3,945 consumed rows carry s07bq03a = 0,
 # and 2 x round-half-up(x / 2) applied to 2018-19's answers reproduces 2021-22's
 # distribution.  The rule maps 1, 2 and 2.5 all to 2, so it cannot be inverted: nothing is
-# recovered, every row of the wave is served as released and carries KEY_ROUNDED, and the
-# zeroed consumed rows, which the shared reshape serves no row for, are a registered
-# deletion (KEY_ROUNDED_TO_ZERO).
+# recovered: every row with a positive quantity is served as released and carries
+# KEY_ROUNDED.  The 3,945 consumed rows whose s07bq03a the rounding sent to 0 are served
+# one purchased row each with Quantity and Expenditure NA, under KEY_ZERO_WITHHELD
+# (ruling 2026-11-13, "Serve NA, as Togo"; Togo 2021-22's floored-count-withheld rows).
 from lsms_library.ehcvm import (  # noqa: E402
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
@@ -217,8 +262,9 @@ from lsms_library.ehcvm import (  # noqa: E402
 
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Guinea-Bissau')
 KEY_ROUNDED = 'Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even'
-#: A DELETION (`rows: 0`, no served row carries it): consumed rows the release rounds to 0.
-KEY_ROUNDED_TO_ZERO = 'Guinea-Bissau::food_acquired::s07b-consumed-quantity-rounded-to-zero'
+#: A WITHHELD quantity (GH #1519's rule): a consumed row the release rounds to 0 is served
+#: one purchased row, Quantity NA and Expenditure NA, carrying this key.
+KEY_ZERO_WITHHELD = 'Guinea-Bissau::food_acquired::s07bq03a-rounded-to-zero-withheld'
 
 #: s07bq03b and s07bq07b label one code book twice: 107 is `Lata/caneca` and `Lata`, 122
 #: `Rede de batata` and `Rede de cebola, alho`, 126 `Pedaço` and `Pedaço (25 F)`.  These
@@ -259,11 +305,64 @@ def _add_key(out, key, rows):
     return out
 
 
+def _purchased(out):
+    return out.index.get_level_values('s').to_numpy() == 'purchased'
+
+
+def zero_quantity_withheld(quantity):
+    '''The registered function of KEY_ZERO_WITHHELD: the release's s07bq03a, NA where it
+    is 0.  A consumed row filed as 0 is a small quantity the rounding sent to 0, which
+    cannot be inverted, so it is withheld rather than served as 0.  No options, by design.'''
+    q = pd.to_numeric(pd.Series(np.ravel(quantity)), errors='coerce')
+    return q.mask(q == 0)
+
+
 def food_acquired(df):
     '''GH #876's construction (Expenditure at the last purchase's unit value, keyed; size
-    in u, GH #1224) on the release's rounded quantities, and KEY_ROUNDED on every row.'''
+    in u, GH #1224) on the release's rounded quantities, KEY_ROUNDED on every row with a
+    quantity, and one purchased row NA, under KEY_ZERO_WITHHELD, for each consumed row the
+    release rounds to 0.
+
+    Ruling 2026-11-13, "Serve NA, as Togo": Togo 2021-22's withheld rows are the template.
+    A purchased row is served where a purchase is implied, which is Togo's test, the row
+    reporting neither own production nor a gift; every one of the 3,945 passes it
+    (s07bq04 is 0 or NA, s07bq05 0).  Its Quantity is NA and so is its Expenditure: the
+    purchase value goes with the quantity it would be derived from (GH #1519).
+    '''
     out = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
-    return _add_key(out, KEY_ROUNDED, np.ones(len(out), dtype=bool))
+    out = _add_key(out, KEY_ROUNDED, np.ones(len(out), dtype=bool))
+    q3 = pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
+    q4 = pd.to_numeric(df['Produced'], errors='coerce').fillna(0).to_numpy(dtype=float)
+    q5 = pd.to_numeric(df['GiftQuantity'], errors='coerce').fillna(0).to_numpy(dtype=float)
+    implied = (q3 == 0) & (q4 <= 0) & (q5 <= 0)
+    if implied.any():
+        # The shared reshape builds the purchased row's index (sized u included), from a
+        # placeholder quantity it never serves.
+        held = _food_acquired_ehcvm(df[implied].assign(Quantity=1.0, Produced=0.0, GiftQuantity=0.0),
+                                    FOOD_ACQUIRED_DERIVATION)
+        held = held[_purchased(held)].copy()
+        held['Quantity'] = np.nan
+        held['Expenditure'] = np.nan
+        out = pd.concat([out, _add_key(held, KEY_ZERO_WITHHELD, np.ones(len(held), dtype=bool))])
+    return _withhold_collisions(out, KEY_ZERO_WITHHELD)
+
+
+def _withhold_collisions(out, key):
+    '''Togo 2021-22's rule: a withheld row that shares its served key (t, v, i, j, u, s)
+    with another row -- two items of the file under one served j (sugar's codes 134 and
+    135) -- would be summed with it by the core collapse, which skips an NA, and the sum
+    would be served as if whole.  So every row of such a group is withheld and keyed.
+    Measured: no household holds both sugar codes in one unit and size, so none fires.'''
+    keyed = out['Derivation'].fillna('').astype(str).str.split('+').apply(lambda ks: key in ks).to_numpy()
+    dup = out.index.duplicated(keep=False)
+    hit = keyed & dup
+    if not hit.any():
+        return out
+    group = out.index.isin(out.index[hit])
+    out = out.copy()
+    out.loc[group, 'Quantity'] = np.nan
+    out.loc[group, 'Expenditure'] = np.nan
+    return _add_key(out, key, group)
 
 
 def inputs_food_acquired(wave):
@@ -272,8 +371,8 @@ def inputs_food_acquired(wave):
 
 
 def _s07b_with_consumed(wave):
-    '''The 7-day key's raw inputs with s07bq02 (consumed in the last 7 days?) beside them,
-    row for row: both read the file in its own order.'''
+    '''The 7-day key's raw inputs with s07bq02 (consumed in the last 7 days?) and s07bq06
+    (when last bought) beside them, row for row: both read the file in its own order.'''
     from pathlib import Path
 
     from lsms_library.paths import countries_root
@@ -282,7 +381,8 @@ def _s07b_with_consumed(wave):
                                   / 's07b_me_gnb2021.dta'), convert_categoricals=True)
     if len(s07) != len(raw):
         raise ValueError(f'Guinea-Bissau {wave} s07b: {len(s07)} rows against {len(raw)} inputs')
-    return raw.assign(s07bq02=s07['s07bq02'].astype('string').str.strip().to_numpy())
+    return raw.assign(s07bq02=s07['s07bq02'].astype('string').str.strip().to_numpy(),
+                      s07bq06=s07['s07bq06'].astype('string').str.strip().to_numpy())
 
 
 def inputs_quantities_rounded(wave):
@@ -293,9 +393,9 @@ def inputs_quantities_rounded(wave):
     return raw[pd.to_numeric(raw['s07bq03a'], errors='coerce') > 0]
 
 
-def inputs_quantity_rounded_to_zero(wave):
-    '''Registry `inputs` of KEY_ROUNDED_TO_ZERO: the consumed rows (s07bq02 = Oui) whose
-    released s07bq03a is 0, which no served row carries, at (t, i, j).'''
+def inputs_zero_quantity_withheld(wave):
+    '''Registry `inputs` of KEY_ZERO_WITHHELD: the consumed rows (s07bq02 = Oui) whose
+    released s07bq03a is 0, each served one purchased row NA, at (t, i, j), with s07bq06.'''
     raw = _s07b_with_consumed(wave)
     q3 = pd.to_numeric(raw['s07bq03a'], errors='coerce')
     return raw[(raw['s07bq02'] == 'Oui') & (q3 == 0)]

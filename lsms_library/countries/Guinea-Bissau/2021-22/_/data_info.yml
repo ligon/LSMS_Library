@@ -67,7 +67,10 @@ household_roster:
     # whether they are still a member (s01q00aa).  The 341 who are not are SERVED with
     # `Departed` True (ruling 2026-11-13, "Serve leavers"; mapping.household_roster),
     # where ehcvm_individu leaves them out (41,160 = 41,501 - 341) and Benin 2021-22
-    # drops them (GH #1565).  246 of them still carry a sex.
+    # drops them (GH #1565).  246 of them still carry a sex.  Their MonthsSpent is served
+    # NA (ruling 2026-11-13, "Exclude from HH size"), so household_characteristics counts
+    # the survey's household; the 12 recorded answers carry
+    # Guinea-Bissau::household_roster::departed-monthsspent-withheld.
     dfs:
         - df_main
         - df_cover
@@ -238,9 +241,12 @@ food_acquired:
     # is 2 x round-half-up(x / 2), which cannot be inverted and is documented nowhere
     # found (_/CONTENTS.org, "food_acquired 2021-22: served as released, the rounding
     # registered").
-    # mapping.food_acquired stamps every row with
-    # Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even; the zeroed rows
-    # are a registered deletion.  The file is a grid (968,524 rows, 128,229 consumed).
+    # mapping.food_acquired stamps every row with a quantity with
+    # Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even; each zeroed row is
+    # served one purchased row with Quantity and Expenditure NA, under
+    # ...::s07bq03a-rounded-to-zero-withheld (ruling 2026-11-13, "Serve NA, as Togo").
+    # The file is a grid: 968,524 rows, 132,176 consumed (128,229 positive, 3,945 zero, 2
+    # blank).
     file: s07b_me_gnb2021.dta
     idxvars:
         v: grappe
