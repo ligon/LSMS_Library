@@ -1682,6 +1682,17 @@ served =Unknown=, the corpus missing-unit sentinel (GH #1041 contract).  2021-22
 =Unknown= (1 line).  Both spellings are missing-unit sentinels to the kg ladder
 (=transformations._U_SENTINELS=), so no kilogram moves.
 
+*An example read backwards.*  The GH #323 notes cite grappe 101 / menage 9, whose =Plants/boutures de
+tubercules= (16 Charrette) and =Autres semences= (3 Charrette) used to collide, as "market-purchased"
+and "own-production".  The file says the reverse: the 16 Charrette came from =Autre paysan ou ménage=
+(=s16bq04=) as a gift from =Autre ménage= (=s16bq05= Oui, =s16bq06=, =s16bq07a= 16), not bought; the 3
+Charrette came from =Marché/Boutique= and were bought (=s16bq08= Oui, =s16bq09a= 3, =s16bq09c= 6,000
+FCFA).  The notes had read the gift flag as the purchase.  Corrected in =2018/_/plot_inputs.py= and
+=tests/test_gh323_benin_togo.py=; the same parenthetical in =_/categorical_mapping.org= (the note
+above =harmonize_seed_crop=) is NOT corrected, because that file is hashed whole into every wave's
+=Wave._input_hash= and a comment edit there would re-warm 2021-22 too.  Correct it with the next
+edit of that file.
+
 *Not changed, and stale:* the docstring of =2021-22/_/plot_inputs.py= still says 2018 serves the
 gift question.  Editing it would move every 2021-22 =Wave._input_hash= of this country (the wave
 directory's =.py= files are hashed whole) for a comment, so it is left for the next edit of that

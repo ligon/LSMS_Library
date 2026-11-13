@@ -195,9 +195,11 @@ assert len(df) > 0, 'plot_inputs 2018 produced no rows'
 # land on one index tuple, whereupon the framework's groupby().first() silently
 # discards one.  That is what happened until 2026-07-13: four labels shared an
 # 'Autre crop' catch-all and 165 rows -- real reported quantities, e.g. the
-# 16 Charrette of market-purchased "Plants/boutures de tubercules" that grappe
-# 101 / menage 9 reported alongside 3 Charrette of own-production "Autres
-# semences" -- vanished with no warning.  The CROP_NA / UNIT_NA sentinels above
+# 16 Charrette of "Plants/boutures de tubercules" that grappe 101 / menage 9
+# received as a gift from another household, alongside 3 Charrette of "Autres
+# semences" bought at the market (s16bq05 / s16bq08 / s16bq04; this note had the
+# two reversed until 2026-11-13, because it read the gift flag as the purchase)
+# -- vanished with no warning.  The CROP_NA / UNIT_NA sentinels above
 # show the author knew the framework drops rows on a duplicated index and
 # guarded the NaN case; the catch-all bucket has the identical effect and was
 # missed.
