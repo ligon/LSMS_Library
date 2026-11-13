@@ -115,8 +115,9 @@ cluster_features:
     # _Longitude_m, labelled "Coordonnées GPS du ménage" but constant within each of
     # the 450 grappes), and region and milieu, constant within grappe too.  Projected
     # to (t, v) by mapping.cluster_features, which refuses a grappe that straddles two
-    # values.  Unlike Togo's and Benin's, this point is NOT 2018-19's fix (2 of 439
-    # grappes coincide; median 0.57 km apart): CONTENTS.org, "2021-22 wired".
+    # values.  Unlike Togo's and Benin's, this point is NOT 2018-19's fix: of the 445
+    # grappes in both files 6 have a null 2018-19 point, and 2 of the other 439
+    # coincide (median 0.57 km apart): CONTENTS.org, "2021-22 wired".
     file: s00_me_gnb2021.dta
     idxvars:
         v: grappe
@@ -235,7 +236,8 @@ food_acquired:
     # release's quantities are not the households' answers: every positive s07bq03a and
     # s07bq07a is an EVEN integer, 3,945 consumed rows carry s07bq03a = 0, and the fit
     # is 2 x round-half-up(x / 2), which cannot be inverted and is documented nowhere
-    # found (_/CONTENTS.org, "food_acquired: the released quantities are rounded").
+    # found (_/CONTENTS.org, "food_acquired 2021-22: served as released, the rounding
+    # registered").
     # mapping.food_acquired stamps every row with
     # Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even; the zeroed rows
     # are a registered deletion.  The file is a grid (968,524 rows, 128,229 consumed).
