@@ -64,22 +64,26 @@ _STILL = {'sim': True, 'não': False, 'nao': False}
 
 
 def household_roster(df):
-    '''Members only, with Age from the stated years, else the birth date.
+    '''Every person s01 lists, the departed flagged; Age from the stated years, else the
+    birth date.
 
-    The 341 people s01q00aa says have left are not served (GH #1565 is open; this
-    is Benin 2021-22's and ehcvm_individu's choice).  Ages as 2018-19's hook: 9999
-    is no answer, and a birth date after the interview gives NA.
+    Ruling 2026-11-13, "Serve leavers": the 341 people s01q00aa ("est-il toujours un
+    membre de ce ménage?") says have left are SERVED, with `Departed` True; everyone else
+    has `Departed` False, including the 9,727 rows the question was not put to (new
+    members, all of them in ehcvm_individu).  No canonical flag existed, so `Departed` is
+    a country-level optional column (data_scheme.yml).  Benin 2021-22 still drops its
+    leavers, so the two waves differ until GH #1565 settles the family.  Ages as
+    2018-19's hook: 9999 is no answer, and a birth date after the interview gives NA.
     '''
     still = df['StillMember'].astype('string').str.strip().str.lower()
     unknown = sorted(set(still.dropna()) - set(_STILL))
     if unknown:
         raise ValueError(f'Guinea-Bissau 2021-22 s01q00aa: unknown answers {unknown}')
-    df = df[still.map(_STILL).fillna(True).astype(bool).to_numpy()].copy()
-    # The leavers carried the column's only NA (s01q12 blank), which made it a float.
-    # Whole numbers, as 2018-19's int64, so a two-wave concat does not widen that
-    # wave's column (Benin 2021-22's fix).  A future NA keeps the float.
-    if df['MonthsSpent'].notna().all():
-        df['MonthsSpent'] = df['MonthsSpent'].astype('int64')
+    df = df.copy()
+    df['Departed'] = (~still.map(_STILL).fillna(True).astype(bool)).astype('boolean')
+    # s01q12 is blank on most leavers, so MonthsSpent holds NA: nullable whole numbers
+    # (2018-19 has none, and a two-wave read serves its column as Int64, values unchanged).
+    df['MonthsSpent'] = pd.to_numeric(df['MonthsSpent'], errors='coerce').astype('Int64')
 
     def _known(x):
         return None if (pd.isna(x) or int(float(x)) == 9999) else x

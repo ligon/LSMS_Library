@@ -154,19 +154,21 @@ class TestServed:
         assert gone, labels
         return s01, s01[~s01["s01q00aa"].isin(gone)], s01[s01["s01q00aa"].isin(gone)]
 
-    def test_the_roster_is_the_members_ehcvm_individu_lists(self):
+    def test_the_roster_serves_everyone_and_flags_the_departed(self):
+        """Ruling 2026-11-13, "Serve leavers": the members are ehcvm_individu's people and
+        the 341 who have left are served beside them, `Departed` True."""
         s01, members, left = self._members()
         assert len(left) == 341
         r = _served("household_roster").reset_index()
-        assert r.duplicated(["i", "pid"]).sum() == 0
-        served = set(zip(r["i"].astype(str), r["pid"].astype(str)))
-        assert served == {(_i(g, m), str(int(p))) for g, m, p in
-                          zip(members["grappe"], members["menage"], members["membres__id"])}
-        ind = _raw("ehcvm_individu_gnb2021.dta")
-        assert served == {(_i(g, m), str(int(p))) for g, m, p in
-                          zip(ind["grappe"], ind["menage"], ind["numind"])}
-        assert not served & {(_i(g, m), str(int(p))) for g, m, p in
-                             zip(left["grappe"], left["menage"], left["membres__id"])}
+        assert r.duplicated(["i", "pid"]).sum() == 0 and len(r) == len(s01) == 41501
+        key = lambda f, p: {(_i(g, m), str(int(x))) for g, m, x in zip(f["grappe"], f["menage"], f[p])}
+        gone = r[r["Departed"].astype("boolean").fillna(False)]
+        stay = r[~r["Departed"].astype("boolean").fillna(False)]
+        assert set(zip(gone["i"].astype(str), gone["pid"].astype(str))) == key(left, "membres__id")
+        assert set(zip(stay["i"].astype(str), stay["pid"].astype(str))) == key(members, "membres__id")
+        assert set(zip(stay["i"].astype(str), stay["pid"].astype(str))) == key(
+            _raw("ehcvm_individu_gnb2021.dta"), "numind")
+        assert r["Departed"].notna().all()
 
     def test_roster_sex_and_relationship_are_the_files(self):
         _, members, _ = self._members()
@@ -174,6 +176,7 @@ class TestServed:
         sex = {int(k): {"Masculino": "M", "Feminino": "F"}[str(v).strip()]
                for k, v in labels["s01q01"].items()}
         r = _served("household_roster").reset_index()
+        r = r[~r["Departed"].astype("boolean").fillna(False)]   # the members; leavers below
         got = dict(zip(zip(r["i"].astype(str), r["pid"].astype(str)), r["Sex"].astype(str)))
         want = {(_i(g, m), str(int(p))): sex[int(s)] for g, m, p, s in
                 zip(members["grappe"], members["menage"], members["membres__id"], members["s01q01"])}
@@ -293,11 +296,27 @@ class TestCopingHook:
 
 
 @pytest.mark.requires_s3
-def test_a_two_wave_roster_keeps_2018s_months_dtype():
-    """The 2021-22 leavers carried MonthsSpent's only NA; without the cast the concat
-    widened 2018-19's int64 column to float64."""
+def test_a_two_wave_roster_keeps_2018s_whole_months():
+    """The served 2021-22 leavers carry MonthsSpent NA, so the column is nullable whole
+    numbers (Int64), never float; 2018-19's values are unchanged, and only 2021-22 has
+    Departed."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         r = ll.Country(COUNTRY).household_roster(waves=[OLD, WAVE])
-    assert str(r["MonthsSpent"].dtype) == "int64"
-    assert set(r["MonthsSpent"].unique()) <= {0, 12}
+    assert str(r["MonthsSpent"].dtype) == "Int64"
+    old = r.xs(OLD, level="t")
+    assert old["MonthsSpent"].notna().all() and set(old["MonthsSpent"].unique()) <= {0, 12}
+    assert old["Departed"].isna().all()
+    assert r.xs(WAVE, level="t")["Departed"].notna().all()
+
+
+@pytest.mark.requires_s3
+def test_the_departed_keep_their_recorded_sex_and_nothing_is_invented():
+    """The 341 leavers: 246 carry a sex in s01q01, the other 95 none, and none is given
+    one; s01q12 is served as recorded (NA where blank)."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = ll.Country(COUNTRY).household_roster(waves=[WAVE])
+    gone = r[r["Departed"].astype("boolean").fillna(False)]
+    assert len(gone) == 341
+    assert gone["Sex"].notna().sum() == 246

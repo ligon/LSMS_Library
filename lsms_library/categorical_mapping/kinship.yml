@@ -571,7 +571,8 @@ Other Not Related:               [0, 0, unrelated]
 "Outros parentes do CAF/cônjuge":        [null, null, null]
 "Pessoa não aparentada com o CAF/cônjuge": [0, 0, unrelated]
 "Empregado(a) doméstico(a) ou parente do empregado(a) doméstico(a)": [0, 0, servant]
-# 2021-22 (EHCVM-2) lists nephews and nieces apart (6,186 rows); title form of "Sobrinho(a)".
+# 2021-22 (EHCVM-2) lists nephews and nieces apart (6,186 s01 rows, 6,139 of them current
+# members); title form of "Sobrinho(a)".
 "Sobrinho(A)":                           [-1, 1, consanguineal]
 
 # --- Stata numbered value labels (unknown country; likely Serbia/Kazakhstan/South Africa) ---

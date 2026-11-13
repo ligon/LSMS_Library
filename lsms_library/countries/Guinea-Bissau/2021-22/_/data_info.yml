@@ -63,11 +63,11 @@ sample:
         - t
 
 household_roster:
-    # The members only: s01 lists the 2018-19 roster again and asks of each person
-    # whether they are still a member (s01q00aa).  The 341 who are not are dropped by
-    # mapping.household_roster, as ehcvm_individu leaves them out (41,160 = 41,501 -
-    # 341) and as Benin 2021-22 does, pending GH #1565.  Unlike Benin's, 246 of them
-    # still carry a sex.
+    # Everyone s01 lists: it lists the 2018-19 roster again and asks of each person
+    # whether they are still a member (s01q00aa).  The 341 who are not are SERVED with
+    # `Departed` True (ruling 2026-11-13, "Serve leavers"; mapping.household_roster),
+    # where ehcvm_individu leaves them out (41,160 = 41,501 - 341) and Benin 2021-22
+    # drops them (GH #1565).  246 of them still carry a sex.
     dfs:
         - df_main
         - df_cover

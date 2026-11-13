@@ -24,6 +24,13 @@ Data Scheme:
     Generation: int
     Distance: int
     Affinity: str
+    # 2021-22 only (ruling 2026-11-13, "Serve leavers"): True for the 341 people s01q00aa
+    # says have left the household, who are served; False for everyone else.  NA in
+    # 2018-19, which does not ask.  No canonical flag exists (GH #1565 is open), so this
+    # is a proposal: one optional bool, country-level.
+    Departed:
+      type: bool
+      optional: true
 
   individual_education:
     index: (t, i, pid)
