@@ -108,6 +108,21 @@ Sampling:
       322 EAs from the 783 EAs the UNHS visited.  Do not read the 750 as this
       wave's realized cluster count.
     record_source: 'population.yml notes ("Design detail (not universe)") + CONTENTS.org "Sampling Design"'
+    served_strata:
+      holds: native-label
+      variable: 'stratum (GSEC1.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2005-06/_/data_info.yml `sample` reads `strata: stratum` from GSEC1.dta; CONTENTS.org, "Sampling Design" > "Strata": six labels (Kampala, Central Rural, East Rural, North Rural, West Rural, Other Urban), spelling folded by the `strata` table of categorical_mapping.org; this record''s `stratification.variable`'
+      note: |-
+        The file's own stratum, region x urban/rural, named `stratum`.  Its labels
+        are the scheme of 2005-06 to 2010-11.  2011-12 onward serve `sregion` /
+        `subreg`, sub-region variables, and have no `served_strata` yet: that they
+        are the stratum is the library's reading in those waves' `stratification`
+        (whose `_status` says the label list is the library's), not something a
+        file or document of the wave states, so they wait on the GH #1577 question
+        about region-type variables served as `strata`.  CONTENTS.org TODO
+        "Investigate 2005-06 strata vs later sub-regions" is open.
 
   '2009-10':
     design_tag: two-stage-stratified-cluster
@@ -193,6 +208,16 @@ Sampling:
       wave (656) exceeds the design's 322 EAs because `v` carries split-off
       and mover codes -- see CONTENTS.org, "Hybrid `v` in 2009-10".
     record_source: 'population.yml notes + CONTENTS.org "Sampling Design" > oversamples'
+    served_strata:
+      holds: native-label
+      variable: 'stratum (GSEC1.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2009-10/_/data_info.yml `sample` reads `strata: stratum` from GSEC1.dta; CONTENTS.org, "Sampling Design" > "Strata": six labels (Kampala, Central Rural, East Rural, North Rural, West Rural, Other Urban), spelling folded by the `strata` table of categorical_mapping.org; this record''s `stratification.variable`'
+      note: |-
+        The same six labels as 2005-06.  The design PSU `ea` does not nest in
+        `strata` in every early wave (CONTENTS.org, "`ea` does not nest in
+        `strata`"): check before nesting PSUs in strata.
 
   '2010-11':
     design_tag: two-stage-stratified-cluster
@@ -265,6 +290,16 @@ Sampling:
       records a documentation gap for this wave: "Neither
       UNPS_2010-11_Basic-Info-2014.pdf nor ..." (see "Exclusions").
     record_source: 'CONTENTS.org "Sampling Design"'
+    served_strata:
+      holds: native-label
+      variable: 'stratum (GSEC1.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2010-11/_/data_info.yml `sample` reads `strata: stratum` from GSEC1.dta; CONTENTS.org, "Sampling Design" > "Strata": six labels (Kampala, Central Rural, East Rural, North Rural, West Rural, Other Urban), spelling folded by the `strata` table of categorical_mapping.org; this record''s `stratification.variable`'
+      note: |-
+        The same six labels as 2005-06; the last wave to serve `stratum`.  The
+        design PSU `ea` does not nest in `strata` in every early wave (CONTENTS.org,
+        "`ea` does not nest in `strata`"): check before nesting PSUs in strata.
 
   '2011-12':
     design_tag: two-stage-stratified-cluster

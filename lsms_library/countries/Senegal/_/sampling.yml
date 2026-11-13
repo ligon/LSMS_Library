@@ -1,0 +1,39 @@
+# Sampling record for Senegal.  Read by `lsms_library/sampling.py`
+# (`Country('Senegal').sampling`, and `df.attrs['sampling']` on every Senegal
+# table).  Field names and vocabulary: see that module and the exemplar,
+# Uganda/_/sampling.yml.
+#
+# Only `served_strata` is written (GH #1577, ruling @ligon 2026-11-12, "Registry +
+# sampling.yml tag"): what `sample().strata` holds in each wave.  Both EHCVM waves
+# serve the region x milieu construction registered in _/derivations.yml.  The
+# design fields are #793's curation and are not written; no `panel:` block is
+# written, so the 2018-19 -> 2021-22 boundary is undeclared, not declared stable.
+# Absence of either reads as "not curated", not "not found".
+
+Sampling:
+
+  '2018-19':
+    served_strata:
+      holds: constructed
+      derivation: 'Senegal::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Senegal::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2018-19/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2018-19/_/mapping.py `sample`; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)": 28 cells, equal to BID Table 1a'
+      note: |-
+        No variable in either wave's files is named or labelled a stratum;
+        `domaine` of ehcvm_individu_sen2018.dta is zone x vague and spans regions,
+        so it is not the stratum and is not read (CONTENTS.org, "2026-11-04 --
+        strata and allocation by wave").  The BID statement the construction rests
+        on is in the 2021-22 BID; no held 2018-19 document states it.
+
+  '2021-22':
+    served_strata:
+      holds: constructed
+      derivation: 'Senegal::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Senegal::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2021-22/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)": 28 cells'
+      note: |-
+        Each wave's label is its own cover's; 0 of the 6,432 households in both
+        waves change stratum.  The source's thies, kedougou and sedhiou stay
+        unaccented, as `Region` does.

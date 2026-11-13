@@ -2,11 +2,43 @@
 # `Country('Togo').waves`?  The design fields are #793's curation and are not
 # written yet; their absence here is "not curated", not "not found".  Read by
 # `lsms_library/sampling.py`.  Vocabulary: see sampling.py.  Modelled on
-# Niger/_/sampling.yml.  The first wave has no preceding wave and so no entry.
+# Niger/_/sampling.yml.  The first wave has no preceding wave and so no `panel:`
+# block.
+#
+# SERVED STRATA (GH #1577, ruling 2026-11-12): `served_strata` says what
+# `sample().strata` holds.  Both waves serve the region x milieu construction
+# registered in _/derivations.yml, each from its own cover, so region code 6 is
+# `Lomé commune Urbain` in 2018 and `Grand Lomé Urbain` in 2021-22, on the same
+# 98 grappes: a cross-wave group on `strata` splits that one stratum.
 
 Sampling:
 
+  '2018':
+    served_strata:
+      holds: constructed
+      derivation: 'Togo::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Togo::sample::region-milieu-stratum (waves 2018, 2021-22); 2018/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2018/_/mapping.py `sample`; CONTENTS.org, "2026-11-10 — 2018 strata wiring selected (GH #1575)" and "2026-11-10 — GH #1575 normal sample validation completed"'
+      note: |-
+        Wired by the #1575 ruling of 2026-11-10 on the own September 2023 BID:
+        "La strate est la combinaison région/milieu de résidence".  The June 2021
+        BID's "except Lome Commune where all respondents are from rural areas"
+        stands beside the 2023 Table 1a's Grand Lomé, 98 urban / 0 rural clusters;
+        neither account is reconciled (CONTENTS.org, "documented planned strata
+        and capital-domain caveat").
+
   '2021-22':
+    served_strata:
+      holds: constructed
+      derivation: 'Togo::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Togo::sample::region-milieu-stratum (waves 2018, 2021-22), validated_against: a cold sample() serves a stratum on all 6,462 households with the key on every one; 2021-22/_/data_info.yml `sample.df_cover.strata`, stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2026-11-12 -- 2021-22 strata on the #1575 rule, and the day''s other rulings (GH #1697)", burst job 41240821'
+      note: |-
+        Extended to 2021-22 by the ruling "Same rule as #1575" (2026-11-12).  The
+        two waves share 10 of their 11 labels; `Lomé commune Urbain` (2018) and
+        `Grand Lomé Urbain` (2021-22) are the same 98 grappes, not renamed.
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: stable

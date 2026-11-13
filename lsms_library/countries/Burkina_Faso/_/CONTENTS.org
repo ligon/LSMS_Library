@@ -3553,3 +3553,15 @@ are not newly measured counts. Implementation verification is limited to
 invented pure frames and committed metadata, not actual sample/data/API or
 fresh planned-design evidence. The wave mapping file is a build hash input;
 final integrated metadata measurement and any rewarm are separate work.
+
+* 2026-11-13 -- what =strata= holds, per wave, is recorded in =_/sampling.yml= (GH #1577)
+
+Ruling (@ligon, 2026-11-12): "Registry + sampling.yml tag".  2018-19 and 2021-22 carry a
+=served_strata= block, =constructed=, naming =Burkina_Faso::sample::region-milieu-stratum=.
+*2014 is not recorded, deliberately.*  Its =strate= is a bare 1-26 number (variable label
+=group(region milieu)=) that =2014/_/mapping.py= decodes to a label through its own GH #1573 lookup,
+"recorded-code decoding", not a registered construction.  None of the four =holds= values describes
+that: the label is not the file's (=native-label=), the served value is no longer the code
+(=native-code=), and nothing is registered (=constructed=).  The case is a question in the #1577
+report; until it is answered, =Country('Burkina_Faso').sampling= has no 2014 entry, which reads as
+unrecorded.

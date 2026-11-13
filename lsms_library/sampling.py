@@ -330,10 +330,11 @@ STRATA_HOLDS: frozenset[str] = frozenset({
     # First record: Mali 2018-19, region x milieu from the cover's labels
     # (`Mali::sample::region-milieu-stratum`, GH #812).
     "constructed",
-    # No stratum is served: `strata` is NA on every row of the wave.  The
-    # locator says what was searched, because silence in config is not
-    # evidence of absence.  First record: Mali 2014-15 (no variable in its 55
-    # files is named or labelled a stratum; GH #812 ruling).
+    # No stratum is served: `strata` is NA on every row of the wave (and a
+    # frame of that wave alone has no `strata` column).  The locator says what
+    # was searched, because silence in config is not evidence of absence.
+    # First record: Mali 2014-15 (no variable in its 55 files is named or
+    # labelled a stratum; GH #812 ruling).
     "absent",
 })
 

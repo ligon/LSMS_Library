@@ -2302,11 +2302,14 @@ def test_the_tag_agrees_with_the_served_strata(country, wave):
         s = ll.Country(country).sample(waves=[wave])
     assert len(s), (country, wave)
     blk = sampling_records(country)[wave].served_strata
+    if blk["holds"] == "absent":
+        # A frame of that wave alone has no `strata` column at all (measured,
+        # Mali 2014-15); in a frame with other waves the column is NA there.
+        assert "strata" not in s or s["strata"].isna().all(), \
+            s["strata"].dropna().unique()[:5]
+        return
     values = s["strata"]
     present = values.notna()
-    if blk["holds"] == "absent":
-        assert not present.any(), values[present].unique()[:5]
-        return
     assert present.any(), (country, wave)
     as_text = values[present].astype(str).str.strip()
     is_code = as_text.str.fullmatch(r"[0-9]+(\.0)?")

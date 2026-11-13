@@ -1,10 +1,10 @@
 # Sampling design record -- HOW this survey's sample was drawn (GH #793).
 #
-# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
+# NO DESIGN FIELDS (GH #942, ruling 2026-10-18, option A): each entry carries
 # the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
 # wave of `Country('Burkina_Faso').waves`?  The design fields are #793's
 # curation and are not written yet; their absence here is "not curated", not
-# "not found".
+# "not found".  An entry may also carry `served_strata:` (GH #1577; below).
 #
 # Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in
 # {wave-scoped, redefined, mixed} makes a `Country('Burkina_Faso')` frame that
@@ -30,7 +30,26 @@
 
 Sampling:
 
+  # SERVED STRATA (GH #1577, ruling 2026-11-12): what `sample().strata` holds.  The
+  # EHCVM waves serve the region x milieu construction registered in
+  # _/derivations.yml.  2014 is NOT recorded: its `strate` is a bare number the
+  # library decodes to a label through its own lookup (GH #1573, "recorded-code
+  # decoding"), which none of sampling.py's `holds` values describes; the case is a
+  # question in the #1577 report.  Absence of a 2014 entry is "unrecorded".
+
   '2018-19':
+    served_strata:
+      holds: constructed
+      derivation: 'Burkina_Faso::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Burkina_Faso::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2018-19/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2018-19/_/mapping.py `sample`; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)": 26 region x milieu labels'
+      note: |-
+        No household file records a stratum.  Labels, never codes: `s00q01` 1 is
+        Boucle du Mouhoun in 2018-19 and Hauts-Bassins in 2021-22.  The 26 cells
+        rest on the panel BID (bid_bfa_ehcvm2.pdf p.4) and the survey's own unit
+        table; the 2018-19 report and English BID describe other stratifications
+        (CONTENTS.org, "26, on three documents that disagree").
     panel:
       household_continuity: independent
       cluster_id_continuity: redefined
@@ -80,6 +99,16 @@ Sampling:
         locator: '2026-10-23 cluster_id_note; Burkina_Faso/_/panel_ids.py; CONTENTS.org "v across wave boundaries" and the later GH #1244 EMC_ namespace checkpoint; historical review f1cf7d06f'
 
   '2021-22':
+    served_strata:
+      holds: constructed
+      derivation: 'Burkina_Faso::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Burkina_Faso::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2021-22/_/data_info.yml `sample.df_cover.strata` over both covers (s00_me_bfa2021.dta and Cross_Section/s00_me_bfa2021.dta), stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)", "2021-22 has two components"'
+      note: |-
+        One construction over both components.  The cross-section's catalog entry
+        (6277) names no stratum, so its label is an inference, recorded as a
+        modelling choice in the registry entry.
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: stable
