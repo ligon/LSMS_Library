@@ -210,13 +210,20 @@ def _sources():
 
 def inputs_all_preloaded_left():
     """Registered inputs of ``Benin::panel_ids::all-preloaded-left-not-linked``: every
-    ``s01`` row of the households the exception leaves unlinked, at ``(t, i)`` with
+    ``s01`` row of the 63 households the exception leaves unlinked, at ``(t, i)`` with
     their own (``E2_``) id, beside the cover's ``PanelHH`` / ``s00q07d`` / ``s00q07e``.
-    Original variable names, codes as the file holds them."""
-    _, cover_21, roster_21 = _sources()
-    gone = all_preloaded_left(roster_21)
+    Original variable names, codes as the file holds them.
+
+    Only households PanelHH and the key would otherwise link: the roster condition
+    alone (``all_preloaded_left``) also holds on 18 households that are unlinked
+    anyway (81 in all on the release held at f138a3d61)."""
+    cover_18, cover_21, roster_21 = _sources()
+    old = set(_pair(cover_18))
+    panel = cover_21['PanelHH'].astype('string').str.strip().eq('Panel').to_numpy()
+    excepted = ({k for k, p in zip(_pair(cover_21), panel) if p and k in old}
+                & all_preloaded_left(roster_21))
     keys = [(int(g), int(m)) for g, m in zip(roster_21['grappe'], roster_21['menage'])]
-    rows = roster_21[[k in gone for k in keys]].copy()
+    rows = roster_21[[k in excepted for k in keys]].copy()
     cover = cover_21.assign(_k=[(int(g), int(m)) for g, m in zip(cover_21['grappe'], cover_21['menage'])])
     cover = cover.set_index('_k')[['PanelHH', 's00q07d', 's00q07e']]
     rk = [(int(g), int(m)) for g, m in zip(rows['grappe'], rows['menage'])]

@@ -314,5 +314,14 @@ def test_2021_22_extraction_and_hook_conserve_every_other_field(wiring, monkeypa
                                        ("E2_7002", LATER): "Autre inventé Rural",
                                        ("E2_42001", LATER): "littoral Urbain"}
     out = module.sample(new)
-    assert_frame_equal(out.drop(columns="Derivation"), new)
+    assert_frame_equal(out.drop(columns=["Derivation", "panel_weight"]),
+                       new.drop(columns="panel_weight"))
     assert out["Derivation"].eq(KEY).all()
+    # GH #1705, ruling 2026-11-13 "NA for unlinked": the hook also keeps panel_weight
+    # only on the ids the committed crosswalk links (E2_42009 is one; the other two are not).
+    import json
+    linked = set(json.loads((ROOT / "Benin" / "_" / "updated_ids.json").read_text())["2021-22"])
+    keep = out.index.get_level_values("i").isin(linked)
+    assert keep.tolist() == [i == "E2_42009" for i in out.index.get_level_values("i")]
+    pd.testing.assert_series_equal(out.loc[keep, "panel_weight"], new.loc[keep, "panel_weight"])
+    assert out.loc[~keep, "panel_weight"].isna().all()

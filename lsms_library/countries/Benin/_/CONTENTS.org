@@ -1317,7 +1317,8 @@ A 2021-22 household is linked to the 2018-19 household with the SAME =(grappe, m
   year within one year, ignoring member numbers, 21 of 258 of those members match (8.1%) against 28 of
   258 (10.9%) for another 2018-19 household of the same grappe (the red team, job 41278460); their
   head's sex agrees with the key's 2018-19 head on 54.0% against 55.6% for the control (job 41279824).
-  They read as replacement households carrying a Panel flag, and keep their own =E2_= id.  The
+  They read as replacement households carrying a Panel flag, and keep their own =E2_= id.  (The
+  roster condition alone holds on 81 households; the other 18 are unlinked anyway.)  The
   registry fits a link exception only partly: no served row carries the key (the households are
   served as new ones), so the entry is a =rows: 0= disclosure on the =panel_ids= table, its function
   =panel_ids.py:all_preloaded_left= is the rule, and =derivation_inputs= returns the households'
