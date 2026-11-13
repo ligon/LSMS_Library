@@ -334,6 +334,19 @@ def _drop_unpriceable(v, units, expected, threshold=PRICE_LOSS_WARN_THRESHOLD):
     per unit was not ruled on), and the ``kg*`` modes keep their sentinel
     rows in the residual ``nan`` count, as before.
 
+    **The two counts are deliberately asymmetric** (ruling @ligon
+    2026-11-12, "Accept, document the asymmetry").  ``currency`` counts
+    INPUT rows: every expected row on a currency-denominated unit, whether
+    or not its Price would otherwise have been servable.  ``unknown``
+    counts only the expected rows on a missing unit that WOULD OTHERWISE
+    HAVE BEEN SERVED (a finite, non-zero Price, not money-only).  Both are
+    taken before the ``(t, i, j, u, s)`` median, so neither is a count of
+    returned rows: Serbia ``unitvalue`` has ``currency`` = 3,772 input rows
+    against 5 served groups removed, because the rest were unpriceable
+    anyway (GH #1509 red team F7).  ``food_quantities(units='units')``
+    reports its own drop under ``attrs['quantity_rows_dropped']``, not
+    here: it is not a price table.
+
     Money-only recall occasions are the second by-design bucket (GH #864)
     ----------------------------------------------------------------------
     Burkina Faso's EMC 2014 re-asks the 7-day food module in four quarterly
@@ -4054,8 +4067,13 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
           (``u='Unknown'``, :func:`_unit_sentinel_mask`) are DROPPED, not
           summed into an ``Unknown`` pseudo-unit, and counted in
           ``attrs['quantity_rows_dropped']['unknown']`` (GH #1068; ruling
-          @ligon 2026-11-12).  ``u='Value'`` rows are kept: their sum is the
-          recorded currency amount, the row the ``'kgs'`` carry rule keeps.
+          @ligon 2026-11-12).  The record is ``quantity_rows_dropped``, not
+          the ``price_rows_dropped`` the #1068 ruling named, because this is
+          not a price table ("Accept, document the asymmetry", 2026-11-12);
+          its ``unknown`` counts INPUT rows that carried a quantity, before
+          the ``(t, i, j, u, s)`` sum.  ``u='Value'`` rows are kept: their sum
+          is the recorded currency amount, the row the ``'kgs'`` carry rule
+          keeps.
     serve_waves : collection of wave labels, optional
         Serve only these waves of *df* while the kg factors read all of it
         (GH #1487; see :func:`food_kg_factors`).  ``Country.food_quantities``
@@ -4209,8 +4227,13 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
           and rows on a missing unit (``u='Unknown'``, a value per unrecorded
           unit) are DROPPED and counted in ``attrs['price_rows_dropped']``
           as ``currency`` and ``unknown`` (GH #1129, #1068; ruling @ligon
-          2026-11-12).  A wave whose rows are all ``u='Value'`` (GhanaLSS
-          1987-88, 1988-89, 1991-92) therefore serves no ``unitvalue`` rows.
+          2026-11-12).  The two counts differ in kind, by ruling:
+          ``currency`` counts every expected INPUT row on a currency unit,
+          ``unknown`` only the expected rows on a missing unit that would
+          otherwise have been SERVED; neither counts returned rows (see
+          :func:`_drop_unpriceable`).  A wave whose rows are all
+          ``u='Value'`` (GhanaLSS 1987-88, 1988-89, 1991-92) therefore
+          serves no ``unitvalue`` rows.
         - ``'kgprice'``: reported ``Price`` × kg_factor (currency / kg).
           NaN where ``Price`` is missing or ``u`` is unconvertible to kg.
         - ``'unitprice'``: reported ``Price`` (currency / native u).
