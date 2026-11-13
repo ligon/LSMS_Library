@@ -240,9 +240,11 @@ Data Scheme:
     # the framework's NaN-key de-dup collapse.  Same i / path quirks as
     # plot_features.
     #
-    # 2021-22 (GH #1697) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
-    # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018-19 still
-    # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
+    # Both waves read the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
+    # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188):
+    # 2021-22 since GH #1697, 2018-19 since 2026-11-13 (ruling "Extend to all
+    # four now"; until then 2018-19 served the GIFT question under Purchased and
+    # Quantity_purchased).  _/CONTENTS.org.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool

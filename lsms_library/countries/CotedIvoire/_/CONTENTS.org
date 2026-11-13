@@ -941,7 +941,8 @@ but no document consulted says so.  Served as recorded; a separate issue.
 
 *Not changed.*  =Purchased= / =Quantity_purchased= read =s16bq05= /
 =s16bq07a=, the gift flag and gift quantity (the #1188 finding applies by
-inspection).
+inspection).  [2026-11-13: changed, under the ruling "Extend to all four now";
+see "2018-19 =plot_inputs= reads the purchase" at the end of this file.]
 
 *Cache.*  =_/categorical_mapping.org= is a build input of every CotedIvoire
 table: all 21 country hashes move (one CotedIvoire re-warm).  Evidence:
@@ -1687,7 +1688,8 @@ are missing-unit sentinels to the kg ladder (=transformations._U_SENTINELS=), so
 =nitrogen_kg= do not move.  The 2021-22 collisions of the 38 damaged households (above) are unchanged:
 =Unknown= was served on no 2021-22 row before, so the relabel can make no new key.
 
-*Not changed: the gift/purchase binding of 2018-19.*  =Purchased= / =Quantity_purchased= still read
+*Not changed: the gift/purchase binding of 2018-19.*  [Later 2026-11-13: superseded, see the next section.]
+=Purchased= / =Quantity_purchased= still read
 =s16bq05= / =s16bq07a=, the gift question; the 2026-11-13 ruling "Fix all three now" names
 Guinea-Bissau, Togo and Benin only.  Measured on =Menage/s16b_me_CIV2018.dta=: =s16bq05= Oui on 890
 applied lines, =s16bq08= (the purchase) Oui on 8,134; gift x purchase Non/Non 2,373, Non/Oui 7,996,
@@ -1700,4 +1702,30 @@ and =tests/test_senegal_1483_s16b.py= pin it (red team of 2026-11-13, F1).
 no other country; =build_transforms_fingerprint= 0 of 42.  Served (cold, private roots, burst jobs 41275616
 and 41275888): 25,907 rows both sides, the 4 relabelled =u= the only difference, =seed_kg= / =nitrogen_kg=
 frame-equal, =Feature('plot_inputs')= equal to =Country('CotedIvoire').plot_inputs()=.
+
+* 2026-11-13 -- 2018-19 =plot_inputs= reads the purchase (ruling "Extend to all four now")
+
+*Ruling (@ligon, 2026-11-13): "Extend to all four now (Recommended)".*  Senegal 2018-19, Cote d'Ivoire
+2018-19 and Niger 2018-19 / 2021-22 read =s16bq08= / =s16bq09a= as the purchase, on the Togo template
+(=408d02a24=), measured and disclosed.  This is the Cote d'Ivoire cell; it also closes the WAITING note under
+"2021-22 wired" / =plot_inputs= (the two waves' columns now mean the same thing).
+
+*What is served now* (=2018-19/_/plot_inputs.py=): =Purchased= =s16bq08=, =Quantity_purchased= =s16bq09a=,
+=Unit_purchased= =s16bq09b=; =Received_as_gift= =s16bq05=, =Quantity_received_as_gift= =s16bq07a=,
+=Unit_received_as_gift= =s16bq07b=.  Each unit is decoded from its own value labels (all three unit questions
+carry the five answers Gramme, Kilogramme, Tonne, Litre, Charrette here) and served in the vocabulary of =u=
+(=ehcvm.served_unit_labels=), as 2021-22 does.  =u= is unchanged.  The Stata labels are the EHCVM-1 ones
+(=s16bq09a= "Quelles sont la quantité et la valeur totale de [INTRANT] achetées?"; 2021-22 asks "Quelle est
+la quantité ... achetée?").
+
+*What moves, on the 11,259 served 2018-19 lines* (no line is hollow under either binding; burst job
+41280484, source counts):
+| column | before (gift question) | after (purchase question) |
+|--------+------------------------+---------------------------|
+| =Purchased= True / False | 890 / 10,369 | 8,134 / 3,125 |
+| =Quantity_purchased= non-null | 890 | 8,134 |
+| =Received_as_gift= True / False | NA | 890 / 10,369 |
+Gift x purchase: Non/Non 2,373, Non/Oui 7,996, Oui/Non 752, Oui/Oui 138.  Every acquisition quantity has its
+unit.  The four largest purchased quantities (400,000, 140,000, 120,000, 87,000) equal the four largest used
+quantities; served as filed.  =seed_kg= and =nitrogen_kg= read =Quantity= and =u= only.
 
