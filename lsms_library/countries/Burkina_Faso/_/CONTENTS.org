@@ -3563,53 +3563,76 @@ final integrated metadata measurement and any rewarm are separate work.
 * 2026-11-13 -- 2021-22 crop_production: the panel s16c and s16d sales (GH #1436, #824, #1437)
 
 =2021-22/_/crop_production.py= builds the wave from the panel component (catalog 6224; the
-cross-section ships no agriculture module we hold, GH #1276): the =s16c= harvest lines, plus
-the =s16d= household-crop sales on the option-(d) rule of Mali 2021-22 (GH #824, @ligon
-2026-11-03): a sale goes on the crop's single line, keyed
-=Burkina_Faso::crop_production::hh-crop-sale-single-row=, else on one =Farm-level= row with
-=u = 'Unknown'= and no key.  A recorded harvest on an unfinished line is served as recorded,
-keyed =::harvest-to-date=.  It runs on the shared =lsms_library.ehcvm= helpers, as Togo
-2021-22 does.
+cross-section ships no agriculture module we hold, GH #1276), on the shared
+=lsms_library.ehcvm= helpers, as Togo, Benin and Cote d'Ivoire 2021-22 do:
+- the =s16c= harvest lines, each its own row: =production_obs= is the constructed
+  =row:<source_fingerprint>:<n>= (Niger 2021-22's rule, GH #1360; ruling @ligon 2026-11-13,
+  "Add production_obs");
+- the =s16d= household-crop sales on the option-(d) rule of Mali 2021-22 (GH #824, @ligon
+  2026-11-03): on the crop's single line, keyed
+  =Burkina_Faso::crop_production::hh-crop-sale-single-row=, else on one =Farm-level= row with
+  =u = 'Unknown'= and no key, with the sale's own state as =Condition_sold= (GH #1528);
+- the harvest of a finished crop from its =s16d= dispositions where they share one unit,
+  keyed =::harvest-from-dispositions= (ruling @ligon 2026-11-13, "Extend Mali's rule");
+- a recorded harvest on an unfinished line served as recorded, keyed =::harvest-to-date=.
+*The authority for wiring the wave is the batch brief*, not a ruling that names Burkina
+(red team F9): option (d) is Mali's ruling, applied here as Togo applies it.  Flagged for the
+maintainer's confirmation.
 
 *The idiosyncrasy that shaped it: one crop list, two label sets.*  =s16cq04= ("Id in
 cultures") and =s16dq01= ("Id in culture_utilisation_annuel") are Survey Solutions roster
-ids on one crop list, but the two held files carry different value-label sets for it
-(measured 2026-11-13):
+ids, and the CODE is what links them: all 6,603 =s16d= crop records have an =s16c= line of
+the same code in the same household (5,080 do by label); the 23 =s16d= code-55 records all
+sit with =s16c= code-55 lines and none with 65; the 24 code-65 records all sit with 65
+(measured 2026-11-13).  The two files carry different value-label sets for the codes:
 
-| code | =s16c= label | =s16d= label | EHCVM-2 siblings (Mali, Togo, Niger, Benin, Senegal) |
-|------+---------------------------+--------------------+-----------------------|
-|    3 | Riz                        | Riz Paddy          | Riz Paddy             |
-|    8 | Niébé/Haricot              | Niébé              | Niébé                 |
-|    9 | Voandzou (pois de terre)   | Voandzou           | Voandzou              |
-|   27 | Laitue (salade)            | Laitue             | Laitue                |
-|   53 | Agrume                     | (bare)             | Agrume                |
-|   54 | Manguier                   | (bare)             | Manguier              |
-|   55 | Autre (à préciser)         | (bare)             | Anacarde              |
-|   58 | (bare)                     | (bare)             | Banane douce          |
-|   64 | (bare)                     | (bare)             | Soja                  |
-|   65 | (bare)                     | Autre (à préciser) | Autre (à préciser)    |
+| code | =s16c= label | =s16d= label | list to 65 (Mali, Togo, Benin, Senegal; Guinea-Bissau in Portuguese) | served |
+|------+---------------------------+--------------------+--------------------+---------------|
+|    3 | Riz                        | Riz Paddy          | Riz Paddy          | Riz           |
+|    8 | Niébé/Haricot              | Niébé              | Niébé              | Niébé/Haricot |
+|    9 | Voandzou (pois de terre)   | Voandzou           | Voandzou           | Voandzou (pois de terre) |
+|   27 | Laitue (salade)            | Laitue             | Laitue             | Laitue (salade) |
+|   53 | Agrume                     | (bare)             | Agrume             | Agrume        |
+|   54 | Manguier                   | (bare)             | Manguier           | Manguier      |
+|   55 | Autre (à préciser)         | (bare)             | Anacarde (Caju)    | *Anacarde*    |
+|   58 | (bare)                     | (bare)             | Banane douce       | *Banane douce* |
+|   64 | (bare)                     | (bare)             | Soja               | *Soja*        |
+|   65 | (bare)                     | Autre (à préciser) | Autre (à préciser) | Autre (à préciser) |
 
-So =s16d= carries the EHCVM-2 list (stripped of 53-64), and =s16c= a set in which 55 is
-"Autre" -- which every other EHCVM-2 file, and Burkina's own =s16d=, put on 65.  2018-19
-=s16cq04= spells 3, 8, 9 and 27 as =s16d= does.  Matched by label, 332 of the 1,548 sales find
-no harvest line and would go to =Farm-level=; matched by code none does (1,331 sales on one
-line, 156 on two, 61 on three or more).  So the attachment joins on the code.  The served
-label is the harvest file's own, through =harmonize_food= as in 2018-19; a code the file
-leaves bare (58, 64, 65), or labels with a word =s16d= gives to a different code (55), keeps
-a source-qualified identity, =Unknown [Burkina_Faso 2021-22 s16cq04=55]=, the form the 2021
-=s16b= adapter uses.  *Not decided here*: whether 55 is Anacarde (the sibling list says so;
-the file does not), and whether 2021-22's =Riz= / =Niébé/Haricot= / =Voandzou (pois de terre)=
-/ =Laitue (salade)= should be served in 2018-19's spellings.  Both are questions for the
-maintainer; as served, cowpea is =Niébé= in 2018-19 and =Niébé/Haricot= in 2021-22.
-The cost, measured: =plot_inputs= seed crops are spelled as 2018-19 harvests are (GH #1119),
-so in 2021-22 0 of 984 =Niébé= and 0 of 291 =Riz Paddy= seed rows find a harvest row at
-=(t, i, crop)=, against 2,097 of 2,156 and 525 of 532 in 2018-19; the other seed crops of
-2021-22 match on 97.8-100% (=Maïs= 1,238 of 1,246, =Sorgho= 1,131 of 1,141, =Sésame= 272 of
-278), and the catch-all seed slots (=Autre crop= and the like) match none, as in 2018-19.
+*Two code lists exist, and Niger is not a sibling here.*  One list ends at 55 =Autre=: Burkina
+2018-19, and Niger and Cote d'Ivoire 2021-22 (Niger codes nothing above 55).  The other runs
+to 65, with 55 cashew, 58 Banane douce, 64 Soja and 65 Autre: Mali, Togo, Benin, Senegal and
+Guinea-Bissau 2021-22.  Burkina 2021-22's =s16c= carries the first list's labels on the
+second list's codes (58, 64 and 65 occur, which the first list has not).  /An earlier version
+of this section listed Niger among the siblings with 55 Anacarde (red team F1); it was wrong./
 
-Units likewise: =s16cq16b= and =s16dq05b= label codes 1-7 (=s16c= 3 =Plat Yoruba=, =s16d= 3
-=Yorouba=; 2018-19 =Plat yorouba=) and leave the longer list bare (=s16cq16b= 8, 9; =s16dq05b=
-8, 10, 13, ... 64 on 89 sales).  A bare code keeps its source-qualified identity, by field.
+*Codes 55, 58 and 64 are labelled from the file's own roster text* (coordinator default,
+2026-11-13, basis derived-from-data), registered as
+=Burkina_Faso::crop_production::crop-code-from-roster-text=: =s16cq03b= ("Roster list
+question", the enumerator's name for the line) names anacarde or cajou on 54 of the 59
+code-55 lines, banane on 5 of 5 code-58 lines, soja or soya on 88 of 92 code-64 lines; the
+code-55 households are in Cascades 26, Hauts-Bassins 17, Sud-Ouest 12 and Centre-Ouest 2, the
+cashew belt.  The =Précisez= field =s16cq03_autre= is filled on 38 of 38 code-65 lines and 0
+of 59 code-55 lines, so 65 is the =Autre= code, and since =s16c= leaves it bare it takes
+=s16d='s label.  Every other code keeps the harvest file's own label, through
+=harmonize_food=.  *Not decided*: whether 2021-22's =Riz= / =Niébé/Haricot= / =Voandzou (pois
+de terre)= / =Laitue (salade)= should be served in 2018-19's spellings.  As served, cowpea is
+=Niébé= in 2018-19 and =Niébé/Haricot= in 2021-22, and so in 2021-22 0 of 984 =Niébé= and 0 of
+291 =Riz Paddy= seed rows of =plot_inputs= (spelled as 2018-19 harvests are, GH #1119) find a
+harvest row at =(t, i, crop)=, against 2,097 of 2,156 and 525 of 532 in 2018-19; the other
+seed crops of 2021-22 match on 97.8-100%, and the catch-all seed slots match none, as in
+2018-19.
+
+*Units: one UML list, one vocabulary* (red team F3).  Every unit field (=s16cq16b= and the
+four =s16d= dispositions) codes on one list: codes 1-7 are labelled alike but for code 3
+(=Plat Yoruba= in =s16c=, =Yorouba= in =s16d=; 2018-19 =Plat yorouba=), and the rest are bare
+(=s16cq16b= 8, 9; the sold units 8, 10, 13, ... 64 on 89 sales).  Each field is decoded by
+code -- the harvest field's label first, a bare code as =Unknown [Burkina_Faso 2021-22
+UML=<code>]= -- and served through the read-path =u= table (=ehcvm.served_unit_labels=), so
+=u=, =Unit_sold= and the dispositions share one spelling: =Kilogramme= is =Kg= everywhere, as
+2018-19's is, and code 3 is =Plat Yoruba= everywhere.  An earlier build mapped =Unit_sold=
+through the country table only and served =Kilogramme= beside a =u= of =Kg=.  =Plat Yoruba=
+(2021-22) and =Plat yorouba= (2018-19) remain two spellings of one unit across waves.
 A missing harvest unit is =Unknown=; a missing sold unit stays NA (the 2018-19 contract).
 
 *GH #1437, the Burkina half, diagnosed (no imputation).*  The harvest block is blank on every
@@ -3628,49 +3651,76 @@ finished row, not just =s16cq16a=.  On the 8,476 crop rows of =s16c=, =s16cq11= 
 Every column before =s16cq11= is filled on both.  So the released file behaves as if the
 fielded program skipped Q16C.12-16 for =Oui=, the reverse of the printed route (Oui ►
 16C.16, the 2026-11-09 entry above).  The printed route is still not proof of the fielded
-program, and this is a description of the file, not a cause.  Nothing is filled in.
+program, and this is a description of the file, not a cause.  Nothing is imputed into
+=s16cq16a=.
 
-*Measured* cold in private roots, base =f138a3d61= against the branch (job 41271920):
+*The harvest of a finished crop, from its dispositions* (ruling @ligon 2026-11-13, "Extend
+Mali's rule"; GH #1437 stays open).  Where every =s16c= line of a household's crop is
+finished, none records a quantity, and the positive =s16d= consumed / given / sold / in-stock
+quantities all state one unit (one UML code), their sum is the harvest, on the crop's single
+line or on its one =Farm-level= row, never split among plots.  Of the 6,397 household-crops
+finished on every line with no recorded quantity, 3,958 qualify (3,421 on a single line, 537
+=Farm-level=), 2,272 span units and stay NA, and 167 record no disposition; 739 crops with an
+unfinished line are held out.  This wave cannot test the sum, since no finished line records
+a harvest.  Burkina 2018-19 can: its module holds the harvest =s16cq12a= and all four
+dispositions (=s16cq13a=, =s16cq14a=, =s16cq16a=, =s16cq22a=) on one row, and on the 12,490 of
+14,956 finished rows whose every positive disposition is in the harvest's unit the sum equals
+the harvest exactly on 87.9%, within 10% on 90.5% (median ratio 1.000; 5.1% over 1.1, 4.2%
+under 0.9).  That is consistency within a row, and a respondent may anchor on the harvest just
+stated.  s16d asks nothing about seed kept, post-harvest loss or feed, so a sum may fall
+short of what was cut.
+
+*The 179 recorded harvests are partial* (red team F4).  All are on unfinished lines, keyed
+=harvest-to-date=, and =s16cq12= says a median 50% of the plot is still to harvest
+(interquartile range 15-70).  =harvest_kg= and =yield_kg= on them are a partial harvest over
+the whole plot's area: do not read them as yields.
+
+*The two repeated lines are distinct lines* (red team F2).  =s16c= repeats (household,
+field, parcel, crop) on 2 pairs, which differ in the roster text (=s16cq03b=), the
+=Précisez=, the area share =s16cq08=, the seed =s16cq10a= and, in one pair, the intercrop
+answer; neither records a harvest, and 2018-19 has no such pair.  With =production_obs= both
+lines of each pair are served, the framework collapses nothing, and =LSMS_GRAIN_STRICT=1=
+passes on =crop_production= (it refused the table under the build that folded them).  The
+builder refuses a keyed row, or a quantity, in a group that repeats the plot-crop key.
+2018-19 and every =Farm-level= row carry =unresolved_observation=, the canonical sentinel, so
+=Feature('crop_production')= is unchanged for 2018-19.
+
+*Not served, for want of a ruling that names this country*: =s16cq16c= as =Quantity_kg= (108
+rows; the #1436 survey-kg ruling is Mali's and Niger's) and =s16dq05c= as =Quantity_sold_kg=
+(1,537 sales; the 2026-11-12 sold-kg ruling names Niger and Mali).  =harvest_month= has no
+source in either file and stays NA, as in 2018-19.
+
+*Measured* cold in private roots, base =f138a3d61= against the branch at =02c716c09= (job
+41275751):
 
 | | base | branch |
 |-+------+--------|
-| =crop_production= rows | 15,587 (2018-19) | 24,278 = 15,587 + 8,691 (2021-22) |
-| 2021-22 rows: plot lines / =Farm-level= | -- | 8,474 / 217 |
-| 2021-22 rows with a sale | -- | 1,548 (1,331 keyed on their line; 217 =Farm-level=) |
+| =crop_production= rows | 15,587 (2018-19) | 24,705 = 15,587 + 9,118 (2021-22) |
+| 2021-22 rows: =s16c= lines / =Farm-level= | -- | 8,476 (every line, =row:= tokens) / 642 |
+| 2021-22 sales | -- | 1,548: 1,331 keyed on their single line, 217 on =Farm-level= rows |
 | 2021-22 =Value_sold= | -- | 270,464,270 FCFA, the =s16dq06= sum of the raw file |
-| 2021-22 rows with a =Quantity= | -- | 179, every one keyed =harvest-to-date= |
-| =harvest_kg= rows 2018-19 / 2021-22 | 1,606 / -- | 1,606 / 56 |
-| =yield_kg= rows 2018-19 / 2021-22 | 1,485 / -- | 1,485 / 53 |
-| 2018-19 rows | -- | equal in every value; a =Derivation= column, NA, is new |
+| 2021-22 =Condition_sold= | -- | on all 1,548 sales: shelled 858, unshelled 357, shell_not_applicable 333 |
+| 2021-22 rows with a =Quantity= | -- | 4,137: 3,958 =harvest-from-dispositions=, 179 =harvest-to-date= |
+| units of the 3,958 totals | -- | Sac gros 1,424, Plat Yoruba 1,231, Kg 530, Autres 315, Sac moyen 256, Tine 162, Unité 8, 32 on bare UML codes |
+| crop labels from the roster text | -- | 159 rows: Anacarde 60, Banane douce 6, Soja 93 |
+| =harvest_kg= rows 2018-19 / 2021-22 | 1,606 / -- | 1,606 / 586 |
+| =yield_kg= rows 2018-19 / 2021-22 | 1,485 / -- | 1,485 / 506 |
+| 2018-19 rows | -- | equal in every value; =production_obs= = =unresolved_observation=; a =Derivation= column, NA, is new |
+| grain reports on =crop_production= | none | none; =LSMS_GRAIN_STRICT=1= passes on all-waves, 2021-22 and 2018-19 requests |
+| Site Q, 2021-22 | -- | 1 low =Quantity=, 2 high =Sale_price= (reported, nothing changed) |
 
-=harvest_kg= and =yield_kg= are this small because the harvest is blank on finished rows;
-that is the finding, not a defect of the builder.  =Feature('crop_production')= equals the
-country table (24,278 rows, same units, same quantity total), index unique.
+The 2021-22 =harvest_kg= / =yield_kg= rows are mostly derived totals in =Kg= (530) plus the
+recorded =Kg= harvests; totals in sacks, tines or plates have no kilogram factor on this
+ladder yet.  Read the 179 =harvest-to-date= rows as partial (above).  =Feature('crop_production')=
+equals the country table (24,705 rows, same units, same quantity total), index unique, and
+raises =PopulationHeterogeneityWarning= now that a 2021-22 panel wave joins (red team F11).
+A cold =crop_production(waves=['2018-19'])= lacks the =Derivation= column that an all-waves
+build adds (NA on every 2018-19 row): existing concat behaviour (red team F8).
 
-*Two repeated lines.*  =s16c= repeats (household, field, parcel, crop) on 2 pairs of lines,
-which differ in =s16cq03b= (the roster list item), =s16cq08= and =s16cq10a=; neither pair
-records a harvest.  On the served key each pair is one row: one pair is identical on every
-served column (a lossless de-dup), the other differs in =intercropped=, so the GH #323 audit
-reports it (=GrainCollapseWarning=, 1 of 8,693 rows) and =LSMS_GRAIN_STRICT=1= refuses the
-table.  Niger 2021-22 resolved the same shape with a constructed =production_obs= (GH #1360);
-doing that here changes the country's declared index for 2018-19 too, so it is a question,
-not done.  The builder refuses a third pair, or a pair with a quantity.
-
-*Not served, each for want of a ruling that names this country*: =s16cq16c= as =Quantity_kg=
-(108 rows, the #1436 survey-kg ruling is Mali's and Niger's), =s16dq05c= as =Quantity_sold_kg=
-(1,537 sales; the 2026-11-12 sold-kg ruling names Niger and Mali), =s16dq05d= as
-=Condition_sold= (1,548 sales; GH1528 wired 2018-19 only), and a harvest from the
-dispositions.  Measured for that last one, by code, with Mali's rule
-(=lsms_library.ehcvm.harvest_totals=, run in a measurement only): of 7,136 household-crop
-pairs, 6,397 are finished on every line with no recorded quantity; 3,958 of those have
-dispositions in one unit (3,421 on a single line, 537 that would be =Farm-level=), 2,272 span
-units and 167 record none.  Units of the 3,958: Sac gros 1,424, Yorouba 1,231, Kilogramme 530,
-Autres 315, Sac moyen 256, Tine 162, 40 on bare codes.  (The 2026-11-04 entry's 3,983 / 2,289
-/ 172 counted pairs with any finished row.)
-
-Cache: a new wave script, =2021-22/_/mapping.py= and =_/data_scheme.yml=: one Burkina
-re-warm.  Pinned by =tests/test_burkina_faso_2021_crop_production.py=, whose oracle reads
-=s16c= and =s16d= directly.
+Cache: a new wave script, =2021-22/_/mapping.py=, =2018-19/_/crop_production.py= and
+=_/data_scheme.yml=: one Burkina re-warm.  Pinned by
+=tests/test_burkina_faso_2021_crop_production.py=, whose oracle reads =s16c= and =s16d=
+directly.
 
 * 2026-11-13 -- =interview_date= through the build-time parser (GH #1045)
 
@@ -3686,8 +3736,9 @@ the cross-section none.  Blank strings: 2018-19 one each in =s00q24b= and =s00q2
 cross-section =s00q25a= 3, =s00q25b= 32.  Measured cold, base against branch: the served table
 is frame-equal (52,234 rows, values and dtypes), and =datetime_reports(country='Burkina_Faso')=
 holds twelve reports with 0 =unparsed=, 0 =out_of_range=, 0 =ambiguous=; the sentinels are
-counted, so reads now warn (=DatetimeParseWarning=) and =LSMS_DATE_STRICT=1= refuses the table,
-as it does Ethiopia's.  No =window:=: 2018-19's two vagues (Sep-Nov 2018, Apr-Jun 2019) need
+counted, so every read now emits six =DatetimeParseWarning=s (one per stamp column with a
+sentinel) and =LSMS_DATE_STRICT=1= refuses the table on 2018-19 =int_end='s 3 sentinels,
+where base passed; Ethiopia behaves the same (red team F7).  No =window:=: 2018-19's two vagues (Sep-Nov 2018, Apr-Jun 2019) need
 two spans and a spec takes one, and no 2021-22 span is cited.  The served stamps run 2018-08-31
 to 2019-07-28 and 2021-05-04 to 2022-09-01.
 
@@ -3739,7 +3790,17 @@ rows and =Expenditure= by source and passage:
   within 2x, to 0.77, 35% within 2x; all inferred 2014 rows stay 0.618, 58.6%.
 - Money equal across blocks: 1,090 =(i, j, visit)= with =achat == autocons= (1,151,410 FCFA) and
   353 with =achat == cadeau= (150,525).  =basis='total'= counts each twice: the money side of the
-  GH #864 "serve as recorded" decision.
+  GH #864 "serve as recorded" decision.  (Counted on the raw source rows instead, 1,074
+  rows with =achat == autocons=, 1.14M FCFA, and 350 with =achat == cadeau=, 148k: red team F5.)
+- *=basis='total'= is not comparable across Burkina waves* (red team F5): 2014 now includes
+  self-valued own production and gifts, while 2018-19 and 2021-22 carry none, because EHCVM
+  asks no value for them.
+- *Passages 2-4 rest on variable labels only*: the files label =autocons= / =cadeau= "Montant en
+  fcfa C05 / C06" in all four passages, but only the passage-1 questionnaire is held.  The
+  amounts heap like reported amounts (99.8% multiples of 25, none fractional) and do not look
+  like an imputation (red team F5).
+- 45 money-only produced / inkind rows keep a recorded unit (a unit with no quantity), where
+  the ruling's text says =u = 'Unknown'=: served as recorded (red team F5's count).
 
 Cache: =2014/_/data_info.yml= and =mapping.py=: one Burkina re-warm.  Pinned by
 =tests/test_gh1442_burkina_section_c_values.py= (oracle on the four passage files) and
