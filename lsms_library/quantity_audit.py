@@ -1262,7 +1262,8 @@ def survey_kg_price_factors(df: Any) -> pd.DataFrame | None:
     ``survey_over_implied``
         ``kg_survey / kg_price_implied``.
     ``kg_price_flag``
-        ``'low'`` below :data:`SURVEY_KG_PRICE_BAND`, ``'high'`` above, else None.
+        ``'low'`` below :data:`SURVEY_KG_PRICE_BAND`, ``'high'`` above, else missing
+        (read it with ``notna()``: pandas 3 may store the column as ``str``).
 
     A sale is a row with ``Quantity_sold > 0``, ``Value_sold > 0`` and a usable
     ``Unit_sold`` -- the sale's OWN unit, never the harvest's (GH #824).  The
@@ -1411,7 +1412,7 @@ def audit_survey_kg_prices(df: Any, *, country: str,
     if factors is None:
         return []
     flag = factors["kg_price_flag"].to_numpy(dtype=object)
-    flagged = np.array([f is not None for f in flag], dtype=bool)
+    flagged = factors["kg_price_flag"].notna().to_numpy(dtype=bool)
     if not flagged.any():
         return []
 
@@ -1448,7 +1449,8 @@ def audit_survey_kg_prices(df: Any, *, country: str,
             "reference": implied,
             "survey_over_implied": float(cols["survey_over_implied"][pos]),
             "ratio": round(float(fold), 1),
-            "rung": None if cols["kg_price_rung"][pos] is None else str(cols["kg_price_rung"][pos]),
+            "rung": (None if pd.isna(cols["kg_price_rung"][pos])
+                     else str(cols["kg_price_rung"][pos])),
             "n_unit_sales": int(cols["kg_price_n_unit"][pos]),
             "n_kg_sales": int(cols["kg_price_n_kg"][pos]),
             "unit_price": float(cols["kg_price_unit_price"][pos]),
