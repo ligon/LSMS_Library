@@ -1691,7 +1691,9 @@ are missing-unit sentinels to the kg ladder (=transformations._U_SENTINELS=), so
 =s16bq05= / =s16bq07a=, the gift question; the 2026-11-13 ruling "Fix all three now" names
 Guinea-Bissau, Togo and Benin only.  Measured on =Menage/s16b_me_CIV2018.dta=: =s16bq05= Oui on 890
 applied lines, =s16bq08= (the purchase) Oui on 8,134; gift x purchase Non/Non 2,373, Non/Oui 7,996,
-Oui/Non 752, Oui/Oui 138.  A question for the maintainer.
+Oui/Non 752, Oui/Oui 138.  A question for the maintainer. The same binding survives in four cells after this batch: Senegal 2018-19, Cote d'Ivoire 2018-19,
+Niger 2018-19 and Niger 2021-22 (=Niger/_/CONTENTS.org= records it); =tests/test_ehcvm_plot_inputs_identity.py=
+and =tests/test_senegal_1483_s16b.py= pin it (red team of 2026-11-13, F1).
 
 *Cost, measured* (hash census against =f138a3d61=): 21 of 21 =Country._table_cache_hash= and 42
 =Wave._input_hash= values (the 21 of 2018-19 and the 21 of 2021-22; the four 1985-89 waves do not move);

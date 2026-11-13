@@ -1646,10 +1646,16 @@ purchase), not =s16bq05= / =s16bq07a= (the gift question).  This section is the 
 | =s16bq09a= | 16B.09a. Quelles sont la quantité et la valeur totale de [INTRANT] achetées? |
 | =s16bq09b= | 16B.09b. Unité (12 answers: the five above, Sachet, Tiya, Sac(50kg), Sac(100kg), Boîte, Tas, Waygouizé) |
 | =s16bq09c= | 16B.09c. Montant (CFA), not read |
-Same labels as 2021-22.  The file answers both questions on every applied line but 3 (the
-three hollow lines below): gift and purchase are not exclusive (79 lines say both), and
-=s16bq07a= is filled exactly where =s16bq05= = Oui (804), =s16bq09a= exactly where =s16bq08=
-= Oui (7,128).
+The two flags and the 12-answer =s16bq09b= card read the same in 2021-22; the QUANTITY questions do
+not: 2021-22 asks =s16bq07a= "Quelle quantité en [INTRANT] reçue sous forme de cadeau ou de don?" and
+=s16bq09a= "Quelle est la quantité [INTRANT] achetée?", where 2018 asks for the respondent's estimate
+("Selon vous") of the gift and for "la quantité et la valeur totale" of the purchase.  Read the two
+waves' quantities as the same question asked in different words.  The file answers both flags on
+every applied line but 3 (the three hollow lines below): gift and purchase are not exclusive (79
+lines say both), and =s16bq07a= is filled exactly where =s16bq05= = Oui (804), =s16bq09a= exactly
+where =s16bq08= = Oui (7,128).  *Quantities with no unit:* 6 purchase quantities have no
+=s16bq09b= (7,128 quantities, 7,122 units) and 1 gift quantity has no =s16bq07b= (804, 803); they
+are served with the quantity and an NA =Unit_purchased= / =Unit_received_as_gift=, as filed.
 
 *What is served now* (=2018/_/plot_inputs.py=): =Purchased= =s16bq08=, =Quantity_purchased=
 =s16bq09a=, =Unit_purchased= =s16bq09b=; =Received_as_gift= =s16bq05=,
