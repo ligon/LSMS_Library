@@ -41,6 +41,16 @@ def _committed():
     return updated, panel
 
 
+def _generator():
+    """``_/panel_ids.py`` as a module.  Its data reads and writes sit under
+    ``if __name__ == '__main__'``, so importing it reads and writes nothing."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("benin_panel_ids_for_test", C_DIR / "panel_ids.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 class TestCommittedCrosswalk:
 
     def test_the_shape_of_the_two_files(self):
@@ -89,10 +99,60 @@ class TestCommittedCrosswalk:
         mapping = (countries_root() / "Benin" / NEW / "_" / "mapping.py").read_text(encoding="utf-8")
         assert f"ID_PREFIX = '{PREFIX}'" in mapping
 
-    def test_the_generator_asserts_both_hazards(self):
-        source = (C_DIR / "panel_ids.py").read_text(encoding="utf-8")
-        assert "chained" in source and "occupied" in source
-        assert "PanelHH" in source
+    def test_the_generator_passes_the_committed_crosswalk(self):
+        """panel_ids.check_single_pass, executed on what is committed."""
+        gen = _generator()
+        links = _committed()[0][NEW]
+        targets = set(links.values())
+        gen.check_single_pass(links, baseline=targets | {"999001"},
+                              current=set(links) | {PREFIX + "999001"})
+
+    @pytest.mark.parametrize("hazard,message", [
+        ("chain", "chained"),
+        ("occupied", "held by a 2021-22 household"),
+        ("shared target", "claim one 2018-19 household"),
+        ("not a 2018-19 household", "not a 2018-19 household"),
+        ("not the same key", "not the same"),
+    ])
+    def test_the_generator_refuses_each_hazard(self, hazard, message):
+        """Each guard fires, by its own message, on a map built to break it.  A chain
+        cannot arise from real covers under the prefix, so it is made by hand: a key
+        that is also another key's target, each key still its target's prefixed form."""
+        gen = _generator()
+        links = {PREFIX + "1001": "1001", PREFIX + "1002": "1002"}
+        baseline = {"1001", "1002"}
+        current = set(links)
+        if hazard == "chain":
+            links = {PREFIX + PREFIX + "1001": PREFIX + "1001", PREFIX + "1001": "1001"}
+            baseline = {PREFIX + "1001", "1001"}
+            current = set(links)
+        elif hazard == "occupied":
+            current = current | {"1001"}          # a 2021-22 household holding a target
+        elif hazard == "shared target":
+            links = {**links, PREFIX + "1003": "1001"}
+        elif hazard == "not a 2018-19 household":
+            baseline = {"1001"}
+        elif hazard == "not the same key":
+            links = {PREFIX + "1001": "1002"}
+        with pytest.raises(AssertionError, match=message):
+            gen.check_single_pass(links, baseline, current)
+
+    def test_the_generator_links_by_panelhh_and_the_2018_key(self):
+        """panel_ids.link on invented covers: Panel and recurring links; Panel without a
+        2018-19 key, Non panel recurring and Non panel new keep their own id."""
+        gen = _generator()
+        old = pd.DataFrame({"grappe": [1, 1, 2], "menage": [1, 2, 1]})
+        new = pd.DataFrame({"grappe": [1, 1, 2, 2], "menage": [1, 2, 1, 9],
+                            "PanelHH": ["Panel", "Non panel", "Panel", "Non panel"]})
+        links, baseline, current, counts = gen.link(old, new)
+        assert links == {PREFIX + "1001": "1001", PREFIX + "2001": "2001"}
+        assert counts == {"panel_no_target": 0, "recurring_non_panel": 1, "linked": 2, "own_id": 2}
+        gen.check_single_pass(links, baseline, current)
+        new.loc[3, "PanelHH"] = "Panel"
+        assert gen.link(old, new)[3]["panel_no_target"] == 1
+        new.loc[3, "PanelHH"] = "Oui"           # a vocabulary the rule was not written for
+        with pytest.raises(AssertionError):
+            gen.link(old, new)
 
 
 def _key(g, m):
@@ -124,6 +184,17 @@ class TestAgainstTheFiles:
         assert int(((panel != "Panel") & recurs).sum()) == 116
         assert int(((panel != "Panel") & ~recurs).sum()) == 1027
 
+    def test_the_generator_on_the_files_is_the_committed_crosswalk(self, covers):
+        """panel_ids.link and check_single_pass, executed on the real covers (the work
+        `make panel-ids` does, without the write)."""
+        new, old = covers
+        gen = _generator()
+        links, baseline, current, counts = gen.link(old.drop(columns="key"), new.drop(columns="key"))
+        gen.check_single_pass(links, baseline, current)
+        assert links == _committed()[0][NEW]
+        assert counts == {"panel_no_target": 11, "recurring_non_panel": 116,
+                          "linked": LINKED, "own_id": 1154}
+
     def test_the_2021_cover_records_no_2018_id(self, covers):
         """The link has to be the key itself: nothing else on the cover points back."""
         new, _ = covers
@@ -152,7 +223,11 @@ class TestAgainstTheFiles:
                 other.append((k, rest[len(k) % len(rest)]))
         control = (sex21.reindex([a for a, _ in other]).to_numpy()
                    == sex18.reindex([b for _, b in other]).to_numpy()).mean()
-        assert agree > 0.94 and control < 0.75, (agree, control)
+        # Measured 0.948 linked against 0.676 control (and 0.836 on the 116 recurring
+        # Non-panel keys).  The floor is set at 0.90, not at the measurement: what this
+        # guards against is a crosswalk onto the WRONG households, which falls to
+        # control level, not a drift of a few households in a regeneration.
+        assert agree > 0.90 and control < 0.75 and agree - control > 0.2, (agree, control)
 
     def test_served_ids_walk_once_and_keep_their_cluster(self):
         with warnings.catch_warnings():

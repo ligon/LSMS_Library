@@ -10,8 +10,11 @@
 # framework used to fall back to, `(cd $(@D) && python <table>.py)`, and the
 # target names are the in-tree names the framework asks for; the scripts write
 # under data_root() through to_parquet, so a target never exists in the tree and
-# make always runs the recipe it is asked for.  A script that fails now fails
-# the build (CalledProcessError) instead of being warned about and skipped.
+# make always runs the recipe it is asked for.  Failure behaviour is unchanged:
+# a failing wave script raised CalledProcessError before this file existed too
+# (from the direct run); now the error names the make target instead of the
+# script, and the "Makefile not found" warning is gone.  Measured cold, serial,
+# all waves (GH #1705 red team).
 
 rounds := $(shell ls -d ../[12]*)
 

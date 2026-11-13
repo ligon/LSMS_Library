@@ -1408,8 +1408,18 @@ eight checks: 6,878 chain endpoints present, 2018-19 -> 2021-22 attrition 6,878 
 - *The Makefile is Benin's first* (=_/Makefile=).  It exists for =make panel-ids=, but once it exists
   =Wave.grab_data= builds every script-path wave table through =make=, so it carries one rule per wave
   script, with the recipe the framework ran directly before.  The cold comparison above is the check
-  that the route changed nothing; the visible difference is that the "Makefile not found" warning is
-  gone, and that a failing wave script now fails the build instead of being skipped.
+  that the route changed nothing served.  *Failure behaviour is unchanged*: a failing wave script raised
+  =CalledProcessError= before the Makefile existed too, from the direct run (measured by the red team,
+  job 41277364, a =raise SystemExit= at the top of =2021-22/_/plot_labor.py=, cold, serial, all waves;
+  an earlier version of this paragraph said the opposite, wrongly).  What does change:
+  - the "Makefile not found" =UserWarning= is gone (2 per script table per cold build before, 0 now);
+  - the error names the make target (=make -s ../2021-22/_/plot_labor.parquet=) instead of the script;
+  - the wave scripts now run in =Wave.grab_data=, the stage-1 builder that =_parallel_waves= fans out
+    when =LSMS_BUILD_WORKERS= > 1 (measured frame-equal at 2 by the red team, job 41277363), instead of
+    in the serial legacy fallback;
+  - =Country._probe_country_builder= now asks =make -n= for each =materialize: make= table where it
+    used to answer "no _/Makefile"; the answer is the same for every Benin table (no =var/= rule;
+    =plot_features= has its country script).
 
 * 2026-11-13 -- 2018-19 =plot_inputs=: the purchase, the gift and the blank unit
 

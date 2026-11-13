@@ -65,6 +65,25 @@ class TestServed:
         assert p["Unit_purchased"].notna().sum() == s16b["s16bq09b"].notna().sum()
         assert p["Unit_received_as_gift"].notna().sum() == s16b["s16bq07b"].notna().sum()
 
+    def test_the_unit_columns_are_spelled_as_u_and_as_2021(self, frames):
+        """The payload unit columns are served as the `u` level is (GH #1705 red team
+        F2): a 2018-19 kilogram purchase reads 'Kg', as 2021-22's does, not the raw
+        'Kilogramme' a filter on 'Kg' would miss."""
+        _, p = frames
+        path = countries_root() / "Benin" / WAVE / "Data" / "s16b_me_ben2018.dta"
+        labels = get_dataframe(path, convert_categoricals=True)
+        labels = labels[(get_dataframe(path, convert_categoricals=False)["s16bq02"] == 1).to_numpy()]
+        u = set(p.index.get_level_values("u").astype(str))
+        for col, raw in (("Unit_purchased", "s16bq09b"), ("Unit_received_as_gift", "s16bq07b")):
+            served = p[col].dropna().astype(str)
+            assert not served.eq("Kilogramme").any(), col
+            assert served.eq("Kg").sum() == labels[raw].astype(str).eq("Kilogramme").sum() > 0, col
+        assert "Kg" in u and "Kilogramme" not in u
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            new = ll.Country("Benin").plot_inputs(waves=["2021-22"])
+        assert "Kg" in set(new["Unit_purchased"].dropna().astype(str))
+
     def test_the_blank_unit_is_unknown(self, frames):
         s16b, p = frames
         u = p.index.get_level_values("u").to_series()

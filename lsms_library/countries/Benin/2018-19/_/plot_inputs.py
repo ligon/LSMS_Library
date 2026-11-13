@@ -19,7 +19,11 @@ Fixed on the ruling "Fix all three now" (@ligon 2026-11-13; Togo 2018 and
 Guinea-Bissau 2018-19 had the same defect), as Burkina Faso's 2018-19 script
 was (GH #1188) and as this country's 2021-22 script already reads it.  Each
 acquisition unit is decoded from its OWN variable's labels and left NA where
-blank; only the index ``u`` takes the missing-unit sentinel.
+blank; only the index ``u`` takes the missing-unit sentinel.  The two unit
+COLUMNS are spelled as the API serves ``u`` (``ehcvm.served_unit_labels``, as
+2021-22 does): the read-time ``u`` table reaches only a level named ``u``, so
+the country table alone left them 'Kilogramme' where ``u`` and 2021-22 say 'Kg'
+(GH #1705 red team F2).
 
 A blank unit of use (one row in this release: 100 of "Autres semences",
 grappe 166, menage 133) is ``u = 'Unknown'``, the canonical missing-unit
@@ -46,6 +50,7 @@ sys.path.append('../../_/')
 import pandas as pd
 
 import lsms_library.local_tools as tools
+from lsms_library.ehcvm import served_unit_labels
 from lsms_library.local_tools import get_dataframe, to_parquet
 from benin import i as benin_i
 
@@ -92,6 +97,16 @@ def _unit_labels(unit_series, unit_map):
     for units not in the table."""
     u = unit_series.astype('string')
     return u.map(lambda x: unit_map.get(x, x) if pd.notna(x) else pd.NA).astype('string')
+
+
+def _served_units(unit_series):
+    """Each unit label as the Country API serves ``u`` (2021-22's ``_units``);
+    NA stays NA.  For the payload unit COLUMNS, which the read-time ``u`` table
+    does not reach."""
+    raw = unit_series.astype('string').str.strip().str.replace(r'^(\d+)\.0$', r'\1', regex=True)
+    known = raw.dropna().unique()
+    served = dict(zip(known, served_unit_labels('Benin', known)))
+    return raw.map(served).astype('string')
 
 
 def _finish_plot_inputs(df, t):
@@ -158,10 +173,10 @@ df = pd.DataFrame({
     'Quantity':           pd.to_numeric(srcn['s16bq03a'], errors='coerce').values,
     'Purchased':          purchased.values,
     'Quantity_purchased': pd.to_numeric(srcn['s16bq09a'], errors='coerce').values,
-    'Unit_purchased':     _unit_labels(src['s16bq09b'], unit_map).values,
+    'Unit_purchased':     _served_units(src['s16bq09b']).values,
     'Received_as_gift':   received_as_gift.values,
     'Quantity_received_as_gift': pd.to_numeric(srcn['s16bq07a'], errors='coerce').values,
-    'Unit_received_as_gift': _unit_labels(src['s16bq07b'], unit_map).values,
+    'Unit_received_as_gift': _served_units(src['s16bq07b']).values,
 })
 
 df = _finish_plot_inputs(df, '2018-19')

@@ -91,65 +91,92 @@ def _id_2021_22(g, m):
     return _m21.i(pd.Series([g, m]))
 
 
-cover_18 = get_dataframe(_HERE.parent / '2018-19' / 'Data' / 's00_me_ben2018.dta')
-cover_21 = get_dataframe(_HERE.parent / '2021-22' / 'Data' / 's00_me_ben2021.dta',
-                         convert_categoricals=True)
-assert cover_18[['grappe', 'menage']].notna().all(axis=None), '2018-19 cover: blank grappe/menage'
-assert cover_21[['grappe', 'menage']].notna().all(axis=None), '2021-22 cover: blank grappe/menage'
+def _require(condition, message):
+    """An assertion that survives ``python -O``: these guards are the design."""
+    if not condition:
+        raise AssertionError(message)
 
-ids_18 = [_id_2018_19(g, m) for g, m in _pair(cover_18)]
-ids_21 = [_id_2021_22(g, m) for g, m in _pair(cover_21)]
-baseline = set(ids_18)
-current = set(ids_21)
-assert len(baseline) == len(cover_18), '2018-19 cover: (grappe, menage) is not a household key'
-assert len(current) == len(cover_21), '2021-22 cover: (grappe, menage) is not a household key'
-# The two namespaces must be disjoint for the construction below to hold.
-assert all(i.startswith(PREFIX) for i in current), 'a 2021-22 id lacks the wave prefix'
-assert not any(i.startswith(PREFIX) for i in baseline), 'a 2018-19 id carries the 2021-22 prefix'
-# ... and the 2021-22 id must be the prefix on the 2018-19 spelling of the same key.
-assert all(_id_2021_22(g, m) == PREFIX + _id_2018_19(g, m) for g, m in _pair(cover_21))
 
-flag = cover_21['PanelHH'].astype('string').str.strip()
-assert set(flag.dropna()) == {'Panel', 'Non panel'} and flag.notna().all(), (
-    f'PanelHH vocabulary changed: {sorted(flag.dropna().unique())}; review the rule')
-is_panel = (flag == 'Panel').to_numpy()
+def link(cover_18, cover_21):
+    """The crosswalk from the two covers, by the rule in the module docstring.
 
-links: dict[str, str] = {}
-panel_no_target = []
-recurring_non_panel = 0
-for (g, m), cur, panel in zip(_pair(cover_21), ids_21, is_panel):
-    prev = _id_2018_19(g, m)
-    if panel and prev in baseline:
-        links[cur] = prev
-    elif panel:
-        panel_no_target.append(cur)
-    elif prev in baseline:
-        recurring_non_panel += 1
+    Returns ``(links, baseline, current, counts)``: ``{2021-22 id: 2018-19 id}``, the
+    2018-19 ids, every 2021-22 id (the FULL cover), and the counts the PR reports.
+    """
+    _require(cover_18[['grappe', 'menage']].notna().all(axis=None), '2018-19 cover: blank grappe/menage')
+    _require(cover_21[['grappe', 'menage']].notna().all(axis=None), '2021-22 cover: blank grappe/menage')
+    ids_18 = [_id_2018_19(g, m) for g, m in _pair(cover_18)]
+    ids_21 = [_id_2021_22(g, m) for g, m in _pair(cover_21)]
+    baseline, current = set(ids_18), set(ids_21)
+    _require(len(baseline) == len(cover_18), '2018-19 cover: (grappe, menage) is not a household key')
+    _require(len(current) == len(cover_21), '2021-22 cover: (grappe, menage) is not a household key')
+    # The two namespaces must be disjoint for the construction below to hold ...
+    _require(all(i.startswith(PREFIX) for i in current), 'a 2021-22 id lacks the wave prefix')
+    _require(not any(i.startswith(PREFIX) for i in baseline), 'a 2018-19 id carries the 2021-22 prefix')
+    # ... and the 2021-22 id must be the prefix on the 2018-19 spelling of the same key.
+    _require(all(c == PREFIX + _id_2018_19(g, m) for (g, m), c in zip(_pair(cover_21), ids_21)),
+             'a 2021-22 id is not the prefixed 2018-19 spelling of its key')
 
-# ---- the single-pass hazards, asserted (Burkina Faso's pattern, GH #1245) ----
-targets = list(links.values())
-assert len(set(targets)) == len(targets), 'two 2021-22 households claim one 2018-19 household'
-assert set(targets) <= baseline, 'a target is not a 2018-19 household'
-assert all(cur == PREFIX + prev for cur, prev in links.items()), 'a link is not the same (grappe, menage)'
-# Chain: a key that is also a target.  Rename-onto-occupied: a target that a
-# 2021-22 household holds as its own id (the FULL cover, not just the linked).
-chained = set(links) & set(targets)
-occupied = set(targets) & current
-assert not chained, f'{len(chained)} chained entries: {sorted(chained)[:5]}'
-assert not occupied, f'{len(occupied)} targets held by a 2021-22 household: {sorted(occupied)[:5]}'
+    flag = cover_21['PanelHH'].astype('string').str.strip()
+    _require(set(flag.dropna()) == {'Panel', 'Non panel'} and bool(flag.notna().all()),
+             f'PanelHH vocabulary changed: {sorted(flag.dropna().unique())}; review the rule')
+    is_panel = (flag == 'Panel').to_numpy()
 
-updated_ids = {'2018-19': {}, '2021-22': dict(sorted(links.items()))}
+    links: dict[str, str] = {}
+    counts = {'panel_no_target': 0, 'recurring_non_panel': 0}
+    for (g, m), cur, panel in zip(_pair(cover_21), ids_21, is_panel):
+        prev = _id_2018_19(g, m)
+        if panel and prev in baseline:
+            links[cur] = prev
+        elif panel:
+            counts['panel_no_target'] += 1
+        elif prev in baseline:
+            counts['recurring_non_panel'] += 1
+    counts['linked'] = len(links)
+    counts['own_id'] = len(current) - len(links)
+    return dict(sorted(links.items())), baseline, current, counts
 
-recursive_D = RecursiveDict()
-for cur, prev in updated_ids['2021-22'].items():
-    recursive_D[('2021-22', cur)] = ('2018-19', prev)
 
-with open(_HERE / 'panel_ids.json', 'w') as f:
-    json.dump({','.join(k): ','.join(v) for k, v in recursive_D.data.items()}, f)
+def check_single_pass(links, baseline, current):
+    """Raise AssertionError unless a single-pass ``id_walk`` over ``links`` is safe.
 
-with open(_HERE / 'updated_ids.json', 'w') as f:
-    json.dump(updated_ids, f)
+    The single-pass hazards (CLAUDE.md "Panel ID Transitive Chains", Burkina Faso's
+    pattern, GH #1245): a CHAIN is a key that is also a target; a RENAME-ONTO-OCCUPIED
+    is a target that a 2021-22 household holds as its own id -- ``current`` is the FULL
+    2021-22 cover, not just the linked households.  Also refused: two households on one
+    target, a target that is no 2018-19 household, and a link that is not the same key.
+    """
+    targets = list(links.values())
+    _require(len(set(targets)) == len(targets), 'two 2021-22 households claim one 2018-19 household')
+    _require(set(targets) <= set(baseline), 'a target is not a 2018-19 household')
+    _require(all(cur == PREFIX + prev for cur, prev in links.items()),
+             'a link is not the same (grappe, menage)')
+    chained = set(links) & set(targets)
+    occupied = set(targets) & set(current)
+    _require(not chained, f'{len(chained)} chained entries: {sorted(chained)[:5]}')
+    _require(not occupied, f'{len(occupied)} targets held by a 2021-22 household: {sorted(occupied)[:5]}')
 
-print(f'Benin 2021-22 -> 2018-19: {len(links)} linked; PanelHH = Panel without a 2018-19 '
-      f'household: {len(panel_no_target)}; recurring keys flagged Non panel, not linked: '
-      f'{recurring_non_panel}; 2021-22 households keeping their own id: {len(current) - len(links)}')
+
+def write(links):
+    """Write the two committed sources beside this script (GH #914)."""
+    updated_ids = {'2018-19': {}, '2021-22': dict(sorted(links.items()))}
+    recursive_D = RecursiveDict()
+    for cur, prev in updated_ids['2021-22'].items():
+        recursive_D[('2021-22', cur)] = ('2018-19', prev)
+    with open(_HERE / 'panel_ids.json', 'w') as f:
+        json.dump({','.join(k): ','.join(v) for k, v in recursive_D.data.items()}, f)
+    with open(_HERE / 'updated_ids.json', 'w') as f:
+        json.dump(updated_ids, f)
+
+
+if __name__ == '__main__':
+    cover_18 = get_dataframe(_HERE.parent / '2018-19' / 'Data' / 's00_me_ben2018.dta')
+    cover_21 = get_dataframe(_HERE.parent / '2021-22' / 'Data' / 's00_me_ben2021.dta',
+                             convert_categoricals=True)
+    links, baseline, current, counts = link(cover_18, cover_21)
+    check_single_pass(links, baseline, current)
+    write(links)
+    print(f"Benin 2021-22 -> 2018-19: {counts['linked']} linked; PanelHH = Panel without a "
+          f"2018-19 household: {counts['panel_no_target']}; recurring keys flagged Non panel, "
+          f"not linked: {counts['recurring_non_panel']}; 2021-22 households keeping their own "
+          f"id: {counts['own_id']}")
