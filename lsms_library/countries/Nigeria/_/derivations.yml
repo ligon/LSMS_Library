@@ -328,7 +328,7 @@ Nigeria::community_prices::c8-unrecorded-size-drop:
         records the same drop from the serving side.
   validated_against: >-
     the build's own drop predicate: `derivation_inputs` returns exactly the
-    source rows the wave scripts remove -- W3_DROP_COUNT rows for 2015-16 (g / cl
+    source rows the wave scripts remove -- 11,170 rows for 2015-16 (g / cl
     only since GH #587, 2026-11-13; 14,603 with the Kg / l rows before), 0 for 2018-19, 182 for 2023-24 (133 g + 49
     cl, GH #587) -- and every
     served row of community_prices under a metric unit either carries the
@@ -1105,7 +1105,7 @@ Nigeria::food_acquired::w2-pp-food-conversion: &w2_food_conversion
     a served key whose contributors the table does not all cover keeps
     Quantity_kg NA (0 such keys).
   function: lsms_library.countries.Nigeria._.nigeria:derive_food_conversion_kg
-  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_food_acquired_conversion
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_food_acquired_w2_pp_conversion
   raw_variables: [hhid, item_cd, zone, s7bq3a, s7bq3b, s7bq4, s7bq6a, s7bq6b,
                   s7bq7a, s7bq7b, s10bq3a, s10bq3b, s10bq4, s10bq6a, s10bq6b,
                   s10bq7a, s10bq7b, conv, g_cl, nsu_cd, s7bq2b]
@@ -1157,6 +1157,7 @@ Nigeria::food_acquired::w2-pp-food-conversion: &w2_food_conversion
 Nigeria::food_acquired::w2-ph-food-conversion:
   <<: *w2_food_conversion
   rows: {t: '2013Q1'}
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_food_acquired_w2_ph_conversion
 
 Nigeria::food_acquired::w3-food-conversion:
   waves: ['2015-16']

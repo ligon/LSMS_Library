@@ -4147,10 +4147,11 @@ def _read_conversion_table(path):
     return get_dataframe(path, convert_categoricals=False)
 
 
-def inputs_food_acquired_conversion(wave):
+def inputs_food_acquired_conversion(wave, rounds=None):
     """The registry `inputs` callable of the GH #1502 table conversions.
 
-    One row per DERIVED served row of the wave's two rounds, indexed
+    One row per DERIVED served row of the wave's rounds (both, or those in
+    ``rounds``), indexed
     ``(t, i, j, u, s)`` as the served table is (``i``, ``j``, ``u`` decoded as
     the build decodes them), with the source row's original variables --
     ``hhid``, ``item_cd``, ``zone`` and the source's own quantity, unit (and
@@ -4167,7 +4168,7 @@ def inputs_food_acquired_conversion(wave):
     here = countries_root() / 'Nigeria' / folder / '_'
     frames = []
     for t in (PP_QUARTER[folder], PH_QUARTER[folder]):
-        if t not in FOOD_CONVERSION_SOURCES:
+        if t not in FOOD_CONVERSION_SOURCES or (rounds and t not in rounds):
             continue
         sp = FOOD_CONVERSION_SOURCES[t]
         with contextlib.chdir(here):
@@ -4200,6 +4201,16 @@ def inputs_food_acquired_conversion(wave):
     if not frames:
         return pd.DataFrame()
     return pd.concat(frames).sort_index()
+
+
+def inputs_food_acquired_w2_pp_conversion(wave='2012-13'):
+    """`inputs` of `Nigeria::food_acquired::w2-pp-food-conversion`: 2012Q3 only."""
+    return inputs_food_acquired_conversion(wave, rounds=('2012Q3',))
+
+
+def inputs_food_acquired_w2_ph_conversion(wave='2012-13'):
+    """`inputs` of `Nigeria::food_acquired::w2-ph-food-conversion`: 2013Q1 only."""
+    return inputs_food_acquired_conversion(wave, rounds=('2013Q1',))
 
 
 def food_acquired_for_wave(fn, t, sources, expenditure,
