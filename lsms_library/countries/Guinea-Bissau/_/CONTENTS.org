@@ -1124,6 +1124,9 @@ the same slice (#1487).  The ladder over both waves: =metric= 24,830, =item_unit
 =item_unit_tight= 7,495, =unit= 136,208, =none= 4 (2018-19 alone on base: 12,974 / 45,574 / 2,232 / 66,141 / 4).
 2021-22 adds 129,382 =food_quantities= rows (248,610 kg on =u = kg=) and 80,647 =food_prices= rows.  This
 is disclosed, as for Malawi 2024-25, and not a correction: the pool now holds rounded 2021-22 rows.
+Wiring the wave also brings a =StatedVsInferredKgWarning= on =food_quantities= and =food_prices= (none on
+base): =saco (25 kg)= is inferred at 0.0125 kg against its stated 25 kg; the stated factor is served
+(=metric= rung).  Which wave's rows carry the label was not counted.
 
 ** 2018-19 finding, not served through
 
