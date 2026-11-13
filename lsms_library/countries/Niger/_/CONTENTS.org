@@ -4031,9 +4031,10 @@ total keyed against a small unit's label; that is not established.  Served as re
 - *The state rung decides 4,187 of 2021-22's 9,020 rows*, and removes 2 low names (state-blind: 4).
   2011-12 and 2014-15 record no state.
 - *2018-19 has nothing to judge* (no kilograms), and its 21 =Kg= sales are a thin baseline for a
-  rung: every cell one could serve rests on exactly 5 of them, from 2 households (a 5-household gate
-  leaves 23 of the 161 servable rows; red team F2), all roselle (=Oseille=) and fresh
-  tomato, and within roselle a =Gros sac= (21 kg, 37 sales) reads lighter than a =Sac Moyen= (28 kg,
+  rung: every cell one could serve rests on exactly 5 of them, all roselle (=Oseille=) and fresh tomato.
+  Roselle's 5 come from 2 households and tomato's from 5, so a 5-household gate keeps the 23 tomato
+  rows of the 161 (red team F2).
+  Within roselle a =Gros sac= (21 kg, 37 sales) reads lighter than a =Sac Moyen= (28 kg,
   6 sales).  Whether those masses are wrong is not established (roselle is light); the size
   inversion is recorded in the memo, and nothing is served from it.
 - *Region* is not a rung (it lives in =cluster_features=): a region-then-national ladder names 155

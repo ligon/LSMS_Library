@@ -4101,9 +4101,15 @@ seasonal rows, with keys rebuilt as =2017-18/_/crop_production.py= builds them (
 positive on 23,205 of them, and it is 1 on every one of the 1,688 =Kg= rows.  So it is a factor per
 unit, the canonical =KgFactor= slot (the =reported= layer).  =Sac= reads 100 on 95% of millet rows,
 so it looks like a nominal conversion, not a weighing.  Simulated through today's ladder, wiring it
-would serve the wave 32.8M kg against 1.66M now (=reported= 21,039 rows, =survey_median= 2,345,
-=none= 1,535; 2,167 refused by the reported-factor screen, reasons not split), and household-crops
-with kilograms would go from 7.6% to 94.6%; no other wave moves.  No ruling leaves it unwired; the
+would serve the wave 32.8M kg against 1.66M now: =reported= 21,039 rows and 25.9M kg, =survey_median=
+2,345 rows and 7.2M kg, =none= 1,535.  The 2,167 rows the reported-factor screen refuses are all above
+the 250 kg ceiling (red team: =Charretée= 1,576, =Autre= 534, =Sac= 31, =Grenier= 21) and none is left
+unserved: =survey_median= re-serves each at the median of the accepted factors for its unit, about
+6.0M kg, where their own factors would give 82.2M, so 1,576 of the 3,729 cart rows are capped at the
+median of other carts.  Whether the ceiling should apply to the survey's own factor is the memo's Q5.
+(The red team's re-join on household, plot and quantity, without the crop map, counts 33.1M kg and
+2,162 refused; the gap is 76 rows that join cannot tell apart.)  Household-crops with kilograms, all
+crops, would go from 7.6% to 94.6%; no other wave moves.  No ruling leaves it unwired; the
 "No ... kg factor ... follows" lines in the 2026-11-09 / -10 entries on the EACI 2017 state bridge
 are about the state, not this column.  2014-15's sibling =s3aq08c= is positive on 9,502 of 9,571
 rows but mixes factors and totals (it equals the quantity on 10% of =Kg= rows, and on those 511
@@ -4114,7 +4120,8 @@ of its own, asked first in the #1559 rung memo (Q0).  Not done here.
 jobs 41275992, 41276357, 41276727 and 41279383), nothing served:
 - 2017-18 is mostly unconverted today (23,160 of 24,921 rows on =none=; 1.66M kg served).  A
   price-implied =Sac= (=Mil= 120 kg, =Maïs= 105, =Arachide= 60, =Coton= 100) would serve 9,052 of them
-  and the wave would gain 14.8M kg: a change of coverage (household-crops with kilograms from about
+  and the wave would gain 14.8M kg: a change of coverage (millet, maize and groundnut household-crops
+  with kilograms from about
   5% to 65-85%), not of level.  Its baselines sit at the floor: the =Arachide=, =Mil= and =Maïs=
   cells (8,673 rows, 10.9M kg) rest on 5, 5 and 7 =Kg= sales from 5, 5 and 7 households, because the
   EAC-I sold sacks state no size.  The top 1% of served rows carry 27.3% of the 14.8M kg, and one row
