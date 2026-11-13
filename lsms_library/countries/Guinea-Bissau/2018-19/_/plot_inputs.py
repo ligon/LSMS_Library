@@ -10,8 +10,8 @@ roster, one row per input-type the household was asked about.  Columns:
   s16bq01   input type (organic / inorganic fert / phyto / seeds-by-crop)
   s16bq02   USED this input? (1=Sim / 2=Não) — application gate
   s16bq03a / s16bq03b   quantity used + native unit
-  s16bq05   purchased? (Sim / Não)
-  s16bq07a  quantity purchased (native unit)
+  s16bq05   received as a GIFT? (Sim / Não) -- served as `Purchased`, see below
+  s16bq07a  quantity received as a gift (native unit) -- served as `Quantity_purchased`
 
 We keep s16bq02==1 (applied) rows (the held file ships only those: 5,534 of
 5,534).  The EHCVM roster has NO crop column — the seed's crop is embedded in
@@ -38,10 +38,10 @@ normally; 'Quilograma' and 'Grama' take their mass from the country's u_kg
 declaration at read time, not from a relabel here.
 
 `Purchased` / `Quantity_purchased` read s16bq05 / s16bq07a, as since this
-script was written.  s16bq06 ('Outro agregado familiar', 'ong', 'Estado',
-'Outro') names who GAVE the input, so s16bq05 looks like the gift question
-and s16bq08 / s16bq09a the purchase, as Benin's and Togo's CONTENTS.org
-record for their 2018 files.  Recorded, not changed here (GNB CONTENTS.org).
+script was written.  Their variable labels make them the GIFT question and
+quantity ("16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de don?";
+s16bq06 names the giver); the purchase is s16bq08 / s16bq09a, as Benin's and
+Togo's CONTENTS.org record for their 2018 files.  Recorded, not changed here (GNB CONTENTS.org).
 """
 import os
 

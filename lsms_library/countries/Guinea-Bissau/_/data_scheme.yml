@@ -199,8 +199,8 @@ Data Scheme:
     # token, so the index level survives the framework's NaN-key collapse.
     # `u` via the Portuguese `u` table; `Quilograma` / `Grama` take their mass
     # from the country `u_kg` table; a missing unit is the sentinel `Unknown`
-    # (none in the held file).  Purchased from s16bq05 ('Sim' / 'Não'), which
-    # looks like the gift question (s16bq06 names the giver): CONTENTS.org.
+    # (none in the held file).  Purchased from s16bq05 ('Sim' / 'Não'), which by
+    # its variable label is the GIFT question (s16bq08 is the purchase): CONTENTS.org.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool

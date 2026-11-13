@@ -907,7 +907,9 @@ isa-sm-20261113, burst job 41271716).
   =NPK= (no grade is printed, so the generic =npk= share applies, as for Togo's =NPK/Formule unique=).
   =DAP e outros adubos inorgânicos= (code 6, 41 applied rows) is a mixed bucket and stays RAW and
   unmatched until #1696 is ruled (#1107's own instruction); the organic labels stay refused (#867).
-  =nitrogen_kg= goes from 0 to 293 matched rows (Urea 190, Phosphate 57, NPK 46), 188 households.
+  =nitrogen_kg= goes from 0 to 293 matched rows (Urea 190, Phosphate 57, NPK 46), 188 households;
+  257 of the 293 carry a mass (=Quilograma= 244, =Grama= 13), the other 36 are in =Outras= (31),
+  =Litro= (4) or =Tonelada= (1).  The nitrogen total was not measured.
 - *Kilograms (#1107).*  The s16b unit card is =1 Grama, 2 Quilograma, 3 Tonelada, 4 Litro, 5 Carroça,
   6 Outras=, none of them in =transformations.KNOWN_METRIC=.  A country =u_kg= table declares
   =Quilograma= 1 kg and =Grama= 0.001 kg under the file's own labels (no served label changes; gram
@@ -1002,7 +1004,8 @@ reported shocks carry follow-ups and are served; a cross-wave incidence reads as
 
 ** assets
 
-The owned lines of the grid (29,727 of 240,795, =s12q02 = Oui=).  43 of the 45 item labels are
+The owned lines of the grid (29,727 of 240,795, =s12q02 = Oui=; 29,713 are served, because 14 owned
+lines record no number).  43 of the 45 item labels are
 2018-19's character for character; codes 25 and 30 are respelled and =harmonize_assets= gains them.
 GH #1566's =s12q09= check, measured: 4 of 29,407 positive values off the 25 grid, no non-integer,
 no sentinel shape (2018-19: 1 of 28,428).
@@ -1018,9 +1021,12 @@ without =vague=).  But:
 - *Every positive 2021-22 =s07bq03a= (128,229) and =s07bq07a= (96,262) is an EVEN integer*, in every
   unit: Kg, Litro, Unidade (33,961 counts, not one odd), Monte, the rest.  =s07bq04= / =s07bq05= are
   99.9% even (23 odd each).  No =Kg= or =Litro= row equals 1 or is below 1.
-- 2018-19: 38.6% of positive q3 even, 4.5% halves, =Kg= mode 1.  The other 2021-22 EHCVM-2 waves:
-  4-7% halves.  The SAME 2021-22 release holds halves elsewhere (s16b q03a 159, s16c q16a 92), so the
-  CAPI took decimals.
+- 2018-19: 38.6% of positive q3 even, 4.5% halves, =Kg= mode 1.  Senegal 2021-22, measured the same
+  way: 6.66% halves, 89.95% integers (Mali 2018-19: 4.11% halves).  The 2026-11-12 check put Benin,
+  Burkina, Mali and Niger 2021-22 q3 0.04-1% OFF the quarter grid, which is not a count of halves.
+  The SAME 2021-22 GNB release holds halves elsewhere (s16b q03a 159, s16c q16a 92), so the CAPI
+  took decimals.  A second reader (pyreadstat, the same blob) agrees: =s07bq03a= is stored as Stata
+  =int8= (=%8.0g=), 0 non-integer and 0 odd values.
 - It is a rounding, not a doubling: per item x unit x size cell (95 cells shared with 2018-19) the
   median q3 ratio 2021/2018 is 1.00, the mean ratio 1.20 (Litro 1.93, Kg 1.25, Unidade 1.13).
 - *3,945 consumed-yes rows carry q3 = 0* (2018-19: 0), 1,881 Kg and 1,682 Litro (palm oil, lemon
@@ -1028,7 +1034,16 @@ without =vague=).  But:
   purchase value (median 750 FCFA).  None has any =depan= in =ehcvm_conso_gnb2021=, so UEMOA's
   aggregate was built from these rounded quantities.
 - The #876 rule reproduces =depan(Compra)= within 1% on 91.3% of rows; that is arithmetic, since the
-  rule is scale-invariant in q3 and q7a together, and says nothing about the quantities.
+  rule is scale-invariant in q3 and q7a TOGETHER, and says nothing about the quantities.  Nor is
+  =Expenditure= exempt: rounding moves q3 and q7a SEPARATELY, so purchased quantity x s07bq08 /
+  s07bq07a inherits both errors.
+- *The rule fits 2 x round-half-up(x / 2)*, the nearest even integer.  Applied to 2018-19's q3 it
+  reproduces 2021-22's shares (Kg: 0 / 2 / 4 at 12.6 / 44.9 / 10.9% against the observed 13.8 /
+  45.4 / 8.8%, mean 5.82 against 5.81; Litro, Unidade and Monte alike), where 2 x round-half-even,
+  2 x floor and 2 x ceil do not.  It maps 1, 2 and 2.5 all to 2 and 0.5 to 0, so it CANNOT be
+  inverted.  Unverified hypothesis: Stata's =round(x, 2)= rounds to the nearest multiple of 2, so a
+  =round(q, 2)= written for "2 decimals" would produce exactly this, a processing slip rather than an
+  imputation.  q4 and q5 keep 23 odd values each, which one rounding of all three would not leave.
 - Documented nowhere found: the English BID (7B description, section 7 processing), the EHCVM-2
   enumerator manual (Q7B.03-Q7B.08 ask the quantity actually consumed, in its unit), and the World
   Bank DDI (=dataProcessing= empty, isa-sm-20261112 docsearch).
