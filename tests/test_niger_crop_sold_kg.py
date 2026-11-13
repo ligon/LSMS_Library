@@ -306,6 +306,15 @@ class TestServed:
                 for offender in report["offenders"]:
                     assert (served == offender["value"]).any()
 
+    def test_site_q_names_no_niger_sold_kilogram(self, built):
+        """Pinned on the built frame, both tails (GH #1560 (d)): no Niger row is named."""
+        from lsms_library.quantity_audit import audit_quantities
+        _, df = built
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            assert audit_quantities(df, "Quantity_sold_kg", country=COUNTRY,
+                                    table=TABLE, tails=("high", "low")) == []
+
     def test_the_2021_22_sold_kilograms_carry_the_estimate_key(self, built):
         """Ruling 2026-11-12 (c): exactly the rows with a Quantity_sold_kg, Farm-level too."""
         country, df = built

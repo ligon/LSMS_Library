@@ -160,6 +160,27 @@ class TestServed:
             for offender in report["offenders"]:
                 assert (served == offender["value"]).any()
 
+    def test_site_q_names_exactly_the_four_2021_22_rows(self, built):
+        """The rows named, pinned on the built frame rather than the process-wide
+        ledger: 3 high and 1 low, all 2021-22 (GH #1560 (d)).  The warning prints the
+        harvest unit as ``harvest_u`` and the value as kilograms sold (red team F2)."""
+        from lsms_library.quantity_audit import _format_quantity_report, audit_quantities
+        _, df = built
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            reports = audit_quantities(df, "Quantity_sold_kg", country=COUNTRY,
+                                       table=TABLE, tails=("high", "low"))
+        named = sorted((r["wave"], r["direction"], o["value"])
+                       for r in reports for o in r["offenders"])
+        assert named == sorted([(WAVE, "high", 1150000.0), (WAVE, "high", 437500.0),
+                                (WAVE, "high", 400000.0), (WAVE, "low", 5.0)])
+        high = next(r for r in reports if r["direction"] == "high")
+        top = high["offenders"][0]
+        assert (top["j"], top["u"], top["value"]) == ("Arachide", "Sac (100 Kg)", 1150000.0)
+        message = _format_quantity_report(high)
+        assert "harvest_u=Sac (100 Kg) 1,150,000 kg sold (x" in message
+        assert "TOTAL kilograms sold" in message and " u=Sac" not in message
+
     def test_the_sold_kilograms_carry_the_estimate_key(self, built):
         """Ruling 2026-11-12 (c): exactly the rows with a Quantity_sold_kg, Farm-level too."""
         country, df = built
