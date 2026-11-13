@@ -69,7 +69,9 @@ def _finish_plot_inputs(df, t):
     """Common tail: coerce numeric columns, guarantee the full schema set,
     fill the crop / u index levels with sentinels so no row is lost to the
     framework's NaN-key collapse, build the (t, i, input, crop, u) index.
-    Mirrors niger.py:_finish_plot_inputs."""
+    Mirrors niger.py:_finish_plot_inputs.  A blank used unit is the corpus
+    missing-unit sentinel 'Unknown' (GH #1118; it was the minted 'Manquant',
+    and no applied 2018-19 line lacks s16bq03b, so the fill serves 0 rows)."""
     for col in ['Quantity', 'Quantity_purchased']:
         if col not in df.columns:
             df[col] = pd.NA
@@ -82,7 +84,7 @@ def _finish_plot_inputs(df, t):
     if 'crop' not in df.columns:
         df['crop'] = pd.NA
     df['crop'] = df['crop'].astype('string').fillna(CROP_NA)
-    df['u'] = df['u'].astype('string').fillna('Manquant')
+    df['u'] = df['u'].astype('string').fillna('Unknown')
     df = df[df['input'].notna() & df['i'].notna()]
     keep = ['t', 'i', 'input', 'crop', 'u',
             'Quantity', 'Purchased', 'Quantity_purchased']

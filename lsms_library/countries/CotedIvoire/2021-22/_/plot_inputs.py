@@ -32,7 +32,10 @@ from lsms_library.local_tools import get_dataframe, to_parquet
 from mapping import household_ids
 
 CROP_NA = '(not crop-specific)'
-UNIT_NA = 'Manquant'
+# A blank used unit s16bq03b (4 applied lines) is the corpus missing-unit
+# sentinel (GH #1118), not the minted 'Manquant' this script first wrote;
+# s16bq03b has no missing-marker label, so there is no raw answer to keep.
+UNIT_NA = 'Unknown'
 
 
 def _table(name):

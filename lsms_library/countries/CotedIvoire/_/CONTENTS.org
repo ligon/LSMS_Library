@@ -1669,3 +1669,30 @@ runs in =_finalize_result= after the index collapse; no =GrainCollapseWarning= f
 extended to 2021-22 by this wiring; filed as GH #1710.
 
 *Cost of this section.*  Text only (=CONTENTS.org= and =_/derivations.yml=): no Cote d'Ivoire hash moves.
+
+* 2026-11-13 -- =plot_inputs=: a missing unit is =Unknown= in both waves (GH #1118)
+
+Both wave scripts filled a blank used unit =s16bq03b= with a minted ='Manquant'=; both now write
+=Unknown=, the corpus missing-unit sentinel (GH #1041 contract).  Measured cold at development
+=f138a3d61= (burst job 41275616):
+| wave    | applied lines | =s16bq03b= blank | served =u= = =Manquant= |
+|---------+---------------+------------------+-------------------------|
+| 2018-19 | 11,259        | 0                | 0                       |
+| 2021-22 | 14,704        | 4 (2 with no quantity, 2 positive) | 4             |
+So 2018-19 (the site GH #1118 lists) serves no row on the fill, and the 4 rows are 2021-22's, a site
+the issue's inventory missed because =2021-22/_/plot_inputs.py= was written after it (GH #1697).  Neither
+wave's =s16bq03b= has a missing-marker label (2018-19: Gramme, Kilogramme, Tonne, Litre, Charrette), so
+there is no raw answer to keep in a column of its own.  Only =u= changes on those 4 rows.  Both spellings
+are missing-unit sentinels to the kg ladder (=transformations._U_SENTINELS=), so =seed_kg= and
+=nitrogen_kg= do not move.  The 2021-22 collisions of the 38 damaged households (above) are unchanged:
+=Unknown= was served on no 2021-22 row before, so the relabel can make no new key.
+
+*Not changed: the gift/purchase binding of 2018-19.*  =Purchased= / =Quantity_purchased= still read
+=s16bq05= / =s16bq07a=, the gift question; the 2026-11-13 ruling "Fix all three now" names
+Guinea-Bissau, Togo and Benin only.  Measured on =Menage/s16b_me_CIV2018.dta=: =s16bq05= Oui on 890
+applied lines, =s16bq08= (the purchase) Oui on 8,134; gift x purchase Non/Non 2,373, Non/Oui 7,996,
+Oui/Non 752, Oui/Oui 138.  A question for the maintainer.
+
+*Cost.*  Both wave scripts and =_/data_scheme.yml=: every Cote d'Ivoire =Country._table_cache_hash= and
+the 2018-19 and 2021-22 =Wave._input_hash= values (census in =burst/isa-sm-20261113/reports/manquant/=).
+
