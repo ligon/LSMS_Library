@@ -434,3 +434,59 @@ Benin::shocks::code25-rank-inferred:
         slot, registered".
   contents: 'Benin/_/CONTENTS.org, "shocks: coping strategies, the set and the positions (GH #1562)"'
   since: '2026-11-13'
+
+# An EXCEPTION TO A LINK, not a served value: the 63 households keep their own E2_ id,
+# so no served row carries this key (`rows: 0`).  The entry is the disclosure, and
+# `derivation_inputs` returns the households' s01 rows and cover flags.
+Benin::panel_ids::all-preloaded-left-not-linked:
+  waves: ['2021-22']
+  rows: 0
+  rule: >-
+    PanelHH stays the rule of the 2021-22 -> 2018-19 crosswalk (_/panel_ids.py), with
+    one exception: a household flagged PanelHH = Panel whose (grappe, menage) is a
+    2018-19 household is NOT linked when s01_me_ben2021.dta records its whole
+    pre-loaded 2018-19 roster as gone -- at least one s01 row answers s01q00aa, and
+    every such row answers 2 (Non).  It keeps its own E2_ id in every table.  63 of the
+    6,878 households PanelHH and the key would link meet it, leaving 6,815 links.
+  function: lsms_library.countries.Benin._.panel_ids:all_preloaded_left
+  inputs: lsms_library.countries.Benin._.panel_ids:inputs_all_preloaded_left
+  raw_variables: [PanelHH, s00q07d, s00q07e, s01q00aa, membres__id]
+  assumptions:
+    - text: >-
+        s01q00aa is the survey's own record that a pre-loaded 2018-19 member is no
+        longer a member of the household: code 2 is Non.
+      basis: variable-label
+      evidence: >-
+        Stata label in s01_me_ben2021.dta: s01q00aa "1.00aa. [NOM] est-il toujours un
+        membre de ce ménage?"; codes 1 (31,592 rows), 2 (6,138), blank on the 11,068
+        rows that were not pre-loaded.
+    - text: >-
+        on these 63 households the current members are not the 2018-19 household's:
+        matched to the same key's 2018-19 roster on sex and birth year within one year,
+        21 of 258 current members match (8.1%) against 28 of 258 (10.9%) for another
+        2018-19 household of the same grappe, where a sample of ordinary linked households matches
+        978 of 1,653 (59.2%) against 245 of 1,653 (14.8%).  52 of the 63 answer s00q07e
+        (same dwelling) Oui, so the dwelling was revisited and its occupants replaced.
+      basis: derived-from-data
+      evidence: >-
+        GH #1705 red team, burst job 41278460 (the match); the 63, the 52 and the 261
+        current members re-derived from the files in burst job 41279397
+        (slurm_logs/isa_backlog_2026-11-13/1705-benin-panel/scripts/fixup_facts.py).
+    - text: >-
+        a Panel flag on a household whose whole 2018-19 roster has left is not a
+        household link, so the household is served as a new one rather than as the
+        2018-19 household.  The other exceptions the files suggest (the 116 recurring
+        keys flagged Non panel, the 11 flagged Panel with no 2018-19 key, new keys with
+        pre-loaded members) are not taken: PanelHH stays the rule.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-13, "Unlink the 63 (Recommended)": "PanelHH stays the
+        rule, but a household whose whole pre-loaded 2018-19 roster is recorded as left
+        is not linked (keeps its E2_ id); registered, disclosed exception; 6,815 links."
+  validated_against: >-
+    _/panel_ids.py asserts the counts on the release (6,815 linked, 63 excepted, 11
+    flagged Panel with no 2018-19 key, 116 recurring keys flagged Non panel, 1,217
+    keeping their own id) and the two single-pass hazards; tests/test_benin_panel_ids.py
+    re-derives the crosswalk from the raw files with its own rule.
+  contents: 'Benin/_/CONTENTS.org, "2026-11-13 -- Benin is a panel country (GH #1705)"'
+  since: '2026-11-13'
