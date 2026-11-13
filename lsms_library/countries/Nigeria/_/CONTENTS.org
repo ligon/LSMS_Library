@@ -4483,7 +4483,10 @@ priced; "5 small pieces" beside another cluster's "1 large piece" would
 give this pattern under a correct division, and base =u= folds W1's size
 into =Size=.  So the non-metric N 2-50 rows are UNVALIDATED, not refuted --
 which is why they stay divided under their own key.  The Kg legs and the
-N > 50 legs do not depend on that assumption.  Every W1 count is integral
+N > 50 legs do not depend on that assumption.  The 3 =Unknown= rows above
+N = 50 show the held non-metric N > 50 signature (0.005x divided, 0.99x
+undivided, 2 matched rows) but are divided, because the ruling names all
+49 =Unknown= rows.  Every W1 count is integral
 (0 non-integral of 22,319 priced rows), so the bands are exact.  W1's
 priced rows: 15,015 with N = 1, 7,199 with N > 1, 105 with no count (22,319;
 the "Register the division" ruling quoted 15,014 / 7,198).

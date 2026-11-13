@@ -409,6 +409,9 @@ Nigeria::community_prices::pp-w1-number-of-units:
 Nigeria::community_prices::pp-w1-number-of-units-unvalidated:
   waves: ['2010-11']
   columns: [Price]
+  # Selector by t only, so it nominally spans every 2010Q3 row; the rows it
+  # stamps are on u = Kg, Unknown and the W1 non-metric units -- never on
+  # g / ml / l, which carry pp-w1-number-of-units or a hold.
   rows: {t: '2010Q3'}
   rule: >-
     Price = sc2q3a / sc2q3b, as pp-w1-number-of-units, on the W1
@@ -417,7 +420,10 @@ Nigeria::community_prices::pp-w1-number-of-units-unvalidated:
     (every W1 unit but Kg / g / l / ml) with Number of Units 2-50 (3,033:
     1,432 at N 2-5, 1,601 at N 6-50), Kg with N 2-5 (547) and every
     Unknown-unit row with N > 1 (49: 20 at N 2-5, 26 at N 6-50, 3 above
-    50).  Ruled 2026-11-12, "Flag them, hold g N 2-5".
+    50).  Ruled 2026-11-12, "Flag them, hold g N 2-5".  The 3 Unknown rows
+    above 50 show the signature of the held non-metric N > 50 band (0.005x
+    divided, 0.99x undivided, on 2 matched rows); they are divided here
+    only because the ruling names all 49 Unknown-unit rows.
   function: lsms_library.countries.Nigeria._.pp_community_prices:derive_pp_w1_unit_price
   inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_number_of_units_unvalidated
   raw_variables: [state, lga, ea, item_cd, sc2q2, sc2q3a, sc2q3b, sc2q3c]
@@ -620,8 +626,9 @@ Nigeria::community_prices::pp-w1-metric-package-hold:
     W1 PP (2010Q3) priced rows on unit 102 "grams" or 104 "millilitre" whose
     Number of Units sc2q3b is 1 (963 g + 80 ml = 1,043 rows) are not served:
     the Naira figure is the price of a package of unrecorded size, not of
-    one gram / millilitre.  W1 g / ml rows with a count above 1 are divided
-    as usual (pp-w1-number-of-units); there the count is a gram / ml count.
+    one gram / millilitre.  W1 g / ml rows with a count of 2-5 are held
+    too (pp-w1-metric-small-count-hold); with a count of 6 or more they are
+    divided (pp-w1-number-of-units), where the count is a gram / ml count.
   function: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_metric_package_hold
   inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_w1_metric_package_hold
   raw_variables: [state, lga, ea, item_cd, sc2q2, sc2q3a, sc2q3b, sc2q3c]

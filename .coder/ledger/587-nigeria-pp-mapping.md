@@ -210,6 +210,10 @@ Rulings: "GH587 label judgements and two follow-ups" and "GH587 W1 division afte
 | W5 Bottle/Can with coded metric size, `c2q2a` != 1 (63) | **served**, `pp-c2-metric-size` | ruling; 0.96x same-round item medians |
 | `pp-unharmonized-item-hold` | 0 rows; waves widened to all PP folders | F7 |
 
+*MAPPING.org is hand-edited in two rows* (W2 item 15 -> Semovita, ruled; W1 unit 1 -> `Tomatoes cup`,
+red team F3).  `587-nigeria-pp-mapping/build_mapping.py` still emits the pre-ruling rows (W2 15 held, W1 unit
+1 blank), so regenerating `MAPPING.org` from it would revert both: re-apply them, or patch the builder first.
+
 ### §6 Open questions for the human
 1. Semovita's Aggregate: the within-Nigeria evidence says `Other grains and flour`; GhanaLSS folds semolina into `Wheat Flour`.
 2. Follow-ups already ruled for the next batch: PH W3 Kg/l ("Measure PH, then align"), PH's blank-unit drop.
