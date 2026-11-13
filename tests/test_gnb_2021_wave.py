@@ -220,3 +220,56 @@ class TestServed:
         assert len(j) == 450
         assert (j["Region_21"] == j["Region_18"]).all()
         assert (j["Rural_21"] == j["Rural_18"]).all()
+
+    # --- shocks -----------------------------------------------------------------------
+
+    def test_a_shock_row_is_a_shock_with_follow_ups(self):
+        s14 = _raw("s14b_me_gnb2021.dta")
+        followed = s14[s14["s14bq04a"].notna()]
+        sh = _served("shocks")
+        assert len(sh) == len(followed) == 4417
+        assert sh.index.is_unique
+
+    def test_the_food_effects_are_purchases_and_stock_not_the_herd(self):
+        s14 = _raw("s14b_me_gnb2021.dta", labels=True)
+        s14 = s14[s14["s14bq04a"].notna()]
+        yes = {"Diminuiu", "Aumentou"}
+        sh = _served("shocks")
+        assert int(sh["AffectedConsumption"].astype("boolean").sum()) == int(s14["s14bq04f"].isin(yes).sum())
+        assert int(sh["AffectedFoodStock"].astype("boolean").sum()) == int(s14["s14bq04e"].isin(yes).sum())
+        assert int(s14["s14bq04d"].isin(yes).sum()) != int(s14["s14bq04f"].isin(yes).sum())
+
+    def test_the_slots_are_the_ranks(self):
+        s14 = _raw("s14b_me_gnb2021.dta", labels=True)
+        s14 = s14[s14["s14bq04a"].notna()]
+        sh = _served("shocks")
+        first = int((s14[[f"s14bq05__{n}" for n in range(1, 27) if n != 25]]
+                     == "Première stratégie").any(axis=1).sum())
+        assert first > 4000
+        assert sh["HowCoped0"].notna().sum() >= first
+        m = _mapping_module()
+        assert set(sh["HowCoped0"].dropna()) <= set(m.COPING_LABELS.values())
+
+
+class TestCopingHook:
+    """Benin's hook after GH #1556, on synthetic rows through this wave's function."""
+
+    def _served(self, **cope):
+        m = _mapping_module()
+        row = {f"Cope{n}": "Non" for n in (1, 2, 3, 25, 26)}
+        row.update({k.replace("c", "Cope"): v for k, v in cope.items()})
+        out = m.shocks(pd.DataFrame([row]))
+        assert not [c for c in out.columns if c.startswith("Cope")]
+        return [out[f"HowCoped{k}"].iloc[0] for k in range(3)], m.COPING_LABELS
+
+    def test_ranks_order_the_slots_not_the_codes(self):
+        got, lab = self._served(c1="Deuxième strategie", c2="Première stratégie")
+        assert got[:2] == [lab[2], lab[1]] and pd.isna(got[2])
+
+    def test_autre_fills_the_rank_no_other_strategy_holds(self):
+        got, lab = self._served(c1="Première stratégie", c25="Oui")
+        assert got[:2] == [lab[1], lab[25]] and pd.isna(got[2])
+
+    def test_an_unknown_answer_is_refused(self):
+        with pytest.raises(ValueError, match="unknown answers"):
+            self._served(c1="Primeira estratégia")

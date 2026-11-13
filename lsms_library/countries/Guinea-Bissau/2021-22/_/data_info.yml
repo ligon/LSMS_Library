@@ -124,3 +124,85 @@ cluster_features:
                 Urbano: Urban
         Latitude: GPS__Latitude_m
         Longitude: GPS__Longitude_m
+
+shocks:
+    # s14a is the COVID-19 module; s14b is the module 2018-19 called s14.  The
+    # consequence labels are 2018-19's Portuguese ones; the coping columns hold the
+    # French ranks `Première / Deuxième / Troisième stratégie` or `Non`, where 2018-19's
+    # held indicators, except column 25 (`nonoui`): see mapping.shocks.  The framework
+    # drops the rows with no follow-up: 4,417 of the 10,842 reported shocks are served,
+    # because the instrument asks follow-ups only of some (as Benin, Togo), so a
+    # cross-wave incidence on this table reads as a false fall.
+    file: s14b_me_gnb2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        Shock: s14bq01
+    myvars:
+        AffectedIncome:
+            - s14bq04a
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        AffectedAssets:
+            - s14bq04b
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        AffectedProduction:
+            - s14bq04c
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        # s14bq04d is the herd ("l'Effectif du cheptel"), s14bq04e the food stock and
+        # s14bq04f the food purchases, by this file's own variable labels, in both
+        # vagues.  Ruling (GH #1556 / #1561): AffectedConsumption is food PURCHASES and
+        # AffectedFoodStock food STOCKS.
+        AffectedFoodStock:
+            - s14bq04e
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        AffectedConsumption:
+            - s14bq04f
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        Cope1: s14bq05__1
+        Cope2: s14bq05__2
+        Cope3: s14bq05__3
+        Cope4: s14bq05__4
+        Cope5: s14bq05__5
+        Cope6: s14bq05__6
+        Cope7: s14bq05__7
+        Cope8: s14bq05__8
+        Cope9: s14bq05__9
+        Cope10: s14bq05__10
+        Cope11: s14bq05__11
+        Cope12: s14bq05__12
+        Cope13: s14bq05__13
+        Cope14: s14bq05__14
+        Cope15: s14bq05__15
+        Cope16: s14bq05__16
+        Cope17: s14bq05__17
+        Cope18: s14bq05__18
+        Cope19: s14bq05__19
+        Cope20: s14bq05__20
+        Cope21: s14bq05__21
+        Cope22: s14bq05__22
+        Cope23: s14bq05__23
+        Cope24: s14bq05__24
+        Cope25: s14bq05__25
+        Cope26: s14bq05__26
+
