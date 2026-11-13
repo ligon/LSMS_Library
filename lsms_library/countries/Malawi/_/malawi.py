@@ -1401,11 +1401,14 @@ def module_d_other_crop_text(g, d, *, cropcode, hhid='hhid'):
     gk['_g48'] = g48 & complete
     gk['_n_g48'] = gk.groupby(keys, dropna=False)['_g48'].transform('sum')
     m = gk.merge(dk, on=keys, how='left', validate='m:1').sort_values('_pos')
-    m.loc[~complete[m['_pos'].to_numpy()], ['_n_rows', '_n_text', '_n_other']] = np.nan
+    # Plain float counts (NaN where no D row), so every comparison below is a bool array.
+    n = {c: pd.to_numeric(m[c], errors='coerce').astype('float64').to_numpy()
+         for c in ('_n_rows', '_n_text', '_n_other', '_n_g48')}
+    incomplete = ~complete[m['_pos'].to_numpy()]
     reason = np.select(
-        [~complete[m['_pos'].to_numpy()], m['_n_rows'].isna().to_numpy(), (m['_n_rows'] > 1).to_numpy(),
-         (m['_n_text'] == 0).to_numpy(), (m['_n_text'] >= 2).to_numpy(),
-         (m['_n_other'] == 0).to_numpy(), (m['_n_other'] >= 2).to_numpy(), (m['_n_g48'] > 1).to_numpy()],
+        [incomplete, np.isnan(n['_n_rows']), n['_n_rows'] > 1,
+         n['_n_text'] == 0, n['_n_text'] >= 2,
+         n['_n_other'] == 0, n['_n_other'] >= 2, n['_n_g48'] > 1],
         list(_D20_REASONS), default=D20_SINGLE)
     reason = pd.Series(reason, index=g.index, dtype='string')
     text = pd.Series(m['_text'].to_numpy(), index=g.index, dtype='string').where(reason.eq(D20_SINGLE))
