@@ -184,7 +184,11 @@ GhanaLSS::food_acquired::12b-fortnight:
   =recall.py='s loader rejects any basis outside =BASIS_LADDER= and
   is not touched; do not reuse it.  A modelling choice is not
   evidence and must not be laundered into one; naming it is the
-  point.
+  point.  [2026-11-12, GH #1697: =derived-from-data= joins the
+  vocabulary, for a regularity measured in the file that no document
+  states, and the ruled ladder is now =questionnaire= >
+  =variable-label= > =config-comment= > =derived-from-data= >
+  =filename= > =modelling-choice= (=derivations.BASES=).]
 - The loader refuses an entry missing =rule=, =function=, =inputs=,
   =raw_variables= or =assumptions= (each with a =basis=) -- the
   =PopulationRecord= discipline: a record that cannot say what it did

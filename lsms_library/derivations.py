@@ -70,6 +70,17 @@ choice is not evidence and must not be laundered into one.  Naming it is the
 point.  ``derived-from-data`` is not documentation either, as in
 ``sampling.py``: it says the file shows it, never that a producer says so.
 
+The ORDER of :data:`BASES` is a ladder, strongest first, and it is what
+:attr:`DerivationRecord.bases` reports in (ruling @ligon 2026-11-12, "Above
+filename"): ``questionnaire`` > ``variable-label`` > ``config-comment`` >
+``derived-from-data`` > ``filename`` > ``modelling-choice``.  A regularity
+measured in the file ranks above a guess from a filename and below anything
+a document or a maintainer states; so the recall ladder's four rungs are no
+longer contiguous here.  An assumption carries one ``basis``: where a
+document states part of a claim and the data show the rest (Cote d'Ivoire
+2021-22's ``s07bq03a`` H and L rows), the record carries two assumptions,
+one per basis, and the documentary one says only what the document says.
+
 The loader refuses an entry missing ``rule``, ``function``, ``inputs``,
 ``raw_variables`` or ``assumptions``, or an assumption without a ``basis`` --
 the ``PopulationRecord`` discipline: a record that cannot say what it did and
@@ -119,14 +130,16 @@ COLUMN = "Derivation"
 KEY_SEP = "::"
 MULTI_SEP = "+"
 
-#: The basis vocabulary for an assumption.  This module's OWN -- see the
-#: module docstring for why ``recall.BASIS_LADDER`` is not reused.
+#: The basis vocabulary for an assumption, strongest first: the order is the
+#: ladder ``DerivationRecord.bases`` reports in (ruling 2026-11-12, "Above
+#: filename").  This module's OWN -- see the module docstring for why
+#: ``recall.BASIS_LADDER`` is not reused.
 BASES = (
     "questionnaire",     # the instrument or its manual states it
     "variable-label",    # a Stata variable label states it
     "config-comment",    # a maintainer asserted it in repo config or prose
-    "filename",          # inferred from a source filename -- a GUESS
     "derived-from-data", # measured in the distributed file itself; no document states it
+    "filename",          # inferred from a source filename -- a GUESS
     "modelling-choice",  # no document supplies it; the library chose it
 )
 
@@ -321,7 +334,8 @@ class DerivationRecord(dict):
 
     @property
     def bases(self) -> tuple[str, ...]:
-        """The distinct assumption bases present, in ladder order."""
+        """The distinct assumption bases present, in ladder order (:data:`BASES`,
+        strongest first)."""
         present = {a.get("basis") for a in (self.get("assumptions") or [])}
         return tuple(b for b in BASES if b in present)
 

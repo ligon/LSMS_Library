@@ -141,20 +141,45 @@ CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld:
   raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05]
   assumptions:
     - text: >-
-        an H value is the producer's replacement of the household's answer, not
-        the answer: the per-item outlier rule of the harmonised UEMOA / World
-        Bank programme replaces a per-capita outlier by "la médiane dans la
-        région et le milieu de résidence", and these rows fit that median per
-        adult equivalent within item x region x milieu, re-expressed in the
-        reported unit.  No document says the rule was written into the
-        distributed s07b file, or which rows; the programme's own protocol
-        confines such corrections to analysis files and requires a correction
-        in a distributed file to be documented.  So the household's answer is
-        gone and is not recoverable, and it is not served as an answer.
-      basis: derived-from-data
+        the survey's producers document an outlier rule and a cleaning of
+        section 7B, and say nothing of their application to this file.  The
+        harmonised UEMOA / World Bank programme's per-item rule takes a
+        quantity per head above the mean plus 2 or 3 standard deviations, or in
+        the top 1 percent, as an outlier, and "dans la majeure partie des cas,
+        la valeur aberrante sera remplacée par la médiane dans la région et le
+        milieu de résidence"; the same protocol confines such corrections to
+        analysis files ("bases brutes ... reflètent les données collectées")
+        and requires a correction in a distributed file to be documented.
+        ANStat records that section 7B "a été partiellement apurée" after
+        collection.  Neither says the rule or the cleaning was written into the
+        distributed s07b file, or on which rows; that is the next assumption,
+        and it rests on the data.
+      basis: questionnaire
       evidence: >-
         Document de travail no 4, "Mesure de la pauvreté" (UEMOA PHMECV,
-        September 2019), §2.2-2.3; doc search
+        September 2019), §2.2 ("deuxième approche") and §2.3, one of the
+        programme's documents de travail with the harmonised manual and the
+        enumerator manual (nos 1 and 2); written for EHCVM-1, and no EHCVM-2
+        version was found.  ANStat, "Profil de pauvreté de la Côte d'Ivoire
+        2021", §2.7.1, printed pp.34-35 (Atelier no 3, 4-18 November 2022).  A
+        methodology paper and the producer's report, not the instrument:
+        questionnaire is the closest rung, as for the Basic Information
+        Documents elsewhere in the registry (Burkina Faso, Senegal, Togo), and
+        config-comment would say a maintainer of this library asserted it.  Doc
+        search burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md
+        §3a items 3 and 5; basis ruled @ligon 2026-11-12 ("Above filename":
+        the H and L entries carry their documentary basis beside
+        derived-from-data).
+    - text: >-
+        an H value is that replacement written into the distributed file, not
+        the household's answer: these rows fit the rule's median per adult
+        equivalent within item x region x milieu, re-expressed in the reported
+        unit.  No document says so (the previous assumption), so the household's
+        answer is gone and is not recoverable, and it is not served as an
+        answer.
+      basis: derived-from-data
+      evidence: >-
+        doc search
         burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md §3
         (T-CIV-1: q3/eqadu1 equals its item x region x milieu cell's mode on
         57.4% of H rows, 29.2% on household size; T-CIV-4b: 32.5% of H rows
@@ -211,6 +236,24 @@ CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion:
   raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05]
   assumptions:
     - text: >-
+        the producer documents correcting section 7B's unit triplets after
+        collection, and says nothing of which rows or which file: ANStat records
+        "la correction du référentiel des triplets de la section 7B sur la
+        consommation alimentaire", and that "la section 7B sur la consommation
+        alimentaire a été partiellement apurée et la correspondance avec la base
+        des relevés NSU a été analysée".  That the distributed s07b carries such a
+        conversion, and where, is the next assumption, and it rests on the data.
+      basis: questionnaire
+      evidence: >-
+        ANStat, "Profil de pauvreté de la Côte d'Ivoire 2021", §2.7.1, printed
+        pp.34-35 (PDF 35-36): Atelier no 1 (25 February - 6 March 2022) and
+        Atelier no 3 (4-18 November 2022).  The producer's report, not the
+        instrument: questionnaire is the closest rung, as for the Basic
+        Information Documents elsewhere in the registry, and config-comment
+        would say a maintainer of this library asserted it.  Doc search
+        burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md §3a
+        item 3; basis ruled @ligon 2026-11-12 ("Above filename").
+    - text: >-
         some L values are the producer's conversion of the row between unit
         triplets (item, unit, size), so the quantity may not be in the unit the
         household named; which rows cannot be identified, and the confidence is
@@ -221,9 +264,6 @@ CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion:
         303,274 here.
       basis: derived-from-data
       evidence: >-
-        ANStat, "Profil de pauvreté de la Côte d'Ivoire 2021", §2.7.1, printed
-        pp.34-35: "la correction du référentiel des triplets de la section 7B"
-        and "la correspondance avec la base des relevés NSU a été analysée";
         doc search REPORT.md §3b T-CIV-7 (an excess of about 8 points, about
         2,000 rows, over a jittered null); the review's mango, honey and salt
         cases in CONTENTS.org.

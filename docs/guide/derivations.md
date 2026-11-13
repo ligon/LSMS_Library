@@ -224,14 +224,26 @@ explicit field can override an inherited field. Two explicit declarations of
 that same field are refused. Generic YAML configuration loading is unchanged.
 
 `basis` is drawn from this module's own six-value vocabulary
-(`derivations.BASES`): `questionnaire`, `variable-label`, `config-comment`,
-`filename`, `derived-from-data`, `modelling-choice`. The first four are the
-recall ladder's evidence rungs. `derived-from-data` says the distributed file
-itself shows the regularity (Togo 2021-22's exact regional multiplier on
-`s07bq03a`, GH #1697) and that no document states it: it is a measurement, not
-a document. The last **names a choice no document supplies**; it is not
-evidence and is deliberately not laundered into one. `recall.BASIS_LADDER` is
-not reused, for exactly that reason.
+(`derivations.BASES`), a ladder listed strongest first: `questionnaire` >
+`variable-label` > `config-comment` > `derived-from-data` > `filename` >
+`modelling-choice` (order ruled 2026-11-12). `questionnaire`, `variable-label`,
+`config-comment` and `filename` are the recall ladder's evidence rungs.
+`derived-from-data` says the distributed file itself shows the regularity
+(Togo 2021-22's exact regional multiplier on `s07bq03a`, GH #1697) and that no
+document states it: it is a measurement, not a document, so it ranks below
+anything a document or a maintainer states and above a guess from a filename.
+The last **names a choice no document supplies**; it is not evidence and is
+deliberately not laundered into one. `recall.BASIS_LADDER` is not reused, for
+exactly that reason. A record's `bases` lists the distinct bases of its
+assumptions in this order.
+
+An assumption carries ONE basis. Where a document states part of a claim and
+the data show the rest, write two assumptions, one per basis, and let the
+documentary one say only what the document says. Cote d'Ivoire 2021-22's
+`s07bq03a` keys do this: a UEMOA methodology paper and the producer's poverty
+profile state that an outlier rule exists and that section 7B was partly
+cleaned (`questionnaire`); that the rule was written into the distributed file,
+and on which rows, is `derived-from-data`.
 
 ### The key
 

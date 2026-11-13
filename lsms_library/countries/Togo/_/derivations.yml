@@ -67,8 +67,8 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
         residual on rows with no purchase (11,952 of 12,963 Jamais rows; 166 in 2018);
         it is not the fill rule, which 2018 shares.  Since 2026-11-12 (GH #1697) the
         residual is formed from s07bq03a with the factor divided out (the
-        s07bq03a-* keys): 305 Jamais rows keep a residual, and 17,546 of the 83,285
-        served purchased rows (21.1%) carry Expenditure NA, 3,916 of them withheld
+        s07bq03a-* keys): 305 Jamais rows keep a residual, and 17,536 of the 83,275
+        served purchased rows (21.1%) carry Expenditure NA, 3,906 of them withheld
         counts with no quantity; 13,630 of the other 79,369 (17.2%).  See
         _/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)".
       basis: variable-label
@@ -252,7 +252,9 @@ Togo::food_acquired::s07bq03a-floored-count-recovered:
       evidence: >-
         ruling @ligon 2026-11-12, "Recover; a 0 becomes NA (Recommended)": keep
         the exact integer recovery outside Grand Lomé, serve a count that
-        recovers to 0 NA under the withheld key, disclose the ~54 (0.43%); the
+        recovers to 0 NA under the withheld key, disclose the ~54 (0.43%); and
+        "NA row only for the 11 (Recommended)": of the 21, only the 11 with no
+        other served row get an NA purchased row (the withheld key); the
         simulation and the 2018 counts are red team r2 of GH #1697
         (burst/isa-sm-20261112/reports/ehcvm2-2021-redteam2/VERDICT.md, Q1b and
         N3); doc search REPORT.md §2e (T-TGO-14)
@@ -283,9 +285,12 @@ Togo::food_acquired::s07bq03a-floored-count-withheld:
     purchased row with Quantity NA and Expenditure NA, and this key, is served
     where a purchase is implied: the row reports neither own production nor a
     gift (the 607 Grand Lomé rows the floor sent to 0 included), or its filed
-    residual is positive, or it is a count elsewhere that recovered to 0.
-    Downstream, the derived food tables drop an NA before they sum, so these
-    rows are absent there, never a zero.
+    residual is positive.  A count elsewhere that recovered to 0 takes the same
+    test, so it is served an NA purchased row only when it reports neither own
+    production nor a gift; with either, its filed residual is negative and it is
+    served its produced and in-kind rows only.  Downstream, the derived food
+    tables drop an NA before they sum, so these rows are absent there, never a
+    zero.
   function: lsms_library.countries.Togo.2021-22._.mapping:classify_s07bq03a
   inputs: lsms_library.countries.Togo.2021-22._.mapping:inputs_floored_count_withheld
   raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s00q01]
@@ -307,24 +312,32 @@ Togo::food_acquired::s07bq03a-floored-count-withheld:
         a count outside Grand Lomé filed as 0 is the floor of a count below 1 / f,
         a fraction, so the count is not known and is withheld rather than served
         as 0, which would serve no row at all for an item the household reported
-        (s07bq02 Oui on all 21 such rows).  Its purchase is below one unit and is
-        not known either, so it is served one purchased row NA whatever its own
-        production or gift: 11 of the 21 report neither, 10 report own production
-        or a gift below 1 / f, and for a filed 0 the filed-residual test cannot
-        say whether a purchase was made.  This reads the ruling literally: s07bq06
-        puts none of those ten's last purchase within 30 days (Jamais 4, Plus de
-        30 jours 6), so their NA row stands where a purchase is unlikely.
+        (s07bq02 Oui on all 21 such rows).  Its purchased row follows the
+        withheld test, and no purchase is invented: the 11 of the 21 that report
+        neither own production nor a gift have no other served row, and each is
+        served one purchased row NA, so the item does not disappear (s07bq06: 7
+        dernier jours 6, 30 derniers jours 1, Plus de 30 jours 4).  The 10 that
+        report own production or a gift below 1 / f (0.5 on 6 rows, 0.25 on 3,
+        0.16 on 1) stay represented by their produced and in-kind rows as filed
+        and are served no purchased row: their filed residual is negative, and
+        s07bq06 puts none of their last purchases within 30 days (Jamais 4, Plus
+        de 30 jours 6).
       basis: modelling-choice
       evidence: >-
-        ruling @ligon 2026-11-12, "Recover; a 0 becomes NA (Recommended)": any
+        rulings @ligon 2026-11-12, "Recover; a 0 becomes NA (Recommended)": a
         count that recovers to 0 is served NA under the withheld key, so no
-        reported item disappears; counts measured 2026-11-12, burst job 41252164.
+        reported item disappears; and "NA row only for the 11 (Recommended)":
+        only the 11 with no other served row get an NA purchased row, and the
+        10 that report small own production or a gift stay represented by those
+        rows.  Counts measured 2026-11-12, burst jobs 41252020 and 41252164.
   validated_against: >-
     derivation_inputs returns each withheld row's filed s07bq03a, s07bq04,
-    s07bq05 and s00q01, joining the 3,916 keyed served rows at (t, i, j) one to one
-    (burst job 41252164; 3,895 before the recovered-0 ruling, burst job 41249521);
-    every one has Quantity and Expenditure NA.  4,056 source rows are withheld:
-    Grand Lomé 4,030, Kara 10, Plateaux 7, Centrale 5, Savanes 3, Maritime 1.
+    s07bq05 and s00q01, joining the 3,906 keyed served rows at (t, i, j) one to one
+    (burst job 41252020, this rule; 3,895 before the recovered-0 ruling, burst job
+    41249521; 3,916 while all 21 recovered-0 counts were served one, burst job
+    41252164); every one has Quantity and Expenditure NA.  4,056 source rows are
+    withheld: Grand Lomé 4,030, Kara 10, Plateaux 7, Centrale 5, Savanes 3,
+    Maritime 1.
   contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
   since: '2026-11-12'
 

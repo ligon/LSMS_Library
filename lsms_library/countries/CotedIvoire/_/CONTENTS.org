@@ -1651,6 +1651,17 @@ and no Cote d'Ivoire build input has changed since):
 - *The basis.*  The H and L assumptions carry =derived-from-data=, the basis this change adds to
   =derivations.BASES=, though their evidence is partly documentary (Document de travail no 4, ANStat).
   The value and its position after =filename= in the ladder order are open for the maintainer (N6).
+  [Ruled 2026-11-12, "Above filename (Recommended)": the ladder is =questionnaire= > =variable-label= >
+  =config-comment= > =derived-from-data= > =filename= > =modelling-choice=, and the H and L entries also
+  carry their documentary basis beside it.  Each now has one =questionnaire= assumption that says only
+  what the documents say -- Document de travail no 4 §2.2-2.3 states the outlier rule and confines such
+  corrections to analysis files; ANStat §2.7.1 (printed pp. 34-35) records that 7B was "partiellement
+  apurée" and its triplet reference corrected -- beside the =derived-from-data= assumption that the
+  distributed =s07b= carries them, and on which rows, which no document says.  =questionnaire= rather
+  than =config-comment=: the statement is the survey producers' (a methodology paper in the series of the
+  harmonised and enumerator manuals, and ANStat's own report), not this library's, and it is the rung the
+  registry already gives the Basic Information Documents (Burkina Faso, Senegal, Togo) with the same
+  "closest rung, not the instrument" note.  No served value and no hash moves.]
 
 *=assets= index (red team F7, GH #1710).*  The served =assets= index =(t, i, j)= is not unique in old
 and new waves alike (2021-22: 2,088 duplicated entries) because the =harmonize_assets= relabel of =j=

@@ -112,6 +112,15 @@ class TestLoaderRefuses:
         assert "derived-from-data" in BASES
         assert "derived-from-data" not in BASIS_LADDER
 
+    def test_the_ladder_order_is_the_ruled_one(self):
+        """Ruling 2026-11-12, "Above filename": a measured regularity ranks below what a
+        document or a maintainer states and above a filename guess; `bases` reports in
+        that order whatever order the assumptions are written in."""
+        assert BASES == ("questionnaire", "variable-label", "config-comment",
+                         "derived-from-data", "filename", "modelling-choice")
+        r = _rec(assumptions=[dict(text=b, basis=b) for b in reversed(BASES)])
+        assert r.bases == BASES
+
     @pytest.mark.parametrize("field", ["function", "inputs"])
     def test_callables_are_dotted(self, field):
         with pytest.raises(ValueError, match="module:function"):

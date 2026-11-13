@@ -1438,8 +1438,8 @@ own-production or gift =unité= rows filed at 0 or with =s07bq03a= / 1.2 off the
 elsewhere that no integer reproduces (Plateaux 3, Centrale 1, Kara 1), and 21 =unité= elsewhere filed as 0,
 which recover to 0.  A withheld row keeps its produced and in-kind rows, which read =s07bq04= and =s07bq05=
 as filed; it is served one purchased row with Quantity and Expenditure NA where a purchase is implied (no
-own production and no gift, a positive filed residual, or a count that recovered to 0): 3,916 rows (3,895
-before the recovered-0 ruling).  A recovered value within a millionth (relative) of =s07bq04= + =s07bq05= is
+own production and no gift, or a positive filed residual): 3,906 rows (3,895 before the recovered-0 ruling;
+the 11 recovered-0 counts with no own production or gift are the difference).  A recovered value within a millionth (relative) of =s07bq04= + =s07bq05= is
 that sum, so a row with no purchase leaves no single-precision residue (the file's residual otherwise runs to
 5e-8).  4,508 recovered counts differ from the filed count.  For a filed Grand Lomé count of 0 to 9 the floor
 sends k to k - 1 (k up to 11), so those could be read as filed + 1 on the integer assumption; the ruling
@@ -1455,7 +1455,7 @@ withheld, which settles the red team's N3b.]
 - *Purchased rows* 107,841 -> 83,264; produced 17,794 and in-kind 10,579 unchanged.  *=Expenditure= NA*
   on 38,092 of 107,841 purchased rows (35.3%) -> 17,525 of 83,264 (21.0%), of which 3,895 are the withheld
   counts; on the other 79,369 it is 13,630 (17.2%), against 19.0% in 2018.  [After the recovered-0 ruling
-  at the end of this file: 83,285 purchased rows, 17,546 with =Expenditure= NA (21.1%), 3,916 of them
+  at the end of this file: 83,275 purchased rows, 17,536 with =Expenditure= NA (21.1%), 3,906 of them
   withheld; the other 79,369 and their 13,630 are unchanged.]
 - *Purchased =Expenditure=* 34,464,072 -> 29,435,020 FCFA (=food_expenditures= the same).  By region, before
   -> after: Centrale 4,999,457 -> 3,002,467; Savanes 5,633,891 -> 4,212,402; Plateaux 7,166,796 -> 5,922,533;
@@ -1482,8 +1482,8 @@ recoverable: =Country('Togo').derivation_inputs('Togo::food_acquired::s07bq03a-r
 =s07bq04= and =s07bq05=; =s07bq03a= / =recover_s07bq03a(...)= is the factor, and the 7-day key's inputs
 return every source row as filed.
 
-*derivation_inputs joins* at =(t, i, j)=: the withheld key 3,895 to 3,895, one to one (3,916 to 3,916
-after the recovered-0 ruling).  The divided-out key
+*derivation_inputs joins* at =(t, i, j)=: the withheld key 3,895 to 3,895, one to one (3,906 to 3,906
+after the recovered-0 rulings).  The divided-out key
 joins 67,992 of its 69,330 served rows to exactly one input row, and the count key 10,035 of 10,039.  The
 rest come from the =harmonize_food= folds (two file items under one served =j=, e.g. the two sugars): of
 the divided-out key's 1,338, 1,172 are pairs of served rows told apart by =u=, and 166 are each the SUM of
@@ -1525,28 +1525,38 @@ that recovers to 0 is served NA under the withheld key, so no reported item disa
 decision: the integer reading stands outside Grand Lomé, and Grand Lomé's floored counts stay withheld as
 first ruled.
 
-*What changed* (=2021-22/_/mapping.py=, =_recover= and =_purchase_implied=).  A count outside Grand Lomé
-filed as 0 recovers to k = 0, the floor of a count below 1 / f, so a fraction; it now takes the withheld
-branch.  Measured on the file (burst job 41252164): *21 source rows*, every one with =s07bq02= = =Oui=,
-in Kara 9, Centrale 4, Plateaux 4, Savanes 3 and Maritime 1.  Eleven report neither own production nor a
-gift; at =9b5585cf2= they were served no row at all, so the item vanished.  The other ten report own
-production or a gift, each below 1 / f, and kept those rows; but a filed 0 leaves the filed-residual test
-silent, and a purchase below one unit cannot be excluded.  So each of the 21 is now served one purchased
-row with Quantity NA, Expenditure NA and =s07bq03a-floored-count-withheld=, beside its produced and
-in-kind rows as filed.  =s07bq06=, the last purchase: of the eleven, =7 dernier jours= 6, =30 derniers
-jours= 1, =Plus de 30 jours= 4; of the ten, =Jamais= 4 and =Plus de 30 jours= 6, so none of the ten reports
-a purchase within 30 days.  Their own production or gift is 0.5 (6 rows), 0.25 (3) or 0.16 (1).  So the
-ten NA purchased rows read the ruling literally ("any count that recovers to 0"), and 4 of them sit on a
-=Jamais= row; serving those ten no purchased row instead, as every other withheld row with own production
-or a gift and no positive filed residual is served, is one clause in =_purchase_implied=.  Either way the
-derived food tables drop the NA, so no served total moves.
+*Second ruling (@ligon, 2026-11-12): "NA row only for the 11 (Recommended)".*  Of the 21 counts outside
+Grand Lomé that recover to 0, only the 11 with no other served row get an NA purchased row under the
+withheld key; the 10 that report small own production or a gift stay represented by those rows, and no
+purchase is invented for them.
+
+*What changed* (=2021-22/_/mapping.py=, =_recover=).  A count outside Grand Lomé filed as 0 recovers to
+k = 0, the floor of a count below 1 / f, so a fraction; it now takes the withheld branch, and its purchased
+row follows the ordinary withheld test (=_purchase_implied=: no own production and no gift, or a positive
+filed residual).  Measured on the file (burst job 41252164): *21 source rows*, every one with =s07bq02= =
+=Oui=, in Kara 9, Centrale 4, Plateaux 4, Savanes 3 and Maritime 1.
+- *The eleven* report neither own production nor a gift.  At =9b5585cf2= they were served no row at all, so
+  the item vanished; each is now served one purchased row with Quantity NA, Expenditure NA and
+  =s07bq03a-floored-count-withheld=.  =s07bq06=, the last purchase: =7 dernier jours= 6, =30 derniers
+  jours= 1, =Plus de 30 jours= 4.
+- *The ten* report own production or a gift below 1 / f: 0.5 (6 rows), 0.25 (3) or 0.16 (1).  Their filed
+  residual 0 - =s07bq04= - =s07bq05= is negative, so no purchase is implied; they are served their produced
+  and in-kind rows as filed and no purchased row, as every other withheld row with own production or a
+  gift and no positive filed residual is.  =s07bq06= puts none of their last purchases within 30 days
+  (=Jamais= 4, =Plus de 30 jours= 6).
+[History: =84722db39= served all 21 an NA purchased row, reading the first ruling's "any count that
+recovers to 0" literally (3,916 such rows, burst job 41252164); the second ruling reverses that for the
+ten, back to =51ef26e5a='s rule.]  The derived food tables drop an NA before they sum, so no served total
+moves either way.
 
 Counts, against =9b5585cf2=: source rows divided 93,986 (unchanged), count-recovered 12,665 -> 12,644,
 withheld 4,035 -> 4,056 (Grand Lomé 4,030, Kara 10, Plateaux 7, Centrale 5, Savanes 3, Maritime 1).
-Served: purchased rows 83,264 -> 83,285, withheld-keyed NA purchased rows 3,895 -> 3,916, =Expenditure= NA
-17,525 -> 17,546; the count key still serves 10,039 rows (the 21 never had a purchased row).  Purchased
-=Expenditure= is unchanged at 29,435,020.05 FCFA, the derived food tables of both waves are frame-equal,
-every 2018 table is frame-equal, and no served row other than the 21 changes (burst job 41252164).
+Served: purchased rows 83,264 -> 83,275, withheld-keyed NA purchased rows 3,895 -> 3,906, =Expenditure= NA
+17,525 -> 17,536 (21.1%); the count key still serves 10,039 rows (the 21 never had a purchased row).
+Purchased =Expenditure= is unchanged at 29,435,020.05 FCFA, the derived food tables of both waves are
+frame-equal, every 2018 table is frame-equal, and no served row other than the 11 changes (burst job
+41252020, at =51ef26e5a=, whose rule this restores; against =ee65db577= the only difference is the ten NA
+purchased rows removed).
 
 *Probable fractional counts, disclosed as ruled* (the red team's simulation, Q1b and N3, not re-run here).
 The inversion is exact only for an integer count.  2018, the same instrument with no factor, has 79
