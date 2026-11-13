@@ -1296,7 +1296,11 @@ A 2021-22 household is linked to the 2018-19 household with the SAME =(grappe, m
 - *What does point back is the roster.*  =s01_me_ben2021.dta= is pre-loaded: =s01q00aa= ("[NOM]
   est-il toujours un membre de ce ménage?") is answered in 99.7% of linked households, and every one
   of their 36,825 pre-loaded members is a 2018-19 member of the same key under the same number
-  (=membres__id= = 2018-19's =s01q00a=), of the same sex on 98.5% of those still members.
+  (=membres__id= = 2018-19's =s01q00a=), of the same sex on 98.5% of those still members.  The
+  control (another 2018-19 household of the same grappe, numbers matched the same way) finds 70.0%
+  of them, because member numbers start at 1 in every household, and agrees on sex for 61.6%: so
+  "found by number" is weak evidence alone, and the sex agreement is what separates the link
+  (=reports/benin/scripts/explore3.py=, burst job 41276456).
 - *=s00q07d= is not the rule.*  It is Oui on all 6,878 linked households, on all 116 recurring keys
   flagged Non panel and on 2 new keys, and Non on the 11 flagged Panel that have no 2018-19 key.
 
@@ -1340,8 +1344,9 @@ is by construction: the same grappe, and region and milieu agree on 6,878 of 6,8
 
 - *The 116 recurring keys flagged Non panel* sit between the link and the control on the head
   (83.6% sex), and their rosters are pre-loaded too: 82.8% of them answer =s01q00aa=, and 98.9% of
-  their 465 pre-loaded members are 2018-19 members of the same key, of the same sex on 94.5%.  That
-  reads as a mix with many genuine panel households in it.  The ruling says "from PanelHH" and the BID
+  their 465 pre-loaded members are 2018-19 members of the same key under the same number, of the same
+  sex on 95.5% of those found and still members (the same-grappe control: 62.4% found, 57.8% same
+  sex; the link: 100.0%, 98.5%).  That reads as a mix with many genuine panel households in it.  The ruling says "from PanelHH" and the BID
   says only =PanelHH= marks a valid merge, so they are not linked here; whether to link them (all, or
   those with a pre-loaded roster) is the maintainer's.
 - *The 11 flagged Panel with no 2018-19 key* answer =s00q07d= Non and have pre-loaded rosters (18
