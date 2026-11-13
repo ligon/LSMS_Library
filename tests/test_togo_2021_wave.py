@@ -376,13 +376,15 @@ class TestServed:
         floors = np.isclose(np.floor(k * f + 1e-9), q3) & np.isclose(q3, q3.round())
         quarter = np.isclose(q3 / f * 4, (q3 / f * 4).round())
         answer = (q3 / f).where(~count, k)
-        # A count outside Grand Lomé that recovers to 0 (filed 0) is withheld too: ruling
-        # 2026-11-12, "Recover; a 0 becomes NA".
-        withheld = count & ((lome & ~own_or_gift) | (~lome & ~floors) | (~lome & (k <= 0))
+        # A count outside Grand Lomé that recovers to 0 (filed 0) is withheld too, and is
+        # served a purchased row NA whatever its own production or gift: ruling 2026-11-12,
+        # "Recover; a 0 becomes NA".
+        zero = count & ~lome & (q3 == 0)
+        withheld = count & ((lome & ~own_or_gift) | (~lome & ~floors) | zero
                             | (lome & own_or_gift & ((q3 <= 0) | ~quarter)))
         answer = answer.where(~(count & lome & own_or_gift), q3 / 1.2).where(~withheld)
         answer = answer.where(~np.isclose(answer, q4 + q5, rtol=1e-6, atol=1e-6), q4 + q5)
-        implied = withheld & ((~own_or_gift) | (q3 - q4 - q5 > 1e-6))
+        implied = withheld & ((~own_or_gift) | (q3 - q4 - q5 > 1e-6) | zero)
         return s07, answer, withheld, implied, q4, q5
 
     def test_food_acquired_sums_are_the_files(self):

@@ -247,7 +247,7 @@ def _on_grid(x, step):
 
 
 def _recover(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
-    '''(recovered s07bq03a, branch) for each row; see `recover_s07bq03a`.'''
+    '''(recovered s07bq03a, branch, recovered-to-0) for each row; see `recover_s07bq03a`.'''
     q3 = pd.to_numeric(pd.Series(np.ravel(s07bq03a)), errors='coerce').to_numpy(dtype=float)
     q4 = pd.to_numeric(pd.Series(np.ravel(s07bq04)), errors='coerce').fillna(0).to_numpy()
     q5 = pd.to_numeric(pd.Series(np.ravel(s07bq05)), errors='coerce').fillna(0).to_numpy()
@@ -281,7 +281,9 @@ def _recover(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
     # recovers to 0 is withheld too (ruling 2026-11-12, "Recover; a 0 becomes NA"): q3
     # was filed as 0, the floor of a count below 1 / f, which is a fraction, so the
     # count is not known, and a recovered 0 would serve no row for an item the
-    # household reported.
+    # household reported.  Its purchase, below one unit, is not known either, so a
+    # purchased row NA is served for it whatever its own production or gift
+    # (`_purchase_implied`).
     floored = has & count & ~lome
     k0 = np.ceil(np.where(floored, q3, 0) / np.where(floored, f, 1) - 1e-9)
     found = np.full(q3.shape, np.nan)
@@ -290,7 +292,9 @@ def _recover(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
         trip = floored & (k >= 0) & (np.abs(np.floor(k * f + 1e-9) - q3) <= 1e-9)
         hits += trip
         found = np.where(trip & np.isnan(found), k, found)
-    rec = floored & _on_grid(q3, 1) & (hits == 1) & (found > 0)
+    unique = floored & _on_grid(q3, 1) & (hits == 1)
+    zero = unique & (found == 0)
+    rec = unique & (found > 0)
     value[rec], branch[rec] = found[rec], BRANCH_COUNT_RECOVERED
     branch[floored & ~rec] = BRANCH_WITHHELD
 
@@ -303,7 +307,7 @@ def _recover(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
     total = q4 + q5
     same = ~np.isnan(value) & (np.abs(value - total) <= SAME_NUMBER * np.maximum(1.0, total))
     value = np.where(same, total, value)
-    return value, branch
+    return value, branch, zero
 
 
 def recover_s07bq03a(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
@@ -367,10 +371,12 @@ def _purchased(out):
     return out.index.get_level_values('s').to_numpy() == 'purchased'
 
 
-def _purchase_implied(q4, q5, filed_residual):
+def _purchase_implied(q4, q5, filed_residual, zero):
     '''Where a withheld row is served one purchased row, NA: it reports neither own
-    production nor a gift, or its filed residual s07bq03a - s07bq04 - s07bq05 is positive.'''
-    return ((q4 <= 0) & (q5 <= 0)) | (filed_residual > SAME_NUMBER)
+    production nor a gift, or its filed residual s07bq03a - s07bq04 - s07bq05 is positive,
+    or it is a count that recovered to 0 (`zero`).  For the last, a filed 0 makes the
+    filed residual silent, and the purchase cannot be excluded: the count is below 1 / f.'''
+    return ((q4 <= 0) & (q5 <= 0)) | (filed_residual > SAME_NUMBER) | zero
 
 
 def food_acquired(df):
@@ -382,13 +388,13 @@ def food_acquired(df):
     withheld row keeps its produced and in-kind rows, which read s07bq04 and s07bq05 as
     filed, and is served one purchased row with Quantity and Expenditure NA where a
     purchase is implied: the row reports neither own production nor a gift, or its filed
-    residual is positive.
+    residual is positive, or it is a count that recovered to 0 (`_purchase_implied`).
     '''
     regions = _cover_regions()
     region = pd.Series(df.index.get_level_values('v')).map(regions).to_numpy()
     filed = pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
-    value, branch = _recover(filed, df['ConsumptionUnitCode'], region,
-                             df['Produced'], df['GiftQuantity'])
+    value, branch, zero = _recover(filed, df['ConsumptionUnitCode'], region,
+                                   df['Produced'], df['GiftQuantity'])
     df = df.assign(Quantity=value)
     parts = []
     for name, key in ((BRANCH_DIVIDED, KEY_DIVIDED), (BRANCH_COUNT_RECOVERED, KEY_COUNT_RECOVERED)):
@@ -404,7 +410,7 @@ def food_acquired(df):
         parts.append(_shared(df[held]))
         q4 = df['Produced'].fillna(0).to_numpy()
         q5 = df['GiftQuantity'].fillna(0).to_numpy()
-        implied = held & _purchase_implied(q4, q5, filed - q4 - q5)
+        implied = held & _purchase_implied(q4, q5, filed - q4 - q5, zero)
         if implied.any():
             # The shared reshape builds the purchased row's index (sized u included), from
             # a placeholder quantity it never serves.
@@ -446,33 +452,33 @@ def _inputs_s07bq03a(wave):
     raw = raw.assign(s00q01=region.reindex(raw.index.get_level_values('i')).to_numpy())
     raw = raw[S07BQ03A_RAW_VARIABLES].copy()
     args = [raw[c] for c in ('s07bq03a', 's07bq03b', 's00q01', 's07bq04', 's07bq05')]
-    value, branch = _recover(*args)
+    value, branch, zero = _recover(*args)
     q4 = pd.to_numeric(raw['s07bq04'], errors='coerce').fillna(0).to_numpy()
     q5 = pd.to_numeric(raw['s07bq05'], errors='coerce').fillna(0).to_numpy()
     filed = pd.to_numeric(raw['s07bq03a'], errors='coerce').to_numpy(dtype=float)
-    return raw, branch, value - q4 - q5, filed - q4 - q5, q4, q5
+    return raw, branch, value - q4 - q5, filed - q4 - q5, q4, q5, zero
 
 
 def inputs_regional_factor_divided_out(wave):
     '''Registry `inputs`: the rows divided by the factor that are served a purchased row,
     one per keyed row, at (t, i, j).  s07bq03a is the producer's filed value.'''
-    raw, branch, residual, _, _, _ = _inputs_s07bq03a(wave)
+    raw, branch, residual = _inputs_s07bq03a(wave)[:3]
     return raw[(branch == BRANCH_DIVIDED) & (residual > 0)]
 
 
 def inputs_floored_count_recovered(wave):
     '''Registry `inputs`: the `unité` rows whose count was recovered from its floor and
     are served a purchased row, at (t, i, j).'''
-    raw, branch, residual, _, _, _ = _inputs_s07bq03a(wave)
+    raw, branch, residual = _inputs_s07bq03a(wave)[:3]
     return raw[(branch == BRANCH_COUNT_RECOVERED) & (residual > 0)]
 
 
 def inputs_floored_count_withheld(wave):
     '''Registry `inputs`: the withheld rows that are served a purchased row with Quantity
     and Expenditure NA, at (t, i, j): those reporting neither own production nor a gift,
-    and those whose filed residual is positive.'''
-    raw, branch, _, filed_residual, q4, q5 = _inputs_s07bq03a(wave)
-    return raw[(branch == BRANCH_WITHHELD) & _purchase_implied(q4, q5, filed_residual)]
+    those whose filed residual is positive, and the counts that recovered to 0.'''
+    raw, branch, _, filed_residual, q4, q5, zero = _inputs_s07bq03a(wave)
+    return raw[(branch == BRANCH_WITHHELD) & _purchase_implied(q4, q5, filed_residual, zero)]
 
 
 def inputs_purchase_removed_by_division(wave):
@@ -485,7 +491,7 @@ def inputs_purchase_removed_by_division(wave):
     withheld row is not here: where a purchase is implied it is served one, NA.  The
     deleted row's produced and in-kind rows are served as filed.
     '''
-    raw, branch, residual, filed_residual, _, _ = _inputs_s07bq03a(wave)
+    raw, branch, residual, filed_residual = _inputs_s07bq03a(wave)[:4]
     recovered = (branch == BRANCH_DIVIDED) | (branch == BRANCH_COUNT_RECOVERED)
     return raw[recovered & (filed_residual > 0) & ~(residual > 0)]
 
