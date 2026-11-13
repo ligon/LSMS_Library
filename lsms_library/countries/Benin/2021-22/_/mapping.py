@@ -5,6 +5,11 @@ import pandas as pd
 import lsms_library.local_tools as tools
 
 from lsms_library.ehcvm import (
+    coping_autre_rank_key as _coping_autre_rank_key,
+    derive_coping_autre_rank as _derive_coping_autre_rank,
+    inputs_coping_autre_rank as _inputs_coping_autre_rank,
+)
+from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
@@ -131,6 +136,15 @@ _STRATEGY_RANK = {
 }
 
 
+#: GH #1562: the inferred option-25 position, where it sits beside a ranked strategy.
+CODE25_RANK_DERIVATION = _coping_autre_rank_key('Benin')
+
+
+def inputs_shocks_code25_rank(wave='2021-22'):
+    """Registry `inputs`: the raw s14bq05__1..26 of the rows the shocks hook stamps."""
+    return _inputs_coping_autre_rank('Benin', wave)
+
+
 def shocks(df):
     '''HowCoped0..2 by the survey's own rank: s14bq05__N holds a rank label or Non.
 
@@ -142,6 +156,7 @@ def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
     how_coped = {0: [], 1: [], 2: []}
+    derivation = []
     for _, row in df[cope_cols].iterrows():
         ranked = []
         unranked = []
@@ -156,9 +171,13 @@ def shocks(df):
             elif str(val) == 'Oui':
                 unranked.append(COPING_LABELS.get(num, f'Strategy {num}'))
 
+        # GH #1562: beside a ranked strategy the position is inferred, and the
+        # row carries the registered key (ruling 2026-11-13, "Keep slot,
+        # registered").  Alone, option 25 is the only answer: not in doubt.
+        derivation.append(CODE25_RANK_DERIVATION if (unranked and ranked) else pd.NA)
         held = {rank for rank, _ in ranked}
         for label in unranked:
-            rank = min(set(range(1, len(held) + 2)) - held)
+            rank = _derive_coping_autre_rank(held)
             held.add(rank)
             ranked.append((rank, label))
 
@@ -171,6 +190,7 @@ def shocks(df):
     df['HowCoped0'] = how_coped[0]
     df['HowCoped1'] = how_coped[1]
     df['HowCoped2'] = how_coped[2]
+    df['Derivation'] = pd.array(derivation, dtype='string')
     return df.drop(columns=cope_cols)
 
 

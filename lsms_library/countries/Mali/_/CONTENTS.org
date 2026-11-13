@@ -4167,3 +4167,36 @@ jobs 41275992, 41276357, 41276727 and 41279383), nothing served:
   a monthly quantity beside a total
   value) are donors with a window mismatch.  Excluding them changes nothing on the screen; the memo
   asks whether a rung should.
+
+* shocks: coping strategies, the set and the positions (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 "Coping-strategy contract, GH1562" (positions are the
+household's REPORTED order; every shocks country also gets an unordered set; EHCVM 2018-19 fills the
+set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical contract:
+=lsms_library/data_info.yml= =shocks= (=HowCoped0..3=, =HowCopedSet=); read-time rules:
+=lsms_library/coping.py=, labels in =_/coping.yml=.
+
+- *2018-19: the set only.*  =s14q05__N= is a grid, one column per option, recording WHICH strategies
+  were chosen and not their order: the paper form asks for strategies "par ordre d'importance", but
+  the release holds {0, 1, 2, 3}, a 2 only ever on option 26 ("Aucune stratégie", 253 cells) per option.  The hook now writes =HowCopedSet= from the grid
+  (=ehcvm.coping_set_from_grid=) and leaves =HowCoped0..2= present and NA (an empty answer must
+  carry its required columns, GH #1292).  Until GH #1562 it listed the positive options
+  in CODE order as =HowCoped0..2=, which disagrees with the value order on 315 rows.  Chosen = a
+  positive cell (1, 2 or 3); 0 = offered and not chosen (every answered row carries 0 on all its unchosen
+  options); NA = not asked; any other value, or a chosen code with no label, is refused
+  (=CopingGridError=).  What a positive value says about ORDER is not established, which is why no
+  position is filled.  Evidence per country: the GH #1562 audit, =out/raw/=.
+- *Site B now warns* that =HowCoped0= / =HowCoped1= are empty in 2018-19.  That is the honest report of
+  a wave that records no order; do not silence it with =optional:=, which is country-grain.
+- *Option 26 beside other options, 444 rows.*  Mali (and Senegal) mark "Aucune stratégie" beside real
+  strategies, holding a 2 or a 3 there; elsewhere it stands alone.  The grid set keeps it at build
+  time; the read-time rule drops it from the set beside a real strategy.  43 rows mark three options.
+- *2014-15 and 2017-18: positions.*  Ranked 1ère/2ème/3ème (questionnaires; 2014-15's variable labels
+  say "après le 1er/2ème/3ème CHOC", audit F9).  =Manquant= (code 99, 177 cells in 2014-15) is a
+  missing code: served NA in its position and never in the set (=_/coping.yml=).  On 3 rows of household
+  =EACI14_299003= every position is =Manquant= and nothing else is recorded: they are served with no
+  content (kept, not deleted; a question in the GH #1562 report).  2017-18 fills unused
+  slots with "Aucune stratégie" on almost every row; those positions keep what was recorded, per the
+  ruling, and the set drops it beside a real strategy.
+- *2021-22: positions by rank.*  Option 25 (Oui/Non) is chosen on 72 rows, all alone, so nothing is
+  inferred beside another strategy and nothing is stamped.

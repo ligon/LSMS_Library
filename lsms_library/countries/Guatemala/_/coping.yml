@@ -1,0 +1,23 @@
+# Coping-strategy label classes for the read-time rules of GH #1562
+# (lsms_library/coping.py), applied in Country._finalize_result on every
+# shocks read.  Not a build input: editing this file moves no cache hash.
+#
+#   filler       a slot filler, terminator or missing code: served NA in its
+#                HowCoped<n> position and never a member of HowCopedSet
+#                (ruling 2026-11-13, "NA in positions, not in set").
+#   did_nothing  an explicit "did nothing" answer: kept in its position as
+#                recorded; a HowCopedSet member only when it is the only
+#                answer, dropped from the set beside a real strategy
+#                (ruling 2026-11-13, "Member only when alone").
+#
+# A label matches the SERVED string exactly.  `waves` (served t values)
+# scopes an entry; without it the entry applies to every wave.  `evidence`
+# is required.  Counts are from the GH #1562 audit
+# (burst/isa-sm-20261113/reports/1562-coping-audit, base f138a3d61).
+
+# ENCOVI 2000 records ONE action per (household, problem): HowCoped0 only.
+
+did_nothing:
+  - label: Did nothing
+    evidence: >-
+      DETALLE `accion` code mapped to English by 2000/_/shocks.py; 2,949 rows.

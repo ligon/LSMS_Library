@@ -27,7 +27,20 @@ def shocks(df):
     what made this wave's row count collapse from cache.
     '''
     df = df[df['Experienced'] == True]
-    return df.drop(columns='Experienced')
+    df = df.drop(columns='Experienced')
+    # GH #1562: S17_5_A/B/C are forest PRODUCTS (ForestProduct0..2), and "no
+    # other product" is a slot filler, served NA in its position (ruling
+    # 2026-11-13, "NA in positions, not in set", which names this label).
+    products = [c for c in ('ForestProduct0', 'ForestProduct1', 'ForestProduct2')
+                if c in df.columns]
+    for col in products:
+        values = df[col].astype(object)
+        df[col] = values.mask(values.eq(FOREST_PRODUCT_FILLER))
+    return df
+
+
+#: The NHFS S17_5 slot filler: no product in this position.
+FOREST_PRODUCT_FILLER = 'no other product'
 
 
 # Hectares per native plot-area unit (GH #879).  The canonical schema

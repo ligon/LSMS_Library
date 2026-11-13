@@ -4,6 +4,7 @@ import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import food_acquired_to_canonical as _food_acquired_canonical
 
+from lsms_library.ehcvm import coping_set_from_grid as _coping_set_from_grid
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
@@ -210,3 +211,50 @@ def household_roster(df):
     df = df.drop('interview_date', axis='columns')
     return df
 
+
+
+# ---------------------------------------------------------------------------
+# shocks: section 14.05 coping strategies (GH #1562)
+# ---------------------------------------------------------------------------
+# Moved here from CotedIvoire/_/cotedivoire.py so that an edit re-warms this
+# wave alone, not every CotedIvoire table.  The EHCVM standard option list.
+COPING_LABELS = {
+    1: "Utilisation de son épargne",
+    2: "Aide de parents ou d'amis",
+    3: "Aide du gouvernement/l'Etat",
+    4: "Aide d'organisations religieuses ou d'ONG",
+    5: "Marier les enfants",
+    6: "Changement des habitudes de consommation",
+    7: "Achat d'aliments moins chers",
+    8: "Membres actifs ont pris des emplois supplémentaires",
+    9: "Membres adultes inactifs/chômeurs ont pris des emplois",
+    10: "Enfants de moins de 15 ans amenés à travailler",
+    11: "Les enfants ont été déscolarisés",
+    12: "Migration de membres du ménage",
+    13: "Réduction des dépenses de santé/d'éducation",
+    14: "Obtention d'un crédit",
+    15: "Vente des actifs agricoles",
+    16: "Vente des biens durables du ménage",
+    17: "Vente de terrain/immeubles/Maisons",
+    18: "Louer/mettre ses terres en gages",
+    19: "Vente du stock de vivres",
+    20: "Pratique plus importante des activités de pêche",
+    21: "Vente de bétail",
+    22: "Confiage des enfants à d'autres ménages",
+    23: "Engagé dans des activités spirituelles",
+    24: "Pratique de la culture de contre saison",
+    25: "Autre stratégie",
+    26: "Aucune stratégie",
+}
+
+
+def shocks(df):
+    """The coping SET from the s14q05__N grid; HowCoped0..2 NA (GH #1562).
+
+    The CAPI form calls 14.05 "CHOIX MULTIPLE: ORDONNE", but the release holds
+    {0, 1, 3} per option and never a 2, so the order is not established (ruling
+    2026-11-12): the set only, ehcvm.coping_set_from_grid, which says which
+    cell values count as chosen.  The hook this replaces listed options in code
+    order and dropped HowCoped2 when it was all-null.
+    """
+    return _coping_set_from_grid(df, COPING_LABELS, country="CotedIvoire")

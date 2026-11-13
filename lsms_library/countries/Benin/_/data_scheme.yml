@@ -153,8 +153,9 @@ Data Scheme:
     AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
-    # 2021-22's s14bq05 ranks up to three strategies (337 rows have a third).  2018-19's
-    # hook emits two (no household there marks a third), so this rides NA on that wave.
+    # 2021-22's s14bq05 ranks up to three strategies (337 rows have a third).  2018-19
+    # fills no position: its grid records which strategies, not their order, so that
+    # wave serves HowCopedSet only (GH #1562) and HowCoped0..2 ride NA there.
     HowCoped2:
       type: str
       optional: true

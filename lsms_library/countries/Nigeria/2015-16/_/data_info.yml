@@ -11,8 +11,12 @@ Wave: 2015-16
 # state/lga/ea `v`, GH #323, and the `moved-{hhid}` singleton are unchanged).
 
 assets:
-    file: sect5_plantingw3.dta
+    # GH #1562: once, under the post-planting quarter.  See 2010-11/_/data_info.yml.
+    file:
+        - sect5_plantingw3.dta:
+            t: '2015Q3'
     idxvars:
+        t: hhid
         i: hhid
         j: item_cd
     myvars:
@@ -21,14 +25,20 @@ assets:
         Value: s5q4
 
 shocks:
-    file: sect15a_harvestw3.dta
+    # GH #1562: once, under the post-harvest quarter; s15aq5d is the fourth
+    # ranked column.  See 2010-11/_/data_info.yml.
+    file:
+        - sect15a_harvestw3.dta:
+            t: '2016Q1'
     idxvars:
+        t: hhid
         i: hhid
         Shock: shock_cd
     myvars:
         HowCoped0: s15aq5a
         HowCoped1: s15aq5b
         HowCoped2: s15aq5c
+        HowCoped3: s15aq5d
 
 individual_education:
     # GH #171: highest education level completed per household member.

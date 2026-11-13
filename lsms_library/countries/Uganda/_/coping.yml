@@ -1,0 +1,59 @@
+# Coping-strategy label classes for the read-time rules of GH #1562
+# (lsms_library/coping.py), applied in Country._finalize_result on every
+# shocks read.  Not a build input: editing this file moves no cache hash.
+#
+#   filler       a slot filler, terminator or missing code: served NA in its
+#                HowCoped<n> position and never a member of HowCopedSet
+#                (ruling 2026-11-13, "NA in positions, not in set").
+#   did_nothing  an explicit "did nothing" answer: kept in its position as
+#                recorded; a HowCopedSet member only when it is the only
+#                answer, dropped from the set beside a real strategy
+#                (ruling 2026-11-13, "Member only when alone").
+#
+# A label matches the SERVED string exactly.  `waves` (served t values)
+# scopes an entry; without it the entry applies to every wave.  `evidence`
+# is required.  Counts are from the GH #1562 audit
+# (burst/isa-sm-20261113/reports/1562-coping-audit, base f138a3d61).
+
+# NOT a filler: 96 "Other (specify)" / "Other(specify)".  It is used in filler
+# patterns in 2010-11 and 2011-12 (('k','96','96') on 165 / 131 rows), but the
+# ruling keeps it a strategy ("Uganda's 96 'Other (specify)' stays a
+# strategy"); repeated in one row it is one set member.
+
+filler:
+  - label: Nothing else
+    waves: ['2013-14', '2015-16']
+    evidence: >-
+      Code 40 of h16q4a/b/c, in the file's value labels from 2013-14 on but
+      not in the printed code list (unps_2013_14_household_qx.pdf p32 prints
+      1-15 and 96).  A slot terminator: 1,035 (2013-14) and 1,065 (2015-16)
+      served slot cells, all three slots on 55 / 41 rows.  Named by the ruling.
+  - label: '99.0'
+    waves: ['2009-10']
+    evidence: >-
+      Code 99 of h16q4a/b/c with no value label in GSEC16 2009-10, served as
+      the string '99.0' on 1 cell.  Named by the ruling ('99.0').
+
+did_nothing:
+  - label: Did nothing
+    evidence: >-
+      s16q04a/b/c value label, 2018-19 and 2019-20: the only answer on 220 /
+      226 rows, beside a strategy on 69 / 70 (audit F7).
+
+did_nothing_when_alone_first:
+  # Ruling 2026-11-13, "Coping follow-ups (... Uganda lone 'Nothing else')":
+  # "Did nothing when alone".  Code 40 as the FIRST answer with nothing else
+  # recorded (every later slot empty or code 40) means the household did
+  # nothing: the set is {Did nothing}.  In any other position, or first and
+  # followed by a strategy, it stays a filler (NA), per the filler entry above.
+  - label: Nothing else
+    waves: ['2013-14', '2015-16']
+    served_as: Did nothing
+    evidence: >-
+      h16q4a = 40 "Nothing else" with h16q4b/c empty or 40: 55 rows in 2013-14
+      and 41 in 2015-16 (GH #1562 red team F3).  The printed code list
+      (unps_2013_14_household_qx.pdf p32: 1-15 and 96) has no "did nothing"
+      option; 2018-19 and 2019-20 add one, labelled "Did nothing", which is the
+      label served here, in the first position and in the set, so that
+      position and set agree as for every other lone "did nothing" answer and
+      the answer composes within Uganda.  The parquet keeps "Nothing else".

@@ -649,11 +649,26 @@ is therefore not implementable for Guatemala from the available microdata.
 Tracked in GitHub issue #341.
 
 
-* shocks — implementable, not yet wired (2026-06-07)
+* shocks — wired (=2000/_/shocks.py=); was "implementable, not yet wired" (2026-06-07)
 
 Contrary to an earlier triage (GH #352), ENCOVI 2000 DOES field a shocks
 module: Chapter 3 "Situaciones Adversas" (=ECV05H03.DTA= RESUMEN,
 =ECV06H03.DTA= DETALLE) records adverse events (=p03a01b= drought,
 =p03a06n= crop loss, =p03a01k= general price rise) AND coping "accion"
-codes.  Data present in-repo; =shocks= is not yet wired.  Implementable —
-a feature gap, not an absence.
+codes.  [2026-11-13, GH #1562 audit F8: this said "=shocks= is not yet
+wired"; it is.  =2000/_/shocks.py= serves 11,752 rows, one per (household,
+experienced shock), the union of RESUMEN occurrences and DETALLE rows.]
+
+** Coping: one action per problem (GH #1562, 2026-11-13)
+
+ENCOVI records ONE =accion= per (household, problem) -- one DETALLE row per
+(=hogar=, =item=) in all 11,685 -- so the action is =HowCoped0= and there is
+no =HowCoped1=/=HowCoped2= (ruling 2026-11-13, "GTM stays").  =HowCopedSet=
+is derived from it at read time (=lsms_library/coping.py=); "Did nothing"
+(2,949 rows) is a "did nothing" answer (=_/coping.yml=), so alone it is the
+set.  1,885 served shocks carry no action (=HowCoped0= NA; GH #1562 audit),
+so their =HowCopedSet= is NA.  The audit put them down to RESUMEN-only
+shocks; the script docstring says RESUMEN and DETALLE disagree on only ~67
+(hh, item) pairs; if both hold, most are DETALLE rows with no =accion=.
+Not reconciled here.  The positions are a single answer, so "reported order"
+is trivially satisfied.

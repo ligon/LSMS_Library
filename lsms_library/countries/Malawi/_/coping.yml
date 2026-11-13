@@ -1,0 +1,42 @@
+# Coping-strategy label classes for the read-time rules of GH #1562
+# (lsms_library/coping.py), applied in Country._finalize_result on every
+# shocks read.  Not a build input: editing this file moves no cache hash.
+#
+#   filler       a slot filler, terminator or missing code: served NA in its
+#                HowCoped<n> position and never a member of HowCopedSet
+#                (ruling 2026-11-13, "NA in positions, not in set").
+#   did_nothing  an explicit "did nothing" answer: kept in its position as
+#                recorded; a HowCopedSet member only when it is the only
+#                answer, dropped from the set beside a real strategy
+#                (ruling 2026-11-13, "Member only when alone").
+#
+# A label matches the SERVED string exactly.  `waves` (served t values)
+# scopes an entry; without it the entry applies to every wave.  `evidence`
+# is required.  Counts are from the GH #1562 audit
+# (burst/isa-sm-20261113/reports/1562-coping-audit, base f138a3d61).
+
+filler:
+  - label: No other response given
+    waves: ['2004-05']
+    evidence: >-
+      Code 99 of ab07a/b/c (IHS2 Module AB), a slot filler in slots 2-3:
+      49,158 served cells on 27,046 rows.  Named by the ruling.
+  - label: Dont know
+    waves: ['2004-05']
+    evidence: >-
+      A LABELLED non-response of ab07a/b/c (the value label says the household
+      did not know), 185 served cells: a missing code in the ruling's sense.
+      Distinct from an UNLABELLED numeric code (Ethiopia W1, Nigeria W2), whose
+      meaning is undocumented and which is not classed.  It is what leaves 26
+      shocks with no recorded content ("Dont know" then "No other response
+      given" twice, every Affected column NA): kept, not deleted.  A reading of
+      the ruling, flagged in the GH #1562 report.
+
+did_nothing:
+  - label: Did not do anything
+    evidence: >-
+      ab07a/b/c (2004-05) and hh_u04a/b/c (2010-11) value label.
+  - label: DID NOT DO ANYTHING
+    evidence: >-
+      hh_u04a/b/c value label, 2013-14, 2016-17 and 2019-20.  Beside a
+      strategy on 257-530 rows per wave (audit F7).

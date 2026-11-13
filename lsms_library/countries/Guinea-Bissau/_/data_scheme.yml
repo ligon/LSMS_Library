@@ -44,9 +44,19 @@ Data Scheme:
     AffectedProduction: bool
     AffectedConsumption: bool  # food purchases, not food stocks
     AffectedFoodStock: bool
-    HowCoped0: str
-    HowCoped1: str
-    HowCoped2: str
+    # 2018-19, the only wave wired here, records WHICH coping strategies (the
+    # s14q05__N grid), not their order: it serves HowCopedSet only and no
+    # position (GH #1562), so the positions are optional for this country.
+    HowCoped0:
+      type: str
+      optional: true
+    HowCoped1:
+      type: str
+      optional: true
+    HowCoped2:
+      type: str
+      optional: true
+    HowCopedSet: str
 
   assets:
     index: (t, i, j)

@@ -3,6 +3,7 @@ import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.ehcvm import (
     UnitSizeLabelError,
+    coping_set_from_grid as _coping_set_from_grid,
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
@@ -232,34 +233,15 @@ def _food_effects_by_vague(df):
 
 
 def shocks(df):
+    """Food effects per vague, then the coping SET from the s14q05__N grid (GH #1562).
+
+    The grid records which strategies were chosen, not their order (ruling
+    2026-11-12), so HowCoped0..2 are written NA: the set only, read by
+    ehcvm.coping_set_from_grid, which says which cell values count as chosen.
+    Benin never marks more than two options per shock.
+    """
     df = _food_effects_by_vague(df)
-    # Benin 2018-19 records at most 2 coping strategies per household.
-    # (A probe over the full survey shows no household with a third
-    # strategy flagged; HowCoped2 would be all-NaN and is therefore
-    # not declared in data_scheme.yml.)
-    cope_cols = [c for c in df.columns if c.startswith('Cope')]
-
-    how_coped = {0: [], 1: []}
-    for _, row in df[cope_cols].iterrows():
-        found = []
-        for c in cope_cols:
-            num = int(c.replace('Cope', ''))
-            val = row[c]
-            try:
-                val = float(val)
-            except (ValueError, TypeError):
-                continue
-            if val >= 1:
-                found.append(COPING_LABELS.get(num, f'Strategy {num}'))
-            if len(found) == 2:
-                break
-        for k in range(2):
-            how_coped[k].append(found[k] if k < len(found) else np.nan)
-
-    df['HowCoped0'] = how_coped[0]
-    df['HowCoped1'] = how_coped[1]
-    df = df.drop(columns=cope_cols)
-    return df
+    return _coping_set_from_grid(df, COPING_LABELS, country="Benin")
 
 
 

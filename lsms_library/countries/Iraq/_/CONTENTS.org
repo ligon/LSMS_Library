@@ -469,3 +469,10 @@ above says =q2005= is already captured by =shocks=.  The current declaration
 reads the experience gate, =q2002_1..5= and =q2003_1..3=, not =q2005=.
 That pre-existing claim is not evidence that this separate food-difficulty
 item is served; its wiring is outside this purchases/stock correction.
+
+* shocks: coping and the set (GH #1562, 2026-11-13)
+
+=q2003_1..3= are ranked ("LIST UP TO 3 ANSWERS BY ORDER OF IMPORTANCE", Part 3 p19), so nothing changes
+at build time.  At READ time (=lsms_library/coping.py=, =_/coping.yml=) "Did not do anything" is a "did
+nothing" answer: alone on 1,779 rows it is =HowCopedSet=; beside a strategy (412 rows) it leaves the
+set and keeps its position (rulings 2026-11-12 / 2026-11-13, GH1562).

@@ -277,6 +277,24 @@ _EXCLUDED_CALLABLES = frozenset({
     # warns; provably returns its input unchanged.
     "lsms_library.null_index_audit.check_index_levels",
     "lsms_library.null_index_audit.audit_index_levels",
+    # The coping-strategy normaliser (coping, GH #1562): READ-path, like
+    # kinship expansion -- it rewrites served values (a filler served NA in its
+    # HowCoped<n> position, the HowCopedSet column) on every read and never a
+    # byte of any parquet.  Reached only from the excluded `_finalize_result`
+    # today; listed so a future call site cannot fold the label rules into a
+    # build fingerprint.  Build code must not call these (the build-side joiner
+    # is ehcvm.coping_set_from_grid).  Pinned by tests/test_coping.py::
+    # test_the_coping_module_is_not_folded_into_any_build_fingerprint.
+    "lsms_library.coping.normalise_coping",
+    "lsms_library.coping.coping_set",
+    "lsms_library.coping.classes_for_wave",
+    "lsms_library.coping.alone_first_for_wave",
+    "lsms_library.coping.label_classes",
+    "lsms_library.coping._registry",
+    "lsms_library.coping._parse_registry",
+    "lsms_library.coping.position_columns",
+    "lsms_library.coping._wave_of_rows",
+    "lsms_library.coping._is_missing",
     # The cluster-identity warning (sampling, GH #942): the same argument.
     # Reads `sampling.yml` and the frame's `t`/`v`, warns, and returns its
     # input unchanged.  Reached only from the excluded `_finalize_result`

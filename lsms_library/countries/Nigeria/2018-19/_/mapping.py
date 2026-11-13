@@ -193,3 +193,49 @@ def inputs_food_acquired_w4_last_purchase(wave='2018-19'):
             piece.index = idx
             pieces.append(piece[idx.isin(derived)])
     return pd.concat(pieces).sort_index()
+
+
+# ---------------------------------------------------------------------------
+# shocks (GH #1562): W4 records WHICH coping strategies, not their order
+# ---------------------------------------------------------------------------
+
+#: The set separator, derivations.MULTI_SEP (canonical shocks.HowCopedSet).
+_SET_SEP = '+'
+
+
+class ShocksCopingError(Exception):
+    """The W4 coping slots cannot be read as a set (not a builtin: a build
+    fallback must not read the refusal as absence)."""
+
+
+def shocks(df):
+    """HowCopedSet from s15aq7_1..4 (``Cope1..4``); HowCoped0..2 present and NA.
+
+    W4 asks "How did your household cope with the most recent [SHOCK]? SEE
+    CODES. SELECT ALL THAT APPLY" (ph_w4_household_quest.pdf p62), so its four
+    slots are entry order, not a rank (ruling 2026-11-13, "W4 ... fills the set
+    only").  The set is the distinct labels of all four slots, sorted, joined
+    with '+'; NA where none is filled.  The fourth slot (s15aq7_4, 31 rows) was
+    not wired before GH #1562.  The read-time rules (lsms_library/coping.py)
+    are applied to this set like any other; this hook only reads the file.
+    """
+    cols = sorted((c for c in df.columns if str(c).startswith('Cope') and str(c)[4:].isdigit()),
+                  key=lambda c: int(str(c)[4:]))
+    if not cols:
+        raise ShocksCopingError('Nigeria 2018-19 shocks: no Cope<n> columns')
+    values = df[cols].astype(object).to_numpy()
+    sets = []
+    for row in values:
+        picked = sorted({str(v) for v in row if v is not None and not pd.isna(v)})
+        bad = [v for v in picked if _SET_SEP in v]
+        if bad:
+            raise ShocksCopingError(f'Nigeria 2018-19 coping labels contain {_SET_SEP!r}: {bad}')
+        sets.append(_SET_SEP.join(picked) if picked else pd.NA)
+    out = df.drop(columns=cols)
+    # Positions present and NA: no order was asked, and an EMPTY answer (a cold
+    # request for 2018Q3 alone) must still carry the required HowCoped0..2
+    # (GH #1292's empty-answer check).
+    for k in range(3):
+        out[f'HowCoped{k}'] = pd.array([pd.NA] * len(out), dtype='string')
+    out['HowCopedSet'] = pd.array(sets, dtype='string')
+    return out
