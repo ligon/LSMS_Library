@@ -572,7 +572,14 @@ Niger::food_acquired::computed-last-purchase-quantity:
     carries flagged-purchase-local-median too.  A purchased row that shares its key with
     an unflagged record's (core sums the two) carries it too; none does.  15,264 of the
     107,263 positive s07bq07a are flagged (14.2%); 15,014 of those records become a
-    served purchased row.
+    served purchased row.  15,263 of the 15,264 are records where the questionnaire
+    ENABLES s07bq07a (s07bq06 = 1, 2 or 3), and their values were reconstructed from a
+    reference unit value.  The 21,063 records where the CAPI disables s07bq07a and the
+    file fills it anyway are a separate set: s07bq08 is empty on every one, so they
+    feed no served value, and they are not keyed.  One record is in both: the flagged
+    record with s07bq06 = Plus de 30 jours, whose s07bq08 is empty.  The first ruling's
+    summary, "CAPI disables it there", described the disabled set; for the flagged
+    rows the premise is reversed.
   function: lsms_library.countries.Niger.2018-19._.mapping:computed_last_purchase_rows
   inputs: lsms_library.countries.Niger.2018-19._.mapping:inputs_computed_last_purchase
   raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s07bq06, s07bq07a,
