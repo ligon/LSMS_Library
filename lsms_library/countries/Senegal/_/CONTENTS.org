@@ -1408,6 +1408,17 @@ as purchases, and 4,876 purchases as not bought.  *Incomplete answers, served as
 unit.  =seed_kg= and =nitrogen_kg= read =Quantity= and =u= only.
 
 *A vocabulary difference across the waves, disclosed.*  The 2021-22 adapter (=_/s16b_2021.py=) decodes its
-acquisition units through the country =u= table at build time, not through =served_unit_labels=, so the
-same unit can be spelled differently in the two waves' =Unit_*= columns; measured in the stream report.
+acquisition units through the country =u= table at build time, not through =served_unit_labels=, so it serves
+the raw =Kilogramme= (3,281 purchase and 213 gift lines) and =Charrettée= (79 / 125) where 2018-19 now serves
+=Kg= and =Charrette=, the =u= vocabulary.  A cross-wave group on =Unit_purchased= splits those units.  Left to
+the #1483 adapter residual (it also serves 26 undeclared columns).
+
+*Measured, served* (cold, private roots, previous head =1d89815f0= against the candidate =14606914c=; burst
+job 41280722).  19,284 rows both sides, index equal.  2018-19 cells move only in the acquisition columns
+(=Purchased= 5,332, =Quantity_purchased= 5,389, =Received_as_gift= 9,916, =Quantity_received_as_gift= 533,
+=Unit_purchased= 4,956, =Unit_received_as_gift= 534); 2021-22: 0.  The new gift columns equal the old purchase
+columns row for row; every =Unit_*= label is a =u= label.  =seed_kg=, =nitrogen_kg=, =crop_production= and
+=plot_features= are frame-equal; =Feature('plot_inputs')= equals the Country table on every value column.
+*Cost:* Senegal 23 of 23 =Country._table_cache_hash= and the 23 2018-19 =Wave._input_hash= against the previous
+head (already moving against =f138a3d61=); no other country.
 

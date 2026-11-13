@@ -1729,3 +1729,11 @@ Gift x purchase: Non/Non 2,373, Non/Oui 7,996, Oui/Non 752, Oui/Oui 138.  Every 
 unit.  The four largest purchased quantities (400,000, 140,000, 120,000, 87,000) equal the four largest used
 quantities; served as filed.  =seed_kg= and =nitrogen_kg= read =Quantity= and =u= only.
 
+*Measured, served* (cold, private roots, previous head =1d89815f0= against the candidate =14606914c=; burst
+job 41280722).  25,907 rows both sides, index equal.  2018-19 cells move only in the acquisition columns
+(=Purchased= 8,748, =Quantity_purchased= 8,863, =Received_as_gift= 11,259, =Quantity_received_as_gift= 890,
+=Unit_purchased= 8,134, =Unit_received_as_gift= 890); 2021-22: 0.  The new gift columns equal the old purchase
+columns row for row; every =Unit_*= label is a =u= label.  =seed_kg= and =nitrogen_kg= are frame-equal;
+=Feature('plot_inputs')= equals the Country table.  *Cost:* Cote d'Ivoire 21 of 21 =Country._table_cache_hash=
+and the 21 2018-19 =Wave._input_hash= against the previous head (already moving against =f138a3d61=).
+

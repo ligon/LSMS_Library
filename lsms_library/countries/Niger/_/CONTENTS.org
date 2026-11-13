@@ -4025,3 +4025,22 @@ the vocabulary of =u= (=ehcvm.served_unit_labels=).  =u= and =input_obs= are unc
 Every 2018-19 acquisition quantity has its unit; in 2021-22 one gift quantity has no =s16bq07b=.
 =seed_kg= and =nitrogen_kg= read =Quantity= and =u= only.
 
+*Measured, served* (cold, private roots, previous head =1d89815f0= against the candidate =14606914c=; burst
+job 41280722).  43,620 rows both sides, index equal, every wave's row count unchanged (12,435 in 2021-22: the
+hollow set did not move, and 5 served 2021-22 lines keep both flags NA).  Cells move only in the two EHCVM
+waves' acquisition columns (=Purchased= 5,658 / 4,307 cells, =Quantity_purchased= 5,760 / 4,356); the new
+gift columns equal the old purchase columns row for row; the four columns are NA on the ECVMA waves.
+=seed_kg= and =nitrogen_kg= are frame-equal, and =Feature('plot_inputs')= equals the Country table on every
+value column.
+
+*Unit vocabulary, one mismatch disclosed and not folded.*  Every served =Unit_purchased= / =Unit_received_as_gift=
+label is a label =u= serves, except 2021-22's =Charrette Bovine= (62 lines) and =Charrette Asine= (12) on
+=Unit_purchased=: =s16bq09b='s value labels capitalise them, while =s16bq03b= and =s16bq07b= write
+=Charrette bovine= / =Charrette asine=, which is what =u= and =Unit_received_as_gift= serve.  Folding the case
+needs a row in =_/categorical_mapping.org='s =u= table, which is a build input of every Niger wave (the ECVMA
+ones included), so it is left for the next edit of that table.
+
+*Cost, measured* (hash census against =f138a3d61=): Niger 25 of 25 =Country._table_cache_hash= and 50 of 100
+=Wave._input_hash= (the 25 of 2018-19 and the 25 of 2021-22; 2011-12 and 2014-15 do not move, because
+=niger.py= is not edited); =build_transforms_fingerprint= 0 of 42, =framework_imports_fingerprint= 0 of 38.
+
