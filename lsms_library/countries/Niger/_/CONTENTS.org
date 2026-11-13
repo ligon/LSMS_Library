@@ -3813,3 +3813,173 @@ all 100 / 96 =Wave._input_hash= values (196 of 2,321), no other country's; 0 of 
 the 2026-11-12 follow-up rulings (head =3199f2f6b=): the same 49 / 196 and nothing else; the Site Q
 commit alone (=quantity_audit._SCREENED_COLUMNS= / =_NEAR_ZERO_COLUMNS=) moves 0 of 555, 0 of
 2,321, 0 of 42 and 0 of 38, because Site Q's callables are excluded from every fingerprint.
+
+* 2026-11-12 -- 2018-19 =s07bq07a= computed on 14.2% of records (GH #1708)
+
+/Ruling @ligon 2026-11-12, "Flag now, diagnose"./  Registered key, keep serving, diagnose; the drop
+decision returns to the maintainer.  /It has returned: the second ruling of 2026-11-12, "Revalue at
+local median", revalues the =Expenditure= of the 12,227 of these rows that #876 values (next
+section)./
+
+*What is flagged.*  A record of =s07b_me_ner2018.dta= whose =s07bq07a= (the quantity of the LAST
+purchase) is positive and off the quarter grid (not a multiple of 0.25): 15,264 of the 107,263
+positive values (14.2%).  14,908 of them carry 13 to 18 decimals, which is double-precision
+arithmetic; 2021-22, the same instrument, has 15 off-grid values in 112,923.  The 356 with fewer
+decimals are kept in the class: a value divided by a round price can be short (25 / 200 = 0.125),
+and the 2021-22 rate bounds the typed ones at about 15.  A computed value that lands ON the grid
+cannot be seen.  Each served purchased row built from a flagged record carries
+=Niger::food_acquired::computed-last-purchase-quantity= beside its #876 key (=2018-19/_/mapping.py=):
+15,014 rows, 12,227 of them with an =Expenditure=, which was 26.0% of 2018-19's served
+=Expenditure=, since =Expenditure= = =Quantity= x =s07bq08= / =s07bq07a=.  Under this first ruling
+nothing else changed; under the second the =Expenditure= of those 12,227 is revalued, and the other
+2,787 stay NA (next section).
+
+*The flagged rows are rows where the questionnaire ENABLES the field.*  15,263 of the 15,264 have
+=s07bq06= in (1, 2, 3) (hier 3,543, 7 jours 10,774, 30 jours 946; one =Plus de 30 jours=), where
+=s07Bq07a= is enabled, and their values were reconstructed from a reference unit value (diagnosis
+below).  /The premise of the first ruling's summary is reversed:/ it read "s07bq07a on 14.2% of rows
+(CAPI disables it there)", but the disabled rows are a different set.
+
+*A separate set: disabled but filled.*  The file ALSO fills =s07bq07a= on 21,063 records where the
+CAPI disables it (=s07bq06= =Plus de 30 jours= or =Jamais=, or missing): all on the grid but one (the
+=Plus de 30 jours= record above), 8,050 equal to =s07bq03a=, 114 in the consumption unit, and with
+=s07bq08= empty on every one, so they feed no served value.  They are recorded here and not keyed.
+
+*Diagnosis: how the values were built.*  Read-only, on the raw file (burst jobs 41248432, 41248724,
+41249061; aggregates under =reports/served-corrections/= of the 2026-11-12 sweep).
+
+1. /A unit-value rule./  On 13,735 of the flagged records (90.0%) the unit value =s07bq08= /
+   =s07bq07a= is one value per (product, unit, size, region): 926 such cells, the value repeating
+   across households whose =s07bq08= differ.  On 12,250 records =s07bq08= is an integer, as the
+   field requires, so there =s07bq07a= = =s07bq08= / P: the QUANTITY was backed out of the reported
+   value at a reference unit value P.  On 3,013 (3,008 of them at P) =s07bq08= is not an integer
+   either, though the CAPI field is "NUMERIQUE: ENTIER", so both the value and the quantity are
+   constructed (=s07bq08= = =s07bq07a= x P); every one of the 2,186 records of product 119 at P =
+   200 FCFA a =Sachet (Moyen)= is of this kind.  The values are rationals whose denominators (9,
+   13, 27, 189, 477, 567, 1,967, ...) come from dividing by a P with decimals.
+2. /P is not a statistic of this file./  It equals the median of the cell's on-grid (reported) unit
+   values on 3,184 records and their mean on 2,168; the national median of (product, unit, size)
+   on-grid unit values in 76 of 926 cells; the mean or median of the 2018-19 community prices
+   (=s05_co_ner2018=, by product, unit-size and region) in 8 to 24 of the 282-539 cells that have
+   one.  431 of the 926 P are integers (200, 4,500, 150, ...); others are like 45.325 or 49.175.
+3. /Not a conversion through the survey's own unit weights./  =s07bq07a= x the NSU weight of its
+   unit lands on a round 0.1 kg for 0.95% of flagged records, against 9.4% of on-grid ones.
+4. /Systematic, not a few outliers./  14.2% in each =vague=, 10-18% of a grappe's records (p10 to
+   p90), and 5,509 of 5,987 households have at least one (none has all).  The on-grid unit values
+   in the same cells run 0.46 to 1.36 times P (p5 to p95), and 1,289 of 20,133 lie beyond 2x, so the
+   rule did not replace everything outside a band around P.
+
+So: a reference unit value per cell, applied to about one record in seven, either to back out the
+quantity from the value or to rebuild both.  Not established: how P was chosen, which records were
+selected, and what was originally answered (not recoverable from the file).  No document explains
+it: the Niger 2018 BID and INS profile are generic, and the 2021-22 documents describe valuation at
+"les valeurs unitaires calculées dans le ménage" or a geographic mean, an analysis step, not a
+rewrite of the section file.  The World Bank DDI (4296) itself shows =s07bq08= with minimum 8.547.
+
+*Measured under the first ruling, cold, development =e5fdd2fa8= against the candidate (burst job
+41249476).*  =food_acquired=: same index, every column but =Derivation= equal, =Derivation= changed
+on exactly the 15,014 rows and only by this key; =food_expenditures=, =food_prices= and
+=food_quantities= frame-equal.
+=derivation_inputs= returns the 15,264 records (with =s07bq06= in its code); every stamped row
+joins them.  Cost: 24 of 24 Niger table hashes and the 24 2018-19 wave hashes, no other country's.
+
+* 2026-11-12 -- 2018-19 flagged purchases revalued at a local median (GH #1708)
+
+/Ruling @ligon 2026-11-12, "Revalue at local median"./  The maintainer asked first whether
+=food_expenditures= reconstructs values from reported quantities and local prices (it does not: EHCVM
+=Expenditure= is the purchased quantity x the household's OWN last-purchase unit value, #876), then
+chose: "For the flagged rows, Expenditure = purchased quantity x the median GENUINE (unflagged)
+last-purchase unit value for the same product x unit x size in the same cluster, falling back to
+region; rows with no genuine local price get NA."  Registered as
+=Niger::food_acquired::flagged-purchase-local-median= (=2018-19/_/mapping.py=).
+
+/Two details ruled afterwards, @ligon 2026-11-12, "GH1708 revaluation details, and the release
+plan"./  "Region floor of 3": a local median needs >= 3 genuine reports at cluster AND at region
+level; otherwise NA.  "Only previously valued": revalue only flagged rows that already carried a
+served =Expenditure= under #876; rows the library left NA (2,787) stay NA.  "The ruling corrects a
+construction, it does not add new values."  The first implementation (=5f113252a=..=e338fedba=, the
+same day) used a region floor of 1 and revalued all 15,014 flagged rows; its numbers are at the end
+of this section.
+
+*The rule.*  On each of the 12,227 flagged purchased rows that #876 values (not NA), =Expenditure= =
+the served purchased =Quantity= x the median of =s07bq08= / =s07bq07a= over the GENUINE reports in
+the row's cell (product =s07bq01= x consumption unit =s07bq03b= x size =s07bq03c=): its cluster's
+when the cluster has at least 3, else its region's (=s00q01= of the cover) when the region has at
+least 3, else NA.  A genuine report is an unflagged record with =s07bq07a= and =s07bq08= positive and
+its last-purchase unit and size recorded (70,933 records); it prices the cell of its OWN
+last-purchase unit and size, compared through #876's unit identity, so nothing is converted between
+units.  The row keeps its #876 and flag keys; =Quantity=, =Quantity_kg= and every consumed quantity
+are unchanged.  The scope is read by calling #876's own function (=ehcvm.derive_ehcvm_purchase_value=)
+on the inputs, and the hook checks it against the value it served.  The other 2,787 flagged
+purchased rows, which #876 serves NA (2,786 whose own last purchase used another unit or size, 1 with
+no =s07bq08=: the flagged record that answered =Plus de 30 jours=), are not revalued: they stay NA and
+carry the flag key alone.
+
+*The floors.*  Each genuine report was scored against the median of the OTHER genuine reports in its
+cell.  Within 25% of the held-out price, a cluster median of 1 other report scores 67.1% against the
+region median's 64.6%, of 2 others 63.6% against 67.4%, of 3 others 71.7% against 69.1%, of 4 69.7%
+against 70.7%, of 5 73.5% against 70.8%, and of 10 or more 87.2% against 84.9%.  The comparison
+is noisy below 5 and does not single out 3; it permits it: from 3 the cluster median is within a
+point of the region's or better, and 3 is also the smallest median one stray report cannot move.
+At the region the floor is 3 too, by ruling.  For reports whose cluster has fewer than 3 others, a
+region median of 1 other report is within 25% of the held-out price 48.5% of the time, of 2 others
+43.1%, of 3-4 49.8%, of 5-9 57.9% and of 10 or more 64.5%.  The report counts behind every value are
+in the registered function's output (=cluster_reports=, =region_reports=), so another floor is a
+re-derivation from =derivation_inputs=, not a rebuild.
+
+*Measured, cold, development =e5fdd2fa8= against =7644de2b5= (burst job 41254597, each build in its
+own private root).*  Niger serves =food_acquired= in 2018-19 and 2021-22 only.
+
+| 2018-19 purchased rows               | before (#876) | after         |
+|--------------------------------------+---------------+---------------|
+| =Expenditure=, all purchases (FCFA)  | 53,351,991.10 | 46,636,756.04 |
+| of which the 15,014 flagged rows     | 13,890,402.00 | 7,175,166.95  |
+| their share                          | 26.04%        | 15.39%        |
+| flagged rows with an =Expenditure=   | 12,227        | 9,355         |
+
+- *Levels*, of the 12,227 revalued: cluster 1,107 (9.1%), region 8,248 (67.5%), NA 2,872 (23.5%).
+  Of the NA, 1,415 have no genuine report in their region cell and 1,457 have 1 or 2 (the region
+  floor's cost).  The region values rest on 3-4 reports for 225 rows, 5-9 for 1,949 and 10 or more
+  for 6,074.  With the 2,787 left NA, 5,659 of the 15,014 flagged rows are served NA.  (The ruling's
+  "about 3,787 NA instead of 1,992" was measured over all 15,014 under the first scope.)
+- *A served total falls by 12.6%.*  The wave's purchased =Expenditure= falls by 6,715,235.06 FCFA,
+  all of it on flagged rows: 2,872 rows #876 valued are now NA, and the 9,355 that stay valued move
+  by a median ratio of 1.00.  An NA =Expenditure= is not served by =food_expenditures=, so those
+  2,872 household-item cells leave it.
+- *Against the producer's values.*  On the 9,355 rows valued before and after, revalued unit value
+  / the producer's =s07bq08= / =s07bq07a=: median 1.00, exactly equal on 28.9%, p10-p90 0.73-1.25
+  (p5-p95 0.62-1.31), within 10% 50.9%, within 25% 77.7%, within 2x 95.8%.  At the cluster level
+  (1,107) p10-p90 0.71-1.22, within 25% 69.0%; at the region level (8,248) 0.73-1.25, within 25%
+  78.9%.  The producer's reference value P is often a common real price (the diagnosis above),
+  which is why so many land on it.
+- *What else moves, against development.*  =food_acquired=: only =Expenditure= (9,618 rows change,
+  all carrying the new key) and =Derivation= (15,014 rows: the 12,227 gain the flag and this key, the
+  2,787 the flag alone) in 2018-19; same index; =Quantity= and =Quantity_kg= equal; 2021-22
+  frame-equal.  =food_expenditures= and =food_prices(units='unitvalue')= 2018-19: 2,872 rows go (now
+  NA), 6,746 change, none appear; 2021-22 frame-equal.  =food_quantities(units='units')= frame-equal.
+  The kilogram modes move in BOTH waves, because the inferred kg factors pool across waves (GH
+  #1487): =food_quantities= (='kgs'=) changes 810 rows in 2018-19 and 93 in 2021-22, totals
+  202,924.9 -> 202,940.0 kg and 208,904.3 -> 208,906.0 kg; =food_prices= (='kgvalue'=) loses the 2,872
+  rows and changes 6,894 in 2018-19, and changes 57 in 2021-22.
+- *Against the first scope (=e338fedba=).*  =Expenditure= changes on 3,667 rows, all flagged: 2,210
+  of the 2,787 it had valued are NA again, and 1,457 are withheld by the region floor.  The 9,355
+  valued by both are identical.  =food_expenditures= loses those 3,667 rows and changes none; the
+  kilogram modes move by 670 / 94 rows (=food_quantities=, 2018-19 / 2021-22) and 95 / 54 prices
+  (=food_prices=).
+- *Joins.*  =derivation_inputs= returns all 107,269 records with =flagged= (15,264); the registered
+  function run on them gives 12,227 rows and reproduces the served =Expenditure= exactly (max
+  difference 0, same NA pattern); every revalued row joins.
+- *A new build input* (measured on the first implementation, whose cover read is unchanged).  The
+  cover =s00_me_ner2018.dta= supplies the region (each of the 504 grappes in one region; every s07b
+  record on the cover), declared under =household_region:= in the wave's =food_acquired= block.  With
+  it unfetchable, =food_acquired(waves=['2018-19'])= raises =FileNotFoundError= naming the file, and
+  =food_acquired(waves=['2021-22'])= still serves.  Not measured: an all-waves call, and the kilogram
+  modes of a 2021-22 subset, which read every wave (GH #1487) and so should raise too.
+- *Residual for the maintainer.*  162 genuine reports carry a non-integer =s07bq08= (more than 1e-9
+  from an integer; an earlier count gave 167), the same "cannot have been entered" signal as the
+  flagged class.  They are unflagged, so the ruling counts them as genuine and they price their
+  cells.  How many revalued rows read such a cell was not re-measured at the ruled floors.
+- Cost: against the first implementation, 24 of 24 Niger table hashes and the 24 2018-19 wave
+  hashes, no build fingerprint; against development, the same as the flag's.
+- *The first scope, superseded.*  Region floor 1, all 15,014 flagged rows: cluster 1,361, region
+  11,661, NA 1,992; wave total 52,486,790.70, flagged rows 13,025,201.60 (24.82%), 13,022 valued.

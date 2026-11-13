@@ -77,7 +77,7 @@ standard error on =ea=; locate a household with =v=.
 | wave    | source of =ea=                                         | non-null / rows | distinct |
 |---------+--------------------------------------------------------+-----------------+----------|
 | 2005-06 | =comm=, through =comm_ea= (GH #1459, below)            | 3,123 / 3,123   |      322 |
-| 2009-10 | the same                                               | 2,410 / 2,979   |      317 |
+| 2009-10 | the same; else the household's label in another wave (GH #1536) | 2,924 / 2,979 | 321 |
 | 2010-11 | the same                                               | 2,715 / 2,716   |      321 |
 | 2011-12 | the same                                               | 2,850 / 2,907   |      321 |
 | 2013-14 | =GSEC1.ea=, direct                                     | 3,119 / 3,119   |      317 |
@@ -119,10 +119,11 @@ that no route means NA.
   So the value is the PSU through which the lineage entered the sample, not where
   the household lives or where it was itself drawn.  That is right for a design-based
   standard error and wrong as a location.
-- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 29.32% of wave weight in
-  2009-10, 4.25% in 2018-19 and 7.66% in 2019-20, and =groupby= drops a null key by default.
-  Those households are not missing at random: in the two late waves they are the no-route
-  households below, and in 2009-10 mostly movers and split-offs (GH #1459, below).
+- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 3.53% of wave weight in
+  2009-10 (29.32% until GH #1536, below), 4.25% in 2018-19 and 7.66% in 2019-20, and =groupby=
+  drops a null key by default.  Those households are not missing at random: in the two late waves
+  they are the no-route households below, and in 2009-10 split-offs no other wave records
+  (51 of the 55) and four households only =AGSEC3B= / =GSEC12= hold.
 - /=ea= does not nest in =strata=./  52 of 317 EAs in 2013-14 and 81 of 316 in 2015-16
   span more than one =sregion=; 61 of 315 and 64 of 315 span more than one =subreg= in
   the two inherited waves.  In the four early waves 0 of 322, 1 of 317, 44 of 321 and 65 of
@@ -250,9 +251,13 @@ from the raw covers.
 | wave    | numbered rows / EAs | own =comm= rows / EAs |    NA |
 |---------+---------------------+-----------------------+-------|
 | 2005-06 | 2,066 / 212         | 1,057 / 110           |     0 |
-| 2009-10 | 1,612 / 210         |   798 / 107           |   569 |
+| 2009-10 | 1,612 / 210         |   798 / 107           |   569 (55 since GH #1536) |
 | 2010-11 | 1,802 / 212         |   913 / 109           |     1 |
 | 2011-12 | 1,917 / 212         |   933 / 109           |    57 |
+
+/Filled since 2026-11-12 (GH #1536, at the end of this file): 514 of the 569 now carry the
+household's own label from another wave, and 3.53% of the weight is left.  The paragraph is kept as
+the case that was put to the maintainer./
 
 *2009-10 stays NA where =comm= is blank, as ruled, and that is a lot of weight.*  Its 569 NA rows
 hold 29.32% of the wave's weight (mean weight 1.55, against 0.87 for the rest).  514 of them hold a
@@ -267,7 +272,9 @@ new column if mixing looked wrong on the numbers, and it does not.  Across all e
 waves =ea= holds 427 labels: 212 panel EAs that appear both early and late, 110 that
 appear only early, and 105 refresh EAs (324-430) that appear only late.  No 8-digit label
 appears after 2011-12 and none collides with 1-430, so =groupby('ea')= gives one group
-per PSU.  Every household linked across a boundary keeps =ea= on all seven: 2,410 of
+per PSU.  (Still 427 after GH #1536: every label it fills is one another wave already
+serves.)  Every household linked across a boundary keeps =ea= on all seven (measured before
+GH #1536, whose filled households keep it by construction): 2,410 of
 2,410, 2,207 of 2,207, 2,510 of 2,510, 1,717 of 1,717, 2,872 of 2,872, 3,022 of 3,022 and
 2,868 of 2,868.  (Only the first three test anything.  The other four cannot come out
 otherwise: the table's construction, UBOS's encoding above, and twice a walked id and an
@@ -6171,3 +6178,54 @@ reproduced the shipped pair exactly: SkylakeX =12d25f6e...= and Haswell
 =f3d3c34d...=, and the invariance test passed under both.  PROVISIONAL until the
 batch's sixth branch (served-wave corrections) lands: its Uganda 2009-10 =ea=
 fill may move this frame again, and the entry is re-measured then.
+
+* 2026-11-12 -- 2009-10 ea from the same household in another wave (GH #1536)
+
+/Ruling @ligon 2026-11-12, "Fill, registered"./  Under "One label across all eight waves (GH
+#1459)" above, 2009-10's =ea= stayed NA where =comm= is blank: 569 rows, 29.32% of the wave's
+weight.  A household whose own =comm= gives no =ea= now takes the same household's label in
+another wave, stamped =Uganda::sample::ea-same-household=.  =v= is not involved and does not change.
+
+*The idiosyncrasies this leans on.*
+- =comm= in 2009-10 is the 2005-06 frame EA, so movers (=hh_status= 2) and split-offs (3) have it
+  blank (see "Hybrid =v= in 2009-10").  2010-11 =GSEC1= records the same households under their
+  original-sample EA, which is why a label exists elsewhere for most of them.
+- =HHID= is unchanged 2005-06 .. 2011-12, and no =updated_ids= entry covers those waves, so 2009-10's
+  served =i= is the raw =HHID= (2,975 of its 2,979 households are on =GSEC1=; the other 4 only on
+  =AGSEC3B= / =GSEC12=).  2013-14 links back through =HHID_old=, the 2011-12 =HHID=, which is what
+  =updated_ids['2013-14']= walks.  The route therefore reads RAW ids through =format_id=, never the
+  walked =i=, and reaches exactly the households the walked =i= links.
+- A split-off inherits its parent's EA, as under GH #689: the value is the PSU through which the
+  lineage entered the sample.
+
+*The rule.*  For a 2009-10 =GSEC1= household whose =comm= gives no =ea=: its =comm= in 2005-06,
+2010-11 or 2011-12, by =HHID=, through =comm_ea=; else its 2013-14 =GSEC1.ea=, by =HHID_old=.  Two
+=dfs:= sub-dfs read those covers (=ea_comm_waves=, =ea_2013_14=), so losing one costs the fill and
+not =v=; their hooks keep only those households, so the outer merge adds no row.  The fill runs
+after the =comm= keys are stamped and never changes an =ea= that is already served.
+
+*Which wave, when several hold a label.*  The =comm= waves', then 2013-14's, and every label the
+household holds must agree or the build raises =OriginEaError=, as =gsec1= / =AGSEC1= do.  The
+=comm= waves come first because they name the frame EA of the same =HHID= directly and 2005-06 is
+the wave the panel was sampled in; 2013-14 is reached only for 22 households no =comm= wave records.
+Measured on the served base frame by walked =i=: 0 of the 514 holds two different labels in any of
+the seven other waves, so the order decides nothing today.
+
+*Measured, cold, development =e5fdd2fa8= against the candidate (burst job 41249476).*
+
+|                                             | before  | after   |
+|---------------------------------------------+---------+---------|
+| 2009-10 rows with no =ea=                   | 569     | 55      |
+| ... share of 2009-10 weight                 | 29.32%  | 3.53%   |
+| 2009-10 distinct =ea=                       | 317     | 321     |
+| non-missing =ea= changed, any wave          | --      | 0       |
+
+The 514 are 192 movers, 317 split-offs and 5 originals; they take their label from 2005-06 (197
+hold one there), 2010-11 (440), 2011-12 (420) and 2013-14 (246, 22 only there).  The 55 left are 51
+split-offs no other wave records and the 4 =AGSEC3B= / =GSEC12= households; 4 of the 55 carry no
+weight.  =sample= has the same index; every column but =ea= and =Derivation= is equal, and
+=Derivation= changes on exactly the 514 rows.  =cluster_features= and
+=household_characteristics= are frame-equal.  =derivation_inputs= returns 1,303 rows for the 514
+households, and every stamped row joins them.  Cost: one Uganda re-warm (=uganda.py= and the
+2009-10 =data_info.yml=): 27 of 27 Uganda table hashes and 216 of 216 Uganda wave hashes, no other
+country's, no build fingerprint.  =var/sample= is re-pinned in =tests/fixtures/uganda_baseline.json=.

@@ -26,9 +26,12 @@ UGANDA = countries_root() / "Uganda"
 ORG = UGANDA / "_" / "categorical_mapping.org"
 LINKED = "Uganda::sample::ea-comm-link"
 OWN = "Uganda::sample::ea-own-comm"
+SAME = "Uganda::sample::ea-same-household"
 EARLY = ("2005-06", "2009-10", "2010-11", "2011-12")
 #: (linked rows, linked EAs, own-comm rows, own-comm EAs, NA), measured on the covers.
-SERVED = {"2005-06": (2066, 212, 1057, 110, 0), "2009-10": (1612, 210, 798, 107, 569),
+#: 2009-10's NA was 569 until GH #1536 filled 514 of them from the same household's
+#: label in another wave (key SAME, below); the comm counts do not move.
+SERVED = {"2005-06": (2066, 212, 1057, 110, 0), "2009-10": (1612, 210, 798, 107, 55),
           "2010-11": (1802, 212, 913, 109, 1), "2011-12": (1917, 212, 933, 109, 57)}
 
 
@@ -171,10 +174,14 @@ class TestAgainstTheSourceFiles:
 
     @pytest.mark.parametrize("wave", EARLY)
     def test_a_v_that_is_not_a_frame_code_stays_na(self, sample, wave):
+        """Unless GH #1536 filled it from the same household in another wave."""
         frame = sample.xs(wave, level="t")
         frame_code = frame["v"].astype("string").str.fullmatch(r"\d{8}").fillna(False)
-        assert frame.loc[~frame_code, "ea"].isna().all()
+        same = frame["Derivation"].astype("string").str.contains(SAME, regex=False).fillna(False)
+        assert frame.loc[~frame_code & ~same, "ea"].isna().all()
         assert frame.loc[frame_code, "ea"].notna().all()
+        assert not (frame_code & same).any()
+        assert int(same.sum()) == (514 if wave == "2009-10" else 0)
 
     def test_the_two_kinds_of_label_never_meet(self, sample):
         labels = sample["ea"].dropna().reset_index()

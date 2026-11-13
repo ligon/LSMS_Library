@@ -261,15 +261,22 @@ class TestTheFoodDispatch:
         assert 'food_prices' in seen
 
 
-def test_senegal_names_its_residues_and_its_prices():
+def test_senegal_serves_its_residues_na_since_gh1519():
+    """Re-pinned for GH #1519 (ruling @ligon 2026-11-12, "Exact-value NA rule").
+
+    Until then this test pinned what the screen named: 2018-19's three quantities
+    near 1e-19 (low tail) and the two prices above 1e21 they made.  The three are
+    now served with Quantity NA (``Senegal::food_acquired::near-zero-quantity-
+    withheld``), so no such price is served and the screen names neither.
+    """
     import lsms_library as ll
     _clear_quantity_reports()
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         served = ll.Country('Senegal').food_prices()
-    assert served['Price'].astype(float).max() > 1e21
+    assert served['Price'].astype(float).max() < 1e10
     prices = [o for r in quantity_reports('Senegal', 'food_prices') for o in r['offenders']]
-    assert sum(o['value'] > 1e21 for o in prices) == 2
+    assert not any(o['value'] > 1e21 for o in prices)
     low = [o for r in quantity_reports('Senegal', 'food_acquired')
            if r['direction'] == 'low' for o in r['offenders']]
-    assert sum(o['value'] < 1e-9 for o in low) == 3
+    assert not any(o['value'] < 1e-9 for o in low)

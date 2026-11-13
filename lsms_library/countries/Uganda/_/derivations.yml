@@ -141,3 +141,50 @@ Uganda::sample::ea-own-comm:
   validated_against: tests/test_gh1459_uganda_early_ea.py
   contents: Uganda/_/CONTENTS.org, "One label across all eight waves (GH #1459)"
   since: '2026-11-04'
+
+Uganda::sample::ea-same-household:
+  waves: ['2009-10']
+  columns: [ea]
+  rows: {}
+  rule: >-
+    A 2009-10 cover household whose own comm gives no ea (blank: movers, split-offs
+    and five originals) takes the same household's ea in another wave: its comm in
+    2005-06, 2010-11 or 2011-12 by HHID, which the survey keeps unchanged across
+    those waves, through the comm_ea table; else its 2013-14 GSEC1.ea, by HHID_old
+    (the 2011-12 HHID).  The labels a household holds must agree, or the build
+    raises OriginEaError.  Raw source ids through format_id, never the walked
+    household id.  A household with no label in those waves stays NA, and no ea
+    that is already served changes.  v is not involved and does not change.
+  function: lsms_library.countries.Uganda._.uganda:derive_ea_same_household
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_ea_same_household
+  raw_variables: [HHID, comm, HHID_old, ea]
+  assumptions:
+    - text: >-
+        ea is a label of origin, carried with a household when it moves, so a 2009-10
+        mover or split-off takes the label its own record carries in another wave.
+        That is the definition the column already serves under (ea-tracking-key,
+        ea-comm-link), and 2010-11 GSEC1 itself records the movers and split-offs
+        under their original-sample EA.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-12, "Fill, registered" (GH #1536).  Of 2009-10's 569
+        households with no ea, 514 hold a label in another wave and none holds two:
+        2005-06 197, 2010-11 440, 2011-12 420, 2013-14 246, 2015-16 229, 2018-19 207,
+        2019-20 197 (measured on the served sample by walked household id, 2026-11-12).
+        The comm waves and 2013-14 reach all 514 by raw id: 492 through comm, 22 only
+        through HHID_old.
+    - text: >-
+        when several waves hold a label, the comm waves' is used, and 2013-14's only
+        for a household they do not record: the comm waves name the frame EA of the
+        same HHID directly, and 2005-06 is the wave the panel was sampled in.  The
+        rule raises rather than choose, so the order cannot decide a served value.
+      basis: modelling-choice
+      evidence: >-
+        On all 514 every label the household holds, in all seven other waves, is the
+        same, so the order changes nothing today.
+  validated_against: >-
+    the base build: 514 of 2009-10's 569 NA ea are filled, every non-missing ea in
+    every wave is unchanged, and derivation_inputs returns rows for every stamped
+    household (Uganda/_/CONTENTS.org).
+  contents: 'Uganda/_/CONTENTS.org, "2009-10 ea from the same household in another wave (GH #1536)"'
+  since: '2026-11-12'

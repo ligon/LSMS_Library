@@ -48,6 +48,12 @@ food_acquired:
         file:
             - ../../2021-22/Data/ehcvm_nsu_ner2021.dta
             - ../../2021-22/Data/s07b_me_ner2021.dta
+    # GH #1708, ruling @ligon 2026-11-12 "Revalue at local median".  Read by mapping.py's
+    # food_acquired hook for each household's region (s00q01), the fallback level of the
+    # revaluation of flagged purchases; declared so its DVC sidecar is in this table's
+    # input hash.  If it cannot be fetched, food_acquired raises.
+    household_region:
+        file: s00_me_ner2018.dta
     idxvars:
         v: grappe
         visit: vague

@@ -39,6 +39,26 @@ def _weights(rows, year=False):
                             year='y' if year else None)
 
 
+
+def _withheld(country, wave):
+    """``(i, j)`` of the records a registered ``rows: 0`` entry withholds or serves NA.
+
+    Since 2026-11-12 (GH #1707, #1519, and Senegal's salt): those records' served rows
+    are gone, or carry Quantity NA, so the raw quantity no longer describes them.
+    """
+    import lsms_library as ll
+    from lsms_library.derivations import records_for
+    out = set()
+    for key, rec in records_for(country, 'food_acquired').items():
+        waves = rec.waves if isinstance(rec.waves, (list, tuple)) else None
+        if rec.rows == 0 and (waves is None or wave in waves):
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                raw = ll.Country(country).derivation_inputs(key, wave=wave).reset_index()
+            out |= set(zip(raw['i'].astype(str), raw['j'].astype(str)))
+    return out
+
+
 class TestNationalWeights:
     def test_a_key_is_the_median_of_its_rows_in_kilograms(self):
         w = _weights([(1, 143, 1, 100.0), (1, 143, 1, 200.0), (1, 143, 1, 900.0),
@@ -761,6 +781,9 @@ class TestDelivered:
             for name, qty in (('purchased', np.clip(total - produced - gift, 0, None)),
                               ('produced', produced), ('inkind', gift))])
         long = long[long['q'] > 0]
+        withheld = _withheld(country, wave)
+        if withheld:
+            long = long[~pd.Index(list(zip(long['i'], long['j']))).isin(withheld)]
         return long[~long.duplicated(['i', 'j', 's'], keep=False)]
 
     def _served(self, built, country, wave):

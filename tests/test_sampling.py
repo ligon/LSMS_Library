@@ -1363,6 +1363,8 @@ def _uganda_historical_cluster_view(sample):
         "Uganda::sample::ea-comm-link": early,
         "Uganda::sample::ea-own-comm": early,
         "Uganda::sample::ea-tracking-key": {"2018-19", "2019-20"},
+        # GH #1536 (2026-11-12): an `ea` fill; it never touches `v`.
+        "Uganda::sample::ea-same-household": {"2009-10"},
     }
     assert isinstance(sample, pd.DataFrame)
     assert list(sample.index.names) == ["i", "t"], "historical operand index"
