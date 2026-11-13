@@ -337,6 +337,22 @@ Data Scheme:
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    # EHCVM waves only (2026-11-13, ruling "Extend to all four now"):
+    # Purchased / Quantity_purchased read the purchase s16bq08 / s16bq09a, and
+    # the gift s16bq05 / s16bq07a, which they used to serve, rides beside it;
+    # each acquisition quantity has its own unit.  NA on the ECVMA waves.
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
     materialize: make
 
   livestock:
