@@ -92,8 +92,8 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, source_fingerprint, to_parquet
-from nigeria import (PH_QUARTER, crop_production_for_wave, _crop_labels,
-                     format_id, hh_crop_sale_records)
+from nigeria import (PH_QUARTER, W3_HARVEST_UNIT_OVERRIDE, crop_production_for_wave,
+                     _crop_labels, format_id, hh_crop_sale_records)
 
 crop_labels = _crop_labels()
 
@@ -194,6 +194,7 @@ pieces.append(crop_production_for_wave(t, [dict(
     df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode', line='cropid',
     qty='sa3iq6i', unit='sa3iq6ii', value_harvested='sa3iq6a',
     harv_m='sa3iq6c1', harv_y='sa3iq6c2', conversion=ag_conv, zone='zone',
+    unit_override=W3_HARVEST_UNIT_OVERRIDE,
     intercropped=inter, perennial=False)], crop_labels,
     hh_sales=hh_crop_sale_records('2015-16', crop_labels)))
 

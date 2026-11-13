@@ -1092,6 +1092,10 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
                                              (crop, sized unit, zone) key, never
                                              a KgFactor (GH #1518; see
                                              `crop_conversion_table`)
+            unit_override                    ``{raw harvest unit code: served
+                                             u}``, applied after
+                                             `_canon_unit` to those codes only
+                                             (W3: `W3_HARVEST_UNIT_OVERRIDE`)
             qty_sold, unit_sold, value_sold  reported sale columns (optional);
                                              `unit_sold` is the sale's OWN
                                              unit code (W1/W2 sa3q11b, GH
@@ -1184,6 +1188,12 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
             piece['u'] = u.fillna(U_UNKNOWN).values
         else:
             piece['u'] = pd.Series(U_UNKNOWN, index=df.index, dtype='string').values
+        # A frame may name raw harvest unit codes whose served `u` is set
+        # outright (W3's jerry cans, `W3_HARVEST_UNIT_OVERRIDE`).
+        if fr.get('unit_override') and fr.get('unit') in df.columns:
+            code = pd.to_numeric(df[fr['unit']], errors='coerce')
+            hit = code.isin(list(fr['unit_override'])).to_numpy(dtype=bool)
+            piece.loc[hit, 'u'] = code[hit].map(fr['unit_override']).to_numpy()
 
         # SURVEY-REPORTED kilograms per ONE unit of THIS row's `u` -- the
         # GHS-Panel "Kg/L conversion factor" column (`*_conv`), asked beside
@@ -4031,6 +4041,15 @@ def derive_food_conversion_kg(quantity, kg_per_unit):
 
 CROP_CONVERSION_KEY = 'Nigeria::crop_production::w3-ag-conversion'
 
+#: GH #1518 red team D2: W3's harvest card labels its cans "190. JERRY
+#: CAN/RUBBER 10 LITRES" (191: 20, 192: 25).  `_canon_unit` tests 'litre'
+#: before 'jerry' and folds them to 'l', so `Quantity` (a count of cans) was
+#: served as litres.  These three W3 harvest codes are served 'Jerry Can', the
+#: label W1 / W2's cans already decode to.  Deliberately NOT a change to
+#: `_canon_unit`, which also canonicalises sold units, plot_inputs and
+#: community prices.
+W3_HARVEST_UNIT_OVERRIDE = {190: 'Jerry Can', 191: 'Jerry Can', 192: 'Jerry Can'}
+
 
 def _card_bodies(dec_unit, raw_unit):
     """``{code: label body}`` of a harvest unit card, from the file's own labels."""
@@ -4173,6 +4192,19 @@ def _read_conversion_table(path):
     return get_dataframe(path, convert_categoricals=False)
 
 
+def _carries_key(derivation, key=None):
+    """Rows whose ``Derivation`` carries ``key`` (any key when None), reading a
+    compound value (``a+b``, `derivations.MULTI_SEP`) as its parts -- so a row
+    whose key is later joined with another's still reaches each one's inputs
+    (GH #1502 red team D6)."""
+    from lsms_library.derivations import MULTI_SEP
+    der = pd.Series(derivation).astype('string')
+    if key is None:
+        return der.notna().to_numpy(dtype=bool)
+    parts = der.fillna('').str.split(MULTI_SEP, regex=False)
+    return parts.map(lambda p: key in p).to_numpy(dtype=bool)
+
+
 def inputs_food_acquired_conversion(wave, rounds=None, key=None):
     """The registry `inputs` callable of the GH #1502 table conversions.
 
@@ -4204,9 +4236,7 @@ def inputs_food_acquired_conversion(wave, rounds=None, key=None):
                                             conversion=sp['conversion'])
             df = get_dataframe(sp['fn'])
             table = _read_conversion_table(sp['conversion'])
-        der = served['Derivation'].astype('string')
-        derived = served.index[(der == key).fillna(False).to_numpy(dtype=bool)
-                               if key else der.notna().to_numpy(dtype=bool)]
+        derived = served.index[_carries_key(served['Derivation'], key)]
         food_labels = harmonized_food_labels(t)
         unit_codes = food_unit_labels(t)
         i = df['hhid'].astype(int).astype(str)

@@ -3952,7 +3952,7 @@ script or the YAML block removes the PH quarter too.  Measured 2026-11-13
 | 2012Q3 | =Post Planting Wave 2/Household/sect2_plantingw2.dta=: 27,165 members of 4,744 households; =s2q8= on 17,403 | fields Section 2 |
 | 2015Q3 | none | =PP_W3_Household_Quest.pdf= contents: "2. EDUCATION ... PH ONLY" |
 | 2018Q3 | none | =pp_w4_household_quest.pdf=: sections 1, 3, 3B, 4A-4C, 5, 7A, 7B, 8, 9, 11 (PH prints "SECTION 2: EDUCATION") |
-| 2023Q3 | none | =ghs_panel_w5_pp_household_questionnaire.pdf=: sections 1, 1A-1E, 3-11, 16, no education (PH prints "SECTION 2: EDUCATION") |
+| 2023Q3 | none | =ghs_panel_w5_pp_household_questionnaire.pdf=: sections 1, 1A-1E, 3-11, 16, no education for current members; the roster asks a LEAVER's education at departure (=s1q39b=) and as of now (=s1q39c=: 3,327 rows, every one =s1q4= = NO; red team delta review) (PH prints "SECTION 2: EDUCATION") |
 
 So W1 / W2 PP record attainment for every member aged 5+ -- far more than the
 served PH new-member blocks (643 / 313 rows) -- while W3-W5 PP do not ask it.

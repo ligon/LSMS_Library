@@ -290,6 +290,43 @@ def test_crop_builder_writes_quantity_kg_never_kgfactor(nigeria):
     assert out.loc[kg.isna(), 'Derivation'].isna().all()
 
 
+def test_w3_jerry_cans_are_served_as_cans_not_litres(nigeria):
+    # GH #1518 red team D2: `_canon_unit` folds "191. JERRY CAN/RUBBER 20
+    # LITRES" to 'l'; the W3 override serves the W1 / W2 label, and touches no
+    # other code.  `_canon_unit` itself is unchanged (it also serves sold units,
+    # plot_inputs and community prices).
+    raw = pd.DataFrame({'hhid': [1, 2, 3], 'plotid': [1, 1, 1],
+                        'cropcode': [3183, 3183, 1080], 'cropid': [1, 1, 1],
+                        'qty': [4.0, 2.0, 2.0], 'unit': [191, 3, 130],
+                        'zone': [3, 3, 3]})
+    dec = raw.copy()
+    dec['unit'] = raw['unit'].map({191: '191. JERRY CAN/RUBBER 20 LITRES',
+                                   3: '3. LITRE (L)', 130: '130. SACK/BAG SMALL'})
+    assert nigeria._canon_unit('191. JERRY CAN/RUBBER 20 LITRES') == 'l'
+    assert nigeria.W3_HARVEST_UNIT_OVERRIDE == {190: 'Jerry Can', 191: 'Jerry Can',
+                                                192: 'Jerry Can'}
+    frame = dict(df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode',
+                 line='cropid', qty='qty', unit='unit', conversion=ag_table(),
+                 zone='zone')
+    crops = {1080: 'Maize', 3183: 'Palm oil'}
+    before = nigeria.crop_production_for_wave('2016Q1', [frame], crops)
+    after = nigeria.crop_production_for_wave(
+        '2016Q1', [dict(frame, unit_override=nigeria.W3_HARVEST_UNIT_OVERRIDE)], crops)
+    u = lambda df: dict(zip(df.reset_index()['i'], df.reset_index()['u']))  # noqa: E731
+    assert u(before) == {'1': 'l', '2': 'l', '3': 'Sack/Bag'}
+    assert u(after) == {'1': 'Jerry Can', '2': 'l', '3': 'Sack/Bag'}
+    kg = after.reset_index().set_index('i')['Quantity_kg']
+    assert kg['1'] == pytest.approx(4 * 20.0)       # the can's litres, at density 1
+
+
+def test_inputs_key_filter_reads_compound_keys(nigeria):
+    # GH #1502 red team D6: a key joined with another ('a+b') still selects.
+    der = pd.Series(['A', 'A+B', 'B', pd.NA, 'AB', 'B+A'], dtype='string')
+    assert nigeria._carries_key(der, 'A').tolist() == [True, True, False, False, False, True]
+    assert nigeria._carries_key(der, 'B').tolist() == [False, True, True, False, False, True]
+    assert nigeria._carries_key(der).tolist() == [True, True, True, False, True, True]
+
+
 # ------------------------------------------------------- community prices (GH #587)
 
 def _w3_ph(nigeria, unit_labels, codes, size_texts):
