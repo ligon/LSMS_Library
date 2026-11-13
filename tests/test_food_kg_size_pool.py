@@ -26,6 +26,14 @@ from lsms_library.transformations import (
 
 from tests.test_ehcvm_7day import SIZES
 
+#: Sizes a delivered cell serves that `transformations._UNIT_SIZE_WORDS` does not yet name.
+#: Guinea-Bissau 2021-22 serves `Inteiro` (whole; 26 consumed rows, e.g. `Corda (Inteiro)`).
+#: Adding it is a `transformations.py` edit that re-warms GhanaLSS, Uganda and Ethiopia, which
+#: the 2026-11-13 ruling for this stream forbids; until it lands, an `X (Inteiro)` label is read
+#: as a unit of its own, so it neither pools with bare `X` nor is size-pooled (residual drafted
+#: in the gnb stream report).
+SIZES_NOT_YET_IN_THE_VOCABULARY = frozenset({"Inteiro"})
+
 IDX = ['t', 'i', 'j', 'u']
 READ_BACK = ['kg_per_unit', 'KgFactorSource', 'kg_item_unit', 'kg_unit',
              'kg_item_n_waves', 'kg_item_wave_spread', 'baseline_refused_spread']
@@ -109,8 +117,11 @@ class TestWhatASizeIs:
     def test_the_vocabulary_is_the_delivered_sizes(self):
         """The chain that stops drift: a delivered cell serving a new size fails
         ``test_every_size_suffix_is_the_countrys_own`` until it joins ``SIZES``,
-        and this fails until it joins the vocabulary."""
-        assert _UNIT_SIZE_WORDS == frozenset().union(*SIZES.values())
+        and this fails until it joins the vocabulary -- or is named in
+        ``SIZES_NOT_YET_IN_THE_VOCABULARY``, with its reason."""
+        delivered = frozenset().union(*SIZES.values())
+        assert _UNIT_SIZE_WORDS == delivered - SIZES_NOT_YET_IN_THE_VOCABULARY
+        assert not _UNIT_SIZE_WORDS & SIZES_NOT_YET_IN_THE_VOCABULARY
 
     @pytest.mark.parametrize('word', sorted(_UNIT_SIZE_WORDS))
     def test_each_word_is_spelled_as_the_hook_serves_it(self, word):

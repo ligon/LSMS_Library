@@ -45,7 +45,7 @@ from lsms_library.paths import countries_root
 WAVES = {
     'Togo': ['2018', '2021-22'],
     'Benin': ['2018-19', '2021-22'],
-    'Guinea-Bissau': ['2018-19'],
+    'Guinea-Bissau': ['2018-19', '2021-22'],
     'Senegal': ['2018-19', '2021-22'],
     'Mali': ['2018-19', '2021-22'],
     'Niger': ['2018-19', '2021-22'],
@@ -64,6 +64,8 @@ BEFORE_SUM = {
     ('Benin', '2018-19'): 87_287_926.96,
     ('Benin', '2021-22'): 111_687_481.85,
     ('Guinea-Bissau', '2018-19'): 91_353_379.75,
+    # 2021-22: the positive s07bq08 total of the release (gnb stream, 2026-11-13).
+    ('Guinea-Bissau', '2021-22'): 101_787_610.0,
     ('Senegal', '2018-19'): 171_946_367.74,
     ('Senegal', '2021-22'): 185_854_824.98,
     ('Mali', '2018-19'): 134_798_354.29,
@@ -90,6 +92,9 @@ AFTER = {
     ('Benin', '2018-19'): (68_929_996.70, 18_645),
     ('Benin', '2021-22'): (82_870_829.43, 27_522),
     ('Guinea-Bissau', '2018-19'): (57_552_942.85, 13_818),
+    # 2021-22 (gnb stream, 2026-11-13): on the release's rounded quantities, served as
+    # released under Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even.
+    ('Guinea-Bissau', '2021-22'): (60_522_116.51, 14_027),
     # 2026-11-12: 2018-19 -6,000 FCFA (GH #1519: two near-zero quantities served NA);
     # 2021-22 -17.78 FCFA and 5 gift rows (salt-per-capita-withheld).
     ('Senegal', '2018-19'): (147_339_570.63, 10_802),
@@ -122,6 +127,9 @@ OTHER_KEYS = {
     ('CotedIvoire', '2021-22'): {
         'CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld',
         'CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion'},
+    # 2026-11-13 ("Serve, registered key"): every row of the wave is served as released
+    # and keyed, its quantities rounded to even integers by the producer.
+    ('Guinea-Bissau', '2021-22'): {'Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even'},
 }
 
 #: The unit sizes each country may serve in `u` (GH #1224): each instrument's own
@@ -134,7 +142,9 @@ SIZES = {
     'Burkina_Faso': {'Petit', 'Moyen', 'Grand'},
     'CotedIvoire': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier', 'Très petit',
                     'Très grand'},
-    'Guinea-Bissau': {'Pequeno', 'Medio', 'Grande'},
+    # 2021-22 (gnb stream) adds `Inteiro`, which the vocabulary does not yet name: see
+    # tests/test_food_kg_size_pool.py SIZES_NOT_YET_IN_THE_VOCABULARY.
+    'Guinea-Bissau': {'Pequeno', 'Medio', 'Grande', 'Inteiro'},
     'Mali': {'Petit', 'Moyen', 'Grand'},
     'Niger': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},
     'Senegal': {'Petit', 'Moyen', 'Grand', 'Très petit', 'Très petite'},

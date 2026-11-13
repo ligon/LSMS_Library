@@ -320,3 +320,69 @@ def test_the_departed_keep_their_recorded_sex_and_nothing_is_invented():
     gone = r[r["Departed"].astype("boolean").fillna(False)]
     assert len(gone) == 341
     assert gone["Sex"].notna().sum() == 246
+
+
+ROUNDED = "Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even"
+ROUNDED_TO_ZERO = "Guinea-Bissau::food_acquired::s07b-consumed-quantity-rounded-to-zero"
+
+
+class TestFoodDeclared:
+    def test_the_two_rounding_keys_are_registered(self):
+        recs = ll.Country(COUNTRY).derivations()
+        r, z = recs[ROUNDED], recs[ROUNDED_TO_ZERO]
+        assert list(r.waves) == list(z.waves) == [WAVE]
+        assert r.rows == {} and z.rows == 0
+        assert r.resolve()(7.0) == 7.0                      # served as released
+        m = _mapping_module()
+        assert list(m.round_half_up_to_even([0.5, 1, 1.5, 2.5, 3, 7])) == [0, 2, 2, 2, 4, 8]
+
+    def test_the_purchase_unit_is_read_on_the_consumption_units_spelling(self):
+        m = _mapping_module()
+        assert m.LastPurchaseUnitCode("Lata") == "Lata/caneca"
+        assert m.LastPurchaseUnitCode("Pedaço (25 F)") == "Pedaço"
+        assert m.LastPurchaseUnitCode("Monte") == "Monte"
+
+
+@pytest.mark.requires_s3
+class TestFoodServed:
+    @pytest.fixture(scope="class")
+    def fa(self):
+        return _served("food_acquired", waves=(OLD, WAVE))
+
+    def test_every_2021_row_carries_the_rounding_key_and_no_2018_row_does(self, fa):
+        new, old = fa.xs(WAVE, level="t"), fa.xs(OLD, level="t")
+        assert new["Derivation"].fillna("").str.contains(ROUNDED, regex=False).all()
+        assert not old["Derivation"].fillna("").str.contains(ROUNDED, regex=False).any()
+
+    def test_the_served_quantities_are_the_releases_even_integers(self, fa):
+        """Every served quantity is an integer, and even but for 46: the 23 rows where
+        s07bq03a = s07bq04 + s07bq05 keep an odd s07bq04 and s07bq05, served on their
+        produced and in-kind rows (they leave no purchased residual)."""
+        new = fa.xs(WAVE, level="t")
+        q = pd.to_numeric(new["Quantity"], errors="coerce")
+        assert q.notna().sum() > 100_000
+        q = q.dropna()
+        assert (q == np.floor(q)).all()
+        odd = q[np.mod(q, 2) != 0]
+        assert len(odd) == 46
+        s = pd.Series(odd.index.get_level_values("s")).value_counts().to_dict()
+        assert s == {"produced": 23, "inkind": 23}
+
+    def test_the_zeroed_consumed_rows_are_a_registered_deletion(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            z = ll.Country(COUNTRY).derivation_inputs(ROUNDED_TO_ZERO, wave=WAVE)
+        assert len(z) == 3945
+        assert (pd.to_numeric(z["s07bq03a"], errors="coerce") == 0).all()
+        assert (z["s07bq02"] == "Oui").all()
+
+    def test_the_rounding_inputs_join_the_served_rows(self, fa):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            inp = ll.Country(COUNTRY).derivation_inputs(ROUNDED, wave=WAVE)
+        new = fa.xs(WAVE, level="t")
+        served = set(zip(new.index.get_level_values("i").astype(str),
+                         new.index.get_level_values("j").astype(str)))
+        keys = set(zip(inp.index.get_level_values("i").astype(str),
+                       inp.index.get_level_values("j").astype(str)))
+        assert served <= keys
