@@ -139,6 +139,20 @@ class TestRecoveryRules:
         assert got[1] == 1.0 and got[2] == 3.0
         assert got[4] == pytest.approx(2.5 / 1.6725)
 
+    def test_a_recovered_zero_with_own_production_or_a_gift_gets_no_purchased_row(self):
+        """Ruling 2026-11-12, "NA row only for the 11": a withheld count that recovers to 0
+        is served a purchased row NA only when it reports neither own production nor a
+        gift.  With either, its filed residual 0 - s07bq04 - s07bq05 is negative, so no
+        purchase is implied and it stays represented by its own-production or gift rows."""
+        from lsms_library.derivations import resolve_callable
+
+        implied = resolve_callable(
+            "lsms_library.countries.Togo.2021-22._.mapping:_purchase_implied")
+        q3 = np.array([0.0, 0.0, 0.0, 3.0])
+        q4 = np.array([0.0, 0.5, 0.0, 1.0])
+        q5 = np.array([0.0, 0.0, 0.25, 0.0])
+        assert list(implied(q4, q5, q3 - q4 - q5)) == [True, False, False, True]
+
 
 class TestDeclared:
     def test_a_split_good_does_not_take_2018s_bundle_label(self):
@@ -376,15 +390,17 @@ class TestServed:
         floors = np.isclose(np.floor(k * f + 1e-9), q3) & np.isclose(q3, q3.round())
         quarter = np.isclose(q3 / f * 4, (q3 / f * 4).round())
         answer = (q3 / f).where(~count, k)
-        # A count outside Grand Lomé that recovers to 0 (filed 0) is withheld too, and is
-        # served a purchased row NA whatever its own production or gift: ruling 2026-11-12,
-        # "Recover; a 0 becomes NA".
+        # A count outside Grand Lomé that recovers to 0 (filed 0) is withheld too: ruling
+        # 2026-11-12, "Recover; a 0 becomes NA".  It is served a purchased row NA only when
+        # it reports neither own production nor a gift (ruling 2026-11-12, "NA row only for
+        # the 11"): a filed 0 with own production or a gift has a negative filed residual,
+        # so no purchase is implied and none is invented.
         zero = count & ~lome & (q3 == 0)
         withheld = count & ((lome & ~own_or_gift) | (~lome & ~floors) | zero
                             | (lome & own_or_gift & ((q3 <= 0) | ~quarter)))
         answer = answer.where(~(count & lome & own_or_gift), q3 / 1.2).where(~withheld)
         answer = answer.where(~np.isclose(answer, q4 + q5, rtol=1e-6, atol=1e-6), q4 + q5)
-        implied = withheld & ((~own_or_gift) | (q3 - q4 - q5 > 1e-6) | zero)
+        implied = withheld & ((~own_or_gift) | (q3 - q4 - q5 > 1e-6))
         return s07, answer, withheld, implied, q4, q5
 
     def test_food_acquired_sums_are_the_files(self):
