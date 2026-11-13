@@ -4020,14 +4020,19 @@ total keyed against a small unit's label; that is not established.  Served as re
   median in every wave, which is why the band is ten and not two.  Holding a stated sack out of the
   baseline shows the estimator's own lean: =Sac de 100 kg= is inferred at 0.80 of its label and =Sac
   de 50 kg= at 1.25, so big lots read light and small ones heavy.
-- *3E's sales price differently and are not excluded.*  With section 3E's sales as donors, 79
-  rainy-module rows of 2011-12 lose their implied mass (1,978 judged without 3E, 1,899 with), and 3
-  of the 12 2011-12 names are 3E rows.  The framework has no Niger rule to drop them; their window
-  keys (=dry-season-sale-window=) would allow a data-driven one, which is a question in the memo.
+- *3E's sales are included, and veto one cell.*  With section 3E's sales as donors, a net 79
+  rainy-module rows of 2011-12 lose their implied mass (1,978 judged without 3E, 1,899 with): 103
+  lost and 24 gained, and all 103 are one cell, =Oseille= / =Tiya= 2011-12, where a single 3E =Kg=
+  sale moves the baseline from 5 to 6 sales and its max/min spread from 4.0 to 12.0, past the gate
+  (red team F7).  A one-donor veto under max/min below 10 sales, not a broad 3E price difference.
+  3 of the 12 2011-12 names are 3E rows.  The measurement the ruling was made on excluded 3E both
+  ways.  The framework has no Niger rule to drop them; their window key (=dry-season-sale-window=)
+  would allow a generic one, which is a question in the memo.
 - *The state rung decides 4,187 of 2021-22's 9,020 rows*, and removes 2 low names (state-blind: 4).
   2011-12 and 2014-15 record no state.
 - *2018-19 has nothing to judge* (no kilograms), and its 21 =Kg= sales are a thin baseline for a
-  rung: every cell one could serve rests on exactly 5 of them, all roselle (=Oseille=) and fresh
+  rung: every cell one could serve rests on exactly 5 of them, from 2 households (a 5-household gate
+  leaves 23 of the 161 servable rows; red team F2), all roselle (=Oseille=) and fresh
   tomato, and within roselle a =Gros sac= (21 kg, 37 sales) reads lighter than a =Sac Moyen= (28 kg,
   6 sales).  Whether those masses are wrong is not established (roselle is light); the size
   inversion is recorded in the memo, and nothing is served from it.

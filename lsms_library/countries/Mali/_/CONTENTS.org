@@ -4093,24 +4093,48 @@ has 70 such rows, all 2021-22 (carts, =Autre=, =Grenier=, ...), and one of them 
 mass (survey / implied 0.30).  It names none.  The cold frame is =assert_frame_equal= to development
 =f138a3d61=.  Cost: 41 ms of a 658 ms warm read; cache: none.
 
+*2017-18 ALREADY HOLDS THE INSTRUMENT'S KILOGRAMS PER UNIT, UNWIRED (red team F1, 2026-11-13).*
+=eaci17_s7fp2.s7fq13d=, "Equivalent en Kg", is the fourth sub-column of Q7F13, beside the quantity
+(=s7fq13a=) and the unit (=s7fq13c=) this file serves.  Joined row by row to the served 2017-18
+seasonal rows, with keys rebuilt as =2017-18/_/crop_production.py= builds them (burst job 41279383):
+24,449 of 24,449 rows join, the quantity equals =s7fq13a= on all 23,348 positive rows, =s7fq13d= is
+positive on 23,205 of them, and it is 1 on every one of the 1,688 =Kg= rows.  So it is a factor per
+unit, the canonical =KgFactor= slot (the =reported= layer).  =Sac= reads 100 on 95% of millet rows,
+so it looks like a nominal conversion, not a weighing.  Simulated through today's ladder, wiring it
+would serve the wave 32.8M kg against 1.66M now (=reported= 21,039 rows, =survey_median= 2,345,
+=none= 1,535; 2,167 refused by the reported-factor screen, reasons not split), and household-crops
+with kilograms would go from 7.6% to 94.6%; no other wave moves.  No ruling leaves it unwired; the
+"No ... kg factor ... follows" lines in the 2026-11-09 / -10 entries on the EACI 2017 state bridge
+are about the state, not this column.  2014-15's sibling =s3aq08c= is positive on 9,502 of 9,571
+rows but mixes factors and totals (it equals the quantity on 10% of =Kg= rows, and on those 511
+rows quantity x factor sums to 45.5M kg), so it is not usable as is.  Wiring =s7fq13d= is a ruling
+of its own, asked first in the #1559 rung memo (Q0).  Not done here.
+
 *For the rung (part (2), a design memo only), Mali's EAC-I waves are the case.*  Measured cold (burst
-jobs 41275992, 41276357 and 41276727), nothing served:
+jobs 41275992, 41276357, 41276727 and 41279383), nothing served:
 - 2017-18 is mostly unconverted today (23,160 of 24,921 rows on =none=; 1.66M kg served).  A
   price-implied =Sac= (=Mil= 120 kg, =Maïs= 105, =Arachide= 60, =Coton= 100) would serve 9,052 of them
-  and the wave would gain 14.8M kg.  Its baselines sit at the floor: the =Arachide=, =Mil= and =Maïs=
-  cells (8,673 rows, 10.9M kg) rest on 5, 5 and 7 =Kg= sales, because the EAC-I sold sacks state no
-  size.  The top 1% of served rows carry 27.3% of the 14.8M kg, and one row whose
-  =Quantity= Site Q already names would carry 857k kg (5.8%).
+  and the wave would gain 14.8M kg: a change of coverage (household-crops with kilograms from about
+  5% to 65-85%), not of level.  Its baselines sit at the floor: the =Arachide=, =Mil= and =Maïs=
+  cells (8,673 rows, 10.9M kg) rest on 5, 5 and 7 =Kg= sales from 5, 5 and 7 households, because the
+  EAC-I sold sacks state no size.  The top 1% of served rows carry 27.3% of the 14.8M kg, and one row
+  whose =Quantity= Site Q already names would carry 857k kg (5.8%).  Against =s7fq13d= on the same
+  9,981 rows the price-implied masses read 1.05 at the median (=Mil= / =Sac= 1.20, =Maïs= 1.05,
+  =Arachide= 0.60, =Coton= 1.00); with =s7fq13d= wired, =reported= would outrank the rung on them.
 - *The instrument's own sold factors agree with prices.*  =KgFactor_sold= (=s3aq23c=, =s7gq21d=,
-  field sales) over the price-implied kilograms per sold unit: median 1.00 in 2014-15 (48 sales) and
-  0.95 in 2017-18 (264), 96-98% within 2x; =Sac= 1.00 / 0.95, =Charretée= 0.98 / 1.17.  Without
-  cotton (72 of the 312 sales) 0.95; by crop =Maïs= 0.95, =Mil= 0.83, =Sésame= 1.00, and =Arachide=
-  1.50 (83 sales): a state-blind wave mixes in-shell and shelled groundnut.
+  field sales) over the price-implied kilograms per sold unit: median 1.00 in 2014-15 (48 sales with a
+  factor and a positive sold quantity; 39 if the sale must also be priced) and 0.95 in 2017-18 (264;
+  261), 96-98% within 2x; =Sac= 1.00 / 0.95, =Charretée= 0.98 / 1.17.  Without cotton (72 of the 312
+  sales) 0.95; by crop =Maïs= 0.95, =Mil= 0.83, =Sésame= 1.00, and =Arachide= 1.50 (83 sales): a
+  state-blind wave mixes in-shell and shelled groundnut.  For millet the keys disagree in sign: 1.20
+  against =s7fq13d= and 0.81-0.83 against the held-out sack and =KgFactor_sold=.
 - *Stated sacks held out of the baseline*: =Sac (100 Kg)= is inferred at 0.80 of its label, =Sac (50
   Kg)= at 1.00 (=Sac (25 Kg)= 1.94, on 12 sales).  =Tonne= reads 1.00, but 222 of its 231 sales are
   cotton at what looks like one fixed price, so it is not evidence.
 - *Carts exceed the reported-factor ceiling*: =Charretée= 2014-15 255 kg and =Cart (donkey)= 2018-19
   317 kg, above =KG_FACTOR_MAX= (250).
-- The tree sales (331 rows keyed =tree-sale-window=, a monthly quantity beside a total value) are
-  donors with a window mismatch.  Excluding them changes nothing on the screen; the memo asks
-  whether a rung should.
+- *Farm-level rows that carry a quantity are rung recipients* (the red team counts 244, 159 and 221 by
+  wave; the per-wave split was not checked here), and the tree sales (331 rows keyed =tree-sale-window=,
+  a monthly quantity beside a total
+  value) are donors with a window mismatch.  Excluding them changes nothing on the screen; the memo
+  asks whether a rung should.
