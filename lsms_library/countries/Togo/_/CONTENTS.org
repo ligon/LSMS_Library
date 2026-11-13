@@ -1084,10 +1084,11 @@ unfinished crops record a quantity and are keyed =harvest-to-date=.
 ** =plot_inputs=
 
 This wave reads the purchase (=s16bq08=, =s16bq09a=, =s16bq09b=) and the gift (=s16bq05=,
-=s16bq07a=, =s16bq07b=), each with its own unit, as Burkina (#1188).  WAITING: 2018's script
-serves =s16bq05= and =s16bq07a= under =Purchased= and =Quantity_purchased=, the same defect,
-recorded and not changed here, so those two columns mean different things across this
-country's waves until it is corrected.  =s16bq01= has two slots 2018's tables did not name,
+=s16bq07a=, =s16bq07b=), each with its own unit, as Burkina (#1188).  DONE 2026-11-13: 2018's
+script served =s16bq05= and =s16bq07a= under =Purchased= and =Quantity_purchased=, the same
+defect; it now reads the purchase too (ruling "Fix all three now"; see "2026-11-13 -- 2018
+=plot_inputs= reads the purchase" at the end of this file), so the columns mean the same
+thing in both waves.  =s16bq01= has two slots 2018's tables did not name,
 =Semences d'arichide= (sic) and =Plants d'hévéa, de teck=; each takes its own crop label.
 
 ** Not wired
@@ -1628,3 +1629,63 @@ new waves alike (2021-22: 958 duplicated entries) because the =harmonize_assets=
 *Cost.*  =2021-22/_/mapping.py= only: against =9b5585cf2=, Togo 22 of 22 =_table_cache_hash= and 22 of 44
 =Wave._input_hash= (the 2021-22 wave), every other country 0, =build_transforms_fingerprint= 0 of 40
 (burst job 41252164).  =_/derivations.yml= and this file move no hash.
+
+* 2026-11-13 -- 2018 =plot_inputs= reads the purchase, and the missing unit is =Unknown= (GH #1118)
+
+*Ruling (@ligon, 2026-11-13): "Fix all three now (Recommended)".*  In Guinea-Bissau 2018-19, Togo
+2018 and Benin 2018-19, =Purchased= / =Quantity_purchased= read =s16bq08= / =s16bq09a= (the
+purchase), not =s16bq05= / =s16bq07a= (the gift question).  This section is the Togo half.
+
+*The labels, from =2018/Data1/s16b_me_tgo2018.dta= itself* (burst job 41275616):
+| variable   | Stata variable label |
+|------------+----------------------|
+| =s16bq05=  | 16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de don? |
+| =s16bq07a= | 16B.07a. Selon vous,quantité en [INTRANT] reçue sous forme de cadeau ou de don? |
+| =s16bq07b= | 16B.07b. Unité (Gramme, Kilogramme, Tonne, Litre, Charrette) |
+| =s16bq08=  | 16B.08. Avez-vous acheté [INTRANT]? |
+| =s16bq09a= | 16B.09a. Quelles sont la quantité et la valeur totale de [INTRANT] achetées? |
+| =s16bq09b= | 16B.09b. Unité (12 answers: the five above, Sachet, Tiya, Sac(50kg), Sac(100kg), Boîte, Tas, Waygouizé) |
+| =s16bq09c= | 16B.09c. Montant (CFA), not read |
+Same labels as 2021-22.  The file answers both questions on every applied line but 3 (the
+three hollow lines below): gift and purchase are not exclusive (79 lines say both), and
+=s16bq07a= is filled exactly where =s16bq05= = Oui (804), =s16bq09a= exactly where =s16bq08=
+= Oui (7,128).
+
+*What is served now* (=2018/_/plot_inputs.py=): =Purchased= =s16bq08=, =Quantity_purchased=
+=s16bq09a=, =Unit_purchased= =s16bq09b=; =Received_as_gift= =s16bq05=,
+=Quantity_received_as_gift= =s16bq07a=, =Unit_received_as_gift= =s16bq07b=.  The four
+acquisition columns were declared (optional) for 2021-22 and served NA on 2018; now 2018
+fills them.  Each unit column is decoded from its own value labels and served in the
+vocabulary of =u= (=ehcvm.served_unit_labels=, so =Kilogramme= is =Kg=), as 2021-22 does.
+=u= is unchanged: it is the unit of the quantity USED, =s16bq03b=.
+
+*What moves, on the 13,730 served 2018 lines* (applied lines 13,733 less the 3 hollow ones the
+framework's =dropna(how='all')= removes; they are blank in both flags, so the hollow set does
+not change):
+| column | before (gift question) | after (purchase question) |
+|--------+------------------------+---------------------------|
+| =Purchased= True / False | 804 / 12,926 | 7,128 / 6,602 |
+| =Quantity_purchased= non-null | 804 | 7,128 |
+| =Received_as_gift= True / False | NA | 804 / 12,926 |
+The lines cross-tabulate (gift x purchase): Non/Non 5,877, Non/Oui 7,049, Oui/Non 725, Oui/Oui 79.
+So 725 lines that were served =Purchased= True are gifts that were not bought, and 7,049 bought
+lines were served False.  Quantities are in each line's own acquisition unit, not in =u=, so
+no total is quoted across units.  =seed_kg= and =nitrogen_kg= read =Quantity= and =u= only and
+are unaffected by this half.
+
+*The missing unit.*  12 applied lines leave =s16bq03b= blank (4 with no quantity, 8 with a
+positive one); 3 of them are the hollow lines, and the other 9 were served =u= = =Manquant=,
+a label the script minted: =s16bq03b='s value labels are Gramme, Kilogramme, Tonne, Litre and
+Charrette, with no missing-marker, so there is no raw answer to keep in a column of its own
+(Niger's case, GH #842, where =Manquant= is a source label, does not arise).  They are now
+served =Unknown=, the corpus missing-unit sentinel (GH #1041 contract).  2021-22 already wrote
+=Unknown= (1 line).  Both spellings are missing-unit sentinels to the kg ladder
+(=transformations._U_SENTINELS=), so no kilogram moves.
+
+*Not changed, and stale:* the docstring of =2021-22/_/plot_inputs.py= still says 2018 serves the
+gift question.  Editing it would move every 2021-22 =Wave._input_hash= of this country (the wave
+directory's =.py= files are hashed whole) for a comment, so it is left for the next edit of that
+wave; this section is the record.
+
+*Cost.*  =2018/_/plot_inputs.py= and =_/data_scheme.yml=: every Togo =Country._table_cache_hash= and
+every 2018 =Wave._input_hash=; measured in the stream report (=burst/isa-sm-20261113/reports/manquant/=).

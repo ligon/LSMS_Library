@@ -759,7 +759,9 @@ def test_the_sweep_sees_the_known_minting_sites():
     ledgered non-sentinel ones."""
     found = {(p, v) for p, _, v in _minted_unit_spellings()}
     assert ('Niger/_/niger.py', 'Unknown') in found
-    assert ('Togo/2018/_/plot_inputs.py', 'Manquant') in found
+    # Togo 2018 wrote the minted 'Manquant' until GH #1118 (2026-11-13); the
+    # site still mints, now the corpus sentinel.
+    assert ('Togo/2018/_/plot_inputs.py', 'Unknown') in found
     assert ('Uganda/_/uganda.py', 'Unknown') in found
     assert ('Uganda/_/uganda.py', 'Value') in found
     assert ('Panama/1997/_/food_acquired.py', 'Value') in found

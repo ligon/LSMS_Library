@@ -7,9 +7,24 @@ agricultural-input roster, one row per input-type the household was asked
 about.  Columns:
   s16bq01   input type (organic / inorganic fert / phyto / seeds-by-crop)
   s16bq02   USED this input? (1=Oui / 2=Non) — application gate
-  s16bq03a / s16bq03b   quantity used + native unit
-  s16bq05   purchased? (Oui / Non)
-  s16bq07a  quantity purchased (native unit)
+  s16bq03a / s16bq03b   quantity used + native unit (`u`)
+  s16bq05 / s16bq07a / s16bq07b   GIFT: received as a gift or donation?
+            (Oui / Non), the quantity received, and its own unit
+  s16bq08 / s16bq09a / s16bq09b   PURCHASE: bought? (Oui / Non), the
+            quantity bought, and its own unit
+
+THE PURCHASE IS s16bq08 (GH #1118 sweep; ruling @ligon 2026-11-13, "Fix all
+three now").  The file's own Stata labels: s16bq05 "16B.05. Avez-vous obtenu
+[INTRANT] sous forme de cadeau ou de don?", s16bq07a "16B.07a. Selon vous,
+quantité en [INTRANT] reçue sous forme de cadeau ou de don?", s16bq08 "16B.08.
+Avez-vous acheté [INTRANT]?", s16bq09a "16B.09a. Quelles sont la quantité et la
+valeur totale de [INTRANT] achetées?".  Until 2026-11-13 this script served the
+GIFT answers under Purchased / Quantity_purchased; they now ride in
+Received_as_gift / Quantity_received_as_gift, as Togo 2021-22 and Burkina Faso
+(GH #1188) serve them.  Each acquisition unit is decoded from its OWN value
+labels (s16bq09b has a 12-answer card, s16bq07b and s16bq03b five) and served
+in the vocabulary the API serves `u` in (ehcvm.served_unit_labels, as 2021-22).
+`u` still describes the quantity USED.  s16bq09c (purchase value) is not read.
 
 *** TOGO PATH / WAVE QUIRKS: source in 2018/Data1/; wave dir 2018; code
 suffix tgo2018; t='2018'; standardized module (NOT Togo_survey2018_*). ***
@@ -33,6 +48,7 @@ sys.path.append('../../_/')
 import pandas as pd
 
 import lsms_library.local_tools as tools
+from lsms_library.ehcvm import served_unit_labels
 from lsms_library.local_tools import get_dataframe, to_parquet
 
 
@@ -42,9 +58,15 @@ from lsms_library.local_tools import get_dataframe, to_parquet
 # through the framework's NaN-key duplicate collapse (groupby().first()
 # drops NaN grouping keys).  Inlined verbatim from niger.CROP_NA.
 CROP_NA = '(not crop-specific)'
-# Missing-unit fill (a reported input may lack a recorded unit, e.g. a count
-# of bags); keeps the `u` index level non-null.  Matches niger's 'Manquant'.
-UNIT_NA = 'Manquant'
+# Missing-unit fill: an applied input whose used-unit answer s16bq03b is blank
+# (12 applied lines of 2018, 8 of them with a positive quantity) keeps a
+# non-null `u` index level under the corpus missing-unit sentinel `Unknown`
+# (GH #1041 contract; GH #1118).  It used to be the minted French 'Manquant',
+# which is no label of this file: s16bq03b's value labels are Gramme,
+# Kilogramme, Tonne, Litre and Charrette, and the raw answer is simply missing,
+# so there is no recorded answer to keep beside it.  Niger made the same move
+# in GH #842.
+UNIT_NA = 'Unknown'
 
 
 def i(value):
@@ -86,18 +108,32 @@ def _unit_labels(series, unit_map):
     return u.map(lambda x: unit_map.get(x, x) if pd.notna(x) else pd.NA).astype('string')
 
 
+def _served_units(series):
+    """Each acquisition-unit label as the API serves `u` (Kilogramme -> Kg via
+    the global u table); NA stays NA.  Same helper as 2021-22."""
+    raw = series.astype('string').str.strip()
+    known = raw.dropna().unique()
+    served = dict(zip(known, served_unit_labels('Togo', known)))
+    return raw.map(served).astype('string')
+
+
 def _finish_plot_inputs(df, t):
     """Common tail (inlined from niger._finish_plot_inputs): coerce numeric
     columns, fill the CROP_NA / UNIT_NA sentinels so every index level is
     non-null, drop rows with no input identity, build the
     (t, i, input, crop, u) index."""
-    for col in ['Quantity', 'Quantity_purchased']:
+    for col in ['Quantity', 'Quantity_purchased', 'Quantity_received_as_gift']:
         if col not in df.columns:
             df[col] = pd.NA
         df[col] = pd.to_numeric(df[col], errors='coerce').astype('Float64')
-    if 'Purchased' not in df.columns:
-        df['Purchased'] = pd.NA
-    df['Purchased'] = df['Purchased'].astype('boolean')
+    for col in ['Purchased', 'Received_as_gift']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = df[col].astype('boolean')
+    for col in ['Unit_purchased', 'Unit_received_as_gift']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = df[col].astype('string')
     df['t'] = t
     df['input'] = df['input'].astype('string')
     if 'crop' not in df.columns:
@@ -106,7 +142,9 @@ def _finish_plot_inputs(df, t):
     df['u'] = df['u'].astype('string').fillna(UNIT_NA)
     df = df[df['input'].notna()]
     keep = ['t', 'i', 'input', 'crop', 'u',
-            'Quantity', 'Purchased', 'Quantity_purchased']
+            'Quantity', 'Purchased', 'Quantity_purchased', 'Unit_purchased',
+            'Received_as_gift', 'Quantity_received_as_gift',
+            'Unit_received_as_gift']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'input', 'crop', 'u'])
     return df
@@ -127,8 +165,11 @@ srcn = srcn[applied.values]
 hh = src.apply(lambda r: i(pd.Series([r['grappe'], r['menage']],
                                      index=['grappe', 'menage'])), axis=1)
 
-# purchased: s16bq05 Oui/Non (labels via convert_categoricals)
-purchased = src['s16bq05'].astype('string').map({'Oui': True, 'Non': False})
+# The purchase is s16bq08 / s16bq09a / s16bq09b; the gift is s16bq05 /
+# s16bq07a / s16bq07b (labels via convert_categoricals; see the docstring).
+yes_no = {'Oui': True, 'Non': False}
+purchased = src['s16bq08'].astype('string').map(yes_no)
+received_as_gift = src['s16bq05'].astype('string').map(yes_no)
 
 df = pd.DataFrame({
     'i':                  hh.values,
@@ -137,7 +178,11 @@ df = pd.DataFrame({
     'u':                  _unit_labels(src['s16bq03b'], unit_map).values,
     'Quantity':           pd.to_numeric(srcn['s16bq03a'], errors='coerce').values,
     'Purchased':          purchased.values,
-    'Quantity_purchased': pd.to_numeric(srcn['s16bq07a'], errors='coerce').values,
+    'Quantity_purchased': pd.to_numeric(srcn['s16bq09a'], errors='coerce').values,
+    'Unit_purchased':     _served_units(src['s16bq09b']).values,
+    'Received_as_gift':   received_as_gift.values,
+    'Quantity_received_as_gift': pd.to_numeric(srcn['s16bq07a'], errors='coerce').values,
+    'Unit_received_as_gift': _served_units(src['s16bq07b']).values,
 })
 
 df = _finish_plot_inputs(df, '2018')
