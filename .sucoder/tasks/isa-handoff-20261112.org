@@ -185,3 +185,9 @@ reports/*/work/private, */data.
   (+#1134), Nigeria #1502/#1518 + #1537 + #587 PH follow-ups, Malawi #1228,
   GNB labels, Manquant (#1118), Burkina bundle (+#1442), GNB 2021-22, Benin panel
   (#1705), #1559 price screen + crop rung, #1709 CFE test, #1712, #1713, #1714, #1716.
+- 2026-11-13: user chose release option (B) "you do the tag and push": annotated
+  tag v0.17.0 (object 169517a90, message "Release 0.17.0", as `make release`
+  writes) on master cf09ea6b4, pushed to GitHub and the mirror.  make release's
+  pytest step skipped as redundant (master tree 47ce9ffd8 == gated head
+  3ccfbcd0c tree).  Next: publish the GitHub Release (web UI preferred);
+  docs/releases/v0.17.0.md to land in the next development PR with #1716.
