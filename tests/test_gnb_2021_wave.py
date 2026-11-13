@@ -143,3 +143,54 @@ class TestServed:
         # The served value is the raw composite with the region part folded.
         folded = rebuilt.map(lambda x: " ".join([REGION[x.rsplit(" ", 1)[0]], x.rsplit(" ", 1)[1]]))
         assert (folded.reindex(served.index) == served).all()
+
+    # --- household_roster -----------------------------------------------------------
+
+    def _members(self):
+        s01 = _raw("s01_me_gnb2021.dta")
+        labels = get_dataframe(ROOT / "s01_me_gnb2021.dta", categories_only=True)["s01q00aa"]
+        gone = {int(k) for k, v in labels.items() if str(v).strip().lower() in ("não", "nao")}
+        assert gone, labels
+        return s01, s01[~s01["s01q00aa"].isin(gone)], s01[s01["s01q00aa"].isin(gone)]
+
+    def test_the_roster_is_the_members_ehcvm_individu_lists(self):
+        s01, members, left = self._members()
+        assert len(left) == 341
+        r = _served("household_roster").reset_index()
+        assert r.duplicated(["i", "pid"]).sum() == 0
+        served = set(zip(r["i"].astype(str), r["pid"].astype(str)))
+        assert served == {(_i(g, m), str(int(p))) for g, m, p in
+                          zip(members["grappe"], members["menage"], members["membres__id"])}
+        ind = _raw("ehcvm_individu_gnb2021.dta")
+        assert served == {(_i(g, m), str(int(p))) for g, m, p in
+                          zip(ind["grappe"], ind["menage"], ind["numind"])}
+        assert not served & {(_i(g, m), str(int(p))) for g, m, p in
+                             zip(left["grappe"], left["menage"], left["membres__id"])}
+
+    def test_roster_sex_and_relationship_are_the_files(self):
+        _, members, _ = self._members()
+        labels = get_dataframe(ROOT / "s01_me_gnb2021.dta", categories_only=True)
+        sex = {int(k): {"Masculino": "M", "Feminino": "F"}[str(v).strip()]
+               for k, v in labels["s01q01"].items()}
+        r = _served("household_roster").reset_index()
+        got = dict(zip(zip(r["i"].astype(str), r["pid"].astype(str)), r["Sex"].astype(str)))
+        want = {(_i(g, m), str(int(p))): sex[int(s)] for g, m, p, s in
+                zip(members["grappe"], members["menage"], members["membres__id"], members["s01q01"])}
+        assert got == want
+        # Nephews and nieces (`Sobrinho(a)`, new in this wave) decompose: kinship.yml.
+        rel = {int(k): str(v).strip() for k, v in labels["s01q02"].items()}
+        code = [k for k, v in rel.items() if v == "Sobrinho(a)"][0]
+        nephews = {(_i(g, m), str(int(p))) for g, m, p, c in
+                   zip(members["grappe"], members["menage"], members["membres__id"], members["s01q02"])
+                   if c == code}
+        assert len(nephews) > 6000
+        x = r[[k in nephews for k in zip(r["i"].astype(str), r["pid"].astype(str))]]
+        assert len(x) == len(nephews)
+        assert (x["Generation"] == -1).all() and (x["Distance"] == 1).all()
+        assert (x["Affinity"] == "consanguineal").all()
+
+    def test_ages_are_plausible_and_mostly_known(self):
+        r = _served("household_roster")
+        age = pd.to_numeric(r["Age"], errors="coerce")
+        assert age.notna().mean() > 0.95
+        assert age.min() >= 0 and age.max() < 120

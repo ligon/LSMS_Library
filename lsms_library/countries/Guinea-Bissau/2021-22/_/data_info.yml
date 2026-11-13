@@ -56,3 +56,51 @@ sample:
     final_index:
         - i
         - t
+
+household_roster:
+    # The members only: s01 lists the 2018-19 roster again and asks of each person
+    # whether they are still a member (s01q00aa).  The 341 who are not are dropped by
+    # mapping.household_roster, as ehcvm_individu leaves them out (41,160 = 41,501 -
+    # 341) and as Benin 2021-22 does, pending GH #1565.  Unlike Benin's, 246 of them
+    # still carry a sex.
+    dfs:
+        - df_main
+        - df_cover
+    df_main:
+        file: s01_me_gnb2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+            pid: membres__id
+        myvars:
+            Sex: s01q01
+            Relationship: s01q02
+            Age:
+                - s01q04a
+                - s01q03a
+                - s01q03b
+                - s01q03c
+            MonthsSpent:
+                - s01q12
+                - mapping:
+                    Sim: 12
+                    Não: 0
+            StillMember: s01q00aa
+    df_cover:
+        file: s00_me_gnb2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            interview_date: s00q23a
+    merge_on:
+        - v
+        - i
+    final_index:
+        - v
+        - i
+        - pid
