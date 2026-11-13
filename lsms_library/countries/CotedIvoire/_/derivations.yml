@@ -166,9 +166,15 @@ CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld:
         the row's s07bq04 and s07bq05 are replaced with it, so the produced and
         in-kind rows are withheld too: on H rows s07bq04 is off the grid with
         four or more decimals on 2,721 of the 2,722 where it is positive, and
-        s07bq05 off the grid on 2,047 of 2,047.
+        s07bq05 off the grid on 2,047 of 2,047.  Ruled: on an H row consumption,
+        own production and gifts are all withheld (20,536 served rows), since none
+        is the household's answer.
       basis: derived-from-data
-      evidence: measured 2026-11-12, burst job 41248473 (probe.py), s07b_me_civ2021.dta
+      evidence: >-
+        measured 2026-11-12, burst job 41248473 (probe.py), s07b_me_civ2021.dta;
+        red team r2 of GH #1697 (N7: 0 on-grid s07bq03a rows carry an H-like
+        s07bq04 or s07bq05); ruling @ligon 2026-11-12, "Withhold all three
+        (Recommended)".
     - text: >-
         the split is a rule on the value, and a heuristic: 20,507 of the 303,274
         positive s07bq03a are H at the stated tolerance (256,983 on the grid,
@@ -185,7 +191,10 @@ CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld:
     purchased, 2,722 produced, 2,045 in-kind) at (t, i, j), every one with
     Quantity and Expenditure NA; they held 3,035,627 FCFA, 2.5% of purchased
     Expenditure (burst job 41249521).  A served key an H row shares with another
-    row is withheld whole (12 rows on the first candidate).
+    row is withheld whole (12 rows on the first candidate).  Those other rows
+    cost, by the wave test's oracle (served sums against the file's non-H sums,
+    red team r2 of GH #1697): about 12 purchased units and 6.7k FCFA (0.006% of
+    purchased Expenditure), about 2 in-kind units, 0 produced.
   contents: 'CotedIvoire/_/CONTENTS.org, "s07bq03a: H withheld, L flagged (GH #1697)"'
   since: '2026-11-12'
 

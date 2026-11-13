@@ -1263,3 +1263,7 @@ full cold re-warm of GhanaLSS; no GhanaLSS served value changes (measured, burst
   =sample=, =food_acquired=, =food_expenditures=, =food_quantities= (kgs and units) and =food_prices= of
   both waves are frame-equal to the previous head =6538bc8b8= (cold, private roots, burst job 41249059),
   and no Benin hash moves.
+- *=assets= index (red team F7, GH #1710).*  The served =assets= index =(t, i, j)= is not unique in old
+  and new waves alike (2021-22: 1,871 duplicated entries) because the =harmonize_assets= relabel of =j=
+  runs in =_finalize_result= after the index collapse; no =GrainCollapseWarning= fires.  Pre-existing,
+  extended to 2021-22 by this wiring; filed as GH #1710.

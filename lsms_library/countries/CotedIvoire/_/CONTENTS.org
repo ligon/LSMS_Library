@@ -1618,3 +1618,43 @@ not unruled.
 *Cost.*  Against the previous head: Cote d'Ivoire 21 of 21 =_table_cache_hash=, 21 of 126 =Wave._input_hash=
 (the 2021-22 wave), Togo 22 of 22 and 44 of 44 for its own change, every other country 0,
 =build_transforms_fingerprint= 0 of 40 (burst job 41249059).
+
+* 2026-11-12 -- s07bq03a H scope ruled, and the second red team's sizings (GH #1697)
+
+*Ruling (@ligon, 2026-11-12, on =burst/isa-sm-20261112/reports/ehcvm2-2021-redteam2/VERDICT.md=):
+"Withhold all three (Recommended)".*  On an H row, consumption, own production and gifts are all NA
+(20,536 served rows), since none is the household's answer.  That is what the section above already
+serves, so nothing is rebuilt: every row an H source row serves, purchased 15,769, produced 2,722 and
+in-kind 2,045, carries Quantity NA, Expenditure NA and
+=CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld=.  The red team's N7 asked only that
+withholding the produced and in-kind rows be put to the maintainer; it has been, and is ruled.  The
+evidence it rests on, from that review: on H rows =s07bq04= is off the grid on 2,722 of 2,722 positive
+values and =s07bq05= on 2,047 of 2,047, and no on-grid =s07bq03a= row carries an H-like =s07bq04= or
+=s07bq05=.  Confirmed on the final head by =tests/test_civ_2021_wave.py= and =tests/test_ehcvm_7day.py=
+(the wave oracle withholds all three and the in-kind NA is pinned).
+
+*Sizings, from the second red team* (=VERDICT.md= §2 and N6-N8, at =9b5585cf2=; not re-measured here,
+and no Cote d'Ivoire build input has changed since):
+- *Collision partners.*  A non-H row withheld because it shares a served key =(t, v, i, j, u, s)= with
+  an H row is not counted row by row; the wave test's oracle sizes it.  Served sums against the file's
+  non-H sums differ by -1.7e-5 (purchased =Quantity=), -5.7e-5 (purchased =Expenditure=), -2.3e-5
+  (in-kind) and 0 (produced): about 12 purchased units, about 6.7k FCFA (0.006% of purchased
+  =Expenditure=), about 2 in-kind units and 0 produced.  Those rows' filed answers are in the 7-day key's
+  inputs only.
+- *One L row differs from its filed residual* (N8): 12,353 of the 12,354 L purchased =(t, i, j)= groups
+  equal the filed residual; the other differs by 5.0, most likely a served-key collision summed by the
+  core collapse.
+- *Large values.*  The relative decimal test cannot see four decimals above about 500.  H has 0 rows
+  above 100; an absolute test at 1e-7 flags 6,126 more rows, all classed L, of which about 26 change
+  class at a relative 1e-7, so at most about 26 hidden H rows (the float32 reading of the rest is an
+  inference, not a round-trip test).
+- *The basis.*  The H and L assumptions carry =derived-from-data=, the basis this change adds to
+  =derivations.BASES=, though their evidence is partly documentary (Document de travail no 4, ANStat).
+  The value and its position after =filename= in the ladder order are open for the maintainer (N6).
+
+*=assets= index (red team F7, GH #1710).*  The served =assets= index =(t, i, j)= is not unique in old
+and new waves alike (2021-22: 2,088 duplicated entries) because the =harmonize_assets= relabel of =j=
+runs in =_finalize_result= after the index collapse; no =GrainCollapseWarning= fires.  Pre-existing,
+extended to 2021-22 by this wiring; filed as GH #1710.
+
+*Cost of this section.*  Text only (=CONTENTS.org= and =_/derivations.yml=): no Cote d'Ivoire hash moves.

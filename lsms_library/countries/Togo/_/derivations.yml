@@ -67,8 +67,8 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
         residual on rows with no purchase (11,952 of 12,963 Jamais rows; 166 in 2018);
         it is not the fill rule, which 2018 shares.  Since 2026-11-12 (GH #1697) the
         residual is formed from s07bq03a with the factor divided out (the
-        s07bq03a-* keys): 305 Jamais rows keep a residual, and 17,525 of the 83,264
-        served purchased rows (21.0%) carry Expenditure NA, 3,895 of them withheld
+        s07bq03a-* keys): 305 Jamais rows keep a residual, and 17,546 of the 83,285
+        served purchased rows (21.1%) carry Expenditure NA, 3,916 of them withheld
         counts with no quantity; 13,630 of the other 79,369 (17.2%).  See
         _/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)".
       basis: variable-label
@@ -198,7 +198,16 @@ Togo::food_acquired::s07bq03a-regional-factor-divided-out:
     join their input row one to one the registered function re-derives the served
     quantity exactly (burst job 41249521).  ehcvm_conso_tgo2021.dta carries the
     factor (the 7-day key's validated_against), so the recovered quantity does NOT
-    reproduce depan(Achat), by design, and no document validates it.
+    reproduce depan(Achat), by design, and no document validates it.  Grand Lomé's
+    own/gift predicate misfits (red team r2, N2; disclosed, not fixed): of the 1,830
+    positive non-`unité` Grand Lomé rows with own production or a gift, 1,686 land
+    on the 0.01 grid at 1.2, 122 only at 0.9143 and 22 at neither, and all are
+    divided by 1.2.  On the 122 the served purchased quantity is 122.5 units
+    against 216.9 at 0.9143, about 18.5k against 36.9k FCFA at each row's own
+    last-purchase unit value: about 18k FCFA understated, 0.3% of Grand Lomé's
+    6.22M purchased Expenditure.  Recovery at 0.9143 where only it lands on the
+    grid is an alternative, not applied.  At this head the key's (t, i, j) groups
+    re-derive exactly: 68,744 of 68,744 (burst job 41252164).
   contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
   since: '2026-11-12'
 
@@ -211,8 +220,9 @@ Togo::food_acquired::s07bq03a-floored-count-recovered:
     the count k scaled by its region's factor f >= 1.0035 and then truncated to
     an integer.  floor(k x f) is one-to-one on integers when f >= 1, so the
     count served is the one integer k whose floor reproduces s07bq03a.  Where no
-    integer does, or s07bq03a is not an integer, the row is withheld (the
-    withheld key).  The purchased residual is formed from k.
+    integer does, or s07bq03a is not an integer, or k is 0 (s07bq03a filed as 0,
+    the floor of a count below 1 / f), the row is withheld (the withheld key).
+    The purchased residual is formed from k.
   function: lsms_library.countries.Togo.2021-22._.mapping:recover_s07bq03a
   inputs: lsms_library.countries.Togo.2021-22._.mapping:inputs_floored_count_recovered
   raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s00q01]
@@ -226,19 +236,34 @@ Togo::food_acquired::s07bq03a-floored-count-recovered:
       evidence: measured 2026-11-12, burst job 41248473 (probe.py); doc search REPORT.md §2b (T-TGO-6, -10)
     - text: >-
         the household's count was an integer: the inversion is exact only then.
-        2018, the same instrument with no factor, has 99.5% of its positive
-        `Unité` s07bq03a integer (16,410 rows), so about one recovered count in
-        two hundred may have been a fraction, served as its nearest consistent
-        integer.
+        A fractional count is served as an integer within one unit of it,
+        usually below (typically -0.5, never beyond 0.75 either way), and one
+        below 1 / f was filed as 0, which is withheld under the withheld key,
+        never served as 0.  2018, the same instrument with no factor, has 79
+        fractional counts among its 16,410 positive `Unité` s07bq03a (0.48%), 65
+        of them half Maggi cubes (`Cube alimentaire`); pushing 2018's counts
+        through the floor and this recovery puts about 54 of 2021-22's 12,670
+        `unité` rows outside Grand Lomé (0.43%) at a probable fractional count,
+        about one in five of them filed as 0; measured, 21 are filed as 0, and
+        all 21 are withheld.  The two numbers come from different sources and are
+        not reconciled.  The rate is concentrated in one item, and the
+        Maggi-cube rate of 2021-22 is not measured.
       basis: modelling-choice
-      evidence: doc search REPORT.md §2e (T-TGO-14)
+      evidence: >-
+        ruling @ligon 2026-11-12, "Recover; a 0 becomes NA (Recommended)": keep
+        the exact integer recovery outside Grand Lomé, serve a count that
+        recovers to 0 NA under the withheld key, disclose the ~54 (0.43%); the
+        simulation and the 2018 counts are red team r2 of GH #1697
+        (burst/isa-sm-20261112/reports/ehcvm2-2021-redteam2/VERDICT.md, Q1b and
+        N3); doc search REPORT.md §2e (T-TGO-14)
   validated_against: >-
     The round trip floor(k x f) = s07bq03a on every recovered row, by
-    construction: 12,665 of the 12,670 `unité` rows outside Grand Lomé pass it (4
-    integers fail it and 1 value is not an integer; those 5 are withheld).  10,039
-    served purchased rows carry the key; on the 10,035 that join their input row one
-    to one, the registered function re-derives the served quantity exactly (burst
-    job 41249521).  4,508 recovered counts differ from the filed count.
+    construction: 12,644 of the 12,670 `unité` rows outside Grand Lomé pass it with
+    a positive k (4 integers fail it, 1 value is not an integer, and 21 filed as 0
+    recover to 0; those 26 are withheld).  10,039 served purchased rows carry the
+    key; at (t, i, j) all 10,037 groups' summed recovered residuals equal the served
+    quantity, 10,035 of them one to one (burst job 41252164).  4,508 recovered counts
+    differ from the filed count.
   contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
   since: '2026-11-12'
 
@@ -250,14 +275,17 @@ Togo::food_acquired::s07bq03a-floored-count-withheld:
     A `unité` row whose count cannot be recovered is served no quantity: a
     Grand Lomé `unité` with neither own production nor a gift (factor 0.9143,
     floored, so 1 became 0 and 11 and 12 both became 10), a `unité` elsewhere
-    that no integer reproduces, and a Grand Lomé `unité` with own production or
-    a gift whose s07bq03a / 1.2 is off the quarter grid or zero.  Its produced
+    that no integer reproduces, a `unité` elsewhere that recovers to 0 (filed as
+    0, the floor of a count below 1 / f, so a fraction), and a Grand Lomé
+    `unité` with own production or a gift whose s07bq03a / 1.2 is off the
+    quarter grid or zero.  Its produced
     and in-kind rows are served from s07bq04 and s07bq05 as filed.  One
     purchased row with Quantity NA and Expenditure NA, and this key, is served
     where a purchase is implied: the row reports neither own production nor a
     gift (the 607 Grand Lomé rows the floor sent to 0 included), or its filed
-    residual is positive.  Downstream, the derived food tables drop an NA
-    before they sum, so these rows are absent there, never a zero.
+    residual is positive, or it is a count elsewhere that recovered to 0.
+    Downstream, the derived food tables drop an NA before they sum, so these
+    rows are absent there, never a zero.
   function: lsms_library.countries.Togo.2021-22._.mapping:classify_s07bq03a
   inputs: lsms_library.countries.Togo.2021-22._.mapping:inputs_floored_count_withheld
   raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s00q01]
@@ -275,10 +303,28 @@ Togo::food_acquired::s07bq03a-floored-count-withheld:
         inverted and are served NA under a registered omission"; doc search
         REPORT.md §2b (T-TGO-6/-10: Grand Lomé purchase-only `unité` rows are
         floor(q x 0.9143)); probe counts, burst job 41248473.
+    - text: >-
+        a count outside Grand Lomé filed as 0 is the floor of a count below 1 / f,
+        a fraction, so the count is not known and is withheld rather than served
+        as 0, which would serve no row at all for an item the household reported
+        (s07bq02 Oui on all 21 such rows).  Its purchase is below one unit and is
+        not known either, so it is served one purchased row NA whatever its own
+        production or gift: 11 of the 21 report neither, 10 report own production
+        or a gift below 1 / f, and for a filed 0 the filed-residual test cannot
+        say whether a purchase was made.  This reads the ruling literally: s07bq06
+        puts none of those ten's last purchase within 30 days (Jamais 4, Plus de
+        30 jours 6), so their NA row stands where a purchase is unlikely.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-12, "Recover; a 0 becomes NA (Recommended)": any
+        count that recovers to 0 is served NA under the withheld key, so no
+        reported item disappears; counts measured 2026-11-12, burst job 41252164.
   validated_against: >-
     derivation_inputs returns each withheld row's filed s07bq03a, s07bq04,
-    s07bq05 and s00q01, joining the 3,895 keyed served rows at (t, i, j) one to one
-    (burst job 41249521); every one has Quantity and Expenditure NA.
+    s07bq05 and s00q01, joining the 3,916 keyed served rows at (t, i, j) one to one
+    (burst job 41252164; 3,895 before the recovered-0 ruling, burst job 41249521);
+    every one has Quantity and Expenditure NA.  4,056 source rows are withheld:
+    Grand Lomé 4,030, Kara 10, Plateaux 7, Centrale 5, Savanes 3, Maritime 1.
   contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
   since: '2026-11-12'
 
@@ -310,15 +356,28 @@ Togo::food_acquired::s07bq03a-purchase-removed-by-division:
         s07bq03a-regional-factor-divided-out entry's first assumption, seen from
         the rows it leaves with no purchase; most of them say the household never
         bought the item (s07bq06 Jamais) or did not buy it in the last 30 days.
+        Not all of them: 1,718 report a last purchase within 30 days, 1,256 of
+        those within 7 days (7 dernier jours 1,108, Hier 148), and on those the
+        recovered consumption equals own production and gifts while s07bq06 puts
+        a purchase in the window.  That is served as the household's answers
+        read together; it was not compared with 2018.
       basis: derived-from-data
       evidence: >-
         the divided-out entry's evidence; red team round 2 of GH #1697
-        (burst/isa-sm-20261112/reports/ehcvm2-2021-redteam2/VERDICT.md, N4):
-        25,234 rows, 11,645 Jamais, 11,871 "plus de 30 jours", 1,718 bought within
-        30 days with a value.
+        (burst/isa-sm-20261112/reports/ehcvm2-2021-redteam2/VERDICT.md, N4), which
+        found the rows and gave the same counts.
   validated_against: >-
-    The count above is the red team's, at 9b5585cf2; measured again on this
-    entry's inputs callable in the burst job of the final head.
+    Measured on this entry's inputs (burst job 41252164): 25,234 rows, 24,489
+    divided and 745 count-recovered; by s07bq06 Jamais 11,645, Plus de 30 jours
+    11,871, within 30 days 1,718 (7 dernier jours 1,108, 30 derniers jours 462,
+    Hier 148); every one reports own production or a gift.  The filed residual
+    is above 1e-6 on all of them, and the recovered residual is exactly 0 on
+    25,224 and below 0 on 10.  The 108,057 source rows with a positive filed
+    residual partition as 79,535 served a purchased row from the recovered value,
+    25,234 here, and 3,288 withheld and served NA.  The inputs are the raw
+    predicate's rows, household for household; no served row carries the key.
+    155 of them share (t, i, j) with a served purchased row (a harmonize_food
+    fold partner), so the deletion is at the source-row grain.
   contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
   since: '2026-11-12'
 
