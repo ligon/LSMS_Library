@@ -879,6 +879,11 @@ GPS); =derivation_inputs= returns the three records.
   all three: their kilograms came from the bottle's stated volume at read time.  The rows stay,
   with their #876 key, as GH #1594's sentinel row stays in Mali 2014-15.  The third is left with
   no measurement.
+- *The Expenditure NA is ruled, not only mechanical.*  The first ruling named the quantity, and
+  the red team of 2026-11-12 noted that the 6,000 FCFA it removes, =(s07bq03a / s07bq07a) x
+  s07bq08= = 40 x =s07bq08=, does not depend on the common scale that corrupted the two
+  quantities.  Ruling @ligon 2026-11-12, "GH1519 Expenditure on the NA rows": "Yes, NA
+  Expenditure too".  /A value computed from a withheld quantity is withheld with it./
 - *Precedent.*  GH #1594 (Mali 2014-15 =s13q03c= = 99,999,999 masked in the wave mapper) is the
   same kind of exact-value rule, but it is recorded only in =Mali/2014-15/_/mapping.py=, Mali's
   CONTENTS, its ledger and =tests/test_mali_1594_raw_food_sentinel.py=; it has no

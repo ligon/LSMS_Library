@@ -358,7 +358,8 @@ Senegal::food_acquired::near-zero-quantity-withheld:
     A record of s07b_me_sen2018.dta whose s07bq03a and s07bq07a are both positive
     and below 1e-3 is served with Quantity NA.  Its Expenditure is NA too, because
     the registered 7day-purchase-at-last-purchase-unit-value rule multiplies that
-    quantity by s07bq08 / s07bq07a.  Its Quantity_kg is NA, as it already was on all
+    quantity by s07bq08 / s07bq07a, and because a value computed from a withheld
+    quantity is withheld with it (ruled 2026-11-12).  Its Quantity_kg is NA, as it already was on all
     three (their kilograms came from the bottle's stated volume at read time, so
     none carried the nsu-national-unit-weight key; the hook would drop that key
     where it did).  The row stays, with its #876 key.
@@ -382,6 +383,17 @@ Senegal::food_acquired::near-zero-quantity-withheld:
         Ruling @ligon 2026-11-12, "Exact-value NA rule" (GH #1519).  The values are in
         the released file, not a subtraction in the build: both subtraction orders
         agree on all 434,299 source rows examined (GH #1519).  Their cause is unknown.
+    - text: >-
+        the Expenditure the #876 rule computes from such a quantity is withheld with it,
+        on the 2 rows that had one (2,000 and 4,000 FCFA).  The value, (s07bq03a /
+        s07bq07a) x s07bq08 = 40 x s07bq08, would not depend on the common scale that
+        corrupted the two quantities; it is withheld because it is computed from a
+        quantity the table does not serve.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-12, "GH1519 Expenditure on the NA rows": "Yes, NA
+        Expenditure too", on the red team's note that the first ruling named only the
+        quantity.  "A value computed from a withheld quantity is withheld with it."
   validated_against: >-
     the base build: the three rows keep their keys and change only in Quantity (3)
     and Expenditure (2, 2,000 and 4,000 FCFA); every other row and column of the
