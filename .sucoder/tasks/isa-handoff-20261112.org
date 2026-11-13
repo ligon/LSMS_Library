@@ -145,3 +145,19 @@ merge -> user publishes GitHub Release.  Open: coverage regrade before release.
 ** Cleanup pending user "go" after merge
 Private data roots under burst/isa-sm-20261112/private/ (26 GB+) and
 reports/*/work/private, */data.
+
+* Update, 2026-11-13 07:30Z -- PR #1711 in data gate
+- PR #1711 (integration/isa-batch-20261112 -> development), head
+  3ccfbcd0c9bd45ff14b16fde81540b5a5c523d41 = six-branch tree 446adc3c2 +
+  coverage regrade 5cd2787bc + tracked blocked_sources.csv 3ccfbcd0c.
+  pr-data-validation restarted on that head 2026-11-13 ~07:27Z (first run on
+  446adc3c2 left to finish for early signal: run 43378953613).
+- Filed #1712 (Malawi plot_inputs all-null Module H columns) and #1713
+  (Nigeria individual_education PP declaration) from the regrade.
+- On green: merge #1711 (match head 3ccfbcd0c); #1604 should auto-mark merged;
+  close #1509 #1068 #1129 #1560 #1707 #1708 #1536 #1519 with comments; narrow
+  #1275 #1571 #587 #1697 #1557; fill release notes' batch section
+  (reports/release-v0.17.0/RELEASE_NOTES.md); open development -> master PR
+  from reports/release-v0.17.0/MERGE_PR_BODY.md (0 Closes lines needed per
+  CLOSES.tsv; add any batch closures that need master to fire -- none: they
+  are closed by hand); user publishes the GitHub Release v0.17.0.
