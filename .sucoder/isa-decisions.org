@@ -1,5 +1,19 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: GH1708 revaluation details, and the release plan -- ANSWERED
+- Region floor: "Region floor of 3 (Recommended)": a local median needs >= 3
+  genuine reports at cluster AND at region level; otherwise NA (about 3,787
+  NA instead of 1,992).
+- Scope: "Only previously valued (Recommended)": revalue only flagged rows
+  that already carried a served Expenditure under #876; rows the library left
+  NA (2,787) stay NA.  The ruling corrects a construction, it does not add new
+  values.
+- Release: "One release after batch".  The standing "no master release" hold
+  is LIFTED for one release, v0.17.0, cut after the six-branch integration
+  batch lands on development with a green data gate.  Sue prepares the
+  development -> master PR (one verified "Closes #N" per resolved issue) and
+  release notes for review; the user publishes the GitHub Release.
+
 * 2026-11-12: GH1509 fixture, eligibility grain and attrs naming -- ANSWERED
 - Uganda nutrition invariance fixture: "Approve the new baseline
   (Recommended)".  Update tests/test_uganda_invariance.py's var/nutrition.parquet
