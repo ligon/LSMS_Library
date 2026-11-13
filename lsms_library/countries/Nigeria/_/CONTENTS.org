@@ -817,7 +817,7 @@ served =u=:
   each with its conv 0.79-0.96 of the container in centilitres -- are conv /
   100 litres at 1 l = 1 kg, under the round's own key.  Beverage powders
   (tea, Milo, coffee) are not liquids and stay grams.  Measured cold (burst
-  job 41279736, =reports/nigeria/out/m15/=, against =f6361d068='s frames):
+  job 41279736, =reports/nigeria/out/m15-73176e056/=, against =f6361d068='s frames):
   exactly 106 =food_acquired= rows move, each x10 (=Quantity_kg= 11.47 ->
   114.7 kg in 2012Q3, 1.68 -> 16.8 in 2013Q1), keys unchanged;
   =food_quantities(units='kgs')= 2012Q3 201,888 -> 201,991, 2013Q1 158,307 ->
@@ -4029,7 +4029,13 @@ held PDFs (the W2 PDFs did not extract).
   bare numeric code (an unlabelled code arrives as a number under
   =convert_categoricals=True=).  A LABELLED answer =harmonize_education= does
   not map still passes through as recorded, and the post-harvest rows are
-  untouched (GH #1292's test now pins both sides).  Measured: see the D4 note in the GH #1502 PR (exactly 3 rows; D4_MEASURED)
+  untouched (GH #1292's test now pins both sides).  Measured cold (burst job
+  41280586, =reports/nigeria/out/m15/=): exactly 3 2012Q3 rows change
+  (="4.0" / "19.0" / "20.0"= -> =Unknown=), every other row and table as
+  before.  Census of served values (burst job 41280588,
+  =reports/nigeria/out/m16/=): no other wave of any of the 30 countries
+  that build =individual_education= serves a bare numeric code (Nepal and
+  Peru build none); nothing else is changed.
 - *W3-W5 PP are =correctly-empty=*: three rows in
   =.coder/coverage/absent_verdicts.csv= (D1, D2, C4; the evidence is the
   table above).  =latest.csv= is not regenerated here.
