@@ -554,6 +554,16 @@ MINTED_UNIT_SPELLINGS = {
     ('Tanzania/_/food_unitvalues.py', 'Kg'): (
         'Legacy script, as food_quantities.py (read only by the equally '
         'legacy food_expenditures.py; no Makefile rule).'),
+    ('Malawi/2024-25/_/food_borrowing.py', 'kg'): (
+        'GH #1275 / PR #1604 (red team F1): _served_unit gives a '
+        'derivation_inputs row the u the shared metric choke point serves it '
+        'under.  It writes "kg" exactly where _rescaled_at_choke_point holds, '
+        'the predicate of malawi.py food_acquired_to_canonical: a '
+        'leading-magnitude metric label with no cfactor is scaled to '
+        'kilograms and written u = "kg" there.  So "kg" is the converted '
+        'unit, not a missing-unit spelling.  The frame is the registered '
+        'borrow-ihs5-factor inputs, which no kg ladder reads.  Recorded at '
+        'integration (#1604 had not run the full offline suite).'),
 }
 
 #: A unit column, by subscript key or receiver text: ``u`` itself, or any
