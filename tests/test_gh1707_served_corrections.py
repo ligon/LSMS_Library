@@ -160,7 +160,7 @@ class TestSenegalRules:
                 raise FileNotFoundError(path)
             return fake.copy()
         monkeypatch.setattr(senegal21.tools, "get_dataframe", get_dataframe)
-        df = pd.DataFrame({"Quantity": fake["s07bq03a"]},
+        df = pd.DataFrame({"Quantity": fake["s07bq03a"].to_numpy()},
                           index=pd.MultiIndex.from_arrays([["a", "b"], ["Sel", "Riz"]],
                                                           names=["i", "j"]))
         out = senegal21._withhold_salt_per_capita_rows(df)
@@ -369,7 +369,7 @@ class TestServed:
         j = x.index.get_level_values("j").astype(str)
         u = x.index.get_level_values("u").astype(str)
         s = x.index.get_level_values("s").astype(str)
-        rice = ((j == "Riz local Gambiaka") & (u == "Kg") & (s == "purchased")).to_numpy()
+        rice = np.asarray((j == "Riz local Gambiaka") & (u == "Kg") & (s == "purchased"))
         assert int(rice.sum()) == 2_276                # 5,632 before
         assert round(float(x.loc[rice, "Quantity"].sum()), 1) == 23_581.7   # 55,895.1 before
         key = "Mali::food_acquired::rice-ration-block-withheld"
