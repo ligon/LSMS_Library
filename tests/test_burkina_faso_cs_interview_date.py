@@ -48,7 +48,9 @@ def test_2021_22_interview_spec_reads_both_covers_with_cs_ids():
     assert files[0] == PANEL_COVER
     assert list(files[1]) == [CS_COVER]
     assert files[1][CS_COVER]["i"] == ["grappe", "menage", {"mapping": "cs_i"}]
-    assert set(spec["myvars"].values()) == set(STAMPS)
+    # Since GH #1045 each stamp is a declarative datetime spec; its source is `datetime:`.
+    sources = {v["datetime"] if isinstance(v, dict) else v for v in spec["myvars"].values()}
+    assert sources == set(STAMPS)
 
 
 def _cover(grappe, menage, day):
