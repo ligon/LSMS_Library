@@ -1,0 +1,296 @@
+{
+ "sect12_attach_report": {
+  "2011-12": {
+   "wave": "2011-12",
+   "read": {
+    "lines": 7872,
+    "pairs": 7872,
+    "positive_value_lines": 1967,
+    "birr": 2047372.5
+   },
+   "flag_no_but_positive_lines": 0,
+   "placeholder": {
+    "lines": 873,
+    "pairs": 873,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "repeated": {
+    "lines": 0,
+    "pairs": 0,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "collides_s11": {
+    "lines": 0,
+    "pairs": 0,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "no_s9_row": {
+    "lines": 6134,
+    "pairs": 6134,
+    "positive_value_lines": 1679,
+    "birr": 1825377.5
+   },
+   "several_s9_plots": {
+    "lines": 300,
+    "pairs": 300,
+    "positive_value_lines": 128,
+    "birr": 160711.0
+   },
+   "folded_key": {
+    "lines": 2,
+    "pairs": 2,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "rows_value_filled": 544,
+   "rows_positive_value_filled": 160,
+   "rows_quantity_filled": 544,
+   "rows_stamped": 544,
+   "attached_then_dropped": {
+    "lines": 0,
+    "pairs": 0,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "attached": {
+    "lines": 563,
+    "pairs": 563,
+    "positive_value_lines": 160,
+    "birr": 61284.0
+   },
+   "rows_stamped_served": 544,
+   "rows_positive_value_served": 160
+  },
+  "2013-14": {
+   "wave": "2013-14",
+   "read": {
+    "lines": 7525,
+    "pairs": 7399,
+    "positive_value_lines": 2725,
+    "birr": 3423724.0
+   },
+   "flag_no_but_positive_lines": 9,
+   "placeholder": {
+    "lines": 0,
+    "pairs": 0,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "repeated": {
+    "lines": 239,
+    "pairs": 113,
+    "positive_value_lines": 101,
+    "birr": 145586.0
+   },
+   "collides_s11": {
+    "lines": 61,
+    "pairs": 61,
+    "positive_value_lines": 26,
+    "birr": 83250.0
+   },
+   "no_s9_row": {
+    "lines": 0,
+    "pairs": 0,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "several_s9_plots": {
+    "lines": 2452,
+    "pairs": 2452,
+    "positive_value_lines": 1186,
+    "birr": 2227273.0
+   },
+   "folded_key": {
+    "lines": 0,
+    "pairs": 0,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "rows_value_filled": 4957,
+   "rows_positive_value_filled": 1464,
+   "rows_quantity_filled": 1376,
+   "rows_stamped": 4957,
+   "attached_then_dropped": {
+    "lines": 299,
+    "pairs": 299,
+    "positive_value_lines": 22,
+    "birr": 3909.0
+   },
+   "attached": {
+    "lines": 4474,
+    "pairs": 4474,
+    "positive_value_lines": 1390,
+    "birr": 963706.0
+   },
+   "rows_stamped_served": 4748,
+   "rows_positive_value_served": 1442
+  },
+  "2015-16": {
+   "wave": "2015-16",
+   "read": {
+    "lines": 7335,
+    "pairs": 7317,
+    "positive_value_lines": 2627,
+    "birr": 3984341.0
+   },
+   "flag_no_but_positive_lines": 0,
+   "placeholder": {
+    "lines": 0,
+    "pairs": 0,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "repeated": {
+    "lines": 35,
+    "pairs": 17,
+    "positive_value_lines": 11,
+    "birr": 1315.0
+   },
+   "collides_s11": {
+    "lines": 40,
+    "pairs": 40,
+    "positive_value_lines": 8,
+    "birr": 19504.0
+   },
+   "no_s9_row": {
+    "lines": 0,
+    "pairs": 0,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "several_s9_plots": {
+    "lines": 2695,
+    "pairs": 2695,
+    "positive_value_lines": 1318,
+    "birr": 2893216.0
+   },
+   "folded_key": {
+    "lines": 6,
+    "pairs": 6,
+    "positive_value_lines": 0,
+    "birr": 0.0
+   },
+   "rows_value_filled": 4557,
+   "rows_positive_value_filled": 1290,
+   "rows_quantity_filled": 971,
+   "rows_stamped": 4557,
+   "attached_then_dropped": {
+    "lines": 62,
+    "pairs": 62,
+    "positive_value_lines": 7,
+    "birr": 7430.0
+   },
+   "attached": {
+    "lines": 4497,
+    "pairs": 4497,
+    "positive_value_lines": 1283,
+    "birr": 1062876.0
+   },
+   "rows_stamped_served": 4495,
+   "rows_positive_value_served": 1283
+  }
+ },
+ "w4_w5_verification": {
+  "codes_in_W1W3_s12_never_W1W3_s11": [
+   32,
+   41,
+   44,
+   45,
+   47,
+   50,
+   51,
+   53,
+   54,
+   57,
+   66,
+   69,
+   82,
+   83,
+   84,
+   85,
+   95,
+   103,
+   105,
+   108,
+   111,
+   112,
+   113,
+   114
+  ],
+  "share_of_s9_pairs_with_s11_record": {
+   "2011-12": {
+    "field_only_codes": {
+     "pairs": 1829,
+     "share": 0.904
+    },
+    "codes_in_both": {
+     "pairs": 3718,
+     "share": 0.73
+    },
+    "only_ever_s12_codes": {
+     "pairs": 131,
+     "share": 0.0
+    }
+   },
+   "2013-14": {
+    "field_only_codes": {
+     "pairs": 3399,
+     "share": 0.981
+    },
+    "codes_in_both": {
+     "pairs": 14106,
+     "share": 0.43
+    },
+    "only_ever_s12_codes": {
+     "pairs": 691,
+     "share": 0.0
+    }
+   },
+   "2015-16": {
+    "field_only_codes": {
+     "pairs": 3064,
+     "share": 0.915
+    },
+    "codes_in_both": {
+     "pairs": 14145,
+     "share": 0.379
+    },
+    "only_ever_s12_codes": {
+     "pairs": 829,
+     "share": 0.0
+    }
+   },
+   "2018-19": {
+    "field_only_codes": {
+     "pairs": 1827,
+     "share": 0.953
+    },
+    "codes_in_both": {
+     "pairs": 7978,
+     "share": 0.891
+    },
+    "only_ever_s12_codes": {
+     "pairs": 494,
+     "share": 0.739
+    }
+   },
+   "2021-22": {
+    "field_only_codes": {
+     "pairs": 999,
+     "share": 0.91
+    },
+    "codes_in_both": {
+     "pairs": 6704,
+     "share": 0.855
+    },
+    "only_ever_s12_codes": {
+     "pairs": 514,
+     "share": 0.796
+    }
+   }
+  }
+ }
+}

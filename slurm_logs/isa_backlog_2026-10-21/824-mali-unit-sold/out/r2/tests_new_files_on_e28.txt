@@ -1,0 +1,23 @@
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDeclared::test_one_twelve_month_total_spans_both_waves
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDeclared::test_wave_scripts_build_trees_through_the_derivation[2014-15]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDeclared::test_wave_scripts_build_trees_through_the_derivation[2017-18]
+FAILED tests/test_gh824_mali_unit_sold.py::TestDeclared::test_2017_18_sale_sums_with_min_count_vectorised
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_2014_15_quantities_are_per_month_times_months
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_2017_18_scales_the_quantities_not_the_value
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_missing_codes_are_masked_before_the_product
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_finalize_masks_field_rows_but_not_a_tree_total
+FAILED tests/test_gh824_mali_unit_sold.py::TestFinalize::test_tree_rows_take_their_own_sold_unit[2014-15-s3bq13b]
+FAILED tests/test_gh824_mali_unit_sold.py::TestFinalize::test_tree_rows_take_their_own_sold_unit[2017-18-s11fq14b]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_tree_rows_and_their_key
+FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_priced_rows_and_label_disagreements_reproduce[2014-15-tree]
+FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_no_unit_on_a_filled_in_zero
+FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_2017_18_unrecorded_sale_is_not_served_as_zero[Quantity_sold]
+FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_2017_18_unrecorded_sale_is_not_served_as_zero[Value_sold]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_edge_rule_na_counts[2014-15-Quantity]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_edge_rule_na_counts[2014-15-Quantity_sold]
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_edge_rule_na_counts[2017-18-Quantity]
+FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_2017_18_sale_matches_the_raw_answers_on_every_field_row
+ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_2014_15_quantities_are_twelve_month_totals
+ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_2017_18_quantities_are_twelve_month_totals_and_value_is_recorded
+ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_value_over_quantity_sold_is_a_price_on_the_12_month_window
+19 failed, 19 passed, 6 warnings, 3 errors in 15.48s

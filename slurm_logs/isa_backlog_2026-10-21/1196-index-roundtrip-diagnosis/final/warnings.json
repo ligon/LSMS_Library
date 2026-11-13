@@ -1,0 +1,164 @@
+{
+  "occurrences": [
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "c24ca7499cfa936e0158b90659d0cde4eae9467be9e121633c0d435b2c8db477",
+      "complete_record_sha256": "16683a2959589bfc8deb9cd664496f0333ba302d7e8047dce801b723b1f659d2"
+    },
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "d9d1036367e90fff375e02aac75cd343716f9a917fcad0c09aa32f73c702f21a",
+      "complete_record_sha256": "bb0ca88082c4363a39525f96f04d5d729a14519c396994785d47f73de8ab1b40"
+    },
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "a8c20e8f521a652c98b1e0de4b93a5e708cecc1d2b2e3d99978df532325faf09",
+      "complete_record_sha256": "d84399313abea51ad3b0cd02271ab11211e044d241e83338b795bc06f719d6a8"
+    },
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "9c123e141bb30fa52878bba09a4dab16c123c28053dc02125dd80e7d509bebfb",
+      "complete_record_sha256": "28001af98b894e5baf14afb35a3122028371a43c7a9419e87915ced70e4bc65d"
+    },
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "dc98078d69cf3298ca46e7e3d26eb5cbe50488db6961780995ea4a6ead7c406d",
+      "complete_record_sha256": "6f3f54a77bf38a87ce3df441d1fe5094144178424e67665d6832a2dbeff52356"
+    },
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "efa5a15e9cdcac2168d9b549cc239fb73788282d326c97ac5081f9b9385d536a",
+      "complete_record_sha256": "5c6f47d9e87d83f8a3fec019aed12d274627e6af93a4ee5658412a657756ae57"
+    },
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "023a7861695093feaf7ef8e7e7dce6f36dca5950e764e09193b72869ced55886",
+      "complete_record_sha256": "ff5f47dafec7f4d0eae896f6d51c478f48e1c285dee7c381b6e28844ed6b6688"
+    },
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "08806ed534e347b74f8754490a9fccd859f2d88a5626a9e2516b0bebaf7f7993",
+      "complete_record_sha256": "98fef66794922e93e6bd5151bed35b14728e9eb5469b94475f0b4a2ee13261da"
+    },
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.null_read_audit.NullReadWarning",
+      "message_sha256": "6f2b88418aadf1fbd6ebb9d9918629d4958993d0603e4c361a7ec627dcc94885",
+      "complete_record_sha256": "d651c4ba88ded69a8280f7c1511a6c7371b682065e604bd1dcef6550f0a1a802"
+    },
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.null_read_audit.NullReadWarning",
+      "message_sha256": "4dd8bb03791317588a0eac0fc259b0ad60c232c46a8fb8471fea3144085da234",
+      "complete_record_sha256": "d4c5ee456cdc0a74d8b3c9294ee540da9e895895a6de3455a6baffe6b6f4652b"
+    },
+    {
+      "process": "warm-observed",
+      "country": "Uganda",
+      "category": "lsms_library.sampling.ClusterIdentityWarning",
+      "message_sha256": "ea263ad852c1c449a70e8dc352e6f9bf8a4503b4521c6a8bc66970a7ed1b6041",
+      "complete_record_sha256": "c526e5b2c108ddff30d92a036ee3912c3a509422080744d44fe323091e74648f"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "c24ca7499cfa936e0158b90659d0cde4eae9467be9e121633c0d435b2c8db477",
+      "complete_record_sha256": "16683a2959589bfc8deb9cd664496f0333ba302d7e8047dce801b723b1f659d2"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "d9d1036367e90fff375e02aac75cd343716f9a917fcad0c09aa32f73c702f21a",
+      "complete_record_sha256": "bb0ca88082c4363a39525f96f04d5d729a14519c396994785d47f73de8ab1b40"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "a8c20e8f521a652c98b1e0de4b93a5e708cecc1d2b2e3d99978df532325faf09",
+      "complete_record_sha256": "d84399313abea51ad3b0cd02271ab11211e044d241e83338b795bc06f719d6a8"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "9c123e141bb30fa52878bba09a4dab16c123c28053dc02125dd80e7d509bebfb",
+      "complete_record_sha256": "28001af98b894e5baf14afb35a3122028371a43c7a9419e87915ced70e4bc65d"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "dc98078d69cf3298ca46e7e3d26eb5cbe50488db6961780995ea4a6ead7c406d",
+      "complete_record_sha256": "6f3f54a77bf38a87ce3df441d1fe5094144178424e67665d6832a2dbeff52356"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "efa5a15e9cdcac2168d9b549cc239fb73788282d326c97ac5081f9b9385d536a",
+      "complete_record_sha256": "5c6f47d9e87d83f8a3fec019aed12d274627e6af93a4ee5658412a657756ae57"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "023a7861695093feaf7ef8e7e7dce6f36dca5950e764e09193b72869ced55886",
+      "complete_record_sha256": "ff5f47dafec7f4d0eae896f6d51c478f48e1c285dee7c381b6e28844ed6b6688"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.country.GrainCollapseWarning",
+      "message_sha256": "08806ed534e347b74f8754490a9fccd859f2d88a5626a9e2516b0bebaf7f7993",
+      "complete_record_sha256": "98fef66794922e93e6bd5151bed35b14728e9eb5469b94475f0b4a2ee13261da"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.null_read_audit.NullReadWarning",
+      "message_sha256": "6f2b88418aadf1fbd6ebb9d9918629d4958993d0603e4c361a7ec627dcc94885",
+      "complete_record_sha256": "d651c4ba88ded69a8280f7c1511a6c7371b682065e604bd1dcef6550f0a1a802"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.null_read_audit.NullReadWarning",
+      "message_sha256": "4dd8bb03791317588a0eac0fc259b0ad60c232c46a8fb8471fea3144085da234",
+      "complete_record_sha256": "d4c5ee456cdc0a74d8b3c9294ee540da9e895895a6de3455a6baffe6b6f4652b"
+    },
+    {
+      "process": "warm-fresh",
+      "country": "Uganda",
+      "category": "lsms_library.sampling.ClusterIdentityWarning",
+      "message_sha256": "ea263ad852c1c449a70e8dc352e6f9bf8a4503b4521c6a8bc66970a7ed1b6041",
+      "complete_record_sha256": "c526e5b2c108ddff30d92a036ee3912c3a509422080744d44fe323091e74648f"
+    }
+  ],
+  "actual_fresh_process_complete_warning_records_exact": true,
+  "per_process": {
+    "Niger": 0,
+    "Uganda": 11
+  },
+  "no_original_cold_warning_equality_claim": true
+}

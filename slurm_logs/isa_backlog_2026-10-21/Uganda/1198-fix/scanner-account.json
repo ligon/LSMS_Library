@@ -1,0 +1,530 @@
+{
+  "status": "EVERY_DIFFERENT_OCCURRENCE_CLASSIFIED",
+  "unchanged_exact_occurrences": 22,
+  "removed": 29,
+  "added": 19,
+  "parent": 51,
+  "candidate": 41,
+  "counts": [
+    {
+      "kind": "added",
+      "category": "alignment_adds_Niger_unresolved_observation_sentinel",
+      "occurrences": 1
+    },
+    {
+      "kind": "added",
+      "category": "existing_empty_harvest_month_scope_row_count",
+      "occurrences": 1
+    },
+    {
+      "kind": "added",
+      "category": "existing_null_index_warning_counts_retained_records",
+      "occurrences": 2
+    },
+    {
+      "kind": "added",
+      "category": "existing_scheme_vs_public_index_warning_text_gains_declared_axis",
+      "occurrences": 1
+    },
+    {
+      "kind": "added",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "occurrences": 14
+    },
+    {
+      "kind": "removed",
+      "category": "alignment_adds_Niger_unresolved_observation_sentinel",
+      "occurrences": 1
+    },
+    {
+      "kind": "removed",
+      "category": "existing_empty_harvest_month_scope_row_count",
+      "occurrences": 1
+    },
+    {
+      "kind": "removed",
+      "category": "existing_null_index_warning_counts_retained_records",
+      "occurrences": 2
+    },
+    {
+      "kind": "removed",
+      "category": "existing_scheme_vs_public_index_warning_text_gains_declared_axis",
+      "occurrences": 1
+    },
+    {
+      "kind": "removed",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "occurrences": 10
+    },
+    {
+      "kind": "removed",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "occurrences": 14
+    }
+  ],
+  "occurrences": [
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "be5494263a2205d32c28547e3373a979b03f80df8a7ec2d949dd1fee016be83a",
+      "category": "existing_scheme_vs_public_index_warning_text_gains_declared_axis",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "c53c3a7b4b5a6fcdbf4fd66dd23a450e15f143d01e8a90bc7829c818c4f901d2",
+      "category": "existing_empty_harvest_month_scope_row_count",
+      "multiplicity": 1,
+      "metrics": {
+        "column": "harvest_month",
+        "rows": 133331,
+        "scope": "waves",
+        "waves": [
+          "2009-10",
+          "2010-11"
+        ]
+      }
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "28b56818fda439373ee295684333ea27cb3996191f8d59c6aee59fb8bb75fd97",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2009-10",
+      "implausible": 2,
+      "rows": 22408
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "234fef80569c2e794f6eba65844221fa1052bacdbf8105675f53223119e1abb6",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2009-10",
+      "implausible": 2,
+      "rows": 22408
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "811883be488e04009cabb84e91dd9a94a09a1ad0229c31e73fd057eb107eeb6c",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2010-11",
+      "implausible": 4,
+      "rows": 20970
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "6c7927c50ff76aab93979e8aee6057ae6a3bdda0579a459af741c1a6e4ff2dfb",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2010-11",
+      "implausible": 4,
+      "rows": 20970
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "0125d86c2c7300f87f1c9cc9ae3a0abb30d6f2d7d520f11977afcc82171dee50",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2011-12",
+      "implausible": 3,
+      "rows": 20152
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "10abf2c00c08fc896d3b3189534cc7f48028552df5db58af71e2439181fd46cd",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2011-12",
+      "implausible": 3,
+      "rows": 20152
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "60b324829515c13cbc5298c91fc969b776ddef617b03098faf4cb248f6277b69",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2013-14",
+      "implausible": 5,
+      "rows": 17585
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "1b50b07ee45d13c159c2523a20b2e5eb17e5c7a781f9c7800f21b09ea2fc097e",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2013-14",
+      "implausible": 5,
+      "rows": 17585
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "4689456cd2dc3c32a3577338097f755ed2ec8779a4410a6df185fd99ff864c08",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2015-16",
+      "implausible": 3,
+      "rows": 19576
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "9b6d8818f110195c22f7634fcc4e0405681498fc308c8e490f735c44ac362d2d",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2015-16",
+      "implausible": 3,
+      "rows": 19576
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "457fd8711729f218d70d293fe7de2d2cce3b49d31586b74a817482258a9e37d6",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2018-19",
+      "implausible": 4,
+      "rows": 15616
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "35a1ddb233c09b8506efd9a3c793169ce390843d6f03f20913cbf53da8f3ebcd",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2018-19",
+      "implausible": 4,
+      "rows": 15616
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "8e11f21dd0576b6a661ee4e5916b935fc2258ac4a30e10222c5a5762d25a3642",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2019-20",
+      "implausible": 5,
+      "rows": 17024
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "865c6f8730e34845e49917988b5ffa388754c6a5b3afd0f34fc96cea8ebd4b51",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2019-20",
+      "implausible": 5,
+      "rows": 17024
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "bbbbc195767de1a404cdfe984877bed524a0d61582623dd9137759090cb92282",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "b186cf4c65d14217441ce1b9ed56aaa66cd97e775c5fe1f4b998e60bfff60ab4",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "1b742d5dbb1f0525b6eb29b17332e27c4b877ff0040af7621dfd47d3462b5df3",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "6ff3addc2f6db3139f57957b714c4eef6be2d68b9cdccc06ff86354765818bec",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "d1a759ef263e77991c35b8c0c447b0681c600d006ea16f91e326a8aff973ac93",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "ef055f1f889d2fda7fccbb2f1206d8e48b02d78448b0049409ccb6f75904362e",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "fff43951f4d4bdf42e29ec9bd1268eabcdfa5fca75e43539167a61fc8b57c0bf",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "c870a00922f01a2d6f074c23b3ec7abd881b9169720a1488d55d8df2497a0bae",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "9a67ac7bc7c2e7ddf7d8c10214a14fa5dd229fa79d5c5679bbba49b144f560a9",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "31a1d7db2e5f36b3f76a822c057c98e47a8a7fdd413cc7087a1cf68fb5bf298c",
+      "category": "old_lossy_sold_label_reducer_warning_removed",
+      "multiplicity": 1
+    },
+    {
+      "kind": "removed",
+      "phase": "1a-sanity",
+      "sha256_full_record": "e44d6f514c1a35489f852d1be8e5ba6cb6de339500576922824394bf2a1e75ca",
+      "category": "existing_null_index_warning_counts_retained_records",
+      "multiplicity": 1,
+      "nan_counts": [
+        926
+      ],
+      "levels": [
+        "v"
+      ]
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "142df9b6680632795acba84f9373f52dc9cbaae6a976199650ece4f14eb23043",
+      "category": "existing_null_index_warning_counts_retained_records",
+      "multiplicity": 1,
+      "nan_counts": [
+        926
+      ],
+      "levels": [
+        "v"
+      ]
+    },
+    {
+      "kind": "removed",
+      "phase": "1b-assembly",
+      "sha256_full_record": "d09437d4be1184402eb06289fe5f6e04c3b12f4987b4a3d6309c57d35214f113",
+      "category": "alignment_adds_Niger_unresolved_observation_sentinel",
+      "multiplicity": 1
+    },
+    {
+      "kind": "added",
+      "phase": "1a-sanity",
+      "sha256_full_record": "75828032b413d0ea1b3aeae84472413af7ef1026508ba54ce40088f315728f90",
+      "category": "existing_scheme_vs_public_index_warning_text_gains_declared_axis",
+      "multiplicity": 1
+    },
+    {
+      "kind": "added",
+      "phase": "1a-sanity",
+      "sha256_full_record": "c1b27228e98452745c5358f7ad3584ae1ca6e0e1164393401189cfa9cc526796",
+      "category": "existing_empty_harvest_month_scope_row_count",
+      "multiplicity": 1,
+      "metrics": {
+        "column": "harvest_month",
+        "rows": 133761,
+        "scope": "waves",
+        "waves": [
+          "2009-10",
+          "2010-11"
+        ]
+      }
+    },
+    {
+      "kind": "added",
+      "phase": "1a-sanity",
+      "sha256_full_record": "17ed234eebd207f447f24bb35a2ea4392b50d5cc53cee6c20c7631049778d25d",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2009-10",
+      "implausible": 2,
+      "rows": 22549
+    },
+    {
+      "kind": "added",
+      "phase": "1b-assembly",
+      "sha256_full_record": "1487d684c132b9733031398e2d75d454c7ac434446d62f08aeb7fde5d3f947e7",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2009-10",
+      "implausible": 2,
+      "rows": 22549
+    },
+    {
+      "kind": "added",
+      "phase": "1a-sanity",
+      "sha256_full_record": "ec04cba7c9d7c9f630bff890dba1c41fe7f4f1bbfcdc65b5da6c2c8de058c928",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2010-11",
+      "implausible": 4,
+      "rows": 21051
+    },
+    {
+      "kind": "added",
+      "phase": "1b-assembly",
+      "sha256_full_record": "b27ea45719d07b8fa4b72b84e3e8ae323103ad90dff92388d2402cd34500075c",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2010-11",
+      "implausible": 4,
+      "rows": 21051
+    },
+    {
+      "kind": "added",
+      "phase": "1a-sanity",
+      "sha256_full_record": "df99183b2af4ef871456fefa469b1ed008fe486fa4462cf06ec0d5f7543dad99",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2011-12",
+      "implausible": 3,
+      "rows": 20200
+    },
+    {
+      "kind": "added",
+      "phase": "1b-assembly",
+      "sha256_full_record": "0ef46d7cde81015f7887e5712f781ee7225913d7425591692f715b067abb2cf8",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2011-12",
+      "implausible": 3,
+      "rows": 20200
+    },
+    {
+      "kind": "added",
+      "phase": "1a-sanity",
+      "sha256_full_record": "88547549d11ab81c9759419194dc1a0eff37ab4baa8013691161a00a04cd168d",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2013-14",
+      "implausible": 5,
+      "rows": 17646
+    },
+    {
+      "kind": "added",
+      "phase": "1b-assembly",
+      "sha256_full_record": "2cb47708b5f3d93905194f211a8381c5088bf92da76f0a63c7e0bf3aada049ea",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2013-14",
+      "implausible": 5,
+      "rows": 17646
+    },
+    {
+      "kind": "added",
+      "phase": "1a-sanity",
+      "sha256_full_record": "1a308c2e26b4b3cda59b13bd6433becfaf334cd45394de9fecad23d9d8fb722b",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2015-16",
+      "implausible": 3,
+      "rows": 19639
+    },
+    {
+      "kind": "added",
+      "phase": "1b-assembly",
+      "sha256_full_record": "9739a0a6184b94757b3720b96dc015465a39b70a27e53ebd29d8654468406e86",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2015-16",
+      "implausible": 3,
+      "rows": 19639
+    },
+    {
+      "kind": "added",
+      "phase": "1a-sanity",
+      "sha256_full_record": "202d0f9ef920d9f4803015d43edd109a1fb413128d47a3ebbe8a1fc8b925dd95",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2018-19",
+      "implausible": 4,
+      "rows": 15630
+    },
+    {
+      "kind": "added",
+      "phase": "1b-assembly",
+      "sha256_full_record": "a23c32f0b411ec4f242a4c62ca59d4632fc9ff7260b10526470e3733056353b0",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2018-19",
+      "implausible": 4,
+      "rows": 15630
+    },
+    {
+      "kind": "added",
+      "phase": "1a-sanity",
+      "sha256_full_record": "f7032bf77f4dff61dd1f1e5350a6b84c267bf4433601b6cd84483342d1a34441",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2019-20",
+      "implausible": 5,
+      "rows": 17046
+    },
+    {
+      "kind": "added",
+      "phase": "1b-assembly",
+      "sha256_full_record": "7461f74862a6626e1ae9425d228731ebe0624deef58b1e4e8c68db4007eaf2d4",
+      "category": "unchanged_quantity_audit_recomputed_on_retained_observations",
+      "multiplicity": 1,
+      "wave": "2019-20",
+      "implausible": 5,
+      "rows": 17046
+    },
+    {
+      "kind": "added",
+      "phase": "1a-sanity",
+      "sha256_full_record": "0be9ec5189d8e3b193978ca47851ee9d628ddfea0ddb48c9e1986ddfbf05b66d",
+      "category": "existing_null_index_warning_counts_retained_records",
+      "multiplicity": 1,
+      "nan_counts": [
+        928
+      ],
+      "levels": [
+        "v"
+      ]
+    },
+    {
+      "kind": "added",
+      "phase": "1b-assembly",
+      "sha256_full_record": "dc51d3d88277299665aea848ccd439149cdaf093eae77f3929fe89697c84cb9a",
+      "category": "existing_null_index_warning_counts_retained_records",
+      "multiplicity": 1,
+      "nan_counts": [
+        928
+      ],
+      "levels": [
+        "v"
+      ]
+    },
+    {
+      "kind": "added",
+      "phase": "1b-assembly",
+      "sha256_full_record": "b81bc74c8a75b11443b2c2482396a8d1f612f8c308346c9a545b688dcff0406d",
+      "category": "alignment_adds_Niger_unresolved_observation_sentinel",
+      "multiplicity": 1
+    }
+  ],
+  "quantity_guard_source_unchanged": "lsms_library/quantity_audit.py:_format_quantity_report; own source frame retains individual records rather than old sums; diagnostics are recomputed, not normalized."
+}

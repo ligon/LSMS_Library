@@ -1,0 +1,59 @@
+{
+  "status": "FROZEN_CORRECTED_OBJECT_V3_SUPPLEMENT_PENDING_ROOT_ACCEPTANCE",
+  "manifest_entries": 1202,
+  "manifest_sha256": "96b5c506e1955748ba62dca453260d773772d9ed9e1f261942500de45c13eeba",
+  "safe_export_allowlist": {
+    "safe-exports/REPRODUCE.md": {
+      "sha256": "1adff3ae29918d5d664e0235b1f413ba8234180e0fcfd3f793b841a53b1831f5",
+      "bytes": 677,
+      "mode": 384,
+      "mtime_ns": 1792656002427131571,
+      "inode": 55712296,
+      "device": 64770,
+      "nlink": 1,
+      "symlink": false
+    },
+    "safe-exports/REVIEW.md": {
+      "sha256": "618b5c1df9ed49fadc5dac16475eff32054b0bb4982d0d3b1859484840442b51",
+      "bytes": 3385,
+      "mode": 384,
+      "mtime_ns": 1792656002427131571,
+      "inode": 55712295,
+      "device": 64770,
+      "nlink": 1,
+      "symlink": false
+    },
+    "safe-exports/calibration.json": {
+      "sha256": "22b472f1989a47ef15a53d2e50cbcd83878999be3e4c6ced94da8b2acbc2015a",
+      "bytes": 1620,
+      "mode": 384,
+      "mtime_ns": 1792656002426131566,
+      "inode": 55712293,
+      "device": 64770,
+      "nlink": 1,
+      "symlink": false
+    },
+    "safe-exports/checker-sources.json": {
+      "sha256": "ae711044310b943b1b5a633cb61232bb48f48ea282f453f6f1ff85ca58bb171f",
+      "bytes": 3813,
+      "mode": 384,
+      "mtime_ns": 1792656002427131571,
+      "inode": 55712294,
+      "device": 64770,
+      "nlink": 1,
+      "symlink": false
+    },
+    "safe-exports/proof.json": {
+      "sha256": "5f6d6ef21c892ca975ed9ed69e97583bb39ffbb494c2a2010c1b8e19b05c966c",
+      "bytes": 5638,
+      "mode": 384,
+      "mtime_ns": 1792656002426131566,
+      "inode": 55712292,
+      "device": 64770,
+      "nlink": 1,
+      "symlink": false
+    }
+  },
+  "packaging_and_postexit_sources_in_manifest": true,
+  "signed": "Sue"
+}

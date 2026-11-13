@@ -1,0 +1,91 @@
+{
+  "status": "SYNTHETIC_ONLY_COMPARATOR_TYPE_PROBE",
+  "packages": {
+    "pandas": "3.0.6",
+    "numpy": "2.4.6",
+    "pyarrow": "25.0.1"
+  },
+  "cases": [
+    {
+      "case": "int-v-bool",
+      "scalar_types": [
+        "int",
+        "bool"
+      ],
+      "dtype_type": "pandas.core.dtypes.dtypes.NumpyEADtype",
+      "kind": "O",
+      "is_numpy_dtype": false,
+      "plain_frame_accepts": true,
+      "slow_accepts": false,
+      "fast_accepts": true
+    },
+    {
+      "case": "int-v-float",
+      "scalar_types": [
+        "int",
+        "float"
+      ],
+      "dtype_type": "pandas.core.dtypes.dtypes.NumpyEADtype",
+      "kind": "O",
+      "is_numpy_dtype": false,
+      "plain_frame_accepts": true,
+      "slow_accepts": false,
+      "fast_accepts": true
+    },
+    {
+      "case": "numpy-v-python-int",
+      "scalar_types": [
+        "int64",
+        "int"
+      ],
+      "dtype_type": "pandas.core.dtypes.dtypes.NumpyEADtype",
+      "kind": "O",
+      "is_numpy_dtype": false,
+      "plain_frame_accepts": true,
+      "slow_accepts": false,
+      "fast_accepts": true
+    },
+    {
+      "case": "decimal-v-int",
+      "scalar_types": [
+        "Decimal",
+        "int"
+      ],
+      "dtype_type": "pandas.core.dtypes.dtypes.NumpyEADtype",
+      "kind": "O",
+      "is_numpy_dtype": false,
+      "plain_frame_accepts": true,
+      "slow_accepts": false,
+      "fast_accepts": true
+    },
+    {
+      "case": "none-v-NA",
+      "scalar_types": [
+        "NoneType",
+        "NAType"
+      ],
+      "dtype_type": "pandas.core.dtypes.dtypes.NumpyEADtype",
+      "kind": "O",
+      "is_numpy_dtype": false,
+      "plain_frame_accepts": false,
+      "slow_accepts": false,
+      "fast_accepts": false
+    },
+    {
+      "case": "nan-v-None",
+      "scalar_types": [
+        "float",
+        "NoneType"
+      ],
+      "dtype_type": "pandas.core.dtypes.dtypes.NumpyEADtype",
+      "kind": "O",
+      "is_numpy_dtype": false,
+      "plain_frame_accepts": true,
+      "slow_accepts": false,
+      "fast_accepts": true
+    }
+  ],
+  "LSMS_imports_or_API_calls": 0,
+  "existing_evidence_mutations": 0,
+  "signed": "Sue"
+}

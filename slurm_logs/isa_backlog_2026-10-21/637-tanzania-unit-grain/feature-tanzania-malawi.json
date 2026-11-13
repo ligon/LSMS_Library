@@ -1,0 +1,5 @@
+{
+ "call": "Feature('plot_inputs')(['Tanzania', 'Malawi']), cold private roots",
+ "development": {"malawi_country_rows": 179949, "feature_rows_by_country": {"Malawi": 179949, "Tanzania": 9698}, "feature_index_unique": true, "grain_collapse_warnings": 0, "promoted": {"Tanzania": {"u": 0}}},
+ "branch": {"malawi_country_rows": 179949, "feature_rows_by_country": {"Malawi": 179949, "Tanzania": 9709}, "feature_index_unique": true, "grain_collapse_warnings": 0, "promoted": {}}
+}

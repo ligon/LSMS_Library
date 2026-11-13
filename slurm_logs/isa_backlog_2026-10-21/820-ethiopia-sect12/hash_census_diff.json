@@ -1,0 +1,55 @@
+{
+ "development_9a0ed5f3c_vs_branch": {
+  "country": {
+   "total": 549,
+   "moved": 25,
+   "moved_by_country": {
+    "Ethiopia": 25
+   }
+  },
+  "btf": {
+   "total": 40,
+   "moved": 0,
+   "moved_by_country": {},
+   "moved_keys": []
+  },
+  "wave": {
+   "total": 2109,
+   "moved": 125,
+   "moved_by_country": {
+    "Ethiopia": 125
+   }
+  },
+  "errors": {
+   "base": 0,
+   "branch": 0
+  }
+ },
+ "f7f567c82_vs_branch": {
+  "country": {
+   "total": 549,
+   "moved": 25,
+   "moved_by_country": {
+    "Ethiopia": 25
+   }
+  },
+  "btf": {
+   "total": 40,
+   "moved": 0,
+   "moved_by_country": {},
+   "moved_keys": []
+  },
+  "wave": {
+   "total": 2109,
+   "moved": 125,
+   "moved_by_country": {
+    "Ethiopia": 125
+   }
+  },
+  "errors": {
+   "base": 0,
+   "branch": 0
+  }
+ },
+ "note": "f7f567c82 census taken at 984f1665d; f7f567c82 changed only CONTENTS.org, which no hash covers."
+}

@@ -1,0 +1,214 @@
+#+title: GH #1144 - Nigeria food item names by quarter
+#+date: 2026-10-21
+
+* Result and scope
+
+The food builder selects its actual quarter's item codebook instead of the global Code-to-Preferred map.
+After correcting the source-contradicted W2 quarter cells, 5,789 rows receive their source-backed existing Preferred names and 14,710 retain the source's unqualified Groundnuts, Pepper or Maize (shelled).
+Exactly 20,499 of 595,725 food rows change item keys; all raw measurements, missingness and row multiplicities are conserved.
+No distinct observed raw item codes are newly merged within a quarter.
+
+The no-argument resolver retains its complete 258-code mapping for crop/community consumers.
+All Code, Preferred Label and Aggregate Label cells are unchanged; exactly nineteen enumerated W2 quarter cells change, including eight previously blank positive PH entries representing 6,288 retained source rows.
+No new Code row, Aggregate bucket, factor, source, feature, dependency or framework behavior is introduced.
+The independent W1 card-weight derivation-input reconstruction now uses the same food quarter as its served rows.
+
+The ledger/design commit precedes the code: b6594f1544f8e922edce9b87c27ed8f1b85ab279.
+The verification baseline is the immutable #1034 head 6fda46bc5437758bd650cf4016f0782a124281cf.
+The frozen #1034 PR ref is not advanced by this work.
+
+* Country idiosyncrasies and contradictory evidence
+
+Nigeria's CSVs discard the Stata twins' value labels, and the food item codes collide between instruments.
+W2 is more specific: its PP and PH instruments give the SAME numeric code different food meanings.
+The questionnaire also renumbers acquisition questions after W1; W4 purchases describe a most recent purchase within thirty days while produced/inkind describe seven days.
+These existing CONTENTS decisions remain in force; no recall period or acquisition channel changes here.
+
+The old quarter cells were contradictory evidence, not an answer key.
+The held W2-PP dictionary says 44 is other nuts/seeds/pulses, 77 is leaves and 78 is other vegetables, while its old 2012Q3 cells said shelled groundnuts, dry pepper and leaves.
+The W2-PH dictionary gives those codes the newer shelled-groundnut/dry-pepper/leaves meanings, while its old 2013Q1 cells said other nuts, leaves and other vegetables.
+Blindly selecting the old quarter columns would introduce 2,135 PH errors and miss 1,686 PP errors.
+The adjacent source-grounding.json records the held source paths, sidecar MD5s, native labels, explicit targets and counts.
+
+W1 PP/PH and W2 PP record only Groundnuts and Pepper, so the decoder does not infer unshelled or fresh.
+W2 code 21 records shelled maize without cob status; W2 code 20 explicitly states unshelled/on the cob.
+Exact normalized Preferred names precede historical aliases, including polluted Leaves-to-Dry-Pepper aliases.
+Only the reviewed example-only Other Spices (e.g. Maggi) alias is otherwise accepted.
+Unreviewed/ambiguous aliases retain native text and warn when used; a known missing quarter cell retains the raw code and warns.
+Unknown codes and NaN retain the existing raw/missing contract.
+An absent quarter, including W5 2023Q3/2024Q1, raises instead of borrowing another instrument; W5 has no newly added food builder or quarter column.
+
+The live CONTENTS entry "WAITING Recall windows are POOLED, and no column records it" concerns nonfood modules with incommensurable windows.
+It remains unresolved and separate.
+The historical #223 sentence "Residual codes =131, 151, 152= (W3) have no label even in the .dta" is corrected by the already-recorded #1034 section and source evidence; it is not used to discard the held planting labels.
+
+* Raw and public-boundary conservation
+
+#+name: tab:quarter-renames
+| Quarter | Before/after rows | Renamed item keys |
+|---------+-------------------+-------------------|
+| 2010Q3  | 72236             | 6492              |
+| 2011Q1  | 69734             | 6286              |
+| 2012Q3  | 65429             | 6982              |
+| 2013Q1  | 70649             | 739               |
+| 2015Q3  | 77702             | 0                 |
+| 2016Q1  | 70469             | 0                 |
+| 2018Q3  | 82865             | 0                 |
+| 2019Q1  | 86641             | 0                 |
+
+The entire food_acquired frame matches exactly after the documented quarter-specific old-to-new item-key replacement, including Quantity, Expenditure, Quantity_kg and Derivation.
+The four later-quarter frames match exactly without any replacement.
+Every household/round expenditure total is exactly conserved.
+Every one of the 1,856 W1 card-weight raw input rows and all nine raw columns matches exactly after the same item-key change, joins its derived served row, and retains its card decision and Quantity_kg.
+The stamped subset remains 1,659 purchased, 148 produced and 49 inkind rows, totaling 4,740.73 stated kg.
+
+Actual normal Country serving, labels='Preferred', labels='Preferred Label', and a fresh Country object's warm read all preserve the full expected frame.
+The spelling/categorical/finalization boundary therefore preserves Groundnuts 2,839 rows, Pepper 10,446 and Maize (shelled) 1,425.
+Warm replay writes no parquet.
+
+The Aggregate API skill was read before those calls.
+An Aggregate food_acquired request preserves all 595,725 rows and reports exactly three uncurated native names, 14,710 rows (2.4692601452%), through labels_unmatched and LabelPassThroughWarning.
+Every incoming native-name row passes through intact; no curation was added to hide it.
+The Aggregate result has 8,365 Groundnuts rows because an existing, unchanged mapping also contributes 5,526 curated groundnut rows.
+The new decoder does not itself merge those categories under default labels.
+
+* Cold cohort and derived effects
+
+Both cohorts start with physically empty Nigeria L2 roots and a private physically copied L1, with exact interpreter/package/config identity assertions and an inherited socket guard that forbids IPv4/IPv6 network IO.
+Numeric threads and build workers are one; source access uses sanctioned library IO.
+No acquisition, DVC CLI, shared writable L2, shared-cache deletion or promotion occurs.
+The baseline seven-table cohort takes about 97 seconds and the candidate about 128 seconds.
+A subsequent comment-only derivation-doc clarification moved hashes; normal scoped reads revalidated/rebuilt affected caches and all final stored food/crop/community hashes match current inputs exactly.
+The rebuilt community and crop frames still match the cold cohort exactly.
+
+#+name: tab:cohort
+| Table | Before/after rows | Numeric result after item-key accounting |
+|-------+-------------------+------------------------------------------|
+| food_acquired | 595725 | Entire raw frame exact |
+| food_quantities(units='kgs') | 595053 | 1724 quantities change |
+| food_prices() | 481191 | 1239 kgvalue prices change |
+| food_prices(units='unitvalue') | 481613 | Exact |
+| food_expenditures | 482285 | Exact |
+| crop_production | 62844 | Entire frame exact without replacement |
+| community_prices | 131338 | Entire frame exact without replacement |
+
+The changed quantities and default prices have exactly the same remapped index sets before/after; no new missing or extra cells appear.
+The kg-only sum is 1,467,196.4975769585 before and 1,467,094.0109991923 after, a decrease of 102.4865777663 kg.
+Both have 594,455 kg rows; do not count the native rows carried by units='kgs' as kilograms.
+The metric, survey_kg and none rung counts and kg totals are unchanged.
+Item-unit inference moves from 121,216 to 121,264 rows and pooled unit inference from 54,308 to 54,260; these are existing inference, not new factors.
+
+Quantity changes by quarter are 611 W2-PP, 277 W2-PH, 500 W3-PP, 323 W3-PH and 13 W4-PP.
+Price changes are 391, 164, 403, 280 and one in those quarters respectively.
+W1 and W4-PH numeric derived results remain unchanged.
+The later-wave propagation follows the existing item/unit factor pooling across waves, despite those waves' unchanged stored food rows.
+
+Exact food-row crop-key coverage (t,i,j) moves from 16,495 to 16,218, and community item/unit-key coverage (t,v,j,u) from 43,268 to 41,291.
+This records the loss of joins that previously depended on an unrecorded qualifier, not a crop/community data change.
+Complete crop/community frames and complete no-argument maps are exactly equal.
+Nigeria declares no nutrition feature, so no nutrition verification is claimed.
+
+* Tests and Feature audit
+
+The owner's original focused selection yielded 115 passed, one inherited dependency failure, zero skips, under four loadfile workers.
+All 36 new item regressions pass; against immutable 6f they yield 31 failures and five already-correct controls.
+The cases cover opposite PP/PH collisions, all eight quarters, numeric code forms, missing/unknown/NaN keys, absent/W5 quarters, exact-match priority, ambiguous aliases, source Q/E conservation and W1 derivation-input keys.
+
+The inherited failure is test_gh1035_nigeria_w1_stated_weights.py::test_kg_ladder_on_the_sized_labels.
+It assumed W1 container names appeared exclusively in 2011Q1, while #1034 correctly gives those same native names to eleven 2015Q3 rows.
+The twelfth #1034 relabel is Basin Large, whose spelling differs from W1's Basin Big/Large, so it is outside this shared-name test guard.
+The identical assertion fails at frozen 6f; all other GH1035 cases pass.
+Root owns a separate #1034 test amendment that scopes card rules to W1 and adds later shared-label no-survey_kg/no-W1-card-KEY assertions.
+The exact private proposed patch has SHA256 8145796ca742bb7fd0cf7230df3bd74a11aa4f1841cca620b3b6f48727149f1f; the amended case passes against this candidate.
+The separately reviewed #1034 test amendment at 3e658298753db4f2934ea1b703415a1bdfa9f6af is now integrated through merge 1e6111e2b0580e045084d3c077c258469f8d7dc0.
+The complete Nigeria library tree is identical before and after that integration.
+Independent review of the integrated head passed the complete six-file selection: 116 tests, zero skips, failures or errors.
+No existing test, fixture or golden changes originate in the #1144 implementation.
+
+Feature phases 1 and 2 cover all four food features for Nigeria plus Uganda on separate roots.
+Baseline: 441 records, 438 warnings, three passes; candidate: 445 records, 442 warnings, three passes.
+Neither scan has failure, error or skip.
+Full normalized finding-multiset accounting removes 54 records and adds 58:
+
+- Forty-two changed reported-quantity warning records are EXACTLY equal after quarter-specific item-name replacement.
+- Ten repeated existing metric-contradiction diagnostics change their item/unit-cell count from 77 to 75; the stated/inferred ml factors and warning class remain unchanged.
+- Two existing Aggregate cardinality findings change: combined Nigeria/Uganda quantities 930,511 to 930,790 rows, expenditures 714,907 to 715,137, as the native categories remain separate under the unchanged Aggregate mapping.
+- Four new expected Aggregate native-label passthrough warnings appear, one per food feature.
+
+Existing quantity, null-key, cluster, population and inference warnings remain a work queue.
+The unchanged comparator's complete Uganda food_acquired (355,571 rows) and sample (24,362 rows) frames match exactly.
+All 24 Nigeria table hashes move; none of Uganda's 28 moves.
+This is a country-wide cache invalidation, not a food-only one.
+
+* Reproduction
+
+The private raw frames, logs and helper scripts are under /local/job40255479/control/isa-backlog-20261021/east/1144 and are not committed.
+The adjacent validation.json and source-grounding.json contain only safe aggregates, labels, input hashes and explicit decisions.
+For a cold replay, supply a new physically private data root seeded only with held relevant L1 blobs; never point this at a shared writable L2.
+Use the immutable baseline checkout with a separate root for before, then the reviewed candidate for after.
+The original private offline/sitecustomize.py guard blocks network connections in the process and its Make children.
+
+#+begin_src sh :eval no :tangle no :results output
+export ISA_CHECKOUT=/local/job40255479/worktrees/isa-Nigeria
+export ISA_PRIVATE=/local/job40255479/control/isa-backlog-20261021/east/1144
+export ISA_PYTHON=/local/job40255479/venv_img/bin/python
+export PYTHONPATH="$ISA_CHECKOUT:$ISA_PRIVATE/offline"
+export LSMS_COUNTRIES_ROOT="$ISA_CHECKOUT/lsms_library/countries"
+export LSMS_DATA_DIR="$ISA_PRIVATE/after-data"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
+export PATH="$(dirname "$ISA_PYTHON"):$PATH"
+cd "$ISA_CHECKOUT"
+"$ISA_PYTHON" - <<'PY'
+import os
+from pathlib import Path
+import lsms_library as ll
+from lsms_library.paths import countries_root, data_root
+from lsms_library.transformations import food_kg_factors
+root = Path(os.environ['ISA_CHECKOUT']).resolve()
+assert Path(ll.__file__).resolve().is_relative_to(root)
+assert countries_root().resolve() == root / 'lsms_library/countries'
+c = ll.Country('Nigeria')
+for name, method, kwargs in [
+    ('food_acquired', 'food_acquired', {}),
+    ('food_prices', 'food_prices', {}),
+    ('food_prices_native', 'food_prices', {'units': 'unitvalue'}),
+    ('food_quantities', 'food_quantities', {'units': 'kgs'}),
+    ('food_expenditures', 'food_expenditures', {}),
+    ('crop_production', 'crop_production', {}),
+    ('community_prices', 'community_prices', {})]:
+    df = getattr(c, method)(**kwargs)
+    df.to_pickle(data_root() / (name + '.pkl'))
+fa = c.food_acquired()
+food_kg_factors(fa, unit_kg=c._unit_kg_factors(),
+                no_kg=c._no_kg_factor_cells()).to_pickle(data_root() / 'kg_factors.pkl')
+c.derivation_inputs('Nigeria::food_acquired::w1-card-weight').to_pickle(
+    data_root() / 'derivation_inputs.pkl')
+PY
+"$ISA_PYTHON" -m pytest -n 4 --dist=loadfile -q \
+  tests/test_nigeria_food_item_decode.py tests/test_nigeria_food_unit_decode.py \
+  tests/test_nigeria_food_acquired_sources.py tests/test_gh1035_nigeria_w1_stated_weights.py \
+  tests/test_gh1041_nigeria_missing_unit.py tests/test_gh1047_nigeria_unit_codes.py \
+  > "$ISA_PRIVATE/tests-replay.log" 2>&1
+"$ISA_PYTHON" bench/feature_audit/scan.py \
+  --features food_acquired food_prices food_quantities food_expenditures \
+  --countries Nigeria Uganda --phases 1,2 --jobs 2 \
+  --out "$ISA_PRIVATE/audit-replay.jsonl" > "$ISA_PRIVATE/audit-replay.log" 2>&1
+#+end_src
+
+At the frozen 6f dependency the test command deliberately reproduces the separately documented #1034 assertion failure; include root's independently reviewed test amendment to obtain its corrected boundary check.
+The private compare.py, public_boundary.py and audit_compare.py commands produced the recorded aggregate evidence, including full raw-frame, native-name and finding-multiset assertions.
+
+* Exact residual scope for a separate issue
+
+Title: [Nigeria] Verify inherited W4-PH maize-shell and tinned-milk qualifiers against its instrument
+
+Body: The held 2018-19 PH food Stata item dictionary records code 20 as "20. Maize (On the cob)" and code 113 as "113. Milk tinned".
+The current 2019Q1 quarter cells and Preferred outputs add "unshelled" and "unsweetened" respectively.
+These affect 20 and 340 retained acquisition-source rows on the frozen 6f corpus.
+GH #1144 preserves these inherited later-wave choices while fixing quarter selection and the enumerated early-wave contradictions; it does not establish those added qualifiers.
+Read the held PH instrument and compare the PP definitions before deciding whether each qualifier is recorded or should be preserved as a broader native name.
+Do not infer shell or sugar status from a code, crop name, historical alias or another round.
+Any correction needs source-key row/Q/E conservation, explicit native-name/Aggregate coverage, crop/community join effects, pooled kg/price accounting and an independent review.
+No raw-source acquisition or Preferred/Aggregate recuration is included in this residual by default.
+
+Sue

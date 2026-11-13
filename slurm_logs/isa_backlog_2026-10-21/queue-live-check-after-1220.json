@@ -1,0 +1,24 @@
+{
+  "status": "COMPLETE_LIVE_32_IMPLEMENTATION_COLLECTION_AND_ALL114_SCOPE_RECORDS_VERIFIED",
+  "at_UTC": "2026-10-22T22:01:19.731922+00:00",
+  "repository_open_PRs": 33,
+  "repository_open_issues": 173,
+  "ISA_related_open_issue_records": 114,
+  "implementation_PRs_open_unmerged": 32,
+  "previous31_head_base_names_unchanged": true,
+  "new_PR1220_head": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "new_PR1220_base": "fix/1204-uganda-crop-wave-coverage-20261022",
+  "new_PR1220_exact_base_sha": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "all114_issue_records_still_open": true,
+  "scope_categories": {
+    "PRlinked": 29,
+    "active": 1,
+    "other": 84
+  },
+  "collection_SHA256": {
+    "open-prs-after-1220.json": "c564eeff30e6ef9ce9fed28ef2ebc810def51bc965da0ab8d6cc3f10cfe8bdbe",
+    "open-issues-after-1220.json": "56ff2cba85bd3a1d4f83bddca4c8e2aacd1750068f29b2c94fb72e36b7144b30"
+  },
+  "retained_root_metadata_stop": "da7bbf incorrectly counted only PR_OPEN, omitting PR_OPEN_AWAIT_HUMAN_MERGE. Failed before writes; sum both states in this corrected metadata-only interval.",
+  "signed": "Sue"
+}

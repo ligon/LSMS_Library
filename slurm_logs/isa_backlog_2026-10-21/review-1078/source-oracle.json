@@ -1,0 +1,13 @@
+{
+  "status": "SUCCESS",
+  "sanctioned_get_dataframe": true,
+  "source_md5": "f4b5885a98654c12d5c9960d1a3586ff",
+  "source_rows": 38743,
+  "genuine_missing_cells": 9,
+  "Quantity_cells": 6,
+  "Expenditure_cells": 3,
+  "one_unique_raw_row_per_cell": true,
+  "positive_counterparts_preserved": true,
+  "all_output_NaNs_match_source_operands": true,
+  "no_food_transform_used_as_source_oracle": true
+}

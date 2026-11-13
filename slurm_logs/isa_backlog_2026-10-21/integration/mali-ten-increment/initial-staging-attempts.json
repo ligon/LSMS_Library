@@ -1,0 +1,24 @@
+{
+  "source_head": "bbdcf34578085fb90e981184a0cadadc9701a366",
+  "attempt1": {
+    "session": 76008,
+    "exit_code": 1,
+    "reason": "Niger labor stale-cache rebuild lacked already-held2011/2014 raw inputs in private staged seed",
+    "external_acquisition": false,
+    "normal_Mali_labor_completed_full_frame_exact": true
+  },
+  "attempt2": {
+    "session": 90832,
+    "exit_code": 1,
+    "reason": "Added four legacy sources; modern2018/2021 Niger labor raw inputs also outside private nine-fix API seed",
+    "external_acquisition": false,
+    "normal_Mali_labor_completed_full_frame_exact": true
+  },
+  "recovery": "Physically stage all currently held declared Niger binary blobs from quiescent cohort, report unavailable declarations without fetching, and replay from fresh seed.",
+  "attempt3": {
+    "session": 83348,
+    "exit_code": 1,
+    "reason": "Niger labor raw builds completed but normal finalization requires stale supporting sample, whose held raw inputs were not staged",
+    "external_acquisition": false
+  }
+}

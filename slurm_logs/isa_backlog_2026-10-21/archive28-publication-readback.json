@@ -1,0 +1,14 @@
+{
+  "verified_at": "2026-10-22T17:09:16.556Z",
+  "tracker": 1170,
+  "state": "open",
+  "merged": false,
+  "head_sha": "cc194414c23b9e28d8042ada65b56488b6e8221d",
+  "body_readback_exact": true,
+  "archive28_receipt": "private-evidence-durability-twentyeighth.json",
+  "GitHub_push_observed_terminal_exit": 0,
+  "normal_commit_hook_published": true,
+  "implementation_PR_count_unchanged": 27,
+  "independent1210_root_acceptance_pending": true,
+  "signed": "Sue"
+}

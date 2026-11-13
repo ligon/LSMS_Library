@@ -64,8 +64,8 @@ Data Scheme:
 
   food_security:
     # FAO 8-item Food Insecurity Experience Scale (FIES).  EHCVM §8A
-    # 'Sécurité alimentaire', recall period = last 12 months.  Single
-    # EHCVM wave (2018-19) reads s08a_me_ben2018.dta; items
+    # 'Sécurité alimentaire', recall period = last 12 months.  Each EHCVM
+    # wave reads its own s08a_me_ben*.dta; items
     # s08aq01..s08aq08 map IN ORDER to the 8 canonical FIES items
     # (Worried..WholeDay).  Values Oui->True, Non->False;
     # "Ne sait pas"/"Refus"/NaN->NaN.  FCS (#332) is deliberately NOT
@@ -149,15 +149,20 @@ Data Scheme:
     AffectedIncome: bool
     AffectedAssets: bool
     AffectedProduction: bool
-    AffectedConsumption: bool
+    AffectedConsumption: bool  # food purchases, not food stocks
+    AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
+    # 2021-22's s14bq05 ranks up to three strategies (337 rows have a third).  2018-19's
+    # hook emits two (no household there marks a third), so this rides NA on that wave.
+    HowCoped2:
+      type: str
+      optional: true
 
   plot_features:
     # Lasting parcel-level characteristics from the EHCVM agriculture
     # module s16a (GH #167; Benin is an EHCVM sibling of the Mali
-    # reference implementation).  Single EHCVM wave: 2018-19 (Benin has
-    # no 2021-22 EHCVM-II wave in this repo).  plot_id =
+    # reference implementation).  plot_id =
     # "{field_no}_{parcel_no}".  Latitude / Longitude are NOT emitted —
     # EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is an area,
     # not a coordinate); deferred as in Uganda / Mali.
@@ -173,8 +178,8 @@ Data Scheme:
   livestock:
     # Item-level livestock roster (GAP 4).  One row per REPORTED
     # (household, species) the household owns/raises, from the EHCVM
-    # section-17 ('Élevage') module s17_me_ben2018.dta (single 2018-19
-    # wave; roster pre-filtered to owned species, s17q03 == 1).
+    # section-17 ('Élevage') module s17_me_ben*.dta (filtered to owned
+    # species, s17q03 == 1).
     #
     # GRAIN (t, i, animal) — NO v level: 'livestock' is in the framework's
     # _no_v_join set, so the household-level rows carry no cluster level and
@@ -196,7 +201,7 @@ Data Scheme:
   crop_production:
     # Item-level crop harvest (GAP 1).  One row per REPORTED (field, parcel,
     # crop) harvest line from the EHCVM agriculture module s16c_me_ben2018.dta
-    # (single 2018-19 wave) — REPORTED values only; harvest_kg / yield /
+    # (2021-22: below) — REPORTED values only; harvest_kg / yield /
     # main_crop / value-shares are transformations, never columns here.  crop
     # carries the native French crop label (Benin has no harmonize_food crop
     # table; Niger's passthrough behavior keeps the label as the item
@@ -207,20 +212,47 @@ Data Scheme:
     # plot-crop grain (s16cq16a / s16cq17); intercropped from s16cq07.
     # harvest_month is OMITTED-then-filled NaN (Benin's s16c has no harvest-
     # month question) but carried for cross-country schema parity with Niger.
-    index: (t, i, plot_id, crop, u)
+    #
+    # condition (GH #1436) is "Etat du produit", s16cq12c, the state of the crop
+    # when the harvest Quantity was measured, read by code through
+    # harmonize_crop_condition_ehcvm1 in categorical_mapping.org.  The instrument
+    # asks the form and never the dryness, so the values are the BARE FORM tokens
+    # `shelled` / `unshelled` / `shell_not_applicable`, plus `unknown_condition`
+    # for a blank code.  Five answers fold onto those tokens (ruled @ligon
+    # 2026-11-04); condition_native below keeps what was answered.
+    #
+    # 2021-22 (GH #1697) splits the module: s16c holds the harvest and s16d, with no
+    # plot, the sales.  A sale goes on the household's single harvest row for the crop,
+    # keyed hh-crop-sale-single-row, else on one row with plot_id = 'Farm-level' and
+    # u = 'Unknown' (option (d), @ligon 2026-11-03).  Unit_sold is the sold unit there;
+    # 2018-19's sold unit is not read, so it is NA on 2018-19.  A recorded harvest of an
+    # unfinished crop is keyed harvest-to-date, and a finished harvest the file lacks is
+    # the sum of its dispositions in one unit, keyed harvest-from-dispositions (GH #1437).
+    # condition reads s16cq16d through the wave's own three-code table, in
+    # 2021-22/_/categorical_mapping.org.
+    index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     Quantity_sold: float
+    Unit_sold:
+      type: str
+      optional: true
     Value_sold: float
     harvest_month:
       type: float
       optional: true
     intercropped: bool
+    # condition_native (GH #1436, ruling @ligon 2026-11-04) is the state label as
+    # recorded (s16cq12c; s16cq16d in 2021-22), the answer the `condition` fold cannot show.  `optional`
+    # because a blank state is NA, never a sentinel.
+    condition_native:
+      type: str
+      optional: true
     materialize: make
 
   plot_inputs:
     # Item-level agricultural inputs (GAP 2).  One row per REPORTED input
-    # applied by a household from the EHCVM input roster s16b_me_ben2018.dta
-    # (single 2018-19 wave): input identity (Seed / Urea / DAP / NPK /
+    # applied by a household from the EHCVM input roster s16b_me_ben*.dta:
+    # input identity (Seed / Urea / DAP / NPK /
     # Phosphate / Organic manure / Organic compost / Pesticide / Herbicide /
     # Fungicide / Other phytosanitary), reported quantity used + native unit,
     # purchased flag + reported purchased quantity, and (seed rows) the seed's
@@ -255,16 +287,32 @@ Data Scheme:
     # and 2018-19/_/plot_inputs.py ASSERTS the declared index is unique before
     # writing, so a re-widened bucket fails the build instead of shipping
     # short.  API rows 10,534 -> 10,605 = every reported line-item.
+    #
+    # 2021-22 (GH #1697) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
+    # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018-19 still
+    # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
     materialize: make
 
   plot_labor:
     # Item-level plot labor (GAP 3).  One row per REPORTED labor SOURCE on a
-    # plot from the EHCVM agriculture-parcel module s16a_me_ben2018.dta (single
-    # 2018-19 wave).  REPORTED person-days; total_labor_days /
+    # plot from the EHCVM agriculture-parcel module s16a_me_ben*.dta.
+    # REPORTED person-days; total_labor_days /
     # total_family_labor_days / total_hired_labor_days / hired_labor_value (a
     # median-wage valuation) are TRANSFORMATIONS over these rows, never columns.
     #
@@ -291,11 +339,11 @@ Data Scheme:
   people_last7days:
     # Item-level individual 7-day labor (GAP 3).  One row per individual
     # carrying the REPORTED last-7-days labor participation, from the EHCVM
-    # 7-day module s04_me_ben2018.dta merged to the s01 roster (single 2018-19
-    # wave).  No rollups: the WB nb_members_working_age HH total is a
+    # 7-day module (s04_me_ben2018.dta; s04a_me_ben2021.dta) merged to the s01
+    # roster.  No rollups: the WB nb_members_working_age HH total is a
     # transformation, not a column here.
     #
-    # GRAIN (t, i, pid): pid = s01q00a (matches household_roster).  v
+    # GRAIN (t, i, pid): pid = s01q00a, membres__id in 2021-22 (matches household_roster).  v
     # auto-joins from sample() (people_last7days is NOT in the framework
     # _no_v_join set).
     #
@@ -321,4 +369,27 @@ Data Scheme:
     wage_hrs: {type: float, optional: true}
     Industry: {type: str, optional: true}
     working_age: bool
+    materialize: make
+
+  community_prices:
+    # Item-level community prices (GH #1226), the Niger 2018-19 template.  One
+    # row per SURVEY-RECORDED price from section 5 of the community
+    # questionnaire, s05_co_ben2018.dta.  Cluster-level: no household i, and v
+    # is the native grappe, the sample() keyspace.  Script path, because a
+    # record is two readings and `u` is decoded from a code.
+    #   j -- BY CODE: the household s07bq01 label through harmonize_food.
+    #   u -- BY CODE: the household's sized form, Tas (Petit), bare units bare,
+    #        no two units folded (#1453 ruling).
+    #   variety -- the product code where harmonize_food lumps several codes
+    #        into one j; elsewhere the canonical unknown_variety.
+    #   visit -- vague.  Each grappe is fielded in one vague.
+    #   obs -- s05q03 "Relevé 1" = 1, s05q04 "Relevé 2" = 2.
+    #   Quantity -- 1, the registered derivation
+    #        Benin::community_prices::one-item-per-price: the form prices one
+    #        item of the selected unit-size and asks no quantity.
+    # Rules and measurements: CONTENTS.org.
+    index: (t, v, j, u, variety, visit, obs)
+    Price: float
+    Quantity: float
+    Description: {type: str, optional: true}
     materialize: make

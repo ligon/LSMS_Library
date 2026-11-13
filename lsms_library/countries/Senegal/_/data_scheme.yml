@@ -60,6 +60,7 @@ Data Scheme:
     AffectedAssets: bool
     AffectedProduction: bool
     AffectedConsumption: bool
+    AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
@@ -105,9 +106,7 @@ Data Scheme:
     v: str
     weight: float
     panel_weight: float
-    strata:
-      type: str
-      optional: true
+    strata: str
     Rural: str
 
   panel_ids: !make
@@ -169,7 +168,15 @@ Data Scheme:
     # in several units.  Quantity_sold / Value_sold are at plot-crop grain
     # (s16cq16a / s16cq17).  harvest_month is NA (the EHCVM s16c module has
     # no planting/harvest-date question); intercropped from s16cq07.
-    index: (t, i, plot_id, crop, u)
+    #
+    # condition (GH #1436) is "Etat du produit", s16cq12c, the state of the crop
+    # when the harvest Quantity was measured, read by code through
+    # harmonize_crop_condition_ehcvm1 in categorical_mapping.org.  The instrument
+    # asks the form and never the dryness, so the values are the BARE FORM tokens
+    # `shelled` / `unshelled` / `shell_not_applicable`, plus `unknown_condition`
+    # for a blank code.  Five answers fold onto those tokens (ruled @ligon
+    # 2026-11-04); condition_native below keeps what was answered.
+    index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
@@ -177,6 +184,12 @@ Data Scheme:
       type: float
       optional: true
     intercropped: bool
+    # condition_native (GH #1436, ruling @ligon 2026-11-04) is the state label as
+    # recorded (s16cq12c), the answer the `condition` fold cannot show.  `optional`
+    # because a blank state is NA, never a sentinel.
+    condition_native:
+      type: str
+      optional: true
     materialize: make
 
   plot_inputs:
@@ -203,6 +216,15 @@ Data Scheme:
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    # Own2021 only (GH #1483): separate acquisition roles, not used-unit amounts.
+    # The 2018 driver and its historical gift-as-purchase binding are unchanged.
+    Unit_purchased: {type: str, optional: true}
+    Received_as_gift: {type: bool, optional: true}
+    Quantity_received_as_gift: {type: float, optional: true}
+    Unit_received_as_gift: {type: str, optional: true}
+    Input_native: {type: str, optional: true}
+    # Own2021 slot identity, including full native uncurated seed descriptions.
+    input_code_native: {type: int, optional: true}
     materialize: make
 
   plot_labor:
@@ -265,4 +287,28 @@ Data Scheme:
     wage_hrs: {type: float, optional: true}
     Industry: {type: str, optional: true}
     working_age: bool
+    materialize: make
+
+  community_prices:
+    # Item-level community prices (GH #1226), the Niger 2018-19 template.  One
+    # row per SURVEY-RECORDED price from section 5 of the community
+    # questionnaire, s05_co_sen2018.dta (2018-19 only: 2021-22 ships no community
+    # price file; s05_me_sen2021 is a household module and ehcvm_prix_sen2021 has
+    # no grappe).  Cluster-level: no household i, and v is the native grappe, the
+    # sample() keyspace.  Script path, because a record is two readings and `u`
+    # is decoded from a code.
+    #   j -- BY CODE: the household s07bq01 label through harmonize_food.
+    #   u -- BY CODE: the household's sized form, Tas (Petit), bare units bare,
+    #        no two units folded (#1453 ruling).
+    #   variety -- the canonical unknown_variety: the form names nothing finer.
+    #   visit -- vague.  Each grappe is fielded in one vague.
+    #   obs -- s05q03 "Relevé 1" = 1, s05q04 "Relevé 2" = 2.
+    #   Quantity -- 1, the registered derivation
+    #        Senegal::community_prices::one-item-per-price: the form prices one
+    #        item of the selected unit-size and asks no quantity.
+    # Rules and measurements: CONTENTS.org.
+    index: (t, v, j, u, variety, visit, obs)
+    Price: float
+    Quantity: float
+    Description: {type: str, optional: true}
     materialize: make

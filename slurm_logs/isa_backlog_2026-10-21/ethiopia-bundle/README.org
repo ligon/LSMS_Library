@@ -1,0 +1,63 @@
+#+title: Ethiopia crop_production bundle -- GH #1253, #1252, #1256
+
+Aggregates only (counts, totals, shares); no household, holder or plot
+identifiers.  Measured 2026-10-23 on a sucoder /local clone.  Base =627d3cfdf=
+(#1257's head, GH #820) in a detached worktree; development =9a0ed5f3c=; the
+branch =fix/1252-1253-1256-ethiopia-bundle-20261023=, built once per commit.
+Every build: its OWN fresh =LSMS_DATA_DIR= (cold; =dvc-cache= symlinked to the
+shared L1), =PYTHONPATH= = the checkout under test (import identity asserted),
+=OPENBLAS/OMP/MKL_NUM_THREADS=1=, =LSMS_BUILD_WORKERS=1=, =nice -n 19=.
+
+*Running a test file against a base checkout*: =tests/= is a package
+(=tests/__init__.py=), so pytest prepends the TEST FILE's repo root to
+=sys.path=.  Running the branch's test file by path from inside a base checkout
+silently imports the BRANCH's =lsms_library= (it did, once, here: 14 passed
+"on base").  =scripts/run_test_on.sh= copies the file into the checkout under
+test, runs it there, and deletes the copy.
+
+* GH #1253 -- §11 sale path
+
+| file | what |
+|------+------|
+| =1253_api_diff_base_vs_branch.json= | =Country('Ethiopia').crop_production()= cold, base vs branch: rows, index identity, changed cells by wave and transition |
+| =1253_change_attribution.json= | every changed cell (wave parquets) attributed to sub-fix (a) / (b) / (c) by the raw §11 lines of its (holder, crop) |
+| =1253_raw_oracle.json= | an independent recomputation of the §11 aggregate from the raw =.dta=, checked against the branch's and the base's wave parquets |
+| =1253_downstream_and_reports.json= | =harvest_kg=, =gross_crop_revenue=, within-wave =median_price_valuation=, grain / null-read / null-index / quantity reports, warning categories |
+
+* GH #1252 -- crop codes that change meaning by wave
+
+| file | what |
+|------+------|
+| =1252_crop_label_sweep.json= | every crop-code variable's Stata value labels, every crop module, every wave: files/variables swept, the codes whose label text varies, and which of those change MEANING (9, 19, 86) |
+| =1252_crop_production_diff_prev_commit_vs_branch.json= | cold builds, #1253 commit vs this commit: rows re-labelled per (wave, label); with the before-frame re-labelled the index is identical; every other changed cell (=perennial= only) |
+| =1252_plot_inputs_diff_base_vs_branch.json= | the same for =plot_inputs= (base =627d3cfdf=; #1253 does not touch it) |
+| =1252_raw_oracle.json= | per wave: served plots holding a code 9/19/86 §9 row whose served =j= includes the label the §9 FILE's own value label gives |
+| =1252_downstream_and_reports.json= | =harvest_kg= (+ shipped), =gross_crop_revenue=, within-wave =median_price_valuation=, audit reports |
+
+* GH #1256 -- W4/W5 permanent-crop window
+
+| file | what |
+|------+------|
+| =1256_api_diff_prev_commit_vs_branch.json= | cold builds, #1252 commit vs this commit: the only changed cells are =Derivation= on W4/W5 rows |
+| =1256_raw_oracle_and_crosstabs.json= | per wave: an independent recomputation of the stamped set from raw §4/§9 (0 mismatches); the stamp against =perennial= and against "§11 Q2 answered"; stamped rows by crop |
+| =1256_downstream_and_reports.json= | downstream and audit reports identical |
+
+The §4 =s4q15= by-crop tabulation (=scripts/s4q15.py=) and the §11
+permanent-block tabulation (=scripts/perm_block2.py=) are quoted in
+=Ethiopia/_/CONTENTS.org=.
+
+* Ruling (@ligon, 2026-10-23) -- the empty-row filter keeps a row that carries a sale value
+
+| file | what |
+|------+------|
+| =filter_api_diff_prev_commit_vs_branch.json= | cold builds, #1256 commit vs this commit: rows added by wave / module (§11 or §12) / value (positive or zero), their Birr, their =u=, their =Derivation=; every pre-existing row asserted identical |
+| =filter_downstream_reports_and_sect12_classes.json= | downstream; grain / null-index / quantity report counts (no identifiers); the =Sect12SaleWarning= class 7 and class 8 after the change |
+
+* Combined: development =9a0ed5f3c= -> this branch (with #1257 underneath)
+
+| file | what |
+|------+------|
+| =combined_api_diff_development_vs_branch.json= | the development frame re-labelled by the #1252 map, then rows added, rows dropped (0), and every cell change on common rows by column / wave / transition; positive =Value_sold= and Birr by wave; =Derivation= counts |
+| =combined_downstream_development_vs_branch.json= | =harvest_kg= (+ shipped), =gross_crop_revenue=, =crop_diversity(weight='value')=, within-wave =median_price_valuation=, grain report counts |
+| =hash_census_diff.json= | =1218-current-validation/hash_census.py=, development vs branch |
+| =tests.org= | test lines |

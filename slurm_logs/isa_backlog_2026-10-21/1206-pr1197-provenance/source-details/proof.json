@@ -1,0 +1,14 @@
+{
+  "status": "PASS_NEW_SAVED_SOURCE_DETAILS_PREDICATES",
+  "PR": 1197,
+  "original_serialized_source_row_predicate_sets": 9,
+  "Quantity_NA": 6,
+  "Expenditure_NA": 3,
+  "typed_key_measure_operand_lists_exact": true,
+  "saved_source_missing_operands_positive_counterparts_and_actual_NA_positive_counterparts": true,
+  "full_counterpart_numeric_equality_or_full_source_38743_rows_not_claimed": true,
+  "all_original_copy_receipts_exact": true,
+  "source_decode_IDformat_mapping_API_test_replays": 0,
+  "old152_release_and_hold_preserved": true,
+  "signed": "Sue"
+}

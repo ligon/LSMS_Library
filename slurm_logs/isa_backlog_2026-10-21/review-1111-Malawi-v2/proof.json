@@ -1,0 +1,95 @@
+{
+  "verdict": "PASS",
+  "head": "a9356f2c5b2bb1709fedf9a288d12ef255ae44f3",
+  "read_only_tracked_tree_proof": {
+    "baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_files": 14880,
+      "HEAD_content_modes_symlinks_status_exact": true,
+      "clean": true,
+      "tracked_raw_format_curation_files": 9,
+      "untracked_in_tree_raw_or_parquet": 0
+    },
+    "candidate": {
+      "head": "a9356f2c5b2bb1709fedf9a288d12ef255ae44f3",
+      "tracked_files": 14888,
+      "HEAD_content_modes_symlinks_status_exact": true,
+      "clean": true,
+      "tracked_raw_format_curation_files": 9,
+      "untracked_in_tree_raw_or_parquet": 0
+    },
+    "old_candidate": {
+      "head": "9b883974a81d6ee664bbca425b7d484f0f14eb7a",
+      "tracked_files": 14887,
+      "HEAD_content_modes_symlinks_status_exact": true,
+      "clean": true,
+      "tracked_raw_format_curation_files": 9,
+      "untracked_in_tree_raw_or_parquet": 0
+    },
+    "organic": {
+      "head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "tracked_files": 14910,
+      "HEAD_content_modes_symlinks_status_exact": true,
+      "clean": true,
+      "tracked_raw_format_curation_files": 9,
+      "untracked_in_tree_raw_or_parquet": 0
+    },
+    "writer": {
+      "head": "a9356f2c5b2bb1709fedf9a288d12ef255ae44f3",
+      "tracked_files": 14888,
+      "HEAD_content_modes_symlinks_status_exact": true,
+      "clean": true,
+      "tracked_raw_format_curation_files": 9,
+      "untracked_in_tree_raw_or_parquet": 0
+    }
+  },
+  "quiescent_author_evidence_files_unchanged": 424,
+  "old_NEEDS_FIX_review_private_files_unchanged": 200,
+  "physical_copies": 212,
+  "all_copy_sources_sha256_size_mode_mtime_unchanged": true,
+  "held_Stata_MD5_verified": 28,
+  "held_PDF_MD5_verified": 2,
+  "all_L1_held_and_reference_copies_unchanged": true,
+  "copied_L2_destinations_normally_rebuilt": [
+    "data-candidate/Malawi/2010-11/_/sample.parquet",
+    "data-candidate/Malawi/2019-20/_/sample.parquet",
+    "data-candidate/Malawi/var/sample.parquet"
+  ],
+  "warm": {
+    "baseline": {
+      "cache_files": 17,
+      "fresh_process_zero_parquet_byte_or_mtime_writes": true,
+      "all_warm_receipts_still_exact": true,
+      "sample_warm_before_after_in_process_receipt_assertion": false
+    },
+    "candidate": {
+      "cache_files": 17,
+      "fresh_process_zero_parquet_byte_or_mtime_writes": true,
+      "all_warm_receipts_still_exact": true,
+      "sample_warm_before_after_in_process_receipt_assertion": false
+    },
+    "sample-baseline": {
+      "cache_files": 10,
+      "fresh_process_zero_parquet_byte_or_mtime_writes": true,
+      "all_warm_receipts_still_exact": null,
+      "sample_warm_before_after_in_process_receipt_assertion": true
+    },
+    "sample-candidate": {
+      "cache_files": 10,
+      "fresh_process_zero_parquet_byte_or_mtime_writes": true,
+      "all_warm_receipts_still_exact": null,
+      "sample_warm_before_after_in_process_receipt_assertion": true
+    }
+  },
+  "Uganda_full_cache_bytes_modes_mtimes_exact": true,
+  "network_attempts": 0,
+  "review_subprocesses_remaining": 0,
+  "test_only_descendant": {
+    "files": 4,
+    "test_lines_deleted": 5,
+    "other_test_bytes_unchanged": true,
+    "production_driver_blobs_exact_old_9b": true
+  },
+  "no_organic_composition": true,
+  "Sue": "independent read-only review"
+}

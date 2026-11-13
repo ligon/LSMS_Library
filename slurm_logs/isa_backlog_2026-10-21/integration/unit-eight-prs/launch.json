@@ -1,0 +1,25 @@
+{
+  "head": "dd0dddcb052f8ce9b0c7401b281ac60df47933ad",
+  "command": [
+    "/local/job40255479/venv_img/bin/python",
+    "-m",
+    "pytest",
+    "-n",
+    "16",
+    "--dist=loadfile",
+    "--timeout=600",
+    "--timeout-method=thread",
+    "--durations=25",
+    "--maxfail=3",
+    "--tb=short",
+    "-ra",
+    "-o",
+    "cache_dir=/local/job40255479/control/isa-backlog-20261021/integration/unit-eight-prs/pytest-cache",
+    "--basetemp=/local/job40255479/control/isa-backlog-20261021/integration/unit-eight-prs/pytest-temp",
+    "--junitxml=/local/job40255479/control/isa-backlog-20261021/integration/unit-eight-prs/unit-private.xml"
+  ],
+  "workers": 16,
+  "credential_free": true,
+  "offline_guard": true,
+  "tracked_paths": 14970
+}

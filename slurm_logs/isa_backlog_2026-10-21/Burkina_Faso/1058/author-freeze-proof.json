@@ -1,0 +1,38 @@
+{
+  "status": "frozen clean for independent review",
+  "head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+  "ledger_head": "b5ced85c571bc4d5b430371d1f92ace336c24a3f",
+  "runtime_head": "7eee549b15cacbe1e86b60a925b0899dc85d49e6",
+  "published_by_ordinary_hook": true,
+  "tracked_files": 14885,
+  "clean": true,
+  "runtime_config_tests_all_prior_tracked_SHA_modes_exact_except_ledger": true,
+  "final_descendant_changed_paths": [
+    ".coder/ledger/1058-burkina-parcel-gps.md",
+    "slurm_logs/isa_backlog_2026-10-21/1058-Burkina_Faso/REPORT.md",
+    "slurm_logs/isa_backlog_2026-10-21/1058-Burkina_Faso/REPRODUCE.md",
+    "slurm_logs/isa_backlog_2026-10-21/1058-Burkina_Faso/validation.json"
+  ],
+  "549_country_hashes_additional_changes": 0,
+  "39_framework_fingerprints_additional_changes": 0,
+  "immutable_tracked_tree_heads": {
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1058": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "/local/job40255479/worktrees/isa-baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1123": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+    "/local/job40255479/worktrees/isa-Burkina_Faso": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb"
+  },
+  "immutable_tracked_content_modes_heads_status_exact": true,
+  "immutable_evidence_roots_files": {
+    "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058": 186,
+    "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1123": 258,
+    "/local/job40255479/control/isa-backlog-20261021/review-1123-Burkina_Faso": 192
+  },
+  "all_held_source_and_comparator_receipts_exact": true,
+  "baseline_candidate_data_SHA_modes_mtimes_exact": true,
+  "in_tree_parquets": 0,
+  "actual_outbound_attempts": 0,
+  "functional_checkout_write_guard": true,
+  "ignored_DVC_tmp_exact_private_target_mode_0700": true,
+  "other_task_processes": [],
+  "completion_time_UTC": "2026-10-21T21:39:38Z"
+}

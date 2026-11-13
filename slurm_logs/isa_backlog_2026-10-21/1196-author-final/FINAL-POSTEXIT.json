@@ -1,0 +1,14 @@
+{
+  "status": "POSTEXIT_TERMINAL_SUCCESS",
+  "seal_actor_exit": 0,
+  "source_head": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+  "tested_runtime": "7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1",
+  "READY_sha256": "1813d467c38f328bfa22c7bb7e26bef73377223cb5e1f24fc6443c0f1077bc87",
+  "manifest_sha256": "6b015771211cde0249c2f394e61c2587d84a8bb0a516634a77a566bf27f37420",
+  "manifest_entries": 859,
+  "all_manifest_receipts_and_membership_exact": true,
+  "zero_task_consumers": true,
+  "source_clean": true,
+  "no_API_source_test_replay": true,
+  "signed": "Sue"
+}

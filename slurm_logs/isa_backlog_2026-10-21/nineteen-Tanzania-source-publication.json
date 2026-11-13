@@ -1,0 +1,12 @@
+{
+  "recorded_at_UTC": "2026-10-22T03:42:57.826096+00:00",
+  "git_ls_remote_exact": {
+    "refs/heads/fix/1091-tanzania-community-builder-20261022": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+    "refs/heads/isa/integration-nineteen-docs-20261022": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e"
+  },
+  "nineteen_root_acceptance": "integration/niger-nineteen-review/ROOT-ACCEPTANCE.json",
+  "Tanzania_root_acceptance": "1091-Tanzania-independent/ROOT-ACCEPTANCE.json",
+  "public_PRs_merged": false,
+  "Tanzania_PR_created": false,
+  "signed": "Sue"
+}

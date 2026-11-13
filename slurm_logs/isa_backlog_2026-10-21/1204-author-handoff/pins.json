@@ -1,0 +1,47 @@
+{
+  "candidate": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "tested_clean_candidate": "69bcbd5ff79883606008c67dd36e81580c3f497b",
+  "actual_parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "python": {
+    "sha256": "99b9e30b1e34701e7136448414fe5e4d2b788bc768cba4ddeca9e5e18bc18b91",
+    "bytes": 23864,
+    "mode": 493,
+    "mtime_ns": 1738885408891840994,
+    "nlink": 1,
+    "device": 36,
+    "inode": 6421342728535199562,
+    "symlink": false,
+    "link": null
+  },
+  "generation": {
+    "sha256": "97e6ed8a488dad718f71cc4a43c17e1ea34bba0b014465b52fe780c8af5d0852",
+    "bytes": 271,
+    "mode": 420,
+    "mtime_ns": 1792447943000000000,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 46928666,
+    "symlink": false,
+    "link": null
+  },
+  "generation_value": "20261019T221223Z",
+  "versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "dvc": "3.67.1",
+    "pytest": "8.4.2",
+    "pytest-xdist": "3.8.0"
+  },
+  "serial": {
+    "LSMS_MAKE_JOBS": "1",
+    "LSMS_BUILD_WORKERS": "1",
+    "MAKEFLAGS": "-j1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "actual_Make_jobs_helper": null,
+  "comparator_sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+  "guard_sha256": "6d1557b0690d1b51738bd636d8e98a3d69538ee5ffc1b23997672751a9bee352"
+}

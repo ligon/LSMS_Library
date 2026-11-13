@@ -1,0 +1,26 @@
+from pathlib import Path
+import json,hashlib,os,stat
+C=Path('/local/job40255479/control/isa-backlog-20261021');P=C/'review-Burkina_Faso-1188'
+capfile=C/'1188-independent-seal-postexit-tool-records.json';literalfile=C/'1188-independent-original-harness-records.json';packetfile=C/'1188-INDEPENDENT-ROOT-PACKET-AUTHENTICATION.json'
+for q,sha in [(capfile,'b10db3e83969ec1765a750b342a31cb1112fa75a04e38eb20548438447f40cf4'),(literalfile,'03a369f1e53f47859214431a15c780c860a119c0a388a1c9d150d03a2e411c15'),(packetfile,'452fbe627adc53d7b5061b023532c86b58a75b893b127c0504f7fe44e15ec33e')]:
+ assert hashlib.sha256(q.read_bytes()).hexdigest()==sha
+cap=json.loads(capfile.read_text());literal=json.loads(literalfile.read_text());packet=json.loads(packetfile.read_text());assert cap['observed_terminal_results']=={'postexit-v2':0,'seal-v2':0}
+assert hashlib.sha256(cap['original_sdk_call_return_jsonl'].encode()).hexdigest()==cap['original_sdk_call_return_jsonl_sha256']
+for name,v in cap['frozen_files'].items():
+ q=P/name;b=q.read_bytes();assert v['sha256']==hashlib.sha256(b).hexdigest() and v['bytes']==len(b)
+ if 'exact_saved_text_utf8' in v:assert v['exact_saved_text_utf8']==b.decode()
+ for k,z in v['NEW_current_physical_receipt'].items():
+  s=q.lstat();got={'type':'file','bytes':s.st_size,'mode':stat.S_IMODE(s.st_mode),'mtime_ns':s.st_mtime_ns,'nlink':s.st_nlink,'inode':s.st_ino,'device':s.st_dev,'uid':s.st_uid,'gid':s.st_gid}
+  if k in got:assert z==got[k],(name,k)
+for chunk,record in literal['records'].items():
+ assert hashlib.sha256(record['literal_original_call_jsonl_utf8'].encode()).hexdigest()==record['call_sha256']
+ assert hashlib.sha256(record['literal_original_return_jsonl_utf8'].encode()).hexdigest()==record['return_sha256']
+ assert record['SDK_value_exact_to_agent_capture'] is True
+assert literal['records']['6e8397']['original_SDK_value']['exit_code']==0
+assert literal['records']['60b5d9']['original_SDK_value']['session_id']==52803
+assert literal['records']['146c69']['original_SDK_value']['exit_code']==0
+assert not (P/'actors/postexit-v2/source-and-self.json').exists()
+x={'status':'ROOT_ACCEPTED_BF1188_COUNTRY_WIRING_WITH_1218_RESIDUAL_AND_EXECUTION_QUALIFICATIONS','issue':1188,'final_source':'657fed11a63354886772d0f978cec8adb2ad647e','tested_runtime':'3d39096d55bc2b2a8a4e387e9d939aabe8951ecd','actual_parent_source':'3dc9d28510dd783c648413987011832669f8bcf7','packet_authentication_sha256':'452fbe627adc53d7b5061b023532c86b58a75b893b127c0504f7fe44e15ec33e','original_SDK_value_capture_sha256':'b10db3e83969ec1765a750b342a31cb1112fa75a04e38eb20548438447f40cf4','verbatim_original_harness_capture_sha256':'03a369f1e53f47859214431a15c780c860a119c0a388a1c9d150d03a2e411c15','manifest_sha256':'dc36563c3d321b3e6397e2d27f523d029db911ab89203e3b603b65e67b0deff0','manifest_entries':1045,'private_payload_bytes':162253383,'tracked_sources':29788,'providers':6,'private_copies':24,'copy_bytes':25343300,'original_and_copy_distinct_inodes':30,'all_applied_rows':22877,'unlabelled_source21_rows_preserved':602,'independent_tests':{'targeted_PASS':14,'actual_parent_FAIL':7,'actual_parent_PASS':7,'supporting_PASS':397,'full_suite':False},'strict_matrix':{'total':151,'PASS':111,'FAIL':40,'writer_readback_PASS_already_inside111':40,'other_PASS':71},'new_empty_references':{'Default_PASS':2,'Make_FAIL':2,'residual_issue':1218,'complete_axes_typed_attrs_PASS':4},'scanners_each_WARN':4,'scanner_JSONL_bytes_each':3028,'scanner_JSONL_sha256':'3e395b68d67db3da11b295c81cecba7a5aa61024d83c91236dab74ac1f087f29','scanner_comparison_DOCUMENT_sha256':'2effd253ec2573b96702e6b79ad37efd9b4c167701483dbaf58c93eea97a51e7','sealer':{'Popen_pid':210629,'SDK_chunk':'6e8397','exit_code':0},'separate_postexit':{'Popen_pid':211180,'SDK_session':52803,'SDK_terminal_chunk':'146c69','exit_code':0,'child_self_record_absent_not_reconstructed':True},'safe_export_allowlist_sha256':'624e1a8705208e58f2fb5fdc250d559e64a010e850e5de1684cc319d8cecd9d3','safe_exports':8,'directory_precision':'Three original full physical directory exceptions and other original mode/owner checks; root whole-directory physical snapshot is explicitly NEW. No chmod.','guard_scope':'Observed guarded execution retains156earlier absent raw-read denials,52phantom parquet read denials(source-chain inference; historical individual stacks/absence not captured),16existing-directory mkdir refusals, network probes and all original calibration/precollection/capability/lifecycle/capture stops plus extra16probe capability replay. No universal unguarded-loader equivalence.','root_metadata_stops':['v1 expected boolean but saved original151 summary is exact count mapping','v2 peer summary supplied comparison-document digest for raw JSONL; manifest-bound raw hash now distinct','Two root shape-only diagnostic inspections failed on scalar fields; no product/API/data decode replay'],'full_campaign_or_science_certification':False,'human_merge_required':True,'signed':'Sue'}
+q=C/'1188-INDEPENDENT-ROOT-ACCEPTANCE.json';fd=os.open(q,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+with os.fdopen(fd,'w') as f:json.dump(x,f,indent=2);f.write('\n')
+print('final BF1188 root acceptance',hashlib.sha256(q.read_bytes()).hexdigest(),'151comparisons retained111PASS40FAIL;1218residual')

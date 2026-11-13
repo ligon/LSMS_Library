@@ -1,0 +1,366 @@
+{
+ "rows": {
+  "base": 85519,
+  "branch": 85519
+ },
+ "index_identical": true,
+ "non_sale_columns_identical": [
+  "Quantity",
+  "planting_month",
+  "harvest_month",
+  "intercropped",
+  "perennial"
+ ],
+ "sale_cells_nonnull_on_development_identical": true,
+ "per_wave": {
+  "2011-12": {
+   "rows": 7744,
+   "Value_sold_nonnull": [
+    3497,
+    4041
+   ],
+   "Value_sold_positive": [
+    694,
+    854
+   ],
+   "Quantity_sold_nonnull": [
+    3497,
+    4041
+   ],
+   "Quantity_sold_positive": [
+    694,
+    854
+   ],
+   "Value_sold_birr_total": [
+    539465.0,
+    600749.0
+   ],
+   "rows_changed": 544
+  },
+  "2013-14": {
+   "rows": 26159,
+   "Value_sold_nonnull": [
+    5676,
+    10139
+   ],
+   "Value_sold_positive": [
+    1347,
+    2737
+   ],
+   "Quantity_sold_nonnull": [
+    2054,
+    3430
+   ],
+   "Quantity_sold_positive": [
+    406,
+    845
+   ],
+   "Value_sold_birr_total": [
+    2031398.0,
+    2995104.0
+   ],
+   "rows_changed": 4463
+  },
+  "2015-16": {
+   "rows": 25920,
+   "Value_sold_nonnull": [
+    4780,
+    9275
+   ],
+   "Value_sold_positive": [
+    1017,
+    2300
+   ],
+   "Quantity_sold_nonnull": [
+    1185,
+    2156
+   ],
+   "Quantity_sold_positive": [
+    643,
+    1614
+   ],
+   "Value_sold_birr_total": [
+    1411978.0,
+    2474854.0
+   ],
+   "rows_changed": 4495
+  },
+  "2018-19": {
+   "rows": 14092,
+   "Value_sold_nonnull": [
+    5746,
+    5746
+   ],
+   "Value_sold_positive": [
+    1368,
+    1368
+   ],
+   "Quantity_sold_nonnull": [
+    1872,
+    1872
+   ],
+   "Quantity_sold_positive": [
+    1056,
+    1056
+   ],
+   "Value_sold_birr_total": [
+    2563767.0,
+    2563767.0
+   ],
+   "rows_changed": 0
+  },
+  "2021-22": {
+   "rows": 11604,
+   "Value_sold_nonnull": [
+    4019,
+    4019
+   ],
+   "Value_sold_positive": [
+    1292,
+    1292
+   ],
+   "Quantity_sold_nonnull": [
+    1755,
+    1755
+   ],
+   "Quantity_sold_positive": [
+    936,
+    936
+   ],
+   "Value_sold_birr_total": [
+    6940614.4,
+    6940614.4
+   ],
+   "rows_changed": 0
+  }
+ },
+ "crops_gaining_positive_sales": {
+  "2011-12": 27,
+  "2013-14": 48,
+  "2015-16": 45
+ },
+ "added_positive_rows_by_perennial_flag": {
+  "perennial": 2170,
+  "not_perennial": 663
+ },
+ "warnings_base": {
+  "GrainCollapseWarning": [
+   "Ethiopia/crop_production/2013-14",
+   "Ethiopia/crop_production/2015-16",
+   "Ethiopia/crop_production/2018-19",
+   "Ethiopia/crop_production/2021-22"
+  ],
+  "QuantityImplausibleWarning": [
+   "Ethiopia/crop_production 2013-14",
+   "Ethiopia/crop_production 2015-16",
+   "Ethiopia/crop_production 2018-19"
+  ],
+  "NullIndexKeyWarning": [
+   "Ethiopia/crop_production"
+  ],
+  "ClusterIdentityWarning": [
+   "Ethiopia/crop_production"
+  ]
+ },
+ "warnings_branch": {
+  "GrainCollapseWarning": [
+   "Ethiopia/crop_production/2013-14",
+   "Ethiopia/crop_production/2015-16",
+   "Ethiopia/crop_production/2018-19",
+   "Ethiopia/crop_production/2021-22"
+  ],
+  "QuantityImplausibleWarning": [
+   "Ethiopia/crop_production 2013-14",
+   "Ethiopia/crop_production 2015-16",
+   "Ethiopia/crop_production 2018-19"
+  ],
+  "NullIndexKeyWarning": [
+   "Ethiopia/crop_production"
+  ],
+  "ClusterIdentityWarning": [
+   "Ethiopia/crop_production"
+  ]
+ },
+ "grain_reports": {
+  "base": [
+   {
+    "levels": [
+     "t",
+     "i",
+     "plot_id",
+     "j",
+     "u"
+    ],
+    "rows": 26765,
+    "dropped": 606,
+    "destroyed": 2,
+    "conflicting_groups": 1,
+    "nan_key_rows": 0,
+    "wave": "2013-14"
+   },
+   {
+    "levels": [
+     "t",
+     "i",
+     "plot_id",
+     "j",
+     "u"
+    ],
+    "rows": 25924,
+    "dropped": 4,
+    "destroyed": 2,
+    "conflicting_groups": 2,
+    "nan_key_rows": 0,
+    "wave": "2015-16"
+   },
+   {
+    "levels": [
+     "t",
+     "i",
+     "plot_id",
+     "j",
+     "u"
+    ],
+    "rows": 14102,
+    "dropped": 10,
+    "destroyed": 7,
+    "conflicting_groups": 7,
+    "nan_key_rows": 0,
+    "wave": "2018-19"
+   },
+   {
+    "levels": [
+     "t",
+     "i",
+     "plot_id",
+     "j",
+     "u"
+    ],
+    "rows": 11623,
+    "dropped": 19,
+    "destroyed": 17,
+    "conflicting_groups": 15,
+    "nan_key_rows": 0,
+    "wave": "2021-22"
+   }
+  ],
+  "branch": [
+   {
+    "levels": [
+     "t",
+     "i",
+     "plot_id",
+     "j",
+     "u"
+    ],
+    "rows": 26765,
+    "dropped": 606,
+    "destroyed": 2,
+    "conflicting_groups": 1,
+    "nan_key_rows": 0,
+    "wave": "2013-14"
+   },
+   {
+    "levels": [
+     "t",
+     "i",
+     "plot_id",
+     "j",
+     "u"
+    ],
+    "rows": 25924,
+    "dropped": 4,
+    "destroyed": 2,
+    "conflicting_groups": 2,
+    "nan_key_rows": 0,
+    "wave": "2015-16"
+   },
+   {
+    "levels": [
+     "t",
+     "i",
+     "plot_id",
+     "j",
+     "u"
+    ],
+    "rows": 14102,
+    "dropped": 10,
+    "destroyed": 7,
+    "conflicting_groups": 7,
+    "nan_key_rows": 0,
+    "wave": "2018-19"
+   },
+   {
+    "levels": [
+     "t",
+     "i",
+     "plot_id",
+     "j",
+     "u"
+    ],
+    "rows": 11623,
+    "dropped": 19,
+    "destroyed": 17,
+    "conflicting_groups": 15,
+    "nan_key_rows": 0,
+    "wave": "2021-22"
+   }
+  ],
+  "identical": true
+ },
+ "null_read_reports": {
+  "base": [],
+  "branch": [],
+  "identical": true
+ },
+ "null_index_reports": {
+  "base": [
+   {
+    "rows": 85519
+   }
+  ],
+  "branch": [
+   {
+    "rows": 85519
+   }
+  ],
+  "identical": true
+ },
+ "quantity_reports": {
+  "base": [
+   {
+    "column": "Quantity",
+    "wave": "2013-14",
+    "rows": 26159
+   },
+   {
+    "column": "Quantity",
+    "wave": "2015-16",
+    "rows": 25920
+   },
+   {
+    "column": "Quantity",
+    "wave": "2018-19",
+    "rows": 14092
+   }
+  ],
+  "branch": [
+   {
+    "column": "Quantity",
+    "wave": "2013-14",
+    "rows": 26159
+   },
+   {
+    "column": "Quantity",
+    "wave": "2015-16",
+    "rows": 25920
+   },
+   {
+    "column": "Quantity",
+    "wave": "2018-19",
+    "rows": 14092
+   }
+  ],
+  "identical": true
+ }
+}

@@ -1,0 +1,27 @@
+# GH #1078 proposal -- no implementation authorized
+
+The reproduced defect is in the framework producer path, not in Uganda's source values or nutrition arithmetic. `Wave.food_acquired` decides whether to apply a legacy reducer by checking a mutable output path after `grab_data` has already returned the frame (`lsms_library/country.py:2303`). A separate normal country rebuild may remove that hashless wave path (`country.py:4709`, `country.py:5268`). The resulting legacy `sum` fabricates the nine zeros; the ordinary country writer then stamps and publishes that frame.
+
+## Proposed implementation boundary for root review
+
+1. Carry explicit, per-result producer provenance from the actual `grab_data` return route into `Wave.food_acquired`. A script/parquet frame must retain that provenance even if its file is subsequently removed. Preserve the public `grab_data` DataFrame interface and full public attributes; a private result or an opt-in private origin return is preferable to a public sentinel attribute. The provenance must describe the route that actually supplied this frame, including script fallback and YAML paths. A fresh `exists()` check, an earlier path check, or the mere presence of `!make` in configuration is not proof of the producer.
+2. Return an already-produced script/parquet food frame without legacy reduction. Preserve the existing aggregation contract for legitimate non-parquet producers, including column selection, numeric coercion, group keys, source categories and existing `sum`/`first` behavior. Do not replace every food sum, disable hashless-wave eviction, alter canonical reshape, or change source/inference/currency logic as part of this fix.
+3. Version the repaired build transform using existing registry machinery. Actual measurements under both frozen heads show `Wave.food_acquired` is absent from direct tags, the food build closure and all nine Uganda script-import closures. A method-only repair can leave corrupt current-hash country caches served indefinitely. A food-scoped `@build_transform(tables=['food_acquired'])` is a concrete candidate, following adjacent `Wave.cluster_features` and existing canonical-food transforms. It requires root approval and measured fingerprint/country-table hash effects. No tag or schema lever was changed during diagnosis.
+4. Verify automatic healing by serving these naturally corrupted, current-hash roots through the candidate's ordinary read/build gate. Require a real stale-hash rebuild that restores the nine NaNs and every other cell/attribute. Do not clear, restamp, bypass, or replace the corrupt caches. Measure actual hashes for affected food countries and all other declared tables to establish the intended scope. Include wave hashes and dependent legacy food outputs, rather than assuming that a decorator's table scope is the entire operational effect.
+
+## Required regression evidence
+
+- The same real-operation, two-process schedule must remain correct after repair: one process reads the real wave frame, another normal country rebuild actually evicts its hashless file, then the first process resumes. Keep actual file results and write inputs unchanged. Verify all 355,571 rows, every cell/key/dtype/attribute and exact source NaN masks, not only a numeric total or test success.
+- Preserve a meaningful non-parquet producer case that exercises legitimate legacy aggregation. Prove the intended reducer was reached and check numeric coercion, missing groups, source index and selected columns. Do not create a test that labels a fabricated frame as script-produced merely to avoid the reducer.
+- Test provenance across actual script success/fallback, YAML and empty-result routes, and ensure no new public attributes leak. Existing read-gate exclusions should remain exclusions: their pure routing role is separate from the content-changing producer method.
+- Run bounded Uganda source/cold/warm, sample/currency order pairs, default derived outputs and healthy comparator checks. Both original named tests passed while writing corruption; green tests alone are not the oracle. Measure cache bytes/modes/mtimes on fresh-process warm reads.
+
+## Historical limit
+
+The controlled schedule identifies actual writers on f8 and reviewed #1062 and reconstructs the complete historical bad frame exactly. The original full-suite run had no corresponding writer trace; its exact historical interleaving and process remain unidentified. This proposal does not equate those source hash states or claim that the historical run's writer has been retrospectively proved.
+
+## Proposed additive Uganda CONTENTS note (not applied)
+
+> The script-produced Uganda food waves are subject to a framework read-to-existence race recorded in GH #1078. A concurrent normal food rebuild can remove a hashless wave cache after another process has read it. The second process can then apply the legacy Wave food reducer to the already-canonical frame and write nine genuine 2011-12 missing measurements as zeros under a valid current country hash. Controlled source-held reproductions under f8 and reviewed #1062 preserve the exact historical nine-cell signature; the original historical full-suite interleaving remains unidentified. #1062's requested-output sibling correction does not repair this framework mechanism. A future repair must preserve producer provenance and invalidate already-corrupt current-hash caches.
+
+Sue, GPT-6. Read-only diagnosis; root must approve a concrete implementation boundary before code or tracked-ledger changes.

@@ -1,0 +1,238 @@
+name: PR data validation
+
+on:
+  pull_request:
+    branches: [development]
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, edited]
+
+# No workflow concurrency: even a queued text edit must not replace a pending
+# credentialed validation. Only the dependent job uses classified concurrency.
+permissions: {}
+
+env:
+  PYTHONPATH: ${{ github.workspace }}
+
+jobs:
+  classify:
+    name: Classify PR data request
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      mode: ${{ steps.event.outputs.mode }}
+      head: ${{ steps.event.outputs.head }}
+      base: ${{ steps.event.outputs.base }}
+    steps:
+      - name: Classify and refuse ineligible requests before checkout
+        id: event
+        run: |
+          # BEGIN_PR_DATA_EVENT_GATE
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+
+
+          def classify_event(event, repository, event_name):
+              """Only known text-only edits avoid validation; uncertainty fails closed."""
+              if event_name != 'pull_request' or not isinstance(event, dict):
+                  raise ValueError('Expected a pull_request event')
+              action = event.get('action')
+              if action not in {'opened', 'synchronize', 'reopened', 'ready_for_review',
+                                'converted_to_draft', 'edited'}:
+                  raise ValueError('Unsupported pull_request action')
+              pr = event.get('pull_request')
+              if not isinstance(pr, dict) or type(pr.get('number')) is not int or pr['number'] <= 0:
+                  raise ValueError('Missing pull request identity')
+              if event.get('repository', {}).get('full_name') != repository:
+                  raise ValueError('Repository identity mismatch')
+              head, base = pr.get('head', {}), pr.get('base', {})
+              if base.get('repo', {}).get('full_name') != repository or base.get('ref') != 'development':
+                  raise ValueError('Expected the development base in this repository')
+              if pr.get('draft') is not False:
+                  raise ValueError('Data validation refuses a draft pull request')
+              if head.get('repo', {}).get('full_name') != repository:
+                  raise ValueError('Data validation refuses fork code and fork credentials')
+              for side in (head, base):
+                  if not isinstance(side.get('sha'), str) or not re.fullmatch('[0-9a-f]{40}', side['sha']):
+                      raise ValueError('Missing exact head/base commit identity')
+              mode = 'validate'
+              if action == 'edited':
+                  changes = event.get('changes')
+                  if not isinstance(changes, dict) or not changes:
+                      raise ValueError('Unknown edited-event changes')
+                  if not set(changes) <= {'title', 'body', 'base'}:
+                      raise ValueError('Unrecognized edited-event change')
+                  for key in ('title', 'body'):
+                      if key in changes:
+                          value = changes[key]
+                          if (not isinstance(value, dict) or set(value) != {'from'}
+                                  or not (isinstance(value['from'], str)
+                                          or (key == 'body' and value['from'] is None))):
+                              raise ValueError('Malformed text-change declaration')
+                  if 'base' in changes:
+                      previous_base = changes['base']
+                      if (not isinstance(previous_base, dict) or set(previous_base) != {'ref', 'sha'}
+                              or not all(isinstance(value, dict) and set(value) == {'from'}
+                                         and isinstance(value['from'], str)
+                                         for value in previous_base.values())):
+                          raise ValueError('Malformed base-change declaration')
+                  else:
+                      mode = 'metadata'
+              return {'mode': mode, 'head': head['sha'], 'base': base['sha']}
+
+
+          if __name__ == '__main__':
+              try:
+                  with open(os.environ['GITHUB_EVENT_PATH'], encoding='utf-8') as stream:
+                      event = json.load(stream)
+                  decision = classify_event(event, os.environ['GITHUB_REPOSITORY'],
+                                            os.environ['GITHUB_EVENT_NAME'])
+              except (ValueError, KeyError, TypeError, AttributeError, OSError) as error:
+                  raise SystemExit('PR data request refused before checkout: ' + str(error))
+              with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
+                  for key, value in decision.items():
+                      stream.write(f'{key}={value}\n')
+              print('PR data request classification: ' + decision['mode'])
+          PY
+          # END_PR_DATA_EVENT_GATE
+
+  validation:
+    # Classifier failure must run a failing required check, never skip it.
+    if: ${{ always() }}
+    needs: classify
+    name: ${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'pr-data-metadata-edit' || 'pr-data-validation' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    concurrency:
+      # Refused/uncertain classifiers must not cancel an eligible request.
+      group: pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'validate' && 'validation' || (needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'metadata' || format('refused-{0}', github.run_id)) }}
+      cancel-in-progress: true
+    # The credentialed acceptance run exceeded two hours before pytest finished.
+    # Allow the hosted runner's full budget; keep every test and its own timeout.
+    timeout-minutes: 360
+    env:
+      LSMS_BUILD_WORKERS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - name: Require successful eligibility before checkout or credentials
+        id: guard
+        env:
+          CLASSIFICATION_RESULT: ${{ needs.classify.result }}
+          REQUEST_MODE: ${{ needs.classify.outputs.mode }}
+        run: |
+          # BEGIN_PR_DATA_RESULT_GATE
+          python3 - <<'PY'
+          import os
+
+
+          def guard_mode(result, mode):
+              if result != 'success' or mode not in {'validate', 'metadata'}:
+                  raise ValueError('Event classification failed; no data validation claimed')
+              return mode == 'validate'
+
+
+          if __name__ == '__main__':
+              try:
+                  run_data = guard_mode(os.environ['CLASSIFICATION_RESULT'], os.environ['REQUEST_MODE'])
+              except (KeyError, ValueError) as error:
+                  raise SystemExit(str(error))
+              with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
+                  stream.write('run_data=' + str(run_data).lower() + '\n')
+              if not run_data:
+                  print('Title/body-only edit: no required data-validation check is emitted')
+          PY
+          # END_PR_DATA_RESULT_GATE
+      - name: Checkout the exact synthetic merge
+        if: steps.guard.outputs.run_data == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Verify synthetic merge and both event parents
+        if: steps.guard.outputs.run_data == 'true'
+        env:
+          EXPECTED_MERGE: ${{ github.sha }}
+          EXPECTED_HEAD: ${{ needs.classify.outputs.head }}
+          EXPECTED_BASE: ${{ needs.classify.outputs.base }}
+        run: python3 .github/scripts/pr_data_checkout.py
+      - uses: actions/setup-python@v5
+        if: steps.guard.outputs.run_data == 'true'
+        with:
+          python-version: '3.11'
+      - name: Install Poetry
+        if: steps.guard.outputs.run_data == 'true'
+        run: pip install poetry
+      - name: Install dependencies
+        if: steps.guard.outputs.run_data == 'true'
+        run: poetry install --no-root
+      # GH #1031: the USER-CONFIG path (`config.s3_creds_path()`), as in the
+      # Windows job, so this run exercises what a user has: no
+      # `countries/.dvc/s3_creds`.  Resolved under `poetry run`, i.e. by the
+      # interpreter (and platformdirs) the library and the `requires_s3` gate
+      # in tests/conftest.py use.  `config.py` is loaded BY FILE so writing
+      # the file does not run the package's import-time auth flow.
+      - name: Configure S3 read credentials
+        if: steps.guard.outputs.run_data == 'true'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.LSMS_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          poetry run python - <<'EOF'
+          import importlib.util, os
+          spec = importlib.util.spec_from_file_location("cfg", "lsms_library/config.py")
+          cfg = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(cfg)
+          f, e = cfg.s3_creds_path(), os.environ
+          f.parent.mkdir(parents=True, exist_ok=True)
+          f.write_text("[default]\naws_access_key_id = " + e["AWS_ACCESS_KEY_ID"]
+                       + "\naws_secret_access_key = " + e["AWS_SECRET_ACCESS_KEY"] + "\n")
+          f.chmod(0o600)
+          print("wrote", f)
+          EOF
+          test ! -e lsms_library/countries/.dvc/s3_creds
+      # Fail loudly rather than let ~4,250 `requires_s3` tests skip and report
+      # green, which is what a credential the gate cannot see would do.
+      - name: Assert the requires_s3 gate is open
+        if: steps.guard.outputs.run_data == 'true'
+        run: >-
+          poetry run python -c "import importlib.util as u;
+          s = u.spec_from_file_location('c', 'tests/conftest.py'); m = u.module_from_spec(s);
+          s.loader.exec_module(m);
+          assert m.aws_creds_available(), 'requires_s3 tests would be SKIPPED: no reader credentials'"
+      - name: Build Uganda tables
+        if: steps.guard.outputs.run_data == 'true'
+        working-directory: lsms_library/countries/Uganda/_
+        run: >-
+          python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
+          --stage data-prebuild -- poetry run make -j2
+        timeout-minutes: 30
+      # The Make shocks compiler writes its reviewed (i,t) + Shock-column
+      # intermediate. Country.shocks() writes the pinned (i,t,Shock) cache that
+      # the invariance test compares. Run that normal path before xdist starts,
+      # so test scheduling cannot decide which of the two stages it reads.
+      - name: Finalize Uganda shocks cache for invariance
+        if: steps.guard.outputs.run_data == 'true'
+        working-directory: lsms_library/countries/Uganda/_
+        run: >-
+          python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
+          --stage data-prebuild -- poetry run python -c
+          "import lsms_library as ll; ll.Country('Uganda').shocks()"
+        timeout-minutes: 15
+      - name: Run full test suite
+        if: steps.guard.outputs.run_data == 'true'
+        # Capture both streams before Poetry/pytest starts. Assertion rewriting,
+        # explicit messages, warnings and plugins can all contain row values;
+        # flags alone do not form the public-output boundary. The wrapper emits
+        # a fixed stage/status, numeric JUnit counts and opt-in static checked-in
+        # test file/function locators, then removes the runner-local output/XML.
+        # Parameter IDs and traces stay private. Do not upload private artifacts.
+        # Plain assertions and warning-summary suppression remain defense in depth.
+        run: >-
+          python scripts/private_ci_check.py --stage data-tests --junit results.xml --public-test-failures --
+          poetry run pytest -n 2 --dist=loadfile --tb=short --assert=plain --disable-warnings
+          --timeout=600 --timeout-method=thread
+          --durations=25 --junitxml={junit}

@@ -1,0 +1,144 @@
+#+TITLE: GH #1078 independent review
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Verdict and source pins
+
+PASS for the bounded f8-based producer-provenance repair; no production blocker found.
+The final author head is =d46795c303e2409ddb8ed5e4c62efca4e87ca347=, with runtime/test behavior reviewed at =a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b= against =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+The first ledger commit is =695b57970c17fdaec5a3e63a8c0f283b29b86282=, whose parent is f8.
+The final descendant changes only seven safe reports and the ledger.
+Library tree =cc18a441cca4c69a24c2f24d513f4f23c3937d86= and tests tree =9b685fc972bbbcec464bf6176963e4f0773ba674= are identical at runtime/final pins, including Git modes.
+All 12,002 library/test filesystem paths also match in content and filesystem modes between review and final writer.
+This is not a full-suite PASS claim: the original guarded full selection has nine isolation failures, separately covered below.
+
+* Prior art and country contracts
+
+The task ledger, STANDING/README, original frozen Uganda/1078 diagnosis/proposal, reviewer, food/aggregate-label, cross-country, backlog, registry and Feature-audit machinery ground the review.
+The previous complete 3,604-line f8 Uganda CONTENTS read, including TODO/WAITING/LOGBOOK, was carried only after its exact SHA256 =774d5bc13c35ca5a6d9543766648f88dbc1efe508d73aa388d5ac6e81146256c= verified.
+All 29 new Uganda note lines were read; the complete current 1,557-line Niger CONTENTS was read.
+
+Uganda mixes real EAs and synthetic GPS bins in 2009-10, then uses parish and district/parish identities in later waves.
+Its household Region fallback therefore matters to the actual market test.
+The document says Region "is complete for every household" (Uganda CONTENTS:253), but its own caveat reports three missing 2019-20 Regions (:270).
+The refresh claim says "each wave" (:279), while the later DDI quotation says "This same sample was used for the UNPS 2015/16 (Wave 5)" (:693).
+The earlier "trust once, then stamp" description (:1950) is explicitly qualified by the #809 correction: "The current L2-country read gate treats hashless country parquets as stale and rebuilds" (:1953).
+The live panel-weight/GPS/null-key and WAITING #829 caveats remain outside this repair.
+These are retained documentary tensions, not a reason to discard the notes or change data policy.
+
+Niger's 2014 household key includes GRAPPE/MENAGE/EXTENSION; split-offs are new households, with a documented remaining unlinked cross-wave namespace collision.
+Its EHCVM food preserves distinct acquisition sources/units, the 2018 mojibake repair differs from roster cp1252 decoding, and native code 166 remains undecoded.
+The unit dictionary declares Original Label as key (#928); this patch changes neither that resolver nor the source vocabulary.
+The opening note says each grappe "is visited in exactly one vague", while the later DDI quotation says the survey "divided each enumeration area into two equal groups" interviewed in separate waves.
+That tension is not adjudicated here and authorizes no identity/grain change.
+The independently confirmed cold/warm unit-index dtype residual is a genuine additional proposed country note, drafted separately by the author; root should deduplicate/file it before describing it as resolved.
+No tracked country note was edited by this reviewer.
+
+* Production and test boundary
+
+Only Wave.grab_data and Wave.food_acquired change among class methods.
+The default public loader returns a DataFrame; the keyword-only private opt-in carries actual per-result origin without adding attrs, instance state or global last-origin state.
+Actual parquet/materialized results bypass the reducer after real path deletion.
+True memory producers preserve the original coercion, selected columns, grouping keys, sum and first behavior.
+The reducer body is AST-identical to f8, as are required hashless eviction, both wave read gates, finalization and country/wave hash mechanisms.
+The four real synthetic memory-route cases retain existing missing-to-zero and Price-first behavior, including failed/disabled writes with an unrelated stale file.
+Those cache-disabled cases are synthetic tests, not source-validation setup.
+No fixture/golden, dependency, global conftest, canonical schema, unit/currency/ID/scientific transform, read-gate exclusion or source configuration changed.
+All 64 focused cases, including all 14 new producer cases, passed within the single full-selection XML; they were not rerun as a second full suite.
+
+* Independent source, race and healing evidence
+
+Preparation independently reconstructs and matches all 47 declared held dependencies for Uganda/Niger food/sample/roster/cluster support.
+All sidecar MD5s and SHA/size/mode/mtime receipts were gated before source decoding/builds; cold roots were physically empty of L2.
+There are 326 source/data/reference/config physical copies across initial preparation and four Uganda scenarios, plus 36 separate persistence-test config copies.
+Copies use distinct inodes and single links; original held sources/evidence are unchanged.
+The private copy of an existing reader credential file is intentionally tightened from 0644 to 0600; its source is unchanged and no credential material is exported.
+No raw source acquisition, DVC CLI, shared-cache mutation, in-tree payload, cache clear, hash stamp, NO_CACHE source setup, assumed freshness or read-gate bypass occurred.
+Exact mounted Python, cwd/package/countries/data identities, private configuration/temp/DVC/XDG, socket guards plus unshare -rn, and numerical/build/Make threads of one apply.
+
+A new sanctioned get_dataframe source oracle reads the 38,743-row 2011-12 GSEC15B source (MD5 =f4b5885a98654c12d5c9960d1a3586ff=).
+Each affected cell has one unambiguous source-row match, all its original operands missing and a positive counterpart measure, independently of the food reshape/reducer.
+All six Quantity and three Expenditure NaNs are therefore source facts on retained observations.
+Native wide source rows, long wave rows and public country rows are distinct grains; the full native/raw/public comparisons preserve their existing transformations and API-time identity/v handling.
+
+The candidate real two-process schedule observes a real wave read, normal hashless eviction and a subsequent genuinely false exists result, with parquet origin preserved.
+Both actual Arrow writer inputs and their real parquet outputs match the complete correct 355,571-row frame and full attrs, under current hash/full eight-wave coverage.
+A writes last, its exact bytes are served, and the legacy reducer is not reached.
+An independent f8 counterfactual repeats the same real schedule: both original tests pass, B writes correctly, and A writes the exact complete historical-signature frame with six Quantity and three Expenditure NaNs changed to zero.
+Every other value/key/null/dtype/order/axis/full attr matches; the legacy reducer is reached once.
+Both candidate serial test orders also preserve the complete correct frame.
+There are eight passing executions of two actual sample/currency tests across two serial orders and both scheduled heads, not eight distinct tests.
+
+Ordinary candidate reading of a physically copied genuine corrupt current-hash f8 root grades it stale and naturally rebuilds the correct complete frame/full attrs.
+Raw null counts return to Quantity 27, Expenditure 34 and Price 29,755; all nine cells restore without clearing, replacing or stamping the bad content.
+Fresh-process/new-object healing reads are strictly exact and leave all 57 data-root files' bytes/modes/mtimes unchanged.
+
+* Full frames, warnings, scanner and cache scope
+
+All 26 baseline/candidate frame pairs match strictly at cold and again at fresh-process warm, including values, nulls, keys/multiplicities, order, dtypes, axes and logical full attrs.
+This includes sample, raw/native/public food, default derived food tables and four default Features; Country and Feature kwargs are both {}, preserving Feature's actual default currency behavior.
+Uganda food has 355,571 rows and Niger 239,877; Uganda has eight food-native waves, Niger two, with full four-wave country coverage including its zero-food waves.
+Each pre-scanner warm process leaves all 73 data-root files unchanged.
+
+The sole strict cross-stage mismatch is Niger public food u: Arrow StringDtype na_value pd.NA (display string) becomes Arrow StringDtype na_value NaN (display str) under BOTH f8 and candidate.
+Both complete frames and strict failures remain private; no payload/dtype/attrs normalization is used to claim strict equality.
+Separate diagnostics prove every other payload/key/null/order/axis/dtype/full attr exact.
+This existing residual is not repaired by #1078.
+
+All main-process warning category/full-message multisets match between heads: 60 occurrences at cold and 58 at warm.
+The two cold-only occurrences are RuntimeWarnings; their exact messages remain private with safe digests.
+Complete cold child logs, including their two formatted warning occurrences, match after only exact source/data path substitution; no warning content/count/value is removed.
+No cross-checkout file/line equality is claimed for general warnings.
+
+Existing phase 1/2 scanner full raw record multisets match all 217 occurrences, without normalization: 214 warnings, three passes, zero failure/error/skip, zero added/removed findings.
+Phase counts are 30 sanity, 29 assembly and 158 kwargs records, also exactly matching the released author occurrences.
+The scanner normally adds 12 previously absent cluster_features YAML-wave caches per head (eight Uganda, four Niger) from already-gated held inputs.
+All 12 complete payloads/full attrs match between heads, and every embedded YAML hash equals its actual checkout-current wave hash.
+All 73 pre-existing files remain byte/mode/mtime exact, giving 85 final files per scoped cold root.
+The scanner is not described as zero-write; the separate earlier 73-file freshwarm proof remains valid.
+
+Independent exact-source metadata processes measure all 549 API hashes, 39 framework fingerprints and 1,362 own-declared wave hashes changing.
+The full 2,139 API-wave caller set has 2,109 changed non-null hashes and 30 None on both heads.
+Only the scoped food method is added to the registry; the shared already-all-table loader explains the broad cost.
+This invalidates every enumerated verifiable cache and needs an explicit coordinated rebuild window in human PR review.
+No corpus rebuild or all-country data-equivalence claim was made.
+
+* Full-suite isolation qualification
+
+The actual candidate conftest credential detector returned false before collection; AWS key/secret/session/profile sources were removed and reader/AWS paths pointed to absent private files.
+The one original full selection used eight explicit loadfile workers and no held data.
+Its exact outcome is 4,689 passed, 4,453 existing data/optional skips, nine failed, zero errors, 70 warnings; pytest time was 138.82 seconds.
+All nine failures are existing persistence tests whose unchanged bodies deliberately os.utime tracked panel_ids.py and restore it; both writes were correctly denied by the read-only guard.
+They remain isolation failures in the original result, not skips or a full-suite PASS.
+The generic log contains 24 denied attempts: 18 represented by those nine tracebacks and six not individually attributed; no attempt succeeded and no unit data parquet/IP attempt occurred.
+After reading the complete test module, the same nine unchanged cases passed separately on 36 receipt-gated physical private config/script/JSON operands, with no monkeypatch removing utime/assertions.
+Initial package import is the a4 checkout; the supported countries-root environment override/cache_clear selects only the private copy before collection.
+All source receipts and copied bytes/modes remain exact; the test's float timestamp restoration leaves only -97 to +109 ns private mtime rounding, recorded rather than called exact nanosecond restoration.
+
+* Preserved harness stops and limits
+
+The strict prephase writer-HEAD assertion stopped when the author advanced to its expected docs descendant; exact runtime/test tree and filesystem comparison supersedes that assumption.
+A stronger scanner-zero-write assertion stopped on the 12 legitimate first-use prerequisite additions; its failure log is retained and all additions are now independently verified.
+The initial final-copy-mode assertion stopped on the intentional private credential mode tightening; that qualification is explicit, with original receipts unchanged.
+The original guarded full-suite failures and strict Niger cross-stage dtype failures remain preserved.
+No production/test/read-gate edit or failure-to-skip conversion was used to address any stop.
+
+The original historical full-suite writer/interleaving remains unidentified: the controlled causal mechanism and exact signature do not prove its original schedule.
+This f8-based result does not establish coexistence with #1062, global16 or other campaign changes.
+Original FCT/nutrition controls remain immutable historical evidence, not newly rerun source builds.
+The broad invalidation cost and pre-existing Niger dtype residual remain explicit review limits.
+
+* Freeze and release
+
+The review/base/final-writer tracked trees are unchanged and clean at 14,882 / 14,880 / 14,889 paths, with exact content/filesystem modes/symlinks and review/base Git index modes.
+Both original diagnosis source trees remain exact, including the reviewed1062 pin.
+All 1,288 author-manifest files, 1,799 original diagnosis files, eight historical original/copy receipts, and 169/646 prior global13/global14 receipts remain exact.
+All source/copy receipts, two exact approved private DVC metadata links and final cache inventories are verified.
+The source phase has zero IP or protected-write attempts; no Git/ref/checkout/GitHub mutation occurred.
+There are zero live private consumers at release.
+Only source-safe review/proof summaries and commands are exportable; full frames/IDs/source operands/warnings/traces/logs remain private.
+
+Evidence: [[file:verdict.json][verdict]], [[file:freeze-proof.json][freeze]], [[file:REPRODUCE.md][commands]], [[file:matched-stage-proof.json][matched frames]], [[file:source-oracle.json][source oracle]], [[file:writer-proof.json][candidate writers]], [[file:baseline-race-proof.json][f8 counterfactual]], [[file:scanner-proof.json][scanner]], [[file:docs-descendant-proof.json][descendant]].
+Root may release this bounded independent review freeze for its public PR preparation after reading these qualifications.
+
+Sue.

@@ -1,0 +1,52 @@
+Country: Malawi
+Wave: 2024-25
+
+# 2024-25 food and its sample/identity dependencies (PR #1604).  The sample
+# weights below are served as wired (maintainer ruling 2026-11-12, "Lift hold, rebase, merge"):
+# that ruling covers this wave's content only and does NOT settle decision 48's
+# joint-inclusion question.  No other wave's weights change.
+
+sample:
+    # weight: IHS6 households carry hh_wgt (its label is 'wt_ihs6'); retained
+    # IHPS households carry wt_cross ('Cross-sectional weight').  panel_weight
+    # is wt_long ('Longitudinal weight', BID section 3.2.3), retained only.
+    # The Panel file's own hh_wgt is labelled 'Baseline Sampling Weight' and
+    # panelweight_2019 is the previous round's: neither describes this wave.
+    #
+    # ihps_hhid / ihps_weight are y5_hhid and wt_cross on all 2,763 IHPS 2024
+    # households, the 815 included: the hook moves them from the dropped Panel
+    # row onto the household's IHS6 row.  That is the panel link for a later
+    # round, and with it the IHPS 2024 cross-section can still be rebuilt:
+    #     s[s.ihps_weight.notna()]
+    file:
+        - Cross_Sectional/hh_mod_a_filt.dta
+        - Panel/hh_mod_a_filt_24.dta:
+            i: y5_hhid
+            weight: wt_cross
+            _ihs6_case_id: case_id
+    idxvars:
+        i:
+            - case_id
+            - mapping: cs_i
+    myvars:
+        v: ea_id
+        weight: hh_wgt
+        panel_weight: wt_long
+        ihps_hhid: y5_hhid
+        ihps_weight: wt_cross
+        strata:
+            - district
+            - mappings: ['district', 'Alternate Spelling', 'Preferred Label']
+        Rural: reside
+        Region: region
+        District: district
+
+
+panel_ids:
+    # The retained half only: y4_hhid is blank on the 815 refreshment
+    # households, which format_id reads as missing and panel_ids drops.
+    file: Panel/hh_mod_a_filt_24.dta
+    idxvars:
+        i: y5_hhid
+    myvars:
+        previous_i: y4_hhid

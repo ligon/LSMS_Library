@@ -1,0 +1,12 @@
+{
+  "recorded_at": "2026-10-22T01:25:20.211694+00:00",
+  "candidate": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+  "parent": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "runtime_tests": "6be6576607f1862b603d123acfb74ace4026fd3f",
+  "ready_sha256": "c4fed7cf05f2dc3f46e48f4d575d3853aa1d0c02c625922b9910a927a17d48df",
+  "manifest_sha256": "9bf86ab634b8913e2e5bfcbadec051de05206b2475cef0b6db58e7f274402808",
+  "manifest_entries": 1437,
+  "root_accepted": true,
+  "public_merge": false,
+  "composition_claim": false
+}

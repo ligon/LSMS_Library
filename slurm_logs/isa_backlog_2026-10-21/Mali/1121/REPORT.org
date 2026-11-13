@@ -1,0 +1,114 @@
+#+title: Mali #1121 source casing -- verification
+#+date: 2026-10-21
+#+author: Sue
+
+Scope deviations: none.
+Ready for independent review.
+Runtime commit: =3990052090e2f56049f6d5116a82ff4cfef97aeb=, based on =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+The initial ledger commit =23b6fde3a= preceded all implementation.
+
+* Problem and change
+
+Mali's two EAC-I drivers emit lower-case synthetic source Codes, but the real country curation table returned =Family/Hired/Other=.
+That split Feature source groups and made the existing exact lower-case family/hired Country selectors raise KeyError.
+The fix changes exactly three Preferred Label cells to =family/hired/other= and corrects the matching schema comment.
+No helper, driver, framework, global enum, fixture, golden or Ghana file changes.
+The wider category decision stays Tier C under #1121; =remaining-issue-body.md= supplies the partial-scope text.
+
+I read the complete country notes before diagnosis.
+The relevant idiosyncrasy is that currently wired labor belongs to EAC-I 2014-15/2017-18, with PP/PH and men/women/children contributions summed within fixed family/non-family hired/mutual-aid blocks.
+Source is not a decoded raw category field.
+The former lower-case helper prose versus capitalized table/schema contradiction is corrected at the curation table.
+Fresh held Stata labels corroborate the source blocks and person/day/remuneration fields, including the existing 2017 child hired c1*c2 days choice (c3 is wage).
+The country notes now record those facts; no new questionnaire PDF was acquired or inspected.
+
+* Full source, Country and Feature proof
+
+Seventeen relevant held blobs (31,077,088 bytes) were physically copied into a separate writer root; all md5s remain exact.
+All Mali plot_labor L2-wave and L2-country files were absent before the successful normal Country cold build.
+A fresh process then verified the warm read; all 28 private parquet hashes, sizes and mtimes stayed unchanged.
+Both native wave frames and complete public frames equal baseline after only the one-to-one source-case replacement, with exact values, keys, dtypes, null masks, multiplicities and Country attrs.
+
+| Wave/source | Rows |
+|-------------+------|
+| 2014-15 | 14843 |
+| 2017-18 | 37214 |
+| family | 33655 |
+| hired | 9565 |
+| other | 8837 |
+| Mali total | 52057 |
+
+Every public key is unique and non-null.
+Every reported PP/PH demographic contribution remains; no source eligibility, sentinel, content filter, plot/role/stage/worker/season grain or min_count reducer changed.
+Wage remains absent on family/other rows.
+The complete total-labor transform output is exact; family/hired outputs equal baseline source selections with the existing lower-case selectors.
+Totals are PersonDays 11,544,571.100000001, Wage 214,685,819 FCFA, family 7,867,691.5 and hired 1,197,091.3 person-days.
+No tolerance or scientific value change is used.
+
+The Niger comparator is fresh under the current hash with complete wave coverage and unchanged bytes: 53,041 rows.
+Actual Feature assembly retains all 105,098 rows and every attribute exactly after only the source-case projection.
+The resulting groups are family 57,671 / hired 26,719 / other 20,708.
+There is no #822 dependency: diagnosis compared complete f8/current-head outputs exactly, and the labor table/drivers/helper bodies are unchanged across those heads.
+
+* Tests, scanner and hashes
+
+335 focused tests pass, no skips, using two loadfile workers with numerical/build/make workers one.
+The new ten-case file is 7 fail / 3 pass at immutable f8.
+It exercises the actual curation binding, real finalizer and existing selectors; unmapped/off-label Codes still stay unmapped, and wage-only/all-missing/zero/sentinel behavior is preserved.
+=make api-audit= passes with no untracked hashed build inputs.
+
+The complete scoped scanner phases 1/2 findings are eight warnings before and eight after.
+All eight records match exactly after normalizing only checkout/private-data paths and timing metrics; zero added/removed findings, errors or failures.
+Full logs/warnings/frames remain private.
+Actual hash enumeration covers all 549 country/table pairs: exactly 24 Mali hashes move; all other 525 pairs and all 39 tagged transform fingerprints stay unchanged.
+This is no output claim for other unbuilt Mali features.
+
+The initial private verifier stopped twice on manual derived-oracle assumptions: inherited Series attrs and an all-missing hired household group.
+Those captures/logs remain private; both assumptions were corrected and a new physical empty-L2 cold run passed without changing product code.
+The final successful cold and fresh warm proof is stored separately.
+
+* Isolation and residual scope
+
+All 14,880 baseline and 14,891 old #822-lane tracked contents/modes and heads remain unchanged and clean.
+Only the fresh f8-based =fix/1121-mali-labor-source-20261021= lane was edited.
+No acquisition, DVC CLI, shared-cache write/clear/promotion/restamp, GitHub write or in-tree source/parquet was performed.
+An active socket guard blocked attempted Internet connections; no acquisition succeeded.
+
+GhanaSPS's seven source categories and GhanaLSS's exchange/hired vocabulary remain unchanged.
+A shared taxonomy or containment decision is still Tier C; this partial fix does not close #1121's wider design scope or repeat #1077 work.
+
+* Exact commands
+
+All data/cache/test/log paths are private.
+The wrappers assert/configure the writer or baseline checkout, countries root and data root explicitly, with the mounted image and offline guard.
+For a fresh cold replay, first copy the held private seed into a new physical root and exclude Mali's plot_labor parquets, as the preserved seed script does.
+
+#+begin_src sh :eval no :tangle no :results output
+R=/local/job40255479/control/isa-backlog-20261021/Mali/1121
+bash "$R/run-writer.sh" "$R/writer_check.py" cold > "$R/writer-cold.log" 2>&1
+bash "$R/run-writer.sh" "$R/writer_check.py" warm > "$R/writer-warm.log" 2>&1
+bash "$R/run-writer.sh" -m pytest -q -n 2 --dist=loadfile \
+ -o cache_dir="$R/writer-pytest-cache" --basetemp="$R/writer-pytest-tmp-verified" \
+ tests/test_mali_plot_labor_source.py tests/test_categorical_mapping_resolution.py \
+ tests/test_schema_consistency.py > "$R/writer-focused-tests.log" 2>&1
+bash "$R/run.sh" baseline -m pytest -q -p no:cacheprovider \
+ /local/job40255479/worktrees/isa-Mali-1121/tests/test_mali_plot_labor_source.py \
+ > "$R/writer-baseline-tests.log" 2>&1
+# The baseline negative intentionally exits 1: seven failures, three passes.
+bash "$R/run.sh" baseline "$R/audit.py" > "$R/baseline-audit.log" 2>&1
+bash "$R/run-writer.sh" "$R/audit.py" > "$R/writer-audit.log" 2>&1
+bash "$R/run-writer.sh" "$R/compare_audits.py"
+bash "$R/run-writer.sh" "$R/writer_hash_inventory.py" "$R/writer-hashes.json"
+W=/local/job40255479/worktrees/isa-Mali-1121
+env PATH=/local/job40255479/venv_img/bin:$PATH \
+ PYTHONPATH="$W:$R/offline" LSMS_COUNTRIES_ROOT="$W/lsms_library/countries" \
+ LSMS_DATA_DIR="$R/writer-data" REVIEW_NETWORK_LOG="$R/writer-network-attempts.jsonl" \
+ PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
+ MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 LSMS_MAKE_JOBS=1 \
+ make api-audit > "$R/writer-api-audit.log" 2>&1
+#+end_src
+
+Private detailed evidence: =/local/job40255479/control/isa-backlog-20261021/Mali/1121/=.
+Safe aggregates are =validation.json= beside this report.
+
+Sue

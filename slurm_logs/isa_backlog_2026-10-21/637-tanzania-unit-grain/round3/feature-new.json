@@ -1,0 +1,115 @@
+{
+ "head": "5239daecdbac44ba20be712531062590a19b91b9",
+ "plot_inputs_warm_equals_cold": true,
+ "Feature_plot_inputs": {
+  "rows": 189658,
+  "index_names": [
+   "country",
+   "t",
+   "v",
+   "i",
+   "plot_id",
+   "input",
+   "j",
+   "u",
+   "season",
+   "currency"
+  ],
+  "index_unique": true,
+  "rows_by_country": {
+   "Malawi": 179949,
+   "Tanzania": 9709
+  },
+  "columns": [
+   "Quantity",
+   "Purchased",
+   "Quantity_purchased",
+   "Unit_purchased",
+   "Improved",
+   "Applied"
+  ],
+  "warnings": {
+   "NullIndexKeyWarning": 2,
+   "RuntimeWarning": 18,
+   "NullReadWarning": 1,
+   "UserWarning": 1,
+   "PopulationHeterogeneityWarning": 1
+  },
+  "canonical_alignment": {
+   "fabricated": {
+    "Tanzania": {
+     "season": "unknown_season"
+    },
+    "Malawi": {
+     "season": "unknown_season"
+    }
+   }
+  },
+  "Unit_purchased_nonnull_by_country": {
+   "Malawi": 0,
+   "Tanzania": 2722
+  }
+ },
+ "crop_production_warm_equals_cold": true,
+ "Feature_crop_production": {
+  "rows": 151147,
+  "index_names": [
+   "country",
+   "t",
+   "v",
+   "i",
+   "plot_id",
+   "j",
+   "u",
+   "condition",
+   "season",
+   "production_obs",
+   "currency"
+  ],
+  "index_unique": true,
+  "rows_by_country": {
+   "Malawi": 135078,
+   "Tanzania": 16069
+  },
+  "columns": [
+   "Quantity",
+   "Quantity_sold",
+   "Value_sold",
+   "harvest_month",
+   "intercropped",
+   "perennial",
+   "crop_variety",
+   "planting_month",
+   "Derivation"
+  ],
+  "warnings": {
+   "QuantityImplausibleWarning": 4,
+   "NullIndexKeyWarning": 1,
+   "UserWarning": 1,
+   "PopulationHeterogeneityWarning": 1
+  },
+  "canonical_alignment": {
+   "promoted": {
+    "Tanzania": {
+     "u": 19
+    }
+   },
+   "fabricated": {
+    "Tanzania": {
+     "condition": "unknown_condition",
+     "season": "unknown_season"
+    },
+    "Malawi": {
+     "season": "unknown_season",
+     "production_obs": "unresolved_observation"
+    }
+   }
+  },
+  "production_obs": {
+   "Malawi_values": [
+    "unresolved_observation"
+   ],
+   "Tanzania_reported_prefix": true
+  }
+ }
+}

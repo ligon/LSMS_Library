@@ -1,0 +1,388 @@
+{
+  "ledger_head": "b5ced85c571bc4d5b430371d1f92ace336c24a3f",
+  "runtime_head": "7eee549b15cacbe1e86b60a925b0899dc85d49e6",
+  "baseline_negative": {
+    "tests": 15,
+    "failures": 12,
+    "errors": 0,
+    "skipped": 0
+  },
+  "candidate_focused_and_supporting": {
+    "tests": 36,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "new_cases": 15,
+  "supporting_cases": 21,
+  "complete_frames_per_phase_process": 13,
+  "baseline_and_candidate_processes_each": 2,
+  "public_rows": 19784,
+  "Feature_rows": 33608,
+  "coordinates": {
+    "reported_pairs": 4180,
+    "latitude_only": 0,
+    "longitude_only": 0,
+    "retained_missing_pairs": 3170,
+    "raw_source_key_projection_exact": true
+  },
+  "source_and_immutable_evidence_exact": true,
+  "immutable_tracked_trees": {
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1058": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_files": 14880,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_files": 14880,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1123": {
+      "head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "tracked_files": 14886,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-Burkina_Faso": {
+      "head": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb",
+      "tracked_files": 14889,
+      "clean": true
+    }
+  },
+  "immutable_evidence_files": {
+    "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058": 186,
+    "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1123": 258,
+    "/local/job40255479/control/isa-backlog-20261021/review-1123-Burkina_Faso": 192
+  },
+  "comparator_parquets_SHA_modes_mtime_exact_per_root": 6,
+  "baseline_and_candidate_warm_tree_changes": 0,
+  "hash_scope": {
+    "actual_country_cells": 549,
+    "actual_framework_tags": 39,
+    "changed_Burkina_cells": [
+      "Burkina_Faso/sample",
+      "Burkina_Faso/cluster_features",
+      "Burkina_Faso/household_roster",
+      "Burkina_Faso/individual_education",
+      "Burkina_Faso/subjective_well_being",
+      "Burkina_Faso/panel_ids",
+      "Burkina_Faso/food_acquired",
+      "Burkina_Faso/assets",
+      "Burkina_Faso/housing",
+      "Burkina_Faso/shocks",
+      "Burkina_Faso/plot_features",
+      "Burkina_Faso/food_security",
+      "Burkina_Faso/food_coping",
+      "Burkina_Faso/months_food_inadequate",
+      "Burkina_Faso/interview_date",
+      "Burkina_Faso/crop_production",
+      "Burkina_Faso/plot_inputs",
+      "Burkina_Faso/livestock",
+      "Burkina_Faso/plot_labor",
+      "Burkina_Faso/people_last7days",
+      "Burkina_Faso/food_expenditures",
+      "Burkina_Faso/food_prices",
+      "Burkina_Faso/food_quantities",
+      "Burkina_Faso/household_characteristics"
+    ],
+    "changed": 24,
+    "other_country_cells_exact": 525,
+    "framework_tags_exact": 39
+  },
+  "warning_accounting": {
+    "total": 13,
+    "status": {
+      "warn": 13
+    },
+    "checks": {
+      "runtime_warning": 9,
+      "index_levels_match_scheme": 2,
+      "no_constant_columns": 2
+    },
+    "runtime_classes": {
+      "NullReadWarning": 2,
+      "QuantityImplausibleWarning": 6,
+      "PopulationHeterogeneityWarning": 1
+    },
+    "full_unmodified_finding_multiset_exact": true,
+    "phase2_kwarg_cases": 0
+  },
+  "API_audit_exit": 0,
+  "active_socket_guards": 2,
+  "actual_outbound_attempts": 0,
+  "in_tree_parquets": 0,
+  "scope_limit": "Normal cold plot_features and supporting sample only; Senegal verified fresh. No all-table Burkina cohort or acquisition.",
+  "status": "author verification complete; independent review pending; unmerged",
+  "baseline_production_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "source_preparation": {
+    "private_L1_MD5_SHA_verified_per_root": 15,
+    "fresh_Senegal_L2_per_root": 6,
+    "initial_Burkina_L2": 0,
+    "physical_distinct_single_link_copies": true,
+    "final_candidate_root": "data-candidate-verified",
+    "current_sidecars_verified": true,
+    "source_acquisition": false,
+    "manual_stamp_or_read_gate_bypass": false
+  },
+  "native_wave_accounting": {
+    "2018-19": {
+      "source_rows": 12441,
+      "retained_native_rows": 12441,
+      "public_rows": 12434,
+      "empty_payload_rows_excluded": 7,
+      "native_and_walked_duplicate_keys": 0,
+      "public_sample_orphans": 0
+    },
+    "2021-22": {
+      "source_rows": 8467,
+      "retained_native_rows": 7350,
+      "public_rows": 7350,
+      "empty_payload_rows_excluded": 0,
+      "native_and_walked_duplicate_keys": 0,
+      "public_sample_orphans": 0
+    }
+  },
+  "raw_country_rows": 19791,
+  "Senegal_rows": 13824,
+  "warnings": {
+    "complete_stage_class_message_multisets_exact": true,
+    "API": {
+      "cold": {
+        "baseline": {
+          "NullReadWarning": 6,
+          "QuantityImplausibleWarning": 8,
+          "PopulationHeterogeneityWarning": 1
+        },
+        "candidate": {
+          "NullReadWarning": 6,
+          "QuantityImplausibleWarning": 8,
+          "PopulationHeterogeneityWarning": 1
+        }
+      },
+      "warm": {
+        "baseline": {
+          "NullReadWarning": 6,
+          "QuantityImplausibleWarning": 8,
+          "PopulationHeterogeneityWarning": 1
+        },
+        "candidate": {
+          "NullReadWarning": 6,
+          "QuantityImplausibleWarning": 8,
+          "PopulationHeterogeneityWarning": 1
+        }
+      }
+    },
+    "scanner": {
+      "total": 13,
+      "status": {
+        "warn": 13
+      },
+      "checks": {
+        "runtime_warning": 9,
+        "index_levels_match_scheme": 2,
+        "no_constant_columns": 2
+      },
+      "runtime_classes": {
+        "NullReadWarning": 2,
+        "QuantityImplausibleWarning": 6,
+        "PopulationHeterogeneityWarning": 1
+      },
+      "full_unmodified_finding_multiset_exact": true,
+      "phase2_kwarg_cases": 0
+    }
+  },
+  "boundary_proof": {
+    "helper_AST_exact_after_removing_only_new_coordinate_loop_and_docstring": true,
+    "wave_AST_exact_after_removing_only_two_coordinate_bindings": true,
+    "all_country_scheme_entries_exact_after_removing_only_two_optional_float_columns": true,
+    "canonical_and_other_country_files_untouched": true
+  },
+  "new_case_outcomes": [
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_helper_retains_positions_independent_of_flag_area_and_index",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_optional_axes_are_independent[latitude]",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_optional_axes_are_independent[longitude]",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_missing_declared_coordinate_source_raises[latitude]",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_missing_declared_coordinate_source_raises[longitude]",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_absent_optional_keys_leave_existing_wave_columns",
+      "candidate": "PASS",
+      "baseline": "PASS"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_actual_wave_script_binds_its_source_and_formatter[2018-19]",
+      "candidate": "PASS",
+      "baseline": "PASS"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_actual_wave_script_binds_its_source_and_formatter[2021-22]",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_source_oracle_rejects_wrong_projection[q47_as_latitude]",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_source_oracle_rejects_wrong_projection[swapped_axes]",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_source_oracle_rejects_wrong_projection[wrong_key]",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_country_declares_existing_coordinates_as_optional_float",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_held_wave_output_matches_native_source_coordinates[2018-19]",
+      "candidate": "PASS",
+      "baseline": "PASS"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_held_wave_output_matches_native_source_coordinates[2021-22]",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    },
+    {
+      "test": "tests.test_burkina_faso_plot_gps::test_public_coordinates_follow_existing_panel_key_mapping",
+      "candidate": "PASS",
+      "baseline": "FAIL"
+    }
+  ],
+  "existing_controls": [
+    {
+      "test": "tests.test_plot_id_canonical.TestDeclaredCanonicalName::test_crop_production_is_registered_on_plot_id",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical.TestDeclaredCanonicalName::test_plot_features_already_agreed",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical.TestDeclaredCanonicalName::test_the_alias_points_AT_plot_id_not_away_from_it",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical.TestDeclaredCanonicalName::test_transform_preference_order_is_canonical_first",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical.TestDeclaredCanonicalName::test_resolve_accepts_either_spelling_and_a_pandas_index",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_feature_alignment_emits_plot_id_from_either_spelling[plot]",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_feature_alignment_emits_plot_id_from_either_spelling[plot_id]",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_plot_grain_transforms_emit_plot_id_from_either_spelling[harvest_kg-_crop_production]",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_plot_grain_transforms_emit_plot_id_from_either_spelling[nitrogen_kg-_plot_inputs]",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_plot_grain_transforms_emit_plot_id_from_either_spelling[seed_kg-_seed_inputs]",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_yield_kg_emits_plot_id_or_parcel_never_plot[plot]",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_yield_kg_emits_plot_id_or_parcel_never_plot[parcel]",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_fertilizer_rate_emits_plot_id_or_parcel_never_plot[plot]",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_fertilizer_rate_emits_plot_id_or_parcel_never_plot[parcel]",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_plot_features_may_still_be_keyed_either_way",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_on_is_a_mode_string_not_a_level_name",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_plot_id_canonical::test_no_country_declares_a_plot_level_any_more",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_burkina_faso_cluster_gps::test_2018_19_geo_subdf_maps_the_coordonnes_gps_columns",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_burkina_faso_cluster_gps::test_2014_declares_no_geo_subdf",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_burkina_faso_cluster_gps::test_no_wave_asks_for_lat_dd_mod",
+      "candidate": "PASS"
+    },
+    {
+      "test": "tests.test_burkina_faso_cluster_gps::test_optional_matches_the_waves_that_lack_gps",
+      "candidate": "PASS"
+    }
+  ],
+  "private_evidence_root": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058-fix",
+  "evidence_script_SHA256": {
+    "run.sh": "8b94c6b7dc2cdf40ebef28bc9ddea329a3a0532f52cfc1409dedcd4237a5c4b4",
+    "sitecustomize.py": "7cca2cf773b792a68bd6f5630bf86014d6cde050a469237374a1b806e16dbfe3",
+    "common.py": "6c691ccd920aeb41a4e692d63d6dcc173169e0c118962f8a741d931de52bc85d",
+    "prepare.py": "2628a37ec6a6ef38d313e07cac19569c88eae45fe532bbade1937569b4ad9814",
+    "prepare_verified_candidate.py": "2fd2ab97669426aea864ce834c0b5f9967d330235d0a76f215119c5f5e491238",
+    "build_verify.py": "ec5b4b501160a00cf6bcdef74c46b70bb383fcf45dd119c19f2aa781a1c8cf59",
+    "hashes.py": "877185ddc403285b1e36ec228da2a90c0bdef76c1001c83fcbc1d5add493b1f2",
+    "verify_final.py": "b136899b65ccbf816d11ba90ecb029d09036292bc52e4cca91f1e4145a705306"
+  },
+  "metadata_exception": {
+    "ignored_checkout_DVC_tmp_symlink": true,
+    "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058-fix/checkout-dvc-tmp",
+    "private_target_mode": "0700",
+    "other_checkout_writes_denied": true,
+    "private_DVC_site_cache": true
+  },
+  "preserved_harness_stops": [
+    "empty-directory preparation gate",
+    "dependent probe stopped at preparation gate",
+    "2018 native columns versus country union comparison; corrected proof, fresh final candidate root"
+  ],
+  "runtime_change_after_runtime_commit": false,
+  "final_freeze_proof": "Private freeze-proof.json records final evidence-commit SHA, clean tracked tree, immutable receipts and no task processes."
+}

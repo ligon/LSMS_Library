@@ -41,16 +41,16 @@ from lsms_library.ehcvm import (
 )
 from lsms_library.paths import countries_root
 
-#: The twelve EHCVM 2018+ waves, country -> waves.
+#: The EHCVM 2018+ waves, country -> waves.
 WAVES = {
-    'Togo': ['2018'],
-    'Benin': ['2018-19'],
+    'Togo': ['2018', '2021-22'],
+    'Benin': ['2018-19', '2021-22'],
     'Guinea-Bissau': ['2018-19'],
     'Senegal': ['2018-19', '2021-22'],
     'Mali': ['2018-19', '2021-22'],
     'Niger': ['2018-19', '2021-22'],
     'Burkina_Faso': ['2018-19', '2021-22'],
-    'CotedIvoire': ['2018-19'],
+    'CotedIvoire': ['2018-19', '2021-22'],
 }
 CELLS = [(c, w) for c, ws in WAVES.items() for w in ws]
 FUNCTION = 'lsms_library.ehcvm:derive_ehcvm_purchase_value'
@@ -60,7 +60,9 @@ FUNCTION = 'lsms_library.ehcvm:derive_ehcvm_purchase_value'
 #: scale the change is against.
 BEFORE_SUM = {
     ('Togo', '2018'): 44_452_024.0,
+    ('Togo', '2021-22'): 45_908_210.33,
     ('Benin', '2018-19'): 87_287_926.96,
+    ('Benin', '2021-22'): 111_687_481.85,
     ('Guinea-Bissau', '2018-19'): 91_353_379.75,
     ('Senegal', '2018-19'): 171_946_367.74,
     ('Senegal', '2021-22'): 185_854_824.98,
@@ -71,26 +73,76 @@ BEFORE_SUM = {
     ('Burkina_Faso', '2018-19'): 65_315_307.5,
     ('Burkina_Faso', '2021-22'): 39_905_158.0,
     ('CotedIvoire', '2018-19'): 119_107_505.0,
+    ('CotedIvoire', '2021-22'): 170_793_500.0,
 }
 
 #: Served purchased-side ``Expenditure`` AFTER, under construction C, and the
 #: number of ``s='inkind'`` rows ``s07bq05`` now supplies.  Measured warm in the
 #: worktree, 2026-09-12.  The three candidate quantities per wave are in each
-#: country's ``_/derivations.yml`` and ``_/CONTENTS.org``.
+#: country's ``_/derivations.yml`` and ``_/CONTENTS.org``.  Three inkind counts
+#: re-pinned 2026-11-03 (GH #1224): two gifts of one bucketed item at different
+#: sizes no longer share a key (Togo +1, Benin +13, Mali 2021-22 +17); gift
+#: quantities and every Expenditure total are unchanged.
 AFTER = {
-    ('Togo', '2018'): (31_676_794.87, 10_212),
-    ('Benin', '2018-19'): (68_929_996.70, 18_632),
+    ('Togo', '2018'): (31_676_794.87, 10_213),
+    # GH #1697 (2026-11-12): 34,464,072.25 before the producer's factor was divided out.
+    ('Togo', '2021-22'): (29_435_020.05, 10_579),
+    ('Benin', '2018-19'): (68_929_996.70, 18_645),
+    ('Benin', '2021-22'): (82_870_829.43, 27_522),
     ('Guinea-Bissau', '2018-19'): (57_552_942.85, 13_818),
-    ('Senegal', '2018-19'): (147_345_570.63, 10_802),
-    ('Senegal', '2021-22'): (182_628_314.17, 10_917),
-    ('Mali', '2018-19'): (89_614_678.64, 16_459),
-    ('Mali', '2021-22'): (97_178_691.52, 16_869),
-    ('Niger', '2018-19'): (53_351_991.10, 8_141),
+    # 2026-11-12: 2018-19 -6,000 FCFA (GH #1519: two near-zero quantities served NA);
+    # 2021-22 -17.78 FCFA and 5 gift rows (salt-per-capita-withheld).
+    ('Senegal', '2018-19'): (147_339_570.63, 10_802),
+    ('Senegal', '2021-22'): (182_628_296.39, 10_912),
+    # 16,459 until GH #1513: its food labels now fold, and 46 gift rows sum into others.
+    ('Mali', '2018-19'): (89_614_678.64, 16_413),
+    ('Mali', '2021-22'): (97_178_691.52, 16_886),
+    # 53,351,991.10 until 2026-11-12 (GH #1708, "Revalue at local median"): the 12,227
+    # flagged purchased rows #876 values are valued at a local median of genuine last
+    # purchases, cluster or region, each needing 3 reports ("Region floor of 3", "Only
+    # previously valued"); 2,872 of them have no such median and are served NA.
+    # 52,486,790.70 under the first scope (every flagged row, region floor 1).
+    ('Niger', '2018-19'): (46_636_756.04, 8_141),
     ('Niger', '2021-22'): (67_358_383.42, 7_112),
     ('Burkina_Faso', '2018-19'): (52_466_280.38, 9_386),
     ('Burkina_Faso', '2021-22'): (27_888_221.36, 6_148),
     ('CotedIvoire', '2018-19'): (105_011_084.65, 35_289),
+    # GH #1697 (2026-11-12): 121,393,491.0 before the H rows were withheld.
+    ('CotedIvoire', '2021-22'): (118_357_863.94, 29_050),
 }
+
+#: Keys a wave's food rows may carry beside this one (GH #1697, rulings of 2026-11-12):
+#: Togo 2021-22's s07bq03a is recovered from the producer's regional factor before the
+#: residual is formed, and Cote d'Ivoire 2021-22's H rows are withheld and its L rows
+#: flagged.  The purchased row joins the key of its rule to the 7-day key with '+'.
+OTHER_KEYS = {
+    ('Togo', '2021-22'): {'Togo::food_acquired::s07bq03a-regional-factor-divided-out',
+                          'Togo::food_acquired::s07bq03a-floored-count-recovered',
+                          'Togo::food_acquired::s07bq03a-floored-count-withheld'},
+    ('CotedIvoire', '2021-22'): {
+        'CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld',
+        'CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion'},
+}
+
+#: The unit sizes each country may serve in `u` (GH #1224): each instrument's own
+#: labels, case normalised.  Togo's `98` is a code its files and questionnaires
+#: never label (`Togo/_/CONTENTS.org`).  Guinea-Bissau's are Portuguese.
+SIZES = {
+    'Benin': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Sans brassée',
+              'Avec 1 brassée', 'Avec 2 brassées', 'A 2 doigts', 'A 3 doigts',
+              'A 5 doigts', 'Autre taille', 'Très petit', 'Très grand', 'Entier'},
+    'Burkina_Faso': {'Petit', 'Moyen', 'Grand'},
+    'CotedIvoire': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier', 'Très petit',
+                    'Très grand'},
+    'Guinea-Bissau': {'Pequeno', 'Medio', 'Grande'},
+    'Mali': {'Petit', 'Moyen', 'Grand'},
+    'Niger': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},
+    'Senegal': {'Petit', 'Moyen', 'Grand', 'Très petit', 'Très petite'},
+    'Togo': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier', '98'},
+}
+#: A trailing parenthesis that belongs to the unit itself, not to its size: a
+#: stated quantity (`Sac (50 Kg)`, `Paquet (250 g)`), or one of two named units.
+_UNITS_OWN_PARENTHESIS = re.compile(r'^(\d[\d,.]*\s*(kg|g)|Kantou|30)$', re.IGNORECASE)
 
 #: Waves of these countries that are NOT EHCVM 2018+ and must carry no key.
 NON_EHCVM_WAVES = {
@@ -190,7 +242,14 @@ class TestConfig:
     @pytest.mark.parametrize('country,wave', CELLS)
     def test_the_hook_calls_the_shared_derivation(self, country, wave):
         m = _mapping(country, wave)
-        assert '_food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)' in m
+        # Re-pinned GH #1224: the three hooks that sweep mojibake after this
+        # call also pass their repair as `decode=` (test_ehcvm_unit_size.py).
+        # Re-pinned GH #1452: the four countries' hooks call the wrapper that adds the
+        # unit weight (test_ehcvm_unit_weights.py), which calls the same function.
+        assert re.search(r'_food_acquired_ehcvm\(df, FOOD_ACQUIRED_DERIVATION(,\s*'
+                         r'decode=_decode_mojibake)?\)', m) or re.search(
+            rf"_food_acquired_with_unit_weights\(\s*df, FOOD_ACQUIRED_DERIVATION, "
+            rf"wave='{wave}'(,\s*decode=_decode_mojibake)?\)", m)
         assert f"_derivation_key('{country}')" in m
         assert 'def inputs_food_acquired(wave):' in m
 
@@ -270,9 +329,19 @@ class TestDelivered:
         assert 'Derivation' in fa.columns
         x = fa.xs(wave, level='t', drop_level=False)
         s = x.index.get_level_values('s').astype(str)
-        got = x['Derivation'].notna().to_numpy()
+        # GH #1452: a 2018-19/2021-22 row of four countries can carry a second key, the
+        # unit weight's, on any source; this test is about the #876 key.
+        got = x['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).to_numpy()
         assert (got == (s == 'purchased')).all()
-        assert set(x.loc[got, 'Derivation'].unique()) == {derivation_key(country)}
+        keys = set(x['Derivation'].dropna().str.split('+').explode())
+        # GH #1708: Niger 2018-19's purchased rows built from a computed s07bq07a also
+        # carry that flag, and the key of their revaluation at a local median.
+        flags = {'Niger::food_acquired::computed-last-purchase-quantity',
+                 'Niger::food_acquired::flagged-purchase-local-median'} \
+            if (country, wave) == ('Niger', '2018-19') else set()
+        assert keys - {derivation_key(country)} <= {
+            f'{country}::food_acquired::nsu-national-unit-weight'} \
+            | OTHER_KEYS.get((country, wave), set()) | flags
 
     @pytest.mark.parametrize('country', sorted(NON_EHCVM_WAVES))
     def test_a_non_ehcvm_wave_of_the_same_country_carries_no_key(self, built, country):
@@ -322,8 +391,12 @@ class TestDelivered:
         _, n = AFTER[(country, wave)]
         assert len(inkind) == n
         assert inkind['Expenditure'].isna().all()
-        assert (inkind['Quantity'] > 0).all()
-        assert inkind['Derivation'].isna().all()   # a reported quantity, not a derivation
+        # GH #1697: Cote d'Ivoire 2021-22's H rows are served with no quantity, and only those.
+        withheld = inkind['Derivation'].fillna('').str.contains('withheld', regex=False)
+        assert (inkind.loc[~withheld, 'Quantity'] > 0).all()
+        assert inkind.loc[withheld, 'Quantity'].isna().all()
+        # A reported quantity, not a derivation of it.  GH #1452: its kilograms can be.
+        assert not inkind['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).any()
 
     @pytest.mark.parametrize('country,wave', CELLS)
     def test_own_production_is_untouched_and_valueless(self, built, country, wave):
@@ -333,7 +406,40 @@ class TestDelivered:
                                  .xs('produced', level='s')
         assert len(produced) > 0
         assert produced['Expenditure'].isna().all()
-        assert produced['Derivation'].isna().all()
+        # GH #1452: the unit weight's key can be on this row; the #876 key cannot.
+        assert not produced['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).any()
+
+    @pytest.mark.parametrize('country,wave', CELLS)
+    def test_every_size_suffix_is_the_countrys_own(self, built, country, wave):
+        """GH #1224: sized rows exist in every cell, and a served `u` never ends
+        in a parenthesis that is neither a size of this instrument nor part of
+        the unit's own name.  The rule, not a count."""
+        x = built(country).xs(wave, level='t', drop_level=False)
+        labels = pd.Series(x.index.get_level_values('u')).dropna().astype(str).unique()
+        ends = {lab: m.group(1) for lab in labels
+                if (m := re.search(r' \(([^()]*)\)$', lab))}
+        sized = {lab for lab, inner in ends.items() if inner in SIZES[country]}
+        stray = {lab for lab, inner in ends.items()
+                 if lab not in sized and not _UNITS_OWN_PARENTHESIS.match(inner)}
+        assert not stray, sorted(stray)
+        assert sized, f'{country} {wave} serves no sized unit'
+
+    def test_a_guard_raised_in_the_build_reaches_the_caller(self, monkeypatch):
+        """GH #1224: the guard's instruction must survive the derived path, which
+        used to read a ValueError as a failed build and report "Could not materialize".
+        LSMS_NO_CACHE makes the build run, so the hook is really reached."""
+        import lsms_library as ll
+        from lsms_library import ehcvm
+        real = ehcvm.served_unit_labels
+
+        def moved(country, values):
+            return np.asarray([{'Tas (Petit)': 'Tas'}.get(v, v)
+                               for v in real(country, values)], dtype=object)
+        monkeypatch.setattr(ehcvm, 'served_unit_labels', moved)
+        monkeypatch.setenv('LSMS_NO_CACHE', '1')
+        for table in ('food_acquired', 'food_prices', 'food_quantities', 'food_expenditures'):
+            with pytest.raises(ehcvm.UnitSizeLabelError, match='would relabel'):
+                getattr(ll.Country('Togo'), table)()
 
     @pytest.mark.parametrize('country,wave', CELLS)
     def test_inputs_join_to_the_served_rows(self, built, country, wave):
@@ -355,7 +461,7 @@ class TestDelivered:
         assert list(raw.columns) == RAW_VARIABLES
         assert list(raw.index.names) == ['t', 'i', 'j']
         served = built(country).xs(wave, level='t', drop_level=False)
-        served = served[served['Derivation'].notna()]
+        served = served[served['Derivation'].fillna('').str.contains(key, regex=False)]
         served_k = set(served.reset_index().set_index(['t', 'i', 'j']).index)
         missing = served_k - set(raw.index)
         assert not missing, (

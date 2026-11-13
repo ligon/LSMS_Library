@@ -1,5 +1,11 @@
 Country: Malawi
 
+# Read only by _/panel_ids.py, which writes the committed panel_ids.json /
+# updated_ids.json.  Country serves those files and does not read this key, so
+# its no-JSON DataFrame fallback would build without the guard (PR #1604).
+Panel IDs:
+  guard_minted_from: '2024-25'
+
 Data Scheme:
   sample:
     index: (i, t)
@@ -10,6 +16,18 @@ Data Scheme:
     Rural: str
     Region: str
     District: str
+    # 2024-25 only: the IHPS 2024 id and cross-sectional weight, carried onto the
+    # IHS6 rows of refreshment households (PR #1604).  Served as wired per the
+    # 2026-11-12 ruling, which does not settle decision 48's joint-inclusion question.
+    # ihps_weight is served at its RAW expansion scale (2024-25 mean ~1,785),
+    # unlike weight and panel_weight, which are normalised to mean 1 within each
+    # wave at read time.  Use it as a ratio weight within its own 2,763 rows.
+    ihps_hhid:
+      type: str
+      optional: true
+    ihps_weight:
+      type: float
+      optional: true
   cluster_features:
     index: (t, v)
     Region: str
@@ -98,7 +116,9 @@ Data Scheme:
     AffectedIncome: bool
     AffectedAssets: bool
     AffectedProduction: bool
+    # Food purchases; food stocks are a separate question.
     AffectedConsumption: bool
+    AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
@@ -182,20 +202,27 @@ Data Scheme:
     # Item-level (t, i, plot_id, crop) harvest feature for the four IHS3+
     # IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 1.  Reported
     # harvest Quantity + native unit + condition, and household-crop sale
-    # Quantity_sold / Value_sold.  Sales attach to single-plot crops only,
-    # in the sale's OWN unit (ag_i02b / ag_q02b, GH #824).  The sale-basis
+    # Quantity_sold / Value_sold.  Sales attach to a harvest row of single-plot
+    # crops only, in the sale's OWN unit (ag_i02b / ag_q02b, GH #824).  The sale-basis
     # ladder admits exact stated condition matches, an unknown wildcard,
     # registered price rules (including resolving contradictions), and
     # distinct not-applicable branches for measured non-separation or an
     # absent reference.  The ladder preserves reported quantities, values
     # and harvest condition; derived attachment/basis interpretation is
     # exposed by Derivation.  Unadmitted or ambiguous candidate sales are
-    # counted -- see malawi.py:assemble_crop_production.  Also includes
+    # counted -- see malawi.py:assemble_crop_production.  Every sale that reaches no
+    # harvest row sits on its own plot_id = 'Farm-level' row, no Quantity, u = Unknown,
+    # condition = unknown_condition, production_obs = 'reported:<I|Q>:<code>', with
+    # its own unit and state in Unit_sold / Condition_sold (GH #1457, option (d) of
+    # #843).  EXCLUDE plot_id == 'Farm-level' for plot-grain work; KEEP it for
+    # household or crop totals.  Also includes
     # item planting / harvest-end months and intercropped / perennial flags.
     # Sources:
     # seasonal Module G + perennial Module P (plot-crop harvest), seasonal
     # Module I + perennial Module Q (household-crop sale).  crop on the
-    # shared harmonize_crop -> harmonize_food Preferred Label axis.  THAT
+    # shared harmonize_crop -> harmonize_food Preferred Label axis (GH #1228:
+    # 2010-11 code 48 lines whose own text says COWPEAS are `Cowpea (Khobwe)`,
+    # with production_obs and crop_variety still the recorded code).  THAT
     # IS A SHARED AXIS, NOT A JOIN (GH #839; this comment used to claim
     # the crop labels "JOIN food_acquired.j", and 20 of 44 do not).
     # Measured on the 2026-09-24 build: 24 of the 44 crop labels also occur
@@ -247,13 +274,16 @@ Data Scheme:
     # issue (malawi.crop_conversion_factors) key their kg factors ON this
     # axis, so without it their shelled and unshelled factors are ambiguous
     # and `harvest_kg(shipped_factors=...)` refuses the table outright.
-    index: (t, i, plot_id, crop, u, condition)
+    # GH #637 ruling: reported:G/P:<native instrument code> keeps codes
+    # with the same harmonized crop separate; no new sale/factor rule.
+    index: (t, i, plot_id, crop, u, condition, production_obs)
     Quantity: float
     # crop_variety (GH #854) is the crop at its NATIVE grain -- the Module G/P
     # value label for the same code `crop` was collapsed from ('Maize Hybrid',
     # 'Rice Faya', 'Groundnut CG7'; `harmonize_crop_variety` in
     # categorical_mapping.org).  A COLUMN, not a level: it is functionally
-    # determined by the crop code, so it splits no key.  It exists because the
+    # determined by the crop code now retained by production_obs. It exists
+    # because the
     # shipped IHS5 conversion tables key their kg factors on the variety and
     # the varieties genuinely differ -- unshelled paddy in a 50 kg bag is
     # 29.04 kg for RICE LOCAL against 49.00 for eight improved varieties.
@@ -263,41 +293,151 @@ Data Scheme:
     crop_variety: str
     Quantity_sold: float
     Value_sold: float
+    # The sale's own unit and shelled/unshelled answer (ag_i02b / ag_q02b, ag_i02c /
+    # ag_q02c).  On a harvest row Unit_sold is the row's `u`, by construction.  They
+    # are what a Farm-level row states, and NA where there is no sale (GH #1457).
+    Unit_sold:
+      type: str
+      optional: true
+    Condition_sold:
+      type: str
+      optional: true
     planting_month: int
     harvest_month: int
     intercropped: bool
     perennial: bool
     materialize: make
   plot_inputs:
+    # input_obs: original G release-row identity across all four waves;
+    # Module D remains unresolved_observation with its existing reducer.
     # Item-level (t, i, plot_id, input, crop, u) agricultural-input feature
     # for the four IHS3+/IHPS waves (2010-11, 2013-14, 2016-17, 2019-20);
-    # GAP 2.  One reported row per input applied to a plot.  Sources:
+    # GAP 2. G/D applied-input rows plus H acquisition-only Farm-level rows.
     # Module D (ag_mod_d) -- inorganic fertilizer in two slots (type +
-    # applied quantity + unit), an organic-fertilizer used? flag (ag_d36),
+    # applied quantity + unit), organic-fertilizer use/quantity/unit
+    # (ag_d36/ag_d37a/ag_d37b),
     # and pesticide/herbicide/fungicide/fumigant types + qty + unit gated
     # by ag_d40; Module G (ag_mod_g) -- seed planted per plot-crop
     # (ag_g04a/b) with the improved-seed flag ag_g0f in IHS4/IHS5; Module H
     # (ag_mod_h) -- purchased seed (household-crop grain) attached to the
-    # single-plot seed row of that (i, crop), like crop_production's sale.
+    # single known observation of that native crop code and source half;
+    # seed received for free (H37/H38, every wave and half) attached by the
+    # same rule in its own columns with its own unit (GH #1190).
     # `input` is the shared harmonize_input Preferred Label
     # (NPK/DAP/CAN/Urea/D-Compound/Other fertilizer, Organic Fertilizer,
     # Insecticide/Herbicide/Fungicide/Fumigant/Other Pesticide, Seed).
     # `crop` is the harmonize_crop->harmonize_food label for seed rows
-    # (NaN for fertilizer/pesticide).  `u` is the reported native unit
-    # label (NaN where the survey records no quantity basis, e.g. organic
-    # fertilizer).  crop / u are in the index because a plot may carry
+    # (unknown_crop when missing; recorded unmapped identities pass through).
+    # Module D uses (not crop-specific). `u` is the reported native unit
+    # label. Organic units use their own ag_d37b dictionary; missing units
+    # are Unknown and unlisted recorded codes are source-qualified raw
+    # identities (Organic unit code N). crop / u are in
+    # the index because a plot may carry
     # several seed crops or a fertilizer in several units.  Reported item
-    # columns only: Quantity, native u, Purchased (bool, True where a
-    # purchased seed quantity is attached), Quantity_purchased, Improved
-    # (bool, seed rows).  Aggregates (seed_kg, nitrogen_kg,
-    # inorganic/organic/pesticide any-flags) are transformations, NOT
+    # columns only: Quantity, native u, Purchased (bool, True where a seed
+    # purchase is attached), Quantity_purchased, Unit_purchased, Improved
+    # (bool, seed rows).  Applied is Module D's own use answer (GH #1174):
+    # organic ag_d36 (rows exist only where Yes), inorganic fertilizer ag_d38
+    # (True / False as answered, NA where unanswered), agrochemical ag_d40
+    # (rows exist only where Yes); NA on seed rows.  A use with no recorded
+    # amount keeps Quantity NA, never 0.
+    # Aggregates (seed_kg, nitrogen_kg,
+    # household inorganic/organic/pesticide any-flags) are transformations, NOT
     # stored columns.  2004-05 (IHS2) deferred: household-level aggregated
     # ag file, no plot-input roster.  See _/malawi.py:assemble_plot_inputs.
-    index: (t, i, plot_id, input, crop, u)
+    index: (t, i, plot_id, input, crop, u, input_obs)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    # GH #1190: the unit Quantity_purchased is recorded in, on the seed
+    # dictionary (ag_h07b / ag_h16b / ag_h26b), Unknown where no unit code is
+    # recorded.  u describes the amount planted (Module G); no conversion
+    # between the two is implied.  Names follow Tanzania and Burkina Faso.  A
+    # household-crop whose purchase components are in unlike units is not
+    # summed: Purchased True, with Quantity_purchased and Unit_purchased NA.
+    Unit_purchased:
+      type: str
+      optional: true
     Improved: bool
+    Applied:
+      type: bool
+      optional: true
+    # GH #1190: Module H seed received FOR FREE (ag_h38a/b), never a
+    # purchase.  Unit_received_as_gift is that answer's own unit on the
+    # seed dictionary (Unknown where no unit code is recorded); it implies
+    # no conversion to u.  Names follow Burkina Faso's plot_inputs.
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
+    # ag_h37 "Did you receive any of the [SEED] for free?", carried as
+    # answered beside the free quantity it gates (rows with no free
+    # quantity carry NA), so a quantity recorded under a No is visible.
+    Received_as_gift:
+      type: bool
+      optional: true
+    # H components are alternate representations of the attached summaries,
+    # never additional applications/transactions. All old fields are NA on H rows.
+    # Own native H scalar columns pass through under their original names.
+    Carrier_role:
+      type: str
+      optional: true
+    Acquisition_quantity:
+      type: float
+      optional: true
+    Acquisition_unit:
+      type: str
+      optional: true
+    Acquisition_value:
+      type: float
+      optional: true
+    Acquisition_kind:
+      type: str
+      optional: true
+    Acquisition_flag:
+      type: bool
+      optional: true
+    Acquisition_source:
+      type: str
+      optional: true
+    Source_path:
+      type: str
+      optional: true
+    Source_sidecar_sha256:
+      type: str
+      optional: true
+    Source_half:
+      type: str
+      optional: true
+    Source_row:
+      type: int
+      optional: true
+    Component_field:
+      type: str
+      optional: true
+    Quantity_field:
+      type: str
+      optional: true
+    Unit_field:
+      type: str
+      optional: true
+    Value_field:
+      type: str
+      optional: true
+    Flag_field:
+      type: str
+      optional: true
+    Source_answer_field:
+      type: str
+      optional: true
+    Native_crop:
+      type: str
+      optional: true
+    Binding_status:
+      type: str
+      optional: true
     materialize: make
   livestock:
     # Item-level (t, i, animal) livestock-roster feature for the four
@@ -306,8 +446,9 @@ Data Scheme:
     # (ag_mod_r1) -- the SAME roster the World Bank cleaning code reads then
     # collapses to a single HH "engaged-in-livestock" binary (MWI_IHPS{1-4}
     # .do: recode ag_r00 -> collapse (max) livestock by hhid).  We keep the
-    # PRE-collapse rows, which are strictly richer: their binary =
-    # livestock().groupby(['t','i']).size() > 0.  Reported item columns:
+    # PRE-collapse rows, which are strictly richer; their binary is only
+    # approximately livestock().groupby(['t','i']).size() > 0 (see
+    # CONTENTS.org).  Reported item columns:
     #   HeadCount    (ag_r02, head owned now),
     #   HeadAcquired (ag_r10, head bought to raise in last 12 months),
     #   HeadSold     (ag_r16, head sold alive in last 12 months),
@@ -317,6 +458,14 @@ Data Scheme:
     #                 (ValuePerAnimal x HeadCount) and a TLU rollup are
     #                 transformations, NOT stored columns.  See
     #                 `Columns: livestock` in lsms_library/data_info.yml.
+    #   HeadCount12MonthsAgo (ag_r07, "How many [LIVESTOCK] did your
+    #                 household own exactly 12 months ago?", all four waves;
+    #                 GH #855).  A second STOCK, not a flow: never a fallback
+    #                 for HeadCount, never differenced into acquisitions or
+    #                 losses (the survey asks those flows directly).
+    #   RaisedOrOwned (ag_r01, the species gate, as answered; GH #1435).  About
+    #                 the last 12 months, not a stock, and the Stata labels shorten
+    #                 the question: see `Columns: livestock` in data_info.yml.
     # `animal` is the harmonize_species Preferred Label (the wave scripts
     # reconcile 2010-11's fine 301-318 code scheme with the later coarse
     # scheme -- Ox=3304, Donkey/Horse=3305, Chicken=3310,
@@ -330,6 +479,10 @@ Data Scheme:
     HeadAcquired: float
     HeadSold: float
     ValuePerAnimal: float
+    HeadCount12MonthsAgo: float
+    RaisedOrOwned:
+      type: bool
+      optional: true
     materialize: make
   anthropometry:
     # Item-level (t, i, pid) body-measurement feature for the four IHS3+/
@@ -393,7 +546,10 @@ Data Scheme:
     # those halves carry no `other` rows (reported, not faked).  2004-05
     # (IHS2) is DEFERRED (household-level aggregated ag file, no plot-labor
     # roster).  See _/malawi.py:_plot_labor_block / assemble_plot_labor.
-    index: (t, i, plot_id, source)
+    # Known plots retain their sum/first reducer. Source-missing plots carry
+    # unknown_plot plus sidecar-qualified original-row labor_obs; never join
+    # those observations as one physical plot. Current eligibility is unchanged.
+    index: (t, i, plot_id, source, labor_obs)
     PersonDays: float
     Wage: float
     materialize: make
@@ -469,12 +625,23 @@ Data Scheme:
     #         join nothing, by design.
     #   u  -- native reported unit on the shared harmonize_price_unit -> `u`
     #         Preferred Label axis, so community_prices.u joins
-    #         food_acquired.u / crop_production.u.
+    #         food_acquired.u / crop_production.u.  GH #827: for the 17
+    #         items whose unit cell the form strikes out, the unit the ITEM
+    #         fixes (Bottle, Packet, 50 kg Bag, Day, ..., Piece); a blank or
+    #         off-list code is `Unknown`.  See CONTENTS.org.
     # Reported columns only:
     #   Price         -- the surveyed price (MK) for NumberOfUnits of the
     #                    item in unit u.
     #   NumberOfUnits -- the number of units that Price refers to (the
     #                    native price-per-quantity basis the survey gives).
+    #                    On the 17 struck items the form strikes this cell
+    #                    too: a PRICED row is served 1, the registered
+    #                    derivation Malawi::community_prices::struck-item-
+    #                    one-unit (20,042 rows; the key is in the
+    #                    `Derivation` column, NA on reported rows); an
+    #                    unpriced row stays NA, and so does every CK33
+    #                    cigarette row -- bimodal packet / single-stick
+    #                    prices (GH #827, rulings 2026-10-23).
     #   Available     -- in-market availability flag (com_ck00c/cka, 1=Yes).
     # A per-unit price (Price / NumberOfUnits), kg-standardisation, and any
     # cross-cluster median/mean or community->household price imputation are
@@ -485,5 +652,3 @@ Data Scheme:
     NumberOfUnits: float
     Available: bool
     materialize: make
-  food_expenditures:
-  food_prices:

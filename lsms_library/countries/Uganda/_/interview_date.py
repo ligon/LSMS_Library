@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library import Country
 from lsms_library.local_tools import to_parquet, get_dataframe
 
 """
@@ -8,16 +9,25 @@ import sys
 sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
-from uganda import Waves, id_walk
+from uganda import id_walk
 import json
 
 x = {}
-for t in list(Waves.keys()):
+country = Country('Uganda')
+for t in country.waves:
+    wave = country[t]
+    # GH #1287; ledger §§2–4: only undeclared output may be skipped.
+    if 'interview_date' not in wave.data_scheme:
+        continue
     print(t, file=sys.stderr)
+    fn = f'../{wave.wave_folder}/_/interview_date.parquet'
     try: 
-        x[t] = get_dataframe('../'+t+'/_/interview_date.parquet')
-    except FileNotFoundError:
-        print(f"No parquet foound for {t}", file=sys.stderr)
+        x[t] = get_dataframe(fn)
+    except FileNotFoundError as error:
+        raise RuntimeError(
+            f'Uganda/{t}: declared interview_date failed to load '
+            f'{fn}; refusing a partial country table.'
+        ) from error
 
 x = pd.concat(x.values())
 

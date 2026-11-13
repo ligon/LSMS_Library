@@ -1,0 +1,1127 @@
+{
+  "issue": 1144,
+  "baseline": "6fda46bc5437758bd650cf4016f0782a124281cf",
+  "first_issue_commit": "b6594f1544f8e922edce9b87c27ed8f1b85ab279",
+  "verification": "offline; private copied L1; physical private Nigeria L2; exact checkout/config imports; numeric threads=1; LSMS_BUILD_WORKERS=1",
+  "cold": {
+    "before": {
+      "repo": "/local/job40255479/worktrees/isa-review-1034",
+      "package": "/local/job40255479/worktrees/isa-review-1034/lsms_library/__init__.py",
+      "offline": true,
+      "tables": {
+        "food_acquired": {
+          "rows": 595725,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "waves": [
+            "2010Q3",
+            "2011Q1",
+            "2012Q3",
+            "2013Q1",
+            "2015Q3",
+            "2016Q1",
+            "2018Q3",
+            "2019Q1"
+          ],
+          "columns": [
+            "Quantity",
+            "Expenditure",
+            "Quantity_kg",
+            "Derivation"
+          ]
+        },
+        "food_prices": {
+          "rows": 481191,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "waves": [
+            "2010Q3",
+            "2011Q1",
+            "2012Q3",
+            "2013Q1",
+            "2015Q3",
+            "2016Q1",
+            "2018Q3",
+            "2019Q1"
+          ],
+          "columns": [
+            "Price"
+          ]
+        },
+        "food_quantities": {
+          "rows": 595053,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "waves": [
+            "2010Q3",
+            "2011Q1",
+            "2012Q3",
+            "2013Q1",
+            "2015Q3",
+            "2016Q1",
+            "2018Q3",
+            "2019Q1"
+          ],
+          "columns": [
+            "Quantity"
+          ]
+        },
+        "food_prices_native": {
+          "rows": 481613,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "waves": [
+            "2010Q3",
+            "2011Q1",
+            "2012Q3",
+            "2013Q1",
+            "2015Q3",
+            "2016Q1",
+            "2018Q3",
+            "2019Q1"
+          ],
+          "columns": [
+            "Price"
+          ]
+        },
+        "food_expenditures": {
+          "rows": 482285,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "s"
+          ],
+          "waves": [
+            "2010Q3",
+            "2011Q1",
+            "2012Q3",
+            "2013Q1",
+            "2015Q3",
+            "2016Q1",
+            "2018Q3",
+            "2019Q1"
+          ],
+          "columns": [
+            "Expenditure"
+          ]
+        },
+        "crop_production": {
+          "rows": 62844,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "plot_id",
+            "crop"
+          ],
+          "waves": [
+            "2011Q1",
+            "2013Q1",
+            "2016Q1",
+            "2019Q1",
+            "2024Q1"
+          ],
+          "columns": [
+            "Quantity",
+            "u",
+            "Quantity_sold",
+            "Value_sold",
+            "Unit_sold",
+            "planting_month",
+            "harvest_month",
+            "intercropped",
+            "perennial",
+            "KgFactor"
+          ]
+        },
+        "community_prices": {
+          "rows": 131338,
+          "index": [
+            "t",
+            "v",
+            "j",
+            "u"
+          ],
+          "waves": [
+            "2011Q1",
+            "2013Q1",
+            "2016Q1",
+            "2019Q1",
+            "2024Q1"
+          ],
+          "columns": [
+            "Price",
+            "Derivation"
+          ]
+        }
+      },
+      "errors": {},
+      "factor_sources": {
+        "metric": 250905,
+        "survey_kg": 168441,
+        "item_unit": 121216,
+        "unit": 54308,
+        "none": 855
+      },
+      "derivation_inputs_rows": 1856,
+      "warm_food_exact": true,
+      "warm_no_parquet_writes": true,
+      "seconds": 97.13280581869185
+    },
+    "after": {
+      "repo": "/local/job40255479/worktrees/isa-Nigeria",
+      "package": "/local/job40255479/worktrees/isa-Nigeria/lsms_library/__init__.py",
+      "offline": true,
+      "tables": {
+        "food_acquired": {
+          "rows": 595725,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "waves": [
+            "2010Q3",
+            "2011Q1",
+            "2012Q3",
+            "2013Q1",
+            "2015Q3",
+            "2016Q1",
+            "2018Q3",
+            "2019Q1"
+          ],
+          "columns": [
+            "Quantity",
+            "Expenditure",
+            "Quantity_kg",
+            "Derivation"
+          ]
+        },
+        "food_prices": {
+          "rows": 481191,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "waves": [
+            "2010Q3",
+            "2011Q1",
+            "2012Q3",
+            "2013Q1",
+            "2015Q3",
+            "2016Q1",
+            "2018Q3",
+            "2019Q1"
+          ],
+          "columns": [
+            "Price"
+          ]
+        },
+        "food_quantities": {
+          "rows": 595053,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "waves": [
+            "2010Q3",
+            "2011Q1",
+            "2012Q3",
+            "2013Q1",
+            "2015Q3",
+            "2016Q1",
+            "2018Q3",
+            "2019Q1"
+          ],
+          "columns": [
+            "Quantity"
+          ]
+        },
+        "food_prices_native": {
+          "rows": 481613,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "u",
+            "s"
+          ],
+          "waves": [
+            "2010Q3",
+            "2011Q1",
+            "2012Q3",
+            "2013Q1",
+            "2015Q3",
+            "2016Q1",
+            "2018Q3",
+            "2019Q1"
+          ],
+          "columns": [
+            "Price"
+          ]
+        },
+        "food_expenditures": {
+          "rows": 482285,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "j",
+            "s"
+          ],
+          "waves": [
+            "2010Q3",
+            "2011Q1",
+            "2012Q3",
+            "2013Q1",
+            "2015Q3",
+            "2016Q1",
+            "2018Q3",
+            "2019Q1"
+          ],
+          "columns": [
+            "Expenditure"
+          ]
+        },
+        "crop_production": {
+          "rows": 62844,
+          "index": [
+            "i",
+            "t",
+            "v",
+            "plot_id",
+            "crop"
+          ],
+          "waves": [
+            "2011Q1",
+            "2013Q1",
+            "2016Q1",
+            "2019Q1",
+            "2024Q1"
+          ],
+          "columns": [
+            "Quantity",
+            "u",
+            "Quantity_sold",
+            "Value_sold",
+            "Unit_sold",
+            "planting_month",
+            "harvest_month",
+            "intercropped",
+            "perennial",
+            "KgFactor"
+          ]
+        },
+        "community_prices": {
+          "rows": 131338,
+          "index": [
+            "t",
+            "v",
+            "j",
+            "u"
+          ],
+          "waves": [
+            "2011Q1",
+            "2013Q1",
+            "2016Q1",
+            "2019Q1",
+            "2024Q1"
+          ],
+          "columns": [
+            "Price",
+            "Derivation"
+          ]
+        }
+      },
+      "errors": {},
+      "factor_sources": {
+        "metric": 250905,
+        "survey_kg": 168441,
+        "item_unit": 121264,
+        "unit": 54260,
+        "none": 855
+      },
+      "derivation_inputs_rows": 1856,
+      "warm_food_exact": true,
+      "warm_no_parquet_writes": true,
+      "seconds": 128.007901632227
+    }
+  },
+  "conservation": {
+    "baseline": "6fda46bc5437758bd650cf4016f0782a124281cf",
+    "checks": {
+      "complete_raw_values_missingness_and_rows_exact_after_item_key_accounting": true,
+      "crop_production_complete_frame_exact": true,
+      "community_prices_complete_frame_exact": true,
+      "all_1856_derivation_input_rows_and_raw_columns_exact": true,
+      "complete_Code_Preferred_Aggregate_curation_exact": true,
+      "complete_noargument_food_and_crop_maps_exact": true,
+      "every_household_round_expenditure_total_exact": true
+    },
+    "source_expected_renames": {
+      "2010Q3": 6492,
+      "2011Q1": 6286,
+      "2012Q3": 6982,
+      "2013Q1": 739
+    },
+    "observed_new_multicode_merges": {
+      "2010Q3": {},
+      "2011Q1": {},
+      "2012Q3": {},
+      "2013Q1": {},
+      "2015Q3": {},
+      "2016Q1": {},
+      "2018Q3": {},
+      "2019Q1": {}
+    },
+    "raw_rows": 595725,
+    "columns": [
+      "Quantity",
+      "Expenditure",
+      "Quantity_kg",
+      "Derivation"
+    ],
+    "raw_index_unique": true,
+    "renames_by_quarter": {
+      "2010Q3": {
+        "rows": 72236,
+        "renamed_rows": 6492
+      },
+      "2011Q1": {
+        "rows": 69734,
+        "renamed_rows": 6286
+      },
+      "2012Q3": {
+        "rows": 65429,
+        "renamed_rows": 6982
+      },
+      "2013Q1": {
+        "rows": 70649,
+        "renamed_rows": 739
+      },
+      "2015Q3": {
+        "rows": 77702,
+        "renamed_rows": 0
+      },
+      "2016Q1": {
+        "rows": 70469,
+        "renamed_rows": 0
+      },
+      "2018Q3": {
+        "rows": 82865,
+        "renamed_rows": 0
+      },
+      "2019Q1": {
+        "rows": 86641,
+        "renamed_rows": 0
+      }
+    },
+    "native_served_counts": {
+      "Groundnuts": 2839,
+      "Pepper": 10446,
+      "Maize (shelled)": 1425
+    },
+    "native_served_counts_by_quarter": {
+      "Groundnuts": {
+        "2010Q3": 1174,
+        "2011Q1": 678,
+        "2012Q3": 987
+      },
+      "Pepper": {
+        "2010Q3": 3496,
+        "2011Q1": 3496,
+        "2012Q3": 3454
+      },
+      "Maize (shelled)": {
+        "2012Q3": 792,
+        "2013Q1": 633
+      }
+    },
+    "derivation": {
+      "rows": 1856,
+      "Quantity_kg_sum": 4740.73,
+      "rows_by_source": {
+        "inkind": 49,
+        "produced": 148,
+        "purchased": 1659
+      },
+      "complete_raw_inputs_join": true
+    },
+    "quarter_table_cells_changed": 19,
+    "noargument_mapping_codes": 258,
+    "derived": {
+      "food_quantities": {
+        "before_rows": 595053,
+        "after_rows": 595053,
+        "index_only_before": 0,
+        "index_only_after": 0,
+        "changed_numeric_rows_exact": 1724,
+        "changed_numeric_rows_tolerance_1e-12": 1724,
+        "changed_finite_absolute_max": 56.25,
+        "per_quarter_changed": {
+          "2010Q3": 0,
+          "2011Q1": 0,
+          "2012Q3": 611,
+          "2013Q1": 277,
+          "2015Q3": 500,
+          "2016Q1": 323,
+          "2018Q3": 13,
+          "2019Q1": 0
+        }
+      },
+      "food_prices": {
+        "before_rows": 481191,
+        "after_rows": 481191,
+        "index_only_before": 0,
+        "index_only_after": 0,
+        "changed_numeric_rows_exact": 1239,
+        "changed_numeric_rows_tolerance_1e-12": 1239,
+        "changed_finite_absolute_max": 4521.739130434782,
+        "per_quarter_changed": {
+          "2010Q3": 0,
+          "2011Q1": 0,
+          "2012Q3": 391,
+          "2013Q1": 164,
+          "2015Q3": 403,
+          "2016Q1": 280,
+          "2018Q3": 1,
+          "2019Q1": 0
+        }
+      },
+      "food_prices_native": {
+        "before_rows": 481613,
+        "after_rows": 481613,
+        "index_only_before": 0,
+        "index_only_after": 0,
+        "changed_numeric_rows_exact": 0,
+        "changed_numeric_rows_tolerance_1e-12": 0,
+        "changed_finite_absolute_max": 0.0,
+        "per_quarter_changed": {
+          "2010Q3": 0,
+          "2011Q1": 0,
+          "2012Q3": 0,
+          "2013Q1": 0,
+          "2015Q3": 0,
+          "2016Q1": 0,
+          "2018Q3": 0,
+          "2019Q1": 0
+        }
+      },
+      "food_expenditures": {
+        "before_rows": 482285,
+        "after_rows": 482285,
+        "index_only_before": 0,
+        "index_only_after": 0,
+        "changed_numeric_rows_exact": 0,
+        "changed_numeric_rows_tolerance_1e-12": 0,
+        "changed_finite_absolute_max": 0.0,
+        "per_quarter_changed": {
+          "2010Q3": 0,
+          "2011Q1": 0,
+          "2012Q3": 0,
+          "2013Q1": 0,
+          "2015Q3": 0,
+          "2016Q1": 0,
+          "2018Q3": 0,
+          "2019Q1": 0
+        }
+      }
+    },
+    "kg_only_totals": {
+      "before": {
+        "rows": 594455,
+        "sum": 1467196.4975769585,
+        "by_quarter": {
+          "2010Q3": 191605.3755410475,
+          "2011Q1": 245539.33734262217,
+          "2012Q3": 189240.58506433875,
+          "2013Q1": 147518.59108019585,
+          "2015Q3": 119990.192624915,
+          "2016Q1": 108087.16421589373,
+          "2018Q3": 251203.08254536905,
+          "2019Q1": 214012.16916257652
+        }
+      },
+      "after": {
+        "rows": 594455,
+        "sum": 1467094.0109991923,
+        "by_quarter": {
+          "2010Q3": 191605.3755410475,
+          "2011Q1": 245539.33734262217,
+          "2012Q3": 189159.47969290407,
+          "2013Q1": 147521.75924436536,
+          "2015Q3": 119978.52985464575,
+          "2016Q1": 108084.77761554718,
+          "2018Q3": 251192.5825454838,
+          "2019Q1": 214012.16916257652
+        }
+      }
+    },
+    "conversion_rungs": {
+      "before": {
+        "rows": {
+          "metric": 250905,
+          "survey_kg": 168441,
+          "item_unit": 121216,
+          "unit": 54308,
+          "none": 855
+        },
+        "kg_sum": {
+          "item_unit": 341103.64683597675,
+          "metric": 621179.8078306111,
+          "none": 0.0,
+          "survey_kg": 457808.09061491955,
+          "unit": 47104.95229545118
+        },
+        "by_quarter_rows": {
+          "2010Q3": {
+            "metric": 44362,
+            "item_unit": 17968,
+            "unit": 9794,
+            "none": 112
+          },
+          "2011Q1": {
+            "metric": 65827,
+            "survey_kg": 1856,
+            "item_unit": 1269,
+            "unit": 676,
+            "none": 106
+          },
+          "2012Q3": {
+            "metric": 50068,
+            "item_unit": 14459,
+            "unit": 748,
+            "none": 154
+          },
+          "2013Q1": {
+            "metric": 51951,
+            "item_unit": 17561,
+            "unit": 674,
+            "none": 463
+          },
+          "2015Q3": {
+            "item_unit": 35499,
+            "unit": 21580,
+            "metric": 20609,
+            "none": 14
+          },
+          "2016Q1": {
+            "item_unit": 32614,
+            "unit": 19769,
+            "metric": 18080,
+            "none": 6
+          },
+          "2018Q3": {
+            "survey_kg": 80336,
+            "item_unit": 1776,
+            "unit": 750,
+            "metric": 3
+          },
+          "2019Q1": {
+            "survey_kg": 86249,
+            "unit": 317,
+            "item_unit": 70,
+            "metric": 5
+          }
+        }
+      },
+      "after": {
+        "rows": {
+          "metric": 250905,
+          "survey_kg": 168441,
+          "item_unit": 121264,
+          "unit": 54260,
+          "none": 855
+        },
+        "kg_sum": {
+          "item_unit": 340991.4935538368,
+          "metric": 621179.8078306111,
+          "none": 0.0,
+          "survey_kg": 457808.09061491955,
+          "unit": 47114.61899982491
+        },
+        "by_quarter_rows": {
+          "2010Q3": {
+            "metric": 44362,
+            "item_unit": 17968,
+            "unit": 9794,
+            "none": 112
+          },
+          "2011Q1": {
+            "metric": 65827,
+            "survey_kg": 1856,
+            "item_unit": 1269,
+            "unit": 676,
+            "none": 106
+          },
+          "2012Q3": {
+            "metric": 50068,
+            "item_unit": 14444,
+            "unit": 763,
+            "none": 154
+          },
+          "2013Q1": {
+            "metric": 51951,
+            "item_unit": 17582,
+            "unit": 653,
+            "none": 463
+          },
+          "2015Q3": {
+            "item_unit": 35515,
+            "unit": 21564,
+            "metric": 20609,
+            "none": 14
+          },
+          "2016Q1": {
+            "item_unit": 32653,
+            "unit": 19730,
+            "metric": 18080,
+            "none": 6
+          },
+          "2018Q3": {
+            "survey_kg": 80336,
+            "item_unit": 1763,
+            "unit": 763,
+            "metric": 3
+          },
+          "2019Q1": {
+            "survey_kg": 86249,
+            "unit": 317,
+            "item_unit": 70,
+            "metric": 5
+          }
+        }
+      }
+    },
+    "join_key_coverage": {
+      "before": {
+        "food_rows_with_household_crop_item_key": 16495,
+        "food_rows_with_community_item_unit_key": 43268,
+        "by_quarter": {
+          "2010Q3": {
+            "crop_key": 0,
+            "community_key": 0
+          },
+          "2011Q1": {
+            "crop_key": 4650,
+            "community_key": 28684
+          },
+          "2012Q3": {
+            "crop_key": 0,
+            "community_key": 0
+          },
+          "2013Q1": {
+            "crop_key": 4039,
+            "community_key": 9993
+          },
+          "2015Q3": {
+            "crop_key": 0,
+            "community_key": 0
+          },
+          "2016Q1": {
+            "crop_key": 3864,
+            "community_key": 65
+          },
+          "2018Q3": {
+            "crop_key": 0,
+            "community_key": 0
+          },
+          "2019Q1": {
+            "crop_key": 3942,
+            "community_key": 4526
+          }
+        }
+      },
+      "after": {
+        "food_rows_with_household_crop_item_key": 16218,
+        "food_rows_with_community_item_unit_key": 41291,
+        "by_quarter": {
+          "2010Q3": {
+            "crop_key": 0,
+            "community_key": 0
+          },
+          "2011Q1": {
+            "crop_key": 4374,
+            "community_key": 26707
+          },
+          "2012Q3": {
+            "crop_key": 0,
+            "community_key": 0
+          },
+          "2013Q1": {
+            "crop_key": 4038,
+            "community_key": 9993
+          },
+          "2015Q3": {
+            "crop_key": 0,
+            "community_key": 0
+          },
+          "2016Q1": {
+            "crop_key": 3864,
+            "community_key": 65
+          },
+          "2018Q3": {
+            "crop_key": 0,
+            "community_key": 0
+          },
+          "2019Q1": {
+            "crop_key": 3942,
+            "community_key": 4526
+          }
+        }
+      }
+    }
+  },
+  "public_boundary": {
+    "package": "/local/job40255479/worktrees/isa-Nigeria/lsms_library/__init__.py",
+    "checks": {
+      "new_Country_warm_complete_frame_exact": true,
+      "warm_no_parquet_writes": true,
+      "Aggregate_preserves_unrecorded_native_details_and_rows": true,
+      "crop_production_final_current_hash_replay_exact": true,
+      "community_prices_final_current_hash_replay_exact": true
+    },
+    "calls": {
+      "normal": {
+        "native_counts": {
+          "Groundnuts": 2839,
+          "Pepper": 10446,
+          "Maize (shelled)": 1425
+        },
+        "full_frame_exact": true,
+        "warning_classes": {
+          "QuantityImplausibleWarning": 8,
+          "NullIndexKeyWarning": 1,
+          "ClusterIdentityWarning": 1
+        }
+      },
+      "preferred": {
+        "native_counts": {
+          "Groundnuts": 2839,
+          "Pepper": 10446,
+          "Maize (shelled)": 1425
+        },
+        "full_frame_exact": true,
+        "warning_classes": {
+          "QuantityImplausibleWarning": 8,
+          "NullIndexKeyWarning": 1,
+          "ClusterIdentityWarning": 1
+        }
+      },
+      "explicit_preferred_label": {
+        "native_counts": {
+          "Groundnuts": 2839,
+          "Pepper": 10446,
+          "Maize (shelled)": 1425
+        },
+        "full_frame_exact": true,
+        "warning_classes": {
+          "QuantityImplausibleWarning": 8,
+          "NullIndexKeyWarning": 1,
+          "ClusterIdentityWarning": 1
+        }
+      }
+    },
+    "aggregate": {
+      "rows": 595725,
+      "labels_unmatched": {
+        "labels": "Aggregate",
+        "column": "Aggregate Label",
+        "n_unmatched": 3,
+        "n_values": 121,
+        "rows": 14710,
+        "row_share": 0.024692601452012256,
+        "examples": [
+          "Groundnuts",
+          "Maize (shelled)",
+          "Pepper"
+        ]
+      },
+      "warning_classes": {
+        "QuantityImplausibleWarning": 8,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1,
+        "LabelPassThroughWarning": 1
+      },
+      "resulting_label_counts": {
+        "Groundnuts": 8365,
+        "Pepper": 10446,
+        "Maize (shelled)": 1425
+      }
+    },
+    "cache_hashes": {
+      "food_acquired": {
+        "stored": "0fc6b0fd17b4d5fe8c867d34321d323f47f5ad034c52e31b6455c53b391ae0fb",
+        "expected": "0fc6b0fd17b4d5fe8c867d34321d323f47f5ad034c52e31b6455c53b391ae0fb",
+        "fresh": true
+      },
+      "crop_production": {
+        "stored": "cc426da0c8908bc8a2597aa2837cd8202fb9bcc13413aba0b9b3127b16b1519d",
+        "expected": "cc426da0c8908bc8a2597aa2837cd8202fb9bcc13413aba0b9b3127b16b1519d",
+        "fresh": true
+      },
+      "community_prices": {
+        "stored": "ea35b584ea28a031592bd39b617d5d1fde502b28f8bf559fdbd85de6420625d8",
+        "expected": "ea35b584ea28a031592bd39b617d5d1fde502b28f8bf559fdbd85de6420625d8",
+        "fresh": true
+      }
+    },
+    "hash_blast_radius": {
+      "Nigeria": {
+        "changed": 24,
+        "declared": 24
+      },
+      "Uganda": {
+        "changed": 0,
+        "declared": 28
+      }
+    }
+  },
+  "comparator": {
+    "food_acquired": {
+      "rows": 355571,
+      "full_frame_exact": true
+    },
+    "sample": {
+      "rows": 24362,
+      "full_frame_exact": true
+    }
+  },
+  "feature_audit": {
+    "before": {
+      "records": 441,
+      "statuses": {
+        "warn": 438,
+        "pass": 3
+      },
+      "checks": {
+        "runtime_warning": 427,
+        "index_levels_match_scheme": 2,
+        "kwarg_changes_rowcount": 9,
+        "market_adds_m": 3
+      }
+    },
+    "after": {
+      "records": 445,
+      "statuses": {
+        "warn": 442,
+        "pass": 3
+      },
+      "checks": {
+        "runtime_warning": 431,
+        "index_levels_match_scheme": 2,
+        "kwarg_changes_rowcount": 9,
+        "market_adds_m": 3
+      }
+    },
+    "normalized_multiset": {
+      "removed": 54,
+      "added": 58,
+      "removed_groups": [
+        {
+          "feature": "food_acquired",
+          "check": "runtime_warning",
+          "kind": "reported_quantity_warning",
+          "records": 6
+        },
+        {
+          "feature": "food_expenditures",
+          "check": "kwarg_changes_rowcount",
+          "kind": "OTHER",
+          "records": 1
+        },
+        {
+          "feature": "food_expenditures",
+          "check": "runtime_warning",
+          "kind": "reported_quantity_warning",
+          "records": 8
+        },
+        {
+          "feature": "food_prices",
+          "check": "runtime_warning",
+          "kind": "kg_factor_diagnostic",
+          "records": 5
+        },
+        {
+          "feature": "food_prices",
+          "check": "runtime_warning",
+          "kind": "reported_quantity_warning",
+          "records": 16
+        },
+        {
+          "feature": "food_quantities",
+          "check": "kwarg_changes_rowcount",
+          "kind": "OTHER",
+          "records": 1
+        },
+        {
+          "feature": "food_quantities",
+          "check": "runtime_warning",
+          "kind": "kg_factor_diagnostic",
+          "records": 5
+        },
+        {
+          "feature": "food_quantities",
+          "check": "runtime_warning",
+          "kind": "reported_quantity_warning",
+          "records": 12
+        }
+      ],
+      "added_groups": [
+        {
+          "feature": "food_acquired",
+          "check": "runtime_warning",
+          "kind": "label_coverage",
+          "records": 1
+        },
+        {
+          "feature": "food_acquired",
+          "check": "runtime_warning",
+          "kind": "reported_quantity_warning",
+          "records": 6
+        },
+        {
+          "feature": "food_expenditures",
+          "check": "kwarg_changes_rowcount",
+          "kind": "OTHER",
+          "records": 1
+        },
+        {
+          "feature": "food_expenditures",
+          "check": "runtime_warning",
+          "kind": "label_coverage",
+          "records": 1
+        },
+        {
+          "feature": "food_expenditures",
+          "check": "runtime_warning",
+          "kind": "reported_quantity_warning",
+          "records": 8
+        },
+        {
+          "feature": "food_prices",
+          "check": "runtime_warning",
+          "kind": "kg_factor_diagnostic",
+          "records": 5
+        },
+        {
+          "feature": "food_prices",
+          "check": "runtime_warning",
+          "kind": "label_coverage",
+          "records": 1
+        },
+        {
+          "feature": "food_prices",
+          "check": "runtime_warning",
+          "kind": "reported_quantity_warning",
+          "records": 16
+        },
+        {
+          "feature": "food_quantities",
+          "check": "kwarg_changes_rowcount",
+          "kind": "OTHER",
+          "records": 1
+        },
+        {
+          "feature": "food_quantities",
+          "check": "runtime_warning",
+          "kind": "kg_factor_diagnostic",
+          "records": 5
+        },
+        {
+          "feature": "food_quantities",
+          "check": "runtime_warning",
+          "kind": "label_coverage",
+          "records": 1
+        },
+        {
+          "feature": "food_quantities",
+          "check": "runtime_warning",
+          "kind": "reported_quantity_warning",
+          "records": 12
+        }
+      ]
+    },
+    "Uganda_country_records_exact": true,
+    "Uganda_country_record_counts": {
+      "before": 1,
+      "after": 1
+    },
+    "accounting": {
+      "quantity_warning_records_only_item_renames": 42,
+      "quantity_warning_full_records_equal_after_quarter_item_rename": true,
+      "metric_contradiction_diagnostic_records": 10,
+      "metric_contradiction_item_unit_cells_before": 77,
+      "metric_contradiction_item_unit_cells_after": 75,
+      "aggregate_cardinality_changed_records": 2,
+      "aggregate_combined_Nigeria_Uganda_quantity_rows_before": 930511,
+      "aggregate_combined_Nigeria_Uganda_quantity_rows_after": 930790,
+      "aggregate_combined_Nigeria_Uganda_expenditure_rows_before": 714907,
+      "aggregate_combined_Nigeria_Uganda_expenditure_rows_after": 715137,
+      "new_typed_label_passthrough_records": 4
+    }
+  },
+  "tests": {
+    "selection": "test_nigeria_food_item_decode.py test_nigeria_food_unit_decode.py test_nigeria_food_acquired_sources.py test_gh1035_nigeria_w1_stated_weights.py test_gh1041_nigeria_missing_unit.py test_gh1047_nigeria_unit_codes.py",
+    "loadfile_workers": 4,
+    "passed": 115,
+    "skipped": 0,
+    "failed": 1,
+    "failure": "Inherited #1034 dependency: GH1035 test assumed these container names occur exclusively in2011Q1; same failure reproduced at immutable6f. No1144 runtime failure. Separate amendment owned by root.",
+    "new_regression_cases": 36,
+    "new_negative_control_at_6f": {
+      "failed": 31,
+      "passed": 5
+    },
+    "private_dependency_amendment": {
+      "passed": 1,
+      "skipped": 0,
+      "failed": 0,
+      "patch_sha256": "8145796ca742bb7fd0cf7230df3bd74a11aa4f1841cca620b3b6f48727149f1f",
+      "scope": "No amendment committed in1144; scopes existing W1 card checks and adds explicit later shared-label no-survey_kg/no-W1-card-KEY boundaries."
+    }
+  },
+  "build_input_sha256": {
+    "lsms_library/countries/Nigeria/_/nigeria.py": "0c0374fb4bb14146f23eedf6a221965f71513bf5daf93c94b46ecf94d1e346b4",
+    "lsms_library/countries/Nigeria/_/categorical_mapping.org": "6c011aef7b51fc1b046d972b491f695989c428cef39fe4e81c559534ba074c0d",
+    "lsms_library/countries/Nigeria/2010-11/_/mapping.py": "ca5c14e7b3ba2d3603f4555b0b25b782f81183bc4104a4133d8b239acfbbfadf"
+  }
+}

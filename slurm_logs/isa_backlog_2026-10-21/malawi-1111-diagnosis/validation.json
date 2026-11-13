@@ -1,0 +1,59 @@
+{
+  "result": "DIAGNOSIS_COMPLETE_NO_IMPLEMENTATION",
+  "heads": {
+    "reviewed-organic": {
+      "head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "status": "",
+      "tracked_contents_modes_exact": true,
+      "git_index_modes_exact": true,
+      "files_checked": 14910
+    },
+    "baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "",
+      "tracked_contents_modes_exact": true,
+      "git_index_modes_exact": true,
+      "files_checked": 14880
+    }
+  },
+  "actual_country_rows": 180184,
+  "actual_all_null_u": 17649,
+  "actual_inorganic_Gram": 13302,
+  "actual_inorganic_null_u": 17044,
+  "current_and_reviewed_full_frame_exact": true,
+  "f8_nonorganic_exact_except_reviewed_added_Applied": true,
+  "raw_organic_all_11075_exact": true,
+  "target_cold_and_fresh_process_warm_exact": true,
+  "existing_organic_tests_passed": 28,
+  "test_warning_count_synthetic": 13,
+  "actual_country_warning_classes": {
+    "NullReadWarning": 1,
+    "NullIndexKeyWarning": 1
+  },
+  "independent_1118_true_missing": 602,
+  "observed_unlisted_seed_units": 3,
+  "questionnaire_2010_2019_counterfactual_only": {
+    "scenario": "questionnaire_2010_2019_only",
+    "rows_before": 180184,
+    "rows_after": 179949,
+    "row_reduction": 235,
+    "inorganic_quantity_sum_before": 2899339.95,
+    "inorganic_quantity_sum_after": 2899339.95,
+    "u_null_after": 6067,
+    "raw_relabel_nitrogen": 1028195.63206,
+    "grouped_nitrogen": 1028195.63206,
+    "nitrogen_delta_from_current": 187959.85247999988,
+    "grouping_nitrogen_delta": 0.0,
+    "grouped_rows_by_wave": {
+      "2010-11": 46576,
+      "2013-14": 16188,
+      "2016-17": 52494,
+      "2019-20": 64691
+    }
+  },
+  "intended_minimal_boundary": "Preserve current enumerator quantities and existing additive reducer; questionnaire-covered2010+2019 only; await separate concrete worktree brief",
+  "2016_literal_C4_sidecar_absent": true,
+  "2013_questionnaire_unheld": true,
+  "framework_or_tracked_edit": false,
+  "no_implementation": true
+}

@@ -1,0 +1,26 @@
+{
+  "status": "PREPARED_UNASSIGNED",
+  "at_UTC": "2026-10-22T12:58:49.179286+00:00",
+  "rows": [
+    {
+      "label": "candidate",
+      "source": "/local/job40255479/worktrees/isa-review-1196-index",
+      "head": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+      "ignored_link": "/local/job40255479/worktrees/isa-review-1196-index/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-1196-index/candidate-dvc-tmp",
+      "checkout_terminal": 0,
+      "clean_before_metadata": true
+    },
+    {
+      "label": "base",
+      "source": "/local/job40255479/worktrees/isa-review-1196-index-base",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "ignored_link": "/local/job40255479/worktrees/isa-review-1196-index-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-1196-index/base-dvc-tmp",
+      "checkout_terminal": 0,
+      "clean_before_metadata": true
+    }
+  ],
+  "imports_API_tests": 0,
+  "signed": "Sue"
+}

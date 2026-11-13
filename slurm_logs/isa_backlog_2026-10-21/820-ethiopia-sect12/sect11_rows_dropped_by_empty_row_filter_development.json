@@ -1,0 +1,37 @@
+{
+ "2011-12": {
+  "rows_dropped": 0,
+  "dropped_with_Value_sold": 0,
+  "dropped_with_positive_Value_sold": 0,
+  "birr": 0.0,
+  "rows_with_positive_Value_sold_before_filter": 694
+ },
+ "2013-14": {
+  "rows_dropped": 3415,
+  "dropped_with_Value_sold": 155,
+  "dropped_with_positive_Value_sold": 1,
+  "birr": 1500.0,
+  "rows_with_positive_Value_sold_before_filter": 1352
+ },
+ "2015-16": {
+  "rows_dropped": 4397,
+  "dropped_with_Value_sold": 17,
+  "dropped_with_positive_Value_sold": 2,
+  "birr": 7750.0,
+  "rows_with_positive_Value_sold_before_filter": 1019
+ },
+ "2018-19": {
+  "rows_dropped": 2103,
+  "dropped_with_Value_sold": 171,
+  "dropped_with_positive_Value_sold": 27,
+  "birr": 41442.0,
+  "rows_with_positive_Value_sold_before_filter": 1397
+ },
+ "2021-22": {
+  "rows_dropped": 2149,
+  "dropped_with_Value_sold": 277,
+  "dropped_with_positive_Value_sold": 32,
+  "birr": 33482.0,
+  "rows_with_positive_Value_sold_before_filter": 1330
+ }
+}

@@ -2,8 +2,9 @@
 """Burkina Faso 2014 (EMC) food_coping -- reduced Coping Strategies Index (rCSI).
 
 Source: ``emc2014_p3_securitealimentaire_27022015.dta`` (Part 3 "Sécurité
-alimentaire").  HOUSEHOLD-level (one row per HH, index i = each wave's roster i
-= format_id(zd) + format_id(menage, zeropadding=3), e.g. zd=1, menage=1 -> '1001').
+alimentaire").  HOUSEHOLD-level (one row per HH, index i = the wave's roster i,
+``burkina_faso.emc_i``: 'EMC_' + zd + menage.zfill(3), e.g. zd=1, menage=1 ->
+'EMC_1001'; the prefix namespaces the EMC sample apart from EHCVM, GH #1244).
 
 The coping battery ``SA2A..SA2E`` asks, for each strategy, "Au cours des 7
 derniers jours, combien de jours vous, ou une autre personne du ménage, avez-
@@ -43,9 +44,16 @@ SA3 (meals/day) and SA5/SA6 (12-month provisioning) belong to other features.
 (NaN) are dropped.  ``t`` = '2014'.  ``v`` is NOT baked in -- the framework
 joins it from ``sample()`` at API time.
 """
+from pathlib import Path
+
 import pandas as pd
 
-from lsms_library.local_tools import get_dataframe, format_id
+from lsms_library.local_tools import get_dataframe, get_formatting_functions
+
+# Standalone and runpy callers must use this script's selected config tree.
+emc_i = get_formatting_functions(
+    Path(__file__).resolve().parents[2] / '_' / 'burkina_faso.py',
+    '_burkina_emc_namespace')['emc_i']
 
 # SA2{letter} -> rCSI Strategy, in questionnaire order (a-e) verified against
 # the WB EMC 2014 Passage-3 questionnaire (catalog 2538, section SA; see module
@@ -66,8 +74,7 @@ df = get_dataframe('../Data/emc2014_p3_securitealimentaire_27022015.dta',
 item_cols = ['SA2' + x for x in STRATEGIES]
 
 wide = df[['zd', 'menage'] + item_cols].copy()
-wide['i'] = (wide['zd'].apply(format_id)
-             + wide['menage'].apply(lambda m: format_id(m, zeropadding=3)))
+wide['i'] = [emc_i(z, m) for z, m in zip(wide['zd'], wide['menage'])]
 
 long = wide.melt(id_vars='i', value_vars=item_cols,
                  var_name='item', value_name='Days')

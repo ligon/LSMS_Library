@@ -55,10 +55,258 @@ changed:
 | 2018-19     | =distirct_name= + =parish_name= | string  | =DISTRICT/PARISH= composite |
 | 2019-20     | =district= + =s1aq04a=          | string  | =DISTRICT/PARISH= composite |
 
-All are drawn from GSEC1 (the household cover page).  The shift
-from numeric EA codes to parish names occurred around 2015-16 as
-the sampling frame evolved from strict EA boundaries to parish-level
-clusters to accommodate split-off households.
+All are drawn from GSEC1 (the household cover page).  =comm= is ONE
+identifier rendered two ways in the raw files -- int32 8-digit in 2005-06 and
+2011-12, a 7-character string in 2009-10 and 2010-11 -- and since GH #1133 all
+four waves serve the 8-digit frame EA (item 1 below). From 2013-14 the
+library's available cover-page key is instead a parish code, followed by
+district/parish names in 2018-19 and 2019-20. This is a change in the grain
+of the library's =v=, not evidence that the survey redesigned its sampling
+PSU as a parish (GH #689). The separate =sampling.yml= record continues to
+describe enumeration-area PSUs, with its per-wave documentation qualifications.
+
+*** The design PSU =ea= (GH #689)
+
+/Ruling @ligon, 2026-11-03, option (C) extended./  From 2013-14 =v= is a parish,
+not the unit the survey sampled.  =v= and =cluster_features= stay exactly as they
+are, and =sample()= gains a column, =ea=: the enumeration area a household was
+SAMPLED in, carried with it when it moves.  That is what makes it a design PSU and
+a poor location key, and why it is a =sample()= column and not =v=.  Cluster a
+standard error on =ea=; locate a household with =v=.
+
+| wave    | source of =ea=                                         | non-null / rows | distinct |
+|---------+--------------------------------------------------------+-----------------+----------|
+| 2005-06 | =comm=, through =comm_ea= (GH #1459, below)            | 3,123 / 3,123   |      322 |
+| 2009-10 | the same; else the household's label in another wave (GH #1536) | 2,924 / 2,979 | 321 |
+| 2010-11 | the same                                               | 2,715 / 2,716   |      321 |
+| 2011-12 | the same                                               | 2,850 / 2,907   |      321 |
+| 2013-14 | =GSEC1.ea=, direct                                     | 3,119 / 3,119   |      317 |
+| 2015-16 | =gsec1.ea=, direct; =AGSEC1.ea= for the 72 only it records | 3,377 / 3,377 |   316 |
+| 2018-19 | =GSEC1.t0_hhid= -> 2015-16 =HHID= -> =ea=              | 3,027 / 3,242   |      315 |
+| 2019-20 | =hhidold= -> 2018-19 =hhid= -> =t0_hhid= -> ... -> =ea= | 2,868 / 3,098   |      315 |
+
+The two inherited waves carry =Derivation= =Uganda::sample::ea-tracking-key=, on
+exactly the rows that received a value, and the 72 of 2015-16 carry
+=Uganda::sample::agriculture-cover=, as they did for =v=.
+
+*What the inheritance does NOT rest on: =ea= being unchanged across waves.*  All
+2,872 households linked 2013-14 -> 2015-16 keep =ea=, 316 labels one-to-one, but
+that cannot come out otherwise.  Characters 2-4 of the household id ARE =ea= (2013-14
+=HHID= 3,119 of 3,119; 2015-16 =hh= and =HHID= 3,305 of 3,305; =DynID= // 100 too),
+and the link is string identity between those ids: =gsec1.hh= with its wave token
+moved back (=-05-= -> =-04-=, the =Waves= table in =uganda.py=; 2015-16 has no
+=HHID_old=).  So that result pins UBOS's encoding and says nothing about whether the
+label or the tracking key is right.  The encoding is also *not a route*: parsing
+=t0_hhid= would give the 149 households below an answer for 119, and the ruling is
+that no route means NA.
+
+*What it does rest on.*  Checks that do not read the id's digits, on the raw files;
+"shuffled" permutes one side of the comparison.  No document states the rule.
+
+| check                                                             | result                | shuffled    |
+|-------------------------------------------------------------------+-----------------------+-------------|
+| =ea= vs 2011-12 =comm=, 1,717 households linked by =HHID_old=     | 212 pairs, one-to-one | 1,684 pairs |
+| =t0_hhid= child and parent in the same district                   | 2,729 of 2,978        | 30          |
+| =hhidold= child and parent in the same district                   | 2,977 of 2,986        | 50          |
+| persons linked by =pid_unps=: same sex                            | 11,203 of 11,296      | 5,687       |
+| persons linked by =pid_unps=: age gap of 1-5 years (median 3)     | 99.8% of 10,684       | 10.6%       |
+| person's 2015-16 household is the one =t0_hhid= names             | 13,166 of 13,298      |             |
+
+*What the value means, and how it misleads.*
+
+- /Split-offs inherit the parent's EA./  5 2015-16 households each have two 2018-19
+  households naming them (=t0_hhid= repeats), and all 10 carry the parent's =ea=.
+  So the value is the PSU through which the lineage entered the sample, not where
+  the household lives or where it was itself drawn.  That is right for a design-based
+  standard error and wrong as a location.
+- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 3.53% of wave weight in
+  2009-10 (29.32% until GH #1536, below), 4.25% in 2018-19 and 7.66% in 2019-20, and =groupby=
+  drops a null key by default.  Those households are not missing at random: in the two late waves
+  they are the no-route households below, and in 2009-10 split-offs no other wave records
+  (51 of the 55) and four households only =AGSEC3B= / =GSEC12= hold.
+- /=ea= does not nest in =strata=./  52 of 317 EAs in 2013-14 and 81 of 316 in 2015-16
+  span more than one =sregion=; 61 of 315 and 64 of 315 span more than one =subreg= in
+  the two inherited waves.  In the four early waves 0 of 322, 1 of 317, 44 of 321 and 65 of
+  321 span more than one stratum.  A variance estimator that nests PSUs in strata cannot take
+  the column as it stands.
+
+*The keys are RAW source ids*, never the walked =i=, which is a canonical id from
+another wave.  All are clean strings: no float, whitespace or =.0= on any of the
+five key columns, and =format_id= changes none but the one trap below.  =ea= is
+int16 in the source, and the country-level =ea= formatter keeps it from reaching a
+consumer as ='12.0'= across the outer merge.
+
+- /A blank is not a link./  69 households in 2019-20 have =hhidold= == =''=; it
+  formats to =None=, and =_follow_key= drops it first because =pd.merge= matches
+  null keys to each other.
+- /A repeated target raises =OriginEaError=./  Two children may name one parent, but one
+  key may not name two households, and =gsec1= and =AGSEC1= may not give one household two
+  =ea=.  The error counts and names no household.  It subclasses =Exception=, because
+  =_join_v_from_sample= used to catch =ValueError= (which the =MergeError= it replaces was) and would
+  have served every household table with no =v=; since GH #1546 it catches only a missing source.
+  One build worker raises the class itself.  Under parallel workers a class in a by-path module does
+  not pickle (GH #1524), so =__reduce__= sends a plain =Exception= carrying its name and message,
+  which the derived-table paths do not catch.  Since GH #1524 (2026-11-05) the relay would carry it
+  as =errors.WaveWorkerError= without that, so =__reduce__= looks redundant, by reading; removing it
+  edits =uganda.py= and moves every Uganda hash, so it waits for a re-warm, with the class's docstring.
+  Measured by injecting one disagreeing household, one and two workers: =sample=, =household_roster=,
+  =household_characteristics=, =food_expenditures= and =interview_date= all raise, on a wave subset
+  and on all waves, and nothing is written.  =Feature= drops Uganda with a warning, and
+  =conversion._interview_dates= returns ={}= with a warning, its fallback for any build failure.
+
+*The 149 + 66 of 2018-19 with no =ea=*, by what the source says about them:
+
+| households | =t0_hhid=                 | what it is                                                                                                                   |
+|------------+---------------------------+------------------------------------------------------------------------------------------------------------------------------|
+|         73 | 8 characters              | the form of a 2015-16 =HHID=; in no column of any of the 119 2015-16 =.dta=.                                                 |
+|         76 | 5 characters (=H= + 4)    | in no 2015-16 file; 46 would parse to a 2015-16 EA and 30 would not, so these are not truncated ids.                          |
+|         66 | (not in =GSEC1=)          | households only 2018-19 =AGSEC1= records, the =unlocated-= singletons of GH #1120 D2.                                        |
+
+The variable's label is "Full wave5 UNPS household ID or wave6 split-off Parent
+Household ID", and the library holds no wave 6, which is the likely home of the 73
+and the 76; that is an inference and nothing here depends on it.  All 149 are
+=response_status= 1 in =GSEC1=.  In 2019-20 the 230 with no =ea= are 69 blank
+=hhidold=, 43 naming a 2018-19 household only =AGSEC1= records, and 118 descending
+from the 149.
+
+*=AGSEC1= as a second source (ruling @ligon, 2026-11-04).*  =sample= first read
+=ea= from =GSEC1= alone, as first ruled.  =AGSEC1.ea= is the same variable on a second
+cover: it is non-null for the 72 households only =AGSEC1= records in 2015-16, its 58
+labels for them are all on =gsec1=, and it equals =gsec1.ea= on all 2,622 households
+both covers hold.  So it fills those 72 directly, and the 49 of 2018-19 and 45 of
+2019-20 whose tracking key names one of them.  Both routes raise if a release breaks
+the equality.  *The key stays =GSEC1='s.*  =AGSEC1.t0_hhid= in 2018-19 is a different
+matter and is not followed: it disagrees with =GSEC1.t0_hhid= on 86 of the 3,176
+households both files hold, and on those 86 its value (1-3 or 7 characters) is never
+a 2015-16 =HHID=.  So the 66 households only 2018-19 =AGSEC1= records stay NA.
+
+*Mechanics.*  =origin_ea= is a real =dfs:= sub-df with the 2015-16 =gsec1= and =AGSEC1=
+as its =file:= list, and its country-level hook re-keys that frame to the current wave's =hhid=.
+Two reasons: the files' sidecars are then in the wave's =_input_hash= (2019-20 also
+declares its bridge, 2018-19 =GSEC1=, under a key that is not in =dfs:=, which
+=_collect_file_paths_from_block= hashes and =grab_data= never reads), and a loss the
+GH #515 handler catches costs =ea= and not =v=.  =Derivation= stays on =sample=:
+=_join_v_from_sample= carries =v= alone, and the =ea= column reaches no other table.
+
+*What losing a source costs.*  =sample= for 2018-19 and 2019-20 now reads other waves'
+covers, and that protection is partial.  Measured in the review of this change,
+2026-11-03, with a private L1 under =unshare -rn=:
+
+| lost                                 | result                                                                                                                                   |
+|--------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------|
+| 2015-16 =gsec1=, remote unreachable  | =EndpointConnectionError= is outside the #515 handler's tuple, so =sample= for both waves raises after about 90 s and =v= is lost too (GH #1463). 2019-20, which needed only its own cover, built in 1.5 s on base and raises at 89 s now. |
+| 2015-16 =gsec1= or =AGSEC1=, =FileNotFoundError= | soft: =ea= is absent, every row and =v= survive (simulated; =tests/test_gh689_uganda_ea_psu.py=).  One =file:= list, so the whole column goes rather than 49 values of it: an =ea= that survived partly would not count as a lost column, and #675 would not grade the parquet degraded. |
+| 2015-16 =AGSEC1= behind a readable =gsec1=, =FileNotFoundError= | measured, fresh processes: =ea= is absent on both inherited waves and =v= survives.  The stamp names =gsec1.dta=, the sub-df's first file, so the #675 probe finds it readable.  Every fresh process rebuilds with =CacheRebuildWarning=, and =DegradedCacheWarning= never fires.  It heals once the file returns. |
+| 2018-19 =GSEC1=, 2019-20's bridge    | =ea= drops and =v= survives, but the drop record names the readable 2015-16 file (the sub-df's one =file:=), so the #675 probe returns True.  Every fresh process rebuilds (about 70 s offline), =DegradedCacheWarning= never fires, and #675's "one probe per process" breaks through its one-source-per-sub-df assumption.  It heals when the blob returns. |
+
+*Measured, cold =98c6069d2= vs cold =6db7bf0d5=, 2026-11-03.*  Every declared Uganda
+table, =Feature('sample')= over Uganda, Albania and Malawi, and
+=household_characteristics=, =food_expenditures= and =sample= under
+=market='Region'= are frame-equal (=check_exact=), 31 of 31, once =ea= and this key
+are set aside; warning counts match table by table, and =updated_ids= and
+=check_panel_consistency= are identical.  A fresh-process warm read equals the cold
+build.  =Feature('sample')= keeps a unique index, =ea= is NA for the other two
+countries (12,225 Uganda values), and =derivation_inputs= joins 5,801 of 5,801
+stamped rows with equal values.  The cost is one Uganda re-warm: 28 of 28 Uganda
+country hashes and 224 of 224 Uganda wave hashes move, none elsewhere, and no build
+fingerprint.  The canonical =data_info.yml= declaration alone moves nothing.
+
+Standard error of a weighted mean, clustered on =ea= over clustered on =v=, on the
+same households (315-317 EAs, 702-864 parishes):
+
+| outcome              | 2013-14 | 2015-16 | 2018-19 | 2019-20 |
+|----------------------+---------+---------+---------+---------|
+| household size       |    0.98 |    1.01 |    1.00 |    0.99 |
+| log food expenditure |    1.00 |    1.01 |    1.14 |    1.11 |
+
+So the column matters for some statistics and not others: clustering on the parish
+understates the food standard error by about a tenth in the two inherited waves, and
+changes nothing visible in the two direct ones.  Why the ratio rises in those waves is
+not established.  This is one small check on two means, not a general claim about the
+size of the design effect, and it does not show that the inheritance is correct.
+
+=market='ea'= raises =KeyError= from =cluster_features=.  It was not asked for, and a
+market is a place, which =ea= is not.
+
+**** One label across all eight waves (GH #1459)
+
+/Ruling @ligon, 2026-11-04./  In 2005-06 to 2011-12 =v= already is the EA, under =comm=,
+so no one label named a PSU across the panel.  =sample.ea= now fills those waves through
+a reviewed table, =comm_ea= in =categorical_mapping.org=, read by =uganda.comm_ea=:
+
+- A =comm= one of the 212 the survey later numbers takes that number.  The pairs are
+  =GSEC1.ea= (2013-14) against =GSEC1.comm= (2011-12), linked by =HHID_old=, 1,717
+  households, one to one.  Stamped =Uganda::sample::ea-comm-link=.
+- The other 110 of the 322 frame EAs rotated out before any household could link them.
+  Each takes its own 8-digit =comm=.  Stamped =Uganda::sample::ea-own-comm=.
+- A blank =comm= stays NA, as does a code that is not 8 digits: 2009-10's 541 =@lat,lon=
+  bins and 28 =unlocated-= households, 2010-11's one =1530040=, 2011-12's 57.  A bin is
+  not an EA.
+
+A table and not a read of the 2011-12 and 2013-14 covers, for the same reason as
+=comm_frame_ea=: it adds no source to =sample= in four more waves, where a lost remote
+already raises in two (GH #1463).  =tests/test_gh1459_uganda_early_ea.py= re-derives it
+from the raw covers.
+
+| wave    | numbered rows / EAs | own =comm= rows / EAs |    NA |
+|---------+---------------------+-----------------------+-------|
+| 2005-06 | 2,066 / 212         | 1,057 / 110           |     0 |
+| 2009-10 | 1,612 / 210         |   798 / 107           |   569 (55 since GH #1536) |
+| 2010-11 | 1,802 / 212         |   913 / 109           |     1 |
+| 2011-12 | 1,917 / 212         |   933 / 109           |    57 |
+
+/Filled since 2026-11-12 (GH #1536, at the end of this file): 514 of the 569 now carry the
+household's own label from another wave, and 3.53% of the weight is left.  The paragraph is kept as
+the case that was put to the maintainer./
+
+*2009-10 stays NA where =comm= is blank, as ruled, and that is a lot of weight.*  Its 569 NA rows
+hold 29.32% of the wave's weight (mean weight 1.55, against 0.87 for the rest).  514 of them hold a
+label on the same household in another wave, so a fill would leave 3.53%.  This section defines
+=ea= as carried when a household moves, and most of these are that wave's movers and split-offs,
+so the fill would be consistent with it, and it is a construction the ruling did not ask for.  It
+is drafted as a follow-up.  For comparison, =ea= is NA for 0.12% of 2010-11's weight and 0% of
+2011-12's (its 57 have no weight).
+
+*Two kinds of label in one column, and why it is left that way.*  The ruling allowed a
+new column if mixing looked wrong on the numbers, and it does not.  Across all eight
+waves =ea= holds 427 labels: 212 panel EAs that appear both early and late, 110 that
+appear only early, and 105 refresh EAs (324-430) that appear only late.  No 8-digit label
+appears after 2011-12 and none collides with 1-430, so =groupby('ea')= gives one group
+per PSU.  (Still 427 after GH #1536: every label it fills is one another wave already
+serves.)  Every household linked across a boundary keeps =ea= on all seven (measured before
+GH #1536, whose filled households keep it by construction): 2,410 of
+2,410, 2,207 of 2,207, 2,510 of 2,510, 1,717 of 1,717, 2,872 of 2,872, 3,022 of 3,022 and
+2,868 of 2,868.  (Only the first three test anything.  The other four cannot come out
+otherwise: the table's construction, UBOS's encoding above, and twice a walked id and an
+inherited =ea= that follow one tracking key.)  A second column would split the one thing
+the column is for.  The column is a label: its form and its numeric order mean nothing,
+and =ea= stays a =str=.
+
+*=ea= is the rank of =comm=.*  /New, 2026-11-04./  Sort the 322 frame EAs of 2005-06 by
+=comm= and number them from 1: that number is =ea= on all 212 rows of the table, and
+the 110 numbers in 1-322 no later household carries are exactly the ranks of the other
+110.  No document states it.  It reads no household, so it is independent evidence that
+the pairing is right; =tests/test_gh1459_uganda_early_ea.py= pins it.  It also means the
+110 could carry a number and the column a single form, which the ruling did not have in
+front of it.  They are served their =comm=, as ruled; the alternative is a memo in the PR.
+
+*Measured, cold development =14c0f5790= vs cold =c63f7e700=, one node, 2026-11-04, with the
+=AGSEC1= source and the =Aggregate= split below.*  38 calls: every declared Uganda table,
+=labels='Aggregate'= on the food tables, =market='Region'= and =market='District'=, and
+=Feature= over =sample= and =household_roster= (with Albania and Malawi) and
+=food_expenditures(labels='Aggregate')= (with Nigeria, GhanaLSS, Malawi and EthiopiaRHS).  30 are
+frame-equal (=check_exact=).  The other 8 are =sample= by itself, under =market='Region'= and
+through =Feature=, each equal once =ea= and =Derivation= are set aside, and the 5 =Aggregate=
+reads, each moving only the labels that CONTENTS says.  Warning counts match on all 38.  The other
+countries are frame-equal.  Hashes: 27 of 27 Uganda tables and 216 of 216 Uganda wave hashes move,
+0 of the other 515 tables across 37 countries, and 0 of 38 build fingerprints.  So the cost is one
+Uganda re-warm.  =var/sample= is the one entry of the 53 in =tests/fixtures/uganda_baseline.json=
+that moves.
+
+**** TODO Decisions the ruling leaves open
+
+1. /The 73 + 76 of 2018-19./  A wave 6 household file would settle what those ids
+   name.  Until then they stay NA; parsing the id is the alternative already declined.
 
 *** =v= across waves: three different defects (GH #942)
 
@@ -67,30 +315,91 @@ boundary -- recorded per boundary in =Uganda/_/sampling.yml='s =panel:=
 blocks, which drive the =ClusterIdentityWarning= on any =Country('Uganda')=
 frame carrying =v= across them:
 
-1. *Two renderings of =comm= (a harmonisation gap, not a redraw).*  Across
-   2010-11 -> 2011-12 (both map =v: comm=), 0 of 2,510 linked households keep
-   =v=.  The survey files carry two renderings of the same EA code (int32
-   8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11); the
-   library serves both un-harmonised, so the 0% is a harmonisation gap, not a
-   redraw.  For 272 of the 322 cluster pairs the 8-digit form is the 7-digit
-   form with one digit inserted at position 3 (=1020001 -> 10210001=); the
-   other 50 also re-code the district field.  2005-06 and 2011-12 share 321 of
-   their 322 / 321 =v= verbatim.  The linkage is verified, so 2011-12 is
-   declared =wave-scoped= (=unobservable= means "no verified linkage", which
-   is false here) and a frame carrying =v= across 2010-11 -> 2011-12 warns.
-   It becomes =stable= once the rendering is harmonised, which needs the
-   322-pair table, not a digit rule: the Uganda =comm= rendering issue (to be
-   filed; DESIGN.org Q5, ruling 2026-10-18).  /History:/ first declared
-   =unobservable= (provisional) on 2026-10-19, on the reading that this was a
-   library defect rather than a survey fact; reversed the same day (dispatcher
-   call on red team r1 H1, @ligon informed), because the raw =GSEC1.dta= files
-   themselves carry both renderings (measured via =get_dataframe=: int32
-   8-digit in 2005-06 and 2011-12, 7-character string in 2009-10 and 2010-11).
+1. *Two renderings of =comm= -- HARMONISED by GH #1133 (2026-10-22).*  The raw
+   GSEC1 files write the same EA as an int32 8-digit code in 2005-06 / 2011-12
+   ("EA Code in 2005/06") and as a 7-character string in 2009-10 / 2010-11, and
+   the library used to serve both, so 0 of 2,510 linked households kept =v=
+   across 2010-11 -> 2011-12 (and 0 of 2,607 across 2005-06 -> 2009-10).  The
+   7-character waves are now served the 8-digit frame EA through the reviewed
+   =comm_frame_ea= table in =categorical_mapping.org=, applied by
+   =uganda.comm_frame_ea= on =sample= and =cluster_features= (same function on
+   both, so =_join_v_from_sample= still hands every table one key).
+   Measured after (=Country('Uganda').sample()=):
+
+   | boundary              | before          | after                  |
+   |-----------------------+-----------------+------------------------|
+   | 2005-06 -> 2009-10    | 0 / 2,607       | 2,410 / 2,607 (92.4%)  |
+   | 2009-10 -> 2010-11    | 1,819 / 2,647   | 2,207 / 2,647 (83.4%)  |
+   | 2010-11 -> 2011-12    | 0 / 2,510       | 2,510 / 2,510 (100%)   |
+
+   (/Measured cold 2026-11-04/: the first two rows stand, and the last is now
+   2,510 / 2,540.  The other 30 are on 2011-12's =AGSEC1= only and carry the
+   =unlocated-= singleton of GH #1120 D2, which is no change of cluster.)
+
+   Every remaining non-keeper is a 2009-10 =@lat,lon= bin or no-=v= household
+   (defect 2).  Served distinct =v=: 2009-10 656 -> 656 (317 EAs now 8-digit,
+   339 bins and 24 NA untouched), 2010-11 324 -> 322, 2005-06 / 2011-12
+   unchanged.  2011-12 is declared =stable= in =sampling.yml= (it was
+   =wave-scoped= from 2026-10-19: "=unobservable= means no verified linkage",
+   which was false; dispatcher call on red team r1 H1, @ligon informed).
+
+   *There are three code families, not two, and the community files name
+   them.*  CSECTION1 (2005-06 =csec1=, 2009-10, 2010-11) keys on a 7-character
+   =comm= labelled "Community Code According to 2005/06 District Definitions",
+   and from 2009-10 also carries =comcod=, "... According to 2009/10 [2010/2011]
+   District Definitions"; 2011-12 =CSEC1= pairs an 8-digit =comm= with a
+   7-character =comcod= ("Community code current").  The 2005/06-definitions
+   form is the 8-digit code with its 4th digit dropped -- all 317 2005-06 ->
+   2009-10 household pairs, and every community-file =comm=.  2009-10 GSEC1
+   writes that form; *2010-11 GSEC1 writes the CURRENT 2010/11 definitions*
+   (321 of its 324 codes match that wave's CSECTION1 =comcod=, only 273 its
+   =comm=), so 50 EAs re-code the district field (=1140003 -> 11030003=) and no
+   digit rule recovers them.  That is also why 388 households changed =v= across
+   2009-10 -> 2010-11 before this fix, which the =mixed= note blamed on the bins
+   alone.  /Contradicts/ "2010-11 ... movers and split-offs got re-coded with
+   their original-sample EA" (§"Hybrid =v= in 2009-10" below): same EA, but
+   written in a later district definition for 50 of them.
+
+   *The table* (370 pairs) is every =(7-character, 8-digit)= pair seen on one
+   household across the four early boundaries (HHID is unchanged 2005-06 ..
+   2011-12, so that is the library's linkage), and every row is corroborated
+   by at least one community file's own =comm=/=comcod= pairing -- though for
+   14 rows (13 "drop 4th digit" plus =2220022 -> 20530022=) that support is the
+   drop-4th-digit rule alone: no 2011-12 =CSEC1= pairing names them and no
+   chain from a CSECTION1 row to a =CSEC1= row does.  The rule itself is
+   validated (every community-file =comm=, 320 / 320 / 322), and the chain
+   =CSEC1= -> 2010-11 CSECTION1 agrees with it for 308 of =CSEC1='s 309 EAs.
+   The 309th is a contradiction *in* =CSEC1=: it pairs =comcod 3010003= with
+   =comm 30130033=, but no GSEC1 household in any wave carries =30130033=,
+   while 10 sit on =30130003= in both 2005-06 and 2011-12.  The table follows
+   the households (=3010003 -> 30130003=); =30130033= is most likely a typo in
+   =CSEC1=.  No 7-character code ever meets two 8-digit codes.  The issue's
+   "2 non-bijective pairs" (=1070027=, =1150027= -> =10730027=; =3060002=,
+   =3180002= -> =30630002=) are one EA under two district definitions inside
+   2010-11, paired on one row by CSECTION1 itself, so both codes are mapped.
+   In raw 2010-11 GSEC1, =1070027= is written by two households (one original;
+   one 2010-11 split-off, never linked) against nine on =1150027=, and
+   =3060002= by one against eight on =3180002= (the table's household columns
+   count linked households only: 1 / 8 and 1 / 7).  One 2010-11 code,
+   =1530040= (one household, on no linkage and in no community file), is NOT
+   in the table and keeps its 7-character rendering.
+
+   *Cost, stated*: the served =v= is no longer the literal key of the
+   2009-10 / 2010-11 CSECTION1 files (literal =comm= matches were 2,399 and
+   2,250 households; now 0).  2005-06's =v= never was the =csec1= key (0 of
+   3,123 households match it literally, before and after), and 2011-12's
+   still is (=CSEC1.comm=, 2,764 households).  No Uganda table reads a
+   community file; a consumer joining
+   CSECTION1 should drop the 4th digit of =v= to get its =comm= (or use the
+   table).  /History:/ declared =unobservable= (provisional) on 2026-10-19,
+   then =wave-scoped= the same day, then =stable= on 2026-10-22.
 2. *Synthetic =@lat,lon= bins in 2009-10* (see the next-but-one subsection):
    339 of that wave's 656 =v= are 0.05-degree GPS bins, not clusters, so its
    two boundaries are declared =mixed=.
 3. *A change of KIND*: EA (=comm=) -> parish code (2013-14) -> =DISTRICT/PARISH=
-   name composite (2018-19).  Declared =redefined=; no crosswalk can exist.
+   name composite (2018-19).  Declared =redefined=; no crosswalk can exist for
+   =v=.  (/2026-11-03/: the EA itself is not lost.  It is served as =ea=, above,
+   GH #689.)
 
 *** Why 2018-19 / 2019-20 =v= is a =DISTRICT/PARISH= composite (GH #323)
 
@@ -190,10 +499,17 @@ dropped these 565 households in =roster_to_characteristics='s
 =groupby=), =sample()='s =v= column in 2009-10 is populated by a
 hybrid rule:
 
-- =v = comm= (7-digit numeric string) when =comm= is non-blank —
-  2 410 households, 317 distinct panel EAs.  Matches CSECTION1's
-  =comm= index exactly, so community-questionnaire joins work as
-  they always did.
+- =v = comm= when =comm= is non-blank — 2 410 households, 317
+  distinct panel EAs — served since GH #1133 as the 8-digit frame EA
+  (=comm_frame_ea=), the same code 2005-06 and 2011-12 write.  This
+  bullet used to say the 7-digit =v= "Matches CSECTION1's =comm= index
+  exactly, so community-questionnaire joins work as they always did".
+  Measured 2026-10-22, that was nearly but not exactly true: 315 of the
+  317 matched; =1020016= (3 households) and =2030008= (8) are in neither
+  CSECTION1 =comm= nor =comcod=.  The same holds of the 4th-digit-dropped
+  form now served: =CSECTION1.comm= = =v= without its 4th digit for 2,399 of
+  the 2,410 households, all but the same two EAs (served as =10210016=, 3
+  households, and =20330008=, 8).
 - =v = "@{lat:+.2f},{lon:+.2f}"= (a /synthetic/ label prefixed with
   =@=, binned to a 0.05° grid ≈ 5.5 km) when =comm= is blank but
   coordinates are available — 541 households, ~339 distinct bins.
@@ -234,7 +550,9 @@ and a fabricated cluster would be worse than a missing one.
 Why only 2009-10 gets the hybrid treatment: 2010-11 and 2011-12
 also use =comm= from GSEC1, but their raw surveys populated it for
 every household (movers and split-offs got re-coded with their
-original-sample EA), so no fallback is needed.  From 2013-14 onward,
+original-sample EA), so no fallback is needed.  (2010-11 writes that EA
+in its 2010/11 district definitions for 50 EAs; see item 1 of "=v=
+across waves" above.)  From 2013-14 onward,
 =v= is a parish identifier — every household has one — and the
 issue disappears by construction.
 
@@ -250,10 +568,11 @@ household-level column for every Uganda wave (it reads the same
 → Central fold in 2009-10 and 2010-11 where applicable).
 
 Practical consequence: =Country('Uganda').sample()[['v','Region']]=
-is complete for every household; joining =Region= from =sample()=
-— rather than =cluster_features()= — avoids dropping the 565
-movers/split-offs from any =(i, t, m)=-keyed regression where =m=
-is derived from Region.  Recommended pattern:
+holds =Region= for every household a cover records it for; joining it from
+=sample()= — rather than =cluster_features()= — keeps the 565
+movers/split-offs in any =(i, t, m)=-keyed regression where =m=
+is derived from Region.  It is not complete: 130 of 24,561 rows have none
+(next subsection, and the audit caveat below).  Recommended pattern:
 
 #+begin_src python
 uga = ll.Country('Uganda')
@@ -268,11 +587,98 @@ cluster-level view (e.g., summarising EAs); use =sample()[['Region']]=
 when you want every surveyed household covered.
 
 Audit caveat (2026-09-16): =sample(waves=['2019-20'])= returns 3,098
-households, of which three have missing =Region=. Thus the blanket
-completeness statement above does not hold for every source record, even
+households, of which three have missing =Region=. (Since GH #1120 D2 so do 4 in
+2009-10, 57 in 2011-12 and 66 in 2018-19, the =unlocated-= households on no
+cover.)  Thus no blanket completeness statement holds for every source record, even
 when the household-level join avoids the known mover problem. The
 [[file:../../../../SkunkWorks/aggregation/evaluation.org::*Uganda observation patterns][food aggregation simulation]] reports these three explicitly and uses the
 remaining 3,095 households; it doesn't infer their Region from a cluster.
+
+*** HH-level =District= on =sample()= (GH #1441, 2026-11-04)
+
+=market='District'= reads =sample()= first and =cluster_features()= second, and
+=sample= had no =District=.  So the only source was the cluster table, where
+=reduce_to_agreed= blanks a cluster whose households disagree.  They do, because
+=comm= is the EA of origin and the label is the household's own (2011-12 is qualified
+below): one mover, or one carved-out district (=LIRA= / =ALEBTONG=), blanked the label
+for every household on that EA, though each carried its own.  =sample= now carries the
+column =cluster_features= reads, through the same formatter.
+
+| wave    | cover column     | no label, before | after | what is left                                 |
+|---------+------------------+------------------+-------+----------------------------------------------|
+| 2005-06 | =h1aq1= names    |                0 |     0 |                                              |
+| 2009-10 | =h1aq1= codes    |               71 |     6 | 4 on no cover (=AGSEC3B= / =GSEC12= only), 2 blank |
+| 2010-11 | =h1aq1= names    |              898 |    12 | blank, on an EA whose households disagree    |
+| 2011-12 | =h1aq1= mixed case |          1,172 |   131 | 57 on =AGSEC1= only, 74 blank on such an EA  |
+| 2013-14 | =h1aq1a= codes   |                0 |     0 |                                              |
+| 2015-16 | =district= names |                0 |     0 |                                              |
+| 2018-19 | =distirct_name=  |               66 |    66 | on =AGSEC1= only, whose =region= is blank for all 66 |
+| 2019-20 | =district= names |                1 |     1 | blank                                        |
+
+- /Disagreement, not absence, was the cause./  92 EAs in 2010-11 and 106 in 2011-12
+  disagree.  9 of the 106 (95 households) differ only by case, =KAMPALA= / =kampala=,
+  125 spellings of 106 names, and =2011-12/_/mapping.py= folds that, so their
+  =cluster_features.District= is back.  The other 97 stay =<NA>= there, correctly.
+- /The two tables agree./  Where both have a value they are equal, 22,341 of 22,341
+  households (=Region=: 23,956 of 23,956), and =m= is the household's own label wherever
+  it has one.  107 households with a blank of their own (=Region=: 1) still take an
+  agreeing cluster's label; that is =_add_market_index='s existing fallback, unchanged.
+- /What the label says it is./  =h1aq1= is "District Code as of 2009/10" in 2009-10 and
+  "District Name as in 2010/11" in 2010-11; =h1aq1a= is "District of residence in
+  2013/14"; =district= is "District where hh is interviewed" in 2015-16.  The 2010-11 BID
+  (PDF p. 4): "The locations of the households at the time of the 2010/11 interview were
+  therefore recorded" against the Ministry's August 2010 list.  On 2010-11's disagreeing
+  EAs, households off the EA's modal label sit nearer their own label's centroid: 70 of
+  88, median 14.0 km against 40.6 km.
+- /2011-12 is effectively 2010-11's label carried forward, not where the household is
+  now./  Its =h1aq1= is labelled only "District", and its BID (PDF p. 8) says Section 1A
+  "was distributed by the Headquarters staff to the field teams before starting data
+  collection".  Of 2,510 households linked to 2010-11, 2,488 keep the label, 20 are blank
+  in both, 1 is blank in 2011-12, and 1 changes, with no GPS in either wave.  All 12
+  labelled households whose GPS moved over 5 km kept their label, 2 of them over 50 km.
+  141 of its 164 blanks have =wave= ("Wave when household was created/split off") 3,
+  which is what a carried-forward field predicts.  So 2,488 of 2,489 is largely circular:
+  it does not show the label is right, and a 2011-12 label can lag a move.
+- /Not a cross-wave vocabulary, so a cross-wave =m= is not comparable./  Codes in 2009-10
+  and 2013-14; Title case in 2005-06 and 2015-16; UPPER in 2010-11, 2011-12, 2018-19 and
+  2019-20.  Title and UPPER waves share at most one exact string, =NTOROKO=, which
+  2015-16 writes in upper case.  Spelling and carve-outs split it further: 2015-16 writes
+  =Ntugamo= where the others write =NTUNGAMO= (56 linked households), and the six name
+  waves hold 141 names even with case folded.  The =districts= table in
+  =categorical_mapping.org=
+  (=Miyana= -> =Mityana=, =Kalanga= -> =Kalangala=, ...) is read by nothing, and not all
+  of it is a spelling: =Bugweri= -> =Bugiri= folds what 2018-19 records as two districts.
+  =MIYANA= (2010-11) and =KALANGA= (2011-12) are one household each, on EAs that
+  disagree anyway, so they blank nothing and are left as recorded.
+
+=Region= (129 households, unchanged): 127 are on no household cover (2009-10 4, 2011-12
+57, 2018-19 66), and 2 are blank on the 2019-20 cover, whose =regurb= holds =0.0= or =0.1=
+for those rows.  A sweep of every =.dta= in those waves, by column name, finds no geography with a
+value for them.  What could fill them, and =District='s 216, is a construction, so:
+
+**** DONE Decision: fill the 129 and the 216 from a household's other waves?
+
+/Ruled @ligon, 2026-11-04: they stay NA./  Nothing cheap recovers the weight that matters.
+Inheriting a label from the same household's adjacent wave recovers 0.02% of 2011-12's
+weight, of the 10.3% that has no =District=.  Its 2013-14 code reaches 3.2%, and needs a
+code-to-name map that does not exist yet (=h1aq1a= is a 3-digit code and 2011-12 writes
+names).  That map is the one useful next step if =District= matters for 2011-12; it is
+not built.  The measurements behind the ruling:
+
+=District='s residual is not evenly spread: 131 households in
+2011-12 hold 10.3% of that wave's weight and 12 in 2010-11 hold 1.1%; elsewhere 0.1% or
+less.  The 74 cover blanks of 2011-12 are mostly new split-offs (60 with =wave= 3), mean
+weight 4.3 against 0.8.  The same household's label in an adjacent wave, in the same form
+(code or name), reaches 77 of the 129 =Region= and 74 of the 216 =District=, but recovers
+only 0.02% of 2011-12's weight; its 2013-14 code would reach 3.2% and needs a code-to-name
+map.  Agreement between name waves is 79.5%, 87.3% and 99.7% on the three =District=
+pairs other than the circular one (above), and 99.4% or better for =Region= on all seven
+boundaries.  A cluster mate's
+modal label matches 740 of 886 and 784 of 946 on the EAs concerned, and is not offered.
+
+Separately, =_add_market_index='s existing fallback is not "own label": 90 households in
+2011-12, 81 of them =wave= 3, take an agreeing origin EA's label and hold 12.4% of that
+wave's weight, and 22 of the 60 with GPS are over 5 km from their EA-mates.
 
 ** Rotating panel and refreshment sample
 
@@ -831,7 +1237,9 @@ The preferred labels include native units (=Kg=, =Gram=, =Litre=, =Akendo (Small
 =food_acquired()= renames the =u= index through this map; source-specific missing-unit handling then distinguishes =Unknown= from =Value= before the canonical parquet is written.
 
 The =u= table also retains the per-wave variant columns (=2005-06=, =2009-10=, ..., =2019-20=) that document the raw unit labels in each wave's Stata metadata.
-These extra columns are unused at runtime but preserve the cross-wave provenance previously captured in the retired =_/unitlabels.py= file.
+These extra columns preserve the cross-wave provenance previously captured in the retired =_/unitlabels.py= file.
+The =Code -> Preferred Label= build decoder does not use them.
+Query-time label selection uses the shared categorical-key resolver and can read them as source keys or requested targets.
 
 The legacy =_/unitlabels.csv= /=_/unitlabels.py= pipeline (which
 emitted a 2-column projection of the same data) was retired in
@@ -980,9 +1388,186 @@ The residual few percent in 2009-10 / 2011-12 is not the home/away fold
 (GH #845: among differing rows only 0.2-0.8% have both legs populated) and
 has not been explained.
 
+*That residual, characterised (GH #845 item c, raw files, 2026-11-03).*  The
+1,461 (2009-10) and 1,357 (2011-12) differing purchased rows:
+
+- are not rounding: =|price - value/qty| <= 0.5= UGX on 0.4% of them; most
+  differ by 5-100%, symmetrically (median price / unit value 0.997 / 0.990,
+  price the larger on 49%);
+- carry ROUND prices: 98.2% / 98.7% are multiples of 50 UGX, against 63.0% /
+  74.7% of the same rows' unit values; every 2009-10 price and all but one
+  2011-12 price are integers;
+- are diffuse: 1,008 of 2,860 households and 286 of 318 EAs (2009-10), 885 of
+  2,771 and 295 of 320 (2011-12); the top items are staples bought in small lots
+  (salt, maize flour, sugar, cooking oil);
+- over-represent fractional quantities (non-integer on 51% / 40%, against 21% /
+  16% of all priced rows).  In 2009-10, 408 of them record a quantity that is
+  not a multiple of 0.25 (0.9% of agreeing rows do), and for 70% of those
+  =value / price= is such a multiple: consistent with a quantity edited after
+  the price was set, for at most about a fifth of that wave's residual.
+
+Ruled out: the all-source unit value over all four legs (0.1% / 0.0% match);
+2011-12 =h15bq15 / h15bq14= (total consumption value / quantity, 0.0%); value
+over the rounded, floored or ceiled quantity (at most 15%); the median unit
+value of the same EA, item and unit (7% / 10%; 35% / 22% equal SOME other
+household's unit value there); the unit code (4-7% differing in every unit with
+200+ rows).  The mechanism is still unknown, and why these two waves run at ~5%
+against 1-2% elsewhere is not explained by their fractional-quantity share
+(similar in every wave).  Read the residual as a mixture of keying edits and,
+possibly, a minority of recorded round prices; not as an independent source.
+
 *How to use it.*  Treat =unitprice= as a copy of =unitvalue= for Uganda.
 Where the two DO differ, the difference is the interesting thing (a keying
 slip in one of three fields), not a second opinion on the price.
+
+* =labels='Aggregate'= keeps processing states apart (GH #833, 2026-11-04)
+
+/Ruling @ligon, 2026-11-04./  =Preferred Label= always kept states apart; only
+=labels='Aggregate'= folded them, and they do not cost the same.  =Maize=, =Millet=, =Cassava=,
+=Sweet Potatoes=, =Ground Nuts= and =Sim Sim= now keep one bucket per state in
+=harmonize_food=.  Variety still folds: white and yellow maize flour are one bucket.  This
+is a user-facing relabel.  =Preferred Label=, =Nutrition Label= and every default read are
+unchanged, and =Expenditure= and =Quantity= are conserved (below).
+
+| bucket           | what is in it now                          | moved out of the bare name                                       |
+|------------------+--------------------------------------------+------------------------------------------------------------------|
+| =Maize=          | =(grains)=, white and yellow               | =Maize (cobs)=, =Maize (flour)=, each with white and yellow      |
+| =Millet=         | code 115, =Millet=                         | code 1151, =Millet Flour= -> =Millet (flour)=; see below         |
+| =Cassava=        | =(fresh)=                                  | =(dry)= -> =Cassava (dry)=                                       |
+| =Sweet Potatoes= | =(fresh)=, white and orange                | =Sweet Potatoes (dry)=, =Sweet Potatoes (flour)=, each with both |
+| =Ground Nuts=    | =(in shell)=                               | =(shelled)=, =(pounded)= and =(paste)=, one bucket each          |
+| =Sim Sim=        | =Sim Sim=                                  | =Sim Sim (paste)=                                                |
+
+Twenty table rows change, and they move eighteen Preferred Labels, eleven of them served:
+=Cassava (dry)= is two rows, and the twentieth, code 182, was a defect.  =Cassava (flour)= had
+two rows with two Aggregates, =Cassava= and =Cassava (flour)=, and =_relabel_j= served the
+last, so it does not move as served.  Each Preferred Label now has one Aggregate.  The column
+goes from 80 labels to 90, and from 76 to 86 served.
+
+*The bare name is the harvest state, because =crop_production= reuses it.*
+=harmonize_crop= writes =Maize=, =Millet=, =Cassava=, =Sweet Potatoes=, =Ground Nuts= and
+=Sim Sim=, so that a crop's =j= joins =food_acquired(labels='Aggregate').j=.  Qualifying
+all six buckets would have cut those crops off that axis.  The join holds at the same
+counts, 126,432 of 134,164 crop rows and 42,957 of 46,918 sale rows.  What it means has
+narrowed: crop =Maize= meets food =Maize=, grains alone, and the crop's own state is its
+=condition= level.  Those states are also what most of these crop rows are in: =Maize=
+=dried_grain= 14,057, =Sweet Potatoes= =fresh= 9,346, =Cassava= =fresh= 7,950, =Ground
+Nuts= =dried_with_shell= 3,032.
+
+*What moved, =food_expenditures(labels='Aggregate')= (default basis), UGX, all waves, cold:*
+
+| before                    | after                                                        |
+|---------------------------+--------------------------------------------------------------|
+| =Maize= 50,913,635        | =Maize= 781,540, =(cobs)= 2,003,150, =(flour)= 48,128,945    |
+| =Millet= 5,045,440        | =Millet= 3,453,140, =(flour)= 1,592,300                      |
+| =Cassava= 14,274,785      | =Cassava= 10,319,820, =(dry)= 3,954,965                      |
+| =Sweet Potatoes= 11,192,725 | =Sweet Potatoes= 10,752,125, =(dry)= 386,200, =(flour)= 54,400 |
+| =Ground Nuts= 17,323,242  | =Ground Nuts= 838,025, =(shelled)= 2,140,585, =(pounded)= 12,184,647, =(paste)= 2,159,985 |
+| =Sim Sim= 3,435,070       | =Sim Sim= 3,248,920, =(paste)= 186,150                       |
+
+The total is 726,299,304.83 both ways, and the other 70 served Aggregates are equal.  =food_expenditures=
+goes from 242,043 rows to 243,043; =food_acquired= keeps its 355,571.  *=Maize= is now 1.5%
+of what it was*, because nearly all of it was flour; a user who wants the old bucket adds three.
+
+*The evidence is purchases in kg, median UGX per kg, by wave:*
+
+|                        | 2005-06 | 2009-10 | 2010-11 | 2011-12 | 2013-14 | 2015-16 | 2018-19 | 2019-20 |
+|------------------------+---------+---------+---------+---------+---------+---------+---------+---------|
+| =Maize (grains)=       |     450 |     800 |     700 |   1,500 |   1,000 |   1,000 |     800 |   1,250 |
+| =Maize (flour)=        |     600 |   1,200 |   1,400 |   1,800 |   1,800 |   1,800 |   1,700 |   2,000 |
+| =Ground Nuts (in shell)= | 1,200 |   1,550 |   3,000 |   2,250 |   4,083 |   3,000 |   5,000 |   5,000 |
+| =Ground Nuts (pounded)= |  1,600 |   2,800 |   3,350 |   4,000 |   4,000 |   4,000 |   5,000 |   5,000 |
+| =Sim Sim=              |   1,450 |   2,400 |   2,250 |   3,000 |   4,000 |   3,000 |   4,500 |   4,000 |
+| =Sim Sim (paste)=      |         |         |         |         |         |         |   5,000 |   5,000 |
+| =Cassava (dry)=        |         |         |         |         |     950 |   1,000 |   1,000 |   1,000 |
+| =Cassava (flour)=      |         |         |         |         |   1,000 |   1,000 |   1,000 |   1,100 |
+
+The thin cells are thin: =Maize (grains)= has 5-17 rows a wave, =Ground Nuts (in shell)= 1-12,
+and =Sweet Potatoes= is hardly bought in kg (=(dry)= 1-2 rows).  Cassava dry and flour cost the
+same and still stay apart: #833's rule is that price magnitude does not license a fold.
+
+*=Millet=: split as ruled, and what the evidence does and does not show.*  Code 115 stays
+=Millet= and code 1151 goes to =Millet (flour)=.  What code 115 holds is not settled.  No wave
+has answers on both codes: 115 is answered through 2015-16 and 1151 from 2018-19 (2018-19 also
+holds 3,172 unlabelled code 115 rows, with no unit, quantity or value on any of them).  So the
+1,500 against 3,000 cited for the ruling crosses 2015-16 -> 2018-19 and is not a same-wave gap.
+
+| wave    | paper form            | Stata value label | UGX/kg | / maize flour | / crop sale price |
+|---------+-----------------------+-------------------+--------+---------------+-------------------|
+| 2005-06 | =Millet=              | =millet=          |    800 |          1.33 | no crop rows      |
+| 2009-10 | no household form held | =Millet=         |  1,500 |          1.25 |              1.88 |
+| 2010-11 | =Millet=              | =Millet (flour)=  |  1,500 |          1.07 |              2.14 |
+| 2011-12 | =Millet=              | =Millet (flour)=  |  2,000 |          1.11 |              2.45 |
+| 2013-14 | =Millet=              | =Millet (flour)=  |  2,000 |          1.11 |              2.00 |
+| 2015-16 | =Millet=              | =Millet (flour)=  |  2,000 |          1.11 |              2.22 |
+| 2018-19 | =Millet flour=        | =Millet flour=    |  3,000 |          1.76 |              3.00 |
+| 2019-20 | =Millet flour=        | =Millet flour=    |  3,000 |          1.50 |              3.00 |
+
+(The same ratio to crop sale price is 1.60-3.00 for maize grain and 3.00-4.67 for maize flour.
+=food_expenditure_labels= in =nutrition.org= copies the Stata value labels.)
+
+- /Against one state:/ the form renames the item only at 2018-19.  The same Stata label set is
+  wrong on code 143 in the same four waves (below).  The national ×1.50 across 2015-16 -> 2018-19
+  is the largest of 13 items with n >= 30 (median 1.11, p90 1.25).  And #833 retains states until
+  source evidence authorizes a fold, and says meaning is not established by labels or price
+  magnitude.
+- /For one state:/ the Stata value labels say flour in 2010-11 to 2015-16, and there is no price
+  step at that label change (1.00, against a median of 1.17).  The share bought in kg runs 0.63 -> 0.62 across 2015-16 -> 2018-19
+  (maize flour 0.82-0.86, grain 0.15-0.35), and the own-production share 0.58 -> 0.57.  The
+  same-household step is ×1.31 (n = 30), beside sugar 1.29, pounded nuts 1.25 and rice 1.20.
+  Regional steps run 1.00-1.54.  The 2018-19 form offers no grain line.  And files sometimes know
+  more than the form: codes 180-182 are not on the 2013-16 forms.
+- /What the split costs:/ a series break at 2018-19, since =Millet= ends at 2015-16 and =Millet
+  (flour)= starts there, and anyone following millet across it adds the two.  717 crop rows (241
+  sale rows) in 2018-19 and 2019-20 lose a same-wave food partner.  The =Millet (flour)= label
+  matches GhanaLSS's exactly.
+
+Undoing it is one table cell.
+
+*What a bucket means across waves.*  A bucket follows codes, and what the forms and files call
+those codes moves.  Read a wave's label before reading a bucket as a series.
+
+- /=Cassava (dry/flour)= stays in =Cassava (flour)=./  The forms print =Cassava (Dry/ Flour)=
+  through 2015-16, while the files split it into codes 181 and 182 from 2013-14 (neither is on
+  those forms).  So =Cassava (flour)= is that one line to 2011-12 and flour alone after, and the
+  continuous series is =(flour)= plus =(dry)=.
+- /=Sweet Potatoes=./  The forms print =Sweet Potatoes (Dry/flour)= in 2013-14 and 2015-16, while
+  the files carry code 106 for dry and code 180 for flour.
+- /Some buckets start late./  =Ground Nuts (paste)= at 2010-11, =Cassava (dry)= and =Sweet Potatoes
+  (flour)= at 2013-14, and =Sim Sim (paste)= at 2018-19.
+- /Code 143 is shelled./  Its Stata value label reads =Ground nut seeds (unshelled)= from 2010-11 to
+  2015-16.  That is a metadata slip: the forms print =Ground nuts (shelled) 143= in 2005-06,
+  2010-11, 2011-12, 2013-14 and 2015-16.
+- /=Cassava (dry)= and =(flour)= in 2019-20 are served as labelled (GH #1525)./  Codes 1081 and 1082
+  do not behave as their labels say.  2019-20's 1081 has the unit mix (kg 0.54, basin 0.19, cup
+  0.16) of 2018-19's 1082 (0.54, 0.18, 0.15), and 2019-20's 1082 is heaps (about 0.72).  Of 2018-19's
+  1082 consumers, 62% consume 1081 in 2019-20 and 5% consume 1082, against unconditional rates of
+  24% and 4%.  Served, 2018-19 -> 2019-20: =Cassava (dry)= goes from 52 to 320 purchased rows and
+  511,650 to 2,322,965 UGX, and =Cassava (flour)= from 284 to 56 rows and 2,044,400 to 182,850 UGX.
+  So in that wave the split is not a state split.  The forms do not settle it: both print =108= Dry
+  and =108_1= Flour, and 1082 does not look like 2018-19's dry basins either, so this is not a
+  clean swap.  It is pre-existing at =Preferred Label=, and nothing is swapped without a source.
+- /Other Aggregates hold two states and were not ruled on/: =Beans= (fresh, dry), =Peas=
+  (=Peas=, dry), =Rice= (=Rice flour=), =Ginger= (fresh, powder), =Soybean= (fresh, dry).
+
+*What the split costs (cold, merge of development =14c0f5790=).*
+
+- /CFE by Region, default thresholds, one build, the fine table summed through each side's
+  column./  Items kept go from 43 to 46.  =Maize= and =Ground Nuts= drop out; =Maize (cobs)=,
+  =Maize (flour)= and the three nut states enter; =Millet (flour)=, with two waves, is not kept.
+  The betas support the split: cobs 0.726 against flour 0.435, shelled 0.879 against pounded 0.611.
+  36 common betas outside the families correlate 0.997, largest move 0.043.  The kept set is
+  fragile: with =Millet= left as one bucket the same run keeps 44, with Chicken, Cigarettes, Coffee
+  and Passion Fruits out and Kabalagala and Waragi in.
+- /Thin cells./  t-m-j cells under 30 rows go from 545 of 1,762 to 691 of 1,964.  =Sweet Potatoes
+  (dry)= and =(flour)= are 100% thin, =Maize= 88%, =Sim Sim (paste)= 86%, =Ground Nuts= 78%.
+- /Kg prices on the crop join are purer and far thinner./  Food kg rows a wave go from 822-1,246
+  to 5-17 for =Maize=, 394-691 to 1-12 for =Ground Nuts=, 2-212 to 2 in 2011-12 alone for =Cassava=,
+  and 1-2 to none for =Sweet Potatoes=.  No library code joins crop to food: =median_price_valuation=
+  uses crop sales, and =food_expenditures(valuation=...)= runs before the relabel.
+- /Pooled./  In =Feature('food_expenditures')(..., labels='Aggregate')= Uganda's =Maize= goes from
+  10,197 rows to 302, beside Nigeria's 3,249 and GhanaLSS's 4,512.  That aligns better, since Nigeria
+  keeps =Maize flour= apart, and Uganda's =Millet (flour)= (421 rows) now meets GhanaLSS's (187).
 
 * =people_last7days= counts MEMBERS, not visitors
 
@@ -1060,8 +1645,13 @@ cells.  Measured on the returned table:
 
 | Wave    | =District= | =Region= | =Rural= | =Latitude= / =Longitude= |
 |---------+------------+----------+---------+--------------------------|
-| 2010-11 | 27.8%      | 5.0%     | 4.4%    | 41.2%                    |
-| 2011-12 | 33.0%      | 7.8%     | 0.0%    | 49.8%                    |
+| 2010-11 | 27.7%      | 5.0%     | 4.4%    | 41.5%                    |
+| 2011-12 | 40.7%      | 21.7%    | 15.1%   | 57.4%                    |
+
+(Cold, 2026-11-04.  2011-12 now counts the 57 =unlocated-= singletons of GH #1120 D2,
+empty in every column.  On its other 321 clusters: =District= 30.2%, =Region= 7.8%,
+=Rural= 0.0%, GPS 49.8%.  Its =District= was 33.0% on those 321, and 43.1% on all 378,
+before the GH #1441 case fold.)
 
 That is the point: the old value was an arbitrary pick, or a composite,
 among disagreeing households.  Two causes of disagreement remain, and
@@ -1070,8 +1660,9 @@ neither is a bug we can configure away:
 1. /Panel dispersal/ — =comm= (2005-06 … 2011-12) is the *2005-06 EA of
    origin*, which the panel carries forward when it tracks a mover.  A
    household that moved district still reports its origin EA, so its
-   =District= / =Region= legitimately differ from its EA-mates'.  93
-   clusters in 2010-11, 106 in 2011-12.
+   =District= / =Region= legitimately differ from its EA-mates'.  92
+   clusters in 2010-11, 97 in 2011-12 (93 before GH #1133 merged two
+   codes, and 106 before GH #1441 folded 2011-12's case).
 2. /Sub-cluster variation/ — =v= is a PARISH from 2013-14 on, and a
    parish contains several enumeration areas, some urban and some rural,
    each with its own geovar fix.  =Rural= and the GPS are therefore not
@@ -1079,7 +1670,53 @@ neither is a bug we can configure away:
    in 2015-16 / 2018-19 / 2019-20 (70 in 2013-14).
 
 For a per-household answer use =sample()=, which carries exact
-household-level =Rural= and =Region= for every household.
+household-level =Rural=, =Region= and (GH #1441) =District= for every household
+whose cover records them.
+
+*Parish disclosure (GH #689).* The =data_scheme.yml= =cluster_features=
+block also states this grain distinction so a reader does not mistake its
+=v= for a design EA. This disclosure changes no keys, attributes or reducer:
+the conflict nulls remain the honest output. Whether a source-backed EA
+identifier can be obtained elsewhere is a separate source-search question;
+this note neither reconstructs one nor claims every shipped source lacks it.
+
+*The cover does ship an EA key in 2013-14 and 2015-16 (GH #689 item 3,
+measured 2026-11-03, raw files).* =GSEC1.ea= (2013-14, labelled "Enumeration
+area") and =gsec1.ea= (2015-16; also on both waves' =AGSEC1=) are int16,
+non-null for all 3,119 / 3,305 households, 317 / 316 distinct, median 10
+households each.  It is the design PSU *of origin*, not a current-location
+cluster, so it is no cleaner than the parish:
+
+| groups that mix ...  | 2013-14 =ea= | 2013-14 parish | 2015-16 =ea= | 2015-16 parish |
+|----------------------+--------------+----------------+--------------+----------------|
+| (number of groups)   |          317 |            706 |          316 |            875 |
+| =urban=              |          128 |             70 |          153 |             65 |
+| district             |          104 |              0 |          155 |              0 |
+| =region=             |           27 |              0 |           35 |              0 |
+
+- Panel households (=rotate= "Covered in wave 2011/12") carry =ea= 1-322.  For
+  the 1,717 linked by =HHID_old= to 2011-12 =GSEC1.HHID=, the 212 2011-12 =comm=
+  values and the 212 =ea= values pair one-to-one: =ea= renumbers the 2005-06
+  frame EA and carries it with movers, exactly like =comm= (cause 1 above).
+- Refresh households ("rotated in 2013/14") carry =ea= 324-430, 105 EAs from
+  the 2013 frame: nearly clean in 2013-14 (21 =urban=-mixed, 7 multi-parish, 3
+  multi-district) and already dispersed by 2015-16 (36 / 57 / 30).
+- 2018-19 / 2019-20: no household or agriculture =.dta= has a column named
+  =ea=, =EA_code=, =comm= or =comcod=.  =EA_code= / =t0_EA_code= (2018-19, 305
+  communities) and =Final_EA_code= (2019-20, 307) exist only in the community
+  files, which carry no household key.  2018-19 =GSEC1.t0_hhid= matches a
+  2015-16 =HHID= for 2,978 of 3,176 households.  (/2026-11-03/: 2019-20 =hhidold=
+  matches a 2018-19 =GSEC1.hhid= for 2,986 of 3,098, and the chain reaches =ea=
+  for 2,823; since =AGSEC1.ea= became a second source, 3,027 in 2018-19 and 2,868 in
+  2019-20.  See "The design PSU =ea=" under Sampling Design.)
+
+/Contradicts/ the 2013-14 =cluster_id_note= in =sampling.yml=, "A parish is
+not an EA, so no crosswalk can exist": true of the served parish =v=, but the
+survey's own =ea= pairs one-to-one with 2011-12 =comm= on all 212 linked EAs.
+(/2026-11-03, #689 decided/: =v= stays the parish, and =ea= is a separate column
+on =sample()=, because as =v= it would give MORE =Rural= conflicts than the parish
+(128 vs 70 groups in 2013-14), not fewer.  See "The design PSU =ea=" under Sampling
+Design; the 2013-14 =cluster_id_note= is corrected.)
 
 *GPS is not averaged.*  Where the within-cluster coordinates vary at all
 they vary by a MEDIAN of 4.6--42.9 km and by up to 584 km (measured, all
@@ -1114,6 +1751,24 @@ Measured effect of the whole change (cold build, =LSMS_NO_CACHE=1=):
 =var/cluster_features.parquet= has 4,809, the difference being the four
 2010-11 clusters below, which the framework's post-read
 =dropna(how='all')= removes.)
+
+/Since GH #1133 (2026-10-22)/ 2009-10 and 2010-11 =v= are the 8-digit frame
+EA, and two 2010-11 EAs that the raw file split across two district
+definitions are one cluster again (=10730027=, =30630002=): 2010-11
+=cluster_features= goes 320 -> *318* rows (=sample= serves 322 distinct =v=;
+the four all-conflict clusters below are still dropped) and the whole table
+*4,803* rows.  Every other cluster row is identical after the relabel.
+=30630002='s two halves agreed on everything.  =10730027='s GPS is now
+=<NA>=, and the cause is NOT its 2005/06-form household: that household's
+fix sits 0.0 km from eight of the nine =1150027= households.  The ninth, a
+2010/11-form household coded =MUBENDE=, is 34.66 km away (probably a
+mover; =comm= is the origin EA), so =1150027= was already =<NA>= under
+=reduce_to_agreed= before the merge, and the merged cluster inherits that
+conflict.  Effect: 2010-11 rows with a GPS fix go 188 -> 186 (one per merged
+EA), and =10730027= loses a fix that 9 of its 11 households share (9 of the
+10 that have one in the geovars file; the 2010-11 split-off has none).
+The four all-conflict 2010-11 clusters and their 42 households are unchanged
+(=21230011=, =21530004=, =30330009=, =30730018=).
 
 The 368 (2005-06) and the surviving NaN-key rows are still DELETED — that
 is decision D2 of =slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org=
@@ -2050,6 +2705,26 @@ not a repair of the general #788 builder-authority/sibling-write issue,
 which remains open. The October 15 #967 approval remains in force;
 no nutrition value, factor policy or fixture changes here.
 
+*** Requested-output builds preserve sibling caches (GH #1062, 2026-10-21)
+
+The authority question in the historical entries above was decided by the maintainer on 2026-10-17 and reaffirmed on 2026-10-18 (GH #788): the framework is authoritative for tables assembled from waves.
+The coupled-output defect is corrected here without changing the FCT or nutrition arithmetic.
+=nutrition.py fct= writes only =var/fct.parquet=, while =nutrition.py nutrition= (also the direct-invocation default) writes only =var/nutrition.parquet=.
+Both retain the existing food intersection and nutrient matrix; neither rewrites its companion.
+Their separate Make targets no longer run the legacy country =food_acquired= compiler as a prerequisite, because quantities already come from the normal Country API.
+
+=income.py= first asks the framework to materialize =earnings= and =enterprise_income=, then reads their verified raw country parquets with =get_dataframe=.
+Each sibling call temporarily selects =LSMS_BUILD_BACKEND=dvc= so that valid existing one-wave caches expand to the requested all-wave coverage even when income inherits the make backend.
+The exact original backend value (or absent key) is restored with =try/finally= before the raw read, including when materialization raises.
+Independent review found that pinning only the Make wrapper was insufficient: Make skips a valid partial target that already exists, serving 1,810 rows of 2011-12 as the all-wave income table instead of 14,740 rows over eight waves.
+Its original source sums, duplicate-key aggregation and household-union arithmetic remain unchanged; the finalized API return is deliberately not an operand.
+The Make targets for those two inputs are thin API calls with =LSMS_BUILD_BACKEND=dvc= pinned in the subprocess, so a make-backend request cannot recurse into itself.
+The historical concatenation scripts and their regression tests remain as reference; normal Make rules no longer run them.
+
+The Makefile edit moves every Uganda table's content hash and no other country's hash.
+This routing correction does not adjudicate the FCT source notes or live-API fallback (GH #771), and does not establish that GH #1078's nine-cell concurrent-suite corruption is repaired.
+See =.coder/ledger/1062-uganda-sibling-writes.md= and the scoped verification report in =slurm_logs/isa_backlog_2026-10-21/1062/=.
+
 ** TODO =cluster_features= 2005-06: 368 phantom rows from the =how='outer'= geovar merge
 :LOGBOOK:
 - Note taken on [2026-07-21 Tue] \\
@@ -2071,6 +2746,30 @@ no nutrition value, factor policy or fixture changes here.
   Pre-existing; unrelated to GH #323.  If a =unps_geovars_2019_20= file
   exists it should be wired in.
 :END:
+GH #592 answer (2026-10-23; the TODO keyword is left for a maintainer to
+close): *no such file was released.*  WB entry 3902
+(=UGA_2019_UNPS_v03_M=, still the latest release) lists 109 data files --
+the 109 we hold -- and none is a geovariables file; of its 1,963 documented
+variables none is a coordinate (the only GPS variables are parcel / plot
+AREA, =s2aq4=, =s2aq04=, =s2aq04_1=, =s2aq04_1_1=, and the flag
+=s2aq05_211_1= "Was GPS captured?").  It is the only wave here with no
+=unps_geovars_*= file (2005-06 holds a copy of 2009-10's).  The instrument
+DID record location: the household questionnaire's cover item "9. GPS
+COORDINATES" (LAT / LONG), and the BID (=unps2019_20_bid.pdf=, §3.1): "The
+GPS was used to collect information on household location".  The shipped
+=GSEC1= keeps cover items 2, 3, 4 and 7 (=s1aq02a=, =s1aq03a=, =s1aq04a=,
+=urban=) and drops item 9.  So 2019-20 is *asked-not-distributed*: 0 of 824
+clusters with coordinates, correctly unwired.
+
+The other waves' shortfall (measured cold on =development= =9a0ed5f3c=:
+2005-06 251/322, 2009-10 605/656, 2010-11 188/320, 2011-12 161/321, 2013-14
+619/706, 2015-16 743/875, 2018-19 618/781) is NOT a release or wiring gap.
+It is almost entirely =reduce_to_agreed= blanking where a cluster's
+households report different fixes -- Latitude cells blanked 70 / 51 / 135 /
+160 / 82 / 106 / 163 in those waves (=GrainConflictWarning=, on every
+build) -- the panel-dispersal and parish-not-EA causes recorded under
+=cluster_features= above.  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
 ** DONE =crop_production.intercropped= was wired to the SEED-USE question
 
 Found 2026-07-21 while closing the "silent colmap" gap above, by reading
@@ -3499,6 +4198,49 @@ fix-up (=gsec15c='s =hhid= is the wrong variable; the real one comes from
 are reading an old script or notebook against this table, check which level it
 thought was which.*
 
+** Early non-food household ID rendering (GH #1291)
+
+The 2009-10 and 2010-11 wave scripts pass the numeric =GSEC15c.hh= field
+to the country helper. Its legacy repair handles an already-stringified
+decimal ID but leaves a numeric float untouched. The scripts now apply the
+existing =local_tools.format_id= to the helper's household index before
+stamping =t=, so an integral numeric household code uses the same decimal
+string as =sample= and =household_roster=.
+
+The existing final uniqueness assertion runs after this rekeying; a collision
+raises before writing. Genuine missing IDs stay missing. This rendering
+normalization does not replace the separate 2015-16 =gsec1.hh= to =HHID=
+bridge, change item aggregation or expenditure arithmetic, or locate a
+household whose sampling cluster is genuinely absent.
+Synthetic tests execute both scripts and check household joins, exact payload
+and attrs preservation, leading-zero strings, missing IDs, the existing
+formatter's fractional-number policy, and refusal on a rekey collision.
+The original synthetic-only acceptance qualification is retained in the task
+ledger. Resumed cached-source verification (2026-10-30, public =d65e8b136=)
+found both =hh= sources finite, integral and within binary64's exact integer range,
+with a bijection after formatting. All 29,235 retained 2009-10 rows and 24,792
+2010-11 rows match their independent =GSEC1.HHID= covers; native amounts,
+items, order, dtypes, masks and attrs equal an independent source oracle.
+
+Fresh private-cache baseline/candidate standard Country/Feature builds each
+serve 251,588 rows over eight waves, followed by exact fresh-process warm
+readbacks with unchanged cache bytes, modes and mtimes. The other six waves
+(197,561 rows) and the complete =sample= frame remain exact. Only the two
+early waves' household rendering and consequent =sample.v= joins change:
+54,027 formerly unmatched rows become canonical; 53,783 obtain =v=.
+The remaining 244 rows are 21 households with a real =sample= row but missing
+=sample.v= in 2009-10, consistent with the documented unlocated-household
+design caveat. They are served by the default API; =LSMS_READ_STRICT= still
+refuses those null index keys. No cluster, location or eligibility is invented.
+The pre-existing five 2013-14 and sixteen 2019-20 null-=v= rows remain.
+Current targeted tests: 43 passed. Numeric verification checks masks and exact
+nonmissing NumPy values, with tiny/nextafter rejection controls, rather than
+relying solely on pandas' nullable-Float64 frame predicate (GH #1206).
+The existing conservative module fingerprint changes all 28 country-table
+hashes and 28 wave-table hashes in each edited wave (56 total); the other
+168 wave-table hashes remain unchanged. This can cause a one-time rewarm of
+other Uganda tables and is not evidence that those tables were validated.
+
 ** WAITING No =RecallWindow=, and the window is ITEM-SPECIFIC -- a real gap
 
 *Do not read the absent column as "Uganda uses one window".*  An earlier draft
@@ -3602,3 +4344,1891 @@ after: =shocks= =HowCoped0/1/2= 862 / 756 / 394 cells "etc<U+0085>)" ->
 condition and the GSEC15b units are decoded on numeric codes).  The =u=
 table's 2009-10 wave-label column, which recorded the raw =Fish <U+0096>...=
 spellings, was re-keyed to the en dash (inert: =u= is keyed on =Code=).
+
+* Food producer provenance during concurrent rebuilds (GH #1078, 2026-10-21)
+
+Uganda's script-produced food waves exposed a framework read-to-existence
+race.  A normal concurrent country rebuild can remove a hashless wave
+parquet after another process has read its correct canonical frame.
+=Wave.food_acquired= used the path's later existence to decide whether to
+apply its legacy sum reducer.  The missing path made it reduce the already
+canonical 2011-12 frame, turning six genuine missing Quantities and three
+missing Expenditures into zeros under a normal current country hash.
+Both actual sample/currency tests still passed in a controlled two-process
+reproduction; a fresh process then served those nine zeros from the cache.
+
+The producer route now travels privately with each =grab_data= result.
+Reading a script/YAML parquet or successfully materializing YAML output
+does not become an in-memory producer when its path is subsequently
+removed.  Legitimate in-memory output retains the existing legacy reducer;
+an unrelated old cache path does not change that provenance.  No public
+DataFrame attribute carries this internal origin, and no source value,
+unit, category, household identity or nutrition arithmetic is changed.
+The content-producing food method is versioned so corrupt current-hash
+country caches can rebuild normally.  The =grab_data= plumbing also moves
+the existing all-table build fingerprint, a broad cache invalidation cost.
+
+*2026-11-04 (GH #1455, ruling @ligon)*: the legacy reducer named above is gone.
+In-memory output is now the frame a successful write stores.
+
+The controlled reproductions on f8 and reviewed #1062 match the exact
+historical nine-cell signature.  The original historical full-suite
+writer and interleaving remain unidentified.  #1062's requested-output
+sibling correction is separate from this framework producer mechanism;
+its independent evidence must not be read as resolving #1078.
+
+* Native crop observations retained (GH #1198, 2026-10-22)
+
+=production_obs= follows =season= in the native crop index.
+The old seven-level sum/first reducer combined distinct harvest and sale
+records, including equal served payloads; its "just de-duplication of repeated
+identical source rows" comment did not describe those records.
+The earlier *OPEN GRAIN QUESTION* above correctly identified the missing level.
+The new coordinate preserves each eligible record before the existing explicit
+=harvest_kg= transformation reduces quantities converted with their own factors.
+
+- 2011-12 uses =productionID= / =production2ID=; 2013-14 and 2015-16 use
+  =Production_ID= / =Production2_ID=. These serve =reported:<ID>= after the
+  existing identifier formatter.
+- 2018-19 and 2019-20 use =slot:1= / =slot:2= for the actual mapped CONDITION
+  slot. Reordering the column-map list does not rename the slot. These are
+  not calendar seasons: A/B are module names, and the 2015-16 A module covers
+  the second season of 2014 while B covers the first season of 2015.
+  The existing scheme's "A (first season) / B (second season)" shorthand
+  must not be interpreted as calendar order in every wave.
+- 2009-10 and 2010-11 use the explicitly CONSTRUCTED
+  =row:<source-fingerprint>:<physical-zero-based-ordinal>=. A missing reported
+  ID value uses =missing-id:row:...=; a missing declared ID COLUMN raises.
+  Loaders pass the same literal source path they read to the existing
+  =local_tools.source_fingerprint=. Its =dvc:= identity contains the source
+  name and SHA256 of the declared sidecar, NOT the raw DTA MD5.
+  The coordinate is tied to the release and physical row order, not a panel
+  entity. Synthetic helper callers must provide explicit synthetic references.
+- Repeated IDs/slots suffix EVERY occurrence with its =/row:...= locator,
+  including identical payloads. Repeating one physical source/row/slot is a
+  loud uniqueness error. Source positions are captured before selection and
+  crop-roster joins; a DataFrame's own index is not the physical coordinate.
+- The legacy null-key boundary is preserved exactly: the old reducer dropped
+  null old-key records only when the OLD seven-level index was nonunique.
+  A wholly unique old index retains its null record. The held sources still
+  exclude the same 403 records (360 in 2009-10, 43 in 2011-12); the sample join
+  still retains all 928 eligible public records with missing =v=.
+
+Held-source normal default/Make builds retain 133,761 observations, versus
+133,331 old keys. No factor mapping, unit/condition decoding, sample join,
+identifier walk, eligibility screen or 2015 sale-value x100 correction changes.
+In particular the swapped 2013 variable labels, 2018 missing A harvest-unit
+source and mixed legacy/WB slot names remain the recorded survey caveats.
+GH #849's twelve proposed factor bindings are separate.
+With current factor wiring, whole-harvest output still has 78,571 rows; retained
+records change the total by 2,091 kg through their own factors and existing
+median pools. There is no new =production_observation= attrs carrier.
+Feature uses the declared =unresolved_observation= sentinel for countries
+whose served rows do not resolve this axis; that asserts no native row count.
+
+Two measured caveats remain outside this fix.
+The country Make builder returns all seven supported waves for either
+=waves=['2018-19']= or the unsupported =waves=['2005-06']=, on both heads;
+default public output returns only the requested wave or zero rows respectively.
+Warm Make calls rewrite native cache files on both heads.
+The author's private run measured 17 byte-identical files with changed mtimes
+and unchanged modes; the independent review measured the same 17 paths
+changing from 0644 to 0600 as well as changing mtimes.
+These are separate observations, not a general guarantee that
+warm Make preserves modes or performs zero writes; no payload change or
+permission repair is part of #1198.
+Separately, =transformations.py= says "on Uganda the parcel key matches on
+100% of crop rows." Actual held-area controls on BOTH heads match 14,022 of
+40,409 converted harvest parcel keys, with zero literal-plot matches.
+The full real parcel-yield frames are unchanged by #1198. This contradicts
+that blanket coverage claim; its remaining ID/area routing requires separate
+diagnosis, not an inferred repair here.
+
+* Reported harvest rates at native observation grain (GH #849, 2026-10-22)
+
+The five previously unwired rounds now carry their own reported kg-per-unit
+fields through the existing builder: =a5aq6d=/=a5bq6d= in 2010-11, 2011-12,
+2013-14 and 2015-16, and =s5aq06d_1=/=s5aq06d_2=/=s5bq06d_1=/=s5bq06d_2=
+in 2019-20.
+These are twelve mapping additions, not a new factor estimator.
+The three 2018-19 bindings and the unwired 2009-10 map remain unchanged;
+this does not adjudicate an additional 2009-10 source carrier.
+The retained 133,761 native observations, source fingerprints, actual slots,
+production IDs or explicit release-row observations, 403 conditional old-null
+exclusions and 928 public null-=v= records remain exact.
+All non-=KgFactor= values, units, conditions, quantities, sales, dates and
+metadata remain exact at their corresponding serialization stages.
+
+Raw and served factors are different layers.
+The helper already applies =pd.to_numeric(errors='coerce')= and
+=kgf.where(kgf > 0, np.nan)=; this work preserves both operations.
+Raw literals remain in the private source oracle, while nonnumeric and
+nonpositive reports remain missing in the served frame.
+Positive over-cap, year-like and Kg-not-one reports are retained in the
+reported column and rejected only by the unchanged downstream screen.
+The new mappings add 82,103 nonmissing reported values at the retained grain.
+
+The earlier note says the move "would be small and in the right direction"
+and immediately cautions that "small" must be measured.
+The normal held-source parent/candidate comparison measures harvest_kg
+29,095,413.407893993 -> 42,026,694.99297963 kg (+12,931,281.585085638), with
+78,571 -> 88,980 plot-crop output rows.
+The rejected historical scalar-carrier projection of about 42.035M kg is
+not this result: each retained observation is converted before aggregation.
+The layer counts are now reported 96,747, survey_median 4,840, metric 23,406,
+none 8,768, with 439 implausible reports rejected; shipped/inferred remain zero.
+The new reports also change fine/coarse median support for other records in
+the same round, rather than only the cells whose own factor was added.
+
+Agreement is measured against nominal label-derived factors, with
+=volume_as_mass=True= and no price inference or declared factor table.
+Among rows with finite positive factors on both sides, the screened-report
+10% / 20% agreement counts are 9,667 / 11,252 of 15,085 (2010-11),
+5,625 / 7,390 of 10,758 (2011-12), 5,214 / 6,081 of 9,526 (2013-14),
+8,508 / 9,671 of 13,542 (2015-16), and 8,052 / 9,465 of 12,602 (2019-20).
+These denominators do not require a reported Quantity.
+Unit/condition dispersion and screen counts are retained in the task report;
+no disagreement is rescaled, averaged, relabelled or hidden by an exception.
+The #829 2015 sales-release WAITING entry and the settled 2018-19 slot-label
+adjudication above retain their existing meanings.
+
+The real area frame remains 42,841 rows, exact to the parent.
+Parcel yield has 14,022 -> 14,520 matched output keys, including 498 newly
+convertible keys and 7,335 changed shared values; literal plot yield remains
+empty on both heads.
+This does not repair the existing #1205 area/key coverage limitation.
+The #1204 country-Make subset-routing defect also remains.
+Cold/warm support =cluster_features.v= still changes from pyarrow StringDtype
+=na_value=pd.NA= to =na_value=np.nan= with zero null values on both heads,
+the distinct Uganda manifestation recorded in #1196; no common cause is proved.
+
+Normal DEFAULT warm reads, new Country objects, matched Feature and CLI calls
+leave private cache bytes, modes and mtimes exact.
+In this separate GH849 run, warm Make changed the same 17 byte-identical paths
+from 0600 to 0644 and changed mtimes on both parent and candidate.
+This is a separate observation from the prior GH1198 opposite-direction
+measurement; it implies no initial-copy provenance or universal mode guarantee.
+Populated DEFAULT subsets recompute sampling/population/recall metadata, so
+filtering an already-finalized all-wave frame is not a full-attrs oracle.
+The original strict subset comparison stop is retained in the task evidence.
+See =slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/= for the safe report,
+source-grounded aggregates, exact hash scope, tests and explicit evidence limits.
+
+* Parquet index policy: cluster keys (GH #1196, 2026-10-22)
+
+The held eight-wave cluster cohort serves 4,805 rows with no null =v= values.
+The reported =Index/v= diagnostic described the extracted level; the complete public frame has a MultiIndex.
+In the verified native wave parquets, 2009-10 records =v= as =numpy_type="string"= and the other seven waves record =str=.
+The all-wave country union records =string=.
+The generic parquet reader preserves each field's recorded missing policy instead of Arrow 25/pandas 3 replacing =string= with =str=.
+It does not impose one policy on all native waves.
+
+A 2019-20 singleton therefore retains its native =str= policy through Make, while a Default request filters the all-wave country union and retains =string=.
+The same existing route difference also leaves Default with two all-null optional GPS columns and unused all-wave index levels, whereas Make serves the three native columns and the requested wave's levels.
+Those complete frames are not identical and were not normalized to claim equality.
+The recorded native 2019-20 writer input, prepared frame, footer and returned Make subset agree; the country footer and returned Default subset also agree.
+The reader repair leaves the EA/GPS-bin/parish conventions, missing-Region caveat, source joins and cluster reducers unchanged.
+
+* Parcel yield after household walking (GH #1205, 2026-10-22)
+
+The native crop constructor joins the explicit formatted source household,
+parcel and plot fields as =hhid-parcel-plot=.
+The Default household walk changes =i= but retains the native household
+embedded in =plot_id=.
+The former parcel extractor required the embedded prefix to equal the current
+=i=, so it returned the whole plot string after a valid household walk.
+This is a wiring defect, separate from missing or nonpositive area.
+The source-backed check finds an exact inverse from the right for all 56,841
+retained unique native plot tuples; the parcel and plot suffixes are nonempty
+ASCII-decimal tokens in all 140,961 associated raw harvest rows.
+These checks use the actual source columns, not a guessed household width or
+a choice of key based on improved area matches.
+
+=yield_kg= now uses that native constructor inverse only for a Country operand
+carrying the existing =attrs['country']='Uganda'=, when the current-=i= prefix
+branch misses and the native household and numeric suffix checks pass.
+An explicit country index level or column disables the new fallback, even
+with a stale scalar country attribute.
+It also requires the common household key =i= and rejects an explicit
+conflicting area-country attribute; unmarked area operands retain the declared
+DataFrame contract.
+Unmarked, other-country and malformed identifiers keep the former fallback.
+No source or public =plot_id= is rewritten, and no index field or grain is
+introduced.
+The separate =fertilizer_rate= route remains under GH #1110.
+
+At the post-factor source =491daf5654b9ee45332bec97e1296ae821ff46d5=, the
+133,761 crop observations and 42,841 area rows remain exact.
+The area frame contains 37,636 positive rows and 37,634 positive parcel keys.
+Before this repair, 42,481 converted route keys partition into 14,520 exact
+positive-area matches, 438 exact-but-ineligible keys, 27,521 directly witnessed
+native-household prefix failures and two native parcels absent from the area
+rosters.
+The prefix-failure group has 21,165 positive-area, 6,348 ineligible-area and
+eight absent-area witnesses.
+These are fallback route keys, not additive additional yields: multiple crop
+plots can belong to the same parcel.
+The prospective =(t, canonical_i, raw_parcel)= census over all retained crop
+and all area witnesses finds no keys with multiple native households, so there
+is no household-alias area/harvest collision to adjudicate in this repair.
+
+| Wave    | Former route keys | Former yield keys | Source-parcel keys | Yield keys |
+|---------+-------------------+-------------------+--------------------+------------|
+| 2009-10 |              4400 |              4024 |               4400 |       4024 |
+| 2010-11 |              4230 |              4212 |               4230 |       4212 |
+| 2011-12 |              4249 |              4247 |               4249 |       4247 |
+| 2013-14 |              6671 |              1889 |               4685 |       4685 |
+| 2015-16 |              8419 |                90 |               4946 |       4944 |
+| 2018-19 |              7764 |                 5 |               4799 |       1027 |
+| 2019-20 |              6748 |                53 |               4650 |       4616 |
+| Total   |             42481 |             14520 |              31959 |      27755 |
+
+The result equals the independent oracle that takes parcel identity directly
+from the raw source columns and applies the existing converted-harvest sum,
+positive-area sum, inner join and division.
+It adds 13,235 yield keys, loses none, and leaves every former yield value
+unchanged at its existing key.
+The full crop and area operands, =harvest_kg= and literal-plot yield remain
+exact; the literal route still returns zero rows.
+The remaining 4,204 converted source parcels do not have a matching positive
+area under this existing route.
+The unchanged area preference, 2,500-acre clamp, nonpositive-area screen,
+A/B area sum and factor ladder are not repaired or reinterpreted here.
+The earlier blanket "100% of crop rows" statement was false; coverage depends
+on both convertible harvest and eligible area.
+The pre-factor 14,022/40,409 measurement above remains a historical result,
+not a target for this factor-stage diagnosis.
+
+Normal Default cold and fresh-process warm controls retain six exact complete
+frames and unchanged warm cache bytes, modes and mtimes.
+The first source-oracle comparison stopped because its index join retained
+unused levels whereas the API constructs observed-only levels; the corrected
+expected axes follow that API contract and preserve the actual frames.
+The #1204 Make subset route, #1196 storage difference, #829 release WAITING
+entry and other scientific/unit caveats retain their separate meanings.
+
+* Requested crop waves use framework assembly (GH #1204, 2026-10-22)
+
+The country =_/crop_production.py= compiler and its country-parquet Make rule
+are retired.
+That compiler concatenated every native wave without accepting a requested
+wave set, which explains the supported and barren subset caveat recorded above.
+The existing framework now assembles this table on both Default and Make,
+using the same seven native loaders, canonical household ID walk and
+wave-to-country grain-audit transport.
+The reviewed household map terminates in one step in every wave, so replacing
+the compiler's local walk with the existing framework walk changes no binding.
+
+2005-06 remains genuinely barren: it has crop-area allocation without
+crop-level harvest quantities.
+The existing typed-empty path answers that request before a country-cache
+rebuild or write; it preserves any other waves already cached.
+Default supported builds retain the existing coverage manifest and monotone
+union rule.
+Make uses requested native waves and writes no country crop parquet.
+The direct =make crop_production= target builds only the native wave parquets.
+
+This changes routing, not the source observation, identifier, factor or
+scientific contracts recorded under GH #1198 and GH #849.
+Native =production_obs=, reported factors, the conditional legacy null-key
+boundary, the sample join and the 2015-16 sale-value correction are unchanged.
+The older country-builder subset and warm-write measurements above remain
+historical evidence; they are not guarantees about this new route.
+The separate area/key limitation (GH #1205) and support-string null-policy
+observation (GH #1196) remain outside this change.
+
+* Constructed empty crop columns retain declaration order (GH #1215, 2026-10-22)
+
+A barren crop request constructed by the framework retains the original
+=data_scheme.yml= field order, including optional fields in their declared
+positions.
+For this table that order equals the native helper's explicit eight-column
+projection: =Quantity, Quantity_sold, Value_sold, Unit_sold, Condition_sold,
+harvest_month, intercropped, KgFactor=.
+The previous required-before-optional grouping moved the sold-label columns
+behind the two later required fields on this newly exposed GH1204 route.
+
+Required/optional membership, index identity, nullable dtype handling and the
+GH1204 no-build/no-country-cache-write boundary remain unchanged.
+Populated output is not reordered.
+This empty-construction rule does not promise that every country's native
+writer uses declaration order or emits every optional column.
+The separate country-local optional-dict dtype gap is not repaired here.
+
+* =plot_labor=: a missing use-flag is not "No" (GH #1250, 2026-10-23)
+
+=uganda._labor_persondays= zeroes a source's person-days where the survey's
+use-flag says "No", mirroring the World Bank's =replace hired_man_days = 0 if
+A3aq41==2= (=UGA_UNPS1.do:484=; the same rule in every =UGA_UNPS*.do= that
+reads a hired block).  In
+Stata a missing flag is not === 2=, so the row keeps its reported days, and a
+row with no reported days stays missing.  The library cast the flag through
+=_to_int_code= (nullable =Int64=), so =flag != code= was =<NA>= for a missing
+flag.  =Series.where= reads =<NA>= as False, so *every missing-flag row was
+served =PersonDays = 0=*.  That included empty stub rows and rows whose day
+cells WERE reported.  The zero is now applied only where the flag positively
+equals the code: =out.mask((flag == code).fillna(False), 0.0)=.
+
+Survey facts this leans on, measured on the raw AGSEC3A/3B:
+
+- *The 2009-10 / 2010-11 family gate =a3aq38= / =a3bq38= is a WORKER COUNT*
+  (0 to 94), not a yes/no, which is why its "No" code is 0.  The hired gates
+  (=q41= in 2009-10 / 2010-11, =q34= after) are 1 Yes / 2 No.  2009-10 hired
+  also carries two off-scheme 0s per season and one 3 (=a3bq41=).  They are
+  not "No", so their reported days are served as before.
+- *Missing flags are concentrated in 2009-10*: 1,365 / 1,452 (A family / hired)
+  and 1,836 / 1,879 (B) rows, against 0 to 170 per cell in later waves.  Most
+  are stub rows whose =a3aq1= / =a3aq3= (parcel / plot) are also blank, so the
+  =hhid-parcel-plot= key is NaN: 1,098 of 9,898 rows (A) and 1,759 of 9,789
+  (B).  No later wave has more than 5.
+- 2018-19 has no family cells and no season-B labour block, and 2019-20's family
+  roster (=AGSEC3A_1=) is not in-repo.  So only =hired= carries a gate there,
+  and the fix touches only =hired= rows in those waves.
+
+*Measured, cold, private =LSMS_DATA_DIR= per side, development =9a0ed5f3c= vs
+the fix* (=Country('Uganda').plot_labor()=):
+
+| quantity                                     | before    | after     |
+|----------------------------------------------+-----------+-----------|
+| rows                                         | 169,877   | 164,692   |
+| rows removed, NaN =plot_id= / valid plot     | --        | 3,561 / 1,624 |
+| served zeros                                 | 78,823    | 73,541    |
+| rows 0 -> reported positive days             | --        | 97 (+2,745 days) |
+| positive values changed                      | --        | 0         |
+| =PersonDays= total                           | 3,052,057 | 3,054,802 |
+| Site I NaN =plot_id= (2009-10 / 11-12 / 13-14) | 3,646 / 5 / 5 | 85 / 5 / 5 |
+| Site I NaN =v=                               | 1,235     | 1,218     |
+
+Valid-plot removals by wave: 2009-10 898, 2010-11 526, 2011-12 18, 2013-14 14,
+2015-16 2, 2018-19 22, 2019-20 144.  Every removed row was a zero.  The total
+RISES because 97 rows have a missing flag and reported days that development
+served as 0.  By wave: 2009-10 45 (one on a plot-less row, 28 days), 2010-11
+43, 2019-20 B 9.  Those rows are served as reported, which is what the Stata
+rule does.  Every surviving zero has a "No" flag or reported zero days behind
+it: =tests/test_uganda_plot_labor_flag.py= re-derives this from the raw files
+for 2009-10 and 2010-11.  An independent raw-source oracle reproduces both
+frames' row, zero, positive, total and NaN-key counts in every (wave, season)
+cell.
+
+*Wage-only hired rows are served (ruling @ligon, 2026-10-23).*  A hired row
+with a reported =Wage= and no day cells is served on its wage, with
+=PersonDays= NaN (not 0).  This follows Malawi's =_plot_labor_block=
+(=Malawi/_/malawi.py:3766-3767=: =... | (source == 'hired') & Wage.notna()=).
+The fix commit above had dropped 7 such rows (missing flag; development served
+them with a fabricated =PersonDays = 0=).  The raw oracle shows the class is
+larger: *85 rows*, all of them in 2009-10 and 2010-11, and 78 of them carry a
+"Yes" flag.  Neither development nor the first #1250 commit ever served those
+78, because their day sum is NaN and a "Yes" is not "No".  Measured, cold,
+=90fc1e18d= vs the follow-up:
+
+| wave, season | flag "Yes" | flag missing | of which wage 0 | rows added |
+|--------------+------------+--------------+-----------------+------------|
+| 2009-10 A    |         36 |            2 |               0 |         38 |
+| 2009-10 B    |         26 |            3 |               0 |         29 |
+| 2010-11 A    |          7 |            0 |               1 |          7 |
+| 2010-11 B    |          9 |            2 |               1 |         11 |
+| total        |         78 |            7 |               2 |         85 |
+
+- 164,692 -> 164,777 rows: 85 added, 0 removed, and 0 changes to =PersonDays=,
+  =Wage= or =v= on the 164,692 common keys.  Wages total 6,062,000 UGX; the 7
+  missing-flag rows are the 414,000 above.  No added row lacks a plot (so GH
+  #1120 D3 is not touched), none folds into an existing key, and every one
+  gets a =v=.  Site I is unchanged (NaN =plot_id= 95, NaN =v= 1,218), and
+  Sites B and Q report nothing on either side.
+- No other flag class has a wage-only row: the off-scheme 2009-10 codes (0, 3)
+  never carry a wage without days.  Later waves have none.
+- *Two zero wages are served* (2010-11 A 1, B 1, both "Yes").  Malawi's test is
+  =Wage.notna()=, so a reported 0 counts as a reported wage.
+- *A "No" flag with a wage was already served, and still is.*  The gate zeroes
+  the days, and the row is served with =PersonDays = 0= and its wage.  That is
+  17 raw rows (2009-10 13, 2010-11 4; 456,700 UGX), 12 of them with day cells
+  that the "No" zeroes.  Malawi has no flag and keeps any hired row with a
+  wage, so this agrees with its rule.
+- *Malawi's other half is NOT adopted.*  Malawi also drops =PersonDays == 0=
+  rows of every source.  Uganda keeps them, because a "No" flag's zero is a
+  reported value (73,541 served zeros).  Family and other rows therefore keep
+  the days-only rule, and they have no wage to be served on.
+
+Downstream: =total_*_labor_days= drop NaN days before summing, so all three are
+byte-identical (16,442 / 11,700 / 16,438 household rows; 3,054,802 days).  A
+median-wage valuation of hired days (=median_price_valuation=,
+=value_col='Wage'=, =kg_qty=PersonDays=, ladder =v= -> national by wave) keeps
+the same 21,513 rows in the price pool and the same price and value on every
+common row.  The 85 new rows receive a ladder price but a NaN value, because
+NaN days times a price is NaN.  A consumer that wants each wage itself now has
+it.
+
+*Residual NaN =plot_id= (GH #1120 D3, unchanged).*  95 rows are still served
+with a NaN =plot_id=, 50 of them with positive days: 2009-10 85 (45 positive),
+2011-12 5 (1), 2013-14 5 (4).  The final =groupby(..., dropna=False).max()=
+puts every plot-less row of a household-season-source on one NaN key.  So it
+folds DISTINCT source rows, not just duplicates: 2009-10 70 positive plot-less
+source rows -> 45 keys (69 -> 44 before the fix), 2011-12 2 -> 1, 2013-14
+4 -> 4.  Two valid-plot keys (4 positive rows) also go through that max.
+Keeping the rows apart needs a =plot_id= sentinel or a row ordinal, which is
+D3's decision, so it is reported and left alone.  This is also why Site I's
+NaN-=plot_id= count is much larger here than on the other Uganda plot tables.
+=crop_production= and =plot_inputs= collapse with =dropna=True=, and only when
+their index is non-unique, so they DELETE most NaN-key rows rather than serve
+them.
+
+*Downstream* (=transformations.total_*_labor_days=, which drop NaN and sum): the
+day totals rise by the same 2,745 (family +1,787, hired +958).  Household rows
+fall 16,481 -> 16,442 (all sources), 11,714 -> 11,700 (family) and 16,480 ->
+16,438 (hired), because households whose only rows were fabricated zeros leave
+the table.
+
+*Cost*: =uganda.py= is in every Uganda table's hash.  The census moved 28/28
+Uganda L2-country and 224/224 Uganda L2-wave hashes, no other country's, and
+0/40 =build_transforms_fingerprint=, so this is a Uganda-only re-warm.  The
+wage-only follow-up moves the same set again: =uganda.py= and
+=data_scheme.yml= give 28/28 and 224/224, against both development and
+=90fc1e18d=, and 0/40.  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/1250-uganda-labor-flag/= (follow-up:
+=r2/=); ledger =.coder/ledger/1250-uganda-labor-flag.md=.
+
+* Country plot-feature compiler refuses declared-wave read failures (GH #1287, 2026-10-28)
+
+All eight registered Uganda waves declare =plot_features= through their native
+=_/plot_features.py= scripts. The country compiler formerly caught EVERY
+reader exception and continued, so a missing or malformed declared wave could
+be silently omitted while the remaining waves were written as a country table.
+The compiler now checks the existing =Wave.data_scheme= declaration API first
+and raises with wave/table context and the original cause on a declared read
+failure, before the ID walk or writer. A genuinely undeclared wave may skip.
+The parcel =_A= / =_B= conventions, area values, null payloads, concatenation
+order and existing household walk are unchanged.
+
+This is a source/synthetic refusal repair, not a measured real-data rebuild.
+The actual shipped compiler has finite invented-reader controls: the original
+source silently accepts four failure types, while the candidate refuses them;
+the healthy eight-wave output is identical. Other broad catch/continue sites
+in =anthropometry=, =livestock=, =plot_inputs= and =plot_labor=, and the narrower
+=FileNotFoundError= skip in =interview_date=, remain separate #1287 work.
+No source acquisition, cache content, native database or baseline was accessed.
+Ledger: =.coder/ledger/1287-uganda-concatenator-refusal.md=.
+
+* Public compiler composition and declaration folders (GH #1287, 2026-10-29)
+
+The eleven active country compilers for =assets=, =shocks=,
+=months_food_inadequate=, =nonfood_expenditures=, =anthropometry=, =livestock=,
+=plot_inputs=, =plot_labor=, =interview_date=, =food_acquired= and
+=plot_features= select registered logical waves through =Country.waves=,
+resolve physical folders through =Country.__getitem__=, and check
+=Wave.data_scheme='s native-script/YAML union before reader access. A genuinely
+undeclared table skips even when an old output is offered; a failed declared
+read propagates before any household walk or country write. Food preserves
+DataFrames instead of squeezing singleton or one-column frames.
+
+This isolated public-base candidate extracts only compiler wiring and tests;
+scientific helpers, wave sources, sample/cluster policy, IDs, schema and
+fixtures keep public bytes. Existing concat/casts/date filtering, duplicate
+nonfood-key refusal, parcel A/B vocabulary and exactly one local ID walk stay
+unchanged. All-empty inputs retain the existing walker/concat failures.
+
+The private ten-compiler208case evidence is retained history, not verification
+of this public composition. Its additional23case plot carrier had not run
+before the crash; the profile observer now chains the prior guard callback.
+Fresh exact-candidate verification remains pending. Real source, Make/cache,
+Country/Feature, rewarm and scientific acceptance are separate; no source
+acquisition or fixture update is implied. Ledger:
+=.coder/ledger/1287-uganda-public-compiler-composition.md=.
+
+
+* Nonfood compiler, direct Make and API verification (GH #1287, 2026-10-30)
+
+Independent review accepts the bounded =nonfood_expenditures= runtime cell.
+Eight native wave contributions total 251,588 rows.  Native helper outputs
+match an independent literal selection/grouping expectation; writer CALL
+matches that native frame and writer RETURN matches stored readback.  The
+country compiler performs one local ID walk and one write, matching the
+walked concatenation and stored output exactly.
+
+Direct GNU Make target execution and the ordinary default Country API both
+completed.  The ~LSMS_BUILD_BACKEND=make~ route and Feature were not tested.
+The API serves 251,588 rows with 265 null-v rows.  The documented 244 target
+plus 21 other-wave partition is retained prior evidence, not a fresh partition
+measurement.  The 2015-16 =gsec1.hh -> HHID= bridge and historical helper's
+=j= household / =i= item convention remain explicit.
+
+API stage-2 and finalizer comparisons establish composition using existing
+production transforms; they are not independent scientific oracles for those
+transforms.  Strict checks include typed attrs, complete axes, ExtensionArray
+values, masks and exact nonmissing NumPy values.  Tiny/nextafter controls
+remain distinct from scientific evidence; no tolerance or normalization was
+introduced to pass a comparison.
+
+Seventeen source objects (42,450,844 bytes) were authenticated and privately
+copied.  Make used nine raw reads/decodes; API used eighteen; the fresh warm
+process used none and preserved the full cold row order and values.  All 35
+tracked data-root files retained bytes, mode and mtime.  Five phases exited
+0 with no timeout and closed descendant trees; total 344.655 seconds.  Prior
+observer and launcher failures remain failed history, not successful checks.
+
+Executed source =3ea9e97f7e207486ac1ec6ce3246cccf16075b76= has production bytes
+identical to =0b88881e9bd7e8b8838552fb4b2d4e7cabab5268=; dispatch
+=ac78fc566dc84a37b2213dea08d3e9ff=.  Independent review authenticated 23 ordinary
+files, 53 production bindings, nine operator files and 193 private witness/log
+hashes without deserialization or data replay.  Review SHA256:
+=1b1d9d1f3b93c744ef7c93848f8b07b4455bd59f73e53b5201303654cc9f2b1e=.
+Other compilers, #1288, the recall contradiction and broader scientific
+acceptance remain separate; this does not close the fourteen-country #1287.
+
+* 2026-10-30 -- other-table float-string ID check (GH #1291)
+
+After merged #1325, a fixed-public source audit covers all 28 declared/derived
+objects, with new normal API checks on ten surfaces. Complete per-index-value
+checks find no integer-float strings matching =-?\d+\.0= in assets, shocks,
+earnings, enterprise income, sample and the food-acquisition family across all
+eight waves, or months_food_inadequate across its five declared waves. This
+extends the existing diagnostic's sampled majority check; it is not a claim
+that all 28 objects received fresh API builds.
+
+A plausible native cast risk was refuted: GSEC17 (2009-10) and GSEC17A (2010-11)
+=HHID= are already strings, unlike the numeric GSEC15C =hh= responsible for
+#1325. Their direct string casts introduce no =.0= suffix and =format_id=
+changes none of those source IDs. YAML idxvars, agricultural/anthropometry
+formatters, interview-date formatting and inherited-ID paths are recorded
+separately from actual API observations. The other entries retain explicit
+source-only or prior-acceptance status; stale shared/retained caches were not
+accepted as current evidence.
+
+No producer, mapping, quantity, unit, ownership or eligibility change follows.
+The repaired 54,027 nonfood IDs remain distinct from the genuine 244 target
+plus 21 other-wave unlocated rows. The #1290 nine unsupported keys, #1297 parcel
+question and #689 parish/EA disclosure are unchanged. Exact table/wave/source
+coverage and preserved preflight failures are in the recovery report
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1291-other-table-final-v1/REPORT.md=.
+
+* 2026-10-30 -- PART harvest is separate from condition, but its additivity is unresolved (GH #647)
+
+The exact declared 2019-20 agriculture questionnaire (MD5
+=cef8ef24c8c1c27241b907d46eb09b35=), pp. 13 and 16--18, asks for amounts
+already harvested and sold from crops planted in the second season of 2018.
+Its ordinary 5A page distinguishes fully/partially/not harvested at Q5.3;
+Q6 separately asks quantity, unit and physical condition. The separate 5A1
+PART page repeats the same planting-season reference. PART is therefore not
+a fresh/dry condition, and the form does not support dismissing its quantities
+as merely prospective output. This does not establish that they are additive.
+
+The agriculture manual (MD5 =3162ca349c56b7c0c1b12ade21bc1364=), printed
+pp. 2,22--25 (PDF pp. 4,24--27), specifies visit/reference periods and separate
+condition records but gives no specific 5A1 incremental-versus-cumulative rule.
+The public DDI labels the ordinary flag =harvest= as full harvest, yet its
+codes include partially harvested; =harvest1= is labelled 5A1 and carries
+Yes/No codes, unlike the repeated three-way paper prompt. That difference
+must remain explicit; the printed form alone is not the exact CAPI routing.
+
+A bounded cached-source diagnostic of the declared 2019-20 AGSEC5A release
+(MD5 =d097f036f8b1e3f8b1b9a42209f828d5=) finds 97 source rows with PART
+quantity: 97 slot-11 and 3 slot-21 reports, not 100 distinct source rows.
+All 97 already carry ordinary-family quantity and have the initial
+=harvest == 2= (partially harvested), =s5aq05_2 == 2= (not immature).
+Their follow-up =harvest1= is Yes on 92 and No on 5. Of 138 initial partial
+rows, 100 have a follow-up flag (95 Yes/5 No), while 38 have none.
+PART end years are predominantly 2019/2020 whereas ordinary end years are
+predominantly 2018. These marginal distributions are not a per-row chronology
+or a proof of nonoverlapping intervals, and cannot decide additivity.
+The ordinary family is consequently not confined to fully harvested crops.
+No =_11= / =_21= or =harvest1= family is present in the exact declared
+2019-20 B or 2018-19 A/B source columns; this is checked coverage, not an
+assumption that sibling forms or releases are identical.
+
+The earlier "not wired; no verdict" entries remain accurate. Simple append
+is not yet justified: GH1198 can preserve source observations, whereas the
+existing =harvest_kg= transform sums converted records across
+=production_obs= and would also combine cumulative reports if that were the
+5A1 meaning. Nor is replacement of ordinary quantities, treating missing
+follow-up as zero, or exclusion by the follow-up Yes/No flag justified.
+Reported-factor median pools could also change other records before the sum.
+Any family selection must therefore precede BOTH factor-pool construction and
+aggregation; filtering afterward does not preserve the current default.
+Distinct source observations can be preserved with their relationship exposed
+without asserting that they are additive components. No access or default
+aggregation policy is selected here.
+
+The precise remaining question on 647 is whether 5A1 Q6 reports additional
+harvest since ordinary 5A or a revised/cumulative amount including it, whether
+the same relationship holds for Q7 sales quantity and Q8 sale value, and which
+recorded CAPI/version/row relationship resolves the 5 No and 38 missing
+follow-up cases. An analyst total requires that relationship to be explicit.
+No quantity, sale, condition, observation token or eligibility rule changes.
+The #1290 nine unsupported keys and #1297 parcel question remain separate.
+
+* Crop-axis vocabulary for native plot inputs (GH #1119)
+
+AGSEC3A/B fertilizer and pesticide records carry =(not crop-specific)=;
+AGSEC4A seed records keep mapped native crops, use =unknown_crop= when the
+crop answer is absent, and pass recorded unmapped codes/labels through.
+Canonical =data_info.yml= explicitly treats Uganda code zero with no value
+label as an unrecorded crop, so it becomes =unknown_crop=. Fractional
+codes are not truncated. Literal source labels are retained. The first-season
+AGSEC4A coverage and the old seed eligibility test are unchanged: a newly
+nonmissing marker does not admit an otherwise excluded empty seed row.
+
+Classification is assigned AFTER the legacy duplicate reduction, using labels
+captured from the original raw answers. This preserves both membership and
+order: relabeling an unmapped numeric code before the sorted reducer can move its
+payload relative to other crops on the same plot even when the non-crop index
+projection is identical (covered by a synthetic regression). A legacy group containing distinct new crop labels
+now raises an explicit conflict instead of guessing a label for summed values
+or silently changing the grouping policy. Such a conflict needs the separate
+source-observation/grain decision; no =input_obs= axis is added here.
+
+The existing conditional null-key loss, reducers, units, plot construction,
+weights and second-season seed coverage gap remain. This does not resolve
+#829 WAITING, #647 PART-harvest additivity or the 2019 panel-weight questions.
+
+* =unknown_plot= and =harvest_kg=: GH #1460 (noted 2026-11-04, excluded and reported since)
+
+=transformations.harvest_kg= groups at =(t, i, plot_id, j)=, so it pools a household's
+=unknown_plot= rows of one crop as if they were one plot, which the canonical
+=data_info.yml= consumer rule says they are not.  It also sums across =condition=.
+Measured at this branch: 403 =crop_production= rows are =unknown_plot= (2009-10 360,
+2011-12 43), 75 household-wave-crops hold more than one, and they reduce to 227
+=Harvest_kg= rows, 70,277 of 42.1M kg (0.17%).  Uganda's crop level is named =j=, so
+#1460's first defect, summing across crops, does not reach this country; the
+=condition= sum and this pooling do.  =plot_inputs= holds 136 =unknown_plot= rows and
+=plot_labor= 141.
+
+=harvest_kg= and =crop_diversity(weight='count')= now leave these rows out, per the rule, and
+report them in =attrs['unknown_plot_excluded']=: =Harvest_kg= rows 89,207 -> 88,980, the 70,277 kg
+reported rather than served.  The =condition= sum stands.
+
+* GH1120 locating covers and singletons (2026-10-30, independent review pending)
+
+The approved D1/D2 rules supersede the historical statement above that the
+24 2009-10 no-community/no-GPS households "keep =v = <NA>= and are dropped".
+They now receive distinct =unlocated-{hhid}= identity markers. These are not
+measured clusters, inferred geography, or evidence of movement. Existing
+=comm_frame_ea= mappings, modified-GPS bins, parish composites and panel maps
+remain unchanged. =moved-= remains reserved for actual movers. The 2019-20
+asked-not-distributed GPS finding and the 2005-06 geo-only split-off exclusion
+remain in force; no coordinate source was added.
+
+Both =sample= and =cluster_features= declare the same own-wave membership
+extensions: 2009-10 AGSEC3B plus GSEC12, 2011-12 AGSEC1, 2015-16 AGSEC1 and
+2018-19 AGSEC1. Dedicated sub-frame hooks check duplicate cover answers
+before joining. Identical projected repeats are lossless; conflicting repeats
+raise. The 2015-16 HH cover wins for every HH-covered household, including
+its missing answers. A disagreement between recorded parish codes is warned,
+not resolved by a formatter or a column-wise first-value reducer.
+
+2015-16 AGSEC1's =hwgt_W5= is PANEL weight only. AGSEC1-only households get
+its recorded parish, region, urban status and strata, and =panel_weight=;
+=weight= stays missing. The two covers have different weight vintages and
+must not be coalesced. The rule and raw operands are registered in
+=_/derivations.yml=. D2 singleton identities are registered too, and carry
+=Derivation= even if no geographic attribute was recorded. This matters:
+otherwise the API's all-null-row filter deletes a legitimate singleton row.
+
+A bounded owned-source check on the dispatch base =e2b972e7= read a declared
+union of 37 sidecar-identified blobs. Current measurements (not acceptance
+constants): 3,305 HH-cover households, 2,694 AG-cover households, 72 AG-only,
+64 AG-only parishes including eight not in the HH cover; 33 AG-only panel
+weights are zero. Raw sample grows to 3,377 households / 883 parish keys;
+AG-only panel weights total 173,873.12353515625, cross-sectional weights are
+all missing. All original HH-cover weights and nonmissing locations compare
+exactly, including null masks and zeroes. All-wave sample has 24,561 rows.
+Singleton counts by wave are 28 / 57 / 1 / 66 / 1 for 2009-10 / 2011-12 /
+2013-14 / 2018-19 / 2019-20. Sample/cluster agreement holds for these added
+identities. Four pre-existing 2010-11 real keys still vanish at API time:
+=reduce_to_agreed= blanks all conflicting attributes and the universal
+all-null-row filter then deletes the row. This is the documented exception in "cluster_features is a PROJECTION":
+"42 households
+therefore reference a =v= with no =cluster_features= row. That is the
+honest outcome". The existing decision is preserved,
+not a new D2 policy question; no geography or dummy data was added.
+
+** What =unlocated-= means, as built (ruling @ligon, 2026-11-04)
+
+GH #1120 D2 was ruled for "households that no file locates".  What is built is
+narrower, and the ruling keeps the label and rewords D2 to match it:
+=unlocated-{hhid}= marks a household with *no value in this wave's cluster-key
+column* (=comm= and, in 2009-10, its GPS bin; the parish code; the district and
+parish pair).  It says nothing about what the wave's other files hold, and some of
+them do hold a location.  Read it as "this wave's key is blank", not as "nothing
+locates this household".
+
+| wave    | households | what else the release records for them (raw files, 2026-11-04)                                                  |
+|---------+------------+-----------------------------------------------------------------------------------------------------------------|
+| 2009-10 |         28 | 24 on =GSEC1= with a blank =comm= and no GPS fix: all 24 have =region= and 23 a district code.  4 are on =AGSEC3B= or =GSEC12= only. |
+| 2011-12 |         57 | on =AGSEC1= and other modules, not on =GSEC1=.  26 have a parcel GPS reading inside Uganda in =AGSEC2A= / =AGSEC2B=. |
+| 2013-14 |          1 | blank =h1aq4a=.  Its cover has =ea=, =region= and =h1aq1a=, and =unps_geovars_2013_14= has a fix.                   |
+| 2018-19 |         66 | on =AGSEC1= and not on =GSEC1=; =AGSEC1='s =region= is blank for all 66.  Parcel GPS not checked.                   |
+| 2019-20 |          1 | blank =district=.                                                                                               |
+
+None of this is used to fill =v=: parcel GPS is where a parcel is and 2013-14's =ea= is a
+PSU of origin, and neither is a value of this wave's key.
+
+*Site C stays silent on these, because a singleton is not a cluster.*  =sampling.yml=
+declares 2010-11 -> 2011-12 =stable=, and 30 linked households go from an EA in 2010-11
+to a singleton in 2011-12, since 2011-12 has them on =AGSEC1= only.  That does not make
+the boundary incomparable.  A singleton names one household and no place, so it cannot
+show that a cluster's key changed; the 2,510 of 2,510 in that note counts located
+households.  =tests/test_sampling.py::test_uganda_comm_rendering_boundary_is_silent_once_harmonised=
+pins the silence and the 30.
+
+** D3: source-missing plots, with observation identity
+
+=crop_production= now uses =unknown_plot= where a source parcel/plot component
+is genuinely missing, retaining its existing =production_obs= coordinate.
+=plot_inputs= uses the same plot marker and the existing canonical =input_obs=
+axis: missing-plot observations carry release-qualified original source-row
+positions, while known-plot rows carry =unresolved_observation= and retain
+exactly their prior reducers. All seven native input scripts pass fingerprints
+of the files they actually read; the country concatenator preserves the axis.
+The #1350 crop distinctions, eligibility gate and loud refusal of conflicting
+known-plot legacy crop groups remain intact. =unknown_plot= is not a plot and
+must never be joined as one; it is distinct from structural =Farm-level=.
+
+Independent raw accounting in 2009-10 / 2011-12 / 2013-14 finds 360 / 43 / 0
+eligible missing-plot production observations and 130 / 5 / 1 input
+observations. The outputs preserve these counts, numeric null masks, zeroes
+and nonmissing values. Known-plot columns and ordering compare exactly to the
+baseline, with no new parcel inference or change to #647 harvest policy.
+The production null-key branch formerly deleted the 403 production rows;
+input null-key reduction deleted 135 rows (the single 2013-14 row survived).
+
+The constructor inventory also includes parcel-grain =plot_features= and
+=plot_labor=. Parcel inference and unsupported keys remain with #1297/#1290;
+no parcel eligibility or joins were changed. Labor is explicitly UNCHANGED
+pending independent observation-axis review: 128 / 8 / 5 eligible missing-plot
+labor source observations still become 85 / 5 / 5 max-reduced keys. Renaming
+the null plot alone would conceal this loss. A =labor_obs= prototype was
+retained as review evidence only, not merged into the shared schema or source.
+
+Bounded Country/Feature checks cover all-wave sample and clusters and the
+three plot waves above. Sample and plot_inputs pass =LSMS_READ_STRICT=.
+Cluster features still refuse strict reads because 2019-20 Latitude is
+unreleased; crop production still refuses because 2009-10 harvest_month is
+all-null. These are not missing-index failures, and no assertion or schema
+requirement was weakened. Warm reads used zero source reads. No unrelated
+country was rebuilt, and #1120 is not closed by this work.
+
+** Retained-scope independent review qualifications
+
+The retained implementation has independent source/ordinary-evidence support;
+public extraction imports no labor prototype or operator archives. The 135-pass,
+35-skipped focused run is retained evidence, not replayed for extraction.
+API/Feature checks establish the reported row counts and nonmissing indexes,
+not Country-versus-Feature full-frame equality. The 2.352-second warm check uses
+new Country objects in the same process, with pandas frame equality and zero
+observed guarded source reads. It is not fresh-process or explicit EA/NumPy
+zero-tolerance warm verification, nor a cache-byte/mtime immutability census.
+Native known-row/source comparisons retain their stronger exact numeric scope;
+original sample conservation is value/mask exact with permitted dtype widening.
+
+Per-stage timeouts do not establish a single global 2400-second supervisor;
+main-process guards are not inherited by Make children. Two failed intermediate
+sample/cluster frames were overwritten before final sealing, so surviving
+witnesses do not authenticate those intermediates. The final YAML blank-line
+cleanup changes expected hashes after cache build; no current-fresh-cache or
+restamping claim follows. Literal-only credential-transcript redaction is a
+separate containment action, and historical transcript hashes can differ.
+The four existing all-conflict real-cluster exclusions, labor source-observation
+follow-up, #1290/#1297 and umbrella #1120 remain separate.
+
+
+** 2026-10-30: D3 labor source observations and qualified runtime checkpoint
+
+The historical statement above that labor remains unchanged is superseded for
+=plot_labor=. Eligible source-missing parcel/plot records now use =unknown_plot=
+and a =labor_obs= coordinate after =season=: literal declared source, matching
+DVC sidecar SHA256 and original zero-based raw row position. It identifies an
+observation, never a plot, worker or persistent panel entity. All seven native
+drivers bind their exact loader paths; missing/ambiguous sidecar authority is
+refused. Source, season and labor category remain distinct.
+
+Known plots use =unresolved_observation= and the prior max reducer. Structural
+parcel-only suffixes remain known. GH1250 flag/zero/wage-only eligibility and
+nullable payloads remain; no seed, crop/input, D1/D2, sample, panel, #647 or
+#1297 rule changes. The canonical Feature axis uses =unresolved_observation=
+for countries without a native =labor_obs= axis. Shared schema support does
+not imply new raw verification in those countries.
+
+Independent source review supports implementation =f916eba15285=. Original
+targeted tests recorded 32 passed, 9 credential-skipped, 4 deselected. The
+first actual actor failed after four 2009-10 reads: writer instrumentation
+changed caller inference and sent its parquet to the owned source tree. The
+saved operands and misdirected storage were closed; that failure remains.
+The continuation (=550d103d3f26=, final =da3d9bc08e08=) reuses and compares
+those 2009 artifacts, places/stamps verified storage under private L2, and
+performs only the eight remaining independent/native reads for 2011/2013.
+This is composed 2009 reuse, not a repaired fresh 2009 native path execution.
+New waves use targeted profiling of the original writer; same-process runpy
+requires a private resolver cache clear at each boundary. Native interpreters
+were not separate processes. The authenticated full eight-wave pre-finalized
+sample is reused with an explicit private stamp, not rebuilt here.
+
+Across those three waves, missing-plot keys 95 become 141 observations and
+native rows 88,732 become 88,778; the 88,637 known-plot rows retain their
+observed axes, typed payloads and downstream values. Existing transformations
+recover 577 reported days and 305,000 reported hired wages, without asserting
+distinct plots. Full native source-position/CALL/RETURN/storage comparisons,
+key-bound composed Country/Feature, strict Country and fresh-process saved
+Country/Feature exact order/dtype/mask/nonmissing-value/typed-attrs checks pass.
+Four L1 plus five L2 selected files retain bytes/mode/nsmtime/coverage; named
+Python reader/build/writer/audit entrypoints observe zero warm operations.
+This is neither a directory snapshot nor universal native/C-level IO coverage.
+
+The continuation actor returned 0 in 126.141 seconds with closed descendants.
+All 60 ordinary files, 12 operator sources and 73 closed private files were
+independently authenticated without deserialization or replay. A later
+source-only declaration regex assertion failed because it assumed unindented
+YAML; the failed assertion and operands remain. Direct source diff supports
+only the approved labor comments/index change; the automatic check is not
+claimed green. Physical 2009 blank/flag counters were not durably retained.
+Three-wave composed evidence and seven-driver source support do not establish
+all-seven-native or clean-cold Country closure. Independent reviews:
+=95ad63dd80b6= (source/failed arm), =b437ddf69f27= (continuation).
+
+* Seven-wave labor compiler runtime checkpoint (GH #1287, 2026-10-31)
+
+The unchanged country =plot_labor= compiler ran through its actual Make
+target with seven verified native prerequisites, serving 164,823 rows through
+normal Country, simultaneous read/grain strict mode, real Feature and fresh
+process warm Country/Feature. All 40 mandatory and six separately recorded
+RETURN/storage predicates passed, including full typed axes/unused levels,
+row order, nullable masks, ExtensionArray/nonmissing values and attrs.
+
+Only 2010-11, 2015-16, 2018-19 and 2019-20 ran new native scripts, in separate
+original Make recipe interpreters: eight numeric source returns/decodes, reused
+for the independent reported-cell/flag/position oracle. The other three native
+inputs retain the historical qualifications above: composed misdirected 2009
+storage, and prior same-process 2011/2013 execution. Seven explicit Make
+=--old-file= prerequisites prevent their replay. This is an actual seven-input
+compiler, not seven fresh native builds. Eligibility, known-plot max,
+=unknown_plot=/=labor_obs= and wage-only missing days remain unchanged.
+
+The finalized sample is an authenticated fixed =v= lookup, not a new sample or
+weight validation. Seven owned wave copies passed current source/sidecar/runtime
+compatibility and full typed before/after sanctioned footer construction;
+historical originals remained immutable. The hashless compiler parquet was
+saved before the normal API rebuild and was never stamped. Original Wave,
+aggregation, finalizer and country cache gates ran; only instance sample lookup
+was supplied. API/finalizer expectations establish existing-transform
+composition, not independent scientific validation of those transforms.
+
+Fresh warm made two selected country-cache getter calls with zero observed
+source/decoder/native/build/Wave/writer attempts. Eight selected caches and all
+12 original/receiving inputs preserved their closed identities. This is named
+Python-entrypoint/selected-file evidence, not a directory snapshot or universal
+IO measurement. All phases exited zero and descendants closed; actual plus
+inline export took 178.073 seconds. Earlier actor and source-assertion failures
+remain historical failures. #1357's anonymous-household exclusion, the distinct
+recorded-household missing-plot boundary, #647/#1297, #829 WAITING, sample/frame
+and 2019 weight/GPS caveats remain unchanged. The four new contributions contain
+zero eligible missing-household or missing-plot rows: this unit does not newly
+exercise either boundary; the earlier retained-wave evidence remains separate.
+
+Executed source =7d71ebaa12279c7f7371d5714b2bc159d85a2c06= has unchanged
+product bytes from =a54fc6d8eb699ca5a334635a3ae4f5827c144cff=; dispatch
+=4a55e14aecbd438395fde9ab2db5079b=. Independent result review SHA256
+=1b1112e8d395946f9e2be77047fe77a241c23e7b4c21430e64bb499e8a485c9d=
+accepts this qualified cell; no inventory count or umbrella closure follows. See
+=.coder/ledger/1287-uganda-labor-runtime-checkpoint.md= and the ordinary
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-labor-runtime-receipt-v1/REPORT.md=.
+
+* GH #771 -- ordinary nutrition requires the versioned FCT component (2026-10-30)
+
+Normal =nutrition.py= reads the existing =fct_usda.csv= and raises an
+explicit error naming =scripts/refresh_fct.py --country Uganda= if absent,
+before any Country/food work. The implicit live-provider fallback and
+tracked key literal are removed. Explicit refresh uses existing
+=FDC_API_KEY=/config lookup; no key rotation or Uganda acquisition occurred.
+
+Uganda's committed snapshot parsing, nutrient arithmetic and requested
+=fct= versus =nutrition= output routing are unchanged. Invented actual-source
+routing/refresh tests cover failure-before-food and offline operation;
+no new Uganda actual nutrition or scientific-density acceptance is claimed.
+The approved #967 direction and separate #1000 source/density concerns
+remain as documented above. This does not repair every legacy metadata or
+Make/cache interaction.
+
+
+* 2015-16 housing: recorded agriculture identity fallback (GH #1290)
+
+Merged #1321 repaired =gsec9.hhid= through the household cover's =hh -> HHID=
+relation: 3,303 of 3,312 recorded housing rows found a unique cover identity.
+The retained nine-record diagnostic later found six exact =AGSEC1.hh -> HHID=
+pairs, each with one recorded target absent from =gsec1.HHID=; three keys occur
+in neither inspected AG identity column. All nine carry recorded keys and
+housing payloads. These are historical observations, not new acceptance counts.
+
+The earlier diagnostic's "No production AGSEC1 bridge, new sample membership"
+conclusion described its bounded scope. Later merged #1358 independently admits
+AGSEC1-only households to =sample= / =cluster_features= using their own recorded
+attributes and panel weight, with cross-sectional weight missing. That membership
+rule does not by itself establish a housing link: the recorded =hh/HHID= pair is
+the separate identity evidence. Agriculture remains a selected instrument subset.
+
+The housing declaration adds AGSEC1's =hh/HHID= projection as a third housing
+source. The household-cover target stays primary; an agreeing agricultural pair
+is harmless, while conflicting recorded targets refuse. Only a missing primary
+target can use the validated AG target. Both bridge projections must be present;
+ambiguous pairs and final key collisions refuse. No agricultural location or
+weight enters housing, no household is inserted, and Roof/Floor/order remain
+owned by the housing source. Unsupported recorded keys retain their warning and
+missing =v=; no approximate, prefix, neighbour or shared-unknown identity is made.
+
+Forty-three guarded invented-input checks passed on the unchanged product,
+including real Wave/Country/Feature machinery with invented source/sample
+leaves. A separate nullable-key control passed once; neither cohort was replayed
+for public extraction.
+
+The bounded actual source oracle now checks every household/AG relation:
+2,622 overlapping source keys and 2,620 overlapping housing rows have zero
+recorded-target disagreements. All 3,312 housing rows retain their payload and
+order; 3,303 use the primary bridge, six use the recorded AG fallback, and
+three keep unsupported recorded keys. Complete relation ambiguity/collision
+and source immutability gates passed. These are observed results, not fixed
+thresholds or an inference from six positive witnesses.
+
+Three mandatory full typed comparisons passed: independent source versus
+native writer CALL, prepared-wave composition versus country writer CALL,
+and source-bound prepared composition versus public Country. Both native
+and country RETURN/storage exact diagnostics also passed. YAML consumes the
+prepared writer RETURN; the public composition checks do not independently
+revalidate unchanged finalizer or cluster policy. Exactly six sanctioned
+source parses completed (three independent, three production), with matching
+reader-init/full-read/same-reader-label counts. No acquisition or sample rebuild
+was needed: the authenticated all-wave finalized sample from merged1358 is an
+explicit instance-only composed prerequisite, not a new sample-cache proof.
+
+The original actor then failed its blanket all-axis null assertion after
+saving a normal strict return. That failure is retained. A saved-output-only
+comparison subsequently establishes full typed equality of Country and strict
+return: both have zero nulls on declared =(t,i)= and three nulls on extra =v=.
+Housing has no canonical index entry, so its existing strict audit checks the
+declared axes rather than every carried axis. No null key was filled, household
+dropped or strict rule changed. Two diagnostic startup failures (an unrelated
+=!make= registry tag and missing genuine metadata-class imports) are retained
+separately from that eventual saved comparison.
+
+A separately reviewed finisher reuses five immutable saved inputs, including
+the exact two L2 files, with new receiving epochs and an explicitly NEW cache
+snapshot. It writes no cache, stamp or synthetic footer. The first genuine
+Feature call (including its normal internal Country read) passes the full typed
+source-carrier comparison; a fresh process passes exact Country and Feature
+warm comparisons on all 3,312 rows. Original expected/footer hash and requested
+wave coverage agree. Both caches retain bytes, mode and nanosecond mtime;
+all five originals/copies, source/manifest bindings and descendant closure pass.
+All seven source/parser/native/Wave/writer counters remain zero; the selected
+country-cache getter runs once in Feature and twice in warm. Permitted tracked
+FCT-CSV fingerprint reads are ordinary metadata, not source parses. This is not a directory snapshot or universal
+native/C-level IO proof. The finisher actor closes in 64.421 seconds without
+replaying the six-source cohort, first Country or strict getter.
+
+Independent source and saved-attribution reviews are =b37abd0db53b= and
+=2210285c12ba=; final finisher result review is 92cf30f63df1.
+Final publication is complete at =b4371cb3e829= (Slurm 40679579,
+COMPLETED 0:0 in 6:56). Original failed stages and the receiving-cache/sample
+composition remain part of the evidence. The three unsupported recorded keys remain producer-provenance
+residuals; no full #1290, other-wave housing, sample, Make/backend or country
+closure follows. #1357 continues to exclude genuinely anonymous households from
+household-keyed tables; it supplies no new ID and does not equate those records
+with known-key housing observations lacking a validated link.
+
+*The three keys are absent from every link the release ships (2026-11-03).*
+Every column whose name contains =hh= or =id= in all 119 2015-16 =.dta= files
+was searched for them.  They occur in three files, all in the =gsec1.hh=
+namespace and none beside an =HHID=: =gsec9.hhid= (housing), =GSEC16= (shocks:
+its one ID column is NAMED =HHID= but holds =hh= values -- 3,305 of its 3,428
+keys are =gsec1.hh= values, none is a =gsec1.HHID=) and =gsec15bb_3.hhid= (10
+rows, =DynID= missing on all).  They are among the 51 =GSEC16= keys in neither
+=gsec1.hh= nor =AGSEC1.hh=.  So no recorded link to a sample household exists
+in this release; closing them needs producer correspondence, not more search.
+
+*2015-16 =shocks= had the same hole (GH #1434, 2026-11-04).*  =shocks.py= reaches
+the sample's =HHID= and its interview month through =gsec1.hh=, and an inner merge
+deleted the 2 valid shock rows (of 1,023) of 2 households only =AGSEC1= records.
+They now use =AGSEC1='s =hh -> HHID= pair and its own date, on the housing rules
+above; 0 valid rows are in neither cover, so the 51 keys above carry no shock.
+=interview= is labelled "Hh with food consumption", and =nonresp= is "Interview result" on
+=gsec1=.  Both read "Not done" for all 72 households =AGSEC1= holds and =gsec1= lacks.  All
+72 have a =GSEC16= grid, but only 6 answered the full 20-row module; those same 6 are the
+only ones with an =AGSEC1= interview date, and 2 of the 120 answers report a shock.  On
+the 2,622 households both covers hold, =AGSEC1='s date equals =gsec1='s on all 2,619 where
+both record one.  Both =Onset= values are under 12 months.  /The 2 kept rows carry NaN
+=weight= and zero =panel_weight=/ (=hwgt_W5=), so no weighted statistic moves.
+
+* Seven-wave plot-input compiler runtime checkpoint (GH #1287, 2026-10-31)
+
+The unchanged =plot_inputs= country compiler ran through its actual Make target
+with seven verified receiving wave parquets. Normal Country, simultaneous
+read/grain strict, real Feature and fresh-process warm comparisons pass on
+84,351 rows. All 55 recorded typed predicates pass (43 mandatory, 12 diagnostic).
+Three old-constructor CALL and three RETURN/storage comparisons occur twice;
+excluding those six repeats leaves 49 distinct comparisons (40 mandatory,
+9 diagnostic), not 49 independent scientific oracles.
+
+Three 2009/2011/2013 inputs are historical direct constructor RETURNs, newly
+transported by the exact original source-anchored writer statement in THREE
+separate fresh processes. They are not old native STORAGE or three new native
+builds. Four original Make recipe interpreters for 2010/2015/2018/2019 each
+complete three full source-return roles despite =_try=: two saved numeric AG3A/B
+reader RETURNs and one new AG4A seed parse. Thus 12 successful roles comprise
+eight saved leaves and four new parses. No accepted source/sample cohort is
+replayed. Old source/custody and historical failed-actor/writer/resolver
+qualifications remain; no 2019 source-path repair was needed.
+
+Current finite source/sidecar/runtime compatibility and full typed before/after
+proof support seven owned receiving wave-footer constructions, not historical
+raw-build freshness. The actual compiler uses seven explicit =--old-file=
+prerequisites; original ordered policy STORAGE plus one Uganda local ID walk
+matches its CALL. Separate RETURN/storage comparisons pass. Immutable hashless
+compiler bytes survive before the normal API rebuild and are never manually
+country-stamped. Only instance sample lookup is supplied: the authenticated
+finalized 24,561-row sample is a fixed =v= lookup, not fresh sample, weight,
+cluster, membership or population acceptance. Existing-transform API/finalizer
+expectations establish composition; no new independent native scientific
+oracle or policy change is claimed.
+
+Actual grain evidence is captured before strict/Feature: process reports zero,
+raw footer =None=. The ordinary count zero / stamp-present false preserves that
+missing metadata; it is not an empty-list substitution or proof of no collapse.
+Strict returns normally with both original levers; no negative was suppressed.
+Fresh warm makes two selected country-cache getter calls and zero observed
+source/decoder/native/build/Wave/writer attempts. Eight physical cache snapshots,
+16 original/receiving inputs and source/manifest bindings close unchanged.
+Country footer hash and seven-wave coverage are checked separately; this is
+named-entrypoint/selected-file evidence, not universal IO or a directory census.
+
+All 13 phases exit zero with closed descendants; actual including inline export
+is 196.577 seconds. Final remote publication verification takes 197.655 seconds
+against its separate 180-second allowance: this deviation remains, even though
+final custody/publication completes. Commit time 165.333 seconds is not proof
+of push completion. No bound was widened and no actor retried. Slurm 40680991
+completes 0:0 / 9:29; final publication is =0993020d25cb31f8ca5a356793f1e432398c2268=.
+
+Executed =cdac4cc1e2d61a1b9671b644a6388e0b945732a3= has unchanged product bytes
+from =324b09384488da742c387a8a696e9ff963ccef9a=; dispatch
+=3b8b039d8ec742faacb5798c32494412=. Independent result review SHA256
+=392f6bd81c2817600cd15f229dde5375f25f126394efdf0bdc3795eeb160e90a=
+accepts the qualified cell. #1357's genuinely anonymous-household exclusion,
+the distinct recorded-household missing-plot/=v= boundary, selected-agriculture
+weights, EA/parish/refresh contradictions, #647/#1297 and #829 WAITING remain.
+No compiler inventory increment, other-cell or umbrella closure follows. See
+=.coder/ledger/1287-uganda-inputs-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-inputs-runtime-receipt-v1/REPORT.md=.
+
+* Five-contributor food-inadequacy compiler checkpoint (GH #1287, 2026-10-31)
+
+The unchanged =months_food_inadequate= country compiler ran through its actual
+Make target over five native contributions. Normal Country, real Feature and
+fresh-process Country/Feature warm each explicitly serve 14,796 rows from
+2009-10, 2010-11, 2011-12, 2013-14 and 2015-16. These are five declared
+contributors among eight registered waves, not eight observed contributions.
+All 33 labelled full typed comparisons pass: 26 mandatory and seven separate
+RETURN/storage diagnostics. They are stage/source/custody/composition checks,
+not 33 independent scientific oracles; the strict negative below is not a pass.
+
+Five separate original Make-native interpreters complete eight full categorical
+source-reader RETURNs, with eight full Stata read/init/label lifecycles, eight
+cp1252 hook calls and no extra initialization or fallback. Captured replies
+support the independent literal source oracle without a second raw cohort.
+2009 counts distinct per-character A-L and applies No => 0; 2010 retains Int64
+=NA= even for No, because only the binary item is wired. Later waves sum Yes
+ROWS, not distinct month names, retaining original all-missing sum/fill-zero and
+No => 0. Existing binary-answer eligibility and literal native household-ID
+rendering remain. #1291's earlier ID-only API evidence is retained history,
+not a native reconstruction or a hard-coded row threshold.
+
+Actual Country and immediate actual null/grain reports precede expected
+finalization: the grain ledger resets per load, but the null-content ledger
+does not. Pure current audit/source/original-message attribution establishes
+one required-column =MonthsInadequate= all-null report for 2010-11. The ONE
+getter with both strict levers raises =NullReadError=, saved before attribution:
+=strict_passed=False=. Grain strict remains unestablished and index completion
+is not promoted from that negative. No optionality, fill/drop, warning or schema
+suppression, invented duration or extra disabled-lever getter was used. Actual
+grain reports are zero and raw grain footer is =None=; missing metadata is not
+an empty-list substitution or proof of no collapse.
+
+The finalized 24,561-row sample is only the disclosed fixed =v= lookup, not new
+sample/weight/eligibility/cluster truth. Five NEW owned wave constructions have
+source/CALL/storage and full typed before/after current-hash proof; this is not
+historical cache freshness. The actual compiler uses five =--old-file=
+prerequisites, ordered policy storage, one local ID walk and original casts.
+Hashless pre-API compiler bytes remain preserved and never manually stamped.
+Existing-transform public/Feature expectations prove composition, not independent
+finalizer science. The Make-backend API route remains separate from direct Make.
+
+Fresh warm makes two selected country-cache getter calls and zero observed
+source/parser/native/build/Wave/writer attempts. Six physical caches, all nine
+original/receiving inputs and source/manifest bindings close unchanged. Current
+country hash and five-wave coverage are checked separately; these are named
+entrypoints/selected files, not a universal IO or directory census. Every new
+binary-source cohort has zero eligible raw/formatted missing household IDs:
+#1357's anonymous-household exclusion is not newly exercised by this zero count.
+Known household keys missing =v=/plot remain distinct; no identity or eligibility
+is inferred. EA/parish, refresh/2019 weights/GPS, #647/#1297 and #829 WAITING
+qualifications remain.
+
+All 11 phases exit zero with closed descendants; actual plus inline export is
+150.555 seconds. Remote publication verifies in 79.681 seconds within its
+180-second allowance. Slurm 40682422 completes 0:0 / 7:30; final publication is
+=d6f8de7e43caf92e14539d3bbdc124a298f3d3b6=. Executed source
+=d1f4662e8c6444fed58dc09593c8b5f36fa8642e= preserves product
+=0bfca3e9f8e8c2e5cc1548d566e5dd423cf69cd2=; dispatch
+=c83db82b676d4a2cb338fe3a937a1ee0=. Independent result review SHA256
+=2bca6fcdd8c5445aaa95e32fd49a5ef65079cb4e518c488beadb999af8be59d3=
+accepts this qualified cell, without inventory or umbrella closure. See
+=.coder/ledger/1287-uganda-months-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-months-runtime-receipt-v1/REPORT.md=.
+
+
+* GH #1287 assets: eight-wave fixed-STORAGE compiler checkpoint (2026-10-31)
+
+Independent result review 0f169d62 and root accept this qualified completed
+result. Exact documentation review precedes publication; compiler-inventory
+credit follows reviewed docs merge and root reconciliation.
+
+Eight authenticated historical native assets STORAGE inputs reached the actual
+unchanged eight-input country VAR Make compiler, composed default Country,
+strict, first genuine Feature and fresh-process original Country/Feature warm.
+These are historically promoted native STORAGE, not current raw/native outputs
+or untouched constructor CALLs/RETURNs. Historical full epochs/mode/image and
+current decoder/#805/IO/map/schema equivalence remain unestablished. No raw
+parses/native writers/manual stamps/source acquisition ran. The same finalized
+24,561-row D1 sample supplies only a fixed complete (t,i) lookup with v, not
+current sample/weights/membership/eligibility/cluster/raw truth or a second walk.
+
+All 25 recorded comparisons PASS: 23 mandatory + 2 RETURN/STORAGE transport,
+broken down admission 8, compiler 9+1, cold/strict/Feature 4+1 and warm 2.
+Compiler, default Country, strict, real Feature and warm Country/Feature each
+record 116,808 rows. Old 116,808/4,237 historical counts were not acceptance
+thresholds; this unit does not newly census that historical duplicate claim.
+Full exact typed values/masks/axes/order/extension types/recursive attrs were
+compared at matching stages, not independent new raw asset science.
+
+Only the disclosed fixed-native Wave.grab_data leaf was replaced for cold,
+truthfully returning parquet origin while retaining original policy read,
+wave-footer replay/map/check_adding_t/logical filtering. Actual original Country
+aggregation/maps/writer/hash/finalizer remained. Normal/provider/restored
+registry+country+all-eight-wave hashes matched before payload with fresh memo
+clears; original Wave/profile restored. Strict and Feature ran after restoration.
+This does not test original script-cache freshness selection, current raw-native
+equivalence, Make-backend API or existing-target incremental Make freshness.
+
+Both original strict levers returned normally once and strict full-exact-matched
+default on (t,i,j). No strict negative or disabled-lever retry occurred. Actual
+pre-oracle NULL/grain counts were 0/0 and raw footer None/stamp absent; missing
+audit metadata is not an empty report or proof of no collapse/all science.
+Expected-finalizer cumulative reports are not pure Feature attribution. Assets
+remains reported owned-stock Value, distinct from unwired 365-day Part D flow.
+The dated 2026-10-15 correction already supersedes the older claim that assets
+still disagreed with its script; this entry preserves that historical chronology.
+
+All three failed parents remain failed: V1 bootstrap prefix under -S, V2
+unavailable author-local ordinary authority locators, and V3 fatal metadata guard
+before payload. V3's exact runtime path was unlogged; source proved the eight
+missing absent-parquet fingerprint probes. V4 permits only direct original
+cached_file_hash readonly/genuine-ENOENT probes and bounded fatal telemetry;
+present payloads/other callers/writes remain fatal. Positive metadata events
+are distinct from denials. No completed raw/native cohort was replayed.
+
+Fresh warm records two selected-country-cache getters and zero named source,
+decoder/native/build/Wave/writer entries. One selected cache survives among nine
+slots; original current hash/all-eight coverage/bytes/epochs close, along with
+nine original/receiving inputs, source/runtime/ordinary authorities and children.
+Named observers are not universal IO/atime proof. #1357 option 1 continues
+excluding genuinely anonymous household-keyed rows: no invented/shared unknown
+identity or orphan representation. Known household missing v/plot is distinct;
+saved-STORAGE comparisons are not raw eligible-loss or new boundary tests.
+
+Actual took 158.557 s; separate export 12.943 s; outer launch 172.901 s. Archive
+526ad284 binds 179 members / 50,746,731 bytes. The publication interval starts 40 ms after
+the whole ACTUAL-LAUNCH supervisor closed, including separate export; it is not
+elapsed from inner actual exit. The terminal receipt records 81.338 s to exact
+push+remote-ref verification, final 1a3971a8. That precise publication baseline and platform outcome were independently
+reviewed and accepted by root, separately from comparison results. A publication-summary list
+handling error was corrected without project/payload replay; its failure remains.
+
+Executed toolkit ac61cad5 used scientific 003e55f6. Public docs base b06abb5d
+matches 997/998 bound source/config files before this addition; the only drift is
+global data_info.yml adding optional crop KgFactor_sold for Mali #824. No Uganda
+producer/core source changed, and no later-base runtime/hash pass is claimed.
+See =.coder/ledger/1287-uganda-assets-runtime-checkpoint.md= and
+=Uganda/1287-assets-public-checkpoint/REPORT.md=. Other cells/#1287 remain separate.
+
+* Qualified fixed-native livestock compiler and consumers (GH #1287, 2026-10-31)
+
+Independent result review 88bf20a1 and root acceptance 068bd6fc accept this
+qualified fixed-native compiler/consumer result. Public documentation review,
+integration and inventory credit remain pending; this entry does not close
+#1287. No source/native/API actor was replayed.
+
+Seven historical native STORAGE operands (322,215 bytes) feed the unchanged
+actual country Make compiler, ordinary Country, simultaneous read/grain strict,
+first genuine Feature and separate-process original warm Country/Feature.
+All report 27,073 rows. Eight requested/registered coverage keys include the
+unwired 2005-06 wave; the seven contributors are 2009-10, 2010-11, 2011-12,
+2013-14, 2015-16, 2018-19 and 2019-20. This establishes a fixed historical
+STORAGE contribution boundary, not current raw/native arithmetic equivalence.
+Historical image/decoder and full historical epochs remain unestablished.
+
+Uganda's =ValuePerAnimal= is a nonadditive reported per-head value: sell-one-today
+reservation value in 2009-10/2010-11, average value per head SOLD from 2011-12.
+The coverage difference survives; this is not additive SalesValue, herd wealth,
+TLU or an engaged binary. Existing positive-head eligibility, head-count sums,
+head-weighted value/plain-mean fallback and missingness are unchanged. The
+2010-11 6B species overrides remain 17/21 Goats and 19/20 Sheep; string/code
+routes retain their original wave-specific meanings.
+
+The actual compiler applies local =uganda.id_walk= once AFTER ordered concat.
+The default framework instead retains its original per-wave mapping/t-filter,
+raw-once framework walk and finalization. Only the disclosed original Wave
+script-parquet selector chooses the seven admitted leaves for cold; original
+policy readers, Wave tail, compiler, aggregation, writer and finalizer remain.
+Normal/provider/restored registry, country and ALL EIGHT wave hashes match with
+fresh memos before payload; the original selector is restored before strict,
+first Feature and fresh warm. All calls use =currency=None=. This original
+=(t,i,animal)= contract needs no village/sample lookup or sample payload.
+
+All 23 labelled full typed comparisons pass: 21 mandatory stage/custody/
+composition checks and two separate prepared RETURN/storage transport diagnostics.
+They include seven native policy-copy and seven original compiler-reader
+comparisons; they are not 23 independent native science oracles. Both original
+strict levers return normally and strict matches saved default. Immediate actual
+NULL/grain report counts are 0/0; raw grain footer is None/stamp absent, not an
+empty stamped audit or universal no-loss proof.
+
+All nine selected API slots are absent before cold. Exactly one country cache
+is created with current hash/all-eight coverage; all eight wave slots remain
+absent. Fresh warm records two selected-cache getters and zero named source,
+decoder/native/build/Wave/writer/sample/raw-panel-map entries. Surviving cache,
+compiler products, immutable originals/receiving copies, source/authorities and
+children close. These named counters do not establish universal IO or atime.
+
+#1357 option 1 continues excluding genuinely anonymous household-keyed output:
+no inferred/shared unknown identity or orphan representation. Native missing-i
+and missing-animal diagnostics are zero; actual household i is complete. This
+native evidence-stage gate is distinct from source eligibility and does not
+newly exercise anonymous-household exclusion. Known households missing v/plot
+remain distinct. EA/parish, refresh/2019 weights/GPS, #647/#1297 and #829 WAITING
+caveats retain their separate meanings.
+
+Held V1 was unexecuted. Its descriptor kind/wave, independent failed-admission
+recovery, immediate conservative OWN allocation gate and executable supervised
+preflight defects were corrected before the single V2 actor. The reviewed d218
+predecessor and draft lifecycle findings remain preserved; the final launch
+rechecks remaining time after receipt fsync, and actual-exit evidence is archived.
+No failure was turned into a scientific pass by replaying a completed producer.
+
+Actual controller elapsed 239.511 s, actual supervisor 239.843 s and separate
+export 14.050 s. Archive f4ec47c3 binds 173 files / 33,762,441 bytes; root verified
+all SHA/size/full stable destination epochs without deserialization. OWN
+publication 6.077 s runs from observed postreceiver/export wait return through
+push AND exact remote-ref verification; it is NOT elapsed from inner actual
+exit. Private ref 3b52590f is verified; Slurm completed 0:0 in 9:32. These delivery
+facts remain separate from the qualified scientific acceptance. Toolkit 1806c9ee
+used scientific b06abb5d; all 998 bound scientific files match public docs base
+c2ed89b3. No later-base runtime/hash claim or inventory increment follows.
+See =.coder/ledger/1287-uganda-livestock-runtime-checkpoint.md= and
+=Uganda/1287-livestock-public-checkpoint/REPORT.md=.
+
+* 2026-10-31 -- Shocks fixed-STORAGE compiler/consumer checkpoint (GH #1287)
+
+The bounded contribution unit is independently and root-qualified accepted.
+Eight historical native contributions fed the original compiler, pinned default
+Country, first genuine Feature and fresh original warm, each with 14,457 rows.
+There are 22 NEW passing comparisons (20 mandatory and two separately labelled
+prepared RETURN/storage transport diagnostics), plus two unchanged inherited
+comparisons from the first failed actor. These are stage/custody/composition
+checks, not 24 new independent native-science oracles.
+
+Two completed 2005--06/2009--10 custody inputs and 22 exact witnesses were adopted
+as bytes without repeating their completed policy pairs. Six named later-bundle
+natives were newly admitted; all eight total 274,328 bytes. The #805 four-native
+coping-label identity changes remain explicit; the old country output was not
+reused as truth. No raw source/native/sample producer, native stamp, attrs reset,
+automatic cache fallback or original freshness validation occurred.
+
+Compiler LOCAL ID walk once after concat emits =(i,t)= with =Shock= a column;
+framework per-wave raw walk/current finalization emits =(t,i,Shock)=. Matching
+stages are compared separately. Bare =shocks: !make= supplies no required columns,
+but all ten native fields survive. The original no-v contract needs no sample.
+Source-specific shock, coping, recall and missingness meanings are unchanged.
+
+The original strict index emitter produced an attributed =NullIndexKeyError=
+NEGATIVE, not PASS. Pure actual metadata had one index report, no required-null
+or process-grain reports and absent raw grain footer; absence is not losslessness.
+The inherited 2005 native missing-Shock observation was retained. Later grain
+strict completion remains unestablished; no disabled-lever retry, imputation or
+row deletion was used to make strict green. First Feature and warm pass separately.
+
+Actual household =i= is complete in cold/warm. #1357 option 1 still excludes
+truly anonymous household-keyed records: no inferred holder-prefix/shared unknown
+household or orphan representation. Native stage diagnostics do not measure raw
+eligible loss; known-HH missing village/plot and missing shock category remain
+distinct. GH #1120 is closed for its separately completed approved scope; this checkpoint
+does not extend that scope or newly test raw anonymous-source exclusion.
+
+Both prior failures remain preserved: original third-size gate before copying
+that native, and first continuation's overstrong global UID-map guard before any
+new native read. The correction proves only the recorded-owner point
+=0 -> 43292 -> 43292=, with original UID/other epochs unchanged, not global/initial
+namespace identity. No completed producer or pair comparison was replayed.
+Prior actual 52.222 s plus successful actual 276.472 s totals 328.694 s; the new
+cap 547 / cumulative 599.222 plus cleanup remains within original 600+5. Absolute
+owner/shared deadlines and complete child/source/input/cache closure apply.
+
+All nine API slots were absent before cold; only one country cache was created,
+with all eight coverage keys. Wave slots remain absent; this is not an eviction
+claim. Warm used two selected cache getters and no named fallback. Root verified
+archive =98ba9872= (252 files / 53,654,762 bytes), full SHA/size/declared stable
+epochs without deserialization. Separate export was 20.105 s. OWN publication
+7.665 s is postreceiver actual/export AND descendant cleanup through push plus
+exact remote ref, not elapsed from inner actual exit. Private =be006e66= and
+Slurm completed 0:0 / platform success are verified separately from science.
+
+Scientific =f952a32e= remains pinned; all 999 selected bindings equal public
+=c4928898=. The later unbound #1254 price-valuation change is a scoped static
+qualification, not a new later-base runtime/hash claim. Historical raw/native
+science, decoder/image/full epochs, freshness, recall/causal comparability and
+population truth remain qualified. EA/parish/refresh, 2019 weights/GPS,
+#647/#1297/#829 WAITING and broader country/compiler work stay open.
+See =.coder/ledger/1287-uganda-shocks-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-shocks-public-checkpoint/REPORT.md=.
+
+* 2026-10-31 -- Anthropometry fixed-STORAGE compiler/consumer checkpoint (GH #1287)
+
+The bounded seven-contributor unit is independently and root-qualified accepted.
+The original compiler, pinned default Country, first genuine Feature and fresh
+original warm each returned 29,553 rows. There are 23 passing comparisons:
+21 mandatory and two separately labelled prepared-RETURN/storage transport
+checks. These are custody/matching-stage composition checks, not independent
+raw/native body-measurement science or 23 native-science oracles.
+
+Seven historical native STORAGE files (484,139 bytes) and the same previously
+accepted 1376 finalized sample (2,452,938 bytes) were admitted and independently
+closed. The 24,561-row sample supplies only its fixed present-byte v lookup;
+no new sample production, weights, membership, frame, population or EA/parish
+truth follows. No raw/native/sample producer or original script-cache freshness
+was tested. All eight registered/requested wave hash and coverage keys remain;
+2005 has no declared native contribution, not a failed read or a new claim that
+the linked baseline instrument had no anthropometry content.
+
+Compiler ordered concat/Uganda-local ID walk once preserves =(t,i,pid)= and four
+fields. The framework instead follows original per-wave policy/replay/map/filter,
+generic raw walk/current finalization and the disclosed original-class fixed-v
+memo. The original enclosing Wave survives the selector-only fixed STORAGE seam.
+Anthropometry has no global canonical registration but still requires the original
+sample-v join. Matching compiler and finalized API stages are compared separately.
+Native and Country retain Weight/Height/MUAC/Age_months; only the original Feature
+adapter drops wholly missing MUAC. No actual frame is projected to conceal this.
+
+With both strict levers enabled once, the original required-column emitter raised
+an attributed =NullReadError= NEGATIVE, not strict PASS. Immediate actual reports
+were null=1/index=0/grain=0 and raw grain footer=None. Required Age_months remains
+all-missing in 2018/2019, not optionalized or filled; the earlier 2009 native also
+has one missing value, whose raw cause is not inferred here. Grain strict and
+later index completion remain unestablished after the first exception. Footer
+absence and matching frames are not universal losslessness or clinical validity.
+
+The existing =_anthro_num= masks all nonpositive values, including Age_months;
+its physical-measure rationale alone does not settle reported zero-month age.
+The helper prefers lying height and the most nonmissing duplicate, with unresolved
+ties; its Weight/Height-only keep prose differs from the literal MUAC-inclusive
+predicate (all current MUAC maps are None). Preserve these source rules. #1401
+remains open; no WHO/zscore/BMI, roster age/sex fill or new threshold is introduced.
+#1357 option 1 excludes genuinely anonymous household-keyed output without inferred
+holder-prefix/shared unknown IDs or orphan representation. Actual cold/warm i/v
+are complete; native diagnostics do not measure raw eligible loss or exercise an
+anonymous-source negative boundary. Known-HH missing village/plot is distinct.
+#1120 is closed for its approved scope; this checkpoint does not extend it.
+
+*Both #1401 rules are inert on the shipped files (raw GSEC6 modules,
+2026-11-03).*  Reported zero-month ages exist -- 43 (2010-11), 26 (2011-12)
+and 43 (2013-14) rows, plus a 999 in 2010-11 -- but every one is on a row with
+no Weight and no Height, which the measure filter drops whatever the age mask
+does; the 8,468 measured rows that carry an in-module age (2009-10 .. 2015-16)
+have ages 2-60 months, with one missing (2009-10).  No wave has a repeated
+=(hhid, pid)= in its raw module, so the most-complete-row selection never
+chooses (0 duplicate keys over 29,553 measured rows).  The served table is
+therefore the same under any zero-age or tie rule; the choice is prospective.
+
+Predata proof installed but did not invoke the payload-dependent original-class
+sample factory; original/provider/restored registry/country/all-eight hashes agree.
+Each admitted genuine-instance hash was checked before target entry. All nine API
+cache slots were absent before cold; one current country cache was created and
+eight wave slots remained absent, not observed evictions. Fresh warm used two
+selected cache getters and zero named Wave/writer/source/build/sample fallbacks.
+Full cache bytes/epochs, current frozen-source hash and eight coverage keys close.
+
+V1's incorrect metadata receipt summary was held/unexecuted; V2 corrected only the
+reported required-column list before this one actor. Actual supervisor 276.580 s,
+separate export 28.748 s and OWN publication 8.064 s passed their bounded clocks.
+OWN begins observed successful receiver cleanup AFTER actual/export, through push
+and exact remote-ref verification, not inner actual exit. Root/peer authenticated
+archive =3105110a= (200 files / 51,371,299 bytes), full SHA/size/stable destination
+epochs without frame deserialization. Private =737b29fe=, scheduler completion
+and final platform success remain separately verified delivery facts.
+
+Scientific =d0acdf61= is deliberate. The 1,009 non-CONTENTS selected bindings match
+public =a7e1f606=; the sole selected CONTENTS difference is the preserved private
+plan note versus later public chronology, excluded from build fingerprints.
+No later-whole-code runtime/hash, historical decoder/image/full-epoch, freshness,
+source arithmetic, causal/panel/population or broader Uganda acceptance follows.
+EA/parish/refresh, 2019 weights/GPS, #647/#1297/#829 WAITING and #1401 remain.
+See =.coder/ledger/1287-uganda-anthropometry-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-anthropometry-public-checkpoint/REPORT.md=.
+
+* 2026-10-31 -- Interview-date compiler/consumer checkpoint (GH #1287)
+
+The bounded result is independently and root-qualified accepted. Final exact
+documentation review/publication and inventory credit remain pending. Root
+byte/delivery authentication remains separate; broader country acceptance does
+not follow.
+
+Ordinary receipts report 26 passing comparisons: 24 mandatory and two separately
+labelled prepared-RETURN/storage transport checks. These are custody and
+matching-stage composition checks, not 26 new independent raw/native science
+oracles. Eight historical native STORAGE operands total 24,362 rows and retain
+legacy =(j,t)= plus =Int_t:datetime64[us]=. The actual original compiler returns
+24,264 rows: ordered native reads/concat, Uganda-local ID walk once, reset/rename
+and its existing =dropna= remove 98 missing dates. The current API writer has
+24,362 rows before its original finalizer yields 24,264 Country/Feature/warm rows.
+Those stages are compared separately; no extra filtering policy is introduced.
+
+The same qualified 1376 finalized sample supplies its fixed 24,561-row v lookup,
+not new sample weights, membership, frame, eligibility, EA/parish or population
+truth. All eight native contributors and requested/hash/coverage keys remain.
+The genuine original Wave body survives selector-only historical leaf admission;
+API per-wave generic walk/finalization/sample-v remains distinct from the
+compiler's local post-concat walk. There is no current raw/native/sample producer
+or original script/cache freshness test.
+
+Both original strict levers passed once; bare =!make= required columns remain
+empty. This does not establish a newly required date or complete visit identity.
+Country audits only present levels; its PASS does not validate absent visit or
+constitute a strict Feature call.
+Pure actual reports before oracle are null=0/index=0/grain=0, raw grain footer
+absent. Country does not infer a visit; original Feature #506 adds
+=visit=pd.NA=, never visit=1. The overview's two annual survey visits does not
+supply per-record visit order in these native scripts. #1357 option 1 excludes
+genuinely anonymous household-keyed output with no inferred holder prefix,
+shared unknown ID or orphan representation. Actual cold/warm i/v are complete;
+native diagnostics are not source eligible-loss counts. #1120 is closed within
+its separately approved scope, which this checkpoint does not extend.
+
+All nine API slots were absent before cold; only one country cache was created,
+with all eight coverage keys, and wave slots remained absent rather than being
+observed evicted. Fresh warm recorded two selected cache getters and no named
+Wave/writer/source/decoder/build/sample/raw-panel-map fallbacks. Four cold and
+two warm ClusterIdentityWarnings remain. Read counts are 34 explicit policy,
+eight observed original Wave policy and 20 pickle reads, not every internal
+byte read. Full typed equality/cache closure is accepted within the fixed-STORAGE scope.
+Allowed positive telemetry records 417 tracked-config CSV fingerprint reads and
+112 exact absent-parquet probes, not guard faults or CSV payload parsing.
+
+Original V1 failed before payload admission at the unchanged 60-second metadata
+subcap; its actual 74.410539 s remains charged. Held 4a/731 corrections were
+unexecuted. V4 uses preflight full proof plus fresh actual-root recheck, the same
+literal unshare-rn entry and durable/independently closed receiving metadata.
+No UID waiver, epoch reset, source cohort or scientific policy change occurred.
+New actual 174.622202 s plus failed actual totals 249.032741 s; controller
+174.200662 s, separate export 29.897104 s and combined receiver phase 206.442796 s
+are distinct clocks. OWN publication 8.498806 s starts successful receiver
+actual/export descendant cleanup through push and exact remote ref, not inner
+actual exit or a precleanup/mtime proxy. Root records all 226 archive members /
+32,803,525 bytes authenticated without frame deserialization, final ordinary
+closure, scheduler COMPLETED 0:0 and platform success separately from science.
+
+Scientific =a7e1f606= is deliberate. The 1,023 selected non-CONTENTS bindings
+match public =885ad00c=; the sole selected CONTENTS difference is the preserved
+private plan note versus later public chronology, excluded from fingerprints.
+This checkpoint preserves the entire previous public CONTENTS prefix. The later
+copy-header checkout 976fc is not independently proved native production for
+the selected bundle. Historical decoder/image/full epochs, source arithmetic,
+script freshness, calendar/visit validity and population truth remain qualified.
+Independent result REVIEW =67c851ad= and root ACCEPTANCE =49ab5f9a= retain these
+limits; no inventory is credited before reviewed merge. EA/parish/refresh, 2019
+weights/GPS, #647/#1297/#829 WAITING and broader country work remain. See =.coder/ledger/1287-uganda-interview-date-runtime-checkpoint.md=
+and =slurm_logs/isa_recovery_2026-10-29/Uganda/1287-interview-date-public-checkpoint/REPORT.md=.
+
+
+* Uganda plot_features: qualified fixed-STORAGE compiler/consumer checkpoint
+
+The bounded result is independently and root-qualified accepted; exact public
+review/integration and inventory credit remain pending. Executed source =1c78ff3a=
+(scientific =885ad00c=), dispatch =2da0f37b=, Slurm40711205. All 25 comparisons
+passed (23 mandatory including native/sample custody,2 transport), not25 independent
+native science oracles. Eight historical native contributions sum42,841rows;
+original compiler, Country, first genuine Feature and fresh-process warm return
+42,841. Full34 policy+8 originalWave-policy+20 pickle matrix is recorded.
+
+The one simultaneous read/grain-strict Country call produced the attributed
+original required-null =NullReadError= NEGATIVE, NOT a strict pass. Grain-strict
+and later index acceptance remain unestablished. All ten country fields remain
+required, with original observed order preserved rather than an alphabetical
+storage assumption. Native 2005 SoilType/Irrigated/PlotCertificate/ErosionProtection,
+2011 Irrigated and2019 SoilType are entirely missing; other partial missingness
+remains. Actual pre-oracle reports are4 null/0 index/0 grain, raw footer=None; this
+neither certifies completeness nor universal losslessness.
+
+Parcel_A/B lasting owned/use-rights land-unit identities differ from crop parcel/
+plot/crop-season vocabulary. GPS-first/farmer fallback, original area mask/hectare
+conversion and source-acre AreaUnit remain. Compiler local post-concat walk and
+API per-wave generic walk/current finalizer are compared at separate stages.
+The same qualified 1376 finalized24,561-row sample supplies present-byte v only,
+not sample production/frame/weights/membership/population truth. Actual i/v are
+complete under [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 anonymous-household exclusion]]; no inferred/shared unknown
+identity or orphan representation, and no new raw-eligibility/loss test. #1120
+remains separately closed for its approved scope.
+
+All 9 API slots start absent; only country appears and8 wave slots remain absent,
+not evicted. Fresh warm records2 selected cache getters,0 namedfallbacks and exact
+cache identity/hash/all 8coverage. Eight pure-actual warnings per process remain
+(NullRead/QuantityImplausible/ClusterIdentity); final24 cold/16 warm are cumulative.
+Fixed STORAGE/current-source composition does not establish raw/native arithmetic,
+historical decoder/runtime continuity, original script freshness, Make-backend
+API or area/tenure/GPS scientific validity. Private frame/report/exception operands
+remain opaque to the independent result reviewer; inference uses executed frozen
+checks plus authenticated closed receipts/archive bytes.
+
+Preserve three failed preflights and the V5 artificial alphabetic-interface
+failure, including its26.213760 s actual charge; no prefix is promoted. V6 fresh
+revalidates all 9inputs. Controller251.872s/outer actual252.225s,export27.469s and
+OWN publication7.547272 s after receiver/export descendant cleanup are separate.
+Root authenticated229 archive files/115,287,186B and terminal scheduler/platform;
+archived pre-export OUTER and committed running3 phase RECEIVER differ from final
+closed receipts. Result review=b6574c5c=, rootacceptance=RESULT-ACCEPTANCE.json=
+in =1287-plot-features-root-result-v6=. See the matching public report and ledger.
+No count 61 precedes reviewed merge; broader #1287/fourteen-country scope stays open.
+
+
+* 2026-11-01 UTC -- Food-acquired compiler/consumer checkpoint (GH #1287)
+
+The bounded result is independently and root-qualified accepted. Executed =e17008c57= pins scientific =2f0494ec=;
+dispatch =15e3e159= / Slurm 40714272. All 26 comparisons passed: 24 mandatory
+and two separately labelled transport checks, not 26 independent native science
+oracles. All eight native contributions and requested/coverage keys remain;
+compiler, Country, strict, first genuine Feature and fresh-process warm each
+return 355,571 rows. Full 34 policy + eight original Wave-policy + 20 pickle
+read roles were recorded.
+
+The original compiler's ordered concat/local ID walk once remains distinct from
+API original decorated food/getter bodies, per-wave generic raw walk/finalizer
+and same qualified 1376 finalized 24,561-row sample-v lookup. This is present-byte
+lookup custody, not sample/frame/weights/membership/EA-parish/population truth.
+The three-field inventory does not impose alphabetic storage order.
+
+One original Country invocation with both strict flags actually PASSED; all
+Quantity/Expenditure/Price requiredness remains. Generic publisher negative
+wording is a conditional branch, not this outcome. Pure actual audit reports
+are null=0/index=0/grain=0, raw footer=None; not pointwise completeness or
+losslessness. Historical natives retain 27 Quantity, 34 Expenditure and 29,755
+Price null cells. Actual cold/warm i/v are complete under #1357's exclusion
+of genuinely anonymous household-keyed output: no inferred/shared unknown ID
+or orphan representation. Source rows are not new eligible-loss evidence;
+#1120's separately completed approved scope is not extended.
+
+Pure actual warnings are three QuantityImplausible plus one ClusterIdentity per
+process; cumulative lists 16 cold/eight warm include expected/strict/Feature work.
+All nine API slots began absent; only country appears and eight wave slots remain
+absent, not evicted. Fresh warm records exactly two selected cache getters, zero
+named fallbacks and unchanged full cache/hash/all-eight coverage. Full typed
+matching-stage comparisons retain original order/nulls/dtypes/attrs.
+
+Preserve failed actual 43.511507 s and 265.285382 s, the withdrawn normalized
+metadata-as-stored-order claim, and killed-child closure limits. V3 freshly
+revalidates all nine inputs; exact observer prebinding retains genuine discovery
+and has no independently measured speedup. Revised actual 900 + 5 / target 840 / closure 60,
+cold 360 / warm 120 / shared 1,260 explicitly supersede historical 600; new actual 334.493207 s
+plus prior 308.796889 s totals 643.290096 s within revised 1,208.796889. Controller
+334.067779 s/export24.033564 s/receiver360.076746 s are separate. OWN 7.057387 s
+starts successful receiver/export descendant cleanup through verified remote ref,
+not inner actual exit/mtime. Root authenticated 253 files/435,778,817 B without
+frame decoding; archived pre-export OUTER and prepublisher RECEIVER remain distinct
+from final closed ordinary receipts. Scheduler COMPLETED0:0/platform success
+are separate terminal facts.
+
+All 1,023 selected non-CONTENTS source bindings match public 049677e3; executed
+CONTENTS and the full previous public prefix are preserved, without a later
+whole-code runtime/hash claim. Historical STORAGE/current composition does not
+establish original producer/decoder/image/runtime continuity, current raw/native/
+sample arithmetic, script/cache freshness, unit/category eligibility, FCT/nutrition
+or derived-food products. Copier 976fc is not proven native production. Seven-day
+one-ask recall versus two agricultural visits, Kgs removal, Value/Unknown, off-map
+unit deletion, UBOS Price provenance, EA/parish/refresh/weights/GPS and WAITING
+caveats remain. Independent REVIEW=152e2912=/BINDINGS=6afae736= and root result
+ACCEPTANCE govern the scope. Original fourteen-country #1287/#1288 and broader
+backlog remain open.
+See =.coder/ledger/1287-uganda-food-acquired-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-food-acquired-public-checkpoint/REPORT.md=.
+
+* Country-labeled parcel yield (GH #1475 / #1517, 2026-11-07)
+
+This extends the explicit country-axis restriction recorded under GH #1205;
+that older paragraph describes the previous protected boundary. A crop and
+area pair carrying row-level =country= on BOTH operands now retains that
+identity through conversion, reduction and joining. Uganda rows select the
+same validated =hhid-parcel-plot= constructor inverse after household walking;
+other countries' rows cannot acquire it from a stale scalar Uganda attribute.
+The nonempty ASCII-decimal parcel/plot suffix checks, matching common =i=,
+malformed/unmarked fallbacks, positive-area requirement and literal-plot mode
+are unchanged. A country axis on only one operand is refused, following the
+existing fertilizer-rate paired-identity rule. No native household or plot
+key is rewritten. This entry records the shared implementation and synthetic
+controls, not new source counts or a completed source verification campaign.
+
+* Explicit invariance comparison coverage (GH #1480, 2026-11-08)
+
+Ordinary pytest now reports the number of baseline entries and pinned fields
+actually compared, plus credential/setup skips, mismatches and not-run entries.
+It retains the data gate and adds no cache discovery/build to the terminal
+reporter. The former root-conftest header still described the retired automatic
+purge; its prose is corrected without reintroducing any purge.
+
+The opt-in read-only command is =scripts/check_uganda_invariance.py= with
+=--data-root /private/data --complete= (or =make uganda-invariance= with explicit
+=LSMS_DATA_DIR=). It reads only existing named Uganda cache files; no configured
+shared-root fallback, acquisition, build, cache stamp or baseline refresh.
+Optional JSON records every entry and each pinned comparison. The manifest is
+the dynamic scope, not a hard-coded53. Short wave manifests remain uncompared;
+missing metadata still follows the previous comparison contract, never a guess
+from observed t. Unknown keys/files and explicitly unpinned debt are separate.
+
+COMPLETE coverage is distinct from successful invariance: a fully compared
+mismatching cohort still fails. The original fingerprint, five assertions,
+dtype equivalences, approved nutrition primary/exact measured alternate and
+null-debt semantics are preserved. No baseline value or scientific rule is
+changed; current-source mismatches, if any, must be reported rather than
+regenerated. Verification and cost evidence: .coder/ledger/1480-uganda-invariance-coverage.md.
+
+* Demand input source aggregation (GH #1439 / #1526)
+
+=food_expenditures(market='Region')= retains acquisition-source =s=, including
+when =labels='Aggregate'= changes item =j=. CFE requires log expenditures on
+exactly =(i,t,m,j)=. The earlier Aggregate-split CFE result above therefore
+does not establish that the old unadapted demand-helper/skill recipe ran:
+GH #1526 records that its reviewer explicitly summed across =s=.
+
+The in-repository =lsms_library.demands.prepare_demand_inputs= now performs
+that consumer aggregation in monetary levels before logs, preserving every
+supplied source value. =basis='purchased'= remains the cash-outlay default;
+=basis='total'= explicitly requests all recorded acquisition values, without
+imputing an unreported own-production/in-kind value. All-missing groups stay
+missing; partially missing groups yield recorded subtotals. Keep the original
+food frame for per-source provenance and missingness.
+
+The adapter refuses absent/ambiguous market identities, repeated native keys
+and country axes rather than letting CFE silently drop or pool them. It does
+not repair the recorded missing Region labels, District vocabulary changes,
+EA/parish design, price provenance or sample/weight caveats. This entry records
+the adapter contract and source-free validation scope, not a new Uganda demand
+fit or source/cache build. Native food API, Aggregate buckets and invariance
+baselines remain unchanged. Ledger: =.coder/ledger/1439-demand-source-index.md=.
+
+* 2026-11-09 -- Anthropometry source declarations (GH #1288, partial)
+
+The seven 2009-10 through 2019-20 native anthropometry scripts obtain their
+raw paths from the authoritative =ANTHRO_FILES= map. The existing literal
+scanner does not follow imported dictionaries, so those raw sidecars were
+invisible to script-source fingerprinting/private Make input collection.
+Each script now declares its identical full source literal and raises before
+reading if it differs from =ANTHRO_FILES[t]=; the getter still uses that map.
+The explicit exception survives Python optimization. Neither the map nor any
+clinical/measurement, identifier, missingness, duplicate or output rule changes.
+This finite discovery fix adds no 2005 contribution and establishes no new
+raw/native/API parity or whole-GH1288 closure. The earlier fixed-STORAGE
+checkpoint's source-freshness/clinical limitations remain; see
+=.coder/ledger/1288-uganda-anthro-source-declarations.md=.
+
+* 2026-11-09 documentary clarification: cassava item key, not a state recode (GH #1525)
+
+The existing note remains the governing qualification: =1081/1082= are served
+as labelled, this is =not a clean swap=, and =nothing is swapped without a
+source=. Historical unit mixes, panel recurrence and purchased-row counts above
+were not remeasured for this documentary check.
+
+Own =2019-20/Documentation/unps2019_20_bid.pdf=, UBOS /Uganda National Panel
+Survey 2019/2020 Basic Information Document/ (566,821 bytes,
+MD5 =e491bd04efbd14658bd7e70050d0edfa=), supplies a narrower primary fact:
+*PDF page 16, Table 1* lists the food/beverages/tobacco consumption-item file
+=GSEC15B.dta= keyed by =hhid/CEB01=. The row alignment was checked visually.
+This supports the current driver's =CEB01= item field despite the own household
+forms' page-11 =CEB01= Description / =CEB02= Code grid; it is not authority to
+change the getter to =CEB02= or to infer either cassava state's meaning.
+
+At the current driver/helper, =CEB01= becomes =j= and the country
+=harmonize_food= table directly maps =1081= to dry and =1082= to flour.
+Only the mapping keys are integer-normalized; there is no paper-code
+underscore-removal/swap rule. A spelling change cannot supply the missing
+paper =108/108_1= to export =1081/1082= semantic bridge.
+
+BID PDF pages 8 and 30 identify /Survey Solutions/ for 2018/19 and 2019/20.
+Section 15 (page 14) gives consumption context, not that code bridge. All 38
+BID pages were read: no such food-state/export correction was found in this
+held document. Annex 1 (pages 35–37) is /unit/ codes (=108= is a medium 400g
+cup); Annex 2 (page 38) is /crop/ codes (=Cassava= =630=). Neither namespace
+may decode these food states. This is a bounded documentary finding, not a
+global absence claim or proof of the deployed CAPI roster.
+
+The cover's survey year and April 2021 PDF creation metadata do not identify
+every specific export version. =SOURCE.org= records WB catalog 3902 /
+=UGA_2019_UNPS_v03_M=; that catalog identity is not a version stamp in the BID.
+Still needed: the attributable own Survey Solutions food roster/questionnaire
+GUID + version/export specification or producer erratum connecting the printed
+fields/codes to the released fields/codes, with affected records and an explicit
+correction rule for both populations. Labels, units, Aggregate buckets, native
+values, weights and all scientific defaults remain unchanged. Whole #1525 is
+open; no native/header/API/build/cache or new statistical check ran here.
+
+* 2026-11-09 -- Remaining processing-state scope and current holds (#833 / #647 / #1000)
+
+The six-family Aggregate change above is already merged in PR #1534
+(=3aefbbedf7f59775c2ea6097fb4c0f8afa2d9c98=); it is not a new refill task.
+The narrowed #833 body leaves Beans, Peas, Rice, Ginger and Soybean unruled.
+[[file:PROCESSING_STATE_REVIEW.md][The residual-state memo]] binds their twelve current food-code rows and the
+separate crop namespace, without selecting a new fold or split.
+
+Two details matter before applying a general state rule. Food code 145 says
+only =Peas=, not fresh; =Peas (dry)= on 162 does not establish 145's state.
+Rice's one bucket holds unqualified 110, white/brown 1101/1102 and flour 1103.
+The crop table deliberately retains four pea species instead of folding them
+to food =Peas=. Numeric food/crop codes are not join keys either: food 141
+is Beans (dry), whereas crop 141 is Millet. These are committed mapping facts,
+not new native observations or proof of physical-state comparability.
+
+The [[https://github.com/ligon/LSMS_Library/issues/647#issuecomment-6639391906][2026-11-04 #647 ruling]] keeps the ordinary-only default pending a person's
+query to UBOS / World Bank about 5A1 routing. The earlier documentary checkpoint
+still supplies the question: additional versus cumulative Q6/Q7/Q8 amounts,
+and No/missing follow-up handling. No record append, replacement or factor-pool
+change is authorized by this note; the historical 97 rows are not remeasured.
+
+The [[https://github.com/ligon/LSMS_Library/issues/1000#issuecomment-6639392305][2026-11-04 #1000 ruling]] retains the current FCT and source note while
+the Kidmose source is obtained. A public [[https://www.academia.edu/15228942/Effect_of_home_preparation_practices_on_the_content_of_provitamin_A_carotenoids_in_coloured_sweet_potato_varieties_Ipomoea_batatas_Lam_from_Kenya][reproduction of the article]] now exposes
+methods beyond the earlier abstract: published p. 401, section 2.2 describes
+peeling the raw samples, and p. 403, section 2.7.1 measures dry matter on peeled
+raw samples. DOI =10.1016/j.ifset.2007.03.025=, journal 8(3), pp. 399--406.
+This supports the preparation question; it does not resolve the with-skin FCT
+assignment. Table 2's web text has scrambled column order. No cultivar cells,
+revised means or numeric correction are inferred from it; no original PDF
+bytes were acquired or authenticated. A readable table and electronic-FCT
+derivation/version remain needed. The #967 approval, container-mass caveats,
+#829 WAITING, sample-design qualifications and #1525 hold remain in force.
+
+This is source/document-only progress. No country table, native source/header,
+getter/provider, Make producer, tests, API/cache operation or new demand fit ran.
+No Preferred/Nutrition/Aggregate cell, FCT source note, value or default changed.
+
+* 2026-11-12 -- =nutrition.py= imports the transform behind =food_quantities()=; the #967 fixture entry moves (GH #1509)
+
+=nutrition.py= (both its =nutrition= and =fct= targets) reads
+=uga.food_quantities()= through the Country API at build time.
+=framework_imports_fingerprint= folds the closures of functions a country
+script imports, and =Country= is a class, so the kilogram ladder behind
+=food_quantities()= (=transformations.food_kg_factors=) was in no Uganda hash.
+Measured on a warm root: a =var/nutrition.parquet= built by base =e5fdd2fa8=,
+read by =0966d62ef= (whose ladder reads purchases only), was served as fresh in
+0.9 s with Energy 2,087,321,650 -- base's number, where that code's cold build
+gives 2,065,011,048 (red team on #1509, F3).  Ruling @ligon 2026-11-12, "Make the
+dependency visible": the script now imports =food_quantities_from_acquired= and
+asserts that =Country._FOOD_DERIVED= still routes =food_quantities= through it
+(=lsms_library.country.Country=, not =ll.Country=, so the GH #1062 exec tests,
+which replace =ll.Country=, still run).  Read by =30523f946=, the same warm
+copy grades stale, rebuilds (70 s) and serves 2,065,011,048.  Cost: every
+Uganda L2-country hash (28 tables) and L2-wave hash (224) moved once, and every
+later kg-factor logic edit re-warms Uganda cold.
+
+*What moved in =nutrition=* (cold, private roots, base =e5fdd2fa8= ->
+=30523f946=, 23,777 households either way): Energy -1.07% (2,087,321,650 ->
+2,065,011,048), Protein +0.40%; the values are the same under the
+"Item self-valued first" ladder order and the order before it, because no
+Uganda row has both an item-level non-purchase estimate and a purchase =unit=
+factor.  The cause is #1509's purchases-only evidence: 141,884 of 355,571
+=food_acquired= rows change kg factor (4,850 by more than 2x).
+
+*The #967 fixture entry no longer matches, and is NOT regenerated here.*
+=tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/nutrition.parquet]=
+passes on base and fails on this branch: shape 23,777 x 15 unchanged,
+=content_hash= =e9fb4c67b2463694a2ec7b46ee5e6df1ef424db19753a74c2b82ad6a48a6a600=
+(measured on n4257, OpenBLAS kernel not recorded) against the approved
+=12d25f6e...= and its Haswell variant =f3d3c34d...=.  The #967 precedent above
+is that this entry moves only on an explicit maintainer approval of the
+specific two fields; the proposal is in the #1509 PR body.  A different BLAS
+kernel may give a second exact fingerprint (=content_hash_variants=, GH #1480
+ledger), which has not been measured for this frame.
+
+*Maintainer decision [2026-11-12]: the #1509 nutrition baseline is approved.*
+"Approve the new baseline (Recommended)", #967 precedent.  The entry
+=var/nutrition.parquet= in =tests/fixtures/uganda_baseline.json= now pins shape
+23,777 x 15 (unchanged), =content_hash=
+=e9fb4c67b2463694a2ec7b46ee5e6df1ef424db19753a74c2b82ad6a48a6a600=, and
+=content_hash_variants= [=324429c1e855440cbd87465c3853087fd7a044f9e4473438297a94960acbd07e=].
+Columns, index names and dtypes are unchanged.  Both hashes were re-measured on
+the INTEGRATED tree of the ISA batch (=integration/isa-batch-20261112=), not
+carried from the #1509 branch:
+- burst job 41254805 (n4257, cold private root, integrated code =6a670ce83=):
+  =e9fb4c67...=, Energy 2,065,011,048.47, the #1509 branch's own value.  Its
+  =27a215996= arm (#1509 merged, EHCVM-2 not yet) gave the same hash, so no
+  other branch in the batch moves this frame;
+- burst job 41255032 (Xeon Gold 6330, OpenBLAS 0.3.31): a private copy of that
+  root's Uganda L2, =nutrition.py nutrition= rebuilt at head =c4bce965a= under
+  =OPENBLAS_CORETYPE=SkylakeX= (=e9fb4c67...= again) and =Haswell=
+  (=324429c1...=).  The same Energy total holds under both kernels.
+The variant replaces =f3d3c34d...=, the Haswell fingerprint of the pre-#1509
+frame, which would otherwise accept that frame's values on a Haswell-kernel
+runner.  The same job ran the method on base =e5fdd2fa8= as a control.  It
+reproduced the shipped pair exactly: SkylakeX =12d25f6e...= and Haswell
+=f3d3c34d...=, and the invariance test passed under both.  Re-measured once the
+batch's sixth branch (served-wave corrections, with its Uganda 2009-10 =ea= fill)
+had merged: the six-branch tree (=fb87c461e=) gives the same frame, cold in a
+private root (burst job 41255173: =e9fb4c67...=) and rebuilt under both kernels
+(burst job 41256344: SkylakeX =e9fb4c67...=, Haswell =324429c1...=).  The
+=ea= fill does not move nutrition, and the entry stands as pinned.
+
+* 2026-11-12 -- 2009-10 ea from the same household in another wave (GH #1536)
+
+/Ruling @ligon 2026-11-12, "Fill, registered"./  Under "One label across all eight waves (GH
+#1459)" above, 2009-10's =ea= stayed NA where =comm= is blank: 569 rows, 29.32% of the wave's
+weight.  A household whose own =comm= gives no =ea= now takes the same household's label in
+another wave, stamped =Uganda::sample::ea-same-household=.  =v= is not involved and does not change.
+
+*The idiosyncrasies this leans on.*
+- =comm= in 2009-10 is the 2005-06 frame EA, so movers (=hh_status= 2) and split-offs (3) have it
+  blank (see "Hybrid =v= in 2009-10").  2010-11 =GSEC1= records the same households under their
+  original-sample EA, which is why a label exists elsewhere for most of them.
+- =HHID= is unchanged 2005-06 .. 2011-12, and no =updated_ids= entry covers those waves, so 2009-10's
+  served =i= is the raw =HHID= (2,975 of its 2,979 households are on =GSEC1=; the other 4 only on
+  =AGSEC3B= / =GSEC12=).  2013-14 links back through =HHID_old=, the 2011-12 =HHID=, which is what
+  =updated_ids['2013-14']= walks.  The route therefore reads RAW ids through =format_id=, never the
+  walked =i=, and reaches exactly the households the walked =i= links.
+- A split-off inherits its parent's EA, as under GH #689: the value is the PSU through which the
+  lineage entered the sample.
+
+*The rule.*  For a 2009-10 =GSEC1= household whose =comm= gives no =ea=: its =comm= in 2005-06,
+2010-11 or 2011-12, by =HHID=, through =comm_ea=; else its 2013-14 =GSEC1.ea=, by =HHID_old=.  Two
+=dfs:= sub-dfs read those covers (=ea_comm_waves=, =ea_2013_14=), so losing one costs the fill and
+not =v=; their hooks keep only those households, so the outer merge adds no row.  The fill runs
+after the =comm= keys are stamped and never changes an =ea= that is already served.
+
+*Which wave, when several hold a label.*  The =comm= waves', then 2013-14's, and every label the
+household holds must agree or the build raises =OriginEaError=, as =gsec1= / =AGSEC1= do.  The
+=comm= waves come first because they name the frame EA of the same =HHID= directly and 2005-06 is
+the wave the panel was sampled in; 2013-14 is reached only for 22 households no =comm= wave records.
+Measured on the served base frame by walked =i=: 0 of the 514 holds two different labels in any of
+the seven other waves, so the order decides nothing today.
+
+*Measured, cold, development =e5fdd2fa8= against the candidate (burst job 41249476).*
+
+|                                             | before  | after   |
+|---------------------------------------------+---------+---------|
+| 2009-10 rows with no =ea=                   | 569     | 55      |
+| ... share of 2009-10 weight                 | 29.32%  | 3.53%   |
+| 2009-10 distinct =ea=                       | 317     | 321     |
+| non-missing =ea= changed, any wave          | --      | 0       |
+
+The 514 are 192 movers, 317 split-offs and 5 originals; they take their label from 2005-06 (197
+hold one there), 2010-11 (440), 2011-12 (420) and 2013-14 (246, 22 only there).  The 55 left are 51
+split-offs no other wave records and the 4 =AGSEC3B= / =GSEC12= households; 4 of the 55 carry no
+weight.  =sample= has the same index; every column but =ea= and =Derivation= is equal, and
+=Derivation= changes on exactly the 514 rows.  =cluster_features= and
+=household_characteristics= are frame-equal.  =derivation_inputs= returns 1,303 rows for the 514
+households, and every stamped row joins them.  Cost: one Uganda re-warm (=uganda.py= and the
+2009-10 =data_info.yml=): 27 of 27 Uganda table hashes and 216 of 216 Uganda wave hashes, no other
+country's, no build fingerprint.  =var/sample= is re-pinned in =tests/fixtures/uganda_baseline.json=.

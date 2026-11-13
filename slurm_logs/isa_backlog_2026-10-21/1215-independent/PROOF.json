@@ -1,0 +1,93 @@
+{
+  "status": "FINAL_SAVED_ARTIFACT_METADATA_ACCOUNT_COMPLETE_NO_API",
+  "strict_public": {
+    "FAIL": 10,
+    "PASS": 54
+  },
+  "strict_native": {
+    "PASS": 28
+  },
+  "normal_actors": 8,
+  "normal_calls": 48,
+  "full_failures_preserved": 10,
+  "approved_order_cross_head_failures": 7,
+  "inherited_actual_parent_backend_order_failures": 3,
+  "scanner_records_each": 22,
+  "scanner_statuses_each": {
+    "warn": 22
+  },
+  "scanners_ordered_bytes_equal": true,
+  "scanner_ordered_sha256": "8a67501840d3fd1b379f03f129b9a35abafef068737293ef937c98acc1299a2c",
+  "source_associated_guard_counts": {
+    "original-calibration-seed": 40,
+    "denied-source-associated-urllib3-IPv6-capability-bind": 101,
+    "denied-existing-Make-country-directory-noop": 20
+  },
+  "private_warning_token_count": 49,
+  "native_grain_transport_qualification": "No native held crop footer contains lsms_grain_audit and the native pandas attribute mappings are empty; nonempty grain-ledger transport is established only by synthetic fixtures, not genuine native records.",
+  "new_reader_APIs_or_raw_decodes": 0,
+  "candidate": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "independent_new_controls": {
+    "candidate": {
+      "PASS": 13
+    },
+    "true_parent": {
+      "FAIL": 6,
+      "PASS": 7
+    }
+  },
+  "existing_supports_each_head": {
+    "PASS": 50
+  },
+  "strict_fault_calibration": {
+    "original_faults_rejected": 30,
+    "separate_positive_controls": 2,
+    "additive_isolated_axis_controls_rejected": 2
+  },
+  "predata_invalidation": {
+    "country": 549,
+    "framework": 39,
+    "wave": 1362,
+    "all_moved": true,
+    "ordered_public_API_unchanged": true
+  },
+  "providers": 37,
+  "provider_bytes": 44442303,
+  "distinct_L1_copies": 148,
+  "copy_bytes": 177769212,
+  "distinct_provider_copy_inodes": 185,
+  "cold_barren_sample_parquets": {
+    "candidate-default": 9,
+    "parent-default": 9,
+    "candidate-make": 8,
+    "parent-make": 8
+  },
+  "cold_barren_crop_parquets_each": 0,
+  "source_protection": {
+    "tracked_paths": 29827,
+    "fresh_nonhistorical_regular_SHA256": 29727,
+    "symlink_text_identities": 94,
+    "historical_now_metadata_only": 6,
+    "regular_total": 29733,
+    "hash_interval": "Original91214 stopped1 saved completed full source/cache prefixes; new72157actual0 metadata gate binds them; provider/copy185 integrity is a NEW persisted full interval."
+  },
+  "historical_original_reads": {
+    "files_per_head": 3,
+    "bytes_per_head": 6632118,
+    "files_both_heads": 6,
+    "bytes_both_heads": 13264236,
+    "original_Popen_pid": null,
+    "source_snapshot_output_at_UTC": "2026-10-22T20:28:41.531425+00:00"
+  },
+  "directory_privacy": {
+    "private_ancestor": "0700",
+    "measured_exceptions": {
+      "dvc-site-cache/repo": "0777",
+      "xdg/cache/fontconfig": "0755"
+    },
+    "no_permission_changes": true
+  },
+  "acceptance_owner": "Root; human owns merge",
+  "signed": "Sue (GPT-6)"
+}

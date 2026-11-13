@@ -1,0 +1,58 @@
+{
+  "accepted_at_UTC": "2026-10-22T02:34:16.063051+00:00",
+  "decision": "ACCEPT_DOCUMENTATION_ONLY_DESCENDANTS",
+  "pairs": [
+    {
+      "label": "standalone",
+      "base": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "candidate": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+      "only_path": "lsms_library/countries/Mali/_/CONTENTS.org",
+      "insertions": 8,
+      "deletions": 8,
+      "other_tracked_blobs_and_Git_modes_exact": true,
+      "tests_tree_exact": true,
+      "actual_checkout_files_Git_blob_verified": 14897,
+      "clean": true,
+      "root_measured_inventory_receipts_verified": true,
+      "API_hashes_exact": 549,
+      "framework_fingerprints_exact": 39,
+      "reviewer_reran_metadata_inventory": false,
+      "data_API_test_or_decode_replay": false
+    },
+    {
+      "label": "integration18",
+      "base": "f9feb3c807aff5206134c37768992302ceb431fa",
+      "candidate": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+      "only_path": "lsms_library/countries/Mali/_/CONTENTS.org",
+      "insertions": 8,
+      "deletions": 8,
+      "other_tracked_blobs_and_Git_modes_exact": true,
+      "tests_tree_exact": true,
+      "actual_checkout_files_Git_blob_verified": 15032,
+      "clean": true,
+      "root_measured_inventory_receipts_verified": true,
+      "API_hashes_exact": 549,
+      "framework_fingerprints_exact": 39,
+      "reviewer_reran_metadata_inventory": false,
+      "data_API_test_or_decode_replay": false
+    }
+  ],
+  "root_read_complete_review_verdict_reproduction_and_actual_check_and_seal_sources": true,
+  "root_all12manifest_payloads_verified": true,
+  "READY_sha256": "837ef38c55ce4f3e1769b43c1959f791005ab904edbc8dd66378e4a9ba279be3",
+  "manifest_sha256": "2979f29e85c9559d7344b06b40e0cce2343d9abce19e9482c09719432d333228",
+  "runtime_proof_remains_at_original_f9_and9e": true,
+  "root_measured_549API_and39framework_exact_each_pair": true,
+  "zero_API_test_decode_replay": true,
+  "original_runtime_root_verification": "integration/mali-eighteen-review/ROOT-RUNTIME-ACCEPTANCE.json",
+  "publication_authorized": [
+    "PR1199 head fastforward9e_to_b4",
+    "new integration18 docs branch471"
+  ],
+  "publication_completed": true,
+  "no_public_PR_merged": true,
+  "signed": "Sue",
+  "published_PR1199_head": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+  "published_integration18_head": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+  "published_integration18_branch": "isa/integration-eighteen-docs-20261022"
+}

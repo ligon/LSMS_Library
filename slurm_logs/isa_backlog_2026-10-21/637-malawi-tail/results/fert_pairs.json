@@ -1,0 +1,22 @@
+{
+ "2010-11": {
+  "pairs": 89,
+  "both_kg_positive": 89,
+  "use_yes": 89,
+  "use_yes_both_positive": 89,
+  "equal_kg": 72,
+  "shared_key_before_1193": 38,
+  "newly_coalesced_by_1193": 51,
+  "newly_coalesced_use_yes_both_positive": 51
+ },
+ "2019-20": {
+  "pairs": 187,
+  "both_kg_positive": 187,
+  "use_yes": 187,
+  "use_yes_both_positive": 187,
+  "equal_kg": 143,
+  "shared_key_before_1193": 3,
+  "newly_coalesced_by_1193": 184,
+  "newly_coalesced_use_yes_both_positive": 184
+ }
+}

@@ -62,7 +62,9 @@ _EXPECTED = {
     # '90 kg Bag' adds 5 to 2010-11 (48 -> 53), and code-23 specify texts that
     # name a food add 66 / 165 / 98 to 2010-11 / 2016-17 / 2019-20
     # (53 -> 119, 429 -> 594, 32 -> 130).
-    'Malawi': ('N/A', {'2004-05': 892, '2010-11': 119, '2013-14': 118,
+    # GH #1075 ruling (@ligon 2026-11-03): the 13 suffixed 2010-11 codes on
+    # no list (16b 5, 12a 2, 21b 2, 16a 2, 12b 1, 03a 1) -> 119 -> 132.
+    'Malawi': ('N/A', {'2004-05': 892, '2010-11': 132, '2013-14': 118,
                        '2016-17': 594, '2019-20': 130}),
 }
 
@@ -229,10 +231,11 @@ def test_delivered_rows_carry_the_sentinel_and_no_inferred_kg(country):
         # Code 23 with no specification is gone under every spelling it had.
         for gone in ('Other', 'Unit'):
             assert not (u == gone).any(), f'Malawi still serves u={gone!r}'
-        # The shipped conversion-table factor survives the relabel (5 code-23
-        # rows + the first pass's 14 'N/A' rows, all 2019-20; + 30 food-named
-        # code-23 rows, ruling 5: 19 -> 49).
-        assert int((sources.astype(str) == 'survey_kg').sum()) == 49
+        # The shipped conversion-table factor used to survive the relabel on
+        # 49 code-23 rows (all 2019-20; Mango 29 at 10.99 kg per mango).
+        # GH #1074 ruling (@ligon 2026-11-03): a row served 'Unknown' keeps
+        # no code-23 factor -> none of them is survey_kg.
+        assert int((sources.astype(str) == 'survey_kg').sum()) == 0
         # Ruling 5: no served food-named specify text survives on IHS3-IHS5.
         for gone in ('Mango', 'Coffee', 'Meal', 'Meals', 'Mice', 'Scones'):
             assert not (u == gone).any(), f'Malawi still serves u={gone!r}'

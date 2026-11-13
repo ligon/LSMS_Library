@@ -1,0 +1,219 @@
+{
+  "result": "PASS_FOR_INDEPENDENT_REVIEW",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "runtime_head": "1eb9bb377157c78f74962c7a9de59807d446b239",
+  "branch": "fix/1006-uganda-derived-api-tests-20261021",
+  "scoped": {
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "real_API_cases": 15,
+    "pure_dtype_controls": 10
+  },
+  "supporting": {
+    "passed": 41,
+    "failed": 0,
+    "skipped": 0
+  },
+  "absence": {
+    "empty": {
+      "skipped": 15,
+      "passed": 10
+    },
+    "credentialless": {
+      "skipped": 15,
+      "passed": 10
+    }
+  },
+  "fault_controls": {
+    "canonical_dtype_rejected": 6,
+    "canonical_float_accepted": 4,
+    "unchanged_attrition_rejected": 6,
+    "index_measurement_dtype_rejected": 8,
+    "post_readiness_API_errors_propagated": 4,
+    "environment_restoration_cases": 4
+  },
+  "fullframe_and_attrs_comparisons": [
+    {
+      "table": "food_prices",
+      "mode": "default",
+      "rows": 348181,
+      "full_frame_exact": true,
+      "attrs_exact": true,
+      "columns_axis_name": null,
+      "reference_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "table": "food_quantities",
+      "mode": "default",
+      "rows": 355487,
+      "full_frame_exact": true,
+      "attrs_exact": true,
+      "columns_axis_name": null,
+      "reference_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "table": "food_expenditures",
+      "mode": "default",
+      "rows": 247049,
+      "full_frame_exact": true,
+      "attrs_exact": true,
+      "columns_axis_name": null,
+      "reference_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "table": "household_characteristics",
+      "mode": "default",
+      "rows": 24364,
+      "full_frame_exact": true,
+      "attrs_exact": true,
+      "columns_axis_name": "sex_age",
+      "reference_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "table": "income",
+      "mode": "default",
+      "rows": 14740,
+      "full_frame_exact": true,
+      "attrs_exact": true,
+      "columns_axis_name": null,
+      "reference_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "table": "food_prices",
+      "mode": "Region",
+      "rows": 348145,
+      "full_frame_exact": true,
+      "attrs_exact": true,
+      "columns_axis_name": null,
+      "reference_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "table": "food_quantities",
+      "mode": "Region",
+      "rows": 355450,
+      "full_frame_exact": true,
+      "attrs_exact": true,
+      "columns_axis_name": null,
+      "reference_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "table": "food_expenditures",
+      "mode": "Region",
+      "rows": 247018,
+      "full_frame_exact": true,
+      "attrs_exact": true,
+      "columns_axis_name": null,
+      "reference_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "table": "household_characteristics",
+      "mode": "Region",
+      "rows": 24297,
+      "full_frame_exact": true,
+      "attrs_exact": true,
+      "columns_axis_name": null,
+      "reference_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    }
+  ],
+  "Region_observations": [
+    {
+      "table": "food_prices",
+      "default_rows": 348181,
+      "Region_rows": 348145,
+      "excluded_rows": 36,
+      "default_columns_axis_name": null,
+      "Region_columns_axis_name": null
+    },
+    {
+      "table": "food_quantities",
+      "default_rows": 355487,
+      "Region_rows": 355450,
+      "excluded_rows": 37,
+      "default_columns_axis_name": null,
+      "Region_columns_axis_name": null
+    },
+    {
+      "table": "food_expenditures",
+      "default_rows": 247049,
+      "Region_rows": 247018,
+      "excluded_rows": 31,
+      "default_columns_axis_name": null,
+      "Region_columns_axis_name": null
+    },
+    {
+      "table": "household_characteristics",
+      "default_rows": 24364,
+      "Region_rows": 24297,
+      "excluded_rows": 67,
+      "default_columns_axis_name": "sex_age",
+      "Region_columns_axis_name": null
+    }
+  ],
+  "attrition": {
+    "helper_and_numerical_AST_bodies_unchanged": 5,
+    "actual_reference_matrices_exact": 2,
+    "threshold": 50,
+    "positive_diagonal_assertions_preserved": true,
+    "monotonic_diagonal_assertion_added": false
+  },
+  "prerequisite_country_caches": {
+    "food_acquired": {
+      "grade": "fresh",
+      "coverage_waves": 8
+    },
+    "household_roster": {
+      "grade": "fresh",
+      "coverage_waves": 8
+    },
+    "sample": {
+      "grade": "fresh",
+      "coverage_waves": 8
+    },
+    "income": {
+      "grade": "fresh",
+      "coverage_waves": 8
+    },
+    "shocks": {
+      "grade": "fresh",
+      "coverage_waves": 8
+    },
+    "cluster_features": {
+      "grade": "fresh",
+      "coverage_waves": 8
+    }
+  },
+  "integrity": {
+    "tracked_original_files_checked": 14880,
+    "unchanged_original_files_outside_three_tests": 14877,
+    "production_config_library_and_all_fixtures_byte_identical": true,
+    "nutrition_FCT_and_baselines_unchanged": true,
+    "prerequisite_L2_writer_diagnosis_and_release_sources_unchanged": 170,
+    "held_L1_writer_diagnosis_and_quiescent_sources_unchanged": 581,
+    "physical_private_copies_no_symlinks": true,
+    "derived_parquets_created": 0,
+    "in_tree_parquets_and_Uganda_Stata_files": 0,
+    "no_acquisition_DVC_CLI_sharedcache_or_hash_bypass": true
+  },
+  "parquet_bytes_or_mtime_changes": 0,
+  "offline": {
+    "unshare_rn": true,
+    "connect_and_connect_ex_method_guards_validated": true,
+    "numerical_build_make_threads": 1,
+    "xdist_workers": 3,
+    "distribution": "loadfile"
+  },
+  "limits": [
+    "Held f8 source-prerequisite caches, not full cold source rebuild",
+    "Bounded targeted/supporting selection, not full suite",
+    "Reported HC column-axis name change and existing schema/documentation contradictions remain outside this test-only change",
+    "Full frames, source IDs, warning examples and logs remain private"
+  ],
+  "private_runner_SHA256": {
+    "run.sh": "e988f1a5b8694a32bd046dfd360e9f427ff3174388a7013ef8f24b6cac5ebddc",
+    "run_tests.py": "b2ebb391cb5e37795fc0a34040e419f6bf16826ab4f1cffefe1b0acae819e804",
+    "check_controls.py": "67b9433b6eb7df380583a73c5a89370268b2eb95e2bc6014a11f0c7e956ab539",
+    "compare_frames.py": "49549c4d4bf29605b162a3011f2108f9a5df139e093bc465801d4beac82ee605",
+    "verify_state.py": "ee79bfa2ac292292b5a5eed9a597ac9c63547d1321fcaab234914a1868bd387b"
+  }
+}

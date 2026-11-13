@@ -1,0 +1,46 @@
+#+TITLE: GH1091 Niger retirement proposal -- approval pending
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Concrete production boundary
+At d602f8d63520e521a730f85551b366c4d45d9a35, delete only =lsms_library/countries/Niger/_/community_prices.py= and the country-specific block Makefile:105-115: old concatenator comments, sole-use COMMUNITY_PRICE_WAVES and country var target/recipe.
+Keep Makefile:117-118, including its niger.py and categorical_mapping.org prerequisites, exactly as a working wave pattern.
+Keep COUNTRY, LSMS_DATA_ROOT, VAR_DIR and all other targets/variables; do not remove the unrelated rounds declaration.
+No change to niger.py, either wave script, mappings, eligibility, IDs, reducers, data_scheme declarations, canonical schema or framework is needed.
+Leave materialize: make in place: wave builds and the script-path required Price/Quantity gate still apply.
+Document actual builder authority, transient i==v shim, default/raw/Make/artifact differences and observed baseline subset behavior additively in CONTENTS; preserve historical measurements.
+Refresh the task ledger before production edits and attach safe aggregate report/proofs.
+Current false coverage/schema comments are explicitly recorded in DIAGNOSIS rather than silently treated as evidence; a comment-only cleanup can be separately approved without changing science.
+
+Delete-only-script and delete-only-rule alternatives are incomplete.
+Script discovery short-circuits _has_country_builder; an active Make rule with a missing prerequisite counts as a real broken builder, not absence.
+After both are removed, existing fresh-empty-root make -n discovery selects the existing authoritative wave aggregation; no new selector or framework code is proposed.
+Default continues to store its verified normalized country cache; explicit Make on the no-country-builder route should aggregate waves and write no country parquet.
+Direct invocation of the retired country target becomes unsupported; the documented CLI/API materialization path remains the supported country entry point.
+
+* Required behavior and explicit qualifications
+Preserve every real current default row:32352 in2011,13691 in2014,46043 all, complete values/null masks/keys/order/dtypes/axis metadata and recursively typed attrs at matched stages.
+Keep all native wave payloads, all30 nonrepeat second-entry slots and all76 #1088 quantity corrections exact.
+Keep239877 food rows and all three complete derived control frames exact at matched cold/warm stages.
+Make supported singleton results must match the requested authoritative default frame, not the old extra-wave output.
+Make unsupported2018/2021/combined requests must return declared empty results; no source/instrument claim is implied by current config absence.
+Preserve strict full comparisons: old native Make attrs lack id_converted, while the authoritative framework path carries it; record this intentional routing metadata change explicitly.
+Existing unsupported-zero-row states also differ in id_converted and the declared-empty helper projects different visit/obs/Description dtypes; actual candidate API measurements are required before calling these identical or accepting the small existing-contract empty-state consequence.
+Do not normalize or erase metadata/dtypes to pass comparisons, and do not expand this work into a framework dtype repair.
+No new human grain/science decision is required by this proposal; root should assess the concrete measured routing consequences before authorizing code.
+
+* Meaningful baseline-negative regression plan
+- Exercise actual _has_country_builder under a fresh empty private root and actual retained wave Make pattern targets. Current baseline is True and runs both scripts+concat; corrected source must be False at country level, while supported wave targets still succeed.
+- Use two distinct nonempty script-produced waves in the existing GH1039 harness with real Make/script operations. Assert default/Make exact full frames and typed attrs for all,2011-only and2014-only; never patch the selector or Path.exists to manufacture absence.
+- Assert all three unsupported requests are empty in independent target-cold and already-populated roots, and that no country Make fallback/cache is produced on explicit Make. Current Make fails all five supported-singleton/unsupported subset contracts by serving both waves.
+- Include a missing-required-column negative and well-formed declared-empty guard so retirement cannot silently evade Price/Quantity policy.
+- Replay the complete held-source matrix in separate candidate physical roots. Compare actual raw/native/walked/public and CLI artifact stages to this frozen baseline with check_exact=True,rtol=0,atol=0 and recursively typed FULLattrs. Keep precise expected routing/empty-state differences visible.
+- Re-run the97 focused cases and12 real built assertions, argument-matched default and currency=None Feature controls plus healthy Mali40218 and all3 scanner findings; fresh processes/new Country/Feature objects must cause zero warm byte/mode/mtime changes.
+- Measure actual pinned baseline/candidate Niger23 API hashes and healthy-country/framework controls before any scoped rebuild. Prediction only: all Niger hashes move due shared Makefile and removed country .py inputs; no other-country/framework source change proposed. Do not claim a candidate census from this diagnosis or launch a full-corpus rebuild.
+
+* Dispatcher residual text
+Suggested title after a reviewed Niger implementation lands: "community_prices: retire remaining Tanzania country concatenator; Mali tracked independently".
+Suggested body: "GH1091 is framework-authoritative under GH788 maintainer comments6244122374/6259387154; accepted GH840/1086 variety/visit/obs and source-duplicate policies are unchanged. Niger's diagnosis and any eventual implementation/review must be linked with its actual PR/pin before it is marked resolved. Tanzania remains a separate source-backed retirement: audit the country concatenator, Make rule148-149/discovery variables145-146, retain wave pattern151-152 and assess generic rule154 using its actual current source and held inputs. Preserve all native v/variety prices, supported and absent subset semantics, strict typed attrs and matched CLI/Feature stages. The supplied Tanzania context pin is e75be9c56fa6c318ce32cea5a8be6d448578bed1; this Niger task makes no runtime verification or completion claim for it. Mali is independently ongoing from the reviewed GH822/PR1180 parent aba2badfe; retain all155931 recorded prices including recovered observation slots, and link that lane's own decision/review rather than compose it here. No authority, grain, source eligibility, selector or aggregation decision is reopened."
+No issue or PR was written; parent owns reconciliation after actual reviewed implementation.
+
+-- Sue

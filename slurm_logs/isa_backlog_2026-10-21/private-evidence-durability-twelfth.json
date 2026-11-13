@@ -1,0 +1,23 @@
+{
+  "verified_at_UTC": "2026-10-22T01:08:00.958296+00:00",
+  "archive_name": "quiescent-followup-twelfth.tar.gz",
+  "archive_sha256": "d5388b73a05e34b63799146d29774f9561dc8ca6688dfe0964f2e39a96c1e1d7",
+  "archive_bytes": 524515130,
+  "included_files": 3331,
+  "included_source_bytes": 3291759001,
+  "roots": [
+    "integration/framework-seventeen-review"
+  ],
+  "excluded_entries": 1316,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "8fdb7a163c93109f8aace7912eb7686d04e97fa70aeb5742bf300bcee9289b1e",
+  "private_full_manifest_sha256": "28bc061745dc5316292c824a37a28b8d63054881a5329ab49e22d71d628877b8",
+  "private_evidence_not_exported_to_Git": true
+}

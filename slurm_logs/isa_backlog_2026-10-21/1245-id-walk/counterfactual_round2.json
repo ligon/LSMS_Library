@@ -1,0 +1,22 @@
+{
+ "id_walk": {
+  "check": "pass",
+  "check_msg": "id_walk is idempotent on cached household_roster.parquet [3 of 3 waves] (21037 rows)",
+  "spine_rows": 21037,
+  "spine_columns": 0,
+  "food_quantities_rows": 316441,
+  "food_quantities_hh_2021_22": 3216,
+  "food_quantities_dup_index_entries": 0,
+  "food_quantities_dup_index_extra_rows": 0
+ },
+ "bare_single_pass": {
+  "check": "fail",
+  "check_msg": "id_walk not idempotent: rows 21037->21037 (delta +0), 77 disappeared, 0 appeared (cached household_roster.parquet [3 of 3 waves])",
+  "spine_rows": 21037,
+  "spine_columns": 0,
+  "food_quantities_rows": 316441,
+  "food_quantities_hh_2021_22": 3140,
+  "food_quantities_dup_index_entries": 1470,
+  "food_quantities_dup_index_extra_rows": 735
+ }
+}

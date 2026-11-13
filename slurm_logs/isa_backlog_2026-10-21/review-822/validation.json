@@ -1,0 +1,294 @@
+{
+  "verdict": "PASS",
+  "blockers": [],
+  "reviewed_head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+  "baseline_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "corrected_descendant": {
+    "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+    "direct_child": true,
+    "only_changed_file": ".coder/ledger/822-mali-community-price-readings.md",
+    "only_change": "remove one trailing space from heading",
+    "all_other_git_tree_entries_identical": true,
+    "full_diff_check_clean": true
+  },
+  "source_and_api": {
+    "old_obs3_exact_frame_and_dtypes": true,
+    "old_full_source_keep_drop_masks_equal": true,
+    "old_kept": 40218,
+    "old_full_source_dropped": 105089,
+    "new_rows": 115713,
+    "all_old_base_cells_retained": true,
+    "old_base_cells": 23646,
+    "new_base_cells": 39245,
+    "rows_by_obs": {
+      "1": 66699,
+      "2": 49014,
+      "3": 40218
+    },
+    "index_unique": true,
+    "null_index_keys": 0,
+    "unknown_source_masks": {
+      "excluded_positive_price_unit": 129,
+      "unresolved_integer_known_missing": 49,
+      "unresolved_zero": 19,
+      "unresolved_fractional": 3,
+      "unresolved_other_integer": 58,
+      "excluded_weight_positive": 79,
+      "excluded_weight_zero": 22,
+      "excluded_weight_sentinel": 15,
+      "excluded_weight_missing": 13
+    },
+    "hashes": {
+      "total": 549,
+      "changed_mali": 24,
+      "unchanged_others": 525,
+      "framework_unchanged": 39
+    },
+    "comparator": {
+      "country": "Niger",
+      "rows": 46043,
+      "hash_current": true,
+      "all_wave_manifest": true,
+      "sha256": "bf47a8949709044659b3f914813e55324b457fc210280c64bf7660589248f284",
+      "physical_private_copies": 2
+    }
+  },
+  "candidate_cold": {
+    "identity": {
+      "head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+      "package": "/local/job40255479/worktrees/isa-review-822/lsms_library/__init__.py",
+      "countries_root": "/local/job40255479/worktrees/isa-review-822/lsms_library/countries",
+      "data_root": "/local/job40255479/control/isa-backlog-20261021/review-822/data-candidate-cold2"
+    },
+    "rows": 155931,
+    "index_names": [
+      "t",
+      "v",
+      "j",
+      "u",
+      "variety",
+      "visit",
+      "obs"
+    ],
+    "column_dtypes": {
+      "Price": "Float64",
+      "Quantity": "Float64",
+      "Description": "string"
+    },
+    "index_dtypes": {
+      "t": "str",
+      "v": "str",
+      "j": "str",
+      "u": "str",
+      "variety": "str",
+      "visit": "int64",
+      "obs": "int64"
+    },
+    "elapsed_s": 6.144816174171865,
+    "warning_classes": [],
+    "network_attempts": 0,
+    "independent_full_source_expectation_exact": true
+  },
+  "candidate_warm": {
+    "identity": {
+      "head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+      "package": "/local/job40255479/worktrees/isa-review-822/lsms_library/__init__.py",
+      "countries_root": "/local/job40255479/worktrees/isa-review-822/lsms_library/countries",
+      "data_root": "/local/job40255479/control/isa-backlog-20261021/review-822/data-candidate-cold2"
+    },
+    "rows": 155931,
+    "index_names": [
+      "t",
+      "v",
+      "j",
+      "u",
+      "variety",
+      "visit",
+      "obs"
+    ],
+    "column_dtypes": {
+      "Price": "Float64",
+      "Quantity": "Float64",
+      "Description": "string"
+    },
+    "index_dtypes": {
+      "t": "str",
+      "v": "str",
+      "j": "str",
+      "u": "str",
+      "variety": "str",
+      "visit": "int64",
+      "obs": "int64"
+    },
+    "elapsed_s": 1.397540159523487,
+    "warning_classes": [],
+    "network_attempts": 0,
+    "independent_full_source_expectation_exact": true,
+    "fresh_process_cold_warm_exact": true,
+    "private_cache_bytes_unchanged": true
+  },
+  "baseline_cold": {
+    "identity": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "package": "/local/job40255479/worktrees/isa-baseline/lsms_library/__init__.py",
+      "countries_root": "/local/job40255479/worktrees/isa-baseline/lsms_library/countries",
+      "data_root": "/local/job40255479/control/isa-backlog-20261021/review-822/data-baseline-cold2"
+    },
+    "rows": 40218,
+    "index_names": [
+      "t",
+      "v",
+      "j",
+      "u",
+      "variety",
+      "visit"
+    ],
+    "column_dtypes": {
+      "Price": "Float64",
+      "Quantity": "Float64",
+      "Description": "string"
+    },
+    "index_dtypes": {
+      "t": "str",
+      "v": "str",
+      "j": "str",
+      "u": "str",
+      "variety": "str",
+      "visit": "int64"
+    },
+    "elapsed_s": 4.968244697898626,
+    "warning_classes": [],
+    "network_attempts": 0,
+    "independent_full_source_expectation_exact": true
+  },
+  "baseline_warm": {
+    "identity": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "package": "/local/job40255479/worktrees/isa-baseline/lsms_library/__init__.py",
+      "countries_root": "/local/job40255479/worktrees/isa-baseline/lsms_library/countries",
+      "data_root": "/local/job40255479/control/isa-backlog-20261021/review-822/data-baseline-cold2"
+    },
+    "rows": 40218,
+    "index_names": [
+      "t",
+      "v",
+      "j",
+      "u",
+      "variety",
+      "visit"
+    ],
+    "column_dtypes": {
+      "Price": "Float64",
+      "Quantity": "Float64",
+      "Description": "string"
+    },
+    "index_dtypes": {
+      "t": "str",
+      "v": "str",
+      "j": "str",
+      "u": "str",
+      "variety": "str",
+      "visit": "int64"
+    },
+    "elapsed_s": 1.1642763996496797,
+    "warning_classes": [],
+    "network_attempts": 0,
+    "independent_full_source_expectation_exact": true,
+    "fresh_process_cold_warm_exact": true,
+    "private_cache_bytes_unchanged": true
+  },
+  "tests": {
+    "scoped_passed": 33,
+    "built_mali_passed": 6,
+    "skipped_in_selections": 0,
+    "candidate_failures": 0,
+    "baseline_counterfactual_failed": 20,
+    "baseline_counterfactual_passed": 1
+  },
+  "feature": {
+    "baseline": {
+      "rows": 86261,
+      "country_rows": {
+        "Mali": 40218,
+        "Niger": 46043
+      },
+      "index_names": [
+        "country",
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "native_niger_frame_exact": true,
+      "mali_frame_exact_after_baseline_neutral_obs_removal": true,
+      "niger_cache_bytes_unchanged": true,
+      "canonical_alignment_present": true,
+      "finding_count": 3,
+      "failures": 0,
+      "errors": 0,
+      "warnings": 1
+    },
+    "candidate": {
+      "rows": 201974,
+      "country_rows": {
+        "Mali": 155931,
+        "Niger": 46043
+      },
+      "index_names": [
+        "country",
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "native_niger_frame_exact": true,
+      "mali_frame_exact_after_baseline_neutral_obs_removal": true,
+      "niger_cache_bytes_unchanged": true,
+      "canonical_alignment_present": false,
+      "finding_count": 2,
+      "failures": 0,
+      "errors": 0,
+      "warnings": 0
+    },
+    "normalized_added_findings": 0,
+    "removed_findings": 1,
+    "removed_kind": "Mali neutral obs=1 filler only",
+    "niger_public_frames_exact": true,
+    "niger_private_comparator_bytes_unchanged": true
+  },
+  "raw_weight_exact_candidate_counts": {
+    "99.0": 5,
+    "999.0": 10134,
+    "9999.0": 0,
+    "999.9": 0,
+    "999.9000244140625": 0,
+    "9999.9": 0,
+    "9999.900390625": 0,
+    "99999.0": 0,
+    "99999.9": 0,
+    "99999.8984375": 0
+  },
+  "immutability": {
+    "candidate": {
+      "head": "23d338e50b60e6a36982ba56e997c82b17f8e3e8",
+      "tracked_content_hashes_unchanged": 14891,
+      "status_clean": true,
+      "no_intree_parquet_dta_sav": true
+    },
+    "baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_content_hashes_unchanged": 14880,
+      "status_clean": true,
+      "no_intree_parquet_dta_sav": true
+    }
+  },
+  "owned_task_processes": [],
+  "residual_complete": true,
+  "no_outbound_connections_in_guarded_checks": true
+}

@@ -1,0 +1,29 @@
+{
+ "btf": {
+  "moved": 0,
+  "moved_by_country": [],
+  "total": 40
+ },
+ "country": {
+  "moved": 66,
+  "moved_by_country": {
+   "CotedIvoire": 21,
+   "Niger": 23,
+   "Senegal": 22
+  },
+  "total": 549
+ },
+ "errors": {
+  "base": 0,
+  "cand": 0
+ },
+ "wave": {
+  "moved": 241,
+  "moved_by_country": {
+   "CotedIvoire": 105,
+   "Niger": 92,
+   "Senegal": 44
+  },
+  "total": 2109
+ }
+}

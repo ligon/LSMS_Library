@@ -1,0 +1,41 @@
+{
+  "at_UTC": "2026-10-22T15:32:42.780152+00:00",
+  "root_read_actual_new_checkers_and_authority_preparers": true,
+  "signed": "Sue",
+  "cohorts": {
+    "pr1193-Malawi": {
+      "status": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_EXPLICIT_GAPS",
+      "strict_full_frames": 251,
+      "NEW_pair_member_recipes": 2,
+      "original_key_amount_predicates": 4,
+      "historical_entries": 668,
+      "original_cold_currency_stop_and_memory_gaps_retained": true,
+      "physical_selected_products": 200,
+      "source_census_scripts": 34,
+      "READY_sha256": "96e379ce1eecfe92cb8931f95a38182ea7a6ddb1b6960c9636e4b91fddacb0ba",
+      "manifest_sha256": "7140d29680a7e283550470aa6107b7b2e7c714d6105310e135fbd7bd46959165",
+      "packet_and_attestation_entries": 288,
+      "all_original_unsaved_source_expected_warm_test_and_runtime_gaps_retained": true,
+      "no_payload_decode_API_source_test_or_cache_replay_by_root": true,
+      "no_all_campaign_or_scientific_verdict": true
+    },
+    "pr1193-integration14": {
+      "status": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_EXPLICIT_GAPS",
+      "strict_full_frames": 135,
+      "NEW_pair_member_recipes": 1,
+      "original_key_amount_predicates": 2,
+      "inline_saved_predicate_sets": 4,
+      "historical_entries": 646,
+      "original_initial_authority_hold_and_sixteen_unsaved_returns_retained": true,
+      "physical_selected_products": 85,
+      "source_census_scripts": 21,
+      "READY_sha256": "e3412e73385f16054168f92caa3513afb81b04cc28fdb74d574b85b0ed2a6d26",
+      "manifest_sha256": "c6b46be71238f67d2820e566be04846e70f8061cb13578cb7df40f7611d76a00",
+      "packet_and_attestation_entries": 170,
+      "all_original_unsaved_source_expected_warm_test_and_runtime_gaps_retained": true,
+      "no_payload_decode_API_source_test_or_cache_replay_by_root": true,
+      "no_all_campaign_or_scientific_verdict": true
+    }
+  },
+  "complete_root_decision_sha256": "8621b05ebb0a9439594ffdf53e8c5c842e5b4b8d3c1d0e64821e223d7b774b67"
+}

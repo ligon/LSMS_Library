@@ -1,0 +1,698 @@
+{
+ "countries": [
+  "Benin",
+  "Burkina_Faso",
+  "CotedIvoire",
+  "Ethiopia",
+  "GhanaLSS",
+  "Guinea-Bissau",
+  "Malawi",
+  "Mali",
+  "Niger",
+  "Nigeria",
+  "Senegal",
+  "Tanzania",
+  "Togo",
+  "Uganda"
+ ],
+ "groupby_size_sum": {
+  "Benin": 10605,
+  "Burkina_Faso": 22877,
+  "CotedIvoire": 11250,
+  "Ethiopia": 180018,
+  "GhanaLSS": 11282,
+  "Guinea-Bissau": 5534,
+  "Malawi": 112296,
+  "Mali": 34287,
+  "Niger": 42426,
+  "Nigeria": 96557,
+  "Senegal": 9901,
+  "Tanzania": 6868,
+  "Togo": 13730,
+  "Uganda": 83486
+ },
+ "head": "9a0ed5f3cc81b5d2ce8d1fdffba4f477e33b9f7f",
+ "j_nan": {
+  "Benin": 0,
+  "Burkina_Faso": 0,
+  "CotedIvoire": 0,
+  "Ethiopia": 0,
+  "GhanaLSS": 0,
+  "Guinea-Bissau": 0,
+  "Malawi": 67653,
+  "Mali": 145530,
+  "Niger": 0,
+  "Nigeria": 0,
+  "Senegal": 0,
+  "Tanzania": 2830,
+  "Togo": 0,
+  "Uganda": 0
+ },
+ "per_country": {
+  "Benin": {
+   "nitrogen_rows": 1823,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "DAP",
+     "NPK",
+     "Phosphate",
+     "Urea"
+    ],
+    "matched_rows": 3763,
+    "refused_organic_labels": {
+     "Organic compost": 158,
+     "Organic manure": 271
+    },
+    "refused_organic_rows": 429,
+    "unmatched_labels": {
+     "Fungicide": 99,
+     "Herbicide": 1466,
+     "Organic compost": 158,
+     "Organic manure": 271,
+     "Other phytosanitary": 36,
+     "Pesticide": 711,
+     "Seed": 4101
+    },
+    "unmatched_rows": 6842
+   },
+   "nitrogen_total": 624312.21023,
+   "seed_rows": 2215,
+   "seed_total": 444062.471
+  },
+  "Burkina_Faso": {
+   "nitrogen_rows": 2469,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "DAP",
+     "NPK",
+     "Phosphate",
+     "Urea"
+    ],
+    "matched_rows": 4271,
+    "refused_organic_labels": {
+     "Organic compost": 1570,
+     "Organic manure": 2339
+    },
+    "refused_organic_rows": 3909,
+    "unmatched_labels": {
+     "Fungicide": 262,
+     "Herbicide": 1644,
+     "Organic compost": 1570,
+     "Organic manure": 2339,
+     "Other phytosanitary": 95,
+     "Pesticide": 615,
+     "Seed": 12081
+    },
+    "unmatched_rows": 18606
+   },
+   "nitrogen_total": 567000.6539,
+   "seed_rows": 4229,
+   "seed_total": 484681.71699999995
+  },
+  "CotedIvoire": {
+   "nitrogen_rows": 1764,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "DAP",
+     "NPK",
+     "Phosphate",
+     "Urea"
+    ],
+    "matched_rows": 2930,
+    "refused_organic_labels": {
+     "Organic compost": 86,
+     "Organic manure": 408
+    },
+    "refused_organic_rows": 494,
+    "unmatched_labels": {
+     "Fungicide": 336,
+     "Herbicide": 3626,
+     "Organic compost": 86,
+     "Organic manure": 408,
+     "Other phytosanitary": 154,
+     "Pesticide": 1695,
+     "Seed": 2015
+    },
+    "unmatched_rows": 8320
+   },
+   "nitrogen_total": 1781030.1154999998,
+   "seed_rows": 1122,
+   "seed_total": 726762.7
+  },
+  "Ethiopia": {
+   "nitrogen_rows": 22458,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "DAP",
+     "NPS",
+     "Urea"
+    ],
+    "matched_rows": 34817,
+    "refused_organic_labels": {
+     "Compost": 4295,
+     "Manure": 27261,
+     "Other Organic": 2651
+    },
+    "refused_organic_rows": 34207,
+    "unmatched_labels": {
+     "Compost": 4295,
+     "Manure": 27261,
+     "Other Organic": 2651,
+     "Pesticide": 3163,
+     "Seed": 108713
+    },
+    "unmatched_rows": 146083
+   },
+   "nitrogen_total": 500847.2208579673,
+   "seed_rows": 60530,
+   "seed_total": 1055466.887
+  },
+  "GhanaLSS": {
+   "nitrogen_rows": 0,
+   "nitrogen_tally": {
+    "matched_labels": [],
+    "matched_rows": 0,
+    "refused_organic_labels": {
+     "Manure": 443
+    },
+    "refused_organic_rows": 443,
+    "unmatched_labels": {
+     "Animal rental": 167,
+     "Containers": 2393,
+     "Equipment rental": 462,
+     "Fertilizer": 1091,
+     "Fuel and electricity": 21,
+     "Irrigation": 6,
+     "Maintenance and repair": 7,
+     "Manure": 443,
+     "Other production expense": 96,
+     "Pesticide or Herbicide": 993,
+     "Seed": 4371,
+     "Storage": 360,
+     "Transport": 872
+    },
+    "unmatched_rows": 11282
+   },
+   "nitrogen_total": 0.0,
+   "seed_rows": 0,
+   "seed_total": 0.0
+  },
+  "Guinea-Bissau": {
+   "nitrogen_rows": 0,
+   "nitrogen_tally": {
+    "matched_labels": [],
+    "matched_rows": 0,
+    "refused_organic_labels": {
+     "Adubos org\u00e2nicos - estrume animal": 365,
+     "Adubos org\u00e2nicos - lixo dom\u00e9stico": 150
+    },
+    "refused_organic_rows": 515,
+    "unmatched_labels": {
+     "Adubos inorg\u00e2nicos - NPK/F\u00f3rmula \u00fanica": 46,
+     "Adubos inorg\u00e2nicos - fosfatos": 57,
+     "Adubos inorg\u00e2nicos - ureia": 190,
+     "Adubos org\u00e2nicos - estrume animal": 365,
+     "Adubos org\u00e2nicos - lixo dom\u00e9stico": 150,
+     "DAP e outros adubos inorg\u00e2nicos": 41,
+     "Outras sementes": 867,
+     "Outros Sementes de cereais": 96,
+     "Outros produtos fitossanit\u00e1rios": 18,
+     "Plantas, cordas/caules de tuberculos": 520,
+     "Produtos fitossanit\u00e1rios - Fungicidas": 9,
+     "Produtos fitossanit\u00e1rios - Herbicidas": 56,
+     "Produtos fitossanit\u00e1rios - Pesticidas": 40,
+     "Sementes de  milho preto": 278,
+     "Sementes de algod\u00e3o": 1,
+     "Sementes de arroz": 1827,
+     "Sementes de feij\u00e3o": 304,
+     "Sementes de milho bacil": 314,
+     "Sementes de milho cavalo": 293,
+     "Sementes de s\u00e9samo": 62
+    },
+    "unmatched_rows": 5534
+   },
+   "nitrogen_total": 0.0,
+   "seed_rows": 0,
+   "seed_total": 0.0
+  },
+  "Malawi": {
+   "nitrogen_rows": 36916,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "CAN Fertilizer",
+     "D Compound Fertilizer",
+     "DAP Fertilizer",
+     "NPK Fertilizer",
+     "Other Fertilizer",
+     "Urea Fertilizer"
+    ],
+    "matched_rows": 54104,
+    "refused_organic_labels": {
+     "Organic Fertilizer": 11075
+    },
+    "refused_organic_rows": 11075,
+    "unmatched_labels": {
+     "Fumigant": 125,
+     "Fungicide": 80,
+     "Herbicide": 549,
+     "Insecticide": 1618,
+     "Organic Fertilizer": 11075,
+     "Other Pesticide": 102,
+     "Seed": 112296
+    },
+    "unmatched_rows": 125845
+   },
+   "nitrogen_total": 1028195.63206,
+   "seed_rows": 64477,
+   "seed_total": 1052393.2050598222
+  },
+  "Mali": {
+   "nitrogen_rows": 2869,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "DAP",
+     "NPK",
+     "Urea"
+    ],
+    "matched_rows": 28929,
+    "refused_organic_labels": {
+     "Compost": 2673,
+     "Manure": 11148,
+     "Other organic": 1189
+    },
+    "refused_organic_rows": 15010,
+    "unmatched_labels": {
+     "Compost": 2673,
+     "Fungicide": 6458,
+     "Herbicide": 6459,
+     "Manure": 11148,
+     "Other inorganic": 9640,
+     "Other organic": 1189,
+     "Other phytosanitary": 6447,
+     "Pesticide": 6460,
+     "Seed": 34332
+    },
+    "unmatched_rows": 84806
+   },
+   "nitrogen_total": 906361.8260000597,
+   "seed_rows": 31645,
+   "seed_total": 1455210.9572301384
+  },
+  "Niger": {
+   "nitrogen_rows": 1380,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "DAP",
+     "Mixed fertilizer",
+     "NPK",
+     "Phosphate",
+     "Urea"
+    ],
+    "matched_rows": 2573,
+    "refused_organic_labels": {
+     "Organic compost": 1740,
+     "Organic manure": 5775
+    },
+    "refused_organic_rows": 7515,
+    "unmatched_labels": {
+     "Fungicide": 345,
+     "Herbicide": 229,
+     "Organic compost": 1740,
+     "Organic manure": 5775,
+     "Other phytosanitary": 148,
+     "Pesticide": 587,
+     "Seed": 31029
+    },
+    "unmatched_rows": 39853
+   },
+   "nitrogen_total": 52139.5688,
+   "seed_rows": 1542,
+   "seed_total": 160676.4055
+  },
+  "Nigeria": {
+   "nitrogen_rows": 4359,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "NPK",
+     "Urea"
+    ],
+    "matched_rows": 10014,
+    "refused_organic_labels": {
+     "Organic Fertilizer": 4149
+    },
+    "refused_organic_rows": 4149,
+    "unmatched_labels": {
+     "Animal Traction": 6169,
+     "Herbicide": 9585,
+     "Organic Fertilizer": 4149,
+     "Other Inorganic Fertilizer": 170,
+     "Pesticide": 4554,
+     "Seed": 61979
+    },
+    "unmatched_rows": 86606
+   },
+   "nitrogen_total": 173671.99223241225,
+   "seed_rows": 4888,
+   "seed_total": 1380982.0074735074
+  },
+  "Senegal": {
+   "nitrogen_rows": 932,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "DAP",
+     "NPK",
+     "Phosphate",
+     "Urea"
+    ],
+    "matched_rows": 1977,
+    "refused_organic_labels": {
+     "Organic compost": 360,
+     "Organic manure": 1315
+    },
+    "refused_organic_rows": 1675,
+    "unmatched_labels": {
+     "Fungicide": 177,
+     "Herbicide": 458,
+     "Organic compost": 360,
+     "Organic manure": 1315,
+     "Other phytosanitary": 48,
+     "Pesticide": 248,
+     "Seed": 5318
+    },
+    "unmatched_rows": 7924
+   },
+   "nitrogen_total": 82701.772425,
+   "seed_rows": 2430,
+   "seed_total": 381403.10150000005
+  },
+  "Tanzania": {
+   "nitrogen_rows": 725,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "CAN",
+     "DAP",
+     "NPK",
+     "Other Fertilizer",
+     "SA",
+     "TSP",
+     "Urea"
+    ],
+    "matched_rows": 1060,
+    "refused_organic_labels": {
+     "Organic Fertilizer": 727
+    },
+    "refused_organic_rows": 727,
+    "unmatched_labels": {
+     "Herbicide": 319,
+     "Organic Fertilizer": 727,
+     "Pesticide": 724,
+     "Seed": 6868
+    },
+    "unmatched_rows": 8638
+   },
+   "nitrogen_total": 19476.17,
+   "seed_rows": 4379,
+   "seed_total": 526995.8799999999
+  },
+  "Togo": {
+   "nitrogen_rows": 2103,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "DAP",
+     "NPK",
+     "Phosphate",
+     "Urea"
+    ],
+    "matched_rows": 4136,
+    "refused_organic_labels": {
+     "Organic compost": 149,
+     "Organic manure": 405
+    },
+    "refused_organic_rows": 554,
+    "unmatched_labels": {
+     "Fungicide": 60,
+     "Herbicide": 1294,
+     "Organic compost": 149,
+     "Organic manure": 405,
+     "Other phytosanitary": 154,
+     "Pesticide": 727,
+     "Seed": 6805
+    },
+    "unmatched_rows": 9594
+   },
+   "nitrogen_total": 161102.983828,
+   "seed_rows": 2584,
+   "seed_total": 537878.896
+  },
+  "Uganda": {
+   "nitrogen_rows": 1436,
+   "nitrogen_tally": {
+    "matched_labels": [
+     "Inorganic Fertilizer",
+     "Mixed Fertilizer",
+     "Nitrate Fertilizer",
+     "Phosphate Fertilizer",
+     "Potash Fertilizer"
+    ],
+    "matched_rows": 1576,
+    "refused_organic_labels": {
+     "Organic Fertilizer": 3966
+    },
+    "refused_organic_rows": 3966,
+    "unmatched_labels": {
+     "Fungicide": 253,
+     "Growth Regulator": 1424,
+     "Insecticide": 2312,
+     "Miticide/Acaricide": 224,
+     "Nematicide/Molluscicide": 54,
+     "Organic Fertilizer": 3966,
+     "Other Pesticide": 414,
+     "Pesticide": 34,
+     "Rodenticide": 29,
+     "Seed": 73930
+    },
+    "unmatched_rows": 82640
+   },
+   "nitrogen_total": 11838.716999998973,
+   "seed_rows": 20305,
+   "seed_total": 1500168.2227824326
+  }
+ },
+ "pooled_nitrogen": {
+  "rows": 79234,
+  "tally": {
+   "matched_labels": [
+    "CAN",
+    "CAN Fertilizer",
+    "D Compound Fertilizer",
+    "DAP",
+    "DAP Fertilizer",
+    "Inorganic Fertilizer",
+    "Mixed Fertilizer",
+    "Mixed fertilizer",
+    "NPK",
+    "NPK Fertilizer",
+    "NPS",
+    "Nitrate Fertilizer",
+    "Other Fertilizer",
+    "Phosphate",
+    "Phosphate Fertilizer",
+    "Potash Fertilizer",
+    "SA",
+    "TSP",
+    "Urea",
+    "Urea Fertilizer"
+   ],
+   "matched_rows": 150150,
+   "refused_organic_labels": {
+    "Adubos org\u00e2nicos - estrume animal": 365,
+    "Adubos org\u00e2nicos - lixo dom\u00e9stico": 150,
+    "Compost": 6968,
+    "Manure": 38852,
+    "Organic Fertilizer": 19917,
+    "Organic compost": 4063,
+    "Organic manure": 10513,
+    "Other Organic": 2651,
+    "Other organic": 1189
+   },
+   "refused_organic_rows": 84668,
+   "unmatched_labels": {
+    "Adubos inorg\u00e2nicos - NPK/F\u00f3rmula \u00fanica": 46,
+    "Adubos inorg\u00e2nicos - fosfatos": 57,
+    "Adubos inorg\u00e2nicos - ureia": 190,
+    "Adubos org\u00e2nicos - estrume animal": 365,
+    "Adubos org\u00e2nicos - lixo dom\u00e9stico": 150,
+    "Animal Traction": 6169,
+    "Animal rental": 167,
+    "Compost": 6968,
+    "Containers": 2393,
+    "DAP e outros adubos inorg\u00e2nicos": 41,
+    "Equipment rental": 462,
+    "Fertilizer": 1091,
+    "Fuel and electricity": 21,
+    "Fumigant": 125,
+    "Fungicide": 8070,
+    "Growth Regulator": 1424,
+    "Herbicide": 25629,
+    "Insecticide": 3930,
+    "Irrigation": 6,
+    "Maintenance and repair": 7,
+    "Manure": 38852,
+    "Miticide/Acaricide": 224,
+    "Nematicide/Molluscicide": 54,
+    "Organic Fertilizer": 19917,
+    "Organic compost": 4063,
+    "Organic manure": 10513,
+    "Other Inorganic Fertilizer": 170,
+    "Other Organic": 2651,
+    "Other Pesticide": 516,
+    "Other inorganic": 9640,
+    "Other organic": 1189,
+    "Other phytosanitary": 7082,
+    "Other production expense": 96,
+    "Outras sementes": 867,
+    "Outros Sementes de cereais": 96,
+    "Outros produtos fitossanit\u00e1rios": 18,
+    "Pesticide": 19518,
+    "Pesticide or Herbicide": 993,
+    "Plantas, cordas/caules de tuberculos": 520,
+    "Produtos fitossanit\u00e1rios - Fungicidas": 9,
+    "Produtos fitossanit\u00e1rios - Herbicidas": 56,
+    "Produtos fitossanit\u00e1rios - Pesticidas": 40,
+    "Rodenticide": 29,
+    "Seed": 463838,
+    "Sementes de  milho preto": 278,
+    "Sementes de algod\u00e3o": 1,
+    "Sementes de arroz": 1827,
+    "Sementes de feij\u00e3o": 304,
+    "Sementes de milho bacil": 314,
+    "Sementes de milho cavalo": 293,
+    "Sementes de s\u00e9samo": 62,
+    "Storage": 360,
+    "Transport": 872
+   },
+   "unmatched_rows": 642573
+  },
+  "total": 5908678.862833438
+ },
+ "rows": {
+  "Benin": 10605,
+  "Burkina_Faso": 22877,
+  "CotedIvoire": 11250,
+  "Ethiopia": 180900,
+  "GhanaLSS": 11282,
+  "Guinea-Bissau": 5534,
+  "Malawi": 179949,
+  "Mali": 179817,
+  "Niger": 42426,
+  "Nigeria": 96620,
+  "Senegal": 9901,
+  "Tanzania": 9698,
+  "Togo": 13730,
+  "Uganda": 84216
+ },
+ "u_census": {
+  "Benin/plot_inputs": {
+   "literal_Unknown": 0,
+   "null": 0,
+   "rows": 10605,
+   "where": "index"
+  },
+  "Burkina_Faso/plot_inputs": {
+   "literal_Unknown": 0,
+   "null": 0,
+   "rows": 22877,
+   "where": "index"
+  },
+  "CotedIvoire/plot_inputs": {
+   "literal_Unknown": 0,
+   "null": 0,
+   "rows": 11250,
+   "where": "index"
+  },
+  "Ethiopia/plot_inputs": {
+   "literal_Unknown": 37370,
+   "null": 0,
+   "rows": 180900,
+   "where": "column"
+  },
+  "GhanaLSS/plot_inputs": {
+   "literal_Unknown": 0,
+   "null": 8763,
+   "rows": 11282,
+   "where": "column"
+  },
+  "Guinea-Bissau/plot_inputs": {
+   "literal_Unknown": 0,
+   "null": 0,
+   "rows": 5534,
+   "where": "index"
+  },
+  "Malawi/plot_inputs": {
+   "literal_Unknown": 8,
+   "null": 0,
+   "rows": 179949,
+   "where": "index"
+  },
+  "Mali/crop_production": {
+   "literal_Unknown": 0,
+   "null": 1910,
+   "rows": 35060,
+   "where": "column"
+  },
+  "Mali/plot_inputs": {
+   "literal_Unknown": 108171,
+   "null": 0,
+   "rows": 179817,
+   "where": "column"
+  },
+  "Niger/plot_inputs": {
+   "literal_Unknown": 74,
+   "null": 0,
+   "rows": 42426,
+   "where": "index"
+  },
+  "Nigeria/crop_production": {
+   "literal_Unknown": 13138,
+   "null": 0,
+   "rows": 62844,
+   "where": "column"
+  },
+  "Nigeria/plot_inputs": {
+   "literal_Unknown": 178,
+   "null": 5546,
+   "rows": 96620,
+   "where": "column"
+  },
+  "Senegal/plot_inputs": {
+   "literal_Unknown": 0,
+   "null": 0,
+   "rows": 9901,
+   "where": "index"
+  },
+  "Tanzania/crop_production": {
+   "literal_Unknown": 0,
+   "null": 2395,
+   "rows": 14126,
+   "where": "column"
+  },
+  "Tanzania/plot_inputs": {
+   "literal_Unknown": 408,
+   "null": 0,
+   "rows": 9698,
+   "where": "column"
+  },
+  "Togo/plot_inputs": {
+   "literal_Unknown": 0,
+   "null": 0,
+   "rows": 13730,
+   "where": "index"
+  },
+  "Uganda/plot_inputs": {
+   "literal_Unknown": 43653,
+   "null": 0,
+   "rows": 84216,
+   "where": "column"
+  }
+ }
+}

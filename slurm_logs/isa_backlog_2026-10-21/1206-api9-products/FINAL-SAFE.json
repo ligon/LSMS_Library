@@ -1,0 +1,27 @@
+{
+  "status": "NEW_EXACT_NINE_CONTENT_SUPPLEMENT_WITH_FOUR_PRESERVED_TYPED_RECORD_BOUNDARY_FAILURES",
+  "original_products": 9,
+  "independent_API9_reference_comparison_pairs": 18,
+  "full_strict_reference_pairs_passed": 14,
+  "typed_attrs_failures_preserved": 4,
+  "diagnostic_numeric_complete_axes_exact_for_four_failed_pairs": true,
+  "record_type_boundaries_observed": 8,
+  "record_class_names": [
+    "lsms_library.population.PopulationRecord",
+    "lsms_library.recall.RecallRecord"
+  ],
+  "all_stored_record_field_values_types_and_other_attrs_exact": true,
+  "additional_data_or_metadata_differences": 0,
+  "full_equality_not_claimed_for_four_failed_pairs": true,
+  "additional_actual_producer_initial_warm_full_strict_pairs_passed": 9,
+  "additional_actual_original_1182_Code_non_u_projection_pair_passed": 1,
+  "historical_original_size_mode_mtime_absent": true,
+  "NEW_current_physical_interval_only_no_history_claim": true,
+  "root_ruling_exact_nine_only": true,
+  "original_other_early_artifact_authority_and_memory_gaps_remain": true,
+  "raw_source_API_Feature_test_CLI_cache_replays": 0,
+  "toy_negative_calibrations": 42,
+  "positive_calibrations": 6,
+  "root_classification_required": true,
+  "signed": "Sue"
+}

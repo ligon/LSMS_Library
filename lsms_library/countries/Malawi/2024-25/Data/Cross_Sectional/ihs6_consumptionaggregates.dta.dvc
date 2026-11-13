@@ -1,0 +1,5 @@
+outs:
+- md5: 7317cf0221fe2f7b99eda9e24ee9a41d
+  size: 13437780
+  hash: md5
+  path: ihs6_consumptionaggregates.dta

@@ -1,0 +1,4 @@
+Malawi/sample: shape (57118, 7) vs (57118, 7); assert_frame_equal OK; per-wave i sets equal in all 5 waves: True
+Malawi/household_roster: shape (260612, 7) vs (260612, 7); assert_frame_equal OK; per-wave i sets equal in all 5 waves: True
+Nigeria/sample: shape (49770, 5) vs (49770, 5); assert_frame_equal OK; per-wave i sets equal in all 10 waves: True
+Nigeria/household_roster: shape (287630, 7) vs (287630, 7); assert_frame_equal OK; per-wave i sets equal in all 10 waves: True

@@ -1,0 +1,42 @@
+{
+ "Niger 2011-12/_/plot_labor.py:51": {
+  "raw_dtype": "float64",
+  "gate_dtype": "float64",
+  "gate_na": 204,
+  "comparison_dtype": "bool",
+  "comparison_na": 0,
+  "rows": 6664
+ },
+ "Niger 2014-15/_/plot_labor.py:46": {
+  "raw_dtype": "float64",
+  "gate_dtype": "float64",
+  "gate_na": 271,
+  "comparison_dtype": "bool",
+  "comparison_na": 0,
+  "rows": 5440
+ },
+ "Tanzania tanzania.py:1727 (2019-20)": {
+  "raw_dtype": "float64",
+  "gate_dtype": "float64",
+  "gate_na": 1274,
+  "comparison_dtype": "bool",
+  "comparison_na": 0,
+  "rows": 2305
+ },
+ "Tanzania tanzania.py:1199 (2019-20)": {
+  "raw_dtype": "float64",
+  "gate_dtype": "float64",
+  "gate_na": 14,
+  "comparison_dtype": "bool",
+  "comparison_na": 0,
+  "rows": 1379
+ },
+ "Ethiopia ethiopia.py:2680 (2011-12)": {
+  "raw_dtype": "float64",
+  "gate_dtype": "float64",
+  "gate_na": 9936,
+  "comparison_dtype": "bool",
+  "comparison_na": 0,
+  "rows": 32025
+ }
+}

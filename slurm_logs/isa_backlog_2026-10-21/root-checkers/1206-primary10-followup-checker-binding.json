@@ -1,0 +1,48 @@
+{
+  "packets": {
+    "pr1193-Malawi-standalone-composed": {
+      "publication": "1206-pr1193-Malawi/standalone-composed",
+      "READY_sha256": "96e379ce1eecfe92cb8931f95a38182ea7a6ddb1b6960c9636e4b91fddacb0ba",
+      "manifest_sha256": "7140d29680a7e283550470aa6107b7b2e7c714d6105310e135fbd7bd46959165"
+    },
+    "pr1193-integration14": {
+      "publication": "1206-pr1193-Malawi/integration14",
+      "READY_sha256": "e3412e73385f16054168f92caa3513afb81b04cc28fdb74d574b85b0ed2a6d26",
+      "manifest_sha256": "c6b46be71238f67d2820e566be04846e70f8061cb13578cb7df40f7611d76a00"
+    },
+    "pr1197-provenance": {
+      "publication": "1206-pr1197-provenance/saved-artifacts",
+      "READY_sha256": "c3617b331974d9568e0e976427b57f7f4a2b31e69e6660b4ec3537beda65aac6",
+      "manifest_sha256": "62bdcf92a54c5fb797fee8b56c793be7f86db628d6dfe84730a970af908fd207"
+    },
+    "pr1197-source-details": {
+      "publication": "1206-pr1197-provenance/source-details",
+      "READY_sha256": "da565b90ec39d08e117bd987da07a200b909c9a832120b7ab04d16d34e34794c",
+      "manifest_sha256": "a80bfed657e2c9796ca21450fea0b0c29aae3e62a10bc1bb2b50040671ae3b64"
+    },
+    "pr1202-Uganda-persisted": {
+      "publication": "1206-pr1202-Uganda/persisted",
+      "READY_sha256": "4b47d28cfb6305a631b5caf6b8018cc8ab922e5dfc0ef0720e9f155b1c424fb5",
+      "manifest_sha256": "fc4b1d77c7dbcc6ad7b3418a1ff1041ae34f6fbf0162152c21fb529502ebaabb"
+    },
+    "pr1202-Uganda-exact-source": {
+      "publication": "1206-pr1202-Uganda/exact-source",
+      "READY_sha256": "b2c1ab80d258daebd1b885d0d03b1fe4462536b6e3baf94f7c8f75f35bb74ca8",
+      "manifest_sha256": "9ada12caa1bf81c5f3d896de3941a75a9dc3068e473d8ff6631fbe15f9ae0abd"
+    }
+  },
+  "root_sources": {
+    "verify_1193_1197_saved_root.py": "ea4964325afab1b5b9c7930862c7540a96292051e8106e1c528325bcbb473235",
+    "verify_1202_saved_root.py": "d51130c5d45b8105e67870340e2b0ada1b5787d88b82feea9160f13ca166ffdf",
+    "verify_1202_saved_root_v2.py": "3352c7db3ce2d78c2f878f604642f3ee8d61c6246cd9159165b9a6e5d12afc30",
+    "verify_primary10_registry_root.py": "bc642da170638d43f752419242e504f2bafbe6875a23d14ca503efab32812418",
+    "verify_primary10_registry_root_v2.py": "c062513e0b5185418843fc824f52d65075a7268bd44ccaa8e39d2e8ab60b7a5c"
+  },
+  "preserved_root_stops": [
+    "1202 original exact/ virtual source-prefix receipt assertion; corrected metadata-only v2",
+    "primary10 expected postexit directory name typo; corrected metadata-only v2"
+  ],
+  "separately_saved_stop_streams": false,
+  "no_payload_API_source_test_cache_replay_by_root": true,
+  "signed": "Sue"
+}

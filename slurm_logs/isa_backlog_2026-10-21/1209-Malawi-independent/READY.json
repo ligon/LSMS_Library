@@ -1,0 +1,16 @@
+{
+  "status": "INDEPENDENT_READY_FOR_ROOT_ACCEPTANCE",
+  "verdict": "PASS_INDEPENDENT_SCOPED_REVIEW",
+  "source_head": "47b3c5d76371acc457c5553ebf8adfb1859e115b",
+  "actual_parent": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+  "manifest_entries": 906,
+  "manifest_sha256": "fdf2907b8bae4f4cda5de886ae9cc3fdf5bccd957dc439c9438848467c7c73cb",
+  "safe_allowlist_sha256": "142b5d8fd971469b74f3056ad18fd7a470d79ef967aa4cc94f7e71fee8f5577e",
+  "source_clean": true,
+  "zero_other_consumers": true,
+  "root_acceptance": false,
+  "human_merge_required": true,
+  "no_global_zero_outside_write_claim": true,
+  "postexit_requirement": "Separate read-only full verifier after observed sealer terminal0; no root acceptance inferred.",
+  "signed": "Sue"
+}

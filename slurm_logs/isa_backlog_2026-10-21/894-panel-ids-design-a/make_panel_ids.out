@@ -1,0 +1,22 @@
+# make panel-ids from countries/{C}/_ at HEAD 6bd1cf017, PYTHONPATH=/local/job40390255/worktrees/894
+python panel_ids.py
+Malawi panel_ids: 5686 entries; updated_ids: 2013-14 4000, 2016-17 2508, 2019-20 3178
+Malawi run 1: regenerated JSON byte-identical to committed (git diff --quiet)
+python panel_ids.py
+Malawi panel_ids: 5686 entries; updated_ids: 2013-14 4000, 2016-17 2508, 2019-20 3178
+Malawi run 2: regenerated JSON byte-identical to committed (git diff --quiet)
+Malawi/panel_ids.json sha256 3bf3e7bcd4537436902489b9d6ea33f4c83d4b3bbbf721574f72c08354281c55 bytes 253728
+Malawi/updated_ids.json sha256 5280b3f6f6cbecfdb09375865fc56ab036b2e2de01d2a44b9a164df0351166cf bytes 279403
+make -n panel_ids.json: make: Nothing to be done for 'panel_ids.json'.
+make -n updated_ids.json: make: Nothing to be done for 'updated_ids.json'.
+python panel_ids.py
+Nigeria panel_ids: 14251 entries; updated_ids: 2012Q3 4859, 2013Q1 4859, 2015Q3 4696, 2016Q1 4696
+Nigeria run 1: regenerated JSON byte-identical to committed (git diff --quiet)
+python panel_ids.py
+Nigeria panel_ids: 14251 entries; updated_ids: 2012Q3 4859, 2013Q1 4859, 2015Q3 4696, 2016Q1 4696
+Nigeria run 2: regenerated JSON byte-identical to committed (git diff --quiet)
+Nigeria/panel_ids.json sha256 ae78f31bcb35d5403de842fee9864cb08cb33de63a41b989d01fda3481c528f1 bytes 477166
+Nigeria/updated_ids.json sha256 4f8ca19045d41d12bce8e4ca7cb32bb775889a676d7daecf58a0ea88ca18f8bc bytes 372240
+make -n panel_ids.json: make: Nothing to be done for 'panel_ids.json'.
+make -n updated_ids.json: make: Nothing to be done for 'updated_ids.json'.
+in-tree parquets: 0

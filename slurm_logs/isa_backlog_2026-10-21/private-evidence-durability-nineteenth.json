@@ -1,0 +1,25 @@
+{
+  "verified_at_UTC": "2026-10-22T04:08:21.961930+00:00",
+  "archive_name": "quiescent-followup-nineteenth.tar.gz",
+  "archive_sha256": "ddc4f303b680f92c2be5ed2c2a796c1b0c3bf71ff72ea61d79233afbf83898c8",
+  "archive_bytes": 209156314,
+  "included_files": 1088,
+  "included_source_bytes": 1730496763,
+  "roots": [
+    "review-Uganda-1198",
+    "Uganda/1198-docs-review",
+    "Uganda/1198-docs-final-review"
+  ],
+  "excluded_entries": 36,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "b59489321ee5d05706b2c1a2a8ba3702a48a0c61fa8d7c68d868bc0c4cd4b55a",
+  "private_full_manifest_sha256": "d6d7ef5974b426d441ea4d75671bcc717e7cd6b957ea7059600cac7c59fc7485",
+  "private_evidence_not_exported_to_Git": true
+}

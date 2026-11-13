@@ -1,0 +1,54 @@
+{
+  "status": "FROZEN_PASS",
+  "verdict": "PASS",
+  "source_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "base_head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "findings": [],
+  "hashes": {
+    "country_hashes": {
+      "total": 549,
+      "identical": 549,
+      "changed": 0
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "identical": 39,
+      "changed": 0
+    }
+  },
+  "runtime_tests_config_other_tracked_paths_exact": true,
+  "both_source_snapshots_initial_final_HEAD_bytes_modes_clean_exact": true,
+  "prior1908_runtime_proof_metadata_and16_small_content_receipts_exact": true,
+  "prior73ad52_content_receipts_and_source_exact": true,
+  "no_source_data_decode_API_unpickle_test_CLI_replay": true,
+  "data_roots_no_files_or_symlinks": true,
+  "other_consumers": [],
+  "sealer_exits_after_READY": true,
+  "safe_exports_allowlist": {
+    "REPRODUCE.md": {
+      "sha256": "7eb79c22e1a7ca55eae203a4f46e9ba7043fdf5a4115cc00622ba8df16c8b693",
+      "bytes": 634
+    },
+    "REVIEW.org": {
+      "sha256": "87514bcd000dd1f5cd191ee1588236ab5c1207ee347f5136a6cef705d0ea5d6e",
+      "bytes": 3629
+    },
+    "checkers.json": {
+      "sha256": "a402394e913a6ece071418f64c17deca983bcd89e85d5614d2dd6c7db23c33d2",
+      "bytes": 715
+    },
+    "validation.json": {
+      "sha256": "67c653bf393079914224928e65f4118530cd8d877986a1d1dd21713195adc934",
+      "bytes": 3017
+    },
+    "verdict.json": {
+      "sha256": "7fa534a9fb3f2de987c777d950a63d6015487e7761e47ea3be7b7e68dc0a7965",
+      "bytes": 395
+    }
+  },
+  "manifest": "final-private-manifest.json",
+  "manifest_entries": 45,
+  "manifest_sha256": "48b3a7fc4017ebe855917db472f076f1ee1732ce48dde7df00b2dc70fed1736f",
+  "created_UTC": "2026-10-22T04:00:28.851895+00:00",
+  "signed": "Sue"
+}

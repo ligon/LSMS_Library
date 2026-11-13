@@ -674,8 +674,11 @@ def test_malawi_warm_nitrogen_kg_resolves_the_fertilizer_labels():
     pi = _warm('Malawi', 'plot_inputs')
     out = nitrogen_kg(pi)
     tally = out.attrs['nitrogen_input_match']
-    assert {'Urea Fertilizer', 'NPK Fertilizer', 'CAN Fertilizer',
+    # Type code 1 is labelled by its product since GH #1106; the old
+    # 'NPK Fertilizer' spelling is no longer in this table.
+    assert {'Urea Fertilizer', 'NPK 23:21:0+4S Fertilizer', 'CAN Fertilizer',
             'DAP Fertilizer'} <= set(tally['matched_labels'])
+    assert 'NPK Fertilizer' not in tally['matched_labels']
     assert tally['matched_rows'] > 50_000
     assert out['Nitrogen_kg'].sum() > 0
     # Organic stays UNMATCHED on purpose -- a nominal N share for manure

@@ -1,0 +1,40 @@
+#+TITLE: Actual Malawi218 review commands and dependency order
+
+These commands record completed work; do not replay them into the frozen private root or source checkouts.
+For reproduction prepare NEW checkout metadata links/private roots, adapt the private runner's exact roots, retain the same source pins and terminal physical-copy gates.
+The mounted interpreter is /local/job40255479/venv_img/bin/python; run.sh asserts exact imports/cwd/countries/config/data and uses unshare-rn/offline write/socket guards.
+One numeric/build/Make thread, two total loadfile pytest workers, sequential cohorts.
+
+#+begin_src sh
+P=/local/job40255479/control/isa-backlog-20261021/review-Malawi-218
+# Each line below was run with private logs; wait for terminal exit before dependent stages.
+bash "$P/run.sh" base metadata "$P/inventory.py" "$P/base/prebuild-hashes-private.json"
+bash "$P/run.sh" candidate metadata "$P/inventory.py" "$P/candidate/prebuild-hashes-private.json"
+bash "$P/run.sh" candidate metadata "$P/scope.py"
+bash "$P/run.sh" candidate metadata "$P/prepare.py"
+bash "$P/run.sh" candidate tests "$P/tests.py" focused
+bash "$P/run.sh" base tests "$P/tests.py" parent # Expected exit1:1 policyFAIL/1PASS
+bash "$P/run.sh" candidate metadata "$P/metadata-controls.py" audit
+# For each side base/candidate, separate physical default/make roots:
+bash "$P/run.sh" base default "$P/probe.py" cold
+bash "$P/run.sh" candidate default "$P/probe.py" cold
+bash "$P/run.sh" base make "$P/probe.py" cold
+bash "$P/run.sh" candidate make "$P/probe.py" cold
+# Fresh process phases (both sides), after corresponding terminal0 cold:
+bash "$P/run.sh" base make "$P/probe.py" warm
+bash "$P/run.sh" candidate make "$P/probe.py" warm
+bash "$P/run.sh" base default "$P/warm-probe.py" warm
+bash "$P/run.sh" candidate default "$P/warm-probe.py" warm
+# Both sides: features.py cold then features.py warm, cli-check.py, scanner.py
+# Artifact-only numeric reassessment after discovery of pandas nullable tolerance:
+bash "$P/run.sh" candidate metadata "$P/strict-negative-controls.py"
+bash "$P/run.sh" candidate evidence "$P/recheck-strict.py"
+bash "$P/run.sh" candidate scanner-check "$P/scanner-check.py"
+bash "$P/run.sh" candidate warnings "$P/warning-check-v2.py"
+bash "$P/run.sh" candidate protection "$P/protect-final-v2.py"
+# Final package/seal only after all actual probes terminal and zero other consumers.
+#+end_src
+
+All original stopped scripts/logs survive; corrected artifact/metadata-only versions are separately named.
+The original assembly expectation was not persisted; later explicitly new expected frames are not originals.
+The complete checker index, operand pairs and source receipts are private and pinned by READY/final manifest.

@@ -1,0 +1,189 @@
+{
+  "records_before": 15,
+  "records_after": 15,
+  "errors_or_failures": 0,
+  "full_records_in_original_order_accounted": true,
+  "unchanged_full_records": 11,
+  "expected_changed_records": 4,
+  "normalization_applied": false,
+  "changes": {
+    "Malawi_null_crop_count": [
+      67888,
+      67653
+    ],
+    "Malawi_null_unit_count": [
+      28724,
+      17142
+    ],
+    "Malawi_scope_rows": [
+      180184,
+      179949
+    ],
+    "Malawi_null_crop_percent": [
+      37.7,
+      37.6
+    ]
+  },
+  "Feature_alignment_record_and_attrs_exact": true,
+  "phase2_plot_inputs_kwarg_grid_present": false,
+  "records": [
+    {
+      "ordinal": 1,
+      "meaning": "Malawi Improved all-null waves",
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    },
+    {
+      "ordinal": 2,
+      "meaning": "Malawi null-key counts",
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": false,
+      "changed_fields": [
+        "detail"
+      ]
+    },
+    {
+      "ordinal": 3,
+      "meaning": "Malawi Improved scope row count",
+      "phase": "1a-sanity",
+      "check": "null_content",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": false,
+      "changed_fields": [
+        "metrics"
+      ]
+    },
+    {
+      "ordinal": 4,
+      "meaning": "Malawi automatic v index",
+      "phase": "1a-sanity",
+      "check": "index_levels_match_scheme",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    },
+    {
+      "ordinal": 5,
+      "meaning": "Malawi null-crop rate",
+      "phase": "1a-sanity",
+      "check": "no_null_index_levels",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": false,
+      "changed_fields": [
+        "detail"
+      ]
+    },
+    {
+      "ordinal": 6,
+      "meaning": "Malawi constant Purchased",
+      "phase": "1a-sanity",
+      "check": "no_constant_columns",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    },
+    {
+      "ordinal": 7,
+      "meaning": "Uganda null keys",
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    },
+    {
+      "ordinal": 8,
+      "meaning": "Uganda cluster boundaries",
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    },
+    {
+      "ordinal": 9,
+      "meaning": "Uganda automatic v index",
+      "phase": "1a-sanity",
+      "check": "index_levels_match_scheme",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    },
+    {
+      "ordinal": 10,
+      "meaning": "assembly repeat of Improved warning",
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    },
+    {
+      "ordinal": 11,
+      "meaning": "assembly repeat of Malawi null-key counts",
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": false,
+      "changed_fields": [
+        "detail"
+      ]
+    },
+    {
+      "ordinal": 12,
+      "meaning": "assembly repeat of Uganda null keys",
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    },
+    {
+      "ordinal": 13,
+      "meaning": "assembly repeat of Uganda clusters",
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    },
+    {
+      "ordinal": 14,
+      "meaning": "canonical Feature alignment metadata",
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    },
+    {
+      "ordinal": 15,
+      "meaning": "population-universe warning",
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status_before": "warn",
+      "status_after": "warn",
+      "exact_full_record": true,
+      "changed_fields": []
+    }
+  ]
+}

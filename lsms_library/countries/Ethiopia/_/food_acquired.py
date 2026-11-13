@@ -20,11 +20,12 @@ collapsed the unit columns.  Replaced 2026-05-07.
 """
 import sys
 sys.path.append('../../_/')
-from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library import Country
+from lsms_library.local_tools import get_dataframe, id_walk, to_parquet
 
 import pandas as pd
 import numpy as np
-from ethiopia import change_id, Waves, harmonized_food_labels
+from ethiopia import Waves, harmonized_food_labels
 
 
 def fix_food_labels():
@@ -41,24 +42,43 @@ def fix_food_labels():
     return D
 
 
-def id_walk(df, wave, waves):
-    use_waves = list(waves.keys())
-    T = use_waves.index(wave)
-    for t in use_waves[T::-1]:
-        if len(waves[t]):
-            df = change_id(df, '../%s/Data/%s' % (t, waves[t][0]), *waves[t][1:])
-        else:
-            df = change_id(df)
-    return df
-
-
+country = Country('Ethiopia', preload_panel_ids=False)
+updated_ids = country.updated_ids
 p = []
-for t in Waves.keys():
-    df = get_dataframe('../' + t + '/_/food_acquired.parquet').squeeze()
+seen_folders = set()
+for t in country.waves:
+    wave = country[t]
+    folder = wave.wave_folder
+    if folder in seen_folders:
+        continue
+    seen_folders.add(folder)
+    # Reuse actual Wave declarations, including YAML-only/null entries
+    # (ledger #1287-ethiopia-food-country-selector §§2–4).
+    if 'food_acquired' not in wave.data_scheme:
+        continue
+    fn = f'../{folder}/_/food_acquired.parquet'
+    try:
+        df = get_dataframe(fn).squeeze()
+    except Exception as exc:
+        raise RuntimeError(
+            f'Ethiopia food_acquired: declared wave {t!r} '
+            f'(folder {folder!r}) could not be read from {fn!r}'
+        ) from exc
     # Wave parquet already has canonical index [t, i, j, u, s] and
     # columns [Quantity, Expenditure] from food_acquired_to_canonical().
-    df1 = id_walk(df, t, Waves)
-    p.append(df1)
+    # Match the framework's native-contribution stage: household is i,
+    # food is j. The obsolete local walk mapped the latter as household.
+    # A source-native frame uses one substitution, never transitive closure;
+    # an explicitly converted frame must not be walked again (GH #1245).
+    if ('i' in df.index.names and not df.attrs.get('id_converted')
+            and updated_ids is not None):
+        df = id_walk(df, updated_ids, state='raw')
+    # The old reset_index/set_index walk returned a DataFrame even when
+    # the unchanged squeeze above yielded a one-column native Series.
+    # Preserve that table/writer shape without changing its keys or values.
+    if isinstance(df, pd.Series) and 'i' in df.index.names:
+        df = df.to_frame()
+    p.append(df)
 
 p = pd.concat(p)
 

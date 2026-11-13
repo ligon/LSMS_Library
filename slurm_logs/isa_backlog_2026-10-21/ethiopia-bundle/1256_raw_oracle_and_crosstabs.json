@@ -1,0 +1,124 @@
+{
+ "2018-19": {
+  "s9_rows": 16205,
+  "s9_rows_flag_yes": 5057,
+  "s9_rows_no_s4_line": 93,
+  "s4_keys_with_disagreeing_lines": 4,
+  "served_rows": 14092,
+  "served_rows_stamped": 3713,
+  "served_rows_expected_by_oracle": 3713,
+  "served_rows_compared": 14092,
+  "served_rows_ambiguous_folded_label": 0,
+  "mismatch_stamped_not_expected": 0,
+  "mismatch_expected_not_stamped": 0,
+  "flagged_rows_with_no_value_not_stamped": 0,
+  "stamped_x_perennial": {
+   "stamped=False perennial=False": 9732,
+   "stamped=False perennial=True": 647,
+   "stamped=True perennial=False": 47,
+   "stamped=True perennial=True": 3666
+  },
+  "stamped_x_s11_q2_answered": {
+   "stamped=False q2=False": 10196,
+   "stamped=False q2=True": 183,
+   "stamped=True q2=False": 99,
+   "stamped=True q2=True": 3614
+  },
+  "stamped_rows_with_positive_Value_sold": 588,
+  "stamped_rows_by_crop_top12": {
+   "Coffee": 786,
+   "Chat/Kat": 651,
+   "Banana": 423,
+   "Enset": 401,
+   "Mango": 356,
+   "Hops (gesho)": 273,
+   "Avocado": 179,
+   "Papaya": 149,
+   "Guava": 91,
+   "Sugar Cane": 60,
+   "Orange": 60,
+   "Rue": 55
+  },
+  "unstamped_perennial_rows_by_crop_top8": {
+   "Berbere": 200,
+   "Garlic": 200,
+   "Other tuber or stem": 115,
+   "Ginger": 24,
+   "Coffee": 22,
+   "Chat/Kat": 17,
+   "Chilies": 11,
+   "Mango": 10
+  },
+  "stamped_nonperennial_rows_by_crop_top8": {
+   "Sacred Basil": 30,
+   "Leafy Greens": 4,
+   "Red Kidney Beans": 4,
+   "Godere": 3,
+   "Kariya": 3,
+   "Maize": 1,
+   "Cardamon": 1,
+   "Sweet potato": 1
+  }
+ },
+ "2021-22": {
+  "s9_rows": 13772,
+  "s9_rows_flag_yes": 5149,
+  "s9_rows_no_s4_line": 235,
+  "s4_keys_with_disagreeing_lines": 5,
+  "served_rows": 11604,
+  "served_rows_stamped": 3723,
+  "served_rows_expected_by_oracle": 3723,
+  "served_rows_compared": 11604,
+  "served_rows_ambiguous_folded_label": 0,
+  "mismatch_stamped_not_expected": 0,
+  "mismatch_expected_not_stamped": 0,
+  "flagged_rows_with_no_value_not_stamped": 0,
+  "stamped_x_perennial": {
+   "stamped=False perennial=False": 7258,
+   "stamped=False perennial=True": 623,
+   "stamped=True perennial=False": 27,
+   "stamped=True perennial=True": 3696
+  },
+  "stamped_x_s11_q2_answered": {
+   "stamped=False q2=False": 5713,
+   "stamped=False q2=True": 2168,
+   "stamped=True q2=False": 200,
+   "stamped=True q2=True": 3523
+  },
+  "stamped_rows_with_positive_Value_sold": 534,
+  "stamped_rows_by_crop_top12": {
+   "Coffee": 847,
+   "Chat/Kat": 627,
+   "Banana": 529,
+   "Enset": 377,
+   "Mango": 353,
+   "Avocado": 262,
+   "Hops (gesho)": 194,
+   "Papaya": 132,
+   "Sugar Cane": 91,
+   "Guava": 55,
+   "Orange": 52,
+   "Lemon": 43
+  },
+  "unstamped_perennial_rows_by_crop_top8": {
+   "Berbere": 140,
+   "Garlic": 121,
+   "Chat/Kat": 87,
+   "Other tuber or stem": 59,
+   "Chilies": 34,
+   "Coffee": 28,
+   "Sugar Cane": 24,
+   "Enset": 21
+  },
+  "stamped_nonperennial_rows_by_crop_top8": {
+   "Sacred Basil": 7,
+   "Kariya": 5,
+   "Leafy Greens": 4,
+   "Tobacco": 3,
+   "Cassava": 3,
+   "Godere": 2,
+   "Pumpkin": 1,
+   "Black Pepper": 1
+  }
+ }
+}

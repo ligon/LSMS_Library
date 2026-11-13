@@ -1,11 +1,15 @@
 """Concatenate wave-level crop_production for Mali (GAP 1; parity loop).
 
 Each EACI wave's ``Mali/<wave>/_/crop_production.py`` writes a parquet
-indexed by ``(t, i, plot, crop)`` with the reported item-level harvest
+indexed by ``(t, i, plot, crop, condition)`` with the reported item-level harvest
 columns (Quantity, u, Quantity_sold, Value_sold, planting_month,
-harvest_month, intercropped, perennial).  The crop/harvest module lives in
-the EACI waves only (2014-15 EACI14, 2017-18 EACI17); the EHCVM waves
-(2018-19, 2021-22) carry no harvest block, so they contribute nothing.
+harvest_month, intercropped, perennial; since GH #824 / #1267 also
+Unit_sold, field-only KgFactor_sold, months_harvested and, on tree rows,
+Derivation). Native grain footers are relayed independently from attrs.
+All four waves contribute: EAC-I 2014-15 (EACI14) and 2017-18 (EACI17), and,
+since GH #824, EHCVM 2018-19 (s16c) and 2021-22 (s16c + s16d).  In 2017-18 and
+2021-22 a household-crop sale sits on a single harvest row or on a plot_id =
+'Farm-level' row (GH #1457, #824).
 
 ``v`` is NOT baked in — the framework joins it from ``sample()`` at API
 time.  ``id_walk`` is left to ``_finalize_result`` (cached parquets store
@@ -13,25 +17,40 @@ pre-transformation data), matching the plot_features / food_coping pattern.
 """
 import pandas as pd
 
-from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library import Country
+from lsms_library.local_tools import (
+    get_dataframe, to_parquet, read_parquet_grain_audit, _resolve_data_path,
+)
 
-WAVES = ['2014-15', '2017-18', '2018-19', '2021-22']
-
+# Reuse Country/Wave declarations and folders (ledger #1287 §2/4).
+country = Country('Mali', preload_panel_ids=False)
 pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/crop_production.parquet'
+grain_audit = []
+for t in country.waves:
+    wave = country[t]
+    if 'crop_production' not in wave.data_scheme:
+        continue
+    fn = f'../{wave.wave_folder}/_/crop_production.parquet'
     try:
         df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired (no .py script / no parquet); DVC raises
-        # PathMissingError here, not FileNotFoundError.
-        continue
+    except Exception as exc:
+        raise RuntimeError(
+            f'Mali/{t}/crop_production: declared wave parquet could not be read: {fn}'
+        ) from exc
     pieces.append(df)
+    # Footer metadata is a separate carrier from DataFrame attrs (GH #868).
+    # This direct caller is the country script, hence stack_depth=1. Keep
+    # original reports, including preexisting kinds, once and without emit.
+    reports = read_parquet_grain_audit(_resolve_data_path(fn, stack_depth=1))
+    if reports is not None:
+        for report in reports:
+            if report not in grain_audit:
+                grain_audit.append(report)
 
 assert pieces, "crop_production: no wave-level parquets found"
 
 p = pd.concat(pieces)
 
-assert p.index.is_unique, "Non-unique (t, i, plot, crop) after concat"
+assert p.index.is_unique, "Non-unique (t, i, plot, crop, condition) after concat"
 
-to_parquet(p, '../var/crop_production.parquet')
+to_parquet(p, '../var/crop_production.parquet', grain_audit=grain_audit)

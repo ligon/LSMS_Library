@@ -1,0 +1,56 @@
+{
+  "source_sha": "097283459f80016b0f00a51b814a0cb964a42789",
+  "tag": "v0.16.0",
+  "version": "0.16.0",
+  "pypi_json_sha256": "ba4094811fd4d9eab0f392284af270df79b830d267eb9c52e7aa0c303645a2cd",
+  "downloads": [
+    {
+      "filename": "lsms_library-0.16.0-py3-none-any.whl",
+      "bytes": 9078781,
+      "sha256": "a28fd5714355bc3bb9d72385c9f37278385d19aebf76c73577f62114d787eb1a",
+      "matches_pypi_digest": true,
+      "url": "https://files.pythonhosted.org/packages/e7/ea/11800349af5bf3dccff5821020db01f0f0318bef0f45637a952d459bbf61/lsms_library-0.16.0-py3-none-any.whl"
+    },
+    {
+      "filename": "lsms_library-0.16.0.tar.gz",
+      "bytes": 5526745,
+      "sha256": "056ebe62fd7f6e10d581fcccde01c9205c0a6553cfffd7dbd36c80fe5a1579fd",
+      "matches_pypi_digest": true,
+      "url": "https://files.pythonhosted.org/packages/0b/8d/560a64d9e13072ab393c983aeda43b6e9e2b9ac9f32271b5391919188b68/lsms_library-0.16.0.tar.gz"
+    }
+  ],
+  "tracked_package_files": 11753,
+  "missing_or_changed_package_files": 0,
+  "metadata_versions_exact": true,
+  "console_entrypoint_exact": true,
+  "source_unchanged": true,
+  "offline_no_deps_install": true,
+  "installed_smoke": {
+    "package_file": "/local/job40255479/control/release-v016/published-0.16.0/installed-target/lsms_library/__init__.py",
+    "version": "0.16.0",
+    "countries_root": "/local/job40255479/control/release-v016/published-0.16.0/installed-target/lsms_library/countries",
+    "data_root": "/local/job40255479/control/release-v016/published-0.16.0/installed-data",
+    "registered_countries": 38,
+    "uganda_waves": [
+      "2005-06",
+      "2009-10",
+      "2010-11",
+      "2011-12",
+      "2013-14",
+      "2015-16",
+      "2018-19",
+      "2019-20"
+    ],
+    "uganda_declared_tables": 28,
+    "roster_declaring_countries": 37,
+    "network_forbidden": true,
+    "data_builds_forbidden": true,
+    "no_parquet_produced": true,
+    "scope": "Installed configuration smoke only; existing image dependencies; no dependency-resolution or installed microdata claim"
+  },
+  "limits": [
+    "Existing image dependencies reused; no fresh dependency-resolution claim",
+    "Configuration smoke only; no installed microdata build",
+    "Archives compared independently; wheel not rebuilt from downloaded sdist"
+  ]
+}

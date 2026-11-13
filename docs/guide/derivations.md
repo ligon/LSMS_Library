@@ -194,7 +194,7 @@ what a sample represents and what recall window a wave used.
 
 The registry is `countries/<C>/_/derivations.yml`, a sibling of
 `population.yml` and `recall.yml`. Framework-level entries (an empty country
-slot) live in `lsms_library/derivations.yml`, which is currently empty. One
+slot) live in `lsms_library/derivations.yml`. One
 entry per key:
 
 | field | meaning |
@@ -209,7 +209,7 @@ entry per key:
 | `since` | the date the entry landed |
 | `waves` | a list, or `all` — the wave scope |
 | `columns` | which served fields the derivation produces: data columns or named index levels |
-| `rows` | a selector saying which rows carry the key, e.g. `{s: produced}` |
+| `rows` | a selector saying which rows carry the key, e.g. `{s: produced}`, or `0` for a deletion, which `ll.derivations()` lists as `0` |
 
 The loader (`derivations.DerivationRecord.from_config`) **refuses** an entry
 missing `rule`, `function`, `inputs`, `raw_variables` or `assumptions`, or an
@@ -217,12 +217,33 @@ assumption without a `basis` — the `PopulationRecord` discipline: a record tha
 cannot say what it did, to what, and why is not a record. The remaining fields
 are optional.
 
-`basis` is drawn from this module's own five-value vocabulary
-(`derivations.BASES`): `questionnaire`, `variable-label`, `config-comment`,
-`filename`, `modelling-choice`. The first four are the recall ladder's evidence
-rungs. The fifth **names a choice no document supplies**; it is not evidence
-and is deliberately not laundered into one. `recall.BASIS_LADDER` is not
-reused, for exactly that reason.
+Both country and framework registries refuse explicitly repeated mapping keys,
+including nested fields, with the file, resolved key and both source locations.
+Anchors, aliases and intentional YAML merge overrides remain supported: an
+explicit field can override an inherited field. Two explicit declarations of
+that same field are refused. Generic YAML configuration loading is unchanged.
+
+`basis` is drawn from this module's own six-value vocabulary
+(`derivations.BASES`), a ladder listed strongest first: `questionnaire` >
+`variable-label` > `config-comment` > `derived-from-data` > `filename` >
+`modelling-choice` (order ruled 2026-11-12). `questionnaire`, `variable-label`,
+`config-comment` and `filename` are the recall ladder's evidence rungs.
+`derived-from-data` says the distributed file itself shows the regularity
+(Togo 2021-22's exact regional multiplier on `s07bq03a`, GH #1697) and that no
+document states it: it is a measurement, not a document, so it ranks below
+anything a document or a maintainer states and above a guess from a filename.
+The last **names a choice no document supplies**; it is not evidence and is
+deliberately not laundered into one. `recall.BASIS_LADDER` is not reused, for
+exactly that reason. A record's `bases` lists the distinct bases of its
+assumptions in this order.
+
+An assumption carries ONE basis. Where a document states part of a claim and
+the data show the rest, write two assumptions, one per basis, and let the
+documentary one say only what the document says. Cote d'Ivoire 2021-22's
+`s07bq03a` keys do this: a UEMOA methodology paper and the producer's poverty
+profile state that an outlier rule exists and that section 7B was partly
+cleaned (`questionnaire`); that the rule was written into the distributed file,
+and on which rows, is `derived-from-data`.
 
 ### The key
 

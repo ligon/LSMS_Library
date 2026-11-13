@@ -1,0 +1,28 @@
+{
+  "verified_at_UTC": "2026-10-22T06:58:43.222658+00:00",
+  "archive_name": "quiescent-followup-twentythird.tar.gz",
+  "archive_sha256": "ef49e5476424ec575c51623a431e30ad6d1f1d9e31160ce5accd816c827adace",
+  "archive_bytes": 711263678,
+  "included_files": 2952,
+  "included_source_bytes": 6364388822,
+  "roots": [
+    "review-Uganda-849",
+    "review-Malawi-218",
+    "shared1196-diagnosis",
+    "nullable-float-comparator-root",
+    "comparator-values-reassessment/critical-release",
+    "comparator-values-reassessment/critical-release-attestation"
+  ],
+  "excluded_entries": 77,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "21fbbdec83076b488ea1cfb70fe8229b28f06150154f2c3266c18fc18aca66bf",
+  "private_full_manifest_sha256": "9fbd34121a89608294cbb9e36ff8d27eff7c73e2979a1928d19baee21b5b6deb",
+  "private_evidence_not_exported_to_Git": true
+}

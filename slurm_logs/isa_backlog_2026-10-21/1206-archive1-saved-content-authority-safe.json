@@ -1,0 +1,33 @@
+{
+  "status": "PERMIT_NEW_CONTENT_COMPARISONS_OF_EXPLICIT_ARCHIVE1_SAVED_PRODUCTS_ONLY",
+  "at_UTC": "2026-10-22T14:59:47.754944+00:00",
+  "tracked_proof_commit": "557fcffaae63998afee7e14ef5bcdad4d4af8f70",
+  "tracked_proof_path": "slurm_logs/isa_backlog_2026-10-21/private-evidence-durability.json",
+  "tracked_proof_sha256": "08b07e9e931831a645fb2a29bb3e8167a2821e9c60c6c703d4c1b2da4341ae02",
+  "archive_entries": 957,
+  "selected_saved_products": 182,
+  "per_PR_selected_products": {
+    "1172": 0,
+    "1173": 13,
+    "1175": 6,
+    "1176": 2,
+    "1178": 0,
+    "1180": 10,
+    "1181": 26,
+    "1182": 21,
+    "1185": 16,
+    "1186": 12,
+    "1189": 54,
+    "1191": 22
+  },
+  "authority": "Exact member bytes, size and mode are bound by the archive SHA256 already recorded in Git before this reassessment. Every listed current original matches those authenticated historical bytes. No external unpinned manifest supplies authority.",
+  "historical_original_exact_nanosecond_mtime_inode_nlink_continuity_not_claimed": true,
+  "new_physical_baselines_only": true,
+  "no_payload_decode_extract_source_API_test_or_cache_replay": true,
+  "unsaved_original_memory_and_nonlisted_products_not_authenticated": true,
+  "old_authority_hold_packets_and_claims_unchanged": true,
+  "pair_stage_and_actual_source_mapping_required_before_decode": true,
+  "signed": "Sue",
+  "archive_sha256": "e828a78dca5b82e9863d35700ef408f475e5693c2742286c1a8ce1acb3007858",
+  "archive_bytes": 153526829
+}

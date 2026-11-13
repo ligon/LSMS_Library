@@ -1,0 +1,30 @@
+{
+  "source": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "source_manifest_SHA256": "61079f813f8d9e579e428a40a4edd9e5d4829b4524a0c66fc62d461e692b5df3",
+  "safe_exports_copied": {
+    "DIAGNOSIS.org": "5aa5d4ebc30c2d19c19ee9b03b2f593b847ab5c37189760c4631c5dbb2603ab6",
+    "PROPOSAL.md": "474a09e0c7e797bb2a0c84ff133475e4feef9210040a9741ba981d79e6d83d7a",
+    "ledger-DRAFT.md": "4b91c7da51290e03d83f3e2c3de4694c2e558a7fe37e1f4d4762185a31f9385e",
+    "DRAFT-CONTENTS-addition.org": "48c58804408651e1a9347b9aa2dea5927c3d01185e5c36c37cfab324fc10cb76",
+    "REPRODUCE.sh": "90d1e4f440fc180f186cf6fcd86d5be59b23e088f43ddda908e2fcc294450c32",
+    "validation.json": "45f638fecfe04a249b7f20c4fe259593aa6cc049ce0be067427b256aa1c17f24",
+    "source-slots.json": "86592d3ba3cd48d327e7cb451ab1cc256efd9b6b9ba7da03ee4a5740b5c64898",
+    "proposed-colmap-keys.json": "dd557a4e8a079f6794f642a179118e4067f94f282b78e0fc29a9ef347521cf1b",
+    "wave-measurements.json": "1469d38821fc1ceba9646a6d0916f3a7d875868b6ec65dfb5d9c9592bebd4196",
+    "raw-factor-counts.json": "47a2208591aa355c62b772fb56a3c1a217cd76eece60d90cf69417fdfb694041",
+    "systematic-unit-condition-disagreement.json": "989a8ad227f285ea9d558be1dadccea574b19ded66fc02a6dc15b3ef42d96d32",
+    "carrier-ambiguity-safe.json": "17bc79b0dd7659f138979f5675bd6e620c961b79c6c2856fbf5924b64a205071",
+    "all-coalescence-classification.json": "1c3d4370b813a8ca639ce2c03f4e03a9c5c215d28f387ba095c807f83e4533d5",
+    "coalescences.json": "87ee07a44b247f0db5754e5f0fbfe9856d4d7328d460ebbca0f4836a7d821744",
+    "source-identity.json": "80c75036c9b6f5151abef815ce4a180cf5ae54e52e77673f29f9a5c2046db7d9",
+    "all-production-key-audit.json": "26d05f1e64db18ccc309ad19f2419440dd5f1846924436fc8500b2dcf5051145",
+    "kg-delta-decomposition.json": "f7a63d52381f124e9c2c90688b2a66b507bb643cd2dd6897841779f82e5b5329",
+    "expected-rewarm-scope.json": "851ac416e37b31626f807ebbff59623843771de90ff41e42020b72c694afa69f",
+    "ordinary-default-warm.json": "186d95b622d38fcb3070526df4a0fda8e8e70b8f9643f4a4fb2e7b8d67eb70fd",
+    "freeze-proof.json": "b5ec845ae77c934feea5d624f91f8332e3d381953e8e20d35539ed5ed7954250",
+    "preparation.json": "3c2ca2c1e2e044893f7b51ecded92485f76a9ec60690f146b7b7f7fd06050244"
+  },
+  "omitted_safe_full_dispersion": "Retained privately; published systematic-unit-condition-disagreement and wave summaries remain complete for their stated scopes.",
+  "exactness_qualification": "Original tolerant comparisons remain frozen; see separate849-Uganda-exact-addendum for explicit saved-artifact proof and unsaved scope gaps.",
+  "factor_or_public_axis_implementation": false
+}

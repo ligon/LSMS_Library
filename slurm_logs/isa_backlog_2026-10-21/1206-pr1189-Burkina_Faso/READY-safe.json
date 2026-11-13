@@ -1,0 +1,14 @@
+{
+  "PR": 1189,
+  "status": "READY_NEW_SAVED_NUMERIC_SUPPLEMENT_WITH_EXPLICIT_ORIGINAL_GAPS",
+  "pins": {
+    "pr1189-full-manifest-private.json": "b7d5d511cf8075d744bd7d123b25748e244ea02d95d3874eaac4e609dcf6edd7",
+    "pr1189-postexit-private.json": "559916feede6aeb8049c5d91e1fb97ba1a061661a7054425cd4df1e5c512a2c7",
+    "pr1189-safe-allowlist.json": "68ae6956919f172e00cc1a8c32635c01eb4812449c693129cd1b882e0a36d13e"
+  },
+  "final_safe_sha256": "5b503960d2c53b713072b545b524e8d21a737c6c95816640897eca764a65e8b4",
+  "packager_terminal_exit": 0,
+  "postexit_checker_terminal_exit": 0,
+  "remaining_consumers": 0,
+  "signed": "Sue"
+}

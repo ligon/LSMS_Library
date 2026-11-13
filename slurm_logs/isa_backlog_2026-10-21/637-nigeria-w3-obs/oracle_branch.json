@@ -1,0 +1,34 @@
+{
+ "source_rows": 37756,
+ "priced_resolved_rows": 37756,
+ "registry_dropped_rows": 14603,
+ "registry_derived_rows": 341,
+ "inputs_carry_obs": {
+  "drop": true,
+  "derived": true
+ },
+ "dropped_keys_unique": true,
+ "dropped_matched_in_source": 14603,
+ "registry_derived_inputs_not_on_g_cl": 340,
+ "derived_matched": 1,
+ "expected_rows": 23153,
+ "expected_unique": true,
+ "expected_by_obs": {
+  "1": 17344,
+  "2": 5809
+ },
+ "built_rows": 23153,
+ "built_index": [
+  "t",
+  "v",
+  "j",
+  "u",
+  "obs"
+ ],
+ "missing_from_built": 0,
+ "extra_in_built": 0,
+ "price_exact_equal": 23153,
+ "price_compared": 23153,
+ "price_max_abs_diff": 0.0,
+ "derivation_equal": 23153
+}

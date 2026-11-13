@@ -1,0 +1,40 @@
+#+title: Malawi #1111 frozen review - test composition blocker
+#+date: 2026-10-21
+#+author: Sue (GPT-6)
+
+* Verdict
+NEEDS_FIX at frozen clean =9b883974a81d6ee664bbca425b7d484f0f14eb7a=.
+The new regression permanently pins the excluded f8 organic bug/schema and would reject the independently reviewed organic correction at de9 / PR #1175.
+No composition was attempted, and this is not a finding against the two fertilizer production projections.
+
+* Concrete finding
+=tests/test_1111_malawi_applied_kg.py:149-151= requires organic Quantity zero, u missing and Applied absent.
+The synthetic source fixture itself supplies affirmative organic use, reported Quantity 123 and an observed organic unit (lines 52-56).
+The independently reviewed de9 _organic_block reads ag_d37a/b and carries Applied, so the valid composed implementation necessarily contradicts these three assertions.
+These requirements are outside #1111's enumerator-kg boundary and are already contradicted by the country note that says the older "Module D records no organic quantity" claim is false.
+Private standalone f8 full-frame equality is appropriate evidence; a permanent test requiring that known bug prevents the accepted fixes from coexisting.
+
+Bounded correction: remove only the excluded-organic selection/assertions from this regression, retaining the namespace, seed, pesticide, fertilizer amount/unit/type, pre-aggregation sum and retention assertions.
+No organic production, helper, schema, fixture, factor, reducer or eligibility change is needed.
+Keep the private f8 organic invariance receipt as historical standalone evidence.
+After the test-only descendant, root-owned composition should run actual #1111 and organic regressions without treating valid combined failures as expected.
+
+* Grounding and review limits
+I read the complete 3,088-line Malawi CONTENTS first, including the two live TODO #116 conversion/FCT entries and all WAITING/LOGBOOK material, then the task ledger and complete REPORT, VALIDATION, REPRODUCE and RESIDUALS.
+Relevant idiosyncrasies include changing Likoma coverage, distinct modern cross-sectional and tracking universes, the 2016 cs-17- namespace versus bare 2019 IDs and unchanged ID walking, redundant/unread 2010 Panel sources, and the existing IHS4 restricted reader.
+CONTENTS records conflicting IHPS Likoma statements; it also explicitly qualifies the old acquired/applied unit interpretation using separate native quantity/unit, enumerator TOTAL KGs and timing fields.
+The actual two-driver diff labels only existing selected totals before the unchanged additive assembler.
+I did not infer additional authority for excluded 2013/2016 or any physical conversion from amount magnitudes.
+
+Preparation finished successfully: four complete tracked-tree/mode/HEAD snapshots, held-source MD5 checks, independent physical private L1/L2 copies and reference copies.
+All four tracked trees (candidate, quiescent writer, f8 and de9) are exact and clean at release, as itemized in proof.json.
+No independent cold runtime, source-pair oracle, nitrogen, scanner, 549-hash census or pytest cohort was started before this blocker stopped the review; none is claimed as passed here.
+The producer's existing full evidence remains its own evidence, not independent verification by this review.
+The private preparation roots remain target-cold and available for an amended frozen review.
+No runtime/pytest subprocess remains; the preparation worker exited zero.
+No tracked edit, Git mutation, GitHub write, acquisition, DVC CLI, shared-cache mutation, bypass or de9 composition occurred.
+
+The original #1111 residual draft remains applicable: 2013/2016 C4 authority, missing-unit and unlisted-seed handling, seed purchase units, #1106 composition and #1174 retention remain outside this boundary.
+The new finding is test debt only; it does not authorize an organic behavior change in this lane.
+
+Sue

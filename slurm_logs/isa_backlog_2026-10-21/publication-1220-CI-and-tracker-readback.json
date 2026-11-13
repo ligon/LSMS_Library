@@ -1,0 +1,13 @@
+{
+  "at_UTC": "2026-10-22T22:06:54.234289+00:00",
+  "PR": 1220,
+  "PR_body_exact": true,
+  "tracker1170_body_exact": true,
+  "head": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "CI_run": 39861535004,
+  "unit_and_windows": "SUCCESS",
+  "skipped_jobs": 6,
+  "data_tests": "SKIPPED",
+  "merged": false,
+  "signed": "Sue"
+}

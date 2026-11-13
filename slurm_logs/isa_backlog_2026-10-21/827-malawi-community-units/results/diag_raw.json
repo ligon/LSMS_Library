@@ -1,0 +1,1437 @@
+{
+ "2010-11/Full_Sample": {
+  "rows": 39168,
+  "rows_item_mapped": 39168,
+  "u_blank": 17612,
+  "n_blank": 17608,
+  "joint_blank": 17604,
+  "u_only_blank": 8,
+  "n_only_blank": 4,
+  "joint_by_avail": {
+   "1.0": 9808,
+   "2.0": 7794,
+   "nan": 2
+  },
+  "joint_price_present": 9803,
+  "joint_price_present_and_positive": 9803,
+  "joint_avail_yes_price_present": 9803,
+  "joint_avail_no": 7794,
+  "joint_avail_missing": 2,
+  "joint_avail_no_price_present": 0,
+  "joint_avail_missing_price_present": 0,
+  "ublank_raw_unit_nan": 17611,
+  "ublank_raw_unit_unmapped_values": {
+   "23.0": 1
+  },
+  "ublank_raw_unit_str_nonnumeric": {},
+  "raw_unit_dtype": "float64",
+  "raw_n_dtype": "float64",
+  "joint_price_present_by_item": {
+   "3:Cost To Grind 50 Kg Maize": 717,
+   "4:Cost To Grind 50 Kg Rice": 272,
+   "5:Rice": 1,
+   "6:Bread": 1,
+   "7:Mandazi, Doughnut (Vendor)": 1,
+   "9:Cabbage": 1,
+   "18:Salt": 1,
+   "22:Bar Soap": 1,
+   "26:Vaseline/Glycerin": 1,
+   "27:Aspirin Or Panadol": 1,
+   "29:Chitenje Cloth": 5,
+   "30:Trousers (Second-Hand)": 726,
+   "31:Soft Drink (Bottle)": 761,
+   "32:Bottled/ Canned Beer": 635,
+   "33:Cigarettes": 747,
+   "34:Battery (Dry Cell)": 757,
+   "35:Watch (Digital)": 447,
+   "36:Firewood": 2,
+   "40:Pesticides/Insecticides": 1,
+   "41:Herbicides/Fungicides": 1,
+   "42:Motorized Transport Of Crop": 290,
+   "43:Hybrid Maize Seed": 2,
+   "44:Hand Hoe": 699,
+   "45:Panga": 664,
+   "46:Sickle": 665,
+   "47:Axe": 670,
+   "48:Bicycle": 512,
+   "49:Foam Mattress": 429,
+   "50:Mosquito Net": 457,
+   "51:Ganyu Wage (1 Day, Adult Male)": 336
+  },
+  "priced_by_item_with_unit": {
+   "1:Maize Grain (Not As Ufa)": [
+    728,
+    728,
+    728
+   ],
+   "2:Maize Ufa Mgaiwa (Normal Flour)": [
+    195,
+    195,
+    195
+   ],
+   "3:Cost To Grind 50 Kg Maize": [
+    717,
+    0,
+    0
+   ],
+   "4:Cost To Grind 50 Kg Rice": [
+    272,
+    0,
+    0
+   ],
+   "5:Rice": [
+    697,
+    696,
+    696
+   ],
+   "6:Bread": [
+    622,
+    621,
+    621
+   ],
+   "7:Mandazi, Doughnut (Vendor)": [
+    760,
+    759,
+    759
+   ],
+   "8:Beans": [
+    735,
+    735,
+    735
+   ],
+   "9:Cabbage": [
+    696,
+    694,
+    695
+   ],
+   "10:Tomato": [
+    760,
+    760,
+    760
+   ],
+   "11:Banana": [
+    750,
+    749,
+    750
+   ],
+   "12:Fresh Milk": [
+    484,
+    484,
+    484
+   ],
+   "13:Eggs": [
+    750,
+    750,
+    750
+   ],
+   "14:Chicken": [
+    764,
+    764,
+    764
+   ],
+   "15:Sun Dried Fish": [
+    757,
+    757,
+    757
+   ],
+   "16:Beef": [
+    696,
+    696,
+    696
+   ],
+   "17:Tea": [
+    754,
+    753,
+    754
+   ],
+   "18:Salt": [
+    767,
+    766,
+    766
+   ],
+   "19:Sugar": [
+    748,
+    748,
+    748
+   ],
+   "20:Cooking Oil": [
+    753,
+    753,
+    753
+   ],
+   "21:Chips (Vendor)": [
+    548,
+    548,
+    548
+   ],
+   "22:Bar Soap": [
+    722,
+    721,
+    721
+   ],
+   "23:Toothbrush": [
+    760,
+    760,
+    760
+   ],
+   "24:Toothpaste": [
+    722,
+    722,
+    722
+   ],
+   "25:Clothes Soap": [
+    639,
+    638,
+    639
+   ],
+   "26:Vaseline/Glycerin": [
+    753,
+    752,
+    752
+   ],
+   "27:Aspirin Or Panadol": [
+    749,
+    746,
+    746
+   ],
+   "28:Fansidar": [
+    169,
+    168,
+    168
+   ],
+   "29:Chitenje Cloth": [
+    725,
+    720,
+    720
+   ],
+   "30:Trousers (Second-Hand)": [
+    726,
+    0,
+    0
+   ],
+   "31:Soft Drink (Bottle)": [
+    761,
+    0,
+    0
+   ],
+   "32:Bottled/ Canned Beer": [
+    635,
+    0,
+    0
+   ],
+   "33:Cigarettes": [
+    747,
+    0,
+    0
+   ],
+   "34:Battery (Dry Cell)": [
+    757,
+    0,
+    0
+   ],
+   "35:Watch (Digital)": [
+    447,
+    0,
+    0
+   ],
+   "36:Firewood": [
+    646,
+    644,
+    644
+   ],
+   "37:Charcoal": [
+    544,
+    543,
+    544
+   ],
+   "38:Paraffin": [
+    639,
+    639,
+    639
+   ],
+   "39:Chemical Fertilizer": [
+    513,
+    513,
+    513
+   ],
+   "40:Pesticides/Insecticides": [
+    315,
+    314,
+    314
+   ],
+   "41:Herbicides/Fungicides": [
+    189,
+    188,
+    188
+   ],
+   "42:Motorized Transport Of Crop": [
+    290,
+    0,
+    0
+   ],
+   "43:Hybrid Maize Seed": [
+    533,
+    531,
+    531
+   ],
+   "44:Hand Hoe": [
+    699,
+    0,
+    0
+   ],
+   "45:Panga": [
+    664,
+    0,
+    0
+   ],
+   "46:Sickle": [
+    665,
+    0,
+    0
+   ],
+   "47:Axe": [
+    670,
+    0,
+    0
+   ],
+   "48:Bicycle": [
+    512,
+    0,
+    0
+   ],
+   "49:Foam Mattress": [
+    429,
+    0,
+    0
+   ],
+   "50:Mosquito Net": [
+    457,
+    0,
+    0
+   ],
+   "51:Ganyu Wage (1 Day, Adult Male)": [
+    336,
+    0,
+    0
+   ]
+  },
+  "os_nonblank": 1020,
+  "os_nonblank_by_ucode": {
+   "21.0": 975,
+   "nan": 12,
+   "19.0": 10,
+   "18.0": 9,
+   "9.0": 5,
+   "20.0": 4,
+   "15.0": 2,
+   "1.0": 2,
+   "6.0": 1
+  },
+  "os_nonblank_on_joint_blank": 12,
+  "os_text_counts_all": {
+   "2 TABLET PACKET": 165,
+   "METERS": 152,
+   "PACKET": 126,
+   "WHOLE CHICKEN": 93,
+   "SPOON": 68,
+   "PER SPOON": 35,
+   "JUMBO": 34,
+   "TABLETS": 31,
+   "MTOLO": 31,
+   "PLASTIC BAG": 22,
+   "3 TABLET PACKET": 19,
+   "BUNDLE": 18,
+   "2 METRES": 17,
+   "50G TUBE": 11,
+   "ONE PACKET": 11,
+   "1 EGG": 10,
+   "TABLET": 10,
+   "PLASTIC PAPER": 8,
+   "LOAF": 7,
+   "PLASTIC": 7,
+   "SMALL PLASTIC BAG": 6,
+   "ONE EGG": 6,
+   "TABLES": 5,
+   "PER JUMBO": 5,
+   "PER SMALL CUP": 5,
+   "150G TUBE": 4,
+   "PER SMALL CONTAINER": 4,
+   "PLATE": 3,
+   "SMALL CONTAINER": 3,
+   "ONE CABBAGE": 3,
+   "SACHET": 3,
+   "2 MTS": 3,
+   "KANKEBE": 3,
+   "1EGG": 2,
+   "1 BAR": 2,
+   "TUBE": 2,
+   "MAN MADE CUP": 2,
+   "OX-CART": 2,
+   "PER SMALL JUMBO": 2,
+   "ONE HEAD": 2,
+   "ONE TOOTHBRUSH": 2,
+   "HEAD": 2,
+   "ONE SMALL BOTTLE": 2,
+   "NONE": 2,
+   "PLASTIC BAG.": 2,
+   "2 METRES CHITENJE": 2,
+   "NO 17 PLATE": 2,
+   "NUMBER 9 PLATE": 2,
+   "TABLET PACKET": 1,
+   "1 TOOTH BRUSH": 1,
+   "150G TOOTHPASTE": 1,
+   "1 50G TUBE": 1,
+   "SMALL MANS MADE CUP": 1,
+   "BOTTLE": 1,
+   "MILLIGRAMS": 1,
+   "NO. 18 PLATE": 1,
+   "BIG SIZE": 1,
+   "STRIPE": 1,
+   "BANDLE": 1,
+   "1 PACKET": 1,
+   "PER POON": 1,
+   "CUP SMALL": 1,
+   "SMALL CUP": 1,
+   "COFFEE PLATE": 1,
+   "PER JUMBO MEDIUM": 1,
+   "PER BOTTLE": 1,
+   "TINNED SPOON SMALL": 1,
+   "COVER OF BLUE SEAL": 1,
+   "SMALL JUMBO": 1,
+   "BUNDLE OF 20 PIECES": 1,
+   "PER PAIL": 1,
+   "PER PACKET": 1,
+   "BAG": 1,
+   "SALT": 1,
+   "BLACK JUMBO": 1,
+   "SMALL PLSTIC BAG": 1,
+   "ONE NDASI": 1,
+   "ONE NDAZI": 1,
+   "ONE TUBE": 1,
+   "ONE BOTTLE": 1,
+   "2 SACHET": 1,
+   "0NE TUBE": 1,
+   "ONE SACHET": 1,
+   "PLASTIC BAGS": 1,
+   "JUMBA": 1,
+   "CUP": 1,
+   "KHETEPHA": 1,
+   "10 GRAM": 1,
+   "PLASTC PAPER": 1,
+   "NO 3 PLATE": 1,
+   "2METERS": 1,
+   "1.75 METRES": 1,
+   "LOCALLY MADE PACKETS": 1,
+   "50G": 1,
+   "LOCAL MADE PACKETS": 1,
+   "A PACKET OF 2 TABLETS": 1,
+   "CHITENJE OF 2 METRES": 1,
+   "2 METRES PIECE": 1,
+   "BIG SPOON": 1,
+   "MTULO": 1,
+   "PER 1 SACHET": 1,
+   "BAR": 1,
+   "SACHET/PLASTIC TUBE": 1,
+   "2 M ETRES": 1,
+   "TINA PLATE": 1,
+   "NUMBER 23": 1,
+   "NO 9 PLATE": 1,
+   "N0 23 PLATE": 1,
+   "WALKMAN": 1,
+   "NO 15 PLATE": 1
+  },
+  "ucode_dist": {
+   "1.0": 4226,
+   "2.0": 946,
+   "3.0": 8,
+   "4.0": 31,
+   "5.0": 168,
+   "6.0": 518,
+   "7.0": 292,
+   "8.0": 157,
+   "9.0": 7242,
+   "10.0": 1806,
+   "11.0": 3,
+   "12.0": 19,
+   "13.0": 2,
+   "14.0": 25,
+   "15.0": 890,
+   "16.0": 149,
+   "17.0": 6,
+   "18.0": 2314,
+   "19.0": 1298,
+   "20.0": 479,
+   "21.0": 977,
+   "23.0": 1,
+   "nan": 17611
+  },
+  "avail_dist": {
+   "1.0": 31372,
+   "2.0": 7794,
+   "nan": 2
+  },
+  "price_present": 31366
+ },
+ "2013-14/Panel": {
+  "rows": 6528,
+  "rows_item_mapped": 6528,
+  "u_blank": 4430,
+  "n_blank": 4256,
+  "joint_blank": 4254,
+  "u_only_blank": 176,
+  "n_only_blank": 2,
+  "joint_by_avail": {
+   "1.0": 2206,
+   "2.0": 2014,
+   "nan": 31,
+   "0.0": 1,
+   "3.0": 1,
+   "5.0": 1
+  },
+  "joint_price_present": 2216,
+  "joint_price_present_and_positive": 2216,
+  "joint_avail_yes_price_present": 2199,
+  "joint_avail_no": 2014,
+  "joint_avail_missing": 31,
+  "joint_avail_no_price_present": 0,
+  "joint_avail_missing_price_present": 14,
+  "ublank_raw_unit_nan": 4273,
+  "ublank_raw_unit_unmapped_values": {
+   "23.0": 88,
+   "22.0": 47,
+   "0.0": 10,
+   "50.0": 7,
+   "500.0": 1,
+   "48.0": 1,
+   "200.0": 1,
+   "69.0": 1,
+   "25.0": 1
+  },
+  "ublank_raw_unit_str_nonnumeric": {},
+  "raw_unit_dtype": "float64",
+  "raw_n_dtype": "float64",
+  "joint_price_present_by_item": {
+   "1:Maize Grain (Not As Ufa)": 2,
+   "3:Cost To Grind 50 Kg Maize": 196,
+   "4:Cost To Grind 50 Kg Rice": 37,
+   "22:Bar Soap": 1,
+   "24:Toothpaste": 1,
+   "25:Clothes Soap": 1,
+   "26:Vaseline/Glycerin": 1,
+   "29:Chitenje Cloth": 1,
+   "30:Trousers (Second-Hand)": 186,
+   "31:Soft Drink (Bottle)": 203,
+   "32:Bottled/ Canned Beer": 160,
+   "33:Cigarettes": 192,
+   "34:Battery (Dry Cell)": 203,
+   "35:Watch (Digital)": 82,
+   "37:Charcoal": 2,
+   "38:Paraffin": 1,
+   "40:Pesticides/Insecticides": 1,
+   "41:Herbicides/Fungicides": 2,
+   "42:Motorized Transport Of Crop": 76,
+   "43:Hybrid Maize Seed": 2,
+   "44:Hand Hoe": 172,
+   "45:Panga": 169,
+   "46:Sickle": 151,
+   "47:Axe": 131,
+   "48:Bicycle": 102,
+   "49:Foam Mattress": 71,
+   "50:Mosquito Net": 70
+  },
+  "priced_by_item_with_unit": {
+   "1:Maize Grain (Not As Ufa)": [
+    192,
+    174,
+    190
+   ],
+   "3:Cost To Grind 50 Kg Maize": [
+    196,
+    0,
+    0
+   ],
+   "4:Cost To Grind 50 Kg Rice": [
+    37,
+    0,
+    0
+   ],
+   "22:Bar Soap": [
+    186,
+    184,
+    185
+   ],
+   "23:Toothbrush": [
+    203,
+    203,
+    203
+   ],
+   "24:Toothpaste": [
+    185,
+    181,
+    184
+   ],
+   "25:Clothes Soap": [
+    184,
+    176,
+    182
+   ],
+   "26:Vaseline/Glycerin": [
+    198,
+    191,
+    197
+   ],
+   "27:Aspirin Or Panadol": [
+    202,
+    162,
+    202
+   ],
+   "28:Fansidar": [
+    30,
+    24,
+    30
+   ],
+   "29:Chitenje Cloth": [
+    182,
+    153,
+    181
+   ],
+   "30:Trousers (Second-Hand)": [
+    186,
+    0,
+    0
+   ],
+   "31:Soft Drink (Bottle)": [
+    203,
+    0,
+    0
+   ],
+   "32:Bottled/ Canned Beer": [
+    160,
+    0,
+    0
+   ],
+   "33:Cigarettes": [
+    192,
+    0,
+    0
+   ],
+   "34:Battery (Dry Cell)": [
+    203,
+    0,
+    0
+   ],
+   "35:Watch (Digital)": [
+    82,
+    0,
+    0
+   ],
+   "36:Firewood": [
+    167,
+    155,
+    167
+   ],
+   "37:Charcoal": [
+    156,
+    121,
+    154
+   ],
+   "38:Paraffin": [
+    66,
+    48,
+    65
+   ],
+   "39:Chemical Fertilizer": [
+    122,
+    119,
+    122
+   ],
+   "40:Pesticides/Insecticides": [
+    77,
+    74,
+    75
+   ],
+   "41:Herbicides/Fungicides": [
+    41,
+    38,
+    39
+   ],
+   "42:Motorized Transport Of Crop": [
+    76,
+    0,
+    0
+   ],
+   "43:Hybrid Maize Seed": [
+    94,
+    92,
+    92
+   ],
+   "44:Hand Hoe": [
+    172,
+    0,
+    0
+   ],
+   "45:Panga": [
+    169,
+    0,
+    0
+   ],
+   "46:Sickle": [
+    151,
+    0,
+    0
+   ],
+   "47:Axe": [
+    131,
+    0,
+    0
+   ],
+   "48:Bicycle": [
+    102,
+    0,
+    0
+   ],
+   "49:Foam Mattress": [
+    71,
+    0,
+    0
+   ],
+   "50:Mosquito Net": [
+    70,
+    0,
+    0
+   ]
+  },
+  "desc_values": {
+   "Cost to grind 50 kg": 408,
+   "Maize grain": 204,
+   "Bar soap (Maluwa)": 204,
+   "Toothbrush": 204,
+   "Toothpaste (50 g tub": 204,
+   "Clothes soap (Omo, S": 204,
+   "Vaseline/glycerin": 204,
+   "Aspirin or Panadol": 204,
+   "Fansidar (3 tablet p": 204,
+   "Chitenje cloth": 204,
+   "Trousers (kaunjika)": 204,
+   "Coca-Cola, Fanta (bo": 204,
+   "Carlsberg beer (bott": 204,
+   "Cigarettes, Embassy": 204,
+   "Battery (dry cell) f": 204,
+   "Watch, digital (simp": 204,
+   "Firewood": 204,
+   "Charcoal": 204,
+   "Paraffin": 204,
+   "Chemical fertilizer": 204,
+   "Pesticides/Insectici": 204,
+   "Herbicides/Fungicide": 204,
+   "Motorized transport": 204,
+   "Hybrid maize seed (m": 204,
+   "Hand hoe, without ha": 204,
+   "Panga": 204,
+   "Sickle": 204,
+   "Axe": 204,
+   "Bicycle": 204,
+   "Foam mattress (10 cm": 204,
+   "Mosquito net (white,": 204
+  },
+  "ucode_dist": {
+   "0.0": 10,
+   "1.0": 462,
+   "2.0": 115,
+   "4.0": 3,
+   "5.0": 14,
+   "7.0": 10,
+   "8.0": 15,
+   "9.0": 745,
+   "10.0": 58,
+   "11.0": 1,
+   "12.0": 5,
+   "14.0": 2,
+   "15.0": 37,
+   "16.0": 3,
+   "18.0": 451,
+   "19.0": 176,
+   "21.0": 1,
+   "22.0": 47,
+   "23.0": 88,
+   "25.0": 1,
+   "48.0": 1,
+   "50.0": 7,
+   "69.0": 1,
+   "200.0": 1,
+   "500.0": 1,
+   "nan": 4273
+  },
+  "avail_dist": {
+   "1.0": 4465,
+   "2.0": 2014,
+   "nan": 45,
+   "3.0": 2,
+   "0.0": 1,
+   "5.0": 1
+  },
+  "price_present": 4486
+ },
+ "2019-20/Cross_Sectional": {
+  "rows": 36210,
+  "rows_item_mapped": 36210,
+  "u_blank": 17890,
+  "n_blank": 17916,
+  "joint_blank": 17890,
+  "u_only_blank": 0,
+  "n_only_blank": 26,
+  "joint_by_avail": {
+   "1.0": 8661,
+   "2.0": 6061,
+   "nan": 3168
+  },
+  "joint_price_present": 8643,
+  "joint_price_present_and_positive": 8637,
+  "joint_avail_yes_price_present": 8643,
+  "joint_avail_no": 6061,
+  "joint_avail_missing": 3168,
+  "joint_avail_no_price_present": 0,
+  "joint_avail_missing_price_present": 0,
+  "ublank_raw_unit_nan": 17890,
+  "ublank_raw_unit_unmapped_values": {},
+  "ublank_raw_unit_str_nonnumeric": {},
+  "raw_unit_dtype": "float64",
+  "raw_n_dtype": "str",
+  "joint_price_present_by_item": {
+   "3:Cost To Grind 50 Kg Maize": 572,
+   "4:Cost To Grind 50 Kg Rice": 261,
+   "22:Bar Soap": 1,
+   "30:Trousers (Second-Hand)": 595,
+   "31:Soft Drink (Bottle)": 634,
+   "32:Bottled/ Canned Beer": 481,
+   "33:Cigarettes": 588,
+   "34:Battery (Dry Cell)": 625,
+   "35:Watch (Digital)": 381,
+   "39:Chemical Fertilizer": 1,
+   "42:Motorized Transport Of Crop": 389,
+   "44:Hand Hoe": 592,
+   "45:Panga": 586,
+   "46:Sickle": 568,
+   "47:Axe": 559,
+   "48:Bicycle": 484,
+   "49:Foam Mattress": 427,
+   "50:Mosquito Net": 308,
+   "51:Ganyu Wage (1 Day, Adult Male)": 591
+  },
+  "priced_by_item_with_unit": {
+   "1:Maize Grain (Not As Ufa)": [
+    629,
+    629,
+    627
+   ],
+   "2:Maize Ufa Mgaiwa (Normal Flour)": [
+    408,
+    408,
+    408
+   ],
+   "3:Cost To Grind 50 Kg Maize": [
+    572,
+    0,
+    0
+   ],
+   "4:Cost To Grind 50 Kg Rice": [
+    261,
+    0,
+    0
+   ],
+   "5:Rice": [
+    588,
+    588,
+    588
+   ],
+   "6:Bread": [
+    551,
+    551,
+    551
+   ],
+   "7:Mandazi, Doughnut (Vendor)": [
+    644,
+    644,
+    642
+   ],
+   "8:Beans": [
+    633,
+    633,
+    632
+   ],
+   "9:Cabbage": [
+    603,
+    603,
+    602
+   ],
+   "10:Tomato": [
+    639,
+    639,
+    638
+   ],
+   "11:Banana": [
+    606,
+    606,
+    606
+   ],
+   "12:Fresh Milk": [
+    526,
+    526,
+    526
+   ],
+   "13:Eggs": [
+    636,
+    636,
+    636
+   ],
+   "14:Chicken": [
+    609,
+    609,
+    608
+   ],
+   "15:Sun Dried Fish": [
+    641,
+    641,
+    640
+   ],
+   "16:Beef": [
+    538,
+    538,
+    538
+   ],
+   "17:Tea": [
+    601,
+    601,
+    600
+   ],
+   "18:Salt": [
+    643,
+    643,
+    640
+   ],
+   "19:Sugar": [
+    510,
+    510,
+    510
+   ],
+   "20:Cooking Oil": [
+    582,
+    582,
+    582
+   ],
+   "21:Chips (Vendor)": [
+    562,
+    562,
+    561
+   ],
+   "22:Bar Soap": [
+    471,
+    470,
+    470
+   ],
+   "23:Toothbrush": [
+    617,
+    617,
+    616
+   ],
+   "24:Toothpaste": [
+    613,
+    613,
+    612
+   ],
+   "25:Clothes Soap": [
+    575,
+    575,
+    573
+   ],
+   "26:Vaseline/Glycerin": [
+    636,
+    636,
+    634
+   ],
+   "27:Aspirin Or Panadol": [
+    642,
+    642,
+    640
+   ],
+   "28:Fansidar": [
+    84,
+    84,
+    84
+   ],
+   "29:Chitenje Cloth": [
+    594,
+    594,
+    594
+   ],
+   "30:Trousers (Second-Hand)": [
+    595,
+    0,
+    0
+   ],
+   "31:Soft Drink (Bottle)": [
+    634,
+    0,
+    0
+   ],
+   "32:Bottled/ Canned Beer": [
+    481,
+    0,
+    0
+   ],
+   "33:Cigarettes": [
+    588,
+    0,
+    0
+   ],
+   "34:Battery (Dry Cell)": [
+    625,
+    0,
+    0
+   ],
+   "35:Watch (Digital)": [
+    381,
+    0,
+    0
+   ],
+   "36:Firewood": [
+    535,
+    535,
+    535
+   ],
+   "37:Charcoal": [
+    565,
+    565,
+    564
+   ],
+   "38:Paraffin": [
+    106,
+    106,
+    106
+   ],
+   "39:Chemical Fertilizer": [
+    481,
+    480,
+    480
+   ],
+   "40:Pesticides/Insecticides": [
+    453,
+    453,
+    450
+   ],
+   "41:Herbicides/Fungicides": [
+    267,
+    267,
+    267
+   ],
+   "42:Motorized Transport Of Crop": [
+    389,
+    0,
+    0
+   ],
+   "43:Hybrid Maize Seed": [
+    534,
+    534,
+    534
+   ],
+   "44:Hand Hoe": [
+    592,
+    0,
+    0
+   ],
+   "45:Panga": [
+    586,
+    0,
+    0
+   ],
+   "46:Sickle": [
+    568,
+    0,
+    0
+   ],
+   "47:Axe": [
+    559,
+    0,
+    0
+   ],
+   "48:Bicycle": [
+    484,
+    0,
+    0
+   ],
+   "49:Foam Mattress": [
+    427,
+    0,
+    0
+   ],
+   "50:Mosquito Net": [
+    308,
+    0,
+    0
+   ],
+   "51:Ganyu Wage (1 Day, Adult Male)": [
+    591,
+    0,
+    0
+   ]
+  },
+  "ucode_dist": {
+   "1.0": 3657,
+   "2.0": 883,
+   "3.0": 7,
+   "4.0": 56,
+   "5.0": 66,
+   "6.0": 135,
+   "7.0": 339,
+   "8.0": 157,
+   "9.0": 4855,
+   "10.0": 1646,
+   "11.0": 1,
+   "12.0": 1,
+   "13.0": 1,
+   "14.0": 5,
+   "15.0": 754,
+   "16.0": 156,
+   "17.0": 108,
+   "18.0": 1885,
+   "19.0": 1033,
+   "20.0": 843,
+   "21.0": 1732,
+   "nan": 17890
+  },
+  "avail_dist": {
+   "1.0": 26981,
+   "2.0": 6061,
+   "nan": 3168
+  },
+  "price_present": 26963
+ },
+ "2019-20/Panel": {
+  "rows": 5151,
+  "rows_item_mapped": 5151,
+  "u_blank": 2996,
+  "n_blank": 2998,
+  "joint_blank": 2996,
+  "u_only_blank": 0,
+  "n_only_blank": 2,
+  "joint_by_avail": {
+   "nan": 1235,
+   "1.0": 1015,
+   "2.0": 746
+  },
+  "joint_price_present": 1015,
+  "joint_price_present_and_positive": 1015,
+  "joint_avail_yes_price_present": 1015,
+  "joint_avail_no": 746,
+  "joint_avail_missing": 1235,
+  "joint_avail_no_price_present": 0,
+  "joint_avail_missing_price_present": 0,
+  "ublank_raw_unit_nan": 2996,
+  "ublank_raw_unit_unmapped_values": {},
+  "ublank_raw_unit_str_nonnumeric": {},
+  "raw_unit_dtype": "float64",
+  "raw_n_dtype": "str",
+  "joint_price_present_by_item": {
+   "3:Cost To Grind 50 Kg Maize": 70,
+   "4:Cost To Grind 50 Kg Rice": 33,
+   "30:Trousers (Second-Hand)": 68,
+   "31:Soft Drink (Bottle)": 75,
+   "32:Bottled/ Canned Beer": 54,
+   "33:Cigarettes": 72,
+   "34:Battery (Dry Cell)": 72,
+   "35:Watch (Digital)": 51,
+   "42:Motorized Transport Of Crop": 42,
+   "44:Hand Hoe": 67,
+   "45:Panga": 68,
+   "46:Sickle": 66,
+   "47:Axe": 66,
+   "48:Bicycle": 52,
+   "49:Foam Mattress": 50,
+   "50:Mosquito Net": 35,
+   "51:Ganyu Wage (1 Day, Adult Male)": 74
+  },
+  "priced_by_item_with_unit": {
+   "1:Maize Grain (Not As Ufa)": [
+    74,
+    74,
+    74
+   ],
+   "2:Maize Ufa Mgaiwa (Normal Flour)": [
+    43,
+    43,
+    43
+   ],
+   "3:Cost To Grind 50 Kg Maize": [
+    70,
+    0,
+    0
+   ],
+   "4:Cost To Grind 50 Kg Rice": [
+    33,
+    0,
+    0
+   ],
+   "5:Rice": [
+    70,
+    70,
+    70
+   ],
+   "6:Bread": [
+    69,
+    69,
+    69
+   ],
+   "7:Mandazi, Doughnut (Vendor)": [
+    76,
+    76,
+    76
+   ],
+   "8:Beans": [
+    73,
+    73,
+    73
+   ],
+   "9:Cabbage": [
+    72,
+    72,
+    72
+   ],
+   "10:Tomato": [
+    77,
+    77,
+    77
+   ],
+   "11:Banana": [
+    74,
+    74,
+    74
+   ],
+   "12:Fresh Milk": [
+    62,
+    62,
+    61
+   ],
+   "13:Eggs": [
+    75,
+    75,
+    75
+   ],
+   "14:Chicken": [
+    74,
+    74,
+    74
+   ],
+   "15:Sun Dried Fish": [
+    76,
+    76,
+    76
+   ],
+   "16:Beef": [
+    63,
+    63,
+    63
+   ],
+   "17:Tea": [
+    70,
+    70,
+    70
+   ],
+   "18:Salt": [
+    77,
+    77,
+    77
+   ],
+   "19:Sugar": [
+    66,
+    66,
+    66
+   ],
+   "20:Cooking Oil": [
+    66,
+    66,
+    66
+   ],
+   "21:Chips (Vendor)": [
+    66,
+    66,
+    66
+   ],
+   "22:Bar Soap": [
+    59,
+    59,
+    59
+   ],
+   "23:Toothbrush": [
+    72,
+    72,
+    72
+   ],
+   "24:Toothpaste": [
+    72,
+    72,
+    71
+   ],
+   "25:Clothes Soap": [
+    63,
+    63,
+    63
+   ],
+   "26:Vaseline/Glycerin": [
+    76,
+    76,
+    76
+   ],
+   "27:Aspirin Or Panadol": [
+    76,
+    76,
+    76
+   ],
+   "28:Fansidar": [
+    8,
+    8,
+    8
+   ],
+   "29:Chitenje Cloth": [
+    68,
+    68,
+    68
+   ],
+   "30:Trousers (Second-Hand)": [
+    68,
+    0,
+    0
+   ],
+   "31:Soft Drink (Bottle)": [
+    75,
+    0,
+    0
+   ],
+   "32:Bottled/ Canned Beer": [
+    54,
+    0,
+    0
+   ],
+   "33:Cigarettes": [
+    72,
+    0,
+    0
+   ],
+   "34:Battery (Dry Cell)": [
+    72,
+    0,
+    0
+   ],
+   "35:Watch (Digital)": [
+    51,
+    0,
+    0
+   ],
+   "36:Firewood": [
+    60,
+    60,
+    60
+   ],
+   "37:Charcoal": [
+    65,
+    65,
+    65
+   ],
+   "38:Paraffin": [
+    21,
+    21,
+    21
+   ],
+   "39:Chemical Fertilizer": [
+    55,
+    55,
+    55
+   ],
+   "40:Pesticides/Insecticides": [
+    50,
+    50,
+    50
+   ],
+   "41:Herbicides/Fungicides": [
+    27,
+    27,
+    27
+   ],
+   "42:Motorized Transport Of Crop": [
+    42,
+    0,
+    0
+   ],
+   "43:Hybrid Maize Seed": [
+    60,
+    60,
+    60
+   ],
+   "44:Hand Hoe": [
+    67,
+    0,
+    0
+   ],
+   "45:Panga": [
+    68,
+    0,
+    0
+   ],
+   "46:Sickle": [
+    66,
+    0,
+    0
+   ],
+   "47:Axe": [
+    66,
+    0,
+    0
+   ],
+   "48:Bicycle": [
+    52,
+    0,
+    0
+   ],
+   "49:Foam Mattress": [
+    50,
+    0,
+    0
+   ],
+   "50:Mosquito Net": [
+    35,
+    0,
+    0
+   ],
+   "51:Ganyu Wage (1 Day, Adult Male)": [
+    74,
+    0,
+    0
+   ]
+  },
+  "ucode_dist": {
+   "1.0": 445,
+   "2.0": 92,
+   "3.0": 2,
+   "4.0": 5,
+   "5.0": 6,
+   "6.0": 14,
+   "7.0": 37,
+   "8.0": 20,
+   "9.0": 557,
+   "10.0": 220,
+   "15.0": 73,
+   "16.0": 18,
+   "17.0": 15,
+   "18.0": 259,
+   "19.0": 132,
+   "20.0": 94,
+   "21.0": 166,
+   "nan": 2996
+  },
+  "avail_dist": {
+   "1.0": 3170,
+   "nan": 1235,
+   "2.0": 746
+  },
+  "price_present": 3170
+ }
+}

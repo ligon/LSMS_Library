@@ -1,0 +1,72 @@
+{
+  "observed_at_UTC": "2026-10-22 02:48:11 UTC",
+  "PR1199_head": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+  "CI": {
+    "head": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+    "run": 39712187800,
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "windows-smoke",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "unit-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "docs",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "data-tests",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "windows-script-build",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "dvc-lock-check",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "dvc-remote-reachability",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "refresh-dvc-locks",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "public_body_readbacks": {
+    "PR1199": {
+      "sha256": "6d17e839dbdc0d3774f43f7a03cb452ccacc4b5f00aa8c602c7060611b1745db",
+      "bytes": 3344,
+      "exact": true
+    },
+    "PR1170": {
+      "sha256": "8fcca0d2ac48a510513c35f2d287620359c8d3fa922e274d68abc728937e2bd7",
+      "bytes": 7640,
+      "exact": true
+    },
+    "issue1091": {
+      "sha256": "9f209425561e46a6bffc1695b5b4a779783d33faa0868e1c07d67366a7dbd2ac",
+      "bytes": 4054,
+      "exact": true
+    }
+  },
+  "parent1180": "freshly verified open/unmerged/exactaba",
+  "no_public_PR_merged": true,
+  "signed": "Sue"
+}

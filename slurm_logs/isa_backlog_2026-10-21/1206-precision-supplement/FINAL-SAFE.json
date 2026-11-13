@@ -1,0 +1,17 @@
+{
+  "status": "PASS_TWO_ADDITIVE_METADATA_PRECISION_CHECKS",
+  "pr1175_qualified_u_code_views": 3,
+  "u_code_dtypes_equal_all_three": true,
+  "observed_u_code_dtype": "int8",
+  "observed_u_code_width_bytes": 1,
+  "code_width_changes": 0,
+  "mapped_code_values_and_missing_masks_exact_all_three": true,
+  "record_boundaries_checked": 8,
+  "all_actual_parquet_and_declared_field_keys_exact_builtins_str": true,
+  "each_matched_field_key_eq_typed_checked": true,
+  "old_three_1175_full_axis_and_four_API9_record_class_FIELDS_failures_preserved": true,
+  "original_frozen_packets_unchanged": true,
+  "fresh_physical_operands": 10,
+  "no_API_source_test_or_cache_replay": true,
+  "signed": "Sue"
+}

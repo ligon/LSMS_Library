@@ -1,0 +1,134 @@
+#+TITLE: GH1091 Niger community-price builder diagnosis
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Disposition
+DIAGNOSIS COMPLETE; implementation remains unapproved and absent.
+Source is clean =d602f8d63520e521a730f85551b366c4d45d9a35= in =isa-Niger-1091=.
+The accepted framework-authority ruling supports a two-file production retirement: remove the concatenate-only country script and its active country Make target/sole-use variable; retain the independent wave rule.
+The existing Make path ignores supported and unsupported wave subsets.
+Default all-wave and supported-singleton frames are the authoritative preservation references.
+No source eligibility, grain, reducer, label, price, quantity or #1088 mask change is proposed.
+
+* Country grounding and contradictions
+The full current 1559-line =Niger/_/CONTENTS.org= was read, including task and caveat entries; blob =ad87b4f92204a53c4ccf49348af623d5b5d904dc=.
+=AGENTS.md= and =CLAUDE.md= are identical and unchanged from f8; current SHA256 is =c1205513db01fb743ec3c8b8c0ec69615a2bfcd9521fb7ed2d3195bd1a7e20dd=.
+The prior-art-ledger, backlog, add-feature, cross-country and Feature audit guidance was read; the private ledger draft preceded preparation/probes.
+
+- ECVMA 2011/2014 and EHCVM 2018/2021 are different programs; EHCVM household identity is (grappe,menage), and each grappe belongs to one vague, a seasonal cross-section rather than a panel round (CONTENTS:6-17).
+- 2014 household identity includes EXTENSION (CONTENTS:451-488); community prices instead carry native grappe v, no household i, and do not require a household/sample join.
+- The shared unit dictionary is keyed by Original Label, despite also carrying Code (CONTENTS:638-650); no dictionary is changed.
+- CS07 records variety codes, passage visits and three source slots. Variety descriptions vary across files, so the code is the variety key (CONTENTS:1221-1260).
+- Accepted duplicate-entry handling removes exact wide repeats, then 134 identical melted readings. The 30 nonrepeat second-record slots remain obs4-6, 15 per wired wave (CONTENTS:1268-1327). No interpretation or eligibility is reopened.
+- Missing/product-absent units remain excluded under the existing source rule (CONTENTS:820-844). Quantity's exact #1088 mask remains: 9999/99999/9999.9/9999.900390625; Price's mask is unchanged (niger.py:1354-1363).
+- Native wave parquets actually carry a redundant i==v shim (niger.py:1546-1555), removed by framework normalization. The current schema comment claiming API j is renamed to i (data_scheme.yml:465-470) does not describe these measured API outputs: every current public reference has j and no i.
+
+The Makefile:105-109 says "only the two ECVMA waves have an EA-level community price module" and "the EHCVM waves replaced it".
+CONTENTS:1185-1188 explicitly says the old no-2018-file claim "is false for 2018-19"; the country script's current docstring also acknowledges the unwired grappe module, while its except comment still denies an EHCVM EA-level module.
+The source helper's coverage comment (niger.py:1294-1300) likewise says 2018 "ships no community price file at all".
+These are recorded contradictions, not a reason to wire 2018 or acquire sources.
+The two EHCVM waves remain undeclared for this feature.
+
+CONTENTS:1303 and the helper still call the nonrepeat tail's representation an open maintainer decision; the supplied accepted PR1086 context explicitly records the three-level ruling and existing obs convention.
+This retirement preserves that representation exactly and requires no new grain decision.
+Historic 15423 and 46177 counts remain historic observations; current counts are measured below.
+
+* Exact source preparation and build routes
+Eleven held DVC sources passed sidecar MD5/size plus SHA256/mode/mtime gates before decoding; 44 copies are physical, distinct-inode, nonsymlink private files.
+Three are CS07 grids; two are food files and six supply the four-wave sample prerequisites for the food control.
+Both held DVC layouts were checked; no source was acquired.
+The three CS07 source grids have 23409,34380,21960 rows, respectively.
+Their accepted source-helper replay, serialized with the actual writer into separate private artifacts, is strictly identical to each cold native wave parquet.
+The pre-serialization source-memory comparison failed on string-index missing-value dtypes and is preserved, not normalized.
+
+Current =_has_country_builder= is True because the country script exists (country.py:4893-4974).
+Actual make -n under a fresh empty private root shows the country target invokes both ECVMA scripts, then the concatenator; each independent supported-wave pattern invokes only that wave; the 2018 pattern has no rule; default all only checks committed panel_ids.json.
+Country Make dependencies and callers were audited: only the community country rule uses COMMUNITY_PRICE_WAVES, and no other Niger target depends on community output.
+COUNTRY/LSMS_DATA_ROOT/VAR_DIR remain used by other tables; the unrelated already-unused rounds variable is outside scope.
+Deleting only the script leaves an active rule with a missing prerequisite; deleting only the rule leaves script discovery True and fallback still available.
+
+Default aggregation walks/normalizes each native wave and concatenates it (country.py:5249-5387).
+The normalized/walked concat is strictly identical to the current default raw-country cache, including full typed attrs.
+All22 cross-root native-wave comparisons are exact.
+The legacy Make raw-country artifact is an exact concat of the two native wave frames, retaining the redundant i==v level and empty attrs; it is not the authoritative normalized default cache.
+The final public all-wave scalar payload, keys, masks, dtypes, order and axis metadata agree exactly across default and legacy Make.
+Whole typed attrs do not: default retains id_converted=True; legacy Make's native country artifact does not supply it.
+This exact difference remains visible.
+
+* Normal cold and fresh-process matrix
+Every cold root began with copied held L1 only; all twelve cold calls and all twelve independent fresh-process warm calls completed normally.
+Each cold/warm pair is strictly frame-and-typed-attrs identical; each warm cache snapshot has zero changed bytes, modes or mtimes.
+
+| request | default cold | default warm | Make cold | Make warm |
+|---------+--------------+--------------+-----------+-----------|
+| all | 46043 | 46043 | 46043 | 46043 |
+| 2011-12 | 32352 | 32352 | 46043 | 46043 |
+| 2014-15 | 13691 | 13691 | 46043 | 46043 |
+| 2018-19 | 0 | 0 | 46043 | 46043 |
+| 2021-22 | 0 | 0 | 46043 | 46043 |
+| 2018-19 + 2021-22 | 0 | 0 | 46043 | 46043 |
+
+Make's 2011-only request serves13691 wrong-wave rows; its 2014-only request serves32352; each unsupported request serves46043 wrong-wave rows.
+The same error occurs on all twelve argument-matched populated-root probes: default filters correctly, Make returns both wired waves; all twelve leave cache bytes/modes/mtimes unchanged.
+The actual Make CLI singleton likewise writes46043 rows, including13691 of the wrong wave.
+Default CLI singleton writes32352.
+
+Default unsupported cold requests return0 publicly but run the country fallback, build both native waves and store the native46043-row country payload under a current hash and requested absent-wave manifest; normal requested-wave filtering keeps the public result empty.
+This does not justify retaining that fallback.
+Legacy Make caches are hashless/without coverage by design, and are recorded separately from default current-hash/full-coverage cache evidence.
+
+Three default unsupported requests have a pre-existing state difference: cold fallback empties lack id_converted, while empties filtered from an authoritative populated cache retain id_converted=True.
+Their entire scalar payload and dtypes are exact, and every common recursively typed attr is exact; strict whole-attrs failures are retained.
+
+The existing pure declared-empty helper plus real finalizer was also measured without a route/config monkeypatch.
+It yields0 rows with string visit/obs and object Description, versus int64 visit/obs and StringDtype(pd.NA) Description on current fallback-derived empties; full typed attrs match.
+This is a helper projection, not implemented-candidate API proof.
+A later retirement must measure and disclose the actual cold/covered empty-state distinction; no general dtype repair is proposed.
+
+* Source and healthy controls
+Current community totals are32352/13691=46043 unique seven-level public keys; Price has no nulls; Quantity nulls are410/230=640.
+All30 nonrepeat second-record slots survive, no second-record reading repeats an already-served reading, and no encoded nominal9999.9 quantity is served.
+The #1088 changed76 quantities remain missing; this task does not reinterpret the instrument or expand its mask.
+
+Food is239877 rows; default derived prices165027, quantities239855 and expenditures165014.
+All three derived cold/warm frames and recursively typed attrs are exact.
+The strict food cold/warm comparison fails only at u StringDtype(pd.NA) versus StringDtype(nan); full typed attrs are exact.
+This reproduces the known pinned Niger dtype residual, owned by GH1196 (https://github.com/ligon/LSMS_Library/issues/1196), without broadening this retirement.
+All baseline references are preserved at their actual stages.
+
+A40218-row Mali comparator was physically copied only after current-hash and full-wave-manifest verification from the immutable #1088 control.
+Its cache bytes/mode/mtime remain exact.
+Default Feature(['Niger','Mali']) and Feature(...,currency=None) are separately captured at cold and fresh warm stages,86261 rows each, both completely exact including recursively typed attrs; neither order nor values/attrs are normalized.
+Make-only Feature(['Niger']) references were also captured under both currency argument forms,46043 rows each, without rebuilding another country.
+
+CLI returns through Country._load_table then writes a separate artifact (cli.py:287-332,574-583).
+API-to-artifact payload/dtypes are exact; generic JSON attrs serialization changes PopulationRecord to dict at attrs.population.Niger.2011-12.
+The complete matched artifact-stage cold/warm controls are exact, and the Make artifact equals an actual matched serialization control exactly.
+Artifact outputs are not mislabeled as raw cache or public in-memory frames.
+
+* Tests and scoped scanner
+The existing data-free community-variety and GH1039 cohort passes97 tests,0 skips, under two loadfile workers and LSMS_BUILD_WORKERS=1.
+Twelve existing TestBuilt methods for Niger/Mali pass when called directly on the genuinely gated nonempty data; pytest's credential-only collection would otherwise skip these, so no credential/marker patch was used and these are reported separately from the97 pytest cases.
+Their source-built and unique-key/nonrepeat guards remain intact; they write no cache bytes.
+
+Actual Feature audit phases1,2 on Niger/Mali emit exactly3 warning records,0 failure/error/skip: Niger lacks household i by design; Mali lacks household i by design; Mali's missing obs receives the canonical sentinel1 with no loss of86261 rows.
+Every finding is individually accounted for in validation.json.
+The current scanner has no community_prices phase2 kwarg grid; zero invented phase2 cases are claimed.
+No broad suite or corpus rebuild was run.
+
+* Preservation and limits
+No implementation, Git/ref/GitHub mutation, fixture/golden/dependency edit or shared-cache operation occurred.
+All readers used the pinned image Python, exact checkout/import/countries/data identities, unshare -rn plus socket/write guards, private DVC/XDG/config/tmp paths and single numerical/build/Make threads.
+Only the exact ignored metadata symlink target was an allowed checkout-path exception.
+All full frames, source records, IDs, warnings and detailed logs remain private.
+One early unqualified python command failed because python was absent on PATH; the pinned image was then used.
+The first CLI receipt reused a loop variable after successful execution; its script/result/log were preserved and a repeat records CompletedProcess.args.
+The first final-analysis assertion rejected the real unsupported-empty attrs distinction; its failure and strict comparisons are preserved, followed by explicit per-field classification without modifying attrs.
+The source-memory serialization failures and food dtype residual are likewise retained.
+
+No candidate exists: predicted re-warm scope is all23 currently enumerated Niger API hashes (19 declared tables plus4 runtime-derived names), via shared whole-Makefile and country .py hash inputs; no framework/other-country source edit is proposed.
+This is a prediction, not a measured candidate hash census or claim about23 existing physical country cache files.
+Source/evidence before/after, physical-copy and quiescence receipts are in freeze-proof.json and READY.json.
+The concrete implementation/test plan and remaining-country issue text are in PROPOSAL.org.
+
+-- Sue

@@ -1,0 +1,49 @@
+{
+  "safe_exports": {
+    "DIAGNOSIS.org": {
+      "sha256": "d4dbfef21ef656cc177d76f77b30e604ea6ec53c1cfa6789b7754bf2662e45ce",
+      "size": 13406
+    },
+    "LEDGER-ADDENDUM.md": {
+      "sha256": "232af57b93cd7ca0142aa1a7526dff328a1d1fafaa3e529d9f8887fead9d0acd",
+      "size": 2209
+    },
+    "PROPOSAL.md": {
+      "sha256": "d94f0e3811e25aa8999033c89683eb0300898015651f32a97d40fb516fd36776",
+      "size": 5763
+    },
+    "PROPOSED-CONTENTS-NOTES.md": {
+      "sha256": "1d6cc0b772fa8e291afcfd5b4bd7abb8594cf23d4a1571119c02ebf21b6c34f1",
+      "size": 1418
+    },
+    "REPRODUCE.sh": {
+      "sha256": "68b69f99e85709d12505fa58e4dec985844485a608ea89846adbe11f872d4154",
+      "size": 1507
+    },
+    "ROUTE-COVERAGE.md": {
+      "sha256": "fa49892230acc9188d4355009ba6d1534523eeefaeeb27e1638120274b858b3b",
+      "size": 3571
+    },
+    "checker-pins.json": {
+      "sha256": "8f644f617577da3b74226f47aeefc1c0a03dbe3f96a8cf09f3e0c5faa452f505",
+      "size": 7456
+    },
+    "proof.json": {
+      "sha256": "84d033ad943cc11dc792620489b480fada5d231467d1d2f0e1c2773c53bf9c49",
+      "size": 1934
+    },
+    "route-and-isolation.json": {
+      "sha256": "e34f05dbe789c4eb8560b74f742a9c63b512ed2414077703db076913af069bf6",
+      "size": 5924
+    },
+    "validation.json": {
+      "sha256": "05ae5da13019d4d91c99e877608fbcd9e15203eb0fb5d43b2ef87d06f7d471c4",
+      "size": 9810
+    },
+    "warnings.json": {
+      "sha256": "a775f3efb95dcafc0169cb3273ba273f9f863f682b57ff1071c80c09e2673d7b",
+      "size": 7398
+    }
+  },
+  "signed": "Sue"
+}

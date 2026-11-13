@@ -1,0 +1,20 @@
+{
+ "rows": [
+  85519,
+  85519
+ ],
+ "relabelled_rows_by_wave_and_label": {
+  "2013-14 Red Kidney Beans -> Cactus": 35,
+  "2013-14 Mung bean -> Roman": 11,
+  "2011-12 Red Kidney Beans -> Cactus": 5,
+  "2011-12 Mung bean -> Roman": 1
+ },
+ "index_identical_after_relabel": true,
+ "changed_cells": {
+  "perennial": {
+   "2015-16 Red Kidney Beans True False": 692,
+   "2018-19 Red Kidney Beans True False": 245,
+   "2021-22 Red Kidney Beans True False": 291
+  }
+ }
+}

@@ -1,0 +1,10 @@
+{
+  "status": "SEALED_PENDING_SEPARATE_POSTEXIT",
+  "signed": "Sue",
+  "manifest_sha256": "5f7364326678e13989091e887e6dd2a0d0044c9e28028f89ff2a9dcca5da99de",
+  "entries": 359,
+  "safe_allowlist_sha256": "050d727ad35f07c02413877876e805423147cad830d31a7135235f01e1eb20a4",
+  "native_harmonized_operands": 20,
+  "full_runtime_raw_excluded": true,
+  "root_acceptance_pending": true
+}

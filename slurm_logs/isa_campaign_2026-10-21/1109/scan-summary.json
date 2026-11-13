@@ -1,0 +1,124 @@
+{
+  "baseline_records": 15,
+  "fixed_records": 15,
+  "warnings_each": 15,
+  "failures_each": 0,
+  "errors_each": 0,
+  "records_exact_after_time_and_checkout_path_normalization": false,
+  "checks": [
+    {
+      "phase": "1a-sanity",
+      "country": null,
+      "check": "runtime_warning",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1a-sanity",
+      "country": null,
+      "check": "runtime_warning",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1a-sanity",
+      "country": "Malawi",
+      "check": "null_content",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1a-sanity",
+      "country": "Malawi",
+      "check": "index_levels_match_scheme",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1a-sanity",
+      "country": "Malawi",
+      "check": "no_null_index_levels",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1a-sanity",
+      "country": "Malawi",
+      "check": "no_constant_columns",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1a-sanity",
+      "country": null,
+      "check": "runtime_warning",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1a-sanity",
+      "country": null,
+      "check": "runtime_warning",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1a-sanity",
+      "country": "Uganda",
+      "check": "index_levels_match_scheme",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1b-assembly",
+      "country": null,
+      "check": "runtime_warning",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1b-assembly",
+      "country": null,
+      "check": "runtime_warning",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1b-assembly",
+      "country": null,
+      "check": "runtime_warning",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1b-assembly",
+      "country": null,
+      "check": "runtime_warning",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1b-assembly",
+      "country": null,
+      "check": "runtime_warning",
+      "status": "warn",
+      "severity": "C"
+    },
+    {
+      "phase": "1b-assembly",
+      "country": null,
+      "check": "runtime_warning",
+      "status": "warn",
+      "severity": "C"
+    }
+  ],
+  "expected_detail_changes": [
+    {
+      "check": "no_constant_columns",
+      "before": "1 constant column(s): ['Purchased']",
+      "after": "2 constant column(s): ['Purchased', 'Applied']",
+      "reason": "Applied is affirmative on organic use rows and missing elsewhere"
+    }
+  ],
+  "all_other_scanner_records_identical": true
+}

@@ -1,0 +1,113 @@
+{
+  "at_UTC": "2026-10-22T13:57:57.081Z",
+  "PRs": [
+    {
+      "PR": 1199,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1199",
+      "head_sha": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+      "base_sha": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "body_readback_exact": true,
+      "body_sha256": "ea7196fa12059d3328335b92f5200f3a0cb3d6a949f1419ba54826094482071d"
+    },
+    {
+      "PR": 1201,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1201",
+      "head_sha": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+      "base_sha": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "body_readback_exact": true,
+      "body_sha256": "b014f1e40fadeb8a55d5561aa4e05a560dc8d18e4679b7f75fd60e990cb10bb2"
+    },
+    {
+      "PR": 1203,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1203",
+      "head_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "base_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "body_readback_exact": true,
+      "body_sha256": "f8a6e9b1427d18f5b11d3e54e5c0b818ff0f9a6990c614990bfa8157c1d55a9d"
+    },
+    {
+      "PR": 1170,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1170",
+      "head_sha": "d96b638befeec13ced6697009eaaff02221ed172",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "body_readback_exact": true,
+      "body_sha256": "146f23b26ab61fc441d9d44b7a28599d5fad8dbefe80472cfad0f1ab3c086c5a"
+    },
+    {
+      "PR": 1212,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1212",
+      "head_sha": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "body_readback_exact": true,
+      "body_sha256": "312942588ab9671bc41e45fa1a6a45de0c0daea0d86c92d542fb029c7f67a1b9"
+    }
+  ],
+  "issue1206_body_sha256": "f14477011c1cf0dab1780b716cb79d2229e0d234e380f0fc1f453426ae48b550",
+  "issue1206_body_readback_exact": true,
+  "CI_query": {
+    "commit_sha": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+    "runs": [
+      {
+        "id": 39789045996,
+        "name": "CI",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 2909,
+        "jobs_url": "https://api.github.com/repos/ligon/LSMS_Library/actions/runs/39789045996/jobs",
+        "logs_url": "https://api.github.com/repos/ligon/LSMS_Library/actions/runs/39789045996/logs",
+        "workflow_id": 209110098
+      }
+    ],
+    "jobs": [
+      {
+        "id": 119859831925,
+        "name": "unit-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 119859832226,
+        "name": "windows-smoke",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 119859896444,
+        "name": "dvc-remote-reachability",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 119859896630,
+        "name": "refresh-dvc-locks",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 119859912502,
+        "name": "dvc-lock-check",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 119860008659,
+        "name": "windows-script-build",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 119860131202,
+        "name": "data-tests",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 119860371391,
+        "name": "docs",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "signed": "Sue"
+}

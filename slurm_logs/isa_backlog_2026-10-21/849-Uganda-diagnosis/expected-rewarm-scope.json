@@ -1,0 +1,12 @@
+{
+  "current_country_API_hashes": 28,
+  "current_nonnull_country_hashes": 28,
+  "API_wave_pairs": 224,
+  "current_nonnull_API_wave_hashes": 224,
+  "source_hashes_unchanged_f8": true,
+  "proposed_rewarm_expected_not_measured_after_patch": true,
+  "basis": "Wave._input_hash includes own country module for every table; Country._table_cache_hash folds full wave set",
+  "expected_country_scope": "All28 Uganda cached API tables; crop descendants such as harvest_kg/yield are runtime transformations",
+  "other_country_framework_changes_proposed": false,
+  "no_actual_candidate_after_hash_claim": true
+}

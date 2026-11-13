@@ -1,0 +1,21 @@
+{
+  "rows": [
+    {
+      "label": "candidate",
+      "checkout": "/local/job40255479/worktrees/isa-review-Malawi-218",
+      "head": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+      "ignored_link": "/local/job40255479/worktrees/isa-review-Malawi-218/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-Malawi-218/candidate-dvc-tmp"
+    },
+    {
+      "label": "base",
+      "checkout": "/local/job40255479/worktrees/isa-review-Malawi-218-base",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "ignored_link": "/local/job40255479/worktrees/isa-review-Malawi-218-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-Malawi-218/base-dvc-tmp"
+    }
+  ],
+  "assigned": false,
+  "imports_tests_decode_APIs": 0,
+  "review_verdict": null
+}

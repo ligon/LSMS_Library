@@ -12,7 +12,9 @@ No unit mapping was edited; aggregate evidence is in =slurm_logs/framework_campa
 
 Benin EHCVM (Enquête Harmonisée sur les Conditions de Vie des
 Ménages), the harmonized West African household-conditions survey
-template.  One wave configured: =2018-19=.
+template.  Two waves: =2018-19= and =2021-22= (EHCVM-2, wired 2026-11-04, see
+"2021-22 wired" below).  The sections on the universe and the design below
+describe =2018-19=.
 
 Source: https://doi.org/10.48529/rn3k-z374
 
@@ -48,8 +50,8 @@ about wave structure, not about the universe.
 
 Companion to the =Sampling Design= section in this file, which covers
 the =(grappe, menage)= identifier convention.  This section covers the
-declared population; that one covers the index.  Benin has exactly one
-configured wave, =2018-19=, so there is one universe statement.
+declared population; that one covers the index.  =2018-19= has this universe
+statement; =2021-22='s documents state none (=_/population.yml=).
 
 ** 2018-19 -- the declared universe
 
@@ -479,6 +481,8 @@ per shock, but Benin households simply did not report a third
 coping strategy in this wave.  If a future Benin wave shows
 households reporting 3+ strategies, the script (loop range) and
 the scheme (add =HowCoped2=) need to be extended in tandem.
+[2026-11-04: 2021-22 does, on 337 rows.  =HowCoped2= is in the scheme, optional, and
+2018-19's hook is unchanged, so the column is NA there.]
 
 History: prior to the 2026-04-12 cleanup (commit =9d677f25=),
 =HowCoped2= was declared in the scheme and emitted by the script,
@@ -538,13 +542,14 @@ duration measure.  Downstream analysts who need a presence filter for
 rather than expecting a =MonthsSpent= column in =household_roster()=.
 
 Benin has no pre-EHCVM waves in the library, so no continuous
-months-of-presence variable is available for any wave.
+months-of-presence variable is available for any wave.  =2021-22= asks the same
+two filters.
 
 * plot_features (GH #167)
 
 Lasting parcel-level characteristics from the EHCVM agriculture
-module =s16a_me_ben2018.dta= (single 2018-19 wave; Benin has no
-2021-22 EHCVM-II wave in this repo).  Benin is an EHCVM sibling of
+module =s16a_me_ben2018.dta= (=s16a_me_ben2021.dta= for 2021-22, on the same
+function).  Benin is an EHCVM sibling of
 the Mali reference implementation (PR #284): the shared
 harmonization lives in =Benin/_/benin.py:plot_features_for_wave=,
 mirroring =Mali/_/mali.py=.
@@ -669,8 +674,596 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - The served =u= index still carries only =s07bq03b=, not the unit SIZE
   =s07bq03c=, so two rows differing only in container size collapse onto one
   =u=.  The derivation does distinguish them; the index does not.
+- [2026-11-03, GH #1224: no longer true.  =u= is now =<unit> (<Size>)= where =s07bq03c= names a size, base mapped through this country's =u= table first.  Cold 2018-19: rows 187,930 -> 188,349 (419 keys of the residual buckets, e.g. =Autres légumes en feuilles= / =Tas=, stop summing across sizes), =u= 79 -> 216, (j, u) 644 -> 1,342.  This instrument's sizes run past Petit/Moyen/Grand: =Sans brassée=, =Avec 1 brassée=, =Avec 2 brassées=, =A 2/3/5 doigts=, =Autre taille=, =Demi=, =Quart=.  8 =Litre= / =Quart= rows keep the bare =Litre= so the kg ladder still reads them; =lsms_library/ehcvm.py=.]
 - The price still comes from a purchase up to 30 days old.  That is what the
   instrument asked; the assumption is recorded rather than hidden.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* 2026-11-04 -- the NPK slot states no grade (GH #1445)
+
+Measured, nothing changed.  Code 5 of =s16bq01= is =Engrais inorganiques -
+NPK/Formule unique= in the file and the questionnaire (1,720 applied rows); no grade.
+It maps to =NPK= (0.17 N) and is 24.3% of =nitrogen_kg=; 31 =Tonne= rows are 30.2% of the slot's
+kilograms.  The =npk 15/15= rows of =harmonize_input= came with the Niger template and
+match no label here.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 2,568 positive), which the
+=data_scheme.yml= grain note says it does not.
+
+* 2026-11-04 -- 2021-22 held and registered (GH #552)
+
+Wired the same day: see the last section of this file, which settles what this one left open.
+
+Acquired whole by =add_wave=: EHCVM-2 (6272, =BEN_2021_EHCVM-2_v01_M=) in =2021-22/Data/=, 60
+files, 303 MB, with the BIDs and both household questionnaires in
+=Documentation/=.  No table of this wave is served: =_/data_info.yml= declares
+nothing.  Each new table is its own piece of work; the 2021-22 waves of Niger,
+Mali and Senegal are the template.  For the wiring:
+
+- *A panel by cluster.*  BID section 4.1: "The 2021/22 survey is a panel survey by
+  cluster".  Measured: all 670 grappes recur from 2018-19, and 6,994 of 8,032
+  =(grappe, menage)= keys do.  Whether a recurring key is the same household is
+  not checked here: =s00_me= has a =PanelHH= column, and Burkina renumbers its
+  households (GH #1245).
+- *GPS.*  =s00_me= carries =GPS__Latitude= / =GPS__Longitude= on all 8,032
+  households.  Whether they are displaced is not known; read GH #791 first.
+- *Prices.*  =ehcvm_prix= comes from a separate sample of markets (BID sections
+  3.3 and 4.3), and the community files are =s00_co= to =s04_co= only, with no
+  =s05_co=.  So there is no grappe-grain price file for =community_prices=.
+- *Size.*  Of the 12 source files the 2018-19 config names that have a 2021
+  analogue, 85% of columns keep their name.  =s11=, =s16c= and the weights file
+  move most.  The file =s04=, =s14=, =s20= split further in 2021 (=s04a= etc.).
+
+Registration moves every Benin =Country._table_cache_hash=, because the wave set
+is folded into the hash, and no existing wave's =Wave._input_hash=.  When
+=food_acquired= is wired for 2021-22, pooled kg factors change for every
+Benin wave at read time (GH #1487).
+* 2018-19 community prices are wired (GH #1226, 2026-11-04)
+
+=community_prices= was declared nowhere for Benin although =2018-19/Data/s05_co_ben2018.dta= holds section 5 of the community questionnaire.  Now built by =2018-19/_/community_prices.py= on Niger's template (rulings D1-D6, =Niger/_/CONTENTS.org=, "2018-19 community prices are wired"), with the household's sized unit form and no folding (#1453 ruling, @ligon 2026-11-04).  Helpers and registry callables are in =2018-19/_/mapping.py=.
+
+*Served, cold private root:* 222,296 rows = both readings of all 111,148 source records; 670 grappes, 98 =j=, 188 =u=.  =visit= 1: 101,646, 2: 120,650.  =obs= 1 and 2: 111,148 each.
+
+*The file.*  One row per (grappe, =s05q01= product, =s05q02= unit-size) with two prices.  0 repeated keys, 0 byte-identical rows, =Existe= constant 1.  No price is NA, zero, negative or a sentinel; 5 to 86,000 FCFA.  19 =s05q03= and 12 =s05q04= values are not integers, and the two readings agree in 63.4% of records.  Niger's 0.85 pattern is absent: 42 and 83 records at that exact ratio, against 1,394 at 0.8.  670 of 670 =sample().v=; each grappe's =vague= equals the cover page's.
+
+*The instrument.*  The held =Documentation/ben_ehcvm1_qnr_community_excel_vague{1,2}.xls= are Benin's own (cover REPUBLIQUE DU BENIN / INSAE), unlike the Chad files shipped under Niger's name.  Sheet =SEC5_PRIX= has one row per (product, unit, size) with =Relevé 1 Prix= and =Relevé 2 Prix= and no quantity.  The CAPI form on the UEMOA catalogue (entry 44, =/download/123=, =/124=; not held) has at most six unit-sizes per product (5.02) and two integer prices, multiple of 5, above 0.  So =Quantity= = 1 is =Benin::community_prices::one-item-per-price=.
+
+*How Benin differs from Niger.*
+
+- *=harmonize_food= lumps priced products.*  Ten of the 103 priced codes fall into five =j=: 1, 2 =Autre Riz local=; 3, 4 =Riz importé non parfumé=; 36, 38 =Autres poissons frais=; 39, 40 =Autres poissons fumés=; 87, 88 =Autres légumes en feuilles=.  5,858 records in 2,929 pairs would share a served key, and they are not repeats: =Riz local parfumé= and =Riz local Nérica= are two products.  Those ten codes carry their product code as =variety=, the canonical definition of the level (=data_info.yml=, GH #840; Tanzania's item codes), and 21,478 rows differ from the =unknown_variety= of the other 93 codes.  Rule D5 (obs 3 / 4) is for a repeated SOURCE key, and fires on none here.
+- *The unit-size code has two forms.*  =10 x unit + size=, but the sizes 98 and 99 (=Autre taille=) make it =100 x unit + size=: =13198= is Pot, size 98.  31 codes, 1,548 records.
+- *The code bridge holds except where the form says otherwise.*  =1050= is Bassine by its digits, but the form prints =1050: Bidon-Unité de taille unique= and all 44 records are vinegar, so it is served =Bidon=.  =1330= is a bare Sac by its digits, but the form prints =Sac (10 Kg)= (10 records, all salt, median 2,750 FCFA), so it is served =Sac (10 Kg)= with =1340=, which the form prints under both spellings.  The other label differences are spellings of one unit (=Parsoire= / =passoire=, =Quartier (cuisse, tête...)= / =cuisse=).
+- *Sizes run past Petit / Moyen / Grand:* =Tohoungolo (Sans brassée)=, =Otoka/Fihanfingban (Avec 1 brassée)=, =Bassine (Quart)=, =Pot (Autre taille 2)=.  Size 99 is not in the household labels, so it takes the form's word.
+- *=Litre (Quart)= keeps its size* (31 records, code 1014): a quarter litre is not a litre, and in the 4 same-market pairs it prices at a median 0.20 of =Litre=.  The household side serves its 8 such rows as bare =Litre=, for the kg ladder, so these prices do not meet them.
+- *Those 8 household rows, all =Jus de fruits=, meet the bare =Litre= price until #1451 lands*, which is about five times a quarter litre.
+
+*The join.*  Household (t, j, u) cells with a community price: 931 of 1,342, covering 168,882 of 188,349 =food_acquired= rows.  212,046 of the 222,296 community rows find a household cell.  All 98 =j= occur in the household table.  18 =u= do not.
+
+*Recorded, not repaired.*  Prices are served as recorded, including the non-integer ones.  =j= is the household's label by code, so products named more narrowly by the form take the household's label and keep theirs in =Description= (code 37 is =Marquereau congelé= on the form and =Marquereau frais (Saloumon)= in the household file).
+
+*Cost.*  =data_scheme.yml= and a new wave script move every Benin hash: one Benin re-warm.  =.coder/coverage/latest.csv= grades the cell =absent= until the next =make matrix=.
+
+* 2026-11-04 -- =crop_production= serves =condition= and the recorded answer (GH #1436)
+
+Ruling @ligon 2026-11-04, option (D), set on Niger in #1471: the fold stays on the
+=condition= level and the survey's own answer rides in the optional column
+=condition_native=.  =2018-19/Data/s16c_me_ben2018.dta= records "Etat du produit" in =s16cq12c=, read by code
+through =harmonize_crop_condition_ehcvm1=.
+
+| code | =.dta= label | rows | =condition= |
+|------+--------------+------+-------------|
+| 1 | Epis | 428 | =unshelled= |
+| 2 | Grain | 4,495 | =shelled= |
+| 3 | Décortiqué | 238 | =shelled= |
+| 4 | Non-décortiqué | 872 | =unshelled= |
+| 5 | Non concerné | 2,018 | =shell_not_applicable= |
+| blank | | 1,005 | =unknown_condition=, column NA |
+
+9,056 lines, unique on (household, field, parcel, crop, unit), so the level separates
+nothing and adds no row.  A blank state is a blank unit on all 1,005.  The answer
+describes the harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).
+2021-22 has its own list, of three answers, where code 3 means something else: see "2021-22 wired".
+
+*Cost:* one Benin re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
+
+* 2026-11-04 -- 2021-22 wired (GH #552)
+
+Every table 2018-19 serves, from EHCVM-2 (WB 6272), on the Togo 2021-22 template.  =nonfood_expenditures=
+is not among them: 2018-19 does not serve it.  Benin differs from Togo in ways that each pass
+silently, so read this before copying from either.
+
+** Ids: no link is served, and the ids cannot meet
+
+=i= is =E2_<grappe><menage:03d>=, by =2021-22/_/mapping.py:i=, which the wave's scripts import.  =pid= is
+=membres__id=, =numind= in =ehcvm_individu=, the same number on all 42,660 members.  =v= is the bare =grappe=.
+
+*Measured*, the head of each household against the 2018-19 head of the same key.  Sex, and sex with
+age 1 to 6 years older, on the RAW answers (=s01q01=; =s01q04a=, else the household's interview year less =s01q03c=):
+| group                                        |     n | head sex | head sex and age |
+|----------------------------------------------+-------+----------+------------------|
+| recurring key, =PanelHH= = Panel             | 6,878 |    94.8% |            61.5% |
+| recurring key, =PanelHH= = Non panel         |   116 |    83.6% |            42.2% |
+| baseline: another household, same grappe     | 8,032 |    68.0% |             9.1% |
+| Mali's =s00q07f= link                        | 3,042 |    94.5% |            61.8% |
+| Niger's =s00q07f= link                       | 4,591 |    89.5% |            67.7% |
+So =PanelHH= = Panel is at real-link level, and unlike Togo's 1,397 the file holds no block of recurring
+keys at the baseline: the 116 sit between.  The BID (7.1) says the same thing: "only households marked
+as panel in the "PanelHH" variable will have valid values for merging".  =s00q07d= is 6,996 Oui, 6,994 of
+them recurring, so it separates nothing.  6,889 households are flagged Panel and 11 of them have no 2018-19 key, so any
+link is 6,878.  Linking would make Benin a panel country, with committed crosswalks under
+=test_panel_ids_persistence=: a decision, memo in the PR.  [2026-11-12: ruled, "Make Benin a
+panel country": a committed crosswalk (=panel_ids.json= / =updated_ids.json=, Design A) from
+=PanelHH=, built in a follow-up PR with its own verification, GH #1705.  Not built in the wiring
+of GH #1697, which keeps the =E2_= ids unlinked.]
+
+*Do not run this test on =ehcvm_individu.age=.*  On 3,662 members, 3,636 of them on the 2018-19 roster, that
+variable is not the answers: it differs from the birth year by more than a year, and of the 3,647 matched to 2018-19,
+99.7% sit 2 to 4 years above the same person's 2018-19 age.  So UEMOA set the age of a panel member from 2018-19
+where the two disagreed.  (The raw answers cannot show the same gap on these rows, because the rows are selected on
+disagreeing with them.)  On that variable the panel row reads 83.2%, which is the construction.  Togo's and Niger's =age= have
+no such rows.  =household_roster= serves the answers, as 2018-19 does.
+
+*Clusters are the same.*  All 670 grappes recur; region and milieu agree on 670 of 670, and the point on all
+670.  =strata= is region only (#812).  [Later 2026-11-12: 2021-22's =strata= is department x milieu too, by the
+same rule (ruled "Same rule as #1575"); see "2026-11-12 -- 2021-22 strata on the #1575 rule, and the day's other rulings (GH #1697)".]  [2026-11-12: 2018-19's =strata= is now department x milieu (GH #1575, ruled
+for 2018-19 only), so the two waves' =strata= no longer share a construction; see the 2026-11-12 section.]  The
+record is =_/sampling.yml=.
+
+*Weights.*  =poids= (=ehcvm_ponderations=, labelled "PS poids de sondage lissé pop_2022") equals
+=ehcvm_welfare.hhweight= on 8,032 of 8,032.  The BID's =hhweight= is not this file's name.  It takes one value in each
+of the 1,007 (grappe, =PanelHH=) pairs, two in 337 of 670 grappes.  No longitudinal weight is shipped, so
+=panel_weight= is =poids=, as Togo.  Do not read it as a panel weight; a family ruling is pending.
+
+** GPS: a cluster point, not stated to be displaced or not
+
+The BID says the section records "the GPS coordinates of the household".  The data say otherwise: one
+distinct point per grappe on all 8,032 households, and on all 670 grappes it is 2018-19's fix to the last digit
+(=grappe_gps_ben2018.dta=, 0.0 km).  No document held says whether it is displaced.
+
+** Names survive where meanings do not
+
+Compare labels, never names.
+- =s11=: roof and floor are =s11q19=, =s11q20= here, =s11q20=, =s11q21= in 2018-19.
+- =s20aq05= replaces =s20q05=, on the same code list (1 = Riche).  The mapping is keyed on the labels.
+- =s14= is two files: =s14a= the COVID-19 module, =s14b= what 2018-19 called =s14=.  =s14bq05__N= holds a rank label
+  or =Non=, except column 25, =Autre stratégie=, Oui/Non: 34 rows, 13 of them beside another strategy, so the hook is
+  Niger's after GH #1556, which gives it the rank no other strategy holds.  =s14bq04d= is the herd, so
+  =AffectedConsumption= reads =s14bq04e=, the food stock.  [2026-11-12: superseded by the ruling of GH #1556 /
+  #1561: =AffectedConsumption= reads =s14bq04f=, the purchases, and =AffectedFoodStock= =s14bq04e=.]  337 rows
+  have a third strategy: =HowCoped2=.
+- =shocks= serves 4,756 of 10,982 reported shocks.  The instrument asks follow-ups only for the last 12 months, and the
+  framework drops the rows with none; 2018-19 serves all 12,305.  So a cross-wave incidence on this table reads as a false
+  61% fall.  With the maintainer.
+- *The files are grids where 2018-19's held the answered lines*: =s07b= 1,333,313 rows (204,206 consumed), =s12= 361,440
+  (40,335 owned), =s16b= 85,459 (11,368 applied), =s17= 92,371 (6,416 owned).  Filter by the gate; a sum over the raw file
+  is not wrong, but a count is.
+- *=s01= and =s04a= list 6,138 people who have left* (=s01q00aa= = non).  Sex, relationship, age and =s01q12= are blank on all of
+  them, and all of =s04a='s answers.  What is filled is why and when they left: =s01q00b= on 6,137, =s01q00c= on 6,135, free text
+  on 345; =s01q07= on 4.  703 of the reasons are deaths, which no table serves.  =ehcvm_individu= leaves them out, and so do
+  =household_roster= and =people_last7days=: 42,660 members of 48,798 rows.  [2026-11-12: whether they belong in the
+  roster, and where a departure reason would be served, is GH #1565's open decision, which that issue says should precede
+  this =household_roster= step.  This wiring serves =ehcvm_individu='s choice, as Senegal 2021-22 does, until it is ruled.]  =s04a='s =membres__id= is labelled "Qui est le répondant", wrongly: it joins =s01= one to one.
+- =s17q01= is the species; 2018-19's =s17q02= is gone.  Code 12 has no label and is not on the questionnaire's list; it is on
+  the grid of vague 2 only and 5 households answer Oui.  Served as =12=.
+- =s16bq05= is the GIFT question in both waves; the purchase is =s16bq08=.  This wave reads both.  2018-19's script serves
+  =s16bq05= and =s16bq07a= under =Purchased= and =Quantity_purchased=, the same defect as Togo 2018, recorded and not changed
+  here, so those columns mean different things across this country's waves until it is corrected.
+- =s16bq03b= code 6 has no label, on 160 rows.  The questionnaire prints 1 to 5.  =s16bq09b='s list has 6 = Sachet, which does
+  not fit: 97 of the 160 are cuttings, up to 100,000 of them.  Served as =6=.
+- =s09=: 49 of 122 item codes moved to another item against 2018-19 (=415= was Parfums and is a washable face mask here) and 9
+  are new.  Nothing reads them: Benin has no =nonfood_items= table.  Whoever wires it needs Togo's wave-level table.
+
+** =food_acquired=
+
+*=s07bq03a= is not rescaled, unlike Togo's.*  Positive values on the quarter grid: =s07bq03a= 98.95% (2018-19 99.05%), =s07bq04= 97.3%,
+=s07bq05= 97.7%, =s07bq07a= 99.9%.  =q3/q4= on never-purchased own-production rows has mode 1.0 in all 12 regions, on 98.9% or more of
+each.  6 of 17,099 =Jamais= rows have a positive residual (2018-19: 301 of 17,959).  A direct read of the file gives the same column.  This is
+what says the column is raw; the =depan= match below does not.
+
+*Two label sets for one unit code book.*  =s07bq03b= and =s07bq07b= label the codes differently and each lacks one the other has: =102= has
+no label in =s07bq03b= (47 rows) and is =Alvéole= in =s07bq07b= (126); =207= is =Chaîne en bois= in =s07bq03b= (41) and has none in =s07bq07b= (13).  A
+code with no label arrives as a number, =unit_match= reads it as another unit, and the row serves =Expenditure= NA.  =mapping.ConsumptionUnitCode=
+and =LastPurchaseUnitCode= name them; the test compares =unit_match= to the codes row for row.  The other five differences fold under =_unit_key=
+(=Kg/kg=, =Boite/Boîte=, =Bol/bol=, =Morceau/morceau=, =Tongolo/tongolo=).  The questionnaire's unit list (PDF pp. 113-115) prints both.
+
+*=u=.*  17 rows in the country's =u= table put this file's spellings on 2018-19's labels (=litre=, =bassine=, =Boite=, =sachet=, =Sans os en tas=,
+=Tongolo= -> =Tohoungolo=, ...), and =102= takes =Alvéole/Plateau=.  The local units of codes 200 to 230 are NOT the same list as 2018-19's: this file
+bundles what 2018-19 named one by one (=Abotoca,Nobayirou, Otoka/Fihanfingban=, =Si, Sikpanou, Sinou, Siroba, Robaca, Blèvi=), under moved codes, so they are served
+as recorded and do not join 2018-19's.  Two are not bundles: codes 217 and 218, =tongolo avec 1 brassée= and =2 brassées= (211 + 9 rows, all
+size-free), respell the sized forms 2018-19 serves, and take =Tohoungolo (Avec 1 brassée)= and =(Avec 2 brassées)= through the wave's YAML, because the =u=
+table may not hold a sized label.  The sizes moved too: code 7 is =Sans Brassée= there and =Très petit= here, and they are read by label.
+
+*=j=.*  The list has 166 codes against 138, and 91 labels needed rows, Niger's rule (#833): a respelling of a good 2018-19 names takes its Preferred
+Label; two goods 2018-19 bundles and this wave splits stay split.  Folded: =Sucre poudre= and =Sucre morceaux=, as 2018-19's own label says.  Respellings: code 42,
+=Marquereau congelé=, is 2018-19's =Marquereau frais (Saloumon)= (the community form calls that one =congelé= too); code 106, =Autres légumes en feuilles=, is
+2018-19's =Feuilles de manioc, moringa, ...= by the questionnaire's text, and so does NOT take the Preferred Label =Autres légumes en feuilles=, which belongs to
+=Gboman= and =Ademe=.  Own labels: =Fromage= as =Fromage (hors soja)= (2018-19's =Fromage local (Amon)= prices 25 per =Morceau (Petit)= like this wave's soy
+cheese, and 500 per =Unité (Moyen)= like this wave's =Fromage=; 2,084 purchased rows against 1,380 + 3,397); =Arachides décortiquées= as =Arachides décortiquées (hors
+pilées)= (215 against 217 + 70); =Piment frais= as =Piment frais (hors séché)=.  *Benin's =Piment= earns no exception, unlike Togo's*: 6,188 purchased rows against 3,985 +
+3,790, 99.0% of households against 57.8% fresh and 96.9% fresh or dried here, and no price separates them (=Sachet (Moyen)= 100, 100
+and 100).  WAITING: a ruling is asked between this and relabelling 2018-19's bundle to =Piment=, leaving this wave's two labels bare, as Senegal and Burkina's tables do.  Split, each under its own label: =Crabes= / =Crevettes= / =Autres fruits de mer=, =Pastèque= /
+=Melon=, =Aubergine,= / =Courge/Courgette=, =Gingembre=, =Café=, =Vinaigre de citron= / =Autres vinaigres= / =Moutarde=, =Huile d'arachide raffinée= / ="Segal"=.  New:
+three =semoule= rows, =Noix de palme=, =Huile de palme raffinée=, =Viande séchée=, =Poivre=, =Fruit de Kapokier=, =Poisson séché en condiment= (code 179, printed without a
+number in section 7B).  A cross-wave demand system on =j= must bundle these itself.
+
+*One key repeats.*  One household holds code 148 (=Vinaigre de citron=) twice, in one unit and size, with different quantities: the 1,333,313 rows are 8,032 x 166 + 1.  Summed
+by the additive collapse, as core does.
+
+*=Expenditure=* is NA on 10.5% of purchased rows (2018-19 9.7%).  =ehcvm_conso='s =codpr= shares this file's codes, unlike 2018-19's, so the check runs: the rule x 365/7 is
+within 1% of =depan(Achat)= for 90.6% of 1,245 discriminating rows.  That validates the arithmetic, not the quantity: Togo's rescaled column passes it too.
+
+*Kilograms.*  =ehcvm_nsu_ben2021.dta= exists and is not wired: GH #1598 is *deferred, not unruled* [2026-11-12: corrected from "not ruled", red team F4; the GO ruling names #1598's own-country NSU weights inside the food step, #1598 says to sequence it after the wave wiring, and it stays open for its own PR].  So this wave's kilograms come from the price-ratio ladder, as 2018-19's do: =metric= 25,831 rows, =item_unit= 85,075,
+=item_unit_tight= 435, =unit= 93,583, =none= 33.  Because #1487 pools factors across a country's waves, wiring this table moved 2018-19's inferred kilograms at read time: =food_quantities(units='kgs')= 168,465 -> 186,631
+(+10.8%), where 126,788 of 187,336 rows move, at a median of 1.22 among them (p10 0.92, p90 1.73); =food_prices= sum 158.4M -> 131.3M, where 92,147 of 133,112 rows move, at a median of 0.82 (p10 0.58, p90 1.09).  One more row
+in each, as 2 rows gain a factor.  Here the rungs move too: on 2018-19 =item_unit= 35,589 -> 65,116, =unit= 132,190 -> 102,387, =none= 155 -> 153, =metric= unchanged at 20,255, because a pair with too few reports in one wave clears
+the floor with two.  A single-wave request is still an exact slice.  2018-19's native =Quantity= and =Expenditure= do not move, and neither does =harvest_kg=.  =StatedVsInferredKgWarning= fires on 9 labels, up from 6:
+=sac (10 kg)=, =sac (100 kg)= and =sac (2,5 kg)= are new.
+
+** =crop_production=
+
+*Benin has Mali's shape, not Togo's.*  =s16cq16a= is filled on 381 of 8,934 rows: 324 of the 970 unfinished harvests and 57 of the 7,964 finished ones.  The questionnaire sends a
+finished crop to the quantity ("1 = Oui ►(16C.16)", PDF p. 87; 16C.16 on p. 88), so the defect is the one GH #1437 records in Mali and Burkina Faso, between the instrument and the
+release.  646 unfinished rows have no quantity, and the form sends a crop with 100% left (651 rows) on to the next crop.  =s16cq11= has no =Récolte nulle= in this file, unlike Togo's.
+
+*The harvest is derived on the #1437 ruling*, which names Mali and Burkina Faso, so its reach to Benin is put to the maintainer in the PR and the step is one commit.  [2026-11-12:
+ruled, "Extend Mali's derivation": the entry extends =Mali::crop_production::harvest-from-dispositions= to this wave, as wired.  GH #1437, why =s16cq16a= is blank, stays open.]  Keys:
+=harvest-from-dispositions=, =harvest-to-date=, in =derivations.yml=.
+| household-crop pairs, of 8,243                       | pairs | served               |
+|------------------------------------------------------+-------+----------------------|
+| finished, one unit, nothing recorded                 | 5,237 | derived              |
+| finished, one unit, a quantity recorded              |    29 | as recorded          |
+| finished, dispositions in two or more units          | 2,009 | NA                   |
+| finished, no positive disposition                    |   111 | NA                   |
+| a row not finished                                   |   857 | as recorded, or NA   |
+Of the 5,237, 4,982 go on the single =s16c= row and 255 on the crop's =Farm-level= row (148 a sale had made, 107 new).  =Quantity= on 381 -> 5,618 rows.
+
+*How good is the sum?*  The only test inside this wave is small: on the 19 finished pairs with a recorded quantity and dispositions in that unit, 9 are exact and 10 within 10%, median 1.0, p10 0.16, p90 2.13; on 128 unfinished pairs, which
+cover a part of the season, 67 are exact.  2018-19's file holds both sides on one row, and its unit variables use one code list in vague 1 and another in vague 2 (=s16cq22b= the other way round), with value labels for only one, so a
+comparison by label reads vague 1 alone (2,920 rows, 79.1% exact) and by code mostly vague 2 (1,738, 92.1%).  Decoding both: 5,175 finished rows with every positive disposition in the harvest's unit, 84.2% exact, 87.2% within 10%, median 1.000,
+5.8% over 1.1, 7.0% under 0.9; vague 1 79.0%, vague 2 90.9%; 0.900 in kilograms over 3,572 metric rows.  2,463 finished rows state a disposition in another unit and are not tested.
+
+*Neither wave's total is a statistic.*  =harvest_kg=: 2021-22 84,486 kg recorded, 45,369,658 with the total; 2018-19 33,462,707.  Each wave's top four rows hold 75.5% and 54.5% of its total.  Without them 11,119,658 against 15,212,707, and per row with a
+kilogram figure 2,521 kg against 2,527 kg, over 4,410 and 6,020 rows.  That per-row match is the strongest support for the rule.
+
+*2021-22's four rows are =Tonne= rows and read as kilograms.*  Nothing is trimmed; they stay as recorded, and Site Q names all four.  On the farmer's stated area:
+| row                      | as tonnes       | as kilograms                                                  |
+|--------------------------+-----------------+---------------------------------------------------------------|
+| cotton 5,800             | 0.28 FCFA/kg    | 275 FCFA/kg, 1,160 kg/ha                                      |
+| cotton 2,050             | 0.13 FCFA/kg    | 129 FCFA/kg, 512 kg/ha                                        |
+| cotton 20,000            | 0.03 FCFA/kg    | 26.5 FCFA/kg, 10,000 kg/ha; its =s16dq05c= of 2,000 is 265 FCFA/kg, about the crop's median, and 1,000 kg/ha |
+| maize 6,400, stock only  | no price        | 3,200 kg/ha                                                   |
+On the 5,800 and 2,050 rows =s16dq05c= (275, 130) is the implied price and not a weight.  =Tonne= is sound below these: 5 of the 414 sold lines are at or above 100, each under 1 FCFA/kg and one a sentinel-shaped 9,999, and the rest have a median of 260 FCFA/kg.  A
+registered correction would be its own ruling.  =Quantity_sold= serves the same slips with or without the total.
+
+Pure-stand medians, kg/ha, 2018-19 / 2021-22 (one crop row on the plot, served =Area= over 0.01 and at most 100 ha):
+maize 1,165 / 958, cotton 1,247 / 1,212, sorghum 794 / 700, yam 3,148 / 2,299, rice 1,625 / 1,722, groundnut 1,161 / 1,000, all crops 1,200 / 976.  A narrower selection moves the levels and not the direction (the review's all crops: 1,094 / 909).  Quantities in one unit sum across states: 132 of the
+5,237 state two, 0.3% of derived kg, served =unknown_condition=.
+
+*The crop is read by code.*  =s16dq01= labels codes 1-47 and 65 only: its 1,089 rows of 51-64, 919 of them Soja, have no label, and it spells 42 and 65 otherwise than =s16cq04=.  On the codes all 7,701 pairs
+of =s16d= find an =s16c= row; on the labels 1,098 do not.  =mapping.crop_labels= reads =s16cq04='s labels for both files.
+
+*Sales* take option (d), as ruled for Mali.  =s16d= repeats a crop's record once per harvest line (627 exact repeats of 8,328, 392 of them sales), and no pair has two different records.  5,064 sales: 4,787 on their single
+row, keyed; 277 on one =Farm-level= row each.  A sale is a record with a positive =s16dq05a= or =s16dq06=, which equals =s16dq04= = Oui on all 7,701.
+
+*=condition=* is =s16cq16d=, by code, through this wave's own table: =1 Epis/coques= =unshelled=, =2 Grains= =shelled=, =3 na= =shell_not_applicable=, Niger's fold.  2018-19's code 3 is =Décortiqué=, so its table would serve =na= as
+=shelled=.  The file states it on 376 rows; every other row, derived or =Farm-level=, is =unknown_condition=.  No answer falls outside the ruled fold, so nothing is =other_condition=.
+
+*=Quantity_kg=.*  =s16cq16c= (376 positive of 381) is the survey's kilograms for the recorded rows, and =s16dq05c= for the sold line, which the questionnaire asks per unit and the label calls a total, and the file holds
+both shapes (=Sac (100 Kg)=: 1,801 at 100 x q, 180 at 100, 57 at q).  Not served on this branch: the survey-kg rung landed on development (=909d9ba29=, GH #1436) after this wiring's base.  Mali's and Niger's wave scripts show the column to add.  A derived total has no survey kilograms.
+
+** =plot_features=: =s16aq47= holds two scales, in both waves
+
+The questionnaire asks hectares.  On 16.7% of measured parcels here (20.3% in 2018-19) the value is about 10,000 times the farmer's estimate in hectares, so it reads as square metres.  The shared function's 1,000 ha clamp (#327) turns 995
+of them NA (2018-19: 1,257) and leaves those between 100 and 1,000 served as hectares: 327 rows, 109 of them plainly m^2, and Site Q names 145.  Served as 2018-19 is; a rule belongs to its own issue, because =yield_kg= reads this.
+
+** Not wired
+
+=ehcvm_nsu=, =ehcvm_prix=, =s00_co=..=s04_co=.  =community_prices=, which 2018-19 serves from =s05_co=, has no source here: this wave has no =s05_co=, and =ehcvm_prix= is a separate market sample.
+
+** Cost, measured
+
+Base =67525c607= against the wiring: =Country._table_cache_hash= Benin 18 of 18, =Wave._input_hash= Benin 36 of 36, =build_transforms_fingerprint= 0 of 35.  One more: GhanaLSS 18 of 18 and 126 of 126, because adding =Très grand= to
+=transformations._UNIT_SIZE_WORDS= is an edit under =food_quantities_from_acquired=, which =GhanaLSS/_/nutrition.py= imports (CLAUDE.md, "Derived Tables").  No GhanaLSS label carries that word, so its values do not change; any other edit to that closure costs the same re-warm.
+
+* Shocks: food purchases and food stocks (2026-11-06, GH #1561)
+
+The maintainer ruling is =AffectedConsumption= for food *purchases* and
+=AffectedFoodStock= for food stocks, following Ethiopia. Neither field
+measures food eaten. Both are nullable booleans using the existing answer
+map: increases and decreases are True, unchanged and ordinary
+not-concerned answers False, and missing answers stay missing.
+
+Vague 1 has five consequences: =s14q04d= is food stock, =e= food
+purchases, =f= blank. Vague 2 has six: =d= livestock, =e= food stock,
+=f= food purchases. Select by each row's =vague=, not by household or
+cluster. The hook refuses a release with a different f/vague layout.
+
+The source variable label still calls d "Stock Produit Alimentaire" and e
+"Achat de Produit Alimentaire"; these labels conflict with the fielded
+six-column layout. The independent 2026-11-05 EHCVM shocks review
+(=reports/review-ehcvm-shocks/VERDICT.md= in the isa-sm-20261103 burst)
+identifies the layouts using source structure, animal disease/ownership
+contrasts and purchase responses, not the misleading labels. The source
+controls in =tests/test_shocks_extension_food_effects.py= independently
+select the expected columns and check the livestock-specific behaviour
+of d. No contradictory shocks-layout statement was found in this file.
+
+The existing two coping slots remain: this source reports at most two
+strategies. No =HowCoped2= is added.
+
+Only the existing 2018-19 declaration is changed. Registered but unfinished
+2021-22 wiring is outside this change. Other effects, coping strategies,
+row/index identity and timing are preserved.
+
+* 2026-11-08 — documented planned strata, not a wiring change (GH #1575)
+
+The own INStaD second-edition BID (September 2023),
+=2021-22/Documentation/ben_ehcvm2_information_de_base.pdf=, section 4.1,
+PDF p. 13 (English edition p. 14), explicitly describes the *original
+2018/19* design: "La strate est la combinaison département/milieu de
+résidence." Source: https://microdata.worldbank.org/index.php/catalog/6272/related-materials .
+Clusters were selected PPS within these strata, then 12 households with
+equal probability within each cluster. The 2021/22 strategy revisits the
+same clusters and supplements households to 12 where needed; it is not
+a new independent first-stage draw.
+
+This corroborates the own 2018 DDI p. 4 quoted above: 23 explicit strata,
+with Littoral purely urban. Country/urban/rural/department reporting
+domains and allocation targets are distinct from sampling strata. The
+earlier instruction "Treat the design as departement-stratified for
+inference" is preserved; the BID supplies the more detailed planned
+definition without relying on the quoted weight-variance shares.
+
+This is documentary evidence only. The 2018-19 YAML still wires region
+alone to =strata=; 2021-22 remains registered but unwired at this source
+pin. No sample, weights, defaults or geographic crosswalk changes are
+selected here. The document check and exact PDF identities are recorded
+in the GH #1575 evidence packet.
+
+* 2026-11-10 — 2018-19 department x milieu strata wiring (GH #1575)
+
+The approved documented combination now wires only =2018-19 sample.strata=
+from the own cover =s00_me_ben2018.dta=: department label =s00q01= followed
+by residence-milieu label =s00q04=. It reuses the shared GH #812 label
+constructor, raw-input retrieval and nullable =Derivation= stamp, registered
+as =Benin::sample::region-milieu-stratum=. Labels are stripped and joined
+with one space; missing or blank either operand gives NA, and nonstring
+codes retain the dedicated refusal. No categorical table, alias or
+geographic crosswalk is added.
+
+This implements the own BID section 4.1 definition quoted above, rather than
+inferring strata from weight variation. It supersedes the earlier
+region-only wiring and the department-only inference advice for this wave;
+all historical text is preserved. The DDI's 23 explicit planned strata and
+purely urban Littoral remain design statements, not observed-count tests or
+row exclusions. The recorded DDI/cluster-vague split wording tension remains
+unresolved by this change. Department x milieu changes neither household
+nor cluster identity.
+
+The cover and =ehcvm_ponderations_ben2018.dta= bindings, =merge_on: v=,
+=(i, t)= final index, household formatter, every row/order/key, =v=, raw
+=hhweight= in both weight columns, normalization and =Rural= are unchanged.
+Registered but unwired =2021-22= remains outside the selected scope.
+
+Validation here is documentary/static and source-free invented-frame
+verification. Actual native label-card coverage, missingness and within-
+cluster consistency, normal Country/Feature cold and fresh-process warm
+validation, independent review and the final metadata footprint remain
+separate acceptance gates; no actual-row result is asserted.
+* 2026-11-10 — own printed GPS question47 and export-authority limit (GH #1531)
+
+Both declared own2018 household workbooks,
+=ben_ehcvm1_qnr_household_excel_vague1.xls= (MD5
+=964ea82bb6320ac3d2bcfe74f4cd5fac=) and =..._vague2.xls= (MD5
+=0eb5f99c97bf53bfb1ee8d1eff77d377=), explicitly identify GPS question47 at
+=S16a_Agri!EO5/EO6=: “superficie de la parcelle (en hectare) selon les
+mesures GPS”. This is direct own question wording, separate from farmer
+question9 at =K5/K6= (ha or m²), measured-by-GPS question45 at =EL5/EL6=
+and its skip to48. Those question blocks agree across these distinct objects.
+
+Both covers =couvert!A17= say2018/2019. The agriculture entry question
+=S16a_Agri!B2= instead names campaign2017/18 in vague1 and2018/19 in vague2.
+Retain the distinction; it is not a demonstrated fielded/export revision bridge.
+The printed GPS wording does not establish the unit or relationship of every
+released field, the existence of an own q47a, or applicability by row/vague.
+No export/cleaning relation was found in inspected S16a cells, covers, workbook
+Observations, selected-sheet comments or defined names; no global absence is
+claimed. Current source binds q47 and the older “already hectares” description
+remains a source assumption beyond the printed-question evidence.
+
+The earlier “no2021-22wave” statement remains beside the dated registered-but-
+unwired holding note. No2021 instrument authority is transferred here.
+Five exact own Benin/Togo DOCUMENT copies were inspected from held L1 without
+network retrieval; no microdata/header/row/API was used for this document result.
+Exact cells, covers, MD5/SHA/custody and limits are in the independent
+=reports/review-1531-benin-togo-own-documents-20261110/= packet. No area conversion,
+substitution, fallback, clamp, yield route, held-list, unit or default changes.
+
+* 2026-11-10 — separate released S16a header result (GH #1531)
+
+After the document-only note above, exactly one metadata-only context read
+the declared own =2018-19/Data/s16a_me_ben2018.dta= header, MD5
+=c033ceb223cd9834d8c47dcb46428576=, with zero records returned. The complete
+208-name variable inventory contains =s16aq47= and no =s16aq47a=, =s16aq47b=,
+=s16aq47_1= or =s16aq47_2=. The bound q47 is double, format =%12.0g=; its own
+French GPS-area label states no unit and has no value-label link. This is
+explicit absence in this exact release, not evidence about another version.
+
+The own GPS-measured field45 links to =S16AQ45=:1 Oui/2 Non. Farmer-unit
+field09b links separately to =S16AQ09B=:1 Hectare (Ha)/2 Mètre Carré (m^2).
+Neither card assigns a unit to GPS47. No numeric records, magnitudes, ratios,
+presence counts or corrections were inspected. Own printed question47
+hectares wording and the calendar/version caveats remain separate from the
+unitless released label. Guinea-Bissau's distinct47a m² operand does not exist
+in this inventory and supplies no substitute or conversion here.
+
+Frozen scope, exact input/private custody, two total contexts and0records
+across both countries are retained in
+=reports/1531-benin-togo-own-header-20261110/=. Source and private copies sealed
+exact before/after. No2021 header, table/API or policy/held-list change. The
+remaining documentary question is this release's own q47 export/cleaning and
+fielded-version definition, not a presumed own47a relation.
+
+* 2026-11-10 — GH #1575 normal sample validation completed
+
+The construction-stage pending/UNRUN wording above records the state at
+that stage. For =2018-19 sample=, the own native cover and weights, cold
+baseline/candidate whole frames, unchanged IDs/weights/Rural, documented
+region or department × milieu strata and derivation inputs passed the
+finite normal validation. Four warm Country.sample returns and two scoped
+Feature.sample returns passed full typed frame/axes/attrs comparison from
+eight authenticated L2 parquets, with zero warm raw getters or writers.
+The cross-run cold and warm capture comparisons, source seals and prior
+failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
+=5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
+earlier job-local caches were reaped; source and survey values did not change.
+
+* 2026-11-12 -- 2021-22 restored onto development (GH #552)
+
+The 2026-11-04 wiring ("2021-22 wired", above) was held on
+=refs/archive/2026-11-11/isa/wire-benin-2021-20261104= and is merged here onto development
+(ruling @ligon 2026-11-12, "Go: restore and wire").  What changed because development moved
+underneath it:
+
+- *Shocks, on the ruling (GH #1556 / #1561).*  =AffectedConsumption= is food PURCHASES and
+  =AffectedFoodStock= food STOCKS.  This file labels =s14bq04d= the herd, =e= the food stock and
+  =f= the food purchases, all three filled on the same 4,756 answered rows (2,376 in vague 1,
+  2,380 in vague 2), so there is no per-vague layout here, unlike 2018-19.  So 2021-22 reads
+  =f= and =e=, as the core 2021-22 waves do.  Affected (Augmenté or Diminué): =f= 3,777 rows,
+  =e= 3,668, =d= 1,872.  No 2018-19 value changes.  The coping hook is unchanged.
+- [Superseded the same day: ruled "Same rule as #1575", and 2021-22 now has 2018-19's construction;
+  see the next section, which also corrects what this bullet says of =strat=.]  *Strata are NOT aligned with 2018-19, and this is a question for the maintainer.*  GH #1575
+  wired 2018-19's =strata= as department x milieu and scoped
+  =Benin::sample::region-milieu-stratum= to =2018-19= alone ("no 2021 integration").  2021-22
+  keeps the archived region-only =s00q01=, so =strata= now means department x milieu in 2018-19
+  and region (department) in 2021-22, on the same 670 grappes.  This wave's weights file also
+  ships its own =strat= (24 cells), not read; 2018-19's DDI states 23 strata.  Aligning is the
+  same three-element =strata= spec, a =sample= stamp hook and the entry's =waves=, or reading
+  =strat=: a choice for the maintainer.  Measured: 2021-22 serves 12 =strata= labels and 2018-19 23, none
+  shared.
+- *Re-measured on this merge (cold, private roots, base =e5fdd2fa8=; burst job 41235873).*  Every
+  non-derived table's 2018-19 rows are frame-equal to base on base's columns, with the same household ids;
+  the new optional columns (=Unit_sold=, =Derivation=, the =plot_inputs= gift/purchase columns, =HowCoped2=)
+  are NA on 2018-19.  The kilogram movement under "2021-22 wired" reproduces: 126,788 of 187,336 2018-19
+  =food_quantities(units='kgs')= rows move, median 1.222 (p10 0.917, p90 1.734); =food_prices= 92,147 rows,
+  median 0.818, sum 158.4M -> 131.3M, one more row; rungs as recorded there (=item_unit_tight= 160 -> 438 also
+  moves).  Summed over rows served with =u= = =kg=, 2018-19 is 164,440 -> 182,615 kg (the text gives 168,465 ->
+  186,631; its sum's definition is not recorded).
+- *=s12q09= (GH #1566's check), measured, nothing changed.*  25 of 40,220 positive values are off the 25 grid
+  (one is the sentinel-shaped 9,999), against Togo's 3.7% and Cote d'Ivoire's 4.1%; 2018-19: 1 of 37,551.
+- [Moot for Benin since the next section: 2021-22 is inside the entry's =waves=.  The framework
+  behaviour is unchanged.]  *An explicit out-of-scope =derivation_inputs= call is not refused*:
+  =Country('Benin').derivation_inputs('Benin::sample::region-milieu-stratum', wave='2021-22')= returns 8,032
+  cover answers for a wave whose rows carry no key (=derivations.call_inputs= checks =waves= only when no wave
+  is named).  It raised =KeyError= before this wiring.  =tests/test_gh1575_benin1575-stratawiring_strata.py=
+  no longer pins that =KeyError=.  A framework residual, not patched here.
+- *Not wired, residuals:* the own-country =ehcvm_nsu_ben2021.dta= weights (GH #1598); the
+  survey-kg =Quantity_kg= of =crop_production= (=s16cq16c= / =s16dq05c=, see "2021-22 wired").
+
+* 2026-11-12 -- 2021-22 strata on the #1575 rule, and the day's other rulings (GH #1697)
+
+The wiring of 2021-22 is tracked in GH #1697, split from GH #552 on 2026-11-12; #552 is now about
+acquisition only.  The "GH #552" in the 2026-11-04 sections above is the issue as it stood then.
+Three rulings of @ligon, 2026-11-12 (=.sucoder/isa-decisions.org=), applied here:
+
+- *Strata: "Same rule as #1575".*  2021-22's =sample.strata= is now the documented department x
+  milieu label, =<s00q01 label> <s00q04 label>=, by the same shared helper, cell formatter and
+  =sample= stamp hook as 2018-19 (=ehcvm.strata_label=, =ehcvm.stamp_region_milieu_stratum=), and
+  =Benin::sample::region-milieu-stratum= now has =waves: ['2018-19', '2021-22']=.  Its =inputs=
+  callable is still 2018-19's =mapping:inputs_strata=, which reads each wave's own cover, so
+  =derivation_inputs(key, wave='2021-22')= returns this wave's 8,032 cover answers, now for rows
+  that carry the key.  A missing or blank label gives NA; a code is refused.  This supersedes the
+  region-only 2021-22 =strata= of the section above.
+- *Harvest: "Extend Mali's derivation".*  =Benin::crop_production::harvest-from-dispositions= is
+  kept as wired; its entry now says it extends =Mali::crop_production::harvest-from-dispositions=,
+  and cites the ruling.  GH #1437 (why =s16cq16a= is blank) stays open.
+- *Link: "Make Benin a panel country".*  A committed crosswalk from =PanelHH= (Design A) in a
+  FOLLOW-UP PR, GH #1705, with its own verification.  Not built here: 2021-22's =E2_= ids still
+  meet no 2018-19 id.  =_/sampling.yml= says so.
+
+*What is served, measured.*  Cold =sample()=, each side in its own private root (burst job
+41240821): base =e5fdd2fa8=, the wiring before this change =df1df60ed=, and this change.
+| wave    | households | =strata= labels | NA | =Derivation= keyed |
+|---------+------------+-----------------+----+--------------------|
+| 2018-19 |      8,012 |              23 |  0 |              8,012 |
+| 2021-22 |      8,032 |              23 |  0 |              8,032 |
+The two waves have the same 23 labels (=littoral Urbain= is the only Littoral cell in both, as
+the DDI's "purely urban Littoral" says), and this file spells the departments as 2018-19's does
+(lower case, the same twelve), so a cross-wave group on =strata= no longer splits any stratum.
+No grappe holds two strata in either wave.  The department part equals =cluster_features.Region=
+and the milieu part =Rural= on every grappe of both waves.  2018-19 is frame-equal to base on
+every column, =strata= and =Derivation= included; 2021-22's =v=, =Rural=, =weight= and
+=panel_weight= are frame-equal to =df1df60ed='s, on the same household ids.
+
+*=strat=, the weights file's own variable: recorded, not served.*  =ehcvm_ponderations_ben2021.dta=
+carries =strat= (=int16=, no value labels), 24 codes.  Measured on all 8,032 households:
+=strat= = 10 x department code + =vague=, exactly, on 8,032 of 8,032 (10 x department + the milieu
+code holds on 3,965, about half, as chance would give).  It is constant within each of the 670
+grappes, as =vague= is.  So its second digit is the VISIT, not the milieu: =strat= is department
+x vague, 12 x 2 = 24, and that is why it has one cell more than the DDI's 23.  The restored
+wiring's YAML comment called it "24 region x milieu cells", which is wrong; the note above and
+the 2026-11-12 PR text offered it as a 24-cell alternative to the DDI's 23 strata, which it is
+not.  Against the constructed strata:
+| constructed =strata= | =strat=, vague 1 | =strat=, vague 2 | households |
+|----------------------+------------------+------------------+------------|
+| alibori Rural     | 11: 180    | 12: 168    |   348 |
+| alibori Urbain    | 11: 60     | 12: 72     |   132 |
+| atacora Rural     | 21: 180    | 22: 168    |   348 |
+| atacora Urbain    | 21: 108    | 22: 120    |   228 |
+| atlantique Rural  | 31: 288    | 32: 276    |   564 |
+| atlantique Urbain | 31: 240    | 32: 252    |   492 |
+| borgou Rural      | 41: 168    | 42: 156    |   324 |
+| borgou Urbain     | 41: 166    | 42: 180    |   346 |
+| collines Rural    | 51: 216    | 52: 204    |   420 |
+| collines Urbain   | 51: 96     | 52: 96     |   192 |
+| couffo Rural      | 61: 216    | 62: 216    |   432 |
+| couffo Urbain     | 61: 95     | 62: 96     |   191 |
+| donga Rural       | 71: 180    | 72: 180    |   360 |
+| donga Urbain      | 71: 131    | 72: 144    |   275 |
+| littoral Urbain   | 81: 347    | 82: 347    |   694 |
+| mono Rural        | 91: 192    | 92: 192    |   384 |
+| mono Urbain       | 91: 214    | 92: 204    |   418 |
+| oueme Rural       | 101: 144   | 102: 156   |   300 |
+| oueme Urbain      | 101: 276   | 102: 276   |   552 |
+| plateau Rural     | 111: 156   | 112: 156   |   312 |
+| plateau Urbain    | 111: 144   | 112: 144   |   288 |
+| zou Rural         | 121: 144   | 122: 144   |   288 |
+| zou Urbain        | 121: 72    | 122: 72    |   144 |
+Every constructed stratum splits across its department's two =strat= codes, and every =strat=
+code but Littoral's holds both milieux.  What =strat= was built for is not established here (no
+document was searched for it).  The ruled construction is served; =strat= is read nowhere.
+
+*Leavers (GH #1565).*  =household_roster= and =people_last7days= leave out the 6,138 people =s01=
+lists as gone, as =ehcvm_individu= does.  GH #1565 asks whether they belong in the roster and says
+that decision should precede this wave's =household_roster= step.  It has not been made, so this
+wiring serves =ehcvm_individu='s choice, the de facto result in Senegal 2021-22, and is revisited
+when it is.
+
+*Issue numbers.*  GH #1697 is the wiring (this branch "Addresses #1697"); GH #552 acquisition only;
+GH #1556's shock ruling is applied here (purchases =s14bq04f=, stock =s14bq04e=, above); GH #791 is
+the UEMOA source, untouched (these waves are World Bank releases); GH #1705 the link; GH #1437 the
+blank harvest; GH #1565 the leavers; GH #1598 the own-country NSU weights, still not wired.
+
+*Cost.*  Measured, config-only, base =e5fdd2fa8= against this change: =Country._table_cache_hash=
+Benin 22 of 22 (and Togo 22 of 22, Cote d'Ivoire 21 of 21, GhanaLSS 21 of 21, through =Très grand=),
+=Wave._input_hash= Benin 44 of 44, =build_transforms_fingerprint= 0 of 40, every other country 0.
+The same scope the restored wiring already had: the strata edit adds no country to it.  [2026-11-12, red
+team F3: GhanaLSS moves at BOTH tiers, 21 of 21 =_table_cache_hash= and 147 of 147 =Wave._input_hash=, a
+full cold re-warm of GhanaLSS; no GhanaLSS served value changes (measured, burst job 41240822).]
+
+* 2026-11-12 -- must-states from the red team (GH #1697)
+
+- *Leavers are dropped pending GH #1565* (red team F5).  =household_roster= and =people_last7days= of
+  2021-22 leave out the 6,138 people =s01= lists as gone (=s01q00aa= = non; 6,138 of 48,798 =s01= rows),
+  matching =ehcvm_individu= (42,660).  That is a de facto choice made before #1565's decision, which the
+  issue says should precede this step; it is reversible and revisited when #1565 is ruled.  Togo and Cote
+  d'Ivoire =s01= carry no leavers.
+- *#1598 is deferred, not unruled* (red team F4): see "Kilograms" above.
+- *No served Benin value moves with the Togo / Cote d'Ivoire =s07bq03a= rulings of the same day*:
+  =sample=, =food_acquired=, =food_expenditures=, =food_quantities= (kgs and units) and =food_prices= of
+  both waves are frame-equal to the previous head =6538bc8b8= (cold, private roots, burst job 41249059),
+  and no Benin hash moves.
+- *=assets= index (red team F7, GH #1710).*  The served =assets= index =(t, i, j)= is not unique in old
+  and new waves alike (2021-22: 1,871 duplicated entries) because the =harmonize_assets= relabel of =j=
+  runs in =_finalize_result= after the index collapse; no =GrainCollapseWarning= fires.  Pre-existing,
+  extended to 2021-22 by this wiring; filed as GH #1710.

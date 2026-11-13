@@ -1,0 +1,372 @@
+diff --git a/.coder/ledger/1210-invalid-food-waves.md b/.coder/ledger/1210-invalid-food-waves.md
+new file mode 100644
+index 000000000..55e7d3595
+--- /dev/null
++++ b/.coder/ledger/1210-invalid-food-waves.md
+@@ -0,0 +1,97 @@
++# Prior-Art Ledger - GH #1210 invalid food-wave requests
++
++Search tier: git + ripgrep; no GitNexus or memory tool is exposed.
++Actual independent parent: f8d236694c26fe9e709c5548f02c70f74ea72c33.
++
++## §1 Task, restated
++
++Reject a request containing an invalid wave before cache maintenance or
++derived-table pre-work can mutate L1 or L2. Preserve the existing invalid-key
++error and valid selection, staleness, coverage and food semantics.
++
++## §2 Existing machinery
++
++| machinery | anchor | behavior and tests | decision |
++|---|---|---|---|
++| `Country.__getitem__` | `country.py:2964` | accepts declared wave identifiers; exact existing KeyError for an invalid identifier | reuse for invalid elements only |
++| generated table method | `country.py:6150` | validates kwargs before derived pre-work; valuation calls `_valuation_geo` before aggregation | extend with entry guard after argument validation |
++| `Country._aggregate_wave_data` | `country.py:4980` | handles internal and public cache/build routes | extend with entry guard before maintenance |
++| `_valuation_geo` | `country.py:3169` | calls `cluster_features(waves=...)`, so invalid validation must precede it | preserve |
++| `_evict_hashless_wave_caches` | `country.py:4709`, nested `load_from_waves:5249` | GH479 eviction before every rebuild descent; `test_cache_hash_invalidation.py` tests selective/stale eviction | preserve for valid requests |
++| `_read_l2_country_cache`, `_union_waves`, `_restrict_to_waves` | `country.py:4311` onward | GH891 coverage grows monotonically; `test_gh891_wave_subset_cache.py` | preserve |
++| `_has_country_builder` and Make route | `country.py`, `test_gh1039_make_backend_no_country_rule.py` | country-builder routing and no-rule fallback | preserve |
++
++## §3 Definitions & conventions in force
++
++- Inherit `STANDING.md` sections 3/4 and `CLAUDE.md` cache/derived-table rules.
++- Canonical food columns/axes remain in `lsms_library/data_info.yml`.
++- Native `(t,i,j,u,s)` food parquets and finalized API `(i,t,v,j,u,s)`
++  frames are distinct; full actual axes/storage are comparison operands.
++- Malawi notes document panel-only 2013, combined later XS/panel waves,
++  label-derived IHS2 factors and region-keyed IHS3+ factors; preserve them.
++- f8 notes say retired food aliases derive from food_acquired, but the scheme
++  still contains two null aliases. GH1208 and GH1209 are independent fixes.
++
++## §4 Invariants & assumptions
++
++- An all-bad or valid-plus-invalid request must preserve the complete L1/L2
++  pathset, bytes, size, mode, mtime and physical receipts.
++- Reuse the first invalid element's precise `__getitem__` KeyError; do not
++  construct valid Wave objects just to validate membership.
++- Materialize explicit non-list iterables once; retain None, empty selections,
++  order, duplicates and existing string-as-iterable behavior. No new string API.
++- Keep existing argument-error precedence before the public wave guard.
++- Valid absent/stale country rebuilds still evict hashless waves (GH479);
++  covered warm requests remain reads, and GH891 union/coverage rules remain.
++- No fingerprint exclusions, Make cleanup, alias removal, valid-subset fallback
++  fix, string-policy change or scientific/unit work belongs here.
++- Full 549 country / 39 framework / 1,362 wave hash census precedes data.
++- All project/data actors use isolated mounted runtime and guarded private roots.
++
++## §5 Reuse decision
++
++| behavior | decision | reason |
++|---|---|---|
++| invalid-key formatting | reuse `self[bad]` | exact existing contract, one source of error wording |
++| explicit iterable preparation | new small Country helper | no existing selection validator snapshots the input before maintenance |
++| entry validation | extend public and internal entries | public valuation pre-work can precede the internal entry |
++| cache/build behavior | reuse unchanged | only invalid entry ordering is defective |
++| verification | extend focused tests and guarded held-source experiment | must distinguish actual parent side effects and preserve valid results |
++
++## §6 Open questions for the human
++
++None blocking. Root approved the helper and both entry guards before framework
++edits; independent review and publication remain root-owned.
++
++### Phase 3 - verification
++
++- `OK` (sections 2/4): 28 candidate regressions pass. Correctly launched actual
++  f8 control has 16 invalid/mixed failures and 11 passing ordinary controls.
++  Its additional exhausted-iterator failure is a measured behavior change,
++  not evidence of universal unchanged iterable compatibility.
++- `OK` (section 4): held-source all-bad and mixed requests preserve the whole
++  candidate L1/L2 physical state. Parent requests each delete five native wave
++  files and alter five directories, with L1 and country parquet unchanged.
++  Direct-food KeyError args and the single-KeyError chain remain exact.
++- `OK` (sections 3/4): 56 strict pairs pass without normalization: 34 Country,
++  12 Feature and ten native-parquet pairs. All complete axes, unused levels,
++  codes, storage, null policies, typed attrs and numeric values are checked.
++- `OK` (section 2): 21 selected GH479/GH891/GH1039 tests and API audit pass.
++  The scoped scanners have 163 literally identical ordered records each,
++  including two pre-existing food-price failures. Six valid warm cases write
++  no parquet; stamped hashes and coverage are current.
++- `OK` (section 4): all 549 country, 39 framework and 1,362 declared-wave
++  fingerprints move. Public API order and complete declaration metadata are
++  unchanged. No exclusions or corpus data rebuild were added.
++- Diagnostic history is retained: the first metadata checker wrongly assumed
++  order for a set-derived declaration list; only its full-multiset comparison
++  was corrected. An unexpected 28-pass supposed-parent xdist run has no worker
++  identity history and is diagnostic only. The corrected parent launch uses
++  explicit base rootdir/importlib and per-worker pre-collection assertions.
++- Controlled Default derived routes retain the existing KeyError args but
++  fail earlier. The two old Make controls reach a deliberately blocked external
++  builder; their underlying wrapped backend error was not measured there.
++- Frozen GH1209 source and evidence remain read-only. Full physical/source/
++  provider protection and immutable author handoff are recorded privately.
++
++Sue
+diff --git a/lsms_library/countries/Malawi/_/CONTENTS.org b/lsms_library/countries/Malawi/_/CONTENTS.org
+index 48609f727..738f21d1f 100644
+--- a/lsms_library/countries/Malawi/_/CONTENTS.org
++++ b/lsms_library/countries/Malawi/_/CONTENTS.org
+@@ -3061,3 +3061,17 @@ Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
+     2019-20, whose unit column is not read (=unit2=None=).  Under the
+     #1041 ruling a missing unit is =Unknown=, not NULL.  Drafted as a
+     residual.
++
++* 2026-10-22 -- reject invalid food waves before cache maintenance (GH #1210)
++
++On release f8, a Default food request containing an unknown wave deleted all five hashless native food parquets before raising the wave-selection =KeyError=.
++A supported wave followed by an unknown wave had the same effect; the country parquet and L1 blobs survived.
++The framework now validates the complete explicit selection before cache maintenance or derived-table pre-work, reusing the existing invalid-wave error without constructing valid waves for that check.
++Valid absent/stale country-cache requests still rebuild hashless waves, and covered warm all-wave and supported singleton requests remain reads.
++
++Explicit iterators are prepared once; this also replaces the parent's exhausted-iterator empty result with the requested data, a measured behavior change.
++The list, tuple, order, duplicate and empty-request controls retain their tested behavior; a string is still treated as an iterable, not a new scalar-wave API.
++Derived calls now reject the selection before valuation lookups or legacy fallbacks; their earlier error timing is intentional.
++
++The tagged framework entry edit moves all 549 country, 39 framework and 1,362 declared-wave fingerprints in the measured inventory, even though the bounded Malawi valid-output comparisons are exact.
++The old null food registrations, obsolete country Make builder, string-policy and scientific/unit residuals are separate from this fix.
+diff --git a/lsms_library/country.py b/lsms_library/country.py
+index c233eb731..7c97480e8 100644
+--- a/lsms_library/country.py
++++ b/lsms_library/country.py
+@@ -2961,6 +2961,17 @@ class Country:
+ 
+         # return list(data_scheme)
+ 
++    def _validate_waves(self, waves):
++        """Prepare an explicit selection before any cache or derived work."""
++        # Snapshot iterators once; preserve order/duplicates and the existing
++        # invalid-key error without constructing valid Waves (ledger 1210, section 4).
++        selected = waves if isinstance(waves, list) else list(waves)
++        available = self.waves
++        for year in selected:
++            if year not in available:
++                self[year]
++        return selected
++
+     def __getitem__(self, year: str) -> Wave:
+         # Ensure the year is one of the available waves
+         if year in self.waves:
+@@ -4993,6 +5004,8 @@ class Country:
+ 
+         if waves is None:
+             waves = self.waves
++        else:
++            waves = self._validate_waves(waves)
+ 
+         scheme_entry = self._materialization_entry(method_name)
+         materialize_backend = None
+@@ -6235,6 +6248,10 @@ class Country:
+                     # Attach the LCU label as an index level so the post-step
+                     # convert() can relabel it to the target basis.
+                     currency = 'index'
++                # Validate before valuation's geographic lookup or a legacy
++                # derived fallback can touch data (ledger 1210, sections 2/4).
++                if waves is not None:
++                    waves = self._validate_waves(waves)
+                 # For derived food tables, try deriving from food_acquired first
+                 # before falling back to wave-level scripts / make
+                 if (name in self._FOOD_DERIVED
+diff --git a/tests/test_gh1210_invalid_food_waves.py b/tests/test_gh1210_invalid_food_waves.py
+new file mode 100644
+index 000000000..bad77f898
+--- /dev/null
++++ b/tests/test_gh1210_invalid_food_waves.py
+@@ -0,0 +1,199 @@
++"""Invalid wave selections cannot mutate caches before they are rejected.
++
++Real Malawi registry, cache gates and assembly with controlled native frames;
++no microdata. Held-source API/frame checks are recorded separately.
++"""
++import hashlib
++import os
++import stat
++
++import pandas as pd
++import pytest
++
++import lsms_library.country as C
++from lsms_library.local_tools import read_parquet_cache_waves, to_parquet
++from lsms_library.paths import data_root
++
++
++def _physical_tree(root):
++    """Bind pathsets, bytes and physical state, including empty directories."""
++    rows = {}
++    for path in sorted(root.rglob('*')):
++        info = path.lstat()
++        row = (stat.S_IMODE(info.st_mode), info.st_size, info.st_mtime_ns,
++               info.st_nlink, info.st_dev, info.st_ino)
++        if path.is_file():
++            row += (hashlib.sha256(path.read_bytes()).hexdigest(),)
++        elif path.is_symlink():
++            row += (os.readlink(path),)
++        rows[str(path.relative_to(root))] = row
++    return rows
++
++
++@pytest.fixture
++def native_food(tmp_path, monkeypatch):
++    root = tmp_path / 'data'
++    monkeypatch.setenv('LSMS_DATA_DIR', str(root))
++    monkeypatch.setenv('LSMS_BUILD_BACKEND', 'dvc')
++    monkeypatch.setenv('LSMS_BUILD_WORKERS', '1')
++    data_root.cache_clear()
++    c = C.Country('Malawi', preload_panel_ids=False)
++    c._panel_ids_attempted = True
++    c._updated_ids_cache = {}
++    state = {'quantity': 2.5, 'built': []}
++
++    def grab(wave, request):
++        assert request == 'food_acquired'
++        state['built'].append(wave.year)
++        frame = pd.DataFrame({
++            't': [wave.year], 'i': ['house'], 'j': ['Rice'],
++            'u': ['kg'], 's': ['purchased'],
++            'Quantity': [state['quantity']], 'Expenditure': [10.0],
++            'Quantity_kg': [state['quantity']],
++        }).set_index(['t', 'i', 'j', 'u', 's'])
++        # Native scripts write a hashless wave parquet before returning.
++        path = root / 'Malawi' / wave.year / '_' / 'food_acquired.parquet'
++        path.parent.mkdir(parents=True, exist_ok=True)
++        to_parquet(frame, path, absolute_path=True)
++        return frame
++
++    monkeypatch.setattr(C.Wave, 'grab_data', grab)
++    # The v-join is separately covered. Retain real finalization/id_walk but
++    # prevent a second table from asking for microdata in this controlled test.
++    monkeypatch.setattr(C.Country, '_join_v_from_sample', lambda self, df, *a, **k: df)
++    # A synthetic unused L1 blob proves that invalid input cannot touch L1.
++    blob = root / 'dvc-cache' / 'aa' / 'unused-synthetic-blob'
++    blob.parent.mkdir(parents=True)
++    blob.write_bytes(b'synthetic L1 control; never read as survey data')
++    try:
++        yield c, root, state
++    finally:
++        data_root.cache_clear()
++
++
++_ROUTES = [
++    ('internal', {}), ('food_acquired', {}),
++    ('food_expenditures', {}), ('food_prices', {}), ('food_quantities', {}),
++    ('food_prices', {'units': 'unitvalue'}),
++    ('food_expenditures', {'basis': 'total', 'valuation': 'median_price'}),
++    ('food_acquired', {'_backend': 'make'}),
++]
++
++
++@pytest.mark.parametrize('route,kwargs', _ROUTES)
++@pytest.mark.parametrize('mixed', [False, True])
++def test_invalid_request_preserves_complete_cache_tree(native_food, monkeypatch,
++                                                       route, kwargs, mixed):
++    c, root, state = native_food
++    c.food_acquired()  # ordinary writer establishes hash and all-wave coverage
++    assert len(list((root / 'Malawi').glob('*/_/food_acquired.parquet'))) == 5
++    bad = 'invalid-wave'
++    with pytest.raises(KeyError) as reference:
++        c[bad]
++    request = [c.waves[2], bad] if mixed else [bad]
++    kwargs = dict(kwargs)
++    if kwargs.pop('_backend', None):
++        monkeypatch.setenv('LSMS_BUILD_BACKEND', 'make')
++
++    def valuation_prework(waves):
++        (root / 'unexpected-valuation-prework').write_text('invalid request')
++        return None
++
++    monkeypatch.setattr(c, '_valuation_geo', valuation_prework)
++    getitem = C.Country.__getitem__
++    looked_up = []
++
++    def lookup(self, year):
++        looked_up.append(year)
++        return getitem(self, year)
++
++    monkeypatch.setattr(C.Country, '__getitem__', lookup)
++    # A bad Make request must be rejected before any external builder; the
++    # f8 country builder is independently broken and needs no raw-data replay.
++    def no_builder(*args, **kwargs):
++        raise AssertionError('invalid selection reached an external builder')
++
++    monkeypatch.setattr(C.subprocess, 'run', no_builder)
++    before = _physical_tree(root)
++    with pytest.raises(KeyError) as caught:
++        if route == 'internal':
++            c._aggregate_wave_data(request, 'food_acquired')
++        else:
++            getattr(c, route)(waves=request, **kwargs)
++    assert caught.value.args == reference.value.args
++    assert _physical_tree(root) == before
++    assert looked_up == [bad], 'validation constructed a valid Wave'
++
++
++@pytest.mark.parametrize('selection', ['all', 'subset', 'empty', 'reverse', 'duplicates', 'tuple', 'iterator'])
++def test_valid_warm_selections_keep_values_and_physical_state(native_food, selection):
++    c, root, state = native_food
++    full = c.food_acquired()
++    waves = c.waves
++    choices = {'all': None, 'subset': [waves[2]], 'empty': [],
++               'reverse': list(reversed(waves)), 'duplicates': [waves[2], waves[2]],
++               'tuple': (waves[2],), 'iterator': iter([waves[2]])}
++    requested = choices[selection]
++    before = _physical_tree(root)
++    result = c.food_acquired(waves=requested)
++    if selection in {'all', 'reverse'}:
++        expected = full
++    elif selection == 'empty':
++        expected = full.iloc[:0]
++    else:
++        expected = full[full.index.get_level_values('t') == waves[2]]
++    pd.testing.assert_frame_equal(result, expected, check_exact=True)
++    assert _physical_tree(root) == before
++    assert state['built'] == waves
++
++
++@pytest.mark.parametrize('country_cache', ['absent', 'stale'])
++def test_valid_rebuild_still_evicts_hashless_waves(native_food, monkeypatch, country_cache):
++    c, root, state = native_food
++    c.food_acquired()
++    state['built'].clear()
++    state['quantity'] = 7.0
++    country_path = root / 'Malawi/var/food_acquired.parquet'
++    if country_cache == 'absent':
++        country_path.unlink()  # synthetic fixture; exercise ordinary missing descent
++    else:
++        compute = C.Country._table_cache_hash
++        monkeypatch.setattr(C.Country, '_table_cache_hash',
++                            lambda self, table, waves: compute(self, table, waves) + '-changed')
++    result = c.food_acquired()
++    assert state['built'] == c.waves
++    assert (result['Quantity'] == 7.0).all()
++    assert (result['Quantity_kg'] == 7.0).all()
++
++
++def test_valid_subset_coverage_grows_then_serves_without_writes(native_food):
++    c, root, state = native_food
++    a, b = c.waves[2], c.waves[-1]
++    c.food_acquired(waves=[a])
++    country_path = root / 'Malawi/var/food_acquired.parquet'
++    assert read_parquet_cache_waves(country_path) == [a]
++    second = c.food_acquired(waves=[b])
++    assert set(read_parquet_cache_waves(country_path)) == {a, b}
++    assert set(second.index.get_level_values('t')) == {b}
++    before = _physical_tree(root)
++    calls = list(state['built'])
++    first = c.food_acquired(waves=[a])
++    assert set(first.index.get_level_values('t')) == {a}
++    assert state['built'] == calls and _physical_tree(root) == before
++
++
++def test_existing_argument_errors_precede_wave_validation(native_food):
++    c, root, state = native_food
++    with pytest.raises(ValueError, match='basis='):
++        c.food_expenditures(waves=['invalid-wave'], basis='invalid-basis')
++    assert state['built'] == []
++
++
++def test_string_is_not_reinterpreted_as_a_single_wave(native_food):
++    c, root, state = native_food
++    # Preserve the existing iterable-of-characters behavior; no new scalar API.
++    with pytest.raises(KeyError) as reference:
++        c['2']
++    with pytest.raises(KeyError) as caught:
++        c.food_acquired(waves='2013-14')
++    assert caught.value.args == reference.value.args

@@ -1,0 +1,23 @@
+{
+  "recorded_at_UTC": "2026-10-22T02:43:40.320543+00:00",
+  "rows": [
+    {
+      "label": "candidate",
+      "checkout": "/local/job40255479/worktrees/isa-review-Uganda-1198",
+      "head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+      "ignored_link": "/local/job40255479/worktrees/isa-review-Uganda-1198/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1198/candidate-dvc-tmp",
+      "clean": true
+    },
+    {
+      "label": "base",
+      "checkout": "/local/job40255479/worktrees/isa-review-Uganda-1198-base",
+      "head": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+      "ignored_link": "/local/job40255479/worktrees/isa-review-Uganda-1198-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1198/base-dvc-tmp",
+      "clean": true
+    }
+  ],
+  "review_assigned": false,
+  "tests_builds": 0
+}

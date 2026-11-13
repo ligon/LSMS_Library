@@ -1,0 +1,70 @@
+{
+  "number": 1202,
+  "url": "https://github.com/ligon/LSMS_Library/pull/1202",
+  "state": "open",
+  "merged": false,
+  "head": "fix/1198-uganda-production-observations-20261022",
+  "head_sha": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "base": "development",
+  "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "body_readback_exact": true,
+  "ci": {
+    "runs": [
+      {
+        "id": 39720922853,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "jobs": [
+      {
+        "name": "unit-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "windows-smoke",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "windows-script-build",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "dvc-lock-check",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "refresh-dvc-locks",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "docs",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "data-tests",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "dvc-remote-reachability",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ],
+    "credentialed_data_suite_pass": false
+  },
+  "independent_runtime": "1198-Uganda-independent/ROOT-RUNTIME-ACCEPTANCE.json",
+  "independent_documentation": "1198-Uganda-documentation-qualification/ROOT-DOC-ACCEPTANCE.json",
+  "issue_status_bodies_readback": {
+    "849": "open",
+    "1198": "open"
+  },
+  "signed": "Sue"
+}

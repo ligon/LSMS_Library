@@ -1,0 +1,57 @@
+{
+ "btf": {
+  "both_none": 0,
+  "moved": 0,
+  "total": 40,
+  "unmoved_examples": [
+   "None",
+   "anthropometry",
+   "assets",
+   "cluster_features",
+   "community_cluster_xwalk",
+   "community_prices",
+   "consumption",
+   "crop_production",
+   "earnings",
+   "employment"
+  ]
+ },
+ "country": {
+  "both_none": 0,
+  "moved": 0,
+  "total": 549,
+  "unmoved_examples": [
+   "Albania/assets",
+   "Albania/cluster_features",
+   "Albania/household_characteristics",
+   "Albania/household_roster",
+   "Albania/housing",
+   "Albania/individual_education",
+   "Albania/interview_date",
+   "Albania/plot_features",
+   "Albania/sample",
+   "Albania/shocks"
+  ]
+ },
+ "errors": {
+  "a": 0,
+  "b": 0
+ },
+ "wave": {
+  "both_none": 0,
+  "moved": 0,
+  "total": 2109,
+  "unmoved_examples": [
+   "Albania/2002/assets",
+   "Albania/2002/cluster_features",
+   "Albania/2002/household_characteristics",
+   "Albania/2002/household_roster",
+   "Albania/2002/housing",
+   "Albania/2002/individual_education",
+   "Albania/2002/interview_date",
+   "Albania/2002/plot_features",
+   "Albania/2002/sample",
+   "Albania/2002/shocks"
+  ]
+ }
+}

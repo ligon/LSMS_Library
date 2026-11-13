@@ -1,0 +1,58 @@
+[
+  {
+    "feature": "earnings",
+    "check": "index_levels_match_scheme",
+    "status": "warn",
+    "severity": "C",
+    "count": 1
+  },
+  {
+    "feature": "earnings",
+    "check": "runtime_warning",
+    "status": "warn",
+    "severity": "C",
+    "count": 2
+  },
+  {
+    "feature": "enterprise_income",
+    "check": "index_levels_match_scheme",
+    "status": "warn",
+    "severity": "C",
+    "count": 1
+  },
+  {
+    "feature": "enterprise_income",
+    "check": "runtime_warning",
+    "status": "warn",
+    "severity": "C",
+    "count": 2
+  },
+  {
+    "feature": "fct",
+    "check": "has_household_index",
+    "status": "warn",
+    "severity": "C",
+    "count": 1
+  },
+  {
+    "feature": "fct",
+    "check": "has_time_index",
+    "status": "warn",
+    "severity": "C",
+    "count": 1
+  },
+  {
+    "feature": "fct",
+    "check": "no_constant_columns",
+    "status": "warn",
+    "severity": "C",
+    "count": 1
+  },
+  {
+    "feature": "nutrition",
+    "check": "runtime_warning",
+    "status": "warn",
+    "severity": "C",
+    "count": 2
+  }
+]

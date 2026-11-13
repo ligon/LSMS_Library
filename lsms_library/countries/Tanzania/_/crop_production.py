@@ -2,9 +2,9 @@
 (parity-loop GAP 1).
 
 Each buildable wave's ``Tanzania/<wave>/_/crop_production.py`` produces a
-parquet with index ``(t, i, plot_id, j)`` and the canonical reported
-columns from data_scheme.yml (Quantity, u, Quantity_sold, Value_sold,
-planting_month, harvest_month, intercropped, perennial).  This script
+parquet with index ``(t, i, plot_id, j, production_obs)`` and the canonical
+reported columns from data_scheme.yml (Quantity, u, Quantity_sold,
+Value_sold, harvest_month, intercropped, perennial).  This script
 concatenates the per-wave parquets and applies cross-wave id_walk so the
 household index uses the panel canonical id scheme.
 
@@ -17,21 +17,34 @@ import json
 
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 from tanzania import id_walk
 
 
 WAVES = ['2019-20', '2020-21']
 
+# GH #1287: declarations belong to logical waves; readers use physical folders.
+country = Country('Tanzania', preload_panel_ids=False)
+declared_folders = {
+    wave.wave_folder
+    for wave in (country[year] for year in country.waves)
+    if 'crop_production' in wave.data_scheme
+}
+
 pieces = []
 for t in WAVES:
+    if t not in declared_folders:
+        continue
     fn = f'../{t}/_/crop_production.parquet'
     try:
         df = get_dataframe(fn)
-    except Exception:
-        # Wave not yet wired / parquet not built.  DVC raises
-        # PathMissingError here, not FileNotFoundError.
-        continue
+    except Exception as exc:
+        # Each folder reaching this reader declares a producer (ledger #1287 §8).
+        # Refuse partial country output when a declared build cannot be read.
+        raise RuntimeError(
+            f'Tanzania/crop_production: could not load declared folder {t} ({fn})'
+        ) from exc
     pieces.append(df)
 
 assert pieces, "crop_production: no wave-level parquets found"

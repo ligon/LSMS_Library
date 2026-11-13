@@ -1,0 +1,220 @@
+{
+  "source_pins": {
+    "candidate17": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+    "actual16_control": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+    "standalone1078": "d46795c303e2409ddb8ed5e4c62efca4e87ca347"
+  },
+  "exact_union": {
+    "candidate": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+    "actual16_parent": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+    "standalone1078": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+    "changed_paths": [
+      ".coder/ledger/1078-food-producer-provenance.md",
+      "lsms_library/countries/Uganda/_/CONTENTS.org",
+      "lsms_library/country.py",
+      "slurm_logs/isa_backlog_2026-10-21/1078/DRAFT-RESIDUAL-warm-index-dtype.md",
+      "slurm_logs/isa_backlog_2026-10-21/1078/PR-DRAFT.md",
+      "slurm_logs/isa_backlog_2026-10-21/1078/REPORT.org",
+      "slurm_logs/isa_backlog_2026-10-21/1078/REPRODUCE.sh",
+      "slurm_logs/isa_backlog_2026-10-21/1078/cold-warm-dtype-residual.json",
+      "slurm_logs/isa_backlog_2026-10-21/1078/scanner-proof.json",
+      "slurm_logs/isa_backlog_2026-10-21/1078/validation.json",
+      "tests/test_build_transform_hash.py",
+      "tests/test_gh1078_food_producer_provenance.py"
+    ],
+    "same_twelve_path_set": true,
+    "all_other_prior16_blobs_preserved": true,
+    "country_parent_reconstructed_byte_exact_by_removing_standalone_delta": true,
+    "delta_edits": [
+      {
+        "method": "food_acquired",
+        "candidate_lines": 23,
+        "baseline_lines": 22,
+        "standalone_method_exact": true
+      },
+      {
+        "method": "grab_data",
+        "candidate_lines": 472,
+        "baseline_lines": 461,
+        "standalone_method_exact": true
+      }
+    ],
+    "retained_1081_rethrows": true,
+    "standalone_new_blobs_exact_except_composed_country_and_additive_CONTENTS": true
+  },
+  "hash_inventory": {
+    "status": "SUCCESS",
+    "pins": [
+      "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+      "7ecf8e95fef567554fe93870ba95abddd1955a86"
+    ],
+    "country_hashes": {
+      "total": 549,
+      "changed": 549,
+      "unchanged": 0
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "changed": 39,
+      "unchanged": 0
+    },
+    "wave_hashes": {
+      "total": 1362,
+      "changed": 1362,
+      "unchanged": 0
+    }
+  },
+  "held_sources": 63,
+  "additional_income_sources": 16,
+  "sidecars_without_declared_size": 33,
+  "source_size_policy": "actual bytes/SHA/MD5/mode/mtime receipts; no invented sidecar sizes",
+  "actual_L1_physical_copy_receipts_rechecked": 1100,
+  "main_actual16_17_full_frames_each_stage": 44,
+  "known_standalone_full_frames_each_stage": 26,
+  "main_freshwarm_files_unchanged_each": 174,
+  "ordered_actual16_17_full_frames": 50,
+  "known14740_income_controls": 16,
+  "complete_order_comparisons": 32,
+  "ordered_freshwarm_files_unchanged_each_of4roots": 133,
+  "income_full8waves_rows": 14740,
+  "raw_food_rows": {
+    "Uganda": 355571,
+    "Niger": 239877
+  },
+  "race_actual16": {
+    "side": "baseline",
+    "actual_source_tests_passed": 2,
+    "actual_writers": [
+      {
+        "role": "A",
+        "actual_input_output_full_frame_typed_attrs_exact": true,
+        "expected_nine_zero_delta": true,
+        "current_own_hash_full8waves": true
+      },
+      {
+        "role": "B",
+        "actual_input_output_full_frame_typed_attrs_exact": true,
+        "expected_nine_zero_delta": false,
+        "current_own_hash_full8waves": true
+      }
+    ],
+    "last_A_final_exact": true,
+    "external_exists_false_schedule": true,
+    "native_read_source_correct": true,
+    "legacy_reducer_reached_by_A": 1,
+    "historical_original_writer_unknown": true
+  },
+  "race_actual17": {
+    "side": "candidate",
+    "actual_source_tests_passed": 2,
+    "actual_writers": [
+      {
+        "role": "A",
+        "actual_input_output_full_frame_typed_attrs_exact": true,
+        "expected_nine_zero_delta": false,
+        "current_own_hash_full8waves": true
+      },
+      {
+        "role": "B",
+        "actual_input_output_full_frame_typed_attrs_exact": true,
+        "expected_nine_zero_delta": false,
+        "current_own_hash_full8waves": true
+      }
+    ],
+    "last_A_final_exact": true,
+    "external_exists_false_schedule": true,
+    "native_read_source_correct": true,
+    "legacy_reducer_reached_by_A": 0,
+    "historical_original_writer_unknown": true
+  },
+  "healing_delta": {
+    "status": "SUCCESS",
+    "rows": 355571,
+    "total_missing_before_bad16": {
+      "Quantity": 21,
+      "Expenditure": 31,
+      "Price": 29755
+    },
+    "total_missing_after_healed17": {
+      "Quantity": 27,
+      "Expenditure": 34,
+      "Price": 29755
+    },
+    "restored_NaN_cell_deltas": {
+      "Quantity": 6,
+      "Expenditure": 3,
+      "Price": 0
+    },
+    "actual_changed_cells": 9,
+    "exact_expected_nine_cell_set": true,
+    "every_other_value_axes_dtype_mask_order_full_typed_attrs_exact": true,
+    "full_before_after_masks_saved_private": true,
+    "masks_sha256": {
+      "healing-before-full-nullmask-private.pkl": "cad4699cb74f17a05c843eff483dee04d07b7bc06ea4f5242e681f2965d5b9fb",
+      "healing-after-full-nullmask-private.pkl": "f6e99a96d0433b934a16c01a012e7c11197ce854aa4567b3e82f0fdc5443ae61"
+    }
+  },
+  "healing_freshwarm_files_unchanged": 120,
+  "scanner_raw_occurrences": 236,
+  "scanner_statuses": {
+    "warn": 232,
+    "pass": 4
+  },
+  "scanner_new_Niger_wave_caches": 4,
+  "source_tree_count": 10,
+  "protected_private_root_count": 8,
+  "protected_private_files_unchanged": 10320,
+  "source_bytes_modes_HEAD_logicalindex_clean_exact": true,
+  "all_source_mtimes_immutable": false,
+  "source_mtime_exception": [
+    {
+      "root": "/local/job40255479/worktrees/isa-integration-seventeen",
+      "relative": "docs/guide/data-methods.md",
+      "before": {
+        "sha256": "d98771404bbf8910f44f9e44a38208731a2dd351cb2af4ef256469381d9bffcb",
+        "bytes": 15876,
+        "mode": 384,
+        "mtime_ns": 1792627304992203363,
+        "type": "file"
+      },
+      "after": {
+        "sha256": "d98771404bbf8910f44f9e44a38208731a2dd351cb2af4ef256469381d9bffcb",
+        "bytes": 15876,
+        "mode": 384,
+        "mtime_ns": 1792628417310398853,
+        "type": "file"
+      },
+      "fields_changed": [
+        "mtime_ns"
+      ]
+    }
+  ],
+  "source_child_guard_gap": {
+    "tests/test_api_discoverability.py": {
+      "actual16_17_blobs_exact": true,
+      "sha256": "06775d2724929e6b45e07c2b557d6062e2e520acc915ebe15cdea4f6d15f1338"
+    },
+    "scripts/gen_data_method_docs.py": {
+      "actual16_17_blobs_exact": true,
+      "sha256": "728e12e7d0e19e1929c15affd5fc4078d0f4cd51544cc94874b90ec3ea171cb6"
+    },
+    "qualification": {
+      "existing_test_source": "tests/test_api_discoverability.py:55-59",
+      "child_command": "[sys.executable, REPO/scripts/gen_data_method_docs.py]",
+      "child_cwd": "REPO",
+      "child_environment_replaces_PYTHONPATH_with_REPO_only": true,
+      "private_sitecustomize_path_lost_in_child": true,
+      "network_namespace_inherited_by_normal_exec": true,
+      "no_child_write_audit_record_was_captured": true,
+      "source_write_path": "scripts/gen_data_method_docs.py:116 OUT.write_text",
+      "testcase_passed_in_original_full_selection": true,
+      "actual_write_PID_not_individually_traced": true,
+      "observed_delta": "one tracked doc mtime only; full before/after receipts retained; no restore or rerun"
+    }
+  },
+  "original_socket_guard_recorded_network_attempts": 0,
+  "full_unit_guard_recorded_denials": 24,
+  "child_doc_generator_complete_Python_guard_coverage_claim": false,
+  "zero_active_data_consumers_at_integrity_gate": true,
+  "no_new_product_API_after_final_metadata_qualification": true
+}

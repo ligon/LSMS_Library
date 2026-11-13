@@ -1,0 +1,18 @@
+{
+  "observed_at_UTC": "2026-10-21T21:32:11.444390+00:00",
+  "archive": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-followup-21h30.tar.gz",
+  "archive_sha256": "efacc5ffc55263a0e69010c8113905e932650b23036b6c698a93a5c4fd689bca",
+  "archive_bytes": 56655122,
+  "private_files_verified": 312,
+  "quiescent_review_roots": [
+    "review-1095-Nigeria",
+    "review-1111-Malawi-composition",
+    "Burkina_Faso/1058"
+  ],
+  "source_after_exact": true,
+  "archive_contents_verified": true,
+  "raw_sources_and_duplicate_L1_L2_excluded": true,
+  "full_private_manifest": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-followup-21h30.manifest.private.json",
+  "durable_launcher_sha256": "123f54f2d6247dacf14ea83ead060791b5e23d45c9da77389669452255346e8e",
+  "limits": "Adds completed independent Nigeria1095, Malawi composition and Burkina1058 diagnosis. Global13 review, current global14/framework1081/Burkina1058 writer need later quiescent archival. Source files remain in place and unchanged."
+}

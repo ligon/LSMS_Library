@@ -1,0 +1,41 @@
+{
+  "verdict": "PASS_BOUNDED_FUNCTIONAL_COMPOSITION_WITH_EXPLICIT_ISOLATION_LIMITS",
+  "source_pins": {
+    "candidate17": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+    "actual16_control": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+    "standalone1078": "d46795c303e2409ddb8ed5e4c62efca4e87ca347"
+  },
+  "full_suite_verdict": "FAIL",
+  "full_suite_counts": {
+    "skipped": 4459,
+    "passed": 5148,
+    "failed": 13
+  },
+  "focused": {
+    "passed": 438,
+    "failed": 0,
+    "skipped": 0
+  },
+  "actual16_negative_producer_controls": {
+    "failed": 14,
+    "passed": 0,
+    "skipped": 0
+  },
+  "functional_source_scope": [
+    "Uganda",
+    "Niger"
+  ],
+  "other37country_rebuilt_output_claim": false,
+  "all17_unrestricted_coexistence_claim": false,
+  "publication_authorized_by_this_review": false,
+  "material_functional_regression_found": false,
+  "limits": [
+    "Full selection retains9 protected-utime failures and4 private warning-prefix oracle failures; no full-suite PASS or rerun.",
+    "One tracked documentation mtime changed with unchanged bytes/mode/Git state. Existing doc-generator child resets PYTHONPATH and loses private guard path; exact child write event was not audited. No timestamp restore.",
+    "Eight unrequested/unserved healing cluster wave caches remain unchanged at actual16 hashes; no blanket all-cache-current claim.",
+    "Niger cold/warm u missing-sentinel dtype difference is owned by1196; all other properties exact, no normalization.",
+    "Original historical corrupt-cache writer remains unknown; controlled mechanism and exact signature do not identify it.",
+    "All549/39/1362 cache hashes move; no corpus rebuild or output verification for37other countries."
+  ],
+  "reviewer": "Sue (GPT-6)"
+}

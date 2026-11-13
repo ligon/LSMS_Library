@@ -1,0 +1,84 @@
+{
+  "source": {
+    "candidate": {
+      "head": "de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2",
+      "tracked_endpoints": 15045,
+      "bytes_modes_mtimes_inodes_index_head_clean_exact": true
+    },
+    "base": {
+      "head": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+      "tracked_endpoints": 15040,
+      "bytes_modes_mtimes_inodes_index_head_clean_exact": true
+    }
+  },
+  "protected_payloads": 8162,
+  "protected_manifests": [
+    {
+      "root": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix",
+      "entries": 2894,
+      "manifest": {
+        "sha256": "2a09f454e5a9622b9493a3cc73673fb897d22c5b412535b41b9018f3644e641f",
+        "size": 744401,
+        "mode": 420,
+        "mtime_ns": 1792635904662649016,
+        "device": 64770,
+        "inode": 55323542,
+        "nlink": 1,
+        "symlink": false
+      }
+    },
+    {
+      "root": "/local/job40255479/control/isa-backlog-20261021/review-Tanzania-1091",
+      "entries": 2426,
+      "manifest": {
+        "sha256": "be946a042d9678a49d9a10d12b652b64890c50f2a7c643655a060bac8aa6adf1",
+        "size": 663599,
+        "mode": 420,
+        "mtime_ns": 1792639989502329262,
+        "device": 64770,
+        "inode": 50600673,
+        "nlink": 1,
+        "symlink": false
+      }
+    },
+    {
+      "root": "/local/job40255479/control/isa-backlog-20261021/integration/niger-nineteen-docs-review",
+      "entries": 2842,
+      "manifest": {
+        "sha256": "0e341b01f80172c203e483ff98336a4384c3684d4d4ec6ac16bd52ab1a5ab18d",
+        "size": 740595,
+        "mode": 384,
+        "mtime_ns": 1792640233354630057,
+        "device": 64770,
+        "inode": 54011138,
+        "nlink": 1,
+        "symlink": false
+      }
+    }
+  ],
+  "raw_copy_count": 176,
+  "final_cache_roots": 44,
+  "data_parquet_grades": {
+    "current-country": 22,
+    "legitimate-hashless-native": 57,
+    "negative-parent-Make-hashless-country": 11
+  },
+  "check_exact": true,
+  "rtol": 0,
+  "atol": 0,
+  "full_typed_attrs_FIELDS": true,
+  "actual_checkers": [
+    "exact.py",
+    "oracle.py",
+    "assess-v2.py",
+    "check_cache_artifacts.py",
+    "warnings_scanner_check.py",
+    "freeze_check.py",
+    "final_stats.py"
+  ],
+  "all92_warning_fields_literal_true": true,
+  "network_attempts": 0,
+  "unexpected_write_denials": 0,
+  "populated_child_log_gap_explicit": true,
+  "final_zero_consumers_is_recorded_in_FINAL_READY": true
+}

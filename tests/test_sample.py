@@ -5,6 +5,7 @@ Tests that sample() returns a well-formed DataFrame with cluster (v),
 weight, strata, and Rural columns, indexed by (i, t).
 """
 
+import importlib.util
 import os
 import pytest
 import pandas as pd
@@ -47,10 +48,18 @@ SAMPLE_COUNTRIES = _countries_with_sample()
 # See Peru/_/CONTENTS.org, "sample carries NO weight".
 NO_WEIGHT_COUNTRIES = {"China", "Kazakhstan", "Pakistan", "Peru"}
 
-# Peru alone has three acquired rounds without any wave configuration.
+# Acquired rounds with no sample wiring yet: Peru's three, and new waves that
+# are registered ahead of their tables (the Guinea-Bissau EHCVM-2 wave, still
+# unwired, GH #1697; Liberia's two HIES waves, GH #597).  Malawi 2024-25 left
+# this list when its sample was wired (GH #1275, PR #1604), and Togo, Benin and
+# Cote d'Ivoire 2021-22 when theirs were (GH #1697).
 # Do not infer exemptions from directory shape: multi-round countries use
 # wave_folder_map for valid rounds without their own _/ directories.
-PARTIALLY_WIRED_SAMPLE = {"Peru": {"1985", "1990", "1991"}}
+PARTIALLY_WIRED_SAMPLE = {
+    "Peru": {"1985", "1990", "1991"},
+    "Guinea-Bissau": {"2021-22"},
+    "Liberia": {"2014-15", "2016-17"},
+}
 
 # ---------------------------------------------------------------------------
 # Raw-layer weight-scale checks (the home of the scale check after the
@@ -458,13 +467,33 @@ class TestSample:
 # See countries/Uganda/_/CONTENTS.org §"Hybrid v in 2009-10" for rationale.
 # ---------------------------------------------------------------------------
 
+def _uganda_2009_sources():
+    """(GSEC1 ids, ids only in AGSEC3B/GSEC12, GSEC1 ids with no comm and no
+    coordinates), read from the raw 2009-10 files, not through the builder."""
+    import pyreadstat
+    from lsms_library.data_access import get_data_file
+    from lsms_library.local_tools import format_id
+
+    def read(name):
+        df, _ = pyreadstat.read_dta(str(get_data_file(f"Uganda/2009-10/Data/{name}")),
+                                    apply_value_formats=False)
+        return df.assign(i=df["HHID"].map(format_id))
+
+    cover, geo = read("GSEC1.dta"), read("UNPS_Geovars_0910.dta")
+    frame = set(read("AGSEC3B.dta").i) | set(read("GSEC12.dta").i)
+    blank = cover[cover["comm"].astype("string").fillna("").str.strip() == ""]
+    located = geo[geo["lat_mod"].notna() & geo["lon_mod"].notna()]
+    return set(cover.i), frame - set(cover.i), set(blank.i) - set(located.i)
+
+
 class TestUganda2009HybridV:
     """2009-10 uses the `coalesce_coord_bin` transformer to fill v for
     the 565 HH whose `comm` is blank (movers + split-offs + 5 data-entry
     anomalies).  After the fix:
       - 2 410 HH have a numeric-string `comm` (317 distinct EAs);
       - 541 HH have a synthetic `@lat,lon` label (~339 distinct bins);
-      - 24 HH are genuinely NA (no comm AND no coords).
+      - 28 HH have the `unlocated-{hhid}` identity (GH #1120 D2, #1358): the
+        24 with no comm AND no coords, and 4 known only from AGSEC3B/GSEC12.
     """
 
     @pytest.fixture()
@@ -478,13 +507,18 @@ class TestUganda2009HybridV:
             pytest.skip("no 2009-10 wave in Uganda sample()")
 
     def test_row_count(self, s09):
-        assert len(s09) == 2975, f"expected 2975 HH, got {len(s09)}"
+        """Own-wave membership: 2,975 GSEC1 households + 4 (#1358, was 2,975)."""
+        cover, frame_only, _ = _uganda_2009_sources()
+        assert len(s09) == len(cover | frame_only) == 2979, (
+            f"expected the GSEC1 + AGSEC3B + GSEC12 households, got {len(s09)}")
 
     def test_na_exact(self, s09):
-        assert s09["v"].isna().sum() == 24, (
-            f"expected exactly 24 NA v's (geo-missing tail), got "
-            f"{s09['v'].isna().sum()}"
-        )
+        """No NA left: #1358 gave the 24 that were NA a singleton identity."""
+        assert s09["v"].isna().sum() == 0
+        _, frame_only, unlocatable = _uganda_2009_sources()
+        singletons = s09["v"].astype("string").str.startswith("unlocated-").fillna(False)
+        assert (len(unlocatable), len(frame_only)) == (24, 4)
+        assert singletons.sum() == len(unlocatable | frame_only)
 
     def test_no_empty_strings(self, s09):
         empty = (s09["v"] == "").sum()
@@ -496,13 +530,15 @@ class TestUganda2009HybridV:
         v = s09["v"].astype("string")
         numeric = v.str.fullmatch(r"\d+", na=False)
         synthetic = v.str.startswith("@").fillna(False)
+        singleton = v.str.startswith("unlocated-").fillna(False)  # #1358
         na = v.isna()
         # No overlap.
         assert not (numeric & synthetic).any()
         assert not (numeric & na).any()
         assert not (synthetic & na).any()
+        assert not (singleton & (numeric | synthetic | na)).any()
         # Cover everyone.
-        assert (numeric | synthetic | na).all()
+        assert (numeric | synthetic | singleton | na).all()
 
     def test_real_comm_count(self, s09):
         numeric = s09["v"].astype("string").str.fullmatch(r"\d+", na=False)
@@ -555,6 +591,10 @@ class TestUganda2009HybridV:
 # Uganda: HH-level Region exposed on sample() (not just cluster-level).
 # ---------------------------------------------------------------------------
 
+UGANDA_WAVES = ["2005-06", "2009-10", "2010-11", "2011-12",
+                "2013-14", "2015-16", "2018-19", "2019-20"]
+
+
 class TestUgandaRegionOnSample:
     """`sample()[['Region']]` should be populated per-HH for every Uganda
     wave, mapping to the canonical 4-region set used by cluster_features.
@@ -584,10 +624,18 @@ class TestUgandaRegionOnSample:
         )
 
     def test_region_coverage_per_wave(self, uga_sample):
-        """All waves except (possibly) 2019-20 should have ≥99% HH with
-        a populated Region.  2019-20 has a handful of NA in the
-        refreshment tail."""
-        for wave, sub in uga_sample.groupby("t"):
+        """Every wave's LOCATED households should have ≥99% populated Region.
+        2019-20 has a handful of NA in the refreshment tail.
+
+        `unlocated-` identities (#1358, GH #1120 D2) are excluded because they
+        have no cluster key: 128 of the 153 have no Region either, and 25 do
+        (24 in 2009-10, 1 in 2013-14).  Counted, all households would read
+        2,850 of 2,907 in 2011-12, 3,176 of 3,242 in 2018-19.  Judged on located
+        households alone this test cannot see a household that loses both `v`
+        and Region, so the singleton test below pins who the excluded ones are."""
+        v = uga_sample["v"].astype("string")
+        located = uga_sample[~v.str.startswith("unlocated-").fillna(False)]
+        for wave, sub in located.groupby("t"):
             non_null = sub["Region"].notna().sum()
             frac = non_null / len(sub)
             assert frac >= 0.995, (
@@ -595,10 +643,64 @@ class TestUgandaRegionOnSample:
                 f"({non_null}/{len(sub)})"
             )
 
+    @pytest.mark.parametrize("wave, n", [("2011-12", 57), ("2018-19", 66)])
+    def test_agsec1_only_households_have_no_region_in_their_own_source(
+            self, uga_sample, wave, n):
+        """Their missing Region is the source's, not a lost join: AGSEC1, which
+        gives them membership, has no `region` (2011-12) or leaves it blank
+        (2018-19).  They are also listed in other files (21 in 2011-12, 53 in
+        2018-19), none with a region or district for them (red-team sweep by
+        column name, 2026-11-04; this test reads AGSEC1 only)."""
+        import pyreadstat
+        from lsms_library.data_access import get_data_file
+        from lsms_library.local_tools import format_id
+
+        hhid = "HHID" if wave == "2011-12" else "hhid"
+        ag, _ = pyreadstat.read_dta(str(get_data_file(f"Uganda/{wave}/Data/AGSEC1.dta")),
+                                    apply_value_formats=False)
+        cover, _ = pyreadstat.read_dta(str(get_data_file(f"Uganda/{wave}/Data/GSEC1.dta")),
+                                       usecols=[hhid], apply_value_formats=False)
+        only = ag[~ag[hhid].map(format_id).isin(set(cover[hhid].map(format_id)))]
+        assert len(only) == n
+        assert "region" not in ag.columns or only["region"].isna().all()
+        sub = uga_sample.xs(wave, level="t")
+        singletons = sub[sub["v"].astype("string").str.startswith("unlocated-").fillna(False)]
+        assert len(singletons) == n and singletons["Region"].isna().all()
+
+    @pytest.mark.parametrize("wave", UGANDA_WAVES)
+    def test_singletons_are_the_households_with_no_location_in_their_sources(
+            self, uga_sample, wave):
+        """A located household must not become `unlocated-` (#1120 D2).
+
+        The rule is read from each wave's locating sources, through the input
+        function registered for the identity.  Region coverage cannot catch this:
+        a household losing `v` and Region together leaves its denominator.
+        """
+        spec = importlib.util.spec_from_file_location(
+            "uganda_singletons", countries_root() / "Uganda" / "_" / "uganda.py")
+        ug = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(ug)
+        v = uga_sample.xs(wave, level="t")["v"].astype("string")
+        served = set(v[v.str.startswith("unlocated-").fillna(False)].str.removeprefix("unlocated-"))
+        rule = set(ug.inputs_unlocated_identity(wave).index.get_level_values("i"))
+        # Counts, so a failure prints no household ids.
+        assert (len(served - rule), len(rule - served)) == (0, 0), (
+            f"{wave}: {len(served)} served, {len(rule)} with no location in source")
+
+    def test_every_wave_gets_the_singleton_check(self, uga_sample):
+        assert sorted(uga_sample.index.get_level_values("t").unique()) == UGANDA_WAVES
+
 
 # ---------------------------------------------------------------------------
 # _add_market_index: HH-level fallback for synthetic-v rows
 # ---------------------------------------------------------------------------
+
+def _labelled_households(df, wave):
+    """Distinct households in *wave* whose market label ``m`` is not NA."""
+    sub = df.xs(wave, level="t")
+    labelled = sub.index.get_level_values("m").notna()
+    return sub.index.get_level_values("i")[labelled].nunique()
+
 
 class TestUganda2009MarketFallback:
     """When `cluster_features.Region` has no row for a HH's v (e.g.
@@ -651,7 +753,10 @@ class TestUganda2009MarketFallback:
             )
         if "2009-10" not in fe.index.get_level_values("t").unique():
             pytest.skip("no 2009-10 wave")
-        hh09 = fe.xs("2009-10", level="t").index.get_level_values("i").nunique()
+        # Count households that GOT a market label.  _add_market_index now
+        # keeps an unlabelled household with m NA instead of dropping it, so
+        # a bare nunique would count them too and stop testing the fallback.
+        hh09 = _labelled_households(fe, "2009-10")
         # Sample-level HH count in 2009-10 is 2 975 (full roster).  22 HH have
         # no food-expenditure records and drop out for that reason, not because
         # of a NaN Region.  Another 24 are dropped by the MonthsSpent filter
@@ -667,7 +772,9 @@ class TestUganda2009MarketFallback:
 
     def test_household_characteristics_retains_hybrid_v_HH(self, hc):
         """household_characteristics(market='Region') should cover every
-        HH in sample (2975 for Uganda 2009-10).
+        household in the 2009-10 GSEC1 cover: 2,975.  `sample()` has 2,979 since
+        #1358, but the 4 it added (known only from AGSEC3B/GSEC12) are not in
+        this table.
 
         Pin history:
 
@@ -681,23 +788,45 @@ class TestUganda2009MarketFallback:
           ``roster_to_characteristics``.  Sample carried a valid
           Region for those HHs all along, so they're correctly
           assignable to a market.
+        - 2026-10-30 (GH #1120 D2): the pin stands, the mechanism does not.
+          Those 24 now carry their own ``v == 'unlocated-{hhid}'``, so no Uganda
+          household reaches the ``'Mover'`` sentinel.  ``sample`` itself holds
+          2,979: the 4 it gained are on no cover and have no roster.
 
         Any further drift in either direction is meaningful: investigate
         before re-pinning.
         """
         if "2009-10" not in hc.index.get_level_values("t").unique():
             pytest.skip("no 2009-10 wave")
-        hh09 = hc.xs("2009-10", level="t").index.get_level_values("i").nunique()
+        # Households that GOT a market label (see the fe test above for why).
+        hh09 = _labelled_households(hc, "2009-10")
         assert hh09 == 2975, (
             f"household_characteristics(market='Region') retained {hh09} HH "
-            f"in 2009-10 — expected exactly 2975 (full sample including "
-            f"mover HHs with v='Mover'; GH #268).  Drift in either "
+            f"in 2009-10 — expected exactly 2975 (every roster household, including "
+            f"the 24 with neither comm nor GPS, whose v is 'unlocated-{{hhid}}'; "
+            f"GH #1120 D2).  Drift in either "
             f"direction is meaningful: investigate before re-pinning."
         )
 
-    def test_no_nan_m_after_fallback(self, fe):
-        """After the fallback, no row in food_expenditures(market='Region')
-        for Uganda 2009-10 should have a NaN m."""
-        m_vals = fe.index.get_level_values("m").astype("string")
-        nan_count = m_vals.isna().sum()
-        assert nan_count == 0, f"{nan_count} rows have NaN m after fallback"
+    def test_nan_m_after_fallback_is_the_measured_residual(self, fe):
+        """After the fallback, Uganda 2009-10 households with a NaN m are
+        only the residual neither source can label.
+
+        This used to assert ``nan_count == 0`` across all waves, which was
+        vacuous: ``_add_market_index`` DELETED every unlabelled row, so no
+        NaN m could ever reach the test.  It now keeps them (m NA, with a
+        ``NullIndexKeyWarning``), so the assertion is scoped to the wave the
+        fallback is about, and pinned to the census of 2026-11-03: 4 of
+        2,979 sample households in 2009-10 have no Region in sample() and
+        none in cluster_features for their (t, v).  A broken HH-level
+        fallback would show ~700 (the pre-fallback coverage was ~2,240)."""
+        if "2009-10" not in fe.index.get_level_values("t").unique():
+            pytest.skip("no 2009-10 wave")
+        sub = fe.xs("2009-10", level="t")
+        m_vals = sub.index.get_level_values("m")
+        assert not m_vals.astype("string").isin(["nan", "<NA>", "None"]).any(), (
+            "a missing market label must be NA, not a stringified NA")
+        nan_hh = sub.index.get_level_values("i")[m_vals.isna()].nunique()
+        assert nan_hh <= 4, (
+            f"{nan_hh} Uganda 2009-10 households have NaN m after the "
+            f"HH-level fallback; the measured residual is 4.")

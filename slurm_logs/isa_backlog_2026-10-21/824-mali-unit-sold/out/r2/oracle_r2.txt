@@ -1,0 +1,36 @@
+===== served: new
+2014-15 trees: served 357, joined 358 (a served key may join >1 raw row)
+  2014-15 tree Quantity == oracle: 358 of 358
+  2014-15 tree Quantity_sold == oracle: 358 of 358
+  2014-15 tree Value_sold == oracle: 358 of 358
+  2014-15 tree months_harvested == oracle: 358 of 358
+  2014-15 tree Quantity == raw per-month answer (the e28 wiring), where months > 1: 0
+2017-18 trees: served 270, joined 270 (a served key may join >1 raw row)
+  2017-18 tree Quantity == oracle: 270 of 270
+  2017-18 tree Quantity_sold == oracle: 270 of 270
+  2017-18 tree Value_sold == oracle: 270 of 270
+  2017-18 tree months_harvested == oracle: 270 of 270
+  2017-18 tree Quantity == raw per-month answer (the e28 wiring), where months > 1: 0
+2017-18 field: served 24449, joined 24449
+  2017-18 field Quantity_sold == oracle: 24449 of 24449
+  2017-18 field Value_sold == oracle: 24449 of 24449
+  served Quantity_sold == 0 on 8807 rows; their raw flag: {'Non': 8806, 'Oui': 1}
+  served Value_sold == 0 on 8806 rows; their raw flag: {'Non': 8806}
+===== served: e28
+2014-15 trees: served 357, joined 358 (a served key may join >1 raw row)
+  2014-15 tree Quantity == oracle: 204 of 358
+  2014-15 tree Quantity_sold == oracle: 221 of 358
+  2014-15 tree Value_sold == oracle: 358 of 358
+  2014-15 tree months_harvested == oracle: 358 of 358
+  2014-15 tree Quantity == raw per-month answer (the e28 wiring), where months > 1: 149
+2017-18 trees: served 270, joined 270 (a served key may join >1 raw row)
+  2017-18 tree Quantity == oracle: 153 of 270
+  2017-18 tree Quantity_sold == oracle: 170 of 270
+  2017-18 tree Value_sold == oracle: 270 of 270
+  2017-18 tree months_harvested == oracle: 270 of 270
+  2017-18 tree Quantity == raw per-month answer (the e28 wiring), where months > 1: 116
+2017-18 field: served 24449, joined 24449
+  2017-18 field Quantity_sold == oracle: 22796 of 24449
+  2017-18 field Value_sold == oracle: 22787 of 24449
+  served Quantity_sold == 0 on 10460 rows; their raw flag: {'Non': 8806, 'Oui': 1030, '<NA>': 624}
+  served Value_sold == 0 on 10468 rows; their raw flag: {'Non': 8806, 'Oui': 1038, '<NA>': 624}

@@ -1,0 +1,35 @@
+{
+  "known_residual": "GH1218 four new optional payload fields remain object on two independently observed Make absent-wave frames; Default cases here are warm all-coverage serves.",
+  "original_pre_writer_strict_failures": 40,
+  "distinct_writer_stage_references_do_not_relabel_original_failures": true,
+  "precollection_v1_actors": "Both stopped before collection because the private plugin checked importmode before parsing; no parent/candidate test result claimed. Additive v2 checks actual controller and worker parsed importlib identity.",
+  "capability_v1_stop": "All16 probes and identities completed, then an overstrict no-directory assertion failed because normal package import creates empty dvc-cache. A v2 actor repeated16 probes before later root steering arrived; original failure/replay remain.",
+  "metadata_mode_check_stop": "An incidental assumption that a new source was0644 failed; it was already0600 and no chmod occurred.",
+  "guard_final_counts": {
+    "os.open-wrapper": 12,
+    "open": 4,
+    "held-source-read-denied": 220,
+    "socket.connect": 8,
+    "socket.bind": 54,
+    "socket.getaddrinfo": 4,
+    "held-source-absent-probe-ENOENT": 54,
+    "exact-data-read-authorized": 111,
+    "os.mkdir": 16
+  },
+  "original156_absent_raw_denials_preserved": true,
+  "additional52_phantom_serialized_denials_preserved": true,
+  "additional16_existing_directory_mkdir_denials_preserved": true,
+  "phantom_effect_precision": "The identified source-hash helper catches both OSError subclasses and uses the same missing sentinel without warnings/drops. Per-open historical stacks and individual pre-open lstat receipts were not captured. Fresh endpoint absence and actual runtime/predata hash equality do not establish universal loader equivalence; get_dataframe catches FileNotFoundError only. All outputs/warnings are observed guarded results.",
+  "network_precision": "All IPv4/IPv6 connect/bind and DNS denials, including extra IPv6 loopback binds without original call stacks, remain in the complete private log.",
+  "no_zero_denial_or_whole_task_zero_outside_attempt_claim": true,
+  "no_unguarded_normal_data_control": true,
+  "no_full_corpus_or_science_certification": true,
+  "metadata_lifecycle_scope": "OriginalUID stdlib-B-S source/runtime/metadata/checksum utilities and lifecycle do not install the project/data guard; no package/numerical/data-reader imports, API/build/decode/acquisition. All package/data actors were guarded.",
+  "preserved_lifecycle_stops": "Initial directory-mode preflight1 and sealer-v1actual1 retained, including incorrect sequential launch after failed preflight. No manifest/READY was created by that stop.",
+  "measured_inner_directory_modes": {
+    "dvc-site-cache/repo": "0777",
+    "xdg-cache/fontconfig": "0755",
+    "home/.fontconfig": "0755"
+  },
+  "directory_boundary": "Exact modes and physical receipts preserved beneath owner0700 private ancestors; no chmod or mode normalization."
+}

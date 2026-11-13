@@ -1,0 +1,144 @@
+{
+  "runtime": "7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1",
+  "production_blobs": {
+    "lsms_library/local_tools.py": "64e8da43640fceb38cb3d4d55e4a006f9f7f7a5be4b5a5c79996299db3c80569",
+    "lsms_library/country.py": "aae765551f8a9863b302697e8b70573085f96e067c72c4819ce7968e7247fb0f"
+  },
+  "checker_SHA256": {
+    "exact_strict.py": "aae4d838b46dde6025c96f76b6177be9a9a95a0f96089e0f695943c479a840f9",
+    "exact_deep.py": "6f2da8f0357d576453f062d379541273699e47a3a293fbe82191a8d5c521a4bf",
+    "compare-v2.py": "f5b1d03d68e49a5b9b0a71a152460b9c082dcf1415798d97fa1a0eea81b10ca8",
+    "compare-deep-v4.py": "cecd9fad8696b086ce7325ea461880e6f6d21ae116594afbea0f9430e9b38c30",
+    "singleton-policy-oracle-artifact-only.py": "480f8dee3523b4b1033533d892b4cc5acc042329d8bbe612e7583b2dfe53904f",
+    "compare-warnings.py": "6a22351ffd68769fc8e774b94b8f4913989d38352ca14222dd4d882fa0039014",
+    "finish-artifacts.py": "054462b6563f7d00d416af0e2bbbb6bd057bc5a23861cfcfe7478b41fc5aaa0b",
+    "protect-v3.py": "44ae87462bc5f809a5fbaff888e02f0eb5bf309790fe5ddc31e1ce67456e0b09"
+  },
+  "scanner_occurrence_digests_and_multiplicities": [
+    {
+      "sha256": "2ee73b3936dd397d8e0e7c38389f1729145d057133c78c129a6893cc34895942",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "8bc06aac936d750b59439dc2626176bdc225b8b40a4fb18b0ec9faf554db959e",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "c1439c0ed0eb7ebaa14264d47abf785813d2453cb569d47fa0f92eead4c8a31e",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "1e619c47d2334304b05338b953f3c163a1f98c589ed02f5a0d2b19fb050e89e3",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "72125977806d2eb501eb2210cb2ed637f50beaf7997ae36ca77bd14ea175116b",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "e82c4a6b190c77e2eec9270259b4ed6f68c8ba949249aa917a07cfc7792f6e9e",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "a2596b596d0099492d78aefae088ae5ef8a19ca7fb5a957a95dbb10ec1b8cb69",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "d994939adfc80d309243a7aee8a6d37f152343dffbe5890692f552c424c4297d",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "2dba820415d826482fbb5825ef17e1ff2a2bb4dabb665fc9949ce4d626f251c4",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "c97107bfc145a2fb30695525cf4c4d25e4bbb4bdca1eacc54feea33fe981e32e",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "086e5714c9e2c9c77e547ceea1f9e0316b94fd4b2e85361b3ca9c05eb0af2b10",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "c3ca57e4b06eb1eefb12b4aeef68a470da778c13fcf6a9b6bd205fb58539f57e",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "77e4af3c98e79c970a72432819a9ea36a588d2171de4408d702bfd8a08c34e44",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "1d1b6ed68f2c766573851cbb46f0f6afa499761ec590d88f8bb8b0ccbe64e9ec",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "af4228f88c315f2285692d74eb71b08b5d9dc0fe0b782ec49fe79837b53a05f9",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "b8487d4b92ee8ef69bb1380c254bea46eb3773622023980030b4a092828a3b30",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "a4e2efa6b09c290f422bc8bc1623d5d0f51c5cb24efbfce5b2ac2802b7d47b30",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "8c7a748ae03bd55354583dc25a8cf714abe788d64b187e9aef0fb0de4cf5fb2a",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "069298c3ff0f84b00879d4da16de05d277b185d400e6339893908f238577806c",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "12f7eb7c602629aafea8098cad921842bad51c80c09d317fe099c30932c7a41b",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "02df91ba74bc7ded9d85e3a4c1334a6ea340e9248e8f2b99cdfe163e6c938cc8",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "3f5dbd4bf2188ecd498c4482c07d390398d7c401d664409fff82f5ec913a8ac6",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "0298993478dc764c668da2eb548dec1a2692e084a861d87f3c0a724ec7461e24",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "2c33a9393aab4b4cca563469921df3e5f3d992a4471d6e82dc024de537a54d2f",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "234046609bbeed34ce7ef27f788b538649872e49c29f35c6ddef66f2773f5baf",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "ed2ccceb94ae39f7778a32574e62d775b8fe6e651bf4128e99a44c1831838c4d",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "cb87483db98ff26e4f058b950426ab528576781376d868080d81b4cd6de37f8f",
+      "multiplicity": 1
+    }
+  ],
+  "old_manifests": {
+    "diagnosis281": "368e4997fd99d0982c6db54992fa19e8f6bea82271b28a1e2ec91e2d1afcd24c",
+    "bd80stop795": "06ffefbf446c763b4e61a3497160ac2654758be16f13cc3c338ee0a2c782c83d"
+  },
+  "full_original_and_new_physical_receipts_private": true,
+  "final_source_head_manifest_and_zero_consumers": "Pinned by final READY and post-exit receipt",
+  "limits": [
+    "Uganda singleton full frames differ in columns/unused levels and footer-correct v policy; not normalized.",
+    "JSON attrs and pre-Arrow unused-source-level preparation are separate serialization stages.",
+    "Old comparator results are not retroactively exact; new deep reassessment is artifact-only.",
+    "Initial missing-v4 stream basenames reused; unique failure survives, original stream bytes not receipted.",
+    "New bd80 control lacks a full initial mtime snapshot; two pretest production receipts and clean Git verified.",
+    "Six denied relative cleanup attempts lack per-child PID/dir_fd/stacks; no zero-denial claim.",
+    "Scanner retains one existing FAIL and warning category/stack collection limits.",
+    "Nine pre-existing tracked CSV codebooks are unchanged; no new in-tree data artifact.",
+    "Initial guarded tracked-report directory copy denied; originalsafe-export snapshot and unique failure retained; separate scoped documentation copy used, guard unchanged."
+  ]
+}

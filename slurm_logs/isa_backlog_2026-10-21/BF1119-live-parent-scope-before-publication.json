@@ -1,0 +1,19 @@
+{
+  "recorded_at_UTC": "2026-10-22 04:27:19 UTC",
+  "parent_PR": {
+    "number": 1189,
+    "state": "open",
+    "merged": false,
+    "head": "fix/1123-burkina-input-identity-20261021",
+    "head_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1"
+  },
+  "issue": {
+    "number": 1119,
+    "state": "open",
+    "title": "#569 residual A: the \"not crop-specific\" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production"
+  },
+  "candidate": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "partial_scope": true,
+  "issue_to_remain_open": true,
+  "signed": "Sue"
+}

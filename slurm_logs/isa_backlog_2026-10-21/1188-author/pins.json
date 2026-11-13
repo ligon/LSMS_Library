@@ -1,0 +1,21 @@
+{
+  "parent": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "tested_runtime": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+  "final_clean_source": "657fed11a63354886772d0f978cec8adb2ad647e",
+  "branch": "fix/1188-burkina-input-purchase-routing-20261022",
+  "later_delta_from_tested_runtime": "CONTENTS.org and per-task ledger only",
+  "guard_authorized_source_sha256": "6d1557b0690d1b51738bd636d8e98a3d69538ee5ffc1b23997672751a9bee352",
+  "guard_adapted_sha256": "19064b23c0917538aa0888d249c7ebd9a2bdb3bae4b465c8b907b15162462949",
+  "source_census_sha256": "2e669ff1c984aed169f2d19a150a32d8687aed15098cbd591ae23edf2895926d",
+  "provider_metadata_sha256": "e3da78206d0352bf36c883cc9fd77e5b9fd633e2dc0cc7a47d303ca418362aa1",
+  "initial_proof_sha256": "7bb32c05c9bd94c8934586a6a548dfd3c31da6c7e1385070faca1f6b130b9a8c",
+  "native_storage_proof_sha256": "02c9346535b5bfa65902a56efaf409fb4bd1c33a3a292c9308ca4f79ba6d8a01",
+  "postedit_full_inventory_sha256": "c5a4df6c00902849385248f9d27d6456cbf5cb56edc2cdf86bc0b6756b975cb7",
+  "raw_source_providers": 6,
+  "normal_roots": 4,
+  "normal_staged_source_copies": 24,
+  "quarantined_extra_source_copy": 1,
+  "actual_private_binary_source_copies": 25,
+  "actual_private_binary_source_copy_bytes": 26332243,
+  "signed": "Sue"
+}

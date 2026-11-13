@@ -7,6 +7,30 @@
 |--------------------------------+--------------------------------|
 | Segou                          | Ségou                          |
 | Tomboctou                      | Tombouctou                     |
+| Taoudenit                      | Taoudénit                      |
+
+GH #812, 2026-11-04.  EHCVM =sample.strata= is region x milieu, as a label
+(=lsms_library/ehcvm.py=, =derive_region_milieu_stratum=).  This table is the
+=Region= table above crossed with the cover's two =s00q04= labels, row for row, so
+the region part of =strata= is =cluster_features.Region=.  No new judgement;
+=tests/test_gh812_ehcvm_strata.py= pins the identity.  Labels of any other wave's
+scheme match no key and pass through unchanged.
+
+GH #1576, 2026-11-08: the 2018-19 cover writes =Taoudénit= and
+=ehcvm_conso_mli2018.dta= writes =Taoudenit=.  The Region row above now prefers
+the accented spelling, like =Ségou=.  The former reverse-direction exceptional
+strata pair is replaced by the ordinary Region-table cross below; already
+accented cover labels pass through unchanged.
+
+#+name: strata
+| Original Label   | Preferred Label   |
+|------------------+-------------------|
+| Segou Urbain     | Ségou Urbain      |
+| Segou Rural      | Ségou Rural       |
+| Tomboctou Urbain | Tombouctou Urbain |
+| Tomboctou Rural  | Tombouctou Rural  |
+| Taoudenit Urbain | Taoudénit Urbain  |
+| Taoudenit Rural  | Taoudénit Rural   |
 
 * Food and Unit Labels (canonical shared label tables — Unit #0 foundation)
 
@@ -35,6 +59,17 @@
 # cannot collide: the two spellings are disjoint in `t`.
 # (x = present, --- = absent).  food_acquired waves: 2014-15 (EACI s13),
 # 2018-19 and 2021-22 (EHCVM s07b).  2017-18 has no food_acquired module.
+#
+# The last block is crop_production's EHCVM units (s16cq12b / s16cq16b /
+# s16dq05b, GH #824); there, x says the label occurs in a crop module, not in
+# food_acquired.  2018-19's sold variable spells the same codes differently from
+# its harvest variable (`Sacs de 100 kg` / `Sac-100 Kg`), which is why each has
+# two rows.  A sack keeps the weight its label states, because the kg ladder reads
+# `Sac (100 Kg)` and has nothing to read in `Sac large`; the form is the one
+# `Sac (25 Kg)` above and Burkina Faso's table already use.  None of these keys
+# occurs as a raw label in s07b, s05 or any EAC-I unit variable, so no served food
+# label moves.  These units take no #1224 size suffix: s16c and s16d have no size
+# variable, and their "Etat du produit" variables are a condition, not a size.
 
 #+name: u
 | Code                         | Preferred Label | 2014-15 | 2018-19 | 2021-22 |
@@ -103,6 +138,7 @@
 | Calebasse                    | Calebasse       | x       | ---     | ---     |
 | Casier                       | Casier          | x       | ---     | ---     |
 | Chargement camion            | Chargement camion | x       | ---     | ---     |
+| Chargement de camion         | Chargement camion | x       | ---     | ---     |
 | Tonne                        | Tonne           | x       | ---     | ---     |
 |------------------------------+-----------------+---------+---------+---------|
 | # plot_inputs units (EACI 2014-15 s1c/s1e/s2c & 2017-18 s11c/s7d) — fertilizer/seed/pesticide units not already present above |                 |         |         |         |
@@ -116,6 +152,21 @@
 | Sac moyen (50 kg)            | Sac moyen       | x       | ---     | ---     |
 | Sac large (100 kg)           | Sac large       | x       | ---     | ---     |
 | Sac petit (25 kg)            | Sac petit       | x       | ---     | ---     |
+|------------------------------+-----------------+---------+---------+---------|
+| Sacs de 100 kg               | Sac (100 Kg)    | ---     | x       | x       |
+| Sac-100 Kg                   | Sac (100 Kg)    | ---     | x       | ---     |
+| Sacs de 50 kg                | Sac (50 Kg)     | ---     | x       | x       |
+| Sac-50kG                     | Sac (50 Kg)     | ---     | x       | ---     |
+| Sacs de 25 kg                | Sac (25 Kg)     | ---     | x       | x       |
+| Sac-25kg                     | Sac (25 Kg)     | ---     | x       | ---     |
+| Charretée asine              | Cart (donkey)   | ---     | x       | x       |
+| Charettée asine              | Cart (donkey)   | ---     | x       | ---     |
+| Charretée bovine             | Cart (ox)       | ---     | x       | x       |
+| Charettée bovine             | Cart (ox)       | ---     | x       | ---     |
+| Baignoire                    | Baignoire       | ---     | x       | x       |
+| Gerbes                       | Gerbe           | ---     | x       | x       |
+| Botte                        | Botte           | ---     | x       | x       |
+| Autres (à préciser)          | Autre           | ---     | x       | x       |
 
 #+name: harmonize_food
 | Code                                                                                                 | Preferred Label                              | 2014-15 | 2018-19 | 2021-22 |
@@ -440,6 +491,16 @@
 | Palmier à huile                                                                                      | Palmier à huile                              | x       | ---     | ---     |
 | Pomme canelle                                                                                        | Pomme cannelle                               | x       | ---     | ---     |
 | Autres                                                                                               | Autres cultures                              | x       | ---     | ---     |
+| Riz Paddy                                                                                            | Riz                                          | ---     | x       | x       |
+| Autre (à préciser)                                                                                   | Autres cultures                              | ---     | x       | x       |
+| Chou                                                                                                 | Chou                                         | ---     | x       | x       |
+| Oseille                                                                                              | Oseille                                      | ---     | x       | x       |
+| Calebassier                                                                                          | Calebasse                                    | ---     | x       | x       |
+| Souchet                                                                                              | Souchet                                      | ---     | x       | ---     |
+| Persil                                                                                               | Persil                                       | ---     | x       | ---     |
+| Céleri                                                                                               | Céleri                                       | ---     | x       | x       |
+| Radis                                                                                                | Radis                                        | ---     | x       | ---     |
+| Pomme à pin                                                                                          | Pomme à pin                                  | ---     | ---     | x       |
 |------------------------------------------------------------------------------------------------------+----------------------------------------------+---------+---------+---------+---------|
 | # community_prices items (EACI 2014-15 s04q01) — price-questionnaire item labels not already covered by the food_acquired/crop_production codes above; each REUSES the consumed-food Preferred Label so community_prices.j joins food_acquired.j / crop_production.j |                                              |         |         |         |
 | Cube alimentaire (Maggi)                                                                             | Cube alimentaire                             | x       | ---     | ---     |
@@ -562,20 +623,22 @@
 # column), and this table maps it to the canonical Preferred Label.  The
 # Code IS the cross-wave join key; both EACI waves emit every slot.
 #+name: harmonize_input
-| Code                | Preferred Label     | 2014-15 | 2017-18 |
-|---------------------+---------------------+---------+---------|
-| seed                | Seed                | x       | x       |
-| urea                | Urea                | x       | x       |
-| dap                 | DAP                 | x       | x       |
-| npk                 | NPK                 | x       | x       |
-| other_inorganic     | Other inorganic     | x       | x       |
-| manure              | Manure              | x       | x       |
-| compost             | Compost             | x       | x       |
-| other_organic       | Other organic       | x       | x       |
-| pesticide           | Pesticide           | x       | x       |
-| fungicide           | Fungicide           | x       | x       |
-| herbicide           | Herbicide           | x       | x       |
-| other_phytosanitary | Other phytosanitary | x       | x       |
+| Code                 | Preferred Label         | 2014-15 | 2017-18 |
+|----------------------+-------------------------+---------+---------|
+| seed                 | Seed                    | x       | x       |
+| urea                 | Urea                    | x       | x       |
+| dap                  | DAP                     | x       | x       |
+| npk                  | NPK                     | x       | x       |
+| other_inorganic      | Other inorganic         | x       | x       |
+| manure               | Manure                  | x       | x       |
+| compost              | Compost                 | x       | x       |
+| other_organic        | Other organic           | x       | x       |
+| pesticide            | Pesticide               | x       | x       |
+| fungicide            | Fungicide               | x       | x       |
+| herbicide            | Herbicide               | x       | x       |
+| other_phytosanitary  | Other phytosanitary     | x       | x       |
+| inorganic_fertilizer | Inorganic Fertilizer?   | x       | x       |
+| phytosanitary        | Phytosanitary products? | x       | x       |
 
 # harmonize_species — the animal-identity (`animal` index level) taxonomy
 # for livestock (GAP 4, parity loop).  Source: the EACI livestock roster
@@ -629,9 +692,9 @@
 #+name: harmonize_labor_source
 | Code   | Preferred Label | 2014-15 | 2017-18 |
 |--------+-----------------+---------+---------|
-| family | Family          | x       | x       |
-| hired  | Hired           | x       | x       |
-| other  | Other           | x       | x       |
+| family | family          | x       | x       |
+| hired  | hired           | x       | x       |
+| other  | other           | x       | x       |
 
 # harmonize_industry — the wage-work industry (`Industry` column) taxonomy
 # for people_last7days (GAP 3b, parity loop).  The WB MLI_EACI*.do code
@@ -763,3 +826,29 @@
 | Téléphone portable                             | Phone (Mobile)  |
 | Ventilateur sur pied                           | Fan             |
 | Voiture personnelle                            | Car             |
+
+# harmonize_crop_condition_ehcvm1 (GH #1436): "Etat du produit" of the harvest, the
+# physical state of the crop when the reported quantity was measured -- the canonical
+# `condition` index level of crop_production (lsms_library/data_info.yml, Columns >
+# crop_production > condition).  2018-19 s16cq12c and 2021-22 s16cq16d carry the same
+# five codes under the same labels, so one table serves both.  Read by code; Source
+# Label is the .dta value label, provenance only.  Niger/_/categorical_mapping.org
+# carries the reasoning for the same five codes.
+#
+# The instrument asks the form and never the dryness, so these are the bare form
+# tokens.  RULED, @ligon 2026-11-04 (GH #1436): the five answers fold onto three
+# tokens, ear and hull into `unshelled`, grain and hulled into `shelled`.  The answer
+# itself is served in the column `condition_native`.  Code 5 is a survey answer, not
+# the missing-data sentinel: a blank code is `unknown_condition`.
+#
+# NEVER FOR 2017-18.  s7fq13b is a different list, 1 Epis/Panicules, 2 Décortiqué,
+# 3 Non-Décortiqué, 4 Egrener, and its codes 3 and 4 invert this table: read through
+# it, 7,249 rows would flip between `shelled` and `unshelled`, with no error raised.
+#+NAME: harmonize_crop_condition_ehcvm1
+| Code | Preferred Label      | Source Label   |
+|------+----------------------+----------------|
+|    1 | unshelled            | Epis           |
+|    2 | shelled              | Grain          |
+|    3 | shelled              | Décortiqué     |
+|    4 | unshelled            | Non-décortiqué |
+|    5 | shell_not_applicable | Non concerné   |

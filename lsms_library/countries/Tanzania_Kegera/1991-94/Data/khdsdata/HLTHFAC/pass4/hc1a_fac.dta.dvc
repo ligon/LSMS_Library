@@ -1,0 +1,5 @@
+outs:
+- md5: 66af17c6f79e5435a29385a4b4acbb77
+  size: 8000
+  hash: md5
+  path: hc1a_fac.dta

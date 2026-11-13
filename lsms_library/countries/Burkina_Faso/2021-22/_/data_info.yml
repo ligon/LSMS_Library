@@ -6,7 +6,13 @@ sample:
         - df_cover
         - df_weights
     df_cover:
-        file: s00_me_bfa2021.dta
+        file:
+            - s00_me_bfa2021.dta
+            - Cross_Section/s00_me_bfa2021.dta:
+                i:
+                    - grappe
+                    - menage
+                    - mapping: cs_i
         idxvars:
             v: grappe
             i:
@@ -22,8 +28,34 @@ sample:
                     Urbain: Urban
                     urbain: Urban
                     URBAIN: Urban
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
     df_weights:
-        file: ehcvm_panel_ponderations_bfa2021.dta
+        # Each component's OWN weight in `weight` (@ligon, GH #1276 ruling 3;
+        # the Malawi precedent): the panel's cross-sectional `hhweight2021`,
+        # the cross-section's `hhweight`.  `panel_weight` is the panel's
+        # `hhweight_panel` and is NaN for every cross-section household: the
+        # cross-section's file has no such column, and missing_ok fills it.
+        # Both weight files are one row per grappe, and the components'
+        # grappes are disjoint, so the merge on `v` stays many-to-one.
+        #
+        # EACH COMPONENT IS WEIGHTED TO THE NATIONAL TOTAL ON ITS OWN (raw
+        # sums over households, measured 2026-10-23: hhweight2021 3,084,993
+        # on 3,227 panel households; hhweight 3,233,016 on 7,176
+        # cross-section households).  So a pooled 2021-22 weighted mean
+        # BLENDS TWO FRAMES, each counted as if it were the whole country --
+        # 48.8% / 51.2% in weight, however unequal their household counts (a
+        # panel household weighs about 2.1 cross-section ones).  Analyse one
+        # component (`v` <= 585 is the panel, >= 586 the cross-section) or
+        # rescale before pooling.  `_normalise_sample_weights` divides each
+        # wave's weights by their mean, which rescales both components by the
+        # same constant and does not change this.
+        file:
+            - ehcvm_panel_ponderations_bfa2021.dta
+            - Cross_Section/ehcvm_ponderations_bfa2021.dta:
+                weight: hhweight
         idxvars:
             v: grappe
         myvars:
@@ -40,7 +72,13 @@ household_roster:
         - df_main
         - df_cover
     df_main:
-        file: s01_me_bfa2021.dta
+        file:
+            - s01_me_bfa2021.dta
+            - Cross_Section/s01_me_bfa2021.dta:
+                i:
+                    - grappe
+                    - menage
+                    - mapping: cs_i
         idxvars:
             v: grappe
             i:
@@ -61,7 +99,13 @@ household_roster:
                     Oui: 12
                     Non: 0
     df_cover:
-        file: s00_me_bfa2021.dta
+        file:
+            - s00_me_bfa2021.dta
+            - Cross_Section/s00_me_bfa2021.dta:
+                i:
+                    - grappe
+                    - menage
+                    - mapping: cs_i
         idxvars:
             v: grappe
             i:
@@ -96,22 +140,71 @@ individual_education:
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 cluster_features:
-    file: s00_me_bfa2021.dta
-    idxvars:
-        i: menage
-        v: grappe
-    myvars:
-        Region: s00q01
-        District: s00q02
-        Rural:
-            - s00q04
-            - mapping:
-                Rural: Rural
-                rural: Rural
-                RURAL: Rural
-                Urbain: Urban
-                urbain: Urban
-                URBAIN: Urban
+    # BOTH COMPONENTS (GH #1276).  The panel cover (WB 6224, grappes 2-585) and
+    # the cross-section cover (WB 6277, Data/Cross_Section/, grappes 586-1185)
+    # carry the same s00q01 / s00q02 / s00q04.  Before this, only the panel
+    # cover was read, so the 600 cross-section grappes `sample()` serves had no
+    # cluster row and every `market=` lookup silently dropped their 7,176
+    # households (household_roster(market='Region') served 22,362 of 69,452
+    # 2021-22 rows).  The two grappe ranges are disjoint, and Region / District
+    # / Rural are constant within every grappe of both files (measured
+    # 2026-11-03), so the household -> (t, v) projection stays lossless.  `i` is
+    # projected away there, so no per-file `cs_i` override is needed.
+    #
+    # NOT MAPPED: the cross-section cover's GPS__Latitude / GPS__Longitude
+    # (« Coordonnées GPS du ménage »), populated for 7,128 of 7,176 households
+    # but HOUSEHOLD positions -- they differ within 578 of the 600 grappes -- so
+    # they are not a cluster attribute (the panel cover's are 0 of 3,227
+    # populated).  See _/CONTENTS.org and GH #1057.
+    #
+    # GPS (GH #1057): this wave ships no cluster fix, so a panel grappe carries
+    # its 2018-19 fix, a registered derivation stamped by mapping.py's
+    # `cluster_features` hook.  df_geo is a DECLARED source in the 2018-19
+    # Data/ directory, so this wave's content hash covers its sidecar.
+    # `merge_how: left` bears served values.  The file has 585 grappes and the
+    # panel 550.  Under `outer`, 28 of the other 35 would be served as 2021-22
+    # clusters with a fix and no Region (1,178 rows, not 1,150); the other 7 reach
+    # the wave frame but are not served.  A cross-section grappe (586-1185) matches
+    # nothing in the file, whose grappes stop at 585, and stays NA.  `final_index`
+    # bears routing only: keeping `i` means this wave still reaches
+    # Wave.cluster_features' household -> (t, v) projection (GH #323 Site 2), as it
+    # did before the merge.
+    dfs:
+        - df_main
+        - df_geo
+    merge_how: left
+    df_main:
+        file:
+            - s00_me_bfa2021.dta
+            - Cross_Section/s00_me_bfa2021.dta
+        idxvars:
+            i: menage
+            v: grappe
+        myvars:
+            Region: s00q01
+            District: s00q02
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbain: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_geo:
+        file: ../../2018-19/Data/grappe_gps_bfa2018.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Latitude: coordonnes_gps__Latitude
+            Longitude: coordonnes_gps__Longitude
+    merge_on:
+        - v
+    final_index:
+        - t
+        - i
+        - v
 
 shocks:
     file: s14b_me_bfa2021.dta
@@ -142,8 +235,16 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
+        # s14bq04d is "Effectif du cheptel"; the food stock is s14bq04e (GH #1556).
+        AffectedFoodStock:
+            - s14bq04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
         AffectedConsumption:
-            - s14bq04d
+            - s14bq04f
             - mapping:
                 Diminué: True
                 Augmenté: True
@@ -191,6 +292,10 @@ assets:
 
 food_acquired:
     file: s07b_me_bfa2021.dta
+    # GH #1452.  Read by mapping.py's food_acquired hook, not by the grabber; declared
+    # so the table's DVC sidecar is in this table's input hash.
+    unit_weights:
+        file: ehcvm_nsu_bfa2021.dta
     idxvars:
         v: grappe
         visit: vague
@@ -263,7 +368,17 @@ housing:
                 Autre: Other
 
 interview_date:
-    file: s00_me_bfa2021.dta
+    # BOTH COMPONENTS (GH #1276): the panel cover and the cross-section cover
+    # (Data/Cross_Section/, WB 6277) ask the same s00q23-25 visit timestamps.
+    # The cross-section households get their `CS_` id through the same
+    # per-file override as `sample` and `household_roster`.
+    file:
+        - s00_me_bfa2021.dta
+        - Cross_Section/s00_me_bfa2021.dta:
+            i:
+                - grappe
+                - menage
+                - mapping: cs_i
     idxvars:
         i:
             - grappe

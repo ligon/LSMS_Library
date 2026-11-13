@@ -1,0 +1,296 @@
+{
+  "warning": "Original evidence roots are frozen and exclusive-create; do not replay them. Reproduce only under a NEW private prefix by rebinding guarded scripts, authenticating held providers and staging fresh L1-only roots.",
+  "wrapper": "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+  "steps": [
+    {
+      "case": "base-all-bad",
+      "script": "probe.py",
+      "args": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 44.93476700782776
+    },
+    {
+      "case": "base-one",
+      "script": "probe.py",
+      "args": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 23.225616216659546
+    },
+    {
+      "case": "base-one",
+      "script": "probe.py",
+      "args": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 9.13534927368164
+    },
+    {
+      "case": "base-one",
+      "script": "feature-probe.py",
+      "args": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "feature-probe.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 29.167542695999146
+    },
+    {
+      "case": "base-all-bad",
+      "script": "scanner-run.py",
+      "args": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "scanner-run.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 265.751590013504
+    },
+    {
+      "case": "base-all-mixed",
+      "script": "probe.py",
+      "args": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 182.32665061950684
+    },
+    {
+      "case": "base-all-mixed",
+      "script": "probe.py",
+      "args": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 9.316726446151733
+    },
+    {
+      "case": "base-all-bad",
+      "script": "invalid.py",
+      "args": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "invalid.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 21.619159936904907
+    },
+    {
+      "case": "base-all-mixed",
+      "script": "invalid.py",
+      "args": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "invalid.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 21.62027931213379
+    },
+    {
+      "case": "candidate-all-bad",
+      "script": "probe.py",
+      "args": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 45.61527872085571
+    },
+    {
+      "case": "candidate-one",
+      "script": "probe.py",
+      "args": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 23.343280792236328
+    },
+    {
+      "case": "candidate-one",
+      "script": "probe.py",
+      "args": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 9.254171133041382
+    },
+    {
+      "case": "candidate-one",
+      "script": "feature-probe.py",
+      "args": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "feature-probe.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 29.731712579727173
+    },
+    {
+      "case": "candidate-all-bad",
+      "script": "scanner-run.py",
+      "args": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "scanner-run.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 272.3124933242798
+    },
+    {
+      "case": "candidate-all-mixed",
+      "script": "probe.py",
+      "args": [
+        "cold"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "probe.py",
+        "cold"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 178.94820952415466
+    },
+    {
+      "case": "candidate-all-mixed",
+      "script": "probe.py",
+      "args": [
+        "warm"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "probe.py",
+        "warm"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 9.449345827102661
+    },
+    {
+      "case": "candidate-all-bad",
+      "script": "invalid.py",
+      "args": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "invalid.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 20.619618892669678
+    },
+    {
+      "case": "candidate-all-mixed",
+      "script": "invalid.py",
+      "args": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh",
+        "invalid.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 20.51072382926941
+    }
+  ],
+  "initial_cold_cases": [
+    "base-all-bad",
+    "candidate-all-bad"
+  ],
+  "initial_cold_script_arguments": [
+    "probe.py",
+    "cold"
+  ],
+  "all_actor_environment": "TASK_CHECKOUT selects the exact side checkout; TASK_LABEL=<case> TASK_DATA=<case>/data. run.sh supplies the clean isolated environment.",
+  "regression_command": "TASK_LABEL=pytest-candidate-v1 TASK_DATA=pytest-candidate-v1-data bash /local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh test-runner.py -q -n 1 --dist=loadfile -p no:cacheprovider --no-purge --basetemp=/local/job40255479/control/isa-backlog-20261021/framework1210-fix/pytest-candidate-v1 --junitxml=/local/job40255479/control/isa-backlog-20261021/framework1210-fix/pytest-candidate-v1.xml tests/test_gh1210_invalid_food_waves.py",
+  "corrected_parent_command": "TASK_CHECKOUT=/local/job40255479/worktrees/isa-invalid-wave-1210-base TASK_LABEL=pytest-base-v2 TASK_DATA=pytest-base-v2-data bash /local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh test-runner.py -q -n 1 --dist=loadfile --rootdir=/local/job40255479/worktrees/isa-invalid-wave-1210-base --import-mode=importlib -p runtime_identity_plugin -p no:cacheprovider --no-purge --basetemp=/local/job40255479/control/isa-backlog-20261021/framework1210-fix/pytest-base-v2 --junitxml=/local/job40255479/control/isa-backlog-20261021/framework1210-fix/pytest-base-v2.xml /local/job40255479/worktrees/isa-invalid-wave-1210/tests/test_gh1210_invalid_food_waves.py",
+  "parent_plugin_provenance": "runtime_identity_plugin-v2.py is the preserved byte archive used for this run; its archive metadata is new. It asserted every process before collection but emitted no dynamic worker files.",
+  "existing_tests": "21 bounded nodes: GH891 five structural classes (excluding S3 EndToEnd), GH479 selective hashless eviction, GH1039 no-rule cold/no-Makefile cold/full-default no-builder-probe. New plugin emits every controller/worker boot and session receipts.",
+  "scanner": "Unmodified bench/feature_audit/scan.py --features food_acquired food_expenditures food_prices food_quantities --countries Malawi --phases 1,2 --jobs 1 --out <private-jsonl>",
+  "artifact_commands": [
+    "bash /local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh compare.py",
+    "bash /local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh artifacts.py"
+  ],
+  "metadata_scope": "base/candidate inventory-v2.py <absolute-private-json>; complete keys549/39/1362; first set-list-order stop retained in hash-scope-v1-stop-private.json",
+  "existing_tests_reproduce_same_21_nodes": {
+    "cwd": "/local/job40255479/worktrees/isa-invalid-wave-1210",
+    "worker_limit": 1,
+    "nodes": [
+      "tests/test_gh891_wave_subset_cache.py::TestHashIsWaveSetIndependent",
+      "tests/test_gh891_wave_subset_cache.py::TestUnionWaves",
+      "tests/test_gh891_wave_subset_cache.py::TestRestrictToWaves",
+      "tests/test_gh891_wave_subset_cache.py::TestCoverageManifest",
+      "tests/test_gh891_wave_subset_cache.py::TestMigrationOfUnstampedParquets",
+      "tests/test_cache_hash_invalidation.py::test_evict_hashless_wave_caches_targets_only_hashless",
+      "tests/test_gh1039_make_backend_no_country_rule.py::test_no_country_rule_builds_from_waves_cold",
+      "tests/test_gh1039_make_backend_no_country_rule.py::test_no_makefile_builds_from_waves_cold",
+      "tests/test_gh1039_make_backend_no_country_rule.py::test_full_default_backend_build_does_not_probe_country_builder"
+    ],
+    "command": "TASK_LABEL=pytest-existing-v1 TASK_DATA=pytest-existing-v1-data bash /local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh test-runner.py -q -n 1 --dist=loadfile -p runtime_identity_plugin -p no:cacheprovider --no-purge --basetemp=/local/job40255479/control/isa-backlog-20261021/framework1210-fix/pytest-existing-v1 --junitxml=/local/job40255479/control/isa-backlog-20261021/framework1210-fix/pytest-existing-v1.xml tests/test_gh891_wave_subset_cache.py::TestHashIsWaveSetIndependent tests/test_gh891_wave_subset_cache.py::TestUnionWaves tests/test_gh891_wave_subset_cache.py::TestRestrictToWaves tests/test_gh891_wave_subset_cache.py::TestCoverageManifest tests/test_gh891_wave_subset_cache.py::TestMigrationOfUnstampedParquets tests/test_cache_hash_invalidation.py::test_evict_hashless_wave_caches_targets_only_hashless tests/test_gh1039_make_backend_no_country_rule.py::test_no_country_rule_builds_from_waves_cold tests/test_gh1039_make_backend_no_country_rule.py::test_no_makefile_builds_from_waves_cold tests/test_gh1039_make_backend_no_country_rule.py::test_full_default_backend_build_does_not_probe_country_builder",
+    "qualification": "Runnable equivalent of the JUnit-bound 21-node selection. Original full launch command is in the tool transcript; per-worker identity receipts remain private. Do not reuse the frozen destinations."
+  },
+  "finish_commands": {
+    "protection_actual": "TASK_LABEL=protect TASK_DATA=protect-data bash /local/job40255479/control/isa-backlog-20261021/framework1210-fix/run.sh protect.py > /local/job40255479/control/isa-backlog-20261021/framework1210-fix/protection-v1-private.log 2>&1",
+    "seal_planned": "GIT_OPTIONAL_LOCKS=0 python3 -I -B /local/job40255479/control/isa-backlog-20261021/framework1210-fix/seal.py > /local/job40255479/control/isa-backlog-20261021/framework1210-fix/seal-v1-private.log 2>&1",
+    "postexit_planned_read_only": "GIT_OPTIONAL_LOCKS=0 python3 -I -B /local/job40255479/control/isa-backlog-20261021/framework1210-fix/postexit.py --sealer-observed-terminal-zero",
+    "qualification": "Sealer/postexit outcomes are supplied by READY and the separate observed terminal-zero verifier transcript; no replay into this prefix.",
+    "metadata_qualification_actual": "GIT_OPTIONAL_LOCKS=0 python3 -I -B /local/job40255479/control/isa-backlog-20261021/framework1210-fix/qualify-protection-v2.py > /local/job40255479/control/isa-backlog-20261021/framework1210-fix/protection-qualification-v2-private.log 2>&1",
+    "prepared_full_protect_v2": "NOT EXECUTED; root requested no gratuitous full protection replay."
+  }
+}

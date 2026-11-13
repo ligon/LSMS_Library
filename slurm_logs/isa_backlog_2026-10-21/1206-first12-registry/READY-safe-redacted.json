@@ -1,0 +1,37 @@
+{
+  "scope": "coverage12",
+  "status": "READY_BOUNDED_ASSERTION_AUTHORITY_REGISTRY_WITH_EXPLICIT_HOLDS",
+  "canonical_safe": "FINAL-SAFE-v3.json",
+  "pins": {
+    "coverage12-full-manifest-private.json": "a58e9587be0a5673e21e9600c6e9b5b39d75dc69148e4d3146a7db2eb772d075",
+    "coverage12-postexit-private.json": "d45632819dc5c3f34f87a3b016cfb9648efaebd23cf432a23f22f16aad65c65a",
+    "coverage12-safe-allowlist.json": "b00f8698f001bef4fbd49d75bb0e5108f3a7057a9c3737794bb7484f2e190baa",
+    "coverage12-packager-private.log": "055c4cb82eefccb0f4332e01920c2950d1706f5e447a996da48f7fdc8134f85f",
+    "coverage12-packager-private.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "coverage12-postexit-private.log": "959e010f40b330558edce5def564ba19db0f8ad4c2749d4859ecb4d37f185e01",
+    "coverage12-postexit-private.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "final_safe_sha256": "319ca8cf9f4e6c955b0cbc6ccf3a3b19b12c666a821e73e627b80d6f64e5a13e",
+  "checker_sources": {
+    "package-coverage12.py": "5b41f17877fd7a9fec8b8c69ef20e0d945d64545f8154e4413e09ac7ea576a48",
+    "postexit-coverage12.py": "5081b42fb2bf56b9ad8c5ba6636cc36b617787081007b9b26468bf9f2d8b4677"
+  },
+  "packager_terminal_exit": 0,
+  "postexit_terminal_exit": 0,
+  "remaining_consumers": 0,
+  "source_receipts_exact": 14880,
+  "source_census_exact": 177,
+  "prior_frozen_packet_count": 6,
+  "prior_frozen_packet_files_verified": 464,
+  "authority_holds": [
+    1172,
+    1173,
+    1186
+  ],
+  "original_memory_and_other_authority_gaps_retained": true,
+  "qualified_findings_not_full_frame_equality": true,
+  "overall_campaign_complete_or_paused": false,
+  "next_owner": "root",
+  "signed": "Sue",
+  "original_private_READY_sha256": "3b3f55718abb05e814c7eb2f9e7200d89c7ecdd6fd999b394b40c6ea4d9f4943"
+}

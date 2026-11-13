@@ -1,0 +1,17 @@
+{
+  "recorded_at_UTC": "2026-10-22T05:11:49.218211+00:00",
+  "status": "AUTHOR_FREEZE_AND_SOURCE_PREPARATION_VERIFIED_NOT_INDEPENDENT_ACCEPTANCE",
+  "candidate": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "parent": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "runtime": "7a8fd22492255cc2c4d020b7a16f99249f588977",
+  "tested_tests": "66bfa1eb16442ceb6d455dfaa5726f181d713abd",
+  "READY_sha256": "262edfc60eec4cffdb6c6e9279c61459c349b5f2d908a7bb7c58a9ade39ea69e",
+  "manifest_entries": 1858,
+  "manifest_sha256": "eb0e0d07305d820b05f6d34a4ef313f4ef5c18130150a95d8d66bd54655beb84",
+  "safe_exports": 19,
+  "all_manifest_receipts_and_allowlisted_exports_verified": true,
+  "final_tests_and_non_CONTENTS_library_equal_tested_source": true,
+  "independent_review_assigned": false,
+  "independent_review_verdict": null,
+  "signed": "Sue"
+}

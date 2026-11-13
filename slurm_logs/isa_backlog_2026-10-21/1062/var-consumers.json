@@ -1,0 +1,32 @@
+[
+  {
+    "country": "Afghanistan",
+    "path": "Afghanistan/_/Makefile",
+    "line": 14,
+    "rule": "$(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_prices.parquet &: $(VAR_DIR)/food_acquired.parquet food_acquired.py"
+  },
+  {
+    "country": "CotedIvoire",
+    "path": "CotedIvoire/_/Makefile",
+    "line": 17,
+    "rule": "$(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_prices.parquet &: $(VAR_DIR)/food_acquired.parquet food_acquired.py"
+  },
+  {
+    "country": "Ethiopia",
+    "path": "Ethiopia/_/Makefile",
+    "line": 187,
+    "rule": "$(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py categorical_mapping.org $(VAR_DIR)/food_acquired.parquet"
+  },
+  {
+    "country": "Guatemala",
+    "path": "Guatemala/_/Makefile",
+    "line": 31,
+    "rule": "$(VAR_DIR)/nutrition.parquet : nutrition.py $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/fct.parquet"
+  },
+  {
+    "country": "Togo",
+    "path": "Togo/_/Makefile",
+    "line": 14,
+    "rule": "$(VAR_DIR)/food_quantities.parquet $(VAR_DIR)/food_expenditures.parquet $(VAR_DIR)/food_prices.parquet &: $(VAR_DIR)/food_acquired.parquet food_acquired.py"
+  }
+]

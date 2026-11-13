@@ -499,8 +499,10 @@ class TestCountryCatalogRegistry:
 
 # Malawi: ONE directory, TWO catalog entries.  Malawi/2016-17/Data/
 # Cross_Sectional/ is IHS4 (2936); Data/Panel/ is the 2016 wave of the IHPS
-# long-term panel (2939) -- 97 of its 98 files are in 2939's datafile list and
-# NONE in 2936's.
+# long-term panel -- 97 of its 98 files are in 2939's datafile list and NONE in
+# 2936's.  (GH #1277 later showed the held files are 3819's re-release of that
+# wave, so the shipped record now holds 2936 + 3819 and COVERS 2939; these
+# synthetic rows still exercise the two-entries-in-one-directory mechanism.)
 MWI_ROWS = [
     {"id": "1003", "idno": "MWI_2010_IHS-III_v01_M", "title": "IHS3",
      "year_start": 2010, "year_end": 2011, "doi": "", "repository": "lsms",
@@ -626,7 +628,8 @@ class TestMultipleIdsPerWaveDir:
         """THE regression (GH #600).  Malawi/2016-17/Data/Panel/ IS the 2016
         wave of the IHPS long-term panel (2939): 97 of its 98 files appear in
         2939's WB datafile list and none in IHS4's.  Recording only 2936 made
-        discovery report a study we hold as MISSING."""
+        discovery report a study we hold as MISSING.  (Synthetic: GH #1277
+        found the shipped files are 3819's re-release of the wave.)"""
         from lsms_library.data_access import discover_waves
         _mock_catalog(monkeypatch, MWI_ROWS)
         _write_source(countries, "Malawi", "2010-11",
@@ -854,13 +857,50 @@ class TestShippedRecordsSayWhatWeMeasured:
         assert prov.catalog_ids == ["3814"]        # we hold the UPD, only
         assert prov.covers == ["76", "1050", "2252", "2862"]
 
-    @pytest.mark.parametrize("wave,ids", [("2016-17", ["2936", "2939"]),
-                                          ("2019-20", ["3818", "3819"])])
-    def test_malawi_wave_dirs_hold_two_entries_each(self, wave, ids):
+    # GH #1277: 2016-17's Data/Panel/ is 3819's re-release of the 2016 IHPS
+    # round (99 of 99 files byte-identical), not 2939; 2939 is subsumed.
+    @pytest.mark.parametrize("wave,ids,covers",
+                             [("2016-17", ["2936", "3819"], ["2939"]),
+                              ("2019-20", ["3818", "3819"], [])])
+    def test_malawi_wave_dirs_hold_two_entries_each(self, wave, ids, covers):
         from lsms_library.data_access import _COUNTRIES_DIR
         prov = pv.read_provenance(_COUNTRIES_DIR, "Malawi", wave)
         assert prov.catalog_ids == ids
-        assert prov.covers == []                   # held, not covered
+        assert prov.covers == covers               # subsumed, not held
+
+    @pytest.mark.parametrize("wave,lines",
+                             [("2016-17", ["2936 Cross_Sectional", "3819 Panel"]),
+                              ("2019-20", ["3818 Cross_Sectional", "3819 Panel"])])
+    def test_malawi_records_name_each_held_entrys_subdir(self, wave, lines):
+        """``#+CATALOG_SUBDIR: <id> <subdir>`` (the #1276 format) names the
+        ``Data/`` subdirectory holding each held entry.  Read as raw lines so
+        the pin does not depend on which parser field carries the key."""
+        from lsms_library.data_access import _COUNTRIES_DIR
+        path = pv.source_org_path(_COUNTRIES_DIR, "Malawi", wave)
+        got = [ln.split(":", 1)[1].strip()
+               for ln in _lines(path.read_text(), "#+CATALOG_SUBDIR:")]
+        assert got == lines
+        prov = pv.read_provenance(_COUNTRIES_DIR, "Malawi", wave)
+        assert [ln.split()[0] for ln in got] == prov.catalog_ids
+        for ln in got:
+            assert (_COUNTRIES_DIR / "Malawi" / wave / "Data"
+                    / ln.split(None, 1)[1]).is_dir(), ln
+
+    @pytest.mark.parametrize("wave", ["2016-17", "2019-20"])
+    def test_malawi_secondary_entry_records_its_held_release(self, wave):
+        """GH #1283 ruling: a SECONDARY entry's held release is a
+        ``#+CATALOG_HELD: <id> <idno> [<doi>]`` line (the primary keeps its
+        scalar keys).  Both Panel halves are 3819 v06, content-validated
+        (99 / 98 sidecars byte-identical to the v06 zip's members)."""
+        from lsms_library.data_access import _COUNTRIES_DIR
+        path = pv.source_org_path(_COUNTRIES_DIR, "Malawi", wave)
+        got = [ln.split(":", 1)[1].strip()
+               for ln in _lines(path.read_text(), "#+CATALOG_HELD:")]
+        assert got == ["3819 MWI_2010-2019_IHPS_v06_M "
+                       "https://doi.org/10.48529/q5q1-2a34"]
+        prov = pv.read_provenance(_COUNTRIES_DIR, "Malawi", wave)
+        assert "3819" in prov.catalog_ids and prov.catalog_id != "3819"
+        assert prov.validation == pv.VALIDATION_CONTENT
 
     # The two queued releases (Nigeria/2023-24, Ethiopia/2021-22) are NOT
     # pinned here: the queue is cleared by the acquisitions (#978, #1127) and
@@ -2054,6 +2094,8 @@ def wb(countries, monkeypatch):
     import urllib.request
     from lsms_library import data_access as da
     state = {"zip": _zip("a.dta", "b.dta"), "fail": False}
+    # Raw-release transaction controls do not acquire catalog documents.
+    monkeypatch.setattr(da, 'fetch_documentation', lambda *a, **k: None)
 
     def urlopen(req, timeout=None):
         if state["fail"]:
@@ -2101,14 +2143,16 @@ class TestAcquisitionWritesTheHeldRelease:
 
     def test_a_file_already_in_data_is_not_recorded_as_the_new_release(
             self, countries, wb, caplog):
-        """``_extract_all_from_zip`` never overwrites: a.dta stays v01's.  The
-        directory is then a mix, so the record must not claim v02."""
+        """A differing raw file without a sidecar is unverified. It stays
+        untouched at its resolved zip-relative path, so it cannot certify v02.
+        GH1149 permits replacement only through a matching held sidecar."""
         from lsms_library import data_access as da
         before = _record("Nigeria", "2023-24", **NGA_W5_QUEUED)
         _write_source(countries, "Nigeria", "2023-24", before)
-        (countries / "Nigeria" / "2023-24" / "Data").mkdir(parents=True)
-        (countries / "Nigeria" / "2023-24" / "Data" / "a.dta") \
-            .write_bytes(b"release-1")
+        data = (countries / "Nigeria" / "2023-24" / "Data"
+                / "NGA_2023_GHSP-W5_v02_M_Stata")
+        data.mkdir(parents=True)
+        (data / "a.dta").write_bytes(b"release-1")
         with caplog.at_level("WARNING", logger="lsms_library.data_access"):
             da.populate_and_push("Nigeria", "2023-24")
 
@@ -2570,20 +2614,21 @@ class TestAcquisitionCompletionBoundaries:
 
     def test_partial_extraction_cannot_record_a_complete_release(
             self, countries, wb, monkeypatch):
-        import builtins
+        import os
         from lsms_library import data_access as da
         before = _record('Nigeria', '2023-24', **NGA_W5_QUEUED)
         _write_source(countries, 'Nigeria', '2023-24', before)
-        actual_open = builtins.open
-        def fail_second(path, mode='r', *args, **kwargs):
-            if mode == 'wb' and Path(path).name == 'b.dta':
+        actual_replace = os.replace
+        def fail_second(src, dst, *args, **kwargs):
+            if Path(dst).name == 'b.dta':
                 raise OSError('simulated disk failure')
-            return actual_open(path, mode, *args, **kwargs)
-        monkeypatch.setattr(builtins, 'open', fail_second)
+            return actual_replace(src, dst, *args, **kwargs)
+        monkeypatch.setattr(os, 'replace', fail_second)
         da.add_wave('Nigeria', '6410', wave='2023-24', push=False,
                     confirm=False, verbose=False)
         assert pv.source_org_path(countries, 'Nigeria', '2023-24').read_text() == before
-        assert (countries / 'Nigeria/2023-24/Data/a.dta').exists()
+        assert (countries / 'Nigeria/2023-24/Data'
+                / 'NGA_2023_GHSP-W5_v02_M_Stata/a.dta').exists()
 
 
 class TestQueueFactsSurviveMissingCatalogMetadata:

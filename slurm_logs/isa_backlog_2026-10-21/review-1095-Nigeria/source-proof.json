@@ -1,0 +1,89 @@
+{
+  "rounds": {
+    "2011Q1": {
+      "old_rows": 27104,
+      "new_rows": 27104,
+      "gained": 0,
+      "intentional_drop_rows": 0,
+      "drop_masks_exact": true,
+      "derived_rows": 0,
+      "full_old_payload_and_attrs_exact": true
+    },
+    "2013Q1": {
+      "old_rows": 27079,
+      "new_rows": 27079,
+      "gained": 0,
+      "intentional_drop_rows": 0,
+      "drop_masks_exact": true,
+      "derived_rows": 0,
+      "full_old_payload_and_attrs_exact": true
+    },
+    "2016Q1": {
+      "old_rows": 20562,
+      "new_rows": 20562,
+      "gained": 0,
+      "intentional_drop_rows": 14603,
+      "drop_masks_exact": true,
+      "derived_rows": 1,
+      "full_old_payload_and_attrs_exact": true
+    },
+    "2019Q1": {
+      "old_rows": 29275,
+      "new_rows": 31757,
+      "gained": 2482,
+      "intentional_drop_rows": 0,
+      "drop_masks_exact": true,
+      "derived_rows": 5393,
+      "full_old_payload_and_attrs_exact": true,
+      "source_oracle_gains_exact": true,
+      "source_rows": 57387,
+      "gains_by_unit": {
+        "Crate": 133,
+        "Cube": 112,
+        "Loaf": 513,
+        "Metric Cup": 240,
+        "Slice": 175,
+        "Table Spoon": 12,
+        "Tea Spoon": 1,
+        "Whole Animal": 793,
+        "Wrap": 503
+      },
+      "gained_source_rows": 2482,
+      "collisions": 0,
+      "fanout": 0
+    },
+    "2024Q1": {
+      "old_rows": 27318,
+      "new_rows": 30064,
+      "gained": 2746,
+      "intentional_drop_rows": 133,
+      "drop_masks_exact": true,
+      "derived_rows": 5339,
+      "full_old_payload_and_attrs_exact": true,
+      "source_oracle_gains_exact": true,
+      "source_rows": 56388,
+      "gains_by_unit": {
+        "Bottle/Can": 2,
+        "Crate": 56,
+        "Cube": 139,
+        "Loaf": 500,
+        "Metric Cup": 316,
+        "Slice": 203,
+        "Whole Animal": 636,
+        "Wrap": 894
+      },
+      "gained_source_rows": 2746,
+      "collisions": 0,
+      "fanout": 0,
+      "metric_crosscheck_coverage": {
+        "all_source_quantity_populated": 258,
+        "metric_rows": 5339,
+        "metric_rows_quantity_populated": 54,
+        "metric_rows_factor_populated": 5167
+      }
+    }
+  },
+  "shared_functions_AST_exact": true,
+  "all_old_helper_wave_rawcountry_Country_fields_null_masks_dtypes_axis_metadata_attrs_exact": true,
+  "healthy_Niger_payload_attrs_exact": true
+}

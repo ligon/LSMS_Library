@@ -1,0 +1,11 @@
+{
+  "status": "RETAINED_ROOT_RECEIPT_REPRESENTATION_STOP",
+  "original_tool_session": 86662,
+  "actual_exit_code": 1,
+  "terminal_chunk": "88926a",
+  "original_checker_sha256": "865a3022d55ac7497270e13c41bfa6cf075670cedb00b4a9cfcd4cf7740e9f73",
+  "stderr_sha256": "23e76fc4cf7c45a75eb28cc221e412417bb8d06449b43eb4542c98b3decf09e5",
+  "effect": "All common provider physical/hash/header keys equal. Original authentication uses regular_file=true/symlink=false while protection uses kind=file. New v3 explicitly requires the exact equivalent flags and compares every remaining key unchanged. Original source/streams retained.",
+  "no_project_payload_decode_API_test_or_controller_execution": true,
+  "signed": "Sue"
+}

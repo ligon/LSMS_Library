@@ -1,0 +1,10 @@
+food_acquired False
+food_coping True
+months_food_inadequate True
+crop_production True
+plot_inputs True
+livestock True
+anthropometry True
+plot_labor True
+people_last7days True
+community_prices True

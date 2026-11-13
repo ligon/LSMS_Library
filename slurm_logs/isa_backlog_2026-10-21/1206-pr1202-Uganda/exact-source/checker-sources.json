@@ -1,0 +1,482 @@
+{
+  "seal_saved_numeric.py": {
+    "sha256": "46653bebeb5879157036be3ffa84b68adce2cf7662f8492314a6b0a384171c6b",
+    "bytes": 2558,
+    "mode": 384,
+    "mtime_ns": 1792673701434650465,
+    "inode": 1584954,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "gate-pr1202-exact-metadata.py": {
+    "sha256": "3db7c1238f4ad6943486df5638e3347a57d1702d7f6093827be3f28b19a78d31",
+    "bytes": 1645,
+    "mode": 384,
+    "mtime_ns": 1792680865673162748,
+    "inode": 1584951,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "calibrate-object-v3.py": {
+    "sha256": "d592d0346bf80f7dca6a8a716e3681552a96562da17c3117c32b3fde563d9639",
+    "bytes": 2866,
+    "mode": 384,
+    "mtime_ns": 1792655052211984941,
+    "inode": 1584956,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact_strict_fast_v3.py": {
+    "sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+    "bytes": 5198,
+    "mode": 384,
+    "mtime_ns": 1792655052211984941,
+    "inode": 1584955,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "package-pr1202-exact.py": {
+    "sha256": "2b9690fab8d4654efa176100967c57be21846675e8074db546cc38f2969ff8fe",
+    "bytes": 7094,
+    "mode": 384,
+    "mtime_ns": 1792680865673162748,
+    "inode": 1584952,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "attest-pr1202-exact.py": {
+    "sha256": "0074877e449e6306372f7fecdbaea83c68b4227eff0f2ef92cdd7dbf18ba920a",
+    "bytes": 1244,
+    "mode": 384,
+    "mtime_ns": 1792680865673162748,
+    "inode": 1584953,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact/bootstrap-exact.py": {
+    "sha256": "20c3adbf50a9c50814cb769ea2783aec89a225903129524d2baf1175a007c077",
+    "bytes": 2658,
+    "mode": 384,
+    "mtime_ns": 1792680096077993962,
+    "inode": 1714113,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact/check-exact-recipes.py": {
+    "sha256": "8fa9a0bd48867c6d1a2743a0d9113c063677bf299fd3cc6ab3609e33c218e829",
+    "bytes": 8575,
+    "mode": 384,
+    "mtime_ns": 1792680201788553419,
+    "inode": 1714115,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact/prepare-exact.py": {
+    "sha256": "0dde1aabc3a8792c26ed2f10aa94cb1c9aa646d1736410681b907dd28e49c554",
+    "bytes": 4938,
+    "mode": 384,
+    "mtime_ns": 1792680096076993957,
+    "inode": 1714118,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-authority/common.py": {
+    "sha256": "f7aa1f0bd4458fea4f0be6983c3d272221515cc16fe745bf3ca126b953050a93",
+    "bytes": 4727,
+    "mode": 384,
+    "mtime_ns": 1792638135051862889,
+    "inode": 2106711,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-authority/feature-compare.py": {
+    "sha256": "859c99a394cd2f58e3f2d3552553f6d33e0239d55127c4ae74175c5f03340d63",
+    "bytes": 3432,
+    "mode": 384,
+    "mtime_ns": 1792639587217146596,
+    "inode": 2106710,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/__init__.py": {
+    "sha256": "4e4cc2a3dad59801f7f4e8fe9feaa5746c50adc40a6da9fd36eb395cf6d36e10",
+    "bytes": 15701,
+    "mode": 384,
+    "mtime_ns": 1792679426042332486,
+    "inode": 1845004,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/feature.py": {
+    "sha256": "48b957fba8d6491cfff08a303dc29707f93a12b83fab1f315e9ed582adcefddd",
+    "bytes": 65291,
+    "mode": 384,
+    "mtime_ns": 1792679427036338017,
+    "inode": 1845005,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/recall_table.py": {
+    "sha256": "1058483526ea132b55c2a7f8d2da2b553de54c292b58c7e5a47e3ba1694b1e04",
+    "bytes": 2959,
+    "mode": 384,
+    "mtime_ns": 1792679427039338034,
+    "inode": 1845006,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/catalog.py": {
+    "sha256": "4976081e5960d3f46ed700a27f778a5ce78fa188cea36e3d780c877633d99531",
+    "bytes": 7673,
+    "mode": 384,
+    "mtime_ns": 1792679426048332520,
+    "inode": 1845007,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/yaml_utils.py": {
+    "sha256": "ad4b1369a56f62d37c8a8b96e849ff184e39505264b4198a27bcd3884d2401d7",
+    "bytes": 1741,
+    "mode": 384,
+    "mtime_ns": 1792679427053338112,
+    "inode": 1845008,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/population.py": {
+    "sha256": "a5a7c79627f274a1fef05098d655e8dc8857f860cdc047fd5c0e04b247eb80c1",
+    "bytes": 32625,
+    "mode": 384,
+    "mtime_ns": 1792679427038338029,
+    "inode": 1845009,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/recall.py": {
+    "sha256": "fc82a9dbf2d863167da0d78fbadfaca942f5e1471a7784fb4820f9bd26cc092c",
+    "bytes": 19584,
+    "mode": 384,
+    "mtime_ns": 1792679427039338034,
+    "inode": 1845010,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/quantity_audit.py": {
+    "sha256": "0b880edf288516fbeaa8d58a2bdc6a558ba1d04fa9610107ae880e28455176e7",
+    "bytes": 37007,
+    "mode": 384,
+    "mtime_ns": 1792679427038338029,
+    "inode": 1845011,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/ehcvm.py": {
+    "sha256": "c044d816ff7d7b3d48ffdf01ff61888697354b1aa86f904c641ac91467d0d3d5",
+    "bytes": 21784,
+    "mode": 384,
+    "mtime_ns": 1792679427036338017,
+    "inode": 1845012,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/paths.py": {
+    "sha256": "b127e25ddd71440607524fc58a4eba07159b6af139db5386471d0bee3147b7c4",
+    "bytes": 7271,
+    "mode": 384,
+    "mtime_ns": 1792679427038338029,
+    "inode": 1845013,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/cli.py": {
+    "sha256": "51642ece5a65f5ce8bd003eab9aa2f2a698c8a6bf432fc6f73fb434404f8bfbb",
+    "bytes": 32171,
+    "mode": 384,
+    "mtime_ns": 1792679426049332525,
+    "inode": 1845014,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/datetime_parse.py": {
+    "sha256": "fd5a88f417e8de9951b8291ae117254983de4caf3fe65a813cd6d2dabe3dd4b3",
+    "bytes": 43989,
+    "mode": 384,
+    "mtime_ns": 1792679427026337962,
+    "inode": 1845015,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/local_tools.py": {
+    "sha256": "de2a4075128967eba0d832c9b442e47c7d5da943e561d52cbfaac5543aaf5818",
+    "bytes": 192957,
+    "mode": 384,
+    "mtime_ns": 1792679427037338023,
+    "inode": 1845016,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/data_access.py": {
+    "sha256": "41bfd39d6bc67e440f3b42b40dc0a88342bde388ae4f173f1b1d042c7d5011b9",
+    "bytes": 111294,
+    "mode": 384,
+    "mtime_ns": 1792679427025337956,
+    "inode": 1845017,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/capability.py": {
+    "sha256": "6b6c5c19d0c564db79a2e06d8b1364c0785bd9ab46e7c508d5c2fb57f552c38a",
+    "bytes": 17113,
+    "mode": 384,
+    "mtime_ns": 1792679426048332520,
+    "inode": 1845018,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/calendars.py": {
+    "sha256": "e48c5152cca256eeecd4633f00c0d64deb8c4505d8fc432ec42cdb9fb860a2e4",
+    "bytes": 8033,
+    "mode": 384,
+    "mtime_ns": 1792679426048332520,
+    "inode": 1845019,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/sampling.py": {
+    "sha256": "d338c7ebc1dd07fe832939d3e18139f8e639f9bf7028fec9b0df9f331a40d1e8",
+    "bytes": 46581,
+    "mode": 384,
+    "mtime_ns": 1792679427039338034,
+    "inode": 1845020,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/_build_registry.py": {
+    "sha256": "82ccae33d6c7c471dd9c157232de45b0c3805f0826916426806f8e6c77f9ee33",
+    "bytes": 31597,
+    "mode": 384,
+    "mtime_ns": 1792679426047332514,
+    "inode": 1845021,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/null_read_audit.py": {
+    "sha256": "1ba0cd55f04b1e5d331b72eb5b7191c1e75790712cc3f16f0d31f860a95ea40d",
+    "bytes": 21315,
+    "mode": 384,
+    "mtime_ns": 1792679427038338029,
+    "inode": 1845022,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/notes.py": {
+    "sha256": "f4d53a6742ab2374316c6b5cee11333c0cfc6f94aea25c1ceeb4e925ad9e69a7",
+    "bytes": 5212,
+    "mode": 384,
+    "mtime_ns": 1792679427037338023,
+    "inode": 1845023,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/conversion.py": {
+    "sha256": "715d59b7bf950f278f5a35e189ea015e542c1d5936b82af0785758b7a1855f5f",
+    "bytes": 11444,
+    "mode": 384,
+    "mtime_ns": 1792679426049332525,
+    "inode": 1845024,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/visualizations.py": {
+    "sha256": "8a22b9208bc4d699867a94637efdc2262d0a923df1fb196669217cbac5be77b3",
+    "bytes": 73172,
+    "mode": 384,
+    "mtime_ns": 1792679427053338112,
+    "inode": 1845025,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/derivations.py": {
+    "sha256": "8ee7030f6c0e091fc1a903f5d6a7a8a6c616942bb4a1882400e49b5cf7058132",
+    "bytes": 32632,
+    "mode": 384,
+    "mtime_ns": 1792679427026337962,
+    "inode": 1845026,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/provenance.py": {
+    "sha256": "aeba0ff3e925579bd023b1549039de1e807f6e83dac84ab05a5669a3bd3bf1d6",
+    "bytes": 31132,
+    "mode": 384,
+    "mtime_ns": 1792679427038338029,
+    "inode": 1845027,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/transformations.py": {
+    "sha256": "cb973473420759f35b2046e0da618fdbddc278c78708038792b0e85856e1b4d0",
+    "bytes": 398605,
+    "mode": 384,
+    "mtime_ns": 1792679427041338045,
+    "inode": 1845028,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/demands.py": {
+    "sha256": "794e4234230f8777f2f41aaab1107a635063ac40503404c3f76693caa0cd444c",
+    "bytes": 1944,
+    "mode": 384,
+    "mtime_ns": 1792679427026337962,
+    "inode": 1845029,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/errors.py": {
+    "sha256": "6902355e9acfdbeb995719fb5c8665c2e0c7287b931e682672460367f1881ed6",
+    "bytes": 5073,
+    "mode": 384,
+    "mtime_ns": 1792679427036338017,
+    "inode": 1845030,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/dvc_permissions.py": {
+    "sha256": "4ed3eab8a954cf45ee8366cde10966bb2fa4763ebcc9f22f916d2543dbae368b",
+    "bytes": 6177,
+    "mode": 384,
+    "mtime_ns": 1792679427027337967,
+    "inode": 1845031,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/diagnostics.py": {
+    "sha256": "b40922955af70f102068ac79c917cf566247cdc2df8509aa3c017ea04d615287",
+    "bytes": 76758,
+    "mode": 384,
+    "mtime_ns": 1792679427027337967,
+    "inode": 1845032,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/build_transforms.py": {
+    "sha256": "1122bd3bd9a4492fb8e42a59aa87b08b30523f4d6c6b5a2d30e8847d92264b21",
+    "bytes": 35377,
+    "mode": 384,
+    "mtime_ns": 1792679426048332520,
+    "inode": 1845033,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/coverage_matrix.py": {
+    "sha256": "b3ab4f71399a081216def71d083c51be3764316cd0bcf170631a731b273c7f58",
+    "bytes": 68158,
+    "mode": 384,
+    "mtime_ns": 1792679427024337951,
+    "inode": 1845034,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/null_index_audit.py": {
+    "sha256": "be9779539f554dbd2d73d9280f51f5744629f17f24bd47d37383527ef2fae053",
+    "bytes": 15537,
+    "mode": 384,
+    "mtime_ns": 1792679427038338029,
+    "inode": 1845035,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/_parallel_waves.py": {
+    "sha256": "354802f57a4ecea43177712cc9a525de654aa17ec4496e6af521ed4ea61970c9",
+    "bytes": 29564,
+    "mode": 384,
+    "mtime_ns": 1792679426047332514,
+    "inode": 1845036,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/country.py": {
+    "sha256": "7a9347537f4d5423dc42c1f9f89cf55ed5abff72d88ced2d7cb6620696b7971c",
+    "bytes": 457055,
+    "mode": 384,
+    "mtime_ns": 1792679427024337951,
+    "inode": 1845037,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/catalog_relations.py": {
+    "sha256": "b7ebd241e3242d15d607304bda893eccf51d641f6b54bbcd063d9f9d59250a3e",
+    "bytes": 4062,
+    "mode": 384,
+    "mtime_ns": 1792679426048332520,
+    "inode": 1845038,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/config.py": {
+    "sha256": "74fb12058297e89bcaa7f4256b859b498d9d22fac310878bcc17e3a70eae71a5",
+    "bytes": 5621,
+    "mode": 384,
+    "mtime_ns": 1792679426049332525,
+    "inode": 1845039,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact-source-snapshot/lsms_library/currency.py": {
+    "sha256": "29c9d555b8131a0c5cdd07d4e55a48d945ef4e060af7fa7d93f20a25d8fc8e14",
+    "bytes": 13736,
+    "mode": 384,
+    "mtime_ns": 1792679427025337956,
+    "inode": 1845040,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  }
+}

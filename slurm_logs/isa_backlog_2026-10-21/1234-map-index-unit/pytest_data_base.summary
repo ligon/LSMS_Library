@@ -1,0 +1,4 @@
+# LSMS_DATA_DIR = private warm root data-real-base (the five cold-built tables, then whatever the tests built)
+# tests: tests/test_malawi_sale_basis.py tests/test_1109_malawi_input_quantity.py tests/test_1111_malawi_applied_kg.py tests/test_panama_777.py tests/test_gh1118_mali_missing_input_units.py tests/test_null_index_guard.py
+# full log (warnings name households) kept outside the repo
+144 passed, 27 warnings in 209.77s (0:03:29)

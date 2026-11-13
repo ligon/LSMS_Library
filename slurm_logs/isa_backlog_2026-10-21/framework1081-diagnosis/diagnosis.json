@@ -1,0 +1,47 @@
+{
+  "status": "DIAGNOSIS_COMPLETE_AWAITING_ROOT_IMPLEMENTATION_BOUNDARY",
+  "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "reviewer": "Sue (GPT-6)",
+  "implementation_applied": false,
+  "named_issue_errors_confirmed": true,
+  "CategoricalKeyDeclarationError_additional_finding_and_explicit_proposed_scope": true,
+  "generated_handlers": {
+    "food_generic_catch": "lsms_library/country.py:6292",
+    "roster_generic_catch": "lsms_library/country.py:6362"
+  },
+  "proposal": "existing three typed categorical classes; bare re-raise ahead of only these two generic handlers; UnitsUnavailable and unrelated generic fallback unchanged",
+  "existing_tests": {
+    "passed": 162,
+    "skipped": 0,
+    "errors": 0
+  },
+  "current_behavior_fault_probes": 166,
+  "explicit_valuation_controls": 5,
+  "proposed_contract_baseline": {
+    "cases": 73,
+    "expected_failures": 42,
+    "passes": 31,
+    "errors": 0,
+    "skips": 0
+  },
+  "strict_food_identity_args_cause_notes_context_preserved_on_f8": true,
+  "successful_mocked_legacy_masking_proven": true,
+  "actual_real_legacy_cache_availability_claim": false,
+  "candidate_hash_scope": "must be measured after approval; no zero-scope assumption or stash",
+  "source_content_modes_HEAD_clean_unchanged": true,
+  "private_data_root_files": 0,
+  "network_attempts": 0,
+  "source_write_attempts": 0,
+  "subprocesses_remaining": 0,
+  "artifact_sha256": {
+    "DIAGNOSIS.md": "4c1f10242d08a1c9afb557c64d464951c8892867786a6da54d1b4cef17d2a2e6",
+    "PROPOSAL.md": "4d23a83bc48ff2e027d719a39de42ef0229f316315d369cee2931a98c4f9b091",
+    "ledger-draft.md": "1092c0d66a9e5c3c79a6a92326c5d67bc7c84484001c5f88c70b8491b93833d1",
+    "REPRODUCE.md": "1705d5ae6a019e732a55535283e5e7f8ada2fd9745dfa2af9f7fc07890a3a488",
+    "proof.json": "c1f609c7f881150e5ae0b9d04b7e4c5c925c1a7fc398690c318171ceb87b88fa",
+    "probe-summary.json": "5989490ccf6a1ffe21f799b53bcdc87968257ce909d49686bea2d3c47c785553",
+    "valuation-controls.json": "45bf0bcd9691e8ac8fd9a5379c6bb8b616e422c22080c5e88df601c0f6ea040b",
+    "baseline-contract.json": "08f68c120c0eb724743eefaa4859f36e882f68ff2231f8568de65b2b5c842c31",
+    "test_1081_proposed_contract.py": "11b1c01807fc6313f85aa8d59101d50863d880520c4591cff9a74b6121b33f64"
+  }
+}

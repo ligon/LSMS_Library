@@ -1,0 +1,35 @@
+{
+ "country_rows": {
+  "CotedIvoire": 11259,
+  "Niger": 42435,
+  "Senegal": 9916
+ },
+ "feature_equals_country_rows": {
+  "CotedIvoire": true,
+  "Niger": true,
+  "Senegal": true
+ },
+ "grain_collapse_warning_heads": [
+  "Niger/plot_inputs/2011-12",
+  "Niger/plot_inputs/2014-15"
+ ],
+ "grain_collapse_warnings": 4,
+ "index_names": [
+  "country",
+  "t",
+  "v",
+  "i",
+  "plot_id",
+  "input",
+  "j",
+  "u",
+  "season",
+  "currency"
+ ],
+ "rows": 63610,
+ "rows_by_country": {
+  "CotedIvoire": 11259,
+  "Niger": 42435,
+  "Senegal": 9916
+ }
+}

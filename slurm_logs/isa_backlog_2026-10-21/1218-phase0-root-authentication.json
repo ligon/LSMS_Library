@@ -1,0 +1,21 @@
+{
+  "status": "ROOT_AUTHENTICATED_STATIC_PHASE0_AND_RELEASED_MINIMAL_IMPLEMENTATION_SOURCE",
+  "at_UTC": "2026-10-22T21:15:00.487734+00:00",
+  "phase0_pins": {
+    "READY.json": "e48a938be5fd064fc79646680a81e99e8a107340dca738821d701efc157b637e",
+    "MANIFEST.private.json": "5b99fa0e2bdf6c6398cbc1e20ee1d7612b6fcc577876d19b33125dea57337929",
+    "EXPORT-ALLOWLIST.json": "001bb595a8cf749bcddcf1b3aa3b703632d664a7685657410e79c8be6018b8e1"
+  },
+  "phase0_manifest_files": 8,
+  "historical_phase0_head": "9aaee25552176f31c3aa6d1c920b621e2cb1dd4d",
+  "current_production_head": "7eb596c223055d45c4f45cffdba4f7eb6aee76e4",
+  "paths": [
+    ".coder/ledger/1218-constructed-empty-explicit-types.md",
+    "lsms_library/country.py",
+    "tests/test_gh1039_make_backend_no_country_rule.py"
+  ],
+  "phase0_postexit_scope": "Corrected original metadata postexit0 b17f28 belongs to PRE-EDIT source9aa. Its historical source-physical checker must not be replayed after authorized product edits. Original v1missingfuture-excluded-path stop remains retained.",
+  "production_release": "Only empty helper, existing GH1039 tests and prior-art ledger, basef7/GH1215 prerequisite. Fixed657 BF config uses separately prepared new source/privateDVCtmp for later genuine composition.",
+  "runtime_import_tests_census_genuine_release": false,
+  "signed": "Sue"
+}

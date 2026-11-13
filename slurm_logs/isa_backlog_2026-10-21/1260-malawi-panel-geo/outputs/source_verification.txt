@@ -1,0 +1,43 @@
+## 2016-17 (2939)
+geo shape (2508, 39) | cover shape (2508, 33)
+geo lat/lon-like columns: ['lat_modified', 'lon_modified']
+key in geo: True | key in cover: True | geo key dtype str | cover key dtype str
+geo has ea_id: False | other id-like cols: ['y3_hhid']
+lat_modified: present True, dtype float64, non-null 2503 of 2508
+lon_modified: present True, dtype float64, non-null 2503 of 2508
+coordinates inside Malawi bbox: 2503 of 2503 non-null pairs
+geo key unique: True 2508 | cover key unique: True 2508
+geo keys in cover: 2508 of 2508 | cover keys in geo: 2508 of 2508
+cover EAs: 102
+EAs with GPS (any household): 102 | EAs with >1 distinct coordinate: 101
+zip cover vs held cover: shape (2508, 33) (2508, 33) | same columns True | DataFrame.equals False
+  columns differing: ['case_id']
+non-movers (distY1Y3<=1km): 0 hh in 0 EAs; EAs with >1 distinct coord among non-movers: 0
+distinct coordinates per EA (all hh): median 6.0 max 25
+households at their EA modal coordinate: 1861 of 2503
+distY1Y3 non-null 641 quantiles [5.0, 8.0, 15.0, 38.0, 104.0, 246.0]
+mover values {1.0: 1356, 0.0: 1147}
+mover=0.0: 1147 hh in 102 EAs; EAs with >1 distinct coord: 39
+mover=1.0: 1356 hh in 102 EAs; EAs with >1 distinct coord: 99
+held case_id dtype str | zip case_id dtype str
+case_id differs after normalising: 2508 of 2508
+held case_id str lengths {12: 2508} | zip {12: 2508}
+other differing columns: []
+mover=0: distinct coords per EA value counts {1: 63, 2: 24, 3: 13, 4: 1, 7: 1}
+
+## 2019-20 (3819)
+geo shape (3178, 45) | cover shape (3178, 34)
+geo lat/lon-like columns: ['lat_mod', 'lon_mod']
+key in geo: True | key in cover: True | geo key dtype str | cover key dtype str
+geo has ea_id: True | other id-like cols: ['y4_hhid', 'ea_id']
+lat_mod: present True, dtype float32, non-null 3175 of 3178
+lon_mod: present True, dtype float32, non-null 3175 of 3178
+coordinates inside Malawi bbox: 3170 of 3175 non-null pairs
+geo key unique: True 3178 | cover key unique: True 3178
+geo keys in cover: 3178 of 3178 | cover keys in geo: 3178 of 3178
+ea_id agrees geo vs cover: 3178 of 3178
+cover EAs: 102
+EAs with GPS (any household): 102 | EAs with >1 distinct coordinate: 102
+non-movers (d_ihs3<=1km): 2136 hh in 102 EAs; EAs with >1 distinct coord among non-movers: 0
+distinct coordinates per EA (all hh): median 9.0 max 38
+households at their EA modal coordinate: 2165 of 3175

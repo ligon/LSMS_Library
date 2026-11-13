@@ -1,0 +1,314 @@
+{
+  "status": "AUTHOR_VALIDATION_COMPLETE_PENDING_INDEPENDENT_REVIEW",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "runtime_commit": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+  "ledger_first_commit": "695b57970",
+  "runtime": {
+    "python": "3.11.6",
+    "pandas": "3.0.6",
+    "numpy": "2.4.6",
+    "pyarrow": "25.0.1",
+    "exact_cwd_import_countries_root": true
+  },
+  "focused_tests": {
+    "passed": 64,
+    "failed": 0,
+    "skipped": 0,
+    "workers": 2,
+    "distribution": "loadfile",
+    "includes_new_route_cases": 14,
+    "files": [
+      "tests/test_gh1078_food_producer_provenance.py",
+      "tests/test_build_transform_hash.py",
+      "tests/test_wave_getattr.py"
+    ],
+    "initial_negative_fixture_failure_retained": "Hashless input is legitimate legacy; corrected to real stale hashed input, no read-gate change"
+  },
+  "actual_source_test_executions": [
+    {
+      "scenario": "market-then-currency",
+      "role": "observer",
+      "passed_executions": 2,
+      "changed_cells": 0,
+      "whole_frame_attrs_exact_to_correct_cold": true,
+      "current_hash_and_full_coverage": true
+    },
+    {
+      "scenario": "currency-then-market",
+      "role": "observer",
+      "passed_executions": 2,
+      "changed_cells": 0,
+      "whole_frame_attrs_exact_to_correct_cold": true,
+      "current_hash_and_full_coverage": true
+    },
+    {
+      "scenario": "timed-pair",
+      "role": "A",
+      "passed_executions": 1,
+      "changed_cells": 0,
+      "whole_frame_attrs_exact_to_correct_cold": true,
+      "current_hash_and_full_coverage": true
+    },
+    {
+      "scenario": "timed-pair",
+      "role": "B",
+      "passed_executions": 1,
+      "changed_cells": 0,
+      "whole_frame_attrs_exact_to_correct_cold": true,
+      "current_hash_and_full_coverage": true
+    }
+  ],
+  "scope_note": "Six executions of two named tests across three scenarios, not six distinct tests",
+  "hash_scope": {
+    "country_API": {
+      "total": 549,
+      "changed": 549,
+      "unchanged": 0
+    },
+    "framework": {
+      "total": 39,
+      "changed": 39,
+      "unchanged": 0
+    },
+    "own_declared_wave": {
+      "total": 1362,
+      "changed": 1362,
+      "unchanged": 0
+    },
+    "API_wave": {
+      "API_wave_pairs": 2139,
+      "changed_nonnull_wave_hashes": 2109,
+      "none_on_both": 30,
+      "unchanged_nonnull": 0,
+      "metadata_only_no_rebuild": true
+    },
+    "registry_added": [
+      "lsms_library.country.Wave.food_acquired"
+    ],
+    "registry_removed": [],
+    "read_gate_exclusions_and_schema_unchanged": true,
+    "requires_coordinated_rebuild_window": true,
+    "no_corpus_rebuild_performed": true
+  },
+  "natural_healing": {
+    "cold": {
+      "mode": "cold",
+      "initial_real_grade": "stale",
+      "initial_stored_hash": "d61dd3d715d7b192c6bf04f92c2ced3378b7d398c11d6edfc5d4eee8f4c51dba",
+      "normal_candidate_current_hash": "e452d51b87329fa6f49803f73e2df141968c2f4001ff0ad148d4363aabf04d2c",
+      "rows": 355571,
+      "null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "every_value_key_order_dtype_null_axis_full_attrs_exact_to_correct_f8": true,
+      "original_nine_NaNs_restored_without_clear_stamp_or_bypass": true,
+      "full_eight_wave_coverage": true,
+      "initial_files": 57,
+      "final_files": 57,
+      "cache_bytes_modes_mtimes_zero_warm_writes": null,
+      "original_corrupt_root_only_read": true
+    },
+    "fresh_process_warm": {
+      "mode": "warm",
+      "initial_real_grade": "fresh",
+      "initial_stored_hash": "e452d51b87329fa6f49803f73e2df141968c2f4001ff0ad148d4363aabf04d2c",
+      "normal_candidate_current_hash": "e452d51b87329fa6f49803f73e2df141968c2f4001ff0ad148d4363aabf04d2c",
+      "rows": 355571,
+      "null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "every_value_key_order_dtype_null_axis_full_attrs_exact_to_correct_f8": true,
+      "original_nine_NaNs_restored_without_clear_stamp_or_bypass": true,
+      "full_eight_wave_coverage": true,
+      "initial_files": 57,
+      "final_files": 57,
+      "cache_bytes_modes_mtimes_zero_warm_writes": true,
+      "original_corrupt_root_only_read": true
+    }
+  },
+  "actual_two_process_writers": {
+    "candidate": {
+      "real_read_then_normal_eviction_then_real_false_but_actual_parquet_origin_preserved": true,
+      "A_writer_input_and_actual_output_exact_entire_correct_cold": true,
+      "B_writer_input_and_output_exact_own_correct_cold": true,
+      "A_final_actual_bytes_equal_served_cache": true,
+      "A_B_normal_current_hash_and_full_coverage": true,
+      "actual_function_data_Path_exists_and_write_arguments_unchanged": true,
+      "real_read_wave_full_frame_attrs_exact": true,
+      "legacy_reducer_not_reached": true,
+      "writer_A_pid": 1243819,
+      "writer_B_pid": 1245062,
+      "A_null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "B_null_counts": {
+        "Quantity": 27,
+        "Expenditure": 34,
+        "Price": 29755
+      },
+      "current_hash": "e452d51b87329fa6f49803f73e2df141968c2f4001ff0ad148d4363aabf04d2c"
+    }
+  },
+  "strict_matched_cold": {
+    "complete_frames_compared": 26,
+    "all_values_keys_order_dtypes_null_masks_axes_full_attrs_exact": true,
+    "stage": "cold",
+    "healthy_comparator": "Niger",
+    "no_value_attrs_order_normalization": true
+  },
+  "strict_matched_warm": {
+    "complete_frames_compared": 26,
+    "all_values_keys_order_dtypes_null_masks_axes_full_attrs_exact": true,
+    "stage": "warm-complete",
+    "healthy_comparator": "Niger",
+    "no_value_attrs_order_normalization": true
+  },
+  "cold_to_warm_dtype_residual": {
+    "frames_per_head": 26,
+    "heads": 2,
+    "all_dtype_differences": [
+      {
+        "side": "baseline",
+        "frame": "Niger-public-food_acquired",
+        "rows": 239877,
+        "differences": [
+          {
+            "axis": "index",
+            "level": "u",
+            "cold": {
+              "str": "string",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "type": "StringDtype",
+              "storage": "pyarrow",
+              "na_value_repr": "<NA>",
+              "na_value_type": "NAType"
+            },
+            "warm": {
+              "str": "str",
+              "repr": "<StringDtype(na_value=nan)>",
+              "type": "StringDtype",
+              "storage": "pyarrow",
+              "na_value_repr": "nan",
+              "na_value_type": "float"
+            }
+          }
+        ],
+        "strict_frame_comparison_failed": true,
+        "all_other_values_masks_dtypes_keys_order_axes_full_attrs_exact": true
+      },
+      {
+        "side": "candidate",
+        "frame": "Niger-public-food_acquired",
+        "rows": 239877,
+        "differences": [
+          {
+            "axis": "index",
+            "level": "u",
+            "cold": {
+              "str": "string",
+              "repr": "<StringDtype(na_value=<NA>)>",
+              "type": "StringDtype",
+              "storage": "pyarrow",
+              "na_value_repr": "<NA>",
+              "na_value_type": "NAType"
+            },
+            "warm": {
+              "str": "str",
+              "repr": "<StringDtype(na_value=nan)>",
+              "type": "StringDtype",
+              "storage": "pyarrow",
+              "na_value_repr": "nan",
+              "na_value_type": "float"
+            }
+          }
+        ],
+        "strict_frame_comparison_failed": true,
+        "all_other_values_masks_dtypes_keys_order_axes_full_attrs_exact": true
+      }
+    ],
+    "only_dtype_difference": "Niger public food_acquired u index StringDtype[pyarrow] with pd.NA to StringDtype[pyarrow] with NaN",
+    "complete_data_files_per_head": 73,
+    "warm_bytes_modes_mtimes_unchanged": true,
+    "strict_matched_stage_baseline_candidate_equal": true,
+    "no_payload_or_attrs_normalization": true
+  },
+  "scanner": {
+    "baseline_records": 217,
+    "candidate_records": 217,
+    "complete_normalized_multisets_equal": true,
+    "exact_record_occurrences": 217,
+    "removed": 0,
+    "added": 0,
+    "status_counts": {
+      "warn": 214,
+      "pass": 3
+    },
+    "phase_counts": {
+      "1a-sanity": 30,
+      "1b-assembly": 29,
+      "2-kwargs": 158
+    },
+    "normalization": [
+      "exact source checkout prefix",
+      "exact private data-root prefix",
+      "metrics.seconds only"
+    ],
+    "raw_multisets_also_equal": true,
+    "actual_records_with_seconds": 0,
+    "no_value_warning_count_fingerprint_normalization": true,
+    "skips": 0
+  },
+  "source_and_prior_evidence": {
+    "original_diagnosis_files_unchanged": 1799,
+    "protected_source_trees": {
+      "baseline": {
+        "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+        "tracked_files": 14880,
+        "bytes_modes_HEAD_clean_exact": true
+      },
+      "with1062": {
+        "HEAD": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+        "tracked_files": 14905,
+        "bytes_modes_HEAD_clean_exact": true
+      }
+    },
+    "prior_global13_global14_evidence_unchanged_counts": {
+      "global13-evidence": 169,
+      "global14-evidence": 646
+    },
+    "historical_originals_and_copies_unchanged": 8,
+    "held_sources_MD5_SHA_size_mode_mtime_exact": 47,
+    "physical_copies": 291,
+    "unchanged_initial_copy_payloads": 172,
+    "healing_payloads_normally_rebuilt": 26,
+    "stage_raw_copies_unchanged": 93,
+    "no_symlinks_hardlinks_in_private_copies": true,
+    "all_original_copy_sources_unchanged": true,
+    "guard_events": {
+      "mkdir-existing": 4,
+      "exclusive-existing": 4
+    },
+    "no_denied_writes_or_network_attempts": true,
+    "no_intree_parquets": true,
+    "runtime_tests_blobs_modes_exact_to": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+    "candidate_head_at_check": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+    "candidate_tracked_files": 14882,
+    "candidate_clean": true
+  },
+  "limits": [
+    "Original historical full-suite writer/interleaving remains unidentified",
+    "Candidate is based on f8; coexistence with reviewed1062 and campaign changes requires separate exact-source proof",
+    "No author full-suite run or whole-corpus rebuild; independent reviewer owns one credential-free full suite",
+    "Niger public food u cold/warm dtype mismatch remains a separately drafted pre-existing residual",
+    "Original FCT/nutrition candidate controls and source oracle are frozen historical pins, not rerun here"
+  ],
+  "private_evidence_root": "/local/job40255479/control/isa-backlog-20261021/framework1078-fix",
+  "full_records_frames_cell_keys_warning_examples_and_write_traces_private": true,
+  "author": "Sue"
+}

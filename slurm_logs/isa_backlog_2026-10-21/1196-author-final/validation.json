@@ -1,0 +1,198 @@
+{
+  "status": "AUTHOR_READY_FOR_INDEPENDENT_REVIEW_NOT_INDEPENDENT_PASS",
+  "runtime": "7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1",
+  "hash_scope": {
+    "actual_source_not_simulation": true,
+    "comparisons": {
+      "bd80": {
+        "country": {
+          "total": 549,
+          "moved": 549,
+          "keys_exact": true
+        },
+        "framework": {
+          "total": 39,
+          "moved": 39,
+          "keys_exact": true
+        },
+        "declared_wave": {
+          "total": 1362,
+          "moved": 1362,
+          "keys_exact": true
+        }
+      },
+      "f8": {
+        "country": {
+          "total": 549,
+          "moved": 549,
+          "keys_exact": true
+        },
+        "framework": {
+          "total": 39,
+          "moved": 39,
+          "keys_exact": true
+        },
+        "declared_wave": {
+          "total": 1362,
+          "moved": 1362,
+          "keys_exact": true
+        }
+      }
+    },
+    "terminal_before_source_staging_and_builds": true
+  },
+  "held_sources": {
+    "status": "TERMINAL_SUCCESS_BEFORE_ANY_SOURCE_DECODE_OR_API",
+    "unique_sources": 17,
+    "physical_copies": 34,
+    "cohorts": [
+      "candidate-default",
+      "candidate-make"
+    ],
+    "all_declared_MD5_SHA_size_mode_mtime_nlink1_inode_gates": true,
+    "sidecar_size_omissions_not_invented": true,
+    "all_originals_unchanged": true,
+    "empty_L2": true,
+    "source_decodes_APIs": 0,
+    "no_acquisition": true
+  },
+  "tests": {
+    "original87": {
+      "pass": 85,
+      "fail": 2,
+      "skip": 0,
+      "original_XML_retained": true
+    },
+    "original_narrow_corrections_and_EA_negatives": {
+      "pass": 4
+    },
+    "original_actual_f8_IO": {
+      "pass": 1,
+      "fail": 23,
+      "error": 0,
+      "skip": 0
+    },
+    "expansion_v1": {
+      "pass": 72,
+      "new_file_collection_error": 1,
+      "skip": 0
+    },
+    "expansion_new_nodes_only": {
+      "total": 47,
+      "pass": 47,
+      "failure": 0,
+      "error": 0,
+      "skip": 0
+    },
+    "actual_bd80": {
+      "pass": 21,
+      "failure": 26,
+      "error": 0,
+      "skipped": 0
+    },
+    "strict_API_audit_exit": 0
+  },
+  "warm": {
+    "default": {
+      "calls": 23,
+      "writer_calls": 0,
+      "public_rows": {
+        "Niger-public-default": 239877,
+        "Niger-public-None": 239877,
+        "Niger-public-index": 239877,
+        "Niger-public-single": 108333,
+        "Niger-Feature-default": 239877,
+        "Niger-Feature-None": 239877,
+        "Uganda-public-default": 4805,
+        "Uganda-public-None": 4805,
+        "Uganda-public-single": 824,
+        "Uganda-Feature-default": 4805,
+        "Uganda-Feature-None": 4805
+      },
+      "cache_files": 12,
+      "endpoint_changed_paths": 0,
+      "current_hashes": true,
+      "full_country_coverage": true,
+      "Make_country_cache_absent": false
+    },
+    "make": {
+      "calls": 21,
+      "writer_calls": 0,
+      "public_rows": {
+        "Niger-public-default": 239877,
+        "Niger-public-None": 239877,
+        "Niger-public-index": 239877,
+        "Niger-public-single": 108333,
+        "Niger-Feature-default": 239877,
+        "Niger-Feature-None": 239877,
+        "Uganda-public-default": 4805,
+        "Uganda-public-None": 4805,
+        "Uganda-public-single": 824,
+        "Uganda-Feature-default": 4805,
+        "Uganda-Feature-None": 4805
+      },
+      "cache_files": 10,
+      "endpoint_changed_paths": 0,
+      "current_hashes": true,
+      "full_country_coverage": false,
+      "Make_country_cache_absent": true
+    }
+  },
+  "strict_saved_frames": {
+    "frame_pairs": 329,
+    "full_exact": 256,
+    "recorded_policy_only": 72,
+    "preexisting_singleton_qualification": 1,
+    "unexpected": [],
+    "all_operand_receipts_unchanged": true
+  },
+  "hash_only_footer_pairs_including_nested_Arrow_schema": 22,
+  "object_and_nullable_float_negative_controls": 8,
+  "scanner": {
+    "scanner_records": 27,
+    "scanner_statuses": {
+      "warn": 26,
+      "fail": 1
+    },
+    "full_raw_scanner_multiset_exact_vs_f8_and_bd80": true,
+    "scanner_full_baseline_frames_exact_to_bd80": 2
+  },
+  "CLI_actual_calls": 2,
+  "CLI_full_stage_frames_exact_to_bd80": 6,
+  "scanner_CLI_cache_changes": 0,
+  "warnings": {
+    "pairs": 176,
+    "full_raw_warning_multiset_exact": 136,
+    "category_message_multiset_exact_separate_property": 176,
+    "unexpected_category_or_message": [],
+    "raw_locations_preserved_not_normalized": true
+  },
+  "raw_warning_occurrences_new_actual_APIs": 210,
+  "protection": {
+    "all_full_receipts_exact": {
+      "diagnosis281": 281,
+      "bd80stop795": 795,
+      "original_held_providers": 17,
+      "new_L1_copies": 34
+    },
+    "diagnosis_source_full_tracked_receipts_exact": 14880,
+    "f8_source_full_tracked_receipts_exact": 14880,
+    "bd80_head_bytes_Git_clean_and_two_pretest_production_receipts_exact": true,
+    "bd80_full_initial_mtime_snapshot_absent": true,
+    "bd80_current_full_source_snapshot_pinned": true,
+    "new_source_tree_payloads": 0,
+    "existing_tracked_source_like_codebooks_exact": 9,
+    "old_roots_no_write_authorization": true,
+    "candidate_runtime_blobs_exact_7f4": true
+  },
+  "guard_events": {
+    "DENIED-os.remove": 6,
+    "mkdir-existing": 24,
+    "DENIED-os.mkdir": 1
+  },
+  "network_attempt_log_present": false,
+  "no_original_failure_stream_recovery_claim": true,
+  "no_all_country_output_or_full_suite_claim": true,
+  "GitHub_PR_merge_issue_closure": false,
+  "packaging_directory_guard_stop_preserved": true
+}

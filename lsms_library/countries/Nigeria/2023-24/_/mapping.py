@@ -64,8 +64,10 @@ def inputs_c8_unrecorded_size_drop(wave):
 
     One row per W5 C8 record whose unit is metric (g / cl / Kg / l) but
     whose coded size c8aq2_c is blank and not '99. ONE SIZE ONLY': the 133
-    rows on '2. GRAMS (G)' -- the only W5 metric-unit rows with no recorded
-    size.  (W5's 937 Kg + 504 l rows with a blank size are SERVED under
+    rows on '2. GRAMS (G)' and the 49 on '4. CENTLITRES (CL)' -- the only W5
+    metric-unit rows with no recorded size.  (The 49 were served as 'l'
+    until GH #587 corrected the decoder's 'CENTLITRES' typo.  W5's 937 Kg +
+    455 l rows with a blank size are SERVED under
     the base unit: a blank size beside KILOGRAMS reads as one kilogram; the
     c8aq2_a quantity and c8aq2_cvn factor agree.)  A dropped row has
     nowhere to carry a Derivation key, so the registry entry carries

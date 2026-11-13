@@ -60,4 +60,15 @@ df = pd.DataFrame({
 df = _finish_plot_inputs(df, '2021-22')
 
 assert len(df) > 0, 'plot_inputs 2021-22 produced no rows'
+# GH #1123: distinct native input slots must keep distinct declared keys,
+# even when their payloads happen to be equal.  Until GH #1123 a
+# non-injective harmonize_seed_crop pooled
+#   slots 15+20 and 19+20 (the three catch-all seed slots)
+# onto one 'Autre crop' key and core silently kept one row.  Same guard as
+# Burkina_Faso/Benin/Togo; it reports a count only, never a source key.
+dups = df.index[df.index.duplicated()]
+assert dups.empty, (
+    f"Niger plot_inputs 2021-22: {len(dups)} duplicate tuple(s) on "
+    "(t, i, input, crop, u); distinct reported input identities collide"
+)
 to_parquet(df, 'plot_inputs.parquet')

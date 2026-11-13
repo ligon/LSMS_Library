@@ -1,0 +1,13 @@
+{
+  "stage": "after",
+  "source_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "source_clean": true,
+  "tracked_content_modes_exact": 14880,
+  "source_index_sha256": "777bf6282634d2f18c98b0844ea64de752470fa738640ac08a8f92cd3bfcf84c",
+  "original_Uganda_manifest_receipts_exact": 344,
+  "original_Uganda_safe_export_receipts_exact": 22,
+  "all_original_Uganda_files_protected": 347,
+  "original_Mali_manifest_receipts_exact": 1309,
+  "all_original_Mali_files_protected": 1311,
+  "before_after_exact": true
+}

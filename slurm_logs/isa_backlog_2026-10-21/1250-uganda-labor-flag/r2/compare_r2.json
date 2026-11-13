@@ -1,0 +1,275 @@
+{
+ "rows": {
+  "base": 164692,
+  "branch": 164777
+ },
+ "removed": 0,
+ "added": 85,
+ "common": 164692,
+ "common_changed": {
+  "PersonDays": 0,
+  "Wage": 0,
+  "v": 0
+ },
+ "added_vs_oracle": {
+  "both": 85,
+  "left_only": 0,
+  "right_only": 0
+ },
+ "added_checks": {
+  "personDays_nan": 85,
+  "wage_equals_oracle": 85,
+  "source_hired": 85,
+  "plot_id_nan": 0,
+  "v_nan": 0,
+  "wage_sum": 6062000.0
+ },
+ "added_by_wave_season_flag_wage": [
+  {
+   "t": "2009-10",
+   "season": "A",
+   "flag": "missing",
+   "wage": "positive",
+   "rows": 2,
+   "wage_sum": 146000.0
+  },
+  {
+   "t": "2009-10",
+   "season": "A",
+   "flag": "yes",
+   "wage": "positive",
+   "rows": 36,
+   "wage_sum": 2235000.0
+  },
+  {
+   "t": "2009-10",
+   "season": "B",
+   "flag": "missing",
+   "wage": "positive",
+   "rows": 3,
+   "wage_sum": 210000.0
+  },
+  {
+   "t": "2009-10",
+   "season": "B",
+   "flag": "yes",
+   "wage": "positive",
+   "rows": 26,
+   "wage_sum": 1993000.0
+  },
+  {
+   "t": "2010-11",
+   "season": "A",
+   "flag": "yes",
+   "wage": "positive",
+   "rows": 6,
+   "wage_sum": 400000.0
+  },
+  {
+   "t": "2010-11",
+   "season": "A",
+   "flag": "yes",
+   "wage": "zero",
+   "rows": 1,
+   "wage_sum": 0.0
+  },
+  {
+   "t": "2010-11",
+   "season": "B",
+   "flag": "missing",
+   "wage": "positive",
+   "rows": 2,
+   "wage_sum": 58000.0
+  },
+  {
+   "t": "2010-11",
+   "season": "B",
+   "flag": "yes",
+   "wage": "positive",
+   "rows": 8,
+   "wage_sum": 1020000.0
+  },
+  {
+   "t": "2010-11",
+   "season": "B",
+   "flag": "yes",
+   "wage": "zero",
+   "rows": 1,
+   "wage_sum": 0.0
+  }
+ ],
+ "added_by_wave_season": {
+  "2009-10/A": 38,
+  "2009-10/B": 29,
+  "2010-11/A": 7,
+  "2010-11/B": 11
+ },
+ "added_by_flag": {
+  "yes": 78,
+  "missing": 7
+ },
+ "added_by_wage": {
+  "positive": 83,
+  "zero": 2
+ },
+ "hired_zero_days_with_wage": {
+  "base": {
+   "rows": 57,
+   "wage_sum": 1357199.0
+  },
+  "branch": {
+   "rows": 57,
+   "wage_sum": 1357199.0
+  }
+ },
+ "downstream_days": {
+  "total_labor_days": {
+   "identical": true,
+   "rows": {
+    "base": 16442,
+    "branch": 16442
+   },
+   "days": {
+    "base": 3054802.0,
+    "branch": 3054802.0
+   }
+  },
+  "total_family_labor_days": {
+   "identical": true,
+   "rows": {
+    "base": 11700,
+    "branch": 11700
+   },
+   "days": {
+    "base": 2703362.0,
+    "branch": 2703362.0
+   }
+  },
+  "total_hired_labor_days": {
+   "identical": true,
+   "rows": {
+    "base": 16438,
+    "branch": 16438
+   },
+   "days": {
+    "base": 338191.0,
+    "branch": 338191.0
+   }
+  }
+ },
+ "downstream_median_wage_valuation": {
+  "base": {
+   "hired_rows": 92002,
+   "priced_rows_in_pool": 21513,
+   "value_nonnull": 92002,
+   "value_sum": 1092039579.0053077,
+   "value_sum_by_wave": {
+    "2009-10": 204971865.18769512,
+    "2010-11": 132146868.70952192,
+    "2011-12": 142601673.1236442,
+    "2013-14": 147119144.78783092,
+    "2015-16": 162837234.60387564,
+    "2018-19": 103449176.18740478,
+    "2019-20": 198913616.40533528
+   }
+  },
+  "branch": {
+   "hired_rows": 92087,
+   "priced_rows_in_pool": 21513,
+   "value_nonnull": 92002,
+   "value_sum": 1092039579.005308,
+   "value_sum_by_wave": {
+    "2009-10": 204971865.18769512,
+    "2010-11": 132146868.70952192,
+    "2011-12": 142601673.1236442,
+    "2013-14": 147119144.78783092,
+    "2015-16": 162837234.60387564,
+    "2018-19": 103449176.18740478,
+    "2019-20": 198913616.40533528
+   }
+  },
+  "unit_price_changed_on_common_rows": 0,
+  "value_changed_on_common_rows": 0,
+  "new_rows": 85,
+  "new_rows_value_nan": 85,
+  "new_rows_unit_price_nonnull": 85
+ },
+ "sites": {
+  "base": {
+   "site_B_reports": 0,
+   "site_Q_reports": 0,
+   "site_I": [
+    {
+     "site": "built-table-index",
+     "country": "Uganda",
+     "table": "plot_labor",
+     "rows": 164692,
+     "findings": [
+      {
+       "level": "plot_id",
+       "n_nan": 95,
+       "waves": {
+        "2009-10": 85,
+        "2011-12": 5,
+        "2013-14": 5
+       }
+      },
+      {
+       "level": "v",
+       "n_nan": 1218,
+       "waves": {
+        "2009-10": 76,
+        "2011-12": 638,
+        "2015-16": 419,
+        "2018-19": 82,
+        "2019-20": 3
+       }
+      }
+     ]
+    }
+   ],
+   "warning_classes": [
+    "ClusterIdentityWarning",
+    "NullIndexKeyWarning"
+   ]
+  },
+  "branch": {
+   "site_B_reports": 0,
+   "site_Q_reports": 0,
+   "site_I": [
+    {
+     "site": "built-table-index",
+     "country": "Uganda",
+     "table": "plot_labor",
+     "rows": 164777,
+     "findings": [
+      {
+       "level": "plot_id",
+       "n_nan": 95,
+       "waves": {
+        "2009-10": 85,
+        "2011-12": 5,
+        "2013-14": 5
+       }
+      },
+      {
+       "level": "v",
+       "n_nan": 1218,
+       "waves": {
+        "2009-10": 76,
+        "2011-12": 638,
+        "2015-16": 419,
+        "2018-19": 82,
+        "2019-20": 3
+       }
+      }
+     ]
+    }
+   ],
+   "warning_classes": [
+    "ClusterIdentityWarning",
+    "NullIndexKeyWarning"
+   ]
+  }
+ }
+}

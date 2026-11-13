@@ -44,6 +44,64 @@ def ehcvm_i(grappe, menage):
         return None
     return g + '0' + m
 
+# ---------------------------------------------------------------------------
+# Household-id NAMESPACES for the independent samples (GH #1244, #1276)
+# ---------------------------------------------------------------------------
+#
+# Every wave builds ``i`` from its cluster SERIAL and the household number, and
+# the serials of independent draws overlap: EMC 2014 numbers its ZD 1-900,
+# EHCVM-1 its grappes 1-585, the 2021-22 cross-section 586-1185.  So unrelated
+# households shared served ids: 583 between 2014 (``zd + menage.zfill(3)``)
+# and 2018-19 (``grappe + '0' + menage.zfill(2)``), and 9 between the 2021-22
+# cross-section and 2018-19 (for a three-digit menage m, 2018-19's (g, m)
+# spells g + '0' + m, the same string as the cross-section's (10g, m)).  A
+# cross-wave ``groupby('i')`` merged them.
+#
+# @ligon's ruling on #1244: namespace the samples that are NOT the EHCVM-1
+# panel lineage, Niger's way (``niger.i`` prefixes EHCVM ids ``'E_'`` to keep
+# them apart from ECVMA's).  The 2018-19 ids and the 2021-22 panel component's
+# ids stay as they are: they are linked through ``panel_ids`` / ``updated_ids``.
+#
+# * ``EMC_`` -- the 2014 Enquete Multisectorielle Continue sample.  The whole
+#   acronym, not Niger's one letter: ``E`` would read as EHCVM to anyone who
+#   knows Niger's ``E_``.
+# * ``CS_`` -- the 2021-22 EHCVM-2 cross-section (WB 6277,
+#   ``Data/Cross_Section/``), Malawi's name for the same component (its
+#   ``cs_i`` / ``'cs-17-'``) in Niger's spelling.  Burkina has one
+#   cross-section sample; a later independent sample needs its own prefix.
+#
+# Letters cannot occur in the numeric ids, so a prefixed id can never equal an
+# unprefixed one, whatever the serials do.
+EMC_PREFIX = 'EMC_'
+CROSS_SECTION_PREFIX = 'CS_'
+
+
+def emc_i(zd, menage):
+    '''2014 (EMC) household id: ``'EMC_' + zd + menage.zfill(3)``.'''
+    z = tools.format_id(zd)
+    m = tools.format_id(menage, zeropadding=3)
+    if z is None or m is None:
+        return None
+    return EMC_PREFIX + z + m
+
+
+def cross_section_i(grappe, menage):
+    '''2021-22 cross-section (WB 6277) household id:
+    ``'CS_' + grappe + menage.zfill(3)`` -- the country :func:`i` format, so
+    the digits after the prefix are the survey's own ``hhid``.'''
+    g = tools.format_id(grappe)
+    m = tools.format_id(menage, zeropadding=3)
+    if g is None or m is None:
+        return None
+    return CROSS_SECTION_PREFIX + g + m
+
+
+def cs_i(value):
+    '''``data_info.yml`` formatter for a ``Cross_Section/`` file entry:
+    ``i: [grappe, menage, {mapping: cs_i}]`` (a per-file override).'''
+    return cross_section_i(value.iloc[0], value.iloc[1])
+
+
 def _household_roster_from_df(df, sex, age, HHID, sex_converter=None, age_converter=None,
                                months_spent='months_spent', Age_ints=None):
     """Inline replacement for lsms.tools.get_household_roster(fn_type=None)."""
@@ -89,17 +147,6 @@ def age_sex_composition(df, sex, sex_converter, age, age_converter, hhid):
     testdf['log HSize'] = np.log(testdf[['girls', 'boys', 'men', 'women']].sum(axis=1))
     testdf.index.name = 'j'
     return testdf
-
-def panel_ids(df):
-    """Construct previous_i from previous_v (grappe) and previous_hid (menage).
-
-    Must match the i() format above: format_id(grappe) + format_id(menage, zeropadding=3).
-    """
-    grappe = df['previous_v'].apply(tools.format_id)
-    menage = df['previous_hid'].apply(lambda x: tools.format_id(x, zeropadding=3))
-    df['previous_i'] = grappe + menage
-    return df[['previous_i']]
-
 
 # ---------------------------------------------------------------------------
 # plot_features (GH #167; EHCVM cluster)
@@ -154,8 +201,8 @@ def _map_codes(series, code_map):
 def plot_features_for_wave(t, source, colmap, id_fn=None):
     """Build canonical ``plot_features`` for one Burkina Faso EHCVM wave.
 
-    Mirrors ``Mali/_/mali.py:plot_features_for_wave`` exactly except for
-    the household-id formatter.  Returns a DataFrame indexed by
+    Uses the Mali EHCVM area/tenure pattern with Burkina's household-id
+    formatter and optional parcel coordinates. Returns a DataFrame indexed by
     ``(t, i, plot_id)`` with columns ``Area`` (hectares float),
     ``AreaUnit`` ('hectares'), ``Tenure``, ``TenureSystem``,
     ``SoilType`` (str), and ``Irrigated`` (nullable bool).
@@ -176,8 +223,11 @@ def plot_features_for_wave(t, source, colmap, id_fn=None):
     Each wave's ``plot_features.py`` passes the formatter matching its own
     ``sample()``; the default is :func:`ehcvm_i` (the canonical EHCVM id).
 
-    Latitude / Longitude are deferred — EHCVM s16a has no decimal-degree
-    parcel GPS (s16aq47 is an area, not a coordinate).
+    Optional ``latitude`` / ``longitude`` colmap keys supply independent
+    nullable-float coordinates on the same retained source rows. Missing keys
+    leave that wave unchanged; a declared missing source column raises.
+    Burkina 2021-22 records these in s16aq46; 2018-19 has no coordinates.
+    s16aq47 is an area, not a coordinate.
     """
     if id_fn is None:
         id_fn = ehcvm_i
@@ -250,6 +300,10 @@ def plot_features_for_wave(t, source, colmap, id_fn=None):
         'SoilType':     soil_type.values,
         'Irrigated':    irrigated.values,
     })
+    for source_key, output_name in [('latitude', 'Latitude'),
+                                    ('longitude', 'Longitude')]:
+        if source_key in c:
+            df[output_name] = pd.array(src[c[source_key]], dtype='Float64')
     df = df.set_index(['t', 'i', 'plot_id'])
     return df
 

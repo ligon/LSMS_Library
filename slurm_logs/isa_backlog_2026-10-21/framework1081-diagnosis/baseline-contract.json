@@ -1,0 +1,23 @@
+{
+  "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "cases": 73,
+  "failed": 42,
+  "passed": 31,
+  "errors": 0,
+  "skips": 0,
+  "expected_baseline_failures": true,
+  "named_two_error_scope": {
+    "cases": 38,
+    "failed": 28,
+    "passed": 10
+  },
+  "key_declaration_scope": {
+    "cases": 19,
+    "failed": 14,
+    "passed": 5
+  },
+  "generic_legacy_success_and_failure_controls": {
+    "cases": 16,
+    "passed": 16
+  }
+}

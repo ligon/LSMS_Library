@@ -1,0 +1,10 @@
+{
+  "status": "POSTEXIT_PR1202_PERSISTED_SAVED_SUPPLEMENT",
+  "READY_sha256": "4b47d28cfb6305a631b5caf6b8018cc8ab922e5dfc0ef0720e9f155b1c424fb5",
+  "manifest_sha256": "fc4b1d77c7dbcc6ad7b3418a1ff1041ae34f6fbf0162152c21fb529502ebaabb",
+  "manifest_entries": 555,
+  "all1908_original459copies_exact": true,
+  "source_clean_zero_consumers_zero_denials": true,
+  "nine_NEW_expected_exact_config_hold_remains_in_this_packet": true,
+  "signed": "Sue"
+}

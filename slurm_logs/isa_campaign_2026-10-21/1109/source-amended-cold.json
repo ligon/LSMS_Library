@@ -1,0 +1,32 @@
+{
+  "checkout": "/local/job40255479/worktrees/isa-Malawi",
+  "source_sha": "d6b709090b2394557976e8a7c36fea2edcba6bf5",
+  "shape": [
+    180184,
+    5
+  ],
+  "organic_rows": 11075,
+  "organic_quantity_null": 7,
+  "organic_quantity_zero": 0,
+  "quantity_dtype": "Float64",
+  "nitrogen_shape": [
+    33466,
+    1
+  ],
+  "nitrogen_total": 840235.7795800001,
+  "warnings": {
+    "RuntimeWarning": 18,
+    "NullReadWarning": 1,
+    "NullIndexKeyWarning": 1,
+    "NutrientCoverageWarning": 1
+  },
+  "seconds": 69.97,
+  "wave_counts": {
+    "2010-11": 46627,
+    "2013-14": 16188,
+    "2016-17": 52494,
+    "2019-20": 64875
+  },
+  "module_sha256": "33b3f4d1e009825016c2e446bbb964683dfa4fc3b02ef39ad3c857b6fc7914a4",
+  "in_tree_parquets": 0
+}

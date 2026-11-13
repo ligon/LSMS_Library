@@ -1,0 +1,87 @@
+{
+ "rows": [
+  85519,
+  86403
+ ],
+ "relabelled": {
+  "2013-14 Red Kidney Beans": 35,
+  "2013-14 Mung bean": 11,
+  "2011-12 Red Kidney Beans": 5,
+  "2011-12 Mung bean": 1
+ },
+ "rows_dropped": 0,
+ "rows_added_by_wave": {
+  "2013-14": 361,
+  "2015-16": 79,
+  "2018-19": 168,
+  "2021-22": 276
+ },
+ "changed_cells_on_common_rows": {
+  "Quantity_sold": {
+   "2011-12 0->NaN": 45,
+   "2011-12 NaN->0": 384,
+   "2011-12 NaN->pos": 160,
+   "2013-14 0->NaN": 4,
+   "2013-14 NaN->0": 937,
+   "2013-14 NaN->pos": 439,
+   "2015-16 0->NaN": 542,
+   "2015-16 NaN->pos": 971,
+   "2018-19 0->NaN": 816,
+   "2021-22 0->NaN": 819
+  },
+  "Value_sold": {
+   "2011-12 0->NaN": 46,
+   "2011-12 NaN->0": 384,
+   "2011-12 NaN->pos": 160,
+   "2013-14 0->NaN": 6,
+   "2013-14 NaN->0": 3073,
+   "2013-14 NaN->pos": 1390,
+   "2015-16 NaN->0": 3212,
+   "2015-16 NaN->pos": 1283,
+   "2018-19 0->NaN": 6,
+   "2021-22 0->NaN": 8
+  },
+  "perennial": {
+   "2015-16 True->False": 692,
+   "2018-19 True->False": 245,
+   "2021-22 True->False": 291
+  },
+  "Derivation": "new column"
+ },
+ "positive_Value_sold_dev": {
+  "2011-12": 694,
+  "2013-14": 1347,
+  "2015-16": 1017,
+  "2018-19": 1368,
+  "2021-22": 1292
+ },
+ "Value_sold_birr_dev": {
+  "2011-12": 539465.0,
+  "2013-14": 2031398.0,
+  "2015-16": 1411978.0,
+  "2018-19": 2563767.0,
+  "2021-22": 6940614.4
+ },
+ "Derivation_dev": {},
+ "positive_Value_sold_final": {
+  "2011-12": 854,
+  "2013-14": 2760,
+  "2015-16": 2309,
+  "2018-19": 1395,
+  "2021-22": 1323
+ },
+ "Value_sold_birr_final": {
+  "2011-12": 600749.0,
+  "2013-14": 3000513.0,
+  "2015-16": 2490034.0,
+  "2018-19": 2605209.0,
+  "2021-22": 6973996.4
+ },
+ "Derivation_final": {
+  "2011-12 Ethiopia::crop_production::sect12-sale-period": 544,
+  "2013-14 Ethiopia::crop_production::sect12-sale-period": 4672,
+  "2015-16 Ethiopia::crop_production::sect12-sale-period": 4557,
+  "2018-19 Ethiopia::crop_production::permanent-crop-12-month-window": 3796,
+  "2021-22 Ethiopia::crop_production::permanent-crop-12-month-window": 3875
+ }
+}

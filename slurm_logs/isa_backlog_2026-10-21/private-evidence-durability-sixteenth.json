@@ -1,0 +1,25 @@
+{
+  "verified_at_UTC": "2026-10-22T02:50:33.364673+00:00",
+  "archive_name": "quiescent-followup-sixteenth.tar.gz",
+  "archive_sha256": "46c526d7b965a44916c0f1ea44f530354bad53c5de2a1a4e703d6d17d1447e22",
+  "archive_bytes": 219261255,
+  "included_files": 895,
+  "included_source_bytes": 1981709270,
+  "roots": [
+    "Uganda/1198-fix",
+    "Mali/1091-docs",
+    "integration/mali-eighteen-doc-review"
+  ],
+  "excluded_entries": 74,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "07d6facbc996c85ed942193a02ddaa7b37a99efe7a2d47c1e6e95b3a75cf7553",
+  "private_full_manifest_sha256": "98c7dfd5e56400d76b7ba8a34116228e4d13b249f47d818338fc92e0121bebf9",
+  "private_evidence_not_exported_to_Git": true
+}

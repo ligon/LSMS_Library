@@ -1,0 +1,44 @@
+{
+  "ROOT-SYNTHETIC-PROOF.json": {
+    "sha256": "562be55e6e4c38c969946f1134a30a159d0ecb86c40a7a88f95f7b3f79e50ba0",
+    "bytes": 944,
+    "mode": 384,
+    "mtime_ns": 1792648775501452534,
+    "owner": 43292
+  },
+  "independent-synthetic.py": {
+    "sha256": "cebb4d5e6c3051198df58c78e93435614c783f5cfd2a272a5c70f0df1025b0f6",
+    "bytes": 3322,
+    "mode": 384,
+    "mtime_ns": 1792648774957449436,
+    "owner": 43292
+  },
+  "nextafter-mutant-private.pkl": {
+    "sha256": "7f9cb373a001029e7f180f2399364544e3146c3659fdf1a3f1a84814e4020b58",
+    "bytes": 1004,
+    "mode": 384,
+    "mtime_ns": 1792648775495452499,
+    "owner": 43292
+  },
+  "nextafter-reference-private.pkl": {
+    "sha256": "2179e0c650ebd289fba2ad8cac2771b13bde69369a766e58f13912a69f65c789",
+    "bytes": 1004,
+    "mode": 384,
+    "mtime_ns": 1792648775495452499,
+    "owner": 43292
+  },
+  "tiny-mutant-private.pkl": {
+    "sha256": "de6143524c129cc2441de9fcac4dad1220eb16e5d065f6d486a7681dd30619e4",
+    "bytes": 1004,
+    "mode": 384,
+    "mtime_ns": 1792648775492452482,
+    "owner": 43292
+  },
+  "tiny-reference-private.pkl": {
+    "sha256": "2179e0c650ebd289fba2ad8cac2771b13bde69369a766e58f13912a69f65c789",
+    "bytes": 1004,
+    "mode": 384,
+    "mtime_ns": 1792648775492452482,
+    "owner": 43292
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "status": "AUTHOR_READY_FOR_INDEPENDENT_REVIEW",
+  "source_head": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+  "tested_runtime": "7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1",
+  "FS_published": true,
+  "source_clean": true,
+  "documentation_descendant_only_paths": [
+    ".coder/ledger/1196-parquet-index-policy.md",
+    "lsms_library/countries/Niger/_/CONTENTS.org",
+    "lsms_library/countries/Uganda/_/CONTENTS.org",
+    "slurm_logs/isa_backlog_2026-10-21/1196-index-policy/ALLOWLIST.json",
+    "slurm_logs/isa_backlog_2026-10-21/1196-index-policy/REPORT.org",
+    "slurm_logs/isa_backlog_2026-10-21/1196-index-policy/REPRODUCE.org",
+    "slurm_logs/isa_backlog_2026-10-21/1196-index-policy/proof.json",
+    "slurm_logs/isa_backlog_2026-10-21/1196-index-policy/validation.json"
+  ],
+  "runtime_config_test_blobs_unchanged_except_two_dated_CONTENTS": true,
+  "manifest_entries": 859,
+  "manifest_sha256": "6b015771211cde0249c2f394e61c2587d84a8bb0a516634a77a566bf27f37420",
+  "safe_exports": {
+    "REPORT.org": {
+      "sha256": "ebaf3bb6b9a375e4ebcfc9a45512aec9160dbadb144715e73a401d2e3e71f266",
+      "md5": "d68fe70d17f6f92d3f41f5509924fcfc",
+      "size": 12743,
+      "mode": 384,
+      "mtime_ns": 1792673023864139049,
+      "nlink": 1,
+      "inode": 55845298,
+      "device": 64770,
+      "symlink": false
+    },
+    "REPRODUCE.org": {
+      "sha256": "f00006d71b52a74c0bc240db78e30656b3f2384e1180bcbb67ecf7c780070afa",
+      "md5": "5370ddb96954373bf5b67bb30422173e",
+      "size": 5589,
+      "mode": 384,
+      "mtime_ns": 1792672760149796498,
+      "nlink": 1,
+      "inode": 55845299,
+      "device": 64770,
+      "symlink": false
+    },
+    "validation.json": {
+      "sha256": "fea55a1deb5c9c799e0c3f6eb26a0f76f9f8380938be4f984134fae406b74ead",
+      "md5": "700d620dffa587fff4d55929a284dfff",
+      "size": 5478,
+      "mode": 420,
+      "mtime_ns": 1792673023864139049,
+      "nlink": 1,
+      "inode": 55845327,
+      "device": 64770,
+      "symlink": false
+    },
+    "proof.json": {
+      "sha256": "d1fb0cf17e9d2ffa6cae9a788727f2a7286be3d7bd98ec424653ce0b53385332",
+      "md5": "d41adcd1827f79af5a5fae9c2807c660",
+      "size": 5770,
+      "mode": 420,
+      "mtime_ns": 1792673023864139049,
+      "nlink": 1,
+      "inode": 55845328,
+      "device": 64770,
+      "symlink": false
+    },
+    "ALLOWLIST.json": {
+      "sha256": "23852a416ddb168214713112052e7f306a5e5e3cf22f5af88a8a0e5233e8ba40",
+      "md5": "5ed8e229b5dbbbec2ccf2dbc7eb588a2",
+      "size": 580,
+      "mode": 420,
+      "mtime_ns": 1792673023865139055,
+      "nlink": 1,
+      "inode": 55845329,
+      "device": 64770,
+      "symlink": false
+    }
+  },
+  "old281_and795_full_receipts_verified": true,
+  "original17_and_new34_L1_receipts_verified": true,
+  "zero_task_consumers_excluding_metadata_verifier": true,
+  "no_API_source_test_scanner_CLI_replay_in_freeze": true,
+  "control_files_excluded_from_payload_manifest": [
+    "FINAL-POSTEXIT.json",
+    "READY.json",
+    "final-private-manifest.json"
+  ],
+  "post_exit_receipt_required": "FINAL-POSTEXIT.json",
+  "signed": "Sue"
+}

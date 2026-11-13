@@ -1,0 +1,23 @@
+{
+  "status": "ROOT_ACCEPTED_BOUNDED_SAVED_NUMERIC_SUPPLEMENT",
+  "strict_nonself_groups": 87,
+  "findings": 0,
+  "historical_entries": 189,
+  "physical_selected_products": 58,
+  "source_census_scripts": 12,
+  "manifest_and_attestation_entries": 114,
+  "READY_sha256": "cccc34f3112629a88a8966a18ac06133ba94d621fefe22e6af351017a0df338a",
+  "manifest_sha256": "97024d37d257ccf6aba5676c17158247682fc0b630b1b4b231b2e89923bc1d1c",
+  "groups": {
+    "producer_source_helper_native": 8,
+    "NEW_retained_matching_native": 8,
+    "NEW_retained_matching_country_raw": 4,
+    "producer_warm_cold": 26,
+    "producer_old_payload_baseline_cold": 26,
+    "posthoc_matched_warm_old_payload": 13,
+    "posthoc_healthy_complete": 2
+  },
+  "all_original_missing_source_expected_warm_and_test_memory_gaps_preserved": true,
+  "no_payload_decode_or_API_source_test_replay_by_root": true,
+  "not_all_campaign_or_scientific_approval": true
+}

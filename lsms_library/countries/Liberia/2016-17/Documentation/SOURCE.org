@@ -1,0 +1,15 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2986
+
+#+CATALOG_ID: 2986
+#+CATALOG_IDNO: LBR_2016_HIES_v01_M
+#+CATALOG_TITLE: Household Income and Expenditure Survey 2016
+#+CATALOG_YEARS: 2016-2017
+#+CATALOG_REPOSITORY: central
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2986
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-11-04
+#+PROVENANCE_NOTE: Acquired whole on 2026-11-04 by add_wave: all 49 data files in the Stata zip, each pushed. 2986's WB datafile list names 50: HH_R1 is listed and not in the zip. Registered, not wired.

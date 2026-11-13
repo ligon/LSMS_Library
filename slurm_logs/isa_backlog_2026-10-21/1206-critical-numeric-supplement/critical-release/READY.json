@@ -1,0 +1,81 @@
+{
+  "status": "FROZEN_CRITICAL_RELEASE",
+  "manifest_entries": 449,
+  "manifest_sha256": "ff982bd1561f6f79151f18a0b048cfb694990514a8ef5562fceb4f32795bd309",
+  "safe_export_allowlist": {
+    "safe-exports/REPRODUCE.md": {
+      "sha256": "ceffcb6ced07e09617ab8ee9c8f85a61e4b253c33ca2f32b2f938aae1fdca284",
+      "bytes": 1090,
+      "mode": 384,
+      "mtime_ns": 1792651373908034964,
+      "inode": 140144,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file"
+    },
+    "safe-exports/REVIEW.md": {
+      "sha256": "a508a508fa3097675b573a2d8c5bad3280f24cd33a5c17a3ea400232cef98855",
+      "bytes": 4105,
+      "mode": 384,
+      "mtime_ns": 1792651373907034958,
+      "inode": 140143,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file"
+    },
+    "safe-exports/calibration.json": {
+      "sha256": "fd936a23797c2ce46d0b3baf60e3f2d63e151f5ed4071fe10c4943a33ce80911",
+      "bytes": 502,
+      "mode": 384,
+      "mtime_ns": 1792651373907034958,
+      "inode": 140141,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file"
+    },
+    "safe-exports/checker-sources.json": {
+      "sha256": "9613382b7e6fb5b3a7cfb45e178cbcd9ea0a6c2dbd0a65fbcd1818afeec41514",
+      "bytes": 2942,
+      "mode": 384,
+      "mtime_ns": 1792651373908034964,
+      "inode": 140145,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file"
+    },
+    "safe-exports/coverage-registry.json": {
+      "sha256": "3b1b280440e2bcec6077eb57126df8610797cec015cd452a6109d3c35f5d7bd8",
+      "bytes": 20573,
+      "mode": 384,
+      "mtime_ns": 1792651373907034958,
+      "inode": 140142,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file"
+    },
+    "safe-exports/proof.json": {
+      "sha256": "5af12d1d31d194fb594ac9ed1ad040d9aa57f16f805180e6ece94a8ad19efe68",
+      "bytes": 1178,
+      "mode": 384,
+      "mtime_ns": 1792651373907034958,
+      "inode": 140140,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file"
+    },
+    "safe-exports/validation.json": {
+      "sha256": "139215e06b891724b7d5d29106206a13217a300eb8f4bc5c3f33bca2fc6560e7",
+      "bytes": 6868,
+      "mode": 384,
+      "mtime_ns": 1792651373943035164,
+      "inode": 140146,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file"
+    }
+  },
+  "scope": "CRITICAL_SUBCOHORTS_ONLY_FULL1206_REASSESSMENT_REMAINS_OPEN",
+  "analysis_processes_completed_before_packaging": true,
+  "original_roots_immutable": true,
+  "signed": "Sue"
+}

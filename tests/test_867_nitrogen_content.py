@@ -32,6 +32,17 @@ The citations, repeated here because the ruling asks for them in the test:
   FAO & GoM, *Soil nutrient loss assessment in Malawi* (2018), p. IX,
   gives with no source (Zimbabwe's Compound D grade).  EPAR's 0.10 is
   Zambia's 10-20-10.
+* **Chitowe = 0.23 kg N / kg** (GH #1106, ruling @ligon 2026-11-03) -- Malawi
+  Module D type code 1, whose source label in every wave is
+  ``23:21:0+4S/CHITOWE``, served as ``NPK 23:21:0+4S Fertilizer``.  The same
+  proposed Regulations, Schedule B, penalty example 3, printed p. 31: "A
+  23-21-0 + 4S compound ... guaranteed as 23% N"; IFDC & AFAP for AGRA,
+  *Assessment ... Malawi* (June 2018), Table 1: ``NPK 23:21:00 +4S`` (maize);
+  FAO & GoM, *Soil nutrient loss assessment in Malawi* (2018), p. IX:
+  "23:21:0+4S (also known as Chitowe)".  The WB panel (``MWI_IHPS1.do:776``,
+  ``NPK_kg * 0.23``) and EPAR (``0.23*(itemcode==1)``) credit code 1 the same.
+  The shared ``npk`` key stays NPK 17-17-17 for every other label (Niger's ECVMA
+  ``NPK 15-15-15`` has its own key, GH #1445, ``tests/test_niger_npk_grade.py``).
 * **Organic: no share.**  Refused, by ruling; the measured reasons are in
   the comment above ``_NITROGEN_CONTENT``.
 
@@ -104,6 +115,73 @@ def test_d_compound_carries_the_cited_8_percent_share():
         'D Compound Fertilizer']
 
 
+MALAWI_CODE_1 = 'NPK 23:21:0+4S Fertilizer'
+
+
+def test_chitowe_carries_the_cited_23_percent_share():
+    """Malawi type code 1 (GH #1106): 23% N per the proposed Regulations'
+    penalty example 3, IFDC/AFAP 2018 Table 1 and FAO & GoM 2018 p. IX."""
+    assert T._NITROGEN_CONTENT['npk 23:21:0+4s'] == 0.23
+    out, cov = _run([('2019-20', 'hh1', 'p1', MALAWI_CODE_1, 'x', 'Kg', 100.0)])
+    assert out['Nitrogen_kg'].sum() == pytest.approx(23.0)
+    tally = out.attrs['nitrogen_input_match']
+    assert tally['matched_labels'] == [MALAWI_CODE_1]
+    assert tally['unmatched_rows'] == 0
+    assert cov == []
+
+
+def test_the_chitowe_label_resolves_to_its_own_key_only():
+    """The strip rule gives ``npk 23:21:0+4s``; no candidate is ``npk``."""
+    assert T._normalise_input_label(MALAWI_CODE_1) == [
+        'npk 23:21:0+4s fertilizer', 'npk 23:21:0+4s']
+    resolved = [k for k in T._normalise_input_label(MALAWI_CODE_1)
+                if k in T._NITROGEN_CONTENT]
+    assert resolved == ['npk 23:21:0+4s']
+
+
+@pytest.mark.parametrize('label', ['NPK', 'NPK Fertilizer'])
+def test_the_shared_npk_key_stays_17_percent(label):
+    """The Chitowe key is additive: ``NPK`` (Nigeria, Mali, Tanzania and the
+    EHCVM countries) and the bare ``NPK Fertilizer`` spelling keep 0.17."""
+    assert T._NITROGEN_CONTENT['npk'] == 0.17
+    out, cov = _run([('2019-20', 'hh1', 'p1', label, 'x', 'Kg', 100.0)])
+    assert out['Nitrogen_kg'].sum() == pytest.approx(17.0)
+    assert out.attrs['nitrogen_input_match']['matched_labels'] == [label]
+    assert cov == []
+
+
+def test_chitowe_and_the_shared_npk_are_separate_products_on_one_plot():
+    out, _ = _run([('2019-20', 'hh1', 'p1', MALAWI_CODE_1, 'x', 'Kg', 100.0),
+                   ('2019-20', 'hh1', 'p1', 'NPK', 'x', 'Kg', 100.0)])
+    assert out['Nitrogen_kg'].sum() == pytest.approx(40.0)
+
+
+def _malawi_harmonize_input():
+    from lsms_library.local_tools import df_from_orgfile
+    from lsms_library.paths import countries_root
+    df = df_from_orgfile(
+        str(countries_root() / 'Malawi' / '_' / 'categorical_mapping.org'),
+        name='harmonize_input', set_columns=True, to_numeric=True)
+    return {int(code): label
+            for code, label in zip(df['Code'], df['Preferred Label'])}
+
+
+def test_malawi_code_1_is_served_as_chitowe_at_23_percent():
+    """Config-only pin of the code -> label -> share chain (no data read).
+    The relabel and the key go together: either alone would leave code 1 with
+    no nitrogen value, or at NPK 17-17-17."""
+    labels = _malawi_harmonize_input()
+    assert labels[1] == MALAWI_CODE_1
+    assert 'NPK Fertilizer' not in labels.values()
+    codes = [1, 2, 3, 4, 5, 6, 20]
+    shares, tally = T._nitrogen_shares([labels[c] for c in codes],
+                                       T._NITROGEN_CONTENT)
+    assert dict(zip(codes, shares.iloc[:6])) == {
+        1: 0.23, 2: 0.18, 3: 0.26, 4: 0.46, 5: 0.08, 6: 0.0}
+    assert pd.isna(shares.iloc[6])                  # organic, refused
+    assert tally['unmatched_labels'] == {'Organic Fertilizer': 1}
+
+
 def test_the_blends_sum_with_the_existing_products_on_one_plot():
     out, _ = _run([
         ('2019-20', 'hh1', 'p1', 'NPS', 'x', 'Kg', 100.0),
@@ -116,10 +194,13 @@ def test_the_blends_sum_with_the_existing_products_on_one_plot():
 
 
 @pytest.mark.parametrize('label', ['Super D Compound Fertilizer', 'NPSB',
-                                   'NPS with added Zn', 'Compound D'])
+                                   'NPS with added Zn', 'Compound D',
+                                   'Chitowe', 'NPK 23:21:0 Fertilizer',
+                                   'NPK 23:21:0+4S+B Fertilizer'])
 def test_a_near_miss_of_a_blend_stays_unmatched(label):
     """Matching stays EXACT: a key is a claim about one product's grade, so
-    a label that merely CONTAINS ``nps`` / ``d compound`` gets no share."""
+    a label that merely CONTAINS ``nps`` / ``d compound`` / ``23:21:0`` gets
+    no share."""
     out, _ = _run([('2019-20', 'hh1', 'p1', label, 'x', 'Kg', 100.0),
                    ('2019-20', 'hh1', 'p1', 'Urea', 'x', 'Kg', 10.0)])
     tally = out.attrs['nitrogen_input_match']
@@ -314,3 +395,22 @@ def test_malawi_warm_d_compound_is_matched_at_8_percent():
     assert product > 0
     assert _label_n(pi, 'D Compound Fertilizer') == pytest.approx(
         0.08 * product)
+
+
+@pytest.mark.requires_s3
+def test_malawi_warm_code_1_is_matched_at_23_percent():
+    """GH #1106.  Checked against the label's own product kilograms, as for
+    D Compound.  ``_warm`` trusts the parquet, so a root last warmed before
+    this change serves the old label and fails here until it is re-warmed
+    (``ll.Country('Malawi').plot_inputs()``; the hash moved, so an ordinary
+    read rebuilds)."""
+    pi = _warm('Malawi', 'plot_inputs')
+    labels = pi.index.get_level_values('input').astype(str)
+    assert 'NPK Fertilizer' not in set(labels)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', NutrientCoverageWarning)
+        product = float(nitrogen_kg(
+            pi[labels == MALAWI_CODE_1],
+            nitrogen_content={'npk 23:21:0+4s': 1.0})['Nitrogen_kg'].sum())
+    assert product > 0
+    assert _label_n(pi, MALAWI_CODE_1) == pytest.approx(0.23 * product)

@@ -83,24 +83,37 @@ U_TABLES = ("crop_production", "food_acquired", "plot_inputs", "community_prices
 
 # Cold-rebuild measurements (see the module docstring for provenance).
 EXPECTED_ROWS = {
-    "crop_production": 46376,   # 46,341 before the 2026-09-24 Niger bundle
+    # 46,341 before the 2026-09-24 Niger bundle; 46,376 before GH #1360, whose
+    # production_obs level stops the collapse destroying repeated harvest lines
+    # (2011-12 +30, 2021-22 +1,010).
+    # 47,416 before GH #1462 served section 3E's 575 dry-season lines.
+    # 47,991 before GH #1457's Farm-level sale rows (2014-15 +498, 2021-22 +553).
+    "crop_production": 49042,
     # 239,031 before GH #876.  The derived purchase value drops rows whose
     # purchased quantity is zero and which used to survive on the raw s07bq08
     # (and the gift subtraction moves more of them to zero); s07bq05 then adds
     # 15,253 new `s='inkind'` rows across the two EHCVM waves.  Net +851.
-    "food_acquired": 239877,    # 239,882 before GH #833's sugar fold
-    "plot_inputs": 42426,       # 42,364 before the bundle
+    # 239,877 before GH #1224: one 2021-22 household's two sugar rows differ in
+    # unit size, so the #833 fold no longer sums them.  Quantity is unchanged.
+    "food_acquired": 239878,    # 239,882 before GH #833's sugar fold
+    # 42,364 before the bundle; 42,426 before GH #1123, whose seed-crop split
+    # stops the catch-all collapse eating 6 (2018-19) + 3 (2021-22) native
+    # input lines.  None of the nine carries u == Unknown (counts below).
+    "plot_inputs": 42553,  # GH #1123 ECVMA input_obs: +73/45 native slots.
     # 15,423 before GH #840, which stopped selecting one row per (t, v, j, u)
     # and added the variety / visit / obs levels: 2011-12 8,923 -> 32,369,
     # 2014-15 6,500 -> 13,808; then 46,177 -> 46,043 when the red team showed
     # 134 of the obs 4-6 rows were duplicate ENTRIES repeating a served row
     # (2011-12 32,369 -> 32,352, 2014-15 13,808 -> 13,691).  Still 0 `Unknown`
     # rows (below): the 795 unit-less CS07 observations are dropped, not
-    # filled (CONTENTS.org).
-    "community_prices": 46043,
+    # filled (CONTENTS.org).  GH #823 then wired 2018-19 (EHCVM s05): +84,444
+    # rows, none of them `Unknown` (every s05 unit-size code names a unit), and
+    # the 46,043 CS07 rows unchanged.  GH #1087 serves a CS07 record's first
+    # entry: -30 (the obs 4-6 rows, 15 + 15), 130,487 -> 130,457.
+    "community_prices": 130457,
 }
 EXPECTED_SENTINEL = {
-    "crop_production": 4909,    # 4,920 before GH #865 dropped 11 all-sentinel lines
+    "crop_production": 6027,    # 4,920 before GH #865 dropped 11 all-sentinel lines; 4,909 before GH #1360; 4,950 before GH #1462 (+26: 3E's no-unit lines); 4,976 before GH #1457 (+1,051: a Farm-level sale has no harvest unit)
     "food_acquired": 8,      # 12 before GH #876; one of the 8 is an inkind row
     "plot_inputs": 74,          # 75 before GH #865 dropped the one 9999 line
     "community_prices": 0,
@@ -108,10 +121,10 @@ EXPECTED_SENTINEL = {
 # Per-wave sentinel counts, so a wave-script regression cannot hide inside a
 # country total that happens to add up.
 EXPECTED_SENTINEL_BY_WAVE = {
-    "crop_production": {"2011-12": 3135, "2014-15": 373, "2018-19": 441, "2021-22": 960},  # 2011-12 3,146 before GH #865
+    "crop_production": {"2011-12": 3171, "2014-15": 871, "2018-19": 441, "2021-22": 1544},  # 2011-12 3,146 before GH #865; 3,135 / 960 before GH #1360; 3,145 before GH #1462; 373 / 991 before GH #1457
     "food_acquired": {"2018-19": 0, "2021-22": 8},   # 12 before GH #876
     "plot_inputs": {"2011-12": 44, "2014-15": 15, "2018-19": 2, "2021-22": 13},   # 2021-22 14 before GH #865
-    "community_prices": {"2011-12": 0, "2014-15": 0},
+    "community_prices": {"2011-12": 0, "2014-15": 0, "2018-19": 0},  # 2018-19: GH #823
 }
 
 
@@ -385,6 +398,10 @@ class TestNoNullUnitIsServed:
     @pytest.mark.parametrize("table", U_TABLES)
     def test_sentinel_counts_are_the_measured_ones(self, table):
         flat = self._serve(table)
+        if table == "plot_inputs":
+            oracle = _plot_input_source_oracle()
+            oracle._assert_plot_input_counts(flat, oracle._expected_plot_inputs())
+            return
         assert len(flat) == EXPECTED_ROWS[table], (
             f"{COUNTRY}.{table}() has {len(flat)} rows, measured "
             f"{EXPECTED_ROWS[table]}"
@@ -401,7 +418,22 @@ class TestNoNullUnitIsServed:
         flat = self._serve(table)
         got = (flat.assign(_s=flat["u"].astype("string") == SENTINEL)
                    .groupby("t")["_s"].sum().astype(int).to_dict())
+        if table == "plot_inputs":
+            oracle = _plot_input_source_oracle()
+            oracle._assert_plot_input_counts(flat, oracle._expected_plot_inputs(), by_wave=True)
+            return
         assert got == EXPECTED_SENTINEL_BY_WAVE[table], (
             f"{COUNTRY}.{table}() sentinel counts by wave are {got}, measured "
             f"{EXPECTED_SENTINEL_BY_WAVE[table]}"
         )
+
+
+def _plot_input_source_oracle():
+    # Load the test oracle by path: tests is not a stable import package here.
+    # No production helper, saved output count or +1067/+12 repin supplies it.
+    import importlib.util
+    path = Path(__file__).with_name("test_niger_npk_grade.py")
+    spec = importlib.util.spec_from_file_location("_niger_input_source_oracle", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module

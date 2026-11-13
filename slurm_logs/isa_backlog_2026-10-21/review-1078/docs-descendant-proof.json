@@ -1,0 +1,27 @@
+{
+  "status": "SUCCESS",
+  "runtime_final_library_tests_git_trees_modes_identical": {
+    "runtime": {
+      "lsms_library": "cc18a441cca4c69a24c2f24d513f4f23c3937d86",
+      "tests": "9b685fc972bbbcec464bf6176963e4f0773ba674"
+    },
+    "final": {
+      "lsms_library": "cc18a441cca4c69a24c2f24d513f4f23c3937d86",
+      "tests": "9b685fc972bbbcec464bf6176963e4f0773ba674"
+    }
+  },
+  "runtime_test_filesystem_paths": 12002,
+  "filesystem_mode_differences": [],
+  "runtime_test_content_differences": [],
+  "docs_descendant_paths": [
+    ".coder/ledger/1078-food-producer-provenance.md",
+    "slurm_logs/isa_backlog_2026-10-21/1078/DRAFT-RESIDUAL-warm-index-dtype.md",
+    "slurm_logs/isa_backlog_2026-10-21/1078/PR-DRAFT.md",
+    "slurm_logs/isa_backlog_2026-10-21/1078/REPORT.org",
+    "slurm_logs/isa_backlog_2026-10-21/1078/REPRODUCE.sh",
+    "slurm_logs/isa_backlog_2026-10-21/1078/cold-warm-dtype-residual.json",
+    "slurm_logs/isa_backlog_2026-10-21/1078/scanner-proof.json",
+    "slurm_logs/isa_backlog_2026-10-21/1078/validation.json"
+  ],
+  "initial_prephase_writer_HEAD_assertion_stop": "Writer advanced from a4 to expected docs descendant during review; no runtime difference. Original assertion failure retained in tool log; superseded by exact tree/FS comparison, not a source test retry."
+}

@@ -1,0 +1,14 @@
+===== Malawi
+ updated_ids[2013-14]: n=4000 identity=0 suffixed=896 many_to_one=0 chains=0 | canonical ids not in roster=0 not in sample=0 | roster ids in wave=4000
+ updated_ids[2016-17]: n=2508 identity=0 suffixed=996 many_to_one=0 chains=0 | canonical ids not in roster=0 not in sample=0 | roster ids in wave=14955
+ updated_ids[2019-20]: n=3178 identity=0 suffixed=1726 many_to_one=0 chains=0 | canonical ids not in roster=0 not in sample=0 | roster ids in wave=14612
+ panel_ids 2016-17->2013-14: {'n': 2508, 'cur_not_in_roster': 0, 'prev_not_in_roster': 0, 'prev_not_in_sample': 0}
+ panel_ids 2019-20->2016-17: {'n': 3178, 'cur_not_in_roster': 0, 'prev_not_in_roster': 0, 'prev_not_in_sample': 0}
+===== Nigeria
+ updated_ids[2012Q3]: n=4859 identity=4859 suffixed=0 many_to_one=0 chains=0 | canonical ids not in roster=113 not in sample=0 | roster ids in wave=4746
+ updated_ids[2013Q1]: n=4859 identity=4859 suffixed=0 many_to_one=0 chains=0 | canonical ids not in roster=128 not in sample=0 | roster ids in wave=4770
+ updated_ids[2015Q3]: n=4696 identity=4696 suffixed=0 many_to_one=0 chains=0 | canonical ids not in roster=85 not in sample=0 | roster ids in wave=4611
+ updated_ids[2016Q1]: n=4696 identity=4696 suffixed=0 many_to_one=0 chains=0 | canonical ids not in roster=115 not in sample=0 | roster ids in wave=4582
+ panel_ids 2013Q1->2012Q3: {'n': 4859, 'cur_not_in_roster': 128, 'prev_not_in_roster': 113, 'prev_not_in_sample': 0}
+ panel_ids 2015Q3->2013Q1: {'n': 4696, 'cur_not_in_roster': 85, 'prev_not_in_roster': 130, 'prev_not_in_sample': 99}
+ panel_ids 2016Q1->2015Q3: {'n': 4696, 'cur_not_in_roster': 115, 'prev_not_in_roster': 85, 'prev_not_in_sample': 0}

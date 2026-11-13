@@ -1,0 +1,25 @@
+{
+  "verdict": "NEEDS_FIX",
+  "candidate_head": "73ad658420c020f81541306d51732e376d85955d",
+  "base_head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "finding": {
+    "path": "lsms_library/countries/Uganda/_/CONTENTS.org",
+    "line": 3662,
+    "text": "independent review started from mode0644 copies",
+    "reason": "Uganda L2 files were outputs of ordinary empty-L2 cold builds, not copied L2 inputs.",
+    "required_change": "Describe measured0644-to0600+mtime without inferring copy/start provenance."
+  },
+  "scope": {
+    "country_hashes": {
+      "total": 549,
+      "identical": 549,
+      "changed": 0
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "identical": 39,
+      "changed": 0
+    }
+  },
+  "signed": "Sue"
+}

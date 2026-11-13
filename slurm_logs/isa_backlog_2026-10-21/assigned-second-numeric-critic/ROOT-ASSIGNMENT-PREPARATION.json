@@ -1,0 +1,26 @@
+{
+  "status": "ROOT_PREPARED_FOR_EXPLICIT_SECOND_CRITIC_ASSIGNMENT",
+  "at_UTC": "2026-10-22T12:58:49.214911+00:00",
+  "source": "/local/job40255479/worktrees/isa-review-comparator-values-second",
+  "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "source_clean": true,
+  "ignored_metadata_target": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment-second/dvc-tmp",
+  "helper_sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+  "calibration_is_reference_not_worker_measurement": true,
+  "assigned_PRs": [
+    1172,
+    1173,
+    1175,
+    1176,
+    1178,
+    1180,
+    1181,
+    1182,
+    1185,
+    1186,
+    1189,
+    1191
+  ],
+  "payload_copies_imports_tests": 0,
+  "signed": "Sue"
+}

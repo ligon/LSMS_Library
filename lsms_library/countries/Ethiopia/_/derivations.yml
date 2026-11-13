@@ -1,0 +1,283 @@
+# Derivations -- served numbers in this country's tables that are NOT survey
+# answers but CONSTRUCTIONS from raw answers, or answers served under a name
+# implying a different window.  One entry per registry key,
+# `country::table::name`; the same key sits in the served table's
+# `Derivation` column on every row it produced.  Loader and field contract:
+# lsms_library/derivations.py.  Design: SkunkWorks/derived_values.org.
+#
+# An entry must say what it did (rule, function), to what (inputs,
+# raw_variables) and why (assumptions, each with a basis) -- the loader
+# refuses one that cannot.  `modelling-choice` is a basis that NAMES a choice
+# no document supplies; it is not evidence and is not laundered into one.
+#
+# Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
+
+Ethiopia::crop_production::sect12-sale-period:
+  waves: ['2011-12', '2013-14', '2015-16']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    On a section-9 field-crop harvest row that section 11 left without a
+    sale: Quantity_sold = section-12 Q7 and Value_sold = Q8 of the same
+    (holder, crop) -- THE IDENTITY -- except that Q6 = 2 (No) with Q7 and Q8
+    both blank is a sale of 0, as section 11 reads it.  Attached only where
+    the (holder, crop) is on ONE section-12 line, is not in section 11
+    (section 11 wins and the two are never summed) and is on exactly one
+    section-9 line (the SALES GRAIN CAVEAT; since GH #1457 a sale on none or
+    several has its own plot_id = 'Farm-level' row, which carries this key too);
+    Quantity_sold only where Q7's unit (KG in W1/W2 by the instrument;
+    ph_s12q0b in W3) equals the row's harvest u.  What is derived is the
+    WINDOW, not the number: section 12 asks about the crop COLLECTED in the
+    last completed production period (Q2) / harvested in the last twelve
+    months (Q3), while the row it is served on -- and section 11's sales
+    beside it -- describe this agricultural season's harvest.
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_sect12_sale
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_sect12_sale
+  raw_variables:
+    - sect12_ph_w{1,2,3}.holder_id
+    - sect12_ph_w{1,2,3}.crop_code
+    - sect12_ph_w{1,2,3}.ph_s12q02_a / ph_s12q02_b / ph_s12q02_c / ph_s12q02_d (Q2 production period, EC year and month, begin and end)
+    - sect12_ph_w{1,2}.ph_s12q03 (Q3 harvest, KG) / sect12_ph_w3.ph_s12q03_a + ph_s12q03_b (Q3 harvest, quantity and unit)
+    - sect12_ph_w{1,2,3}.ph_s12q06 (Q6 sold any?)
+    - sect12_ph_w{1,2,3}.ph_s12q07 (Q7 quantity sold)
+    - sect12_ph_w3.ph_s12q0b (Q7 unit, W3 only)
+    - sect12_ph_w{1,2,3}.ph_s12q08 (Q8 value sold, Birr)
+  assumptions:
+    - text: >-
+        section 12's sale questions (Q6 "Did you sell any of the
+        [TREES/FRUIT/ROOT CROP] collected?", Q7, Q8) refer to the crop of the
+        "last completed production period ... (IF THERE IS NO PARTICULAR
+        PRODUCTION PERIOD, USE THE LAST 12 MONTHS)" (Q2), whose harvest Q3
+        asks "in the last twelve months" (W1: "in the past 12 months");
+        section 11 asks about this season's harvested roster crop.  So a
+        section-12 sale on a section-9 row is served under a window it was
+        not asked in.  Measured on positive-sale lines: the period's median
+        length is 3 months; 8.1% / 11.9% / 12.6% (W1 / W2 / W3) span 12
+        months or more; 6.1% / 5.6% / 6.0% ended in an Ethiopian-calendar
+        year before the post-harvest visit's
+      basis: questionnaire
+      evidence: >-
+        W1 2b_Post_Harvest_English.pdf PDF p.13; W2
+        Post_Harvest_Questionnaire_English_wave2.pdf PDF p.15; W3 ESS3 Post
+        Harvest Questionnaire_English.pdf PDF p.18 (section 12, Q2 / Q3 /
+        Q6-Q8); period figures from ph_s12q02_a-d,
+        slurm_logs/isa_backlog_2026-10-21/820-ethiopia-sect12/
+    - text: >-
+        the section-12 value is SERVED on the season row as recorded --
+        not rescaled to a season, not dropped -- and the row is labelled
+        instead.  A user who wants only season sales filters on this key;
+        the raw period is one derivation_inputs call away
+      basis: modelling-choice
+      evidence: >-
+        GH #820 round 2 (dispatcher ruling, 2026-10-23), under CLAUDE.md
+        "Derived Values" fit rule ("a value served under a name implying a
+        different window -- the function is the identity and the registry
+        is the point")
+    - text: >-
+        a holder-level sale belongs to the crop's only section-9 line (and to
+        no row where the crop is on several); the section-12 file is
+        keyed (household, holder, crop) with no parcel or field, the grain of
+        section 11
+      basis: config-comment
+      evidence: >-
+        Ethiopia/_/ethiopia.py, SALES GRAIN CAVEAT (the section-11 rule since
+        GAP 1); measured grain in Ethiopia/_/CONTENTS.org, "section 12 wired"
+    - text: >-
+        Q6 = 2 (No) skips Q7 and Q8 ("NO....2 (>Q10a)"), so a No with both
+        blank is a sale of 0; a positive Q7 or Q8 beside a No is kept as
+        reported (9 lines in W2)
+      basis: questionnaire
+      evidence: W2 Post_Harvest_Questionnaire_English_wave2.pdf PDF p.15, Q6 skip
+    - text: >-
+        Q7's unit is KG in W1 and W2 (the column header and the variable
+        label "What was the total quantity sold? (KG)"); W3 records it in
+        ph_s12q0b on the same 62-label unit_code list as the section-9
+        harvest unit
+      basis: variable-label
+      evidence: sect12_ph_w1/w2 ph_s12q07 labels; sect12_ph_w3 ph_s12q0b value labels (unit_code)
+  validated_against: >-
+    The window is a stated difference, not a calibrated one: nothing rescales
+    it, so there is no target to validate against.  Its symptom is measured:
+    on served rows carrying both a harvest Quantity and a Quantity_sold in
+    the same unit, the sold quantity EXCEEDS the harvest on 7.5% of
+    section-12 rows vs 5.4% of section-11 rows in 2013-14 and 2.7% vs 1.4% in
+    2015-16 (independent review, GH #820 round 2; re-measured in
+    slurm_logs/isa_backlog_2026-10-21/820-ethiopia-sect12/).  The
+    attachment itself was re-derived by an independent oracle from the raw
+    files (GH #820 round-2 review), and every class count matched; that no
+    section-11 cell is overwritten is asserted by the build itself
+    (ethiopia._attach_sect12_sales).  W4/W5 carry the same window inside
+    section 11, unmarked (GH #1256).
+  contents: Ethiopia/_/CONTENTS.org, "§12 wired as a second sale source (GH #820)"
+  since: '2026-10-23'
+
+Ethiopia::crop_production::permanent-crop-12-month-window:
+  waves: ['2018-19', '2021-22']
+  columns: [Quantity, Quantity_sold, Value_sold]
+  rule: >-
+    THE IDENTITY, on every W4/W5 row whose crop the post-planting crop roster
+    flags permanent (section-4 Q15 = 1 on every section-4 line of the
+    (holder, parcel, field, crop) key) and that serves a Quantity,
+    Quantity_sold or Value_sold.  Those numbers are served exactly as on
+    every other row (section-9 Q5; section-11 Q11 / Q12 by the section-11
+    sale rule).  What is derived is the WINDOW: ESS4 asks a permanent crop's
+    harvest and sales over a fixed twelve months (March 10, 2018 - March 9,
+    2019), while the season rows beside it -- and the same columns in
+    W1-W3 -- describe this agricultural season.  A section-9 row with no
+    section-4 line, or whose section-4 lines disagree, is not stamped.
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_permanent_crop_window
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_permanent_crop_window
+  raw_variables:
+    - sect9_ph_w{4,5}.holder_id / parcel_id / field_id / s9q00b (crop code)
+    - sect9_ph_w{4,5}.s9q04 (Q4 harvested any? -- "for permanent crop harvested between March 10, 2018 to March 9, 2019")
+    - sect9_ph_w{4,5}.s9q05a / s9q05b (Q5 quantity harvested, unit) / s9q08a / s9q08b (Q8 harvest months)
+    - sect4_pp_w{4,5}.s4q01b / s4q15 (Q15 permanent / tree crop flag)
+    - sect11_ph_w4.s11q01 / sect11_ph_w5.s11q01b (crop code)
+    - sect11_ph_w{4,5}.s11q02a1 / s11q02a2 / s11q02b1 / s11q02b2 (Q2 last completed production period) / s11q03a1 / s11q03a2 (Q3 harvest in the last 12 months) / s11q04 (Q4 trees)
+    - sect11_ph_w{4,5}.s11q07 (Q7 sold any?) / s11q11a / s11q11b (Q11 quantity sold, unit) / s11q12 (Q12 value of sales, Birr)
+  assumptions:
+    - text: >-
+        ESS4 puts a PERMANENT crop's harvest and sales on a fixed window:
+        section-9 Q4 "Have you harvested any of the [CROP] from this
+        [FIELD]? (for permanent crop harvested between March 10, 2018 to
+        March 9, 2019)" -- Q5 is the quantity of that harvest -- and the
+        section-11 crop list "LIST ALL CROPS HARVESTED DURING THIS
+        AGRICULTURAL SEASON. FOR PERMANENT CROPS PLEASE INCLUDE CROP
+        HARVESTED BETWEEN MARCH 10, 2018 TO MARCH 9, 2019", whose Q7 / Q11 /
+        Q12 are the sales of "the harvested [CROP]".  So Quantity as well as
+        the sale columns are in the window
+      basis: questionnaire
+      evidence: >-
+        2018-19/Documentation/2018_19_ethiopian_socioeconomic_survey_post_harvest_agricultural_questionnaire.pdf,
+        PDF p.3 (section 9 Q4) and PDF p.8-9 (section 11 Q1, Q7, Q11, Q12)
+    - text: >-
+        the instrument lists no permanent crops; the crop row's permanence is
+        the survey's own post-planting flag, section-4 Q15 (W4 "IS THIS CROP
+        A FRUIT TREE CROP?", answered Yes for 95-99% of coffee / enset / chat
+        / gesho / banana / mango rows, so it is a permanent/tree flag in
+        practice; W5 variable label "IS THIS CROP A Permanent/TREE CROP?").
+        The WB perennial code list disagrees on whole codes the flag rejects
+        (red kidney beans, berbere, garlic, ginger: 0-1.3% Yes), so it is not
+        used
+      basis: variable-label
+      evidence: >-
+        sect4_pp_w4 / sect4_pp_w5 s4q15 variable labels; W4 post-planting
+        questionnaire section 4; cross-tabulation in
+        slurm_logs/isa_backlog_2026-10-21/ethiopia-bundle/
+    - text: >-
+        W5 (ESPS-5) follows the W4 design: no W5 questionnaire is held; its
+        section-11 carries the same permanent-crop block (s11q02 "completed
+        production period", s11q03a1 "harvested in last 12 months", s11q04
+        trees) and its section-4 the same flag.  W5's window dates are not
+        known
+      basis: variable-label
+      evidence: sect11_ph_w5 / sect4_pp_w5 variable labels
+    - text: >-
+        the window values are SERVED as recorded and labelled -- not
+        rescaled to a season, not dropped.  A user who wants season numbers
+        only filters on this key; the raw lines are one derivation_inputs
+        call away
+      basis: modelling-choice
+      evidence: >-
+        the GH #820 ruling for section 12 (sect12-sale-period), under
+        CLAUDE.md "Derived Values" fit rule ("a value served under a name
+        implying a different window -- the function is the identity and the
+        registry is the point")
+  validated_against: >-
+    The window is a stated difference, not a calibrated one: nothing rescales
+    it, so there is no target to validate against.  The stamp is checked
+    against the raw files: the stamped rows are exactly the served W4/W5
+    rows whose (holder, parcel, field, crop) has every section-4 Q15 line
+    = 1 (GH #1256 test file; counts in Ethiopia/_/CONTENTS.org).
+  contents: 'Ethiopia/_/CONTENTS.org, "W4/W5 permanent crops: a 12-month window (GH #1256)"'
+  since: '2026-10-23'
+
+# GH #1457 (bulk ruling 2026-11-04, extending #843 option (d)).
+Ethiopia::crop_production::hh-crop-sale-single-row:
+  waves: ['2011-12', '2013-14', '2015-16', '2018-19', '2021-22']
+  columns: [Quantity_sold, Value_sold, Unit_sold]
+  rule: >-
+    Section 11 records a sale per holder and crop, with no plot.  A sale is a line with a
+    positive quantity or value.  Where the (holder, crop) is on exactly one SERVED section-9
+    line (a line with no unit and no quantity does not count where another does, because
+    the empty-row filter removes it) its sale is served on that row, as recorded, and the row carries this key: Value_sold
+    always, Quantity_sold only where the sale's unit is the row's u.  What is derived is the
+    ATTACHMENT, not the numbers.  Any other sale is served on ONE row with plot_id =
+    'Farm-level', u = 'Unknown', production_obs = 'reported:s11:<holder>:<crop code>', no
+    Quantity, and no key for the attachment, because its index discloses it.  It carries its
+    own Unit_sold.  No sale is split or dropped.  Section 12's sales go the same way under
+    sect12-sale-period.  Shares a row with permanent-crop-12-month-window through
+    derivations.MULTI_SEP, in sorted order; a Farm-level row takes that key where every
+    section-4 line of the (holder, crop) says permanent.
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_hh_crop_sale_single_row
+  raw_variables: [holder_id, crop_code, s11q01, s11q01b, ph_s11q01, s11q07, ph_s11q03_a, ph_s11q03_b,
+                  s11q11a, s11q11b, ph_s11q04, ph_s11q04_a, s11q12]
+  assumptions:
+    - text: >-
+        section 11 asks the sale once per holder and crop, with no parcel or field.  Where
+        the holder has one section-9 line of the crop, no other row can hold it.  The sale is not
+        thereby a share of that line's Quantity.
+      basis: variable-label
+      evidence: >-
+        sect11_ph_w{1..5}.dta carry holder_id and a crop code, and no parcel_id or field_id.
+        harvestedcrop_id in W4/W5 is a per-holder ordinal: it does not join section 9's crop_id
+        to a line (Ethiopia/_/CONTENTS.org, "2026-11-04 -- sales no §9 line holds").
+    - text: >-
+        a sale of a crop on two or more section-9 lines is not allocated among them, since any
+        split would be invented.  That includes two lines of one crop on ONE plot, whose plot is
+        knowable and lost here (W4 1 sale, 600 Birr; W5 7, 31,870 Birr).  A row with no stated
+        harvest but with a unit still counts as a line: Nigeria's further ruling A is not extended.
+      basis: modelling-choice
+      evidence: rulings @ligon 2026-11-03 and 2026-11-04, GH #843 option (d), GH #1457.
+  validated_against: >-
+    tests/test_gh1457_ethiopia_multi_plot_sales.py, whose oracle reads sections 11 and 12
+    directly.  Cold builds: value served equals the raw sum in all five waves, less section 12's
+    repeated and section-11-colliding lines (W2 228,836; W3 20,819 Birr) and one W2 section-11
+    line with no crop code (180 Birr), which stay unserved.  Not validated against an external
+    total: no document here reports one.
+  contents: 'Ethiopia/_/CONTENTS.org, "2026-11-04 -- sales no §9 line holds: Farm-level (GH #1457)"'
+  since: '2026-11-04'
+
+Ethiopia::crop_production::hh-crop-sale-records-summed:
+  waves: ['2013-14', '2021-22']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    Two or more section-11 lines of one (holder, crop), all with a sold quantity in one unit: the
+    row's Quantity_sold and Value_sold are their sums.  W5 lists a crop twice under two
+    harvestedcrop_id on 84 pairs (1 pair in W2), and the values differ on 80.  The build always
+    summed the value; this names it.
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_hh_crop_sale_records_summed
+  raw_variables: [holder_id, s11q01b, s11q07, s11q11a, s11q11b, s11q12, crop_code, ph_s11q01,
+                  ph_s11q03_a, ph_s11q04]
+  assumptions:
+    - text: >-
+        the lines are separate sales of one crop, not one sale listed twice.  Exact repeats
+        on quantity, unit and value are 5 of W5's 213 lines; they are not separated out.
+      basis: modelling-choice
+      evidence: GH #1461 (the sum predates this key); Nigeria's hh-crop-sale-records-summed.
+  validated_against: tests/test_gh1457_ethiopia_multi_plot_sales.py.
+  contents: 'Ethiopia/_/CONTENTS.org, "2026-11-04 -- sales no §9 line holds: Farm-level (GH #1457)"'
+  since: '2026-11-04'
+
+Ethiopia::crop_production::hh-crop-sale-two-units:
+  waves: ['2021-22']
+  columns: [Value_sold, Quantity_sold, Unit_sold]
+  rule: >-
+    Two or more section-11 lines of one (holder, crop) sold in two units: on a Farm-level row
+    Value_sold is their sum, since Birr add, and Quantity_sold and Unit_sold are NA, since no
+    sum across units is served (Nigeria's ruling B on GH #843).  On a section-9 row, as before,
+    Quantity_sold is the sum in the harvest's own unit.  The lines come back through
+    derivation_inputs.
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_hh_crop_sale_two_units
+  raw_variables: [holder_id, s11q01b, s11q07, s11q11a, s11q11b, s11q12]
+  assumptions:
+    - text: >-
+        one index key holds one row and the canonical Unit_sold note rejects a sold-unit level,
+        so two units cannot both be served.
+      basis: modelling-choice
+      evidence: ruling @ligon 2026-11-04 on GH #843, choice B.
+  validated_against: tests/test_gh1457_ethiopia_multi_plot_sales.py.
+  contents: 'Ethiopia/_/CONTENTS.org, "2026-11-04 -- sales no §9 line holds: Farm-level (GH #1457)"'
+  since: '2026-11-04'

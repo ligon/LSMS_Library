@@ -1,0 +1,5 @@
+outs:
+- md5: 8038daf642fee8cfa68c35fc7cb1d4d8
+  size: 3424
+  hash: md5
+  path: ha10_fac.dta

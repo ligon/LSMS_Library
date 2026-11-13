@@ -1,0 +1,6 @@
+{
+  "baseline_cold_warm_exact": true,
+  "candidate_cold_warm_exact": true,
+  "candidate_obs3_baseline_exact": true,
+  "includes_index_and_column_dtypes": true
+}

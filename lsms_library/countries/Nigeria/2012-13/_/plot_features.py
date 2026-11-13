@@ -3,7 +3,7 @@
 Post-planting only -> single t = 2012Q3.  Area (sect11a1) joined onto
 plot detail (sect11b1) on (hhid, plotid).  Erosion protection is absent
 this wave (ErosionProtection NaN).  PlotSlope from the plot-geovariables
-file (srtmslp_nga, degrees), joined on (hhid, plotid).
+file (srtmslp_nga, percent), joined on (hhid, plotid).
 """
 import sys
 
@@ -36,5 +36,12 @@ df = plot_features_for_wave(t, area, detail, colmap, geovar=geovar)
 
 assert df.index.is_unique, "Non-unique (t, i, plot_id) in plot_features 2012-13"
 assert len(df) > 0, "plot_features 2012-13 produced no rows"
+
+# GH587: own PH A1 records; the preceding PP block remains unchanged.
+from nigeria_ph_plot_features import admit_ph_plot_source, append_ph_plot_features
+
+admit_ph_plot_source('2012-13', '../Data/Post Harvest Wave 2/Agriculture/secta1_harvestw2.dta')
+ph = get_dataframe('../Data/Post Harvest Wave 2/Agriculture/secta1_harvestw2.dta', convert_categoricals=False)
+df = append_ph_plot_features(df, ph, '2012-13')
 
 to_parquet(df, 'plot_features.parquet')

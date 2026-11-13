@@ -8,7 +8,7 @@ REPORTED input values.  See uganda.INPUT_COLMAPS for the per-wave column map.
 """
 import sys
 sys.path.append('../../_/')
-from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.local_tools import get_dataframe, to_parquet, source_fingerprint
 from uganda import plot_inputs_for_wave, INPUT_COLMAPS
 
 t = '2015-16'
@@ -23,7 +23,7 @@ df3a = _try('../Data/AGSEC3A.dta')
 df3b = _try('../Data/AGSEC3B.dta')
 df4a = _try('../Data/AGSEC4A.dta')
 
-df = plot_inputs_for_wave(t, df3a, df3b, df4a, INPUT_COLMAPS[t])
+df = plot_inputs_for_wave(t, df3a, df3b, df4a, INPUT_COLMAPS[t], source_refs={'A': source_fingerprint('../Data/AGSEC3A.dta'), 'B': source_fingerprint('../Data/AGSEC3B.dta'), 'seed': source_fingerprint('../Data/AGSEC4A.dta')})
 assert len(df) > 0, f"plot_inputs produced no rows for {t}"
 assert df.index.is_unique, f"Non-unique plot_inputs index for {t}"
 to_parquet(df, 'plot_inputs.parquet')

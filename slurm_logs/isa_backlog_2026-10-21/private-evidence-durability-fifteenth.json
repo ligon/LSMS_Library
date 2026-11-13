@@ -1,0 +1,24 @@
+{
+  "verified_at_UTC": "2026-10-22T02:32:34.282714+00:00",
+  "archive_name": "quiescent-followup-fifteenth.tar.gz",
+  "archive_sha256": "5579b6346bfb26139ca09a8807911238cdd3eb98e43a7e830f2e020b608e77b2",
+  "archive_bytes": 161863486,
+  "included_files": 3456,
+  "included_source_bytes": 1867069930,
+  "roots": [
+    "Tanzania/1091-fix",
+    "integration/mali-eighteen-review"
+  ],
+  "excluded_entries": 265,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "947471696636efe87b109d9acf5d6050305bcb922e4b73dcb78becbcfb151fec",
+  "private_full_manifest_sha256": "b33dcd4dc7af605e9a59a3a9098cac99b26c548c7505c94c349ff6318abb57ac",
+  "private_evidence_not_exported_to_Git": true
+}

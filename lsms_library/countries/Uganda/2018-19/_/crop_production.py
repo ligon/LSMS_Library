@@ -4,7 +4,7 @@
 Reads AGSEC5A (season 1), AGSEC5B (season 2) and the two plot-crop
 rosters AGSEC4A / AGSEC4B (the crop-stand flag, ONE PER SEASON -- GH #872;
 season B's flag comes from AGSEC4B and is never borrowed from AGSEC4A)
-via get_dataframe and emits a canonical (t,i,plot,j,u,condition,season)
+via get_dataframe and emits a canonical (t,i,plot_id,j,u,condition,season,production_obs)
 parquet of REPORTED harvest values.
 
 2018-19 is the odd wave, and the two visits disagree with each other AND
@@ -37,7 +37,7 @@ in the same season B (harvest-end June/July 2018 on 1 423 of 1 435 rows,
 like slot 1), NOT the 2017 second season its variable label names; that
 season is AGSEC5A.  Slot 1 uses the legacy a5bq6{b,c,d} names and slot 2
 the WB s5bq06{b,c,d}_2 names, in the same file.  14 slot-2 records share
-(plot, crop, unit, condition) with slot 1 and are summed; 4 report a
+(plot, crop, unit, condition) with slot 1; production_obs keeps both slots; 4 report a
 quantity with no unit code and serve u='Unknown'.  AGSEC5A has no _2 slot.
 
 The harvest CONDITION is an index level in its own right (GH #323/#637).
@@ -54,7 +54,7 @@ value ranges, not copied.
 """
 import sys
 sys.path.append('../../_/')
-from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.local_tools import get_dataframe, to_parquet, source_fingerprint
 from lsms_library.country import grain_reports
 from uganda import crop_production_for_wave, CROP_COLMAPS
 
@@ -71,11 +71,12 @@ df5b = _try('../Data/AGSEC5B.dta')
 df4a = _try('../Data/AGSEC4A.dta')
 df4b = _try('../Data/AGSEC4B.dta')
 
-df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t], df4b=df4b)
+df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t], df4b=df4b,
+    source_refs={'A': source_fingerprint('../Data/AGSEC5A.dta'),
+                 'B': source_fingerprint('../Data/AGSEC5B.dta')})
 assert len(df) > 0, f"crop_production produced no rows for {t}"
 assert df.index.is_unique, f"Non-unique crop_production index for {t}"
-# GH #868: the de-dup's reduce_to_agreed(on_conflict='na') files a grain
-# report in THIS process; stamp it into the wave parquet so the framework
-# can replay it warm (it cannot re-detect it from the de-duplicated frame).
+# Retain grain-audit transport for any reports from the existing build path.
+# GH1198 retains native observations rather than reducing their sale labels.
 to_parquet(df, 'crop_production.parquet',
            grain_audit=grain_reports('Uganda', 'crop_production'))

@@ -1,0 +1,11 @@
+{
+  "PR": 1182,
+  "status": "PASS_ACTUAL_ORIGINAL_CODE_NON_U_PAYLOAD_AND_TYPED_ATTRIBUTES",
+  "source_sha256": "acdc37ac069728157226a91b02d5a8ea7a8c7233d49a7c2325f86acb70f7e9b9",
+  "actual_intended_field_projection_pairs": 1,
+  "not_full_frame_equality_before_u_projection": true,
+  "historical_original_size_mode_mtime_absent_for_both": true,
+  "NEW_current_physical_baseline_only": true,
+  "no_record_or_axis_reconstruction": true,
+  "signed": "Sue"
+}

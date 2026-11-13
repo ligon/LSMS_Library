@@ -1,0 +1,72 @@
+{
+  "verdict": "PASS",
+  "candidate_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "base_head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "findings": [],
+  "scope": {
+    "country_hashes": {
+      "total": 549,
+      "identical": 549,
+      "changed": 0
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "identical": 39,
+      "changed": 0
+    }
+  },
+  "source_proof": {
+    "status": "SINGLE_PARAGRAPH_DOC_ONLY_WORDING_ACCURATE",
+    "changed_path": "lsms_library/countries/Uganda/_/CONTENTS.org",
+    "base_blob": "be81d30d8816827af537ba67dcef511e17a7bc08",
+    "candidate_blob": "9dbb7afba39b772e2670608dd9040fd626ccab33",
+    "base_current_full_CONTENTS_read_carry_exact": true,
+    "base_CONTENTS_lines": 3665,
+    "candidate_CONTENTS_lines": 3671,
+    "all_other_tracked_content_blobs_Git_modes_exact": true,
+    "tracked_paths_per_head": 14893,
+    "mode": "100644",
+    "actual_endpoint_proof": {
+      "base": {
+        "cold_initial_Uganda_cache_empty": true,
+        "cold_outputs_produced_normally_not_copied_L2": true,
+        "warm_modified_paths": 17,
+        "warm_mode_before": "0644",
+        "warm_mode_after": "0600",
+        "warm_bytes_sizes_exact": true,
+        "endpoint_SHA_gated_against_frozen_manifest": true
+      },
+      "candidate": {
+        "cold_initial_Uganda_cache_empty": true,
+        "cold_outputs_produced_normally_not_copied_L2": true,
+        "warm_modified_paths": 17,
+        "warm_mode_before": "0644",
+        "warm_mode_after": "0600",
+        "warm_bytes_sizes_exact": true,
+        "endpoint_SHA_gated_against_frozen_manifest": true
+      }
+    },
+    "wording_proof": {
+      "path": "lsms_library/countries/Uganda/_/CONTENTS.org",
+      "line": 3662,
+      "text": "independent review measured the same17 paths changing from0644 to0600",
+      "matches_frozen_actual_endpoints": true,
+      "no_copied_L2_or_start_inference": true
+    },
+    "runtime_root_protection_scope": "All1908 recorded file sizes/modes/mtimes/types checked;16 small READY/manifest/export files content-hashed. No data files decoded or rehashed; no old-root unpickle/API replay. Exact outside-root write guard protects immutable runtime evidence.",
+    "snapshot_timing": "Git status/head and full actual tracked/Git-byte snapshots captured before metadata inventories; every tracked byte is verified against immutable Git blobs."
+  },
+  "wording_matches_frozen_endpoints": true,
+  "no_L2_copy_or_inferred_start_provenance": true,
+  "both_source_snapshots_initial_final_exact": true,
+  "runtime_tests_config_and_all_other_tracked_paths_exact": true,
+  "old_runtime_manifest1908_stats_exact": true,
+  "old_runtime_READY_manifest_14exports_content_exact": true,
+  "full_old_runtime_data_content_rehash_not_performed": true,
+  "prior73ad52_manifest_entries_content_modes_mtimes_and_source_exact": true,
+  "no_source_decode_unpickle_data_API_test_CLI_replay": true,
+  "private_data_roots_no_files": true,
+  "network_attempts": 0,
+  "guard_events": {},
+  "signed": "Sue"
+}

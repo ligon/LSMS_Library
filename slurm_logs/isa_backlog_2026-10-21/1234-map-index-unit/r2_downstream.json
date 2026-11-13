@@ -1,0 +1,159 @@
+{
+ "development": {
+  "CotedIvoire/harvest_kg": {
+   "columns": [
+    "Harvest_kg"
+   ],
+   "kg_factor_sources": {
+    "declared": 0,
+    "inferred": 0,
+    "metric": 4213,
+    "none": 18003,
+    "reported": 0,
+    "reported_implausible": 0,
+    "shipped": 0,
+    "shipped_implausible": 0,
+    "shipped_matched": 0,
+    "survey_median": 0
+   },
+   "rows": 3864,
+   "total": {
+    "Harvest_kg": 12131426.16
+   }
+  },
+  "Malawi/harvest_kg": {
+   "columns": [
+    "Harvest_kg"
+   ],
+   "kg_factor_sources": {
+    "declared": 0,
+    "inferred": 0,
+    "metric": 92564,
+    "none": 42514,
+    "reported": 0,
+    "reported_implausible": 0,
+    "shipped": 0,
+    "shipped_implausible": 0,
+    "shipped_matched": 0,
+    "survey_median": 0
+   },
+   "rows": 62327,
+   "total": {
+    "Harvest_kg": 38427582.74998998
+   }
+  },
+  "Mali": {
+   "food_acquired_rows": 431046,
+   "food_prices_rows": 308134,
+   "food_prices_sum": 3993032700.9786634,
+   "food_quantities_rows": 416396,
+   "kg_factor_sources": {
+    "item_unit": 154753,
+    "item_unit_tight": 1822,
+    "metric": 130658,
+    "none": 1534,
+    "survey_kg": 0,
+    "unit": 142279
+   },
+   "kg_total": 13080195.722548153,
+   "native_rows_by_u": {}
+  },
+  "Panama": {
+   "food_acquired_rows": 570939,
+   "food_prices_rows": 484051,
+   "food_prices_sum": 1402736.5353393343,
+   "food_quantities_rows": 560260,
+   "kg_factor_sources": {
+    "item_unit": 96996,
+    "item_unit_tight": 0,
+    "metric": 396874,
+    "none": 17409,
+    "survey_kg": 0,
+    "unit": 59660
+   },
+   "kg_total": 1227237.6554322492,
+   "native_rows_by_u": {
+    "Value": 6795
+   }
+  }
+ },
+ "fix": {
+  "CotedIvoire/harvest_kg": {
+   "columns": [
+    "Harvest_kg"
+   ],
+   "kg_factor_sources": {
+    "declared": 0,
+    "inferred": 0,
+    "metric": 4213,
+    "none": 18003,
+    "reported": 0,
+    "reported_implausible": 0,
+    "shipped": 0,
+    "shipped_implausible": 0,
+    "shipped_matched": 0,
+    "survey_median": 0
+   },
+   "rows": 3864,
+   "total": {
+    "Harvest_kg": 12131426.16
+   }
+  },
+  "Malawi/harvest_kg": {
+   "columns": [
+    "Harvest_kg"
+   ],
+   "kg_factor_sources": {
+    "declared": 0,
+    "inferred": 0,
+    "metric": 92564,
+    "none": 42514,
+    "reported": 0,
+    "reported_implausible": 0,
+    "shipped": 0,
+    "shipped_implausible": 0,
+    "shipped_matched": 0,
+    "survey_median": 0
+   },
+   "rows": 62327,
+   "total": {
+    "Harvest_kg": 38427582.74998998
+   }
+  },
+  "Mali": {
+   "food_acquired_rows": 431046,
+   "food_prices_rows": 308134,
+   "food_prices_sum": 3993032700.9786634,
+   "food_quantities_rows": 416396,
+   "kg_factor_sources": {
+    "item_unit": 154753,
+    "item_unit_tight": 1822,
+    "metric": 130658,
+    "none": 1534,
+    "survey_kg": 0,
+    "unit": 142279
+   },
+   "kg_total": 13080195.722548153,
+   "native_rows_by_u": {}
+  },
+  "Panama": {
+   "food_acquired_rows": 570942,
+   "food_prices_rows": 483661,
+   "food_prices_sum": 1400221.992846541,
+   "food_quantities_rows": 560263,
+   "kg_factor_sources": {
+    "item_unit": 96947,
+    "item_unit_tight": 0,
+    "metric": 396874,
+    "none": 17852,
+    "survey_kg": 0,
+    "unit": 59269
+   },
+   "kg_total": 1226520.3531301117,
+   "native_rows_by_u": {
+    "Unknown": 443,
+    "Value": 6795
+   }
+  }
+ }
+}

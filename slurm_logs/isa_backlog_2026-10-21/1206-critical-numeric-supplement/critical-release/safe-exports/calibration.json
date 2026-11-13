@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "negative_controls": [
+    "tiny",
+    "tiny-nested-Series",
+    "tiny-nested-DataFrame",
+    "nextafter",
+    "nextafter-nested-Series",
+    "nextafter-nested-DataFrame",
+    "mask",
+    "dtype",
+    "order",
+    "attrs-scalar-type",
+    "numeric-axis-nextafter",
+    "immutable-declared-field-presence"
+  ],
+  "old_pandas_frame_escape_demonstrated": [
+    "tiny",
+    "nextafter"
+  ],
+  "versions": {
+    "pandas": "3.0.6",
+    "numpy": "2.4.6",
+    "pyarrow": "25.0.1"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "source_relative": "Uganda/2011-12/Data/GSEC15B.dta",
+  "source_md5": "f4b5885a98654c12d5c9960d1a3586ff",
+  "raw_rows": 38743,
+  "historical_nine_cells_all_original_source_operands_missing": 9,
+  "positive_counterpart_preserves_every_affected_row": true,
+  "independent_direct_DTA_selection_no_food_transform_used": true,
+  "Quantity_cells": 6,
+  "Expenditure_cells": 3,
+  "source_rows_per_cell": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}

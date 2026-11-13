@@ -1,91 +1,97 @@
 ---
 name: tests
-description: "Skill for the Tests area of LSMS_Library. 141 symbols across 23 files."
+description: "Skill for the Tests area of LSMS_Library. 3799 symbols across 437 files."
 ---
 
 # Tests
 
-141 symbols | 23 files | Cohesion: 93%
+3799 symbols | 437 files | Cohesion: 75%
 
 ## When to Use
 
 - Working with code in `tests/`
-- Understanding how pytest_configure, data_root, test_uganda_makefile_backfill work
+- Understanding how inputs_cluster_features, inputs_cluster_features, ehcvm_is_sale work
 - Modifying tests-related functionality
 
 ## Key Files
 
 | File | Symbols |
 |------|---------|
-| `tests/test_age_intervals.py` | test_default_first_bucket_contains_0_through_3, test_default_bucket_boundaries_are_left_closed, test_default_top_bucket_is_unbounded, test_ages_below_zero_become_nan, test_sub_year_infant_split (+19) |
-| `tests/test_data_access.py` | test_s3_read_when_creds_exist, test_s3_write_when_env_set, test_s3_none_when_no_creds, test_s3_none_when_creds_empty, test_gdrive_read_when_creds_exist (+13) |
-| `tests/test_food_labels.py` | _uganda_food_cache_exists, _fake_country, _sample_expenditure_df, _food_items_table, test_relabel_j_preferred_is_noop (+6) |
-| `tests/test_dvc_caching.py` | test_stale_cache_triggers_rebuild, test_valid_cache_uses_cached_file, test_dvc_cache_applies_location_index, test_panel_ids_dict_cache_written_as_json, test_panel_ids_dataframe_cache_written_as_parquet (+4) |
-| `tests/test_data_separation.py` | test_env_override, test_default_without_env, test_default_is_space_free, test_whitespace_override_warns, _country_makefiles (+2) |
-| `tests/test_canonical_spellings.py` | _make_roster_df, test_categorical_variants_replaced, test_categorical_lowercase_variants, test_categorical_already_canonical_is_noop, test_string_variants_replaced (+2) |
-| `tests/test_schema_consistency.py` | _load_yaml, _all_data_scheme_paths, _schemes_with_table, test_no_rejected_column_spellings, test_all_data_scheme_files_parse (+2) |
-| `tests/test_panel_attrition.py` | _has_cached_table, _attrition_matrix, _is_upper_triangular, _nonzero_adjacent, test_panel_attrition_household_characteristics_is_upper_triangular (+1) |
-| `lsms_library/transformations.py` | age_intervals, _is_int_bound, _fmt_bound, format_interval, dummies (+1) |
-| `tests/test_uganda_api_vs_replication.py` | _load_replication, _call_api, _merge_on_common_index, _coerce_string_na, _compare_column (+1) |
+| `tests/test_wave_provenance.py` | _shipped_source_orgs, _write_source, _catalog, _unresolved, _snapshot (+86) |
+| `tests/test_visualizations.py` | test_nigeria_default_wave_is_the_most_recent_the_measure_holds, _all_text, _households, _long, _fills (+57) |
+| `tests/test_863_transforms.py` | _plot_inputs, _plot_features, test_fertilizer_rate_nitrogen_per_hectare, test_fertilizer_rate_product_basis_is_the_raw_kilograms, test_fertilizer_rate_sums_inputs_and_areas_to_the_same_land_grain (+53) |
+| `tests/test_feature_canonical_index.py` | test_sentinel_levels_are_canonical_levels, test_alias_targets_are_canonical_levels, test_every_real_corpus_shape_reaches_the_canonical_index, test_alias_runs_before_alignment, test_promotion_of_DISTINCT_values_refines_and_loses_nothing (+47) |
+| `lsms_library/transformations.py` | _seeded_kg_factors, _shipped_factor_lookup, harvest_kg_factors, food_acquired_valued, median_price_valuation (+42) |
+| `tests/test_coverage_matrix.py` | _env, _tiers, test_coverage_only_declared_vs_absent, test_readiness_builds_when_sanity_fails, test_readiness_broken_when_build_raises (+42) |
+| `tests/test_crop_kg_factor.py` | _frame, _legacy_harvest_kg, test_frame_without_kgfactor_reproduces_the_old_algorithm, test_only_the_bottom_layers_act_without_reports, test_reported_factor_wins_and_converts_an_unknown_unit (+38) |
+| `tests/test_ehcvm_unit_weights.py` | test_the_derivation_is_registered_with_the_shared_function, built, test_no_exact_metric_row_has_one_and_every_one_carries_the_key, test_the_ladder_counts_these_rows_as_the_surveys, test_the_inputs_callable_joins_and_counts_the_branches (+38) |
+| `tests/test_gh1276_acquisition_subdir.py` | _record, _zip, _hold, _snapshot, _data (+37) |
+| `tests/test_median_price_valuation.py` | _sold_frame, _sold_price, test_sold_unit_literal_price_oracle, test_sold_different_unit_one_row_negative_control, test_sold_reported_factor_precedes_label_and_missing_label (+36) |
 
 ## Entry Points
 
 Start here when exploring this area:
 
-- **`pytest_configure`** (Function) — `conftest.py:53`
-- **`data_root`** (Function) — `lsms_library/paths.py:68`
-- **`test_uganda_makefile_backfill`** (Function) — `tests/test_uganda_tables.py:43`
-- **`test_uganda_household_characteristics_has_m_index`** (Function) — `tests/test_uganda_tables.py:88`
-- **`test_fallback_path_uses_wave_data_scheme`** (Function) — `tests/test_uganda_tables.py:110`
+- **`inputs_cluster_features`** (Function) — `lsms_library/countries/Burkina_Faso/2018-19/_/mapping.py:205`
+- **`inputs_cluster_features`** (Function) — `lsms_library/countries/Burkina_Faso/2021-22/_/mapping.py:136`
+- **`ehcvm_is_sale`** (Function) — `lsms_library/countries/Mali/_/mali.py:1021`
+- **`inputs_hh_crop_sale_single_row`** (Function) — `lsms_library/countries/Mali/_/mali.py:1293`
+- **`cached_file_hash`** (Function) — `lsms_library/local_tools.py:3034`
 
 ## Key Symbols
 
 | Symbol | Type | File | Line |
 |--------|------|------|------|
-| `pytest_configure` | Function | `conftest.py` | 53 |
-| `data_root` | Function | `lsms_library/paths.py` | 68 |
-| `test_uganda_makefile_backfill` | Function | `tests/test_uganda_tables.py` | 43 |
-| `test_uganda_household_characteristics_has_m_index` | Function | `tests/test_uganda_tables.py` | 88 |
-| `test_fallback_path_uses_wave_data_scheme` | Function | `tests/test_uganda_tables.py` | 110 |
-| `uganda_root` | Function | `tests/test_uganda_invariance.py` | 112 |
-| `test_parquet_matches_baseline` | Function | `tests/test_uganda_invariance.py` | 133 |
-| `test_food_prices_cache_dtype_float64` | Function | `tests/test_food_prices_dtype.py` | 64 |
-| `test_food_quantities_cache_dtype_float64` | Function | `tests/test_food_prices_dtype.py` | 80 |
-| `test_env_override` | Function | `tests/test_data_separation.py` | 26 |
-| `test_default_without_env` | Function | `tests/test_data_separation.py` | 34 |
-| `test_default_is_space_free` | Function | `tests/test_data_separation.py` | 47 |
-| `test_whitespace_override_warns` | Function | `tests/test_data_separation.py` | 70 |
-| `fingerprint` | Function | `tests/generate_baseline.py` | 21 |
-| `build_manifest` | Function | `tests/generate_baseline.py` | 44 |
-| `main` | Function | `tests/generate_baseline.py` | 77 |
-| `age_intervals` | Function | `lsms_library/transformations.py` | 11 |
-| `test_default_first_bucket_contains_0_through_3` | Function | `tests/test_age_intervals.py` | 31 |
-| `test_default_bucket_boundaries_are_left_closed` | Function | `tests/test_age_intervals.py` | 35 |
-| `test_default_top_bucket_is_unbounded` | Function | `tests/test_age_intervals.py` | 42 |
+| `TestRules` | Class | `tests/test_gh1060_1057_burkina_cluster_features.py` | 142 |
+| `inputs_cluster_features` | Function | `lsms_library/countries/Burkina_Faso/2018-19/_/mapping.py` | 205 |
+| `inputs_cluster_features` | Function | `lsms_library/countries/Burkina_Faso/2021-22/_/mapping.py` | 136 |
+| `ehcvm_is_sale` | Function | `lsms_library/countries/Mali/_/mali.py` | 1021 |
+| `inputs_hh_crop_sale_single_row` | Function | `lsms_library/countries/Mali/_/mali.py` | 1293 |
+| `cached_file_hash` | Function | `lsms_library/local_tools.py` | 3034 |
+| `countries_root` | Function | `lsms_library/paths.py` | 37 |
+| `roster_has_interview_date` | Function | `slurm_logs/2026-06-16_share_female/evidence_table.py` | 20 |
+| `main` | Function | `slurm_logs/ghana_audit/api_before_after_731.py` | 9 |
+| `main` | Function | `slurm_logs/ghana_audit/community_prices/probe_price_files.py` | 25 |
+| `run_script` | Function | `slurm_logs/isa_backlog_2026-10-21/1123-ehcvm-identity/diagnose_source.py` | 57 |
+| `main` | Function | `slurm_logs/null_read_guard/sweep_build.py` | 35 |
+| `drive` | Function | `tests/test_1111_malawi_applied_kg.py` | 21 |
+| `test_all_six_driver_refs_equal_their_loader_literals_and_capture_before_fields` | Function | `tests/test_1120_malawi_labor_observations.py` | 154 |
+| `test_every_real_native_line_and_payload_is_served` | Function | `tests/test_ehcvm_plot_inputs_identity.py` | 208 |
+| `test_niger_make_recipe_stops_when_any_wave_script_fails` | Function | `tests/test_ehcvm_plot_inputs_identity.py` | 266 |
+| `w1ph` | Function | `tests/test_gh1035_nigeria_w1_stated_weights.py` | 73 |
+| `upd_raw` | Function | `tests/test_gh1441_tanzania_district_code.py` | 235 |
+| `test_y5_column_is_the_stata_value_label` | Function | `tests/test_gh1441_tanzania_district_code.py` | 332 |
+| `test_farm_level_rows_are_the_producing_roster` | Function | `tests/test_gh1476_mali_tree_farm_level.py` | 52 |
 
 ## Execution Flows
 
 | Flow | Type | Steps |
 |------|------|-------|
-| `Load_json_cache → _warn_on_whitespace` | cross_community | 6 |
-| `Load_with_dvc_cache → _warn_on_whitespace` | cross_community | 6 |
-| `Load_from_waves → _warn_on_whitespace` | cross_community | 6 |
-| `Populate_and_push → _gpg_decrypt` | cross_community | 6 |
-| `_aggregate_wave_data → _warn_on_whitespace` | cross_community | 6 |
-| `Load_dataframe_with_dvc → _warn_on_whitespace` | cross_community | 5 |
-| `Push_to_cache → _gpg_decrypt` | cross_community | 5 |
-| `Populate_and_push → _validate_wb_api_key` | cross_community | 5 |
-| `Populate_and_push → _check_remote_access` | cross_community | 5 |
-| `Collect_stage_outputs → _warn_on_whitespace` | cross_community | 5 |
+| `Seed_kg → _metric_scalar` | cross_community | 8 |
+| `Seed_kg → _is_currency_denominated` | cross_community | 7 |
+| `Seed_kg → _as_float` | cross_community | 7 |
+| `Measure → _metric_scalar` | cross_community | 6 |
+| `Cluster_features → _warn_on_whitespace` | cross_community | 6 |
+| `Cluster_features → Countries_root` | cross_community | 6 |
+| `Cluster_features → _parse_dct` | cross_community | 6 |
+| `Seed_kg → _level_series` | cross_community | 6 |
+| `Main → _derive_fernet_key` | cross_community | 6 |
+| `Inputs_survey_kg_estimate → _warn_on_whitespace` | cross_community | 6 |
 
 ## Connected Areas
 
 | Area | Connections |
 |------|-------------|
-| Lsms_library | 1 calls |
+| Lsms_library | 130 calls |
+| _ | 113 calls |
+| Scripts | 6 calls |
+| Ghanasps | 2 calls |
+| Feature_audit | 2 calls |
+| Gh850_design | 1 calls |
 
 ## How to Explore
 
-1. `gitnexus_context({name: "pytest_configure"})` — see callers and callees
-2. `gitnexus_query({query: "tests"})` — find related execution flows
+1. `context({name: "inputs_cluster_features"})` — see callers and callees
+2. `query({search_query: "tests"})` — find related execution flows
 3. Read key files listed above for implementation details
+4. `explain({target: "<file or symbol>"})` — persisted taint findings (source→sink data flows), when indexed with `--pdg`

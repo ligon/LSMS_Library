@@ -1,0 +1,5 @@
+outs:
+- md5: 8dbdd7d08a86c95dfb55dcfa47823ddd
+  size: 786252
+  hash: md5
+  path: ehcvm_welfare_gnb2021.dta

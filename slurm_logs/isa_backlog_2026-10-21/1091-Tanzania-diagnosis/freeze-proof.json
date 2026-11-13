@@ -1,0 +1,56 @@
+{
+  "head": "99c824079da480ab2646e499c06ac70e457ff271",
+  "baseline_runtime": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+  "status_clean": true,
+  "changed_paths": [
+    ".coder/ledger/1091-tanzania-community-builder.md"
+  ],
+  "before_tracked_delta": [
+    ".coder/ledger/1091-tanzania-community-builder.md"
+  ],
+  "trees": {
+    "lsms_library": {
+      "baseline": "5fe4acdc4dfa47524243a92699fa55c3ea242c11",
+      "head": "5fe4acdc4dfa47524243a92699fa55c3ea242c11"
+    },
+    "tests": {
+      "baseline": "3241e24deec76e3ddb057c7e32c0540286648d41",
+      "head": "3241e24deec76e3ddb057c7e32c0540286648d41"
+    }
+  },
+  "raw_physical_copies_exact": 44,
+  "reference_receipts_exact": 7,
+  "Mali_source_and_copy_exact": true,
+  "final_cache_checks": [
+    {
+      "backend": "default",
+      "files": 6,
+      "exact_last_recorded_state": true
+    },
+    {
+      "backend": "make",
+      "files": 5,
+      "exact_last_recorded_state": true
+    }
+  ],
+  "guard_events": {
+    "mkdir-existing": 89,
+    "DENIED-os.mkdir": 1,
+    "DENIED-os.symlink": 1
+  },
+  "network_attempts": 0,
+  "other_consumers": [],
+  "runtime_tests_unchanged": true,
+  "source_and_reference_receipts_reverified_not_source_decoded": true,
+  "tracked_count": 14888,
+  "all_working_tracked_blobs_match_head": true,
+  "all_nonledger_tracked_bytes_modes_exact": true,
+  "no_untracked_intree_payloads": true,
+  "ignored_metadata_target_exact": true,
+  "staged_sources": 2,
+  "sidecars": 2,
+  "populated_cache_setup_receipts_not_falsely_claimed_unchanged": true,
+  "no_new_APIs_tests_or_source_decodes_during_freeze": true,
+  "candidate_patch_and_census": false,
+  "signature": "Sue (GPT-6)"
+}

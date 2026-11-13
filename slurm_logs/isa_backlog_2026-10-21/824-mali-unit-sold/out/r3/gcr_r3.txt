@@ -1,0 +1,12 @@
+gross_crop_revenue by household: sum by wave (FCFA)
+  dev  rows  7415  {'2014-15': '8.03803e+07', '2017-18': '1.61886e+08'} total 2.42266e+08
+  e28  rows  7415  {'2014-15': '8.03803e+07', '2017-18': '1.61886e+08'} total 2.42266e+08
+  e95  rows  6968  {'2014-15': '8.03803e+07', '2017-18': '1.61886e+08'} total 2.42266e+08
+  r3   rows  6968  {'2014-15': '1.12659e+08', '2017-18': '2.33204e+08'} total 3.45864e+08
+e95 -> r3 households changed: 175  up 171  down 4  by wave {'2014-15': 87, '2017-18': 88}
+e95 PRICED 2014-15 tree (192, 190, 186, 42) agree 144 sold in Kg 37
+   tree NA counts {('2014-15', 'Quantity'): 7, ('2014-15', 'Quantity_sold'): 8, ('2014-15', 'Value_sold'): 153, ('2017-18', 'Quantity'): 86, ('2017-18', 'Quantity_sold'): 85, ('2017-18', 'Value_sold'): 143}
+   filled-zero rows with Unit_sold 0
+r3 PRICED 2014-15 tree (190, 188, 184, 40) agree 144 sold in Kg 35
+   tree NA counts {('2014-15', 'Quantity'): 7, ('2014-15', 'Quantity_sold'): 8, ('2014-15', 'Value_sold'): 162, ('2017-18', 'Quantity'): 86, ('2017-18', 'Quantity_sold'): 85, ('2017-18', 'Value_sold'): 143}
+   filled-zero rows with Unit_sold 0

@@ -1,0 +1,126 @@
+{
+  "status": "EXACT_SAVED_ARTIFACTS_CONFIRMED_WITH_SCOPE_GAPS",
+  "released_UTC": "2026-10-22T00:01:25.637716+00:00",
+  "source_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "source_index_HEAD_clean_contents_modes_exact": true,
+  "exact_artifact_checks": 85,
+  "comparator_self_controls": 7,
+  "original_four_expected_dtype_failures_preserved": true,
+  "terminal_actual_artifact_mismatches": 0,
+  "scope_gaps_explicit": [
+    "Ordinary default-Country-constructor warm probe saved only ordinary-default-warm.json, not its returned public/harvest frames; no exact artifact pair exists for that constructor comparison.",
+    "No separately captured explicit currency=None/Feature frame pair is saved; no new default-versus-None equality claim is made.",
+    "The recreated baseline _finalize_result return base_final was not separately saved; only its raw/public operands and projected frame exist. No finalizer/API rerun is performed.",
+    "Four preliminary scenario/*.pkl source artifacts belong to the preserved failed initial oracle launch; only final scenario-v3 artifacts are acceptance targets."
+  ],
+  "original_Uganda_manifest_entries_exact": 344,
+  "original_Uganda_all_files_exact": 347,
+  "original_Uganda_safe_exports_exact": 22,
+  "original_Mali_manifest_entries_exact": 1309,
+  "original_Mali_all_files_exact": 1311,
+  "all_loaded_input_and_comparator_source_receipts_before_after_exact": true,
+  "data_cache_payload_files": 0,
+  "empty_import_time_dvc_cache_directory_disclosed": true,
+  "network_attempts": 0,
+  "guard_events": 0,
+  "no_source_API_measurement_or_test_stage_rerun": true,
+  "no_Git_ref_or_GitHub_mutations": true,
+  "source_and_original_evidence_roots_unchanged": true,
+  "quiescent": true,
+  "active_consumers": [],
+  "safe_allowlisted_exports": {
+    "ADDENDUM.org": {
+      "sha256": "5b8ad6fb317e45eb2abf506aad5884be1c26d7046fd42d0e987ec6b9c348ff03",
+      "bytes": 11139,
+      "mode": 384,
+      "mtime_ns": 1792627197507562674
+    },
+    "validation.json": {
+      "sha256": "690196d580fcb8f75238a067cde8b47bb451bc26cc667eecd6b19ac7476cc24a",
+      "bytes": 7263,
+      "mode": 384,
+      "mtime_ns": 1792627197507562674
+    },
+    "EXACT-COMPARATOR.py": {
+      "sha256": "658b3417858790fe0810706e8b7ac195a91fc5ee39a70a3ea3bbb6d2bd2e1b1b",
+      "bytes": 4540,
+      "mode": 384,
+      "mtime_ns": 1792627029005585356
+    },
+    "comparator-provenance.json": {
+      "sha256": "2c595fbf6e90db92b9517d298a54638783aec0179abcc2175de636d940f2863a",
+      "bytes": 682,
+      "mode": 384,
+      "mtime_ns": 1792627029010585383
+    },
+    "four-native-source-dtype-checks.json": {
+      "sha256": "a58b9b81fa2cdc0f9a4d6089c7f1c152d64fa6b99f0e0636c795123305c5b4fe",
+      "bytes": 2419,
+      "mode": 384,
+      "mtime_ns": 1792626950959157419
+    },
+    "guard-policy-proof.json": {
+      "sha256": "633dbdff9cf8d593abd1de524536e01b56e36d68bbb77a14dc6fab36fb263f65",
+      "bytes": 325,
+      "mode": 384,
+      "mtime_ns": 1792626435734377510
+    },
+    "protection-before.json": {
+      "sha256": "66378f3498a391ff815d0f29174616d474da53a52c06b6f4386169b2ae70f71e",
+      "bytes": 515,
+      "mode": 384,
+      "mtime_ns": 1792626590012197870
+    },
+    "protection-after.json": {
+      "sha256": "7f7feb9043dabcef1dc4f427066db805d76b4b97e65ae41b8086df4eb58d3d00",
+      "bytes": 513,
+      "mode": 384,
+      "mtime_ns": 1792627284859086114
+    },
+    "REPRODUCE.sh": {
+      "sha256": "3382d927dfba9cc2b600419174b0e711b8aabf373359e4ee300f98d86d21a711",
+      "bytes": 1648,
+      "mode": 384,
+      "mtime_ns": 1792627197513562707
+    },
+    "run.sh": {
+      "sha256": "390420dfe5487edcc498cf03f19242d8eec47401184308568112bd8f40a00053",
+      "bytes": 1157,
+      "mode": 384,
+      "mtime_ns": 1792626482875608688
+    },
+    "bootstrap.py": {
+      "sha256": "b068b0f50744fadbd6014e923600ee6b09038e185eb865115897a58fab84d82c",
+      "bytes": 3204,
+      "mode": 384,
+      "mtime_ns": 1792626577341127917
+    },
+    "exact_addendum.py": {
+      "sha256": "c0633951ed736831dfd14833abbe727786182ac4fb4868fb345449d68e3eeb07",
+      "bytes": 14832,
+      "mode": 384,
+      "mtime_ns": 1792626838499546594
+    },
+    "verify_four_operands.py": {
+      "sha256": "8cac6280fbe34c8c1c53bd7175a862a5c86808008e639ca2a2ab2eafc17caa14",
+      "bytes": 4202,
+      "mode": 384,
+      "mtime_ns": 1792626947731139965
+    },
+    "protect.py": {
+      "sha256": "a43407ea8dc46f2a4654877ba0a32ca7b54739abb4b4a604c634bb8ea2f3103f",
+      "bytes": 3057,
+      "mode": 384,
+      "mtime_ns": 1792626482878608704
+    },
+    "freeze.py": {
+      "sha256": "5159fe9b7bf395765b2f3adcbfea06eb99016b4e30e501f7f699dab61297faa3",
+      "bytes": 5021,
+      "mode": 384,
+      "mtime_ns": 1792627272204014539
+    }
+  },
+  "private_manifest_entries": 52,
+  "private_manifest_sha256": "939b450191680dee00f92fb8bc7a1ae9d1f99a5f6fc575b0ff4bc0d221565e56",
+  "no_further_writes_or_consumers": true
+}

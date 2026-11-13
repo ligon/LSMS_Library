@@ -1,0 +1,642 @@
+[
+  {
+    "wave": "2009-10",
+    "before": {
+      "input_rows": 22408,
+      "factor_convertible_rows": 14894,
+      "factor_coverage": 0.664673330953231,
+      "finite_positive_quantity_rows": 19978,
+      "finite_positive_quantity_converted_rows": 14890,
+      "finite_nonzero_contributing_input_rows": 14890,
+      "finite_input_product_sum": 4045545.6100029806,
+      "harvest_kg_output_rows": 11589,
+      "harvest_kg_sum": 4045545.61000298,
+      "source_counts": {
+        "metric": 14894,
+        "none": 7514
+      },
+      "reported_implausible": 0
+    },
+    "projected": {
+      "input_rows": 22408,
+      "factor_convertible_rows": 14894,
+      "factor_coverage": 0.664673330953231,
+      "finite_positive_quantity_rows": 19978,
+      "finite_positive_quantity_converted_rows": 14890,
+      "finite_nonzero_contributing_input_rows": 14890,
+      "finite_input_product_sum": 4045545.6100029806,
+      "harvest_kg_output_rows": 11589,
+      "harvest_kg_sum": 4045545.61000298,
+      "source_counts": {
+        "metric": 14894,
+        "none": 7514
+      },
+      "reported_implausible": 0
+    },
+    "raw_positive_factor_rows": 0,
+    "screened_usable_factor_rows": 0,
+    "reported_equals_Quantity": 0,
+    "reported_gt_MAX": 0,
+    "reported_equals_Quantity_and_gt_MAX": 0,
+    "screen_reason_Kg_not_one": 0,
+    "screen_reason_calendar_year_nonKg": 0,
+    "screened_reported_vs_independent_label": {
+      "both_finite_positive": 0,
+      "within10_count": 0,
+      "within20_count": 0,
+      "within10_share": null,
+      "within20_share": null,
+      "ratio_other_over_reported_p10_p50_p90": null
+    },
+    "unscreened_positive_reported_vs_label": {
+      "both_finite_positive": 0,
+      "within10_count": 0,
+      "within20_count": 0,
+      "within10_share": null,
+      "within20_share": null,
+      "ratio_other_over_reported_p10_p50_p90": null
+    },
+    "screened_reported_vs_current_metric": {
+      "both_finite_positive": 0,
+      "within10_count": 0,
+      "within20_count": 0,
+      "within10_share": null,
+      "within20_share": null,
+      "ratio_other_over_reported_p10_p50_p90": null
+    },
+    "screened_reported_vs_survey_median": {
+      "both_finite_positive": 0,
+      "within10_count": 0,
+      "within20_count": 0,
+      "within10_share": null,
+      "within20_share": null,
+      "ratio_other_over_reported_p10_p50_p90": null
+    },
+    "label_factor_basis": "existing KNOWN_METRIC + explicit label parser, volume_as_mass=True, no declared table or price inference",
+    "kg_delta": 0.0
+  },
+  {
+    "wave": "2010-11",
+    "before": {
+      "input_rows": 20970,
+      "factor_convertible_rows": 15130,
+      "factor_coverage": 0.7215069146399619,
+      "finite_positive_quantity_rows": 20220,
+      "finite_positive_quantity_converted_rows": 15082,
+      "finite_nonzero_contributing_input_rows": 15082,
+      "finite_input_product_sum": 3676764.4050000003,
+      "harvest_kg_output_rows": 11408,
+      "harvest_kg_sum": 3676764.4050000003,
+      "source_counts": {
+        "metric": 15130,
+        "none": 5840
+      },
+      "reported_implausible": 0
+    },
+    "projected": {
+      "input_rows": 20970,
+      "factor_convertible_rows": 20968,
+      "factor_coverage": 0.9999046256556986,
+      "finite_positive_quantity_rows": 20220,
+      "finite_positive_quantity_converted_rows": 20218,
+      "finite_nonzero_contributing_input_rows": 20218,
+      "finite_input_product_sum": 6914392.07,
+      "harvest_kg_output_rows": 13888,
+      "harvest_kg_sum": 6914392.07,
+      "source_counts": {
+        "reported": 20173,
+        "survey_median": 795,
+        "none": 2
+      },
+      "reported_implausible": 76
+    },
+    "raw_positive_factor_rows": 20249,
+    "screened_usable_factor_rows": 20173,
+    "reported_equals_Quantity": 432,
+    "reported_gt_MAX": 24,
+    "reported_equals_Quantity_and_gt_MAX": 1,
+    "screen_reason_Kg_not_one": 54,
+    "screen_reason_calendar_year_nonKg": 1,
+    "screened_reported_vs_independent_label": {
+      "both_finite_positive": 15061,
+      "within10_count": 9650,
+      "within20_count": 11233,
+      "within10_share": 0.6407277073235509,
+      "within20_share": 0.7458336099860567,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.4285714285714286
+      ]
+    },
+    "unscreened_positive_reported_vs_label": {
+      "both_finite_positive": 15126,
+      "within10_count": 9650,
+      "within20_count": 11233,
+      "within10_share": 0.6379743488033849,
+      "within20_share": 0.742628586539733,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.4285714285714286
+      ]
+    },
+    "screened_reported_vs_current_metric": {
+      "both_finite_positive": 15061,
+      "within10_count": 9650,
+      "within20_count": 11233,
+      "within10_share": 0.6407277073235509,
+      "within20_share": 0.7458336099860567,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.4285714285714286
+      ]
+    },
+    "screened_reported_vs_survey_median": {
+      "both_finite_positive": 20036,
+      "within10_count": 11780,
+      "within20_count": 14137,
+      "within10_share": 0.587941704931124,
+      "within20_share": 0.7055799560790577,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.6666666666666667
+      ]
+    },
+    "label_factor_basis": "existing KNOWN_METRIC + explicit label parser, volume_as_mass=True, no declared table or price inference",
+    "kg_delta": 3237627.665
+  },
+  {
+    "wave": "2011-12",
+    "before": {
+      "input_rows": 20152,
+      "factor_convertible_rows": 15215,
+      "factor_coverage": 0.755011909487892,
+      "finite_positive_quantity_rows": 19442,
+      "finite_positive_quantity_converted_rows": 15215,
+      "finite_nonzero_contributing_input_rows": 15215,
+      "finite_input_product_sum": 4513141.5301430505,
+      "harvest_kg_output_rows": 11854,
+      "harvest_kg_sum": 4513141.530143051,
+      "source_counts": {
+        "metric": 15215,
+        "none": 4937
+      },
+      "reported_implausible": 0
+    },
+    "projected": {
+      "input_rows": 20152,
+      "factor_convertible_rows": 19441,
+      "factor_coverage": 0.9647181421198888,
+      "finite_positive_quantity_rows": 19442,
+      "finite_positive_quantity_converted_rows": 19441,
+      "finite_nonzero_contributing_input_rows": 19441,
+      "finite_input_product_sum": 8192391.850239925,
+      "harvest_kg_output_rows": 14132,
+      "harvest_kg_sum": 8192391.850239925,
+      "source_counts": {
+        "reported": 14956,
+        "metric": 4407,
+        "none": 711,
+        "survey_median": 78
+      },
+      "reported_implausible": 69
+    },
+    "raw_positive_factor_rows": 15025,
+    "screened_usable_factor_rows": 14956,
+    "reported_equals_Quantity": 317,
+    "reported_gt_MAX": 69,
+    "reported_equals_Quantity_and_gt_MAX": 0,
+    "screen_reason_Kg_not_one": 0,
+    "screen_reason_calendar_year_nonKg": 0,
+    "screened_reported_vs_independent_label": {
+      "both_finite_positive": 10742,
+      "within10_count": 5614,
+      "within20_count": 7377,
+      "within10_share": 0.5226214857568423,
+      "within20_share": 0.6867436231614225,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7692307692307693,
+        1.0,
+        1.5
+      ]
+    },
+    "unscreened_positive_reported_vs_label": {
+      "both_finite_positive": 10803,
+      "within10_count": 5614,
+      "within20_count": 7377,
+      "within10_share": 0.519670461908729,
+      "within20_share": 0.6828658705915024,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.5
+      ]
+    },
+    "screened_reported_vs_current_metric": {
+      "both_finite_positive": 10742,
+      "within10_count": 5614,
+      "within20_count": 7377,
+      "within10_share": 0.5226214857568423,
+      "within20_share": 0.6867436231614225,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7692307692307693,
+        1.0,
+        1.5
+      ]
+    },
+    "screened_reported_vs_survey_median": {
+      "both_finite_positive": 14951,
+      "within10_count": 7210,
+      "within20_count": 9737,
+      "within10_share": 0.48224199050230754,
+      "within20_share": 0.6512607852317571,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.7142857142857142
+      ]
+    },
+    "label_factor_basis": "existing KNOWN_METRIC + explicit label parser, volume_as_mass=True, no declared table or price inference",
+    "kg_delta": 3679250.3200968737
+  },
+  {
+    "wave": "2013-14",
+    "before": {
+      "input_rows": 17585,
+      "factor_convertible_rows": 13569,
+      "factor_coverage": 0.7716235427921524,
+      "finite_positive_quantity_rows": 17226,
+      "finite_positive_quantity_converted_rows": 13569,
+      "finite_nonzero_contributing_input_rows": 13569,
+      "finite_input_product_sum": 3371198.950004625,
+      "harvest_kg_output_rows": 10355,
+      "harvest_kg_sum": 3371198.950004625,
+      "source_counts": {
+        "metric": 13569,
+        "none": 4016
+      },
+      "reported_implausible": 0
+    },
+    "projected": {
+      "input_rows": 17585,
+      "factor_convertible_rows": 17203,
+      "factor_coverage": 0.9782769405743531,
+      "finite_positive_quantity_rows": 17226,
+      "finite_positive_quantity_converted_rows": 17203,
+      "finite_nonzero_contributing_input_rows": 17203,
+      "finite_input_product_sum": 5269633.449994665,
+      "harvest_kg_output_rows": 12237,
+      "harvest_kg_sum": 5269633.449994665,
+      "source_counts": {
+        "reported": 13125,
+        "metric": 3986,
+        "none": 382,
+        "survey_median": 92
+      },
+      "reported_implausible": 85
+    },
+    "raw_positive_factor_rows": 13210,
+    "screened_usable_factor_rows": 13125,
+    "reported_equals_Quantity": 349,
+    "reported_gt_MAX": 85,
+    "reported_equals_Quantity_and_gt_MAX": 1,
+    "screen_reason_Kg_not_one": 0,
+    "screen_reason_calendar_year_nonKg": 1,
+    "screened_reported_vs_independent_label": {
+      "both_finite_positive": 9500,
+      "within10_count": 5196,
+      "within20_count": 6062,
+      "within10_share": 0.5469473684210526,
+      "within20_share": 0.6381052631578947,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.875
+      ]
+    },
+    "unscreened_positive_reported_vs_label": {
+      "both_finite_positive": 9577,
+      "within10_count": 5196,
+      "within20_count": 6062,
+      "within10_share": 0.5425498590372768,
+      "within20_share": 0.6329748355434897,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.875
+      ]
+    },
+    "screened_reported_vs_current_metric": {
+      "both_finite_positive": 9500,
+      "within10_count": 5196,
+      "within20_count": 6062,
+      "within10_share": 0.5469473684210526,
+      "within20_share": 0.6381052631578947,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.875
+      ]
+    },
+    "screened_reported_vs_survey_median": {
+      "both_finite_positive": 13096,
+      "within10_count": 5898,
+      "within20_count": 8058,
+      "within10_share": 0.4503665241295052,
+      "within20_share": 0.6153023824068418,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7,
+        1.0,
+        1.5
+      ]
+    },
+    "label_factor_basis": "existing KNOWN_METRIC + explicit label parser, volume_as_mass=True, no declared table or price inference",
+    "kg_delta": 1898434.4999900395
+  },
+  {
+    "wave": "2015-16",
+    "before": {
+      "input_rows": 19576,
+      "factor_convertible_rows": 15872,
+      "factor_coverage": 0.8107887208827135,
+      "finite_positive_quantity_rows": 19576,
+      "finite_positive_quantity_converted_rows": 15872,
+      "finite_nonzero_contributing_input_rows": 15872,
+      "finite_input_product_sum": 3500953.500243336,
+      "harvest_kg_output_rows": 11567,
+      "harvest_kg_sum": 3500953.500243336,
+      "source_counts": {
+        "metric": 15872,
+        "none": 3704
+      },
+      "reported_implausible": 0
+    },
+    "projected": {
+      "input_rows": 19576,
+      "factor_convertible_rows": 19575,
+      "factor_coverage": 0.999948917041275,
+      "finite_positive_quantity_rows": 19576,
+      "finite_positive_quantity_converted_rows": 19575,
+      "finite_nonzero_contributing_input_rows": 19575,
+      "finite_input_product_sum": 5165329.550242275,
+      "harvest_kg_output_rows": 13579,
+      "harvest_kg_sum": 5165329.550242275,
+      "source_counts": {
+        "reported": 17202,
+        "survey_median": 2373,
+        "none": 1
+      },
+      "reported_implausible": 24
+    },
+    "raw_positive_factor_rows": 17226,
+    "screened_usable_factor_rows": 17202,
+    "reported_equals_Quantity": 274,
+    "reported_gt_MAX": 23,
+    "reported_equals_Quantity_and_gt_MAX": 0,
+    "screen_reason_Kg_not_one": 1,
+    "screen_reason_calendar_year_nonKg": 4,
+    "screened_reported_vs_independent_label": {
+      "both_finite_positive": 13504,
+      "within10_count": 8478,
+      "within20_count": 9641,
+      "within10_share": 0.6278139810426541,
+      "within20_share": 0.7139366113744076,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.0,
+        1.6666666666666667
+      ]
+    },
+    "unscreened_positive_reported_vs_label": {
+      "both_finite_positive": 13523,
+      "within10_count": 8478,
+      "within20_count": 9641,
+      "within10_share": 0.626931893810545,
+      "within20_share": 0.7129335206684907,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.0,
+        1.6666666666666667
+      ]
+    },
+    "screened_reported_vs_current_metric": {
+      "both_finite_positive": 13504,
+      "within10_count": 8478,
+      "within20_count": 9641,
+      "within10_share": 0.6278139810426541,
+      "within20_share": 0.7139366113744076,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.0,
+        1.6666666666666667
+      ]
+    },
+    "screened_reported_vs_survey_median": {
+      "both_finite_positive": 17190,
+      "within10_count": 9187,
+      "within20_count": 12102,
+      "within10_share": 0.5344386271087842,
+      "within20_share": 0.7040139616055846,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.4285714285714286
+      ]
+    },
+    "label_factor_basis": "existing KNOWN_METRIC + explicit label parser, volume_as_mass=True, no declared table or price inference",
+    "kg_delta": 1664376.049998939
+  },
+  {
+    "wave": "2018-19",
+    "before": {
+      "input_rows": 15616,
+      "factor_convertible_rows": 15528,
+      "factor_coverage": 0.9943647540983607,
+      "finite_positive_quantity_rows": 15615,
+      "finite_positive_quantity_converted_rows": 15528,
+      "finite_nonzero_contributing_input_rows": 15528,
+      "finite_input_product_sum": 6152896.012499999,
+      "harvest_kg_output_rows": 12329,
+      "harvest_kg_sum": 6152896.012499999,
+      "source_counts": {
+        "reported": 14972,
+        "survey_median": 555,
+        "none": 88,
+        "metric": 1
+      },
+      "reported_implausible": 102
+    },
+    "projected": {
+      "input_rows": 15616,
+      "factor_convertible_rows": 15528,
+      "factor_coverage": 0.9943647540983607,
+      "finite_positive_quantity_rows": 15615,
+      "finite_positive_quantity_converted_rows": 15528,
+      "finite_nonzero_contributing_input_rows": 15528,
+      "finite_input_product_sum": 6152896.012499999,
+      "harvest_kg_output_rows": 12329,
+      "harvest_kg_sum": 6152896.012499999,
+      "source_counts": {
+        "reported": 14972,
+        "survey_median": 555,
+        "none": 88,
+        "metric": 1
+      },
+      "reported_implausible": 102
+    },
+    "raw_positive_factor_rows": 15074,
+    "screened_usable_factor_rows": 14972,
+    "reported_equals_Quantity": 306,
+    "reported_gt_MAX": 82,
+    "reported_equals_Quantity_and_gt_MAX": 12,
+    "screen_reason_Kg_not_one": 26,
+    "screen_reason_calendar_year_nonKg": 11,
+    "screened_reported_vs_independent_label": {
+      "both_finite_positive": 6238,
+      "within10_count": 4129,
+      "within20_count": 4752,
+      "within10_share": 0.661910868868227,
+      "within20_share": 0.76178262263546,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.0,
+        1.5
+      ]
+    },
+    "unscreened_positive_reported_vs_label": {
+      "both_finite_positive": 6280,
+      "within10_count": 4129,
+      "within20_count": 4752,
+      "within10_share": 0.657484076433121,
+      "within20_share": 0.756687898089172,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.0,
+        1.5
+      ]
+    },
+    "screened_reported_vs_current_metric": {
+      "both_finite_positive": 6238,
+      "within10_count": 4129,
+      "within20_count": 4752,
+      "within10_share": 0.661910868868227,
+      "within20_share": 0.76178262263546,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.0,
+        1.5
+      ]
+    },
+    "screened_reported_vs_survey_median": {
+      "both_finite_positive": 7890,
+      "within10_count": 4748,
+      "within20_count": 5804,
+      "within10_share": 0.6017743979721166,
+      "within20_share": 0.7356147021546261,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.0,
+        1.4
+      ]
+    },
+    "label_factor_basis": "existing KNOWN_METRIC + explicit label parser, volume_as_mass=True, no declared table or price inference",
+    "kg_delta": 0.0
+  },
+  {
+    "wave": "2019-20",
+    "before": {
+      "input_rows": 17024,
+      "factor_convertible_rows": 13509,
+      "factor_coverage": 0.7935267857142857,
+      "finite_positive_quantity_rows": 17014,
+      "finite_positive_quantity_converted_rows": 13509,
+      "finite_nonzero_contributing_input_rows": 13509,
+      "finite_input_product_sum": 3832822.4,
+      "harvest_kg_output_rows": 9469,
+      "harvest_kg_sum": 3832822.4,
+      "source_counts": {
+        "metric": 13509,
+        "none": 3515
+      },
+      "reported_implausible": 0
+    },
+    "projected": {
+      "input_rows": 17024,
+      "factor_convertible_rows": 17011,
+      "factor_coverage": 0.9992363721804511,
+      "finite_positive_quantity_rows": 17014,
+      "finite_positive_quantity_converted_rows": 17011,
+      "finite_nonzero_contributing_input_rows": 17011,
+      "finite_input_product_sum": 6294926.35,
+      "harvest_kg_output_rows": 11226,
+      "harvest_kg_sum": 6294926.35,
+      "source_counts": {
+        "reported": 16085,
+        "survey_median": 925,
+        "none": 13,
+        "metric": 1
+      },
+      "reported_implausible": 82
+    },
+    "raw_positive_factor_rows": 16167,
+    "screened_usable_factor_rows": 16085,
+    "reported_equals_Quantity": 172,
+    "reported_gt_MAX": 28,
+    "reported_equals_Quantity_and_gt_MAX": 1,
+    "screen_reason_Kg_not_one": 58,
+    "screen_reason_calendar_year_nonKg": 17,
+    "screened_reported_vs_independent_label": {
+      "both_finite_positive": 12587,
+      "within10_count": 8043,
+      "within20_count": 9454,
+      "within10_share": 0.6389926114244856,
+      "within20_share": 0.7510923969174546,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.0,
+        1.4285714285714286
+      ]
+    },
+    "unscreened_positive_reported_vs_label": {
+      "both_finite_positive": 12666,
+      "within10_count": 8043,
+      "within20_count": 9454,
+      "within10_share": 0.6350071056371388,
+      "within20_share": 0.7464077056687194,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.0,
+        1.4285714285714286
+      ]
+    },
+    "screened_reported_vs_current_metric": {
+      "both_finite_positive": 12587,
+      "within10_count": 8043,
+      "within20_count": 9454,
+      "within10_share": 0.6389926114244856,
+      "within20_share": 0.7510923969174546,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.0,
+        1.4285714285714286
+      ]
+    },
+    "screened_reported_vs_survey_median": {
+      "both_finite_positive": 15811,
+      "within10_count": 9332,
+      "within20_count": 11843,
+      "within10_share": 0.5902219973436216,
+      "within20_share": 0.7490354816267156,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8,
+        1.0,
+        1.4
+      ]
+    },
+    "label_factor_basis": "existing KNOWN_METRIC + explicit label parser, volume_as_mass=True, no declared table or price inference",
+    "kg_delta": 2462103.9499999997
+  }
+]

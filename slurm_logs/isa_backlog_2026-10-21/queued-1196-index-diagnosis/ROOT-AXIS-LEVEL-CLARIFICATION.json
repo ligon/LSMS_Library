@@ -1,0 +1,13 @@
+{
+  "scope": "GH1196 diagnosis wording correction; no product or scientific change",
+  "source": "review-Uganda-1198/dtype-details.py:6-7",
+  "actual_expression": "level=f.index.levels[f.index.names.index('v')]",
+  "reported_index_class_refers_to": "extracted v level, not whole public frame index",
+  "initial_root_wording_overstated_full_frame_class": true,
+  "original_ledger_commit_preserved": "468d9733701e1b1402dcc4d428b980830e0ce298",
+  "original_private_brief_preserved": true,
+  "old_frozen_evidence_mutated": false,
+  "live_issue_body_corrected_and_independently_readback": true,
+  "next_check": "Bind full-frame and extracted-level classes separately at every actual stage for both observations; shared cause still unproved",
+  "signed": "Sue"
+}

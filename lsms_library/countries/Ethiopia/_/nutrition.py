@@ -8,9 +8,26 @@ import sys
 sys.path.append('../../_/')
 import lsms_library as ll
 from lsms_library.local_tools import df_from_orgfile
-from fct_tools import nutrient_df, harmonize_nutrient, fct_filter
+from lsms_library.country import Country as _Country
+from lsms_library.transformations import food_quantities_from_acquired
+from fct_tools import fct_filter
 import pandas as pd
 import numpy as np
+
+# GH #1509 (@ligon 2026-11-12, "Make the dependency visible").  Part 3 below
+# reads ``eth.food_quantities()``, which the Country API derives at read time
+# through ``food_quantities_from_acquired`` and its kilogram ladder
+# (``food_kg_factors``).  A call through the Country API is invisible to
+# ``framework_imports_fingerprint``, so a kg-factor edit used to leave a warm
+# ``var/nutrition.parquet`` serving the old numbers.  The import above folds
+# the transform's closure into every Ethiopia cache hash; this assertion keeps
+# it honest: if the API stops deriving ``food_quantities`` through it, the
+# build fails rather than the hash tracking the wrong code.
+assert _Country._FOOD_DERIVED['food_quantities'] == \
+    food_quantities_from_acquired.__name__, (
+        'Ethiopia nutrition.py imports food_quantities_from_acquired to version '
+        'the code behind food_quantities(); the API now derives it from '
+        f"{_Country._FOOD_DERIVED['food_quantities']!r}: import that instead")
 
 
 #retrieve org tables 
@@ -28,11 +45,15 @@ fct = fct_filter(food, n_labels, fct_origin)
 
 
 ##--Part 2: process foods that are non-existent in the given Tanzania fct 
-apikey = "hAkb5LsLAS1capOD60K6ILrZDkC29eK6ZmqCumXB"
 #create and restructure fct for fdc food items; 
-fct_add = food[["Preferred Label", "FDC ID"]]
-fct_add = nutrient_df(fct_add, apikey)
-fct_add = harmonize_nutrient(fct_add, n_labels)
+# Stored densities are already per kg: do not harmonize/scale twice.
+try:
+    fct_add = pd.read_csv('fct_usda.csv', index_col=0, float_precision='round_trip')
+except FileNotFoundError as exc:
+    raise FileNotFoundError(
+        'Missing versioned Ethiopia FCT snapshot; run '
+        'python scripts/refresh_fct.py --country Ethiopia explicitly'
+    ) from exc
 #combine two fcts 
 final_fct = pd.concat([fct, fct_add]).sort_index().T
 

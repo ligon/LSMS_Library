@@ -1,0 +1,217 @@
+{
+  "comparisons": {
+    "pairs": 56,
+    "strict_pass": 56,
+    "strict_fail": 0,
+    "normalizations_used": 0,
+    "Country_pairs": 34,
+    "Feature_pairs": 12,
+    "native_parquet_pairs": 10
+  },
+  "artifacts": {
+    "footer_parquets": 78,
+    "current_expected_hash_and_coverage": "PASS",
+    "warm_no_write_cases": 6,
+    "invalid_cases": [
+      {
+        "case": "base-all-bad",
+        "request_kind": "all-bad",
+        "same_KeyError": true,
+        "exception_chain_types": [
+          "builtins.KeyError"
+        ],
+        "all_L1_and_country_parquet_receipts_exact": true,
+        "whole_L1_L2_state_exact": false,
+        "native_wave_files_removed": 5,
+        "directories_changed": 5,
+        "before_paths": 105,
+        "after_paths": 100
+      },
+      {
+        "case": "base-all-mixed",
+        "request_kind": "mixed",
+        "same_KeyError": true,
+        "exception_chain_types": [
+          "builtins.KeyError"
+        ],
+        "all_L1_and_country_parquet_receipts_exact": true,
+        "whole_L1_L2_state_exact": false,
+        "native_wave_files_removed": 5,
+        "directories_changed": 5,
+        "before_paths": 105,
+        "after_paths": 100
+      },
+      {
+        "case": "candidate-all-bad",
+        "request_kind": "all-bad",
+        "same_KeyError": true,
+        "exception_chain_types": [
+          "builtins.KeyError"
+        ],
+        "all_L1_and_country_parquet_receipts_exact": true,
+        "whole_L1_L2_state_exact": true,
+        "native_wave_files_removed": 0,
+        "directories_changed": 0,
+        "before_paths": 105,
+        "after_paths": 105
+      },
+      {
+        "case": "candidate-all-mixed",
+        "request_kind": "mixed",
+        "same_KeyError": true,
+        "exception_chain_types": [
+          "builtins.KeyError"
+        ],
+        "all_L1_and_country_parquet_receipts_exact": true,
+        "whole_L1_L2_state_exact": true,
+        "native_wave_files_removed": 0,
+        "directories_changed": 0,
+        "before_paths": 105,
+        "after_paths": 105
+      }
+    ],
+    "scanner_records_each": 163,
+    "scanner_literal_order_equal": true,
+    "scanner_statuses": {
+      "warn": 158,
+      "pass": 3,
+      "fail": 2
+    },
+    "preexisting_scanner_failures": [
+      {
+        "feature": "food_prices",
+        "check": "assembly_nonempty",
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "status": "fail"
+      },
+      {
+        "feature": "food_prices",
+        "check": "assembly_nonempty",
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "status": "fail"
+      }
+    ],
+    "valid_warning_pairs": 16,
+    "valid_warning_category_message_order_equal": true,
+    "warning_locations": "Original absolute filename and line remain literal in private endpoint evidence; no claim of equal locations."
+  },
+  "calibration39": {
+    "status": "PASS",
+    "negative_controls": [
+      "float64-nextafter",
+      "float64-null-zero",
+      "float64-typed-attrs",
+      "Float64-nextafter",
+      "Float64-null-zero",
+      "Float64-typed-attrs",
+      "unused-level",
+      "codes",
+      "string-na-policy",
+      "int-bool/column",
+      "int-bool/row-axis",
+      "int-bool/column-axis",
+      "int-bool/nested-Series",
+      "int-bool/nested-DataFrame",
+      "int-bool/scalar-attrs",
+      "int-float/column",
+      "int-float/row-axis",
+      "int-float/column-axis",
+      "int-float/nested-Series",
+      "int-float/nested-DataFrame",
+      "int-float/scalar-attrs",
+      "numpyint-pythonint/column",
+      "numpyint-pythonint/row-axis",
+      "numpyint-pythonint/column-axis",
+      "numpyint-pythonint/nested-Series",
+      "numpyint-pythonint/nested-DataFrame",
+      "numpyint-pythonint/scalar-attrs",
+      "Decimal-int/column",
+      "Decimal-int/row-axis",
+      "Decimal-int/column-axis",
+      "Decimal-int/nested-Series",
+      "Decimal-int/nested-DataFrame",
+      "Decimal-int/scalar-attrs",
+      "NaN-None/column",
+      "NaN-None/row-axis",
+      "NaN-None/column-axis",
+      "NaN-None/nested-Series",
+      "NaN-None/nested-DataFrame",
+      "NaN-None/scalar-attrs"
+    ],
+    "count": 39,
+    "pandas": "3.0.6",
+    "numpy": "2.4.6"
+  },
+  "calibration_storage3": {
+    "status": "PASS",
+    "supplemental_controls": [
+      "string-storage/column-values",
+      "string-storage/row-axis",
+      "string-storage/column-axis"
+    ]
+  },
+  "fingerprint_scope": {
+    "country_hashes": {
+      "keys": 549,
+      "changed": 549,
+      "unchanged": 0
+    },
+    "framework_hashes": {
+      "keys": 39,
+      "changed": 39,
+      "unchanged": 0
+    },
+    "wave_hashes": {
+      "keys": 1362,
+      "changed": 1362,
+      "unchanged": 0
+    }
+  },
+  "tests": {
+    "candidate": {
+      "cases": 28,
+      "failures": 0,
+      "errors": 0,
+      "observed_exit_code": 0
+    },
+    "actual_parent": {
+      "cases": 28,
+      "failures": 17,
+      "errors": 0,
+      "observed_exit_code": 1
+    },
+    "existing": {
+      "cases": 21,
+      "failures": 0,
+      "errors": 0,
+      "observed_exit_code": 0
+    }
+  },
+  "parent_failures_split": {
+    "invalid_mixed": 16,
+    "exhausted_iterator": 1,
+    "ordinary_controls_pass": 11
+  },
+  "diagnostics": {
+    "first_parent28_pass_run": "DIAGNOSTIC_ONLY; worker identity history not captured",
+    "first_metadata_scope_check": "stopped on noncontractual set-derived declaration-list order; corrected complete metadata multiset only",
+    "universal_iterable_compatibility_claim": false,
+    "all_error_classes_unchanged_claim": false
+  },
+  "protection_guard_denial_qualification": {
+    "actual_v1_session": 4319,
+    "actual_v1_exit_code": 1,
+    "stop": "Last assertion after all full protection comparisons completed",
+    "retained_relative_delete_denials": 6,
+    "log_bytes": 285,
+    "log_sha256": "6ab8bdea5387bafde436a30cfc753d9000ee95815ed0e1801fa2e1bee89c380c",
+    "original_dir_fd_per_event_timestamp_and_call_stack_history": "Not recorded",
+    "attribution": "Last-mtime/static-source association with existing GH479 fixture only; endpoints unresolved, no harmlessness claim.",
+    "correction": "Metadata qualification only; no API/test/data replay or source edits",
+    "no_universal_outside_write_claim": true
+  }
+}

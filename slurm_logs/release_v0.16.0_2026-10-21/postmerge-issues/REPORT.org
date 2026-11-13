@@ -1,0 +1,23 @@
+#+TITLE: Post-release-merge issue-state verification
+#+AUTHOR: Sue
+
+* Result
+PASS after release PR 1168 merged to master =097283459f80016b0f00a51b814a0cb964a42789=.
+All 48 accepted issues are CLOSED; all 77 retained referenced issues are OPEN.
+Missing closures: []. Unexpected retained closures: [].
+Accepted closures with an explicit closer link to PR 1168/master merge: 47.
+Closure timestamps range from 2026-10-21T13:01:32Z to 2026-10-21T13:02:05Z; exact timestamps remain in the per-issue JSON.
+Exact per-issue state, reason, closure timestamp, close/reopen event and closer URL are retained in verification.json.
+
+Issue 1099 instead names its accepted fix commit 7117f5b683d5c98812027277de88b5d9d7a8536a as closer.
+It matches the frozen keyword audit and is an ancestor of the master merge; this is the expected accepted-issue commit closure, not an unexpected residual closure.
+
+* Scope and reproduction
+The status-only GraphQL selections do not request body, title, comments or survey fields.
+The connected issue tools always fetch bodies, so this read-only field-projected CLI fallback honors the narrower task scope.
+Run verify_statuses.py, then annotate_commit_closure.py with the mounted image Python; it reads the frozen closure exports and performs query-only GitHub requests.
+Later lifecycle changes need a separately named snapshot; do not overwrite this frozen observation.
+This result does not assess CI 39604418333, create a release/tag, or establish publication status.
+No source, repository, GitHub, credentials or cache state was changed.
+
+-- Sue

@@ -32,30 +32,87 @@ individual_education:
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
-    file: ../Data/gsec9.dta
-    idxvars:
-        i: hhid
-    myvars:
-        Roof: h9q4
-        Floor: h9q6
+    # GH #1290: gsec9.hhid uses gsec1.hh, not the sample's HHID.
+    # All three sources are declared for hashing; mapping.py validates the bridges
+    # before this left join and preserves unresolved recorded housing keys.
+    dfs: [housing_payload, housing_ids, housing_ag_ids]
+    housing_payload:
+        file: gsec9.dta
+        idxvars:
+            i: hhid
+        myvars:
+            Roof: h9q4
+            Floor: h9q6
+    housing_ids:
+        file: gsec1.dta
+        idxvars:
+            i: hh
+        myvars:
+            _housing_HHID: HHID
+    # GH1290: fallback identity only, from exact recorded hh/HHID pairs.
+    # Sample membership/location/weights remain owned by sample below.
+    housing_ag_ids:
+        file: AGSEC1.dta
+        idxvars:
+            i: hh
+        myvars:
+            _housing_AG_HHID: HHID
+    merge_on: [i]
+    merge_how: left
+    final_index: [t, i]
 
 sample:
-    file: gsec1.dta
-    idxvars:
-        i: HHID
-    myvars:
-        v: parish_code
-        weight: h_xwgt_W5  # cross-sectional weight (covers both panel and refreshment sample)
-        panel_weight: hwgt_W5  # longitudinal weight (zero for refreshment sample)
-        strata: sregion
-        Rural: urban
-        Region: region
+    # GH #1120 D1: AGSEC1-only households use their own recorded parish
+    # and cover attributes. hwgt_W5 is PANEL weight only; weight stays NA.
+    # HH-covered households keep every HH answer, including missing values.
+    # The two covers have different weight vintages; never coalesce them.
+    dfs:
+        - locating_cover
+        - locating_ag
+    locating_cover:
+        file: gsec1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            v: parish_code
+            # The design PSU of origin, not `v`, which is a parish (GH #689).  The
+            # 72 AGSEC1-only households take AGSEC1.ea, below (ruling 2026-11-04).
+            ea: ea
+            weight: h_xwgt_W5  # cross-sectional weight (covers both panel and refreshment sample)
+            panel_weight: hwgt_W5  # longitudinal weight (zero for refreshment sample)
+            strata: sregion
+            Rural: urban
+            Region: region
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: district
+            _cover: HHID
+    locating_ag:
+        file: AGSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _ag_member: HHID
+            _ag_v: parish_code
+            _ag_panel_weight: hwgt_W5
+            _ag_ea: ea  # equals gsec1.ea on all 2,622 households both covers hold
+            _ag_strata: sregion
+            _ag_Rural: urban
+            _ag_Region: region
+            _ag_District: district
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
 
 cluster_features:
+    # Same locating-cover membership/precedence as sample (GH #1120 D1).
     dfs:
-        - df_main
+        - locating_cover
         - df_geo
-    df_main:
+        - locating_ag
+    locating_cover:
         file: gsec1.dta
         idxvars:
             i: HHID
@@ -64,6 +121,7 @@ cluster_features:
             Region: region
             Rural: urban
             District: district
+            _cover: HHID
     # GPS from the public geovar (modified/offset coordinates), joined on
     # household id then collapsed to cluster grain by final_index (GH #161).
     df_geo:
@@ -73,6 +131,16 @@ cluster_features:
         myvars:
             Latitude: pub_lat_mod
             Longitude: pub_lon_mod
+    locating_ag:
+        file: AGSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _ag_member: HHID
+            _ag_v: parish_code
+            _ag_Region: region
+            _ag_Rural: urban
+            _ag_District: district
     merge_on:
         - i
     final_index:

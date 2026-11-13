@@ -259,6 +259,55 @@
 | Zinder                         | Zinder                         |
 | zinder                         | Zinder                         |
 
+GH #812, 2026-11-04.  EHCVM =sample.strata= is region x milieu, as a label
+(=lsms_library/ehcvm.py=, =derive_region_milieu_stratum=).  This table is the
+=Region= table above crossed with the cover's two =s00q04= labels, row for row, so
+the region part of =strata= is =cluster_features.Region=.  No new judgement;
+=tests/test_gh812_ehcvm_strata.py= pins the identity.  Labels of any other wave's
+scheme match no key and pass through unchanged.
+
+#+name: strata
+| Original Label                      | Preferred Label  |
+|-------------------------------------+------------------|
+| Agadez Urbain                       | Agadez Urbain    |
+| Agadez Rural                        | Agadez Rural     |
+| agadez Urbain                       | Agadez Urbain    |
+| agadez Rural                        | Agadez Rural     |
+| gadez Urbain                        | Agadez Urbain    |
+| gadez Rural                         | Agadez Rural     |
+| Communauté urbaine de Niamey Urbain | Niamey Urbain    |
+| Communauté urbaine de Niamey Rural  | Niamey Rural     |
+| Niamey Urbain                       | Niamey Urbain    |
+| Niamey Rural                        | Niamey Rural     |
+| niamey Urbain                       | Niamey Urbain    |
+| niamey Rural                        | Niamey Rural     |
+| Diffa Urbain                        | Diffa Urbain     |
+| Diffa Rural                         | Diffa Rural      |
+| diffa Urbain                        | Diffa Urbain     |
+| diffa Rural                         | Diffa Rural      |
+| Dosso Urbain                        | Dosso Urbain     |
+| Dosso Rural                         | Dosso Rural      |
+| dosso Urbain                        | Dosso Urbain     |
+| dosso Rural                         | Dosso Rural      |
+| Maradi Urbain                       | Maradi Urbain    |
+| Maradi Rural                        | Maradi Rural     |
+| maradi Urbain                       | Maradi Urbain    |
+| maradi Rural                        | Maradi Rural     |
+| Tahoua Urbain                       | Tahoua Urbain    |
+| Tahoua Rural                        | Tahoua Rural     |
+| tahoua Urbain                       | Tahoua Urbain    |
+| tahoua Rural                        | Tahoua Rural     |
+| Tillabéri Urbain                    | Tillabéri Urbain |
+| Tillabéri Rural                     | Tillabéri Rural  |
+| Tillaberi Urbain                    | Tillabéri Urbain |
+| Tillaberi Rural                     | Tillabéri Rural  |
+| tillaberi Urbain                    | Tillabéri Urbain |
+| tillaberi Rural                     | Tillabéri Rural  |
+| Zinder Urbain                       | Zinder Urbain    |
+| Zinder Rural                        | Zinder Rural     |
+| zinder Urbain                       | Zinder Urbain    |
+| zinder Rural                        | Zinder Rural     |
+
 #+NAME: District
 | Original Label                 | Preferred Label                |
 |--------------------------------+--------------------------------|
@@ -590,6 +639,7 @@
 | Caramel, bonbons, confiseries, etc                                                        | Caramel, bonbons, confiseries, etc                                                   |
 | 90. Carotte                                                                               | Carotte                                                                              |
 | Carotte                                                                                   | Carotte                                                                              |
+| carotte                                                                                   | Carotte                                                                              |
 | 41. Carpes fraîches                                                                       | Carpes fraîches                                                                      |
 | Carpes fraÃ®ches                                                                          | Carpes fraîches                                                                      |
 | 36. Charcuterie (jambon, saucisson), conserves de viandes                                 | Charcuterie (jambon, saucisson), conserves de viandes                                |
@@ -1009,7 +1059,7 @@
 #
 # TAXONOMY (the Preferred Labels, a sensible shared input vocabulary):
 #   Organic manure / Organic compost   (organic fertilizers)
-#   Urea / DAP / NPK / Phosphate / Mixed fertilizer  (inorganic fertilizers)
+#   Urea / DAP / NPK / NPK 15-15-15 / Phosphate / Mixed fertilizer  (inorganic)
 #   Pesticide / Herbicide / Fungicide / Other phytosanitary  (phytosanitary)
 #   Seed                                 (all seed slots collapse to Seed;
 #                                         the seed's crop is carried in the
@@ -1021,6 +1071,17 @@
 # Seed here and its crop is resolved by the companion harmonize_seed_crop
 # table below.  ECVMA code 6 'Mélange' (an unspecified inorganic blend)
 # -> Mixed fertilizer; EHCVM has no such code (it splits DAP/phosphate).
+#
+# THE NPK SLOT IS TWO LABELS, ONE PER PROGRAMME (GH #1445, ruling @ligon
+# 2026-11-04).  Only ECVMA states a grade: code 5 is "npk 15/15" (2011-12, whose
+# questionnaire asks "How much NPK(15/15)") and "NPK 15/15" (2014-15, whose
+# questionnaire prints "NPK (15/15/15)" and "NPK 15/15/15"), so it is served as
+# `NPK 15-15-15`, which transformations._NITROGEN_CONTENT keys at 0.15 N (the
+# Malawi `NPK 23:21:0+4S Fertilizer` pattern, GH #1106).  EHCVM's code 5 says
+# "NPK/Formule unique" and NO held document gives its grade, so it keeps the
+# bare `NPK` and the map's nominal 0.17 (NPK 17-17-17), which is a default and
+# not a reading.  Niger's `input` axis therefore splits across the programmes:
+# compare the two labels knowingly.  Evidence: CONTENTS.org.
 #
 # Referenced from the wave-level _/plot_inputs.py via
 #   tools.get_categorical_mapping('harmonize_input','Original Label','Preferred Label').
@@ -1039,8 +1100,8 @@
 | engrais inorganiques - dap                | DAP                 |
 | Engrais inorganiques - DAP                | DAP                 |
 | DAP et autres engrais inorganiques        | DAP                 |
-| engrais inorganiques - npk 15/15          | NPK                 |
-| Engrais inorganiques - NPK 15/15          | NPK                 |
+| engrais inorganiques - npk 15/15          | NPK 15-15-15        |
+| Engrais inorganiques - NPK 15/15          | NPK 15-15-15        |
 | Engrais inorganiques - NPK/Formule unique | NPK                 |
 | Engrais inorganiques - Phosphates         | Phosphate           |
 | engrais inorganiques - mélange            | Mixed fertilizer    |
@@ -1075,15 +1136,36 @@
 # crop is encoded in the seed-type label ('Semences de petit mil').  This
 # table resolves each EHCVM seed-type label to the crop's harmonize_food
 # `Preferred Label`, so seed rows carry the SAME `crop` value a consumed
-# food / grown crop would (the shared j axis).  The catch-all seed slots
-# ('Semences d'autres céréales', 'Autres semences', 'Plants/boutures de
-# tubercules') resolve to 'Autre crop' (no single crop named).  The bare
-# label '20' is the 2018-19 trailing seed slot whose value-label text was
-# not stored (it is 'Autres semences' = code 20 in the sibling 2021-22
-# wave), so it also maps to 'Autre crop'.  Non-seed input labels are absent
-# here (the wave script only consults this table for rows whose input
+# food / grown crop would (the shared j axis).  Non-seed input labels are
+# absent here (the wave script only consults this table for rows whose input
 # resolved to 'Seed').  The ECVMA waves do NOT use this table — they read
 # the crop from the roster's own crop column.
+#
+# KEEP DISTINCT NATIVE SLOTS DISTINCT (GH #1123).  `crop` is an index level
+# of plot_inputs (t, i, input, crop, u) and harmonize_input maps every seed
+# label to the single input 'Seed', so two seed slots sharing a Preferred
+# Label collide on one key and core keeps one row.  Until GH #1123 the three
+# catch-all slots all mapped to 'Autre crop', and households reporting two
+# of them in one unit lost a line: 6 in 2018-19 (slots 15+19), 3 in 2021-22
+# (15+20, 19+20).  "Semences d'autres céréales" and "Plants/boutures de
+# tubercules" now take the Benin/Togo/Burkina labels 'Autre céréale' and
+# 'Autre tubercule'; 'Autres semences' keeps 'Autre crop'.  The uniqueness
+# guard before to_parquet in 2018-19/_/ and 2021-22/_/plot_inputs.py is the
+# enforcement; this comment is not.
+#
+# CODES ARE NOT LABELS ACROSS THE TWO EHCVM WAVES.  2018-19's s16bq01 value
+# labels stop at 19 = 'Autres semences' (no 'Plants/boutures' label at all);
+# 2021-22 inserts 19 = 'Plants/boutures de tubercules' and moves 'Autres
+# semences' to 20.  Both scripts resolve by LABEL, so that shift is harmless
+# -- except for the bare key '20', which is a CODE: 2018-19 code 20 occurs on
+# 382 applied rows and carries no value label.  Its meaning is UNKNOWN; an
+# earlier comment here called it 'Autres semences' by borrowing the 2021-22
+# code, which is a different code list (and 2018-19 already has its own
+# 'Autres semences' at 19).  It keeps its legacy 'Autre crop' (and
+# harmonize_input 'Seed') binding, unverified: with the two splits above it
+# collides with nothing (3 households report both 19 and 20, always in
+# different units).  Burkina's source-qualified 'Unknown [...]' fallback was
+# NECESSARY there and is not here; the guard catches a future collision.
 
 #+NAME: harmonize_seed_crop
 | Original Label                | Preferred Label     |
@@ -1096,8 +1178,8 @@
 | Semences de sésame            | Sésame              |
 | Semences de césame            | Sésame              |
 | Semences de haricots/niébé    | Niébé/Haricots secs |
-| Semences d'autres céréales    | Autre crop          |
-| Plants/boutures de tubercules | Autre crop          |
+| Semences d'autres céréales    | Autre céréale       |
+| Plants/boutures de tubercules | Autre tubercule     |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
 
@@ -1195,6 +1277,60 @@
 |    9 | Chicken         |
 |   10 | Guinea Fowl     |
 |   11 | Other Poultry   |
+
+# harmonize_crop_condition_{ehcvm1,ehcvm2} (GH #1436): "Etat du produit", the
+# physical state of the crop when the reported harvest quantity was measured --
+# the canonical `condition` index level of crop_production (lsms_library/
+# data_info.yml, Columns > crop_production > condition).  EHCVM only: 2018-19
+# s16cq12c, 2021-22 s16cq16d.  Neither ECVMA harvest module asks a state
+# question (2E.7a/7b/7c are quantity, unit, kilograms), so niger.py serves
+# `unknown_condition` there, as it does for a blank or off-scheme code.
+#
+# WHY TWO CODE-KEYED TABLES (the harmonize_species_{ecvma,ehcvm} shape): the code
+# lists COLLIDE across the waves -- 3 is Decortique in 2018-19 and `na` in
+# 2021-22 -- so one code-keyed table cannot serve both, and the labels are no
+# better a key (2021-22 code 1 carries a trailing comma, and 2018-19's code 5 is
+# labelled differently by the .dta and by the questionnaire).  Source Label is
+# the .dta value label, provenance only; the readers use Code + Preferred Label.
+#
+# A FORM AXIS WITH NO DRYNESS AXIS, as in Malawi: the instrument never asks
+# whether the crop was dry, so these are the bare form tokens and NOT
+# `dried_grain` / `dried_with_shell`, which would assert a dryness nobody
+# recorded.
+#
+# RULED, @ligon 2026-11-04 (GH #1436): 2018-19's five answers fold onto the three tokens
+# the way Niger's and Senegal's 2021-22 instruments folded them -- ear and
+# hull (Epis, Non-decortique) into `epis/coques`, grain and hulled (Grain,
+# Decortique) into `Grains`; Burkina Faso's and Mali's 2021-22 keep all five.
+# The level no longer separates what the 2018-19 answer did: `unshelled` is Epis
+# 6,482 + Non-decortique 904 lines, `shelled` is Grain 3,715 + Decortique 1,763.
+# The answer itself is served in the column `condition_native`, and the fold costs
+# no index collision, because the wave's (plot, crop, unit) key is unique without
+# this level.  Evidence: CONTENTS.org, "crop_production: the condition level".
+#
+# Code 5 of 2018-19: the .dta says "Non concerne", the EHCVM household
+# questionnaire template says "Entier".  Both describe the crops that actually
+# carry it (onion, okra, roselle, tomato, cassava: a whole product with no shell
+# to speak of), so both land on `shell_not_applicable`, a survey ANSWER and not
+# the missing-data sentinel `unknown_condition`.
+# Condition_sold reads these two tables too (GH #1462): 2018-19 s16cq16c has this
+# code list, and 2021-22 s16dq05d has these codes under its own labels (1
+# epis/coques/panicules, 2 grains, 3 na).  A blank there stays NA.
+#+NAME: harmonize_crop_condition_ehcvm1
+| Code | Preferred Label      | Source Label   |
+|------+----------------------+----------------|
+|    1 | unshelled            | Epis           |
+|    2 | shelled              | Grain          |
+|    3 | shelled              | Décortiqué     |
+|    4 | unshelled            | Non-décortiqué |
+|    5 | shell_not_applicable | Non concerné   |
+
+#+NAME: harmonize_crop_condition_ehcvm2
+| Code | Preferred Label      | Source Label |
+|------+----------------------+--------------|
+|    1 | unshelled            | épis/coques, |
+|    2 | shelled              | Grains       |
+|    3 | shell_not_applicable | na           |
 
 # harmonize_education (GH #171): Niger per-country delta on the global ordinal
 # base (categorical_mapping/harmonize_education.org, row-additive).  Covers BOTH

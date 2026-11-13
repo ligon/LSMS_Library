@@ -1,0 +1,24 @@
+{
+  "verified_at_UTC": "2026-10-22T03:46:45.768558+00:00",
+  "archive_name": "quiescent-followup-eighteenth.tar.gz",
+  "archive_sha256": "028eeb4160a9361568f9b7b33e87f5de7df8e6d778c7702216f574811a759d8c",
+  "archive_bytes": 125633329,
+  "included_files": 3184,
+  "included_source_bytes": 1342503941,
+  "roots": [
+    "review-Tanzania-1091",
+    "integration/niger-nineteen-docs-review"
+  ],
+  "excluded_entries": 226,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "a11d4229f48b7aacbff581eafc47beeb827629e2bd170cc2ac22c0f4305c2530",
+  "private_full_manifest_sha256": "a42b1c7937bb2d1ba279a8e85f7930677c616534c69f65239167089d7173bff1",
+  "private_evidence_not_exported_to_Git": true
+}

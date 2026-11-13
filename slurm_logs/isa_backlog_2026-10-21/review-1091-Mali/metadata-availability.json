@@ -1,0 +1,10 @@
+{
+  "optional_fresh_variable_label_probe": "STOPPED_BEFORE_METADATA",
+  "first_get_data_file_returned_None": true,
+  "cause_proven_by_actual_No_permissions_warning_and_matching_return_branch": true,
+  "actual_materialized_raw_copies": 0,
+  "fresh_variable_labels_or_PDF_not_claimed": true,
+  "current_value_label_dictionaries_freshly_read_with_get_dataframe": true,
+  "both_raw_source_MD5_SHA_and_source_oracle_verified": true,
+  "no_permission_or_source_reader_bypass": true
+}

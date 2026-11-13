@@ -3,6 +3,69 @@
 * Food Conversion Table
 A food conversion table can be found at https://docs.google.com/spreadsheets/d/1whE_EW5x-jxrsKvYWfefdBppzp_TZhPP61bdEN-FEJ4/
 
+* food_acquired item names are decoded per QUARTER (GH #1144, 2026-10-21)
+
+The food CSVs carry numeric =item_cd= without the Stata twins' value labels.
+These codes change meaning both between waves and BETWEEN THE TWO W2 ROUNDS: the post-planting =2012Q3= still uses the older groundnut/pepper scheme, while post-harvest =2013Q1= uses the newer one.
+The food-only =harmonized_food_labels(t)= branch therefore reads the actual quarter; the no-argument resolver remains unchanged for crop and community-price codebooks.
+The separate W1 card-weight =derivation_inputs= reconstruction uses the same food quarter, so changing served item names does not strand their raw answers.
+
+*The old quarter columns were not an answer key.*
+The held W2-PP Stata dictionary says code 44 is "other nuts/seeds/pulses", 77 is leaves and 78 is other vegetables; the =2012Q3= cells instead said =Groundnuts (shelled)=, =Dry Pepper= and leaves.
+The held W2-PH dictionary says the SAME codes are shelled groundnuts, dry pepper and leaves, but the =2013Q1= cells instead said other nuts, leaves and other vegetables.
+Blindly switching to those old quarter columns would have introduced 2,135 wrong PH rows while missing 1,686 wrong PP rows.
+Those source-contradicted cells, the W2-PP groundnut/pepper detail, and eight positively used missing PH entries (45, 79, 141--146; 6,288 source rows) are now corrected from the held dictionaries.
+Preferred and Aggregate columns are unchanged.
+
+*Do not add an attribute the source did not record.*
+W1 PP/PH and W2 PP say only =Groundnuts= (2,839 retained source rows) and =Pepper= (10,446); W2 code 21 says only =Maize (shelled)= (1,425 across PP/PH).
+They are served with those native names, rather than the historical aliases' invented unshelled/fresh/on-the-cob qualifiers (approved country correction, 2026-10-21).
+W2 code 20 DOES say =maize (unshelled/on the cob)=, so its corresponding specific Preferred name is source-backed.
+An exact normalized Preferred name wins over colliding historical aliases; only the reviewed example-only =Other Spices (e.g. Maggi)= alias is otherwise used.
+These three native names are not new Aggregate buckets: an alternate-label request leaves an uncurated name intact and reports it through the ordinary label-coverage diagnostic.
+
+A known code with missing quarter curation is reported by =FoodItemDecodeWarning= and keeps its raw code; an unreviewed or ambiguous alias keeps the native name and is reported when used.
+Unknown raw codes and NaN item keys keep the existing raw/missing contract.
+An absent quarter, including W5's =2023Q3=/=2024Q1=, raises explicitly; this change adds no W5 food feature.
+
+*Inherited specificity questions left open by #1144.*
+The W4-PH codebook says =Maize (On the cob)= for code 20 while its curated Preferred name adds =unshelled=, and =Milk tinned= for code 113 while its curated name adds =unsweetened=.
+That correction preserved these choices pending an instrument check; the #1177 checkpoint below supplies grounding for these two qualifiers only.
+The raw measurements and source rows remain the survey's answers; kilograms and prices still come from the existing transforms, whose label-pooled inference can move other waves after an item rename.
+
+* W4-PH qualifiers confirmed in the published instrument (GH #1177, 2026-10-30)
+
+The [[https://microdata.worldbank.org/catalog/3557/download/47671][official W4 post-harvest household questionnaire]] explicitly prints:
+- Section 10B, printed page 45 (PDF index 44): code 20 =Maize (Unshelled/On the cob)=.
+- Section 10B, printed page 49 (PDF index 48): code 113 =Milk tinned (unsweetened)=.
+
+Independent review visually confirmed both aligned item-code rows and their
+surrounding categories.  This supports retaining the existing qualifiers as
+published questionnaire wording.  The shorter held Stata labels above remain
+valid source evidence; they are not rewritten to match the questionnaire.
+Historical 20/340 retained-source-row counts were not remeasured.
+
+The [[https://microdata.worldbank.org/catalog/3557/download/47668][post-planting questionnaire]] independently agrees for these two labels
+(Section 7B, printed pages 28 and 32).  The maize tables are still different:
+PH includes code 21 =Maize (Shelled/On the cob)=; PP's printed table goes from
+20 to 22.  Do not transfer other quarter definitions by inference.
+
+Both questionnaires match their tracked PDF sidecar MD5 and size: PH
+=61ce32c4fe52cb7dc8753e651957e6c3= / 612850 bytes; PP
+=da641e8c226502f32b80183b1de59a7b= / 485720 bytes.  Catalog 3557 is the GHS
+Wave 4 instrument; the superseded 3827 is NGA_2018_LSS.  PH/PP interviewer
+manuals were also read; inspected food instructions add no item-specific
+shell/sugar definition.  No condensed/evaporated equivalence is inferred.
+
+No mapping, Preferred/Aggregate label, row, quantity, expenditure, conversion
+or API behavior changed.  This establishes published category wording, not
+respondent-level purchase contents or every fielded CAPI version.  #1178's
+implementation evidence and unrelated recall/unit questions remain separate.
+Independent review SHA256
+=50ba69fadfe8a0754d4935f6b1ddb3ee7d55261ba89246bafae622e86256c1f8=;
+report SHA256 =edace7af40a578385e08147c596875c65feaef7cf79c436048835360d477e73b=,
+dispatch =d7a0b6cb4e9744b1a9a271581c2cc6be=.
+
 * food_acquired acquisition sources (GH #591)
 
 The GHS-Panel food module asks total 7-day consumption of each item and then
@@ -61,6 +124,29 @@ as =q5a x price=, which is what the World Bank's own W4 consumption aggregate
 does --- was rejected here because it fabricates a number no respondent
 reported and would silently move =food_expenditures=.  Worth revisiting as its
 own issue.
+
+**** DONE The window is on the row: a registered identity derivation (GH #881, 2026-11-03)
+
+Ruling @ligon 2026-11-03, option A.  Every =s='purchased'= row of both W4
+rounds carries =Derivation = Nigeria::food_acquired::w4-last-purchase-30d=
+(=_/derivations.yml=), stamped by =2018-19/_/mapping.py:
+stamp_w4_last_purchase_window= after =food_acquired_for_wave='s duplicate-key
+collapse.  The function is the IDENTITY: =Quantity= / =Expenditure= /
+=Quantity_kg= are q9a / q10 / q9a x q9_cvn exactly as before; what is
+registered is the 30-day most-recent-purchase window.  The =recall.yml=
+=within_wave_variation: by-s= record said this at wave grain and dies with
+=attrs=; the column survives concat, cache and =Feature()=.
+=Country('Nigeria').derivation_inputs(key)= returns the raw purchase block
+(q8, q9a/q9b/q9_cvn, q10) plus q5a / q2b / q2_cvn at the served
+=(t, i, j, u, s)= grain, so a user can re-derive a 7-day value.
+
+Option B (a constructed 7-day =Expenditure = q5a x q10/q9a=, the #876 EHCVM
+pattern) was declined.  Measured on the raw W4 CSVs for the record: q5a is
+in the consumption unit q2b and q9a in the purchase unit q9b, which differ
+on 9.5% (2018Q3) / 13.1% (2019Q1) of priced rows, so B is only defined
+through the q2_cvn / q9_cvn kg factors; kg-reconciled it totals 29.4M /
+23.6M Naira against 40.0M / 33.4M of q10 on the same rows (median row ratio
+1.0), and the unreconciled product 117.7M / 163.4M.
 
 *** Stray unit codes in the per-source unit columns
 
@@ -197,12 +283,13 @@ The unwired legacy =2012-13/_/units.py= also said =4:'ml'=; it now says
 through =food_acquired_for_wave= fails loudly (=KeyError: '2023-24'= from
 =food_unit_labels=) until that column is added -- intended, not a bug.
 
-*Open, not fixed here*: (a) W4's per-wave column gives size-less W4 codes
+*Open, not fixed here*: (a) W4's per-wave column gave size-less W4 codes
 (20 CONGO, 30 MUDU, 40 DERICA, 80 PIECE, 90 HEAP, ...) W3's =small ...=
 labels -- 48,305 (2018Q3) + 50,181 (2019Q1) rows -- while W4 records the
 size separately in =s7bq2c=/=s7bq9c=/=s10bq2c=/=s10bq9c=, which no build
-reads; W4 also differs *within* the wave by round (PH 40 =DERICA/TIN=, PP 40
-=DERICA=; PH 120 =SACHET=, PP 120 =PACKET/SACHET=).  (b) W1-PH labels state
+read; W4 also differs *within* the wave by round (PH 40 =DERICA/TIN=, PP 40
+=DERICA=; PH 120 =SACHET=, PP 120 =PACKET/SACHET=).  /Settled by GH #1033,
+next section./  (b) W1-PH labels state
 weights (=Sack/Bag: Small (20 kg)=) that the cleaned labels drop.  /Settled by
 GH #1035 (amended ruling 2026-10-19), see below/: the labels STAY weightless,
 and the card weight is served as =Quantity_kg= on fraction-of-a-container rows
@@ -214,6 +301,167 @@ have *no label even in the =.dta=*" holds for the post-HARVEST file only.
 MEDIUM=, =152. BASIN LARGE= (and =161. BUNDLE MEDIUM=), and all 12 rows are
 in 2015Q3 (post-planting).  Left as =other specify (13x)= here (W3 out of
 scope for #607).
+
+*Resolved 2026-10-21 (GH #1034).*  The =2015-16= column now decodes =131= as =Sack/Bag Medium=, =151= as =Basin Medium=, =152= as =Basin Large= and =161= as =Bundle Medium=, without adding kilogram factors.
+The two rounds share this column; the twelve served rows affected are all in 2015Q3 (=131= three, =151= eight, =152= one), and no wired post-harvest source uses these codes.
+The raw quantities, expenditures and row counts are unchanged.
+
+*Qualification to the correction above.*  Re-reading the held Stata metadata shows that the post-harvest TOTAL-consumption unit =s10bq2b= also carries all four labels.
+The post-harvest columns the build actually reads (=s10bq3b=, =s10bq6b=, =s10bq7b=) do not, and contribute no rows on these codes.
+Thus "no label in the post-harvest file" was too broad; it was a statement about the wired fields, not every unit column in that file.
+
+** W4: the unit code plus the recorded size, decoded per round (GH #1033, 2026-11-04)
+
+/Ruling (@ligon, 2026-11-04)/: combine the unit code with the size column, onto
+W3's small / medium / large, and decode post-planting and post-harvest
+separately.
+
+*The idiosyncrasy.*  W3 prints the size in the code (=20. CONGO SMALL=, =21. CONGO
+LARGE=, =41. DERICA MEDIUM=).  W4 prints =20. CONGO= and asks the size in its own
+column, beside each unit column: =s7bq2c= / =s7bq9c= (PP), =s10bq2c= / =s10bq9c=
+(PH), value-label set =LABB=.  The =2018-19= column gave W4's codes W3's =small=
+labels, so every row on them was served =small=; SMALL is the recorded size on
+42.3% (2018Q3) and 36.7% (2019Q1), or 44.1% and 42.5% of the rows with an ordinal
+size.  The CSV the build reads and the =.dta= agree on every code in all four unit
+and size columns.
+
+*What the code does.*  The =u= table's =2018-19= column is now =2018Q3= and
+=2019Q1=, holding size-less labels (=food_unit_labels= reads a round's own column
+where it has one).  Codes 14, 250, 300 and 340 are on PP's value labels only.  W3's
+size-variant codes (21, 41-43, ...) are =---=: W4 records none of them in any row.
+=nigeria.sized_food_unit= prefixes the recorded size for the eleven
+codes the old column labelled =small= (=W4_SIZED_UNIT_CODES=: 20, 30, 40, 50, 60,
+70, 80, 90, 100, 110, 120).  =purchased= reads q9c beside q9b; =produced= and
+=inkind= read q2c beside q2b.  W1-W3 name no size column and are untouched.
+
+Every (code, ordinal size) pair W4 records lands on a W3 label: congo and mudu
+carry only SMALL and LARGE in both waves, and only derica carries VERY LARGE.
+Code 100 is =BUNCH/BUNDLE= in both W4 rounds and is served W3's =bunch=, as it was.
+
+*PH's 40 and 120 are served W3's names (ruling @ligon, 2026-11-04).*  PH labels them
+=40. DERICA/TIN= and =120. SACHET=; PP labels them =40. DERICA= and =120.
+PACKET/SACHET=.  Both rounds serve =derica= and =packet/sachet=.  "Decode separately"
+stands: each round still reads its own code and size columns and its own =u= column.
+The survey's own factors treat each pair as one unit: on code 40 the PH / PP =cvn=
+ratio has a median of 1.000 over 78 item-size cells, 83% within 1%, and on code 120
+all 9 cells are exact, with both rounds matching W3's table.  PH spellings of its own
+isolated PH's rows with no =cvn= in cells no other wave shares.  Scored against W4's
+survey median for that size and unit, on 42 such rows (independent review, simulated):
+
+| | median log error | within 2x | no factor |
+|-+-+-+-|
+| old labels | 0.693 | 21.4% | 0 |
+| PH's own names | 1.605 | 0% | 6 |
+| W3's names | 0.681 | 83.3% | 0 |
+
+It is not uniformly better: 6 =large derica= rows in 2019Q1 get 0.32 kg against a
+survey median of 1.077, which is 3.4x under where PH's own name was 2.4x over.
+
+| recorded size on those codes | 2018Q3 | 2019Q1 | served |
+|-+-+-+-|
+| 0. SMALL | 20,447 | 18,432 | =small heap= |
+| 1. MEDIUM | 18,069 | 16,587 | =medium heap= |
+| 2. LARGE | 7,802 | 8,277 | =large heap= |
+| 3. VERY LARGE (derica only) | 40 | 38 | =very large derica= |
+| blank | 1,947 | 1,448 | =heap=, the unit with no size claim; not =Unknown=, since the unit is recorded |
+| a metric size (PH 120 only: =30. 20 GRAMS= ... =55. 400 GRAMS (100 CUBES)=) | 0 | 5,399 | =packet/sachet=; see below |
+| total | 48,305 | 50,181 | |
+
+The survey's own factor corroborates the mapping: the median =s7bq9_cvn= /
+=s10bq9_cvn= rises with the recorded size on every code (2018Q3 heap 0.205 / 0.495
+/ 0.995 kg, tiya 0.532 / 1.490 / 2.543, derica 0.090 / 0.340 / 1.077 / 1.314).  The
+stronger check is W4's =cvn= against W3's published =food_conv_w3.dta=, by item and
+served label (independent review, 2026-11-04): median ratio 1.000 with 98.9% of
+86,860 rows within 25%, against 1.52 and 35.2% of 92,715 rows on the old labels.
+W4's blank-size =piece= rows are mostly eggs, whose =cvn= (0.07, 0.045) is W3's
+=medium piece= factor exactly; the rest are meat, with no =cvn=.
+
+*Measured*, cold, private root (base =e92ae6b0f=).  =food_acquired= rows, =i=, =j=,
+=s=, =Quantity=, =Expenditure=, =Quantity_kg= and =Derivation= do not move in any
+round; =u= moves only in W4, which goes from 40 / 36 distinct labels to 64 / 59.
+Native quantities and =food_expenditures()= on its default basis do not move.
+=food_expenditures(basis='total', valuation='median_price')= does, by design, because
+its price cells carry =u=.  At transform level with =geo=None=, 14,642 of W4's 38,398
+non-purchased rows change value (net +0.9%, gross 9.4%), and 203 fall from
+=median_price= to =none= (111,152 -> 110,949 priced, 2,288 -> 2,491 unpriced).
+
+| =t= | kg before | kg after | change | net change of rung |
+|-+-+-+-+-|
+| 2010Q3 | 191,605.38 | 191,707.15 | +101.77 | 0 |
+| 2011Q1 | 245,539.34 | 245,539.34 | 0 | 0 |
+| 2012Q3 | 189,159.48 | 189,161.44 | +1.96 | 0 |
+| 2013Q1 | 147,521.76 | 147,523.16 | +1.40 | 0 |
+| 2015Q3 | 119,978.53 | 119,918.91 | -59.62 | 8 =item_unit= -> =unit= |
+| 2016Q1 | 108,084.78 | 108,067.75 | -17.03 | 7 =item_unit= -> =unit= |
+| 2018Q3 | 251,192.58 | 251,251.19 | +58.60 | 21 =unit= -> =item_unit= |
+| 2019Q1 | 214,012.17 | 214,079.90 | +67.73 | 1 =item_unit= -> =unit= |
+| total | 1,467,094 | 1,467,249 | +154.8 | |
+
+=survey_kg= (168,441 rows, 457,808 kg) and =metric= do not move.  *W1-W3 kilograms
+move although their rows do not*: the inferred factor has no =t= axis (the same
+mechanism as the #607 note above), and W4's rows with no =*_cvn= (2,529 and 392)
+sit in cells shared with other waves.  2010Q3's +101.77 is all =piece=, W1-PP's own
+label, which W4's blank-size pieces now share; W3's moves are in =small heap=,
+=small piece= and their neighbours, whose W4 peers have left for =medium= and
+=large=.  So "others must not move" holds for their rows and =u=, but not for their
+inferred kilograms: row by row, 35,928 of the 426,219 W1-W3 rows change kilograms
+(2010Q3 3,785, 2012Q3 156, 2013Q1 169, 2015Q3 16,578, 2016Q1 15,240, 2011Q1 0), gross
+408.51 kg of 1.00M, at most 0.14% of a round.  Most by a sliver (2015Q3 p10 / p50 /
+p90 0.94 / 0.999 / 1.009); 577 rows move by more than 10% and 53 by more than 25%.
+
+*That movement is a cost, not a correction.*  Scored against W3's own table on the
+30,900 moved rows with a key (independent review, 2026-11-04, before the PH fold,
+which moves the gross by 3 kg): median log error
+1.235 -> 1.218, mean 1.297 -> 1.301, within 2x 6.7% -> 6.0%, better 48.9%, worse
+51.1%.  By size, =small= is 88% worse, =medium= 98.6% better and =large= 83% better:
+W4's medium and large rows had been pulling a too-low =small= factor up by accident.
+Across all 106,916 W3 inferred rows the median is unchanged at 0.621.  20 W3 rows
+fall a rung, and the one such cell with a key clearly worsens: Salt =small bowl=,
+0.60 -> 0.15 against 0.50, on 9 rows.  W1's =piece= rises 1.41% on 3,270 rows, with
+508 Beef rows x1.14 and 19 Pork rows x1.51, driven by 146 W4 size-less meat =piece=
+rows.
+
+*W4's per-kg prices on inferred rows.*  Only rows with no =*_cvn= are affected: a
+factor changes on 357 (2018Q3) and 145 (2019Q1) of W4's 169,506 rows, 276 and 77 of
+them priced purchases.  A medium or large row used to get the =small= cell's factor,
+and now gets its own size's cell, thin as that is:
+
+| size | rows, 2018Q3 / 2019Q1 | kg, 2018Q3 | kg, 2019Q1 | median price after / before, priced rows |
+|-+-+-+-+-|
+| small | 90 / 59 | 88.8 -> 90.2 | 18.7 -> 17.7 | 1.03 / 1.01 |
+| medium | 103 / 58 | 49.8 -> 89.5 | 38.1 -> 108.7 | 0.32 / 0.51 |
+| large | 30 / 28 | 29.8 -> 28.2 | 16.9 -> 15.0 | 0.38 / 0.55 |
+| size-less or other | 134 / 0 | 73.7 -> 92.7 | | 0.99 / |
+
+Summed kgvalue is a tail statistic, so its fall says little about a typical row.
+- 2018Q3 goes 1,563,507 -> 405,545, but the median changed row is x0.991 and the top
+  5 rows are 58% of the gross move.  12 Baby milk powder rows go 1,036,894 -> 45,437,
+  which is 86% of the net fall: their factor goes 0.011 -> 0.293 kg, where W3's milk
+  powder table reads 0.012 / 0.4 / 0.9.  Without that cell the sum goes 526,613 ->
+  360,108.  Rows above N50,000/kg go 8 -> 0.
+- 2019Q1 goes 162,773 -> 109,325, with a median changed row of x1.012 and the top 5
+  rows 51% of the gross move.
+- Against each label's W4 survey median, a weak key because it ignores the item
+  (independent review, simulated): 2018Q3 median log error 0.644 -> 0.575, over 5x
+  21.8% -> 5.4%; 2019Q1 0.845 -> 0.773, within 2x 31.0% -> 35.7%, over 5x 1.8%.
+
+*Not changed, by ruling (@ligon, 2026-11-04)*: other W4 codes that carry a size keep
+their plain label, as do the 5,399 metric-size =packet/sachet= rows.  They were never
+served a false size, which is the defect the ruling addressed.  Ordinal sizes,
+rows 2018Q3 / 2019Q1: =Loaf= 3,215 / 3,340, =Tuber= 556 / 2,552, =Wrap= 25 / 2,897,
+=Sachet= 297 / 0, =Packet= 14 / 157, =Basin= 47 / 133, =other specify= 55 / 23,
+=Slice= 16 / 0, =Basket= 9 / 1, =Shot= 3 / 0.  Metric sizes: =Bottle/Can= 3,881 /
+6,313, =Sack/Bag= 197 / 311, =Packet= 0 / 413.
+
+W3 has a sized form for some of these.  Its PH card (=s10bq2b=) has 130-132 Sack/Bag,
+140-142 Basket, 150-152 Basin and 160-162 Bundle, and W3's rows use 131, 150, 151 and
+152.  W4's =Basin= rows carry =cvn= 12.5 / 28.0 / 46.0 by size, all served =Basin=, so
+that pool mixes three sizes.  It has no sized form for the W4-only =Loaf=, =Tuber=,
+=Wrap=, =Packet=, =Slice= or =Shot=.  On a metric size the survey's factor already
+equals the stated size (p10 = p90 in every cell, bar two cube sizes), so what stays
+pooled is native-unit price, not kilograms.  A metric size in a label would also feed
+=transformations._parse_explicit_metric= (compare GH #1035, where a stated weight was
+wrong by a median 31x on count rows).
 
 ** A blank unit code is =Unknown=, not ='None'= (GH #1041, 2026-10-18)
 
@@ -431,14 +679,308 @@ geopolitical zones serve as strata; within each zone, enumeration areas
 drawn within EAs.
 
 Each wave collects data in two rounds: post-planting (PP, ~Q3) and
-post-harvest (PH, ~Q1 of the following year).  The same households are
-visited in both rounds.  The library uses the post-planting cover page
-(=secta_plantingw{N}.dta=) as the sample frame because it comes first
-and defines the household universe for the wave.
+post-harvest (PH, ~Q1 of the following year). Each round's =sample= and
+=cluster_features= now use its own cover, with that cover's weights
+(GH #1120 D1 / #1261; approved retained repair extracted 2026-10-29).
+
+/Superseded behavior, preserved as a contradiction of record:/ "The same
+households are visited in both rounds. The library uses the post-planting
+cover page (=secta_plantingw{N}.dta=) as the sample frame because it comes
+first and defines the household universe for the wave." The per-round source
+counts below disprove identical membership; D1 supersedes the PP-for-both
+choice. Older counts elsewhere in this file describe that former build,
+including the #592 null-key description, not the repaired per-round outputs.
 
 Starting with wave 4 (2018-19), a refreshment sample of new households
 was drawn alongside the continuing panel.  Wave 5 (2023-24) continues
 this rotating panel design.
+
+** Each round's cover and labelled same-location PH answers (GH #1120 / #1261)
+
+Source-reviewed extraction of retained =16636094f= / =9cd98fabf= /
+=57b99d3de= over public =d65e8b136=. Only the cover/cluster repair is included;
+#1119, #637, education #1318 and successful-empty #1309 remain separate.
+
+Fresh cached-source checks (2026-10-29) use all 25 declared cover, roster and
+wired geo files, through the ordinary reader and Make/Country APIs, on a
+private root. Independent raw membership, composite keys, exact raw and
+normalized weights, and household geo pairs agree in all ten rounds.
+The per-round sample rows are:
+
+| wave | PP household cover | PH household cover | served PP | served PH |
+|------+--------------------+--------------------+-----------+-----------|
+| 2010-11 | 5000 | 4939 | 5000 | 4939 |
+| 2012-13 | 4859 | 4854 | 4880 | 4854 |
+| 2015-16 | 4696 | 4592 | 4696 | 4594 |
+| 2018-19 | 5263 | 5025 | 5263 | 5025 |
+| 2023-24 | 5067 | 4771 | 5067 | 4771 |
+
+Precedence is household cover, then supplement cover, then own-round roster.
+W2's PP agriculture cover supplies 21 additional households with NA weights;
+W3's PH roster supplies two with NA weights. The roster must agree on each
+household's location across its member rows. No missing weight is filled with
+zero, and no missing location is inferred from another household.
+
+*W2's geo-only rows are real PH households.* There are 44 PH-only households
+relative to the PP household cover; 39 have geo records. Those 39 include two
+EAs with no household on the PP household cover. The repaired PH sample serves
+all 44 with real keys; its cluster table uses the same membership. Only then
+is the geo join LEFT onto the round's cover. Left join alone would suppress
+the old live-gap signal without repairing membership. W2 has 497 real EAs in
+each round (plus 152 PP / 165 PH moved singletons).
+
+*Labelled same-location PH answers.* For PH =ea=0= only, W4 =hhsmlc=1=
+labelled =1. YES= or W5 =hh_moved=2= labelled =2. NO, IN ORIGINAL DWELLING=
+permits the COMPLETE known own-PP =state/lga/ea= identity. It never mixes PP
+and PH components. All PH attributes and weights stay PH. Numeric-only,
+missing or wrong labels, actual movement answers, missing/moved PP identities
+and unlabelled W3 do not authorize reuse. This is an explicit derived identity,
+registered separately for =sample= and =cluster_features=; it does not assert
+physical movement completeness or national-population equivalence.
+
+Fresh measurement gives 20 W4 and 31 W5 reused PH identities. Historical
+54/66/64 and boundary-diagnostic populations are not interchangeable with
+these rule-qualified rows. =ea=0= is a source sentinel, not a complete census
+of dwelling moves; a nonzero EA can accompany a movement answer too.
+
+D2 =unlocated-{hhid}= remains a different singleton from recorded =ea=0=
+=moved-{hhid}=. No source household requires D2 in these builds. That repair deliberately kept W5's held geo
+file unwired; #978 subsequently adds its reference coordinates as documented
+above. Site 2 continues
+to select the most complete observed household row and report disagreements;
+it never averages geo fixes, and only the selected row's derivation survives.
+The panel crosswalk remained its committed source, unchanged here (rebuilt by
+#1264, below).
+
+*** The W3 household on the geovariables file but on neither W3 cover (GH #1261, 2026-11-03)
+
+=NGA_HouseholdGeovars_Y3.dta= has 4,613 households; exactly one is on
+neither W3 household cover: hhid =320201=.  Its geovariables row carries a
+coordinate and the geo-derived attributes but *blank* =zone/state/lga/ea=.
+Its provenance, from the survey's own files:
+
+- =HHTrack.dta= (W3; also W2 =HHTrack.csv=): a W1/W2 panel household in
+  Rivers / Bonny / EA 1464 (rural), "1. Interviewed" in all four W1/W2
+  visits, *"3. Not found"* in BOTH W3 visits, every W3 weight NA.
+- =sect1_harvestw3.dta= (PH roster) nevertheless lists it: two members, the
+  former head (=s1q3b= "FORMER HEAD (DEAD)", =s1q28= 14 DEAD) and a new
+  32-year-old female head, located at state 32 / lga 3207 / ea 1464 -- its
+  original EA.  The PP roster has no row for it.
+- Its W3 coordinate is the EA's: all 9 households of =32/3207/1464= on the
+  W3 geovariables file carry one identical pair (the published fix is the
+  EA's displaced point stamped on each household).
+
+So "no recorded EA" holds for the geovariables row only; the PH roster and
+=HHTrack= both record EA 1464.  At =3a33f2869= the household is *already
+served*: the GH #1120 D1 roster supplement puts it in 2016Q1 =sample= with
+=v = 32/3207/1464= and NA weights, and the LEFT geo join gives its
+=cluster_features= row the EA's coordinate (measured with
+=nigeria.sample_for_wave= / =cluster_features_for_wave('2015-16')=: 4,594
+PH rows, the 4,592 cover households + =320201= + =30082=).  No row is
+invented: weights stay NA, the location is the roster's own.
+
+=30082= is the same shape the other way round: =HHTrack= says *"2. Refused"*
+in both W3 visits, yet it is on the PP cover (=3/318/1136=, weights NA) and
+its PH roster lists four members at =ea = 0= in a different LGA (served
+=moved-30082=).
+
+*The contradiction is of record, not resolved here*: =HHTrack='s W3 status
+says neither household was interviewed; the PH roster says someone answered.
+The D1 rule (cover, then supplement cover, then own-round roster) admits a
+household on roster evidence alone.  /Decided 2026-11-04 (GH #1444): status does
+not gate that admission; see the =InterviewResult= entry under =interview_date=./
+
+*=HHTrack= is read by no table.*  It is the panel's per-visit disposition
+record (=hhstatus_w{1,2,3}v{1,2}=: 1 interviewed, 2 refused, 3 not found,
+4 dead, 5 tracked and interviewed, 6 moved away not tracked, 7 crisis area,
+91 not interviewed for unknown reason -- unlabelled in W2's CSV, labelled in
+W3's =.dta=), with =tracking_*=, =moved_*= and per-visit weights.  Both files
+carry the W1 visits too, and agree on every W1 and W2 status cell.  It explains the GH #1264 roster-less crosswalk ids:
+the 85 2015Q3 PP-cover households with no PP roster rows are EXACTLY the
+PP-cover households =HHTrack= records as not interviewed at W3 visit 1
+(30 dead, 29 refused, 15 moved away, 11 not found).
+
+** Panel crosswalk rebuilt: all rounds, interviewed households, own covers (GH #1264, 2026-11-03)
+
+@ligon's ruling, approved together: (a) identity links for W1, W4-old and W5,
+using =old_new=; (b) link only households recorded as interviewed; (c) build
+each round's links from that round's own cover.  This changes the crosswalk
+only.  Interview status does not gate ROSTER admission (#1444, ruled 2026-11-04),
+so no table's membership changes and =id_walk= stays an identity.
+
+*The chain.*  =2010Q3 <- 2011Q1 <- 2012Q3 <- 2013Q1 <- 2015Q3 <- 2016Q1 <- 2018Q3
+<- 2019Q1 <- 2023Q3 <- 2024Q1=: PH to the PP of the same visit, PP to the PH of
+the wave before.  Each round is a node because each round is its own =t=.  It is
+one chain because that is what =local_tools.panel_ids= builds (each wave to the
+wave sorted before it), what =_check_panel_attrition_monotonic= walks (one
+predecessor per wave), and what =sampling.yml= declares its boundaries over.
+Every link is an identity on =hhid=, so nothing here can move a household
+between clusters: =v= comes from each round's own cover.  =2010Q3= has nothing to
+point at, so its =updated_ids= map is empty, the convention for a baseline.
+
+*What counts as interviewed.*  Both ends of a link must qualify.
+
+| rounds | source | interviewed | not interviewed |
+|--------+--------+-------------+-----------------|
+| W1 | own cover =saq22a= / =sq1= | completed, partially completed | refused, not at home, moved away, other (specify) |
+| W2, W3 | =HHTrack= =hhstatus_w{2,3}v{1,2}= | 1 interviewed, 5 tracked (and interviewed) | 2 refused, 3 not found, 4 dead, 6 moved away, 7 crisis area, 91 unknown reason |
+| W4, W5 | own cover =interview_result= | 1 complete, 2 and 3 partially complete | 4 unable to identify, 5 moved away, 6 unavailable, 7 refused, 8 all deceased |
+
+- *Code 91 is settled.*  W3's =HHTrack.dta= labels it "91. Not interviewed for
+  unknown reason"; W2's CSV has the same 5,000 values with no labels.
+- *W1 does have =HHTrack= columns* (=hhstatus_w1v{1,2}=, in W2's and W3's files),
+  though no W1 file.  The W1 cover's own result field is used, and the two name
+  exactly the same households (4,997 and 4,917).
+- *A partial interview is an interview.*  W4's own manuals define both partial
+  codes, for interviews given consent, as "started an interview" that "will
+  contain unanswered questions":
+  [[https://microdata.worldbank.org/catalog/3557/download/47675][PP interviewer manual]] p. 90 and
+  [[https://microdata.worldbank.org/catalog/3557/download/47677][PH interviewer manual]] p. 98 (printed and PDF page agree in both; neither
+  manual is held here).  The W5 PP interviewer manual (held, PDF p. 112) defines
+  them the same way.  W4's held questionnaires list the codes:
+  =pp_w4_household_quest.pdf= (PDF p. 2) prints 1--7, and
+  =ph_w4_household_quest.pdf= (PDF p. 3) prints 1--6, both partial codes among
+  them; PH's code 7 is on the data's labels only.  And all 42 "partially
+  completed" households on the W1--W3 covers are =HHTrack= 1 or 5.  The BID's
+  headline 4,976 (W4) and 4,715 (W5) are code 1 at PH alone.  Partial households
+  counted here: 9 (2018Q3), 4 (2019Q1), 2 (2024Q1).
+- A status value outside these tables makes =panel_ids.py= refuse, not guess.
+- *=old_new= decides the sample.*  The W4 refresh and the original sample overlap
+  in hhid RANGE (19001--379155 against 10001--370040) and share no id.
+  =panel_ids.py= refuses any hhid that changes sample, or that first appears in a
+  round not drawing its sample (only 2010Q3 and 2018Q3 draw one).
+
+*Counts* (cover rows are not all interviews):
+
+| round | cover | interviewed | roster | interviewed, no roster | roster, not interviewed |
+|-------+-------+-------------+--------+------------------------+-------------------------|
+| 2010Q3 | 5000 | 4997 | 4997 | 0 | 0 |
+| 2011Q1 | 4939 | 4917 | 4917 | 0 | 0 |
+| 2012Q3 | 4859 | 4749 | 4746 | 3 | 0 |
+| 2013Q1 | 4854 | 4770 | 4770 | 0 | 0 |
+| 2015Q3 | 4696 | 4611 | 4611 | 0 | 0 |
+| 2016Q1 | 4592 | 4582 | 4582 | 2 | 2 |
+| 2018Q3 | 5263 | 5053 | 5051 | 2 | 0 |
+| 2019Q1 | 5025 | 4980 | 4980 | 0 | 0 |
+| 2023Q3 | 5067 | 4771 | 4771 | 0 | 0 |
+| 2024Q1 | 4771 | 4717 | 4716 | 1 | 0 |
+
+*Links* (39,326, was 14,251; 13,821 kept, 25,505 added, 430 removed).  "Dropped"
+counts households interviewed in the current round, in the sample the link needs,
+whose target round did not interview them.
+
+| link | before | after | dropped | the target round says |
+|------+--------+-------+---------+-----------------------|
+| 2011Q1 -> 2010Q3 | 0 | 4916 | 1 | 1 refused |
+| 2012Q3 -> 2011Q1 | 0 | 4702 | 47 | 37 unknown reason, 7 not found, 3 refused |
+| 2013Q1 -> 2012Q3 | 4859 | 4716 | 54 | 28 crisis area, 17 unknown reason, 6 not found, 3 moved |
+| 2015Q3 -> 2013Q1 | 4696 | 4523 | 88 | 31 unknown reason, 24 moved, 15 refused, 13 not found, 5 dead |
+| 2016Q1 -> 2015Q3 | 4696 | 4582 | 0 | |
+| 2018Q3 -> 2016Q1 | 0 | 1454 | 0 | (of 1,493 W4 old; the other 39 were not interviewed at W4) |
+| 2019Q1 -> 2018Q3 | 0 | 4980 | 0 | |
+| 2023Q3 -> 2019Q1 | 0 | 4736 | 35 | 13 not on the W4 PH cover, 9 unable to identify, 9 refused, 4 unavailable |
+| 2024Q1 -> 2023Q3 | 0 | 4717 | 0 | |
+
+W5 links carry 1,369 old and 3,367 new households, each nested in its W4 sample.
+
+Of the 430 removed: 143 / 173 / 114 in the three pairs that existed, of which 105
+fail at the current round only, 103 at the target only and 222 at both.  Of the 99
+=2015Q3 -> 2013Q1= links that used to target an hhid off the W2 PP cover, the 58
+on neither W2 cover are gone, and 38 of the 41 on the PH cover stay, now because
+that cover says so.
+
+*A household that misses a round has no link across the gap* (224 of the 225
+dropped above; the other, at 2011Q1, has no earlier round to bridge to).  Its =i=
+is unchanged on both sides, so it is still followed by =i=.  The crosswalk records
+adjacent rounds, not every revisit.
+
+*Residuals, deliberately not filtered on the roster.*
+- 8 household-rounds are recorded as interviewed and have no roster: =2012Q3= 3
+  (=HHTrack= 5, cover "other"), =2016Q1= 2 (=HHTrack= 5, cover "refused"),
+  =2018Q3= 2 and =2024Q1= 1 (partial).  6 of them are link sources, so
+  =panel_ids_targets_exist= still reports 6 of 39,326 current-round endpoints.
+  It warns where it used to fail.
+- 2 household-rounds have a roster and no recorded interview: =320201= and =30082=
+  in =2016Q1=.  They stay served (the #1120 D1 rule) and are not linked.  #1444
+  ruled this stands: no gate.
+- Served by =sample()= with no recorded interview: 3 / 22 / 131 / 84 / 85 / 12 /
+  210 / 45 / 296 / 54 household-rounds, 2010Q3 through 2024Q1.  =2012Q3='s 131
+  includes the 21 households only the W2 agriculture cover lists (=HHTrack=: 19
+  crisis area, 2 unknown reason), which =plot_inputs= reports on.  #1444.
+
+*=sampling.yml= counts these links (GH #1448, 2026-11-04).*  Its "N of M linked
+households" used to be hhid overlaps of covers, most of them measured while
+=sample()= still stamped the PP cover on both rounds, so it read, for example,
+"4,859 of 4,859" keep =v= at 2013Q1 where the links show 4,699 of 4,716 (17 PH
+movers).  The notes now state the link counts, and
+=tests/test_gh1448_nigeria_sampling_notes.py= recomputes them.  The declared
+continuities did not move: no real EA changes =v= across any boundary declared
+=stable=, and 10 households across 2018Q3 (1 EA) and 88 across 2023Q3 (10 of the 12
+EAs) do change it, whole EAs with only the LGA code moving, as declared
+=wave-scoped=.  The 12 EAs (112 households) are a fact of the two covers; two of them
+hold no linked household.
+
+*Why not YAML.*  A =panel_ids:= block reads one file and is stamped with every
+round of its directory, so it expresses neither own covers nor a gate on a second
+file.  The two blocks are removed rather than left to disagree with the JSON;
+=LSMS_BUILD_BACKEND=make= used to derive the old dicts from them, and now serves
+the committed ones, as Uganda does.
+
+*Cost:* a cold re-warm of Nigeria at both tiers, L2-wave included: 24 of 24
+=Country._table_cache_hash= values move, and 148 of 148 =Wave._input_hash= values
+(the latter measured in review).  No other country's hash moves (0 of 126 probed
+across five countries), nor any =build_transforms_fingerprint= (0 of 36).
+
+** Panel crosswalk: =_/panel_ids.py= and the committed JSON (GH #894, 2026-10-23)
+
+/Superseded by the #1264 entry above; kept as the record of what #894 reproduced./
+
+The household panel crosswalk is a COMMITTED SOURCE ("design A", the
+convention in =CLAUDE.md=): =_/panel_ids.json= and =_/updated_ids.json=,
+regenerated with =make panel-ids= and reviewed as a diff.  Until GH #894
+Nigeria was "design B": the library read the =panel_ids:= blocks in
+=2012-13/_/data_info.yml= and =2015-16/_/data_info.yml= at run time and kept
+the result only as a cache parquet.  =panel_ids.py= reads those SAME blocks
+and =nigeria.wave_folder_map=; the blocks stay, and =LSMS_BUILD_BACKEND=make=
+still derives the dicts from them.
+
+Verified against development =9a0ed5f3c= on cold builds: =panel_ids= (14,251
+entries) and =updated_ids= (4,859 / 4,859 / 4,696 / 4,696 for 2012Q3 / 2013Q1
+/ 2015Q3 / 2016Q1) equal entry for entry; =sample()= and
+=household_roster()= equal under =assert_frame_equal= in all ten rounds;
+=check_panel_consistency= identical before and after (5 pass, 2 warn, 1
+fail; see below).  =Country('Nigeria').panel_ids= is now a plain dict of
+="t,i" -> "t0,i0"= strings, as for the other countries; design B returned a
+=RecursiveDict= keyed by tuples.
+
+What it encodes, reproduced as found -- *not* fixed by #894:
+- *PP/PH*: one directory, two rounds.  The directory's single block names the
+  post-planting cover page (=secta_plantingw2= / =secta_plantingw3=), and the
+  library ran it once per round, so the PH round's ids are the PP cover's ids.
+- =previous_i: hhid= is an identity (hhid is stable across waves), so every
+  =updated_ids= map is the identity and =id_walk= renames nothing.  The
+  caveat under plot_features below ("there is no per-wave remapping dict") is
+  right in effect but not literally: the dicts exist, and map each id to
+  itself.
+- =panel_ids= chains =2013Q1 -> 2012Q3= (the PH round to the PP round of the
+  same visit), =2015Q3 -> 2013Q1= and =2016Q1 -> 2015Q3=.  W1 (=2010Q3= /
+  =2011Q1=), W4 (=2018Q3= / =2019Q1=) and W5 (=2023Q3= / =2024Q1=) declare no
+  block and are absent from both dicts.
+- The PP cover lists households with no =household_roster= rows: 113 / 128 /
+  85 / 115 of the 2012Q3 / 2013Q1 / 2015Q3 / 2016Q1 ids (every one IS in
+  =sample()=).  So =check_panel_consistency= FAILS =panel_ids_targets_exist=
+  with 328 of 14,251 current-wave and 328 previous-wave ids missing from the
+  roster.
+- Because the link is an identity, 99 of the 4,696 =2015Q3 -> 2013Q1= entries
+  point at an =hhid= that is not on the W2 cover at all (not in 2013Q1
+  =sample()=).
+
+Proposed follow-up (one issue, #1264): decide whether the crosswalk should (a)
+span W1 and W4/W5, (b) link only households the target round actually observed,
+and (c) stop linking a PH round to its own PP round.  Any of these changes the
+committed JSON, so each shows up as a reviewable diff.  /Decided 2026-11-03: (a)
+and (b) yes; (c) as each round's links coming from its own cover, the PH -> PP
+chain kept./
 
 ** Cluster (PSU) identifier
 
@@ -506,33 +1048,103 @@ JEGA -> KALGO, EAs 548 and 926 MAIYAMA -> NGASKI, EAs 3956 and 3992 SURU ->
 DANKO WASAGU, Osun EA 220 EJIGBO -> EGBEDORE, and so on: *12 whole EAs (112
 households)* across 2019Q1 -> 2023Q3, plus *one* (=16/1624/136 ->
 16/1622/136=, 10 households) across 2016Q1 -> 2018Q3.  Every other changed
-=v= at a PH -> PP boundary is a mover's =moved-{hhid}= singleton.
+=v= at any boundary, PP -> PH included, is a mover's =moved-{hhid}= singleton.
 =Nigeria/_/sampling.yml= declares those two boundaries
 =cluster_id_continuity: wave-scoped= (partial), so a =Country('Nigeria')= frame
 carrying =v= across them raises a =ClusterIdentityWarning=; every other
 boundary is =stable=.  A 13-entry alias table would make them stable again, but
 it would change served =v= values and is not done here.
 
-*** Wave 5 geovariables await acquisition of WB v02 (GH #841 / #978)
+*** Wave 5 geovariables: acquired v02 household reference coordinates (GH #841 / #978)
 
-The acquired =NGA_2023_GHSP-W5_v01_M= extract recorded in =SOURCE.org=
-contains 106 files and no household geovariables file; the cover page
-=secta_plantingw5.dta= carries no lat/lon. This is an acquisition gap,
-not a claim that the survey did not collect coordinates. WB catalog 6410
-version =v02_M= (changed 2026-09-16) adds =NGA_HouseholdGeovariables_Y5.dta=
-(4,883 households, 55 variables) and =totcons_final.dta=, and revises
-=sect2b_harvestw5.dta= and =sect3d_harvestw5.dta=. Existing GH #978 tracks
-that refresh and the coordinate wiring; it needs no duplicate issue.  =cluster_features=
-for 2023-24 is therefore declared from the cover page alone (=df_key= +
-=df_main=, no =df_geo=, unlike W1--W4): =Region= / =District= / =Rural= are
-fully populated for 2023Q3 and 2024Q1 (911 clusters each), and =Latitude= /
-=Longitude= are 100% NaN there pending the v02 acquisition.  The Site B
-null-content guard warns for exactly those two waves on every
-=cluster_features()= read; that is the known country-grain =optional:=
-mismatch (CLAUDE.md) and must NOT be silenced with =optional: true= in
-=data_scheme.yml=, which would disarm W1--W4 as well.  A side effect of having
-no coordinates: the Site 2 household -> cluster collapse is lossless for W5
-(no =GrainCollapseWarning= fires for 2023Q3 / 2024Q1).  Measured 2026-10-14
+Until 2026-10-23 this wave held =NGA_2023_GHSP-W5_v01_M=: 106 files and no
+household geovariables file, and the cover page =secta_plantingw5.dta=
+carries no lat/lon -- an acquisition gap, not a claim that the survey did not
+collect coordinates.  It now holds =NGA_2023_GHSP-W5_v02_M= (WB catalog 6410,
+changed 2026-09-16; DOI =10.48529/90ec-pv69=), acquired with
+=data_access.add_wave= under GH #978 after a diff-first review.  =add_wave='s
+staged comparison: 104 files unchanged, 2 revised, 2 new, 0 no longer shipped.
+
+*The two revised files are read by no table:*
+- =Post Harvest Wave 5/Household/sect2b_harvestw5.dta=: =s2bq0= ("who in the
+  household is responding for [NAME]?") is recoded from a roster POSITION to
+  the respondent's =indiv=; every one of its 1,986 non-null values now names
+  an =indiv= in the household's post-harvest roster (1,292 did before).  Wire
+  it as an =indiv=, never as a position.
+- =Post Harvest Wave 5/Household/sect3d_harvestw5.dta=: adds
+  =rselected_person= and =sec3c_wdd=; the FILTER label now reads "15-49
+  YEARS OLD WOMAN?".
+
+*The two new files land at the ROOT of =Data/=* (that is where the v02 zip
+puts them), not under =Post Planting Wave 5/= / =Post Harvest Wave 5/= like
+the other 106:
+- =Data/nga_householdgeovariables_y5.dta=: 4,883 households x 55 columns,
+  =hhid= unique, coordinates =lat_mod= / =lon_mod= (all 4,883 non-null and
+  inside Nigeria's bounding box).  It carries NO EA key: join it to the cover
+  page on =hhid= (all 4,883 are on the PP cover; 4,771 are on the PH cover).
+  The older 112/708 and 34/510 disagreement counts used different populations:
+  the first included =ea=0= pseudo-groups; the second counted real EAs with
+  coordinates. Their exact reconciliation is below.
+- =Data/totcons_final.dta=: the consumption aggregate, 4,715 households x 62
+  columns, with the weights =wt_wave5= and =popw= and three =totcons_adj*=
+  columns.
+
+*Historical pre-wiring state.* The old YAML declared W5 from the PP cover
+alone, with no =df_geo= and both quarters holding 911 clusters and all-null
+coordinates. The earlier note that =2023-24/_/data_info.yml:70-71= described
+v02 as unacquired was itself superseded by #1311: that YAML block no longer
+exists. The own-round compiler is now authoritative. Its W5 geo tuple names
+the root-level file and verified =hhid= / =lat_mod= / =lon_mod= bindings.
+No =optional: true= bypass is added: that would also disarm W1--W4.
+
+*W5-only cached-source diagnosis and existing-selector comparison, 2026-10-30.*
+The official v02 dictionary describes =lat_mod= / =lon_mod= as reference
+coordinates anonymized to preserve place confidentiality
+([[https://microdata.worldbank.org/catalog/6410/data-dictionary/F107][World Bank file dictionary]], variables V4477/V4478). They are not exact
+household GPS positions or an EA centroid. The file has no visit key, so its
+same recorded household reference pair enriches each round where that
+household exists; this does not establish visit-specific physical location.
+No source-specific displacement radius or numeric offset is inferred here.
+
+| logical round | own-round households | clusters | households with a pair | selected clusters with a pair |
+|---------------+----------------------+----------+------------------------+-------------------------------|
+| 2023Q3 PP     |                 5067 |      911 |                   4883 |                           886 |
+| 2024Q1 PH     |                 4771 |      900 |                   4771 |                           900 |
+
+PP has 184 households without a source pair and 25 clusters without one.
+All 112 geovariable households outside the PH cover remain excluded there;
+none is manufactured by an outer join. All 31 rule-qualified PH same-location
+identity repairs are preserved and have source coordinates.
+
+*The old disagreement counts reconcile without changing the cluster key.*
+Among PP groups with a pair, 112/708 raw =(zone,state,lga,ea)= groups disagree:
+34/510 real-EA groups plus 78/198 =ea=0= pseudo-groups. The latter are NOT
+sampling clusters; canonical =moved-{hhid}= singletons separate them. Canonical
+PP therefore has 34 multi-pair real clusters. PH has 24 under its raw nonzero
+EA keys and 31 under the approved same-location-refined keys. These are
+separate populations, not an invitation to average or re-key. Disagreement
+between anonymized household reference pairs alone does not establish a move.
+
+The household-grain left join preserves all non-coordinate fields, sample
+rows, raw weights, and own-round/refined identities exactly. The unchanged
+Site 2 =most_complete_row= selector reports disagreement and keeps a complete
+observed household row, never a centroid or per-column composite. Adding
+coordinates changes the selected household in 14 PP clusters and zero PH
+clusters. In these sources no selected Region/District/Rural/Derivation cell
+changes; the PH cluster-selected derivation remains present on six rows.
+That selected provenance is still not a census of all 31 repaired households.
+
+These figures come from the existing helpers and Site 2 compared to exact
+public =188adf03=, with independent recorded-round/whole-pair checks. The
+scientific assertions completed; the conventional guard's terminal exit1
+separately records one refused import-time urllib3 IPv6 socket-construction
+probe, not a clean zero-denial actor. Earlier diagnostic failures are retained.
+An additive receipt verifies raw MD5 against all five explicit =hash: md5=
+sidecars and records actual SHA256/size; no data decoding was repeated for
+that identity check. No full Country/Make/Feature/warm-cache or other-wave
+cohort is claimed. Evidence: =slurm_logs/isa_recovery_2026-10-29/Nigeria/978-w5geo-v1/=.
+
+*Historical W2--W4 collapse evidence (unchanged).* Measured 2026-10-14
 on the cover page + geovariables of W2 / W3 / W4, per column, over the real
 (non-=moved=) composite clusters: =zone= / =state= / =sector= take more than
 one value in *0* clusters in every wave, while =Latitude= / =Longitude= do in
@@ -542,7 +1154,29 @@ report different coordinates (NOT the =ea == 0= movers, which are singletons
 and cannot disagree with anyone).  The audit's larger "conflicting tuples"
 counts (70 / 78 / 129) include households with NO coordinate beside ones
 with one, which a whole-row comparison counts as a disagreement.  So the only
-columns that ever made this collapse lossy are exactly the two W5 lacks.
+columns that made that older collapse lossy were the two W5 then lacked.
+W5 now also has the coordinate disagreements measured above.
+
+GH #592 re-check (2026-10-23): unchanged.  The catalog search now returns
+=NGA_2023_GHSP-W5_v02_M= for entry 6410, and its file list includes
+=nga_householdgeovariables_y5= (4,883 cases, 55 variables, coordinates
+=lat_mod= / =lon_mod=); we still hold v01 (/superseded the same day:/ v02 is
+now held, see above; the 0/911 figure below is the historical pre-wiring build).  Cold on =development=
+=9a0ed5f3c=, clusters with coordinates: W1 500/500 (both rounds), W2
+645/647, W3 784/792, W4 671/685, W5 0/911.  The six W1-W4 rounds GH #592
+listed at zero are all populated now (the casing / =merge_on: [i]= fixes
+recorded in each wave's =data_info.yml=).  The W2-W4 shortfall is
+release-side: 96 / 84 / 147 cover-page households are absent from that
+wave's geovariables file (W2 also has 1 present with a null fix).  Per
+column, the household -> cluster projection disagrees ONLY on the
+coordinates (=Region= / =District= / =Rural=: 0 groups in every round);
+groups holding >1 distinct fix (rounded to 6 dp): 6 / 24 / 49, and groups
+mixing a fix with no fix: 65 / 57 / 92.  Those agree with the 5 / 24 / 50
+above: W2's sixth is the null-=v= group of the 39 geovariables-only
+households the default =outer= merge admits (the =nan_key_rows: 39= in that
+round's grain report), and unrounded W4 gives 50 (one cluster's two fixes
+differ only beyond the 6th decimal).  Evidence:
+=slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
 
 ** Strata
 
@@ -1133,6 +1767,41 @@ Net: ~86.6% of rows have a non-null Area; non-standard units dominate
 W1--W3 (per the refuter, convertible-unit share is W1 29% / W2 28% /
 W3 25% / W4 56% / W5 49%).
 
+*** Heaps, ridges and stands: evaluated and not wired (GH #860, 2026-11-04)
+
+/Ruling (@ligon, 2026-11-04)/: do not wire a factor; record the disagreement.
+
+EPAR (TR#335, =Nigeria GHS Wave 4/EPAR_UW_Nigeria_GHS_W4.do=, lines 355-382, commit
+=abfbdc930=; reference clone under =/global/scratch/fsa/fc_jevons/ligon/reference/epar/=)
+carries two zone-by-unit grids of hectare factors in one comment block, and applies
+the first.  W1's =.do= has the first alone.
+
+| zone | heaps BID | heaps observed | ridges BID | ridges observed | stands BID | stands observed |
+|-+-+-+-+-+-+-|
+| 1 | 0.00012 | 0.00281 | 0.0027 | 0.0059 | 0.00006 | 0.00121 |
+| 2 | 0.00016 | 0.00748 | 0.004 | 0.0052 | 0.00016 | 0.0006 |
+| 3 | 0.00011 | 0.00787 | 0.00494 | 0.0051 | 0.00004 | 0.0002 |
+| 4 | 0.00019 | 0.00003 | 0.0023 | 0.0010 | 0.00004 | 0.0003 |
+| 5 | 0.00021 | 0.00076 | 0.0023 | 0.0008 | 0.00013 | 0.009 |
+| 6 | 0.00012 | 0.00437 | 0.00001 | 0.0005 | 0.00041 | 0.002 |
+
+"BID" is EPAR's transcription of the LSMS-ISA Wave 2 Basic Information Document;
+"observed" is its own label, "ALT observed from the data", with nothing on how it
+was derived.  Observed / BID, recomputed over the 18 cells: median *4.9x*, minimum
+0.16x, maximum 71.5x.  By unit: heaps 0.16x-71.5x (median 29.9x), ridges 0.35x-50x
+(median 1.2x), stands 3.8x-69x (median 6.3x).  Neither grid has been checked against
+the survey here, and a spread that wide leaves nothing to choose between them on.
+
+*What stays unconverted.*  2,567 rows report an area in heaps, ridges or stands with
+a positive estimate and no GPS (272 / 434 / 437 / 1,172 / 252, W1--W5, from the raw
+=sect11a1= files).  They are served =Area= NaN with =AreaUnit= naming the unit, as
+are 3 more with no estimate either (2,570 served).  GPS and convertible-unit rows
+never used these units' factors and are not affected.  The native estimate is not
+served; it is in the source, not in =plot_features=.
+
+*Still open, separately*: =plots=, 396 W1--W3 rows with no GPS, which EPAR converts
+at one all-zone x0.0667 with no competing grid.  It was not part of this ruling.
+
 ** Harmonization (=categorical_mapping.org=)
 
 - =harmonize_acquire= -> Tenure.  WAVE-KEYED =(Wave, Code)=: the
@@ -1160,6 +1829,17 @@ W3 25% / W4 56% / W5 49%).
   across waves (panel_ids maps previous_i = hhid), so there is no
   per-wave remapping dict (mirrors Nigeria food_acquired).
 
+** Country concatenator requires every declared folder (GH #1287, 2026-10-28)
+
+All five folders in =nigeria.Waves= ship a =_/plot_features.py= script.
+The country concatenator previously caught every reader exception and wrote
+whatever folders succeeded, provided at least one did. It now propagates a
+failed declared-folder read before writing a partial country table.
+The folder order and each source frame's PP-quarter =t= values are unchanged.
+Invented reader/writer regression checks conserve healthy rows, nulls and
+dtypes and refuse a missing, unreadable or malformed middle-wave input;
+no native payload, cache, or public API acceptance is asserted here.
+
 * community_prices (GAP C -- OURS-ONLY, maintainer priority)
 
 Item-level REPORTED community food prices at natural grain (t, v, j, u):
@@ -1171,6 +1851,88 @@ are transformations).  The WB panel surveys no community prices (their
 crop_price_EA is an HH-median imputation), so this is strictly richer.
 
 124,539 priced rows across 5 waves x 584 clusters x 139 food items x 30 units.
+
+** W3 prices TWO locations per community: the =obs= level (GH #637 defect C, 2026-10-23)
+
+*The idiosyncrasy.*  W3 (2015-16) is the one wave whose C8 has two reading
+slots.  =PH_W3_Community_Quest.pdf= lists "8 Food Prices / a. First location
+18 / b. Second location 24" in its SECTIONS table; C8a is headed "FOOD PRICES
+- 1ST LOCATION" and C8b "FOOD PRICES - 2ND LOCATION", and each opens with its
+own location block (type MARKETPLACE / SHOPS/STALLS / OTHERS, name,
+description, date of collection, GPS) over the SAME item list.  The shipped
+files carry none of that location block: =sectc8a_harvestw3.dta= and
+=sectc8b_harvestw3.dta= hold only =zone state lga sector ea item_cd c8q1 c8q2
+c8q2b c8q3=, with =c8q1= (available?) = 1 on every row and every price > 0.
+Each file is =(ea, item_cd)=-unique and covers all 487 EAs.
+
+*How the second page was used differs by EA.*  In 78 EAs (53 in zone 4) it
+re-prices most of the first page's list: 4,323 shared =(ea, item)= cells.  In
+the other 409 it prices a short tail -- median 10 items, 87% of those 4,032
+rows codes 70-77 (tomatoes, onions, garden eggs, okra, peppers) or 160-163
+-- that the first location did not price at all.  So the wave script's old
+"different item ranges" was false as a statement about the files (all 110
+=sectc8b= codes occur in =sectc8a=) but describes the 409-EA pattern.
+
+*The defect.*  =community_prices_for_wave= collapsed =(t, v, j, u)= with
+=Price: 'first'=, so location 1 always won.  Of the 2,591 cells both
+locations priced (after the size drop and unit canonicalisation), 983 held a
+DIFFERENT location-2 price (ratio median 1.25, max 21.4) that was dropped,
+and 1,608 an equal one; and the 3,218 location-2-only rows were served
+indistinguishable from location 1.
+
+*The fix* is the GH #840 =obs= level (=lsms_library/data_info.yml= Index
+Info: "the form's reading slot").  =obs = 1= is C8a, =obs = 2= is C8b; every
+other wave prices one location and carries a native =obs = 1=.  The declared
+index is =(t, v, j, u, obs)=, so =Feature('community_prices')= no longer
+fabricates Nigeria's =obs= (=variety= / =visit= stay sentinels).
+
+| PH round | before | after | obs 1 | obs 2 |
+|----------+--------+--------+--------+-------|
+| 2011Q1   | 27,104 | 27,104 | 27,104 |     0 |
+| 2013Q1   | 27,079 | 27,079 | 27,079 |     0 |
+| 2016Q1   | 20,562 | 23,153 | 17,344 | 5,809 |
+| 2019Q1   | 31,757 | 31,757 | 31,757 |     0 |
+| 2024Q1   | 30,064 | 30,064 | 30,064 |     0 |
+
+Every pre-fix row is still served with the identical =Price= and
+=Derivation=: 17,344 at =obs = 1=, and the 3,218 location-2-only rows at
+=obs = 2= -- the slot they always came from.  The other four rounds are
+frame-equal apart from the added level.
+
+*No duplicate entries are dropped (0 rows), and why.*  Niger's #840 drop
+removes a SECOND SOURCE RECORD of the same slot that repeats a served row; its
+content key includes the slot, so two slots that agree are both served (and
+GhanaLSS serves equal vendor prices).  Here there is no second record of any
+slot, and C8b is not a re-entry of C8a: no EA's location-2 block repeats its
+location 1 (the most-identical EA agrees on 88% of shared items on every raw
+field; Niger's re-shipped blocks were 99.8% byte-identical), and location 1
+vs location 2 in one EA agree on 64.6% of same-unit prices against a 48.6%
+base rate for location 1 in two different EAs of the same LGA.  An equal
+price at the second location is an observation.
+
+*Reading it.*  =obs == 1= gives one location per community, but loses the
+409-EA vegetable / drinks tail, which exists only at =obs = 2=.  The
+=first= collapse still runs for W1/W2 only (see the next paragraph);
+W3-W5 are asserted collision-free on =(t, v, j, u, obs)=, so it selects
+nothing there.  This supersedes the "(t, v, j, u)" grain stated in this
+section's opening paragraph and the shim paragraph below, and the #1095
+note's "existing first-row reducer remain[s] in force" now holds for W1/W2
+only.
+
+*Still open -- W1/W2 (a maintainer decision, not changed here).*  W1/W2's
+own code scheme collapses on =(t, v, j, u, obs = 1)= to the first price:
+size variants of one base item (=base*10+size=; 1,770 W1 / 1,921 W2 groups)
+and distinct items the name map lumps under one label (Maize, Beer,
+Fish--fresh, Butter/Margarine, ...; 798 / 1,030 groups), with Price
+conflicts in 2,303 / 2,605 groups (GH #637 tail diagnosis).  A =variety=
+level (the source item code, as #840 did for Tanzania) is the sketched fix.
+
+*Observed, not fixed.*  The W3 deletion / derivation =inputs= frames now
+carry =obs=, so they join the served grain.  The W3 =inputs_community_prices=
+frame returns 341 rows, but the derivation stamps 1: the other 340 are on
+the unit "other specify" with a quantity in the free-text =c8q2b=, and are
+served undivided under =u = 'other specify'= (988 W3 rows in all).  This
+predates #637 and is identical on development.
 
 ** Source files (post-harvest community round)
 
@@ -1211,7 +1973,7 @@ not always 100%: three clusters (2 in 2013Q1, 1 in 2016Q1; 87 price rows)
 appear in the community file with no household-side cluster.  The 2024Q1 row
 used to read =0 (0%)= in the =cluster_features= column because the table was
 not declared for W5 at all; it is since GH #841 (declared without
-coordinates, see [[*Wave 5 ships NO household geovariables file (GH #841)]]),
+coordinates, see [[*Wave 5 geovariables: acquired v02 household reference coordinates (GH #841 / #978)]]),
 and all 27,318 2024Q1 price rows now join a =Region= / =District= / =Rural=.
 
 ** Item labels (j) -- the community-price arm of label unification
@@ -1262,6 +2024,42 @@ recorded, not missing: the =#1041= ruling's
 (most already have a =u= Preferred Label: Loaf 200, Bottle/Can 240, Cube
 270, Metric Cup 280, Wrap 290, Crate 310, Slice 320, Whole Animal 330, Tea
 Spoon 301, Table Spoon 302).  Drafted as a residual.
+
+*** Recorded C8 units restored; a future unplaced label is kept as recorded (GH #1095)
+
+Measured from held C8 sources and normal cold builds, 2026-10-21.
+The ten labels above now use a COMMUNITY-only extension of =_canon_unit=; the shared harvest decoder, food decoding and input extension are unchanged.
+Existing metric-size rescue runs before unplaced-label reporting: it already rescues 3,368 W4 and 3,267 W5 rows whose original unit label the shared decoder cannot place.
+Reporting those rows before rescue would falsely call them unplaced.
+No positive recorded label remains unplaced in the held W3-W5 sources after the ten aliases.
+
+| PH round | baseline rows | restored rows | served rows |
+|----------+---------------+---------------+-------------|
+| 2011Q1   |        27,104 |             0 |      27,104 |
+| 2013Q1   |        27,079 |             0 |      27,079 |
+| 2016Q1   |        20,562 |             0 |      20,562 |
+| 2019Q1   |        29,275 |         2,482 |      31,757 |
+| 2024Q1   |        27,318 |         2,746 |      30,064 |
+| total    |       131,338 |         5,228 |     136,566 |
+
+The overview's historical "124,539 priced rows" does not match the fresh 131,338-row baseline; both counts are recorded rather than assuming that the historical claim describes this source/build state.
+All 131,338 baseline rows retain their keys, Price, Derivation, null masks and dtypes exactly.
+The 5,228 restored source cells have unique keys, no collision with a served cell, their exact reported native-unit Price, and no Derivation.
+The existing first-row reducer, composite state/LGA/EA identity, PH-only coverage and =i==v= shim remain in force.
+So do the 14,603 W3 and 133 W5 intentional metric-size exclusions and the older size-collapsing caveat below.
+
+The two restored W5 =Bottle/Can= rows carry =c8aq2_c = '0. SMALL'=.
+That is an ordinal size, not a metric volume: their native Bottle/Can price is retained without inventing a cl or l factor.
+The size table below says =c8aq2_a= and =c8aq2_cvn= "agree with it and are a cross-check"; fresh source coverage limits that claim: on the 5,339 W5 metric-size rows, only 54 record =c8aq2_a= and 5,167 record =c8aq2_cvn= (258 quantity values in all 56,388 source rows).
+They are not a complete independent cross-check of every size code.
+This work reuses the existing #834 coded-size rule and recorded questionnaire evidence; it neither acquires a new PDF nor changes that rule.
+
+/Ruling (@ligon, 2026-11-04)/: a future positive-priced recorded label still unplaced AFTER size rescue keeps that label as =u=, with no factor and no shared =Unknown= bucket, and warns.
+=community_prices_for_wave= does this; =UnplacedUnitLabelWarning= names the label and count.  *0 rows today*, so nothing served moves and the tests are synthetic (=tests/test_nigeria_community_units.py=).
+- The label is kept verbatim, code prefix included (=999. CALABASH=), so two units that differ only in their code stay two units.  =Unknown= would merge two native units on one =(v, j)=.
+- No factor: =Price= stays the native-unit price reported.  A quantity in the label (=999. 50 KG GOURD=) is not parsed, and an ordinal size is not used.  =_c8_size_metric_grams= still rescues a coded metric SIZE first, exactly as for a known unit.  Nothing computes kilograms from =community_prices= today (=rg community_prices lsms_library/transformations.py= is empty).  If something ever does, =_parse_explicit_metric= would read such a label, so it must decline an uncurated one.
+- A repeated =(t, v, j, u, variety, obs)= still raises, equal prices or not (the #840 / #637 assertion).
+- A blank, a bare numeric code, an ineligible price, and the 14,603 W3 / 133 W5 unrecorded-size rows stay excluded, silently.  The first two record no unit; the last are registered in =c8-unrecorded-size-drop=.
 
 *** The C8 SIZE field -- READ since GH #834 (2026-09-13), and what the fix does and does not repair
 
@@ -1340,6 +2138,18 @@ registry entry cites them):
    against.
 
 *** C8 is POST-HARVEST ONLY -- why community_prices grades =dropped= on every PP round
+
+/Contradicted, and superseded (GH #587, 2026-11-12)./  The paragraph below is
+kept as a contradiction of record.  "The post-planting community questionnaire
+carries sections C1-C4 only" is true, but the conclusion drawn from it is not:
+every one of the five PP community forms prices food in its OWN section 2 --
+W1 PDF p.5 "Section 2: Food Prices", W2 p.5 "Section 2: Food Prices", W3 p.5
+and p.11 "Food Prices - 1st / 2nd Location", W4 p.5 "C2: FOOD PRICES", W5 p.6
+"SECTION C2. FOOD PRICES" -- and the released =sectc2*_planting*= files carry
+the price (W1 =sc2q3a= "What is the price for [ITEM]? (Naira)", W2-W5 =c2q3=).
+The search for =*c8*= could not find them because the PP module is C2, not C8.
+So the five =dropped= cells were a real omission, not a grader artefact.  They
+are served since GH #587: see [[*2026-11-12 -- Post-planting community prices (GH #587)][Post-planting community prices (GH #587)]].
 
 =.coder/coverage/latest.csv= grades =Nigeria/community_prices= =dropped=
 ("declared for wave but absent from built t-index") in 2010Q3, 2012Q3,
@@ -1454,19 +2264,22 @@ column, never an index level, never sentinel-filled.  Pinned by
   positive-sale rows discarded gives 96 / 66 (the 93 / 66 above additionally
   require both units);
   it sits in the country script, upstream of every core audit, so
-  =grain_reports()= cannot see it.  Reported for its own issue, not fixed.
+  =grain_reports()= cannot see it.  /Fixed 2026-11-04 (GH #1433): every line is
+  served, so the built table is now 3,544 both / 3,466 equal (97.8%) and 3,477 /
+  3,349 (96.3%), which is the raw table but for the 4 / 1 unlabelled unit codes./
   Non-null =Unit_sold= on the built table:
-  2011Q1 3,486, 2013Q1 3,430, W3-W5 0.  The top served disagreement cells
+  2011Q1 3,582, 2013Q1 3,496 (3,486 / 3,430 before #1433; W3-W5 were 0 until
+  GH #843; now 3,771 / 3,775 / 3,707).  The top served disagreement cells
   are =l= -> =Kg= (10) and =Kg= <-> =Sack/Bag= (14) in 2011Q1, and =Kg= ->
   =Tiya= / =Mudu= (24) in 2013Q1: a kilogram harvest sold by the measure.
 - *The consumer rule is the canonical one*: where the two disagree the row
   is a data-quality FLAG, not an identification of which unit prices the
   sale (measured on Uganda, =Unit_sold= is the closer denominator only ~40%
   of the time).  Exclude or resolve those rows, and report how many.
-- *W3-W5 are all-NA by design, not a gap.*  Their sale block is =secta3ii=
-  at hh-crop grain with no plot linkage (GH #843), the same reason their
-  =Quantity_sold= / =Value_sold= are NaN; hence =optional: true=.  =Olodo=
-  appears in =Unit_sold= (W2 sold vocabulary) but never in =u=.
+- /Superseded 2026-11-03 (GH #843): see [[*crop_production W3-W5 sales: on the household's one row that states a harvest, else on a Farm-level row (GH #843, 2026-11-03/04)][the W3-W5 sales section]]./  *W3-W5 were
+  all-NA by design.*  Their sale block is =secta3ii= at hh-crop grain with no
+  plot linkage.  =Olodo= appears in =Unit_sold= (W2 sold vocabulary) but never
+  in =u=.
 - *Every pre-existing column is byte-identical* before and after (62,844
   rows, isolated cold build compared column-by-column).
 - *The served (API) frame reproduces the parquet counts exactly* -- both
@@ -1502,10 +2315,12 @@ column, never an index level, never sentinel-filled.  Pinned by
   TestOtherInorganicSpelling= now pins that =Other Inorganic Fertilizer=,
   =Other inorganic= and =other (specify)= resolve to NOTHING.  Any share
   for them lands on #867 with its own disclosure and a signature.
-- *Unit_sold NA has three causes*, not two: no sold-unit column (W3-W5),
-  no sale on the row, or a sale whose unit was simply not recorded -- 41
-  positive-sale rows in 2011Q1, 6 in 2013Q1 (and 1 / 5 rows carry a
-  =Unit_sold= with no positive sale).
+- *Unit_sold NA has three causes*: no sale on the row; a sale whose unit was
+  simply not recorded -- 44 positive-sale rows in 2011Q1, 6 in 2013Q1 (41 / 6
+  before GH #1433 served every line; and rows carry a =Unit_sold= with no positive
+  sale); or, since GH #843, a
+  household-crop sold in two units.  Until #843 a third cause was "no sold-unit
+  column (W3-W5)", which is no longer true.
 - *Not read, pre-existing scope*: =Quantity_sold= / =Value_sold= /
   =Unit_sold= are the MAIN buyer only.  The W1/W2 A3 files also carry
   =sa3q16a/b= (quantity + unit sold to OTHER buyers) and =sa3q17= (their
@@ -1523,7 +2338,8 @@ column, never an index level, never sentinel-filled.  Pinned by
   wave concat's dtype; both were already string before this change).  The
   API read coerces them to =Float64= via =_enforce_canonical_dtypes=, so
   nothing served is wrong, but =pd.read_parquet(cache_path)= needs
-  =pd.to_numeric= on them.
+  =pd.to_numeric= on them.  /Fixed 2026-11-03 (GH #843): the script pins both to
+  =float64=; no served value moved./
 
 ** =sa3q18= is an unwired farmgate valuation of the WHOLE harvest
 
@@ -1541,18 +2357,465 @@ Coverage measured on the raw files:
 | 2011Q1 |         13,018 |    9,857 (75.7%) | 9,600 |
 | 2013Q1 |         12,948 |    9,868 (76.2%) | 9,827 |
 
-against only ~3,500 rows per wave with an actual sale.  Nothing in
-=crop_production= carries it.  This is the closest Nigeria has to the
+against only ~3,500 rows per wave with an actual sale.  Until GH #844 nothing
+in =crop_production= carried it (it is now =Value_harvested=, see the DONE
+entry below).  This is the closest Nigeria has to the
 own-consumption valuation that =food_prices(units='unitprice',
 s='produced')= returns for other countries -- Nigeria's =food_acquired= has
 no =Price= column at all, so =food_prices(units='unitprice')= returns *zero
 rows* and both the "reported purchase price" and "own-consumption
 valuation" sources are empty for this country.  Wiring =sa3q18= (as, say,
 =Value_if_sold=) would give Nigeria a farmgate valuation on ~2.8x more rows
-than its sales data, and is recorded here as a gap rather than guessed at.
+than its sales data, and was recorded here as a gap rather than guessed at.
+
+*** DONE Wired as =Value_harvested=, in every wave (GH #844, 2026-11-03)
+
+The "check the later waves" item came back positive: every wave asks a Naira
+valuation of the harvest ON THE SAME PLOT-CROP ROW as the harvest quantity,
+so there is no household-crop fan-out (contrast the W3-W5 sales, GH #843).
+The wording is not the same sentence in every wave:
+
+| wave | file (PH agriculture) | column | Stata label / questionnaire wording |
+|-+-+-+-|
+| W1 | =secta3_harvestw1= | =sa3q18= | "Total sale value of [CROP] if all had been sold since last visit" |
+| W2 | =secta3_harvestw2= | =sa3q18= | "TOTAL VALUE IF YOU HAD SOLD ALL [CROP] HARVESTED SINCE LAST VISIT (NAIRA)" |
+| W3 | =secta3i_harvestw3= | =sa3iq6a= | q6a "What is the estimated value of the [CROP] harvested during this agricultural (rainy) season?" |
+| W4 | =secta3i= / =secta3iii_harvestw4= | =sa3iq6a= / =sa3iiiq14= | "What is the estimated value of the [CROP] harvested from [PLOT] during 2018/2019 ..." / "... during the past 12 months?" |
+| W5 | =secta3i= / =secta3iii_harvestw5= | =sa3iq10= / =sa3iiiq24= | same wording as W4 (2023/2024 season / past 12 months) |
+
+(W3-W5 wording read from the text layer of =PH_W3_Agriculture_Quest.pdf=,
+=ph_w4_agriculture_quest.pdf= p. 15/17 and
+=ghs_panel_w5_ph_agriculture_questionnaire.pdf=; W1/W2 from the Stata
+labels and the W1 form quoted above.)  W1/W2 frame it as a SALE value, W3-W5
+as an estimated value; both are the household's own valuation of the whole
+harvest the row's =Quantity= measures, and neither is a transaction.  One
+column, =Value_harvested= (Naira), with the wave wording recorded here and in
+=data_scheme.yml=; never pooled with =Value_sold=.  Declared REQUIRED (every
+wave carries it).  Not a derivation: read positionally off the row, stored as
+recorded.  Named =Value_harvested= rather than the issue's =Value_if_sold=
+because three of the five waves do not ask "if sold".
+
+Measured on a private cold build (base =3a33f2869= vs this change):
+every pre-existing column of the 62,844-row API frame is
+=assert_frame_equal=-identical; =Value_harvested= non-null per =t=:
+
+| =t= | raw non-null | dropped, no crop label | dropped by keep-first dedup | served |
+|-+-+-+-+-|
+| 2011Q1 | 9,857 | 3 | 201 | 9,653 |
+| 2013Q1 | 9,868 | 0 | 155 | 9,713 |
+| 2016Q1 | 10,233 | 0 | 121 | 10,112 |
+| 2019Q1 | 11,739 (10,966 + 773) | 13 | 139 | 11,587 |
+| 2024Q1 | 8,627 (8,252 + 375) | 8 | 102 | 8,517 |
+| total | 50,324 | 24 | 718 | 49,582 |
+
+The dedup losses are the =drop_duplicates(keep='first')= at =(t, i, plot_id,
+crop)= (the Unit_sold note above).  /Fixed 2026-11-04 (GH #1433): the 718 are
+served, so =Value_harvested= is now 9,854 / 9,868 / 10,233 / 11,726 / 8,619, every
+raw valuation but the 24 with no crop label./  Zeros: 254 / 41 / 51 / 0 / 0
+served rows.  No sentinel (no 9999-type value in any wave).  *One W5 outlier*:
+a single 2024Q1 row of N1,950,000,000 (the next largest in the wave is
+N11,440,000) -- about half of the wave's N3.81e9 served total.  Kept as
+recorded; Site Q screens =Quantity= only.  On the W1/W2 rows that also carry
+a positive =Value_sold= (3,480 / 3,423), =Value_harvested / Value_sold= has
+median 1.63 / 1.50, as expected when only part of the harvest is sold (this
+compares a whole-harvest value with a part-harvest sale; the price comparison
+is the next table).
+
+- The W5 outlier is 65 bags x 100 kg (=KgFactor=) of rice valued at
+  N1.95e9, about N300,000/kg: half the W5 total (N1.86e9 without it), and
+  unflagged because Site Q screens =Quantity= only.
+- The dedup dropped 718 valuations: on 16 keys the kept row has no valuation
+  but a dropped twin does, and on 656 keys a dropped twin's valuation DIFFERS
+  from the kept one -- so the duplicates are distinct observations, not
+  re-entries.  (Red-team review of the #844 commit, 2026-11-03.)  That finding is
+  GH #1433, fixed below.
+
+*Valuation vs. sale prices, W1/W2 (red-team review of the #844 commit,
+2026-11-03).*  The #844 issue comment asked for =sa3q18= to be compared with
+a sale-price-ladder imputation before wiring.  What was run is a NATIVE-UNIT
+STAND-IN, not EPAR's per-kg geographic ladder: per-unit valuation
+(=Value_harvested / Quantity=) against sale prices (=Value_sold /
+Quantity_sold=, sale unit = harvest unit), cells by crop x unit, the
+cluster =v= median where it has >= 10 sales, else the national one.
+
+| | W1 (2011Q1) | W2 (2013Q1) |
+|-+-+-|
+| own row: per-unit valuation / own sale price, median | 1.00 | 1.00 |
+| own row: share within 2x | 85% | 90% |
+| vs the ladder: median | 1.05 | 1.00 |
+| vs the ladder: share within 2x | 71% | 77% |
+| vs the ladder: p90 | 3.0 | 2.5 |
+| summed valuation / ladder-imputed value | 0.83 (8,565 rows) | 0.73 (8,326 rows) |
+
+Per-crop medians (crops with >= 100 rows) run 0.8-1.4, except Pumpkin in W2
+at 1.9.  Plainly: a household that sold prices its whole harvest at its own
+sale price (median 1.00); against other households' sale prices the medians
+agree, but the aggregate valuation sits 17-27% BELOW the ladder imputation
+and the right tail is wide (one row in ten above 2.5-3x).  W3-W5 ask an
+"estimated value" and have no plot-grain sale to compare with (GH #843), so
+this check covers W1/W2 only.  Scripts and logs:
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/review-844/=.
+
+Cost: =nigeria.py= and =data_scheme.yml= move every Nigeria table's cache
+hash (a country re-warm); only =crop_production= gains a column.
+* crop_production W3-W5 sales: on the household's one row that states a harvest, else on a Farm-level row (GH #843, 2026-11-03/04)
+
+=Quantity_sold= / =Value_sold= were 100% empty in 2016Q1, 2019Q1 and 2024Q1: from
+W3 the sale is in A3.ii (=secta3ii=), per household and crop, with no plot.
+*Rulings* (@ligon).  2026-11-03, option d: a sale with one harvest row goes on it, in
+its own =Unit_sold=; otherwise on ONE =plot_id='Farm-level'= row with no harvest
+=Quantity=.  No invented split, no double count, nothing dropped.  A separate
+=crop_sales= table is not what was ruled.  2026-11-04, "Yes, take all four on #843":
+- A: the sale attaches to the one row that STATES a harvest, even when the
+  household-crop's other rows are explicit "did not harvest".  Farm-level only where
+  zero rows, or two or more, state one.
+- B: a sale in two units sums the value, with quantity and unit NA.
+- C: the five W4 crop codes with no =harmonize_food= label keep their raw label.
+- D: W3's =median_price_valuation= is served, and disclosed.
+W1/W2 record the sale on the plot-crop row and do not move.
+
+*What "states a harvest" means.*  A served row states a harvest when its harvest
+=Quantity= is positive.  A blank does not: no quantity was recorded.  A zero does not:
+a recorded zero is not a harvest, even under a YES.  An explicit "did not harvest" does
+not, and needs no separate read, because every such line has a blank quantity:
+
+| source line says | W3 | W4 annual / tree | W5 annual / tree |
+|-+-+-+-|
+| NO, quantity blank | 1,678 | 3,230 / 289 | 1,819 / 108 |
+| NO, quantity positive | 0 | 0 / 0 | 0 / 0 |
+| YES, quantity positive | 10,260 | 10,966 / 773 | 8,252 / 375 |
+| YES, quantity zero | 6 | 0 / 0 | 0 / 0 |
+| YES, quantity blank | 12 | 0 / 0 | 0 / 0 |
+| no answer, quantity blank | 0 | 1 / 0 | 0 / 0 |
+
+The screeners are W3-W5 =sa3iq3=, W4 =sa3iiiq7=, W5 =sa3iiiq17=.  So the only readings
+that could differ are a YES with a zero and a YES with a blank.  On sale pairs that is
+one household-crop (W3, N48,000): a YES with 0 beside a positive row, which attaches.
+A YES with a blank decides nothing, because no sale pair turns on one.
+
+It is judged on the SERVED rows, and since GH #1433 every labelled line is one.  The
+rulings were made when only the first line of a =(plot, crop)= was served, and the
+counts in this section are from that frame unless they say otherwise.  [[*crop_production: one row per harvest line (GH #1433, 2026-11-04)][The #1433
+section]] has what moved.
+
+*The form.*  A3.ii is a crop roster.  W5 p. 19: "CAPI WILL MAKE A LIST OF ALL
+HARVESTED CROPS FROM FLAP D. IT WILL NOT LIST CROPS MORE THAN ONCE. IF THE
+RESPONDENTS HARVESTED MAIZE FROM 2 DIFFERENT PLOTS, CAPI WILL LIST MAIZE ONCE."
+W5's value column also says "ESTIMATE THE VALUE OF IN-KIND PAYMENTS", so a W5
+=Value_sold= can include an estimated in-kind part.
+
+*The sale's unit differs by wave, and this is not obvious from the file.*
+
+| round | quantity | unit | value | how the form states the unit |
+|-+-+-+-+-|
+| 2016Q1 | =sa3iiq5a= | =sa3iiq5b= | =sa3iiq6= | Q5 has its own PROD. UNIT CODE; the code embeds the size (131 sack medium) |
+| 2019Q1 | =sa3iiq5a= | =sa3iiq1c= | =sa3iiq6= | Q5 prints only QUANTITY: "Of the [QTY] [UNIT] [CONDITION] of [CROP] harvested, how much of it did your household sell?" |
+| 2024Q1 | =sa3iiq6= | =sa3iiq3b= | =sa3iiq7= | same wording, W5 p. 19 |
+
+So =Unit_sold= in W4/W5 is the unit of the household's total harvest (asked just
+before, with its size =sa3iiq1d= / =sa3iiq3c= and condition =sa3iiq1b= /
+=sa3iiq3d=), through the same size-agnostic =_canon_unit= as =u=; size and
+condition are not carried.  The W5 interviewer manual says so (p. 99): "the
+respondent MUST provide the quantity of unprocessed CROP NAME sold in the SAME UNIT
+AS THE QUANTITY HARVESTED".  EPAR reads W4 the same way
+(=EPAR_UW_Nigeria_GHS_W4.do:690-694=).  Three checks support that reading.  The sold quantity
+is at most the stated total on 3,820 of 3,825 (W4) and 3,747 of 3,747 (W5) sales,
+median share 0.67 / 0.63.  On one-record attached sales the unit equals the row's
+=u= on 2,798 of 2,800 (W4) and 3,062 of 3,063 (W5), against 2,926 of 3,041 for W3,
+which asks its own.  And all three unit columns carry the harvest unit's value
+labels, W3 exactly (60 labels), W4/W5 but for splitting '40. DERICA/TIN' in two.
+
+*What is a sale.*  A record with a positive quantity or a positive value.
+
+| | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-|
+| rows in the file | 8,544 | 8,839 | 7,184 |
+| sold = NO | 4,681 | 5,014 | 3,437 |
+| sold = YES, both answers blank (not a sale) | 2 | 0 | 0 |
+| sold blank, both answers blank (not a sale) | 1 | 0 | 0 |
+| quantity 0 and value 0 (not a sale) | 1 | 0 | 0 |
+| *sale records* | *3,859* | *3,825* | *3,747* |
+| of which quantity > 0, value > 0 | 3,838 | 3,825 | 3,747 |
+| quantity > 0, value 0 (served as the recorded 0) | 14 | 0 | 0 |
+| quantity > 0, value blank (served blank) | 5 | 0 | 0 |
+| value > 0, quantity blank (served blank, =Unit_sold= NA) | 2 | 0 | 0 |
+
+A non-sale adds no row and states no zero: a harvest row whose crop was not sold
+stays NaN, it does not become 0.
+
+*Grain.*  One record per crop code in W4/W5.  W3's roster can repeat a code
+(12 =(hhid, cropcode)= pairs, 24 rows), which is why =crop_number= is its line.
+No file has an exact-duplicate record (Niger's s16d does, so this was checked, not
+assumed).  But =harmonize_food= gives several codes one label (Yam--roots is
+1120-1124, Fresh Pepper 2141/2142, Orange/tangerine 3150/3170, Avocado pear
+3220/3221), so one household and served crop can hold two records, and a sale is
+placed once per household and served crop.
+
+| household-crops | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-|
+| with a sale | 3,786 | 3,789 | 3,714 |
+| *on the one row that states a harvest* | *3,090* | *2,814* | *3,082* |
+| *Farm-level, two or more state a harvest* | *694* | *966* | *629* |
+| *Farm-level, rows but none states one* | *2* | *2* | *0* |
+| *Farm-level, no served row* | *0* | *7* | *3* |
+| two records, one unit: quantity and value summed | 60 | 22 | 26 |
+| two records, two units: value summed, quantity withheld | 13 | 14 | 7 |
+
+The partition is per SERVED row, on the one line per (plot, crop) served then; the sweep's earlier
+figures (749 / 1,050 / 683 on two or more plots) were per raw plot.  Against the first
+build, which counted served rows whatever they stated, ruling A moves 64 / 94 / 57
+household-crops (N1.5M / N3.4M / N8.8M, 1.2% of value) onto their one harvesting row,
+and 2 / 2 / 0 (N45,000 / N6,500) off a lone row that states none.  The other rows
+beside those 215 are explicit "did not harvest" on 63 of 64, 75 of 94 and 57 of 57; the
+rest have no answer or, in W3, a YES with 0.
+
+*Two records, two units.*  The two quantities cannot be two rows (one index key)
+and cannot be one number, so =Value_sold= is the sum, since Naira add, and
+=Quantity_sold= / =Unit_sold= are NA.  "Two units" means the raw unit code, size
+or condition differ, because =_canon_unit= would serve 'Sack/Bag' for a 50 kg and
+a 100 kg sack alike; 4 / 11 / 4 of them differ in the canonical label too.  34
+household-crops, about N3.7M of N1.14 billion.  Ruled 2026-11-04 (B).  Nothing is
+lost: =derivation_inputs= returns each record's own quantity and unit.
+
+*Three derivation keys*, one function (=derive_hh_crop_sale_attachment=, a key per
+path): =hh-crop-sale-single-row= on an attached row,
+=hh-crop-sale-records-summed= and =hh-crop-sale-two-units= on a row that combines
+records, whichever row it landed on.  A Farm-level row holding one record carries
+*no* key: it is a survey answer at its own grain and the index value discloses
+that.  =Derivation= is declared in the canonical schema, never in =data_scheme.yml=.
+
+*What a row with a sentinel means.*
+- =plot_id = 'Farm-level'= is the canonical STRUCTURAL sentinel: not a plot.  It
+  joins no =plot_features= row.  Filter it before counting plots.  A count of crop
+  occurrences drops it only where the household has a plot row of that crop (the
+  CONSUMER RULE in =data_info.yml=, GH #1469).
+- =u = 'Unknown'= beside a real =Unit_sold= on that row is *correct* (#1047): =u=
+  describes the harvest =Quantity=, which the row does not have.  Do not read it
+  as the =Unit_sold != u= data-quality flag, and do not "fix" it.
+- =perennial= is NA there: the row has no annual/perennial answer.
+- =KgFactor= stays the HARVEST factor on an attached row; it never rates the sale.
+  =KgFactor_sold= does: see below.
+- A lone-record W4/W5 Farm-level row (968 + 635 = 1,603) carries no key, and its
+  =Unit_sold= and =KgFactor_sold= are the household total's, inherited as the form
+  states.  That reading is recorded on the =hh-crop-sale-single-row= entry only; the
+  frame alone cannot tell these rows from W3's own-unit answers.
+
+*Five crops appear only on Farm-level rows.*  W4 codes 9001/9002/9006/9007/9008
+(=BAKA=, =LOCUST BEANS=, =YELLOW PEPPER=, =SHEA BUTTER=, =SWEET MELON=, 7 sales,
+N378,000) have no =harmonize_food= label.  Base drops their harvest rows as
+unlabelled (still does).  The sale keeps its own label instead of being dropped,
+as an unmapped crop does elsewhere in the corpus, so the =2019Q1= no-served-row
+count is these 7: they have raw harvest rows.  The 3 =2024Q1= ones (Yam--roots ×2,
+Cassava--roots) have none.  Ruled 2026-11-04 (C).  The labels are raw uppercase, and
+=labels== never touches this level.  Extending =harmonize_food= would move harvest
+rows and is a separate decision.
+
+*A sale cannot be stranded or doubled.*  Each household-crop lands on exactly one row
+by construction, and =crop_production_for_wave= asserts the index stays unique.
+
+*What else is out of scope.*  Processed-crop sales (W3 q19-21, W4 =sa3iiq18aa= /
+q20-21, W5 q21-24) are a different good in different units and are not read,
+as the W1/W2 other-buyer block is not.
+
+*Sale above harvest.*  On attached one-record rows in one unit, the sold quantity
+exceeds the row's harvest =Quantity= on 43 (W3), 3 (W4) and 0 (W5) rows.  Reported,
+not clipped.  W3 is the wave whose form does not tie the sale to the harvest unit.
+
+*The price is what validates the placement.*  On attached rows in one unit, the
+household's own valuation per harvest unit (=Value_harvested / Quantity=) over its
+sale price (=Value_sold / Quantity_sold=) has median 1.00, within 2x on 90% (2,932
+rows), 93% (2,805) and 92% (3,079) in W3, W4, W5.  Those counts include summed rows;
+one-record rows alone are 2,895 / 2,798 / 3,062 at the same rates.  W1/W2, which
+record the sale on the row, are 83% and 88%.  So the attachment and the W4/W5 unit
+reading are at least as coherent as the data they join.  In the 19 crop-by-unit
+cells with 30 sales on each side, Farm-level over attached median price is 1.00
+(p10 0.52, p90 1.13).  A sale value exceeds the valuation on 210 / 186 / 217 attached
+rows, 6-7%; not corrected.
+
+*Measured, cold, development =4ea95a0aa= against this branch merged with it.*
+- Conservation: =Value_sold= equals the raw sum in each round (N196,085,180 /
+  N226,761,273 / N716,443,945), and =Quantity_sold= by =Unit_sold= equals the raw sum
+  in all 63 round-by-unit cells, the withheld two-unit quantities apart.  No sale is on
+  two rows; every attached row has a positive =Quantity=; no Farm-level row has one.
+- Nothing else moves: 62,844 pre-existing rows keep their keys, =v=, =Quantity=, =u=,
+  months, flags, =KgFactor= and =Value_harvested=; the 25,529 W1/W2 rows are wholly
+  identical; the other 18 tables built are frame-equal.  Rows +696 / +975 / +632, 2,303
+  in all.
+- Site B's =Quantity_sold= and =Value_sold= warnings are gone (5 -> 3); Site I and the
+  grain audit report nothing either side; Site Q names the same five rows.
+- =gross_crop_revenue= (=by=None= and =by='j'=) now equals the source total in each
+  round.  =harvest_kg=, =yield_kg= (both =on=, joined on the PH quarter, because as
+  served it joins nothing: =plot_features= is on the PP quarter), =fertilizer_rate=,
+  =nitrogen_kg=, =seed_kg= and valued =food_expenditures= are identical.
+- Cost: every Nigeria table and wave hash moves (20 of 20, 200 of 200): a country
+  re-warm.  Uganda, GhanaLSS, Malawi and every =build_transforms_fingerprint= do not.
+
+*Two consumers.  =crop_diversity= is fixed (GH #1469); =median_price_valuation= is not
+(=transformations.py= is not this country's).*
+- =crop_diversity(weight='count')= counted a Farm-level row as one more occurrence of
+  the crop until GH #1469.  Against the pre-#843 frame, 454 / 695 / 429 households moved
+  and 2 were added, mean H 1.0595 -> 1.0518, 0.9452 -> 0.9370, 0.7747 -> 0.7681.  It now
+  drops such a row where the household has a plot row of that crop, 2,293 of 2,303, and
+  the means are 1.0595, 0.9456, 0.7747.  Against the pre-#843 frame 7 households then
+  differ and 2 are new, all from the 10 rows kept (0 / 7 / 3 by wave), whose crop has no
+  plot row on the served frame.  Of the rows dropped, 4 have a plot row of the crop that
+  states no harvest.
+- =median_price_valuation=: see below.
+
+*=KgFactor_sold=: the sale's own factor (GH #843 red team, 2026-11-04).*  W4/W5
+=sa3iiq1_conv= is served as =KgFactor_sold=, kg per ONE sold unit (canonical
+=lsms_library/data_info.yml=), because the form states the sale in the unit it rates.
+The World Bank does the same (=NGA_GHS4.do:281=, =sa3iiq5a * sa3iiq1_conv=).  W1-W3
+ship no factor, so the column is float NaN there.  A non-positive value would read as
+not recorded; none occurs.  Positive on 3,721 of 3,825 and 3,626 of 3,747 sale records.
+
+*Agreement policy, which the canonical note requires a folding producer to state.*
+Never summed and never chosen between.  A one-record row carries its record's factor.
+A summed row carries it only where every record reports the same factor, missingness
+included, as Mali's does; otherwise NA with the quantity kept (3 pairs in W4, 1 in W5,
+all four being two different factors).  A two-unit row's is NA.  Unlike Mali this files
+no grain report: the row already carries =hh-crop-sale-records-summed=, and
+=derivation_inputs= returns each record's factor.
+
+*Why it had to be wired.*  =median_price_valuation= needs kilograms per sold unit, and
+without this factor it could convert only sales in a metric unit, so serving the W3-W5
+sales alone made it return wrong numbers where it used to return NaN.  Against the
+household's own =Value_harvested=, cold build of =8b0c1b398= (no factor) and of
+=08532bf15= (factor):
+
+| | W1 | W2 | W3 | W4 | W5 |
+|-+-+-+-+-+-|
+| no factor: sum ratio | 0.82 | 1.48 | 2.25 | 14.80 | 6.09 (18.29 without the N1.95B valuation) |
+| no factor: row median / within 2x | 0.91 / 68% | 1.00 / 72% | 1.14 / 63% | 1.40 / 47% | 7.55 / 23% |
+| no factor: sales in the price pool | 2,249 | 991 | 171 | 43 | 41 |
+| no factor: value from a crop price of under 10 sales | 2.5% | 2.7% | 20.0% | 99.3% | 99.2% |
+| *factor: sum ratio* | same | same | same | *1.09* | *0.51 (1.06 without that row)* |
+| *factor: row median / within 2x* | same | same | same | *1.00 / 80%* | *1.00 / 79%* |
+| *factor: sales in the price pool* | same | same | same | *3,669* | *3,588* |
+| factor: value from a crop price of under 10 sales | same | same | same | 0.7% | 0.4% |
+| factor: rows valued | 6,590 | 4,446 | 524 | 11,508 | 8,412 |
+
+W5 maize goes N4,150 -> N423 per kg and W4 millet N8,000 -> N90.  No other column of any
+row moved, the other 18 tables are frame-equal, and every other consumer is identical.
+Ruling A changes none of this table: it moves where a sale sits, not which sales price.
+
+*W3 is not fixed.*  It ships no factor, so its valuation stays at 2.25x from a pool of
+171 metric-unit sales, with 20% of its value resting on a crop price from under 10 sales.
+Ruled 2026-11-04 (D): served, and disclosed here.  Do not sum =median_price_valuation=
+over W3.  W1/W2, also with no factor, have far more
+metric sales (2,249 and 991).
+
+*Coverage and residuals.*  =KgFactor_sold= is on 3,669 of 3,789 (W4) and 3,585 of 3,714
+(W5) sale rows.  The 249 without: 224 lone records whose factor is blank, 21 two-unit
+rows, 4 summed rows whose factors disagree.  One =Kg= row reports a factor other than 1;
+it is served as reported and the consumer's screen rejects it
+(=supplied_factor_rejected=: 1).
+
+* crop_production: one row per harvest line (GH #1433, 2026-11-04)
+
+=_/crop_production.py= kept the first row of any duplicate at =(t, i, plot_id, crop)=.
+That key is not a harvest line, and the #323 rule applies: name the line, do not
+select one.  The index is now =(t, i, plot_id, crop, production_obs)=.
+
+*The idiosyncrasy.*  One plot can hold several lines of one served crop, for two
+reasons.  =harmonize_food= folds several codes onto one label: Yam--roots is 1120-1124,
+and it is 1,449 of the 1,616 lines concerned.  And the W1-W3 rosters can repeat one code
+on a plot.  The lines are distinct answers: 70 of the 794 keys agree across quantity,
+unit, valuation and sale.
+
+| | 2011Q1 | 2013Q1 | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-+-+-|
+| lines with a crop label | 12,985 | 12,948 | 11,956 | 15,237 | 10,540 |
+| keys with two or more lines | 227 | 163 | 125 | 173 | 106 |
+| ... two or more codes under one label | 190 | 150 | 120 | 173 | 106 |
+| ... one code repeated | 37 | 13 | 5 | 0 | 0 |
+| lines discarded | 233 | 171 | 127 | 183 | 108 |
+| ... with a positive harvest quantity | 207 | 157 | 121 | 139 | 102 |
+| ... with a valuation | 201 | 155 | 121 | 139 | 102 |
+| ... with a positive sale value | 97 | 66 | | | |
+
+*The token names the line.*  It is per wave, like Ethiopia's, and is not a panel id.
+
+| wave | =production_obs= | why |
+|-+-+-|
+| W1-W3 | =reported:crop_id:<cropid>= | the roster's line id; the code repeats on a plot, and no recorded =cropid= repeats within one |
+| W4, W5 | =reported:crop_code:<code>= | no =cropid= ships; the code is unique within a plot across the annual and tree files together |
+| W1, 6 lines | =missing-id:row:<source_fingerprint>:<n>= | =cropid= is blank; =n= is the zero-based row of the held release.  CONSTRUCTED |
+| a Farm-level sale row | =unresolved_observation= | it answers no harvest line |
+
+W1's =cropid= also has a -1 and a 0, on one plot, carried as recorded.  A repeat within
+the index, or a served line with no token, raises.
+
+*What moved, cold, =19db1a068= against this change.*
+
+| | 2011Q1 | 2013Q1 | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-+-+-|
+| rows, before | 12,752 | 12,777 | 12,525 | 16,029 | 11,064 |
+| rows, after | 12,985 | 12,948 | 12,708 | 16,241 | 11,208 |
+| ... harvest lines added | 233 | 171 | 127 | 183 | 108 |
+| ... Farm-level rows added | | | 56 | 29 | 36 |
+| =Value_harvested= non-null added | 201 | 155 | 121 | 139 | 102 |
+| =Value_sold= non-null added | 97 | 66 | 0 | 0 | 0 |
+| =Value_sold=, added, Naira | 1,848,860 | 1,009,350 | 0 | 0 | 0 |
+
+Every one of the 62,844 pre-existing harvest rows has an identical line in the new
+frame, on its key, =v=, =Quantity=, =u=, =KgFactor=, =Value_harvested=, months and
+flags.  72 of the 822 new lines repeat their kept twin on all of those.  =Value_sold=
+now equals the source in every round, W1/W2 included.  Site B, I and the grain audit
+report the same on both sides, and Site Q names the same five rows.
+
+*#843's rule applied as ruled, and what that does.*  The rule counts rows that state a
+harvest, and the rows are now every line.
+
+| household-crops with a sale | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-|
+| on the one row that states a harvest | 3,034 | 2,785 | 3,046 |
+| Farm-level, two or more state a harvest | 750 | 997 | 665 |
+| Farm-level, rows but none states one | 2 | 0 | 0 |
+| Farm-level, no served row | 0 | 7 | 3 |
+
+- 2 W4 household-crops (N6,500) move onto their line.  Their kept line said no and the
+  discarded twin stated the harvest.
+- *123 household-crops (56 / 31 / 36; N3,878,684 / N1,276,100 / N4,315,300, 0.83% of
+  sale value) move to Farm-level.  The rulings did not contemplate this.*  In every one,
+  two lines of ONE plot state a harvest (three in one W5 case), so the survey knows the
+  plot, and the rule does not pick a line.  They used to sit on whichever line came
+  first.  Of the 42 with one sale record, 12 sat on a line of a different code from the
+  one sold.  A sale's own code would place 202 of their 204 records on their own line,
+  but that is a different grain from the one ruled, and it is left for a ruling.
+- Conservation holds: =Value_sold=, =Quantity_sold=, =Unit_sold= and =KgFactor_sold=
+  are unchanged on every household-crop in W3-W5, none is on two rows, every attached
+  row has a positive =Quantity= and a line token, and no Farm-level row has either.
+- On one-record attached rows in one unit, the sold quantity exceeds the row's harvest
+  on 43 / 2 / 0 rows (43 / 3 / 0 before).
+
+*Consumers, before -> after.*
+- =gross_crop_revenue= now equals the source in W1/W2 too: +1.9%, +0.7%; W3-W5
+  identical.
+- =harvest_kg=: 31,624 -> 31,637 rows, totals +2.9% / +0.14% / +0.11% / +0.64% / +1.5%.
+  It sums to =(t, i, plot_id, j)=, so two yam lines on a plot are one figure in kg, and
+  a line whose unit has no factor is left out, as before.
+- =yield_kg= (joined on the PH quarter): 17,751 -> 17,755 rows; totals +1.6% / +0.2% /
+  +0.1% / +2.0% / +2.9%.
+- =median_price_valuation=: =Value= totals +2.2% / +0.08% / +0.05% / +0.5% / +0.8%.  W3-W5
+  prices are unmoved in every =(v, crop)= cell, so the rise there is the new lines being
+  valued.  W1/W2 prices move in 202 of 2,544 and 3 of 2,579 cells, where the recovered
+  sales enter the pool.
+- =crop_diversity=: =weight='count'= is identical, because it counts land units, not
+  lines.  =weight='value'=: 93 households move and 17 are new, all W1/W2.
+- =fertilizer_rate=, =nitrogen_kg=, =seed_kg= and valued =food_expenditures= are
+  identical, and the other 18 Nigeria tables built are frame-equal.
+- =Feature('crop_production')(['Nigeria', 'Tanzania', 'GhanaSPS'])= stays unique; Nigeria
+  serves its own =production_obs= where it had the sentinel on every row, and the other
+  two countries are frame-equal.
+
+*Cost:* =nigeria.py= and =data_scheme.yml= are in every Nigeria table's hash, so a
+country re-warm: 20 of 20 =Country._table_cache_hash= and 200 of 200 =Wave._input_hash=.
+Uganda, GhanaLSS, Malawi, Tanzania and all 31 =build_transforms_fingerprint= do not move.
+
 * crop_production: a unit =_canon_unit= cannot place is =Unknown= (GH #1047)
 
-=u= is a *column* here (the declared index is =(t, i, plot_id, crop)=), and
+=u= is a *column* here (the declared index is =(t, i, plot_id, crop, production_obs)=), and
 =crop_production_for_wave= used to serve NaN wherever =_canon_unit= returned
 NA: 13,138 rows (2011Q1 3,053 / 2013Q1 3,009 / 2016Q1 1,694 / 2019Q1 3,467 /
 2024Q1 1,915).  Census on the raw files: all but 12 have a *blank* raw unit
@@ -1585,6 +2848,53 @@ builder now maps through =_canon_units=, which raises an
 =UnplacedUnitLabelWarning= naming each non-numeric label it cannot place
 (the row is still served =Unknown=).  No crop label triggers it today;
 =plot_inputs= had 1,018 rows that would have (next section).
+
+* plot_inputs retained missing units: Country and Feature agree (GH #1118)
+
+The earlier dispatcher decision below, "Country() serves them u = NA, not
+Unknown", conflicted with the subsequent #1041 ruling and Feature's canonical
+unit rule. =assemble_plot_inputs= now fills every retained missing unit with
+=U_UNKNOWN=, after channel reduction. This applies to missing amounts and zero
+amounts too. Blank strings and the existing =map_index= string markers =nan=
+and =<NA>= are normalized; genuine nonblank units are preserved.
+
+The fill must also preserve the existing finalizer's hollow-row boundary.
+Before normalizing =u=, assembly records whether any of its exact returned
+payload (=Quantity, u, Purchased, Quantity_purchased, Improved=) is nonmissing.
+Only those records receive =Unknown=; an entirely missing payload stays hollow
+for the existing =dropna(how='all')=. Observed False, zero and literal blank
+or string-marker units still count as existing payload. Keys or an ignored
+extra source column do not. The keep-first dedup remains before that finalizer
+drop, so a hollow first duplicate does not expose a later observed duplicate.
+This is an additive source/synthetic eligibility repair, not another real-data
+rebuild or a decision to remove the retained no-channel/tree-crop population.
+
+This is NOT a decision that the retained no-channel seed/tree-crop rows are
+valid input records. They remain in place, and the existing mixed-channel
+reducer remains unchanged. In particular, fill must stay AFTER channel
+collapse, or a missing channel becomes a second unit and changes quantities.
+A recorded unit with no quantity must still win over an earlier empty channel.
+
+Fresh private-source diagnosis at public =10ad99d62a5e= (2026-10-30) reproduced
+96,620 rows, Country 5,546 null units / 178 Unknown versus Feature 0 null /
+5,724 Unknown; 90 no-quantity rows carried recorded units. The historical
+counts below are retained as history, not acceptance constants. The original
+source-row eligibility caveat and seven mixed-channel cases remain unresolved.
+
+The candidate rebuild preserves all 96,620 rows, identities, payloads, dtypes,
+and Country attrs; only the 5,546 missing unit cells change to Unknown. The
+90 no-quantity recorded units remain exact. =seed_kg= (4,888 rows) and
+=nitrogen_kg= (4,359 rows) are exact before/after and between the aligned APIs.
+Feature values remain exact; its alignment report now says zero unit nulls
+filled rather than 5,546. =season= and =input_obs= are Feature-added axes.
+Cold baseline and hash-triggered rebuild took 167 / 182 seconds including
+sample support and checks; a 17-second warm check changed no parquet mtimes.
+The shared country module moves all 24 measured Nigeria country-table hashes,
+not just plot_inputs; unbuilt tables will need their own re-warm. Independent
+review remains with the coordinator. This is no claim about non-ISA #1118.
+
+The following #1047 account describes the earlier policy; its Country NA
+exception is superseded only for retained unit normalization by #1118.
 
 * plot_inputs: =u= is NaN only where no amount is recorded, and four units only the input modules use (GH #1047)
 
@@ -1732,17 +3042,17 @@ every wave).  *Only waves 4 and 5 ship one at all.*
 | 2015-16 | secta3ii_harvestw3   |  8 544 | *none*           | ---           | ---                         | n/a    |
 | 2018-19 | secta3i_harvestw4    | 14 197 | =sa3iq6_conv=    | 10 845 (76.4%) | =sa3iq6i= / =sa3iq6ii=        | *yes*    |
 | 2018-19 | secta3i_harvestw4    |        | =sa3iq6d_conv=   |  3 410 (24.0%) | =sa3iq6d1= / =sa3iq6d2=       | no     |
-| 2018-19 | secta3ii_harvestw4   |  8 839 | =sa3iiq1_conv=   |  8 669 (98.1%) | =sa3iiq1a= / =sa3iiq1c=       | no     |
+| 2018-19 | secta3ii_harvestw4   |  8 839 | =sa3iiq1_conv=   |  8 669 (98.1%) | =sa3iiq1a= / =sa3iiq1c=       | as =KgFactor_sold= (GH #843) |
 | 2018-19 | secta3iii_harvestw4  |  1 062 | =sa3iiiq13_conv= |    695 (65.4%) | =sa3iiiq13a= / =sa3iiiq13c=   | *yes*    |
 | 2023-24 | secta3i_harvestw5    | 10 071 | =sa3iq9_conv=    |  8 092 (80.3%) | =sa3iq9a= / =sa3iq9b=         | *yes*    |
 | 2023-24 | secta3i_harvestw5    |        | =sa3iq15_conv=   |  1 169 (11.6%) | =sa3iq15a= / =sa3iq15b=       | no     |
-| 2023-24 | secta3ii_harvestw5   |  7 184 | =sa3iiq1_conv=   |  6 962 (96.9%) | =sa3iiq1a= / =sa3iiq1c=       | no     |
+| 2023-24 | secta3ii_harvestw5   |  7 184 | =sa3iiq1_conv=   |  6 962 (96.9%) | =sa3iiq1a= / =sa3iiq1c=       | as =KgFactor_sold= (GH #843) |
 | 2023-24 | secta3iii_harvestw5  |    483 | =sa3iiiq23_conv= |    295 (61.1%) | =sa3iiiq23a= / =sa3iiiq23b=   | *yes*    |
 
 Every one of them carries the Stata label "Kg/L conversion factor"; the label
 does not distinguish them.  Only the *neighbouring question* does.
 
-** Why three of them are NOT wired --- and must not be
+** Why three of them are NOT wired as =KgFactor= --- and must not be
 
 *A factor belongs to the quantity block it was asked beside.*
 
@@ -1754,9 +3064,12 @@ does not distinguish them.  Only the *neighbouring question* does.
   q6d/q15 factor to it would multiply one container's rate by another
   container's quantity.
 - =sa3iiq1_conv= (=secta3ii=, both waves) is the *household*-crop total
-  harvest, with no plot linkage --- the same reason =crop_production.py=
-  already leaves W3--W5 =Quantity_sold= / =Value_sold= NaN (see the
-  [[*crop_production: two reported price fields the build does not carry][price-fields section]] above).  =secta3ii= is not read by this build at all.
+  harvest, with no plot linkage, so it rates no plot row's quantity and is not
+  =KgFactor=.  This note used to end there, and the factor went unread, because
+  =secta3ii= was hh-crop grain and nothing served sat at that grain.  /Changed
+  2026-11-04 (GH #843)/: the W4/W5 sale now does, and the form states it in that
+  total's unit, so the same number is the sale's =KgFactor_sold=.  The rule above
+  is what decides it: a factor belongs to the quantity block it was asked beside.
 
 GH #859 quoted EPAR's W4 =.do= (:575--592) as evidence of "FOUR columns".  It
 is four columns *for EPAR's purpose*, which is different: EPAR runs a *lockstep
@@ -1790,6 +3103,9 @@ after):
 | 2019Q1 | 15 054 |                    11 393 |
 | 2024Q1 | 10 432 |                     8 285 |
 | total  | 62 844 |                    19 678 |
+
+/Since GH #1433 (2026-11-04) every labelled line is served: 2019Q1 11,531 and 2024Q1
+8,387 non-null.  The rest of this section is the #859 measurement./
 
 W1--W3 are all-NaN *because the column does not exist in the source*, which is
 why =data_scheme.yml= declares =KgFactor= =optional: true= --- the Site-B
@@ -2044,8 +3360,124 @@ refused):
 | 2019Q1 | 4: 6, 6: 12, 7: 14 | 32 |
 
 So =interview_date= is a *visit* date, not an interview date, for 419 rows
-(216 W1--W3, 203 W4).  Not filtered: whether it should be is a semantics
-decision, drafted as a residual (tier DECISION, 2026-10-19).
+(216 W1--W3, 203 W4).  Not filtered; decided below.
+
+*** DONE =InterviewResult= rides beside the date, and status gates nothing (GH #1096, #1444, 2026-11-04)
+
+/Rulings (@ligon, 2026-11-04)/: keep the dated non-interview rows and add
+=InterviewResult=; do not gate the roster on it.
+
+*Which tables carry it: =interview_date= (eight rounds) and =sample= (all ten).*
+The declarations are =Columns > interview_date > InterviewResult= and =Columns >
+sample > InterviewResult= (=str=, =optional=) in the canonical =data_info.yml=, and
+=InterviewResult: str= in this country's =data_scheme.yml=.  =household_roster= does
+not carry it.  =sample= reads it in =_cover_frame=, from the same field; it is NA on
+the 23 household-rounds no household cover of that round lists.  =cluster_features=
+shares =round_covers= and does not carry it.
+
+*Source: the cover's own result field*, read by each round's script:
+
+| rounds | field | not this |
+|-+-+-|
+| 2010Q3, 2012Q3, 2015Q3, 2016Q1 | =saq22a= | =saq22b= is the status of DATA ENTRY; 2016Q1's =saq22= is a yes/no on observations |
+| 2011Q1 | =sq1= | =sq2= (data entry) |
+| 2013Q1 | =saq1= | =saq2= (data entry) |
+| 2018Q3, 2019Q1, 2023Q3, 2024Q1 | =interview_result= | |
+
+W1--W3 share one card (1 completed ... 7 other); W3's script reads codes
+(GH #1037), so =nigeria.response_status_label= applies that card.  W4's codes
+differ (its 4 is "unable to identify", its 7 "refused") and W4 reads labels, so
+the card is never applied to it.  A value outside =_INTERVIEW_RESULT_LABELS= is
+refused.
+
+*Vocabulary.*  Code prefix stripped, one case.  =COMPLETE= and =COMPLETED= are one
+spelling, as are =MOVED AWAY= and =HOUSEHOLD HAS MOVED AWAY=.  Different answers
+stay different: W4's two partials are distinct, and W2's "not located" is not W4's
+"unable to identify".  Served rows:
+
+| =InterviewResult= | 2010Q3 | 2011Q1 | 2012Q3 | 2013Q1 | 2015Q3 | 2016Q1 | 2018Q3 | 2019Q1 |
+|-+-+-+-+-+-+-+-+-|
+| Completed | 4,942 | 4,891 | 4,718 | 4,730 | 4,601 | 4,570 | 5,044 | 4,976 |
+| Partially completed | 8 | 7 | 11 | 2 | 4 | 8 | | |
+| Partially completed (refused) | | | | | | | 7 | 4 |
+| Partially completed (unavailable) | | | | | | | 2 | |
+| Refused | 2 | 5 | 14 | 7 | 24 | 11 | 22 | 14 |
+| Not at home | 1 | 1 | 2 | 3 | 1 | | | |
+| Household not located | | | 1 | 1 | 5 | | | |
+| Moved away | | 9 | 24 | 15 | 11 | | | |
+| Other | | 2 | 39 | 11 | 26 | 1 | | |
+| Unable to identify household | | | | | | | 94 | 6 |
+| Long-term unavailable | | | | | | | 55 | 12 |
+| total | 4,953 | 4,915 | 4,809 | 4,769 | 4,672 | 4,590 | 5,224 | 5,012 |
+
+Filter =Completed= plus the three partials for "was interviewed" (the #1264 rule
+counts a partial as an interview).  =Int_t= and the row set are =assert_frame_equal=
+to base: a row with no date is still not served, and each script now drops it
+itself, because a second column would otherwise carry it past =dropna(how='all')=.
+
+*The #1444 counts reproduce exactly*, using the crosswalk's definition of
+interviewed (=panel_ids.round_table=: own cover in W1, W4, W5; =HHTrack= in W2, W3):
+2 household-rounds with a roster and no recorded interview (320201, 30082, both
+2016Q1); 8 with a recorded interview and no roster (2012Q3 3, 2016Q1 2, 2018Q3 2,
+2024Q1 1); 942 served by =sample()= with no recorded interview (3 / 22 / 131 / 84
+/ 85 / 12 / 210 / 45 / 296 / 54, 2010Q3 through 2024Q1).
+
+*The two definitions differ on 5 households*: the column is the cover's, the
+crosswalk uses =HHTrack= in W2 and W3.  The 5 are =HHTrack= 5 "tracked and
+interviewed" with a cover saying other (2012Q3, 3) or refused (2016Q1, 2).  That is
+why 419 here is 414 of the 942 plus these 5.
+
+*What the column does not reach*, of the 942:
+
+| | household-rounds |
+|-+-|
+| a row on =interview_date=, so the column says | 414 |
+| on the round's cover but undated, so no row | 155 |
+| on no cover of that round (2012Q3 21, agriculture cover only; 2016Q1 2: 320201, 30082) | 23 |
+| W5: on the cover, but =interview_date= has no W5 script | 350 |
+
+That table is =interview_date=.  /Ruling (@ligon, 2026-11-04): =sample= carries the
+column too./  =sample()= reaches 919 of the 942: everything above except the 23 on no
+cover, whose =sample= row serves NA.  Whether W5 should have an =interview_date= is a
+residual.  =sample= serves every cover row, dated or not, on all 49,089 rows:
+
+| =InterviewResult= | 2010Q3 | 2011Q1 | 2012Q3 | 2013Q1 | 2015Q3 | 2016Q1 | 2018Q3 | 2019Q1 | 2023Q3 | 2024Q1 |
+|-+-+-+-+-+-+-+-+-+-+-|
+| Completed | 4,988 | 4,909 | 4,735 | 4,768 | 4,607 | 4,572 | 5,044 | 4,976 | 4,771 | 4,715 |
+| Partially completed | 9 | 8 | 11 | 2 | 4 | 8 | | | | |
+| Partially completed (refused) | | | | | | | 7 | 4 | | 1 |
+| Partially completed (unavailable) | | | | | | | 2 | | | 1 |
+| Refused | 2 | 5 | 17 | 16 | 29 | 11 | 23 | 14 | 20 | 20 |
+| Not at home | 1 | 1 | 3 | 9 | 1 | | | | | |
+| Household not located | | | 1 | 1 | 10 | | | | | |
+| Moved away | | 10 | 47 | 44 | 13 | | | | 46 | 13 |
+| Other | | 6 | 45 | 14 | 32 | 1 | | | | |
+| Unable to identify household | | | | | | | 129 | 19 | 137 | 6 |
+| Long-term unavailable | | | | | | | 58 | 12 | | |
+| Unavailable for interview | | | | | | | | | 42 | 7 |
+| All household members deceased | | | | | | | | | 51 | 8 |
+| NA (no household cover) | | | 21 | | | 2 | | | | |
+
+*Census of the other countries' covers* (GH #1096; report only, none wired).
+Metadata sweep of every held =.dta= / =.sav= under =Data/=; 2,448 of 6,016 sidecars
+have a blob in the shared L1, so a file no table reads may be unseen, and a value
+is only what a public release ships.  Togo's =Data1/= was read by hand.  Evidence:
+=burst/isa-sm-20261103/reports/nigeria-bundle/census_interview_result.tsv=.
+- *Record non-interviews on the household cover, as Nigeria does*: Ethiopia
+  =hh_saq33_a= / =pp_saq34_a= / =ph_saq34_a= (W1--W3: moved away, not located, not
+  at home, other, refused; NA on 130--487 rows), Uganda 2015-16 =VISITOUTCME=,
+  Liberia 2018-19 =rescd=, Serbia 2007 =drugaposeta= (second visit refused), Niger
+  2014-15 =MS00Q05= (P2: 40 absent, 26 refused), Burkina Faso 2014 =A13= (P2:
+  absent, refused, abandoned).
+- *Record a result, but the release holds only completed or partial households*:
+  every EHCVM cover =s00q27= / =s00q08= (Benin, Burkina Faso, CotedIvoire,
+  Guinea-Bissau, Mali, Niger, Senegal, Togo; replacement households are counted as
+  completed), Tanzania =int_result=, Uganda =interview_result= / =result_code= /
+  =response_status=, Iraq =q0034=, Malawi =int_outcome_1=.
+- *Different in kind*: GhanaLSS 2016-17 =hhstatus= (all seven visits or not), Malawi
+  2010-11 =int_outcome_2= (second visit, 4 not complete) and 2013-14
+  =interview_status= (panel and visit pattern), Albania =OUTCOME= / =m1_q24=
+  (individuals).
 
 * nonfood_expenditures (sect8a-e / sect11a-e) -- long since GH #817
 
@@ -2083,6 +3515,12 @@ for years looking like scaffolding for a non-food aggregation; it was pointing
 at the wrong file entirely and has been removed rather than revived.
 
 ** WAITING Recall windows are POOLED, and no column records it
+
+The #1177 instrument review found an additional published contradiction:
+[[https://microdata.worldbank.org/catalog/3557/download/47675][W4 PP interviewer manual]], printed page 49 (PDF index 48), describes a
+"12 months reference period" while instructions on that same page say
+"PAST 6 MONTHS".  Both were visually confirmed; this does not settle the
+sub-module windows or authorize a recall-policy change.
 
 =sect8a..e= and =sect11a..e= are separate sub-modules asking over *different
 recall windows* -- the wave scripts' own comments say "past 7 days" for
@@ -2164,3 +3602,950 @@ development served.  Nothing served moves: =individual_education= reads
 =s2aq9= of this file, never =s2aq10=.  To recover the text, a consumer can
 =s.encode('latin-1').decode('utf-8', errors='ignore')= -- which yields
 =... /  ‘O LEVEL=, the closing quote being genuinely gone.
+
+** Declaration membership supplement (GH #1287)
+
+
+*Declaration qualification (continuation, 2026-10-28).* The five physical
+=Waves= and today's five producer scripts do not themselves establish
+per-table membership after a retirement. The compiler now obtains each logical
+PP/PH quarter through the actual =Country('Nigeria')[quarter]= lookup and
+=Wave.data_scheme=, which includes native scripts AND YAML declarations.
+Both quarters map to one physical folder through =wave_folder_map=; the
+compiler reads each declared folder once in its original order. A folder
+without either declaration skips before any reader, even if an output is
+available. Declared reader errors retain their original exception before any
+country write. No source-column mapping, round selection or metadata API is
+substituted. All-retired inputs still fail without writing; successful declared
+empty frames remain valid, including when every declared frame is empty.
+
+The separate new 27-case private-metadata/invented-IO cohort records the old
+compiler's 13 declaration failures and 14 healthy passes, then 27 passes after
+this correction. It preserves native PP keys, repeated indices, nulls, dtypes,
+order, source frames and the existing agreeing/disagreeing-attrs concat rule.
+The original four controls remain historical evidence for current wiring.
+Neither cohort establishes real source/Make/cache/API or scientific acceptance.
+
+* 2026-10-28 -- four country compilers use actual table declarations (GH #1287)
+
+=community_prices=, =food_coping=, =household_roster= and =housing= now collect
+eligible physical folders through actual logical-quarter =Country= lookup and
+=Wave.data_scheme=. Native script stems and YAML keys form the existing union;
+a null YAML key does not disable a retained native declaration. A physical
+folder is read once, in its existing enumeration order. Unwired/unregistered
+folders skip before offered outputs, and malformed metadata propagates.
+Declared reader errors stop before the country writer, preserving the original
+exception. Successful typed-empty inputs remain valid; all-retired inputs keep
+the existing no-input error. This does not establish native-producer emptiness.
+
+The compilers preserve source quarters, concat/sort/uniqueness behavior, native
+IDs and opaque payload/axes; they add no ID walk or new schema. Housing's current
+script quarters remain PH/PH/PP/PP/PH, while roster has both rounds and C8 is
+PH-only. These are source bindings, not fresh instrument/data measurements.
+Ten roster/housing wave recipes change only =cd ...; python ...= to
+=cd ... && python ...=, so a failed directory change cannot execute in the
+wrong directory. No Make execution or freshness claim follows from that syntax.
+
+The narrow public-421 extraction excludes the author's inherited module,
+source/config, sample/cluster, education and scientific changes. Invented extra
+price axes in tests check opaque transport; they do not add native production
+semantics to this baseline. Previous qualified community timeout/traceback
+observations remain distinct from new extracted-candidate verification.
+
+* W2 individual_education: new members, including current students (GH #1292)
+
+Fresh cached-source diagnosis, 2026-10-29, on public =d65e8b136= and the
+W2 timing block of draft PR #1318 (=c951c6a2a=). The selected source is
+=2012-13/Data/Post Harvest Wave 2/Household/sect2a_harvestw2.dta=,
+sidecar md5 =6dc65a2e5cea1ccf92a480b2bd27c581= (verify against the sidecar).
+
+The earlier W2 comment, "members who had LEFT school", is contradicted by
+this source. Its own variable labels identify =s2aq1= as new household
+membership, =s2aq2= as age five or older, =s2aq6= as ever attended school,
+=s2aq9= as highest educational level completed, and =s2aq13= as currently
+in school in 2012-2013. Of 26,305 unique =(hhid, indiv)= rows:
+
+- 520 answer YES to new membership; 390 of those answer YES to age five or
+  older; 313 of those answer YES to ever attended school.
+- Those 313 are EXACTLY the rows with non-null =s2aq9=. Of them, 175 are
+  currently in school and 138 are not. There are 25,992 null attainment
+  cells; this file is not a full-population attainment series.
+- This establishes the observed routing pattern, not every printed skip
+  instruction: the W2 household questionnaire blobs were unavailable in
+  the selected cache. The W1 left-school explanation is not adjudicated.
+
+The currently selected PH series and the separate PP education measurement
+must remain distinct. Both declared W2 PP education blobs (Stata and CSV)
+were unavailable in this cache, so this diagnosis neither reconstructs PP
+attainment nor concludes that PP had none. The draft's PH-only selection
+corrects the date of the selected source, not its population coverage.
+
+The 313 answers join uniquely to the PH household cover page. Its recorded
+visit dates range from 2013-02-02 through 2013-07-11: February 73, March 226,
+April 7, June 4, July 3; none is missing. Thus 14 are outside calendar Q1.
+These are recorded cover-page dates, not independently verified interview
+completion dates. =2013Q1= labels the logical PH visit, not a recall window
+or a guarantee of an interview during calendar Q1.
+
+The ordinary Wave comparison preserves all 26,305 PH rows, keys/order,
+values, 25,992 nulls and dtypes exactly under the draft W2 timing block;
+its PP result is schema-preserving empty. Baseline Country serves 313
+non-null answers under EACH round (626 total). With fresh private caches,
+the draft W2 block serves 313 PH-only rows through Country; these match
+baseline PH exactly, including the sample-joined cluster keys. The all-round
+49,770-row sample is unchanged, and warm mixed-round reads equal cold reads.
+A PP-only Country request is cache-dependent: warm after the mixed-round
+build it returns zero rows, but cold it attempts Make fallbacks and raises
+"no wave-level build succeeded". That is actual-source evidence for the
+remaining shared #1309 dependency, not acceptance of Country empty behavior.
+
+=tests/test_nigeria_w2_education_source.py= checks the source routing pattern
+and actual PH Wave extraction using locally cached data only. It skips when
+that declared blob is absent and never acquires it. No new eligibility,
+attainment, sample-link or PP carry-forward rule is introduced here.
+
+* 2026-10-30 -- Household roster actual runtime checkpoint (GH #1287)
+
+At source =96d9b3970341bfe9f53a0848fbdafe90422e3d74=, dispatch
+=99162779e3dd4730ac6b11674b6a5aed= (job 40647990) executed five native
+producers and the country compiler through GNU Make. Independent selected-source
+keys/order and Sex/Relationship checks account for 301,343 raw roster rows,
+13,713 all-selected-fields-empty exclusions and 287,630 native rows across ten
+PP/PH quarters. Saved-native concatenation exactly matches the compiler;
+normal Country and singleton Feature match production-composed expectations,
+with explicit exact numeric checks as well as axes, dtypes, masks and attrs.
+These composition expectations reuse production mapping/finalization: they do
+not independently validate age/DOB, kinship, panel linkage or sample geography.
+Canonical Age is float despite the local int declaration and the older
+integer-rounding guidance; this checkpoint preserves that contradiction.
+
+The second fresh warm process explicitly records full Country and Feature
+exact passes. Twelve owned parquets retain exact hashes, sizes, modes and
+nanosecond mtimes; no warm raw return, decoder, native/Make call or sanctioned
+write is observed. Both optional-subset actors remain failed overall. Separate
+saved-operand diagnosis supports the 53,250-row W1-PP/W5-PH cache-filter-then-
+finalize composition, while preserving pruned unused index domains, scoped
+attrs and an all-null W2-only =in_housing= column absent from standalone
+native-subset composition. Standalone subset schema/index-metadata equality
+is not accepted.
+
+Initial staging/premature-Make failures, partial early decoder instrumentation
+and the overwritten first subset traceback remain limitations. The first warm
+actor lacks explicit per-comparison pass receipts; acceptance relies on the
+second recorded full-warm passes. Own-round membership, composite sample =v=,
+native source EA and existing panel/recall-window caveats remain distinct.
+This accepts one roster runtime cell, leaving plot_features, community_prices,
+food_coping and housing runtime cells, #1288 failure paths and whole #1287 open.
+
+* GH #1150 slope-unit reconciliation (2026-10-30)
+
+The issue and older =nigeria.py=/wave comments called =PlotSlope= degrees.
+That uncited premise was contradicted, not silently treated as reliable:
+direct metadata inspection of held W4 =nga_plotgeovariables_y4.dta=
+(MD5 =bba0142518076269462546a9990f005e=) labels =srtmslp_nga=
+"Plot Slope (percent)" and stores it as text. The helper only parses the
+number; it does NOT convert percent to degrees. An independent review then
+checked EACH feeding source's official dictionary, all reporting percent:
+
+| Feed | Driver source | Official dictionary |
+|------+---------------+---------------------|
+| W1 | nga_plotgeovariables_y1.csv | [[https://microdata.worldbank.org/index.php/catalog/1002/data-dictionary/F3?file_name=NGA_PlotGeovariables_Y1][catalog1002/F3]] |
+| W2 | nga_plotgeovariables_y2.csv | [[https://microdata.worldbank.org/index.php/catalog/1952/data-dictionary/F19?file_name=NGA_PlotGeovariables_Y2][catalog1952/F19]] |
+| W3 | nga_plotgeovariables_y3.csv | [[https://microdata.worldbank.org/catalog/2734/data-dictionary/F98?file_name=NGA_PlotGeovariables_Y3][catalog2734/F98]] |
+| W4 | nga_plotgeovariables_y4.dta | [[https://microdata.worldbank.org/index.php/catalog/3557/data-dictionary/F96?file_name=nga_plotgeovariables_y4][catalog3557/F96]] |
+
+The W1-W3 evidence is official variable documentation plus current driver
+mapping, NOT a new measured-byte comparison to the original CSV export.
+The missing historical CSV export receipt remains a provenance limitation.
+W4 has both the measured held-file label and independent official-document
+corroboration. W5 has no plot geovariables feed and remains missing.
+
+Under the coordinator's final #1150 disposition, =PlotSlope= is now declared
+optional in native PERCENT for Nigeria and Ethiopia. No Nigeria value, join,
+key, dtype or round assignment changes; no inverse conversion or range-based
+unit inference was used. The post-planting-only design and W5 questionnaire
+renumbering remain in force. The rejected degree conversion is not shipped.
+
+* 2026-10-30 -- Two more actual compiler cells and legacy CSV hashes (GH #1287)
+
+At exact source =73c5d955e782c9a335d9e4dda96456c3c207cb53=, actual GNU
+Make ran the three =food_coping= natives and compiler (43,204 + 41,353 +
+41,282 = 125,839 rows), and five =housing= natives and compiler (4,899 +
+4,756 + 4,589 + 5,047 + 4,715 = 24,006 rows). The four-target task remains
+incomplete: plot_features and community_prices stopped at source-verifier
+refusals before their country compilers. No accepted roster cell was replayed.
+
+All nine coping writer/compiler/storage predicates pass. Housing passes ten
+of thirteen: three native CALL/RETURN complete-axis comparisons remain failed.
+Unused household-index domains shrink 4,929 -> 4,899, 4,789 -> 4,756 and
+4,611 -> 4,589 through the existing reset/set-index writer preparation.
+Observed ordered index values, typed attrs, dtypes, masks and numeric payload
+agree; RETURN/storage and policy-read native concat/compiler CALL are exact.
+The failed full-metadata predicates were not normalized away or relabelled.
+
+Each completed table passes seven cold and six fresh-process warm predicates:
+full/first/last Country and aligned singleton Feature (=currency=None=), using
+matching wave stages and raw-cache subset restriction before finalization.
+ExtensionArray and independent exact nonmissing NumPy checks supplement pandas
+frame equality. These are production-composition checks, not independent
+survey-science or linkage oracles. Both 60-file warm snapshots preserve exact
+bytes, sizes, modes and mtimes; observed warm raw/build/write activity is zero.
+The one current sample prerequisite is reused across the completed targets.
+
+The five source refusals are independently explained by legacy DVC text hashes,
+not evidence of corrupted data: W1-W3 plot-geovariable CSVs and W1-W2 C8 CSVs
+have no modern =hash:= field. The installed DVC selects =md5-dos2unix= while
+reading their =md5= metadata. Their original byte MD5s differ, but both full
+CRLF-to-LF hashing and the installed text-classified chunk algorithm equal the
+sidecars; declared sizes and original raw SHA256 identities are recorded.
+Only hashing transforms line endings: source bytes are not rewritten or
+substituted. Explicit modern =hash: md5= still means byte hashing. The failed
+actors remain failed; this diagnosis is not plot/community runtime acceptance.
+
+Dispatch =497ed9dda8ac446991ed220dd4497119=, job =40652865=; final private
+result =08646447a3a1f92b3881b36d2d623f6e898867e8=. Independent two-cell review
+SHA256 =4ce7627e871031058914375adb79e999df50df667d3b2afccdf183138049bc01=;
+legacy-hash review =f67d359eb602a0df32cd186d5a447f707f96bdf5920e1d3be85b74c460ddefb4=.
+Original staging, dangling-config-link and absent-Poetry failures remain
+recorded; 34 observed processes closed before witness export. The separate
+successor is limited to the two unexecuted targets with compatible saved sample
+prerequisites. No broader #1287/#1288, #1095 retention, source-grain or pooled
+recall-window acceptance follows, and no production rule changes here.
+
+* 2026-10-30 -- Plot/community actual compiler successor (GH #1287)
+
+The separate successor uses unchanged product source
+=73c5d955e782c9a335d9e4dda96456c3c207cb53=, executed operator/ledger descendant
+=8558512303cb7cb8a0d6f0c149e18e7bd5f546e8=. Two absent-target Make units
+run five natives each and their actual country compilers. =plot_features=
+native rows 6,086 / 5,893 / 5,824 / 11,076 / 9,232 yield 38,111 compiler rows
+and 38,045 served rows. =community_prices= rows 27,104 / 27,079 / 23,153 /
+31,757 / 30,064 yield 139,157 compiler and served rows. Historical C8 counts
+remain dated; this does not silently substitute the older 136,566-row total.
+
+All 26 writer/compiler/storage, 14 cold and 12 fresh-process warm predicates
+pass, including complete axes/levels/codes, dtypes, masks, typed attrs and
+strong extension-array/nonmissing NumPy checks. Numeric and mask mutations
+are rejected. Expectations use existing ordered native concat (community's
+actual sort), logical-quarter restriction, mapping/walk/normalization,
+assembly, finalizer/sample join and aligned singleton Feature (=currency=None=).
+Raw-cache subset restriction precedes finalization. This proves production
+composition, not independent science or the individual dispositions behind
+the plot 66-row reduction. Optional isolated saved-count diagnosis failed
+before producing counts; its exit/traceback remain without retry.
+
+Twenty original held objects total 50,140,494 bytes. Fifteen explicit-md5
+objects use byte hashes; five absent-hash CSV sidecars use the installed
+=md5-dos2unix= semantics. Raw bytes, metadata and sidecars are unchanged;
+no checksum waiver or line-ending rewrite occurred. Six source-bound saved
+sample parquets (628,645 bytes) pass exact bytes, current country hash and
+ten-quarter coverage admission; hashless native samples are prerequisites,
+not fresh-hash claims. No sample, roster, coping or housing producer was replayed.
+Observed source calls are 24 Make plus 24 cold API, zero warm. Both 38-file
+warm snapshots retain exact bytes, sizes, modes and mtimes; observed warm
+raw/decoder/helper/script/write activity is zero. All nine stage actors exit0
+and owned descendants close. Main execution is 369.638 seconds within the
+749-second cap computed from Slurm remaining time with a 240-second closure
+reserve. The 216 closed witnesses include 12 pre-API and 12 final parquets.
+
+Original verifier failures, the 0.075-second pre-child import failure and six
+once-passing stdlib controls remain separate; no old failure is relabelled.
+The task and publication completed, while native terminal state is interrupted
+143 / Slurm FAILED 15:0 at 42:59. The submitted 45-minute command requested
+=B:TERM@120=; timing is consistent with advance signaling, not proof of
+preemption. Closed data actors and publication remain independently evidenced.
+Original =REPORT.md= is unchanged; actual evidence is additive. The earlier
+three housing axis failures, #1095 Tier C, unit/observation/recall policies,
+independent plot row-disposition question and #1288 failure/freshness paths
+remain. No whole #1287/#1288 or scientific closure follows.
+
+Dispatch =cdea6582a0994891912223b33d2f3ab7=, job =40653317=; final published
+snapshot =a2838b6ae4bca3a7bd25eaf24e6de6f5c988f712=. Additive report SHA256
+=d8785ea5a5108a649ff401af20a4db3939a2319c4514442fe1c0287a0b922035=;
+independent review =d7945f156d033adbfd9f42a89e556d341dee5e63248b2534d1040ee577fbc6d2=;
+[[https://github.com/ligon/LSMS_Library/issues/1287#issuecomment-6527830265][accepted bounded checkpoint]].
+
+
+* 2026-10-30 -- Source-derived input crop markers (GH #1119)
+
+Structural fertilizer/chemical rows now carry =(not crop-specific)= separately
+from their legacy =n/a= crop key. Seed rows carry their resolved crop label only
+AFTER the unchanged household/plot/crop lookup gate. Assembly retains the old
+keys through sorting and keep-first dedup, then replaces only the crop axis.
+Private provenance is discarded. No global =n/a= replacement or failed-lookup
+inference occurs. Quantities, units, channels, five-payload hollow eligibility,
+no-channel/tree-crop retention, noncrop axes and native/API grain are unchanged.
+
+Explicit nonnull direct assembler labels remain supported, including recorded
+=n/a= with explicit provenance. Untagged null/legacy-marker calls refuse even
+when hollow: provenance validation precedes the existing hollow filter. All
+production constructors tag their outputs. Conflicting desired identities in
+one legacy group, or a post-relabel key collision, refuse rather than split,
+merge or allocate measurements; broader observation/grain work remains #1120.
+
+The existing seed gate still excludes missing/unmapped lookup results and can
+refuse fractional numeric codes. No new =unknown_crop= population or universal
+zero rule is introduced. The source still retains no-quantity/tree-crop seed
+rows despite the older reported-quantity prose; existing =Purchased=False=
+with absent purchase amounts remains unadjudicated. #1118/#1041 retained-unit,
+#867 share, mixed-channel and WAITING recall caveats are separate.
+
+Seventy-six focused invented cases passed at =283cbe44= (35 marker plus 41
+retained-unit cases), including injected-sample finalization, canonical Feature
+alignment, legacy winner/order and collision refusals. The first incorrect
+hollow-row test expectation remains recorded; only that expectation changed.
+This extraction reuses those exact product/test bytes without replaying them.
+
+Actual source/native conservation covers 96,620 rows: 34,641 structural and
+61,979 seed rows. Seed-gate exclusions remain nine in 2010 and fourteen in 2023;
+no row becomes newly eligible. The initial eleven constructor-marker oracle
+failures remain: a forced nullable-string =pd.NA= expectation was used before
+assembly, where scalar construction uses =np.nan= policy. A finite read of only
+those eleven closed outputs confirmed every scalar label and source-faithful
+expected Series, without coercing actual frames/attrs or changing production.
+A late-detection/zero-exit harness error was corrected separately; verification
+operators and private archives are not product changes.
+
+The completed normal API and fresh-process warm unit passed all 26 mandatory
+and 10 transport predicates for full/five-PP-subset Country and singleton
+Feature. Full Country/Feature each have 96,620 rows. Exact complete axes/domains,
+codes, string policy, masks, extension-array/nonmissing NumPy values and typed
+attrs accompany counts. API574.222s, warm83.642s, whole controller/export692.284s.
+All 94 source getters close (26 input, 68 sample); warm named raw/build/script/
+serializer/parser calls are zero, including aggregate counters before refusals.
+Source, inherited RETURN, all new cache bytes/identities and owned children close.
+These are production composition checks, not independent population/ID/unit science.
+
+Original 300-second baseline timeout, clone128/publisher74 and interrupted
+partial API remain failed history. The intermediate node-local archive lost two
+parquets (925,631 bytes); deterministic recovery found neither. They were NOT
+reconstructed. The final normal API built NEW caches and compared its script
+RETURN with the authenticated surviving native RETURN. Its absolute shared
+private archive has 241 verified members / 386,477,750 bytes; manifest
+=6ff0780adece779c714b9ec791a0ba035dc6951f960fef0231c786c6fd14020c=.
+Getter history is 20 + 36 + 94 = 150, including necessary partial-read repeats.
+
+Final dispatch =141c99de9d5e434889ac5f6be90c5945=, job =40659774= completed
+infrastructure0/0 with task/publication complete; final private result
+=ee01226f3cead787a0755818ad6f293665f8af1e=. Ordinary REPORT SHA256
+=0313377a60b1c0571105427f8eee59d9af23642d153904f32bbfbc0652316a91=.
+No whole #1119/#1120/#1287 closure or decision on remaining source retention,
+units, conflicts or recall follows. The shared helper changes build fingerprints;
+validation used private caches, not a no-rewarm or full cache-census claim.
+
+
+* W1/W2 community prices retain native item/size variety (GH #637)
+
+The earlier paragraph "Still open -- W1/W2 (a maintainer decision, not changed
+here)" and helper/registry wording "pending a ruling" describe the previous
+implementation. They conflict with the later settled
+[[https://github.com/ligon/LSMS_Library/issues/637#issuecomment-6368100768][2026-10-23 maintainer ruling]]:
+set =variety= to the source item code, following Tanzania #840. The original
+W1/W2 =item_cd= is now carried as a string, including the size digit: =1511=
+and =1512= remain separate under Milk powder/tin, as do codes =3= and =4=
+under Maize/Kg. Equal prices do not make different surveyed identities copies.
+The existing j/u resolution still tries the full code then code divided by10;
+that lookup does not replace the native identity with its base item.
+
+The declared country grain is =(t,v,j,u,variety,obs)=. Nigeria is PP/PH, but C8
+remains PH-only (2011Q1/2013Q1/2016Q1/2019Q1/2024Q1) and cluster-level, using
+the composite state/lga/EA =v=. No household key is introduced: =i==v= remains
+an internal map_index compatibility shim that is removed before the public
+Country result. W1/W2 =obs= remains1. W3's two physical locations keep =obs=1/2.
+
+W3--W5 carry the canonical =unknown_variety= that Feature previously supplied,
+following Niger's mixed-wave s05 precedent. Their source item codes are not
+new varieties. This uniform axis avoids mixed-depth wave concatenation and
+preserves their already aligned identities. Feature still supplies =visit=1;
+its =canonical_alignment= record truthfully ceases claiming it fabricated
+variety, while all other metadata remains governed by the existing carrier
+contract. No new shared schema or derivation is required.
+
+The existing resolved-cluster/item/unit, positive-price filters and all
+metric-size normalization/deletion rules run unchanged. Only admitted W1/W2
+rows must have an integral native code; excluded junk is not promoted into a
+new key or a new refusal. A duplicate full native key refuses, even if prices
+agree; no row ordinal, new dedup rule or first-price selection is invented.
+No unit fallback, factor, eligibility, native source or other table changes.
+The older1095 unit fix intentionally preserved the W1/W2 collapse;1268 fixed
+W3 locations only;1370 changed plot-input markers, so none already implemented
+this coordinate. See =.coder/ledger/637-nigeria-w1w2-variety.md=.
+
+Guarded invented-source/real-Feature checks passed 101 tests, with four
+source-gated cases deliberately unrun. Independent raw-source expectations and
+two actual W1/W2 native writer CALL checks establish 30,628/31,239 rows; the
+older 27,104/27,079 served counts describe first-selected rows. W3--W5 reuse
+authenticated, source-compatible helper RETURN/storage witnesses through an
+explicit constant-axis lift, not new raw builds. The compiler and composed
+Country/strict/full and both PH-subset Feature checks pass at 146,841 total rows.
+No scientific source/size/unit/eligibility rule was changed.
+
+Runtime acceptance is staged. Preserve the failed combined-oracle 120-second
+timeout, shared PP/PH-wave hash Make refusal, provider-context country-hash warm
+refusal, and later normal-warm 120-second timeout. Metadata-only attribution
+proved that temporary live method identity changed the build fingerprint.
+A NEW unmodified production writer construction from the accepted pre-finalize
+API CALL matches its original CALL/RETURN/storage stages exactly and uses the
+normal original hash, complete recorded coverage and official audit/drop
+metadata. The old cache is immutable; this does not establish original
+cold-to-warm byte continuity or unmodified cold script-cache/Make acceptance.
+
+Two full normal-warm comparison returns are supported by the interrupted run's
+control flow. A later saved PH2011 Country comparison and only the three missing
+PH getter results complete the remaining four full typed predicates, with
+per-check durable completion. Six cache copies and eleven immutable inputs
+close unchanged in that finisher; no observed named source/parser/helper/script/
+writer activity occurred in the finishing stage. Its receipt does not recreate
+the interrupted old warm's missing terminal/event totals; the previous first-PH
+Feature may have been in flight without a saved return. No completed source,
+native/compiler, bridge or full getter is replayed to finish these checks.
+Independent final result review: =5f2a4c3452a20c113070bb1c573540cefddca43f152e785b415bfb98e008d948=.
+
+This is qualified staged evidence, not an uninterrupted original six-check warm
+run or a country-wide cache census. Existing unknown-unit fallback and WAITING
+pooled recall questions remain separate. The public extraction preserves all
+relevant Nigeria/core bytes of the validated source; the sole bound-source drift
+is an unused EHCVM slot helper. #1357 continues excluding genuinely anonymous
+households from household-keyed tables; it supplies no inferred C8 household or
+orphan identity. Tanzania's remaining #637 seed decision is unchanged.
+
+* 2026-11-04 -- the NLSS 2018-19 is held beside the panel, not registered
+
+=2018-19-NLSS/= holds WB 3827 =NGA_2018_LSS_v01_M=: 47 files, 1.70 GB, in =Data/Household/= and
+=Data/Community/=, with the BID, questionnaires, manuals and report.
+
+*Why this directory name.*  =2018-19/= is GHS-Panel W4 (3557) over the same years, and both
+entries derive the label =2018-19= from the catalog.  They are different surveys: the NLSS is an
+NBS cross-section of 22,587 households, representative by state, whose file names
+(=sect1_roster=, =secta_cover=) share nothing with the panel's.  =discover_waves= matches on
+the catalog id, so 3827 reads =yes= here and 3557 =yes= there.
+
+*Why it is not in =Country.waves=.*  =nigeria.py= fixes the list, and that module is in every
+Nigeria wave's input hash, so registering costs a cold Nigeria re-warm for no served row.
+Do it with the wiring, and decide then whether the NLSS is a wave of this country or a country
+of its own (=GhanaLSS= / =GhanaSPS= is the precedent).  That choice also decides whether its
+units pool into the panel's kg factors (GH #1487).
+
+*Borno.*  BID Box 1, PDF p. 11: the Borno sample has a different frame and weights and "is not
+representative of the state and must be treated separately from the data of the other states."
+No =population.yml= row was added: the wave has no API label yet.
+
+* W3 shipped harvest factors: opt-in bridge audit, not a reported factor (GH #1518)
+
+The native A3i harvest source =2015-16/Data/secta3i_harvestw3.dta=
+(MD5 =aaff46107fa1940949cb8cb84e1f1747=) keeps the full =cropid=/
+=production_obs= line grain. The separate published =Data/ag_conv_w3.dta=
+(MD5 =188456c9f0a97592d4e40dc6de36ea0b=) has crop/unit/zone mass candidates;
+the size-coarsened served =u= is unsuitable as its lookup key. This does not
+change the existing note "W1--W3 are all-NaN because the column does not exist
+in the source": that note concerns *reported per-row KgFactor*. "A factor
+belongs to the quantity block it was asked beside" remains binding.
+
+The separately opt-in =native_w3_harvest_kg= accepts admitted own numeric
+sources/cards, current crop labels and committed ID mappings. It requires an
+explicit national-versus-own-zone choice and keeps raw release positions, full
+native crop/unit codes and actual container sizes. It does not wire a default
+table, replace native quantities or select a scientific geography/default.
+
+On the exact held two-release artifacts and frozen implementation2323284b,
+all11956 native harvest rows retained their current pure-producer + once-walked
+PH2016Q1-ID key witness, including1690 quantity-missing lines;0 native rows were
+currently unserved in that bounded comparison. The711-row factor audit retains
+the original9 unit/card-conflict and7 fluid-basis holds. Those affect69 native
+conflict-pair rows and108 native fluid rows (177 total), withheld before every
+consumer layer/donor path. Both explicit geographies delegate11779 rows, with
+8892 shipped-factor and2887 unresolved-factor rows. Counts describe coverage,
+not scientific validity of published/borrowed/imputed container weights.
+
+No fluid density, conflicting bundle size, price-pooling or W1/W2 quantity-mode
+ruling follows. Actual final Country API/sales/PP/sample/v/Make/warm/yield routes
+were not exercised by this pure-producer witness. Keep those limits and the
+existing valuation caveat "Do not sum median_price_valuation over W3".
+
+Tracked contract and gate record: =.coder/ledger/1518-nigeria-safe-harvest.md=
+and [[https://github.com/ligon/LSMS_Library/pull/1622][PR #1622]]. Durable source evidence:
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1518-nigeria-sealed-correspondence-v2-20261108/REPORT.md=,
+with =RESULT.json= and =STAGE-RECEIPT.json= in the same directory. The source
+audit contains every original row; private outputs/IDs are not published here.
+
+* 2026-11-08 -- GH #1537: two label-only Aggregate aliases; Pepper remains unqualified
+
+Preferred =Groundnuts= now maps to the already existing Aggregate =Groundnuts=,
+and =Maize (shelled)= to existing =Maize=.  These are two label-only rows in
+=harmonize_food=: both Code cells and all eight quarter cells PER row are blank.
+They add no numeric/quarter aliases, units or buckets.  Original rows and default
+native =j= are unchanged; code-mode crop/community mappings still skip blank keys.
+
+This dated curation decision qualifies the earlier #1144 account that an alternate
+label request leaves all three native names uncurated; that historical record is
+retained.  =Pepper= still passes through with the ordinary coverage warning and
+strict-mode refusal.  The served name does not state Fresh/Dry/ground/spice, so no
+such classification is inferred; its source-identity question remains held.  Whole #1537 remains OPEN for that question.
+
+Both committed Org parsers, all eight quarter maps and invented price-grain/value
+controls passed in the bounded 29-control source-free proof.  The default route
+was checked by its unchanged source chain and pure decoder tail, not a real
+no-argument producer/API invocation.  No actual source/current coverage count,
+quantity/price/unit/factor/weight rule or cold/warm acceptance is claimed.  The
+historical 121-label/11,649-row/2.4% figures were not remeasured.
+
+* 2026-11-09 -- Equal W1/W2 sale payloads are not transaction identity (GH #1552)
+
+Bounded diagnosis =6cfbaa73b43351eaae25c3e22e8b692a8957b81b=, independently
+reviewed, retains every recorded line. Own W1 PH agriculture form PDF pp.13--15
+and W2 PH form PDF pp.14--17 carry Plot ID/Crop ID and prefilled/additional
+plot-crop roster lines. Own February 2011 manual pp.118--119 and February 2013
+manual pp.106--107 support that organization. Q9 screens sales since harvest;
+Q11 quantity/own unit and Q12 Naira value refer to the MAIN buyer. Q14--17
+other buyers and Q18 hypothetical harvest valuation are separate answers.
+These are not individual transaction records or fixed calendar-quarter totals.
+
+Current W1/W2 code copies =sa3q11a/sa3q11b/sa3q12= from each native row;
+=cropid= is a line within a plot, not a crop code or persistent transaction ID.
+W3--W5 household-crop sale allocation supplies no W1/W2 interpretation. The two
+complete admitted A3 exports (13,018/12,948 rows) have no exact full-record
+repeat or repeated nonmissing =(hhid, plotid, cropid)= key. Equal sale answers
+already occur at distinct source positions; no library multiplication was
+established by static binding and the bounded invented-join control. Actual
+PP inputs/producer/API were not executed in this diagnosis.
+
+Historical 75/67 are EXCESS occurrences, not all member rows: 73/58 groups
+contain 148/125 members under the old harmonized-crop, positive-value,
+any-plot definition; 3/1 recovered lines are members of those groups. Requiring
+complete native-code payloads and distinct plots instead gives 70/58 groups,
+142/125 members and 72/67 excess occurrences. The historical arithmetic excess
+Naira 720,500/1,677,800 is a sensitivity count, NOT an identified overcount.
+
+Among harmonized cross-plot groups, only 5/4 agree on all raw fields except
+plot/line; buyer codes differ in 5/12. Neither equality nor disagreement proves
+transaction duplication or independence. W1 form/manual skips and Q4 wording
+conflict, and W2's manual repeats a Q15 heading; no source is declared stale.
+Published form identity does not authenticate every fielded version. The
+remaining authority is fielded A3/export-custodian evidence tied to private
+source positions: were household-crop totals ever copied across plot lines,
+and what transaction linkage distinguishes them? Whole #1552 remains open;
+no deduplication, household-crop reassignment, unit, weight or default changed.
+
+* 2026-11-09 -- W3 post-harvest also records coping day counts (GH #587)
+
+The historical statement that the post-harvest round has "no equivalent
+battery" is contradicted for W3 by its own instrument and released fields.
+=2015-16/Documentation/PH_W3_Household_Quest.pdf=, PDF p.58 (printed55),
+Section12 Q1, asks the same nine seven-day coping day counts, with zero when
+there were no days. Its cover identifies Wave3 PH, February/March2016,
+VERSION1; its December2016 generation metadata do not authenticate every
+fielded CAPI version.
+
+The own =2015-16/Data/sect12_harvestw3.dta= header (sidecar MD5
+=ad699abe993590bcb73401bd37093ade=,779585bytes) carries =hhid= and all nine
+=s12q1a..s12q1i= numeric DAYS fields with matching labels and no value-label
+sets. This header check decoded zero rows; its4582-observation count is not
+a measured uniqueness, missingness or response count.
+
+W3's driver now transports those PH answers under =t = '2016Q1'= through the
+existing helper with explicit own-field bindings. PP =2015Q3= keeps its own
+file and processing. No PP answer is copied to PH, and no new missing-value,
+sentinel, range, eligibility, ID or weighting rule is selected. All other
+rounds and the separate FIES interface remain unchanged. The W1/W2 PH and
+C8 PP documentary gaps are not resolved by this W3 repair; whole #587 stays
+open. Closed documentary/header evidence is in the 20261103 burst reports
+=587-nigeria-own-round-documents-20261109/= and
+=587-nigeria-W3PH-coping-source-binding-20261109/=; actual-row/API acceptance
+is separate from those source bindings.
+
+** [2026-11-10] Own PH plot records contradict the PP-only premise (GH587)
+
+The earlier plot_features note says lasting attributes are recorded "only in
+the POST-PLANTING round". Preserve that historical premise alongside the GH587
+maintainer finding that the five PH omissions are real half-missing features.
+Own PH agriculture forms and released =secta1_harvestw1/2/3.dta= now establish
+PH area/acquisition operands with NEW/current-access/lost-access routing, not
+an instruction to duplicate PP plots. W1 PDF4 and W3 PDF5(printed4) visually
+confirm the skips; W1/W2 A1 PDF4–9 and W3 A1 PDF5–7 are source-qualified.
+
+The source-qualified W1–W3 append uses =2011Q1/2013Q1/2016Q1= and preserves the
+original PP blocks. W1 PH GPS is =sa1q9d=; W2/W3 use =sa1q9c=. W1 PH unit8
+means Other/specify with a separate string operand, not PP's square-foot code8.
+All three PH acquisition cards include native5 family/inheritance; W1/W2 PP
+maps do not. Keep that exact report and native4 community-or-family wording;
+neither establishes a narrower canonical tenure. Preserve raw operands and
+unknowns, including existing/lost-access records with no canonical area.
+
+Five zero-row headers and then five separately authorized numeric reads retained
+all38495 released records unchanged (6316/6124/5918/10961/9176), complete integral
+unique keys within each source. These are not cross-round uniqueness, eligibility
+or as-fielded CAPI claims. The three repaired sources have6316/6124/5918 records;
+source/pure controls do not themselves prove normal Wave/Country/Feature serving.
+
+W4 =prefilled_gps_area= and W5 =sa1q1c= explicitly refer to a previous/PP visit.
+W4's additional =sa1q11= has1066 positive values but the inspected printed A1
+and native label provide no unit/routing/version bridge. W5 has no corresponding
+fresh-area field in this inspected112-variable export. Keep both cells held
+separately: no current-area units, PP carry, fielding or whole587 closure inferred.
+W4's own cover/A1 says W4 while its ToC footer says W3; retain that version tension.
+Closed forms/sidecars/typed-header/numeric evidence is in burst report
+=587-nigeria-five-PH-plot-features-authority-20261110/=; no PP native replay,
+new local-unit factors, sample/panel/weights or geovar policy is selected.
+
+** [2026-11-10] Physical PP/PH plots and managed Make targets (GH587)
+
+Ten logical quarters share five physical =_/plot_features.py= producers.
+An actual cold Make attempt on9763 ran each physical producer twice: strict
+private preparation wrote managed parquets, but the country Make rule still
+named absent in-tree parquet prerequisites. It timed out900s during ordinary
+sample construction before returning a Country frame; warm/Feature were UNRUN.
+The Make rule now names managed wave outputs and preserves legacy names as
+dependency aliases to the same producer. This changes build routing only;
+normal sample/ID/area/tenure policy and both held PH cells remain unchanged.
+A separately authorized actual backend retry is required after pure graph checks.
+
+* 2026-11-10 -- W1–W3 nonfood source declarations are anchored beside their scripts (GH #1288)
+
+The W1/W2/W3 =nonfood_expenditures.py= loops already contain all 10/10/8
+countries-root CSV path literals. A variable =get_dataframe(fn)= does not hide
+those literals from =scan_script_data_refs=. However, private Make preparation
+resolves literals beside the script, and the wave hash resolves them under
+=wave/Data=. Neither anchor resolves =Nigeria/<wave>/Data/...= to its actual
+committed sidecar. Seeing a filename is not the same as authenticating its source.
+
+The three scripts now add script-relative =../Data/...= declarations, checked
+against the complete ordered original round/file dictionaries before the first
+source getter. This follows the guarded Uganda anthropometry declaration
+pattern. The original reader arguments, loops, kwargs, mappings, positive-value
+filter, IDs, assertions and writer remain intact. Original root-qualified
+scanner artifacts remain too; they are not relabelled as authenticated sources.
+The per-round label file remains the existing =_/nonfood_items.json= build input.
+
+This is source-only engineering, with no actual CSV/header/row, producer, Make,
+Country/Feature, cache or hash-census acceptance. After the initial static proof,
+Root clarified that the bootstrap runtime label did not limit the explicit pure
+grant. All 39 focused scanner/collector-metadata/order/drift cases passed on the
+verified MAIN image, with three active observer profiles, zero denials and empty
+private data/config. The guards refuse actual readers, constructors, builders,
+writers and providers. This does not validate the scientific producer or API.
+The country compiler still enumerates four physical folders. Its W4 sibling
+retains the same anchoring problem for seven CSVs and is outside this three-wave
+repair. No complete country nonfood closure or whole #1288 closure is claimed.
+The WAITING pooled-recall-window question above remains unchanged.
+
+* 2026-11-10 -- W4 nonfood source-declaration residual completed (GH #1288)
+
+The separate W4 follow-on anchors its four harvest and three planting CSVs
+with the same checked =../Data/...= declaration idiom. The scanner already
+sees all seven original root-qualified strings; this repairs preparation/hash
+anchoring, not a measured row loss. Every original reader argument, order,
+kwargs/default, dictionary, processing/reducer, assertion and writer remains
+byte/AST-exact after removing only the added declarations/guard/comment.
+The seven committed sidecars are bound by metadata only.
+
+Exactly13 NEW W4 pure cases pass once at =46b1bfdaeae58fa836e3533437d05709883652a1=;
+the accepted W1–W3 product, original test bodies and old39 proof remain intact
+and those39 were not replayed. Three observer profiles remain active with zero
+denials, private data/config files0, and the actor closes normally. JUnit
+retains all13 cases; the reused plugin's shared callspec filenames leave11
+per-case call receipts, a recorded evidence limitation without a test replay.
+No actual CSV/header/row, producer, Make, Country/Feature, cache/census or
+scientific acceptance follows. Whole1288, exact conservative hash footprint
+and the WAITING pooled-recall-window question remain separate.
+
+* 2026-11-12 -- C8 decoder: two W4/W5 labels were PLACED WRONGLY, not unplaced (GH #587)
+
+=_canon_community_unit= falls through to the shared substring decoder
+=_canon_unit= for every label outside its ten exact aliases, and two W4/W5
+labels hit the wrong substring.  #1095's unplaced-label report cannot see
+this: a wrongly placed label is placed.
+
+| label | rule hit | served before | served now | PH rows (priced, measured on =e5fdd2fa8='s sources) |
+|-+-+-+-+-|
+| =251. BAG OF 20 SACHETS= | ='bag'= | =Sack/Bag= | =Bag of 20 Sachets= (the =u= table's code 251) | 2019Q1 148, 2024Q1 261; every one with a blank size |
+| =4. CENTLITRES (CL)= (W5's typo for centilitres) | ='litre'= | =l= | =cl= (code 4) | 2024Q1 49; every one with a blank size |
+
+So 409 served rows change =u= and keep their =Price=; the 49 centilitre rows,
+now on =cl= with a blank =c8aq2_c=, fall under the existing
+=Nigeria::community_prices::c8-unrecorded-size-drop= and LEAVE the served
+table, exactly as W5's 133 blank-size =2. GRAMS (G)= rows always did.  Served
+as one litre they misstated the package (a centilitre price of an unrecorded
+package is not a price per litre).  W5's drop count is 182 (133 g + 49 cl).
+The deletion entry's =inputs= mask (=_c8_raw_inputs=) used the harvest
+=_canon_unit=, which still reads the typo as =l=; it now decodes with
+=_canon_community_unit=, so it names exactly the rows the build drops.
+
+Two exact aliases in =_COMMUNITY_UNIT_LABELS=, nothing else: the shared
+=_canon_unit= (harvest, sold and input units) is unchanged, and still returns
+=Sack/Bag= / =l= for these two strings.  The labels are on the W4/W5 PP C2
+cards too (W4 103 + W5 464 priced =251= rows, W5 36 =CENTLITRES= rows),
+where the same decoder would have placed them the same wrong way; see the
+next section.
+
+* 2026-11-12 -- Post-planting community prices (GH #587)
+
+/Rulings (@ligon, 2026-11-12, six GH587 entries in the decision log)./
+"Develop the item and unit code mapping, then provide community_prices using
+those harmonized labels."  Base =u=, native size in its own column.  W1:
+register the division by the Number of Units.  W5: accept the printed
+quantity of one.  W4/W5 metric sizes: reuse PH's =c8-metric-size=.  Then,
+after the household-unit-value test below: *"Hold both groups"* -- W1 =g= /
+=ml= with N = 1 and W1 =Kg= / =l= with N > 50 are held, each under its own
+registered omission; and *"Serve W3 kg/l and W5 g/cl"* -- W3's =Kg= / =l=
+with no size are served as recorded, W5's =g= / =cl= with no size are
+served as =c2q3 / c2q2a= (a registered derivation), and W3 =g= / =cl= and
+W2 grams stay held.  Then, on the wiring PR's label tables ("GH587 label
+judgements and two follow-ups"): *"Add a Semovita row"* (W2 code 15 is
+served, W3 161 is Palm wine, W2 code 0 is a dropped sentinel), *"Accept
+all"* unit proposals, *"Measure PH, then align"* for PH W3's blank-size
+=Kg= / =l= (next Nigeria batch), *"Serve the 63 via c8"* for W5; and, on
+the red team's N-band test ("GH587 W1 division after red team"): *"Hold
+both"* (W1 =Kg= N 6-50, non-metric N > 50), *"Flag them, hold g N 2-5"*
+(non-metric N 2-50, =Kg= N 2-5 and =Unknown= keep the division under a
+SEPARATE key marking it unvalidated; =g= / =ml= N 2-5 held) and *"Register
+tokens, keep Unknown"* (=Congo/Mudu=, =ml=, =Tomatoes cup= enter the =u=
+table; blank-unit PP rows stay =Unknown=).
+
+*The idiosyncrasy.*  The PP community questionnaire prices food in Section
+C2, not C8 (the entry "C8 is POST-HARVEST ONLY" above concluded otherwise).
+Six sources, because W3 prices two physical locations:
+=sectc2_plantingw1= / =w2= / =w4= / =w5=, =sectc2a= / =sectc2b_plantingw3=.
+The PP cards are NOT the PH C8 cards:
+
+- W1/W2 PP item codes are the HOUSEHOLD consumption numbering of their
+  quarter (2010Q3 / 2012Q3), not the community-own numbering PH W1/W2 use
+  (=_W1W2_PRICE_ITEM=): 63 code numbers are shared and only 30-37 mean the
+  same thing (10 is guinea corn in PP, biscuits in PH).  The W1 printed PP
+  list is a third numbering; the data follow the native card.
+- Codes collide across quarters (GH #1144), so =j= comes from
+  =harmonized_food_labels(t=<PP quarter>)=; the wave-blind Code contract
+  is wrong on 7 W1 and 6 W2 codes.  W3-W5 equal the Code contract on every
+  carded code (pinned by test).  W5's item card is byte-identical to W4's
+  and the food codebook has no 2023Q3 column, so W5 reads 2018Q3.
+- W1's unit card is its own: 1-7 cups / congo-mudu / tiya with stated
+  weights, 11-95 the W1-PH sized containers, 101-106 kg/g/l/ml/pieces/other.
+  Household W1 code 1 is Kg; PP W1 code 1 is a tomato cup.  Never join a PP
+  unit code to the =u= table by number.
+- W3's native unit card lacks 31 and 42, which its data use (707+53, 66+1
+  priced rows) and the printed PP card and =u[2015-16]= call Mudu Large /
+  Derica Large; it carries 22 / 32 instead, the PH W3 printed card's
+  numbers.  Item 161 is labelled "Palm oil" natively; every printed card says
+  Palm wine, and Palm oil is code 50 -- served as Palm wine.
+- W4's printed PP list lacks the alcoholic-drinks block 160-164 and its
+  cover/footer disagree (W4 PP vs "Wave 3 Post-Harvest"); the data follow
+  the native card.
+- W5's C2 file carries PH-style label sets (=c8aq7a_1=, =c8aq7b_1=) and a
+  =c2q2a= "Quantity" on 350 priced rows (19 equal to 1) that the printed
+  form does not have.  The PP supervisor manual's C2 instructions say the
+  opposite of what the field implies -- "indicate the UNIT for ONE quantity.
+  Do not consider more than one quantity" and "record the price for ONE
+  quantity" (=ghs_panel_w5_pp_supervisor_manual.pdf=, PDF pp.22-23) -- and no
+  document describes =c2q2a=.
+- *W5's Other-unit text =c2q2b_os= states the package on the =g= / =cl=
+  rows.*  On all 231 priced =2. GRAMS (G)= / =4. CENTLITRES (CL)= rows with a
+  blank SIZE it is non-blank (a gram figure, a gram or millilitre figure with
+  a container word, or just the unit word).  Where it carries a number, =c2q2a= restates it in the
+  row's unit: on 172 of the 176 =g= rows that record =c2q2a= it equals the
+  text's gram figure (a number in the text on 175, one only to float32
+  precision; the last row is unresolved -- its text has a letter inside its
+  number and most plausibly states a package about 12x its =c2q2a=, so its
+  served price may be about 12x high); on all 32 =cl= rows the
+  text is in millilitres and =c2q2a= is that figure / 10, i.e. centilitres
+  (the household manual's "500ml is 50cl").  The 23 rows with no =c2q2a=
+  have no number in their text.  So =c2q2a= is the package size in g / cl --
+  the basis of =pp-w5-metric-unit-quantity=.  PH W5's =c8aq2_a= is the same
+  field: 121 of 121 =g= rows equal the text's grams, but only 42 of 49 =cl=
+  rows are in centilitres -- 7 restate the millilitre figure unconverted.
+  Those PH rows are dropped (blank size, =c8-unrecorded-size-drop=), so
+  nothing served depends on it; recorded here in case PH ever uses
+  =c8aq2_a=.
+- *PP and PH now treat W3's blank-size =Kg= / =l= differently.*  PH W3 drops
+  its 3,433 (=c8-unrecorded-size-drop=); PP W3 serves its 4,120, because
+  they measured as per-kilogram / per-litre prices (1.07x / 1.00x the
+  household unit value, below).  PH W3's rows were not re-measured.  Ruled
+  "Measure PH, then align": test PH W3's 3,433 against household unit
+  values and, if per-unit, serve them too -- a FOLLOW-UP for the next
+  Nigeria batch, not done here.
+- *PP and PH treat a blank unit differently.*  PP serves its 399 blank-unit
+  rows as =u = 'Unknown'= (the =data_info.yml= sentinel; W1 390, W3 9),
+  where PH drops a blank unit.  Ruled "Register tokens, keep Unknown";
+  aligning PH's drop is a FOLLOW-UP.
+- *Semovita is a PP-card item the household card does not number.*  W2's
+  PP community card code 15 is "Semovita"; the 2012Q3 household card has
+  no code 15 (0 rows in =sect7b_plantingw2= / =sect10b_harvestw2=, and none
+  in any later household food file; W1's code 15 is Bread).  Where the
+  household files do record Semovita -- W4 PP / PH, W5 PP and NLSS 2018-19
+  -- it is the other-specify recode ='231. Semovita/semolina'= (=item_os_cd=
+  / =item_cd_alt=) under =item_cd= 23 "Other grains and flour (specify)"
+  (59 of 60, 29 of 29, 32 of 32 and 69 of 69 rows; the 60th under 38,
+  other roots and tuber).  So =harmonize_food='s 2012Q3 cell for code 15
+  names Semovita, a label-only row (the GH #1144 convention) gives it the
+  Aggregate =Other grains and flour=, and the wave-blind Code contract
+  still reads code 15 as Bread.  GhanaLSS 2016-17 folds "Wheat semolina,
+  suji" into =Wheat Flour= (=GhanaLSS/2016-17/_/categorical_mapping.org=);
+  EHCVM keeps =Semoule de blé= as its own label.
+
+*What is served* (cold build, private root, after the final rulings):
+
+| PP t | served | Derivation | held (registered) |
+|-+-+-+-|
+| 2010Q3 | 20,326 | 2,725 =pp-w1-number-of-units=; 3,629 =pp-w1-number-of-units-unvalidated= | 105 no count; 1,043 g/ml with N = 1 (963 g, 80 ml); 332 Kg/l with N > 50 (128 Kg, 204 l); 64 g/ml with N 2-5 (61 g, 3 ml); 208 Kg with N 6-50; 241 non-metric with N > 50 |
+| 2012Q3 | 21,196 (72 Semovita) | -- | 209 g/cl no size (204 g, 5 cl); the code-0 sentinel has no priced row |
+| 2015Q3 | 24,995 (obs 1 18,365, obs 2 6,630) | -- | 12,934 g/cl no size (g 8,445, cl 4,489); its 4,120 Kg/l are served |
+| 2018Q3 | 32,246 | 3,156 =pp-c2-metric-size= | none |
+| 2023Q3 | 29,938 | 4,619 =pp-c2-metric-size= (63 Bottle/Can whose =c2q2a= is not 1); 208 =pp-w5-metric-unit-quantity= (176 g, 32 cl) | 23 g/cl with no size and no =c2q2a= (19 g, 4 cl); 60 =c2q2a= not 1 (41 Cube, 2 Bottle/Can with no size, 10 Kg, 7 l) |
+
+128,701 PP rows.  The first wiring (=03fe9034c=) served 22,214 / 21,124 /
+20,875 / 32,246 / 29,667; =e5940eaa9= (the "Hold both groups" / "Serve W3
+kg/l and W5 g/cl" head) 20,839 / 21,124 / 24,995 / 32,246 / 29,875; the
+differences are exactly the rows the later rulings moved (2010Q3 -513 held,
+2012Q3 +72 Semovita, 2023Q3 +63 Bottle/Can).
+
+Unpriced rows (no positive Naira: not available, or unpriced) are excluded
+as PH excludes them.  =u= is the PH base label; the six PP-only overrides
+are W1 =Tomatoes cup=, =Congo/Mudu=, =ml= (=millilitre=, which the decoder
+reads as litres), W2 =Derica= for the typo =MEDIUM DERCA=, W3 31 =Mudu= and
+42 =Derica=.  The three W1 spellings are =u= Preferred Labels since the
+2026-11-12 ruling (codes 1020-1022, no per-wave cell, so no food or harvest
+decode reads them); served on 1,830 (=Congo/Mudu=), 372 (=ml=) and 229
+(=Tomatoes cup=) rows.  A PP row with no unit recorded is =Unknown= (390 W1, 9 W3
+rows), where PH drops a blank unit.  =Size= keeps what base =u= folds away:
+the W4/W5 SIZE label verbatim (='0. SMALL'=, ='34. 250 GRAMS'=), the size word
+W1-W3 code into the unit (='small'=, ='LARGE'=); NA on PH rows.  PH rows are
+unchanged except the decoder fix in the previous section.
+
+*Measured against the same round's household unit value* (=food_acquired=
+purchased Expenditure / Quantity, matched =(t, v, j, u)= cells, median
+community / household; measured on the first wiring, whose treatment the
+first column names, and the basis of the final rulings):
+
+| stratum (first wiring) | cells | median | within 2x | final ruling |
+|-+-+-+-+-|
+| W2 g, held | 70 | 2.24 | 39% | held |
+| W2 cl, held | 3 | 1.13 | 100% | held (not named by the ruling; held with W2 g) |
+| W3 g, held | 1,699 | 150 | 9% | held |
+| W3 cl, held | 1,256 | 57 | 4% | held |
+| W3 Kg, held | 719 | 1.07 | 82% | *served as recorded* |
+| W3 l, held | 328 | 1.00 | 85% | *served as recorded* |
+| W4 cl, =pp-c2-metric-size= | 460 | 1.00 | 97% | (control) |
+| W2 / W4 Kg served (control) | 3,697 / 649 | 0.90 / 1.00 | 55% / 96% | (control) |
+| W1 g, N = 1, served as recorded | 218 | 144 | 5% | *held* (=pp-w1-metric-package-hold=) |
+| W1 g, N >= 6, divided | 656 | 0.73-1.01 | 44-59% | divided |
+| W1 Kg, N > 50, divided | 79 | 0.009-0.23 | 0-42% | *held* (=pp-w1-count-as-size-hold=) |
+| W1 l, N > 50, divided | 89 | 0.001-0.014 | 0-6% | *held* (=pp-w1-count-as-size-hold=) |
+
+So W3's g/cl "quantity of one" prices are package prices (as PH W3's are),
+W3's Kg/l prices are per-kilogram / per-litre prices, and W2 g is unclear.
+W5 has no =food_acquired=, so no same-wave household comparator exists; 208
+of its 231 g/cl rows with no size record the package size in =c2q2a= (see
+the =c2q2b_os= note above).  Against the community's own per-gram /
+per-centilitre prices (item medians, 6 g and 5 cl items), those rows as
+recorded sit at 543x / 13x the same round's =pp-c2-metric-size= rows and
+307x / 11x PH 2024Q1's; divided by =c2q2a= they sit at 1.5x / 1.5x and
+0.96x / 1.23x -- served divided since the final ruling.  The W1 =g= (and
+=ml=) rows with N = 1 are package prices (144x; ml 21.6x on 2 cells), and
+dividing W1 Kg/l by an N above 50 under-prices by 50-1000x, because there N
+reads more like a size than a count (undivided, the litre rows sit at
+0.85-1.05x the household price; the kilogram rows at 4.8-22x, so neither
+reading fits them) -- both held since the final ruling.  The numbers are
+re-measurable with the wiring report's scripts.
+
+*W1 Number of Units, band by band* (the red team's test, 2026-11-12,
+=reports/587-redteam/VERDICT.md= F1 / F2; the basis of "GH587 W1 division
+after red team").  The evidence above covered metric units only.  Three
+references, each calibrated by its own N = 1 rows: the household unit value
+in the same =(v, j, u)= cell (Kg N = 1: 1.05), PH 2011Q1's community price
+in the same cluster (Kg 1.00, l 0.85, non-metric 1.00), and W1's own N = 1
+price for the same =(j, u)= (1 by construction).  Median price /
+reference, share within 2x in brackets, cells or rows after the slash:
+
+| band (rows) | household, divided | PH 2011Q1, divided | W1 N = 1, divided | W1 N = 1, undivided | ruling | key |
+|-+-+-+-+-+-+-|
+| Kg N 2-5 (547) | 0.75 (63%) / 237 | 0.56 (47%) / 266 | 0.60 (51%) / 534 | 1.6 (53%) | divided, unvalidated | =pp-w1-number-of-units-unvalidated= |
+| Kg N 6-50 (208) | 0.33 (32%) / 94 | 0.16 (22%) / 72 | 0.155 (16%) / 193 | 2.0 (38%) | *held* | =pp-w1-kg-mid-count-hold= |
+| Kg N > 50 (128) | 0.009-0.23 (see above) | | | | held | =pp-w1-count-as-size-hold= |
+| non-metric N 2-5 (1,432) | -- | 0.40 (36%) / 271 | 0.50 (42%) / 1,240 | 1.67 (32%) | divided, unvalidated | =pp-w1-number-of-units-unvalidated= |
+| non-metric N 6-50 (1,601) | -- | 0.20 (24%) / 233 | 0.14 (17%) / 1,408 | 1.5 (39%) | divided, unvalidated | =pp-w1-number-of-units-unvalidated= |
+| non-metric N > 50 (241) | -- | 0.087 (17%) / 6 | 0.015 (0%) / 238 | 1.0 (70%) | *held* | =pp-w1-nonmetric-count-as-size-hold= |
+| Unknown N > 1 (49: 20 / 26 / 3) | -- | -- | 0.38 / 0.23 / 0.005 on 13 / 12 / 2 | 1.1 / 1.75 / 0.99 | divided, unvalidated | =pp-w1-number-of-units-unvalidated= |
+| g N 2-5 (61), ml N 2-5 (3) | 9.0 (10%) / 21 (undivided 30) | | | | *held* | =pp-w1-metric-small-count-hold= |
+| g N 6-50 (263) | 1.01 (44%) / 90 (undivided 30) | | | | divided | =pp-w1-number-of-units= |
+| g N > 50 (1,754) | 0.75 (58%) / 566 (undivided 233) | | | | divided | =pp-w1-number-of-units= |
+| ml N 6-50 (44) | no matched cell | | | | divided | =pp-w1-number-of-units= |
+| ml N > 50 (328) | 1.00 (74%) / 27 (undivided 330) | | | | divided | =pp-w1-number-of-units= |
+| l N 2-5 (183) | 1.00 (79%) / 84 | 0.89 (77%) / 53 | 0.83 (56%) / 177 | 2.2 (28%) | divided | =pp-w1-number-of-units= |
+| l N 6-50 (153) | 0.67 (54%) / 79 | 0.71 (55%) / 40 | 0.12 (33%) / 147 | 1.1 (53%) | divided (mixed) | =pp-w1-number-of-units= |
+
+Non-metric by unit, divided / W1 N = 1 (all bands): Piece 0.25 (1,735
+rows), Basket 0.05, Bunch 0.19, Tuber 0.33, Congo/Mudu 0.33, Milk cup 0.63,
+Cigarette cup 0.89 (the one fit), other specify 0.024 (pools several
+units); the same within state.  Within each item and unit the elasticity
+of the Naira figure with respect to N is 0.47 (non-metric), 0.46 (Kg),
+0.41 (Unknown), 0.40 (g), 0.33 (l), 0.08 (ml) -- a true count would give 1,
+a count that is really a size 0.  *Caveat (red team):* the within-W1
+reference and the elasticity assume N is unrelated to the size of what is
+priced; "5 small pieces" beside another cluster's "1 large piece" would
+give this pattern under a correct division, and base =u= folds W1's size
+into =Size=.  So the non-metric N 2-50 rows are UNVALIDATED, not refuted --
+which is why they stay divided under their own key.  The Kg legs and the
+N > 50 legs do not depend on that assumption.  The 3 =Unknown= rows above
+N = 50 show the held non-metric N > 50 signature (0.005x divided, 0.99x
+undivided, 2 matched rows) but are divided, because the ruling names all
+49 =Unknown= rows.  Every W1 count is integral
+(0 non-integral of 22,319 priced rows), so the bands are exact.  W1's
+priced rows: 15,015 with N = 1, 7,199 with N > 1, 105 with no count (22,319;
+the "Register the division" ruling quoted 15,014 / 7,198).
+
+*W5 =c2q2a=.*  350 priced rows record it; 19 equal 1 (18 CUBE, 1 LITRES)
+and are served.  208 are on GRAMS / CENTLITRES with a blank size: there it
+is the package size in g / cl, and Price = =c2q3 / c2q2a=
+(=Nigeria::community_prices::pp-w5-metric-unit-quantity=).  Of the
+remaining 123 (41 CUBE, 65 BOTTLE/CAN, 10 KILOGRAMS, 7 LITRES), the 63
+BOTTLE/CAN rows with a coded metric size (33 CL to 1.5 LITRE) are served
+by the size division, =pp-c2-metric-size=, their =c2q2a= unused (ruled
+"Serve the 63 via c8"; =c2q2a= equals the coded size on 8 of them; divided,
+they sit at 0.96x the same round's other =pp-c2-metric-size= item-unit
+medians and 0.70x PH 2024Q1's, 62 matched, all within 2x); the
+other 60 (41 CUBE, 2 BOTTLE/CAN with no size, 10 KILOGRAMS, 7 LITRES) are
+not served, registered as
+=Nigeria::community_prices::pp-w5-quantity-not-one-hold=.  On CUBE the price
+scales with =c2q2a= (price / same item-unit-size median = 0.7-1.0 x
+=c2q2a=), so "one cube" would overstate it up to ~1,400x.
+
+*Registered* (=_/derivations.yml=): four constructions --
+=pp-w1-number-of-units= (the supported bands), =pp-w1-number-of-units-unvalidated=
+(the same function on the unvalidated bands), =pp-c2-metric-size= (the PH
+function; its own key because the PH entry's =inputs= return PH rows only)
+and =pp-w5-metric-unit-quantity= -- and nine =rows: 0= omissions, one per
+held group: =pp-w1-no-count-hold= (105), =pp-w1-metric-package-hold=
+(1,043), =pp-w1-count-as-size-hold= (332), =pp-w1-metric-small-count-hold=
+(64), =pp-w1-kg-mid-count-hold= (208), =pp-w1-nonmetric-count-as-size-hold=
+(241), =pp-unrecorded-size-hold= (13,166: W2 g/cl 209, W3 g/cl 12,934, W5
+23), =pp-unharmonized-item-hold= (0: W2's code-0 sentinel has no priced
+row; it spans every PP folder so an off-card item would be reachable) and
+=pp-w5-quantity-not-one-hold= (60).  The =unit-unplaced= disposition (an
+unlabelled unit code off the native card) has no key: 0 rows, and it warns.
+Each =inputs= returns its rows with their original variables under the
+served =(t, v, j, u, variety, obs)= labels.  The crosswalk lives in
+=_/pp_community_prices.py=, not in =categorical_mapping.org= (where a table
+named like a column would auto-apply to every Nigeria =u=); proposals and
+every judgement row are in =.coder/ledger/587-nigeria-pp-mapping/MAPPING.org=.
+
+*Not changed.*  PH C8, its size rule and its first-row / variety contracts;
+=Size= is not filled for PH; =labels='Aggregate'= still collapses W3-W5 items
+onto one label without making the index unique (pre-existing, base too);
+W1/W2 PP =Pepper= passes through =Aggregate= on 808 rows (2010Q3 396,
+2012Q3 412; =LabelPassThroughWarning= measures the same).  It was 837 at
+the first wiring and 817 at =e5940eaa9= (the red team's count); the 9 W1
+=Pepper= rows the N-band holds remove are the difference.  Its Aggregate
+is GH #1537's ruling ("Check codes, then Fresh"), a separate batch.
+
+*Owed, not done here.*
+- *A full Nigeria re-warm.*  Every Nigeria table hash moves: =nigeria.py=,
+  =categorical_mapping.org=, =data_scheme.yml= and the two new =_/*.py=
+  files are in every Nigeria table's input hash, so any later edit to
+  =pp_community_prices.py= or =pp_community_price_sources.py= re-warms all
+  of Nigeria.  No other country moves.
+- *The coverage regrade.*  =.coder/coverage/latest.csv= still grades the
+  five PP =community_prices= cells =dropped=; =make matrix= was not rerun.
+- *PH W3 blank-size =Kg= / =l=* ("Measure PH, then align") and *PH's
+  blank-unit drop* (aligning with PP's =Unknown=): next Nigeria batch.
+- *W2's 5 =cl= rows* are held with W2's grams (no size field); no ruling
+  names them.
+- *One W5 gram row* is served at about 12x its item median under
+  =pp-w5-metric-unit-quantity= (its text's number is garbled), as ruled.

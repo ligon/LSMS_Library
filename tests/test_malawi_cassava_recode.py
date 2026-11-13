@@ -61,7 +61,8 @@ def cp():
                     f'{type(exc).__name__}: {exc}')
     if df is None or df.empty:                              # pragma: no cover
         pytest.skip('Malawi crop_production empty')
-    return df
+    # GH #1457: a sale's Farm-level row is not a harvest row; these pin harvest rows.
+    return df[df.index.get_level_values('plot_id') != 'Farm-level']
 
 
 def _perennial_label(malawi_mod, code):
@@ -130,13 +131,38 @@ class TestDelivered:
             assert got == n, f'{wave} tree classes: got {got}, expected {n}'
 
     def test_old_waves_gain_nothing(self, cp):
-        """The recode is a no-op pre-IHS4: total rows must not move."""
+        """The recode is a no-op pre-IHS4: total rows must not move.
+
+        33,420 / 12,616 until #1373 (0377b733b) kept each native crop code on
+        its own row, which added rows to every wave and is not this recode.
+        """
         tot = cp.reset_index().groupby('t').size()
-        assert int(tot['2010-11']) == 33420
-        assert int(tot['2013-14']) == 12616
+        # GH #1457 re-pin: + 1 / + 23 Module P rows of sugar cane, 1039 -> 39.
+        assert int(tot['2010-11']) == 33549 + 1
+        assert int(tot['2013-14']) == 12671 + 23
+
+    def test_recoded_native_codes_occur_only_in_ihs4_ihs5(self, cp):
+        """The rule itself, on the native code `production_obs` now serves."""
+        f = cp.reset_index()
+        codes = {t: set(x) for t, x in f.groupby('t')['production_obs']}
+        recoded = {f'reported:P:{c}' for c in (100, 21)}
+        for wave in ('2010-11', '2013-14'):
+            assert not codes[wave] & recoded, wave
+            assert 'reported:P:1' in codes[wave], wave
+        for wave in ('2016-17', '2019-20'):
+            assert recoded <= codes[wave], wave
+            assert 'reported:P:1' not in codes[wave], wave
 
     def test_no_unmapped_codes_warn_or_survive(self, cp):
         """No delivered row may carry a crop label outside harmonize_crop's
         vocabulary after the fix (the filter drops, but should now have
         nothing to drop)."""
         assert cp.reset_index()['crop'].notna().all()
+
+
+class TestSugarCane:
+    """GH #1457 review: Modules P and Q list sugar cane under its seasonal code 39."""
+
+    def test_code_39_of_the_perennial_modules_is_sugar_cane(self, malawi_mod):
+        assert malawi_mod._PERENNIAL_RECODE[1039] == 39
+        assert _perennial_label(malawi_mod, 39) == 'Sugar Cane'

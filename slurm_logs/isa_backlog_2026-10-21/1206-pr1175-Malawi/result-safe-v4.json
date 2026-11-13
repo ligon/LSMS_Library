@@ -1,0 +1,9 @@
+{
+  "PR": 1175,
+  "status": "PASS_SAVED_ARTIFACT_SCALAR_ASSERTIONS",
+  "original_scalar_predicates_new_checked": 14,
+  "new_qualified_code_count_check": 1,
+  "source_prefix_or_kg_nitrogen_calls": 0,
+  "full_frame_equality_claim_added": false,
+  "signed": "Sue"
+}

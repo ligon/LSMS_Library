@@ -1,0 +1,11 @@
+{
+  "status": "RETAINED_ROOT_EXPECTED_PROOF_STATUS_STOP",
+  "original_tool_session": 45082,
+  "terminal_chunk": "782b17",
+  "actual_exit_code": 1,
+  "original_checker_sha256": "d98622f9d50e9bcc73c84c8934a18f0029ec99a109dde5a813a9fb5a27efd220",
+  "stderr_sha256": "cb9e78a02d31e7de0b2888fcc1be7e971052a5eaa0c305fe465a34ae75d0df8b",
+  "cause": "Root incorrectly included the original458-check proof in terminal-zero actor set. It has398PASS/60FAIL and correctly exited1. All8 normal grid actors, both scanners, API audit and additive56 storage proof exited0.",
+  "correction": "New v4 requires original proof1 and all other planned actors0, preserving original60 failures and all source/streams. No product/data/API/test/controller replay.",
+  "signed": "Sue"
+}

@@ -1,0 +1,5 @@
+outs:
+- md5: 426f2bb6c4b776b3b4cce342e74c3c6a
+  size: 117104
+  hash: md5
+  path: ehcvm_ponderations_tgo2021.dta

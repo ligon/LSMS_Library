@@ -1,0 +1,130 @@
+#+title: Bounded twelve-change Uganda coexistence review
+#+date: 2026-10-21
+#+author: Sue (GPT-6)
+
+* Verdict and boundary
+PASS at frozen integration =55ec81b5f04aed8239128d8453aa7dd5ee0f2d25=.
+The integration freeze may be released for this bounded Uganda verification.
+All 25 scoped and 41 supporting cases pass, without skips, failures or xfails.
+Two independent API processes each match nine complete public frames and two attrition matrices to both the immutable f8 references and the independently reviewed #1191 references.
+No combined-production logical output difference was found.
+No source, tracked file, Git ref or GitHub write was made.
+
+The previous eleven-change review retains its exact pin =7886f7ece49767b2357a2f559c474e0eb710561f= and its separate 20-frame/13-test/warm-no-write proof.
+The delta from that pin is exactly the seven reviewed #1191 test, ledger and evidence paths.
+All production/configuration blobs and modes remain exact to that pin, and the three test blobs are exact to independent #1006/#1191 review =2b6cf4ccb474665bfd9ced256371a0fdc5e25c93=.
+The full cohort, scanner and adversarial fault catalog were not repeated.
+No full 549-hash sweep was needed for this test-only increment.
+
+* Country grounding and live caveats
+The full 3,604-line f8 Uganda CONTENTS, including TODO, WAITING and LOGBOOK entries, was read in the immediately preceding independent #1006 review.
+Here I reused that reading, verified the complete f8-to-integration documentation delta, and read both changed sections and the current live-entry locations.
+The current file has 3,626 lines; its changes distinguish build unit decoding from query-time label selection (#1077) and document requested-output sibling routing (#1062).
+No country documentation was edited during this review.
+
+Uganda's =v= is not a stable cross-wave geography: early EA renderings, the 2009-10 synthetic GPS-bin mover/split-off identities, and later district/parish composites coexist.
+Household-level sample Region avoids the known mover loss, but neither =v= nor Region is universally complete.
+The rotating/refresh panel also means attrition need not decrease monotonically by wave.
+The existing threshold-50, upper-triangle, positive-adjacent and positive-diagonal contracts remain tested rather than replaced by a monotonicity claim.
+
+The documented contradictions remain evidence:
+- CONTENTS:253 says sample Region "is complete for every household"; its own :270 caveat says three of 3,098 households in 2019-20 have missing Region.
+- The rotating-panel prose says "one-third of the original sample is refreshed each wave"; its source discussion at :670/:693 quotes "This same sample was used for the UNPS 2015/16 (Wave 5)" and explicitly distinguishes design intent from the reported implementation.
+- The historical test note at :3379 says =test_uganda_tables.py= "DELETES generated parquets".
+  The independent #1006 AST review established that the named helper definitions were uncalled at f8; #1191 removes them.
+  A future country-note update should state that concrete distinction rather than infer an executed destructive path.
+
+Current live caveats include 2005-06 cluster outer-merge phantom rows, missing 2019-20 GPS, incomplete crop-slot/unit coverage, unconfirmed 2015-16 sales scaling, panel weights/strata, and nonfood recall/coverage questions.
+They are neither resolved nor hidden by this check.
+The #1077 unit note correctly distinguishes the Code-to-Preferred build decoder from query-time metadata source/target selection.
+The #1062 routing note preserves framework authority for wave-assembled earnings/enterprise inputs and records the prior 1,810-versus-14,740 partial-income failure.
+No nutrition, FCT, source-authority or concurrent-build claim is added here.
+
+* Preparation before probes
+The private root is physically separate from the frozen checkout and every source/reference root.
+I copied only the eight needed prerequisite tables: food_acquired, sample, household_roster, cluster_features, earnings, enterprise_income, shocks and income.
+The initial copy comprises 64 L2 parquets, 55 unique held L1 blobs and 22 complete f8/#1191 reference frames/matrices.
+Every raw blob was verified against its current DVC-sidecar MD5 and SHA256; all copies have distinct inodes and one link.
+Original/copy SHA256, modes and nanosecond mtimes are receipted privately.
+Both committed panel JSON sources were verified before the probes; their generator was not run.
+The current declared-source census used a profiling observer, without replacing or altering fingerprinted production functions.
+
+The first freshness gate correctly found that the selected API11 source is not an all-Uganda freshness certificate.
+Food_acquired and sample were already current with eight-wave manifests.
+Household_roster, cluster_features, shocks, income and enterprise_income were stale; earnings was hashless, which is stale at the country read boundary.
+The root explicitly authorized ordinary private rebuilds of these six actually stale required tables using held sources.
+No source was missing and no acquisition was attempted.
+
+| Normal stale-table build | API rows |
+|--------------------------+----------|
+| household_roster         |   144704 |
+| cluster_features         |     4805 |
+| earnings                 |    22447 |
+| enterprise_income        |    13935 |
+| shocks                   |    14457 |
+| income                   |    14740 |
+
+The normal builds changed 46 of the 64 private parquets; the remaining 18 stayed byte/mode/mtime exact.
+All eight required country parquets then had genuine current hashes and manifests covering all eight declared waves, before any scoped test or comparison probe began.
+No hash was manually stamped and no read gate, assume_cache_fresh, LSMS_NO_CACHE, backend bypass or cache clear was used.
+No derived, nutrition or FCT parquet was staged or persisted.
+This is six bounded stale prerequisite rebuilds plus verified fresh prerequisites, not a claim of an entirely cold Uganda build.
+
+An initial private read-only audit guard returned PermissionError for DVC's exclusive-create attempt on an already-existing checkout btime file.
+That is a harness defect: the operating-system result is FileExistsError, which DVC catches without writing.
+I corrected only the private guard to preserve that result while continuing to reject checkout writes, and placed DVC site metadata under the private root with DVC_SITE_CACHE_DIR.
+The earlier failure was before data rebuilding; its full trace is private.
+No runtime, source-access or freshness policy was changed.
+
+* Complete public API comparisons
+Every call used a new Country object, for nine objects per process.
+The second API process was fresh and started after the first API probe and scoped tests; both use ordinary cache/read routes.
+Comparisons cover every value, dtype, index/key, null mask, axis metadata and recursively compared logical attribute.
+Pickle bytes were never used as the logical-attribute equality criterion.
+The second process also matches the first process's complete outputs.
+
+| Public table              | Default rows | Explicit Region rows | Region exclusions |
+|---------------------------+--------------+----------------------+-------------------|
+| food_prices               |       348181 |               348145 |                36 |
+| food_quantities           |       355487 |               355450 |                37 |
+| food_expenditures         |       247049 |               247018 |                31 |
+| household_characteristics |        24364 |                24297 |                67 |
+| income                    |        14740 |      not requested   |     not requested |
+
+The household-characteristics and income attrition matrices are complete and exact in both processes.
+The Region exclusions are pre-existing source/key behavior, not a new coverage failure.
+Household-characteristics columns.name remains =sex_age= by default and =None= for Region, exactly as in each corresponding f8/#1191 reference; no metadata was normalized away.
+All 64 ready private parquets retain exact bytes, modes and nanosecond mtimes through the two API processes and both test selections.
+No derived parquet appeared.
+
+* Tests and warning accounting
+The exact three changed test files pass 25 cases; the supporting selection passes 41 cases.
+Supporting files are test_food_prices_units_kwarg.py, test_wave_getattr.py, test_add_market_index_dedup.py and TestUganda2009MarketFallback in test_sample.py.
+Both use three loadfile workers, numeric/build/Make counts one, and private pytest temporary outputs.
+The independently completed #1006 dtype/index/market/environment/attrition fault controls retain their separate pin; no fault catalog was rerun here.
+
+All warning messages and full pytest output remain private.
+The API warning sequence is exactly identical across the initial and fresh warm processes.
+Each process emits QuantityImplausible 18, NullIndexKey 12, ClusterIdentity 8, StatedVsInferredKg 4, UserWarning 2 and GrainCollapse 32.
+The first five class counts are exact to the earlier f8/#1191 API review.
+The GrainCollapse count is 32 rather than 8 because this review uses four distinct Region-query Country objects; each replays the exact same eight warning messages when its market lookup is first populated.
+The earlier review reused one Country object and its per-object market-lookup cache.
+The four relevant market-join/lookup and warning-replay function ASTs are exact to f8.
+The additional 24 emissions therefore reflect the requested new-object probe, without a production warning change or output loss.
+warning-accounting.json contains the source-safe multiset and AST proof.
+verdict.json records all build, API and test warning-class counts.
+
+* Isolation and freeze proof
+The mounted-image interpreter, cwd, import file, countries root, data root and exact HEAD are asserted in every API/test process.
+Both unshare -rn and active socket connect/connect_ex guards enforce offline execution; no actual outbound attempt was recorded.
+All 14,992 tracked paths retain SHA256, mode and symlink identity; HEAD and clean status are exact.
+All 64 selected original L2 files, 55 original held L1 blobs, both committed panel JSON sources, and all 22 original reference files retain their receipts.
+The private L1 blobs also retain their verified MD5/SHA/mode/mtime receipts.
+There are zero in-tree parquets or untracked raw sources, zero derived/nutrition/FCT outputs, and zero remaining task processes.
+freeze-proof.json records these aggregate checks; the underlying snapshots and full receipts remain private.
+
+No additional all-country hash sweep, cohort rebuild, scanner or source-policy adjudication is implied.
+The previous eleven-change integration review and independent #1191 review remain separately pinned.
+Exact commands and their fresh-root replay conditions are in REPRODUCE.md.
+
+Sue.

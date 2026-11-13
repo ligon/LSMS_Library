@@ -1,0 +1,12 @@
+{
+  "records": 13,
+  "status_counts": {
+    "warn": 13
+  },
+  "finding_counts_by_check_status": {
+    "('runtime_warning', 'warn')": 9,
+    "('index_levels_match_scheme', 'warn')": 2,
+    "('no_constant_columns', 'warn')": 2
+  },
+  "scope": "plot_features, Burkina_Faso and Senegal, phases1/2; no plot_features kwarg grid exists, so phase2 has zero kwarg cases"
+}

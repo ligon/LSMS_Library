@@ -1,0 +1,143 @@
+{
+ "checkout": "/local/job40390255/worktrees/856",
+ "build_seconds": 36.6,
+ "rows": 135078,
+ "index": [
+  "i",
+  "t",
+  "v",
+  "plot_id",
+  "crop",
+  "u",
+  "condition"
+ ],
+ "columns": [
+  "Quantity",
+  "crop_variety",
+  "Quantity_sold",
+  "Value_sold",
+  "planting_month",
+  "harvest_month",
+  "intercropped",
+  "perennial",
+  "Derivation"
+ ],
+ "rows_by_wave": {
+  "2010-11": 33420,
+  "2013-14": 12616,
+  "2016-17": 37170,
+  "2019-20": 51872
+ },
+ "u_by_wave": {
+  "2010-11|50 kg Bag": 16255,
+  "2010-11|90 kg Bag": 738,
+  "2010-11|Bale": 435,
+  "2010-11|Basket (Dengu)": 3856,
+  "2010-11|Bunch": 278,
+  "2010-11|Kilogramme": 5466,
+  "2010-11|No 10 Plate": 5,
+  "2010-11|No 12 Plate": 7,
+  "2010-11|Other (Specify)": 245,
+  "2010-11|Ox-Cart": 2439,
+  "2010-11|Pail (Large)": 1894,
+  "2010-11|Pail (Small)": 361,
+  "2010-11|Piece": 162,
+  "2010-11|<NA>": 1279,
+  "2013-14|50 kg Bag": 6383,
+  "2013-14|90 kg Bag": 81,
+  "2013-14|Bale": 135,
+  "2013-14|Basket (Dengu)": 2,
+  "2013-14|Bunch": 250,
+  "2013-14|Kilogramme": 1910,
+  "2013-14|No 10 Plate": 3,
+  "2013-14|No 12 Plate": 5,
+  "2013-14|Other (Specify)": 217,
+  "2013-14|Ox-Cart": 1037,
+  "2013-14|Pail (Large)": 1494,
+  "2013-14|Pail (Small)": 321,
+  "2013-14|Piece": 184,
+  "2013-14|<NA>": 594,
+  "2016-17|50 kg Bag": 18920,
+  "2016-17|90 kg Bag": 735,
+  "2016-17|Bale": 419,
+  "2016-17|Basket (Dengu)": 454,
+  "2016-17|Bunch": 251,
+  "2016-17|Kilogramme": 6620,
+  "2016-17|No 10 Plate": 4,
+  "2016-17|No 12 Plate": 5,
+  "2016-17|Other (Specify)": 532,
+  "2016-17|Ox-Cart": 1212,
+  "2016-17|Pail (Large)": 3547,
+  "2016-17|Pail (Small)": 825,
+  "2016-17|Piece": 238,
+  "2016-17|<NA>": 3408,
+  "2019-20|50 kg Bag": 26436,
+  "2019-20|90 kg Bag": 538,
+  "2019-20|Bale": 406,
+  "2019-20|Basket (Dengu)": 853,
+  "2019-20|Bunch": 778,
+  "2019-20|Kilogramme": 9182,
+  "2019-20|No 10 Plate": 10,
+  "2019-20|No 12 Plate": 13,
+  "2019-20|Other (Specify)": 530,
+  "2019-20|Ox-Cart": 993,
+  "2019-20|Pail (Large)": 6241,
+  "2019-20|Pail (Small)": 1718,
+  "2019-20|Piece": 553,
+  "2019-20|<NA>": 3621
+ },
+ "attrs_keys": [
+  "country",
+  "derivations",
+  "id_converted",
+  "population",
+  "population_resolution",
+  "recall",
+  "unit_kg"
+ ],
+ "attrs_sale": {},
+ "malawi_warnings": [
+  "NullIndexKeyWarning: Malawi/crop_production: declared index level(s) carried NaN key(s): level 'plot_id' (wave(s) ['2016-17'] with 41 NaN row(s)); level 'u' (wave(s) ['2010-11', '2013-14', '2016-17', '2019-20'] with 8,902 NaN row(s)). These row(s) are SERVED and will vanish in the first groupby (pandas' groupby defaults",
+  "QuantityImplausibleWarning: Malawi/crop_production 2016-17: 6 of 37,170 row(s) report a 'Quantity' more than 100x the 90th percentile of comparable rows",
+  "QuantityImplausibleWarning: Malawi/crop_production 2019-20: 13 of 51,872 row(s) report a 'Quantity' more than 100x the 90th percentile of comparable rows"
+ ],
+ "kg_default": {
+  "source_counts": {
+   "metric": 93264,
+   "none": 41814
+  },
+  "harvest_kg_by_wave": {
+   "2010-11": 8509405.249989979,
+   "2013-14": 2336456.0,
+   "2016-17": 8171320.7,
+   "2019-20": 19690619.8
+  },
+  "rows_with_factor": 93264
+ },
+ "kg_shipped": {
+  "source_counts": {
+   "shipped": 94110,
+   "none": 23646,
+   "metric": 17322
+  },
+  "harvest_kg_by_wave": {
+   "2010-11": 8497721.806078488,
+   "2013-14": 2477271.537440069,
+   "2016-17": 8432685.806473527,
+   "2019-20": 20327805.031052366
+  },
+  "rows_with_factor": 111432
+ },
+ "shipped_table_u_labels": [
+  "50 kg Bag",
+  "90 kg Bag",
+  "Bale",
+  "Basket (Dengu)",
+  "Bunch",
+  "Kilogramme",
+  "Ox-Cart",
+  "Pail (Large)",
+  "Pail (Small)",
+  "Piece"
+ ]
+}

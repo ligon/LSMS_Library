@@ -1,0 +1,65 @@
+{
+  "recorded_at_UTC": "2026-10-22 06:08:14 UTC",
+  "comparator_issue": {
+    "number": 1206,
+    "title": "Campaign validation: exact frame comparison misses nullable Float64 differences",
+    "state": "open",
+    "url": "https://github.com/ligon/LSMS_Library/issues/1206",
+    "body_readback_exact": true
+  },
+  "issue1196_status_verified": {
+    "number": 1196,
+    "state": "open",
+    "body_readback_exact": true
+  },
+  "campaign1170_status_verified": {
+    "number": 1170,
+    "state": "open",
+    "body_readback_exact": true
+  },
+  "triage": [
+    {
+      "number": 798,
+      "title": "Mali interview_date: rewrite the stale data_scheme.yml:69-73 comment (state the measured collapse loss) and refresh the coverage matrix",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/798"
+    },
+    {
+      "number": 827,
+      "title": "Malawi community_prices: u and NumberOfUnits jointly blank on 38,506 of 82,635 rows (46%) -- the price basis is unknown for half the yardstick",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/827"
+    },
+    {
+      "number": 856,
+      "title": "Malawi: measure the harvest-side 'other (specify)' free-text residue per wave before deciding on recovery",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/856"
+    },
+    {
+      "number": 1150,
+      "title": "plot_features: serve the WB plot geovariables (elevation, slope, wetness, distance to dwelling) for Ethiopia W1-W5, and declare Nigeria's PlotSlope (#1127 ruling A)",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1150"
+    },
+    {
+      "number": 1127,
+      "title": "Ethiopia 2021-22: acquire ESPS-5 v03_M (replaces the plot geovariables file) and re-stamp SOURCE.org (#1114 ruling)",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1127"
+    },
+    {
+      "number": 1149,
+      "title": "add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1149"
+    },
+    {
+      "number": 978,
+      "title": "Nigeria W5: acquire WB v02 (NGA_2023_GHSP-W5_v02_M) and wire NGA_HouseholdGeovariables_Y5.dta as cluster_features df_geo",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/978"
+    }
+  ],
+  "signed": "Sue"
+}

@@ -1,0 +1,35 @@
+{
+  "verified_at_UTC": "2026-10-22T00:07:08.763821+00:00",
+  "archive_name": "quiescent-followup-23h55.tar.gz",
+  "archive_sha256": "b74bba64ffd1a10d01b5db1897495b469a8c704bdd81617bc380f46333e300c4",
+  "archive_bytes": 499305331,
+  "included_files": 2592,
+  "included_source_bytes": 4393492017,
+  "roots": [
+    "framework1078-fix",
+    "review-1078",
+    "review-1078-unit-attribution",
+    "Mali/1091",
+    "Mali/1091-fix",
+    "root-public-instruments-1135"
+  ],
+  "excluded_entries": 182,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "explicit_public_PDF_exception_count": 4,
+  "public_PDFs_MD5_SHA_size_gated": true,
+  "initial_4GiB_plan_stop_preserved": true,
+  "new_cap_bytes": 5368709120,
+  "durable_launcher_copies_sha256": {
+    "archive_quiescent_followup_23h55_bounded.py": "7974472532ed65147199cae0cc10860cf66fff4ac312f2549453ffc9dec837dd",
+    "archive_quiescent_followup_23h55.py": "f45eea97eeac8ad32da323e90a79592e4bd99db30bb3fdbb7b4898a38f266bf9",
+    "archive-23h55-plan-qualification.json": "29e495579d52d9dc1bb132282b01bb7190e769269ef36b7781059997084083a2"
+  },
+  "private_full_manifest_sha256": "58f0c3faefbf4b6cbbe262fecedecb0701ca2754efdca4fff77d382ee7f0b685",
+  "private_evidence_not_exported_to_Git": true,
+  "duplicate_L1_L2_trees_raw_source_extensions_and_parser_tree_excluded": true,
+  "derived_frames_and_writer_inputs_remain_in_owner_only_archive": true
+}

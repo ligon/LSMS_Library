@@ -1,0 +1,11 @@
+{
+  "selection": [
+    "test_gh1078_food_producer_provenance",
+    "test_build_transform_hash",
+    "test_wave_getattr"
+  ],
+  "outcomes": {
+    "passed": 64
+  },
+  "source": "same full-selection XML; no repeated suite"
+}

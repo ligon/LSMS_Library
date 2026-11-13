@@ -1,0 +1,99 @@
+#+title: GH1149 independent staged-acquisition review
+#+author: Sue
+
+* Decision
+
+The six human-decided Option C requirements are independently established within the synthetic acquisition and bounded warm scopes below.
+A narrow cleanup amendment remains before acceptance under the additional dispatcher completion-receipt requirement.
+If the push helper returns an invalid None result, both public entrypoints raise TypeError during receipt validation but retain the completed local-download receipt in _ACQUIRED_RELEASES.
+SOURCE remains byte-identical.
+The same two controls fail on actual release f8, so this is a pre-existing gap, not an established regression, false held-release stamp, normal push-helper failure or country-data corruption.
+The real push_to_cache_batch contract returns list[Path]; all its ordinary returns in the reviewed source satisfy that contract.
+
+* Concrete amendment
+
+Candidate data_access.py:1822 and :2463 build the confirmed path set after the try/except that protects only the push helper invocation.
+Receipt validation therefore raises outside that cleanup boundary for None.
+The private test_review_adversarial.py::test_invalid_none_push_receipt_is_cleared independently preserves the caller TypeError and unchanged SOURCE, then fails only on the retained receipt, for add_wave and populate_and_push.
+Wrap validation/confirmation failure paths in cleanup that removes the current call's receipt before re-raising; preserve the existing TypeError and SOURCE facts rather than coercing an invalid result into success.
+Add the two controls to the author test suite and rerun appropriate affected tests on a new source pin.
+No product, source, Git or public issue edits were made by this reviewer.
+The original human six-part contract does not explicitly name a None-typed push receipt; the extra invalid-push/completion-cleanup requirement is in the dispatched review brief and task ledger.
+Root owns that acceptance classification.
+
+* Country context and prior art
+
+Complete current Nigeria CONTENTS (2166 lines) and Ethiopia CONTENTS (2350 lines), including TODO/WAITING material, were read before implementation review or imports.
+Nigeria's existing W5 release is v01 with nested post-planting/post-harvest files; v02's geography is an acquisition gap, not proof the survey never collected coordinates.
+Its amended quantity-aware W1 conversion rule and WAITING nonfood recall-window caveat remain untouched.
+Ethiopia's held release is v02 and the old plot-geovariables name is retained.
+Its rationale "whose coordinates are **CONFIDENTIAL** anyway" conflicts with live #1127 comment6282011092, "The redaction is in a different file".
+The contradiction is retained; no raster, coordinate, scientific or acquisition policy is inferred here.
+Live #1149, #978, #1127 (including comments), #1128, #1163 and #1150 were read.
+The existing recursive leftover scan was already in f8; the reviewed change repairs resolved membership and placement, rather than claiming recursion was newly introduced.
+The standing/task ledgers, acquisition/provenance helpers, exact call sites, changed tests, add-wave guidance and installed DVC hash sources ground the review.
+Ripgrep/git provide the call-site and scope analysis; no unavailable GitNexus result is claimed.
+
+* Human Option C checks
+
+1. Unique recursive case-insensitive basename mapping is implemented in the real extractor and exercised for nested/flat/case variants.
+   Ambiguous existing sidecars name both paths and refuse before earlier staged files are placed.
+   Revised staged bytes are compared with the sidecar's declared raw or legacy text-aware MD5 through the installed DVC implementation, independently including binary legacy and CRLF controls.
+2. New members preserve zip-relative paths, including a brand-new wave and distinct same-named members in separate directories.
+   Destination collisions, parent overlaps, absolute/traversing paths and escaping destinations refuse before placement.
+   An independent synthetic archive-symlink control also refuses before an earlier held file changes.
+3. The complete release is staged and compared before placement.
+   Late unsafe-member and invalid-checksum controls preserve every earlier held endpoint.
+   Every revised member and recursive leftover is logged before replacement; retirement is not performed.
+   Atomic per-file replacement protects held DVC hardlinks; a later placement failure can leave a partial refresh and does not claim whole-release rollback.
+4. Written or verified-identical resolved members drive push and provenance.
+   Differing untracked raw files stay unverified, unchanged and cannot certify a new held release.
+   Valid-list partial/duplicate/wrong-path push receipts, raised pushes, empty downloads, interrupted downloads and partial placement preserve SOURCE and clear the tested completion state.
+   Confirmation decline performs no download or data placement; push=False supports a complete local acquisition.
+   The separate None-return cleanup gap is reported above without broadening it into a false-stamp claim.
+5. Independent current-source five-file execution gives266PASS, zero failures/errors/skips, one expected mocked bad-GPG warning.
+   The identical final45new staged cases plus two changed provenance cases were physically copied and run on actual f8 as one NEW coherent47-case cohort:45FAIL,2PASS, zero errors/skips.
+   Those are independent results, distinct from the author's earlier43+4 parent cohorts and all preserved author setup failures.
+   Seven additional independent staging/hash/path/report-reset controls pass; two invalid-None cleanup controls fail on candidate and the same two fail on actual f8.
+6. The fixture's complete106Nigeria/68Ethiopia held-sidecar sets independently match the actual recursive current sets and all174SHA receipts.
+   Exact additions/revisions/removal match live issue evidence.
+   The product reproduces Nigeria104unchanged/2revised/2new and Ethiopia67unchanged/1removed/1new with synthetic bytes.
+   Archive directory choices are synthetic; the original2026-10-19 zip-relative spellings and actual downloaded-release equality are not established.
+   The updated add-wave skill accurately describes staging, mapping, revisions, verified membership, leftovers, held truth and the per-file atomicity limitation.
+
+* Fingerprints and scoped warm verification
+
+Before any Country/Feature data call, both actual sources independently produced549country,39framework and1362declared-wave fingerprints with exact keysets and zero moves.
+No hash exclusion, schema change, bypass, stamp or warm-cache promotion was used.
+Two sample caches per country were individually receipt-checked, then current hash/full requested-wave coverage were checked before physical copying.
+The Nigeria internal panel companion is bound by its exact original SHA and physical receipt; no country-hash claim is made for it.
+Six physical copies are nonsymlink, single-link and inode-distinct; their measured0644 mode is retained inside the0700 private review root.
+Their bytes, mode, mtime and inode remain unchanged across all calls.
+
+Two separate processes per head each call Country('Nigeria').sample(), Country('Ethiopia').sample(), and Feature('sample')(['Nigeria','Ethiopia']) with actual default arguments and new objects.
+Nigeria49770/Ethiopia25914 assemble to75684Feature rows on both heads.
+All12cross-head/separate-process frame assertions pass after physical receipt gates on every saved operand.
+The checker explicitly verifies EA and nonmissing numeric values, masks, dtype/storage/NA policy, axes/levels/codes/unused levels/order and recursively typed attrs, including nested Series and immutable declared-field presence.
+Fourteen synthetic negative calibrations reject tiny and nextafter differences, nested-Series faults, numeric index/column-axis faults, mask/dtype/order/unused-level/attrs changes, immutable record type/presence changes and string NA-policy changes.
+The old pandas frame-only predicate's acceptance of the tiny/nextafter column mutants is retained as evidence; no mismatch is rounded or normalized away.
+
+All five phase1 scanner records are existing WARNs and match full ordered bytes across heads.
+There is no sample phase2 grid and no phase2 result is claimed.
+Six main warning pairs contain10occurrences per head in total: categories/messages are literal, line numbers equal, and filenames match only after substituting the two explicitly known checkout prefixes.
+Full warning strings and all failed operands/logs remain private.
+No raw/L1 files were copied, no real acquisition or country source-cold build ran, and no broader country-output correctness claim follows from this warm scope.
+
+* Protection and handoff
+
+All subprocesses have recorded terminal outcomes.
+The two review sources remain at their exact original heads and clean, with all tracked byte/mode/mtime/inode/link endpoints unchanged.
+Both installed hashing dependency sources, the three original held parquets and all4014frozen author entries remain unchanged.
+Offline network namespaces and active socket/write guards were installed before imports; private config/XDG/tmp/data and exact root-prepared DVCtmp exceptions were asserted.
+No write-guard denial or network attempt occurred.
+The strict API surface audit independently passes with zero data-endpoint changes.
+The final release manifest, source/checker pins, safe allowlist and zero-consumer check are generated after these gates.
+Raw frames, warnings, tracebacks and synthetic failure operands are not safe exports.
+The author can make the narrow cleanup amendment in a separate worktree/head, preserving this first review's results.
+Root owns acceptance, publication and human merge.
+
+Sue.

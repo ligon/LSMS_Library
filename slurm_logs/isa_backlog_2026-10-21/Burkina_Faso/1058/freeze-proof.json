@@ -1,0 +1,41 @@
+{
+  "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "tracked_trees": {
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1058": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "files_SHA_mode_symlink_exact": 14880,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "files_SHA_mode_symlink_exact": 14880,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1123": {
+      "head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "files_SHA_mode_symlink_exact": 14886,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-Burkina_Faso": {
+      "head": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb",
+      "files_SHA_mode_symlink_exact": 14889,
+      "clean": true
+    }
+  },
+  "all_tracked_changes": 0,
+  "prior1123_evidence_files_exact": 258,
+  "source_L1_MD5_SHA_mode_mtime_receipts_exact": 15,
+  "source_comparator_L2_SHA_mode_mtime_receipts_exact": 6,
+  "private_verified_cold_tree_unchanged_after_probes": true,
+  "private_physical_warm_tree_unchanged": true,
+  "private_ready_parquets": 13,
+  "in_tree_parquets": 0,
+  "outbound_network_attempts": 0,
+  "functional_socket_guards": 2,
+  "functional_checkout_write_denial": true,
+  "root_authorized_ignored_DVC_tmp_target_exact": true,
+  "DVC_site_state_private": true,
+  "remaining_task_processes": 0,
+  "captured_utc": "2026-10-21T21:10:18.929201+00:00",
+  "private_task_root_owner_only": true
+}

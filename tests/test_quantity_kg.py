@@ -129,6 +129,21 @@ def test_malawi_food_quantities_kg_total_preserved():
     (-0.11%) because its refused cells are small ones; Niger +14.8% and Mali
     -11.5% are where the gate bites.
 
+    2026-11-03, GH #1074 ruling (@ligon): 2.5678e6.  49 2019-20 rows served
+    ``u = 'Unknown'`` no longer keep the IHS5 table's code-23 OTHER (SPECIFY)
+    factor (Mango 29 rows at 10.99 kg per mango): -7,143.49 kg, from
+    2,574,982.10 (measured at development 7c2b5ed01) to 2,567,838.62.
+
+    2026-11-12, GH #1275 / PR #1604 (Malawi 2024-25 food): 3.2858e6.  A new
+    WAVE, not a repair: 2024-25 adds 706,491.69 kg, and the older five waves
+    move +0.45% (2,567,830.45 -> 2,579,311.90 kg) because the delivered kg
+    factor is estimated over every wave (GH #1487), as #1604 discloses
+    (+0.07% to +1.39% by wave).  Measured cold at the ISA integration batch
+    (burst jobs 41254804 / 41254839 / 41254805): 3,285,803.59 once #1604 is
+    merged (with sold kg and #587, which touch no Malawi file), and the same
+    to the last digit once #1509's purchases-only evidence and EHCVM-2 are
+    merged too.  #1604 had not run this file.
+
     Skips when the Malawi food data isn't available."""
     import warnings as _w
     import lsms_library as ll
@@ -140,4 +155,4 @@ def test_malawi_food_quantities_kg_total_preserved():
         import pytest
         pytest.skip('Malawi food data unavailable')
     total = float(fq.xs('kg', level='u')['Quantity'].sum())
-    assert abs(total - 2.5827e6) / 2.5827e6 < 0.005, f"kg total drifted: {total}"
+    assert abs(total - 3.2858e6) / 3.2858e6 < 0.005, f"kg total drifted: {total}"

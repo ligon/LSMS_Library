@@ -1,0 +1,639 @@
+[
+ {
+  "label": "dev_s1_vs_dev_s3:Mali",
+  "a": "v_dev_s1_w1_Mali_household_roster",
+  "b": "v_dev_s3_w1_Mali_household_roster",
+  "rows_a": 220732,
+  "rows_b": 220732,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 6474,
+  "first_diff_pos": 131246,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19",
+   "2021-22"
+  ]
+ },
+ {
+  "label": "br_s1_vs_br_s3:Mali",
+  "a": "v_br_s1_w1_Mali_household_roster",
+  "b": "v_br_s3_w1_Mali_household_roster",
+  "rows_a": 220732,
+  "rows_b": 220732,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_cold_vs_warm:Mali",
+  "a": "v_br_s1_w1_Mali_household_roster",
+  "b": "v_br_s1_w1_Mali_household_roster_warm",
+  "rows_a": 220732,
+  "rows_b": 220732,
+  "index_order_identical": true,
+  "order_identical": false,
+  "order_diff": "Attributes of DataFrame.iloc[:, 3] (column name=\"MonthsSpent\") are different",
+  "sorted_equal": false,
+  "sorted_diff": "Attributes of DataFrame.iloc[:, 3] (column name=\"MonthsSpent\") are different",
+  "positions_differing": 0
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Mali",
+  "a": "v_br_s1_w1_Mali_household_roster",
+  "b": "v_dev_s1_w1_Mali_household_roster",
+  "rows_a": 220732,
+  "rows_b": 220732,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s3_vs_dev_s3:Mali",
+  "a": "v_br_s3_w1_Mali_household_roster",
+  "b": "v_dev_s3_w1_Mali_household_roster",
+  "rows_a": 220732,
+  "rows_b": 220732,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 6474,
+  "first_diff_pos": 131246,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19",
+   "2021-22"
+  ]
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:CotedIvoire",
+  "a": "v_dev_s1_w1_CotedIvoire_household_roster",
+  "b": "v_dev_s3_w1_CotedIvoire_household_roster",
+  "rows_a": 111788,
+  "rows_b": 111788,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 12725,
+  "first_diff_pos": 50672,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19"
+  ]
+ },
+ {
+  "label": "br_s1_vs_br_s3:CotedIvoire",
+  "a": "v_br_s1_w1_CotedIvoire_household_roster",
+  "b": "v_br_s3_w1_CotedIvoire_household_roster",
+  "rows_a": 111788,
+  "rows_b": 111788,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_cold_vs_warm:CotedIvoire",
+  "a": "v_br_s1_w1_CotedIvoire_household_roster",
+  "b": "v_br_s1_w1_CotedIvoire_household_roster_warm",
+  "rows_a": 111788,
+  "rows_b": 111788,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:CotedIvoire",
+  "a": "v_br_s1_w1_CotedIvoire_household_roster",
+  "b": "v_dev_s1_w1_CotedIvoire_household_roster",
+  "rows_a": 111788,
+  "rows_b": 111788,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s3_vs_dev_s3:CotedIvoire",
+  "a": "v_br_s3_w1_CotedIvoire_household_roster",
+  "b": "v_dev_s3_w1_CotedIvoire_household_roster",
+  "rows_a": 111788,
+  "rows_b": 111788,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 12725,
+  "first_diff_pos": 50672,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19"
+  ]
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Burkina_Faso",
+  "a": "v_dev_s1_w1_Burkina_Faso_household_roster",
+  "b": "v_dev_s3_w1_Burkina_Faso_household_roster",
+  "rows_a": 146517,
+  "rows_b": 146517,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 17627,
+  "first_diff_pos": 78543,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19",
+   "2021-22"
+  ]
+ },
+ {
+  "label": "br_s1_vs_br_s3:Burkina_Faso",
+  "a": "v_br_s1_w1_Burkina_Faso_household_roster",
+  "b": "v_br_s3_w1_Burkina_Faso_household_roster",
+  "rows_a": 146517,
+  "rows_b": 146517,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_cold_vs_warm:Burkina_Faso",
+  "a": "v_br_s1_w1_Burkina_Faso_household_roster",
+  "b": "v_br_s1_w1_Burkina_Faso_household_roster_warm",
+  "rows_a": 146517,
+  "rows_b": 146517,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Burkina_Faso",
+  "a": "v_br_s1_w1_Burkina_Faso_household_roster",
+  "b": "v_dev_s1_w1_Burkina_Faso_household_roster",
+  "rows_a": 146517,
+  "rows_b": 146517,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s3_vs_dev_s3:Burkina_Faso",
+  "a": "v_br_s3_w1_Burkina_Faso_household_roster",
+  "b": "v_dev_s3_w1_Burkina_Faso_household_roster",
+  "rows_a": 146517,
+  "rows_b": 146517,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 17627,
+  "first_diff_pos": 78543,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19",
+   "2021-22"
+  ]
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Niger",
+  "a": "v_dev_s1_w1_Niger_household_roster",
+  "b": "v_dev_s3_w1_Niger_household_roster",
+  "rows_a": 121956,
+  "rows_b": 121956,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 14268,
+  "first_diff_pos": 47796,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19",
+   "2021-22"
+  ]
+ },
+ {
+  "label": "br_s1_vs_br_s3:Niger",
+  "a": "v_br_s1_w1_Niger_household_roster",
+  "b": "v_br_s3_w1_Niger_household_roster",
+  "rows_a": 121956,
+  "rows_b": 121956,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_cold_vs_warm:Niger",
+  "a": "v_br_s1_w1_Niger_household_roster",
+  "b": "v_br_s1_w1_Niger_household_roster_warm",
+  "rows_a": 121956,
+  "rows_b": 121956,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Niger",
+  "a": "v_br_s1_w1_Niger_household_roster",
+  "b": "v_dev_s1_w1_Niger_household_roster",
+  "rows_a": 121956,
+  "rows_b": 121956,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s3_vs_dev_s3:Niger",
+  "a": "v_br_s3_w1_Niger_household_roster",
+  "b": "v_dev_s3_w1_Niger_household_roster",
+  "rows_a": 121956,
+  "rows_b": 121956,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 14268,
+  "first_diff_pos": 47796,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19",
+   "2021-22"
+  ]
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Senegal",
+  "a": "v_dev_s1_w1_Senegal_household_roster",
+  "b": "v_dev_s3_w1_Senegal_household_roster",
+  "rows_a": 129650,
+  "rows_b": 129650,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 21639,
+  "first_diff_pos": 0,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19",
+   "2021-22"
+  ]
+ },
+ {
+  "label": "br_s1_vs_br_s3:Senegal",
+  "a": "v_br_s1_w1_Senegal_household_roster",
+  "b": "v_br_s3_w1_Senegal_household_roster",
+  "rows_a": 129650,
+  "rows_b": 129650,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_cold_vs_warm:Senegal",
+  "a": "v_br_s1_w1_Senegal_household_roster",
+  "b": "v_br_s1_w1_Senegal_household_roster_warm",
+  "rows_a": 129650,
+  "rows_b": 129650,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Senegal",
+  "a": "v_br_s1_w1_Senegal_household_roster",
+  "b": "v_dev_s1_w1_Senegal_household_roster",
+  "rows_a": 129650,
+  "rows_b": 129650,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s3_vs_dev_s3:Senegal",
+  "a": "v_br_s3_w1_Senegal_household_roster",
+  "b": "v_dev_s3_w1_Senegal_household_roster",
+  "rows_a": 129650,
+  "rows_b": 129650,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 21639,
+  "first_diff_pos": 0,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19",
+   "2021-22"
+  ]
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Togo",
+  "a": "v_dev_s1_w1_Togo_household_roster",
+  "b": "v_dev_s3_w1_Togo_household_roster",
+  "rows_a": 27480,
+  "rows_b": 27480,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 4882,
+  "first_diff_pos": 0,
+  "first_diff_t": "2018",
+  "waves_with_diffs": [
+   "2018"
+  ]
+ },
+ {
+  "label": "br_s1_vs_br_s3:Togo",
+  "a": "v_br_s1_w1_Togo_household_roster",
+  "b": "v_br_s3_w1_Togo_household_roster",
+  "rows_a": 27480,
+  "rows_b": 27480,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_cold_vs_warm:Togo",
+  "a": "v_br_s1_w1_Togo_household_roster",
+  "b": "v_br_s1_w1_Togo_household_roster_warm",
+  "rows_a": 27480,
+  "rows_b": 27480,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Togo",
+  "a": "v_br_s1_w1_Togo_household_roster",
+  "b": "v_dev_s1_w1_Togo_household_roster",
+  "rows_a": 27480,
+  "rows_b": 27480,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s3_vs_dev_s3:Togo",
+  "a": "v_br_s3_w1_Togo_household_roster",
+  "b": "v_dev_s3_w1_Togo_household_roster",
+  "rows_a": 27480,
+  "rows_b": 27480,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 4882,
+  "first_diff_pos": 0,
+  "first_diff_t": "2018",
+  "waves_with_diffs": [
+   "2018"
+  ]
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Guinea-Bissau",
+  "a": "v_dev_s1_w1_Guinea-Bissau_household_roster",
+  "b": "v_dev_s3_w1_Guinea-Bissau_household_roster",
+  "rows_a": 42839,
+  "rows_b": 42839,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 727,
+  "first_diff_pos": 19488,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19"
+  ]
+ },
+ {
+  "label": "br_s1_vs_br_s3:Guinea-Bissau",
+  "a": "v_br_s1_w1_Guinea-Bissau_household_roster",
+  "b": "v_br_s3_w1_Guinea-Bissau_household_roster",
+  "rows_a": 42839,
+  "rows_b": 42839,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_cold_vs_warm:Guinea-Bissau",
+  "a": "v_br_s1_w1_Guinea-Bissau_household_roster",
+  "b": "v_br_s1_w1_Guinea-Bissau_household_roster_warm",
+  "rows_a": 42839,
+  "rows_b": 42839,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Guinea-Bissau",
+  "a": "v_br_s1_w1_Guinea-Bissau_household_roster",
+  "b": "v_dev_s1_w1_Guinea-Bissau_household_roster",
+  "rows_a": 42839,
+  "rows_b": 42839,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s3_vs_dev_s3:Guinea-Bissau",
+  "a": "v_br_s3_w1_Guinea-Bissau_household_roster",
+  "b": "v_dev_s3_w1_Guinea-Bissau_household_roster",
+  "rows_a": 42839,
+  "rows_b": 42839,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 727,
+  "first_diff_pos": 19488,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19"
+  ]
+ },
+ {
+  "label": "dev_s1_vs_dev_s3:Benin",
+  "a": "v_dev_s1_w1_Benin_household_roster",
+  "b": "v_dev_s3_w1_Benin_household_roster",
+  "rows_a": 42343,
+  "rows_b": 42343,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 14491,
+  "first_diff_pos": 0,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19"
+  ]
+ },
+ {
+  "label": "br_s1_vs_br_s3:Benin",
+  "a": "v_br_s1_w1_Benin_household_roster",
+  "b": "v_br_s3_w1_Benin_household_roster",
+  "rows_a": 42343,
+  "rows_b": 42343,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_cold_vs_warm:Benin",
+  "a": "v_br_s1_w1_Benin_household_roster",
+  "b": "v_br_s1_w1_Benin_household_roster_warm",
+  "rows_a": 42343,
+  "rows_b": 42343,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Benin",
+  "a": "v_br_s1_w1_Benin_household_roster",
+  "b": "v_dev_s1_w1_Benin_household_roster",
+  "rows_a": 42343,
+  "rows_b": 42343,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s3_vs_dev_s3:Benin",
+  "a": "v_br_s3_w1_Benin_household_roster",
+  "b": "v_dev_s3_w1_Benin_household_roster",
+  "rows_a": 42343,
+  "rows_b": 42343,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 14491,
+  "first_diff_pos": 0,
+  "first_diff_t": "2018-19",
+  "waves_with_diffs": [
+   "2018-19"
+  ]
+ },
+ {
+  "label": "dev_s1_vs_dev_s0:Nigeria",
+  "a": "v_dev_s1_w1_Nigeria_assets",
+  "b": "v_dev_s0_w1_Nigeria_assets",
+  "rows_a": 865318,
+  "rows_b": 865318,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_br_s0:Nigeria",
+  "a": "v_br_s1_w1_Nigeria_assets",
+  "b": "v_br_s0_w1_Nigeria_assets",
+  "rows_a": 865318,
+  "rows_b": 865318,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_cold_vs_warm:Nigeria",
+  "a": "v_br_s1_w1_Nigeria_assets",
+  "b": "v_br_s1_w1_Nigeria_assets_warm",
+  "rows_a": 865318,
+  "rows_b": 865318,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Nigeria",
+  "a": "v_br_s1_w1_Nigeria_assets",
+  "b": "v_dev_s1_w1_Nigeria_assets",
+  "rows_a": 865318,
+  "rows_b": 865318,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s0_vs_dev_s0:Nigeria",
+  "a": "v_br_s0_w1_Nigeria_assets",
+  "b": "v_dev_s0_w1_Nigeria_assets",
+  "rows_a": 865318,
+  "rows_b": 865318,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "dev_s1_vs_dev_s0:Serbia",
+  "a": "v_dev_s1_w1_Serbia_sample",
+  "b": "v_dev_s0_w1_Serbia_sample",
+  "rows_a": 5557,
+  "rows_b": 5557,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 5557,
+  "first_diff_pos": 0,
+  "first_diff_t": "2007",
+  "waves_with_diffs": [
+   "2007"
+  ]
+ },
+ {
+  "label": "br_s1_vs_br_s0:Serbia",
+  "a": "v_br_s1_w1_Serbia_sample",
+  "b": "v_br_s0_w1_Serbia_sample",
+  "rows_a": 5557,
+  "rows_b": 5557,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_cold_vs_warm:Serbia",
+  "a": "v_br_s1_w1_Serbia_sample",
+  "b": "v_br_s1_w1_Serbia_sample_warm",
+  "rows_a": 5557,
+  "rows_b": 5557,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s1_vs_dev_s1:Serbia",
+  "a": "v_br_s1_w1_Serbia_sample",
+  "b": "v_dev_s1_w1_Serbia_sample",
+  "rows_a": 5557,
+  "rows_b": 5557,
+  "index_order_identical": true,
+  "order_identical": true,
+  "sorted_equal": true
+ },
+ {
+  "label": "br_s0_vs_dev_s0:Serbia",
+  "a": "v_br_s0_w1_Serbia_sample",
+  "b": "v_dev_s0_w1_Serbia_sample",
+  "rows_a": 5557,
+  "rows_b": 5557,
+  "index_order_identical": false,
+  "order_identical": false,
+  "order_diff": "DataFrame.index level [0] are different",
+  "sorted_equal": true,
+  "positions_differing": 5557,
+  "first_diff_pos": 0,
+  "first_diff_t": "2007",
+  "waves_with_diffs": [
+   "2007"
+  ]
+ }
+]

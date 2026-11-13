@@ -1,0 +1,341 @@
+{
+  "scope": "All actual private computation/guard/launcher/terminal-sealer sources, including preserved stopped versions.",
+  "sources": {
+    "build-cold.py": {
+      "sha256": "8dca700b8ad70f5918949374c97c7c262be99bb9cd363eaff21b5aea36169661",
+      "bytes": 4700,
+      "mode": 384,
+      "mtime_ns": 1792642781210834074,
+      "type": "file"
+    },
+    "cli-check.py": {
+      "sha256": "e65041ac2a7dbe8b3f955bf71e59e5adaa186e51e289c07f6a7d2c632316735a",
+      "bytes": 2223,
+      "mode": 420,
+      "mtime_ns": 1792643716899233582,
+      "type": "file"
+    },
+    "common.py": {
+      "sha256": "c6a74c131fd29d4176b632b46d5bb1ffd3a04b6e09a2a70a2048c95f764dff1b",
+      "bytes": 3922,
+      "mode": 384,
+      "mtime_ns": 1792646843016879754,
+      "type": "file"
+    },
+    "confirm-source-fields.py": {
+      "sha256": "b3ae4c129237ec9d8371d264710b3b7b2ee69d9ea20cfddde7f05cb50cfc99f8",
+      "bytes": 2988,
+      "mode": 384,
+      "mtime_ns": 1792642279143945234,
+      "type": "file"
+    },
+    "derived-v2.py": {
+      "sha256": "455082570b7598ac720de2cecb1e2bd6d4540cd6ed39bc7bfd028a7aea495f1c",
+      "bytes": 11271,
+      "mode": 420,
+      "mtime_ns": 1792643635930761013,
+      "type": "file"
+    },
+    "entry.py": {
+      "sha256": "3dfc10a0f9cdcc3719d5b1d6ca3c5b172a6d44d2b1a05ead1bc35044b03ffa00",
+      "bytes": 1547,
+      "mode": 384,
+      "mtime_ns": 1792642223765646214,
+      "type": "file"
+    },
+    "exact.py": {
+      "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2",
+      "bytes": 4376,
+      "mode": 384,
+      "mtime_ns": 1792643425425562239,
+      "type": "file"
+    },
+    "exact_strict.py": {
+      "sha256": "8808c0125729797b10db1856d292a2fb1aedf194a93cbb4dce56e93495beb7c2",
+      "bytes": 4638,
+      "mode": 384,
+      "mtime_ns": 1792648415964350543,
+      "type": "file"
+    },
+    "exact_strict_v2.py": {
+      "sha256": "fe69d1548c0b78535f81a556e3a22a89e6b51634fcd2600b147a5fc6189b0a6d",
+      "bytes": 4903,
+      "mode": 384,
+      "mtime_ns": 1792648541421091736,
+      "type": "file"
+    },
+    "feature-compare-strict-v2.py": {
+      "sha256": "b416a85234fa4cce3e421bed7070f6ed600d9787d8a106f316925089a42f525b",
+      "bytes": 3642,
+      "mode": 384,
+      "mtime_ns": 1792648541421091736,
+      "type": "file"
+    },
+    "feature-compare-strict.py": {
+      "sha256": "f629af62ad0eee90011ff2dffe2a3bfe7a48beb5b556eba41b6f6e8a8b5b0377",
+      "bytes": 3636,
+      "mode": 384,
+      "mtime_ns": 1792648450165560129,
+      "type": "file"
+    },
+    "feature-compare.py": {
+      "sha256": "b9415cb317e69a464f9a4ceb47542b8aa40f29f209eb840da53e7a82ddfdba3f",
+      "bytes": 3399,
+      "mode": 420,
+      "mtime_ns": 1792643818939836117,
+      "type": "file"
+    },
+    "features.py": {
+      "sha256": "b1a9207b4aa66675b65c144c15999e5c76b7812df62166ed0c62378c80a58709",
+      "bytes": 2009,
+      "mode": 420,
+      "mtime_ns": 1792643539032207757,
+      "type": "file"
+    },
+    "final-account.py": {
+      "sha256": "aede1fef1b51a4bc0ca4dc7caad1e1f8a943866c1c4844e7bf2828bea05dc5e7",
+      "bytes": 3268,
+      "mode": 384,
+      "mtime_ns": 1792648714889102295,
+      "type": "file"
+    },
+    "focused-tests.py": {
+      "sha256": "3149f81ec17e30bdd22a071f3534519cf196c7fe08c9c2b75c9b917aaa6390df",
+      "bytes": 1074,
+      "mode": 420,
+      "mtime_ns": 1792643716899233582,
+      "type": "file"
+    },
+    "hash-inventory-v2.py": {
+      "sha256": "227bba0535e68c495f788d89bcc7d5675a1008a73ed66681e6cae2a5150648aa",
+      "bytes": 1244,
+      "mode": 384,
+      "mtime_ns": 1792642643706038089,
+      "type": "file"
+    },
+    "hash-scope-own.py": {
+      "sha256": "40a6bd5abc8bbba99b727fbb1e55c99c6ffb1d3eff15a5328bea1c72541c2773",
+      "bytes": 2356,
+      "mode": 384,
+      "mtime_ns": 1792646915448311877,
+      "type": "file"
+    },
+    "negative-diagnostic.py": {
+      "sha256": "d39a78a1bdfe979b334500b605f56b0e7d7e653c8f344665337ad370f63dfd02",
+      "bytes": 1187,
+      "mode": 384,
+      "mtime_ns": 1792648275387473921,
+      "type": "file"
+    },
+    "own-artifacts-v2.py": {
+      "sha256": "6766c937e78abd004d28b9f4378c2b998a46a67f612c34d852c0a797175e4016",
+      "bytes": 7464,
+      "mode": 384,
+      "mtime_ns": 1792648224572157587,
+      "type": "file"
+    },
+    "own-artifacts-v3.py": {
+      "sha256": "0663eb1409b8ce02ff4d65bcbea9acce0bba007c3e58ae4a9874b897b32f7ffd",
+      "bytes": 7623,
+      "mode": 384,
+      "mtime_ns": 1792648415964350543,
+      "type": "file"
+    },
+    "own-artifacts-v4.py": {
+      "sha256": "19b5af914e30433e8dfac393ba7eb8307f0ada828bf07521ac94837dbf1b1127",
+      "bytes": 7722,
+      "mode": 384,
+      "mtime_ns": 1792648541421091736,
+      "type": "file"
+    },
+    "own-artifacts.py": {
+      "sha256": "4b6a55d6018575ce747b202284030536d75fb8dc808ce9b62c334dd1dfc11487",
+      "bytes": 7027,
+      "mode": 384,
+      "mtime_ns": 1792648133891610354,
+      "type": "file"
+    },
+    "package-review.py": {
+      "sha256": "7f243c3333eb58547c0b859f926a46ee3a3d28bbfc97818c0524f510375d865f",
+      "bytes": 24082,
+      "mode": 384,
+      "mtime_ns": 1792649091596218814,
+      "type": "file"
+    },
+    "parent-negative.py": {
+      "sha256": "f67920c06bc03aa641f752f8c063644363a129e8a54f5dcb74c0d27d40509786",
+      "bytes": 739,
+      "mode": 384,
+      "mtime_ns": 1792647017761911688,
+      "type": "file"
+    },
+    "preflight.py": {
+      "sha256": "0e0f836907ece1c8095039738750bf029d015d280ba97b5ecf9610672e67d5f1",
+      "bytes": 2690,
+      "mode": 384,
+      "mtime_ns": 1792646865739016336,
+      "type": "file"
+    },
+    "prepare-tests.py": {
+      "sha256": "c7e22ccdac0f0ae3d8fe14f0739e8f4ecd1851092f607879a1f4b2e549132b55",
+      "bytes": 1618,
+      "mode": 420,
+      "mtime_ns": 1792643716899233582,
+      "type": "file"
+    },
+    "prepare.py": {
+      "sha256": "0a5fe5e148dc2f52b17b06f596b31de441fc433a6da32f11c134c6de2f820f3f",
+      "bytes": 5308,
+      "mode": 384,
+      "mtime_ns": 1792642229291673440,
+      "type": "file"
+    },
+    "protected-final-v2.py": {
+      "sha256": "b06ec89ff8da7db948758cbc67634c20e1fbaedd6ca03ea6a99a52b4ad5672e9",
+      "bytes": 3432,
+      "mode": 384,
+      "mtime_ns": 1792648841454824729,
+      "type": "file"
+    },
+    "protected-final.py": {
+      "sha256": "b520d38115921a8358b6d38cea21998e5976099024e6a0fb34221feedbaa0a79",
+      "bytes": 3429,
+      "mode": 384,
+      "mtime_ns": 1792647680943883941,
+      "type": "file"
+    },
+    "scanner.py": {
+      "sha256": "fe0ae1042e38ca843dfb57a4d6153fcd7b807ae95efb67750bd3be9739e8ca26",
+      "bytes": 1961,
+      "mode": 420,
+      "mtime_ns": 1792643716899233582,
+      "type": "file"
+    },
+    "seal.py": {
+      "sha256": "06cf8a68b0bb0e79b476c0c3b2c4910a28a9db27f4a7cd808a9435dc25f23a76",
+      "bytes": 7466,
+      "mode": 384,
+      "mtime_ns": 1792649300645395167,
+      "type": "file"
+    },
+    "sitecustomize.py": {
+      "sha256": "e8596af09c490694ccbc1087007199a92d91b4db5924af39c2583645a27a4b11",
+      "bytes": 2428,
+      "mode": 384,
+      "mtime_ns": 1792646843016879754,
+      "type": "file"
+    },
+    "source-factor-oracle-v2.py": {
+      "sha256": "7703704cd8530e7f9fa9257226f19b7ee5262a9ff7eef577d17727ccca8d2033",
+      "bytes": 8353,
+      "mode": 420,
+      "mtime_ns": 1792643471757827191,
+      "type": "file"
+    },
+    "source-terminal-check.py": {
+      "sha256": "3cd922f3be9a4b75352e331a518c1bc8fb904445ded5260b6fd03bbf11180cd2",
+      "bytes": 1822,
+      "mode": 384,
+      "mtime_ns": 1792647017761911688,
+      "type": "file"
+    },
+    "strict-artifact-sweep-v2.py": {
+      "sha256": "ec23b0d8257ec0c33d02569298b7d9a94b6df78d986b128dee669867d9eec1f7",
+      "bytes": 5058,
+      "mode": 384,
+      "mtime_ns": 1792648541421091736,
+      "type": "file"
+    },
+    "strict-artifact-sweep-v3.py": {
+      "sha256": "ab670eac9f347ce1e2760a77912088a1117c67d9d4e07c88badd9b3cc16b22d8",
+      "bytes": 5049,
+      "mode": 384,
+      "mtime_ns": 1792648770195422321,
+      "type": "file"
+    },
+    "strict-artifact-sweep.py": {
+      "sha256": "ab835a46e0ff9b406d54cc3203746c50ef4b4d087ab57ebb3bb3c0683b26946e",
+      "bytes": 5052,
+      "mode": 384,
+      "mtime_ns": 1792648450165560129,
+      "type": "file"
+    },
+    "subsets-own.py": {
+      "sha256": "6d5b2948b6dd7ff52648b5ece22462b83191fe4170c75ff537f2f77160029b16",
+      "bytes": 1507,
+      "mode": 384,
+      "mtime_ns": 1792647135519598965,
+      "type": "file"
+    },
+    "support-metadata.py": {
+      "sha256": "3ccd19d3071736c03caac7d40c5dffd8efd63db84caa5119fd22695b3838c3d6",
+      "bytes": 688,
+      "mode": 384,
+      "mtime_ns": 1792647866506026451,
+      "type": "file"
+    },
+    "test-account-own-v2.py": {
+      "sha256": "52fb02e0d8f31eb1ea075cb2d5871641e65b4364007ed31491c4f9b87b571d8d",
+      "bytes": 2785,
+      "mode": 384,
+      "mtime_ns": 1792648040521070308,
+      "type": "file"
+    },
+    "test-account-own-v3.py": {
+      "sha256": "88d831eab3ccc08f73488380b899f10411753b751f492f82f5d345879f300b42",
+      "bytes": 3229,
+      "mode": 384,
+      "mtime_ns": 1792648114621509383,
+      "type": "file"
+    },
+    "test-account-own.py": {
+      "sha256": "4d34b6dc16a04c46289820e35549b472fcdcea263973a0e6cf611668a8c060a0",
+      "bytes": 1760,
+      "mode": 384,
+      "mtime_ns": 1792647967074638576,
+      "type": "file"
+    },
+    "tiny-exact-diagnostic.py": {
+      "sha256": "6e5910261e8bdf4ce17676dcc53341c745f535100f9a8111843ba8517c0547bb",
+      "bytes": 910,
+      "mode": 384,
+      "mtime_ns": 1792648324974795528,
+      "type": "file"
+    },
+    "warm-native-artifacts.py": {
+      "sha256": "c673f2a305c13377e2ded74325cfd21dc5dbfb830c16093ea946bc4600400007",
+      "bytes": 1061,
+      "mode": 384,
+      "mtime_ns": 1792647255009285091,
+      "type": "file"
+    },
+    "warm.py": {
+      "sha256": "519245028ce90420f339183225299e817778e55ef7be178deb393e736f5cff9a",
+      "bytes": 2932,
+      "mode": 420,
+      "mtime_ns": 1792643539032207757,
+      "type": "file"
+    },
+    "warning-account-own-v2.py": {
+      "sha256": "099dd2d7ba00883d89e582ddc903a448217832a4343d35147ddfa71c1960f3f6",
+      "bytes": 3216,
+      "mode": 384,
+      "mtime_ns": 1792648541421091736,
+      "type": "file"
+    },
+    "warning-account-own.py": {
+      "sha256": "c4f7e21c075122e59a814ff262c9bcc730247a7be69edda9e486787fc61df77c",
+      "bytes": 3382,
+      "mode": 384,
+      "mtime_ns": 1792647994020797008,
+      "type": "file"
+    },
+    "run.sh": {
+      "sha256": "6ab291bb2da68d09fb9b1f5542dfda7a36e6dba9aecfade8cf1b0777723ec226",
+      "bytes": 1636,
+      "mode": 384,
+      "mtime_ns": 1792646843016879754,
+      "type": "file"
+    }
+  }
+}

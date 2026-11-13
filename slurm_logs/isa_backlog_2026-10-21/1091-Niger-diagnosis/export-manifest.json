@@ -1,0 +1,21 @@
+{
+  "source_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "files_sha256": {
+    "ledger-DRAFT.md": "4eb9a0f0325d8f54cc881344dace4bde8b48998c9fd1bdb4aad7d3453edae31a",
+    "REPRODUCE.sh": "5ad05916e5fba6821c26fc117031fb07ab3e7f90099644362c620d3a725458e0",
+    "root-approval.org": "e85e86f0895578e06256e61520f9775a9ef6d94a56ee7a041a45aa949b2538bf",
+    "freeze-proof.json": "56c6c03fd4211c72fe0f015a27265f473e6ef2ef0a2167aeb2d0910ec7d0273f",
+    "READY.json": "0271dd442de93fbd2f5bbede62111fb6e4031a99566736233c2c818fed860ccf",
+    "DIAGNOSIS.org": "32540b978b2ef750c11df867992a5a9fc54c797542d79bc69ab6948e01dc61e4",
+    "validation.json": "3f1b5403933827ce4b9da8e487756b9a15c78b716ddfc74455cb7f041e94dd27",
+    "PROPOSAL.org": "3a09dae0121843fbcd0dd22e677d778b2733fd9293d6d9490599d5a0df97d065"
+  },
+  "source_proposal_frozen": true,
+  "publication_only_whitespace_edit": {
+    "path": "PROPOSAL.org",
+    "line": 43,
+    "removed": "One trailing ASCII space after the quoted residual draft; no text, data, code or private source was changed.",
+    "frozen_original_source_sha256": "e2f07814736fe8f330e5b0b3ccf8ee49ec68b8a56298a736f692ea2139076544",
+    "published_sha256": "3a09dae0121843fbcd0dd22e677d778b2733fd9293d6d9490599d5a0df97d065"
+  }
+}

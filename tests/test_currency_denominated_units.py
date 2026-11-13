@@ -231,13 +231,15 @@ def test_food_prices_kgvalue_drops_currency_rows(canonical_frame):
     assert out.loc[u == 'kg', 'Price'].unique() == pytest.approx([5.0])
 
 
-def test_food_prices_unitvalue_unaffected(canonical_frame):
-    """``unitvalue`` never used a kg factor, so it is untouched (delta 0)."""
+def test_food_prices_unitvalue_drops_the_currency_tautology(canonical_frame):
+    """``unitvalue`` never used a kg factor, but its ``Value`` rows were the
+    constant 1.0 -- cedi per cedi.  Moved by GH #1129 (ruling @ligon
+    2026-11-12): they are dropped and counted in the ``currency`` bucket."""
     out = food_prices_from_acquired(canonical_frame, units='unitvalue')
     u = out.index.get_level_values('u').astype(str)
-    assert (u == 'Value').any()
-    # Expenditure / Quantity for a currency row is 1 -- cedi per cedi.
-    assert out[u == 'Value']['Price'].unique() == pytest.approx([1.0])
+    assert not (u == 'Value').any()
+    assert out.attrs['price_rows_dropped']['currency'] > 0
+    assert (u == 'Heap').any()                 # the physical units stay
 
 
 def _unpriceable_frame(labels):
@@ -367,22 +369,43 @@ def test_no_collision_warning_for_inert_known_metric_keys():
     assert factors['kg'] == 1                 # KNOWN_METRIC still wins
 
 
-def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
-    """``unitvalue`` CAN price a currency row, so nothing is excluded there.
+def test_drop_unpriceable_unitprice_keeps_currency_in_the_denominator():
+    """``unitprice`` reads a REPORTED price, so nothing is excluded there.
 
-    The exclusion is mode-conditional on purpose: it is licensed by "there is
-    no kg factor", which is true only of the ``kg*`` modes.
+    The exclusion is mode-conditional on purpose.  This test used to say the
+    same of ``unitvalue``; GH #1129 (ruling @ligon 2026-11-12) moved that mode
+    into the bucket, because there ``Expenditure / Quantity`` on a currency
+    row is the amount over itself -- see the next test.
     """
     from lsms_library.transformations import _drop_unpriceable
     v = _unpriceable_frame(['Value'] * 4)
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        out = _drop_unpriceable(v, 'unitvalue', np.array([True] * 4))
+        out = _drop_unpriceable(v, 'unitprice', np.array([True] * 4))
     tally = out.attrs['price_rows_dropped']
     assert tally['currency'] == 0
     assert tally['expected'] == 4
     assert tally['dropped_expected'] == 4
     assert tally['lost_fraction'] == 1.0
+
+
+def test_drop_unpriceable_unitvalue_drops_currency_by_label():
+    """GH #1129: in ``unitvalue`` a currency row is dropped even at Price 1.0,
+    and tallied in the same ``currency`` bucket the ``kg*`` modes use."""
+    from lsms_library.transformations import (
+        UnpriceableRowsWarning, _drop_unpriceable,
+    )
+    v = _unpriceable_frame(['Value'] * 4).assign(Price=1.0)
+    with warnings.catch_warnings(record=True) as rec:
+        warnings.simplefilter('always')
+        out = _drop_unpriceable(v, 'unitvalue', np.array([True] * 4))
+    assert len(out) == 0
+    tally = out.attrs['price_rows_dropped']
+    assert tally['currency'] == tally['currency_expected'] == 4
+    assert tally['expected'] == 0
+    assert tally['lost_fraction'] == 0.0
+    assert not [w for w in rec
+                if issubclass(w.category, UnpriceableRowsWarning)]
 
 
 # ---------------------------------------------------------------------------
@@ -391,7 +414,8 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 
 #: Measured on `development` @ 30c06c56 with Step 1 applied (2026-09-05).
 #: The GhanaLSS all-wave counts in
-#: ``test_ghanalss_unitvalue_and_units_modes_are_unaffected`` were RE-DERIVED
+#: ``test_ghanalss_native_unit_modes_read_no_kg_factor`` (then named
+#: ``..._unitvalue_and_units_modes_are_unaffected``) were RE-DERIVED
 #: cold on 2026-09-07 after merging `development` @ 96e051c5: #785
 #: canonicalised GhanaLSS ``food_acquired.j`` (5,259,320 rows cold) and every
 #: table pinned here groups on ``j``.  Private ``LSMS_DATA_DIR``, no wave
@@ -465,6 +489,30 @@ def test_drop_unpriceable_unit_modes_keep_currency_in_the_denominator():
 #: ``s8hq1 != 2`` removes only price-only rows with no unit (the "No" fills),
 #: which never carried a kg factor, and the ``Unknown`` sentinel rows get
 #: none -- so kgvalue stays 560,023 and kgprice 187,096 (measured, cold).
+#: Moved by GH #1509 (ruling @ligon 2026-11-12, "all purchase rows"): 560,023
+#: -> 538,099 (-21,924).  The kg price ratio now reads purchases only, so the
+#: section-8H farmgate valuations of produced rows no longer set factors, and
+#: cells only they estimated get none (1998-99 26,490 -> 20,142, 2005-06
+#: 29,913 -> 18,296, 2012-13 48,662 -> 44,703, 2016-17 454,958 unchanged).
+#: kgprice moves with it, 187,096 -> 151,446 (1991-92 28,754 -> 15,028).
+#: Measured cold in private roots, base e5fdd2fa8 vs candidate.
+#: Moved back most of the way by the same day's amendment ("Fallback rung,
+#: disclosed"): a (j, u) cell with NO purchase in any wave reads the
+#: separately labelled item_unit_nonpurchase rung (the item estimator on the
+#: non-purchase rows alone), so 208,090 produced rows of 1991-92 to 2012-13
+#: get their factor back, each equal to its e5fdd2fa8 value.  538,099 ->
+#: 557,502 (1998-99 25,392, 2005-06 28,703, 2012-13 48,449, 2016-17 454,958);
+#: kgprice 151,446 -> 182,675 (1991-92 26,854).  The 2,521 rows still short
+#: of 560,023 (1998-99 1,098, 2005-06 1,210, 2012-13 213) are rows still
+#: ``none``: 28,939 produced rows whose e5fdd2fa8 factor was u-pooled, which no
+#: item-keyed rung replaces.  Measured cold in private roots, three arms
+#: (e5fdd2fa8 / 6c14097e9 / 322530074).
+#: Moved back to 560,023 by the second amendment ("Add a unit-level rung"):
+#: those 28,939 rows read the separately labelled unit_nonpurchase rung (the
+#: u-pooled ``unit`` estimator on the non-purchase rows), so every wave is at
+#: its e5fdd2fa8 count again; kgprice 182,675 -> 187,096 (1991-92 28,754).
+#: Measured cold in private roots, three arms (e5fdd2fa8 / 5b2496a12 /
+#: ee9d6cd23).
 GHANALSS_FOOD_PRICES_ROWS = 560_023
 GHANALSS_FOOD_PRICES_WAVES = ['1998-99', '2005-06', '2012-13', '2016-17']
 PANAMA_KGPRICE_ROWS = 483_661
@@ -541,8 +589,13 @@ def test_ghanalss_food_prices_are_not_a_made_up_constant():
 
 @pytest.mark.requires_s3
 @pytest.mark.slow
-def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
+def test_ghanalss_native_unit_modes_read_no_kg_factor():
     """Only the kg-denominated modes touch the factor map.
+
+    Renamed 2026-11-12 (was ``..._unitvalue_and_units_modes_are_unaffected``):
+    GH #1129 / #1068 moved two of the three counts below by dropping rows by
+    label, so "unaffected" no longer described the assertions (red team on
+    #1509, F8).  What it pins is unchanged: no kg factor reaches these modes.
 
     That premise is intact -- the kg factor map still does not reach these
     modes.  ``unitvalue`` moved for an unrelated reason: it is
@@ -578,9 +631,16 @@ def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
     # quantity); 1,694,623 -> 1,695,046 (+423).  Every added row is 2016-17
     # u='Unknown'.  (The `== 1` spelling, red-teamed in r2 and superseded,
     # served 1,676,470 / 190,514 / 1,695,001.)
-    assert len(c.food_prices(units='unitvalue')) == 1_676_514
+    # GH #1129 / #1068 (ruling @ligon 2026-11-12, "drop and count") moves
+    # unitvalue and units by rows DROPPED BY LABEL, not by a factor:
+    # unitvalue 1,676,514 -> 568,130 (the 1,107,464 u='Value' rows, every one
+    # at exactly 1.0, and 920 u='Unknown' rows; GLSS1-3 serve none), units
+    # 1,695,046 -> 1,694,111 (935 u='Unknown' rows: 1998-99 36, 2005-06 242,
+    # 2012-13 234, 2016-17 423).  unitprice was not ruled on and stays.
+    # Measured cold in private roots, base e5fdd2fa8 vs candidate.
+    assert len(c.food_prices(units='unitvalue')) == 568_130
     assert len(c.food_prices(units='unitprice')) == 190_575
-    assert len(c.food_quantities(units='units')) == 1_695_046
+    assert len(c.food_quantities(units='units')) == 1_694_111
 
 
 @pytest.mark.requires_s3
@@ -602,4 +662,14 @@ def test_panama_kgprice_loses_its_currency_rows():
     # so the 10,571 rows whose "unit value" was Expenditure / 7.70 no longer
     # exist.  kgprice/kgvalue 483,661 unchanged; unitprice 501,027 -> 490,456
     # for the same reason.  Measured cold in a private LSMS_DATA_DIR.
-    assert len(c.food_prices(units='unitvalue')) == 490_456
+    # MOVED 490_456 -> 490_846 by GH #1234 (2026-10-23): 390 1997 rows whose
+    # source unit is blank used to reach food_prices with a null `u` on a cold
+    # build (map_index ran only on the warm read gate) and were deleted as
+    # null keys; they now carry the `Unknown` sentinel cold and warm, and keep
+    # their own key (none shares (t, v, i, j, s) with a genuine 'unit' row).
+    # Measured on the cold integration build of 2026-10-23.
+    # MOVED 490_846 -> 483_661 by GH #1129 / #1068 (ruling @ligon
+    # 2026-11-12): the 6,795 u='Value' rows served at exactly 1.0 and the 390
+    # u='Unknown' rows are dropped and counted (currency 17,409 / unknown 390
+    # input rows in price_rows_dropped).  Measured cold in a private root.
+    assert len(c.food_prices(units='unitvalue')) == 483_661

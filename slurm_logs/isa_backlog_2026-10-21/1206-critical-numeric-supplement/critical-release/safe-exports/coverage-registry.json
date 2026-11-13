@@ -1,0 +1,541 @@
+{
+  "status": "INVENTORY_ONLY_REMAINING_COHORTS_NOT_REASSESSED",
+  "authoritative_PR_checkpoint_sha256": "688452d522c1bc7f7dcf71cf6554640015873ff8666eda8cebbd9050256b6749",
+  "PRs": 22,
+  "integration_17_18_19": 3,
+  "remaining": [
+    {
+      "PR": 1172,
+      "source_head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1034-v2",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "proof.py",
+          "sha256": "eca6bfe8e21aa9f92681e4c2b1d62340140d4c20df3fad488a53ddd52570eb34"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1173,
+      "source_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1062-v2",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "check_delta.py",
+          "sha256": "d5817b76af190ba0c99a56db3737b14cd8e1fff2979d8a6c75daf7ec700395fc"
+        },
+        {
+          "file": "check_restoration.py",
+          "sha256": "f8b0ab51456989a70ef1daba71b9d18791cbb1da2f35a2c338b1a877333d9053"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1175,
+      "source_head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1109-v2",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "compatibility_check.py",
+          "sha256": "a6c92e3e462acc300a314f119c1e0804beedaea37136b24639c1dc3817feb1b8"
+        },
+        {
+          "file": "independent_source_check.py",
+          "sha256": "f12f8ded99c86fe775436b19ce22c3fcdb73c3c8dbb7ca051b743c59fff26fa4"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1176,
+      "source_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1088",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "check_sources.py",
+          "sha256": "2292567ff555bd226bdeffd0910744383f0d7f3d9e8e79bb38f1765bc46dddce"
+        },
+        {
+          "file": "finish_checks.py",
+          "sha256": "54e1b73ed6f71825630a5a25b6808334f1737851c74e9925e1daef86cde6e9aa"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1178,
+      "source_head": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "source_base": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "review_root": "review-1144",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "audit_proof.py",
+          "sha256": "1aac26b2ac02326428635484bd7cb97e1794195e5ecaa235d67472e9ab1d05a4"
+        },
+        {
+          "file": "compare.py",
+          "sha256": "408da0f1715ea7f3a4782c30f76a033eaab643005922bb31aad857807b1899d5"
+        },
+        {
+          "file": "source_check.py",
+          "sha256": "f7ae7f73dcf061743ec47c4b014cf506e9ae2fa1c6e72726526417746e17e790"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1180,
+      "source_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-822",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "compare.py",
+          "sha256": "fd234c7da2ad99f9c504907d7f8028cf03fbedc18a4e6af3950bd76bc7593959"
+        },
+        {
+          "file": "feature_check.py",
+          "sha256": "eafd12fec17a785541509787d8abde3a63914050b0095a39f3585e0a09da8e30"
+        },
+        {
+          "file": "review_check.py",
+          "sha256": "81f81e6fadbe6cdac601c6c5fa6b61cf5097ff9b7f29baedc7860c067ddb9f94"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1181,
+      "source_head": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1118-Ethiopia",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "check.py",
+          "sha256": "3f14f44001b1aeb7a1d9597a0a5842c7d6dc802549a401c0313e5130adb1154d"
+        },
+        {
+          "file": "compare_audits.py",
+          "sha256": "86681d7867dd6d4796d8b14bed13c6feecc72e19a33cbc5a866017890baacdb4"
+        },
+        {
+          "file": "final_checks.py",
+          "sha256": "935bf094f5316ae285b061ae8da84f6458615b7574ff9d82e65b2e84b793f562"
+        },
+        {
+          "file": "prepare_comparator.py",
+          "sha256": "3392a2b29701970001f0d1e5162100a1e178262281c6e8edb78fc861d6026266"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1182,
+      "source_head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1077",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "audit_compare.py",
+          "sha256": "dbdadf70a384041951bdd5ed0eb8b5bc0dc9065016723d5a4c246750f2ded4d7"
+        },
+        {
+          "file": "compare.py",
+          "sha256": "b30ce841de1841be800b048992323fef977276227923b2f8721dbee15de3dfb7"
+        },
+        {
+          "file": "feature_check.py",
+          "sha256": "603cd4744d6148494ad235e9cee4c54b6094b93b5dae6dae3d6db68e44fd8e7f"
+        },
+        {
+          "file": "metadata_check.py",
+          "sha256": "f2cabc730f2018c3290021f5529e409e4b555135d5bb013f5aedebdb4dba6c46"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1185,
+      "source_head": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1118-Tanzania",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1186,
+      "source_head": "6e97eaeb488096459d673486c127043f016c4f8d",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1121-Mali",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "check_api.py",
+          "sha256": "40719fb64633355839c391dffad7adb10bb41ce25f5e00084ab518df48dbd85a"
+        },
+        {
+          "file": "compare_audits.py",
+          "sha256": "6924bd5fdeaecca50f678a08523f3ee56861ee2a14ee2fad99801dd50bd73e38"
+        },
+        {
+          "file": "static_proof.py",
+          "sha256": "69820c91965d90620d06f4bee68d6e1c2cd1f25e0c2d2cd972e83e62e5f1dba7"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1189,
+      "source_head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1123-Burkina_Faso",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "feature_check.py",
+          "sha256": "cd32f14e26ad6036b78e053def237b6c17140309618258da06dc918feb234eb5"
+        },
+        {
+          "file": "final_check.py",
+          "sha256": "547a1edea350f3a40db6d794ae2d14fe5e2824daf2f60a6b63e887e767483e89"
+        },
+        {
+          "file": "residual_check.py",
+          "sha256": "4207951c8303c31cec94bb84ff6b394b4564333fb2a255f7eca908583d6ac2e5"
+        },
+        {
+          "file": "source_check.py",
+          "sha256": "d0812b8f548db1e9e9c76f786773b6d383d2113699177e3c7c5bdf987081aff7"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1191,
+      "source_head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1006-Uganda",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1192,
+      "source_head": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1095-Nigeria",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "final-proof.py",
+          "sha256": "008efaddb0f078d86a5754e7edc6eab5586a6f2ad03b7661c4c58d0b7e07606d"
+        },
+        {
+          "file": "source-proof.py",
+          "sha256": "6f9f7e09c856b8abc78913115a7443f7a1661a20dc2086772d5fd60eb40c50d3"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1193,
+      "source_head": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "source_base": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "review_root": "review-1111-Malawi-v2",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "compare_runtime.py",
+          "sha256": "c7780b6a5f436a1a29abdec79b30bb78c44ead0945d2689d5030388d4d7e47ea"
+        },
+        {
+          "file": "compare_scope.py",
+          "sha256": "79794743840929912f2c9b59beee80e72453c0b9a59c675cc239032348e206b5"
+        },
+        {
+          "file": "final_proof.py",
+          "sha256": "57e0214193da309a96d38b229ee3cdb783f0edfe8778c027c106c4aaf0417aac"
+        },
+        {
+          "file": "warning_checks.py",
+          "sha256": "e316b55e601a2147072cefc7e0a648d2859c8ad413c7126d4a394028a7821711"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1194,
+      "source_head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1058-Burkina_Faso",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "finish_checks.py",
+          "sha256": "b01007650a5c3b37d00188583b611183d24f3ff87680d8e6290ceb13337eb090"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1195,
+      "source_head": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1081",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [],
+      "comparator_source_candidates": [
+        {
+          "file": "static_proof.py",
+          "sha256": "250ddc9086cb0b7a916c434fd2774206ba4331c869cac57dbea7901e0a7c8300"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1197,
+      "source_head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-1078",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [
+        {
+          "file": "FINAL-READY.json",
+          "sha256": "009300610374f3cefcc796d4a2e90dfd2ebba8f8eca70049a31f57ec850a7560"
+        }
+      ],
+      "comparator_source_candidates": [
+        {
+          "file": "final_checks.py",
+          "sha256": "aea451061b994917f9227f943abf1858fd064499051c68192300d05488760265"
+        },
+        {
+          "file": "trace-proof.py",
+          "sha256": "54c5a090e870c9a429311e98804e24e89db3ca65f9904a1ec40e52f2a6fd698f"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1199,
+      "source_head": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+      "source_base": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "review_root": "review-Mali-1091",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [
+        {
+          "file": "FINAL-READY.json",
+          "sha256": "b8c9abc6e691b0f185afd5089ae898292627e4020028308a9c35bcba42307da9"
+        }
+      ],
+      "comparator_source_candidates": [
+        {
+          "file": "exact.py",
+          "sha256": "91710171b93ddfe36d3caafa81eb3b51908d800e627a75bd461d49ccb9f932e5"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1200,
+      "source_head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "source_base": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "review_root": "review-Niger-1091",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [
+        {
+          "file": "FINAL-READY.json",
+          "sha256": "c4fed7cf05f2dc3f46e48f4d575d3853aa1d0c02c625922b9910a927a17d48df"
+        }
+      ],
+      "comparator_source_candidates": [
+        {
+          "file": "check_artifacts.py",
+          "sha256": "37eada6f76541ce8f04ce746371bf3fb2fb363f9afe2633ea20c04ebdb97e0fd"
+        },
+        {
+          "file": "exact.py",
+          "sha256": "c8c503db2d65b58cb806e7e57d9440935c6454d78caa161577bed4d1f0cc83fa"
+        },
+        {
+          "file": "warnings_scanner_check.py",
+          "sha256": "6c103220d97a99c67e72ba093de44e99c0636124b965e44cc71d08ff0d59f7ba"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1201,
+      "source_head": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+      "source_base": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "review_root": "review-Tanzania-1091",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [
+        {
+          "file": "READY.json",
+          "sha256": "f521ddd16122e579b69189e4764a162e41ff3458eb1aa5ac639a4ac18e0fa256"
+        }
+      ],
+      "comparator_source_candidates": [
+        {
+          "file": "artifact-final-checks.py",
+          "sha256": "211ac9b238883f59923284914e9b1989b8ef6edacecc294e44fda4973733fcc0"
+        },
+        {
+          "file": "assess.py",
+          "sha256": "dba2277bca39e3b8d7f23f76c467636d6b47e8bc9adf1e311ca70ca94f2ef20d"
+        },
+        {
+          "file": "comparator-controls.py",
+          "sha256": "0067bcf158d7cc578a202d1f1f8484c41cd6d3240fe7315a7db46ef06fdb1ffa"
+        },
+        {
+          "file": "exact.py",
+          "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2"
+        },
+        {
+          "file": "post-stop-check.py",
+          "sha256": "57169fcc600269ea6e1ebc8c7f650518f413a1c5aef8f987f5b18557a2a18ffd"
+        },
+        {
+          "file": "terminal-proof-v2.py",
+          "sha256": "fbcea225ce762f3213e6c92c3d858e5fcaf968013897f029b34c13cd7d15b3e1"
+        },
+        {
+          "file": "terminal-proof.py",
+          "sha256": "f7ea8df99a9d92571ab7ef7caeb859cff444cc668681b35ae02804328352da2e"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1202,
+      "source_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "review_root": "review-Uganda-1198",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [
+        {
+          "file": "READY.json",
+          "sha256": "48cdf1247ce321bce6f4af0dea5a92503f09e1c9dfa08762ed45e58a65b71450"
+        }
+      ],
+      "comparator_source_candidates": [
+        {
+          "file": "cli-check.py",
+          "sha256": "e65041ac2a7dbe8b3f955bf71e59e5adaa186e51e289c07f6a7d2c632316735a"
+        },
+        {
+          "file": "feature-compare.py",
+          "sha256": "859c99a394cd2f58e3f2d3552553f6d33e0239d55127c4ae74175c5f03340d63"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "PR": 1203,
+      "source_head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "source_base": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "review_root": "review-Burkina_Faso-1119",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "top_level_READY_candidates": [
+        {
+          "file": "FINAL-READY.json",
+          "sha256": "1773a6b1771a5a3e3b67692ec8028bc3520692e2c0b0124c62b2e56773e219fc"
+        }
+      ],
+      "comparator_source_candidates": [
+        {
+          "file": "check_artifacts.py",
+          "sha256": "320c26e8c88c913ab46b6a17a500c07c2664f099a2323e51d5d1099b78a4504d"
+        },
+        {
+          "file": "cli_check.py",
+          "sha256": "90ff74056afba40a0212f6d35321fbf4914fc389d965c2e4ea5e9c1f8617d912"
+        },
+        {
+          "file": "exact.py",
+          "sha256": "c8c503db2d65b58cb806e7e57d9440935c6454d78caa161577bed4d1f0cc83fa"
+        },
+        {
+          "file": "warnings_check.py",
+          "sha256": "d4c04779a7a5d803d703f1a1cd128113e9f02cf46b1e2ed9855fd77995524c1d"
+        }
+      ],
+      "no_claim_of_manifest_absence": true,
+      "original_archived_proofs_retained": true
+    },
+    {
+      "cohort": "integration/framework-seventeen-review",
+      "source_head": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "no_all_green_inference": true
+    },
+    {
+      "cohort": "integration/mali-eighteen-review",
+      "source_head": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "no_all_green_inference": true
+    },
+    {
+      "cohort": "integration/niger-nineteen-docs-review",
+      "source_head": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+      "status": "PENDING_ORIGINAL_COMPARATOR_PAIR_SELECTION_AND_PHYSICAL_SOURCE_GATES",
+      "no_all_green_inference": true
+    }
+  ],
+  "new_849_218_independent_reviews": "Already use strengthened helpers; do not replay these finished reviews. Root holds their acceptance.",
+  "critical_subcohorts": "combined20 and1196 new numeric supplement completed; this does not subsume every earlier run or remove its qualifications.",
+  "all_campaign_result": false
+}

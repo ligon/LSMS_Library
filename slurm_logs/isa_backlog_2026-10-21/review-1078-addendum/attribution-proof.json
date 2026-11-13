@@ -1,0 +1,54 @@
+{
+  "status": "PASS_QUALIFIED_FULL_SELECTION",
+  "full_node_identity_outcome_multisets_exact": true,
+  "full_node_identities_compared": 9151,
+  "canonical_identity_outcome_multiset_sha256": "679b8c7720ee143f8be5915b07001843abafa683bc52842149064449e2a70a8d",
+  "outcomes": {
+    "skipped": 4453,
+    "passed": 4689,
+    "failure": 9
+  },
+  "added_or_removed_outcomes": 0,
+  "diagnostic_full_selections": 1,
+  "new_denied_events": 24,
+  "fully_attributed_new_denied_events": 24,
+  "collection_or_import_denied_events": 0,
+  "tracked_utime_denials": 18,
+  "tracked_utime_failed_cases": 9,
+  "fake_FS_best_effort_cleanup_denials": 6,
+  "cleanup_controls": [
+    {
+      "test": "tests/test_s3_fetch_retry.py::test_retry_succeeds_after_transient_tls_errors",
+      "denied_cleanup_calls": 2,
+      "test_line": 36,
+      "product_cleanup_line": "lsms_library/local_tools.py:311",
+      "outcome": "passed"
+    },
+    {
+      "test": "tests/test_s3_fetch_retry.py::test_non_transient_error_is_not_retried",
+      "denied_cleanup_calls": 1,
+      "test_line": 50,
+      "product_cleanup_line": "lsms_library/local_tools.py:311",
+      "outcome": "passed"
+    },
+    {
+      "test": "tests/test_s3_fetch_retry.py::test_exhausts_attempts_then_reraises",
+      "denied_cleanup_calls": 3,
+      "test_line": 57,
+      "product_cleanup_line": "lsms_library/local_tools.py:311",
+      "outcome": "passed"
+    }
+  ],
+  "cleanup_semantics": "Fake FS creates no target and performs no network access. PermissionError is caught as OSError by existing best-effort cleanup; original exception drives retries or reraising. Successful controls assert original exception class and/or exact get_file call count.",
+  "original_six_events": "Original generic log has no test/operation metadata. This new run reproduces the six-event cleanup pattern; it does not retroactively identify individual original events.",
+  "no_full_suite_PASS_claim": true,
+  "guarded_unit_network_attempts": 0,
+  "guarded_unit_LSMS_data_root_parquets": 0,
+  "intentional_synthetic_pytest_temp_parquets": 251,
+  "diagnostic_recording_errors": 0,
+  "test_and_product_blobs_sha256": {
+    "tests/test_s3_fetch_retry.py": "ef9a82d2ed1640f1142acfafa5f116d01b03ebe29b797ccb7297bfb138cbc3d8",
+    "lsms_library/local_tools.py": "de2a4075128967eba0d832c9b442e47c7d5da943e561d52cbfaac5543aaf5818",
+    "tests/test_panel_ids_persistence.py": "4e2db337d19e9078c09ffbd17940ae62f8d8bf9b22a6ffd4567ae1e4f9bb17dc"
+  }
+}

@@ -1,0 +1,20 @@
+#+title: Root publication gates for GH1078 review
+#+author: Sue
+#+date: 2026-10-21
+
+The frozen author and independent reports are copied byte-for-byte from their released evidence.
+Root read the complete review, verdict, commands, freeze and actual comparator code.
+Both publication checks now pass in the separate =review-1078-addendum/= export.
+
+- The new diagnostic selection attributes all 24 denials: 18 tracked timestamp attempts and six best-effort cleanup calls in passing fake-filesystem retry controls. The original metadata-free six events remain individually unattributed. All 9,151 original/new node identities and outcomes match; root independently verified the complete multiset and its SHA256.
+- A separate guarded artifact-only checker uses explicit =check_exact=True=, zero tolerances and recursively exact typed attrs. It passes the required comparisons across 195 immutable inputs, retaining the sole Niger cross-stage unit-index dtype exception on both heads. Root read the complete checker and its seven discriminating negative controls.
+
+The original full selection remains failed: 4,689 passed, 4,453 skipped and nine guarded timestamp failures.
+The unchanged nine tests separately passed on physical private country operands; that result is separate from the full selection.
+The new diagnostic run preserves those outcomes and accounts for 251 legitimate synthetic pytest-temp parquets, with zero LSMS data-root or in-tree parquets.
+The preliminary unguarded attrs-type census is explicitly qualified in the addendum; it is not retrospectively claimed isolated or network-free.
+Twelve legitimate scanner cache additions, the Niger dtype residual and the measured 549/39/1362 cache invalidation remain explicit.
+Root accepts the bounded independent source review for PR preparation at =d46795c303e2409ddb8ed5e4c62efca4e87ca347=.
+Composition with #1062 and global16, and a whole-corpus rebuild, remain outside this standalone verdict.
+
+Sue

@@ -1,0 +1,134 @@
+#+title: GH #1034 - Nigeria W3 planting unit labels
+#+date: 2026-10-21
+
+* Result
+
+The W3 column decodes =131= as =Sack/Bag Medium=, =151= as =Basin Medium=, =152= as =Basin Large= and =161= as =Bundle Medium=.
+These are source labels, with no stated mass or new kilogram factor.
+The original Preferred Label entries for 131/151/152 stay unchanged so this correction does not change their global Code lookups.
+Every existing non-W3 unit-column cell is unchanged; 161 has no other wave mapping.
+
+The existing =food_unit_labels= and =food_acquired_for_wave= functions do the work (ledger sections 2-5).
+No framework code, source script, dependency, fixture, baseline or source sidecar changes.
+
+* Held source and country idiosyncrasy
+
+Nigeria's CSV food sources lose Stata value labels, and unit code meanings collide across waves.
+The existing decoder therefore selects the wave column; both PP and PH rounds share that column.
+The held W3 planting Stata =s7bq3b= codebook independently names all four labels.
+The positive wired-source census is twelve PP rows: 131 three produced; 151 one purchased, five produced and two inkind; 152 one purchased; 161 zero.
+Every wired PH field has zero affected rows.
+The new mapping exists for both W3 rounds, but the actual PH data remain unchanged.
+
+The historical CONTENTS correction was too broad when it said there was no label in the PH file.
+Re-reading the held metadata shows the UNWIRED total-consumption unit =s10bq2b= also names all four codes; the wired PH fields =s10bq3b/q6b/q7b= do not.
+CONTENTS now records that distinction and preserves the historical correction.
+
+* Cold verification
+
+Before: immutable =isa-baseline= at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+After: the isolated Nigeria fix worktree.
+Both builds started with physically empty Nigeria L2 roots, used the image Python, asserted matching package/config roots, and pinned BLAS/OMP/MKL threads and LSMS_BUILD_WORKERS to 1.
+Relevant held L1 blobs were physically copied to a private L1; each private data root links only that private L1.
+No shared L2 file was modified or promoted.
+The data reads use sanctioned library IO; no acquisition or DVC CLI was run.
+
+Both Country food builds return 595,725 rows across eight quarters.
+After renaming the three old unit labels, the entire food_acquired frame is exactly equal, including Quantity, Expenditure and their missingness.
+The other seven quarter frames are exactly equal without renaming.
+Expenditure remains 196,081,393.6719517 Naira; the sum of native Quantity values remains 34,463,986.98308215 as a conservation diagnostic across incompatible units.
+Only twelve 2015Q3 unit keys change.
+Each complete cold build plus prices/quantities takes about 52 seconds.
+
+** Existing inferred-kilogram effects
+
+The downstream inference pools by item/unit across waves, so correcting a native label can change another wave's inferred values.
+These are measured consequences of the existing inference, not new factors.
+
+#+name: tab:kg-effect
+| Quantity | Before | After |
+|----------+--------+-------|
+| kg-only Quantity sum | 1467177.4931960062 | 1467196.4975769585 |
+| kg rows | 594452 | 594455 |
+| native rows carried by units=kgs | 601 | 598 |
+| default food_prices rows | 481191 | 481191 |
+
+Kilograms increase by 19.0043809523: 2015Q3 gains 25.2838095238 and 2011Q1 loses 6.2794285714.
+Three previously native Sack/Bag Medium rows now receive the existing pooled unit factor.
+Among common kg-index rows, 85 W1-PH and eight W3-PP quantities change.
+Default kgvalue prices change on 14 rows: 13 W1-PH Basin Medium and one W3-PP Basin Medium; all other rows match after the native-unit rename.
+The factor-source tally moves =unit= 54,305 -> 54,308 and =none= 858 -> 855; all other rung counts are unchanged.
+Do not sum the entire units=kgs Quantity column to report kilograms: it also retains the unconvertible native rows.
+Nigeria declares no nutrition table/script, so no nonexistent nutrition consumer is claimed verified.
+
+* Tests and Feature audit
+
+The selected suite passes 53 tests with zero skips using four loadfile workers.
+It covers the strengthened independent Stata facts, actual synthetic purchased/produced builder rows, other-wave exclusion, missing/float unit handling, acquisition-source conservation and existing food guardrails.
+The three strengthened test cases fail on the immutable baseline and pass on the fix.
+Two unrelated built crop/plot-input checks from the broader unit-code module are excluded; its synthetic checks run.
+An earlier unscoped selection was interrupted after 39 passing tests while those unrelated builds were running; the final scoped run is the complete result above.
+
+The existing Feature harness runs phases 1 and 2 for food_acquired, food_prices, food_quantities and food_expenditures on Nigeria plus Uganda, separately on before/after roots.
+Each scan produces 455 records: three pass, 452 existing warning records, no failures, errors or skips.
+The full normalized record multisets are identical: zero added or removed findings.
+These retained quantity/null-key/cluster/population and other warnings are not an all-green corpus claim.
+Uganda comparator food_acquired (355,571 rows) and sample (24,362 rows) are exactly equal between roots.
+Uganda's documented EA/parish/name transitions remain unchanged.
+
+* Cache cost
+
+Changing this country Org table moves all 24 Nigeria Country table hashes, including derived names.
+None of the 28 Uganda hashes moves.
+CONTENTS and test edits move no hash.
+Do not describe the cost as a food-only invalidation.
+
+* Reproduction
+
+Use a fresh private LSMS_DATA_DIR for each checkout, a private seeded L1, and the mounted image interpreter.
+Set PATH to include the image bin directory because the existing Make recipes call python.
+The shell variables below name the actual job's after environment; use the baseline checkout and a separate empty private data root for before.
+
+#+begin_src sh :eval no :tangle no :results output
+export ISA_CHECKOUT=/local/job40255479/worktrees/isa-1034
+export ISA_PYTHON=/local/job40255479/venv_img/bin/python
+export PYTHONPATH="$ISA_CHECKOUT"
+export LSMS_COUNTRIES_ROOT="$ISA_CHECKOUT/lsms_library/countries"
+export LSMS_DATA_DIR=/local/job40255479/control/isa-backlog-20261021/east/1034/after-data
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
+export PATH="$(dirname "$ISA_PYTHON"):$PATH"
+cd "$ISA_CHECKOUT"
+"$ISA_PYTHON" - <<'PY'
+import os
+from pathlib import Path
+import lsms_library as ll
+from lsms_library.paths import countries_root, data_root
+root = Path(os.environ['ISA_CHECKOUT']).resolve()
+assert Path(ll.__file__).resolve().is_relative_to(root)
+assert countries_root().resolve() == root / 'lsms_library/countries'
+c = ll.Country('Nigeria')
+fa = c.food_acquired()
+fa.to_pickle(data_root() / 'food_acquired.pkl')
+c.food_prices().to_pickle(data_root() / 'food_prices.pkl')
+c.food_quantities(units='kgs').to_pickle(data_root() / 'food_quantities.pkl')
+print(len(fa), fa.index.names)
+PY
+"$ISA_PYTHON" -m pytest -n 4 --dist=loadfile -q \
+  -k 'not test_no_crop_row_has_a_nan_unit and not test_no_plot_input_has_a_nan_unit' \
+  tests/test_nigeria_food_unit_decode.py tests/test_gh1041_nigeria_missing_unit.py \
+  tests/test_gh1047_nigeria_unit_codes.py tests/test_nigeria_food_acquired_sources.py
+"$ISA_PYTHON" bench/feature_audit/scan.py \
+  --features food_acquired food_prices food_quantities food_expenditures \
+  --countries Nigeria Uganda --phases 1,2 --jobs 2 --out /tmp/1034-audit.jsonl
+#+end_src
+
+Private raw frames and full logs remain under the job's control/isa-backlog-20261021/east/1034 directory; they are not committed.
+The adjacent validation.json contains only safe aggregates, source-codebook labels and hash-change counts.
+
+* Residual and review handoff
+
+GH #1034 has no remaining implementation scope after independent review accepts this evidence.
+GH #1144 item-code decoding, #1033 W4 size vocabulary, #1095 community unit loss, existing null-v/quantity warnings and W5 food acquisition coverage remain separate.
+No issue or PR has been written by this worker.
+
+Sue

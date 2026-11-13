@@ -12,7 +12,9 @@ harmonize_input categorical table:
   Seed / NPK / Urea / Other Inorganic Fertilizer / Organic Fertilizer /
   Pesticide / Herbicide / Animal Traction
 `crop` (index) is the seed's crop (harmonize_food labels) for seed rows;
-non-seed (crop-agnostic) inputs carry crop = 'n/a'.
+non-seed (crop-agnostic) inputs carry crop = '(not crop-specific)'.
+Constructors carry this source classification separately from legacy keys;
+assembly relabels only after unchanged sorting and keep-first deduplication.
 
 Every emitted row carries a REPORTED quantity (a recorded item), never a
 bare any-use flag: chemicals carry the reported quantity+unit; animal

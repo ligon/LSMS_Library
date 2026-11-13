@@ -27,7 +27,9 @@ destroyed by groupby().first(), in each of the wave's two quarters), but no
 change to Nigeria's config can fix it; see the KNOWN OPEN DEFECT note in
 Nigeria/_/data_scheme.yml for the two core edits that would.
 """
+import importlib.util
 import os
+from functools import lru_cache
 import warnings
 from pathlib import Path
 
@@ -35,6 +37,16 @@ import pandas as pd
 import pytest
 
 from lsms_library.country import Country
+
+
+@lru_cache(maxsize=1)
+def _round_oracle():
+    """Load the sibling oracle without requiring tests/ on PYTHONPATH."""
+    spec = importlib.util.spec_from_file_location(
+        "_nigeria_round_oracle", Path(__file__).with_name("nigeria_round_oracle.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def _aws_creds_available() -> bool:
@@ -88,21 +100,21 @@ ROUNDS = [
 # Every wave declares cluster_features (W5 since GH #841).
 CF_ROUNDS = ROUNDS
 CF_QUARTERS = [q for pair in CF_ROUNDS for q in pair]
-# Waves with acquired and wired household geovariables. W5 is still the
-# v01 extract: WB v02 supplies NGA_HouseholdGeovariables_Y5.dta, queued for
-# acquisition and wiring under GH #978. Its coordinates remain missing here.
-GEO_ROUNDS = ROUNDS[:4]
+# All waves have acquired and wired household geovariables. W5's root-level
+# v02 file supplies anonymized lat_mod/lon_mod household reference fixes (#978).
+GEO_ROUNDS = ROUNDS
 GEO_QUARTERS = [q for pair in GEO_ROUNDS for q in pair]
-NO_GEO_QUARTERS = [q for pair in ROUNDS[4:] for q in pair]
 
-# community_prices comes from the COMMUNITY questionnaire's Section C8, which is
-# administered in the post-harvest round only.  Verified structurally: across all
-# five waves there are 11 `sectc8*` files and every one is a `_harvest` file --
-# there is no `sectc8*_planting*` anywhere.  The planting community files that do
-# carry an `item_cd` (sectc2_plantingw1, sectc2a/b_plantingw3) have no price
-# column at all; C2 is an availability module.  So no planting-round price data
-# is being dropped -- there is none to drop.
+# community_prices comes from the COMMUNITY questionnaire's food-price module,
+# which is fielded in BOTH rounds: post-harvest Section C8 (the 11 `sectc8*`
+# files are all `_harvest`) and post-planting Section C2 (GH #587).  This comment
+# used to say "the planting community files ... have no price column at all; C2
+# is an availability module" -- contradicted by the files: sectc2_plantingw1
+# carries sc2q3a "What is the price for [ITEM]? (Naira)", and every PP C2 source
+# (W1 sc2q3a, W2-W5 c2q3) prices food.  Since the 2026-11-12 rulings the PP rows
+# are served at the PP quarter.
 PH_QUARTERS = ['2011Q1', '2013Q1', '2016Q1', '2019Q1', '2024Q1']
+PP_QUARTERS = ['2010Q3', '2012Q3', '2015Q3', '2018Q3', '2023Q3']
 
 
 @pytest.fixture(scope='module')
@@ -158,19 +170,15 @@ def test_every_wave_has_coordinates_in_every_round(cf, t):
     assert wave['Longitude'].notna().any(), f'{t}: no Longitude at all'
 
 
-@pytest.mark.parametrize('t', NO_GEO_QUARTERS)
-def test_w5_has_geography_but_no_coordinates_in_either_round(cf, t):
-    """GH #841: W5 declares cluster_features from the cover page alone.  Wave 5
-    v01 lacks the geovariables file supplied in WB v02 (GH #978), so
-    Latitude/Longitude remain all-NaN while Region/District/Rural are
-    populated. Retire this assertion and extend GEO_QUARTERS when the v02
-    file is acquired and wired as df_geo on hhid, as W4 does."""
+@pytest.mark.parametrize('t', ROUNDS[4])
+def test_w5_coordinates_enrich_existing_geography_in_either_round(cf, t):
+    """The acquired v02 fixes enrich each own-round household cover (#978)."""
     wave = cf.loc[t]
     assert len(wave) > 0, f'{t} missing from cluster_features'
     for col in ['Region', 'District', 'Rural']:
         assert wave[col].notna().all(), f'{t}: {col} has nulls'
-    assert wave['Latitude'].isna().all(), f'{t}: unexpected Latitude -- W5 geovars acquired?'
-    assert wave['Longitude'].isna().all(), f'{t}: unexpected Longitude -- W5 geovars acquired?'
+    assert wave['Latitude'].notna().any(), f'{t}: W5 Latitude not wired'
+    assert wave['Longitude'].notna().any(), f'{t}: W5 Longitude not wired'
 
 
 @pytest.mark.parametrize('t', ['2010Q3', '2011Q1'])
@@ -215,69 +223,53 @@ def test_moved_sentinel_does_not_fire_in_the_baseline_wave(sample):
 # ROUND SAFETY -- the pp/ph question
 # --------------------------------------------------------------------------
 
+# GH #1120 D1 (owner ruling 2026-10-23; comment6380186741 refinement):
+# each round uses its OWN cover. The old PP-for-both assertions were preserved
+# in the dispatch evidence (9 failures / 2 passes) before reconciliation.
 @pytest.mark.parametrize('pp,ph', ROUNDS)
-def test_v_is_round_invariant_within_a_wave(sample, pp, ph):
-    """A household must get the SAME cluster in the planting and the harvest
-    quarter of one wave.
-
-    It does, by construction: both quarters of a wave read the SAME post-planting
-    cover page (the wave folder has one data_info.yml and both Wave(t)s use it),
-    so there is no second geo-coding to drift from.  This test is the guard that
-    keeps it that way -- e.g. if someone later points the harvest quarter at
-    secta_harvest*.dta, 17/41/66/64 households in W2/W3/W4/W5 would flip to a
-    `moved-` singleton (they relocate BETWEEN the two visits) and `v` would stop
-    being a stable within-wave cluster key.
-    """
-    s = sample.reset_index()
-    a = s[s.t == pp][['i', 'v']].rename(columns={'v': 'v_pp'})
-    b = s[s.t == ph][['i', 'v']].rename(columns={'v': 'v_ph'})
-    m = a.merge(b, on='i', how='inner')
-    assert len(m) > 0, f'no households shared between {pp} and {ph}'
-    differs = m[m.v_pp != m.v_ph]
-    assert len(differs) == 0, (
-        f'{len(differs)} households change cluster between {pp} and {ph}; '
-        f'`v` must be constant within a wave.  e.g.\n{differs.head().to_string()}'
-    )
+def test_v_matches_each_rounds_recorded_location(sample, pp, ph):
+    recorded_round = _round_oracle().recorded_round
+    for t in (pp, ph):
+        actual = sample.xs(t, level='t')
+        expected = recorded_round(t)
+        assert actual.index.is_unique
+        assert set(actual.index) == set(expected.index)
+        assert actual['v'].to_dict() == expected['v'].to_dict()
 
 
 @pytest.mark.parametrize('pp,ph', CF_ROUNDS)
-def test_cluster_features_carries_both_rounds_and_they_agree(cf, pp, ph):
-    """Both quarters must be present, with the same cluster set and identical
-    attributes -- neither round may overwrite or collide with the other."""
-    c = cf.reset_index()
-    A = c[c.t == pp].set_index('v').drop(columns='t')
-    B = c[c.t == ph].set_index('v').drop(columns='t')
-
-    assert len(A) > 0, f'{pp} missing from cluster_features'
-    assert len(B) > 0, f'{ph} missing from cluster_features'
-    assert set(A.index) == set(B.index), (
-        f'{pp} and {ph} disagree on the cluster set '
-        f'({len(A)} vs {len(B)} clusters)'
-    )
-    for col in ['Region', 'District', 'Rural', 'Latitude', 'Longitude']:
-        x, y = A[col], B.loc[A.index, col]
-        mismatched = int(((x != y) & ~(x.isna() & y.isna())).sum())
-        assert mismatched == 0, (
-            f'{col} differs between {pp} and {ph} for {mismatched} cluster(s)'
-        )
+def test_cluster_features_matches_each_rounds_recorded_geography(cf, pp, ph):
+    recorded_geo = _round_oracle().recorded_geo
+    for t in (pp, ph):
+        actual = cf.xs(t, level='t')
+        expected = recorded_geo(t)
+        assert actual.index.is_unique and len(actual) > 0
+        assert set(actual.index) == set(expected['v'])
+        # A served fix is one recorded household pair, never a cross-column
+        # composite or a mean. Missing W5 geo remains missing, not zero.
+        def pair(values):
+            return tuple(None if pd.isna(x) else float(x) for x in values)
+        for v, group in expected.groupby('v'):
+            observed = {pair(row) for row in
+                        group[['Latitude', 'Longitude']].to_numpy()}
+            assert pair(actual.loc[v, ['Latitude', 'Longitude']]) in observed
 
 
 def test_sample_is_one_row_per_household_per_round(sample):
-    """sample is keyed (i, t) with t the QUARTER, so a household in a pp/ph wave
-    has exactly two rows -- one per round.  The GH #323 rekey changed `v`'s
-    VALUE, and must not have changed this grain (development and this branch both
-    return 49,770 rows)."""
-    assert sample.index.names == ['i', 't'] or set(sample.index.names) == {'i', 't'}
-    assert int(sample.index.duplicated().sum()) == 0
-
-    s = sample.reset_index()
+    recorded_round = _round_oracle().recorded_round
+    assert_numeric_exact = _round_oracle().assert_numeric_exact
+    assert set(sample.index.names) == {'i', 't'}
+    assert sample.index.is_unique
     for pp, ph in ROUNDS:
-        n_pp = s[s.t == pp]['i'].nunique()
-        n_ph = s[s.t == ph]['i'].nunique()
-        assert n_pp == n_ph and n_pp > 0, (
-            f'{pp} has {n_pp} households but {ph} has {n_ph}; both rounds of a '
-            f'wave are populated from the same cover page and must match'
-        )
+        for t in (pp, ph):
+            actual = sample.xs(t, level='t').sort_index()
+            expected = recorded_round(t)
+            assert set(actual.index) == set(expected.index) and len(actual) > 0
+            expected = expected.loc[actual.index]
+            for col in ('weight', 'panel_weight'):
+                raw = expected[col].astype(float)
+                mean = raw.groupby(pd.Series(t, index=raw.index)).transform('mean')
+                assert_numeric_exact(actual[col], raw / mean)
 
 
 # --------------------------------------------------------------------------
@@ -295,18 +287,103 @@ def test_sample_and_cluster_features_share_one_keyspace(nigeria, cf, sample):
     assert not orphans, f'{len(orphans)} sample clusters absent from cluster_features'
 
 
-def test_community_prices_is_post_harvest_only(nigeria):
-    """Section C8 is asked in the post-harvest round only (there is no
-    sectc8*_planting* file in any wave), so community_prices must land on the PH
-    quarter -- and on NO planting quarter."""
+def test_community_prices_serves_each_round_at_its_own_quarter(nigeria):
+    """C8 (post-harvest) rows land on the PH quarter, C2 (post-planting) rows on
+    the PP quarter (GH #587) -- distinct t per round, never one shared label.
+    PP rows carry only PP derivation keys; PH rows never carry `Size`."""
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         cp = nigeria.community_prices()
-    ts = set(cp.reset_index()['t'].unique())
-    assert ts == set(PH_QUARTERS), (
-        f'community_prices t values {sorted(ts)}; expected exactly the '
-        f'post-harvest quarters {PH_QUARTERS}'
-    )
+    r = cp.reset_index()
+    ts = set(r['t'].unique())
+    assert ts == set(PH_QUARTERS) | set(PP_QUARTERS), sorted(ts)
+    is_pp = r['t'].isin(PP_QUARTERS)
+    pp_keys = set(r.loc[is_pp, 'Derivation'].dropna())
+    assert pp_keys == {'Nigeria::community_prices::pp-w1-number-of-units',
+                       'Nigeria::community_prices::pp-w1-number-of-units-unvalidated',
+                       'Nigeria::community_prices::pp-c2-metric-size',
+                       'Nigeria::community_prices::pp-w5-metric-unit-quantity'}, pp_keys
+    assert not set(r.loc[~is_pp, 'Derivation'].dropna()) & pp_keys
+    assert r.loc[~is_pp, 'Size'].isna().all()
+    # Rulings 2026-11-12: every served PP gram / centilitre / millilitre row
+    # is a constructed per-unit price -- W1 g / ml with N = 1, W2 / W3 g / cl
+    # and W5 g / cl with no size and no c2q2a are all held -- bar a recorded
+    # '99. ONE SIZE ONLY', the form's own one-unit statement (as in PH).
+    one_size = r['Size'].astype('string').str.match(r'^\s*99\.', na=False)
+    pp_metric_small = r[is_pp & r['u'].isin(['g', 'cl', 'ml']) & ~one_size]
+    assert pp_metric_small['Derivation'].notna().all(), (
+        pp_metric_small.loc[pp_metric_small['Derivation'].isna(), ['t', 'u']].value_counts())
+    # W3 Kg / l are served as recorded (no key); W3 g / cl are not served.
+    w3 = r[r['t'].eq('2015Q3')]
+    assert w3['u'].isin(['Kg', 'l']).sum() > 0
+    assert not w3['u'].isin(['g', 'cl']).any()
+    assert w3.loc[w3['u'].isin(['Kg', 'l']), 'Derivation'].isna().all()
+    assert r.loc[r['t'].isin(['2018Q3', '2023Q3']), 'Size'].notna().mean() > 0.5
+
+
+@pytest.mark.parametrize('key', [
+    'Nigeria::community_prices::pp-w1-number-of-units',
+    'Nigeria::community_prices::pp-w1-number-of-units-unvalidated',
+    'Nigeria::community_prices::pp-c2-metric-size',
+    'Nigeria::community_prices::pp-w5-metric-unit-quantity',
+])
+def test_pp_derivation_inputs_join_and_reproduce_the_served_rows(nigeria, key):
+    """Each PP construction's `inputs` are keyed to the served rows, and the
+    registered function on them gives the served Price."""
+    import importlib
+    D = importlib.import_module('lsms_library.derivations')
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        cp = nigeria.community_prices()
+        inp = nigeria.derivation_inputs(key)
+    served = cp[cp['Derivation'].eq(key)]
+    assert len(inp) == len(served) > 0
+    assert set(inp.index) == set(served.index)
+    fn = D.resolve_callable(nigeria.derivations()[key].function)
+    if 'number-of-units' in key:        # both W1 division keys
+        again = fn(inp['sc2q3a'], inp['sc2q3b'])
+        assert set(inp.index.get_level_values('t')) == {'2010Q3'}
+        assert (pd.to_numeric(inp['sc2q3b']) > 1).all()
+    elif key.endswith('metric-unit-quantity'):
+        again = fn(inp['c2q3'], inp['c2q2a'])
+        assert set(inp.index.get_level_values('u')) == {'g', 'cl'}
+        assert set(inp.index.get_level_values('t')) == {'2023Q3'}
+    else:
+        from lsms_library.countries.Nigeria._ import pp_community_prices as pp
+        labels = {}
+        for source in ('W4', 'W5'):      # W5's SIZE card extends W4's, same labels
+            labels.update(pp._card(pp.pp_source(source), 'size'))
+        quantity = inp['c2q2c'].map(labels).map(pp._ng._c8_size_metric_grams)
+        again = fn(inp['c2q3'], quantity)
+    got = pd.Series(again, index=inp.index, dtype='float64')
+    pd.testing.assert_series_equal(got.sort_index(),
+                                   served['Price'].astype('float64').sort_index(),
+                                   check_names=False, check_index=False, rtol=1e-12)
+
+
+@pytest.mark.parametrize('key,held', [
+    ('Nigeria::community_prices::pp-w1-no-count-hold', 105),
+    ('Nigeria::community_prices::pp-w1-metric-package-hold', 1043),
+    ('Nigeria::community_prices::pp-w1-count-as-size-hold', 332),
+    ('Nigeria::community_prices::pp-w1-metric-small-count-hold', 64),
+    ('Nigeria::community_prices::pp-w1-kg-mid-count-hold', 208),
+    ('Nigeria::community_prices::pp-w1-nonmetric-count-as-size-hold', 241),
+    ('Nigeria::community_prices::pp-unrecorded-size-hold', 13166),
+    # W2 code 0, the "No more option" sentinel, has no priced row; code 15
+    # (Semovita) is served since the 2026-11-12 "Add a Semovita row" ruling.
+    ('Nigeria::community_prices::pp-unharmonized-item-hold', 0),
+    ('Nigeria::community_prices::pp-w5-quantity-not-one-hold', 60),
+])
+def test_pp_omissions_return_rows_the_table_does_not_serve(nigeria, key, held):
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        cp = nigeria.community_prices()
+        inp = nigeria.derivation_inputs(key)
+    assert len(inp) == held
+    assert inp.index.is_unique
+    assert not set(inp.index) & set(cp.index)
+    summary = cp.attrs['derivations']['Nigeria']
+    assert summary[key]['rows'] == 0
 
 
 def test_community_prices_joins_the_household_keyspace(nigeria, sample):

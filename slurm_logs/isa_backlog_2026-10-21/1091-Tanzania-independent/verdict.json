@@ -1,0 +1,73 @@
+{
+  "verdict": "PASS",
+  "scope": "Independent bounded Tanzania1091 implementation review; no external approval/merge/closure",
+  "source": {
+    "candidate": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+    "runtime_tests": "cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270",
+    "parent": "99c824079da480ab2646e499c06ac70e457ff271"
+  },
+  "runtime_change": "exact45-line script and5-line Make retirement",
+  "tests": {
+    "candidate_passed": 85,
+    "candidate_errors": 0,
+    "candidate_skips": 0,
+    "actual_parent_new_failed": 20,
+    "actual_parent_new_passed": 7,
+    "parent_errors": 0,
+    "parent_skips": 0,
+    "held_assertion_bodies_per_head": 11
+  },
+  "source_rows": {
+    "2019-20": 3076,
+    "2020-21": 14623,
+    "total": 17699,
+    "varieties_per_wave": 52
+  },
+  "frame_checks": {
+    "main_strict_full_pairs": 152,
+    "cold_warm_native_raw_cache_pairs": 76,
+    "source_oracle_strict_pairs": 10,
+    "comparator_negative_controls": 8
+  },
+  "healthy_Mali_rows": 40218,
+  "pooled_Feature_rows": 57917,
+  "actual_CLI_artifacts": 16,
+  "scanner": {
+    "records_per_head": 4,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "complete_multisets_exact_parent_candidate_author": true,
+    "phase2_kwargs_grid": 0
+  },
+  "warnings": {
+    "complete_captured_message_files": 172,
+    "nonempty": 24,
+    "all_categories_and_stack_fields_persisted": false,
+    "structured_warning_event_equality_claimed": false
+  },
+  "measured_prebuild_scope": {
+    "API_total": 549,
+    "Tanzania_moved": 25,
+    "other_API_exact": 524,
+    "framework_exact": 39
+  },
+  "raw_physical_private_copies": 176,
+  "final_cache_endpoint_roots_exact": 44,
+  "network_attempts": 0,
+  "evidence_limits": [
+    "Tanzania community_prices and compatible warm Mali40218 only; no broad suite/corpus or other table outputs.",
+    "No first-cold Feature claim; default and currency=None actual calls separately paired.",
+    "Empty Description/id_converted and source/writer/JSON attrs stage distinctions preserved without normalization.",
+    "Complete captured warning-message text files and matrix counts exist; category/stack fields not persisted for every warning, so no full structured-warning-event equality claim. Structured scanner multisets are separate and exact.",
+    "Original normalized symlink snapshots and missing original partial aggregate JSON remain explicit author evidence limitations.",
+    "Known Niger1196 and prior global17 full-suite13FAIL/guard-mtime limits remain outside this cohort.",
+    "Shared advertised code-reviewer/prior-art/orgmode skill paths were unavailable after scoped alternate searches; current repo ledger/STANDING, backlog, cross-country, audit and survey guidance were read, with prior identical f8 guidance carried.",
+    "Original frozen source proofs for diagnosis/old author parent omit mtimes; exact frozen bytes/modes/HEAD are verified without a retrospective mtime claim."
+  ],
+  "public_writes": false,
+  "signed": "Sue (GPT-6)",
+  "final_frozen": true,
+  "zero_other_consumers": true,
+  "source_clean_immutable": true
+}

@@ -1,0 +1,19 @@
+{
+  "source_pin": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "branch": "diagnose/1135-nigeria-boundary-counts-20261021",
+  "clean": true,
+  "tracked_files_content_modes_exact": 14880,
+  "git_index_exact": true,
+  "source_and_physical_destination_receipts_exact": 10,
+  "six_manifest_parquets_and_four_MD5_L1_blobs": true,
+  "all14private_cache_data_files_exact": true,
+  "original_diagnosis_checkout_tracked_files_exact": 14880,
+  "original_historical1137_copies_exact": 5,
+  "original_diagnosis_private_evidence_written": false,
+  "prior_other_country_or_review_evidence_written": false,
+  "ignored_metadata_link_exact": true,
+  "in_tree_payloads": 0,
+  "task_consumers": [],
+  "no_Git_ref_or_GitHub_mutation": true,
+  "scope": "Assigned and original diagnosis trees plus pinned source/copy receipts; no global-ref comparison while parent campaign operates."
+}

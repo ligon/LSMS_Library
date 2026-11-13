@@ -1,0 +1,98 @@
+#+title: GH1119 Burkina Faso seed-crop label alignment
+#+date: 2026-10-22
+#+author: Sue (GPT-6)
+
+* Author result and boundary
+AUTHOR VALIDATED; a different agent must independently review before acceptance.
+Root's fresh live receipt =BF1119-live-parent-scope-0248.json= (1,262 bytes, SHA256 =3833b7fa64abd62976c65bee9e63d512ca4796908941eb70c3ab091901e9b0a6=) confirms PR1189 open/unmerged at the actual parent and GH1119 open, unchanged, with zero comments.
+Parent is reviewed, unmerged GH1123 =cfd0782766068da6dc7e7605334e957f988a4ab1= (PR1189).
+Ledger-first =0e9f1f696153562b62d3a3d2d389e309b96c9238= precedes runtime/tests =c5134f57f76bc53e84df6c3398ffc9a3781e9e1c=; both ordinary commits published through SUCODER.
+Production changes exactly two Preferred Label cells in Burkina Faso's harmonize_seed_crop, retaining the original keys and every other cell/table/comment byte.
+The exact French source labels in validation.json retain their accents; maize becomes the existing native crop label Maïs, and cowpea becomes Niébé.
+The existing GH1123 source test changes exactly its two matching expected values and retains every source/payload/identity assertion.
+Nine additional focused cases use the actual Org parser and production pure resolvers; no resolver, extraction, reducer, schema, ID, unit or scientific transformation changes.
+
+* Country grounding and contradictions
+I read all 1,466 parent CONTENTS lines first, including every TODO/WAITING/LOGBOOK occurrence.
+There are three live TODOs (food_items.org, nutrition, Makefile), with no additional WAITING/LOGBOOK entries beyond the keyword declaration.
+The 2018 input roster is household x native input slot, with no parcel axis, using the injective ehcvm_i household formatter and grappe cluster identity.
+Vague is a sample split, not a repeated input measurement.
+EMC 2014 has four independent food recalls, quantities only in passage 1, and passage identity in filenames.
+EHCVM 2021-22 is a half-panel restricted to original EAs with distinct panel/cross-sectional weights.
+Only the 2018-19 builder consumes harmonize_seed_crop; neither other wave has a current input or crop builder.
+
+Historical sample notes quote "10,224 households", "6,961 households" and "3,218 households"; the same current parent/candidate builds instead serve 10,411 / 7,010 / 3,227 (20,648 total).
+CONTENTS quotes the French ZD-sample split and the English "divided each enumeration area into two equal groups"; no sampling-policy choice follows here.
+The old harmonize_input comment says code21 is "the 'Autres semences' code -> Seed", whereas the dated GH1123 note and held 2018 dictionary say 20 means Autres semences and 21 has no label.
+The source-qualified code21 identity remains exact on 602 records; its Seed classification remains unverified under GH1187.
+The existing builder comments "s16bq05 purchased?" and "s16bq07a quantity purchased" contradict the held gift/donation labels, already documented under GH1188.
+All current bindings and NA masks are preserved; API column names do not certify purchase semantics.
+These contradictions are quoted findings, not grounds to declare notes stale or expand this patch.
+The additive dated CONTENTS section records the newly measured label mismatch and the household-grain join limit.
+
+* Held-source reproduction and conservation
+Nine declared held sources per head were physically copied to two new private roots (18 distinct-inode, nlink1, nonsymlink copies), preserving modes and nanosecond mtimes.
+Sidecar MD5, SHA256, byte count and before/after source receipts passed terminal gates before source decode or build.
+Eight sample/cluster/input prerequisites plus the 2018 crop module were staged; no Burkina L2 was seeded, cleared, stamped or assumed fresh.
+Twelve healthy Benin/Togo cache files per root passed actual expected-hash and complete-wave-coverage gates before physical copying; corrected caches from incompatible pins were not substituted.
+All source receipts are summarized without records or IDs in validation.json.
+
+The held input source has 22,877 applied records, unique and nonnull on native household/input keys.
+Maize seed contributes 2,274 rows and cowpea 2,156; their old target labels occur zero times in the crop source.
+The native crop source has 2,671 Maïs records and 2,898 Niébé records.
+The two replacements remain injective across actual present native seed slots, preserving every distinct GH1123 input identity.
+The unmodified existing source-conservation assertion bodies pass directly at both heads: every native input line, key, quantity, existing flag, purchase-named quantity, mask and unit is retained.
+
+Normal actual cold Country builds and separate-process warm/new-object controls pass 52 strict full-frame comparisons.
+The comparator checks exact numeric values with rtol=atol=0, index/column types, every unused MultiIndex level and code, order, dtypes, NA masks, sortorder and recursively typed full attrs (including record _FIELDS presence).
+Exactly 4,430 crop labels change; every other input field is exact, with 22,877 public rows at both heads.
+Native crop remains 15,593 records and public crop remains 15,587; the pre-existing six-row difference is unchanged, with no source/grain repair claimed.
+Sample remains 20,648 and cluster_features 2,035; raw-country and all available native-wave frames are exact.
+Both unsupported-wave input/crop subset outputs remain zero rows with their actual full representations preserved.
+The existing seed_kg output is exact on all 4,229 household (t,i) rows; no parcel axis or allocation is invented.
+
+At the actual (t,i,crop) existence join, maize matches rise from 0 to 2,251 of 2,274 seed rows, and cowpea from 0 to 2,097 of 2,156.
+The remaining 23/59 seed records have no corresponding crop row at that projection; this patch neither fabricates a harvest nor guesses another crop.
+Reported input quantities and aggregate mass are unchanged, as are all seed_kg values.
+
+* Feature, warm caches, scanner and tests
+Healthy Benin/Togo complete Country outputs remain exact at 10,605 / 13,730 input rows, including full attrs and their cache bytes/modes/mtimes.
+Argument-matched default and currency=None Feature frames both contain 47,212 records and no additional loss.
+The complete counterfactual expectation changes only the Burkina labels and preserves the actual default currency axis; full assembled attrs and exact global unused levels/codes match.
+Healthy observations remain exact; the Feature's shared unused crop-level representation necessarily reflects the intended Burkina vocabulary changes.
+Both fresh-process warm stages and new Country objects leave every private data-root byte, mode and nanosecond mtime exact, with genuine current country hashes and full wave manifests.
+Full scanner phases 1/2 produce six warnings at both heads; every complete normalized record and multiplicity is exact, with zero failure/error/skip.
+Only checkout/data paths were normalized for scanner comparison; no frame or attr normalization was used.
+Plot_inputs has no phase-2 kwargs grid, so no unrun variants are claimed.
+
+Candidate pytest: 131 passed, zero skipped (9 new mapping/vocabulary cases, 7 existing identity unit cases, 115 existing declared-unit/pooled-reducer cases).
+Two real-data identity cases were explicitly deselected from pytest's credential-gated selection, then their complete unchanged assertion bodies were run normally against the held-source Country at each head: two passed per head.
+The identical new test file on the immutable actual parent gives five failures and four passes, zero fixture errors, distinguishing the label defect.
+API audit and git diff --check pass; no broad full suite was run.
+
+* Invalidation and explicit timing limit
+Before any source API build, actual exact-source processes enumerated all 549 Country API hashes and all 39 framework fingerprints.
+Exactly 24 Burkina hashes move; 525 other-country hashes and all 39 framework fingerprints are exact.
+This is the existing whole-country Org input footprint; only four Burkina tables were actually rebuilt, and no output claim is made for the other 20 API tables.
+The separate 12 relevant-wave hashes were inadvertently omitted from that prebuild inventory.
+They were measured later, in separate exact-source config-only processes after the scoped builds, and all 12 move; runtime/config bytes are identical to those at the prebuild inventory.
+This is explicitly not a prebuild wave-hash enumeration, and no source/API-output work was replayed to change that history.
+
+* Retained private harness stops
+The first pure Feature expected-construction comparison omitted the existing default currency index and stopped strictly.
+Its original script, source frames, compared operands and traceback survive; the corrected v2 construction uses actual matched parent per-row currency records and the existing alignment helper.
+No API call was replayed, no attr was stripped or normalized, and candidate runtime/tests were unchanged by that correction.
+The first supplemental wave-hash probe used a nonexistent Country.wave accessor and failed before producing a hash result or building anything.
+A distinct v2 script uses the existing Country.__getitem__ accessor; both attempts remain private.
+No private aggregate basename was overwritten or reconstructed.
+
+* Limits, residual and review handoff
+This is partial GH1119 Burkina Faso scope and does not close the issue.
+Senegal labels, Guinea-Bissau extraction and shared farm-level/not-crop-specific/missing marker decisions remain separate.
+Code21 source meaning/legacy classification (GH1187), gift/purchase field/unit routing (GH1188), new wave coverage and pre-existing crop aggregation are excluded.
+No GitHub write, public merge, acquisition, DVC CLI, shared-cache mutation/promotion, bypass, manual stamp, fixture/golden/dependency edit or in-tree payload occurred.
+Full frames, source rows, IDs, complete warnings and tracebacks remain private.
+A different reviewer must inspect the exact frozen source, retained stops and source/preparation receipts; author validation is not independent acceptance.
+Final immutable source/mode and data/reference receipts, zero-consumer release, complete allowlist and runtime/docs equivalence are recorded by READY.json and freeze-proof.json.
+
+Sue

@@ -43,6 +43,42 @@
 | quinara            | Quinara         |
 | sab                | SAB             |
 | tombali            | Tombali         |
+| BOLAMA_BIJAGOS Urbano | Bolama-Bijagos Urbano |
+| BOLAMA_BIJAGOS Rural | Bolama-Bijagos Rural |
+| Bolama-Bijagos Urbano | Bolama-Bijagos Urbano |
+| Bolama-Bijagos Rural | Bolama-Bijagos Rural |
+| bafata Urbano | Bafata Urbano |
+| bafata Rural | Bafata Rural |
+| Bafata Urbano | Bafata Urbano |
+| Bafata Rural | Bafata Rural |
+| biombo Urbano | Biombo Urbano |
+| biombo Rural | Biombo Rural |
+| Biombo Urbano | Biombo Urbano |
+| Biombo Rural | Biombo Rural |
+| cacheu Urbano | Cacheu Urbano |
+| cacheu Rural | Cacheu Rural |
+| Cacheu Urbano | Cacheu Urbano |
+| Cacheu Rural | Cacheu Rural |
+| gabu Urbano | Gabu Urbano |
+| gabu Rural | Gabu Rural |
+| Gabu Urbano | Gabu Urbano |
+| Gabu Rural | Gabu Rural |
+| oio Urbano | Oio Urbano |
+| oio Rural | Oio Rural |
+| Oio Urbano | Oio Urbano |
+| Oio Rural | Oio Rural |
+| quinara Urbano | Quinara Urbano |
+| quinara Rural | Quinara Rural |
+| Quinara Urbano | Quinara Urbano |
+| Quinara Rural | Quinara Rural |
+| sab Urbano | SAB Urbano |
+| sab Rural | SAB Rural |
+| SAB Urbano | SAB Urbano |
+| SAB Rural | SAB Rural |
+| tombali Urbano | Tombali Urbano |
+| tombali Rural | Tombali Rural |
+| Tombali Urbano | Tombali Urbano |
+| Tombali Rural | Tombali Rural |
 
 * Region
 

@@ -10,8 +10,8 @@ roster, one row per input-type the household was asked about.  Columns:
   s16bq01   input type (organic / inorganic fert / phyto / seeds-by-crop)
   s16bq02   USED this input? (1=Oui) — application gate (all Oui in 2018)
   s16bq03a / s16bq03b   quantity used + native unit
-  s16bq05   purchased? (Oui / Non)
-  s16bq07a  quantity purchased (native unit)
+  s16bq05 / s16bq07a / s16bq07b   gift flag + quantity + own unit
+  s16bq08 / s16bq09a / s16bq09b   purchase flag + quantity + own unit
 
 ENCODING: loaded with the DEFAULT (utf-8) encoding so the accented French
 input / unit labels match the harmonize_input / u / harmonize_seed_crop keys.
@@ -72,13 +72,18 @@ def _finish_plot_inputs(df, t):
     """Coerce numerics, fill the CROP_NA / 'Manquant' sentinels so the index
     is fully non-null, drop rows with no input identity, build
     (t, i, input, crop, u)."""
-    for col in ['Quantity', 'Quantity_purchased']:
+    for col in ['Quantity', 'Quantity_purchased', 'Quantity_received_as_gift']:
         if col not in df.columns:
             df[col] = pd.NA
         df[col] = pd.to_numeric(df[col], errors='coerce').astype('Float64')
-    if 'Purchased' not in df.columns:
-        df['Purchased'] = pd.NA
-    df['Purchased'] = df['Purchased'].astype('boolean')
+    for col in ['Purchased', 'Received_as_gift']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = df[col].astype('boolean')
+    for col in ['Unit_purchased', 'Unit_received_as_gift']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = df[col].astype('string')
     df['t'] = t
     df['input'] = df['input'].astype('string')
     if 'crop' not in df.columns:
@@ -87,7 +92,9 @@ def _finish_plot_inputs(df, t):
     df['u'] = df['u'].astype('string').fillna('Manquant')
     df = df[df['input'].notna()]
     keep = ['t', 'i', 'input', 'crop', 'u',
-            'Quantity', 'Purchased', 'Quantity_purchased']
+            'Quantity', 'Purchased', 'Quantity_purchased', 'Unit_purchased',
+            'Received_as_gift', 'Quantity_received_as_gift',
+            'Unit_received_as_gift']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'input', 'crop', 'u'])
     return df
@@ -105,8 +112,10 @@ srcn = srcn[applied.values]
 
 hh = srcn.apply(lambda r: ehcvm_i(r['grappe'], r['menage']), axis=1)
 
-# purchased: s16bq05 Oui/Non (labels with convert_categoricals)
-purchased = src['s16bq05'].map({'Oui': True, 'Non': False})
+# Each flag and unit retains its own source variable's decoded labels.
+# Acquisition units are payload columns; u still describes quantity USED.
+purchased = src['s16bq08'].map({'Oui': True, 'Non': False})
+received_as_gift = src['s16bq05'].map({'Oui': True, 'Non': False})
 
 df = pd.DataFrame({
     'i':                  hh.values,
@@ -115,10 +124,22 @@ df = pd.DataFrame({
     'u':                  _unit_labels(src['s16bq03b'], unit_map).values,
     'Quantity':           pd.to_numeric(srcn['s16bq03a'], errors='coerce').values,
     'Purchased':          purchased.values,
-    'Quantity_purchased': pd.to_numeric(srcn['s16bq07a'], errors='coerce').values,
+    'Quantity_purchased': pd.to_numeric(srcn['s16bq09a'], errors='coerce').values,
+    'Unit_purchased':     _unit_labels(src['s16bq09b'], unit_map).values,
+    'Received_as_gift':    received_as_gift.values,
+    'Quantity_received_as_gift': pd.to_numeric(srcn['s16bq07a'], errors='coerce').values,
+    'Unit_received_as_gift': _unit_labels(src['s16bq07b'], unit_map).values,
 })
 
 df = _finish_plot_inputs(df, '2018-19')
 
 assert len(df) > 0, 'plot_inputs 2018-19 produced no rows'
+# GH #1123: distinct native input slots must retain distinct declared keys,
+# even when their measured payloads happen to be equal (ledger sections 2-4).
+# Match the Benin/Togo pre-write guard; never let core select a row silently.
+dups = df.index[df.index.duplicated()]
+assert dups.empty, (
+    f"Burkina_Faso plot_inputs 2018-19: {len(dups)} duplicate tuple(s) on "
+    "(t, i, input, crop, u); distinct reported input identities collide"
+)
 to_parquet(df, 'plot_inputs.parquet')

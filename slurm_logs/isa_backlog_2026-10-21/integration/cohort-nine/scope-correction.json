@@ -1,0 +1,9 @@
+{
+  "actual_deselected_parameter_cases": 2,
+  "parameter_values": [
+    "plot_labor",
+    "plot_inputs"
+  ],
+  "original_launcher_description_case_count": 3,
+  "correction": "The executed node selection excludes two parametrized all-country corpus cases. The launcher prose said three; the command and656-pass result are unchanged."
+}

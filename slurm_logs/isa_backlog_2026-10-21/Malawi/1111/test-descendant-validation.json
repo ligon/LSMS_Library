@@ -1,0 +1,53 @@
+{
+  "parent_frozen_head": "9b883974a81d6ee664bbca425b7d484f0f14eb7a",
+  "amendment": "Exactly five excluded organic selection/assertion lines deleted; all other test bytes unchanged",
+  "test_sha256_before": "3a1e491e57fb1b403cbd4482ba25e2b23444d3d2f82010a44fc3bb9e5df3c8eb",
+  "test_sha256_after": "d8c747d19c97ed516ab20d30c771d462ef73c311f0085bf3163976417ec0d86b",
+  "production_changes": 0,
+  "production_driver_sha256_exact_parent": {
+    "lsms_library/countries/Malawi/2010-11/_/plot_inputs.py": "64c5771c0d94db2ebcf86c94e2030a58d0cc5f878c11d013f3956d8571998c13",
+    "lsms_library/countries/Malawi/2019-20/_/plot_inputs.py": "958c18c40c38e8ec3fb708393c2f724d889319cb5df39cc490c4b9a32db9728b"
+  },
+  "other_existing_tracked_files": 14884,
+  "other_existing_tracked_files_bytes_and_modes_exact_reviewer_parent_manifest": true,
+  "all_changed_existing_paths_modes_exact": true,
+  "original_private_9b_evidence_files": 424,
+  "original_private_9b_evidence_paths_sha_size_mtime_mode_exact": true,
+  "reviewer_receipt": "/local/job40255479/control/isa-backlog-20261021/review-1111-Malawi/verdict.json",
+  "reviewer_receipt_sha256": "ffd2840cbe6b04f17ae5643c2e8ddc0dfa3c914a5b2a23eb937bb7717dfe155a",
+  "reviewer_verdict_at_parent": "NEEDS_FIX; independent runtime validation had not started",
+  "scoped_test_logs": {
+    "new-tests-baseline.private.log": {
+      "result": "10 failed, 2 passed in 5.63s",
+      "sha256": "5d4a8be0c49eeb4ac4ae80d91f821bbf6f21cf19e24174586ed3749b49ccc39e"
+    },
+    "new-tests-candidate.private.log": {
+      "result": "12 passed in 6.08s",
+      "sha256": "5de9fad7e3d7591c266abe60f318f1ec450fb3cf95a0f68d588f3878e079865f"
+    },
+    "postlabel-mutant.private.log": {
+      "result": "12 failed in 5.81s",
+      "sha256": "3738ce2314d095a9f18986f3752f103678539ea5ab04da0284f0a77959a90074"
+    },
+    "regressions.private.log": {
+      "result": "101 passed in 6.38s",
+      "sha256": "02b5a3f129b0e5e457d3cd6f63f980c60e81402eede2ea74b5e0a48d5e1c4ed5"
+    }
+  },
+  "source_and_runtime_proofs": "Original 9b source/runtime/cache/hash receipts retained without rerun because production blobs are identical",
+  "private_descendant_root": "/local/job40255479/control/isa-backlog-20261021/Malawi/1111-tests-descendant",
+  "composition_attempted": false,
+  "independent_review_and_root_composition_pending": true,
+  "reproduction_scripts_sha256": {
+    "run.sh": "3680d45142bb443d95bd8161b096d87456290d83fc44354a9e81c2530f3fa4ca",
+    "identity.py": "eaf6de4cfbf83566796a90a30eaa86e63ab9dccebda6d6005b62bf46e2e81868",
+    "offline/sitecustomize.py": "c5c5fdb9afb5f1fea1b6620063b6f1b56151ebfad537c57663e79ace4d6247f3",
+    "late_label_plugin.py": "ab82b689d8d9418a816e9f95e805544795aaf893a8c49405a02bfc46f012d2e0"
+  },
+  "reproduce_commands": [
+    "bash /local/job40255479/control/isa-backlog-20261021/Malawi/1111-tests-descendant/run.sh baseline -m pytest -n 2 --dist=loadfile -q -p no:cacheprovider /local/job40255479/worktrees/isa-Malawi-1111/tests/test_1111_malawi_applied_kg.py",
+    "bash /local/job40255479/control/isa-backlog-20261021/Malawi/1111-tests-descendant/run.sh candidate -m pytest -n 2 --dist=loadfile -q -p no:cacheprovider tests/test_1111_malawi_applied_kg.py",
+    "bash /local/job40255479/control/isa-backlog-20261021/Malawi/1111-tests-descendant/run.sh candidate -m pytest -n 2 --dist=loadfile -q -p no:cacheprovider -p late_label_plugin tests/test_1111_malawi_applied_kg.py",
+    "bash /local/job40255479/control/isa-backlog-20261021/Malawi/1111-tests-descendant/run.sh candidate -m pytest -n 2 --dist=loadfile -q -p no:cacheprovider tests/test_1111_malawi_applied_kg.py tests/test_867_nitrogen_content.py tests/test_863_transforms.py tests/test_plot_id_canonical.py -k 'not warm'"
+  ]
+}

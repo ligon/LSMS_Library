@@ -33,6 +33,22 @@ asymmetry this leaves: the purchased row is a 30-day most-recent purchase
 while produced / in-kind are 7-day consumption.  Imputing a 7-day
 purchased value (q5a x price) was rejected -- it would fabricate a number
 no respondent reported.  See nigeria.food_acquired_for_wave.
+
+GH #881 (ruling @ligon 2026-11-03, option A): that asymmetry is now ON THE
+ROW.  Every s='purchased' row of both rounds carries
+Derivation = Nigeria::food_acquired::w4-last-purchase-30d, a registered
+IDENTITY derivation (Nigeria/_/derivations.yml) that labels the 30-day
+most-recent-purchase window; Quantity / Expenditure / Quantity_kg are
+unchanged.  The stamp is applied after food_acquired_for_wave's duplicate-key
+collapse (mapping.stamp_w4_last_purchase_window).
+
+GH #1033: W4 asks a unit's size in its own column (q2c beside q2b, q9c beside
+q9b), where W3 printed it in the unit code.  The `size` entries below are what
+gives W3's sized units (heap, mudu, piece, ...) the size the row records; see
+nigeria.sized_food_unit.  Each round reads its own column of the `u` table.  Their
+value labels differ on 40 and 120 (PP DERICA, PACKET/SACHET; PH DERICA/TIN,
+SACHET), and both are served W3's name, because the survey's own factors treat
+them as one unit.  They also differ on 14, 250, 300 and 340, on PP's labels only.
 """
 import sys
 
@@ -41,17 +57,23 @@ import pandas as pd
 sys.path.append('../../_/')
 from lsms_library.local_tools import to_parquet
 from nigeria import food_acquired_for_wave
+from mapping import stamp_w4_last_purchase_window
+
+# Source paths and variables stay LITERALS here (the cache hash fingerprints
+# string-literal sources); mapping.W4_FOOD / w4_food_sources repeat them for
+# the GH #881 inputs callable, and tests/test_gh881_nigeria_w4_purchase_window
+# holds the two equal.
 
 # --- Harvest (2019Q1) ---
 harvest = food_acquired_for_wave(
     '../Data/sect10b_harvestw4.csv', '2019Q1',
     sources={
         'purchased': {'quantity': 's10bq9a', 'unit': 's10bq9b',
-                      'kg_factor': 's10bq9_cvn'},
+                      'kg_factor': 's10bq9_cvn', 'size': 's10bq9c'},
         'produced':  {'quantity': 's10bq6a', 'unit': 's10bq2b',
-                      'kg_factor': 's10bq2_cvn'},
+                      'kg_factor': 's10bq2_cvn', 'size': 's10bq2c'},
         'inkind':    {'quantity': 's10bq7a', 'unit': 's10bq2b',
-                      'kg_factor': 's10bq2_cvn'},
+                      'kg_factor': 's10bq2_cvn', 'size': 's10bq2c'},
     },
     expenditure='s10bq10')
 
@@ -60,14 +82,15 @@ planting = food_acquired_for_wave(
     '../Data/sect7b_plantingw4.csv', '2018Q3',
     sources={
         'purchased': {'quantity': 's7bq9a', 'unit': 's7bq9b',
-                      'kg_factor': 's7bq9_cvn'},
+                      'kg_factor': 's7bq9_cvn', 'size': 's7bq9c'},
         'produced':  {'quantity': 's7bq6a', 'unit': 's7bq2b',
-                      'kg_factor': 's7bq2_cvn'},
+                      'kg_factor': 's7bq2_cvn', 'size': 's7bq2c'},
         'inkind':    {'quantity': 's7bq7a', 'unit': 's7bq2b',
-                      'kg_factor': 's7bq2_cvn'},
+                      'kg_factor': 's7bq2_cvn', 'size': 's7bq2c'},
     },
     expenditure='s7bq10')
 
-df = pd.concat([harvest, planting]).sort_index()
+# GH #881: label every purchased row's 30-day window, after the collapse.
+df = stamp_w4_last_purchase_window(pd.concat([harvest, planting]).sort_index())
 
 to_parquet(df, 'food_acquired.parquet')

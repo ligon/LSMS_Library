@@ -1,0 +1,32 @@
+{
+  "candidate_HEAD": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+  "baseline_HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "clean_all4_frozen_trees": true,
+  "tracked_receipts_exact": true,
+  "original_diagnosis457_and_author801_files_exact": true,
+  "physical_cache_receipts120_exact": true,
+  "remaining_task_processes": 0,
+  "network_source_write_attempts": 0,
+  "metadata_exception_exact": true,
+  "completion_time_UTC": "2026-10-21T22:10:42Z",
+  "full_original_tree_scope": {
+    "baseline_original_tracked_files": 14880,
+    "candidate_tracked_files": 14886,
+    "original_tracked_content_modes_symlinks_exact_except_country_py": 14879,
+    "original_changed_paths": [
+      "lsms_library/country.py"
+    ],
+    "new_allowed_paths": [
+      ".coder/ledger/1081-derived-categorical-errors.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/REPORT.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/REPRODUCE.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/RESIDUALS.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/VALIDATION.json",
+      "tests/test_1081_derived_categorical_errors.py"
+    ],
+    "original_diagnosis_source_exact_baseline": true,
+    "author_source_Git_tree_and_runtime_test_filesystem_modes_exact_review_candidate": true,
+    "five_documentation_filesystem_modes": "author0644 versus detached0600; identical content and Git100644 mode; each frozen tree unchanged",
+    "ledger_first_commit_contains_only_ledger": true
+  }
+}

@@ -1,0 +1,158 @@
+#+title: GH #1077 - finite numeric aliases and null-safe label dictionaries
+#+date: 2026-10-21
+
+* Result
+
+The numeric-key helper checks np.isfinite before integer conversion, retaining its purely additive contract and every supplied original key/value.
+The actual label-mapping caller drops only rows whose RESOLVED SOURCE KEY is missing before constructing its replacement dictionary.
+That second guard matters: avoiding the exception alone exposed existing NaN dictionary keys that could turn missing input into an unrelated label or code.
+Nonmissing infinities, literal strings nan/inf, finite/fractional/collision behavior, null targets, explicit key resolution and sentinel protections remain intact.
+No country file, curation, dependency, schema, registry or fingerprint policy changes.
+
+Runtime baseline is f8d236694c26fe9e709c5548f02c70f74ea72c33.
+The root-authored initial ledger and separate worker ledger corrections preceded implementation; see .coder/ledger/1077-nonfinite-label-keys.md.
+Root explicitly approved the measured Uganda cache cost and the null-source caller guard after the initial diagnosis contradicted the original premises.
+
+* Actual scope and historical discrepancy
+
+The current metadata census reproduces 34 crashing table/target cells across twelve tables in seven countries, including nineteen ISA cells and fifteen incidental GhanaLSS/Guatemala cells.
+All 34 now succeed on the real Country._apply_categorical_mappings path using their actual curated tables and synthetic observations; these are metadata/path tests, not a claim of 34 separate raw-survey API builds.
+The one actual source-backed public replay below is Uganda food_acquired(labels={'u':'Code'}).
+The current complete metadata census has zero remaining nonfinite augmentation exceptions.
+
+The live issue says "13 tables / 36 (table, target) cells" from its earlier #928 red team.
+The current source does not reproduce that count.
+Applying the old positional selection rule to CURRENT metadata gives 35, not 36; its only extra unique failing cell is Niger u / Original Label, previously keyed on Code with a NaN.
+The held ddd79800c Niger Org table lacks the declaration and independently reproduces that same legacy failure.
+At f8, Niger declares #+key: Original Label.
+Requesting Original Label (or its bare Original spelling) excludes that declared source and correctly raises the EXISTING plain KeyError before augmentation; it does not fall back to Code.
+Those are two spellings of one target column, not evidence of two distinct cells.
+Niger's four other targets, Preferred Label, Code, 2018-19 and 2021-22, work through the actual mapping method.
+No second distinct Niger target or other missing historical cell was established from the supplied historical issue description; do not report 36 current cells resolved.
+The new test preserves #928's explicit-key rejection rather than converting it to a degradable label error.
+
+* Null-safety counterfactual
+
+The first finite-only candidate preserved original NaN dictionary keys, as the helper contract requires.
+An adversarial synthetic-input probe on all 34 real tables then mapped an actual null to a nonmissing metadata target in 21 column-path cells and eight index-path cells in the measured process.
+For Uganda u -> Code, the resolved source is 2005-06: np.nan, None and pd.NA became metadata code 807089 via the original NaN replacement key.
+These are source-codebook codes and synthetic null inputs, not household identifiers or observed microdata values.
+Literal strings nan/inf/-inf remained distinct; Unknown and protected kg/Value controls survived.
+This was a caller defect exposed by making the helper total, not a reason to weaken its additive dictionary contract.
+
+Root approved filtering actual missing SOURCE keys at _build_replace_dict, using dropna(subset=[source]) before set_index.
+The final probe has ZERO fabricated null labels in all 34 column cells and all 34 index cells.
+Tests additionally curate literal nan and inf keys explicitly, retain separate numeric infinities, retain a nonmissing key's null target, and use a declared source that is not the first column.
+Known/unmatched mappings, all non-label payload/keys, nested attrs and reserved sentinels are checked.
+The intermediate failure evidence remains private for independent review.
+
+* Cache cost: a genuine build caller
+
+The initial zero-cost premise was false.
+Uganda wave food scripts import uganda.food_acquired, which at Uganda/_/uganda.py:362 imports _augment_numeric_code_keys and at line 386 calls it on harmonized_unit_labels().
+The resulting food frame is written by each wave script and assembled by Uganda/_/food_acquired.py.
+Country._table_cache_hash fingerprints the country-level framework-import closure, so editing the shared helper moves ALL 28 Uganda table hashes.
+It moves none of the other 521 hashes; all 39 tagged build_transforms fingerprints are byte-identical.
+The read-time caller filter adds no further hash moves.
+No function is excluded to hide the dependency, and no schema/fingerprint lever is changed.
+
+This library-specific dependency was recorded and approved before the held-L1 rebuild.
+An initial warm replay with only old L2 copies correctly descended into stale Uganda caches and hit the offline guard because it had no copied L1.
+That private process was stopped; no source was acquired.
+It was replaced by two fresh physical Uganda L2 roots with only 23 physically copied held L1 blobs, 25 relevant sidecar references and 121,541,917 source bytes.
+All source reads in the completed cold builds use sanctioned library IO, with image Python, exact package/config roots, one numeric thread and one build worker.
+No shared writable L2, acquisition, DVC CLI, shared-cache clearing/promotion or in-tree parquet is involved.
+
+Uganda CONTENTS documents changing cluster identity from EA codes to parish codes to district/parish composites, plus live LOGBOOK/TODO/WAITING caveats including item-specific nonfood recall windows and the measured 2015-16 crop-value correction.
+Those decisions remain unchanged; the observed cluster/null-key/quantity warnings are not dismissed as stale documentation.
+No survey-specific semantic change is inferred from this helper correction.
+
+* Paired raw and public evidence
+
+Both cold builds produce 355,571 food rows across eight waves.
+The complete pre-finalize country food frame and EACH of the eight wave food frames match exactly before/after, including values, index and logical attrs.
+Default public results match exactly before/after, including Quantity, Expenditure, Price, the full six-level index and all seven attrs.
+At each checkout the warm Preferred call matches its first default result exactly and writes no parquet.
+
+The baseline public Code request raises ValueError: cannot convert float NaN to integer, on both first and repeated calls.
+The fixed Code request succeeds on all 355,571 rows and is exact on every value, non-u index key and attr; only the explicitly requested u vocabulary changes.
+The selected result has 74,603 numeric unit keys, versus 24 already-numeric keys under the unchanged default vocabulary, and zero null u rows.
+Its warm replay is fully exact and writes no parquet.
+A separate fresh process also verifies default, Code, default-after-Code, Preferred and a new Country object's Code call, including full values/index/attrs and no parquet writes.
+
+The first baseline evidence script compared pickle byte streams for attrs and failed despite logical dict equality being True, because serialization encodes object memoization.
+The complete first-cold snapshots were preserved, and resumed assertions use logical attrs equality without rebuilding or replacing those source snapshots.
+This was a verification-oracle correction, not a product change or omitted attr comparison.
+
+* Targeted tests and audit
+
+230 tests pass, zero fail/skip, using four loadfile workers with numeric/build threads pinned to one.
+This includes 119 new regressions plus existing label-selection, categorical-key-resolver and numeric-unit-key tests.
+Only the unrelated multi-country live source sweep test_clean_countries_have_no_u_code_leaks is deselected; all its cache-independent helper/leak tests run.
+Against immutable f8, the final regressions yield 118 failures and one existing Niger contract control passes.
+With just the finite guard retained and the original caller restored in an isolated private counterfactual process, 52 regressions fail and 67 pass.
+That second control discriminates the null-source bug from the exception fix.
+
+The existing Feature harness runs phases 1/2 for Uganda food_acquired, with a private runtime-only kwarg grid of Preferred, Aggregate and {'u':'Code'}.
+Baseline: 23 records, 22 warnings and one failed assembly; candidate: 26 warnings, zero failures/errors/skips.
+The 21 full normalized default/Preferred/Aggregate finding records are EXACTLY unchanged.
+The selected-Code cell removes two records: a class-A load-failure warning and a class-B empty-assembly failure.
+It adds five existing read diagnostics now reachable on the successful request: three quantity warnings, one null-index warning and one cluster-identity warning.
+No full scanner JSONL, observed-value example, household identifier, raw frame or detailed log is committed.
+The adjacent validation.json contains source-safe metadata, exact comparison statuses, aggregates and hash-scope evidence.
+
+* Reproduction
+
+Private scripts, raw snapshots and logs remain under /local/job40255479/control/isa-backlog-20261021/framework1077.
+The following commands replay the targeted tests and public selection on the completed candidate root.
+For a fresh cold replay, use a NEW physical data root with only the relevant held L1 copies; use immutable f8 with its own root for before.
+The private cohort.py, null_probe.py, counterfactual.py, hash_inventory.py and audit.py preserve the exact runnable evidence used here.
+All input/output data roots must remain outside the repository; never clear or promote a shared cache.
+
+#+begin_src sh :eval no :tangle no :results output
+export ISA_CHECKOUT=/local/job40255479/worktrees/isa-framework-1077
+export ISA_PRIVATE=/local/job40255479/control/isa-backlog-20261021/framework1077
+export ISA_PYTHON=/local/job40255479/venv_img/bin/python
+export PYTHONPATH="$ISA_CHECKOUT:/local/job40255479/control/isa-backlog-20261021/east/1144/offline"
+export LSMS_COUNTRIES_ROOT="$ISA_CHECKOUT/lsms_library/countries"
+export LSMS_DATA_DIR="$ISA_PRIVATE/cold-after-data"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1
+export PATH="$(dirname "$ISA_PYTHON"):$PATH"
+cd "$ISA_CHECKOUT"
+"$ISA_PYTHON" -m pytest -n 4 --dist=loadfile -q \
+  tests/test_gh1077_nonfinite_label_keys.py tests/test_label_selection.py \
+  tests/test_categorical_key_resolver.py tests/test_u_code_leak.py \
+  -k 'not test_clean_countries_have_no_u_code_leaks' > "$ISA_PRIVATE/tests-replay.log" 2>&1
+"$ISA_PYTHON" - <<'PY'
+from pathlib import Path
+import os, pandas as pd
+import lsms_library as ll
+from lsms_library.paths import countries_root
+root = Path(os.environ['ISA_CHECKOUT']).resolve()
+assert Path(ll.__file__).resolve().is_relative_to(root)
+assert countries_root().resolve() == root / 'lsms_library/countries'
+c = ll.Country('Uganda', preload_panel_ids=False)
+base = c.food_acquired()
+selected = c.food_acquired(labels={'u': 'Code'})
+pd.testing.assert_frame_equal(base.droplevel('u'), selected.droplevel('u'), check_exact=True)
+assert base.attrs == selected.attrs
+warm = c.food_acquired(labels={'u': 'Code'})
+pd.testing.assert_frame_equal(selected, warm, check_exact=True)
+assert selected.attrs == warm.attrs
+print(len(base), len(selected))
+PY
+"$ISA_PYTHON" "$ISA_PRIVATE/audit.py" "$ISA_PRIVATE/audit-replay.jsonl" \
+  > "$ISA_PRIVATE/audit-replay.log" 2>&1
+"$ISA_PYTHON" "$ISA_PRIVATE/hash_inventory.py" "$ISA_PRIVATE/hashes-replay.json" \
+  > "$ISA_PRIVATE/hashes-replay.log" 2>&1
+#+end_src
+
+* Remaining scope and independent-review handoff
+
+No remaining #1077 exception or fabricated-null-label case was found in the CURRENT 34-cell matrix after both guards.
+The historical 36-cell total remains qualified evidence, not an additional invented coverage claim or an identified remaining runtime defect.
+Niger's explicit-key self-target KeyError remains intentional #928 behavior; supporting an identity request would be a separate API-contract decision.
+Target-null curation and nonmissing dictionary semantics are deliberately unchanged.
+Independent review should check the null-source counterfactual, both infinity/literal cases, all default/attrs conservation and the genuine 28-hash build cost before publication.
+
+Sue

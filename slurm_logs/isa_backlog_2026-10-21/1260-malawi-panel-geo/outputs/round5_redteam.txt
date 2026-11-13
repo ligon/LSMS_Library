@@ -1,0 +1,103 @@
+GH #1260 round 5 -- red-team fixes on fix/malawi-2013-14-panel-stayer-geo-20261023
+base e0b1485ae (round 4 head) vs branch 3a49809a2; burst jobs malawi-plot/p1-{base,branch,tests,basetests,cmp} (savio4_htc), each cold in its own LSMS_DATA_DIR.
+Counts only: no ids, no coordinates.
+
+== 1. Cold build of EVERY Malawi table (Country('Malawi').data_scheme, 26) + the 5 cluster_features wave frames: base vs branch
+anthropometry                              IDENTICAL (31038, 4)
+assets                                     IDENTICAL (356297, 5)
+cluster_features                           IDENTICAL (3235, 5)
+community_prices                           IDENTICAL (82635, 4)
+crop_production                            IDENTICAL (135078, 9)
+food_acquired                              IDENTICAL (971531, 3)
+food_coping                                IDENTICAL (200738, 1)
+food_expenditures                          IDENTICAL (681980, 1)
+food_prices                                IDENTICAL (680400, 1)
+food_quantities                            IDENTICAL (971028, 1)
+food_security                              IDENTICAL (27878, 9)
+household_characteristics                  IDENTICAL (56918, 15)
+household_roster                           IDENTICAL (260612, 7)
+housing                                    IDENTICAL (57118, 2)
+individual_education                       IDENTICAL (184667, 1)
+interview_date                             IDENTICAL (69484, 1)
+livestock                                  IDENTICAL (39126, 4)
+months_food_inadequate                     IDENTICAL (40152, 2)
+panel_ids                                  IDENTICAL (non-frame, len 5686 / 5686)
+people_last7days                           IDENTICAL (207713, 8)
+plot_features                              IDENTICAL (68339, 10)
+plot_inputs                                IDENTICAL (179850, 5)
+plot_labor                                 IDENTICAL (79997, 2)
+sample                                     IDENTICAL (57118, 7)
+shocks                                     IDENTICAL (104691, 7)
+subjective_well_being                      IDENTICAL (36147, 3)
+wf_cluster_features_2004-05                IDENTICAL (11280, 3)
+wf_cluster_features_2010-11                IDENTICAL (12271, 5)
+wf_cluster_features_2013-14                IDENTICAL (4000, 5)
+wf_cluster_features_2016-17                IDENTICAL (14955, 5)
+wf_cluster_features_2019-20                IDENTICAL (14612, 5)
+
+== 2. Hash census (hash_census.py, config only): base vs branch
+country: 26 of 549 moved; only-base 0 only-branch 0
+   by {'Malawi': 26}
+btf: 0 of 40 moved; only-base 0 only-branch 0
+   by []
+wave: 130 of 2109 moved; only-base 0 only-branch 0
+   by {'Malawi/2004-05': 26, 'Malawi/2010-11': 26, 'Malawi/2013-14': 26, 'Malawi/2016-17': 26, 'Malawi/2019-20': 26}
+errors base 0 branch 0
+
+== 3. IHS3 (2010-11) EAs that reappear in later cluster_features (branch build), by kind; km between served coordinates
+2016-17: IHS3 EAs present 108
+  IHPS panel EAs (continuing): 102 EAs (with panel households 102, with cross-sectional households 1); km from 2010-11 coordinate: min 0.00 median 0.00 max 0.00; <0.001 km: 102
+  short-term 2013-14 EAs, cross-section only: 1 EAs (with panel households 0, with cross-sectional households 1); km from 2010-11 coordinate: min 17.49 median 17.49 max 17.49; <0.001 km: 0
+  IHS3-only EAs drawn again by the cross-section: 5 EAs (with panel households 0, with cross-sectional households 5); km from 2010-11 coordinate: min 3.15 median 15.65 max 29.91; <0.001 km: 0
+2019-20: IHS3 EAs present 104
+  IHPS panel EAs (continuing): 102 EAs (with panel households 102, with cross-sectional households 0); km from 2010-11 coordinate: min 0.00 median 0.00 max 0.00; <0.001 km: 102
+  short-term 2013-14 EAs, cross-section only: 0
+  IHS3-only EAs drawn again by the cross-section: 2 EAs (with panel households 0, with cross-sectional households 2); km from 2010-11 coordinate: min 8.15 median 10.15 max 12.15; <0.001 km: 0
+
+== 4. Tests: tests/test_gh1260_malawi_panel_geo.py + tests/test_gh323_malawi_cluster_key.py, -n 8 --dist=loadfile
+clean: 65 passed, 1 xfailed, 199 warnings in 51.38s
+mutA_short: ============ 6 failed, 59 passed, 1 xfailed, 199 warnings in 46.49s ============
+mutA_long: ============ 6 failed, 59 passed, 1 xfailed, 178 warnings in 45.48s ============
+mutB_short: =========== 11 failed, 54 passed, 1 xfailed, 199 warnings in 57.11s ============
+mutB_long: =========== 11 failed, 54 passed, 1 xfailed, 178 warnings in 54.55s ============
+new tests on base e0b1485ae: 7 failed, 58 passed, 1 xfailed, 199 warnings in 51.98s
+new tests on base 8a8278a2a: 20 failed, 46 passed, 178 warnings in 47.42s
+Failing on e0b1485ae (the 7 new structural tests):
+  test_shared_implementation_is_the_country_modules
+  test_wave_hook_is_a_thin_caller_of_the_shared_implementation[2016-17]
+  test_wave_hook_is_a_thin_caller_of_the_shared_implementation[2019-20]
+  test_wave_hook_is_a_thin_caller_of_the_shared_implementation[2013-14]
+  test_missing_status_error_names_the_waves_own_source[2016-17]
+  test_missing_status_error_names_the_waves_own_source[2019-20]
+  test_missing_status_error_names_the_waves_own_source[2013-14]
+Failing on 8a8278a2a (development): 20 (the 2013-14 tests, the 7 structural ones, and the #1281 xfail's precondition, which pytest.fail()s rather than xfails)
+Mutation A (shared implementation blanks Latitude only) caught by:
+  test_hook_keeps_coordinates_on_the_eas_fix[2016-17]
+  test_hook_keeps_coordinates_on_the_eas_fix[2019-20]
+  test_hook_keeps_coordinates_on_the_eas_fix[2013-14]
+  test_wave_frame_gives_panel_households_their_coordinates[2016-17]
+  test_wave_frame_gives_panel_households_their_coordinates[2019-20]
+  test_2013_14_wave_frame_keeps_only_coordinates_on_the_eas_fix
+Mutation B (2013-14 hook renamed away) caught by:
+  test_hook_keeps_coordinates_on_the_eas_fix[2013-14]
+  test_hook_fails_closed_without_a_status[2013-14]
+  test_hook_refuses_a_status_off_the_panel_id_shape[2013-14]
+  test_hook_refuses_stayers_that_disagree[2013-14]
+  test_wave_hook_is_a_thin_caller_of_the_shared_implementation[2013-14]
+  test_missing_status_error_names_the_waves_own_source[2013-14]
+  test_misspelled_distance_variable_raises[2013-14]
+  test_2013_14_wave_frame_keeps_only_coordinates_on_the_eas_fix
+  test_2013_14_every_ea_serves_its_stayers_fix
+  test_2013_14_ea_coordinate_is_the_same_in_every_ihps_round
+  test_2013_14_cluster_attributes_come_from_a_stayer
+
+== 5. Leak scan of every pytest output above (EA codes [1-3]NNNNNNN, panel ids NNNN-NNN, 12-digit case_ids, Malawi-range lat/lon with >=3 decimals)
+report-line hits = assertion explanations (E lines) and the FAILURES section outside source listings; any-line hits include traceback SOURCE listings
+pytest_clean.txt: FAILED=0 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+pytest_mutA_long.txt: FAILED=6 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 21, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+pytest_mutA_short.txt: FAILED=6 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+pytest_mutB_long.txt: FAILED=11 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+pytest_mutB_short.txt: FAILED=11 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+pytest_8a8278a2a.txt: FAILED=20 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+pytest_e0b1485ae.txt: FAILED=7 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+The 21 any-line panel_id hits in mutA_long are all the synthetic test's own literals (e.g. "0001-001") in the long-traceback source listing; 0 in any report line.

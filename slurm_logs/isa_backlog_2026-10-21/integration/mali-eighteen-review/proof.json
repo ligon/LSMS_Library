@@ -1,0 +1,105 @@
+{
+  "candidate": "f9feb3c807aff5206134c37768992302ceb431fa",
+  "actual17": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+  "runtime_verdict": "PASS",
+  "documentation_finding": "coverage-dependent unsupported empty representation requires qualification",
+  "source_delta_paths": 10,
+  "hash_scope": {
+    "API": 549,
+    "Mali_changed": 24,
+    "others_exact": 525,
+    "framework_exact": 39
+  },
+  "candidate_tests": {
+    "pass": 111,
+    "fail": 0,
+    "error": 0,
+    "skip": 0,
+    "explicit_deselection": 1
+  },
+  "actual17_new_test_counterfactual": {
+    "pass": 4,
+    "fail": 24,
+    "error": 0,
+    "skip": 0
+  },
+  "Mali_rows": 155931,
+  "Mali_obs_counts": [
+    66699,
+    49014,
+    40218
+  ],
+  "Mali_passage_counts": [
+    66159,
+    89772
+  ],
+  "Niger_rows": 46043,
+  "Niger_quantity_masks": [
+    43,
+    32,
+    1
+  ],
+  "Niger_late_obs": 30,
+  "current_Feature_rows": 201974,
+  "Feature_argument_routes": [
+    "default",
+    "currency=None"
+  ],
+  "candidate_primary_stages": 48,
+  "actual17_primary_stages": 28,
+  "strict_pair_counts": {
+    "normal_cold_warm": 28,
+    "all_native_source_oracle": 40,
+    "raw_country_matching_layer": 34,
+    "actual17_18_supported": 6,
+    "cold_unsupported_existing_factory": 8,
+    "old_Make_sole_attrs_difference_exact_elsewhere": 1,
+    "populated_freshwarm": 10,
+    "populated_existing_contract": 10,
+    "covered_empty_parent": 4,
+    "current_country_Feature": 4,
+    "CLI_supported_parent": 4,
+    "CLI_parent_full_Arrow_schema_footer_bytes": 2,
+    "CLI_unsupported_existing_contract": 2,
+    "CLI_unsupported_backends": 1,
+    "CLI_actual_writer_frame_attrs": 8,
+    "CLI_actual_writer_full_Arrow_schema_footer_bytes": 8
+  },
+  "strict_input_pickles": 177,
+  "comparator_mutations_rejected": 7,
+  "explicit_check_exact": true,
+  "rtol": 0,
+  "atol": 0,
+  "full_recursive_typed_attrs": true,
+  "all_40_warning_multiset_fields_literal_true": true,
+  "warning_captures": 102,
+  "captured_warnings": 1,
+  "synthetic_pytest_warning_summary_groups": {
+    "CacheRebuildWarning": 16,
+    "UserWarning": 3
+  },
+  "source_and_CLI_log_warning_headers": 0,
+  "scanner": {
+    "records": 2,
+    "WARN": 2,
+    "full_records_and_bytes_parent_exact": true,
+    "data_changes": 0
+  },
+  "physical_source_files": 5,
+  "sidecars": 5,
+  "physical_copies": 213,
+  "old_manifest_payloads_rehashed": 10404,
+  "source_trees_unchanged_and_clean": true,
+  "in_tree_parquets": 0,
+  "outbound_IP_attempts": 0,
+  "unexpected_write_denials": 0,
+  "unexpected_harness_stops_preserved": 5,
+  "first_seal_stop_private_font_metadata_files": 8,
+  "scope_limits": [
+    "no full suite/cohort",
+    "other23 Mali outputs not rebuilt",
+    "historical17 13FAIL/doc-child qualification/1196 retained",
+    "API/artifact and empty-coverage representations remain distinct",
+    "runtime proof stays pinned to f9"
+  ]
+}

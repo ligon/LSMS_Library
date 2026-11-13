@@ -1,0 +1,78 @@
+{
+ "s00_me_bfa2018_rows": 7010,
+ "s00_me_bfa2021_rows": 3227,
+ "grappes": [
+  {
+   "grappe": 19,
+   "expected": {
+    "2018-19": "Séno",
+    "2021-22": "Yagha"
+   },
+   "rows_2018_19": 12,
+   "rows_2021_22": 6,
+   "s00q02_2018_19": {
+    "Séno": 12
+   },
+   "s00q02_2021_22": {
+    "Yagha": 6
+   },
+   "s00q01_2018_19": {
+    "Sahel": 12
+   },
+   "s00q01_2021_22": {
+    "Sahel": 6
+   },
+   "rows_2021_22_with_grappe_EHCVM1_same": 6,
+   "rows_2021_22_with_grappe_EHCVM1_other": 0,
+   "rows_2021_22_with_no_EHCVM1_link": 0
+  },
+  {
+   "grappe": 365,
+   "expected": {
+    "2018-19": "Poni",
+    "2021-22": "Noumbiel"
+   },
+   "rows_2018_19": 12,
+   "rows_2021_22": 6,
+   "s00q02_2018_19": {
+    "Poni": 12
+   },
+   "s00q02_2021_22": {
+    "Noumbiel": 6
+   },
+   "s00q01_2018_19": {
+    "Sud-Ouest": 12
+   },
+   "s00q01_2021_22": {
+    "Sud-Ouest": 6
+   },
+   "rows_2021_22_with_grappe_EHCVM1_same": 6,
+   "rows_2021_22_with_grappe_EHCVM1_other": 0,
+   "rows_2021_22_with_no_EHCVM1_link": 0
+  },
+  {
+   "grappe": 549,
+   "expected": {
+    "2018-19": "Kompienga",
+    "2021-22": "Gourma"
+   },
+   "rows_2018_19": 12,
+   "rows_2021_22": 6,
+   "s00q02_2018_19": {
+    "Kompienga": 12
+   },
+   "s00q02_2021_22": {
+    "Gourma": 6
+   },
+   "s00q01_2018_19": {
+    "Est": 12
+   },
+   "s00q01_2021_22": {
+    "Est": 6
+   },
+   "rows_2021_22_with_grappe_EHCVM1_same": 6,
+   "rows_2021_22_with_grappe_EHCVM1_other": 0,
+   "rows_2021_22_with_no_EHCVM1_link": 0
+  }
+ ]
+}

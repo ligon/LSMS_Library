@@ -1,0 +1,5 @@
+outs:
+- md5: 4d05dd9dcaff491374f01018d42fab6e
+  size: 384739
+  hash: md5
+  path: HH_CONSUMPTION.dta

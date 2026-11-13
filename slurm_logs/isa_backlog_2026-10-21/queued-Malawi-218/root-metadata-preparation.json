@@ -1,0 +1,23 @@
+{
+  "recorded_at_UTC": "2026-10-22T03:02:10.309301+00:00",
+  "rows": [
+    {
+      "label": "candidate",
+      "checkout": "/local/job40255479/worktrees/isa-Malawi-218",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "ignored_link": "/local/job40255479/worktrees/isa-Malawi-218/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/Malawi/218/candidate-dvc-tmp",
+      "clean": true
+    },
+    {
+      "label": "base",
+      "checkout": "/local/job40255479/worktrees/isa-Malawi-218-base",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "ignored_link": "/local/job40255479/worktrees/isa-Malawi-218-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/Malawi/218/base-dvc-tmp",
+      "clean": true
+    }
+  ],
+  "writer_assigned": false,
+  "edits_tests_builds": 0
+}

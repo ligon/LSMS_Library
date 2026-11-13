@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from lsms_library.local_tools import to_parquet
+from lsms_library.local_tools import format_id, to_parquet
 import sys
 sys.path.append('../../_')
 from uganda import nonfood_expenditures
@@ -15,6 +15,8 @@ myvars = dict(fn='../Data/GSEC15c.dta',
               given='h15cq9')
 
 x = nonfood_expenditures(**myvars)
+# GSEC15c.hh is numeric; use the same household spelling as sample (GH #1291).
+x = x.rename(index=format_id, level='i')
 
 # `t` is stamped by the WAVE script, mirroring the sibling food_acquired path
 # (2013-14/_/food_acquired.py):  uganda.nonfood_expenditures returns the long

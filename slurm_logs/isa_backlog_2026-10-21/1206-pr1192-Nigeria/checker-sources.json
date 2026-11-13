@@ -1,0 +1,242 @@
+{
+  "check-pr1192-nigeria.py": {
+    "sha256": "d4765e124420569d91361fa033e734c885d117e36af1b5b356913e0912a2909b",
+    "bytes": 4995,
+    "mode": 384,
+    "mtime_ns": 1792674410318539697,
+    "inode": 58076449,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "seal_saved_numeric.py": {
+    "sha256": "46653bebeb5879157036be3ffa84b68adce2cf7662f8492314a6b0a384171c6b",
+    "bytes": 2558,
+    "mode": 384,
+    "mtime_ns": 1792673701434650465,
+    "inode": 58076486,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact_strict.py": {
+    "sha256": "c42164e9d7e01027ac264b1442e5157d44aa0207655ab8c53d080659084f812d",
+    "bytes": 5155,
+    "mode": 384,
+    "mtime_ns": 1792650727680300392,
+    "inode": 58076453,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "attest-pr1192-nigeria.py": {
+    "sha256": "64f75d03c45d9911f1f6664e183ed96030c39d418b630e070a9e28a240f850b4",
+    "bytes": 2301,
+    "mode": 384,
+    "mtime_ns": 1792675517062773678,
+    "inode": 58076442,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "characterize-pr1192-index-domains.py": {
+    "sha256": "981427c6aeba9285cf78bff4d3baead9220893260e8322ccc3704164b13128ea",
+    "bytes": 11625,
+    "mode": 384,
+    "mtime_ns": 1792675242155099294,
+    "inode": 58076446,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "calibrate-object-v3.py": {
+    "sha256": "d592d0346bf80f7dca6a8a716e3681552a96562da17c3117c32b3fde563d9639",
+    "bytes": 2866,
+    "mode": 384,
+    "mtime_ns": 1792655052211984941,
+    "inode": 58076444,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "prepare-pr1192-nigeria.py": {
+    "sha256": "e2b041a3b75ad327dabc126cbb3442c5a16284bedec7f9990bc6579ea0a1373d",
+    "bytes": 7441,
+    "mode": 384,
+    "mtime_ns": 1792674294596910216,
+    "inode": 58076483,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact_strict_fast_v3.py": {
+    "sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+    "bytes": 5198,
+    "mode": 384,
+    "mtime_ns": 1792655052211984941,
+    "inode": 58076454,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "bootstrap.py": {
+    "sha256": "3a3aca0d72e4d3b919bc1708947f8edc413e712cab125d2badb74e104199b522",
+    "bytes": 2560,
+    "mode": 384,
+    "mtime_ns": 1792650727641300176,
+    "inode": 58076443,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "1196-original-exact.py": {
+    "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2",
+    "bytes": 4376,
+    "mode": 384,
+    "mtime_ns": 1792650621807714413,
+    "inode": 58076439,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "package-pr1192-nigeria.py": {
+    "sha256": "1744454cf978dbf90096a36992629ffa380fefffbf581d595f4aa3e6faca51ae",
+    "bytes": 8984,
+    "mode": 384,
+    "mtime_ns": 1792675517062773678,
+    "inode": 58076457,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "check-critical.py": {
+    "sha256": "947bc88204df04cdc9d23b70624f697fcd279fe20cfb01c2f5f7a3ed4658f808",
+    "bytes": 9585,
+    "mode": 384,
+    "mtime_ns": 1792650827403867387,
+    "inode": 58076447,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "twenty-original-exact.py": {
+    "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2",
+    "bytes": 4376,
+    "mode": 384,
+    "mtime_ns": 1792650620812709018,
+    "inode": 58076487,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/source-proof.py": {
+    "sha256": "6f9f7e09c856b8abc78913115a7443f7a1661a20dc2086772d5fd60eb40c50d3",
+    "bytes": 8935,
+    "mode": 384,
+    "mtime_ns": 1792616444346284332,
+    "inode": 3419529,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/final-proof.py": {
+    "sha256": "008efaddb0f078d86a5754e7edc6eab5586a6f2ad03b7661c4c58d0b7e07606d",
+    "bytes": 4762,
+    "mode": 384,
+    "mtime_ns": 1792616725839733918,
+    "inode": 3419530,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/hash_inventory.py": {
+    "sha256": "ec522cd0aca9b464869e9143837785112ae2de3f9d231902e49be0ae67de5e54",
+    "bytes": 947,
+    "mode": 384,
+    "mtime_ns": 1792616216850007607,
+    "inode": 3419531,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/snapshot.py": {
+    "sha256": "d7e37c09ae805bf07de0fb0a593dc3ed1f6f82b22d64c8d473459242fb90f6b8",
+    "bytes": 2304,
+    "mode": 384,
+    "mtime_ns": 1792616002114675356,
+    "inode": 3419532,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/build.py": {
+    "sha256": "5bf756dcc406bc538670ac05d8832cebce0608d4e2cc28c738c163d604fb70e7",
+    "bytes": 2899,
+    "mode": 384,
+    "mtime_ns": 1792616071116090307,
+    "inode": 3419533,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/feature_probe.py": {
+    "sha256": "0b0ba291be34616c3bdec3fbe7c5c20459106a40bece82b08f59f31c65bee4c3",
+    "bytes": 2936,
+    "mode": 384,
+    "mtime_ns": 1792616277206371822,
+    "inode": 3419534,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/adversarial.py": {
+    "sha256": "4ce88c9d19337ed03aa3e316d3b7f40d4f8e257561a9faef8e22224a62a430d8",
+    "bytes": 4302,
+    "mode": 384,
+    "mtime_ns": 1792616332808684954,
+    "inode": 3419535,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/prepare.py": {
+    "sha256": "3affbfd3a70da85c4f4c9d82e7aab69438dba2b543b7e0208416384abe0062d8",
+    "bytes": 2561,
+    "mode": 384,
+    "mtime_ns": 1792616041614908430,
+    "inode": 3419536,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "pr1192-Nigeria-test-sources/test_gh1047_nigeria_unit_codes.py": {
+    "sha256": "83b6238261b95ce8541e3a9c02f08e28680b79bd4d7efd343e86574eaab214e7",
+    "bytes": 14162,
+    "mode": 384,
+    "mtime_ns": 1792675447113361893,
+    "inode": 3282035,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "pr1192-Nigeria-test-sources/test_nigeria_cluster_identity.py": {
+    "sha256": "e8efa14c70fa67025e9bb0bd8ab4cca8b640c409d439eac17bb0041dad9f51cc",
+    "bytes": 18735,
+    "mode": 384,
+    "mtime_ns": 1792675447128361983,
+    "inode": 3282036,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "pr1192-Nigeria-test-sources/test_nigeria_community_units.py": {
+    "sha256": "a1f34350e1941848dafda77e730c799fb9f96b47bbde3cfe2c0768089bf75f37",
+    "bytes": 5485,
+    "mode": 384,
+    "mtime_ns": 1792675447102361827,
+    "inode": 3282037,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  }
+}

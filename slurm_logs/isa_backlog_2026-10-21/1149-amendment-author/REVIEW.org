@@ -1,0 +1,50 @@
+#+title: GH1149 invalid receipt cleanup amendment - author evidence
+#+author: Sue
+
+* Narrow result
+
+The new runtime adds current-call completion cleanup and a bare re-raise around path receipt validation in populate_and_push and add_wave.
+The normal push helper still promises list[Path]; invalid None and Path(None) returns preserve their original TypeError and SOURCE bytes.
+An unrelated receipt entry retains object identity.
+This is a pre-existing defensive cleanup gap, not an established normal-helper regression, false held stamp or country-data corruption.
+
+* Grounding
+
+The full amendment brief, root metadata, original/standing ledgers, current acquisition helpers and independent review/verdict/validation/adversarial controls were read.
+Complete previous personal Nigeria2166-line and Ethiopia2350-line CONTENTS readings are carried through exact new-checkout blobs e548594c034362bc5bf08e08b3d447444ef6c8db and21d795f41c9a294511a4abe37f2dd80d7fd3f828.
+Nigeria's nested W5v01/v02 acquisition gap, amended W1 quantity-aware unit rule and WAITING nonfood recall caveat remain.
+Ethiopia's heldv02 and old plot filename remain; its "coordinates are **CONFIDENTIAL** anyway" rationale conflicts with1127's "The redaction is in a different file" correction.
+That contradiction remains a documented result; no country policy, source or scientific decision changed.
+The amendment ledger was committed first as82f6cb8c4, before functional edits.
+
+* Checks
+
+All270 affected current-source tests pass, with0failure/error/skip and one expected mocked bad-GPG warning.
+The four new controls cover two invalid receipts across both public entrypoints.
+The identical physically copied controls fail4of4 on actualfb only at retained-current-receipt assertions, after confirming original TypeError args, unchanged SOURCE bytes and preserved unrelated receipt identity.
+The entire data_access AST becomes identical tofb after removing exactly the two new validation cleanup wrappers.
+Removing the one new parametrized test makes the complete affected test AST identical tofb.
+Confirmation, push=False, partial/duplicate/wrong-list receipts, successful source recording and all original six Option C tests remain in the current270PASS suite.
+
+Actual549country/39framework/1362wave fingerprints have exact keysets and0moves versus actualfb, with0data-endpoint changes.
+Both census stderr streams retain three non-ISA Peru missing-_/directory diagnostics; checkout prefixes differ explicitly.
+No schema or fingerprint exclusion changed.
+There were0network attempts or write-guard denials.
+Offline namespaces, active pre-import guards, exact DVCtmp exceptions, private config/data/tmp roots and thread/build limits were asserted.
+Pytest used at most2workers with loadfile distribution.
+
+* Scope and retained history
+
+No Country/Feature/CLI data call, real payload copy, real external acquisition or source-cold build ran for this amendment.
+The earlier independent bounded warm results remain pinned tofb and are not relabelled as measurements on the new runtime.
+Original human Option C and real-name fixture versus unavailable original archive-relative-path qualifications remain in the frozen review.
+A setup metadata KeyError used checkout where reviewer metadata names source, after bootstrap copies had succeeded and before imports/tests/product edits.
+The unchanged failed helper and original tool stderr transcript are retained; no old writer was rerun or overwritten.
+
+Before and after work,5932 original author/reviewer manifest entries and exact pathsets were verified, alongside89292 tracked-source receipts across six checkouts.
+Original sources, references, artifacts, modes, mtimes, inodes, links and verdicts remain unchanged.
+The candidate is clean and FS-published, with only the task ledger following the runtime/tests commit.
+Seven aggregate-only exports, exact checker/source pins and a full immutable manifest are provided after zero-consumer and post-exit checks.
+Root owns independent delta acceptance, PR publication and human merge.
+
+Sue.

@@ -1,0 +1,27 @@
+#+title: Nigeria #1135 diagnosis qualifications
+#+author: Sue
+#+date: 2026-10-21
+
+* Scope and interpretation
+
+The seven source reports are copied byte-for-byte from the frozen read-only diagnosis.
+The root reviewer read the complete diagnosis, proposal and validation and inspected the relevant oracle/probe code.
+No implementation is approved by exporting a proposal or draft ledger.
+
+The initial normal-API validation boolean named =all_full_frames_axes_dtypes_nulls_values_fullattrs_exact= is false because =sample_probe.py= initializes it from =SIDE != 'initial'=.
+The initial process captures the first reference rather than comparing it with itself.
+The warm process uses =assert_frame_equal(check_exact=True)= and a separate full-attrs equality check against that initial capture; those comparisons pass.
+The initial false flag is not a reported product mismatch.
+
+The panel companion oracle aligns both indexes with =sort_index()= before its exact frame comparison.
+It establishes values, keys and dtypes after index alignment, not unmodified concatenation order or full-attrs identity for that companion.
+The served sample initial-to-warm comparisons do not sort or normalize their frames.
+
+The Nigeria movement flags contradict interpreting prefix-filtered changed IDs as a complete net-of-movers renumbering statistic.
+The 86..106 W5 numerator is conditional on an unverified reference-period interpretation.
+The twelve observed earlier ID groups are not twelve source-verified physical renumbered clusters.
+Five instrument blobs are absent from both held L1 layouts; upstream availability was not tested.
+The other ten boundaries still require complete movement and cluster measurements.
+The settled SPAN and no-threshold ruling is unchanged.
+
+Sue

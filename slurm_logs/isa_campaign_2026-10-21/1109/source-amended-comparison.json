@@ -1,0 +1,18 @@
+{
+  "rows_before": 180184,
+  "rows_after": 180184,
+  "nonorganic_rows": 169109,
+  "nonorganic_index_order_values_dtypes_exact": true,
+  "organic_index_except_unit_and_other_measures_exact": true,
+  "organic_rows": 11075,
+  "organic_applied_true": 11075,
+  "before_organic_missing_amounts": 11075,
+  "after_organic_missing_amounts": 7,
+  "after_organic_positive_amounts": 11068,
+  "nitrogen_output_exact": true,
+  "nitrogen_rows": 33466,
+  "nitrogen_input_match_tally_exact": true,
+  "nitrogen_total": 840235.7795800001,
+  "private_builds_offline": true,
+  "no_shared_cache_promotion": true
+}

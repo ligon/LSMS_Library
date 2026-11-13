@@ -1,0 +1,24 @@
+{
+  "parent_default_and_candidate_request": [
+    "2017-18",
+    "2018-19",
+    "2021-22"
+  ],
+  "rows_all_controls": 0,
+  "candidate_default_make_three_stages_full_frame_full_typed_attrs_exact": true,
+  "candidate_empty_API_exact_actual_empty_declared_factory_and_finalizer": true,
+  "candidate_default_make_full_arrow_schema_and_metadata_exact": true,
+  "all_three_artifacts_exact_independent_unchanged_writer_controls": true,
+  "parent_artifact_and_API_identical_to_candidate": false,
+  "parent_candidate_empty_full_typed_attrs_exact": true,
+  "parent_empty_visit_obs_dtype": "int64",
+  "candidate_declared_empty_visit_obs_dtype": "str",
+  "candidate_Description_API_dtype": "object",
+  "candidate_Description_postread_dtype": "string",
+  "writer_source_SHA256": "e697a53f93279add6268c011b87dd3784c6245a588563223176d1c32db9009a3",
+  "supported_CLI_two_backends_full_frame_full_typed_attrs_and_footer_exact_parent_artifact": true,
+  "supported_CLI_API_prewrite_full_frame_full_typed_attrs_exact_parent_API": true,
+  "supported_API_to_artifact_typed_attrs_identical": false,
+  "supported_artifact_exact_unchanged_writer_control": true,
+  "framework_or_writer_changes": false
+}

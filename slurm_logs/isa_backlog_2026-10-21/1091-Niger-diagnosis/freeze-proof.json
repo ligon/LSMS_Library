@@ -1,0 +1,28 @@
+{
+  "status": "FROZEN_READ_ONLY_DIAGNOSIS",
+  "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "clean": true,
+  "tracked_file_count": 14885,
+  "tracked_bytes_and_modes_unchanged": true,
+  "tracked_manifest_sha256": "e5b34414e600f2fd96532a2a5d3ad3b2fab186fe8ae60a0e0166683685e3c1dc",
+  "source_receipts_unchanged": {
+    "held_sources": 11,
+    "source_sidecars": 11,
+    "physical_copies": 44
+  },
+  "protected_reference_receipts_unchanged": true,
+  "Mali_comparator_source_and_copy_bytes_mode_mtime_unchanged": true,
+  "quiescent_consumers_excluding_this_final_receipt_writer": [],
+  "guard_denied_attempts": 52,
+  "network_guard_attempts": 0,
+  "safe_exports": [
+    "DIAGNOSIS.org",
+    "PROPOSAL.org",
+    "validation.json",
+    "ledger-DRAFT.md",
+    "REPRODUCE.sh",
+    "freeze-proof.json",
+    "READY.json"
+  ],
+  "completed_at_UTC": "2026-10-22T00:01:19.118401+00:00"
+}

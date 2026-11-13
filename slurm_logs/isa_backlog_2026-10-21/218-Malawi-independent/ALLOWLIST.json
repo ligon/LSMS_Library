@@ -1,0 +1,15 @@
+{
+  "files": [
+    "ALLOWLIST.json",
+    "REVIEW.org",
+    "REPRODUCE.org",
+    "RESIDUALS.md",
+    "verdict.json",
+    "validation.json",
+    "proof.json",
+    "scanner-occurrences.json"
+  ],
+  "aggregate_only": true,
+  "no_raw_records_IDs_warning_examples_tracebacks": true,
+  "all_other_private_files_excluded": true
+}

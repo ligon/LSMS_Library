@@ -1,0 +1,11 @@
+{
+  "recorded_at": "2026-10-22T01:30:40.741410+00:00",
+  "source_head": "99c824079da480ab2646e499c06ac70e457ff271",
+  "runtime_source": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+  "ready_sha256": "a6cbd79afda1454696cc22ce0282f61946a99f7fbc2f0891ffa1fa0bc6d25d02",
+  "manifest_sha256": "0d0519b90e77e918b695815d7174d942b4fe1a12ce777510c0521b0d92315784",
+  "manifest_entries": 1216,
+  "root_approved_two_path_implementation": true,
+  "candidate_verdict": null,
+  "public_merge": false
+}

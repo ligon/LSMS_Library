@@ -23,7 +23,7 @@ Three tiers, deliberately separate:
 MEASURED NUMBERS (private cold rebuild, 2026-10-19, on the commit that
 introduced them).  Served rows before -> after:
 
-    Mali      2014-15    23,646 -> 40,218
+    Mali      2014-15    23,646 -> 40,218 (GH #840), then 155,931 (GH #822)
     Niger     2011-12     8,923 -> 32,352   (32,369 before the r1 fix below)
               2014-15     6,500 -> 13,691   (13,808 before the r1 fix below)
     Tanzania  2019-20     2,769 ->  3,076
@@ -34,12 +34,22 @@ Niger's second source records are duplicate ENTRIES of one questionnaire
 ``numquest``), not second readings.  The first cut enumerated every one of
 their slots as ``obs`` 4-6, so 134 served rows (2011-12 17, 2014-15 117)
 repeated an already-served row in every column but ``obs`` (red team r1);
-``_community_price_triples`` now drops those, and the 30 slots that repeat
-nothing stay as ``obs`` 4-6.
+``_community_price_triples`` now drops those.  The 30 slots that repeat nothing
+were ``obs`` 4-6 until GH #1087 (ruling @ligon 2026-11-04): a record's first
+entry is served, and ``second_entry_disagrees`` marks a record whose second entry
+disagrees; ``tests/test_gh1087_niger_second_entries.py`` pins that against the
+raw grids.  Niger's rows and cells below are after it.
 
-The number of (t, v, j, u) CELLS is unchanged in every wave -- the old table
-is a projection of the new one, and every row it served is one of the new
-table's rows for that cell.
+GH #840 kept the number of (t, v, j, u) CELLS unchanged. GH #822 restores
+Mali readings 1/2 and expands those cells 23,646 -> 39,245 while retaining
+every old cell and every reading-3 value (now obs=3). Its source census is
+recorded in slurm_logs/isa_backlog_2026-10-21/Mali/822/.
+
+GH #823 adds Niger 2018-19 (EHCVM s05, 84,444 rows, 42,087 cells) without
+touching a 2011-12 / 2014-15 row.  s05 has no variety field (the canonical
+``unknown_variety``) and TWO readings per record, so its second records are
+``obs`` 3-4, not 4-6; the CS07 tests below are scoped to the CS07 waves and
+``tests/test_gh823_niger_s05_community_prices.py`` pins the s05 rules.
 """
 from __future__ import annotations
 
@@ -60,7 +70,7 @@ CANONICAL = ["t", "v", "j", "u", "variety", "visit", "obs"]
 
 # What each country's own table carries (data_scheme.yml `index:`).
 DECLARED = {
-    "Mali": ["t", "v", "j", "u", "variety", "visit"],
+    "Mali": ["t", "v", "j", "u", "variety", "visit", "obs"],
     "Niger": ["t", "v", "j", "u", "variety", "visit", "obs"],
     "Tanzania": ["t", "v", "j", "u", "variety"],
 }
@@ -73,16 +83,23 @@ BUILDERS = {
 }
 
 # Measured served rows by wave (see the module docstring), and the (t, v, j, u)
-# cell counts the pre-#840 tables served -- which the new tables must keep.
+# cell counts after the source-accounted fixes (Mali expanded again in #822).
 EXPECTED_ROWS = {
-    "Mali": {"2014-15": 40218},
-    # 32,369 / 13,808 before the r1 duplicate-entry drop (-17 / -117).
-    "Niger": {"2011-12": 32352, "2014-15": 13691},
+    # 2018-19 since #1356 (a06b7a62f): two quotes per s05 source row, 2 x 54,669;
+    # `test_mali_2018_19_serves_both_quotes_of_every_source_row` reads the source.
+    "Mali": {"2014-15": 155931, "2018-19": 109338},
+    # 32,369 / 13,808 before the r1 duplicate-entry drop (-17 / -117); 32,352 /
+    # 13,691 before GH #1087 served a record's first entry only (-15 / -15).
+    "Niger": {"2011-12": 32337, "2014-15": 13676, "2018-19": 84444},
     "Tanzania": {"2019-20": 3076, "2020-21": 14623},
 }
 EXPECTED_CELLS = {
-    "Mali": {"2014-15": 23646},
-    "Niger": {"2011-12": 8923, "2014-15": 6500},
+    "Mali": {"2014-15": 39245, "2018-19": 54205},
+    # GH #1090: 8,923 / 6,500 before CS07 rice variety 7031 moved from
+    # `Autre Riz local` to `Riz importé non parfumé`; the +56 / +16 are exactly
+    # the (t, v, u) rice cells that priced BOTH 7031 and 7032 and now split.
+    # 8,979 / 6,516 before GH #1087: -3 / -2 cells held only by a second entry.
+    "Niger": {"2011-12": 8976, "2014-15": 6514, "2018-19": 42087},
     "Tanzania": {"2019-20": 2769, "2020-21": 13062},
 }
 
@@ -217,7 +234,8 @@ class TestNigerDuplicateEntries:
 
     A second source record for one (grappe, variety) is a duplicate ENTRY of
     the questionnaire (red team r1): a slot of it that repeats a served row is
-    dropped, a slot that repeats nothing is served as ``obs = slot + 3``."""
+    dropped.  A slot that repeats nothing was served as ``obs = slot + 3`` until
+    GH #1087; it is now not served, and it flags the first entry's rows."""
 
     TRIPLES = [("cs07q04", "cs07q05", "cs07q03"),
                ("cs07q06", "cs07q07", "cs07q03"),
@@ -239,9 +257,11 @@ class TestNigerDuplicateEntries:
         out = niger._community_price_triples(
             labels, {"Mil": "Millet"}, {"Kg": "Kg", "Gramme": "Gramme"},
             self.TRIPLES, codes=codes)
-        return out.set_index("obs")[["u", "Price", "Quantity"]]
+        return out.set_index("obs")[["u", "Price", "Quantity",
+                                     "second_entry_disagrees"]]
 
-    def test_a_repeated_slot_is_dropped_and_a_new_one_kept(self, niger_module):
+    def test_a_repeated_slot_is_dropped_and_a_new_one_flags(self, niger_module):
+        # Re-pinned for GH #1087: slots 5, 6 were served as obs 5, 6.
         nan = float("nan")
         out = self._triples(niger_module, [
             # numquest 1: slots 1, 2 priced, slot 3 empty
@@ -249,30 +269,37 @@ class TestNigerDuplicateEntries:
             # numquest 2: slot 1 repeats, slot 2 disagrees, slot 3 is new
             (212, 2, 701, 7011, 1, 100.0, 2.0, 175.0, 3.0, 200.0, 4.0),
         ])
-        assert sorted(out.index) == [1, 2, 5, 6]
-        assert out.loc[5, "Price"] == 175.0 and out.loc[6, "Price"] == 200.0
+        assert sorted(out.index) == [1, 2]
+        assert out["Price"].tolist() == [100.0, 150.0]
+        assert out["second_entry_disagrees"].tolist() == [True, True]
 
     def test_a_conflicting_unit_is_not_a_repeat(self, niger_module):
         # Same Price and Quantity under another unit code: one of the two is a
-        # keying error and nothing here can say which, so both are served.
+        # keying error and nothing here can say which, so it is not a copy.
+        # Re-pinned for GH #1087: both were served; the first entry now is.
         nan = float("nan")
         out = self._triples(niger_module, [
             (61, 1, 701, 7011, 2, 250.0, 192.0, nan, nan, nan, nan),
             (61, 2, 701, 7011, 1, 250.0, 192.0, nan, nan, nan, nan),
         ])
-        assert out["u"].to_dict() == {1: "Gramme", 4: "Kg"}
+        assert out["u"].to_dict() == {1: "Gramme"}
+        assert out["second_entry_disagrees"].tolist() == [True]
 
     def test_a_byte_identical_row_does_not_count_as_a_record(self, niger_module):
         # 2011-12 p2 re-ships whole grappe blocks.  The byte-identical copy is
         # dropped before ranking, so a genuinely different record after it is
-        # the SECOND record (obs 4-6), not the third (obs 7-9).
+        # the SECOND record, not the third: the rank that decides what is served
+        # (was obs 4-6 against 7-9, before GH #1087).
         nan = float("nan")
-        out = self._triples(niger_module, [
+        labels, codes = self._grids([
             (53, 1, 701, 7011, 1, 100.0, 2.0, nan, nan, nan, nan),
             (53, 1, 701, 7011, 1, 100.0, 2.0, nan, nan, nan, nan),
             (53, 1, 701, 7011, 1, 125.0, 2.0, nan, nan, nan, nan),
         ])
-        assert sorted(out.index) == [1, 4]
+        slots = niger_module._community_price_slots(
+            labels, {"Mil": "Millet"}, {"Kg": "Kg"}, self.TRIPLES, codes=codes)
+        assert slots["rank"].tolist() == [0, 1]
+        assert slots["source_row"].tolist() == [0, 2]
 
     def test_the_tail_accepts_the_result(self, niger_module):
         nan = float("nan")
@@ -283,8 +310,106 @@ class TestNigerDuplicateEntries:
         long = niger_module._community_price_triples(
             labels, {"Mil": "Millet"}, {"Kg": "Kg"}, self.TRIPLES, codes=codes)
         out = niger_module._finish_community_prices(long, "2014-15")
-        assert out.index.is_unique and len(out) == 4
+        assert out.index.is_unique and len(out) == 2   # 4 before GH #1087
         assert "slot" not in out.columns
+
+
+class TestNigerQuantitySentinels:
+    """GH #1088: recognize the two exact 9999.9 representations only in
+    Quantity, retaining the price and the existing recorded-price grain."""
+
+    @staticmethod
+    def _long(niger, quantities, prices=(100.0, 150.0, 200.0)):
+        records = [
+            (1, 1, 701, 7011, 1,
+             prices[0], quantities[0], prices[1], quantities[1],
+             prices[2], quantities[2]),
+        ]
+        labels, codes = TestNigerDuplicateEntries._grids(records)
+        return niger._community_price_triples(
+            labels, {"Mil": "Millet"}, {"Kg": "Kg"},
+            TestNigerDuplicateEntries.TRIPLES, codes=codes)
+
+    @pytest.mark.parametrize("quantity", [9999.9, 9999.900390625])
+    @pytest.mark.parametrize("slot", [1, 2, 3])
+    def test_exact_missing_code_keeps_price_through_finalize(
+            self, niger_module, quantity, slot):
+        from lsms_library import Country
+
+        quantities = [1.0, 2.0, 3.0]
+        quantities[slot - 1] = quantity
+        long = self._long(niger_module, quantities)
+        wave = niger_module._finish_community_prices(long, "2014-15")
+        country = Country("Niger")
+        served = country._finalize_result(
+            wave, country._materialization_entry("community_prices"),
+            "community_prices")
+        assert len(long) == len(served) == 3
+        assert served.index.is_unique
+        assert list(served.index.names) == CANONICAL
+        assert served.index.get_level_values("obs").tolist() == [1, 2, 3]
+        assert served["Price"].tolist() == [100.0, 150.0, 200.0]
+        assert pd.isna(long.set_index("obs").loc[slot, "Quantity"])
+        assert pd.isna(served.xs(slot, level="obs")["Quantity"].iloc[0])
+
+    @pytest.mark.parametrize("quantity", [
+        9997.0, 9998.0, 9999.8, 9999.89, 9999.91,
+        # The adjacent float32 values: a tolerance/float32 coercion must not
+        # turn a distinct reported weight into the missing code.
+        9999.8994140625, 9999.9013671875,
+        # Adjacent doubles around each exact missing-code representation.
+        9999.899999999998, 9999.900000000001,
+        9999.900390624998, 9999.900390625002,
+        10000.0, 99998.0, 100000.0,
+    ])
+    def test_nearby_reported_quantity_is_unchanged(self, niger_module, quantity):
+        out = self._long(niger_module, [quantity, 2.0, 3.0]).set_index("obs")
+        assert out.loc[1, "Quantity"] == quantity
+        assert out.loc[1, "Price"] == 100.0
+
+    @pytest.mark.parametrize("quantity", [0.0, -1.0, None, 9999.0, 99999.0])
+    @pytest.mark.parametrize("slot", [1, 2, 3])
+    def test_existing_missing_quantity_policy_is_unchanged(
+            self, niger_module, quantity, slot):
+        quantities = [1.0, 2.0, 3.0]
+        quantities[slot - 1] = quantity
+        out = self._long(niger_module, quantities).set_index("obs")
+        assert len(out) == 3
+        assert pd.isna(out.loc[slot, "Quantity"])
+        assert out["Price"].tolist() == [100.0, 150.0, 200.0]
+
+    @pytest.mark.parametrize("price", [9999.9, 9999.900390625])
+    def test_quantity_missing_codes_do_not_expand_price_filter(
+            self, niger_module, price):
+        out = self._long(niger_module, [1.0, 2.0, 3.0],
+                         prices=[price, 150.0, 200.0]).set_index("obs")
+        assert len(out) == 3
+        assert out.loc[1, "Price"] == price
+        assert out.loc[1, "Quantity"] == 1.0
+
+    @pytest.mark.parametrize("second_quantity, disagrees", [
+        (1.0, True),  # The held-source tail: a reported weight is distinct.
+        (9999.9, False),  # Exact normalized content repeats are still copies.
+    ])
+    def test_second_record_uses_existing_content_equality(
+            self, niger_module, second_quantity, disagrees):
+        nan = float("nan")
+        labels, codes = TestNigerDuplicateEntries._grids([
+            (1, 1, 701, 7011, 1, 100.0, 9999.900390625, nan, nan, nan, nan),
+            (1, 2, 701, 7011, 1, 100.0, second_quantity, nan, nan, nan, nan),
+        ])
+        out = niger_module._community_price_triples(
+            labels, {"Mil": "Millet"}, {"Kg": "Kg"},
+            TestNigerDuplicateEntries.TRIPLES, codes=codes).set_index("obs")
+        # Re-pinned for GH #1087: the distinct weight was served as obs 4.
+        assert out.index.tolist() == [1]
+        assert out["Price"].eq(100.0).all()
+        assert pd.isna(out.loc[1, "Quantity"])
+        assert out.loc[1, "second_entry_disagrees"] == disagrees
+
+
+# The CS07 waves (three slots per record); 2018-19 is s05 (two slots).
+NIGER_CS07 = ["2011-12", "2014-15"]
 
 
 def _build(country):
@@ -317,7 +442,15 @@ class TestBuilt:
 
     @pytest.mark.parametrize("country", sorted(DECLARED))
     def test_variety_is_a_code_not_a_float_string(self, country):
-        v = _build(country).index.get_level_values("variety")
+        df = _build(country)
+        v = df.index.get_level_values("variety")
+        if country == "Niger":
+            # Niger 2018-19 (s05) names no variety: the canonical sentinel, a
+            # declared value, not a mis-formatted code (GH #823).  Exempt for
+            # that wave only, so the code check stays strict everywhere else.
+            t = df.index.get_level_values("t")
+            assert (v[t == "2018-19"] == "unknown_variety").all()
+            v = v[t != "2018-19"]
         assert v.str.fullmatch(r"\d+").all(), v[~v.str.fullmatch(r"\d+")].unique()[:5]
 
     @pytest.mark.parametrize("country", sorted(DECLARED))
@@ -328,8 +461,8 @@ class TestBuilt:
         cells = (df.reset_index()[["t", "v", "j", "u"]].drop_duplicates()
                    .groupby("t").size().to_dict())
         assert cells == EXPECTED_CELLS[country], (
-            "the (t, v, j, u) cells the pre-#840 table served must all still be "
-            "present -- the old table is a projection of this one")
+            "the (t, v, j, u) cell counts must match the source-accounted "
+            "coverage; all old cells are separately verified as retained")
 
     def test_mali_tomato_paste_varieties_survive(self):
         # CONTENTS.org's instance: three varieties under u='Boite' at very
@@ -338,7 +471,24 @@ class TestBuilt:
         med = x.groupby(level="variety")["Price"].median()
         assert {"5451", "5452"} <= set(med.index)
         assert med["5452"] > 3 * med["5451"]   # 220 g tin vs 60 g tin
-        assert (x.groupby(level=["t", "v", "visit"]).size() == 3).any()
+        varieties = x.reset_index().groupby(["t", "v", "visit"])["variety"].nunique()
+        assert (varieties == 3).any()
+
+    def test_mali_2018_19_serves_both_quotes_of_every_source_row(self):
+        # #1356, against the raw file: s05 has one row per (grappe, product, unit)
+        # and two price readings, no weight (Mali/_/CONTENTS.org, GH #821).
+        import pyreadstat
+        from lsms_library.data_access import get_data_file
+        raw, _ = pyreadstat.read_dta(
+            str(get_data_file("Mali/2018-19/Data/s05_co_mli2018.dta")),
+            apply_value_formats=False)
+        df = _build("Mali").xs("2018-19", level="t")
+        assert len(df) == 2 * len(raw)
+        assert set(df.index.get_level_values("obs")) == {1, 2}
+        assert df["Price"].sum() == pytest.approx(raw["s05q03"].sum() + raw["s05q04"].sum())
+        assert df["Quantity"].isna().all()
+        assert df.index.get_level_values("v").nunique() == raw["grappe"].nunique()
+        assert df.index.get_level_values("variety").nunique() == raw["s05q01"].nunique()
 
     def test_mali_carries_both_passages(self):
         visits = set(_build("Mali").index.get_level_values("visit"))
@@ -350,16 +500,16 @@ class TestBuilt:
         cell = df.loc[("2020-21", "01-06-47-85", "Millet & Sorghum (grain)", "Kg")]
         assert cell["Price"].to_dict() == {"6": 2000.0, "7": 16000.0}
 
-    def test_niger_second_records_are_slots_four_to_six(self):
+    def test_niger_second_records_are_not_observations(self):
+        # Re-pinned for GH #1087, which moved these rows off the table: obs 4-6
+        # held {2011-12: 32, 2014-15: 132} before the r1 duplicate-entry drop
+        # and {15, 15} after it.  Their record's first entry now carries a flag.
         df = _build("Niger")
-        obs = df.index.get_level_values("obs")
-        assert set(obs) <= {1, 2, 3, 4, 5, 6}
-        late = df[obs > 3]
-        # {2011-12: 32, 2014-15: 132} before the r1 duplicate-entry drop: 134
-        # of those 164 rows repeated a served row (the test below).
-        assert late.groupby(level="t").size().to_dict() == {"2011-12": 15, "2014-15": 15}
+        df = df[df.index.get_level_values("t").isin(NIGER_CS07)]
+        assert set(df.index.get_level_values("obs")) <= {1, 2, 3}
+        flagged = df[df["second_entry_disagrees"].astype("boolean").fillna(False)]
         # 2014-15's second records are one grappe's second questionnaire.
-        assert set(late.xs("2014-15", level="t").index.get_level_values("v")) == {"212"}
+        assert set(flagged.xs("2014-15", level="t").index.get_level_values("v")) == {"212"}
 
     def test_niger_no_second_record_repeats_a_served_row(self):
         # Red team r1: a second source record is a duplicate ENTRY, so a slot
@@ -367,6 +517,7 @@ class TestBuilt:
         # copy, not a reading -- serving it double-weights that price in any
         # cluster mean, median or count.  134 such rows before the fix.
         x = _build("Niger").reset_index()
+        x = x[x["t"].isin(NIGER_CS07)].copy()
         x["slot"] = (x["obs"] - 1) % 3 + 1
         content = ["t", "v", "j", "u", "variety", "visit", "slot",
                    "Price", "Quantity", "Description"]

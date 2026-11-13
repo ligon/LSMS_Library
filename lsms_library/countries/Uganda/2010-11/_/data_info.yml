@@ -40,36 +40,60 @@ housing:
         Floor: h9q6
 
 sample:
-    file: ../Data/GSEC1.dta
-    idxvars:
-        i: HHID
-    myvars:
-        v: comm
-        weight: wgt10
-        panel_weight: wgt10  # pre-refreshment — same as cross-sectional
-        strata: stratum
-        Rural: urban
-        Region:
-            - region
-            - # Kampala is Central (matches cluster_features convention)
-              Kampala: Central
-
-cluster_features:
-    dfs:
-        - df_main
-        - df_geo
-    df_main:
+    dfs: [locating_cover]
+    locating_cover:
         file: ../Data/GSEC1.dta
         idxvars:
             i: HHID
-            v: comm
         myvars:
+            _cover: HHID
+            # GH #1133: the 7-character comm (2010/11 district definitions for 50
+            # EAs) is served as the 8-digit frame EA through the reviewed
+            # `comm_frame_ea` table, as 2005-06 / 2011-12 write it.
+            v:
+                - comm
+                - mappings: comm_frame_ea
+            # The design PSU, on one label across all eight waves (GH #1459).
+            ea:
+                - comm
+                - mappings: comm_ea
+            weight: wgt10
+            panel_weight: wgt10  # pre-refreshment — same as cross-sectional
+            strata: stratum
+            Rural: urban
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: h1aq1
+            Region:
+                - region
+                - # Kampala is Central (matches cluster_features convention)
+                  Kampala: Central
+
+    merge_on: [i]
+    final_index: [t, i]
+
+cluster_features:
+    dfs:
+        - locating_cover
+        - df_geo
+    locating_cover:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+            # GH #1133: same function as `sample`.  The list form is what lets
+            # it reach an idxvar at all: a bare `v: comm` idxvar is formatted
+            # with format_id only (Wave.column_mapping's scalar-string branch).
+            v:
+                - comm
+                - mappings: comm_frame_ea
+        myvars:
+            _cover: HHID
             Region:
                 - region
                 - # Kampala is Central
                   Kampala: Central
             Rural: urban
-            District: h1aq1  # TODO: Needs string regularization
+            District: h1aq1  # no case or whitespace variant in this wave (GH #1441)
     df_geo:
         file: ../Data/UNPS_Geovars_1011.dta
         idxvars:

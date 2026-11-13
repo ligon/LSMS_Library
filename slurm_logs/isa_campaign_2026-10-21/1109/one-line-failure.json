@@ -1,0 +1,74 @@
+{
+  "status": "one-line implementation fails preservation; not accepted",
+  "baseline": {
+    "source_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "shape": [
+      180184,
+      4
+    ],
+    "organic_rows": 11075,
+    "organic_quantity_null": 0,
+    "organic_quantity_zero": 11075,
+    "quantity_dtype": "Float64",
+    "nitrogen_shape": [
+      33466,
+      1
+    ],
+    "nitrogen_total": 840235.7795800001,
+    "warnings": {
+      "RuntimeWarning": 18,
+      "NullReadWarning": 1,
+      "NullIndexKeyWarning": 1,
+      "NutrientCoverageWarning": 1
+    },
+    "seconds": 73.58,
+    "wave_counts": {
+      "2010-11": 46627,
+      "2013-14": 16188,
+      "2016-17": 52494,
+      "2019-20": 64875
+    },
+    "in_tree_parquets": 0
+  },
+  "one_line_candidate": {
+    "source_sha": "ec59e3b011c7cc1ce580d269f7f2a8f5095d32aa",
+    "shape": [
+      168672,
+      4
+    ],
+    "organic_rows": 0,
+    "organic_quantity_null": 0,
+    "organic_quantity_zero": 0,
+    "quantity_dtype": "Float64",
+    "nitrogen_shape": [
+      33452,
+      1
+    ],
+    "nitrogen_total": 840235.7795800001,
+    "warnings": {
+      "RuntimeWarning": 18,
+      "NullReadWarning": 1,
+      "NullIndexKeyWarning": 1
+    },
+    "seconds": 81.2,
+    "wave_counts": {
+      "2010-11": 44388,
+      "2013-14": 15348,
+      "2016-17": 48713,
+      "2019-20": 60223
+    },
+    "in_tree_parquets": 0
+  },
+  "cause": "Country._finalize_result dropna(how=all) removes records once every payload column is missing",
+  "lost_rows_by_input": {
+    "Organic Fertilizer": 11075,
+    "Seed": 390,
+    "NPK Fertilizer": 24,
+    "Urea Fertilizer": 11,
+    "DAP Fertilizer": 6,
+    "Herbicide": 4,
+    "Fungicide": 1,
+    "Insecticide": 1
+  },
+  "broader_nonorganic_rows_not_adjudicated": 437
+}

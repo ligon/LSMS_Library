@@ -1,0 +1,45 @@
+{
+  "verified_at_UTC": "2026-10-22T02:27:48.318831+00:00",
+  "candidate": "f9feb3c807aff5206134c37768992302ceb431fa",
+  "actual17": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+  "decision": "ACCEPT_BOUNDED_RUNTIME_WITH_REQUIRED_DOCUMENTATION_QUALIFICATION",
+  "READY_sha256": "3e1b1311ee2477ea09f337606b96805684c634e2c92a8dbdba948875a66d0a59",
+  "manifest_sha256": "2406d10a2c013a08df6da2336a2fdc2643213e88981c3f1b2167c6f87284ea02",
+  "all_manifest_entries_verified": 1885,
+  "excluded_control_receipts_verified": true,
+  "checker_sources_verified": true,
+  "root_read_complete_review_and_actual_exact_artifact_oracle_probe_warning_seal_sources": true,
+  "root_independent_JUnit": {
+    "candidate": {
+      "pass": 111
+    },
+    "base": {
+      "fail": 24,
+      "pass": 4
+    }
+  },
+  "root_independent_hash_scope": {
+    "Mali_changed": 24,
+    "other_API_exact": 525,
+    "framework_exact": 39
+  },
+  "root_independent_scanner": {
+    "records": 2,
+    "WARN": 2,
+    "complete_bytes_exact": true
+  },
+  "warning_multisets_literal_true": 40,
+  "exact_heads_clean": true,
+  "original_runtime_proof_pinned": true,
+  "documentation_descendant": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+  "documentation_wording_review": "pending",
+  "source_publication_completed": false,
+  "no_public_PR_merged": true,
+  "limits": [
+    "Bounded Mali/Niger coexistence only; no full18 suite/corpus or other23 Mali output rebuild.",
+    "Two original Mali empty-representation paragraphs require route/coverage qualification; runtime remains pinned to f9.",
+    "Historical17 full13FAIL, doc-child guard/mtime limitation, stale8companions and preexisting1196 remain at original pins.",
+    "Five review harness stops, including first-seal eight private font metadata files, preserved; no data/test/API replay."
+  ],
+  "signed": "Sue"
+}

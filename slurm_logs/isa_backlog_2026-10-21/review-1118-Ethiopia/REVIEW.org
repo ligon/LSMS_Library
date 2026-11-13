@@ -1,0 +1,126 @@
+#+title: Independent review -- Ethiopia #1118
+#+date: 2026-10-21
+#+author: Sue
+
+Scope deviations: none.
+Verdict: PASS for frozen =286108cf7ecc1a6e1e07150b8eec8411f5326b05= against =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+The reviewer did not author this patch.
+
+* Boundary and grounding
+
+The sole runtime change imports the existing =U_UNKNOWN= and masks the final string =u= column where it is null or whitespace-only.
+No eligibility predicate, amount, label, key, join, index grain, conversion factor, or framework code changes.
+The live [[https://github.com/ligon/LSMS_Library/issues/1118][#1118 ruling]] applies missing-unit normalization even without an amount; it preserves Ethiopia's genuine use-only observations.
+The issue has no comments and remains open for its other country scopes.
+
+I read all 2,364 lines of =Ethiopia/_/CONTENTS.org=, including task/status material, before reviewing code.
+The relevant idiosyncrasies are: =Applied= is the sole organic/pesticide datum; W1 seed purchases have field/crop grain while W2-W5 holder/crop purchases attach only to one unique plot; plot identity is holder_parcel_field; household-ID columns change by wave; and the PP/PH panel, urban-coverage, EA-renumbering and new-panel boundaries remain material.
+The #660 cover-key and #1110 land-grain caveats are retained.
+The existing sampling/weight tensions and a W4/W5 improved-code prose/config discrepancy are quoted in =residual_draft.org= rather than dismissed as stale documentation.
+The repo guidance, reviewer skill, standing/task ledgers, backlog/cross-country workflows and Feature-audit instructions were read.
+
+* Independent source and runtime evidence
+
+All 15 held section3/4/5 sources were read through sanctioned readers in physically private roots.
+Source Stata metadata established 1=Yes / 2=No for 30 use/gate/purchase columns.
+Expected organic/pesticide eligibility came from direct numeric source comparisons, not the candidate helper or its yes/no decoder.
+All 37,370 eligible distinct use keys match the complete native helper key sets and survive the public build.
+
+| Wave    | All input rows | Use-only unit replacements |
+|---------+----------------+----------------------------|
+| 2011-12 |          45149 |                       9141 |
+| 2013-14 |          47416 |                       8881 |
+| 2015-16 |          47426 |                       8879 |
+| 2018-19 |          23271 |                       5567 |
+| 2021-22 |          17638 |                       4902 |
+| Total   |         180900 |                      37370 |
+
+The replacements are Manure 27,261; Compost 4,295; Other Organic 2,651; Pesticide 3,163.
+Every replaced row has =Applied=True= and missing =Quantity= and =Quantity_purchased=.
+All 143,530 =Kg= rows are exact, including 40,977 without Quantity.
+Complete five-wave helper frames and actual cold/fresh-process-warm Country frames match baseline after only the specified unit replacement, with exact dtypes, index, non-unit values and attrs.
+Strict DataFrame equality was checked in addition to =assert_frame_equal(check_exact=True)=; 17 complete captured-frame comparisons passed.
+The complete nitrogen frame and attrs are unchanged; the total remains 500,847.2208579673 kg.
+
+The private comparator was built cold from held sources in both roots: Uganda 84,216 rows, current fingerprint, full eight-wave manifest, identical bytes.
+The initial broad seed exclusion removed all plot_inputs parquets, including Uganda's; its absence was caught before serving, then both comparators were built normally.
+No stale comparator was trusted or restamped.
+Actual Feature assembly retains all 265,116 rows exactly.
+Its sole attrs change is =canonical_alignment.promoted.Ethiopia.u= from 37,370 to 0; every other attribute is exact.
+Fresh-process warm calls leave all 38 private parquet hashes, sizes and mtimes unchanged on each side.
+
+Independent source controls checked 47,941 seed rows whose holder/crop maps to multiple plots: no purchase attachment fanned out.
+Another 49,119 known-answer direct/unique-plot attachments match source-derived purchase flags and quantities exactly.
+Output keys combining multiple raw crop codes were explicitly excluded from this positive-control subset, not silently resolved.
+The existing source-unknown purchase-answer behavior is separately recorded below.
+
+* Tests, audit and fingerprints
+
+The exact focused selection passes 58 tests with zero skips.
+The 14 new regression cases reproduce 8 failures and 6 passes at the immutable baseline.
+Six additional independent adversarial controls pass: empty section, absent sections, mixed null/Unicode whitespace, preserved nonblank strings, known Kg with absent amount, gate/crop exclusion, and cross-holder purchase/no-fanout checks.
+No fixture, golden, dependency or framework edits were made.
+
+Independent Feature audit phases 1/2 reproduce 13 to 12 warnings, zero errors and zero failures.
+Full finding-multiset accounting leaves 11 records exact after normalizing only checkout/data-root paths and elapsed/duration fields.
+The constant-u warning disappears; the remaining changed warning differs only in alignment fill count 37,370 to 0.
+Detailed scanner findings remain private.
+
+All 549 country/table cache hashes were independently computed at both heads: exactly 25 Ethiopia hashes move, all 524 other-country pairs remain unchanged.
+All 39 tagged build-transform fingerprints remain unchanged.
+These are fingerprint claims only; this review makes no output claim for other unbuilt Ethiopia features.
+
+* Residuals and immutable proof
+
+The pre-existing yes/no helper maps a missing source purchase answer to False in both baseline and candidate.
+Among the source-control attachments, 4,421 W1 and 60 W2 source-unknown flags exhibit this behavior; W1 also records zero purchased quantity instead of the oracle's unknown amount.
+Known-answer controls pass and #1118 changes none of those values.
+=residual_draft.org= records a diagnosis-first follow-up to establish skip/routing meaning before changing policy.
+Sales (#820), #660, #1110, factors and the other-country #1118 scopes remain outside this patch.
+No new questionnaire PDF was acquired or inspected.
+
+The report-only descendant =9e698a3677da8097da42fec90c90525cdaaf3e68= changes only 23 lines in REPORT.org.
+Its library and test tree objects are identical to frozen 286108, and its added test selector matches the producer command exactly.
+No extra cohort rerun was needed for that documentation-only descendant.
+
+Before/after full tracked-content and mode snapshots are identical: 14,880 baseline files and 14,885 frozen-review files, unchanged heads and clean status.
+Both roots have no in-tree parquets or dta sources; no review task processes remain.
+All 84 held L1 blobs in each root match their content-addressed md5 and original held bytes, with distinct physical inodes; all 15 materialized Ethiopia source files match reviewed sidecar md5s.
+An active offline socket guard intercepted eight Internet connection attempts in two review processes; none connected or acquired data.
+There were no DVC CLI calls, GitHub writes, git mutations or shared-cache changes.
+
+* Runnable commands and evidence
+
+All paths below are private; detailed raw frames/logs must stay private.
+=validation.json= is the safe machine-readable aggregate; =residual_draft.org= is safe diagnosis prose.
+The fixed review wrapper sets matching cwd/PYTHONPATH/country/data roots, numerical/build workers 1 and the offline guard.
+The runtime/audit/hash runners assert exact package/config identity.
+The tests used two loadfile workers and private pytest cache/temp paths.
+
+#+begin_src sh :eval no :tangle no :results output
+R=/local/job40255479/control/isa-backlog-20261021/review-1118-Ethiopia
+# Initial setup only, requiring absent baseline-data and candidate-data:
+/local/job40255479/venv_img/bin/python "$R/seed.py"
+/local/job40255479/venv_img/bin/python "$R/snapshot.py" before
+bash "$R/run.sh" baseline "$R/prepare_comparator.py" > "$R/baseline-comparator.log" 2>&1
+bash "$R/run.sh" candidate "$R/prepare_comparator.py" > "$R/candidate-comparator.log" 2>&1
+bash "$R/run.sh" baseline "$R/check.py" cold > "$R/baseline-cold.log" 2>&1
+bash "$R/run.sh" baseline "$R/check.py" warm > "$R/baseline-warm.log" 2>&1
+bash "$R/run.sh" candidate "$R/check.py" cold > "$R/candidate-cold.log" 2>&1
+bash "$R/run.sh" candidate "$R/check.py" warm > "$R/candidate-warm.log" 2>&1
+bash "$R/run.sh" baseline -m pytest -q -p no:cacheprovider "$R/test_baseline_controls.py" > "$R/baseline-controls.log" 2>&1
+# Baseline negative control intentionally exits 1 (8 failed / 6 passed).
+bash "$R/run-targeted-tests.sh"
+bash "$R/run.sh" candidate -m pytest -q -p no:cacheprovider "$R/test_independent_boundary.py" > "$R/adversarial.log" 2>&1
+bash "$R/run.sh" candidate "$R/purchase_sources.py" > "$R/purchase-source-controls.log" 2>&1
+bash "$R/run.sh" baseline "$R/audit.py" > "$R/baseline-audit.log" 2>&1
+bash "$R/run.sh" candidate "$R/audit.py" > "$R/candidate-audit.log" 2>&1
+bash "$R/run.sh" candidate "$R/compare_audits.py"
+bash "$R/run.sh" baseline "$R/hash_inventory.py" "$R/baseline-hashes.json"
+bash "$R/run.sh" candidate "$R/hash_inventory.py" "$R/candidate-hashes.json"
+bash "$R/run.sh" candidate "$R/final_checks.py" > "$R/final-checks.log" 2>&1
+/local/job40255479/venv_img/bin/python "$R/snapshot.py" after
+bash "$R/run.sh" candidate "$R/finish.py" > "$R/finish.log" 2>&1
+#+end_src
+
+Sue

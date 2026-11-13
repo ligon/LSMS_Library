@@ -1,0 +1,44 @@
+{
+  "status": "FINAL_FULL_PROTECTION_VERIFIED_BEFORE_SEAL_EXIT",
+  "final_source_heads": {
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1188": "657fed11a63354886772d0f978cec8adb2ad647e",
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1188-base": "3dc9d28510dd783c648413987011832669f8bcf7"
+  },
+  "source_tracked_files": 29788,
+  "unchanged_tracked_physical_and_hash_receipts": 29782,
+  "exact_authorized_source_delta": [
+    "lsms_library/countries/Burkina_Faso/2018-19/_/plot_inputs.py",
+    "lsms_library/countries/Burkina_Faso/_/data_scheme.yml",
+    "lsms_library/countries/Burkina_Faso/_/CONTENTS.org",
+    "tests/test_burkina_faso_plot_inputs_identity.py",
+    "tests/test_gh1188_burkina_input_acquisition_fields.py",
+    ".coder/ledger/1188-burkina-input-purchase-routing.md"
+  ],
+  "external_providers": 6,
+  "normal_staged_copies": 24,
+  "retained_quarantined_exception": 1,
+  "total_private_source_copies": 25,
+  "total_private_source_copy_bytes": 26332243,
+  "original24copybudget_exceeded_and_exception_preserved": true,
+  "all31inodes_distinct": true,
+  "normal_L2_parquets": 20,
+  "all_normal_cache_bytes_modes_mtimes_inodes_nlinks_exact_since_saved_grid": true,
+  "guard_event_counts": {
+    "open": 2,
+    "os.chmod": 1,
+    "os.link-src": 1,
+    "os.mkdir": 25,
+    "os.open-wrapper": 1,
+    "os.remove": 1,
+    "os.rename-src": 1,
+    "os.symlink-target": 1,
+    "os.utime": 1,
+    "socket.bind": 53,
+    "socket.connect": 2,
+    "socket.getaddrinfo": 1
+  },
+  "original_unattributed_noncalibration_binds": 51,
+  "private_full_protection_sha256": "f9450d9592c6ff0aebeae9eb9529056c3b6214057dafb721c3a163e14eafab9b",
+  "separate_sealer_and_postexit_terminal_statuses_are_external_tool_evidence": true,
+  "signed": "Sue"
+}

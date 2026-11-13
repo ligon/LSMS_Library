@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
+from lsms_library.local_tools import get_dataframe, format_id
 
 import sys
 sys.path.append('../../_/')
@@ -8,7 +8,9 @@ import pandas as pd
 import numpy as np
 import json
 from malawi import (handling_unusual_units, conversion_table_matching,
-                    food_acquired_to_canonical, normalize_food_label)
+                    food_acquired_to_canonical, normalize_food_label,
+                    is_other_specify_code)
+from lsms_library.transformations import U_UNKNOWN
 
 wave = '2019-20'
 
@@ -23,6 +25,12 @@ hh_cs = get_dataframe('../Data/Cross_Sectional/hh_mod_a_filt.dta', convert_categ
 hh_pn = get_dataframe('../Data/Panel/hh_mod_a_filt_19.dta', convert_categoricals=True)
 regions_cs = hh_cs[['case_id', 'region']].rename(columns={'case_id': 'j'})
 regions_pn = hh_pn[['y4_hhid', 'region']].rename(columns={'y4_hhid': 'j'})
+# The same household-id keyspace the wave's cs_i mapping applies to sample and
+# household_roster (GH #1278): cross-sectional cases get the 'cs-19-' prefix,
+# panel cases stay bare; both pass through format_id.  Done here too so the
+# `regions` join below (keyed on j) still matches once `df`'s ids are prefixed.
+regions_cs['j'] = 'cs-19-' + regions_cs['j'].apply(format_id)
+regions_pn['j'] = regions_pn['j'].apply(format_id)
 regions = pd.concat([regions_cs, regions_pn]).drop_duplicates().set_index('j')['region']
 regions = regions.replace({'South': 'Southern'})
 regions.name = 'm'
@@ -36,6 +44,8 @@ df = df.rename(columns_dict, axis=1)
 panel_df = panel_df.rename(columns_dict, axis=1)
 df = df.loc[:, list(set(columns_dict.values()))]
 panel_df = panel_df.loc[:, list(set(columns_dict.values()))]
+df['j'] = 'cs-19-' + df['j'].apply(format_id)
+panel_df['j'] = panel_df['j'].apply(format_id)
 df = pd.concat([df, panel_df], axis=0)
 df['i'] = normalize_food_label(df['i'].astype(str).str.capitalize())
 
@@ -70,6 +80,17 @@ df = df.merge(conversions, how='left',
 
 df = df.set_index(['j', 'i'])
 df = handling_unusual_units(df, suffixes=['consumed','bought','produced','gifted'])
+
+# GH #1074 ruling (@ligon 2026-11-03): a row served u = 'Unknown' ("no unit
+# recorded") does NOT keep the conversion table's code-23 OTHER (SPECIFY)
+# factor.  The factor was merged above on the RAW code, so a code-23 row
+# whose specify text is absent, 'N/A' or names a food (handling_unusual_units)
+# still carried that table's factor for an unnamed unit -- e.g. 10.99 kg per
+# mango.  Code-23 rows whose text names a unit keep their factor.
+for s in ['consumed', 'bought', 'produced', 'gifted']:
+    no_unit = (df[f'u_{s}'].eq(U_UNKNOWN).fillna(False).to_numpy()
+               & is_other_specify_code(df[f'unitcode_{s}']).to_numpy())
+    df[f'cfactor_{s}'] = df[f'cfactor_{s}'].mask(no_unit)
 
 df['t'] = wave
 df = df.reset_index()

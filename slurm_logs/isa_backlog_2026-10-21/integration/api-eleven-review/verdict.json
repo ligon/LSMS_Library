@@ -1,0 +1,83 @@
+{
+  "verdict": "PASS",
+  "frozen_head": "7886f7ece49767b2357a2f559c474e0eb710561f",
+  "tracked_files": 14988,
+  "tracked_content_modes_paths_HEAD_and_clean_exact": true,
+  "tracked_manifest_SHA256": "ce0aef65bef3af9f9d6ccbf56479eb8eccb6d6844251702dafe019018808e834",
+  "quiescent_source_file_receipts_exact": 2807,
+  "reference_source_and_copies_exact": 20,
+  "supplement_MD5_mode_mtime_exact": 10,
+  "private_L1_exact": 1298,
+  "physical_private_data_no_symlinks": true,
+  "no_network_attempts": true,
+  "no_intree_parquets_or_introduced_raw_sources": true,
+  "unchanged_existing_tracked_curation_source_extensions": 9,
+  "warm_parquets_unchanged_bytes_modes_mtimes": 1519,
+  "focused_tests": {
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0,
+    "deselected": 4
+  },
+  "initial_authorized_BF_stale_parquet_rebuilds": 10,
+  "other_initial_parquets_unchanged": 1509,
+  "fullframe_nullmask_dtype_axis_and_attrs_comparisons_per_process": 20,
+  "exact_frame_processes": 2,
+  "new_Country_repeats_per_process": 3,
+  "Feature_rows": 47212,
+  "normal_freshness_and_coverage": true,
+  "git_or_GH_mutations": 0,
+  "acquisition_DVC_CLI_sharedcache_write_clear_promotion": false,
+  "all_source_references_kept_private": true,
+  "scope": "Bounded eleventh-fix API coexistence against full independently reviewed Burkina/Benin/Togo references; previous nine/ten proofs retain their own pins",
+  "runtime_head": "7886f7ece49767b2357a2f559c474e0eb710561f",
+  "source_decisions_preserved": {
+    "code21_qualified_rows": 602,
+    "legacy_input_Seed_unverified": true,
+    "current_Purchased_Quantity_purchased_bindings_are_gifts": true,
+    "previously_verified_recovered_actual_purchase_rows": 18,
+    "no_binding_unit_reducer_eligibility_change": true
+  },
+  "documented_sample_counts": [
+    10224,
+    6961,
+    3218
+  ],
+  "actual_sample_counts": [
+    10411,
+    7010,
+    3227
+  ],
+  "harness_failures_retained": [
+    "initial-api-private.log: overbroad comparator-file count, corrected to the three requested tables before API calls",
+    "focused-tests-private.log: hook argument named r rather than pytest hookspec report, corrected before test execution"
+  ],
+  "limits": [
+    "No repeat of the full nine-fix cohort, full suite, source-oracle study or scanner/hash census",
+    "No source-authority claim for code21 or purchase/gift physical-unit routing",
+    "Only held supporting source files; no missing instruments acquired"
+  ],
+  "safe_report": "REVIEW.org",
+  "exact_private_deselected_cases": "focused-nodeids-private.json",
+  "context": {
+    "frozen_head": "7886f7ece49767b2357a2f559c474e0eb710561f",
+    "Burkina_Benin_Togo_country_blobs_and_modes_exact_to_cfd078276": true,
+    "shared_1077_fix_in_ancestry": "e7ea575fd7d8de1cb353badc20a7e4d1dceabf67",
+    "comparator_tier_grade_counts": {
+      "country:fresh": 6,
+      "wave:fresh": 4,
+      "wave:legacy": 2
+    },
+    "country_complete_coverage_manifests": 6,
+    "normal_hashless_script_wave_outputs_retained": 2,
+    "no_manual_stamping": true
+  },
+  "private_runner_SHA256": {
+    "prepare.py": "93484ed439f29b6411448bfe9e110abc85cd71e7e389406a7e674111a53c29fc",
+    "run.sh": "452d437fa35a60d43977bd4fc29ca18d9e972205b59db8a8dff517fe907374d1",
+    "check_api.py": "a286013846e6dcde681202350293590e5f1f2a19ebab43b01ef859ef854b8c88",
+    "check_tests.py": "882a755820a9a070503e6efe7161a95f5d431b45486cbcf7f3e3f78257eec287",
+    "finish.py": "8d0105798c213c8aa9215a212efd30d0a2dafe8a470f05bd1a9df2cd3e0ebb1b",
+    "sitecustomize.py": "37fa375f3bd353bdc0ae9a6ef062985ee18d5cb2a3359a4ea971c175f4c59bbb"
+  }
+}

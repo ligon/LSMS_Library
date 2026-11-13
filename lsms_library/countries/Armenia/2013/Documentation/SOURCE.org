@@ -1,0 +1,15 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2962
+
+#+CATALOG_ID: 2962
+#+CATALOG_IDNO: ARM_2013_ILCS_v02_M
+#+CATALOG_TITLE: Integrated Living Conditions Survey 2013
+#+CATALOG_YEARS: 2013-2013
+#+CATALOG_REPOSITORY: central
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2962
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-11-04
+#+PROVENANCE_NOTE: Acquired whole on 2026-11-04 by add_wave: 2962's Stata zip, every file pushed. Registered, not wired (GH #597).

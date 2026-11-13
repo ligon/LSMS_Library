@@ -1,0 +1,15 @@
+{
+  "status": "ROOT_VERIFIED_AUTHOR_FREEZE_FOR_INDEPENDENT_REVIEW_ONLY",
+  "at_UTC": "2026-10-22T12:56:50.553878+00:00",
+  "source": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+  "runtime": "7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1",
+  "manifest_entries": 859,
+  "safe_exports": 5,
+  "exact_payload_pathset": true,
+  "two_production_SHAs_match_approved_frozen_patch": true,
+  "only_eight_doc_report_ledger_descendants": true,
+  "source_clean": true,
+  "author_runtime_verdict_not_independently_accepted": true,
+  "no_API_payload_decode_or_test_replay": true,
+  "signed": "Sue"
+}

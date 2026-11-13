@@ -1,0 +1,23 @@
+{
+  "status": "DIAGNOSIS_COMPLETE_PROPOSAL_AWAITS_ROOT_APPROVAL",
+  "source_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "source_root": "/local/job40255479/worktrees/isa-Niger-1091",
+  "source_clean": true,
+  "tracked_bytes_modes_exact": true,
+  "private_root": "/local/job40255479/control/isa-backlog-20261021/Niger/1091",
+  "private_payload_files": 690,
+  "private_manifest_sha256": "0ee725660357c646add06ad5d625210d5f0d5dad1cf6fb1fa7f952023db4e2a7",
+  "safe_exports": [
+    "DIAGNOSIS.org",
+    "PROPOSAL.org",
+    "validation.json",
+    "ledger-DRAFT.md",
+    "REPRODUCE.sh",
+    "freeze-proof.json",
+    "READY.json"
+  ],
+  "zero_consumers": true,
+  "no_implementation": true,
+  "residual_owner": "GH1196",
+  "signed": "Sue (GPT-6)"
+}

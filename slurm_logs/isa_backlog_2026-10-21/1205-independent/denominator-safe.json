@@ -1,0 +1,93 @@
+{
+  "status": "SAVED_CONVERTED_PARCEL_DENOMINATOR_PARTITION_COMPLETE",
+  "converted_source_parcel_keys": 31959,
+  "eligible_served_yield_keys": 27755,
+  "unserved_converted_source_parcel_keys": 4204,
+  "disjoint_exhaustive_reasons": {
+    "served_positive_area_finite_yield": 27755,
+    "area_roster_present_all_area_rows_ineligible": 4194,
+    "native_household_present_parcel_absent_area_roster": 10
+  },
+  "area_roster_matching_converted_keys": 31949,
+  "positive_area_eligible_converted_keys": 27755,
+  "ineligible_area_reason_signatures": [
+    {
+      "raw_area_reasons": [
+        "both_missing"
+      ],
+      "converted_keys": 3918
+    },
+    {
+      "raw_area_reasons": [
+        "nonpositive_gps"
+      ],
+      "converted_keys": 276
+    }
+  ],
+  "waves": [
+    {
+      "wave": "2009-10",
+      "counts": {
+        "served_positive_area_finite_yield": 4024,
+        "area_roster_present_all_area_rows_ineligible": 376
+      }
+    },
+    {
+      "wave": "2010-11",
+      "counts": {
+        "served_positive_area_finite_yield": 4212,
+        "area_roster_present_all_area_rows_ineligible": 18
+      }
+    },
+    {
+      "wave": "2011-12",
+      "counts": {
+        "served_positive_area_finite_yield": 4247,
+        "native_household_present_parcel_absent_area_roster": 2
+      }
+    },
+    {
+      "wave": "2013-14",
+      "counts": {
+        "served_positive_area_finite_yield": 4685
+      }
+    },
+    {
+      "wave": "2015-16",
+      "counts": {
+        "served_positive_area_finite_yield": 4944,
+        "native_household_present_parcel_absent_area_roster": 1,
+        "area_roster_present_all_area_rows_ineligible": 1
+      }
+    },
+    {
+      "wave": "2018-19",
+      "counts": {
+        "area_roster_present_all_area_rows_ineligible": 3765,
+        "served_positive_area_finite_yield": 1027,
+        "native_household_present_parcel_absent_area_roster": 7
+      }
+    },
+    {
+      "wave": "2019-20",
+      "counts": {
+        "served_positive_area_finite_yield": 4616,
+        "area_roster_present_all_area_rows_ineligible": 34
+      }
+    }
+  ],
+  "before_conversion_scope": "31,959 is after harvest quantity/unit-factor conversion and aggregation. Original public crop rows and harvest output rows have different grain; this saved check does not partition pre-harvest quantity versus factor exclusions.",
+  "no_raw_decode_API_or_build_replay": true,
+  "partition_receipt": {
+    "sha256": "be9270724a57c73921f9e4a68db8508f2ea8084926a07c0eb9c58c35ceb9b078",
+    "bytes": 1941924,
+    "mode": 384,
+    "mtime_ns": 1792692966593648899,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 3944966,
+    "symlink": false,
+    "link": null
+  },
+  "signed": "Sue"
+}

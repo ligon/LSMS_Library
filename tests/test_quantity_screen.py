@@ -143,7 +143,9 @@ def test_a_cell_with_no_scale_is_silent():
     """A cell whose 90th percentile is zero carries no scale, so it cannot
     support a plausibility judgement.  Measured cost of omitting this guard:
     six Malawi rows of 2-30 units fired at ratio ``inf`` -- a 2 kg cassava
-    harvest named as implausible."""
+    harvest named as implausible.  Since GH #1259 the cell is silenced one
+    step earlier: its single positive row is below ``QUANTITY_MIN_CELL``
+    positive values at every rung, so no reference is formed at all."""
     df = _cell(base=0.0, extras=[_outlier(30.0)])
     assert _audit(df) == []
 
@@ -334,6 +336,121 @@ def test_the_ladder_falls_back_but_never_pools_across_waves():
 
 
 # ---------------------------------------------------------------------------
+# Zeros never define the scale (GH #1259)
+# ---------------------------------------------------------------------------
+
+#: Tanzania's ``(2020-21, kg, Timber)`` positive values, as pinned by
+#: ``test_p90_survives_the_second_outlier_where_p99_does_not``: 37 rows, p90
+#: 23,088, with the 200,000 kg row and the 4,000,000 kg row GH #857 names.
+_TIMBER_POSITIVE = ([600.0] * 27
+                    + [3500., 3600., 10200., 15000., 16200., 18480., 30000.,
+                       38500.]
+                    + [200_000., 4_000_000.])
+
+
+def _rows(values, crop="Timber", unit="kg", wave="2020-21", prefix="hh"):
+    return [{"t": wave, "i": f"{prefix}{k:04d}", "plot": "1", "j": crop,
+             "u": unit, "Quantity": v} for k, v in enumerate(values)]
+
+
+def _frame(rows):
+    return pd.DataFrame(rows).set_index(["t", "i", "plot", "j"])
+
+
+def _offenders(df):
+    return {(o["i"], o["j"], o["value"], o["reference"], o["rung"])
+            for r in _audit(df) for o in r["offenders"]}
+
+
+def test_recorded_zeros_do_not_collapse_the_reference():
+    """GH #1259's own cell.  PR #1263 serves Tanzania's recorded "not harvested
+    in the last 12 months" answers as explicit ``Quantity = 0, u = kg``, which
+    put 309 zeros beside Timber's 37 harvests.  Counted in the quantile, the
+    zeros dragged the reference from 23,088 kg to 17 and ordinary harvests
+    fired.  A zero says the household did not harvest; it says nothing about
+    how large a harvest in this cell is, so it may not define the scale.
+
+    Here the same 37 positive values sit under 309 zeros: the reference must
+    be the positive rows' own p90 (23,088, exactly as with no zeros at all),
+    the 4,000,000 kg row must still fire, and the 200,000 kg row -- 8.7x that
+    reference -- must not.  Counting the zeros, the reference is 600 and the
+    200,000 kg row is named at 333x."""
+    df = _frame(_rows([0.0] * 309 + _TIMBER_POSITIVE))
+    reports = _audit(df)
+    assert len(reports) == 1
+    offenders = reports[0]["offenders"]
+    assert [o["value"] for o in offenders] == [4_000_000.0], offenders
+    assert offenders[0]["reference"] == pytest.approx(23_088.0)
+    assert offenders[0]["rung"] == "t,u,j"
+
+    # ... and the audit still changes nothing, zeros included.
+    before = df["Quantity"].to_numpy(dtype="float64").copy()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        assert check_quantities(df, country="T", table="crop_production") is df
+    assert np.array_equal(before, df["Quantity"].to_numpy(dtype="float64"))
+    assert int((df["Quantity"] == 0).sum()) == 309
+
+
+def test_zeros_cannot_pad_a_thin_cell_over_the_floor():
+    """``QUANTITY_MIN_CELL`` exists because a thin cell cannot manufacture a
+    reference.  Zeros must not be able to supply the bulk: a cell of 300 zeros
+    and 5 harvests holds 5 measurements of scale, not 305.
+
+    The discriminating shape is a cell the zeros carry OVER the floor without
+    swamping its quantile: 20 zeros + 25 harvests + one extreme.  Counting the
+    zeros it has 46 rows and a p90 of 850, and the extreme fires; counting
+    measurements it has 26, below the floor at every rung, so it is not
+    judged -- silence, not a guess."""
+    harvests = [100.0 * (1 + k % 10) for k in range(25)]
+    df = _frame(_rows([0.0] * 20 + harvests + [1_000_000.0]))
+    assert len(df) >= QUANTITY_MIN_CELL
+    assert int((df["Quantity"] > 0).sum()) < QUANTITY_MIN_CELL
+    assert _audit(df) == []
+
+
+def test_a_zero_padded_crop_falls_to_its_wave_unit_cell():
+    """The ladder consequence of counting only measurements.  A crop with 20
+    zeros, 9 harvests and one extreme has 30 rows but 10 measurements, so its
+    own ``(t, u, j)`` cell no longer qualifies and the row is judged on the
+    wave's ``(t, u)`` cell -- the same fall-through a crop with 10 rows and no
+    zeros gets.  Counting the zeros, it was judged against itself."""
+    common = _rows([100.0 * (1 + k % 10) for k in range(60)], crop="Common",
+                   prefix="c")
+    rare = _rows([0.0] * 20 + [100.0 * (1 + k) for k in range(9)]
+                 + [9_000_000.0], crop="Rare", prefix="r")
+    df = _frame(common + rare)
+    reports = _audit(df)
+    assert len(reports) == 1
+    (offender,) = reports[0]["offenders"]
+    assert offender["j"] == "Rare" and offender["value"] == 9_000_000.0
+    assert offender["rung"] == "t,u"
+
+
+def test_the_audit_ignores_zero_rows_entirely():
+    """The rule stated as an invariant: auditing a frame names exactly the
+    rows, references and rungs that auditing its strictly positive rows
+    names.  A zero is never judged (it cannot exceed a positive reference)
+    and, since GH #1259, never judges either.  PR #1263's re-formed Tanzania
+    pin is built on exactly this comparison."""
+    rng = np.random.default_rng(1259)
+    rows = _rows([0.0] * 309 + _TIMBER_POSITIVE)
+    rows += _rows([0.0] * 20 + [100.0 * (1 + k % 10) for k in range(25)]
+                  + [1_000_000.0], crop="Thin", prefix="t")
+    for crop, zeros in (("Maize", 0.05), ("Beans", 0.5), ("Cassava", 0.85)):
+        n = 200
+        values = rng.lognormal(5, 1.5, n)
+        values[rng.random(n) < zeros] = 0.0
+        values[:2] = [values.max() * 500, 0.0]
+        rows += _rows(list(values), crop=crop, prefix=crop[:2])
+    df = _frame(rows)
+    q = df["Quantity"]
+    with_zeros, without = _offenders(df), _offenders(df[q > 0])
+    assert without, "the probe frame must name something"
+    assert with_zeros == without
+
+
+# ---------------------------------------------------------------------------
 # Strict mode -- its own lever, same spelling as the other two
 # ---------------------------------------------------------------------------
 
@@ -407,6 +524,43 @@ def test_the_message_names_country_table_wave_and_the_lever():
         assert token in msg, f"{token!r} missing from the warning"
 
 
+def test_a_sold_kilogram_total_is_not_printed_as_a_count_of_the_harvest_unit():
+    """GH #1560 red team F2.  ``Quantity_sold_kg`` is a kilogram TOTAL screened in
+    the row's HARVEST-unit cell; ``u=Sac (100 Kg) 1,150,000`` read as 1,150,000
+    sacks.  The message now says kilograms sold and names the unit ``harvest_u``.
+    Wording only: the structured report is what it was, and ``Quantity`` on the
+    same frame keeps its old wording (the control)."""
+    rows = [{"t": "2021-22", "i": f"hh{k:04d}", "plot": "1", "j": "Arachide",
+             "u": "Sac (100 Kg)", "Quantity": 10.0 * (1 + k % 10),
+             "Quantity_sold_kg": 100.0 * (1 + k % 10)} for k in range(60)]
+    rows.append({"t": "2021-22", "i": "hh9999", "plot": "1", "j": "Arachide",
+                 "u": "Sac (100 Kg)", "Quantity": 9e6, "Quantity_sold_kg": 1.15e6})
+    df = pd.DataFrame(rows).set_index(["t", "i", "plot", "j"])
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        check_quantities(df, country="Testland", table="crop_production")
+    by_column = {}
+    for w in caught:
+        text = str(w.message)
+        if issubclass(w.category, QuantityImplausibleWarning) and "report a '" in text:
+            by_column[text.split("report a '", 1)[1].split("'", 1)[0]] = text
+    sold = by_column["Quantity_sold_kg"]
+    assert "harvest_u=Sac (100 Kg) 1,150,000 kg sold (x" in sold
+    assert "TOTAL kilograms sold" in sold and "not the sale's Unit_sold" in sold
+    assert "cell keyed on t,harvest_u,j" in sold
+    assert " u=Sac" not in sold
+    control = by_column["Quantity"]
+    assert " u=Sac (100 Kg) 9,000,000 (x" in control
+    assert "cell keyed on t,u,j" in control and "kg sold" not in control
+    assert "same wave, unit and crop" in control
+
+    report = next(r for r in quantity_reports(country="Testland")
+                  if r["column"] == "Quantity_sold_kg")
+    offender = report["offenders"][0]
+    assert (offender["u"], offender["rung"], offender["value"]) == (
+        "Sac (100 Kg)", "t,u,j", 1.15e6)
+
+
 def test_a_broken_audit_never_breaks_a_read(monkeypatch):
     """The read is the job.  A failure inside the audit must warn, not raise --
     and must still hand the frame back.  An instrument that fails silently and
@@ -435,7 +589,9 @@ def test_a_broken_audit_never_breaks_a_read(monkeypatch):
 #: A string that appears in ``quantity_audit``'s SOURCE and nowhere else in
 #: the library, so "did the fingerprint walk reach this module" can be answered
 #: by searching the fingerprint parts rather than by trusting a name.
-_SOURCE_TOKEN = "QUANTITY_REFERENCE_FLOOR"
+# GH #1493: the ladder now takes its floors as arguments, so this names the
+# constant its body still reads.
+_SOURCE_TOKEN = "QUANTITY_MIN_CELL"
 
 _EXCLUDED_ENTRY_POINTS = (
     "lsms_library.quantity_audit.check_quantities",
@@ -557,6 +713,35 @@ def test_tanzania_2020_21_coconut_and_timber_rows_fire():
 
     # ... and a bounded total, so a future rule change that turns the screen
     # into a firehose fails here rather than in someone's analysis.
-    assert report["n_implausible"] == 13, [
-        (o["j"], o["value"], o["ratio"]) for o in report["offenders"]]
-    assert report["rows"] == 11_125
+    #
+    # The bound is the set of offenders that survive a POSITIVE-ONLY
+    # reference.  GH #637 (2026-10-23) made Tanzania's perennial "not
+    # harvested in the past 12 months" answers explicit 0.0 kg rows, and the
+    # screen's p90 then counted those zeros (Timber 2020-21: 309 of 346 rows),
+    # which named 13 zero-driven rows on top -- the defect #1259, fixed by PR
+    # #1266 (positive-only reference).  With #1266 merged the full-frame
+    # audit IS the positive-reference set; until then it is a superset.  The
+    # earlier "known excess" block that pinned those 13 rows is retired here,
+    # as #1266 asks of whichever PR lands second.
+    #
+    # 14, not 13: the round-3 ruling (PR #1263) serves one row per native crop
+    # code (``production_obs``) instead of summing the codes harmonize_crop
+    # lumps.  The 2020-21 Other Fruits kg cell holds 1,662 positive rows
+    # instead of 1,102, its p90 falls from 752.5 to 493.6 kg, so the lumped
+    # 77,644 kg (72,400 + 5,244) is now the single code's 72,400 kg and one
+    # 50,625 kg code (ratio 67 before) now crosses 100x.
+    def _key(o):
+        return (o["i"], o["plot"], o["j"], o["value"])
+
+    named_all = {_key(o) for o in report["offenders"]}
+    q = pd.to_numeric(df["Quantity"], errors="coerce")
+    positive = df[~(q <= 0).fillna(False)]
+    pos_reports = audit_quantities(positive, "Quantity", country="Tanzania",
+                                   table="crop_production")
+    assert len(pos_reports) == 1
+    real = {_key(o) for o in pos_reports[0]["offenders"]}
+    assert len(real) == 14, sorted((k[2], k[3]) for k in real)
+    assert real <= named_all, "a positive-reference offender stopped firing"
+    # GH #1457: a sale no plot holds adds a Farm-level row, which holds no harvest.
+    plots = df.reset_index()["plot_id"]
+    assert report["rows"] - int((plots == "Farm-level").sum()) == 12_676

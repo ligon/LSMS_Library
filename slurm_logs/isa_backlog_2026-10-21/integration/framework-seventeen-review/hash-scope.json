@@ -1,0 +1,22 @@
+{
+  "status": "SUCCESS",
+  "pins": [
+    "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+    "7ecf8e95fef567554fe93870ba95abddd1955a86"
+  ],
+  "country_hashes": {
+    "total": 549,
+    "changed": 549,
+    "unchanged": 0
+  },
+  "framework_fingerprints": {
+    "total": 39,
+    "changed": 39,
+    "unchanged": 0
+  },
+  "wave_hashes": {
+    "total": 1362,
+    "changed": 1362,
+    "unchanged": 0
+  }
+}

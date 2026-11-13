@@ -1,0 +1,71 @@
+#+title: Independent narrow review - GH #1034 test amendment
+#+date: 2026-10-21
+
+* Verdict
+
+PASS at immutable =3e658298753db4f2934ea1b703415a1bdfa9f6af= against the preserved runtime review at =6fda46bc5437758bd650cf4016f0782a124281cf=.
+No actionable finding.
+This approves the test boundary correction only; the original source/runtime PASS remains separate and preserved.
+
+* Immutable scope
+
+Only the task ledger, aggregate =test-amendment.json= and =tests/test_gh1035_nigeria_w1_stated_weights.py= differ from 6f.
+The entire =lsms_library= runtime/config/source tree has the same Git tree object on both commits: =c55a3c8c54d1fb13e70fa3b6b1250de224199853=.
+Nigeria CONTENTS, including its #223/#1035 qualifications and nonfood WAITING caveat, is unchanged at blob =e410da8228bac0d6778dc450d63a06603abfcf82=.
+All 24 Nigeria table cache hashes were independently computed under each frozen checkout's asserted package/config identity and are exactly equal.
+The review's physically copied food cache is exactly equal to the original reviewer's independently cold-built 6f frame.
+The new frozen tree remains clean and unchanged.
+
+* Test semantics
+
+At =tests/test_gh1035_nigeria_w1_stated_weights.py:300=, the invalid all-round exclusivity check is replaced by W1 presence and explicit guards on later shared-label rows.
+The =on_mass= mask at line 309 now limits the W1 card assertions to W1 post-harvest.
+The W1 fraction/whole numerical checks, litre exclusion and sized-label metric exclusion remain.
+
+AST comparison confirms every other part of the test module is unchanged.
+Five original assertions remain byte-equivalent in AST form; the sole removed original assertion is the invalid all-round exclusivity check.
+Every original call, including the numerical =assert_allclose=, remains except the obsolete =set(t[sized])= call.
+Every original assignment remains except the intended =on_mass= scope change.
+
+Actual held food data has 3,809 W1-PH rows on these sized spellings and eleven W3-PP rows sharing W1 spellings.
+All eleven later rows use the inferred =unit= rung, with zero non-null =Quantity_kg= values and zero W1-card derivation stamps.
+The W1 mass fraction and whole-container groups still contain 1,856 and 1,566 rows respectively.
+The amendment therefore exercises actual later rows rather than passing through an empty mask.
+
+Six independent in-memory faults are rejected by the amended test: a wrong W1 fraction card factor; W1 whole-container =survey_kg=; later-row =survey_kg=; sized-label =metric=; litre =survey_kg=; and a later-row W1-card Derivation key.
+A later row carrying an unrelated derivation key is permitted by this amended test.
+No source, fixture, baseline or test file was altered for these private process-local controls.
+
+* Independent execution
+
+The complete GH #1035 file and the original four-file scoped selection pass together: *78 passed, zero skipped, failed or errors*, with 55 retained warnings in 29.33 seconds.
+This includes the survey conversion-file check and derivation-input reconstruction check.
+The two unrelated built crop/plot-input checks remain the only deselections.
+
+The old committed ladder test was extracted directly from the immutable 6f object and run against the identical runtime and held data.
+It fails exactly at =assert set(t[sized]) == {'2011Q1'}= because the observed set also includes =2015Q3=: one expected failure, zero setup errors or skips, in 8.75 seconds.
+Its original source file remains untouched.
+
+All runs used physically copied private L1/L2, the mounted image Python, matching frozen =PYTHONPATH= / =LSMS_COUNTRIES_ROOT= / cwd, numerical/build thread counts of one, and an asserted active offline socket guard.
+The positive suite used two loadfile workers.
+No cold source rebuild was necessary for this test-only amendment.
+
+* Commands and safe artifacts
+
+=run_tests.py amended= runs the five named modules with =-n 2 --dist=loadfile= and =-k 'not test_no_crop_row_has_a_nan_unit and not test_no_plot_input_has_a_nan_unit'=.
+=run_tests.py baseline= runs only the old committed ladder test and verifies its expected failure count.
+=proof.py= verifies AST preservation, actual provenance and six fault controls.
+=hash_control.py= computes the 6f control hashes with its own exact immutable-root assertion.
+All scripts reside in this review directory.
+
+Safe aggregate evidence is in =validation.json=, =proof.json=, =amended-result.json=, =baseline-result.json= and =frozen-6f-hashes.json=.
+Warning logs and JUnit output remain private and must not be committed or published, because diagnostics can contain household records.
+
+* Limits
+
+These are bounded warm-data regression and test-semantics checks, using a private physical copy whose food frame matches the earlier independent cold build exactly.
+This amendment review does not rerun the original cold source census or complete Feature scans.
+It introduces no runtime/data correction and does not resolve other Nigeria issues.
+No tracked edit, Git mutation, GitHub write, acquisition, DVC CLI, shared-cache mutation or cache promotion was performed.
+
+Sue

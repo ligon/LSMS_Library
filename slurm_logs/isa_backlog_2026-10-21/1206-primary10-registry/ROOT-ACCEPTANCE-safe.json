@@ -1,0 +1,35 @@
+{
+  "status": "ROOT_ACCEPTED_BOUNDED_PRIMARY10_REGISTRY_METADATA",
+  "at_UTC": "2026-10-22T15:50:38.933982+00:00",
+  "READY_sha256": "8851c5ef630a3770344f2cde48c91a31c65b20cde2ec20166445248b7b033950",
+  "manifest_sha256": "65ef324a8962cab7d998cc9441d7195080f527d19299f1bcc85b2cc1da565341",
+  "registry_entries": 75,
+  "distinct_release_and_postexit_metadata_pairs": 34,
+  "historically_absent_postexit_count_fields": [
+    "pr1199-Mali-content-v2-release-attestation",
+    "pr1200-Niger-release-attestation",
+    "pr1201-Tanzania-release-attestation"
+  ],
+  "missing_count_policy": "Counts are observed manifest lengths, not invented historical declarations.",
+  "root_read_complete_generator_and_preserved_v1_stop_present": true,
+  "snapshot_status_policy": "Frozen child acceptance statuses are as of its snapshot. Current root scope below is additive.",
+  "current_root_scope": {
+    "1192": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_ORIGINAL_GAPS_AND_FINDINGS",
+    "1193": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_ORIGINAL_GAPS_AND_FINDINGS",
+    "1194": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_ORIGINAL_GAPS_AND_FINDINGS",
+    "1195": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_ORIGINAL_GAPS_AND_FINDINGS",
+    "1197": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_ORIGINAL_GAPS_AND_FINDINGS",
+    "1199": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_ORIGINAL_GAPS_AND_FINDINGS",
+    "1200": "ROOT_ACCEPTED_CORRECTED_V3_96_NUMERIC_GROUPS_ONLY_FULL_PACKET_NOT_ASSERTED",
+    "1201": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_ORIGINAL_GAPS_AND_FINDINGS",
+    "1202": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_ORIGINAL_GAPS_AND_FINDINGS",
+    "1203": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_ORIGINAL_GAPS_AND_FINDINGS"
+  },
+  "integration_scope": "17 corrected196 and original252 stay distinct; 18/19 corrected868 and critical433 retain their existing bounded acceptances. Full17 and18/19 packet approval is not asserted.",
+  "all22_or_all_campaign_acceptance": false,
+  "counts_overlap_and_are_not_independent_datasets": true,
+  "root_checked_metadata_only_did_not_rehash_other_full_packet_payloads": true,
+  "root_API_source_payload_decode_test_cache_replays": 0,
+  "root_checker_sha256": "c062513e0b5185418843fc824f52d65075a7268bd44ccaa8e39d2e8ab60b7a5c",
+  "signed": "Sue"
+}

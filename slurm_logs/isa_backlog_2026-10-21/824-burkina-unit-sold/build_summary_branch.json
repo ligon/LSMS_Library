@@ -1,0 +1,46 @@
+{
+ "checkout": "/local/job40390255/worktrees/824-bf",
+ "head": "9a0ed5f3cc81b5d2ce8d1fdffba4f477e33b9f7f",
+ "lsms_library": "/local/job40390255/worktrees/824-bf/lsms_library/__init__.py",
+ "elapsed_s": 7.7,
+ "rows": 15587,
+ "index": [
+  "i",
+  "t",
+  "v",
+  "plot_id",
+  "crop",
+  "u"
+ ],
+ "columns": [
+  "Quantity",
+  "Quantity_sold",
+  "Value_sold",
+  "Unit_sold",
+  "harvest_month",
+  "intercropped"
+ ],
+ "dtypes": {
+  "Quantity": "Float64",
+  "Quantity_sold": "Float64",
+  "Value_sold": "Float64",
+  "Unit_sold": "string",
+  "harvest_month": "Float64",
+  "intercropped": "boolean"
+ },
+ "rows_by_t": {
+  "2018-19": 15587
+ },
+ "warning_categories": {
+  "NullReadWarning": 1,
+  "QuantityImplausibleWarning": 1
+ },
+ "audit_warnings": [
+  "NullReadWarning: Burkina_Faso/sample:",
+  "QuantityImplausibleWarning: <text removed: names a household>"
+ ],
+ "grain_reports": 0,
+ "null_index_reports": 0,
+ "quantity_reports": 1,
+ "null_read_reports": 0
+}

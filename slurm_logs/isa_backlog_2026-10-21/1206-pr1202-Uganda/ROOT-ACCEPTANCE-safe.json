@@ -1,0 +1,46 @@
+{
+  "status": "ROOT_ACCEPTED_PR1202_PERSISTED_AND_SEPARATE_EXACT_SOURCE_RECIPES",
+  "at_UTC": "2026-10-22T15:43:11.622550+00:00",
+  "persisted": {
+    "positive_groups": 278,
+    "strict": 274,
+    "original_v_NA_policy_qualifications": 4,
+    "historical_entries": 1908,
+    "original_literal_links": 11,
+    "physical_selected_products": 459,
+    "source_census_scripts": 38,
+    "assertion_comparison_sites": 319,
+    "partial_crosshead_attrs_predicates": 3,
+    "full_CLI_footer_schema_bytes_pairs": 2,
+    "preserved_CLI_cross_stage_strict_rejections": 2,
+    "original_saved_count_sets": 40,
+    "original_two_median_arrays_and_fixture_memory_absent": true
+  },
+  "exact_source": {
+    "head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+    "explicitly_NEW_recipe_groups": 9,
+    "source_config_pins": 42,
+    "physical_saved_inputs": 9,
+    "NEW_expected_frames": 9,
+    "sole_self_attribute": "table_name",
+    "Country_Wave_Feature_runtime_calls": 0,
+    "bare_index_targets_duplicate_not_nine_independent_datasets": true,
+    "prior_f8_hold_unchanged": true
+  },
+  "packet_and_attestation_entries": 656,
+  "all_original_source_prefix_Make_area_XML_warning_and_memory_limits_retained": true,
+  "no_payload_decode_or_API_source_test_replay_by_root": true,
+  "root_read_actual_pure_recipe_and_profiling_source": true,
+  "no_all_campaign_or_scientific_verdict": true,
+  "packet_pins": {
+    "pr1202-Uganda-persisted": {
+      "READY_sha256": "4b47d28cfb6305a631b5caf6b8018cc8ab922e5dfc0ef0720e9f155b1c424fb5",
+      "manifest_sha256": "fc4b1d77c7dbcc6ad7b3418a1ff1041ae34f6fbf0162152c21fb529502ebaabb"
+    },
+    "pr1202-Uganda-exact-source": {
+      "READY_sha256": "b2c1ab80d258daebd1b885d0d03b1fe4462536b6e3baf94f7c8f75f35bb74ca8",
+      "manifest_sha256": "9ada12caa1bf81c5f3d896de3941a75a9dc3068e473d8ff6631fbe15f9ae0abd"
+    }
+  },
+  "signed": "Sue"
+}

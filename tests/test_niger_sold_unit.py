@@ -72,18 +72,24 @@ S16D_DISTINCT_MULTI_ROWS = 388      # non-identical lines within a pair; none se
 #: 2014-15 AS2E2: one row per (household, crop) -- the sum there is a no-op.
 AS2E2_ROWS = 5226
 
-#: Served, 2026-09-24 cold rebuild.
-UNIT_SOLD_ROWS = {"2011-12": 1294, "2014-15": 564, "2018-19": 3226, "2021-22": 1425}
-W2021_SALE_PAIRS = 1409
-W2021_VALUE_SOLD_PER_PAIR = 73_206_995
-W2021_QUANTITY_SOLD_PER_PAIR = 32_420.5
+#: Served, 2026-09-24 cold rebuild; 2021-22 re-measured after GH #1360, whose
+#: one-harvest-LINE attribution leaves the sale NaN on 144 multi-line pairs
+#: (was 1,425 rows / 1,409 pairs / 73,206,995 FCFA / 32,420.5 per pair, with
+#: 16 pairs served on two rows).
+#: 2011-12 was 1,294 before GH #1462 served section 3E's 424 lines with a sold unit.
+#: Re-pinned for GH #1457: every 2014-15 / 2021-22 sale now reaches a row in its own unit,
+#: the one-served-line rule's 583 / 1,265 plus Farm-level's 498 / 553.
+UNIT_SOLD_ROWS = {"2011-12": 1718, "2014-15": 583 + 498, "2018-19": 3226, "2021-22": 1265 + 553}
+W2021_SALE_PAIRS = 1265
+W2021_VALUE_SOLD_PER_PAIR = 68_629_070
+W2021_QUANTITY_SOLD_PER_PAIR = 28_845.5
 W2021_VALUE_SOLD_BEFORE = 78_934_620      # what summing the repeats served
 
 #: Sold-unit == harvest-unit share on PRICED rows (Quantity_sold > 0 and
 #: Value_sold > 0) that know both units (Unit_sold non-null, u != 'Unknown'),
 #: canonicalised through the `u` table, measured on the served table.
-AGREEMENT = {"2011-12": (0.9869, 1293), "2014-15": (0.8943, 558),
-             "2018-19": (0.9231, 3226), "2021-22": (0.8904, 1423)}
+AGREEMENT = {"2011-12": (0.9654, 1707), "2014-15": (0.8977, 577),  # 2011-12 (0.9869, 1293) before GH #1462's dry-season rows; 2014-15 (0.8943, 558) before GH #1457 put 19 sales on their one served line
+             "2018-19": (0.9231, 3226), "2021-22": (0.8964, 1265)}  # 2021-22 (0.8904, 1423) before GH #1360
 AGREEMENT_TOL = 0.002
 
 
@@ -164,7 +170,8 @@ class TestDeclared:
     @pytest.mark.parametrize("wave", CROP_LEVEL_WAVES)
     def test_crop_level_sale_is_keyed_on_the_sold_unit(self, wave):
         src = _script(wave)
-        assert "groupby(['i', 'crop', 'Unit_sold']" in src, (
+        # 2021-22's key also names the sold state since GH #1462: never a sum across states.
+        assert "groupby(['i', 'crop', 'Unit_sold'" in src, (
             f"{wave}: the crop-level sale must be summed per (i, crop, Unit_sold), never across units")
         assert "one_unit" in src and "single" in src, f"{wave}: single-plot AND single-unit attribution"
 
@@ -173,7 +180,7 @@ class TestDeclared:
         ``duplicated(`` must precede the ``groupby`` that sums the sale."""
         src = _script("2021-22")
         i_dedup = src.index("duplicated(keep='first')")
-        i_sum = src.index("groupby(['i', 'crop', 'Unit_sold']")
+        i_sum = src.index("groupby(['i', 'crop', 'Unit_sold'")  # no ']': the key grew in GH #1462
         assert i_dedup < i_sum, "de-duplication must run before the sale is summed"
         assert "sold[~_dup]" in src and "soldn[~_dup]" in src, (
             "the labelled and the coded frame must be de-duplicated with the SAME mask")
@@ -286,7 +293,9 @@ class TestServed:
         assert int((n > 1).sum()) == 0, f"{wave}: {int((n > 1).sum())} pairs sold in two units"
 
     def test_2021_22_single_plot_sale_is_not_multiplied(self, built):
-        g = built[(built["t"] == "2021-22") & built["Value_sold"].notna()]
+        # GH #1457: the plot rows' pin; Farm-level has its own (test_gh1457_niger_multi_plot_sales).
+        g = built[(built["t"] == "2021-22") & built["Value_sold"].notna()
+                  & (built["plot_id"] != "Farm-level")]
         pairs = g.drop_duplicates(subset=["i", "crop"])
         assert pairs.groupby(["i", "crop"]).ngroups == W2021_SALE_PAIRS
         total = float(pairs["Value_sold"].sum())

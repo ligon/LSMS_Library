@@ -19,19 +19,26 @@ import json
 
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
-from uganda import Waves, id_walk
+from uganda import id_walk
 
 
 pieces = []
-for t in Waves.keys():
-    fn = f'../{t}/_/plot_labor.parquet'
+country = Country('Uganda')
+for t in country.waves:
+    wave = country[t]
+    # GH #1287; ledger §§2–4: absence is declared, not inferred from a read.
+    if 'plot_labor' not in wave.data_scheme:
+        continue
+    fn = f'../{wave.wave_folder}/_/plot_labor.parquet'
     try:
         df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired for plot_labor (no .py / parquet, e.g. 2005-06).
-        # DVC raises PathMissingError here, not FileNotFoundError.
-        continue
+    except Exception as error:
+        raise RuntimeError(
+            f'Uganda/{t}: declared plot_labor failed to load {fn}; '
+            'refusing a partial country table.'
+        ) from error
     pieces.append(df)
 
 assert pieces, "plot_labor: no wave-level parquets found"

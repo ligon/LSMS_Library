@@ -1,0 +1,16 @@
+{
+  "timestamp_utc": "2026-10-21T13:58:15.919310+00:00",
+  "release_tag": "v0.16.0",
+  "annotated_tag_object": "caf9be7baefb83cee2b9bcdc9717f69fba5e97fd",
+  "commit": "097283459f80016b0f00a51b814a0cb964a42789",
+  "tag_pushed_origin_and_github": true,
+  "github_release": "https://github.com/ligon/LSMS_Library/releases/tag/v0.16.0",
+  "publish_run": 39612460165,
+  "publish_event": "release",
+  "publish_status_at_checkpoint": "in_progress",
+  "existing_credentialed_run": 39533863014,
+  "new_master_data_run": 39604418333,
+  "new_master_data_status_at_checkpoint": "in_progress",
+  "release_gate_basis": "Completed exact-code credentialed source + fresh exact-master local full suite + actual master platform checks; extra duplicate wait retired explicitly",
+  "publication_verification": "pending"
+}

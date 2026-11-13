@@ -1,0 +1,3620 @@
+{
+  "status": "PASS_INDEPENDENT_BOUNDED_FROZEN",
+  "source": {
+    "candidate": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+    "runtime_tests": "cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270",
+    "parent": "99c824079da480ab2646e499c06ac70e457ff271"
+  },
+  "assessment": {
+    "status": "PASS_BOUNDED_INDEPENDENT_FUNCTIONAL_REVIEW",
+    "source": {
+      "base": {
+        "status": "PASS",
+        "source_rows": 17699,
+        "wave": {
+          "2019-20": {
+            "raw": 5148,
+            "positive_price": 3079,
+            "positive_basis": 3077,
+            "positive_both": 3077,
+            "retained": 3076,
+            "excluded": 2072,
+            "source_varieties": 52,
+            "coarse_cells": 2769,
+            "multiple_variety_groups": 261,
+            "distinct_price_groups": 243,
+            "native_key_unique": true,
+            "unresolved_unit_positive_both": 1
+          },
+          "2020-21": {
+            "raw": 25376,
+            "positive_price": 14639,
+            "positive_basis": 14673,
+            "positive_both": 14625,
+            "retained": 14623,
+            "excluded": 10753,
+            "source_varieties": 52,
+            "coarse_cells": 13062,
+            "multiple_variety_groups": 1281,
+            "distinct_price_groups": 1149,
+            "native_key_unique": true,
+            "unresolved_unit_positive_both": 2
+          }
+        },
+        "helper_oracle_writer_native_normalized_raw_exact": true,
+        "no_data_root_changes": true,
+        "source_native_memory_dtype_failure_separately_preserved": {
+          "2019-20/memory-native": false,
+          "2020-21/memory-native": false
+        }
+      },
+      "candidate": {
+        "status": "PASS",
+        "source_rows": 17699,
+        "wave": {
+          "2019-20": {
+            "raw": 5148,
+            "positive_price": 3079,
+            "positive_basis": 3077,
+            "positive_both": 3077,
+            "retained": 3076,
+            "excluded": 2072,
+            "source_varieties": 52,
+            "coarse_cells": 2769,
+            "multiple_variety_groups": 261,
+            "distinct_price_groups": 243,
+            "native_key_unique": true,
+            "unresolved_unit_positive_both": 1
+          },
+          "2020-21": {
+            "raw": 25376,
+            "positive_price": 14639,
+            "positive_basis": 14673,
+            "positive_both": 14625,
+            "retained": 14623,
+            "excluded": 10753,
+            "source_varieties": 52,
+            "coarse_cells": 13062,
+            "multiple_variety_groups": 1281,
+            "distinct_price_groups": 1149,
+            "native_key_unique": true,
+            "unresolved_unit_positive_both": 2
+          }
+        },
+        "helper_oracle_writer_native_normalized_raw_exact": true,
+        "no_data_root_changes": true,
+        "source_native_memory_dtype_failure_separately_preserved": {
+          "2019-20/memory-native": false,
+          "2020-21/memory-native": false
+        }
+      }
+    },
+    "Feature": {},
+    "CLI": {
+      "base/default/first": {
+        "CLI": {
+          "2019": {
+            "rows": 3076,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": []
+            }
+          },
+          "2008": {
+            "rows": 0,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": []
+            }
+          }
+        },
+        "api_artifact_full_exact": {
+          "2019": false,
+          "2008": false
+        }
+      },
+      "base/default/fresh": {
+        "CLI": {
+          "2019": {
+            "rows": 3076,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": []
+            }
+          },
+          "2008": {
+            "rows": 0,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": []
+            }
+          }
+        },
+        "api_artifact_full_exact": {
+          "2019": false,
+          "2008": false
+        }
+      },
+      "base/make/first": {
+        "CLI": {
+          "2019": {
+            "rows": 17699,
+            "wrong_wave_rows": 14623,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": [
+                "Tanzania/2019-20/_/community_prices.parquet",
+                "Tanzania/var/community_prices.parquet",
+                "Tanzania/2020-21/_/community_prices.parquet"
+              ]
+            }
+          },
+          "2008": {
+            "rows": 17699,
+            "wrong_wave_rows": 17699,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": [
+                "Tanzania/2019-20/_/community_prices.parquet",
+                "Tanzania/var/community_prices.parquet",
+                "Tanzania/2020-21/_/community_prices.parquet"
+              ]
+            }
+          }
+        },
+        "api_artifact_full_exact": {
+          "2019": false,
+          "2008": false
+        }
+      },
+      "base/make/fresh": {
+        "CLI": {
+          "2019": {
+            "rows": 17699,
+            "wrong_wave_rows": 14623,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": [
+                "Tanzania/2020-21/_/community_prices.parquet",
+                "Tanzania/var/community_prices.parquet",
+                "Tanzania/2019-20/_/community_prices.parquet"
+              ]
+            }
+          },
+          "2008": {
+            "rows": 17699,
+            "wrong_wave_rows": 17699,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": [
+                "Tanzania/2020-21/_/community_prices.parquet",
+                "Tanzania/var/community_prices.parquet",
+                "Tanzania/2019-20/_/community_prices.parquet"
+              ]
+            }
+          }
+        },
+        "api_artifact_full_exact": {
+          "2019": false,
+          "2008": false
+        }
+      },
+      "candidate/default/first": {
+        "CLI": {
+          "2019": {
+            "rows": 3076,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": []
+            }
+          },
+          "2008": {
+            "rows": 0,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": []
+            }
+          }
+        },
+        "api_artifact_full_exact": {
+          "2019": false,
+          "2008": false
+        }
+      },
+      "candidate/default/fresh": {
+        "CLI": {
+          "2019": {
+            "rows": 3076,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": []
+            }
+          },
+          "2008": {
+            "rows": 0,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": []
+            }
+          }
+        },
+        "api_artifact_full_exact": {
+          "2019": false,
+          "2008": false
+        }
+      },
+      "candidate/make/first": {
+        "CLI": {
+          "2019": {
+            "rows": 3076,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": [
+                "Tanzania/2019-20/_/community_prices.parquet"
+              ]
+            }
+          },
+          "2008": {
+            "rows": 0,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": []
+            }
+          }
+        },
+        "api_artifact_full_exact": {
+          "2019": false,
+          "2008": false
+        }
+      },
+      "candidate/make/fresh": {
+        "CLI": {
+          "2019": {
+            "rows": 3076,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": [
+                "Tanzania/2019-20/_/community_prices.parquet"
+              ]
+            }
+          },
+          "2008": {
+            "rows": 0,
+            "wrong_wave_rows": 0,
+            "full_footer_exact": true,
+            "full_schema_metadata_exact": true,
+            "file_bytes_exact": true,
+            "changes_by_kind": {
+              "added": [],
+              "deleted": [],
+              "modified": []
+            }
+          }
+        },
+        "api_artifact_full_exact": {
+          "2019": false,
+          "2008": false
+        }
+      }
+    },
+    "scanner": {
+      "base": {
+        "records": 4,
+        "full_occurrences": [
+          {
+            "check": "has_household_index",
+            "country": "Mali",
+            "status": "warn",
+            "record_sha256": "37afd998595dffdec09b3090b2885ea1b19c34a954c56fa0e4c60ae08cc790b3",
+            "reason": "native community table has no household i"
+          },
+          {
+            "check": "has_household_index",
+            "country": "Tanzania",
+            "status": "warn",
+            "record_sha256": "4f9665fe997b0eb215eeb7eddb25a432d5c4270c0c0051431cfd80d2aae1063b",
+            "reason": "native community table has no household i"
+          },
+          {
+            "check": "runtime_warning",
+            "country": null,
+            "status": "warn",
+            "record_sha256": "5b1993be25892c2adfc5fce8fd28d263d557286a759a5282fa1ef67d893a0cc7",
+            "reason": "declared canonical sentinel alignment without row loss"
+          },
+          {
+            "check": "runtime_warning",
+            "country": null,
+            "status": "warn",
+            "record_sha256": "1b4f97e6be014743de4e9de7fd4ab315e7063e6fcd3eb62fbc2ff7b1db3a9639",
+            "reason": "missing Tanzania2020-21 population statement"
+          }
+        ],
+        "file_sha256": "9ce945124fc6cddada2a60ad3917a3e61bc94cc5d25b6669d75305b08763ecc2",
+        "cache_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        }
+      },
+      "candidate": {
+        "records": 4,
+        "full_occurrences": [
+          {
+            "check": "has_household_index",
+            "country": "Mali",
+            "status": "warn",
+            "record_sha256": "37afd998595dffdec09b3090b2885ea1b19c34a954c56fa0e4c60ae08cc790b3",
+            "reason": "native community table has no household i"
+          },
+          {
+            "check": "has_household_index",
+            "country": "Tanzania",
+            "status": "warn",
+            "record_sha256": "4f9665fe997b0eb215eeb7eddb25a432d5c4270c0c0051431cfd80d2aae1063b",
+            "reason": "native community table has no household i"
+          },
+          {
+            "check": "runtime_warning",
+            "country": null,
+            "status": "warn",
+            "record_sha256": "5b1993be25892c2adfc5fce8fd28d263d557286a759a5282fa1ef67d893a0cc7",
+            "reason": "declared canonical sentinel alignment without row loss"
+          },
+          {
+            "check": "runtime_warning",
+            "country": null,
+            "status": "warn",
+            "record_sha256": "1b4f97e6be014743de4e9de7fd4ab315e7063e6fcd3eb62fbc2ff7b1db3a9639",
+            "reason": "missing Tanzania2020-21 population statement"
+          }
+        ],
+        "file_sha256": "9ce945124fc6cddada2a60ad3917a3e61bc94cc5d25b6669d75305b08763ecc2",
+        "cache_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        }
+      },
+      "full_multiset_exact_parent_candidate_and_author": true,
+      "phase2_kwargs_grid": 0
+    },
+    "warm": {},
+    "known_stage_differences": [
+      {
+        "comparison": "parent-default/candidate-default/2008",
+        "full_exact": false,
+        "sole_delta": "Description string -> existing declared-empty object dtype",
+        "all_other_axes_levels_codes_masks_order_types_and_typed_attrs_exact": true
+      },
+      {
+        "comparison": "parent-default/candidate-Make/2008",
+        "full_exact": false,
+        "sole_delta": "Description string -> existing declared-empty object dtype",
+        "all_other_axes_levels_codes_masks_order_types_and_typed_attrs_exact": true
+      },
+      {
+        "comparison": "parent-default/candidate-default/2010",
+        "full_exact": false,
+        "sole_delta": "Description string -> existing declared-empty object dtype",
+        "all_other_axes_levels_codes_masks_order_types_and_typed_attrs_exact": true
+      },
+      {
+        "comparison": "parent-default/candidate-Make/2010",
+        "full_exact": false,
+        "sole_delta": "Description string -> existing declared-empty object dtype",
+        "all_other_axes_levels_codes_masks_order_types_and_typed_attrs_exact": true
+      },
+      {
+        "comparison": "parent-default/candidate-default/2012",
+        "full_exact": false,
+        "sole_delta": "Description string -> existing declared-empty object dtype",
+        "all_other_axes_levels_codes_masks_order_types_and_typed_attrs_exact": true
+      },
+      {
+        "comparison": "parent-default/candidate-Make/2012",
+        "full_exact": false,
+        "sole_delta": "Description string -> existing declared-empty object dtype",
+        "all_other_axes_levels_codes_masks_order_types_and_typed_attrs_exact": true
+      },
+      {
+        "comparison": "parent-default/candidate-default/2014",
+        "full_exact": false,
+        "sole_delta": "Description string -> existing declared-empty object dtype",
+        "all_other_axes_levels_codes_masks_order_types_and_typed_attrs_exact": true
+      },
+      {
+        "comparison": "parent-default/candidate-Make/2014",
+        "full_exact": false,
+        "sole_delta": "Description string -> existing declared-empty object dtype",
+        "all_other_axes_levels_codes_masks_order_types_and_typed_attrs_exact": true
+      },
+      {
+        "comparison": "parent-default/candidate-default/older",
+        "full_exact": false,
+        "sole_delta": "Description string -> existing declared-empty object dtype",
+        "all_other_axes_levels_codes_masks_order_types_and_typed_attrs_exact": true
+      },
+      {
+        "comparison": "parent-default/candidate-Make/older",
+        "full_exact": false,
+        "sole_delta": "Description string -> existing declared-empty object dtype",
+        "all_other_axes_levels_codes_masks_order_types_and_typed_attrs_exact": true
+      },
+      {
+        "comparison": "old public Default versus old Make",
+        "full_exact": false,
+        "all_payload_axes_dtypes_masks_order_exact": true,
+        "attrs_delta": {
+          "only_left": [
+            "id_converted"
+          ],
+          "only_right": [],
+          "changed": []
+        },
+        "intended_after": "candidate Make matches complete authoritative parent Default including id_converted=True"
+      }
+    ],
+    "default_country_Arrow_metadata_delta": [
+      "lsms_cache_hash"
+    ],
+    "tests": {
+      "candidate_new": {
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "total": 27,
+        "passed": 27,
+        "exit": 0
+      },
+      "parent_new": {
+        "failures": 20,
+        "errors": 0,
+        "skips": 0,
+        "total": 27,
+        "passed": 7,
+        "exit": 1
+      },
+      "candidate_existing": {
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "total": 58,
+        "passed": 58,
+        "exit": 0
+      },
+      "new_test_same_sha256": "cc64075e6edfc5be063c23ab0b63ddcb0f42e6b24a87c0b40b9f01f0fd619c77",
+      "parent_failed_case_names": [
+        "test_real_country_discovery_and_wave_make_rules",
+        "test_requests_use_only_the_requested_native_waves[None-make]",
+        "test_requests_use_only_the_requested_native_waves[requested1-dvc]",
+        "test_requests_use_only_the_requested_native_waves[requested1-make]",
+        "test_requests_use_only_the_requested_native_waves[requested2-dvc]",
+        "test_requests_use_only_the_requested_native_waves[requested2-make]",
+        "test_requests_use_only_the_requested_native_waves[requested3-dvc]",
+        "test_requests_use_only_the_requested_native_waves[requested3-make]",
+        "test_requests_use_only_the_requested_native_waves[requested4-dvc]",
+        "test_requests_use_only_the_requested_native_waves[requested4-make]",
+        "test_requests_use_only_the_requested_native_waves[requested5-make]",
+        "test_requests_use_only_the_requested_native_waves[requested6-make]",
+        "test_requests_use_only_the_requested_native_waves[requested7-dvc]",
+        "test_requests_use_only_the_requested_native_waves[requested7-make]",
+        "test_requests_use_only_the_requested_native_waves[requested8-make]",
+        "test_requests_use_only_the_requested_native_waves[requested9-make]",
+        "test_make_never_reads_an_existing_wrong_wave_country_payload[requested0]",
+        "test_make_never_reads_an_existing_wrong_wave_country_payload[requested1]",
+        "test_populated_make_preserves_verified_default_country_cache[requested0]",
+        "test_populated_make_preserves_verified_default_country_cache[requested1]"
+      ],
+      "direct_held_assertion_bodies_per_head": 11
+    },
+    "hash_scope": {
+      "status": "PASS_MEASURED_BEFORE_REBUILD",
+      "cells": 549,
+      "moved": [
+        "Tanzania/sample",
+        "Tanzania/cluster_features",
+        "Tanzania/shocks",
+        "Tanzania/household_roster",
+        "Tanzania/individual_education",
+        "Tanzania/anthropometry",
+        "Tanzania/life_satisfaction",
+        "Tanzania/food_coping",
+        "Tanzania/interview_date",
+        "Tanzania/food_acquired",
+        "Tanzania/panel_ids",
+        "Tanzania/assets",
+        "Tanzania/housing",
+        "Tanzania/plot_features",
+        "Tanzania/crop_production",
+        "Tanzania/plot_inputs",
+        "Tanzania/plot_labor",
+        "Tanzania/people_last7days",
+        "Tanzania/livestock",
+        "Tanzania/community_prices",
+        "Tanzania/community_cluster_xwalk",
+        "Tanzania/food_expenditures",
+        "Tanzania/food_prices",
+        "Tanzania/food_quantities",
+        "Tanzania/household_characteristics"
+      ],
+      "Tanzania_moved": 25,
+      "others_exact": 524,
+      "framework_exact": 39,
+      "actual_parent": "99c824079da480ab2646e499c06ac70e457ff271",
+      "candidate": "fa457f90edbedfd7282eaf988c8231e4e87ba082"
+    },
+    "full_exact_comparison_counts": {
+      "cold_warm": 40,
+      "candidate_Make_cold_populated": 10,
+      "candidate_backends": 10,
+      "supported_authoritative_public": 10,
+      "populated_default_crosshead": 10,
+      "native_layers_crosshead": 10,
+      "Make_native_crosshead": 4,
+      "raw_country": 1,
+      "old_Make_raw_layer": 1,
+      "extras_fresh_process": 34,
+      "healthy_Mali": 2,
+      "pooled_Feature": 4,
+      "authoritative_Make_Feature": 4,
+      "CLI_Default_crosshead_matched_stage": 8,
+      "CLI_Make_supported_API": 2,
+      "CLI_Make_existing_empty_factory": 2
+    },
+    "matrix": {
+      "base/default-all": {
+        "rows": 17699,
+        "requested": null,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/default-2019": {
+        "rows": 3076,
+        "requested": [
+          "2019-20"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/default-2020": {
+        "rows": 14623,
+        "requested": [
+          "2020-21"
+        ],
+        "actual_wave_rows": {
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/default-modern": {
+        "rows": 17699,
+        "requested": [
+          "2019-20",
+          "2020-21"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/default-2008": {
+        "rows": 0,
+        "requested": [
+          "2008-09"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/default-2010": {
+        "rows": 0,
+        "requested": [
+          "2010-11"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/default-2012": {
+        "rows": 0,
+        "requested": [
+          "2012-13"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/default-2014": {
+        "rows": 0,
+        "requested": [
+          "2014-15"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/default-older": {
+        "rows": 0,
+        "requested": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/default-mixed": {
+        "rows": 3076,
+        "requested": [
+          "2008-09",
+          "2019-20"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/make-all": {
+        "rows": 17699,
+        "requested": null,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/make-2019": {
+        "rows": 17699,
+        "requested": [
+          "2019-20"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/make-2020": {
+        "rows": 17699,
+        "requested": [
+          "2020-21"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/make-modern": {
+        "rows": 17699,
+        "requested": [
+          "2019-20",
+          "2020-21"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/make-2008": {
+        "rows": 17699,
+        "requested": [
+          "2008-09"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/make-2010": {
+        "rows": 17699,
+        "requested": [
+          "2010-11"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/make-2012": {
+        "rows": 17699,
+        "requested": [
+          "2012-13"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/make-2014": {
+        "rows": 17699,
+        "requested": [
+          "2014-15"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/make-older": {
+        "rows": 17699,
+        "requested": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "base/make-mixed": {
+        "rows": 17699,
+        "requested": [
+          "2008-09",
+          "2019-20"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/default-all": {
+        "rows": 17699,
+        "requested": null,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/default-2019": {
+        "rows": 3076,
+        "requested": [
+          "2019-20"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/default-2020": {
+        "rows": 14623,
+        "requested": [
+          "2020-21"
+        ],
+        "actual_wave_rows": {
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/default-modern": {
+        "rows": 17699,
+        "requested": [
+          "2019-20",
+          "2020-21"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/default-2008": {
+        "rows": 0,
+        "requested": [
+          "2008-09"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/default-2010": {
+        "rows": 0,
+        "requested": [
+          "2010-11"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/default-2012": {
+        "rows": 0,
+        "requested": [
+          "2012-13"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/default-2014": {
+        "rows": 0,
+        "requested": [
+          "2014-15"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/default-older": {
+        "rows": 0,
+        "requested": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/default-mixed": {
+        "rows": 3076,
+        "requested": [
+          "2008-09",
+          "2019-20"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/make-all": {
+        "rows": 17699,
+        "requested": null,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/make-2019": {
+        "rows": 3076,
+        "requested": [
+          "2019-20"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/make-2020": {
+        "rows": 14623,
+        "requested": [
+          "2020-21"
+        ],
+        "actual_wave_rows": {
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/make-modern": {
+        "rows": 17699,
+        "requested": [
+          "2019-20",
+          "2020-21"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/make-2008": {
+        "rows": 0,
+        "requested": [
+          "2008-09"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/make-2010": {
+        "rows": 0,
+        "requested": [
+          "2010-11"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/make-2012": {
+        "rows": 0,
+        "requested": [
+          "2012-13"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/make-2014": {
+        "rows": 0,
+        "requested": [
+          "2014-15"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/make-older": {
+        "rows": 0,
+        "requested": [
+          "2008-09",
+          "2010-11",
+          "2012-13",
+          "2014-15"
+        ],
+        "actual_wave_rows": {},
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      },
+      "candidate/make-mixed": {
+        "rows": 3076,
+        "requested": [
+          "2008-09",
+          "2019-20"
+        ],
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "warm_changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "warning_count_cold": 0,
+        "warning_count_warm": 0
+      }
+    },
+    "populated": {
+      "base/default-all": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/default-2019": {
+        "rows": 3076,
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/default-2020": {
+        "rows": 14623,
+        "actual_wave_rows": {
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/default-modern": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/default-2008": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": false
+      },
+      "base/default-2010": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": false
+      },
+      "base/default-2012": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": false
+      },
+      "base/default-2014": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": false
+      },
+      "base/default-older": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": false
+      },
+      "base/default-mixed": {
+        "rows": 3076,
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/make-all": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": "50638db7c93661f10385b6ff6a4f382bf3b7d18f6f479a8cf363b3851ea425b7",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": null,
+          "coverage": null
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/make-2019": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": null,
+          "coverage": null
+        },
+        "country_footer_after": {
+          "hash": null,
+          "coverage": null
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/make-2020": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": null,
+          "coverage": null
+        },
+        "country_footer_after": {
+          "hash": null,
+          "coverage": null
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/make-modern": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": null,
+          "coverage": null
+        },
+        "country_footer_after": {
+          "hash": null,
+          "coverage": null
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/make-2008": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": null,
+          "coverage": null
+        },
+        "country_footer_after": {
+          "hash": null,
+          "coverage": null
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/make-2010": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": null,
+          "coverage": null
+        },
+        "country_footer_after": {
+          "hash": null,
+          "coverage": null
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/make-2012": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": null,
+          "coverage": null
+        },
+        "country_footer_after": {
+          "hash": null,
+          "coverage": null
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/make-2014": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": null,
+          "coverage": null
+        },
+        "country_footer_after": {
+          "hash": null,
+          "coverage": null
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/make-older": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": null,
+          "coverage": null
+        },
+        "country_footer_after": {
+          "hash": null,
+          "coverage": null
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "base/make-mixed": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/var/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": null,
+          "coverage": null
+        },
+        "country_footer_after": {
+          "hash": null,
+          "coverage": null
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/default-all": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/default-2019": {
+        "rows": 3076,
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/default-2020": {
+        "rows": 14623,
+        "actual_wave_rows": {
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/default-modern": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/default-2008": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": false
+      },
+      "candidate/default-2010": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": false
+      },
+      "candidate/default-2012": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": false
+      },
+      "candidate/default-2014": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": false
+      },
+      "candidate/default-older": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": false
+      },
+      "candidate/default-mixed": {
+        "rows": 3076,
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/make-all": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet",
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/make-2019": {
+        "rows": 3076,
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "changes": {
+          "added": [],
+          "deleted": [
+            "Tanzania/2020-21/_/community_prices.parquet"
+          ],
+          "modified": [
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/make-2020": {
+        "rows": 14623,
+        "actual_wave_rows": {
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [
+            "Tanzania/2020-21/_/community_prices.parquet"
+          ],
+          "deleted": [
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/make-modern": {
+        "rows": 17699,
+        "actual_wave_rows": {
+          "2019-20": 3076,
+          "2020-21": 14623
+        },
+        "changes": {
+          "added": [
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ],
+          "deleted": [],
+          "modified": [
+            "Tanzania/2020-21/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/make-2008": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/make-2010": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/make-2012": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/make-2014": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/make-older": {
+        "rows": 0,
+        "actual_wave_rows": {},
+        "changes": {
+          "added": [],
+          "deleted": [],
+          "modified": []
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      },
+      "candidate/make-mixed": {
+        "rows": 3076,
+        "actual_wave_rows": {
+          "2019-20": 3076
+        },
+        "changes": {
+          "added": [],
+          "deleted": [
+            "Tanzania/2020-21/_/community_prices.parquet"
+          ],
+          "modified": [
+            "Tanzania/2019-20/_/community_prices.parquet"
+          ]
+        },
+        "country_footer_before": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "country_footer_after": {
+          "hash": "e19933bc8041ee4c45508f58af90dba0000f8647f5a239721d1b3742c244303c",
+          "coverage": [
+            "2008-09",
+            "2010-11",
+            "2012-13",
+            "2014-15",
+            "2019-20",
+            "2020-21"
+          ]
+        },
+        "cold_vs_populated_full_exact": true
+      }
+    }
+  },
+  "terminal": {
+    "status": "TERMINAL_IMMUTABILITY_METADATA_PASS",
+    "source_heads": {
+      "candidate": {
+        "head": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+        "tracked_files": 14892,
+        "clean": true,
+        "SHA_size_mode_mtime_literal_symlinks_exact_initial": true
+      },
+      "base": {
+        "head": "99c824079da480ab2646e499c06ac70e457ff271",
+        "tracked_files": 14888,
+        "clean": true,
+        "SHA_size_mode_mtime_literal_symlinks_exact_initial": true
+      },
+      "writer": {
+        "head": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+        "tracked_files": 14892,
+        "clean": true,
+        "SHA_size_mode_mtime_literal_symlinks_exact_initial": true
+      },
+      "Uganda1198": {
+        "head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+        "tracked_files": 14893,
+        "clean": true,
+        "SHA_size_mode_mtime_literal_symlinks_exact_initial": true
+      }
+    },
+    "frozen_old_root_checks": {
+      "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091-fix": {
+        "entries_exact": 2894,
+        "manifest": {
+          "sha256": "2a09f454e5a9622b9493a3cc73673fb897d22c5b412535b41b9018f3644e641f",
+          "size": 744401,
+          "mode": 420,
+          "mtime_ns": 1792635904662649016,
+          "symlink": false,
+          "literal_link": null
+        }
+      },
+      "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091": {
+        "entries_exact": 1216,
+        "manifest": {
+          "sha256": "0d0519b90e77e918b695815d7174d942b4fe1a12ce777510c0521b0d92315784",
+          "size": 295794,
+          "mode": 420,
+          "mtime_ns": 1792632475499320671,
+          "symlink": false,
+          "literal_link": null
+        }
+      },
+      "/local/job40255479/control/isa-backlog-20261021/Uganda/1198-fix": {
+        "entries_exact": 4122,
+        "manifest": {
+          "sha256": "e1a7d64677dbc9b11f6159512e890d8372ba330acfa471dfdd9ed6cae5734472",
+          "size": 1038359,
+          "mode": 420,
+          "mtime_ns": 1792636798489408146,
+          "symlink": false,
+          "literal_link": null
+        }
+      },
+      "old_source_trees": {
+        "writer_parent_and_diagnosis_heads_clean_bytes_modes_exact_frozen_literal_proofs": true,
+        "source_mtime_not_present_in_their_original_frozen_proof_no_retrospective_claim": true
+      }
+    },
+    "other_old_source_literal_proof_checks": true,
+    "raw_private_physical_copies": 176,
+    "raw_private_distinct_inodes": 176,
+    "cache_endpoints": [
+      {
+        "head": "base",
+        "scenario": "default-all",
+        "files": 8,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "default-2019",
+        "files": 6,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "default-2020",
+        "files": 6,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "default-modern",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "default-2008",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "default-2010",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "default-2012",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "default-2014",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "default-older",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "default-mixed",
+        "files": 6,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "make-all",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "make-2019",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "make-2020",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "make-modern",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "make-2008",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "make-2010",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "make-2012",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "make-2014",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "make-older",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "make-mixed",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "populated-default",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "base",
+        "scenario": "populated-make",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "default-all",
+        "files": 8,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "default-2019",
+        "files": 6,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "default-2020",
+        "files": 6,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "default-modern",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "default-2008",
+        "files": 4,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "default-2010",
+        "files": 4,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "default-2012",
+        "files": 4,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "default-2014",
+        "files": 4,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "default-older",
+        "files": 4,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "default-mixed",
+        "files": 6,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "make-all",
+        "files": 5,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "make-2019",
+        "files": 5,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "make-2020",
+        "files": 5,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "make-modern",
+        "files": 6,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "make-2008",
+        "files": 4,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "make-2010",
+        "files": 4,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "make-2012",
+        "files": 4,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "make-2014",
+        "files": 4,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "make-older",
+        "files": 4,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "make-mixed",
+        "files": 5,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "populated-default",
+        "files": 7,
+        "final_exact_recorded_endpoint": true
+      },
+      {
+        "head": "candidate",
+        "scenario": "populated-make",
+        "files": 6,
+        "final_exact_recorded_endpoint": true
+      }
+    ],
+    "healthy_comparators": {
+      "base": {
+        "rows": 40218,
+        "current_hash": "905706eed2aa30f90dbeda71371977d4a8fe5f216744fc7309b7f8715bb400e4",
+        "full_coverage": [
+          "2014-15",
+          "2017-18",
+          "2018-19",
+          "2021-22"
+        ],
+        "source_and_copy_exact": true
+      },
+      "candidate": {
+        "rows": 40218,
+        "current_hash": "905706eed2aa30f90dbeda71371977d4a8fe5f216744fc7309b7f8715bb400e4",
+        "full_coverage": [
+          "2014-15",
+          "2017-18",
+          "2018-19",
+          "2021-22"
+        ],
+        "source_and_copy_exact": true
+      }
+    },
+    "guard_event_counts": {
+      "mkdir-existing": 176
+    },
+    "network_attempts": 0,
+    "no_API_source_decode_or_test_in_this_terminal_check": true,
+    "cache_footer_classification_counts": {
+      "genuine_current_country": 20,
+      "legitimate_script_native_hashless": 57,
+      "baseline_Make_native_country_negative_hashless": 11
+    }
+  },
+  "artifact_checks": {
+    "status": "PASS_ARTIFACT_ONLY",
+    "cold_warm_native_raw_cache_pair_count": 76,
+    "actual_Feature_arguments_and_saved_summaries": {
+      "base/first/default": {
+        "actual_arguments": {},
+        "summary": {
+          "rows": 57917,
+          "columns": [
+            "Price",
+            "Description",
+            "Quantity"
+          ],
+          "dtypes": [
+            "Float64",
+            "string",
+            "Float64"
+          ],
+          "index_names": [
+            "country",
+            "t",
+            "v",
+            "j",
+            "u",
+            "variety",
+            "visit",
+            "obs",
+            "currency"
+          ],
+          "index_dtypes": [
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "int64",
+            "int64",
+            "string"
+          ],
+          "waves": {
+            "2014-15": 40218,
+            "2019-20": 3076,
+            "2020-21": 14623
+          },
+          "nulls": {
+            "Price": 0,
+            "Description": 0,
+            "Quantity": 20435
+          },
+          "unique": true,
+          "attrs_keys": [
+            "canonical_alignment",
+            "population",
+            "population_resolution",
+            "recall",
+            "sampling",
+            "sampling_resolution"
+          ],
+          "typed_attrs_sha256": "104bc97ca5eb57781b40865f69e9e341ea5688f09daa367dc98f7e575cd891f2"
+        },
+        "source_invocation": "ll.Feature(community_prices)([Tanzania,Mali], **actual_arguments)"
+      },
+      "base/first/currency-None": {
+        "actual_arguments": {
+          "currency": null
+        },
+        "summary": {
+          "rows": 57917,
+          "columns": [
+            "Price",
+            "Description",
+            "Quantity"
+          ],
+          "dtypes": [
+            "Float64",
+            "string",
+            "Float64"
+          ],
+          "index_names": [
+            "country",
+            "t",
+            "v",
+            "j",
+            "u",
+            "variety",
+            "visit",
+            "obs"
+          ],
+          "index_dtypes": [
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "int64",
+            "int64"
+          ],
+          "waves": {
+            "2014-15": 40218,
+            "2019-20": 3076,
+            "2020-21": 14623
+          },
+          "nulls": {
+            "Price": 0,
+            "Description": 0,
+            "Quantity": 20435
+          },
+          "unique": true,
+          "attrs_keys": [
+            "canonical_alignment",
+            "population",
+            "population_resolution",
+            "recall",
+            "sampling",
+            "sampling_resolution"
+          ],
+          "typed_attrs_sha256": "104bc97ca5eb57781b40865f69e9e341ea5688f09daa367dc98f7e575cd891f2"
+        },
+        "source_invocation": "ll.Feature(community_prices)([Tanzania,Mali], **actual_arguments)"
+      },
+      "base/fresh/default": {
+        "actual_arguments": {},
+        "summary": {
+          "rows": 57917,
+          "columns": [
+            "Price",
+            "Description",
+            "Quantity"
+          ],
+          "dtypes": [
+            "Float64",
+            "string",
+            "Float64"
+          ],
+          "index_names": [
+            "country",
+            "t",
+            "v",
+            "j",
+            "u",
+            "variety",
+            "visit",
+            "obs",
+            "currency"
+          ],
+          "index_dtypes": [
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "int64",
+            "int64",
+            "string"
+          ],
+          "waves": {
+            "2014-15": 40218,
+            "2019-20": 3076,
+            "2020-21": 14623
+          },
+          "nulls": {
+            "Price": 0,
+            "Description": 0,
+            "Quantity": 20435
+          },
+          "unique": true,
+          "attrs_keys": [
+            "canonical_alignment",
+            "population",
+            "population_resolution",
+            "recall",
+            "sampling",
+            "sampling_resolution"
+          ],
+          "typed_attrs_sha256": "104bc97ca5eb57781b40865f69e9e341ea5688f09daa367dc98f7e575cd891f2"
+        },
+        "source_invocation": "ll.Feature(community_prices)([Tanzania,Mali], **actual_arguments)"
+      },
+      "base/fresh/currency-None": {
+        "actual_arguments": {
+          "currency": null
+        },
+        "summary": {
+          "rows": 57917,
+          "columns": [
+            "Price",
+            "Description",
+            "Quantity"
+          ],
+          "dtypes": [
+            "Float64",
+            "string",
+            "Float64"
+          ],
+          "index_names": [
+            "country",
+            "t",
+            "v",
+            "j",
+            "u",
+            "variety",
+            "visit",
+            "obs"
+          ],
+          "index_dtypes": [
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "int64",
+            "int64"
+          ],
+          "waves": {
+            "2014-15": 40218,
+            "2019-20": 3076,
+            "2020-21": 14623
+          },
+          "nulls": {
+            "Price": 0,
+            "Description": 0,
+            "Quantity": 20435
+          },
+          "unique": true,
+          "attrs_keys": [
+            "canonical_alignment",
+            "population",
+            "population_resolution",
+            "recall",
+            "sampling",
+            "sampling_resolution"
+          ],
+          "typed_attrs_sha256": "104bc97ca5eb57781b40865f69e9e341ea5688f09daa367dc98f7e575cd891f2"
+        },
+        "source_invocation": "ll.Feature(community_prices)([Tanzania,Mali], **actual_arguments)"
+      },
+      "candidate/first/default": {
+        "actual_arguments": {},
+        "summary": {
+          "rows": 57917,
+          "columns": [
+            "Price",
+            "Description",
+            "Quantity"
+          ],
+          "dtypes": [
+            "Float64",
+            "string",
+            "Float64"
+          ],
+          "index_names": [
+            "country",
+            "t",
+            "v",
+            "j",
+            "u",
+            "variety",
+            "visit",
+            "obs",
+            "currency"
+          ],
+          "index_dtypes": [
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "int64",
+            "int64",
+            "string"
+          ],
+          "waves": {
+            "2014-15": 40218,
+            "2019-20": 3076,
+            "2020-21": 14623
+          },
+          "nulls": {
+            "Price": 0,
+            "Description": 0,
+            "Quantity": 20435
+          },
+          "unique": true,
+          "attrs_keys": [
+            "canonical_alignment",
+            "population",
+            "population_resolution",
+            "recall",
+            "sampling",
+            "sampling_resolution"
+          ],
+          "typed_attrs_sha256": "104bc97ca5eb57781b40865f69e9e341ea5688f09daa367dc98f7e575cd891f2"
+        },
+        "source_invocation": "ll.Feature(community_prices)([Tanzania,Mali], **actual_arguments)"
+      },
+      "candidate/first/currency-None": {
+        "actual_arguments": {
+          "currency": null
+        },
+        "summary": {
+          "rows": 57917,
+          "columns": [
+            "Price",
+            "Description",
+            "Quantity"
+          ],
+          "dtypes": [
+            "Float64",
+            "string",
+            "Float64"
+          ],
+          "index_names": [
+            "country",
+            "t",
+            "v",
+            "j",
+            "u",
+            "variety",
+            "visit",
+            "obs"
+          ],
+          "index_dtypes": [
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "int64",
+            "int64"
+          ],
+          "waves": {
+            "2014-15": 40218,
+            "2019-20": 3076,
+            "2020-21": 14623
+          },
+          "nulls": {
+            "Price": 0,
+            "Description": 0,
+            "Quantity": 20435
+          },
+          "unique": true,
+          "attrs_keys": [
+            "canonical_alignment",
+            "population",
+            "population_resolution",
+            "recall",
+            "sampling",
+            "sampling_resolution"
+          ],
+          "typed_attrs_sha256": "104bc97ca5eb57781b40865f69e9e341ea5688f09daa367dc98f7e575cd891f2"
+        },
+        "source_invocation": "ll.Feature(community_prices)([Tanzania,Mali], **actual_arguments)"
+      },
+      "candidate/fresh/default": {
+        "actual_arguments": {},
+        "summary": {
+          "rows": 57917,
+          "columns": [
+            "Price",
+            "Description",
+            "Quantity"
+          ],
+          "dtypes": [
+            "Float64",
+            "string",
+            "Float64"
+          ],
+          "index_names": [
+            "country",
+            "t",
+            "v",
+            "j",
+            "u",
+            "variety",
+            "visit",
+            "obs",
+            "currency"
+          ],
+          "index_dtypes": [
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "int64",
+            "int64",
+            "string"
+          ],
+          "waves": {
+            "2014-15": 40218,
+            "2019-20": 3076,
+            "2020-21": 14623
+          },
+          "nulls": {
+            "Price": 0,
+            "Description": 0,
+            "Quantity": 20435
+          },
+          "unique": true,
+          "attrs_keys": [
+            "canonical_alignment",
+            "population",
+            "population_resolution",
+            "recall",
+            "sampling",
+            "sampling_resolution"
+          ],
+          "typed_attrs_sha256": "104bc97ca5eb57781b40865f69e9e341ea5688f09daa367dc98f7e575cd891f2"
+        },
+        "source_invocation": "ll.Feature(community_prices)([Tanzania,Mali], **actual_arguments)"
+      },
+      "candidate/fresh/currency-None": {
+        "actual_arguments": {
+          "currency": null
+        },
+        "summary": {
+          "rows": 57917,
+          "columns": [
+            "Price",
+            "Description",
+            "Quantity"
+          ],
+          "dtypes": [
+            "Float64",
+            "string",
+            "Float64"
+          ],
+          "index_names": [
+            "country",
+            "t",
+            "v",
+            "j",
+            "u",
+            "variety",
+            "visit",
+            "obs"
+          ],
+          "index_dtypes": [
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "str",
+            "int64",
+            "int64"
+          ],
+          "waves": {
+            "2014-15": 40218,
+            "2019-20": 3076,
+            "2020-21": 14623
+          },
+          "nulls": {
+            "Price": 0,
+            "Description": 0,
+            "Quantity": 20435
+          },
+          "unique": true,
+          "attrs_keys": [
+            "canonical_alignment",
+            "population",
+            "population_resolution",
+            "recall",
+            "sampling",
+            "sampling_resolution"
+          ],
+          "typed_attrs_sha256": "104bc97ca5eb57781b40865f69e9e341ea5688f09daa367dc98f7e575cd891f2"
+        },
+        "source_invocation": "ll.Feature(community_prices)([Tanzania,Mali], **actual_arguments)"
+      }
+    },
+    "native_walked_stage_distinction": [
+      {
+        "head": "base",
+        "wave": "2019-20",
+        "native_and_walked_complete_payload_axes_dtypes_masks_order_exact": true,
+        "sole_full_attrs_delta": "id_converted=True added by existing walker",
+        "original_operands_unchanged": true
+      },
+      {
+        "head": "base",
+        "wave": "2020-21",
+        "native_and_walked_complete_payload_axes_dtypes_masks_order_exact": true,
+        "sole_full_attrs_delta": "id_converted=True added by existing walker",
+        "original_operands_unchanged": true
+      },
+      {
+        "head": "candidate",
+        "wave": "2019-20",
+        "native_and_walked_complete_payload_axes_dtypes_masks_order_exact": true,
+        "sole_full_attrs_delta": "id_converted=True added by existing walker",
+        "original_operands_unchanged": true
+      },
+      {
+        "head": "candidate",
+        "wave": "2020-21",
+        "native_and_walked_complete_payload_axes_dtypes_masks_order_exact": true,
+        "sole_full_attrs_delta": "id_converted=True added by existing walker",
+        "original_operands_unchanged": true
+      }
+    ],
+    "warning_files": 172,
+    "nonempty_warning_files": 24,
+    "warnings_scope": "Complete captured message texts and main-call warning counts, plus full private subprocess logs; categories/stack fields not separately persisted for every captured Python warning. Full structured scanner records separately preserved.",
+    "scanner_redirect_stop_zero_cache_changes_since_last_completed_assertion_endpoint": true,
+    "source_API_test_rerun": false
+  },
+  "author_gap_assessment": {
+    "status": "BOUNDED_EVIDENCE_LIMITATIONS_CONFIRMED",
+    "seven_original_observations": {
+      "public-Tanzania": {
+        "rows": 17699,
+        "original_percall_exact_completed_operand": true,
+        "cache_endpoint_zero_changes": true
+      },
+      "public-Mali": {
+        "rows": 40218,
+        "original_percall_exact_completed_operand": true,
+        "cache_endpoint_zero_changes": true
+      },
+      "Feature-default": {
+        "rows": 57917,
+        "original_percall_exact_completed_operand": true,
+        "cache_endpoint_zero_changes": true
+      },
+      "Feature-currency-None": {
+        "rows": 57917,
+        "original_percall_exact_completed_operand": true,
+        "cache_endpoint_zero_changes": true
+      },
+      "Feature-Tanzania-default": {
+        "rows": 17699,
+        "original_percall_exact_completed_operand": true,
+        "cache_endpoint_zero_changes": true
+      },
+      "Feature-Tanzania-currency-None": {
+        "rows": 17699,
+        "original_percall_exact_completed_operand": true,
+        "cache_endpoint_zero_changes": true
+      },
+      "CLI-api-2019": {
+        "rows": 3076,
+        "original_percall_exact_completed_operand": true,
+        "cache_endpoint_zero_changes": true
+      }
+    },
+    "partial_original_bytes_size_sha_unavailable": true,
+    "reconstruction_is_not_original": true,
+    "failed_CLI_never_opened_wrapper_no_identity_receipt_zero_cache_changes": true,
+    "earlier_percall_frames_not_replayed_by_resume_source": true,
+    "literal_link_qualification": [
+      {
+        "head": "base",
+        "path": "Kyrgyz Republic",
+        "current_literal_equals_Git": true,
+        "original_snapshot_hashes_normalized_target": true,
+        "original_literal_bytes_unrecorded": true
+      },
+      {
+        "head": "base",
+        "path": "Serbia and Montenegro",
+        "current_literal_equals_Git": true,
+        "original_snapshot_hashes_normalized_target": true,
+        "original_literal_bytes_unrecorded": true
+      },
+      {
+        "head": "base",
+        "path": "South Africa",
+        "current_literal_equals_Git": true,
+        "original_snapshot_hashes_normalized_target": true,
+        "original_literal_bytes_unrecorded": true
+      },
+      {
+        "head": "base",
+        "path": "_",
+        "current_literal_equals_Git": true,
+        "original_snapshot_hashes_normalized_target": true,
+        "original_literal_bytes_unrecorded": true
+      },
+      {
+        "head": "candidate",
+        "path": "Kyrgyz Republic",
+        "current_literal_equals_Git": true,
+        "original_snapshot_hashes_normalized_target": true,
+        "original_literal_bytes_unrecorded": true
+      },
+      {
+        "head": "candidate",
+        "path": "Serbia and Montenegro",
+        "current_literal_equals_Git": true,
+        "original_snapshot_hashes_normalized_target": true,
+        "original_literal_bytes_unrecorded": true
+      },
+      {
+        "head": "candidate",
+        "path": "South Africa",
+        "current_literal_equals_Git": true,
+        "original_snapshot_hashes_normalized_target": true,
+        "original_literal_bytes_unrecorded": true
+      },
+      {
+        "head": "candidate",
+        "path": "_",
+        "current_literal_equals_Git": true,
+        "original_snapshot_hashes_normalized_target": true,
+        "original_literal_bytes_unrecorded": true
+      }
+    ],
+    "old_operands_exact_before_after": 37,
+    "source_API_test_replay": false
+  },
+  "own_stops": [
+    {
+      "stage": "preflight.py",
+      "failure": "AttributeError from treating Uganda manifest mapping as list",
+      "correction": "preflight-v2.py; pure metadata; no API/source/test replay"
+    },
+    {
+      "stage": "post.sh final scanner redirection, both heads",
+      "failure": "absolute script path embedded in log basename; missing output directory",
+      "correction": "scanner-run.py only; completed source/API/test/CLI prefix not replayed; pre-scanner endpoints exact"
+    },
+    {
+      "stage": "terminal-proof.py:72",
+      "failure": "shortened hard-coded Mali footer wave labels, not the canonical names already gated during preparation",
+      "correction": "coverage-stop.py then terminal-proof-v2.py consumes saved canonical coverage; metadata only; no API/source/test replay"
+    }
+  ],
+  "bounds": [
+    "Tanzania community_prices and compatible warm Mali40218 only; no broad suite/corpus or other table outputs.",
+    "No first-cold Feature claim; default and currency=None actual calls separately paired.",
+    "Empty Description/id_converted and source/writer/JSON attrs stage distinctions preserved without normalization.",
+    "Complete captured warning-message text files and matrix counts exist; category/stack fields not persisted for every warning, so no full structured-warning-event equality claim. Structured scanner multisets are separate and exact.",
+    "Original normalized symlink snapshots and missing original partial aggregate JSON remain explicit author evidence limitations.",
+    "Known Niger1196 and prior global17 full-suite13FAIL/guard-mtime limits remain outside this cohort.",
+    "Shared advertised code-reviewer/prior-art/orgmode skill paths were unavailable after scoped alternate searches; current repo ledger/STANDING, backlog, cross-country, audit and survey guidance were read, with prior identical f8 guidance carried.",
+    "Original frozen source proofs for diagnosis/old author parent omit mtimes; exact frozen bytes/modes/HEAD are verified without a retrospective mtime claim."
+  ],
+  "signed": "Sue (GPT-6)",
+  "zero_other_consumers": true
+}

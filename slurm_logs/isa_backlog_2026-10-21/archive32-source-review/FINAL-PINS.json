@@ -1,0 +1,147 @@
+{
+  "at_UTC": "2026-10-22T22:16:44.311256+00:00",
+  "controller_pins": {
+    "archive32-common.py": {
+      "bytes": 12134,
+      "ctime_ns": 1792706223621285124,
+      "device": 64770,
+      "gid": 501,
+      "inode": 4994019,
+      "mode": 384,
+      "mtime_ns": 1792706223621285124,
+      "nlink": 1,
+      "sha256": "624147d234a0d294a28e030af0d0c2df3b3ad20310882a4728a07d4764dd9ec1",
+      "uid": 43292
+    },
+    "archive32-launcher.py": {
+      "bytes": 29466,
+      "ctime_ns": 1792706629823420100,
+      "device": 64770,
+      "gid": 501,
+      "inode": 4994022,
+      "mode": 384,
+      "mtime_ns": 1792706629823420100,
+      "nlink": 1,
+      "sha256": "e30072863778def4ff81fb2158a4fc3ddb2fb2f2d2b061271959ddfc5dd41e66",
+      "uid": 43292
+    },
+    "archive32-selection.py": {
+      "bytes": 11143,
+      "ctime_ns": 1792706629820420084,
+      "device": 64770,
+      "gid": 501,
+      "inode": 4994020,
+      "mode": 384,
+      "mtime_ns": 1792706629820420084,
+      "nlink": 1,
+      "sha256": "c4d154c03f661a0bc9ba9e2c0b547a3713a6e90fec69ede9ed7a6e7110af6862",
+      "uid": 43292
+    },
+    "archive32-verifier.py": {
+      "bytes": 26467,
+      "ctime_ns": 1792706629830420137,
+      "device": 64770,
+      "gid": 501,
+      "inode": 4994023,
+      "mode": 384,
+      "mtime_ns": 1792706629830420137,
+      "nlink": 1,
+      "sha256": "d7b84d77a1f40524be907d77a24d31bef447ca992c461a2928708da5cf130021",
+      "uid": 43292
+    },
+    "postexit_archive32.py": {
+      "bytes": 26028,
+      "ctime_ns": 1792706629837420175,
+      "device": 64770,
+      "gid": 501,
+      "inode": 4994025,
+      "mode": 384,
+      "mtime_ns": 1792706629837420175,
+      "nlink": 1,
+      "sha256": "caf7570e3302b57a85ad403a2957297ce56e2330e303d7488a29ad0f684cd406",
+      "uid": 43292
+    },
+    "run_archive32_original.py": {
+      "bytes": 14977,
+      "ctime_ns": 1792706223734285665,
+      "device": 64770,
+      "gid": 501,
+      "inode": 4994024,
+      "mode": 384,
+      "mtime_ns": 1792706223734285665,
+      "nlink": 1,
+      "sha256": "3612a5ed886dd721d83a7309119fa3066172cde1eed800609f2a00d16a981211",
+      "uid": 43292
+    }
+  },
+  "input_modes_receipt_sha256": "dd57e8949323a287081fb102eae1f759bf81beff25ea19d3238b2194f389a248",
+  "plan_receipt": {
+    "bytes": 2721528,
+    "ctime_ns": 1792706649580525671,
+    "device": 64770,
+    "gid": 501,
+    "inode": 4994109,
+    "mode": 384,
+    "mtime_ns": 1792706649580525671,
+    "nlink": 1,
+    "sha256": "f157b0a08cdfcc340f55791b10fa6543ec031f6b71d2dc84d726d8c23dab93e7",
+    "uid": 43292
+  },
+  "prefix_mode": "0o700",
+  "review_files": {
+    "EVIDENCE.json": {
+      "bytes": 37572,
+      "ctime_ns": 1792707275804723814,
+      "device": 64770,
+      "gid": 501,
+      "inode": 7485031,
+      "mode": 384,
+      "mtime_ns": 1792707275804723814,
+      "nlink": 1,
+      "sha256": "94ffda899d61d60bb8b6b9f026ea53f210ace41ebcb75871ef746e1b6aa4a755",
+      "uid": 43292
+    },
+    "FINDINGS.json": {
+      "bytes": 2271,
+      "ctime_ns": 1792707404310376285,
+      "device": 64770,
+      "gid": 501,
+      "inode": 7485033,
+      "mode": 384,
+      "mtime_ns": 1792707404310376285,
+      "nlink": 1,
+      "sha256": "b922e770afc07da68318198e2a46f33e2771f9f3d650bf7ca46f7ace57539ceb",
+      "uid": 43292
+    },
+    "REVIEW.md": {
+      "bytes": 5818,
+      "ctime_ns": 1792707404310376285,
+      "device": 64770,
+      "gid": 501,
+      "inode": 7485034,
+      "mode": 384,
+      "mtime_ns": 1792707404310376285,
+      "nlink": 1,
+      "sha256": "f6daad410370fa987f19ab27ca21ecbd45e13475697b50c087295845b8ed7b4e",
+      "uid": 43292
+    },
+    "ROOT-SCOPE-CLARIFICATION.json": {
+      "bytes": 931,
+      "ctime_ns": 1792707404310376285,
+      "device": 64770,
+      "gid": 501,
+      "inode": 7485032,
+      "mode": 384,
+      "mtime_ns": 1792707404310376285,
+      "nlink": 1,
+      "sha256": "1f868f4be0aa04597b7b9a43267d288aa2bd625ac6c144877ab03383036fdce1",
+      "uid": 43292
+    }
+  },
+  "root_preauthentication_sha256": "c09993e68d04a166027681bcc27a1ee20c154b2134f3e6e2fd1073456539372d",
+  "self_exclusion": "FINAL-PINS.json is the final static record and excludes its own bytes from this map.",
+  "signed": "Sue",
+  "static_inputs_final_exact_count": 75,
+  "status": "FROZEN_SOURCE_ONLY_REVIEW_NO_SOURCE_BLOCKERS_UNDER_ROOT_SCOPED_CONTRACT",
+  "writable_prefix_only": "/local/job40255479/control/isa-backlog-20261021/review-archive32-static"
+}

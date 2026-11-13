@@ -1,0 +1,47 @@
+{
+  "status": "ROOT_CONDITIONAL_SYNTHETIC_RUNTIME_RELEASE_1218_V2",
+  "at_ns": 1792706505435393478,
+  "plan_sha256": "67ec88613a1586253e4af9143745d1886059fe6295c3cdf648031d721f439d33",
+  "candidate": "7eb596c223055d45c4f45cffdba4f7eb6aee76e4",
+  "actual_framework_parent": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "root_pin_gate_sha256": "d289320aa693d12aaa9034eea7ba149abe55dd1406c121b4f1ea2284747bd1cd",
+  "independent_source_only_review": {
+    "REVIEW.md": "7b627a9a05403acb9e32718e954c26dbb91747618a79fa22c364fc3ca89c722a",
+    "FINDINGS.json": "07199b2b534c5fb199c3511f20d8848b90f50d1e702a2a1af0f2d60b3ba34425",
+    "FINAL-PINS.json": "4f14a7066c2acb44b53000d8855a10c11bb790f102b5642162b34e7b9784650d"
+  },
+  "ordered_scope": [
+    "metadata source epoch exact3HEADs and exact3 historical names, Python does not open historical payloads; untraced Git internals qualified",
+    "four original old/v2 read/startup controls, old exit1 only accepted with exact expected counterfactuals and gate0",
+    "two core calibrations23seeds/head plus negativechildren and separately authenticated14prefix/48suffix gates; counts predictions until measured",
+    "two native549country/39framework/1362wave metadata censuses, actual all-move/API/policy gate before tests",
+    "identical candidate synthetic test copies against both heads:57 planned regression cells and bounded supporting selection from pinned plan; actual collection/JUnit/worker/source identity checks"
+  ],
+  "stop_on_unexpected": true,
+  "expected_exit1_is_not_semantic_proof": true,
+  "preserve_all_original_stops_counterfactual_failures_sources_and_tool_records": true,
+  "no_completed_stage_replay_to_repair_packaging": true,
+  "synthetic_only_exception": {
+    "original_GH1039_cache_flag_functions": [
+      "test_absent_subset_is_typed_and_preserves_other_cached_waves",
+      "test_covered_subset_cache_hit_does_not_construct_waves"
+    ],
+    "allow_original_synthetic_NO_CACHE_and_assume_fresh_cells": true,
+    "allow_original_manual_synthetic_parquet_cache_fixtures": true,
+    "genuine_flags_or_manual_stamp_promotion": false
+  },
+  "resource_limits": {
+    "total_pytest_workers_at_most": 2,
+    "dist": "loadfile",
+    "BLAS_OMP_MKL_BUILD": 1,
+    "make_j": 1,
+    "no_conftest": true,
+    "plugin_autoload": false,
+    "mounted_runtime_generation": "20261019T221223Z"
+  },
+  "genuine_stage": "SEPARATELY_HELD: no provider authentication/copies/decodes/API or extra normal data root until later root release",
+  "historical_payload_direct_opens_authorized": 0,
+  "no_acquisition_network_shared_cache_mutation_or_runtime_update": true,
+  "source_runtime_identity_and_private_HOME_XDG_DVC_gates_required": true,
+  "signed": "Sue (GPT-6)"
+}

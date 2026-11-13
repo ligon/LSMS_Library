@@ -1,0 +1,19 @@
+{
+  "base_head": "bd80d86c26786ca92680160abd790260bc924c3f",
+  "source_files": [
+    {
+      "path": "lsms_library/local_tools.py",
+      "before_sha256": "0a5f4ce56d471f7db7b925b3bebabd85c6d5de19ffe46579bbd39b9566db52f6",
+      "proposed_sha256": "64e8da43640fceb38cb3d4d55e4a006f9f7f7a5be4b5a5c79996299db3c80569"
+    },
+    {
+      "path": "lsms_library/country.py",
+      "before_sha256": "7a9347537f4d5423dc42c1f9f89cf55ed5abff72d88ced2d7cb6620696b7971c",
+      "proposed_sha256": "aae765551f8a9863b302697e8b70573085f96e067c72c4819ce7968e7247fb0f"
+    }
+  ],
+  "patch_sha256": "942527406d9abaa3a58e853b11255ef5740de4d59a982ca028dd72dce7b26c31",
+  "private_unapplied_proposal": true,
+  "stdlib_ast_only": true,
+  "no_product_or_test_edit_import_api_or_payload_decode": true
+}

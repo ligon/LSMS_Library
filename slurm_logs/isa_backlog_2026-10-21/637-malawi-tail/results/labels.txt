@@ -1,0 +1,414 @@
+===== 2010-11 Data/Full_Sample/Agriculture/ag_mod_g.dta 28143
+  case_id: Unique HH Identifier
+  visit: Panel Visit
+  ea_id: Unique EA Identifier
+  ag_g0a: Did you or anyone in your household plant any crops in the 2009/2010 rainy seaso | 1=Yes; 2=No
+  ag_g0b: PLOT ID
+  ag_g0d: CROP CODE | 1=MAIZE LOCAL; 2=MAIZE COMPOSITE/OPV; 3=MAIZE HYBRID; 4=MAIZE HYBRID RECYCLED; 5=TOBACCO BURLEY; 6=TOBACCO FLUE CURED; 7=TOBACCO NNDF; 8=tobaccosdf; 9=TOBACCO ORIENTAL; 10=OTHER TOBACCO (SPECIFY); 11=GROUNDNUT CHALIMBANA; 12=GROUNDNUT CG7
+  ag_g0d_os: Crop Code (Other Specify)
+  ag_g01: What type of crop stand is on the [PLOT]? | 1=Pure stand; 2=Mixed stand
+  ag_g02: Was the [CROP] planted in the entire area of the plot? | 1=Yes; 2=No
+  ag_g03: Approximately, how much of the [PLOT] is under [CROP]? | 1=Less than 1/4; 2=1/4; 3=1/2; 4=3/4; 5=More than 3/4
+  ag_g04a: How much seed did you plant for the [CROP] on this [PLOT] during the[RS]?(QUANT)
+  ag_g04b: How much seed did you plant for the [CROP] on this [PLOT] during the[RS]?(UNIT) | 1=Gram; 2=Kilogram; 3=2 kg bag; 4=3 kg bag; 5=3.7 kg bag; 6=5 kg bag; 7=10 kg bag; 8=50 kg bag; 9=Other (specify)
+  ag_g04b_os: How much seed did you plant for the [CROP] on this [PLOT]...?(UNIT)(O/S)
+  ag_g05a: When did you plant the seeds for the [CROP] on this [PLOT]during the[RS]?(MONTH) | 1=January; 2=February; 3=March; 4=April; 5=May; 6=June; 7=July; 8=August; 9=September; 10=October; 11=November; 12=December
+  ag_g05b: When did you plant the seeds for the [CROP] on this [PLOT]during the[RS]?(YEAR)
+  ag_g06: ENUMERATOR: IS THIS A CROSS - SECTIONAL HOUSEHOLD?
+  ag_g07: Have you completed the harvest of the [CROP] from this [PLOT]? | 1=Yes; 2=No
+  ag_g08a: How much [CROP] do you expect to harvest from this[PLOT]during the [RS]? (QUANT)
+  ag_g08b: How much [CROP] do you expect to harvest from this[PLOT]during the [RS]? (UNIT) | 1=Kilogram; 2=50 kg Bag; 3=90 kg Bag; 4=Pail (small); 5=Pail (large); 6=No 10 Plate; 7=No 12 Plate; 8=Bunch; 9=Piece; 10=Bale; 11=Basket (Dengu); 12=Ox-cart
+  ag_g08b_os: How much [CROP] do you expect to harvest from this[PLOT]...? (UNIT)(O/S)
+  ag_g08c: How much [CROP] do you expect to harvest from this[PLOT]during the [RS]? (S/U) | 1=S: Shelled; 2=U: Unshelled; 3=Not Applicable
+  ag_g09a: How much [CROP] did you harvest from this [PLOT] during the [RS]? (QUANT)
+  ag_g09b: How much [CROP] did you harvest from this [PLOT] during the [RS]? (UNIT) | 1=Kilogram; 2=50 kg Bag; 3=90 kg Bag; 4=Pail (small); 5=Pail (large); 6=No 10 Plate; 7=No 12 Plate; 8=Bunch; 9=Piece; 10=Bale; 11=Basket (Dengu); 12=Ox-cart
+  ag_g09b_os: How much [CROP] did you harvest from this [PLOT]... (Unit) (Other Specify)
+  ag_g09c: How much [CROP] did you harvest from this [PLOT] during the [RS]? (S/U) | 1=S: Shelled; 2=U: Unshelled; 3=Not Applicable
+  ag_g10: Was the area harvested less than the area planted? | 1=yes; 2=no
+  ag_g11a: Why was the area harvested less than the area planted? (1ST) | 1=Drought; 2=Rains; 3=Fire; 4=Insects; 5=Animals; 6=Crop theft; 7=Disease; 8=Community problems; 9=Lack of hired labor; 10=Other (Specify)
+  ag_g11a_os: Why was the area harvested less than the area planted? (1st) (Other Specify)
+  ag_g11b: Why was the area harvested less than the area planted? (2ND) | 1=Drought; 2=Rains; 3=Fire; 4=Insects; 5=Animals; 6=Crop theft; 7=Disease; 8=Community problems; 9=Lack of hired labor; 10=Other (Specify)
+  ag_g11b_os: Why was the area harvested less than the area planted? (2ND)(Other Specify)
+  ag_g12a: What were the months when the harvest started and ended? (START) | 1=January; 2=February; 3=March; 4=April; 5=May; 6=June; 7=July; 8=August; 9=September; 10=October; 11=November; 12=December
+  ag_g12b: What were the months when the harvest started and ended? (END) | 1=January; 2=February; 3=March; 4=April; 5=May; 6=June; 7=July; 8=August; 9=September; 10=October; 11=November; 12=December
+  ag_g13a: How much [CROP] did you harvest from this [PLOT] during the [RS]? (QUANT)
+  ag_g13b: How much [CROP] did you harvest from this [PLOT] during the [RS]? (UNIT) | 1=kilogram; 2=50 KG BAG; 3=90 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO. 10 PLATE; 7=NO. 12 PLATE; 8=bunch; 9=piece; 10=bale; 11=BASKET (DENGU); 12=OX - CART
+  ag_g13b_os: How much [CROP] did you harvest from this [PLOT]... (Unit) (Other Specify)
+  ag_g13c: How much [CROP] did you harvest from this [PLOT] during the [RS]? (S/U) | 1=S: SHELLED; 2=U: UNSHELLED; 3=NOT APPLICABLE
+===== 2010-11 Data/Full_Sample/Agriculture/ag_mod_p.dta 12531
+  case_id: Unique HH Identifier
+  visit: Panel Visit
+  ea_id: Unique EA Identifier
+  ag_p0a: Did you or anyone in your household own any tree or permanent crop, such as, cas | 1=yes; 2=no
+  ag_p0b: PLOT ID
+  ag_p0d: TREE/PERMANENT CROP CODE | 1=cassava; 2=tea; 3=coffee; 4=mango; 5=orange; 6=PAWPAW/PAPAYA; 7=banana; 8=avocado; 9=guava; 10=lemon; 11=NAARTJE (TANGERINE); 12=peach
+  ag_p0d_os: Tree/Permanent Crop Code (Other Specify)
+  ag_p01: Is[TREE/PERM CROP]cultivated in a plantation or scattered in field? | 1=plantation; 2=scattered
+  ag_p02a: What is the area of the plantation?(AREA)
+  ag_p02b: What is the area of the plantation?(UNIT) | 1=acre; 2=hectare; 3=SQUARE METERS; 4=OTHER (SPECIFY)
+  ag_p02b_os: What is the area of the plantation?(UNIT/SPECIFY)
+  ag_p03: How many plants/trees for the[TREE/PERM CROP]do you own on this[PLOT]?
+  ag_p04: In what year were most of these plants/trees planted?
+  ag_p05: How many plants/trees were planted during the last 12 months?
+  ag_p06a: What was the last completed production period for[TREE/PERM CROP]?(START MONTH) | 1=January; 2=February; 3=March; 4=April; 5=May; 6=June; 7=July; 8=August; 9=September; 10=October; 11=November; 12=December
+  ag_p06b: What was the last completed production period for[TREE/PERM CROP]?(START YEAR)
+  ag_p06c: What was the last completed production period for[TREE/PERM CROP]?(END MONTH) | 1=January; 2=February; 3=March; 4=April; 5=May; 6=June; 7=July; 8=August; 9=September; 10=October; 11=November; 12=December
+  ag_p06d: What was the last completed production period for[TREE/PERM CROP]?(END YEAR)
+  ag_p07: Were there any losses of[TREE/PERM CROP]before harvest? | 1=yes; 2=no
+  ag_p08a: Why were there losses before the harvest? (1ST CAUSE) | 1=Drought; 2=Rains; 3=Fire; 4=Insects; 5=Animals; 6=Crop theft; 7=Diseases; 8=Community problems; 9=Lack of hired labor; 10=Other (Specify)
+  ag_p08a_os: Why were there losses before the harvest? (1ST CAUSE/SPECIFY)
+  ag_p08b: Why were there losses before the harvest? (2ND CAUSE) | 1=Drought; 2=Rains; 3=Fire; 4=Insects; 5=Animals; 6=Crop theft; 7=Diseases; 8=Community problems; 9=Lack of hired labor; 10=Other (Specify)
+  ag_p08b_os: Why were there losses before the harvest? (2ND CAUSE/SPECIFY)
+  ag_p09a: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(Q)
+  ag_p09b: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(U) | 1=kilogram; 2=50 KG BAG; 3=90 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO. 10 PLATE; 7=NO. 12 PLATE; 8=bunch; 9=piece; 10=bale; 11=BASKET (DENGU); 12=OX - CART
+  ag_p09b_os: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(O/S)
+===== 2013-14 Data/AG_MOD_G_13.dta 10169
+  occ: Case Section Roster / Line Occurrence Sequence for O/S Merge
+  y2_hhid: Unique Household Identification IHPS
+  qx_type: Sample Group (Panel A, Panel B) | 1=PANEL A; 2=PANEL B
+  interview_status: Household Interview Status | 1=Panel A - 2 Visits; 2=Panel B - 2 Visits; 3=Panel A - Combined Visit; 4=Panel B - Combined Visit; 5=Panel A - Only Visit 1; 6=Panel B - Only Visit 1; 7=Household Refusal; 8=Partial Refusal
+  ag_g0a: Did you or anyone in your household plant any crops during the 2012/2013 rainy s | 1=YES; 2=NO
+  ag_g00: Plot ID
+  ag_g0b: CROP CODE | 1=MAIZE LOCAL; 2=MAIZE COMPOSITE/OPV; 3=MAIZE HYBRID; 4=MAIZE HYBRID RECYCLED; 5=TOBACCO BURLEY; 6=TOBACCO FLUE CURED; 7=TOBACCO NNDF; 8=TOBACCO SDF; 9=TOBACCO ORIENTAL; 10=OTHER TOBACCO (SPECIFY); 11=GROUNDNUT CHALIMBANA; 12=GROUNDNUT CG7
+  ag_g0e: ENUMERATOR: RECORD PRIMARY RESPONDENT ID
+  ag_g01: What type of crop stand is on the [PLOT]? | 1=PURE STAND; 2=MIXED STAND
+  ag_g02: Was the [CROP] planted in the entire area of the plot? | 1=YES; 2=NO
+  ag_g03: Approximately, how much of the [PLOT] is under [CROP]? | 1=LESS THAN 1/4; 2=1/4; 3=1/2; 4=3/4; 5=MORE THAN 3/4
+  ag_g04a: How much seed did you plant for the [CROP] on this [PLOT] during the 2012/2013 r
+  ag_g04b: How much seed did you plant for the [CROP] on this [PLOT] during the 2012/2013 r | 1=GRAM; 2=KILOGRAM; 3=2 KG BAG; 4=3 KG BAG; 5=3.7 KG BAG; 6=5 KG BAG; 7=10 KG BAG; 8=50 KG BAG; 9=OTHER (SPECIFY)
+  ag_g05a: When did you plant the seeds for the [CROP] on this [PLOT] during the 2012/2013 | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g05b: When did you plant the seeds for the [CROP] on this [PLOT] during the 2012/2013
+  ag_g07: Have you completed the harvest of the [CROP] from this [PLOT]? | 1=YES; 2=NO
+  ag_g08a: How much [CROP] do you expect to harvest from this [PLOT] during the 2012/ 2013
+  ag_g08b: How much [CROP] do you expect to harvest from this [PLOT] during the 2012/ 2013 | 1=KILOGRAM; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO. 10 PLATE; 7=NO. 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 12=OXCART; 13=OTHER (SPECIFY)
+  ag_g08c: How much [CROP] do you expect to harvest from this [PLOT] during the 2012/ 2013 | 1=SHELLED; 2=UNSHELLED; 3=NOT APPLICABLE
+  ag_g09a: How much [CROP] did you harvest from this [PLOT] during the 2012/ 2013 rainy sea
+  ag_g09b: How much [CROP] did you harvest from this [PLOT] during the 2012/ 2013 rainy sea | 1=KILOGRAM; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO. 10 PLATE; 7=NO. 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 12=OXCART; 13=OTHER (SPECIFY)
+  ag_g09c: How much [CROP] did you harvest from this [PLOT] during the 2012/ 2013 rainy sea | 1=SHELLED; 2=UNSHELLED; 3=NOT APPLICABLE
+  ag_g10: Was the area harvested less than the area planted? | 1=YES; 2=NO
+  ag_g11a: Why was the area harvested less than the area planted? (1ST) | 1=DROUGHT; 3=FIRE; 4=INSECTS; 5=ANIMALS; 6=CROP THEFT; 7=DISEASES; 9=LACK OF HIRED LABOR; 10=OTHER (SPECIFY); 11=IRREGULAR RAINS; 12=FLOODING
+  ag_g11b: Why was the area harvested less than the area planted? (2ND) | 1=DROUGHT; 3=FIRE; 4=INSECTS; 5=ANIMALS; 6=CROP THEFT; 7=DISEASES; 9=LACK OF HIRED LABOR; 10=OTHER (SPECIFY); 11=IRREGULAR RAINS; 12=FLOODING
+  ag_g13a: How much [CROP] did you harvest from this [PLOT] during the 2012/2013 rainy seas
+  ag_g13b: How much [CROP] did you harvest from this [PLOT] during the 2012/2013 rainy seas | 1=KILOGRAM; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO. 10 PLATE; 7=NO. 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 11=BASKET (DENGU); 12=OX-CART; 13=OTHER (SPECIFY)
+  ag_g13c: How much [CROP] did you harvest from this [PLOT] during the 2012/2013 rainy seas | 1=SHELLED; 2=UNSHELLED; 3=NOT APPLICABLE
+  ag_g12a: What were the months when the harvest started and ended? (START) | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g12b: What were the months when the harvest started and ended? (END) | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g14a: Who in the household makes the decision concerning the use of [CROP] output from
+  ag_g14b: Who in the household makes the decision concerning the use of [CROP] output from
+===== 2013-14 Data/AG_MOD_P_13.dta 4505
+  occ: Case Section Roster / Line Occurrence Sequence for O/S Merge
+  y2_hhid: Unique Household Identification IHPS
+  qx_type: Sample Group (Panel A, Panel B) | 1=PANEL A; 2=PANEL B
+  interview_status: Household Interview Status | 1=Panel A - 2 Visits; 2=Panel B - 2 Visits; 3=Panel A - Combined Visit; 4=Panel B - Combined Visit; 5=Panel A - Only Visit 1; 6=Panel B - Only Visit 1; 7=Household Refusal; 8=Partial Refusal
+  ag_p00: Plot ID
+  ag_p0c: TREE/PERMANENT CROP CODE | 1=CASSAVA; 2=TEA; 3=COFFEE; 4=MANGO; 5=ORANGE; 6=PAWPAW/PAPAYA; 7=BANANA; 8=AVOCADO; 9=GUAVA; 10=LEMON; 11=NAARTJE (TANGERINE); 12=PEACH
+  ag_p01: Is the [TREE / PERMANENT CROP] cultivation in a plantation or scattered in the f | 1=PLANTATION; 2=SCATTERED
+  ag_p02a: What is the area of the plantation? (AREA)
+  ag_p02b: What is the area of the plantation? (UNIT) | 1=ACRE; 2=HECTARE; 3=SQUARE METERS; 4=OTHER (SPECIFY)
+  ag_p03: How many plants/trees for the [TREE / PERMANENT CROP] do you own on this [PLOT]?
+  ag_p04: In what year were most of these plants/ trees planted? (YEAR)
+  ag_p05: How many plants/trees were planted during the last 12 months? (NUMBER)
+  ag_p06a: What was the last completed production period for the [TREE / PERMANENT CROP? (B | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_p06b: What was the last completed production period for the [TREE / PERMANENT CROP? (B
+  ag_p06c: What was the last completed production period for the [TREE / PERMANENT CROP? (E | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_p06d: What was the last completed production period for the [TREE / PERMANENT CROP? (E
+  ag_p07: Were there any losses of [TREE / PERMANENT CROP] before harvest? | 1=YES; 2=NO
+  ag_p08a: Why were there losses before the harvest? (1ST) | 1=DROUGHT; 3=FIRE; 4=INSECTS; 5=ANIMALS; 6=CROP THEFT; 7=DISEASES; 8=COMMUNITY PROBLEMS; 9=LACK OF HIRED LABOR; 10=OTHER (SPECIFY); 11=IRREGULAR RAINS; 12=FLOODING
+  ag_p08b: Why were there losses before the harvest? (2ND) | 1=DROUGHT; 3=FIRE; 4=INSECTS; 5=ANIMALS; 6=CROP THEFT; 7=DISEASES; 8=COMMUNITY PROBLEMS; 9=LACK OF HIRED LABOR; 10=OTHER (SPECIFY); 11=IRREGULAR RAINS; 12=FLOODING
+  ag_p09a: How much [TREE / PERMANENT CROP] did you harvest during the last 12 months? (QUA
+  ag_p09b: How much [TREE / PERMANENT CROP] did you harvest during the last 12 months? (UNI | 1=KILOGRAM; 2=50 KG BAG; 3=90 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO. 10 PLATE; 7=NO. 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 12=OX - CART; 13=OTHER (SPECIFY)
+===== 2016-17 Data/Cross_Sectional/ag_mod_g.dta 26506
+  case_id: Unique Household Identifier
+  hhid: Survey Solutions Unique HH Identifier
+  gardenid: Garden ID
+  plotid: Plot ID
+  crop_code: Consistent CC across Modules | 1=MAIZE: LOCAL; 2=MAIZE: COMPOSITE/OPV; 3=MAIZE: HYBRID; 4=MAIZE: HYBRID RECYCLED; 5=TOBACCO: BURLEY; 6=TOBACCO: FLUE CURED; 7=TOBACCO: NNDF; 8=TOBACCO: SDF; 9=TOBACCO: ORIENTAL; 10=TOBACCO: OTHER SPECIFY; 11=GROUNDNUT: CHALIMBANA; 12=GROUNDNUT: CG7
+  crop_code_collapsed: Collapsed CC maize,gn,tob,rice | 1=maize; 5=tobacco; 11=groundnut; 12=groundnut; 17=rice; 27=GROUND BEAN(NZAMA); 28=SWEET POTATO; 29=IRISH [MALAWI] POTATO; 30=wheat; 31=FINGER MILLET(MAWERE); 32=sorghum; 33=PEARL MILLET(MCHEWERE)
+  ag_g0a: Did you or anyone in your HH plant any crops during the [RS] | 1=yes; 2=no
+  ag_g0e_1: What is the primary variety of CROP being cultivated on [PLOT] | 1=MAIZE: LOCAL; 2=MAIZE: COMPOSITE/OPV; 3=MAIZE: HYBRID; 4=MAIZE: HYBRID RECYCLED; 5=TOBACCO: BURLEY; 6=TOBACCO: FLUE CURED; 7=TOBACCO: NNDF; 8=TOBACCO: SDF; 9=TOBACCO: ORIENTAL; 10=TOBACCO: OTHER SPECIFY; 11=GROUNDNUT: CHALIMBANA; 12=GROUNDNUT: CG7
+  ag_g0e_1_oth: What is the other specified primary variety of CROP being cultivated on [PLOT]
+  primary_variety: Primary Variety
+  local_vs_improved: Classification of Variety
+  ag_g0f: Is the primary variety of [CROP] local or improved? | 1=local; 2=improved
+  ag_g0g: Is the variety recyclable? | 1=yes; 2=no; 3=DON'T KNOW
+  ag_g0h: When, [which year] did you last buy the seed you planted on this plot?
+  ag_g01: What type of crop stand was on the PLOT? | 1=Pure stand / Sole; 2=Strip Intercrop; 3=Row Intercrop; 4=Relay Intercrop; 5=Mixed stand
+  ag_g02: Was the crop (%rostertitle%) planted in the entire area of the plot? | 1=yes; 2=no
+  ag_g03: Approximately, how much of the [PLOT] is under [CROP]? | 1=Less than 1/4; 2=1/4; 3=1/2; 4=3/4; 5=More than 3/4
+  ag_g04a: How much seed did you plant for the [CROP] on this [PLOT] during the[RS]?(QUANT)
+  ag_g04b: How much seed did you plant for the [CROP] on this [PLOT] during the[RS]?(UNIT) | 1=gram; 2=kilogram; 3=2 KG BAG; 4=3 KG BAG; 5=3.7 KG BAG; 6=5 KG BAG; 7=10 KG BAG; 8=50 KG BAG; 9=OTHER (SPECIFY)
+  ag_g04b_oth: How much seed did you plant for crop on this [PLOT] during the[RS]?(Other UNIT)
+  ag_g05a: When did you plant the seeds for the [CROP] on this [PLOT]during the[RS]?(MONTH) | 1=january; 2=february; 3=march; 4=april; 5=may; 6=june; 7=july; 8=august; 9=september; 10=october; 11=november; 12=december
+  ag_g05b: When did you plant the seeds for the [CROP] on this [PLOT]during the[RS]?(YEAR)
+  ag_g10: Was the area harvested less than the area planted? | 1=yes; 2=no
+  ag_g11a: Why was the area harvested less than the area planted? (1ST)
+  ag_g11b: Why was the area harvested less than the area planted? (2ND)
+  ag_g11_oth: Why was the area harvested less than the area planted? (OTHER)
+  ag_g11_1: What was the main disease affecting the plants in the plot? | 1=MAIZE LETHAL NECROSIS DISEASE; 2=MAIZE STREAK VIRUS DISEASE; 3=FINE STRIPPING DISEASE; 4=MAIZE BUSHY STUNT; 5=MAIZE DWARF VIRUS; 6=EAR Rot; 7=DOWNY MILDEW; 8=LEAF BLIGHT; 9=STALK ROT; 10=rust; 11=smut; 12=TASSEL SMUT
+  ag_g11_1_oth: What was the main disease affecting the plants in the plot (OTHER)?
+  ag_g12a: What months did the harvest start? | 1=january; 2=february; 3=march; 4=april; 5=may; 6=june; 7=july; 8=august; 9=september; 10=october; 11=november; 12=december
+  ag_g12b: What months did the harvest end? | 1=january; 2=february; 3=march; 4=april; 5=may; 6=june; 7=july; 8=august; 9=september; 10=october; 11=november; 12=december
+  ag_g13a: How much [CROP] did you harvest from this [PLOT] during the [RS]? (QUANT)
+  ag_g13b: How much [CROP] did you harvest from this [PLOT] during the [RS]? (UNIT) | 1=kilogram; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=bunch; 9=piece; 10=bale; 12=OX-CART; 13=OTHER (SPECIFY)
+  ag_g13b_oth: How much [CROP] did you harvest from this [PLOT] during the [RS]? (OTHER UNIT)
+  ag_g13c: How much [CROP] did you harvest from this [PLOT] during the [RS]? (S/U) | 1=S: SHELLED; 2=U: UNSHELLED; 3=NOT APPLICABLE
+  ag_g14a: Who in the HH makes decision concerning the use of output from this plot(#ID1)?
+  ag_g14b: Who in the HH makes decision concerning the use of output from this plot(#ID2)?
+===== 2016-17 Data/Cross_Sectional/ag_mod_p.dta 4251
+  case_id: Unique Household Identifier
+  hhid: Survey Solutions Unique HH Identifier
+  gardenid: Garden ID
+  plotid: Plot ID
+  ag_p0_crops: FOR EACH PLOT, LIST ALL TREE/PERMANENT CROPS HARVESTED BY HH IN LAST 12MONTHS
+  ag_p0a: What is the primary variety of [TREE/PERM CROP] being cultivated on this [PLOT]? | 101=Balaka; 102=Chithekere/Kithekere; 103=Masangwi; 104=Mgwalangwa; 105=Matuvi; 106=Chilikhano2/Mchilingano; 107=Azungu (Masoghazungu); 108=Gomani2; 109=Beatrice; 110=Mbawala; 111=Kasungwi; 112=Guguza
+  ag_p0aoth: Please Specify the other type of variety
+  ag_p0c: TREE/PERMANENT CROP CODE | 2=tea; 3=coffee; 4=mango; 5=orange; 6=PAWPAW/PAPAYA; 7=banana; 8=avocado; 9=guava; 10=lemon; 11=NAARTJE (TANGERINE); 12=peach; 13=[CUSTADE APPLE] POZA
+  ag_p0c_oth: Tree/Permanent Crop Code (Other Specify)
+  ag_p01: Is[TREE/PERM CROP]cultivated in a plantation or scattered in field? | 1=plantation; 2=scattered
+  ag_p02a: What is the area of the plantation?
+  ag_p02b: unit | 1=acre; 2=hectare; 3=SQUARE METERS; 4=OTHER (SPECIFY)
+  ag_p02b_oth: Specify UNIT
+  ag_p03: How many plants/trees for the[TREE/PERM CROP]do you own on this[PLOT]?
+  ag_p04: In what year were most of these plants/ trees planted?
+  ag_p05: How many plants/ trees were planted during the last 12 months?
+  ag_p05_1: What is the primary variety of %ag_p00% being cultivated on this [PLOT]? | 901=kawalika; 902=ABITI MDALA; 903=thepula; 904=mpapa; 905=nyaukandawire; 906=20:20; 907=lwinga; 908=dzalamayenje; 909=matakolembwende; 910=simama; 911=GOMANI MFIPA; 912=manyimanyi
+  ag_p05_1b: Please specify other variety
+  ag_p06a: What was the last completed production period for the tree/permanent crop | 1=january; 2=february; 3=march; 4=april; 5=may; 6=june; 7=july; 8=august; 9=september; 10=october; 11=november; 12=december
+  ag_p06b: BEGIN YEAR (4-DIGIT)
+  ag_p06c:  END MONTH | 1=january; 2=february; 3=march; 4=april; 5=may; 6=june; 7=july; 8=august; 9=september; 10=october; 11=november; 12=december
+  ag_p06d: END YEAR (4-DIGIT)
+  ag_p07: Were there any losses of[TREE/PERM CROP]before harvest? | 1=yes; 2=no
+  ag_p08a: Why were there losses before the harvest? (1ST CAUSE) | 1=Drought; 3=EFFECTS OF: Fire; 4=EFFECTS OF: Insects; 5=EFFECTS OF: Animals; 6=EFFECTS OF: Crop theft; 7=EFFECTS OF: Diseases; 8=EFFECTS OF: Community problems; 9=EFFECTS OF: Lack of hired labor; 10=EFFECTS OF: Other (Specify); 11=EFFECTS OF: Irregular Rains; 12=EFFECTS OF: Flooding
+  ag_p08b: Why were there losses before the harvest? (2ND CAUSE) | 1=Drought; 3=EFFECTS OF: Fire; 4=EFFECTS OF: Insects; 5=EFFECTS OF: Animals; 6=EFFECTS OF: Crop theft; 7=EFFECTS OF: Diseases; 8=EFFECTS OF: Community problems; 9=EFFECTS OF: Lack of hired labor; 10=EFFECTS OF: Other (Specify); 11=EFFECTS OF: Irregular Rains; 12=EFFECTS OF: Flooding
+  ag_p08_oth: Specify why were there losses before the harvest.
+  ag_p08_1: What was the main disease affecting the plants in the [PLOT]? | 15=CASSAVA MOSAIC. AFRICAN CASSAVA MOSAIC VIRUS (ACMV); 16=CASSAVA BACTERIAL BLIGHT. XANTHOMONAS AXONOPODIS; 17=BROWN LEAF SPOT. CERCOSPORIDIUM HENNINGSII; 18=WHITE LEAF SPOT. CERCOSPORA VICOSAE; 19=CASSAVA BROWN STREAK DISEASE; 20=CASSAVA ROOT ROT DISEASE; 21=other
+  ag_p08_1oth: Please specify the main disease affecting the plants in the [PLOT]?
+  ag_p09a: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(Q)
+  ag_p09b: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(U) | 1=kilogram; 2=50 KG BAG; 3=90 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=bunch; 9=piece; 10=bale; 11=BASKET (DENGU); 12=OX-CART
+  ag_p09b_oth: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(O/S)
+  ag_p09_1: What was the condition of [TREE/PERM CROP]? | 1=fresh; 2=dry; 3=NOT APPLICABLE.
+===== 2016-17 Data/Panel/ag_mod_g_16.dta 6289
+  y3_hhid: Unique Household Identification IHS4
+  qx_type: Sample Group (Panel A, Panel B) | 1=PANEL A; 2=PANEL B
+  interview_status: Household Interview Status | 1=Panel A - 2 Visits; 2=Panel B 2 Visits; 3=Panel A - Combined Visit; 4=Panel B - Combined Visit; 5=Panel A - Only Visit 1
+  gardenid: Garden ID
+  plotid: Plot ID
+  crop_code: Consistent CC across Modules | 1=MAIZE: LOCAL; 2=MAIZE: COMPOSITE/OPV; 3=MAIZE: HYBRID; 4=MAIZE: HYBRID RECYCLED; 5=TOBACCO: BURLEY; 6=TOBACCO: FLUE CURED; 7=TOBACCO: NNDF; 8=TOBACCO: SDF; 9=TOBACCO: ORIENTAL; 10=TOBACCO: OTHER SPECIFY; 11=GROUNDNUT: CHALIMBANA; 12=GROUNDNUT: CG7
+  crop_code_collapsed: Collapsed CC maize,gn,tob,rice | 1=MAIZE; 5=TOBACCO; 11=GROUNDNUT; 12=GROUNDNUT; 17=RICE; 27=GROUND BEAN(NZAMA); 28=SWEET POTATO; 29=IRISH [MALAWI] POTATO; 30=WHEAT; 31=FINGER MILLET(MAWERE); 32=SORGHUM; 33=PEARL MILLET(MCHEWERE)
+  ag_g0a: Did you or anyone in your HH plant any crops during the [RS] | 1=YES; 2=NO
+  ag_g0b: Id in "ag_c_plot_roster"
+  ag_g0e: What is the primary variety of CROP being cultivated on [PLOT] | 1=MAIZE: LOCAL; 2=MAIZE: COMPOSITE/OPV; 3=MAIZE: HYBRID; 4=MAIZE: HYBRID RECYCLED; 5=TOBACCO: BURLEY; 6=TOBACCO: FLUE CURED; 7=TOBACCO: NNDF; 8=TOBACCO: SDF; 9=TOBACCO: ORIENTAL; 10=TOBACCO: OTHER SPECIFY; 11=GROUNDNUT: CHALIMBANA; 12=GROUNDNUT: CG7
+  ag_g0e_oth: What is the other specified primary variety of CROP being cultivated on [PLOT]
+  primary_variety: Primary Variety
+  local_vs_improved: Classification of Variety
+  ag_g0f: Is the primary variety of [CROP] local or improved? | 1=LOCAL; 2=IMPROVED
+  ag_g0g: Is the variety recyclable? | 1=YES; 2=NO; 3=DON'T KNOW
+  ag_g0h: When, [which year] did you last buy the seed you planted on this plot?
+  ag_g01: What type of crop stand was on the PLOT? | 1=Pure stand; 2=Mixed stand; 3=Row Intercrop; 4=Relay Intercrop; 5=Mixed Stand
+  ag_g02: Was the crop (%rostertitle%) planted in the entire area of the plot? | 1=YES; 2=NO
+  ag_g03: Approximately, how much of the [PLOT] is under [CROP]? | 1=Less than 1/4; 2=1/4; 3=1/2; 4=3/4; 5=More than 3/4
+  ag_g04a: How much seed did you plant for the [CROP] on this [PLOT] during the[RS]?(QUANT)
+  ag_g04b: How much seed did you plant for the [CROP] on this [PLOT] during the[RS]?(UNIT) | 1=GRAM; 2=KILOGRAM; 3=2 KG BAG; 4=3 KG BAG; 5=3.7 KG BAG; 6=5 KG BAG; 7=10 KG BAG; 8=50 KG BAG; 9=OTHER (SPECIFY)
+  ag_g04b_oth: How much seed did you plant for crop on this [PLOT] during the[RS]?(Other UNIT)
+  ag_g05a: When did you plant the seeds for the [CROP] on this [PLOT]during the[RS]?(MONTH) | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g05b: When did you plant the seeds for the [CROP] on this [PLOT]during the[RS]?(YEAR)
+  ag_g07: Have you completed the harvest of the [CROP] from this [PLOT]? | 1=YES; 2=NO
+  ag_g08a: How much do you expect to harvest from this plot during the...?
+  ag_g08b: Unit | 1=KILOGRAM; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 12=OX-CART; 13=OTHER (SPECIFY)
+  ag_g08b_oth: Specify Unit
+  ag_g08c: S/U | 1=S: SHELLED; 2=U: UNSHELLED; 3=NOT APPLICABLE
+  ag_g09a: How much did you harvest from this plot during the ...?
+  ag_g09b: Unit | 1=KILOGRAM; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 12=OX-CART; 13=OTHER (SPECIFY)
+  ag_g09c: S/U | 1=S: SHELLED; 2=U: UNSHELLED; 3=NOT APPLICABLE
+  ag_g10: Was the area harvested less than the area planted? | 1=YES; 2=NO
+  ag_g11a: Why was the area harvested less than the area planted? (1ST) | 1=Drought; 3=Fire; 4=Insects; 5=Animals; 6=Crop Theft; 7=Diseases; 9=Lack of hired labor; 10=Other (Specify); 11=Irregular Rains; 12=Floods
+  ag_g11b: Why was the area harvested less than the area planted? (2ND) | 1=Drought; 3=Fire; 4=Insects; 5=Animals; 6=Crop Theft; 7=Diseases; 9=Lack of hired labor; 10=Other (Specify); 11=Irregular Rains; 12=Floods
+  ag_g11oth: Why was the area harvested less than the area planted? (OTHER)
+  ag_g11_1: What was the main disease affecting the plants in the plot? | 1=MAIZE LETHAL NECROSIS DISEASE; 2=MAIZE STREAK VIRUS DISEASE; 3=FINE STRIPPING DISEASE; 4=MAIZE BUSHY STUNT; 5=MAIZE DWARF VIRUS; 6=EAR Rot; 7=DOWNY MILDEW; 8=LEAF BLIGHT; 9=STALK ROT; 10=RUST; 11=SMUT; 12=TASSEL SMUT
+  ag_g11_1oth: What was the main disease affecting the plants in the plot (OTHER)?
+  ag_g12a: What months did the harvest start? | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g12b: What months did the harvest end? | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g13a: How much [CROP] did you harvest from this [PLOT] during the [RS]? (QUANT)
+  ag_g13b: How much [CROP] did you harvest from this [PLOT] during the [RS]? (UNIT) | 1=KILOGRAM; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 12=OX-CART; 13=OTHER (SPECIFY)
+  ag_g13b_oth: How much [CROP] did you harvest from this [PLOT] during the [RS]? (OTHER UNIT)
+  ag_g13c: How much [CROP] did you harvest from this [PLOT] during the [RS]? (S/U) | 1=S: SHELLED; 2=U: UNSHELLED; 3=NOT APPLICABLE
+  ag_g14a: Who in the HH makes decision concerning the use of output from this plot(#ID1)?
+  ag_g14b: Who in the HH makes decision concerning the use of output from this plot(#ID2)?
+===== 2016-17 Data/Panel/ag_mod_p_16.dta 1064
+  y3_hhid: Unique Household Identification IHS4
+  qx_type: Sample Group (Panel A, Panel B) | 1=PANEL A; 2=PANEL B
+  interview_status: Household Interview Status | 1=Panel A - 2 Visits; 2=Panel B 2 Visits; 3=Panel A - Combined Visit; 4=Panel B - Combined Visit; 5=Panel A - Only Visit 1
+  gardenid: Garden ID
+  plotid: PLOT ID
+  ag_p0_crops: FOR EACH PLOT, LIST ALL TREE/PERMANENT CROPS HARVESTED BY HH IN LAST 12MONTHS
+  ag_p0a: What is the primary variety of [TREE/PERM CROP] being cultivated on this [PLOT]? | 101=Balaka; 102=Chithekere/Kithekere; 103=Masangwi; 104=Mgwalangwa; 105=Matuvi; 106=Chilikhano2/Mchilingano; 107=Azungu (Masoghazungu); 108=Gomani2; 109=Beatrice; 110=Mbawala; 111=Kasungwi; 112=Guguza
+  ag_p0aoth: Please Specify the other type of variety
+  crop_code: TREE/PERMANENT CROP CODE | 2=TEA; 3=COFFEE; 4=MANGO; 5=ORANGE; 6=PAWPAW/PAPAYA; 7=BANANA; 8=AVOCADO; 9=GUAVA; 10=LEMON; 11=NAARTJE (TANGERINE); 12=PEACH; 13=[CUSTADE APPLE] POZA
+  ag_p0d_oth: Tree/Permanent Crop Code (Other Specify)
+  ag_p01: Is[TREE/PERM CROP]cultivated in a plantation or scattered in field? | 1=PLANTATION; 2=SCATTERED
+  ag_p02a: What is the area of the plantation?
+  ag_p02b: UNIT | 1=ACRE; 2=HECTARE; 3=SQUARE METERS; 4=OTHER (SPECIFY)
+  ag_p02b_oth: Specify UNIT
+  ag_p03: How many plants/trees for the[TREE/PERM CROP]do you own on this[PLOT]?
+  ag_p04: In what year were most of these plants/ trees planted?
+  ag_p05: How many plants/ trees were planted during the last 12 months?
+  ag_p05_1: What is the primary variety of %ag_p00% being cultivated on this [PLOT]? | 901=KAWALIKA; 902=ABITI MDALA; 903=THEPULA; 904=MPAPA; 905=NYAUKANDAWIRE; 906=20:20; 907=LWINGA; 908=DZALAMAYENJE; 909=MATAKOLEMBWENDE; 910=SIMAMA; 911=GOMANI MFIPA; 912=MANYIMANYI
+  ag_p05_1b: Please specify other variety
+  ag_p06a: What was the last completed production period for the tree/permanent crop | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_p06b: BEGIN YEAR (4-DIGIT)
+  ag_p06c:  END MONTH | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_p06d: END YEAR (4-DIGIT)
+  ag_p07: Were there any losses of[TREE/PERM CROP]before harvest? | 1=YES; 2=NO
+  ag_p08a: Why were there losses before the harvest? (1ST CAUSE)
+  ag_p08b: Why were there losses before the harvest? (2ND CAUSE)
+  ag_p08_oth: Specify why were there losses before the harvest.
+  ag_p08_1: What was the main disease affecting the plants in the [PLOT]? | 15=CASSAVA MOSAIC. AFRICAN CASSAVA MOSAIC VIRUS (ACMV); 16=CASSAVA BACTERIAL BLIGHT. XANTHOMONAS AXONOPODIS; 17=BROWN LEAF SPOT. CERCOSPORIDIUM HENNINGSII; 18=WHITE LEAF SPOT. CERCOSPORA VICOSAE; 19=CASSAVA BROWN STREAK DISEASE; 20=CASSAVA ROOT ROT DISEASE
+  ag_p08_1oth: Please specify the main disease affecting the plants in the [PLOT]?
+  ag_p09a: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(Q)
+  ag_p09b: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(U) | 1=KILOGRAM; 2=50 KG BAG; 3=90 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 11=BASKET (DENGU); 12=OX-CART
+  ag_p09b_oth: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(O/S)
+  ag_p09_1: What was the condition of [TREE/PERM CROP]? | 1=FRESH; 2=DRY; 3=NOT APPLICABLE.
+===== 2019-20 Data/Cross_Sectional/ag_mod_g.dta 32677
+  case_id: Unique Household Identifier
+  HHID: Survey Solutions Unique HH Identifier
+  gardenid: Garden ID
+  plotid: Plot ID
+  crop_code: Crop ID | 1=MAIZE LOCAL; 2=MAIZE COMPOSITE/OPV; 3=MAIZE HYBRID; 4=MAIZE HYBRID RECYCLED; 5=TOBACCO BURLEY; 6=TOBACCO FLUE CURED; 7=TOBACCO NNDF; 8=TOBACCO SDF; 9=TOBACCO ORIENTAL; 10=OTHER TOBACCO (SPECIFY); 11=GROUNDNUT CHALIMBANA; 12=GROUNDNUT CG7
+  ag_g0a: Did you or anyone in your HH plant any crops during the [RS] | 1=YES; 2=NO
+  ag_g0e_1: What is the primary variety of [CROP] being cultivated on this [PLOT]? | 101=SC 719; 102=PAN 53; 103=PAN 4M-21; 104=DKC 80-53; 105=PHB 30D79; 106=PAN 6777; 107=PAN 4m-19; 108=PAN 5M-35; 109=PHB 30V33; 110=PHB 30G19; 111=PAN 57; 112=DKC 80-73
+  ag_g0e_1_oth: Please specify other variety
+  ag_g0f: Is the primary variety of [CROP] local or improved? | 1=LOCAL; 2=IMPROVED
+  ag_g0g: Is this variety recyclable? | 1=YES; 2=NO; 3=DON'T KNOW
+  ag_g0h: When, [which year] did you last buy the seed you planted on this plot?
+  ag_g01: What type of crop stand was on the [PLOT]? | 1=Pure stand / Sole; 2=Strip Intercrop; 3=Row Intercrop; 4=Relay Intercrop; 5=Mixed stand
+  ag_g02: Was the crop planted in the entire area of the plot? | 1=YES; 2=NO
+  ag_g03: Approximately, how much of the [PLOT] is under [CROP]? | 1=Less than 1/4; 2=1/4; 3=1/2; 4=3/4; 5=More than 3/4
+  ag_g04a: How much seed did you plant for the [CROP] on this [PLOT] during the[RS]?(QUANT)
+  ag_g04b: How much seed did you plant for the [CROP] on this [PLOT] during the[RS]?(UNIT) | 1=GRAM; 2=KILOGRAM; 3=2 KG BAG; 4=3 KG BAG; 5=3.7 KG BAG; 6=5 KG BAG; 7=10 KG BAG; 8=50 KG BAG; 9=OTHER (SPECIFY)
+  ag_g04b_oth: Specify Unit
+  ag_g05a: When did you plant the seeds for the [CROP] on this [PLOT]during the[RS]?(MONTH) | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g05b: When did you plant the seeds for the [CROP] on this [PLOT]during the[RS]?(YEAR)
+  ag_g10: Was the area harvested less than the area planted? | 1=YES; 2=NO
+  ag_g11a: Why was the area harvested less than the area planted? (1ST) | 1=Drought; 3=Fire; 4=Insects; 5=Animals; 6=Crop theft; 7=Diseases; 9=Lack of hired labor; 10=Other (Specify); 11=Irregular Rains; 12=Floods
+  ag_g11b: Why was the area harvested less than the area planted? (2ND) | 1=Drought; 3=Fire; 4=Insects; 5=Animals; 6=Crop theft; 7=Diseases; 9=Lack of hired labor; 10=Other (Specify); 11=Irregular Rains; 12=Floods
+  ag_g11_oth: Specify the other reason why the area harvested was less than the area...
+  ag_g11_1: What was the main disease affecting the plants in the plot? | 1=MAIZE LETHAL NECROSIS DISEASE; 2=MAIZE STREAK VIRUS DISEASE; 3=FINE STRIPPING DISEASE; 4=MAIZE BUSHY STUNT; 5=MAIZE DWARF VIRUS; 6=EAR Rot; 7=DOWNY MILDEW; 8=LEAF BLIGHT; 9=STALK ROT; 10=RUST; 11=SMUT; 12=TASSEL SMUT
+  ag_g11_1oth: Please specify the main disease affecting the plants in the plot...
+  ag_g11_2: Approximately what percentage of [PLOT] was planted with [CROP]?
+  ag_g12a: What months did the harvest start? | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g12b: What months did the harvest end? | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g13a: How much [CROP] did you harvest from this [PLOT] during the [RS]? (QUANT)
+  ag_g13b: How much [CROP] did you harvest from this [PLOT] during the [RS]? (UNIT) | 1=KILOGRAM; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 12=OX-CART; 13=OTHER (SPECIFY)
+  ag_g13b_oth: Specify Unit
+  ag_g13c: How much [CROP] did you harvest from this [PLOT] during the [RS]? (S/U) | 1=S: SHELLED; 2=U: UNSHELLED; 3=NOT APPLICABLE
+  ag_g13_1: What is the estimated value of [CROP] harvested?
+  ag_g14a: Who in the HH makes decision concerning the use of output from this plot(#ID1)?
+  ag_g14b: Who in the HH makes decision concerning the use of output from this plot(#ID2)?
+===== 2019-20 Data/Cross_Sectional/ag_mod_p.dta 7893
+  case_id: Unique Household Identifier
+  HHID: Survey Solutions Unique HH Identifier
+  gardenid: Garden ID
+  plotid: Plot ID
+  ag_p0_crops: FOR EACH PLOT, LIST ALL TREE/PERMANENT CROPS HARVESTED BY HH IN LAST 12MONTHS
+  ag_p0c: CROP CODE | 2=TEA; 3=COFFEE; 4=MANGO; 5=ORANGE; 6=PAWPAW/PAPAYA; 7=BANANA; 8=AVOCADO; 9=GUAVA; 10=LEMON; 11=NAARTJE (TANGERINE); 12=PEACH; 13=[CUSTADE APPLE] POZA
+  ag_p0c_oth: SPECIFY CROP CODE
+  ag_p0a: What is the primary variety of [TREE/PERM CROP] being cultivated on this [PLOT]? | 101=Balaka; 102=Chithekere/Kithekere; 103=Masangwi; 104=Mgwalangwa; 105=Matuvi; 106=Chilikhano2/Mchilingano; 107=Azungu (Masoghazungu); 108=Gomani2; 109=Beatrice; 110=Mbawala; 111=Kasungwi; 112=Guguza
+  ag_p0aoth: Please Specify the other type of variety
+  ag_p01: Is[TREE/PERM CROP]cultivated in a plantation or scattered in field? | 1=PLANTATION; 2=SCATTERED
+  ag_p02a: What is the area of the plantation?
+  ag_p02b: UNIT | 1=ACRE; 2=HECTARE; 3=SQUARE METERS; 4=OTHER (SPECIFY)
+  ag_p02b_oth: Specify UNIT
+  ag_p03: How many plants/trees for the[TREE/PERM CROP]do you own on this[PLOT]?
+  ag_p04: In what year were most of these plants/ trees planted?
+  ag_p05: How many plants/ trees were planted during the last 12 months?
+  ag_p06a: What was the last completed production period for the tree/permanent crop | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_p06b: BEGIN YEAR (4-DIGIT)
+  ag_p06c: END MONTH | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_p06d: END YEAR (4-DIGIT)
+  ag_p07: Were there any losses of[TREE/PERM CROP]before harvest? | 1=YES; 2=NO
+  ag_p08a: Why were there losses before the harvest? (1ST CAUSE) | 1=Drought; 2=Effects of Rains; 3=Effects of Fire; 4=Effects of Insects; 5=Effects of Animals; 6=Effects of Crop theft; 7=Effects of Diseases; 8=Effects of Community problems; 9=Effects of Lack of hired labor; 10=Other (Specify); 11=Effects of Irregular Rains; 12=Effects of Flooding
+  ag_p08b: Why were there losses before the harvest? (2ND CAUSE) | 1=Drought; 2=Effects of Rains; 3=Effects of Fire; 4=Effects of Insects; 5=Effects of Animals; 6=Effects of Crop theft; 7=Effects of Diseases; 8=Effects of Community problems; 9=Effects of Lack of hired labor; 10=Other (Specify); 11=Effects of Irregular Rains; 12=Effects of Flooding
+  ag_p08_oth: Specify why were there losses before the harvest.
+  ag_p08_1: What was the main disease affecting the plants in the [PLOT]? | 15=CASSAVA MOSAIC. AFRICAN CASSAVA MOSAIC VIRUS (ACMV); 16=CASSAVA BACTERIAL BLIGHT. XANTHOMONAS AXONOPODIS; 17=BROWN LEAF SPOT. CERCOSPORIDIUM HENNINGSII; 18=WHITE LEAF SPOT. CERCOSPORA VICOSAE; 19=CASSAVA BROWN STREAK DISEASE; 20=CASSAVA ROOT ROT DISEASE; 21=OTHER SPECIFY
+  ag_p08_1oth: Please specify the main disease affecting the plants in the [PLOT]?
+  ag_p09a: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(Q)
+  ag_p09b: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(U) | 1=KILOGRAM; 2=50 KG BAG; 3=90 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 11=BASKET (DENGU); 12=OX-CART
+  ag_p09b_oth: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(O/S)
+  ag_p09_1: What was the condition of [TREE/PERM CROP]? | 1=FRESH; 2=DRY; 3=NOT APPLICABLE.
+===== 2019-20 Data/Panel/ag_mod_g_19.dta 9984
+  y4_hhid: Unique Household Identification 2019
+  qx_type: Sample Group (Panel A, Panel B) | 1=PANEL A; 2=PANEL B
+  interview_status: Household Interview Status | 1=Panel A - 2 Visits; 2=Panel B 2 Visits; 3=Panel A - Combined Visit; 4=Panel B - Combined Visit; 5=Panel A - Only Visit 1; 6=Panel B - Only Visit 1
+  gardenid: Garden ID
+  plotid: Plot ID
+  crop_code: Crop ID | 1=MAIZE LOCAL; 2=MAIZE COMPOSITE/OPV; 3=MAIZE HYBRID; 4=MAIZE HYBRID RECYCLED; 5=TOBACCO BURLEY; 6=TOBACCO FLUE CURED; 7=TOBACCO NNDF; 8=TOBACCO SDF; 9=TOBACCO ORIENTAL; 10=OTHER TOBACCO (SPECIFY); 11=GROUNDNUT CHALIMBANA; 12=GROUNDNUT CG7
+  ag_g0a: Did you or anyone in your HH plant any crops during the [RS] | 1=YES; 2=NO
+  ag_g0e_1: What is the primary variety of [CROP] being cultivated on this [PLOT]? | 101=SC 719; 102=PAN 53; 103=PAN 4M-21; 104=DKC 80-53; 105=PHB 30D79; 106=PAN 6777; 107=PAN 4m-19; 108=PAN 5M-35; 109=PHB 30V33; 110=PHB 30G19; 111=PAN 57; 112=DKC 80-73
+  ag_g0e_1_oth: Please specify other variety
+  ag_g0f: Is the primary variety of [CROP] local or improved? | 1=LOCAL; 2=IMPROVED
+  ag_g0g: Is this variety recyclable? | 1=YES; 2=NO; 3=DON'T KNOW
+  ag_g0h: When, [which year] did you last buy the seed you planted on this plot?
+  ag_g01: What type of crop stand was on the [PLOT]? | 1=Pure stand / Sole; 2=Strip Intercrop; 3=Row Intercrop; 4=Relay Intercrop; 5=Mixed stand
+  ag_g02: Was the crop planted in the entire area of the plot? | 1=YES; 2=NO
+  ag_g03: Approximately, how much of the [PLOT] is under [CROP]? | 1=Less than 1/4; 2=1/4; 3=1/2; 4=3/4; 5=More than 3/4
+  ag_g04a: How much seed did you plant for the [CROP] on this [PLOT] during the[RS]?(QUANT)
+  ag_g04b: How much seed did you plant for the [CROP] on this [PLOT] during the[RS]?(UNIT) | 1=GRAM; 2=KILOGRAM; 3=2 KG BAG; 4=3 KG BAG; 5=3.7 KG BAG; 6=5 KG BAG; 7=10 KG BAG; 8=50 KG BAG; 9=OTHER (SPECIFY)
+  ag_g04b_oth: Specify Unit
+  ag_g05a: When did you plant the seeds for the [CROP] on this [PLOT]during the[RS]?(MONTH) | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g05b: When did you plant the seeds for the [CROP] on this [PLOT]during the[RS]?(YEAR)
+  ag_g07: G07. Have you completed the harvest of the %rostertitle% from this [PLOT]? | 1=YES; 2=NO
+  ag_g08a: G08a. How much %rostertitle% do you expect to harvest from this [PLOT] during th
+  ag_g08b: G08b. UNIT | 1=KILOGRAM; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 12=OX-CART; 13=OTHER (SPECIFY)
+  ag_g08b_oth: G08b_oth. SPECIFY UNIT
+  ag_g08c: G08c. S/U | 1=S: SHELLED; 2=U: UNSHELLED; 3=NOT APPLICABLE
+  ag_g09a: G09a. How much %rostertitle% did you harvest from this [PLOT] during the referen
+  ag_g09b: G09b. UNIT | 1=KILOGRAM; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 12=OX-CART; 13=OTHER (SPECIFY)
+  ag_g09c: G09c. S/U | 1=S: SHELLED; 2=U: UNSHELLED; 3=NOT APPLICABLE
+  ag_g10: G10. Was the area harvested less than the area planted? | 1=YES; 2=NO
+  ag_g11a: Why was the area harvested less than the area planted? (1ST)
+  ag_g11b: Why was the area harvested less than the area planted? (2ND)
+  ag_g11_oth: Specify the other reason why the area harvested was less than the area...
+  ag_g11_1: G11_1. What was the main disease affecting the plants in the plot(%rostertitle%) | 1=MAIZE LETHAL NECROSIS DISEASE; 2=MAIZE STREAK VIRUS DISEASE; 3=FINE STRIPPING DISEASE; 4=MAIZE BUSHY STUNT; 5=MAIZE DWARF VIRUS; 6=EAR Rot; 7=DOWNY MILDEW; 8=LEAF BLIGHT; 9=STALK ROT; 10=RUST; 11=SMUT; 12=TASSEL SMUT
+  ag_g11_1oth: G11_1Oth. Please Specify the main disease affecting the plants in the plot(%rost
+  ag_g11_2: G11_2. Approximately what percent of %ag_G_plot_roster% planted with %rostertitl
+  ag_g12a: G12a. What months did the harvest start? | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g12b: G12b. What months did the harvest end? | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_g13a: G13a. How much %rostertitle% did you harvest from this plot during the reference
+  ag_g13b: G13b. UNIT | 1=KILOGRAM; 2=50 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 12=OX-CART; 13=OTHER (SPECIFY)
+  ag_g13b_oth: G13b_oth. SPECIFY UNIT
+  ag_g13c: G13c. S/U | 1=S: SHELLED; 2=U: UNSHELLED; 3=NOT APPLICABLE
+  ag_g13_1: G13_1. What is the estimated value of %rostertitle% harvested from [PLOT]?
+  ag_g14a: Who in the HH makes decision concerning the use of output from this plot(#ID1)?
+  ag_g14b: Who in the HH makes decision concerning the use of output from this plot(#ID2)?
+===== 2019-20 Data/Panel/ag_mod_p_19.dta 1601
+  y4_hhid: Unique Household Identification 2019
+  qx_type: Sample Group (Panel A, Panel B) | 1=PANEL A; 2=PANEL B
+  interview_status: Household Interview Status | 1=Panel A - 2 Visits; 2=Panel B 2 Visits; 3=Panel A - Combined Visit; 4=Panel B - Combined Visit; 5=Panel A - Only Visit 1; 6=Panel B - Only Visit 1
+  gardenid: Garden ID
+  plotid: Plot ID
+  ag_p0_crops: FOR EACH PLOT, LIST ALL TREE/PERMANENT CROPS HARVESTED BY HH IN LAST 12MONTHS
+  crop_code: CROP CODE | 2=TEA; 3=COFFEE; 4=MANGO; 5=ORANGE; 6=PAWPAW/PAPAYA; 7=BANANA; 8=AVOCADO; 9=GUAVA; 10=LEMON; 11=NAARTJE (TANGERINE); 12=PEACH; 13=[CUSTADE APPLE] POZA
+  ag_p0d_oth: SPECIFY CROP CODE
+  ag_p0a: What is the primary variety of [TREE/PERM CROP] being cultivated on this [PLOT]? | 101=Balaka; 102=Chithekere/Kithekere; 103=Masangwi; 104=Mgwalangwa; 105=Matuvi; 106=Chilikhano2/Mchilingano; 107=Azungu (Masoghazungu); 108=Gomani2; 109=Beatrice; 110=Mbawala; 111=Kasungwi; 112=Guguza
+  ag_p0aoth: Please Specify the other type of variety
+  ag_p01: Is[TREE/PERM CROP]cultivated in a plantation or scattered in field? | 1=PLANTATION; 2=SCATTERED
+  ag_p02a: What is the area of the plantation?
+  ag_p02b: UNIT | 1=ACRE; 2=HECTARE; 3=SQUARE METERS; 4=OTHER (SPECIFY)
+  ag_p02b_oth: Specify UNIT
+  ag_p03: How many plants/trees for the[TREE/PERM CROP]do you own on this[PLOT]?
+  ag_p04: In what year were most of these plants/ trees planted?
+  ag_p05: How many plants/ trees were planted during the last 12 months?
+  ag_p06a: What was the last completed production period for the tree/permanent crop | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_p06b: BEGIN YEAR (4-DIGIT)
+  ag_p06c: END MONTH | 1=JANUARY; 2=FEBRUARY; 3=MARCH; 4=APRIL; 5=MAY; 6=JUNE; 7=JULY; 8=AUGUST; 9=SEPTEMBER; 10=OCTOBER; 11=NOVEMBER; 12=DECEMBER
+  ag_p06d: END YEAR (4-DIGIT)
+  ag_p07: Were there any losses of[TREE/PERM CROP]before harvest? | 1=YES; 2=NO
+  ag_p08a: Why were there losses before the harvest? (1ST CAUSE) | 1=Drought; 2=Effects of Rains; 3=Effects of Fire; 4=Effects of Insects; 5=Effects of Animals; 6=Effects of Crop theft; 7=Effects of Diseases; 8=Effects of Community problems; 9=Effects of Lack of hired labor; 10=Other (Specify)
+  ag_p08b: Why were there losses before the harvest? (2ND CAUSE) | 1=Drought; 2=Effects of Rains; 3=Effects of Fire; 4=Effects of Insects; 5=Effects of Animals; 6=Effects of Crop theft; 7=Effects of Diseases; 8=Effects of Community problems; 9=Effects of Lack of hired labor; 10=Other (Specify)
+  ag_p08_oth: Specify why were there losses before the harvest.
+  ag_p08_1: What was the main disease affecting the plants in the [PLOT]? | 15=CASSAVA MOSAIC. AFRICAN CASSAVA MOSAIC VIRUS (ACMV); 16=CASSAVA BACTERIAL BLIGHT. XANTHOMONAS AXONOPODIS; 17=BROWN LEAF SPOT. CERCOSPORIDIUM HENNINGSII; 18=WHITE LEAF SPOT. CERCOSPORA VICOSAE; 19=CASSAVA BROWN STREAK DISEASE; 20=CASSAVA ROOT ROT DISEASE; 21=OTHER SPECIFY
+  ag_p08_1oth: Please specify the main disease affecting the plants in the [PLOT]?
+  ag_p09a: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(Q)
+  ag_p09b: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(U) | 1=KILOGRAM; 2=50 KG BAG; 3=90 KG BAG; 4=PAIL (SMALL); 5=PAIL (LARGE); 6=NO 10 PLATE; 7=NO 12 PLATE; 8=BUNCH; 9=PIECE; 10=BALE; 11=BASKET (DENGU); 12=OX-CART
+  ag_p09b_oth: How much[TREE/PERM CROP]did you harvest during the last 12 mnths?(O/S)
+  ag_p09_1: What was the condition of [TREE/PERM CROP]? | 1=FRESH; 2=DRY; 3=NOT APPLICABLE.

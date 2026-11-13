@@ -1,0 +1,130 @@
+#+TITLE: Ethiopia #1118 - Missing plot-input units
+#+AUTHOR: Sue
+#+DATE: 2026-10-21
+
+* Result and boundary
+
+Author validation PASS; independent review is pending.
+The shared =plot_inputs_for_wave= helper now normalizes its final null or whitespace-only =u= values to the existing =transformations.U_UNKNOWN= (=Unknown=), including observations without an amount.
+Every nonblank unit remains verbatim.
+The implementation adds an import and one final-column mask; it changes no source selection, use predicate, purchase join, quantity, factor, table registry or other-country/framework code.
+The pre-code ledger was committed and published as =7c0198e2eef8432f96e170cb11138131a8a7d944= against baseline =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+The dispatcher explicitly approved this boundary after the held-source diagnosis.
+
+* Country grounding
+
+=CONTENTS.org= was read first, including its TODO, WAITING and LOGBOOK entries.
+Its plot-input section says these are "one row per input APPLIED to a plot (or plot-crop)" and that =Applied= is "the sole datum for organic / pesticide rows, which carry NO quantity in ESS".
+Those are genuine use observations and must remain; Nigeria's separate non-input question is inapplicable here.
+It also requires section5 holder/crop purchase fields to attach "ONLY where the (holder, crop) maps to exactly ONE plot" in waves 2-5.
+The synthetic negative join case checks that two plots sharing a holder/crop receive no copied purchase amount.
+No contradiction with those documented source rules was found.
+The existing parcel/plot fertilizer-rate caveat, #820 sales grain and #660 cover keys remain outside this repair.
+
+All 15 held section3/section4/section5 sources were read through =get_dataframe= with numerical codes.
+Independent eligible source-use key counts match the direct helper for every organic input and pesticide in each of the five waves.
+Sanctioned =categories_only=True= metadata confirms 1=Yes and 2=No for all 25 use/gate fields; waves 4-5 prefix their labels with =1.= and =2.=.
+The selected held input/sample seed covers 48 sidecars and 47 distinct physically copied L1 blobs (161,128,465 bytes), all matching their sidecar MD5, with separate inodes and no raw-blob symlinks to shared cache.
+See =source-grounding.json= for aggregate source counts and instrument labels.
+
+* Exact data accounting
+
+| Wave    | All plot-input rows | Null units before | Unknown after |
+|---------+---------------------+-------------------+---------------|
+| 2011-12 |               45149 |              9141 |          9141 |
+| 2013-14 |               47416 |              8881 |          8881 |
+| 2015-16 |               47426 |              8879 |          8879 |
+| 2018-19 |               23271 |              5567 |          5567 |
+| 2021-22 |               17638 |              4902 |          4902 |
+| Total   |              180900 |             37370 |         37370 |
+
+The held sources contain null units, with no blank-string units at baseline.
+The 37,370 changed payloads are 27,261 Manure, 4,295 Compost, 2,651 Other Organic and 3,163 Pesticide observations.
+Every changed row remains =Applied=True=, with Quantity and Quantity_purchased missing.
+All five complete helper frames and the complete cold Country frame match baseline after exactly that unit replacement: non-unit values, missingness, indexes, keys, multiplicities, dtypes and attrs are exact.
+The 143,530 nonblank =Kg= rows remain unchanged, including 40,977 rows with missing Quantity.
+Complete =nitrogen_kg= output and attrs remain exact; the total is 500847.2208579673 kg N on both versions.
+
+A fresh Python process serves precisely the cold Country/Feature captures.
+All 38 private L2 parquet SHA256 hashes, sizes and mtimes remain unchanged through that warm proof.
+All 25 Ethiopia table hashes change because the shared country module is a declared build input; none of 28 Uganda table hashes change.
+No other Ethiopia feature was cold-built to infer an output claim from that hash result.
+
+* Feature and healthy comparator
+
+Uganda was rebuilt privately from held AGSEC inputs after the initially copied L2 proved stale; that stale copy was neither trusted nor restamped as evidence.
+Its 84,216 plot-input rows have no null/blank units, and the full frame and attrs match before/after.
+The paired =Feature('plot_inputs')(['Ethiopia', 'Uganda'])= has 265,116 rows, with each country retaining its full row count and values through the declared canonical promotions, absent-season sentinel and currency annotation.
+The complete assembled frame is exact against baseline.
+The sole Feature metadata delta is =attrs['canonical_alignment']['promoted']['Ethiopia']['u']=, 37,370 -> 0, because the builder already supplies =Unknown=.
+The alignment record remains present and every other Feature attr is exact.
+
+The existing Feature scanner has 13 baseline warnings and 12 candidate warnings, with zero fail/error findings on either side.
+After normalizing checkout/private-data paths and volatile timing fields only, 11 complete finding records match as a multiset.
+Two records are removed and one is added: the former Ethiopia constant-column warning for =u= disappears when =Unknown= becomes the second payload alongside =Kg=, and one assembly runtime-warning record changes solely by replacing the Ethiopia unit-fill count text =37370= with =0=.
+The whole residual scanner multiset is accounted for; this is not an unchanged-finding claim.
+Raw warnings and individual diagnostic examples remain private.
+
+* Tests and reproducibility
+
+The final targeted selection passes 58 tests with zero skips/failures/errors using two =--dist=loadfile= workers.
+It includes all 14 new helper cases, NPS/organic nitrogen tests (including actual warm Ethiopia), the complete Uganda plot-input season file, the missing-unit spelling inventory, and eleven existing fertilizer/nitrogen transform tests.
+The unrelated Malawi warm nitrogen case is excluded from selection.
+Replaying the new cases against the exported baseline helper produces eight failures and six passes; the nonblank-unit and join/value guards already pass at baseline.
+The new cases explicitly catch nulls rather than relying on pandas =all()= over nullable comparisons.
+
+Private runnable evidence lives at =/local/job40255479/control/isa-backlog-20261021/Ethiopia/1118/=.
+Set =TASK_ROOT= to the checkout and =TASK_DATA= to a physically private held-source root before each command:
+
+#+begin_src sh
+cd "$TASK_ROOT"
+export PATH=/local/job40255479/venv_img/bin:$PATH
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHONPATH="$TASK_ROOT:/local/job40255479/control/isa-backlog-20261021/Ethiopia/1118/offline"
+export LSMS_COUNTRIES_ROOT="$TASK_ROOT/lsms_library/countries"
+export LSMS_DATA_DIR="$TASK_DATA"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+export LSMS_BUILD_WORKERS=1 LSMS_MAKE_JOBS=1
+python /local/job40255479/control/isa-backlog-20261021/Ethiopia/1118/validate.py --root "$TASK_ROOT" --data "$TASK_DATA" --phase cold
+python /local/job40255479/control/isa-backlog-20261021/Ethiopia/1118/validate.py --root "$TASK_ROOT" --data "$TASK_DATA" --phase warm
+TASK_PHASE=candidate python /local/job40255479/control/isa-backlog-20261021/Ethiopia/1118/audit.py
+#+end_src
+
+The exact 58-test producer selection, using the same checkout/data environment, is:
+
+#+begin_src sh :eval no :tangle no :results output
+python -m pytest -q -n 2 --dist=loadfile \
+ tests/test_gh1118_ethiopia_plot_input_units.py \
+ tests/test_867_nitrogen_content.py \
+ tests/test_gh637_uganda_plot_inputs_season.py \
+ tests/test_962_unit_sentinel.py::test_no_unclassified_missing_unit_spelling_is_minted \
+ tests/test_863_transforms.py::test_fertilizer_rate_nitrogen_per_hectare \
+ tests/test_863_transforms.py::test_fertilizer_rate_product_basis_is_the_raw_kilograms \
+ tests/test_863_transforms.py::test_fertilizer_rate_sums_inputs_and_areas_to_the_same_land_grain \
+ tests/test_863_transforms.py::test_fertilizer_rate_zero_area_plot_is_dropped_not_infinite \
+ tests/test_863_transforms.py::test_fertilizer_rate_bad_nutrient_and_bad_on_raise \
+ tests/test_863_transforms.py::test_fertilizer_rate_missing_area_column_raises \
+ tests/test_863_transforms.py::test_nitrogen_kg_warns_when_every_fertilizer_label_is_unmatched \
+ tests/test_863_transforms.py::test_nitrogen_kg_normalises_the_trailing_fertilizer_word \
+ tests/test_863_transforms.py::test_nitrogen_kg_does_not_fuzzy_match_an_unknown_fertilizer \
+ tests/test_863_transforms.py::test_fertilizer_rate_warns_on_an_empty_grain_join \
+ tests/test_863_transforms.py::test_fertilizer_rate_parcel_default_bridges_the_two_vocabularies \
+ -k 'not test_malawi_warm_d_compound_is_matched_at_8_percent' \
+  > "$TASK_DATA/ethiopia-1118-tests-private.log" 2>&1
+#+end_src
+
+The runners assert exact checkout import/config/data/cwd identity and an active offline socket guard.
+The first verifier stopped only after capturing all cold frames because it initially required the expected Feature alignment count to stay unchanged.
+=finalize-cold.py= checked those original saved cold captures with that one metadata delta explicitly accounted for; no cold capture was replaced to fix the expectation.
+The corrected =validate.py= and the fresh-process warm verifier require the complete assembled frame and all other metadata to match.
+Detailed logs, raw warning records and data pickles remain private; committed evidence contains aggregate counts and configuration/instrument labels only.
+
+* Remaining issue scope for dispatcher
+
+This completes only Ethiopia's missing-unit portion of #1118; the multi-country issue must remain open for its other named lanes until independently remeasured and validated there.
+The issue's Mali, Malawi, Tanzania, GhanaLSS, Nigeria, and Benin/Togo sentinel questions were not changed or adjudicated by this work.
+Do not infer their counts or eligibility predicates from Ethiopia's real use-only observations.
+Ethiopia's documented ambiguous holder/crop purchase allocation and parcel/plot fertilizer-rate mismatch also remain, as do the separate #820 and #660 concerns.
+No new unit vocabulary, amount, conversion factor or human ruling is required for this Ethiopia repair.
+
+Sue

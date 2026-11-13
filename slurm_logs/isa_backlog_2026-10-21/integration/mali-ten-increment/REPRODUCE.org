@@ -1,0 +1,46 @@
+#+title: Tenth-fix incremental coexistence validation
+#+author: Sue
+#+date: 2026-10-21
+
+* PASS and scope
+
+Source head =bbdcf34578085fb90e981184a0cadadc9701a366= combines the ten reviewed PRs, adding Mali #1121 to the nine-fix head =483b4aa11=.
+The two focused Mali test files pass31tests, zero skips/failures/errors, under two loadfile workers.
+Normal stale-cache calls reproduce complete frozen reference frames, dtypes and attrs: Mali plot_labor52,057, Niger plot_labor53,041 and Mali community_prices155,931.
+The complete Mali/Niger labor Feature has105,098rows and exact reference attrs.
+All three requested caches grade fresh with complete declared-wave coverage.
+The initial read changes20of1,519parquets without creating/deleting any; a separate fresh process repeats all calls with0byte/mtimechanges across all1,519.
+All tracked content/modes, HEAD and clean status remain unchanged.
+This is an incremental check of the added Mali fix, not a repeat of the entire nine-fix cohort or the full suite.
+
+* Held input staging
+
+The quiescent completed nine-fix API cache supplies1,519physical L2copies and preverified heldL1.
+Seventeen held Mali labor/sample blobs and the already-held Niger footprint supplement it; the final private L1 has1,288blobs.
+All161held Niger binary sidecar entries verify their recorded MD5;134unheld declarations remain absent and no source is fetched.
+The three initial failed API launches expose incomplete private Niger staging: legacy labor, modern labor, then supporting sample.
+Their logs/data remain private; =initial-staging-attempts.json= records the failures and corrected boundary.
+The network namespace and socket guard prevented external acquisition during those attempts.
+The successful replay begins from a new physical copy rather than reusing partial build outputs.
+All copied source bytes and the source checkout remain unchanged after verification.
+
+* Exact command and artifacts
+
+Private task root: =/local/job40255479/control/isa-backlog-20261021/integration/mali-ten-increment-v4/=.
+Exec59069returned0; total launcher83.03seconds including physical-copy staging.
+=run.py= and =check_api.py= are source-safe copies of the exact launcher/checker, including reference pins and independent root/data/offline assertions.
+Their canonical private filenames are =integration/run_mali_ten_increment.py= and =integration/check_mali_ten_increment.py= under the campaign control root.
+Replaying requires fresh destinations and access to the pinned private reference frames/held inputs; it deliberately refuses an existing output root.
+No shared-cache clear/promotion, assumed-fresh serve, manual hash stamp, DVC CLI or source acquisition is used.
+Numerical/build/Make thread counts are1; the run uses the mounted image Python, exact checkout/config paths, active socket guards and =unshare -rn=.
+Full logs, warnings, raw inputs, frames and source-copy manifests remain private.
+
+#+begin_src sh
+cd /local/job40255479/worktrees/isa-integration
+python3 /local/job40255479/control/isa-backlog-20261021/integration/run_mali_ten_increment.py
+#+end_src
+
+The exact pytest argument vector and the two normal API processes are preserved in =summary.json=.
+The earlier nine-fix656-test and13-call full-frame proofs keep their own source head and scope.
+
+Sue

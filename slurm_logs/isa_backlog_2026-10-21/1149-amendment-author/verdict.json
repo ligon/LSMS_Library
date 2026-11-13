@@ -1,0 +1,15 @@
+{
+  "status": "AUTHOR_PASS_PENDING_INDEPENDENT_DELTA_ACCEPTANCE",
+  "head": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+  "runtime_tests": "21f5cb7f91152c5a86eba8cfd264dd24124b523a",
+  "actual_parent": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+  "change": "Current-key cleanup and bare re-raise around expected/confirmed path validation at two existing acquisition entrypoints",
+  "finding_classification": "Pre-existing defensive cleanup gap for invalid helper returns; normal helper promises list[Path]. Original TypeError and SOURCE preserved. No false-stamp, data-corruption or ordinary-helper regression claim.",
+  "six_OptionC_requirements": "Established independently on frozenfb; entire product AST otherwise identical after unwrapping two new validation handlers. New affected270-case suite includes all original266 and4added controls.",
+  "limits": [
+    "No actual acquisition or new-runtime country/Feature data measurement.",
+    "Old bounded warm results retain originalfb pins and qualifications.",
+    "Original human release fixtures retain real-name/synthetic-payload/unavailable original archive-path qualification.",
+    "Independent delta acceptance and human merge remain."
+  ]
+}

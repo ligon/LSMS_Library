@@ -1,0 +1,33 @@
+{
+  "status": "EXACT_HEAD_CI_COMPLETED_SUCCESS_WITH_SIX_SKIPPED_JOBS",
+  "PR": 1220,
+  "run_id": 39861535004,
+  "run_attempt": 1,
+  "head_sha": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "head_branch": "docs/1215-uganda-empty-order-diagnosis-20261022",
+  "event": "pull_request",
+  "at_UTC": "2026-10-22T22:06:07.932353+00:00",
+  "run_status": "completed",
+  "run_conclusion": "success",
+  "jobs": {
+    "unit-tests": {
+      "id": 120113199144,
+      "conclusion": "success"
+    },
+    "windows-smoke": {
+      "id": 120113198772,
+      "conclusion": "success"
+    }
+  },
+  "skipped_jobs": [
+    "windows-script-build",
+    "dvc-lock-check",
+    "data-tests",
+    "dvc-remote-reachability",
+    "docs",
+    "refresh-dvc-locks"
+  ],
+  "exact_run_API_sha256": "24de6d6189d7ae9ee5be01ba0733196bf8a1dce4bfd38a406838998ed75dd2a5",
+  "scope": "Unit/Windows CI only; no full-data or combined32-PR suite/corpus verdict. No rerun triggered.",
+  "signed": "Sue"
+}

@@ -67,6 +67,15 @@ def _run_script(name, sources, tmp_path, monkeypatch, *, updated_ids=None):
     """
     import lsms_library.local_tools as lt
 
+    # GH #1062: income now asks the framework to verify/materialize its
+    # siblings before reading these same raw operands. Keep this historical
+    # arithmetic test independent of survey acquisition.
+    if name == "income.py":
+        import lsms_library as ll
+        from types import SimpleNamespace
+        monkeypatch.setattr(ll, "Country", lambda name: SimpleNamespace(
+            earnings=lambda: None, enterprise_income=lambda: None))
+
     written = {}
     monkeypatch.setattr(lt, "get_dataframe",
                         lambda fn, *a, **k: sources[fn].copy())

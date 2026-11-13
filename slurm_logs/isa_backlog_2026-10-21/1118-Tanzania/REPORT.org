@@ -1,0 +1,140 @@
+#+title: Tanzania #1118 -- missing plot-input units
+#+author: Sue
+#+date: 2026-10-21
+
+* Result and boundary
+
+The two modern Tanzania plot-input waves retain all 9,698 existing Country rows and replace exactly 408 missing units with the existing =U_UNKNOWN= (=Unknown=).
+All keys, non-unit fields, dtypes and attrs equal the release-baseline result.
+The correction removes quantity-dependent unit blanking and normalizes null/whitespace-only units after the unchanged duplicate reduction.
+Recorded nonblank labels remain verbatim, including records without an amount.
+No decoder, source-use predicate, identifier, grain, factor, curation, other-country or shared-framework code changes.
+The ledger was committed first as =963d45f21=; the release baseline is =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+
+The existing #1041 maintainer ruling already covers missing units with and without quantity.
+The removed comment, "u is meaningless where there is no quantity", contradicted that ruling.
+There is no new human policy decision for this slice of #1118.
+
+* Country design retained
+
+The full =CONTENTS.org=, including TODO, WAITING and LOGBOOK, was read before implementation.
+UPHI back-casts descendant households into earlier waves; =r_hhid= identifies interviewed households instead.
+The 2014-15 Extended and Refresh subpanels are disjoint; 2019-20 follows the Extended cohort, whereas 2020-21 follows Refresh plus its urban booster.
+The modern agriculture waves consequently have disjoint household populations by design.
+The live =WAITING= #114 caveat and older-wave feature behavior remain untouched.
+No contradiction with those country design notes was found or presumed stale.
+Only the unchanged older-wave =sample= prerequisite was rebuilt, from a held cover file, because the normal public plot-input API joins =v= through all-wave =sample()=.
+
+* Held-source evidence
+
+All four required agriculture modules and three sample-cover prerequisites were already held and copied into physically separate private storage after sidecar MD5 verification.
+The 2019 agriculture questionnaire was held; PDF page 9 confirms liquid codes 1 kg, 2 litre, 3 millilitre, 4 OTHER (SPECIFY).
+Both extracts' Stata dictionaries agree with the existing decoder, including seed code 5 OTHER (SPECIFY).
+No unlisted nonnull unit code or recoverable unit-specification text field was found in the held modules.
+Missing total units arise directly from native missing/OTHER codes, rather than a failed unit join.
+The separate purchased-seed unit =ag4a_10c_2= is known for two 2020 records with missing/OTHER total units; it does not establish the total-quantity unit and is not borrowed.
+
+| Wave    | Country rows | Missing u before | With quantity | Without quantity | Missing u after |
+|---------+--------------+------------------+---------------+------------------+-----------------|
+| 2019-20 |         1774 |               86 |            72 |               14 |               0 |
+| 2020-21 |         7924 |              322 |           317 |                5 |               0 |
+| Total   |         9698 |              408 |           389 |               19 |               0 |
+
+All 19 no-amount source-use records remain; each is a seed record with an absent native total unit.
+The current sources contain no recorded unit on those 19 records; synthetic controls therefore establish preservation of a future no-amount/known-unit record.
+Whitespace-only units number zero in the current extracts and are covered synthetically with and without quantity.
+
+The independent field-binding oracle covers every supported source channel and every output field.
+It accounts for 1,787 -> 1,774 rows in 2019-20 and 8,035 -> 7,924 in 2020-21 under the existing duplicate collapse.
+Three actual 2020 duplicate groups have a missing unit first and a recorded unit later: filling Unknown early would displace a known unit.
+The post-collapse normalization preserves the existing =first= selection.
+See =source-grounding.json= for source hashes, native-code counts and aggregate channel accounting.
+
+The exact unheld sidecar is =Tanzania/2020-21/Documentation/nps_agriculture_qx_y5_final.pdf.dvc= (MD5 =635f875f7ffc02415411d808bb4a7a2b=).
+No acquisition was attempted.
+This limits independent questionnaire-text confirmation for 2020; it does not prevent checking its held native dictionaries and records.
+
+* Verification
+
+Normal =Country('Tanzania').plot_inputs()= built from an empty private Tanzania L2, with only the seven held L1 blobs available and an active network guard.
+No =assume_cache_fresh= / =trust_cache= bypass or fabricated cache stamp was used in the cold or warm proof.
+The full expected frame equals the previously captured baseline frame with exactly its 408 missing =u= cells replaced; attrs and all other cells are equal.
+Cold Country time was 13.681 seconds; a fresh-process normal warm read took 1.532 seconds and changed no parquet bytes or mtimes.
+Script-path wave parquets remain hashless by existing design; the country parquet is hash-stamped with the declared all-wave coverage manifest.
+
+The healthy unit comparator is the held, rebuilt Uganda cache from the frozen Ethiopia lane, whose Uganda configuration matches the release baseline.
+Its current hash grades fresh, its 84,216-row full frame equals that lane's reference, and it has zero missing/blank units.
+All 26 copied Uganda parquets remain byte-identical.
+This is a unit-health comparator, not a claim that Uganda has no unrelated audit warnings.
+Normal =Feature('plot_inputs')(['Tanzania', 'Uganda'])= returns all 93,914 rows.
+Each complete country part equals the matching ordinary Country call, accounting explicitly for declared crop-to-j aliases, sentinel levels and the default Feature currency-index option.
+The complete before/after Feature data, index, ordering and dtypes are exact because Feature already filled missing units.
+Its sole attrs change is =canonical_alignment.promoted.Tanzania.u= from 408 to 0; every other attribute is exact.
+
+The final 16 new synthetic tests pass.
+The wider scoped selection passed 243 tests before three additional quantity parameters were added to the new tests; =make api-audit= also passed.
+Against the immutable old helper the final tests produce 14 expected failures and two unchanged-behavior passes.
+A private early-fill mutant fails the duplicate missing-first/known-later control, demonstrating why placement matters.
+No fixtures, goldens or dependencies changed.
+
+All 549 country/table hashes and all 39 framework fingerprints were compared in fresh processes.
+Exactly Tanzania's 25 country hashes change because the country module is a declared build input; zero other-country hashes or framework fingerprints change.
+The public cold proof therefore includes a genuine rebuild of the unchanged sample prerequisite, including 2008-15, rather than silently trusting its old hash.
+
+The complete scoped scanner ran phases 1 and 2 for Tanzania/Uganda plot_inputs.
+It emits 11 warnings and no failures or errors; plot_inputs has no phase-2 kwarg-grid entries.
+Every finding is classified in =verification.json=:
+
+- Tanzania null crop key: two runtime findings plus one diagnostic warning; 2,830 plot-level non-seed rows deliberately have no crop.
+- Uganda pre-finalization null keys and cross-wave cluster identity: two runtime findings each, unchanged comparator evidence.
+- Extra API-joined =v= relative to the country scheme: one diagnostic warning per country.
+- Declared canonical Feature alignment: one runtime warning, with no row loss.
+- Undocumented 2020-21 Tanzania population statement: one runtime warning; the population metadata is unchanged.
+
+These findings are retained and accounted for, not filtered to make the run green.
+Raw rows, individual IDs, complete warnings, logs and group frames remain private.
+
+* Residuals and dispatcher text
+
+For #637, reconcile this additional evidence against the live issue rather than filing a duplicate:
+
+#+begin_quote
+Held 2020-21 Tanzania long-rainy-season seed data contain six canonical Seed/Pulses duplicate groups with conflicting recorded total units: two bucket/kg, one bucket/small cup, two kg/large cup, one kg/small cup.
+The existing country helper sums quantities and keeps the first nonmissing unit, so those incommensurable groups remain a grain/unit defect.
+The scoped #1118 normalization leaves all six full helper and Country group frames, including attrs, unchanged; 14 raw member records and group identities remain private.
+There are no conflicting known-unit duplicate groups in held 2019-20 data.
+#+end_quote
+
+#1118 remains open outside this Tanzania correction: its other-country missing-unit and label-curation cells were not changed or remeasured here.
+Historical issue percentages or counts for other countries are not a current cross-country census.
+The separate #637 duplicate policy, live WAITING #114, null crop keys and missing population documentation remain explicit residuals.
+
+* Reproduction
+
+Private evidence root in this allocation is =/local/job40255479/control/isa-backlog-20261021/Tanzania/1118=.
+The tracked =source_oracle.py= and =verify_api.py= contain no raw records and require existing private held inputs/reference frames; they do not acquire sources.
+Set =TASK_EVIDENCE= to that root and =ISA_CHECKOUT= to the exact Tanzania checkout.
+Run from the checkout, using the mounted image Python and the private =offline/sitecustomize.py= guard:
+
+#+begin_src sh
+export ISA_CHECKOUT=/local/job40255479/worktrees/isa-Tanzania
+export TASK_EVIDENCE=/local/job40255479/control/isa-backlog-20261021/Tanzania/1118
+cd "$ISA_CHECKOUT"
+export PATH=/local/job40255479/venv_img/bin:$PATH
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHONPATH="$ISA_CHECKOUT:$TASK_EVIDENCE/offline"
+export LSMS_COUNTRIES_ROOT="$ISA_CHECKOUT/lsms_library/countries"
+export LSMS_DATA_DIR="$TASK_EVIDENCE/public-proof-data"
+export LSMS_ISSUES_LOG="$TASK_EVIDENCE/issues-reproduce.log"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+export LSMS_BUILD_WORKERS=1
+python slurm_logs/isa_backlog_2026-10-21/1118-Tanzania/source_oracle.py > "$TASK_EVIDENCE/reproduce-source.log" 2>&1
+python slurm_logs/isa_backlog_2026-10-21/1118-Tanzania/verify_api.py warm > "$TASK_EVIDENCE/reproduce-warm.log" 2>&1
+python bench/feature_audit/scan.py --features plot_inputs --countries Tanzania Uganda --phases 1,2 --jobs 1 --out "$TASK_EVIDENCE/reproduce-audit.jsonl" > "$TASK_EVIDENCE/reproduce-audit.log" 2>&1
+python -m pytest -q -n 4 --dist=loadfile -m 'not requires_s3' tests/test_1118_tanzania_plot_input_units.py tests/test_962_unit_sentinel.py tests/test_feature_canonical_index.py tests/test_863_transforms.py tests/test_867_nitrogen_content.py > "$TASK_EVIDENCE/reproduce-tests.log" 2>&1
+#+end_src
+
+For a repeated cold proof, use a new physically private =LSMS_DATA_DIR= with verified copies of the seven listed L1 blobs and the 26 Uganda comparator parquets, no Tanzania parquets, then run =verify_api.py cold= followed by =verify_api.py warm= in separate processes.
+Keep the private baseline/reference pickles in =TASK_EVIDENCE=; neither shared caches nor repository raw-data directories are writable verification targets.
+
+Sue

@@ -1,0 +1,1 @@
+cbb52e0ae Niger: every country concatenator refuses a missing wave (GH #1123 ext.)

@@ -1,0 +1,15 @@
+{
+  "scope": "precision-supplement",
+  "status": "READY_ADDITIVE_METADATA_PRECISION_ONLY_OLD_FAILURES_PRESERVED",
+  "pins": {
+    "precision-supplement-full-manifest-private.json": "ce11931191354bbf6554b07a37c3c176b0d8d820b97cd9e34338a68a278e6782",
+    "precision-supplement-postexit-private.json": "aaf5b9b9d1260e0059a881dbf86a54f6d34becc69b9b6b40061b65557ae7b286",
+    "precision-supplement-safe-allowlist.json": "5e7c26b6ef79947520dc1a196899821e4c4e721ffd33d0c7f7ced55512c67dde"
+  },
+  "final_safe_sha256": "3b0f3ab8d7cd35a42d2ad4262d58acbf4768e8b72a9cb884e0d81800473656e9",
+  "packager_terminal_exit": 0,
+  "postexit_terminal_exit": 0,
+  "remaining_consumers": 0,
+  "signed": "Sue",
+  "original_private_READY_sha256": "ef2077d0f19f8ad33f08e7bd1bf299b5b8fdef0b12be7fe002e4e43a63c508b6"
+}

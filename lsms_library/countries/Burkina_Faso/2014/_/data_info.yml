@@ -2,7 +2,20 @@ Country: Burkina Faso
 Wave: 2014
 
 sample:
-    file: emc2014_welfare.dta
+    # GH #1464.  emc2014_welfare.dta holds 10,411 of the 10,800 households of the p1
+    # roster and food files, so the other 389 had no `v` anywhere that joins from here.
+    # The p1 food file records all 10,800, at item grain, with zd, menage, milieu and
+    # strate.  It has no `hhweight`: under a file list a missing column arrives NaN, so
+    # the 389 get `weight` and `panel_weight` NA.  Its `hhweight1` is a passage weight
+    # and is deliberately NOT read (@ligon's ruling).  mapping.py's `sample` hook keeps
+    # the welfare rows as they are and first, and appends one row per added household.
+    file:
+        - emc2014_welfare.dta
+        - emc2014_p1_conso7jours_16032015.dta:
+            i:
+                - zd
+                - menage
+            v: zd
     idxvars:
         i:
             - grappe
@@ -145,8 +158,15 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 NA: False
-        AffectedConsumption:
+        AffectedFoodStock:
             - CS3D
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                NA: False
+        AffectedConsumption:
+            - CS3E
             - mapping:
                 Diminué: True
                 Augmenté: True
@@ -230,9 +250,25 @@ food_acquired:
             - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
         u: uachat
     myvars:
+        # THREE DISJOINT BLOCKS, EACH WITH ITS OWN QUANTITY AND UNIT (GH #864;
+        # Questionnaire_EMC_2014_Passage_1.pdf section C, and the file's own
+        # variable labels "Quantite / Unite / Montant en fcfa C04 | C05 | C06"):
+        #   C04 purchases consumed      qachat    / uachat    / achat
+        #   C05 own production          qautocons / uautocons / autocons
+        #   C06 gift / in-kind / barter qcadeau   / ucadeau   / cadeau
+        # `Quantity` is C04's purchased quantity, NOT a total: 2014/_/mapping.py
+        # serves each block on its own `s` row in its own unit, and never
+        # subtracts one block from another (@ligon ruling, 2026-11-03).
+        # `Expenditure` is C04's `achat` (ruling iv); the C02 `mtt_dep` and
+        # the C05 / C06 values (`autocons`, `cadeau`) are not read.  Only
+        # passage 1 fields the quantity grid; in passages 2-4 these columns
+        # do not exist and arrive NaN.
         Quantity: qachat
         Expenditure: achat
         Produced: qautocons
+        ProducedUnit: uautocons
+        GiftQuantity: qcadeau
+        GiftUnit: ucadeau
         # Passage 1 (the un-overridden default; see the `file:` list below).
         visit:
             - zd

@@ -1,0 +1,11 @@
+[
+  {
+    "country": "Mali",
+    "feature": "community_prices",
+    "wave": "2014-15",
+    "tier": "sane",
+    "coverage": "declared",
+    "n_rows": 155931,
+    "detail": "warn: has_household_index"
+  }
+]

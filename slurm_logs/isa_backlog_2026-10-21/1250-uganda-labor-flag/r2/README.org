@@ -1,0 +1,112 @@
+#+title: GH #1250 follow-up -- serve wage-only hired rows (ruling @ligon, 2026-10-23)
+
+Aggregates only; no row-level data is committed (the repo is public).  The
+cold-built frames and the oracle's wage-only rows stayed in a session
+scratchpad.
+
+* Ruling and rule
+"Serve wage-only hired rows, following Malawi's precedent: a hired row is kept
+on its reported wage, with =PersonDays= NaN."  Malawi's rule is
+=Malawi/_/malawi.py:3766-3767=:
+#+begin_src python
+out = out[out['PersonDays'].notna() & (out['PersonDays'] > 0)
+          | (out['source'] == 'hired') & out['Wage'].notna()]
+#+end_src
+Uganda adopts the wage disjunct only.  =plot_labor_for_wave= now keeps
+=PersonDays.notna() | (source == 'hired' & Wage.notna())=.  Malawi's
+=PersonDays > 0= half is not adopted, because Uganda serves a "No" flag's zero
+as a reported value (#1250).  Family and other rows keep the days-only rule;
+they carry no wage.
+
+* Setup
+- base :: detached worktree at =90fc1e18d= (the PR head before this commit)
+- branch :: =fix/1250-uganda-labor-flag-20261023= with the follow-up
+- Each side had its own fresh =LSMS_DATA_DIR= under
+  =/local/job40390255/data-private/1250-r2/= (only =dvc-cache= symlinked), its
+  own =PYTHONPATH=, and an import-identity assert.  Settings were
+  =OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 LSMS_BUILD_WORKERS=1= under
+  =nice -n 19=.  Afterwards =find lsms_library/countries -name '*.parquet'=
+  returns 0 in both worktrees.
+
+* Files
+- =../build_plot_labor.py= (reused) -> =build_{base,branch}.json= :: a cold
+  =Country('Uganda').plot_labor()=, giving shape, Site I and warnings.
+- =site_reports.py= -> =sites_{base,branch}.json= :: a warm read in a fresh
+  process.  Sites B, Q and I run in =_finalize_result= on every read.
+- =oracle_r2.py= -> =oracle_r2.json= :: the raw-source oracle.  It reads
+  AGSEC3A/3B and classifies each hired row by its raw float flag, day cells and
+  wage.  It emulates the old and new keep rules, including the final
+  =groupby(dropna=False).max()=, and development's missing-flag-as-0 gate.
+- =compare_r2.py= -> =compare_r2.json= :: base vs branch, joined to the
+  oracle's wage-only rows.  It also covers the downstream transforms.
+- =census_diff.py= -> =hash-impact-vs-{dev,base}.json= :: diffs of
+  =../../1218-current-validation/hash_census.py= run on development
+  =9a0ed5f3c=, on base =90fc1e18d= and on the branch.
+
+* Headline (all measured)
+| quantity                                         | base 90fc1e18d | follow-up |
+|--------------------------------------------------+----------------+-----------|
+| rows                                             | 164,692        | 164,777   |
+| added / removed                                  |                | 85 / 0    |
+| common-key changes (=PersonDays=, =Wage=, =v=)   |                | 0 / 0 / 0 |
+| added keys = oracle wage-only keys (join)        |                | 85 = 85   |
+| added: =PersonDays= NaN, hired, raw wage matched |                | 85 / 85 / 85 |
+| added: NaN =plot_id= / NaN =v=                   |                | 0 / 0     |
+| wage-only rows folded into an existing key       |                | 0         |
+| Site I NaN =plot_id= / NaN =v=                   | 95 / 1,218     | 95 / 1,218 |
+| Site B / Site Q reports                          | 0 / 0          | 0 / 0     |
+
+Added rows by cell and class (raw flag x wage):
+| wave, season | "Yes" | missing | wage 0 (all "Yes") | total |
+|--------------+-------+---------+--------------------+-------|
+| 2009-10 A    |    36 |       2 |                  0 |    38 |
+| 2009-10 B    |    26 |       3 |                  0 |    29 |
+| 2010-11 A    |     7 |       0 |                  1 |     7 |
+| 2010-11 B    |     9 |       2 |                  1 |    11 |
+| total        |    78 |       7 |                  2 |    85 |
+
+- The 7 missing-flag rows are the ones the first #1250 commit dropped (414,000
+  UGX); development had served them as fabricated zeros.  Neither development
+  nor =90fc1e18d= ever served the 78 "Yes" rows.  Wages total 6,062,000 UGX.
+- No off-scheme flag code (2009-10's 0 and 3) has a wage-only row, and no wave
+  after 2010-11 has one.
+- "No" + wage: 17 raw rows (12 with day cells that the "No" zeroes; 456,700
+  UGX).  They are served with =PersonDays = 0= and their wage both before and
+  after, which agrees with Malawi.
+
+* Downstream
+- =total_labor_days= / =total_family_labor_days= / =total_hired_labor_days=:
+  =assert_frame_equal= passes on all three (16,442 / 11,700 / 16,438
+  household rows; 3,054,802 days).
+- Median-wage valuation of hired days.  No library =hired_labor_value= wrapper
+  exists, so this calls =median_price_valuation= with =value_col='Wage'=,
+  =kg_qty=PersonDays=, =quantity_col='PersonDays'=, ladder =v= -> national and
+  =item_keys=('t',)=.  The price pool is 21,513 rows on both sides.
+  =_unit_price= and =Value= are unchanged on all 92,002 common hired rows.  The
+  85 new rows get a ladder price and a NaN =Value=.  The per-wave value sums are
+  identical; the all-wave sum differs in its last float digit
+  (1,092,039,579.0053077 vs ...0053080), from summing with NaNs present.
+
+* Tests
+- =tests/test_uganda_plot_labor_flag.py= gains =test_wage_only_hired_rows_are_served=
+  (synthetic: Yes / missing / zero-wage / off-scheme flag; "No" + wage; family
+  unaffected) and =test_every_reported_hired_wage_is_served= (data-gated, all
+  seven waves, raw oracle).  On =90fc1e18d= (file copied in temporarily):
+  *3 failed, 11 passed*.  The failures are the synthetic test and 2009-10 (67)
+  and 2010-11 (18).  On the branch: *14 passed*.
+- Uganda + plot_labor selection, 28 files (=tests/test_uganda_*.py=,
+  =tests/test_gh*_uganda_*.py=, =test_id_format_id_canonical.py=,
+  =test_feature_canonical_index.py=, =test_feature_audit_participation.py=,
+  =test_ghanasps_plot_labor.py=, =test_mali_plot_labor_source.py=,
+  =test_gh866_stale_country_parquet_not_laundered.py=,
+  =test_niger_2014_15_extension_key.py=, =test_median_price_valuation.py=).
+  Run with =-n 3 --dist=loadfile=, each side in its own data dir:
+  - =90fc1e18d=: 537 passed, 91 skipped, 0 failed
+  - follow-up: 545 passed (+8 new), 91 skipped, 0 failed.  The skips are
+    cache- or replication-gated ("prerequisites not cached", "Parquet not
+    built", the replication dir).
+
+* Hash census
+Uganda only, against development =9a0ed5f3c= and against =90fc1e18d=: 28/28
+Uganda L2-country, 224/224 Uganda L2-wave, 0/40 =build_transforms_fingerprint=;
+no other country moved.

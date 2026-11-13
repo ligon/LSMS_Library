@@ -11,25 +11,44 @@ Wave: 2014-15
 # Every 2014-15 source file carries EXTENSION (checked file by file).
 
 sample:
-    file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2014welfare_T1c.dta
-    idxvars:
-        i:
-            - GRAPPE
-            - MENAGE
-            - EXTENSION
-    myvars:
-        v: GRAPPE
-        weight: hhweight
-        panel_weight: hhweight
-        Rural:
-            - urbrur
-            - mapping:
-                Rural: Rural
-                rural: Rural
-                RURAL: Rural
-                Urbain: Urban
-                urbain: Urban
-                URBAIN: Urban
+    # GH #812.  The welfare file has no `strate`; the consumption file records it,
+    # at household x product x mode grain.  `df_strate` in mapping.py reduces it to
+    # one row per grappe and refuses a grappe that holds two.
+    dfs:
+        - df_welfare
+        - df_strate
+    df_welfare:
+        file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2014welfare_T1c.dta
+        idxvars:
+            v: GRAPPE
+            i:
+                - GRAPPE
+                - MENAGE
+                - EXTENSION
+        myvars:
+            weight: hhweight
+            panel_weight: hhweight
+            Rural:
+                - urbrur
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbain: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_strate:
+        file: NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2014_P1P2_Conso.dta
+        idxvars:
+            v: GRAPPE
+        myvars:
+            strata: strate
+    merge_on:
+        - v
+    merge_how: left
+    final_index:
+        - i
+        - t
 
 # panel_ids is constructed at the country level by
 # Niger/_/panel_ids.py (declared as !make in data_scheme.yml).
@@ -120,8 +139,16 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Manquant: False
-        AffectedConsumption:
+        AffectedFoodStock:
             - MS10Q04D
+            - mapping:
+                Dimunié: True
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Manquant: False
+        AffectedConsumption:
+            - MS10Q04E
             - mapping:
                 Dimunié: True
                 Diminué: True

@@ -1,0 +1,12 @@
+{
+  "unmanifested_raw_seed_files_not_copied": 16,
+  "l2_files": 1519,
+  "l2_bytes": 341221428,
+  "declared_unique_source_keys": 3814,
+  "held_copied_sources": 2733,
+  "absent_sources_not_fetched": 1081,
+  "held_source_bytes": 11729400989,
+  "physical_private_copies": true,
+  "source_fetches": 0,
+  "seconds": 70.04082349408418
+}

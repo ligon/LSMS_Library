@@ -14,15 +14,21 @@
 # `v` is the composite `state/lga/ea` built from raw codes (CONTENTS.org,
 # "Cluster (PSU) identifier"), and a real EA keeps it -- EXCEPT where the raw
 # LGA code of a whole EA changes between waves (1 EA at 2018Q3, 12 at 2023Q3;
-# measured 2026-10-19, see those entries), which renumbers that cluster's
-# composite `v` and is declared `wave-scoped` (partial).  Otherwise what
-# changes across a PH -> PP boundary is the households that MOVED:
-# the survey records them with `ea == 0`, and the library gives each its own
-# singleton `v = moved-{hhid}` rather than a fake pooled cluster.  So a mover
-# has a different `v` in each round by design, not because an EA was
+# measured 2026-10-19 on the covers, see those entries), which renumbers that
+# cluster's composite `v` and is declared `wave-scoped` (partial).  Otherwise
+# what changes across a boundary, PP -> PH included, is the households that
+# MOVED: the survey records them with `ea == 0`, and the library gives each its
+# own singleton `v = moved-{hhid}` rather than a fake pooled cluster.  So a
+# mover's `v` changes when it moves, by design, not because an EA was
 # renumbered.  (Whether a mover's DESIGN cluster is its original EA -- the
 # BID pins its weight there -- is DESIGN.org Q7, `cluster_reference`, not
 # decided.)
+#
+# Every "N of M linked households" below counts the links of the committed
+# crosswalk `_/panel_ids.json` (GH #1264: both ends interviewed, each round's
+# own cover) and compares `v` in Country("Nigeria").sample() at the two ends.
+# Re-measured 2026-11-04 (GH #1448); tests/test_gh1448_nigeria_sampling_notes.py
+# recomputes them.  An EA's household count is a cover fact and is stated as one.
 
 Sampling:
 
@@ -31,61 +37,65 @@ Sampling:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit of the 2010Q3 households.  Measured: 5,000 of
-        5,000 linked households keep `v` (500 EAs, one-to-one).
+        Post-harvest revisit of the 2010Q3 households.  Over the GH #1264
+        crosswalk, 4,916 of 4,916 linked households keep `v` (500 EAs).
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Nigeria rows); re-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Nigeria rows); CONTENTS.org, "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2012Q3':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Measured: 4,707 of 4,859 linked households (96.9%) keep `v`; the rest
-        are tracked movers given a singleton `moved-{hhid}` (152 in W2), not
-        renumbered EAs.
+        Over the GH #1264 crosswalk, 4,560 of 4,702 linked households (97.0%)
+        keep `v`; the other 142 are tracked movers given a singleton
+        `moved-{hhid}`, not renumbered EAs.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel); re-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel), "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2013Q1':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit.  Measured: 4,859 of 4,859 linked households keep
-        `v`.
+        Post-harvest revisit.  Over the GH #1264 crosswalk, 4,699 of 4,716
+        linked households (99.6%) keep `v`; the other 17 are movers, not
+        renumbered EAs: 15 newly given a singleton `moved-{hhid}` and 2 back on
+        an EA from one.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2015Q3':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Measured: 4,437 of 4,597 linked households (96.5%) keep `v`; the rest
-        are tracked movers given a singleton `moved-{hhid}` (306 in W3).
+        Over the GH #1264 crosswalk, 4,391 of 4,523 linked households (97.1%)
+        keep `v`; the other 132 are tracked movers given a singleton
+        `moved-{hhid}`, not renumbered EAs.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel); re-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel), "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2016Q1':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit.  Measured: 4,696 of 4,696 linked households keep
-        `v`.
+        Post-harvest revisit.  Over the GH #1264 crosswalk, 4,541 of 4,582
+        linked households (99.1%) keep `v`; the other 41 are movers given a
+        singleton `moved-{hhid}`, not renumbered EAs.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2018Q3':
     panel:
@@ -96,51 +106,87 @@ Sampling:
         changed, so its composite `v` changes (16/1624/136 -> 16/1622/136,
         neither id occurring in the other wave); every other EA keeps its id.
         W4 is a partial refresh: 360 new EAs plus a 159-EA "long panel" of the
-        2010 sample (BID, quoted in CONTENTS.org).  Measured over the
-        long-panel households: 1,414 of 1,493 (94.7%) keep `v`; of the 79 that
-        change, 69 are movers' `moved-{hhid}` singletons and 10 are that EA.
+        2010 sample (BID, quoted in CONTENTS.org).  Over the GH #1264 crosswalk,
+        which links long-panel households only, 1,400 of 1,454 linked households
+        (96.3%) keep `v`; of the 54 that change, 44 are movers' `moved-{hhid}`
+        singletons and 10 are that EA.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'CONTENTS.org, "Sub-samples: refresh and long panel"; re-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Sub-samples: refresh and long panel", "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
+      cluster_id_measurement:
+        linked_households: 1454
+        households_changed: 54
+        clusters_renumbered: 1
+        note: |-
+          Historical measurement recorded 2026-11-04 (GH #1448), over the
+          GH #1264 interviewed-household crosswalk. Copied from the committed
+          panel note for this port; not remeasured or a current-accuracy claim.
+          households_changed includes movers and all other causes of change.
+          Net of movers is unknown: no settled count or mover rule is recorded
+          for this linked-household population. Earlier marker-dependent
+          measurements describe a different population and are not carried
+          forward.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'lsms_library/countries/Nigeria/_/sampling.yml at 79f5979cf8022e64928c5150950dfb00456994da, 2018Q3 panel.cluster_id_note and panel.locator (recorded 2026-11-04, GH #1448 over GH #1264 crosswalk); lsms_library/countries/Nigeria/_/CONTENTS.org at the same commit, "Panel crosswalk rebuilt" and "sampling.yml counts these links"'
 
   '2019Q1':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit.  Measured: 5,263 of 5,263 linked households keep
-        `v`.
+        Post-harvest revisit.  Over the GH #1264 crosswalk, 4,947 of 4,980
+        linked households (99.3%) keep `v`; the other 33 are movers given a
+        singleton `moved-{hhid}`, not renumbered EAs.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2023Q3':
     panel:
       household_continuity: panel
       cluster_id_continuity: wave-scoped
       cluster_id_note: |-
-        Partial: 12 EAs (112 households) have their raw LGA code changed, so
-        their composite `v` changes whole (21/2111/260 -> 21/2112/260,
-        5/509/1064 -> 5/508/1064, ...; no old id occurs in W5 and no new id in
-        W4); every other EA keeps its id.  W5 revisits both W4 sub-samples
-        (long panel and refresh).  Measured: 4,724 of 5,067 linked households
-        (93.2%) keep `v`; of the 343 that change, 231 are movers'
-        `moved-{hhid}` singletons and 112 are those 12 EAs.
+        Partial: 12 EAs have their raw LGA code changed, so their composite
+        `v` changes whole (21/2111/260 -> 21/2112/260, 5/509/1064 -> 5/508/1064,
+        ...; no old id occurs in W5 and no new id in W4); every other EA keeps
+        its id.  W5 revisits both W4 sub-samples (long panel and refresh).  Over
+        the GH #1264 crosswalk, 4,469 of 4,736 linked households (94.4%) keep
+        `v`; of the 267 that change, 179 are movers' `moved-{hhid}` singletons
+        and 88 are in 10 of those EAs.  On the two covers the 12 EAs hold 112
+        households; two of them hold no linked household.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'CONTENTS.org, "Sub-samples: long panel (1,590 -> 1,376) and refresh"; re-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Sub-samples: long panel (1,590 -> 1,376) and refresh", "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
+      cluster_id_measurement:
+        linked_households: 4736
+        households_changed: 267
+        note: |-
+          Historical measurement recorded 2026-11-04 (GH #1448), over the
+          GH #1264 interviewed-household crosswalk. Copied from the committed
+          panel note for this port; not remeasured or a current-accuracy claim.
+          households_changed includes movers and all other causes of change.
+          The 12 EAs (112 households) on the covers and the 10 EAs with 88
+          linked households do not establish the one-to-one renumbering count;
+          clusters_renumbered remains unknown. Net of movers is also unknown:
+          no settled count or mover rule is recorded for this population.
+          Earlier counts and marker-dependent bounds are not carried forward.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'lsms_library/countries/Nigeria/_/sampling.yml at 79f5979cf8022e64928c5150950dfb00456994da, 2023Q3 panel.cluster_id_note and panel.locator (recorded 2026-11-04, GH #1448 over GH #1264 crosswalk); lsms_library/countries/Nigeria/_/CONTENTS.org at the same commit, "Panel crosswalk rebuilt" and "sampling.yml counts these links"'
 
   '2024Q1':
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit.  Measured: 5,067 of 5,067 linked households keep
-        `v`.
+        Post-harvest revisit.  Over the GH #1264 crosswalk, 4,686 of 4,717
+        linked households (99.3%) keep `v`; the other 31 are movers given a
+        singleton `moved-{hhid}`, not renumbered EAs.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 're-measured 2026-10-19 through Country("Nigeria").sample()'
+      locator: 'CONTENTS.org, "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'

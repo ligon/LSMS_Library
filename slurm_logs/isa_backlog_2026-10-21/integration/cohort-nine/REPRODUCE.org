@@ -1,0 +1,26 @@
+#+title: Nine-fix ISA integration cohort
+#+author: Sue
+#+date: 2026-10-21
+
+The validation-only head =483b4aa117c2c05ac00bf023adab97e47782df46= combines reviewed PRs #1172, #1173, #1175, #1176, #1178, #1180, #1181, #1182 and #1185.
+The 18-file selection passed all 656 cases with zero skips, failures or errors; the launcher measured 270.243 seconds and pytest measured 268.72 seconds.
+Tracked contents/modes, HEAD and clean status remained unchanged.
+This result is distinct from the preceding eight-fix credential-free suite and six-fix source-backed cohort.
+
+The test data root is the physically private integration copy described in the parent =REPRODUCE.org=.
+Before this run, 91 completed-study held blobs were rechecked against their MD5 keys; all were already present, so no additional copy or source acquisition was needed.
+The run used eight loadfile workers, single numerical/build/Make threads, matching checkout/config realpaths, =LSMS_SKIP_AUTH=1=, the active inherited socket guard and =unshare -rn=.
+Existing reader-credential availability enabled the marked held-source tests; the network guard prevented remote IO.
+
+Exactly two all-country corpus cases, =plot_labor= and =plot_inputs= under =test_warm_corpus_plot_table_assembly_keeps_every_country_and_row=, are explicitly deselected because they require every supported country rather than this held ISA cohort.
+All synthetic canonical-index guards remain included.
+The launcher's prose incorrectly said three excluded cases; =scope-correction.json= records the two-case parameterization.
+The executed command and test result are unchanged.
+
+=launch.json= records the complete exact argv, including all 18 filenames and the explicit node exclusion.
+To replay, use a clean checkout at the pinned head, matching private data/config roots and the parent report's offline environment.
+Run the recorded pytest arguments with the mounted interpreter, replacing private output/temp paths with a new evidence directory.
+The original private launcher is =control/isa-backlog-20261021/integration/run_cohort_nine.py=, terminal exec session =62910=; its full log and JUnit XML remain private under =integration/cohort-nine/=.
+The separate combined normal-API full-frame review is still pending and is not implied by this pytest result.
+
+Sue

@@ -1,0 +1,18 @@
+Historical command forms; the frozen prefix must remain immutable.
+P denotes this independent private evidence prefix. Each source pins its exact paths.
+
+python3 -B -S "$P/run-released-v2.py" candidate tests-candidate-v2 synthetic-tests-v2.py control
+python3 -B -S "$P/run-released-v2.py" base tests-base-v2 synthetic-tests-v2.py control
+python3 -B -S "$P/run-released-v2.py" candidate tests-supporting synthetic-tests-v2.py supporting
+python3 -B -S "$P/run-data-released-v2.py" candidate-default prepare-providers-v1 prepare-providers-v1.py
+python3 -B -S "$P/run-data-released-v2.py" candidate-default own-source-oracle-v1 source-oracle-v1.py
+
+The eight grid launches use run-data-released-v2.py, each exact root name,
+grid-<root>-<cold|warm>-v1, data-grid-v1.py and the matching cold|warm argument.
+The two Default scanners use scanner-v1.py. Saved-operand proof uses compare-v1.py;
+the separate NEW empty proof uses run-data-released-v3.py and compare-empty-v1.py.
+All original Popen/source/env/runtime/guard/boot/terminal receipts are private.
+These commands are historical evidence, not authorization to rerun frozen actors.
+Sue (GPT-6)
+
+Additive metadata lifecycle uses run-lifecycle-v2.py with seal-v2 then postexit-v2; the original v1 failed source and streams remain private.

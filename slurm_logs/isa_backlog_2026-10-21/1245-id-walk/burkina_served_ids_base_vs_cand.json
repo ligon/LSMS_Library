@@ -1,0 +1,105 @@
+{
+ "expected_moved_households": 80,
+ "sample": {
+  "rows": [
+   20648,
+   20648
+  ],
+  "non_2021_22_identical": true,
+  "hh_2021_22": [
+   3227,
+   3227
+  ],
+  "cand_ids_equal_prediction": true,
+  "ids_only_in_base": 77,
+  "ids_only_in_cand": 77,
+  "dup_index_cand": 0,
+  "dup_index_base": 0,
+  "rows_2021_22_equal_after_remap": true
+ },
+ "household_roster": {
+  "rows": [
+   146517,
+   146517
+  ],
+  "non_2021_22_identical": true,
+  "hh_2021_22": [
+   3227,
+   3227
+  ],
+  "cand_ids_equal_prediction": true,
+  "ids_only_in_base": 77,
+  "ids_only_in_cand": 77,
+  "dup_index_cand": 0,
+  "dup_index_base": 0,
+  "rows_2021_22_equal_after_remap": true
+ },
+ "food_acquired": {
+  "rows": [
+   765816,
+   765816
+  ],
+  "non_2021_22_identical": true,
+  "hh_2021_22": [
+   3216,
+   3216
+  ],
+  "cand_ids_equal_prediction": true,
+  "ids_only_in_base": 77,
+  "ids_only_in_cand": 77,
+  "dup_index_cand": 0,
+  "dup_index_base": 0,
+  "rows_2021_22_equal_after_remap": true
+ },
+ "food_quantities": {
+  "rows": [
+   316441,
+   316441
+  ],
+  "non_2021_22_identical": true,
+  "hh_2021_22": [
+   3216,
+   3216
+  ],
+  "cand_ids_equal_prediction": true,
+  "ids_only_in_base": 77,
+  "ids_only_in_cand": 77,
+  "dup_index_cand": 0,
+  "dup_index_base": 0,
+  "rows_2021_22_equal_after_remap": true
+ },
+ "plot_features": {
+  "rows": [
+   19784,
+   19784
+  ],
+  "non_2021_22_identical": true,
+  "hh_2021_22": [
+   2110,
+   2110
+  ],
+  "cand_ids_equal_prediction": true,
+  "ids_only_in_base": 62,
+  "ids_only_in_cand": 62,
+  "dup_index_cand": 0,
+  "dup_index_base": 0,
+  "rows_2021_22_equal_after_remap": true
+ },
+ "assets": {
+  "rows": [
+   112951,
+   112951
+  ],
+  "non_2021_22_identical": true,
+  "hh_2021_22": [
+   3214,
+   3214
+  ],
+  "cand_ids_equal_prediction": true,
+  "ids_only_in_base": 77,
+  "ids_only_in_cand": 77,
+  "dup_index_cand": 2013,
+  "dup_index_base": 2013,
+  "rows_2021_22_equal_after_remap": true
+ }
+}

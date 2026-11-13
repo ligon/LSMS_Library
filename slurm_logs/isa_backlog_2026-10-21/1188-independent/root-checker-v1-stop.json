@@ -1,0 +1,11 @@
+{
+  "status": "ROOT_METADATA_REPRESENTATION_ASSERTION_STOP",
+  "session_id": 8414,
+  "initial_chunk": "d3270f",
+  "terminal_chunk": "5a903b",
+  "exit_code": 1,
+  "cause": "Root checker expected original151matrix_unchanged literal True, but saved field is a stronger explicit151/111/40count mapping. v2 asserts that exact mapping.",
+  "completed_before_stop": "All1045payload hashes/physical/set,29788source receipts,6provider+24copyMD5SHA/magic/physical,tests/grid terminals and151strict counts passed.",
+  "product_API_or_data_decoding_replayed": false,
+  "signed": "Sue"
+}

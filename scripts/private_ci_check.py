@@ -1,0 +1,259 @@
+"""Run a credentialed CI command without publishing its output.
+
+The hosted Windows runner supplies its user-temp/profile ACL. On POSIX we also
+set explicit owner-only modes. This is an Actions output boundary, not isolation
+from other processes running as the same user (ledger #1294, sections 3-4).
+"""
+from __future__ import annotations
+
+import argparse
+import ast
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import tempfile
+import warnings
+import xml.etree.ElementTree as ET
+
+
+_STAGES = ("data-prebuild", "data-tests", "windows-script-build")
+_MAX_XML_BYTES = 16 * 1024 * 1024
+_MAX_SOURCE_BYTES = 1024 * 1024
+_MAX_PUBLIC_LOCATIONS = 32
+_PUBLIC_TEST_PATH = re.compile(r"tests/(?:[A-Za-z0-9_]+/)*test_[A-Za-z0-9_]+\.py")
+_PUBLIC_NAME = re.compile(r"test[A-Za-z0-9_]*")
+_CLASSNAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")
+
+
+class _PrivateParser(argparse.ArgumentParser):
+    def error(self, message: str) -> None:
+        # argparse's normal error includes caller-controlled argument text.
+        raise ValueError("invalid arguments")
+
+
+def _junit_root(path: Path):
+    """Bound private XML parsing; never forward content or parse exceptions."""
+    try:
+        if path.is_symlink() or path.stat().st_size > _MAX_XML_BYTES:
+            return None
+        with path.open("rb") as source:
+            content = source.read(_MAX_XML_BYTES + 1)
+        if len(content) > _MAX_XML_BYTES or b"<!DOCTYPE" in content.upper():
+            return None
+        root = ET.fromstring(content)
+        if root.tag not in ("testsuite", "testsuites"):
+            return None
+        return root
+    except (OSError, ValueError, ET.ParseError):
+        return None
+
+
+def _junit_counts(path: Path) -> dict[str, int] | None:
+    """Read numeric outcomes; arbitrary XML identifiers/text remain private."""
+    root = _junit_root(path)
+    if root is None:
+        return None
+    try:
+        counts = dict(tests=0, passed=0, failures=0, errors=0, skipped=0)
+        for case in root.iter("testcase"):
+            counts["tests"] += 1
+            outcome = "passed"
+            for tag, category in (("error", "errors"), ("failure", "failures"),
+                                  ("skipped", "skipped")):
+                if case.find(tag) is not None:
+                    outcome = category
+                    break
+            counts[outcome] += 1
+        return counts
+    except (OSError, ValueError, ET.ParseError):
+        return None
+
+
+def _git(root: Path, *args: str) -> bytes | None:
+    """Read local Git metadata without hooks, output forwarding or network."""
+    try:
+        result = subprocess.run(
+            ["git", "--no-optional-locks", "-c", "core.fsmonitor=false",
+             "-C", str(root), *args], stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=2, check=False)
+        return result.stdout if result.returncode == 0 else None
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+
+
+def _source_head(root: Path) -> str | None:
+    raw = _git(root, "rev-parse", "--verify", "HEAD^{commit}")
+    if raw is None:
+        return None
+    value = raw.decode("ascii", errors="replace").strip()
+    return value if re.fullmatch(r"[0-9a-f]{40}", value) else None
+
+
+def _checked_in_tests(root: Path, revision: str, path: str):
+    """Only regular committed test blobs supply printable names, never imports."""
+    if not _PUBLIC_TEST_PATH.fullmatch(path) or len(path) > 240:
+        return None
+    entry = _git(root, "ls-tree", "-z", revision, "--", path)
+    if entry is None:
+        return None
+    records = entry.split(b"\0")
+    if len(records) != 2 or records[1]:
+        return None
+    fields, separator, found_path = records[0].partition(b"\t")
+    parts = fields.split()
+    if (not separator or len(parts) != 3 or parts[0] not in (b"100644", b"100755")
+            or parts[1] != b"blob" or found_path != path.encode("ascii")
+            or not re.fullmatch(b"[0-9a-f]{40}", parts[2])):
+        return None
+    blob = parts[2].decode("ascii")
+    size = _git(root, "cat-file", "-s", blob)
+    if size is None or not size.strip().isdigit() or int(size) > _MAX_SOURCE_BYTES:
+        return None
+    content = _git(root, "cat-file", "blob", blob)
+    if content is None or len(content) != int(size):
+        return None
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            module = ast.parse(content)
+    except (SyntaxError, ValueError, RecursionError):
+        return None
+    declared = set()
+    def collect(body, classes=()):
+        for item in body:
+            if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if len(item.name) <= 128 and _PUBLIC_NAME.fullmatch(item.name):
+                    declared.add((classes, item.name))
+            elif isinstance(item, ast.ClassDef):
+                collect(item.body, (*classes, item.name))
+    collect(module.body)
+    return declared
+
+
+def _junit_failure_locations(path: Path, root: Path, revision: str | None):
+    """Return only source-validated file/function identifiers and numeric counts.
+
+    Parameter IDs, classnames and all XML text are lookup inputs only. Missing,
+    ambiguous, dynamic, oversized or uncommitted identities are count-only.
+    """
+    document = _junit_root(path)
+    if document is None:
+        return None
+    cache, locations = {}, {}
+    unmapped = {"failures": 0, "errors": 0}
+    for case in document.iter("testcase"):
+        outcome = "errors" if case.find("error") is not None else (
+            "failures" if case.find("failure") is not None else None)
+        if outcome is None:
+            continue
+        matched = None
+        name = case.get("name", "").partition("[")[0]
+        classname = case.get("classname", "")
+        file = case.get("file")
+        if (revision is not None and re.fullmatch(r"[0-9a-f]{40}", revision)
+                and len(name) <= 128 and _PUBLIC_NAME.fullmatch(name)
+                and len(classname) <= 512
+                and (not classname or _CLASSNAME.fullmatch(classname))
+                and (file is None or (len(file) <= 240 and _PUBLIC_TEST_PATH.fullmatch(file)))):
+            components = classname.split(".") if classname else []
+            candidates = ([file] if file is not None else [
+                "/".join(components[:i]) + ".py" for i in range(1, min(len(components), 16) + 1)
+                if components[i - 1].startswith("test_")])
+            for candidate in candidates:
+                if not _PUBLIC_TEST_PATH.fullmatch(candidate):
+                    continue
+                module = candidate[:-3].split("/")
+                if components and components[:len(module)] != module:
+                    continue
+                classes = tuple(components[len(module):]) if components else ()
+                if candidate not in cache and len(cache) < _MAX_PUBLIC_LOCATIONS:
+                    cache[candidate] = _checked_in_tests(root, revision, candidate)
+                if (classes, name) in (cache.get(candidate) or ()):
+                    matched = (outcome, candidate, name)
+                    break
+        if matched is None or (matched not in locations and len(locations) >= _MAX_PUBLIC_LOCATIONS):
+            unmapped[outcome] += 1
+        else:
+            locations[matched] = locations.get(matched, 0) + 1
+    return locations, unmapped
+
+
+def _exit_status(returncode: int) -> int:
+    # subprocess uses negative signal numbers on POSIX; shells use 128+signal.
+    return 128 - returncode if os.name == "posix" and returncode < 0 else returncode
+
+
+def main(argv: list[str] | None = None) -> int:
+    stage = "ci-check"
+    counts = None
+    wants_junit = False
+    diagnostics = None
+    status = 125
+    try:
+        parser = _PrivateParser(prog="private-ci-check", allow_abbrev=False)
+        parser.add_argument("--stage", required=True, choices=_STAGES)
+        parser.add_argument("--junit", metavar="FILENAME")
+        parser.add_argument("--public-test-failures", action="store_true")
+        parser.add_argument("command", nargs=argparse.REMAINDER)
+        args = parser.parse_args(argv)
+        stage = args.stage
+        command = args.command
+        if command[:1] == ["--"]:
+            command = command[1:]
+        if not command:
+            raise ValueError("command required")
+        wants_junit = args.junit is not None
+        if args.public_test_failures and not wants_junit:
+            raise ValueError("public test locations require JUnit")
+        if wants_junit and (Path(args.junit).name != args.junit
+                            or args.junit in ("", ".", "..")
+                            or "/" in args.junit or "\\" in args.junit):
+            raise ValueError("JUnit filename must be a single path segment")
+        if not wants_junit and any("{junit}" in arg for arg in command):
+            raise ValueError("JUnit placeholder requires --junit")
+        source_root = Path(__file__).resolve().parents[1]
+        source_head = _source_head(source_root) if args.public_test_failures else None
+        # One private directory contains both streams and optional XML. Never
+        # forward child output, even on startup/parse/cleanup failures (§4).
+        with tempfile.TemporaryDirectory(prefix="lsms-private-ci-") as private:
+            private_dir = Path(private)
+            if os.name == "posix":
+                private_dir.chmod(0o700)
+            junit = private_dir / args.junit if wants_junit else None
+            if junit is not None:
+                command = [arg.replace("{junit}", str(junit)) for arg in command]
+            with (private_dir / "output.log").open("xb") as output:
+                if os.name == "posix":
+                    os.fchmod(output.fileno(), 0o600)
+                result = subprocess.run(command, stdout=output, stderr=subprocess.STDOUT,
+                                        stdin=subprocess.DEVNULL, check=False)
+            status = _exit_status(result.returncode)
+            if junit is not None:
+                if os.name == "posix" and junit.is_file() and not junit.is_symlink():
+                    junit.chmod(0o600)
+                counts = _junit_counts(junit)
+                if args.public_test_failures:
+                    diagnostics = _junit_failure_locations(junit, source_root, source_head)
+    except KeyboardInterrupt:
+        status = 130
+    except Exception:
+        # Includes startup, XML permissions, invalid arguments and cleanup.
+        # If the command finished, its actual status remains authoritative.
+        pass
+    print(f"private-ci-check stage={stage} exit={status}")
+    if counts is not None:
+        print("junit " + " ".join(f"{key}={value}" for key, value in counts.items()))
+    elif wants_junit:
+        print("junit unavailable")
+    if diagnostics is not None:
+        locations, unmapped = diagnostics
+        for (outcome, path, function), count in sorted(locations.items()):
+            print(f"junit {outcome} {path}::{function} count={count}")
+        print("junit unmapped " + " ".join(f"{key}={value}" for key, value in unmapped.items()))
+    return status
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

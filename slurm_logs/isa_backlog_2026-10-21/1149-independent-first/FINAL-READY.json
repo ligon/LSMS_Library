@@ -1,0 +1,113 @@
+{
+  "status": "FROZEN_NEEDS_NARROW_CLEANUP",
+  "head": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+  "base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "manifest": {
+    "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/final-private-manifest.json",
+    "mode": 384,
+    "mtime_ns": 1792654733734282465,
+    "bytes": 1044015,
+    "inode": 54272498,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file",
+    "sha256": "5ffc80cd88184122d4dd923299017d652b58f1409ea690ab3431ac3031f9c4a0"
+  },
+  "entries": 1918,
+  "safe_exports": [
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/safe-exports/ALLOWLIST.json",
+      "mode": 384,
+      "mtime_ns": 1792654719775181932,
+      "bytes": 251,
+      "inode": 10361899,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "698e718766613f3a3cf47570bd17bd386d1d879932b9b408151775ad95f8b57f"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/safe-exports/REPRODUCE.md",
+      "mode": 384,
+      "mtime_ns": 1792654719772181911,
+      "bytes": 2338,
+      "inode": 10361897,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "85d31131729b5e8bc283d28bba1b671d0f4b07044fc53a42aec456fb5100244b"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/safe-exports/REVIEW.org",
+      "mode": 384,
+      "mtime_ns": 1792654719772181911,
+      "bytes": 9759,
+      "inode": 10361896,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "afbd98b020018c9333b2bde9c3ccecf0ff5262734d04f2c851bb3d86fb9888c5"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/safe-exports/checker-sources.json",
+      "mode": 384,
+      "mtime_ns": 1792654719774181925,
+      "bytes": 8988,
+      "inode": 10361898,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "d29aacb8d32fe86ac723192f4ca4b042552933c035059961666c2fb149364803"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/safe-exports/proof.json",
+      "mode": 384,
+      "mtime_ns": 1792654719772181911,
+      "bytes": 7685,
+      "inode": 10361893,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "b017ef840dbbbf36b64227b708b63c881c2b334546be7676fff0e1dd5baeebd7"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/safe-exports/validation.json",
+      "mode": 384,
+      "mtime_ns": 1792654719772181911,
+      "bytes": 2833,
+      "inode": 10361894,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "a94e5fd6022111adf6b53828a1e7c50ac1b99061b94eebd5e6f0b35a4c98988b"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/safe-exports/verdict.json",
+      "mode": 384,
+      "mtime_ns": 1792654719772181911,
+      "bytes": 995,
+      "inode": 10361895,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "19b9afd9b3ee6620fc045a0b29984dd74092a98e3ec2d22f0f8e7fa4a8df3276"
+    }
+  ],
+  "source_protection": {
+    "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/final-protection-safe.json",
+    "mode": 384,
+    "mtime_ns": 1792654512059981910,
+    "bytes": 695,
+    "inode": 54272490,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file",
+    "sha256": "47ca65e0c07f1208789a5d2d99712f2f78e1b38813d1966a2ae125d7c82b7766"
+  },
+  "zero_external_consumers_at_seal": true,
+  "scope": "all human six requirements independently verified; additional dispatcher invalid-None cleanup gap retained, pre-existing on parent; root acceptance pending",
+  "immutable_exclusions": [
+    "final-private-manifest.json",
+    "FINAL-READY.json"
+  ]
+}

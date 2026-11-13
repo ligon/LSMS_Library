@@ -1,0 +1,28 @@
+{
+  "pr": 1170,
+  "body_exact_readback": true,
+  "evidence_commit": "e1d9850c0304f5c676cb46f59e0dc0976c9094ba",
+  "implementation_PRs": 30,
+  "open_scope_records": 114,
+  "PR_linked_records": 27,
+  "active_records": 2,
+  "other_records": 85,
+  "private_archives_root_verified": 31,
+  "approved_1215_source": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "candidate_new_pass": 13,
+  "supporting_pass": 88,
+  "actual_parent_new_fail": 6,
+  "actual_parent_new_pass": 7,
+  "author_normal_grid_actors_exit0": 10,
+  "author_strict_comparisons": {
+    "total": 44,
+    "exact": 38,
+    "intentional_approved_empty_order_differences": 6
+  },
+  "independent_1215_phase": "STATIC_ONLY",
+  "BF1188_author_root_authenticated": true,
+  "BF1188_independent_data_phase": "Capability gate completed; bounded source-data review released; no final independent genuine verdict",
+  "human_merge_required": true,
+  "goal_status": "ACTIVE",
+  "signed": "Sue"
+}

@@ -1,0 +1,55 @@
+#+TITLE: GH #637 defect C -- Nigeria W3 community_prices: the =obs= slot (2026-10-23)
+
+Aggregates only; no row-level data is committed here.  Scripts read the held
+C8 sources at run time through =get_dataframe= (L1 blobs).
+
+* Setup
+- development = =9a0ed5f3c= (detached worktree), branch =
+  =fix/637-nigeria-w3-obs-20261023=.  Each built in its OWN fresh
+  =LSMS_DATA_DIR= (cold), =dvc-cache= symlinked to the shared L1;
+  =PYTHONPATH= = the checkout, import identity asserted (=run.sh=,
+  =build_cp.py=).
+- Questionnaire: =PH_W3_Community_Quest.pdf= fetched with
+  =data_access.get_data_file=, text extracted with =pdftext.py= (zlib
+  stream inflate; no PDF tooling on the node).  C8a "FOOD PRICES - 1ST
+  LOCATION", C8b "FOOD PRICES - 2ND LOCATION"; SECTIONS list "8 Food Prices
+  / a. First location 18 / b. Second location 24".
+
+* Files
+| file | what |
+|------+------|
+| =raw_pairs.txt= | within-file duplicates (0), cross-file pairing, identity rates, between-EA base rate |
+| =raw_items.txt= | per-EA item partition: 78 overlap EAs vs 409 short-tail EAs |
+| =raw_ea_ident.txt= | per-EA identity share (max 88%; histogram), no identifiers |
+| =tail_codes.txt= | the 409-EA tail: 87.4% codes 70-77 / 160-163 |
+| =build_dev.log=, =build_branch.log= | cold builds: rows per PH round, warning classes |
+| =compare.json= | development vs branch, per round (=compare.py=) |
+| =oracle_branch.json= | raw-source oracle vs branch build, W3 (=oracle_w3.py=) |
+| =feature_dev.json=, =feature_branch.json= | =Feature('community_prices')(['Nigeria','Niger'])= |
+| =derived_inputs.py= | the pre-existing 341-vs-1 =inputs_community_prices= observation |
+| =hash_impact.json= | cache-hash census, development vs branch (=hash_census.py= from the 1218 validation) |
+
+* Headline
+| PH round | development | branch | obs 1 | obs 2 |
+|----------+-------------+--------+--------+-------|
+| 2011Q1   |      27,104 | 27,104 | 27,104 |     0 |
+| 2013Q1   |      27,079 | 27,079 | 27,079 |     0 |
+| 2016Q1   |      20,562 | 23,153 | 17,344 | 5,809 |
+| 2019Q1   |      31,757 | 31,757 | 31,757 |     0 |
+| 2024Q1   |      30,064 | 30,064 | 30,064 |     0 |
+
+- +2,591 rows, all 2016Q1 =obs = 2= in cells location 1 also priced (983 at
+  a different price, ratio median 1.25, max 21.43; 1,608 equal).
+- Duplicate entries not served: 0 (Niger's rule; see the ledger
+  =.coder/ledger/637-nigeria-w3-obs.md= §5).
+- Every development row present with identical Price and Derivation:
+  17,344 at =obs = 1=, 3,218 (the location-2-only rows) at =obs = 2=, 0
+  unmatched.  Other rounds frame-equal after dropping =obs=.
+- Oracle: 23,153 expected = 23,153 built; 0 missing, 0 extra; Price and
+  Derivation exact on all.
+- Feature (Nigeria + Niger): 182,609 -> 185,200 rows, unique, =obs= int64,
+  same warning classes, 0 grain reports; Nigeria's =obs= is no longer a
+  fabricated sentinel.
+- Caveat: the =feature_*.json= files were regenerated (warm) while the
+  development pytest run was in progress; the counts match the first,
+  solo runs.

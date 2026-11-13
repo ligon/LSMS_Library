@@ -1,0 +1,312 @@
+{
+  "head_pins": {
+    "candidate": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+    "base": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+  },
+  "fingerprints": {
+    "country": {
+      "count": 549,
+      "keys_equal": true,
+      "moved": 0
+    },
+    "framework": {
+      "count": 39,
+      "keys_equal": true,
+      "moved": 0
+    },
+    "wave": {
+      "count": 1362,
+      "keys_equal": true,
+      "moved": 0
+    }
+  },
+  "warm": {
+    "status": "PASS_BOUNDED_WARM_ONLY",
+    "strict_frame_assertions": 12,
+    "groups_overlap_not_unique_pair_count": true,
+    "comparisons": [
+      {
+        "family": "cross-head",
+        "name": "Nigeria",
+        "phase": "first",
+        "exact": true
+      },
+      {
+        "family": "cross-head",
+        "name": "Nigeria",
+        "phase": "warm",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Nigeria",
+        "head": "parent",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Nigeria",
+        "head": "candidate",
+        "exact": true
+      },
+      {
+        "family": "cross-head",
+        "name": "Ethiopia",
+        "phase": "first",
+        "exact": true
+      },
+      {
+        "family": "cross-head",
+        "name": "Ethiopia",
+        "phase": "warm",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Ethiopia",
+        "head": "parent",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Ethiopia",
+        "head": "candidate",
+        "exact": true
+      },
+      {
+        "family": "cross-head",
+        "name": "Feature",
+        "phase": "first",
+        "exact": true
+      },
+      {
+        "family": "cross-head",
+        "name": "Feature",
+        "phase": "warm",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Feature",
+        "head": "parent",
+        "exact": true
+      },
+      {
+        "family": "separate-process",
+        "name": "Feature",
+        "head": "candidate",
+        "exact": true
+      }
+    ],
+    "negative_controls": [
+      {
+        "label": "tiny",
+        "scope": "column",
+        "rejected": true,
+        "pandas_frame_accepted_column": true
+      },
+      {
+        "label": "tiny",
+        "scope": "nested-Series-attrs",
+        "rejected": true,
+        "pandas_frame_accepted_column": true
+      },
+      {
+        "label": "nextafter",
+        "scope": "column",
+        "rejected": true,
+        "pandas_frame_accepted_column": true
+      },
+      {
+        "label": "nextafter",
+        "scope": "nested-Series-attrs",
+        "rejected": true,
+        "pandas_frame_accepted_column": true
+      },
+      {
+        "label": "missing-mask",
+        "rejected": true
+      },
+      {
+        "label": "column-dtype",
+        "rejected": true
+      },
+      {
+        "label": "unused-index-level",
+        "rejected": true
+      },
+      {
+        "label": "attrs",
+        "rejected": true
+      },
+      {
+        "label": "row-order",
+        "rejected": true
+      },
+      {
+        "label": "numeric-axis-tiny",
+        "rejected": true
+      },
+      {
+        "label": "numeric-column-axis-nextafter",
+        "rejected": true
+      },
+      {
+        "label": "immutable-record-type",
+        "rejected": true
+      },
+      {
+        "label": "immutable-field-presence",
+        "rejected": true
+      },
+      {
+        "label": "string-NA-policy",
+        "rejected": true
+      }
+    ],
+    "warning_pairs": [
+      {
+        "phase": "first",
+        "call": {
+          "kind": "Country",
+          "country": "Nigeria",
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 1,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      },
+      {
+        "phase": "first",
+        "call": {
+          "kind": "Country",
+          "country": "Ethiopia",
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 1,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      },
+      {
+        "phase": "first",
+        "call": {
+          "kind": "Feature",
+          "countries": [
+            "Nigeria",
+            "Ethiopia"
+          ],
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 3,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      },
+      {
+        "phase": "warm",
+        "call": {
+          "kind": "Country",
+          "country": "Nigeria",
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 1,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      },
+      {
+        "phase": "warm",
+        "call": {
+          "kind": "Country",
+          "country": "Ethiopia",
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 1,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      },
+      {
+        "phase": "warm",
+        "call": {
+          "kind": "Feature",
+          "countries": [
+            "Nigeria",
+            "Ethiopia"
+          ],
+          "feature": "sample",
+          "kwargs": {}
+        },
+        "occurrences_per_head": 3,
+        "category_message_literal_exact": true,
+        "filename_only_known_checkout_prefix_qualification": true
+      }
+    ],
+    "scanner_records": 5,
+    "scanner_statuses": {
+      "warn": 5
+    },
+    "scanner_full_ordered_bytes_equal": true,
+    "country_rows": {
+      "Nigeria": 49770,
+      "Ethiopia": 25914
+    },
+    "Feature_rows": 75684,
+    "cache_endpoint_changes": 0,
+    "raw_L1_copies": 0,
+    "source_cold_builds": 0,
+    "phase2_kwargs_grid": "sample has no grid; phase1 only"
+  },
+  "member_fixture": {
+    "Nigeria": {
+      "held": 106,
+      "revised": 2,
+      "new": 2,
+      "removed": 0,
+      "actual_recursive_sidecar_keyset_equal": true,
+      "all_current_sidecar_sha_equal": true,
+      "synthetic_payloads_and_archive_directories": true,
+      "actual_downloaded_release_equality_established": false
+    },
+    "Ethiopia": {
+      "held": 68,
+      "revised": 0,
+      "new": 1,
+      "removed": 1,
+      "actual_recursive_sidecar_keyset_equal": true,
+      "all_current_sidecar_sha_equal": true,
+      "synthetic_payloads_and_archive_directories": true,
+      "actual_downloaded_release_equality_established": false
+    }
+  },
+  "api_surface": {
+    "strict": true,
+    "terminal_success": true,
+    "script_sha256": "6825f6f22dee8c49c772e09260c475a689be9eaba90a6bccbd47761588021697",
+    "zero_data_endpoint_changes": true
+  },
+  "protection": {
+    "sources": {
+      "/local/job40255479/worktrees/isa-review-1149-acquisition": {
+        "head": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+        "unchanged_tracked": 14883,
+        "clean": true
+      },
+      "/local/job40255479/worktrees/isa-review-1149-acquisition-base": {
+        "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+        "unchanged_tracked": 14880,
+        "clean": true
+      }
+    },
+    "tracked_total": 29763,
+    "installed_hash_dependencies_unchanged": 2,
+    "author_frozen_entries_verified_unchanged": 4014,
+    "held_seed_originals_unchanged": 3,
+    "six_warm_copies_current_endpoints_exact": true,
+    "source_or_git_edits": 0,
+    "new_network_attempts": 0,
+    "write_guard_denials": 0
+  }
+}

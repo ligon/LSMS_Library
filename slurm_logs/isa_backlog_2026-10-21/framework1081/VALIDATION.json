@@ -1,0 +1,51 @@
+{
+  "runtime_HEAD": "ca3e5cc119896983b49f50a6b9dade6a5f825131",
+  "ledger_first_HEAD": "12346145ab715c28b604f3cc8cdfba7d82db7072",
+  "clean_runtime_source": true,
+  "exact_country_diff": "3 existing typed imports and2 bare re-raise clauses;9 added lines",
+  "UnitsUnavailable_handler_byte_identical": true,
+  "all_other_original_tracked_content_modes_symlinks_exact": 14879,
+  "baseline_original_tracked_files_exact": 14880,
+  "diagnosis_files_unchanged": 457,
+  "source_fixtures_schemas_parsers_Feature_and_dependencies_unchanged": true,
+  "candidate_tests": {
+    "passed": 235,
+    "skips": 0,
+    "failures": 0,
+    "errors": 0
+  },
+  "baseline_negatives": {
+    "failed": 42,
+    "passed": 31,
+    "same73case_AST": true
+  },
+  "desired_outcome_probes": 166,
+  "Python_exception_context_additionally_verified": true,
+  "valuation_controls": 5,
+  "Feature_synthetic_cases_per_source": 6,
+  "healthy_full_frames_per_stage_source": 17,
+  "healthy_sources_and_stages": 4,
+  "healthy_total_frame_comparisons": 68,
+  "healthy_warnings_category_message_multisets_exact": {
+    "initial": 110,
+    "warm": 133
+  },
+  "full_warning_records_private_not_claimed_same_file_line_across_sources": true,
+  "all8country_source_cache_hashes_fresh_full_wave_coverage": true,
+  "physical_L2_copies": 120,
+  "all_copy_sources_destinations_SHA256_size_mode_mtime_exact": true,
+  "all60parquets_per_root_zero_writes_initial_and_warm": true,
+  "default_vs_explicit_Feature_currency_arguments_separate": true,
+  "actual_hash_scope": {
+    "API_unchanged": 549,
+    "API_changed": 0,
+    "framework_unchanged": 39,
+    "framework_changed": 0
+  },
+  "no_source_cold_or_L1_claim": true,
+  "network_attempts": 0,
+  "source_write_attempts": 0,
+  "stage": "runtime validation before documentation-only freeze",
+  "strict_API_audit": "PASS; scripts/api_surface_audit.py --strict under mounted image",
+  "scope": "three existing typed errors through two generated handlers; no country/parser/schema/policy change"
+}

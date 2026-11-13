@@ -1,0 +1,164 @@
+#+TITLE: Independent review -- Niger GH1091
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Verdict and immutable source
+
+PASS for the approved Niger country-builder retirement.
+No runtime, test, configuration, tracked file, Git ref or GitHub write was made during this independent review.
+Candidate is =670de9cc073f6a1436aaf9b55cf6371a244f232d=; actual parent is =d602f8d63520e521a730f85551b366c4d45d9a35=.
+Runtime/tests are pinned to =6be6576607f1862b603d123acfb74ace4026fd3f=.
+Final tests tree is =a2c9ba05f0faf6625885bc6a0bd5f3bd71bece43= and final package tree is =00cb01e7c1ca727dcefd5ed04d3de49d951a5276=.
+The final package differs from the runtime snapshot only in CONTENTS documentation; runtime and test blobs/Git modes are exact.
+Runtime/test filesystem modes also match the writer; two new safe JSON reports have writer0644/review0600, with identical bytes and Git100644 modes.
+Those documentation permissions are recorded separately and remained unchanged during review.
+The author ledger precedes runtime at =e4aed55125f1aeec553d3203f9a373c87f71fe26=.
+This verdict authorizes no issue closure, public merge or integration claim; root handles the eventual PR1176 stack.
+
+* Country and authority grounding
+
+The complete 1626-line candidate CONTENTS, including TODO/WAITING/LOGBOOK and the additive GH1091 note, was read first.
+The task ledger, standing machinery, code-reviewer, backlog/cross-country and Feature audit guidance anchor the review.
+ECVMA 2011/2014 and EHCVM 2018/2021 have distinct designs; 2014 household identity needs EXTENSION.
+Community v is native grappe, without a household join; native wave i==v is a compatibility shim removed at normalization.
+The unit dictionary is keyed by Original Label, not Code; variety retains source CODE separately from Description.
+Accepted GH840/PR1086 policy drops 134 exact melted repeats and retains 30 nonrepeat later slots as obs4-6.
+GH788 framework authority and this native grain are settled and unchanged.
+
+The helper's claim that 2018 "ships no community price file at all" contradicts the existing CONTENTS section "2018-19 DOES ship a cluster-grain community price file" and its explanation that the absence claim "is false for 2018-19".
+That grappe module remains unwired; the retirement establishes no new EHCVM absence or coverage conclusion.
+The old schema comment that the API renames j to i also conflicts with the measured public j-bearing/no-i frame and native shim.
+The dated note records these tensions rather than silently treating earlier documentation as stale.
+
+* Exact production and cache scope
+
+Only the 45-line country concatenator and original Makefile lines105-115 are deleted: 56 production-line deletions total.
+The independent wave pattern, prerequisites, shared variables, all other Make bytes, both source scripts, niger.py, mappings, schema/materialize flag, framework, units, scientific transformations, IDs, eligibility and duplicate policy are unchanged.
+Real make -n under a fresh empty data root proves the country target absent only on the candidate and both wave rules retained.
+The new tests use actual copied Make/script operands rather than patched selector results.
+
+Before any build, separate exact-source processes measured all549 API hashes and39 framework fingerprints.
+Exactly23 Niger API hashes move;526 others and all39 framework fingerprints remain identical, with no null hashes.
+This proves hash scope, not23 built outputs or a whole-corpus rebuild.
+
+* Isolation and preparation
+
+Every decoding, pickle/API and artifact-checking process asserted exact mounted interpreter, cwd, package, countries/config/data realpaths, active socket/write guard and preparation state.
+Processes ran under unshare -rn with private physical L1/L2, config/XDG/temp/DVC/matplotlib paths and one numerical/build/Make thread.
+Tests used two explicit loadfile workers; one consumer used each data root.
+Only the two root-prepared ignored DVC tmp symlinks resolving to their exact private targets were checkout-write exceptions.
+No source acquisition, DVC CLI, shared-cache mutation, assumed-fresh/manual stamp/read-gate bypass or in-tree payload occurred.
+The guard recorded only existing-directory FileExistsError handling, zero unexpected write denials and zero IP connection attempts.
+
+Terminal preparation gated11 declared held sources and11 sidecars before decoding/APIs.
+Both DVC layouts were populated with physically distinct nonsymlink nlink1 copies, checking declared MD5, actual SHA/size/mode/mtime and inode identity.
+The main gate contains142 copies; the separately gated oracle adds6 and two bounded parent controls add12, totaling160 physical copies.
+Healthy Mali's40218-row cache passed actual current hash and full four-wave coverage before copying; it is a normal current-L2 comparator, not a source-cold Mali reconstruction.
+All source rows, IDs, full warnings, exact frame payloads and logs stay private.
+
+* Tests and independently measured source identity
+
+Candidate:114 focused passes, zero failures/errors/skips.
+The identical17 new cases physically copied to the actual parent:12 meaningful assertion failures, five passes, zero fixture errors/skips.
+They discriminate real country discovery, both backend subsets, wrong existing country output and required Price/Quantity enforcement.
+Twelve existing built-data assertion bodies also passed directly per head against gated data, retaining nonempty guards; this is explicitly not a credential-marked normal-pytest pass.
+No fixture, golden, tolerance or dependency was changed, and no broad suite was run.
+
+An independent direct source oracle calls sanctioned source/dictionary/ID helpers, not the candidate's community-price helper or finalizer.
+It reconstructs every eligible native reading and exact duplicate policy from the three declared sources.
+
+| Source layer | Raw rows | Served readings | Melted exact repeats removed | Retained late obs |
+|--------------+----------+-----------------+------------------------------+-------------------|
+| 2011 passage1 | 23409 | 13073 | 0 | 0 |
+| 2011 passage2 | 34380 | 19279 | 17 | 15 |
+| 2014 passage1 | 21960 | 13691 | 117 | 15 |
+
+Passage2 additionally removes13478 exact wide repeats under the existing policy.
+The resulting46043 readings comprise32352/13691 by wave and all30 late observations.
+The 2014 exact quantity sentinels are43/32/1 by native slot, totaling76; no Price-policy extension was made.
+Complete serialized native frames equal the independent generic-writer-stage oracle, including axes, dtypes, masks/order and attrs.
+The original source-memory/serialized StringDtype distinction is retained as a strict difference rather than normalized.
+
+* Actual Country, Make, Feature and CLI behavior
+
+Twelve independently staged candidate cold roots cover both backends and all/singleton2011/singleton2014/2018/2021/combined-absent requests.
+Each had a fresh-process/new-Country warm probe, plus all twelve populated-root requests.
+Counts are46043,32352,13691,0,0,0 respectively on both backends.
+Unsupported cold roots create no community parquet; Default current cache coverage follows actual request history, not an assumed all-wave manifest.
+The all-wave Default cache is normalized, current-hash and four-wave-covered; native script caches remain hashless/eight-level.
+Make creates no new country cache.
+Supported Make full attrs match authoritative parent Default, including id_converted.
+
+Actual parent cold all controls and two additional source-gated combined-unsupported cold/fresh-warm controls ground the old behavior.
+Parent Default unsupported returns public0 but builds a46043-row eight-level native fallback and stamps unsupported-only coverage.
+That raw frame equals the actual native concatenation oracle; it is not compared to the normalized seven-level supported-country frame.
+Parent Make unsupported returns all46043 wrong-wave rows from its hashless country output.
+Both parent combined-unsupported warm probes changed no cache files.
+Populated parent Make singleton/unsupported wrong-wave outputs are retained as failures of the parent, not acceptance references.
+
+Default warm and populated calls change zero cache bytes/modes/mtimes.
+Fresh Make warm calls naturally rewrite two/one/zero hashless native files for all/supported-singleton/unsupported requests, preserving bytes/size/mode and changing mtime.
+Populated Make receipts need added/modified/deleted classification: the 2011 request modifies2011 and deletes the unrequested2014 native cache; the following2014 request deletes2011 and adds2014; absent requests change nothing.
+The verified country cache stays exact throughout.
+Unchanged load_from_waves evicts hashless caches across all waves before a singleton descent; the requested Wave script path reads only its wave candidate.
+The generic run_make_target fallback can inspect a country candidate, but that fallback was not demonstrated on this nonempty wave path.
+No independently unsafe stale/wrong-data case was exposed beyond the retired country route.
+
+Healthy Mali standalone40218, both argument-matched default/currency=None Features86261, food239877, prices165027, quantities239855 and expenditures165014 match the actual parent completely at corresponding stages.
+Make Niger-only Features each46043 match actual parent Default with identical arguments and typed attrs.
+CLI prewrite frames match actual parent API controls; postread artifacts match actual parent artifacts, with complete Arrow footers/schema metadata/file bytes.
+Existing PopulationRecord-to-dict serialization is a layer distinction, not removed attrs.
+Cold declared-empty visit/obs strings and object Description differ explicitly from populated-cache integer levels/string Description/id_converted.
+GH1196's food u cold/warm missing-sentinel StringDtype distinction is independently reproduced on both heads; all other payload/index levels/codes/dtypes and full attrs remain exact, without modifying either returned frame.
+
+* Exact comparisons, warnings and scanner
+
+The main artifact-only checker verifies104 saved pickle inputs before/after and rejects seven deliberate comparator mutations.
+It records98 categorized checks:91 complete exact frame pairs, two explicitly qualified GH1196 pairs and five full Arrow footer/schema/byte checks.
+Additional controls prove standalone Mali and the actual parent unsupported native/public layers exactly.
+All complete comparisons use check_exact=True, rtol=atol=0, explicit axis classes/levels/codes/dtypes/masks/order and recursively exact typed attrs, including immutable record _FIELDS presence/values.
+No pandas default float tolerance, attr stripping or frame normalization is used.
+The checker and its full source, comparator, guard, launchers and input receipts remain privately available for root inspection.
+
+Twenty-eight matched warning category/message multisets agree exactly; messages remain private.
+The unmodified phases1/2 scanner produces exactly three records, each fully identical to parent including detail/metrics/fingerprint, with no failure/error/skip.
+Two are the Niger/Mali native-cluster no-household-i warnings; the third is Mali's canonical obs sentinel1 assembly warning.
+There is no community_prices phase2 kwargs grid.
+Both scanner endpoint inventories are byte/mode/mtime exact.
+
+* Preserved stops and evidence limitations
+
+The author's original auxiliary direct-Wave zero-write assertion failed before recording its delta; that delta remains unidentified.
+Later equality/zero-write evidence does not identify it, and no author API was repeated to explain it.
+First author packaging overwrote the detailed private aggregate validation.json before the first manifest; its original final size/SHA are unavailable.
+Both freeze attempts and replacement are retained; validation-reconstructed-private.json is a new artifact-only reconstruction, never original bytes.
+All1680 first-manifest paths and1701 final-manifest payloads independently remain unchanged.
+Those qualifications limit original aggregate/write-history claims and do not substitute for the independent source-backed evidence above.
+
+This review also retains its own stopped expectations: a newline-stripping Make proof, an initially source-unresolvable oracle, a singleton-cache manifest expectation and a populated-Make receipt assertion that assumed both endpoints existed.
+Only private harness/proof expectations were corrected; no product code, equality policy, source eligibility or output was changed.
+The source oracle resumed only after a new six-copy terminal L1 gate.
+The singleton cold frame and endpoint were reconstructed from already saved evidence, explicitly not original missing receipt bytes, without repeating that API.
+The populated prefix retained both full frames, but individual all-call endpoint receipts had not been persisted; only its combined all-then2011 delta is reconstructible.
+The four unexecuted requests were then completed with per-call endpoint receipts saved before assertions; all stopped artifacts remain private.
+Two shell invocations stopped before Python because an unavailable bare python and a relative diagnostic path were used; neither decoded data or ran an API.
+The first packaging attempt stopped before generating JSON exports or manifests on a /proc stat parent-PID parser that assumed process names contained no spaces; its private diagnostic and source are retained, and the parser now splits after the closing process-name parenthesis.
+The first seal then stopped before updating READY because basename exclusions also omitted preserved same-named stop controls from its payload manifest; all listed receipts had passed.
+Exclusions now use exact root-relative control paths, with that stopped source and metadata diagnostics retained.
+The direct seal emitted a metadata-only traceback outside the aggregate wrapper; it contained source paths/AssertionError and no data or IDs.
+Its remaining error handling saves full errors privately and emits aggregate diagnostics only.
+No source/API or test was repeated for packaging or sealing.
+
+* Frozen handoff and scope
+
+All tracked contents, index blobs, Git/filesystem modes, HEADs and clean status are exact for candidate, parent and author checkout; no in-tree parquet exists.
+All11 held source endpoints and160 physical copies remain exact.
+The author's1701 payloads and protected original diagnosis690, Uganda1198 design241 and Mali review1190 manifest entries remain exact.
+Healthy Mali bytes/modes/mtimes are unchanged.
+Private LSMS data roots retain40 expected parquets;104 synthetic pytest-temp parquets are separately accounted, not called absent.
+Safe exports are isolated in safe-exports and never copied over private evidence basenames.
+No full corpus rebuild, other23 Niger table-build coverage, EHCVM wiring, broad suite, Mali source-cold claim or cross-fix composition is implied.
+Tanzania retirement and GH1196 remain separate residuals.
+Final receipts and FINAL-READY record the allowlist and zero live task consumers.
+
+Signed: Sue.

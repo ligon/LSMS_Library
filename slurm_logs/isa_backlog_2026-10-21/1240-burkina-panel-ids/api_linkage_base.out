@@ -1,0 +1,35 @@
+{
+ "checkout": "/local/job40390255/worktrees/base-1240",
+ "sample": {
+  "seconds": 1.5,
+  "hh_2018_19": 7010,
+  "hh_2021_22": 3227,
+  "naive_linked": 2053,
+  "strict_linked": 2041,
+  "linked_to_a_different_household": 12,
+  "served_2021_22_ids_unmapped_and_unlinked": 1174,
+  "strict_linked_with_3digit_2018_menage": 0
+ },
+ "household_roster": {
+  "seconds": 1.3,
+  "hh_2018_19": 7010,
+  "hh_2021_22": 3227,
+  "naive_linked": 2053,
+  "strict_linked": 2041,
+  "linked_to_a_different_household": 12,
+  "served_2021_22_ids_unmapped_and_unlinked": 1174,
+  "strict_linked_with_3digit_2018_menage": 0,
+  "head_consistency": {
+   "strict_2digit": {
+    "pairs_with_one_head_each": 2041,
+    "same_head_sex": 0.94,
+    "head_age_gap_1_to_5": 0.748
+   },
+   "different_household": {
+    "pairs_with_one_head_each": 12,
+    "same_head_sex": 0.833,
+    "head_age_gap_1_to_5": 0.083
+   }
+  }
+ }
+}

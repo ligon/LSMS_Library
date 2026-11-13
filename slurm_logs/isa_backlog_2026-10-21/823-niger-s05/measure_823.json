@@ -1,0 +1,1184 @@
+{
+ "checkout": "/local/job40390255/worktrees/823",
+ "lsms_library": "/local/job40390255/worktrees/823/lsms_library/__init__.py",
+ "s05": {
+  "path_sidecar_md5": "586edb9feb45f4593058bdfb0a7b83b5",
+  "read_file_md5": "586edb9feb45f4593058bdfb0a7b83b5",
+  "variable_labels": {
+   "grappe": "grappe",
+   "vague": "Vague",
+   "Existe": "[PRODUIT] existe dans ce marché ?",
+   "s05q01": "5.01.Code produit",
+   "s05q02": "5.02.Selectionner les unités tailles qui exist pour ce produit sur ce marché?",
+   "s05q03": "5.03. Relevé 1-Prix (en FCFA)",
+   "s05q04": "5.04. Relevé 2-Prix (en FCFA)"
+  },
+  "label_set_of_variable": {
+   "grappe": "",
+   "vague": "",
+   "Existe": "Existe_cereales",
+   "s05q01": "produitID",
+   "s05q02": "releveID",
+   "s05q03": "",
+   "s05q04": ""
+  },
+  "value_label_sets": {
+   "Existe_cereales": 2,
+   "produitID": 60,
+   "releveID": 156
+  },
+  "rows": 42247,
+  "cols": 7,
+  "columns": [
+   "grappe",
+   "vague",
+   "Existe",
+   "s05q01",
+   "s05q02",
+   "s05q03",
+   "s05q04"
+  ],
+  "dtypes": {
+   "grappe": "int16",
+   "vague": "int8",
+   "Existe": "int8",
+   "s05q01": "int16",
+   "s05q02": "int16",
+   "s05q03": "float64",
+   "s05q04": "float64"
+  },
+  "Existe_values": {
+   "1": 42247
+  },
+  "vague_rows": {
+   "1": 21068,
+   "2": 21179
+  },
+  "grappes": 504,
+  "grappes_with_two_vagues": 0,
+  "grappes_by_vague": {
+   "1": 249,
+   "2": 255
+  },
+  "product_codes_declared": 60,
+  "product_codes_used": 55,
+  "unit_codes_declared": 156,
+  "unit_codes_used": 74,
+  "products_per_grappe_quantiles": {
+   "0.0": 14.0,
+   "0.25": 31.0,
+   "0.5": 36.0,
+   "0.75": 42.0,
+   "1.0": 55.0
+  },
+  "units_per_grappe_product_quantiles": {
+   "0.0": 1.0,
+   "0.25": 1.0,
+   "0.5": 2.0,
+   "0.75": 3.0,
+   "0.9": 4.0,
+   "1.0": 8.0
+  },
+  "distinct_units_per_product": {
+   "count": 55.0,
+   "mean": 8.27,
+   "std": 2.88,
+   "min": 2.0,
+   "25%": 6.0,
+   "50%": 8.0,
+   "75%": 10.0,
+   "max": 14.0
+  },
+  "candidate_keys": {
+   "grappe+s05q01+s05q02": {
+    "rows_in_dup_keys": 320,
+    "dup_keys": 160
+   },
+   "grappe+vague+s05q01+s05q02": {
+    "rows_in_dup_keys": 320,
+    "dup_keys": 160
+   },
+   "grappe+s05q01": {
+    "rows_in_dup_keys": 37205,
+    "dup_keys": 13207
+   },
+   "grappe+s05q02": {
+    "rows_in_dup_keys": 34636,
+    "dup_keys": 8211
+   }
+  },
+  "exact_duplicate_rows": 40,
+  "exact_duplicate_pairs": 20,
+  "dup_keys": {
+   "keys": 160,
+   "rows": 320,
+   "rows_per_key": {
+    "2": 160
+   },
+   "identical_keys": 20,
+   "conflicting_keys": 140,
+   "grappes": 137,
+   "row_gap_quantiles": {
+    "0.0": 1.0,
+    "0.25": 1610.0,
+    "0.5": 7725.5,
+    "0.75": 18161.5,
+    "1.0": 41797.0
+   },
+   "top_items": {
+    "poisson séché": 96,
+    "Maquereau (poisson de mer)": 78,
+    "Riz Importé non parfumé": 64,
+    "Cube alimentaire (Maggi, Jumbo, )": 14,
+    "Niébé-Haricots secs": 14,
+    "Autre Riz local": 12,
+    "Mais en grain": 6,
+    "Piment": 6
+   },
+   "conflicting_second_record_slots": {
+    "slot1_second_repeats_first": 6,
+    "slot1_second_new_price": 134,
+    "slot2_second_repeats_first": 4,
+    "slot2_second_new_price": 136
+   }
+  },
+  "projection_obs12_policy": {
+   "records_after_exact_drop": 42227,
+   "melted_slots": 84454,
+   "slot_repeats_dropped": 10,
+   "served_rows": 84444,
+   "second_record_rows_served_as_obs_3_4": 270
+  },
+  "price": {
+   "s05q03": {
+    "na": 0,
+    "zero": 0,
+    "negative": 0,
+    "sentinels_999_9999_99999_9999.9": 0,
+    "quantiles": {
+     "0.0": 2.3438,
+     "0.01": 15.0,
+     "0.1": 50.0,
+     "0.25": 150.0,
+     "0.5": 500.0,
+     "0.75": 1500.0,
+     "0.9": 6500.0,
+     "0.99": 25000.0,
+     "1.0": 90000.0
+    },
+    "integer_valued_share": 0.906,
+    "non_integer_rows": 3973,
+    "denominator_counts_noninteger": {
+     "2": 1999,
+     "3": 1254,
+     "4": 445,
+     "8": 143,
+     "6": 54,
+     "<NA>": 32,
+     "12": 12,
+     "9": 6,
+     "13": 5,
+     "16": 5,
+     "5": 5,
+     "19": 2
+    }
+   },
+   "s05q04": {
+    "na": 0,
+    "zero": 0,
+    "negative": 0,
+    "sentinels_999_9999_99999_9999.9": 0,
+    "quantiles": {
+     "0.0": 1.9762,
+     "0.01": 15.0,
+     "0.1": 50.0,
+     "0.25": 150.0,
+     "0.5": 500.0,
+     "0.75": 1466.6666,
+     "0.9": 6250.0,
+     "0.99": 25000.0,
+     "1.0": 85000.0
+    },
+    "integer_valued_share": 0.8989,
+    "non_integer_rows": 4272,
+    "denominator_counts_noninteger": {
+     "2": 2317,
+     "3": 1238,
+     "4": 450,
+     "8": 135,
+     "6": 53,
+     "<NA>": 27,
+     "12": 11,
+     "16": 7,
+     "5": 6,
+     "9": 5,
+     "17": 4,
+     "21": 3
+    }
+   },
+   "ratio_q4_over_q3_quantiles": {
+    "0.0": 0.103,
+    "0.01": 0.75,
+    "0.05": 0.85,
+    "0.25": 1.0,
+    "0.5": 1.0,
+    "0.75": 1.0,
+    "0.95": 1.1,
+    "0.99": 1.25,
+    "1.0": 8.5
+   },
+   "ratio_category_rows": {
+    "equal": 29783,
+    "other": 10401,
+    "q4=0.85*q3": 1296,
+    "q3=0.85*q4": 767
+   },
+   "top_ratios": {
+    "1.0": 29785,
+    "0.85": 1296,
+    "1.1765": 767,
+    "0.9": 571,
+    "0.8": 433,
+    "0.8333": 403,
+    "0.9333": 279,
+    "0.875": 278,
+    "0.8571": 271,
+    "0.95": 229,
+    "0.9286": 186,
+    "0.9167": 183
+   },
+   "extreme_ratio_rows": {
+    ">2": 15,
+    "<0.5": 26,
+    ">5": 1,
+    "<0.2": 13
+   },
+   "q4=0.85*q3_integer_share": {
+    "s05q03": 0.972,
+    "s05q04": 0.677
+   },
+   "q3=0.85*q4_integer_share": {
+    "s05q03": 0.574,
+    "s05q04": 0.966
+   },
+   "file_order_runs_total": 170,
+   "file_order_runs_over_200_rows": [
+    {
+     "cat": "other",
+     "start": 831,
+     "end": 1319,
+     "n": 489
+    },
+    {
+     "cat": "other",
+     "start": 1386,
+     "end": 1724,
+     "n": 339
+    },
+    {
+     "cat": "q4=0.85*q3",
+     "start": 1771,
+     "end": 2603,
+     "n": 833
+    },
+    {
+     "cat": "q4=0.85*q3",
+     "start": 2605,
+     "end": 2886,
+     "n": 282
+    },
+    {
+     "cat": "other",
+     "start": 3028,
+     "end": 5920,
+     "n": 2893
+    },
+    {
+     "cat": "other",
+     "start": 5922,
+     "end": 8002,
+     "n": 2081
+    },
+    {
+     "cat": "other",
+     "start": 8004,
+     "end": 8270,
+     "n": 267
+    },
+    {
+     "cat": "equal",
+     "start": 8271,
+     "end": 38007,
+     "n": 29737
+    },
+    {
+     "cat": "other",
+     "start": 38205,
+     "end": 38510,
+     "n": 306
+    },
+    {
+     "cat": "other",
+     "start": 38512,
+     "end": 39594,
+     "n": 1083
+    },
+    {
+     "cat": "other",
+     "start": 39634,
+     "end": 40600,
+     "n": 967
+    },
+    {
+     "cat": "q3=0.85*q4",
+     "start": 40756,
+     "end": 41486,
+     "n": 731
+    }
+   ],
+   "grappe_monotonic_in_file": false,
+   "file_order_sort_on_ratio": {
+    "equal_block": [
+     8271,
+     38007
+    ],
+    "before_rows": 8271,
+    "before_share_q4_lt_q3": 0.9972,
+    "after_rows": 4239,
+    "after_share_q4_gt_q3": 0.9908,
+    "spearman_ratio_vs_position_before": 0.9819,
+    "spearman_ratio_vs_position_after": 0.9472
+   },
+   "q4=0.85*q3_spread": {
+    "rows": 1296,
+    "grappes": 380,
+    "top10_grappe_share": 0.108,
+    "products": 40,
+    "by_vague": {
+     "1": 790,
+     "2": 506
+    }
+   },
+   "q3=0.85*q4_spread": {
+    "rows": 767,
+    "grappes": 296,
+    "top10_grappe_share": 0.1291,
+    "products": 34,
+    "by_vague": {
+     "1": 382,
+     "2": 385
+    }
+   },
+   "ratio_0.8_0.85_0.9_rows": {
+    "0.8": 433,
+    "0.85": 1296,
+    "0.9": 571
+   },
+   "per_grappe_equal_share_quantiles": {
+    "0.0": 0.267,
+    "0.1": 0.527,
+    "0.25": 0.642,
+    "0.5": 0.736,
+    "0.75": 0.831,
+    "0.9": 0.907,
+    "1.0": 1.0
+   },
+   "grappes_all_equal": 9,
+   "grappes_no_equal": 0,
+   "equal_share_by_vague": {
+    "1": 0.6691,
+    "2": 0.7406
+   },
+   "size_digit_by_q3_denominator": {
+    "0": {
+     "10": 0,
+     "11": 0,
+     "12": 0,
+     "13": 0,
+     "14": 0,
+     "16": 0,
+     "17": 0,
+     "19": 0,
+     "2": 47,
+     "29": 0,
+     "3": 7,
+     "32": 0,
+     "4": 16,
+     "5": 0,
+     "6": 0,
+     "7": 0,
+     "8": 0,
+     "9": 0,
+     "NA": 0,
+     "int": 9129
+    },
+    "1": {
+     "10": 1,
+     "11": 0,
+     "12": 11,
+     "13": 0,
+     "14": 1,
+     "16": 5,
+     "17": 0,
+     "19": 0,
+     "2": 1347,
+     "29": 0,
+     "3": 856,
+     "32": 2,
+     "4": 241,
+     "5": 4,
+     "6": 38,
+     "7": 1,
+     "8": 104,
+     "9": 1,
+     "NA": 13,
+     "int": 11097
+    },
+    "2": {
+     "10": 0,
+     "11": 0,
+     "12": 0,
+     "13": 3,
+     "14": 1,
+     "16": 0,
+     "17": 0,
+     "19": 2,
+     "2": 318,
+     "29": 0,
+     "3": 195,
+     "32": 0,
+     "4": 137,
+     "5": 1,
+     "6": 12,
+     "7": 1,
+     "8": 21,
+     "9": 2,
+     "NA": 11,
+     "int": 8884
+    },
+    "3": {
+     "10": 0,
+     "11": 1,
+     "12": 1,
+     "13": 2,
+     "14": 0,
+     "16": 0,
+     "17": 1,
+     "19": 0,
+     "2": 131,
+     "29": 2,
+     "3": 164,
+     "32": 0,
+     "4": 28,
+     "5": 0,
+     "6": 2,
+     "7": 0,
+     "8": 14,
+     "9": 3,
+     "NA": 8,
+     "int": 5784
+    },
+    "4": {
+     "10": 0,
+     "11": 0,
+     "12": 0,
+     "13": 0,
+     "14": 0,
+     "16": 0,
+     "17": 0,
+     "19": 0,
+     "2": 75,
+     "29": 0,
+     "3": 23,
+     "32": 0,
+     "4": 15,
+     "5": 0,
+     "6": 2,
+     "7": 0,
+     "8": 3,
+     "9": 0,
+     "NA": 0,
+     "int": 633
+    },
+    "5": {
+     "10": 0,
+     "11": 0,
+     "12": 0,
+     "13": 0,
+     "14": 0,
+     "16": 0,
+     "17": 0,
+     "19": 0,
+     "2": 57,
+     "29": 0,
+     "3": 4,
+     "32": 0,
+     "4": 4,
+     "5": 0,
+     "6": 0,
+     "7": 0,
+     "8": 1,
+     "9": 0,
+     "NA": 0,
+     "int": 1070
+    },
+    "6": {
+     "10": 0,
+     "11": 0,
+     "12": 0,
+     "13": 0,
+     "14": 0,
+     "16": 0,
+     "17": 0,
+     "19": 0,
+     "2": 24,
+     "29": 0,
+     "3": 5,
+     "32": 0,
+     "4": 4,
+     "5": 0,
+     "6": 0,
+     "7": 0,
+     "8": 0,
+     "9": 0,
+     "NA": 0,
+     "int": 1677
+    }
+   },
+   "noninteger_share_by_size_digit": {
+    "0": 0.0076,
+    "1": 0.1913,
+    "2": 0.0734,
+    "3": 0.0581,
+    "4": 0.1571,
+    "5": 0.0581,
+    "6": 0.0193
+   }
+  }
+ },
+ "coverage": {
+  "s00_me_grappes": 504,
+  "s05_grappes": 504,
+  "s05_not_in_s00": [],
+  "s00_not_in_s05": [],
+  "sample_v": 504,
+  "s05_not_in_sample": [],
+  "sample_not_in_s05": [],
+  "s05_vague_equals_cover_vague": 504,
+  "grappes_compared": 504
+ },
+ "s07b": {
+  "variable_labels": {
+   "vague": "Vague",
+   "grappe": "grappe",
+   "menage": "Identifiant du ménage",
+   "s07bq01": "7B.01.Code Produit",
+   "s07bq02": "7B.02.Votre ménage a-t-il consommé  [PRODUIT] au cours des 7 derniers jours?",
+   "s07bq03a": "7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours",
+   "s07bq03b": "7B.03b. Unité",
+   "s07bq03c": "7B.03c. Taille",
+   "s07bq04": "7B.04. Qtité autocons (agricultur_élevage_pêche_aquacultur_chasse_cueillette)",
+   "s07bq05": "7B.05. Qtité reçue comm cadeaux (cadeau_prélèvement propre commerce_troc_etc)",
+   "s07bq06": "7B.06. Quelle est la dernière fois que le [PRODUIT] a été acheté dans le MEN?",
+   "s07bq07a": "7B.07a. Quelle est la quantité du  [PRODUIT] acheté la dernière fois?",
+   "s07bq07b": "7B.07b. Unité",
+   "s07bq07c": "7B.07c. Taille",
+   "s07bq08": "7B.08. Valeur (en FCFA) du [PRODUIT] acheté la dernière fois"
+  },
+  "label_set_of_variable": {
+   "vague": "",
+   "grappe": "",
+   "menage": "",
+   "s07bq01": "produitID",
+   "s07bq02": "s07Bq02",
+   "s07bq03a": "",
+   "s07bq03b": "s07Bq03b",
+   "s07bq03c": "s07Bq03c",
+   "s07bq04": "",
+   "s07bq05": "",
+   "s07bq06": "s07Bq06",
+   "s07bq07a": "",
+   "s07bq07b": "s07Bq07b",
+   "s07bq07c": "s07Bq07c",
+   "s07bq08": ""
+  },
+  "value_label_sets": {
+   "produitID": 138,
+   "s07Bq02": 2,
+   "s07Bq03b": 48,
+   "s07Bq03c": 7,
+   "s07Bq06": 5,
+   "s07Bq07b": 48,
+   "s07Bq07c": 7
+  }
+ },
+ "items": {
+  "codes_used": 55,
+  "household_produitID_codes_declared": 138,
+  "s05_codes_absent_from_household_set": [],
+  "meta_label_equal_codes": 35,
+  "read_label_equal_codes": 35,
+  "read_label_equal_rows": 25895,
+  "harmonize_food_exact_codes": 39,
+  "harmonize_food_exact_rows": 30106,
+  "harmonize_food_after_decode_codes": 0,
+  "j_in_household_served_codes": 41,
+  "j_in_household_served_rows": 32244,
+  "unmatched": [
+   {
+    "code": 3,
+    "s05_label_read": "Riz Importé non parfumé",
+    "hh_label_read_same_code": "Riz importÃ© non parfumÃ©",
+    "j": "Riz Importé non parfumé",
+    "rows": 1270
+   },
+   {
+    "code": 4,
+    "s05_label_read": "Riz Importé parfumé",
+    "hh_label_read_same_code": "Riz importÃ© parfumÃ©",
+    "j": "Riz Importé parfumé",
+    "rows": 109
+   },
+   {
+    "code": 6,
+    "s05_label_read": "Mais en grain",
+    "hh_label_read_same_code": "MaÃ¯s en grain",
+    "j": "Mais en grain",
+    "rows": 1112
+   },
+   {
+    "code": 12,
+    "s05_label_read": "Farine de mais",
+    "hh_label_read_same_code": "Farine de maÃ¯s",
+    "j": "Farine de mais",
+    "rows": 138
+   },
+   {
+    "code": 16,
+    "s05_label_read": "Pates alimentaires",
+    "hh_label_read_same_code": "PÃ¢tes alimentaires",
+    "j": "Pates alimentaires",
+    "rows": 983
+   },
+   {
+    "code": 23,
+    "s05_label_read": "Viande de boe__uf",
+    "hh_label_read_same_code": "Viande de bÅ__uf",
+    "j": "Viande de boe__uf",
+    "rows": 1339
+   },
+   {
+    "code": 36,
+    "s05_label_read": "Carpes fraiches",
+    "hh_label_read_same_code": "Carpes fraÃ®ches",
+    "j": "Carpes fraiches",
+    "rows": 185
+   },
+   {
+    "code": 39,
+    "s05_label_read": "sillure fumée",
+    "hh_label_read_same_code": "Sillure fumÃ©",
+    "j": "sillure fumée",
+    "rows": 220
+   },
+   {
+    "code": 41,
+    "s05_label_read": "poisson séché",
+    "hh_label_read_same_code": "Poisson sÃ©chÃ©",
+    "j": "poisson séché",
+    "rows": 243
+   },
+   {
+    "code": 67,
+    "s05_label_read": "Pastèque",
+    "hh_label_read_same_code": "PastÃ¨que, Melon",
+    "j": "Pastèque",
+    "rows": 904
+   },
+   {
+    "code": 77,
+    "s05_label_read": "Courge/courgette",
+    "hh_label_read_same_code": "Aubergine, Courge/Courgette",
+    "j": "Courge/courgette",
+    "rows": 458
+   },
+   {
+    "code": 95,
+    "s05_label_read": "Niébé-Haricots secs",
+    "hh_label_read_same_code": "NiÃ©bÃ©/Haricots secs",
+    "j": "Niébé-Haricots secs",
+    "rows": 1184
+   },
+   {
+    "code": 100,
+    "s05_label_read": "Pate d'arachide",
+    "hh_label_read_same_code": "PÃ¢te d'arachide",
+    "j": "Pate d'arachide",
+    "rows": 740
+   },
+   {
+    "code": 130,
+    "s05_label_read": "Thé vert",
+    "hh_label_read_same_code": "ThÃ©",
+    "j": "Thé vert",
+    "rows": 1118
+   }
+  ],
+  "j_by_code_in_household_served_codes": 55,
+  "j_by_code_in_household_served_rows": 42247,
+  "label_j_equals_code_j_codes": 41,
+  "label_j_differs_from_code_j": [
+   {
+    "code": 3,
+    "s05_label_read": "Riz Importé non parfumé",
+    "j": "Riz Importé non parfumé",
+    "j_by_code": "Riz importé non parfumé",
+    "rows": 1270
+   },
+   {
+    "code": 4,
+    "s05_label_read": "Riz Importé parfumé",
+    "j": "Riz Importé parfumé",
+    "j_by_code": "Riz importé parfumé",
+    "rows": 109
+   },
+   {
+    "code": 6,
+    "s05_label_read": "Mais en grain",
+    "j": "Mais en grain",
+    "j_by_code": "Maïs en grain",
+    "rows": 1112
+   },
+   {
+    "code": 12,
+    "s05_label_read": "Farine de mais",
+    "j": "Farine de mais",
+    "j_by_code": "Farine de maïs",
+    "rows": 138
+   },
+   {
+    "code": 16,
+    "s05_label_read": "Pates alimentaires",
+    "j": "Pates alimentaires",
+    "j_by_code": "Pâtes alimentaires",
+    "rows": 983
+   },
+   {
+    "code": 23,
+    "s05_label_read": "Viande de boe__uf",
+    "j": "Viande de boe__uf",
+    "j_by_code": "Viande de bœuf",
+    "rows": 1339
+   },
+   {
+    "code": 36,
+    "s05_label_read": "Carpes fraiches",
+    "j": "Carpes fraiches",
+    "j_by_code": "Carpes fraîches",
+    "rows": 185
+   },
+   {
+    "code": 39,
+    "s05_label_read": "sillure fumée",
+    "j": "sillure fumée",
+    "j_by_code": "Sillure fumé",
+    "rows": 220
+   },
+   {
+    "code": 41,
+    "s05_label_read": "poisson séché",
+    "j": "poisson séché",
+    "j_by_code": "Poisson séché",
+    "rows": 243
+   },
+   {
+    "code": 67,
+    "s05_label_read": "Pastèque",
+    "j": "Pastèque",
+    "j_by_code": "Pastèque, Melon",
+    "rows": 904
+   },
+   {
+    "code": 77,
+    "s05_label_read": "Courge/courgette",
+    "j": "Courge/courgette",
+    "j_by_code": "Aubergine, Courge/Courgette",
+    "rows": 458
+   },
+   {
+    "code": 95,
+    "s05_label_read": "Niébé-Haricots secs",
+    "j": "Niébé-Haricots secs",
+    "j_by_code": "Niébé/Haricots secs",
+    "rows": 1184
+   },
+   {
+    "code": 100,
+    "s05_label_read": "Pate d'arachide",
+    "j": "Pate d'arachide",
+    "j_by_code": "Pâte d'arachide",
+    "rows": 740
+   },
+   {
+    "code": 130,
+    "s05_label_read": "Thé vert",
+    "j": "Thé vert",
+    "j_by_code": "Thé",
+    "rows": 1118
+   }
+  ],
+  "declared_codes_with_zero_rows": [
+   22,
+   24,
+   40,
+   80,
+   112
+  ]
+ },
+ "units": {
+  "codes_used": 74,
+  "bare_codes": 19,
+  "bare_rows": 9199,
+  "size-qualified_codes": 55,
+  "size-qualified_rows": 33048,
+  "unit_part_label_matches_hh_codes": 62,
+  "unit_part_label_mismatch": [
+   {
+    "code": 1071,
+    "label": "Boite, petit",
+    "hh_unit_label": "BoÃ®te"
+   },
+   {
+    "code": 1072,
+    "label": "Boite, moyen",
+    "hh_unit_label": "BoÃ®te"
+   },
+   {
+    "code": 1073,
+    "label": "Boite, grand",
+    "hh_unit_label": "BoÃ®te"
+   },
+   {
+    "code": 1080,
+    "label": "Boite de tomate",
+    "hh_unit_label": "BoÃ®te de tomate"
+   },
+   {
+    "code": 1081,
+    "label": "Boite de tomate, petit",
+    "hh_unit_label": "BoÃ®te de tomate"
+   },
+   {
+    "code": 1082,
+    "label": "Boite de tomate, moyen",
+    "hh_unit_label": "BoÃ®te de tomate"
+   },
+   {
+    "code": 1083,
+    "label": "Boite de tomate, grand",
+    "hh_unit_label": "BoÃ®te de tomate"
+   },
+   {
+    "code": 1170,
+    "label": "Canette,n/a",
+    "hh_unit_label": "Cannette"
+   },
+   {
+    "code": 1220,
+    "label": "Filet au kilogramme",
+    "hh_unit_label": "Filet au Kg"
+   },
+   {
+    "code": 1251,
+    "label": " Louche (Djoni/Djéni), petit",
+    "hh_unit_label": "Louche"
+   },
+   {
+    "code": 1252,
+    "label": " Louche (Djoni/Djini), grand",
+    "hh_unit_label": "Louche"
+   },
+   {
+    "code": 1253,
+    "label": " Louche (Djoni/Djini), moyen",
+    "hh_unit_label": "Louche"
+   }
+  ],
+  "unit_part_matches_hh_unaccented_codes": 69,
+  "unit_part_mismatch_unaccented": [
+   {
+    "code": 1170,
+    "label": "Canette,n/a",
+    "hh_unit_label": "Cannette",
+    "rows": 355
+   },
+   {
+    "code": 1220,
+    "label": "Filet au kilogramme",
+    "hh_unit_label": "Filet au Kg",
+    "rows": 51
+   },
+   {
+    "code": 1251,
+    "label": " Louche (Djoni/Djéni), petit",
+    "hh_unit_label": "Louche",
+    "rows": 207
+   },
+   {
+    "code": 1252,
+    "label": " Louche (Djoni/Djini), grand",
+    "hh_unit_label": "Louche",
+    "rows": 73
+   },
+   {
+    "code": 1253,
+    "label": " Louche (Djoni/Djini), moyen",
+    "hh_unit_label": "Louche",
+    "rows": 6
+   }
+  ],
+  "bare_via_code_in_household_served_u_codes": 16,
+  "bare_via_code_in_household_served_u_rows": 9096,
+  "bare_via_code_not_in_household_served_u": [
+   {
+    "code": 1220,
+    "label": "Filet au kilogramme",
+    "hh_unit_via_code": "Filet au Kg",
+    "rows": 51
+   },
+   {
+    "code": 1340,
+    "label": "Sac (10 Kg)",
+    "hh_unit_via_code": "Sac (10 Kg)",
+    "rows": 1
+   },
+   {
+    "code": 1370,
+    "label": "Sac (5 Kg)",
+    "hh_unit_via_code": "Sac (5 kg)",
+    "rows": 51
+   }
+  ],
+  "size_suffix_matches_code_codes": 72,
+  "size_suffix_mismatch": [
+   {
+    "code": 1252,
+    "label": " Louche (Djoni/Djini), grand"
+   },
+   {
+    "code": 1253,
+    "label": " Louche (Djoni/Djini), moyen"
+   }
+  ],
+  "pair_observed_in_household_codes": 65,
+  "pair_observed_in_household_rows": 42014,
+  "u_table_hit_codes": 14,
+  "bare_and_in_household_served_u_codes": 14,
+  "bare_and_in_household_served_u_rows": 8726,
+  "bare_not_in_household_served_u": [
+   {
+    "code": 1080,
+    "label": "Boite de tomate",
+    "u_if_wired": "Boite de tomate",
+    "rows": 15
+   },
+   {
+    "code": 1170,
+    "label": "Canette,n/a",
+    "u_if_wired": "Canette,n/a",
+    "rows": 355
+   },
+   {
+    "code": 1220,
+    "label": "Filet au kilogramme",
+    "u_if_wired": "Filet au kilogramme",
+    "rows": 51
+   },
+   {
+    "code": 1340,
+    "label": "Sac (10 Kg)",
+    "u_if_wired": "Sac (10 Kg)",
+    "rows": 1
+   },
+   {
+    "code": 1370,
+    "label": "Sac (5 Kg)",
+    "u_if_wired": "Sac (5 Kg)",
+    "rows": 51
+   }
+  ],
+  "sized_label_in_household_served_u_codes": 0,
+  "household_size_code_rows_consumed": {
+   "0.0": 16091,
+   "1.0": 33326,
+   "2.0": 28921,
+   "3.0": 10499,
+   "4.0": 2633,
+   "5.0": 3276,
+   "6.0": 12470
+  }
+ },
+ "wave_2021_22": {
+  "community_sidecars": [
+   "s00_co_ner2021.dta.dvc",
+   "s01_co_ner2021.dta.dvc",
+   "s02_co_ner2021.dta.dvc",
+   "s03_co_ner2021.dta.dvc",
+   "s04_co_ner2021.dta.dvc"
+  ],
+  "s05_co_sidecars": [],
+  "price_sidecars": [
+   "ehcvm_prix_ner2021.dta.dvc",
+   "ehcvm_nsu_ner2021.dta.dvc"
+  ]
+ },
+ "wave_2018_19_community_sidecars": [
+  "s00a_co_ner2018.dta.dvc",
+  "s00b_co_ner2018.dta.dvc",
+  "s01_co_ner2018.dta.dvc",
+  "s02_co_ner2018.dta.dvc",
+  "s03_co_ner2018.dta.dvc",
+  "s04_co_ner2018.dta.dvc",
+  "s05_co_ner2018.dta.dvc"
+ ],
+ "instrument": {
+  "ner_ehcvm1_qnr_community_excel_vague1.xls": {
+   "sidecar_md5": "7a72b806d02d5cd7878e7a9d80053664",
+   "sheets": [
+    "Couvert",
+    "TOC",
+    "Sect0_Repondants",
+    "Sect1_Village",
+    "Sect2_Infra",
+    "Sect3_Agri",
+    "Sect4_ParticipCommunautaire",
+    "Sect6_MigrationReligion",
+    "SEC5_PRIX",
+    "Liste produits",
+    "Unites",
+    "Observations"
+   ],
+   "cover_text": [
+    "REPUBLIQUE DU TCHAD",
+    "MINISTERE DE L'ECONOMIE ET DE LA PLANIFICATION DU DEVELOPPEMENT",
+    "INSTITUT NATIONAL DE LA STATISTIQUE, DES ETUDES ECONOMIQUES ET DEMOGRAPHIQUES",
+    "NUMERO DE LA GRAPPE",
+    "VAGUE",
+    "ENQUÊTE HARMONISEE SUR LES CONDITIONS DE VIE DES MENAGES 2017/2018"
+   ],
+   "sec5_header_rows": [
+    [
+     "Produit",
+     "",
+     "Unité",
+     "",
+     "Relevé 1",
+     "",
+     "Relevé 2",
+     "",
+     "Relevé 3",
+     ""
+    ],
+    [
+     "Libellé",
+     "Code",
+     "Libellé",
+     "Code",
+     "Quantité",
+     "Prix",
+     "Quantité",
+     "Prix",
+     "Quantité",
+     "Prix"
+    ],
+    [
+     "",
+     "5.01",
+     "",
+     "5.02",
+     "5.029999999999999",
+     "5.039999999999999",
+     "5.049999999999999",
+     "5.059999999999999",
+     "5.0699999999999985",
+     "5.079999999999998"
+    ]
+   ],
+   "sec5_first_products": [
+    "Riz de Bongor",
+    "Riz de Laï",
+    "Riz importé Brisure (Tigo)",
+    "Riz importé long grain blanc (Amal Iyal)"
+   ]
+  },
+  "ner_ehcvm1_qnr_community_excel_vague2.xls": {
+   "sidecar_md5": "78545c3e7c2cbe7c97c5a7f7e56496ec",
+   "sheets": [
+    "Couvert",
+    "TOC",
+    "Sect0_Repondants",
+    "Sect1_Village",
+    "Sect2_Infra",
+    "Sect3_Agri",
+    "Sect4_ParticipCommunautaire",
+    "Sect6_MigrationReligion",
+    "SEC5_PRIX",
+    "Liste produits",
+    "Unites",
+    "Observations"
+   ],
+   "cover_text": [
+    "REPUBLIQUE DU TCHAD",
+    "MINISTERE DE L'ECONOMIE ET DE LA PLANIFICATION DU DEVELOPPEMENT",
+    "INSTITUT NATIONAL DE LA STATISTIQUE, DES ETUDES ECONOMIQUES ET DEMOGRAPHIQUES",
+    "NUMERO DE LA GRAPPE",
+    "VAGUE",
+    "ENQUÊTE HARMONISEE SUR LES CONDITIONS DE VIE DES MENAGES 2017/2018"
+   ],
+   "sec5_header_rows": [
+    [
+     "Produit",
+     "",
+     "Unité",
+     "",
+     "Relevé 1",
+     "",
+     "Relevé 2",
+     "",
+     "Relevé 3",
+     ""
+    ],
+    [
+     "Libellé",
+     "Code",
+     "Libellé",
+     "Code",
+     "Quantité",
+     "Prix",
+     "Quantité",
+     "Prix",
+     "Quantité",
+     "Prix"
+    ],
+    [
+     "",
+     "5.01",
+     "",
+     "5.02",
+     "5.029999999999999",
+     "5.039999999999999",
+     "5.049999999999999",
+     "5.059999999999999",
+     "5.0699999999999985",
+     "5.079999999999998"
+    ]
+   ],
+   "sec5_first_products": [
+    "Riz de Bongor",
+    "Riz de Laï",
+    "Riz importé Brisure (Tigo)",
+    "Riz importé long grain blanc (Amal Iyal)"
+   ]
+  }
+ }
+}

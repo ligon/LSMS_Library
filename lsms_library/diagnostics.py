@@ -399,10 +399,30 @@ def _check_declared_columns(df: pd.DataFrame, scheme: dict, feature: str) -> Che
                  f"All {len(expected_cols)} declared columns present")
 
 
-def _check_dtype_consistency(df: pd.DataFrame, scheme: dict, feature: str) -> Check:
-    """Check that column dtypes roughly match declarations."""
+def _check_dtype_consistency(
+    df: pd.DataFrame, scheme: dict, feature: str, *, stage: str = "native",
+) -> Check:
+    """Roughly grade native local types or finalized canonical-over-local types.
+
+    Global datetime declarations use pandas' dtype predicate without parsing
+    or casting values. Other supported global types override local types;
+    unknown future global types retain local grading (ledger #1606 §3).
+    """
+    if stage not in ("native", "finalized"):
+        raise ValueError("stage must be 'native' or 'finalized'")
     spec = scheme.get(feature, {})
     expected_cols = spec.get("columns", {})
+    canonical_datetime_cols = set()
+    if stage == "finalized":
+        from .country import _load_canonical_dtypes
+
+        expected_cols = dict(expected_cols)
+        for col, declared in _load_canonical_dtypes().get(feature, {}).items():
+            if str(declared) == "datetime":
+                canonical_datetime_cols.add(col)
+                expected_cols[col] = declared
+            elif str(declared) in _DTYPE_MAP:
+                expected_cols[col] = declared
     if not expected_cols:
         return Check("dtype_consistency", "pass", "No dtype declarations (skipped)")
     issues = []
@@ -410,6 +430,10 @@ def _check_dtype_consistency(df: pd.DataFrame, scheme: dict, feature: str) -> Ch
         if col_name not in df.columns:
             continue
         actual = df[col_name].dtype
+        if col_name in canonical_datetime_cols:
+            if not pd.api.types.is_datetime64_any_dtype(actual):
+                issues.append(f"{col_name}: expected datetime, got {actual}")
+            continue
         if isinstance(declared_type, list):
             # List declaration = constrained string column
             if not (pd.api.types.is_string_dtype(actual) or pd.api.types.is_object_dtype(actual)):
@@ -719,6 +743,7 @@ def is_this_feature_sane(
     feature: str,
     *,
     extra_optional: set[str] | None = None,
+    stage: str = "native",
 ) -> SanityReport:
     """Run all sanity checks on a feature DataFrame.
 
@@ -730,6 +755,15 @@ def is_this_feature_sane(
         Country name (e.g., ``'Uganda'``).
     feature : str
         Feature/table name (e.g., ``'food_acquired'``).
+    stage : {'native', 'finalized'}, optional
+        Inspection stage for dtype grading only. The default checks local
+        declarations for native/cache frames. Use ``'finalized'`` for public
+        API frames: supported global rough types override local types, and
+        present canonical-only columns are checked without becoming required.
+        Canonical datetimes accept naive or timezone-aware datetime dtypes
+        without parsing or casting values. Unknown future global types retain
+        local grading. Other checks keep the local schema. This does not cast
+        the frame or verify exact dtype units or calendar values.
     extra_optional : set[str], optional
         Column names to exempt from ``no_all_null_columns``, *in addition* to
         those declared ``optional`` in the country's scheme.
@@ -752,6 +786,8 @@ def is_this_feature_sane(
         Contains individual Check results.  ``report.ok`` is True if
         no checks failed (warnings are allowed).
     """
+    if stage not in ("native", "finalized"):
+        raise ValueError("stage must be 'native' or 'finalized'")
     scheme = _load_scheme(country)
     report = SanityReport(country=country, feature=feature)
     optional = set(scheme.get(feature, {}).get("optional", set()))
@@ -768,7 +804,7 @@ def is_this_feature_sane(
     report.checks.append(_check_no_all_null_columns(df, optional))
     report.checks.append(_check_no_constant_columns(df))
     report.checks.append(_check_declared_columns(df, scheme, feature))
-    report.checks.append(_check_dtype_consistency(df, scheme, feature))
+    report.checks.append(_check_dtype_consistency(df, scheme, feature, stage=stage))
     report.checks.append(_check_value_constraints(df, scheme, feature))
     report.checks.append(_check_declared_spellings(df, feature))
     report.checks.append(_check_duplicate_index(df))
@@ -995,7 +1031,8 @@ def validate_feature(
     report.checks.append(_check_no_all_null_columns(df, optional))
     report.checks.append(_check_no_constant_columns(df))
     report.checks.append(_check_declared_columns(df, scheme, feature))
-    report.checks.append(_check_dtype_consistency(df, scheme, feature))
+    report.checks.append(_check_dtype_consistency(df, scheme, feature,
+                                                 stage="finalized"))
     report.checks.append(_check_value_constraints(df, scheme, feature))
     report.checks.append(_check_declared_spellings(df, feature))
     report.checks.append(_check_duplicate_index(df))
@@ -1667,17 +1704,28 @@ def _check_panel_ids_targets_exist(country) -> Check:
 def _check_id_walk_idempotent(country) -> Check:
     """Applying ``id_walk`` to an already-canonical spine must be a no-op.
 
-    The framework sets ``df.attrs['id_converted'] = True`` after
-    ``id_walk`` to prevent double-application. Operations like
-    ``merge()`` and ``set_index()`` drop ``.attrs`` in pandas 2.x, and
-    any downstream helper that touches a DataFrame without preserving
-    ``.attrs`` can cause ``id_walk`` to run twice — which for countries
-    with transitive ID chains produces duplicate rows.
+    ``id_walk`` is a single-pass rename (GH #1245), which is NOT idempotent
+    on its own when a wave's map has a chain (Burkina Faso 2021-22: 80
+    households move onto an id another household moves off; a second pass
+    would move them again).  Exactly-once rests on ``id_walk`` recognising
+    an already-walked wave from its own ids and leaving it alone -- the
+    ``df.attrs['id_converted']`` flag is only a fast path, and a table
+    derived from a served one arrives without it.
 
-    This check reruns ``id_walk`` manually on the spine and confirms
-    the row count and index set are unchanged. It would have caught
-    the Burkina Faso 2021-22 attrs bug from commit 4db41a27 (392
-    duplicate tuples out of ~78,000).
+    This check clears the flag, reruns ``id_walk`` on the served spine and
+    confirms the row count and index set are unchanged.  A served spine
+    that ``id_walk`` refuses (``IdWalkError``: raw and walked ids mixed in
+    one wave, or only ids it cannot classify) fails the check.
+
+    The spine is an index-only frame (zero columns).  Until the GH #1245
+    review, ``id_walk`` returned any ``df.empty`` frame untouched -- and pandas
+    calls a zero-column frame empty -- so this check never reached the walk
+    and passed vacuously.  ``id_walk`` now tests for zero ROWS.  With its
+    detection removed (a bare single-pass rename), the check fails on
+    Burkina Faso's served spine, so it does exercise the walk.  The
+    pre-closure form of this check would have caught the Burkina Faso
+    2021-22 attrs bug from commit 4db41a27 (392 duplicate tuples out of
+    ~78,000).
     """
     try:
         from .local_tools import id_walk
@@ -1698,9 +1746,10 @@ def _check_id_walk_idempotent(country) -> Check:
 
         # Re-apply id_walk. Even though the spine already went through
         # _finalize_result once, running id_walk again on a clean copy
-        # should produce the same set of (i, t) tuples.
+        # should produce the same set of (i, t) tuples: id_walk must
+        # recognise every walked wave and leave it alone (GH #1245).
         #
-        # Clear .attrs so id_walk doesn't early-exit on the flag.
+        # Clear .attrs so the flag cannot be what saves it.
         replayed = spine.copy()
         replayed.attrs = {}
         replayed = id_walk(replayed, ui, hh_index="i")

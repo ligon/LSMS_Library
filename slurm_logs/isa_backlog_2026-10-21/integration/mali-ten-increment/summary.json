@@ -1,0 +1,56 @@
+{
+  "head": "bbdcf34578085fb90e981184a0cadadc9701a366",
+  "exit_code": 0,
+  "outcomes": {
+    "passed": 31
+  },
+  "seconds_including_copy": 83.03,
+  "commands": [
+    [
+      "unshare",
+      "-rn",
+      "--",
+      "/local/job40255479/venv_img/bin/python",
+      "/local/job40255479/control/isa-backlog-20261021/integration/check_mali_ten_increment.py",
+      "initial"
+    ],
+    [
+      "unshare",
+      "-rn",
+      "--",
+      "/local/job40255479/venv_img/bin/python",
+      "/local/job40255479/control/isa-backlog-20261021/integration/check_mali_ten_increment.py",
+      "warm"
+    ],
+    [
+      "unshare",
+      "-rn",
+      "--",
+      "/local/job40255479/venv_img/bin/python",
+      "-m",
+      "pytest",
+      "-n",
+      "2",
+      "--dist=loadfile",
+      "--timeout=600",
+      "--timeout-method=thread",
+      "--tb=short",
+      "-ra",
+      "-o",
+      "cache_dir=/local/job40255479/control/isa-backlog-20261021/integration/mali-ten-increment-v4/pytest-cache",
+      "--basetemp=/local/job40255479/control/isa-backlog-20261021/integration/mali-ten-increment-v4/pytest-temp",
+      "--junitxml=/local/job40255479/control/isa-backlog-20261021/integration/mali-ten-increment-v4/tests-private.xml",
+      "tests/test_mali_plot_labor_source.py",
+      "tests/test_mali_community_price_readings.py"
+    ]
+  ],
+  "private_L2_copies": 1519,
+  "private_L1_copies": 1288,
+  "held_Niger_binary_sidecars_verified": 161,
+  "unheld_Niger_binary_declarations_left_absent": 134,
+  "source_files_unchanged": true,
+  "tracked_content_modes_unchanged": true,
+  "head_unchanged": true,
+  "clean_status": true,
+  "scope": "Mali1121 incremental coexistence with822; not a repeat of the complete nine-fix cohort or full suite"
+}

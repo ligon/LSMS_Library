@@ -1,0 +1,156 @@
+#+title: Independent review of Burkina Faso #1123
+#+date: 2026-10-21
+#+author: Sue (GPT-6)
+
+* Verdict
+PASS for the approved Burkina Faso 2018-19 source-identity boundary at frozen =3848778d0e8676c798883c11ea3e33fc88e8a591=, runtime =69ed4d2028a6f989a8ac45d117a5cffc60a831fd=.
+I did not write this patch.
+The ledger-first commit =d780445e89a50d7c78fa3a25cf36a152556bcdcb= precedes the runtime commit.
+No runtime correction is required for this boundary.
+The pre-existing gift/purchase binding contradiction below is a separate Tier B result, with a safe draft in =PURCHASE-RESIDUAL.md=.
+Source-conservation references to =Purchased= and =Quantity_purchased= mean existing API column names, not verified purchase semantics.
+
+* Grounding and exact scope
+I read the candidate's complete 1,426-line =Burkina_Faso/_/CONTENTS.org= FIRST, including all TODO/WAITING/LOGBOOK material.
+The three live TODO entries are =food_items.org=, =nutrition= and =Makefile=; there are no additional WAITING/LOGBOOK entries beyond the TODO-keyword declaration.
+I read the guidance, backlog/cross-country skills, task ledger and standing ledger, and consulted the live #1123 body (no comments).
+The live ruling explicitly separates this source-preservation repair from physical crop inference, other waves, #1119 vocabulary work and the remaining Niger/Senegal/CotedIvoire reproductions.
+
+Actual country idiosyncrasies matter here.
+The 2018 input roster is household x native input slot, with no parcel axis.
+Its EHCVM household formatter uses grappe + literal zero + two-digit-padded menage, rather than the older formatter; I independently reconstructed that string convention and verified injectivity and zero input/sample orphans.
+The four EMC 2014 passages revisit the same households; only passage 1 supplies food quantities, and passage identity is carried by filenames.
+The 2021-22 survey is an EHCVM half-panel with restricted tracking and distinct weights.
+The source dictionary is wave-specific: 2018 code 20 means =Autres semences= while 21 is unlabelled on 602 applied rows; 2021 code 21 means =Plants d'hevea, de teck= (accented in Stata) and 22 means =Autres semences=.
+The candidate appropriately retains the legacy, explicitly unverified =input=Seed= classification for 21 and gives only its crop identity the approved source-qualified unknown token.
+I did not acquire or newly verify the four missing questionnaire/nomenclature instruments.
+
+The runtime diff is exactly three Preferred Label cells plus an eight-line pre-write guard.
+Other cereals and tuber cuttings reuse =Autre cereale= and =Autre tubercule= (accented first label in source); literal 21 becomes =Unknown [Burkina_Faso 2018-19 s16bq01=21]=.
+Code 20, the complete input map, units, schema, grain, eligibility and reducers remain unchanged.
+No framework, comparator-country, fixture, golden, dependency or acquisition file changes.
+The guard runs after finish/nonempty and immediately before =to_parquet=; its exact error exposes only country, wave, duplicate-extra count and declared axis names.
+
+* Independent held-source and runtime proof
+I physically copied ten held private L1 blobs into each of two new roots, verifying sidecar MD5, byte count, distinct inode and single-link status.
+Eight blobs (6,887,434 bytes) support the actual normal Country rebuilds; two additional held input counterparts support cross-wave diagnosis.
+All ten total 49,081,606 bytes per root.
+No Burkina L2 was seeded, cleared, restamped or assumed fresh.
+The Benin/Togo comparator roots contain twelve physical cache copies, independently verified against current expected hashes and complete coverage before serving.
+
+Both actual cold builds used normal =Country= routes from physically absent Burkina L2 trees.
+All-wave sample is 20,648 rows and cluster_features 2,035 in both revisions.
+Every sample/cluster Country, raw-country and six raw-wave frame compares exactly, including index, values, dtypes and full logical attrs.
+2014 and 2021-22 plot_inputs subsets remain empty in both revisions.
+Separate fresh-process warm calls, including a new Country instance, match every cold output and logical attr exactly.
+Every parquet byte hash and nanosecond mtime remains unchanged through warm, tests and Feature review.
+
+The source contains 22,877 rows, all with the independently verified =s16bq02=1= use gate.
+The native =(grappe,menage,s16bq01)= key is unique and nonnull.
+I specified source-code identities independently of the candidate helper, read numeric/labelled frames through sanctioned readers and source variable labels through sanctioned get_data_file plus metadata-only pyreadstat.
+The candidate native wave and public Country preserve every source line, amount, current API flag/quantity column, NA mask and unit.
+The old native frame differs only in the 877 crop labels affected by the three cells.
+I independently reconstructed the standing most-complete/first-tie keep/drop set, then compared it to the actual baseline raw Country output.
+I also matched every old retained public row, including v, all values, dtypes and attrs, after only the key-label replacements.
+
+| Quantity | Baseline | Candidate |
+|----------+----------+-----------|
+| Native wave records | 22,877 | 22,877 |
+| Public Country records | 22,694 | 22,877 |
+| Source records lost | 183 | 0 |
+
+The 170 old collision groups contain 353 native records: 163 extras in 150 conflicting-payload groups and 20 extras in 20 equal-payload groups.
+The recovered records contain 2,409.58 reported kg of Quantity, including 931.60 on unlabelled 21.
+All recovered existing API Purchased values are False and existing API Quantity_purchased values missing; this does not imply that none was purchased (see residual).
+
+The real held-source script succeeds with a write spy and produces the exact native payload after the normal parquet string-extension encoding is aligned.
+An actual-source two-cell-only counterfactual leaves 98 duplicate extras and raises before any write, with the exact aggregate-only diagnostic.
+Eight additional independent adversarial tests pass: two-cell and old-map mutations, repeated native seed/nonseed slots even with equal payload, missing units, use eligibility, empty source and no-use source.
+No first/median selector was introduced.
+
+Held source counterparts were independently checked without implementing them: 2014 has 138,242 rows, 3,111 null-key rows and 36 rows on repeated native keys; 2021 has 70,994 rows, 12,223 applied, no null/repeated native keys and the different dictionary above.
+Only the 2018 script currently consumes harmonize_seed_crop.
+
+* Feature, fingerprints and focused checks
+The full actual Feature grows from 47,029 to 47,212 rows: Burkina 22,877, Benin 10,605, Togo 13,730.
+Every Country frame is preserved under the existing crop-to-j alias and canonical sentinels, with no additional Feature row loss.
+Full Feature logical attrs are exactly equal across revisions.
+Complete comparator Country and Feature frames, dtypes, attrs and all twelve comparator cache bytes are exact.
+
+I reran actual scanner phases 1/2 for plot_inputs and these three countries.
+There is no plot_inputs phase-2 kwarg grid, so no unrun variant is claimed.
+The full normalized finding multiset changes from eight warnings to six, with zero failures/errors: exactly two Burkina input-collapse runtime warnings disappear; all six other complete records are exact.
+Only checkout and private-data paths were normalized; full warning records remain private.
+
+All 549 country/table hashes were actually recomputed at both revisions: 24 Burkina hashes change and 525 other country hashes are exact.
+All 39 tagged framework fingerprints are exact.
+Whole-country Org hashing explains the breadth; this review builds only sample, cluster_features and plot_inputs and makes no output claim for the other 21 Burkina tables.
+
+The candidate focused selection passes 13 tests (nine new and four existing comparator tests), zero skipped, four unrelated comparator parameter cases deselected.
+The same nine new regressions on immutable f8 produce eight failures and one pass, as required.
+The eight independent adversarial tests also pass, zero skipped.
+=make api-audit= exits zero using a private adapter to the already mounted image.
+=git diff --check f8d236694..3848778d= passes.
+No full-suite or other-country output claim is made.
+
+* Contradictions and separate residuals
+The recorded sample notes at CONTENTS.org:507-509 explicitly state =10,224 households=, =6,961 households= and =3,218 households=.
+Both fresh f8 and candidate outputs instead have 10,411 / 7,010 / 3,227 sample rows, while clusters remain 900 / 585 / 550.
+I report this contradiction without assuming the documentation stale or changing sample policy.
+The file also records conflicting French/English descriptions of the EHCVM sample split; this patch does not choose between them.
+
+Fresh source metadata contradicts the existing script comments =s16bq05 purchased?= and =s16bq07a quantity purchased= at plot_inputs.py:13-14 and the bindings at :109/:118.
+The actual q05 label is =16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de don?=; q07a explicitly refers to quantity received as gift/donation.
+The purchase question is q08, and purchase quantity is q09a, each with its own unit field.
+On these 22,877 applied source rows, gift yes is 802 versus purchase yes 7,689; flags disagree on 8,297 rows.
+Gift quantity is nonmissing/positive on 801 rows, purchase quantity on 7,689, with 8,371 differences including missingness and no zero/negative amounts.
+The unit differs from the used-quantity unit on 23 gift rows and 193 purchase rows, so a later correction must resolve routing/units explicitly rather than blindly substitute one column.
+All used quantities are positive/nonmissing, so neither old nor hypothetical purchase routing creates an all-payload-missing row in this held scope; no new eligibility policy is authorized.
+Among the recovered 183 lines, 18 have an actual affirmative purchase flag and purchase quantity.
+Full raw source/native/public current-binding comparisons pass; the identity patch changes no such binding.
+Repo issue searches for exact s16bq05 and Burkina plot_inputs found no owner for this gift/purchase defect; root independently confirmed exact s16bq09a and plot_inputs gift searches empty.
+No primary-source claim is made for any other country.
+
+Report these new source facts in country notes through a separately reviewed documentation amendment; qualify existing API column names wherever conservation is described.
+The source-authority question for code 21 remains separate, as do #1119 vocabulary work, other-wave builders and #1123's Niger/Senegal/CotedIvoire scope.
+
+* Reproduction and immutable proof
+All executable probes, complete frames and logs are private under the directory containing this report.
+=run.sh= sets exact checkout/cwd/PYTHONPATH/config identity, private data/config/temp roots, threads/build/Make workers one, a socket guard and =unshare -rn=.
+No network attempt occurred.
+All tests ran serially, below the four-worker budget.
+Source readers used held private copies only; no DVC CLI, acquisition, shared-cache access/write/clear/promotion or in-tree source/parquet was used.
+
+#+begin_src sh
+P=/local/job40255479/control/isa-backlog-20261021/review-1123-Burkina_Faso
+# Preparation ran once; it refuses existing destination inputs or Burkina L2.
+bash "$P/run.sh" candidate "$P/prepare.py"
+bash "$P/run.sh" baseline "$P/build.py" baseline cold
+bash "$P/run.sh" candidate "$P/build.py" candidate cold
+bash "$P/run.sh" baseline "$P/build.py" baseline warm
+bash "$P/run.sh" candidate "$P/build.py" candidate warm
+bash "$P/run.sh" candidate "$P/source_check.py"
+bash "$P/run.sh" candidate "$P/actual_script_controls.py"
+bash "$P/run.sh" candidate -m pytest -q -p no:cacheprovider --basetemp="$P/pytest-candidate" tests/test_burkina_faso_plot_inputs_identity.py tests/test_gh323_benin_togo.py -k 'not recovers_the_discarded_line_item'
+bash "$P/run.sh" baseline -m pytest -q -p no:cacheprovider --basetemp="$P/pytest-baseline" "$P/test_f8_counterfactual.py" # expected exit 1, 8 fail/1 pass
+bash "$P/run.sh" candidate -m pytest -q -p no:cacheprovider --basetemp="$P/pytest-adversarial-v2" "$P/test_independent_adversarial.py"
+bash "$P/run.sh" baseline "$P/feature_check.py" baseline
+bash "$P/run.sh" candidate "$P/feature_check.py" candidate
+bash "$P/run.sh" baseline "$P/hash_inventory.py" "$P/baseline-hashes.json"
+bash "$P/run.sh" candidate "$P/hash_inventory.py" "$P/candidate-hashes.json"
+bash "$P/run.sh" candidate "$P/accounting.py"
+bash "$P/run.sh" candidate "$P/residual_check.py"
+bash "$P/run.sh" candidate "$P/api.py"
+/local/job40255479/venv_img/bin/python "$P/final_check.py"
+#+end_src
+
+Initial failed reviewer probes are retained: a missing shell python alias, an overbroad categorical-table test setup, row-order comparison, pre/post-parquet nullable-string encoding, and an in-tree scanner that initially counted the nine existing tracked curation CSVs as raw sources.
+These were private harness mistakes, corrected without touching candidate code; their original logs remain available.
+The final scan distinguishes those unchanged tracked curation CSVs from source pollution; all three trees contain zero introduced/untracked raw sources and zero parquet files.
+
+Before/after SHA256 content, modes, HEAD and status match for all 14,886 candidate, 14,880 baseline and 14,889 old-Burkina tracked entries.
+The old worktree remains at a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb; baseline remains f8d236694c26fe9e709c5548f02c70f74ea72c33; candidate remains the frozen 3848778d head.
+All source MD5s and physical-copy receipts remain exact; no review workers remain.
+No commits, refs or GitHub writes were made.
+
+Sue

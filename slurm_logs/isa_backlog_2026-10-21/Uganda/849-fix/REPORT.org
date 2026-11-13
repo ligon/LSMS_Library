@@ -1,0 +1,147 @@
+#+TITLE: GH849 Uganda reported harvest-factor writer validation
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-22
+
+* Result and boundary
+
+Author validation is complete; independent review is required before acceptance.
+The actual parent is =0854303bc5f60daa698b2927fc3b193822a4c090=, the independently accepted1198 native-observation runtime with its separately accepted documentation qualification.
+The runtime pin is =7a8fd22492255cc2c4d020b7a16f99249f588977=; =66bfa1eb1= records the tested existing-test expectation updates and contemporaneous ledger.
+The final documentation/evidence descendant and clean source pin are recorded in READY.json and source-and-cache-proof.json.
+
+Production changes are twelve absent =kg_factor= bindings in =Uganda/_/uganda.py:1880-2029= and directly superseded comments, plus the superseded 2019-20 loader docstring at line17.
+Eight long-form bindings use =a5aq6d=/=a5bq6d= in2010/2011/2013/2015; four2019 bindings use each actual =s5aq06d_1/2= and =s5bq06d_1/2= slot.
+The three2018 bindings and2009 map remain exact.
+AST comparison proves every other colmap cell and every helper/function AST exact; the2019 loader AST differs only in its module docstring.
+There is no source, identity, eligibility, unit, condition, quantity, sales, factor-dictionary, schema, framework, reducer or screen change.
+
+* Country grounding and contradictions
+
+The complete3671-line current CONTENTS reading carries by exact blob =9dbb7afba39b772e2670608dd9040fd626ccab33= from the prior full6e reading plus the sole085 paragraph amendment; TODO/WAITING/LOGBOOK entries were included.
+A/B are module seasons, not universal calendar order:2015 A is second2014 and B first2015;2013 harvest labels are swapped,2018 mixes legacy and wide names and has no A harvest-unit field, and2019 actual slots describe distinct condition records.
+Source production IDs, actual slots and explicit release-row identities retain their1198 meanings, including equal and partial reports.
+Harvest and sold unit/condition fields are separate; AGSEC4 crop-stand rosters are season-specific.
+The #829 2015 sales-value x100 producer-release WAITING entry is independent and unchanged.
+
+CONTENTS1414-1434/2315-2324 already adjudicates the2018 B slot-label contradiction: the held label says "during the second season of 2017", while recorded harvest dates and vocabulary support the existing same-season condition-slot interpretation.
+This task preserves the settled ruling and literal slot identity; it does not infer a calendar from the label or reopen that decision.
+The historical note at2436 says the move would be "small and in the right direction" but also requires measurement.
+The measured12.931M-kg increase below refutes any unqualified "small" assumption, without supplying a scientific correction to the source reports.
+CONTENTS3666 quotes the transform's "100% of crop rows" parcel-coverage claim; actual real-area matches remain much smaller, and #1205 owns that residual.
+Dated old coverage/reducer notes are retained rather than silently rewritten as current facts.
+
+* Source and execution gates
+
+A fresh physical private root contains59 MD5/SHA-gated held modules, copied to both DVC layouts in four independent default/Make roots (472 L1 copies), with distinct inodes, nlink1, nonsymlink, size, mode and mtime receipts.
+Forty-one sidecars omit a declared size; that absence is explicit and measured actual sizes are recorded.
+All gates reached terminal success before28 raw harvest/roster decodes and before any Country table build.
+Actual source metadata confirms the twelve new fields and three2018 controls; source-fields.json retains labels and nonmissing/positive/zero counts.
+The raw-new-slot total has24 zero reports;22 are on retained observations (5/0/1/0/16 across the five waves).
+No negative or positive-infinite report appears in these held fields; synthetic tests cover unchanged nonnumeric/nonpositive/nonfinite behavior.
+
+The existing builder at =uganda.py:1522-1536= applies =pd.to_numeric(errors='coerce')= and =kgf.where(kgf>0,np.nan)= exactly as before.
+Root corrected the original brief's incompatible raw-zero/negative served-value sentence before code; the ledger-first commits and original brief remain historical evidence.
+Raw literals remain private; served factors follow this unchanged normalization, then the unchanged downstream finite-positive/Kg1percent/cap250/calendar-year screen.
+Positive implausible reports remain visible in KgFactor and are not clipped, rescaled or blanked by this patch.
+
+Mounted image Python, exact cwd/import/PYTHONPATH/countries/config/data assertions, unshare-rn and active socket/write guards preceded imports, pickle/source decoding and APIs.
+Numerical/build/Make threads were1; later pytest cohorts ran sequentially with at most2 loadfile workers.
+The initial two24-case toy cohorts overlapped with2 workers each (4 requested in total); original outputs remain and this bounded execution qualification is not erased by a rerun.
+No acquisition, DVC CLI, shared-cache operation, freshness bypass, manual stamp, in-tree payload, nutrition/FDC call or corpus rebuild occurred.
+Network-attempt count is recorded in the final proof.
+
+* Actual prebuild scope
+
+Separate exact-source processes measured549 API hashes and39 framework fingerprints before any Uganda L2 existed.
+Exactly28 Uganda API hashes moved;521 other-country hashes and39 framework fingerprints are exact.
+Declared-wave hashes move171/1362, and API-wave hashes224/2139, Uganda only.
+The inventory ran on the ledger head with the eventual7a8 runtime bytes; the final proof compares those measured file SHAs to the final tree.
+The original inventory checker incorrectly rejected the separately gated Niger comparator parquets; both stopped outputs survive, and its corrected version explicitly requires no Uganda parquet before the gate.
+Hash movement does not claim rebuild coverage for all28 Uganda APIs.
+
+* Full source-observation and matched-stage proof
+
+The independent oracle reuses the unchanged actual parent decoder/eligibility with explicit physical source coordinates, then obtains each factor from the literal raw row and actual slot, independently of the candidate's map.
+It retains every133761 observation and every production_obs/source fingerprint; the403 old conditional null-key exclusions (360/43) and928 public null-v rows are exact.
+No sum/first carrier, averaging, reported-total layer or factor-dependent identity is introduced.
+All82103 newly nonmissing factor payloads match their own source row/slot and existing normalization.
+The full2009 and2018 controls are exact.
+
+Both actual normal DEFAULT and MAKE cold builds completed from empty Uganda L2 roots.
+The oracle matches helper, serialized native waves, ID-walked/raw country and finalized public frames at their corresponding routes.
+Every non-KgFactor value, key, order, dtype, mask, axis class, unused MultiIndex level/code and recursively typed full attrs/_FIELDS is exact to the actual parent.
+The comparator uses check_exact=True and zero rtol/atol; negative controls catch payload, attrs-presence and unused-level mutations.
+An additional90 matched cold/warm/native/support checks and12 saved subset/CLI checks pass.
+
+Fresh-process warm and new-Country crop frames are strictly exact to their corresponding cold frames.
+DEFAULT calls preserve all cache bytes, modes and mtimes.
+Both Make heads change the same17 byte-identical paths from0600 to0644 and change mtimes, with no additions/deletions; endpoints are saved before assertions.
+This is a separate observation from prior1198's opposite mode direction, with no inferred initial-copy provenance or universal mode claim.
+Support cluster_features/v has the known4805-row, zero-null pyarrow StringDtype distinction: cold na_value=pd.NA, warm na_value=np.nan, on both heads/backends.
+Same-stage parent/candidate support frames remain fully exact; no dtype normalization or repair occurs.
+
+Populated-current DEFAULT supported2018 and combined requests return15630 rows, unsupported2005 returns0, without writes.
+Actual parent/candidate subset returns match fully, including typed attrs; the2018 and empty controls match factors too.
+Make returns all133761 rows/all seven supported waves even for these singleton/unsupported requests, preserving #1204.
+A filtered already-finalized full frame is not a full-attrs subset oracle: sampling/population/recall are recomputed, and empty output additionally changes population_resolution/sampling_resolution.
+The first strict parent-supported comparison stopped after saving actual/endpoints; its in-memory expected filter was not serialized.
+A distinctly named artifact-only reconstruction from the surviving full reference and pinned unchanged restriction helper is retained, not presented as the original operand; the completed API prefix was not replayed.
+
+* Existing transformation effects
+
+Direct own-row products and an independent fine/coarse median implementation match full harvest_kg frames exactly on both heads.
+The area frame42841 is exact, and actual parcel/plot yield results match direct positive-area joins using the existing transforms.
+Whole harvest changes from29095413.407893993 to42026694.99297963 kg (+12931281.585085638); output keys78571 ->88980.
+This is not the rejected historical42.035M scalar-carrier projection.
+Layers are reported14981 ->96747, survey_median560 ->4840, metric88443 ->23406, none29777 ->8768, implausible102 ->439; shipped/inferred remain0.
+Fine pool count/median changes1287 with692 support-threshold crossings; coarse changes166 with133 crossings.
+The same-wave pooling mechanism changes resolved factors on727 records whose own report payload is unchanged;2009 and2018 remain exact controls.
+
+| Wave | Before kg | After kg | Factor-convertible before/after | Screened reports | Label agreement10% /20% /denominator |
+|------+-----------+----------+--------------------------------+------------------+------------------------------------|
+|2010-11|3676764.4050000003|6910907.57|15154 /21049|20254|9667 /11252 /15085|
+|2011-12|4513141.530143051|8187314.4502397105|15243 /19486|14989|5625 /7390 /10758|
+|2013-14|3371198.950004625|5267806.449994665|13609 /17259|13167|5214 /6081 /9526|
+|2015-16|3500953.500243336|5164742.550242275|15921 /19638|17254|8508 /9671 /13542|
+|2019-20|3832822.4|6295391.35|13529 /17033|16102|8052 /9465 /12602|
+
+Agreement requires finite strictly positive factors on both sides, no Quantity filter, and abs(label-reported)/reported <=.1/.2.
+Nominal label factors use the existing metric/explicit-label parser with volume_as_mass=True, no price inference or declared table.
+Wave-measurements.json includes unscreened/screened agreement, each overlapping screen reason, raw-positive Factor==Quantity, >MAX and joint counts, usable contributions and coverage denominators.
+For the five new waves those equality counts are437/318/350/275/173 and >MAX counts24/69/86/23/28; they are diagnostics, not new rejection rules.
+Unit/condition dispersion is material: e.g.2011 Sack(120kgs), dried_with_shell, has only9/119 within20%, median reported65kg and CV0.4406; its nominal label is not silently substituted.
+All unit/condition group counts are retained, with small-group ratios/dispersion suppressed in safe exports.
+Real parcel yields have14022 ->14520 keys,498 new keys,7335 changed shared values; literal plot yield remains empty on both heads (#1205).
+
+* Feature, CLI, tests and scanner
+
+Actual bare/default, explicit currency=None and currency='index' calls are matched separately on both heads and fresh processes.
+Feature has180137 rows, Uganda133761 plus healthy current/full-coverage Niger46376; every non-factor cell and complete typed attrs is exact, with no new merge or carrier change.
+The source-backed currency/assembly oracle gives30 strict checks; all15 healthy Niger cache copies per root remain exact.
+CLI materialize prewrite matches the actual argument-matched API, postread matches an independently serialized artifact, and full Arrow schema/footer/bytes are exact on each head.
+Prewrite-to-postread remains strictly different on both heads: v changes NA representation and sampling/population/recall typed records change under JSON serialization.
+Those stage differences are disclosed, not normalized or substituted for actual API proof.
+
+The complete focused selection has416 pass,10 genuine unavailable-country/corpus skips,0 fail/error (426 cases including the24 new cases).
+The new file alone has24 pass; the exact same file on the actual parent has20 meaningful failures and4 unchanged-normalization passes, no fixture errors/skips.
+Twelve failures expose missing pairing, two slot-carrier controls, four positive suspect/Kg controls and two missing-column contract failures.
+The only existing assertions updated are the directly superseded whole-harvest/layer pin and all-other-rounds-unwired assumption, retaining2018 positive and2009 negative controls.
+All41 scanner findings are literally exact full-record multisets, all warn,0 fail/error; crop_production has no phase2 kwargs grid.
+All54 captured public-warning class/full-message multisets are literally exact without path normalization; derived captured warnings are empty on both heads.
+Full findings, source records, frames, warning examples and logs remain private.
+
+* Evidence lineage, limits and release
+
+The source-oracle categorical-lookup cwd stop, two relative-path launch failures, nullable-Boolean summary stop and empty-safe-directory packaging stop remain alongside corrected uniquely named checkers/outputs.
+No private aggregate was overwritten, no failed frame comparison was normalized, and no completed API/test/source prefix was replayed to erase a stop.
+The original1198 overwritten XML and first-failed-Make warning-list qualifications remain at their original immutable source pins; this run does not reconstruct them as originals.
+Current #1196 records the distinct Uganda/v and Niger/u dtype manifestations, with shared cause unproved; #1204 routing and #1205 area coverage remain separate.
+No2009 mapping, other Uganda output corpus, whole suite, source-science exception or global composition is claimed.
+
+Protected-reference receipts rehash the4122 author1198 entries,1908 independent runtime entries,52/45 documentation-review entries,1960 original849/addendum/Mali references,6468 GLOBAL17 entries,594 BF and2894 Tanzania entries, plus606 held-source/comparator/copy receipts.
+Final source snapshots prove literal os.readlink Git bytes/modes, clean parent and author head, exact runtime/test descendants, no in-tree parquets and no other consumers.
+The new checkouts have full content/mode/HEAD/status checks, not an invented initial source-mtime baseline; frozen reference receipts retain their recorded timestamp checks.
+The dedicated safe-export allowlist, checker hashes and complete final private manifest are recorded in READY.json.
+Only those safe files may be exported; all other payloads stay private.
+
+Signed: Sue.

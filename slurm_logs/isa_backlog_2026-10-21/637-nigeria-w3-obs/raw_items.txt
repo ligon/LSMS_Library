@@ -1,0 +1,14 @@
+item code range a 10 601 n 116
+item code range b 10 601 n 110
+items a-only 6 b-only 0 both 110
+per-EA rows a quantiles {0.0: 10.0, 0.25: 51.5, 0.5: 61.0, 0.75: 68.0, 1.0: 87.0}
+per-EA rows b quantiles {0.0: 4.0, 0.25: 9.0, 0.5: 10.0, 0.75: 12.0, 1.0: 91.0}
+EAs with overlap>0 78
+overlap EAs: na median 68.0 nb median 63.0 ov median 57.0
+no-overlap EAs: na median 58.0 nb median 10.0
+no-overlap EAs where all b codes > all a codes 0  all b codes < all a codes 0
+union items per EA quantiles: overlap EAs {0.25: 69.0, 0.5: 73.0, 0.75: 80.0}  no-overlap EAs {0.25: 60.0, 0.5: 68.0, 0.75: 76.0}
+b rows in no-overlap EAs 4032  top item codes {72: 406, 70: 397, 76: 390, 77: 383, 74: 360, 71: 346, 73: 289, 75: 281, 160: 245, 163: 214}
+b rows in overlap EAs 4855
+overlap EAs by sector {2: 48, 1: 30}  by zone {4: 53, 1: 11, 5: 7, 2: 4, 3: 3}
+no-overlap EAs by sector {2: 280, 1: 129}

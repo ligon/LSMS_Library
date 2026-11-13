@@ -1,0 +1,29 @@
+{
+  "verdict": "PASS",
+  "reviewer": "Sue (GPT-6)",
+  "global13_head": "5dde66645a444b025aa69682838cdf7c033a6e88",
+  "global12_head": "55ec81b5f04aed8239128d8453aa7dd5ee0f2d25",
+  "standalone_reviewed_head": "b8b03e448783c6803648623dcf5318673b3ddde1",
+  "blocking_findings": [],
+  "bounded_conclusion": "The reviewed partial Nigeria #1095 fix composes with global12 without changing any old community-prices payload or full attrs, or the current healthy Niger output.",
+  "residuals": [
+    "#1095 remains partial: future eligible unplaced labels are warned then dropped under existing policy; literal raw-native retention remains a Tier C decision.",
+    "Historical Nigeria CONTENTS count and W5 cross-check claims have explicit qualifications; neither was treated as current complete source evidence."
+  ],
+  "limits": [
+    "full 549-country-hash/39-framework-fingerprint census",
+    "standalone 23 extra fault groups",
+    "full test suite",
+    "food/crop/input/nutrition cohorts",
+    "Only held local sources were used; no new instrument acquisition.",
+    "Community-prices scanner has no phase-2 keyword grid.",
+    "Quiescence checks read command lines for all live same-UID processes; 10 nonreview process environments were inaccessible."
+  ],
+  "frozen_tracked_trees_and_prior_evidence_unchanged": true,
+  "private_consumers_released_quiescent": true,
+  "artifacts": [
+    "REVIEW.org",
+    "proof.json",
+    "commands.sh"
+  ]
+}

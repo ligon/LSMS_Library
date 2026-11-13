@@ -1,0 +1,53 @@
+Test lines (cwd + PYTHONPATH = checkout under test; LSMS_DATA_DIR private per checkout;
+OPENBLAS/OMP/MKL threads 1, LSMS_BUILD_WORKERS=1; -n 3 --dist=loadfile).
+
+Every tests/ file mentioning Tanzania (`rg -l Tanzania tests/`):
+  development 9a0ed5f3c (35 files):  1971 passed, 116 skipped, 4 xfailed in 392.70s
+  branch (36 files, +test_gh637_tanzania_unit_grain.py): 1992 passed, 116 skipped, 4 xfailed in 424.80s
+  (includes tests/test_feature_canonical_index.py, tests/test_1118_tanzania_plot_input_units.py,
+   tests/test_quantity_screen.py)
+
+tests/test_gh637_tanzania_unit_grain.py (21 tests; TestHeldSources ran -- credentials present):
+  against branch code:       21 passed
+  against development code:  15 failed, 6 passed
+    (the 6 that pass on development are preserve-controls: same-unit sums,
+     two-slot fertilizer sum, reported zeros with an explicit harvested column,
+     lumped kg sums)
+
+tests/test_1118_tanzania_plot_input_units.py on branch: 16 passed.  Edits:
+  - 2 pins REVERSED, with comments (and renamed):
+      test_duplicate_missing_first_unit_does_not_displace_later_known_unit
+        -> test_duplicate_missing_unit_and_later_known_unit_stay_separate (1 row -> 2)
+      test_conflicting_recorded_duplicate_units_keep_existing_first_policy
+        -> test_conflicting_recorded_duplicate_units_are_separate_rows (1 row -> 2)
+  - 1 RENAMED, same assertions (normalization now precedes the reduction):
+      test_all_missing_duplicate_units_normalize_after_unchanged_reduction
+        -> test_all_missing_duplicate_units_reduce_to_one_unknown_row
+  - 3 tests read u from the index via a new served_unit() helper instead of
+    out.iloc[0]['u'] (u is no longer a column); assertions unchanged.
+tests/test_feature_canonical_index.py: comments only (INPUT_SHAPES shape note,
+  one docstring); no assertion changed.
+
+tests/test_quantity_screen.py::test_tanzania_2020_21_coconut_and_timber_rows_fire
+  development code + development warm parquet: passed (n_implausible 13)
+  branch code + branch warm parquet: passed after pin 13 -> 26 (comment in test)
+
+ROUND 2 (2026-10-23, after independent review; docs/tests only):
+  tests/test_quantity_screen.py: the interim `== 26` pin is withdrawn.  It now
+    pins the 13 offenders that survive a POSITIVE-ONLY reference (the bound;
+    the same count development pinned) and the 13 zero-driven offenders of
+    2020-21 as a named, explained excess (Timber 10, Citrus Fruits 1,
+    Coconuts 1, Ripe Bananas 1; GH #1259), each checked to sit in a cell with
+    zeros and to be judged against less than its cell's positive-only p90.
+    Mutation check: one injected 1e9-kg Maize row makes the positive-only set
+    14, so the bound fails.  On development's warm parquet the bound holds and
+    the excess assertion fails (no excess there).
+  tests/test_gh637_tanzania_unit_grain.py: +1 test pinning the disclosed
+    both-OTHER residual (22 tests); held-source zero comment corrected.
+  Branch (-n 3 --dist=loadfile, the four files): 156 passed in 16.84s
+    test_gh637_tanzania_unit_grain.py 22 passed; test_quantity_screen.py 39
+    passed; test_1118_tanzania_plot_input_units.py 16 passed;
+    test_962_unit_sentinel.py 79 passed.
+  Development code, branch test files (new file + quantity screen):
+    16 failed, 45 passed (15 + 1 failures; the 7 + 38 passes include the
+    preserve-controls and the residual pin, which development shares).

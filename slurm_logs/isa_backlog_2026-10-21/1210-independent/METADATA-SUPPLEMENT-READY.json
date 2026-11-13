@@ -1,0 +1,10 @@
+{
+  "status": "READY_ADDITIVE_METADATA",
+  "signed": "Sue",
+  "manifest_sha256": "bbd87d432c35d8c2ea1887dceb848d2691829469cd0521e1ff8ed704a96a0b51",
+  "entries": 27,
+  "safe_allowlist_sha256": "e3f802110a167bc4ef007b054da5a4377fdc195adddfd724639be70dc5bf7bf5",
+  "original_v1_READY_sha256": "b1878041c931bf71426f5f865ea2d9ebb01b6e279ede5fd2085a08eb17616765",
+  "original_v1_manifest_sha256": "5f7364326678e13989091e887e6dd2a0d0044c9e28028f89ff2a9dcca5da99de",
+  "root_joint_acceptance_pending": true
+}

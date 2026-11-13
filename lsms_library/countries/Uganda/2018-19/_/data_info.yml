@@ -69,31 +69,72 @@ housing:
         Floor: h9q06
 
 sample:
-    file: GSEC1.dta
-    idxvars:
-        i: hhid
-    myvars:
-        # GH #323: the composite DISTRICT/PARISH key built by this wave's
-        # mapping.v().  parish_name ALONE is not a cluster key -- 20 parish
-        # names recur across districts ('CENTRAL' in ten of them).  `sample`
-        # and `cluster_features` MUST declare the identical pair, or they
-        # desynchronise and _join_v_from_sample hands every other table a key
-        # that does not exist in cluster_features.  (parish_code is unusable:
-        # 19 distinct values for 751 parishes.)
-        v:
-            - distirct_name   # sic: the source misspells "district"
-            - parish_name
-        weight: wgt  # cross-sectional weight
-        panel_weight: hwgt_W7  # longitudinal weight (NaN for refreshment sample)
-        strata: subreg
-        Rural: urban
-        Region: region
+    # GH #1120 D2: AGSEC1 contributes membership for households excluded
+    # from GSEC1 (which ships completed responses only). No location or
+    # weight is inferred for those households; each receives a singleton.
+    dfs:
+        - locating_cover
+        - locating_ag
+        - origin_ea
+    locating_cover:
+        file: GSEC1.dta
+        idxvars:
+            i: hhid
+        myvars:
+            _cover: hhid
+            # GH #323: the composite DISTRICT/PARISH key built by this wave's
+            # mapping.v().  parish_name ALONE is not a cluster key -- 20 parish
+            # names recur across districts ('CENTRAL' in ten of them).  `sample`
+            # and `cluster_features` MUST declare the identical pair, or they
+            # desynchronise and _join_v_from_sample hands every other table a
+            # key that does not exist in cluster_features.  (parish_code is
+            # unusable: 19 distinct values for 751 parishes.)
+            v:
+                - distirct_name   # sic: the source misspells "district"
+                - parish_name
+            weight: wgt  # cross-sectional weight
+            panel_weight: hwgt_W7  # longitudinal weight (NaN for refreshment sample)
+            strata: subreg
+            Rural: urban
+            Region: region
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: distirct_name  # sic
+    locating_ag:
+        file: AGSEC1.dta
+        idxvars:
+            i: hhid
+        myvars:
+            _frame: hhid
+    # GH #689: the design PSU, which no file of this wave ships.  The country
+    # hook `origin_ea` re-keys this 2015-16 frame to this wave's `hhid` through
+    # GSEC1.t0_hhid, the survey's own tracking key; a household it does not
+    # reach stays NA.  Declared here so the files' sidecars are in this wave's
+    # input hash, and so that a loss the GH #515 handler catches costs `ea`, not
+    # `v`.  An unreachable remote is not caught: `sample` raises here (GH #1463).
+    # Two files because a tracking key can name a household only 2015-16's
+    # AGSEC1 records (ruling 2026-11-04).  The key stays GSEC1's: AGSEC1.t0_hhid
+    # disagrees with it on 86 households and is not read.
+    origin_ea:
+        file:
+            - ../../2015-16/Data/gsec1.dta
+            - ../../2015-16/Data/AGSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            ea: ea
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
 
 cluster_features:
     dfs:
-        - df_main
+        - locating_cover
         - df_geo
-    df_main:
+        - locating_frame
+    locating_cover:
         file: GSEC1.dta
         idxvars:
             i: hhid
@@ -103,6 +144,7 @@ cluster_features:
                 - distirct_name
                 - parish_name
         myvars:
+            _cover: hhid
             Region: region
             Rural: urban
             District: distirct_name
@@ -115,6 +157,12 @@ cluster_features:
         myvars:
             Latitude: pub_lat_mod
             Longitude: pub_lon_mod
+    locating_frame:
+        file: AGSEC1.dta
+        idxvars:
+            i: hhid
+        myvars:
+            _frame: hhid
     merge_on:
         - i
     final_index:

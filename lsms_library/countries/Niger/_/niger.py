@@ -1,9 +1,13 @@
+from pathlib import Path
+
 import pandas as pd
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 import numpy as np
 import json
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import lsms_library.local_tools as tools
+from lsms_library.derivations import MULTI_SEP, union_keys
 
 
 Waves = {'2011-12': (),
@@ -532,12 +536,142 @@ def _crop_maps():
     return crop_map, unit_map
 
 
+# ---------------------------------------------------------------------------
+# production_obs: the native crop-observation coordinate (GH #1360)
+# ---------------------------------------------------------------------------
+#
+# `(t, i, plot_id, crop, u)` is NOT a harvest line in two waves: one (plot,
+# crop, unit) can carry several reported lines.  Measured on the held sources
+# (development 3a33f2869): 2011-12 27 key groups / 57 rows (19 conflicting),
+# 2021-22 846 groups / 1,856 rows (740 conflicting); 2014-15 and 2018-19 are
+# unique.  The framework collapsed each group to one observed row (GH #323 /
+# #871), destroying 916 rows, and because only a non-unique index is collapsed
+# AND key-sorted, the default route (per-wave collapse) and the Make route
+# (combined collapse) served the same rows in different orders (GH #1360).
+# The missing level is the canonical `production_obs` axis
+# (`lsms_library/data_info.yml`, GH #1198 -- Uganda, Malawi, Tanzania):
+#   2011-12  `reported:<as02eq0>` -- the module's own line number ("numero
+#            d'ordre"), unique within `hid` on every row of ecvmaas2e_p2.
+#   2021-22  `row:<source_fingerprint>:<n>` -- s16c records no line number, so
+#            the zero-based row of the held release, bound to its sidecar.
+#            CONSTRUCTED, not a survey id.
+#   2014-15, 2018-19  `unresolved_observation` -- unique without it (the
+#            plot_inputs EHCVM precedent); the sentinel does not assert that a
+#            row is one native observation.
+CROP_OBS_NA = 'unresolved_observation'
+
+
+def _crop_reported_observations(households, line, module=None):
+    """Recorded harvest-line numbers as ``reported:<n>`` tokens (2011-12), or
+    ``reported:<module>:<n>`` for a second module of the same wave, whose line 1
+    is not the first module's (section 3E, GH #1462).
+
+    Refuses a missing household or line number and a repeated
+    (household, line) pair rather than inventing an ordinal.
+    """
+    numeric = pd.to_numeric(line, errors='coerce')
+    if (pd.isna(households).any() or numeric.isna().any()
+            or not ((numeric > 0) & (numeric % 1 == 0)).all()):
+        raise ValueError('Niger crop observations require household and integer line number')
+    keys = pd.DataFrame({'i': np.asarray(households), 'line': numeric.to_numpy()})
+    if keys.duplicated().any():
+        raise ValueError('Niger crop observations repeat a native household/line number')
+    prefix = 'reported:' if module is None else f'reported:{module}:'
+    return prefix + numeric.astype('Int64').astype('string')
+
+
+def _crop_row_observations(n_rows, source_path, *, script_path):
+    """Constructed ``row:<fingerprint>:<n>`` tokens for a source with no line id.
+
+    ``n`` is the zero-based row position in the file as read, BEFORE any
+    filter, so a token names one physical line of one held release.  The
+    fingerprint is ``local_tools.source_fingerprint`` of the same literal path
+    the script reads; a source without a DVC sidecar is refused.
+    """
+    from lsms_library.local_tools import source_fingerprint
+
+    path = Path(source_path)
+    if not path.is_absolute():
+        path = Path(script_path).resolve().parent / path
+    reference = source_fingerprint(path.resolve())
+    if not reference.startswith('dvc:'):
+        raise ValueError('Niger constructed crop observations require a declared sidecar')
+    return 'row:' + reference + ':' + pd.Series(np.arange(n_rows)).astype('string')
+
+
+# ---------------------------------------------------------------------------
+# condition: the physical state of the reported harvest (GH #1436)
+# ---------------------------------------------------------------------------
+#
+# Canonical index level (lsms_library/data_info.yml): a Tiya of millet on the
+# ear and a Tiya of millet grain are two facts, not one.  EHCVM asks it ("Etat
+# du produit": 2018-19 s16cq12c, 2021-22 s16cq16d); the ECVMA harvest modules do
+# not, so 2011-12 and 2014-15 pass nothing and carry the sentinel.  The tables
+# and the named decision behind them are in categorical_mapping.org.
+CONDITION_NA = 'unknown_condition'
+
+
+def _crop_conditions(codes, table):
+    """Map raw state CODES (``convert_categoricals=False``) through a
+    ``harmonize_crop_condition_*`` table.  A blank or off-scheme code becomes
+    :data:`CONDITION_NA` -- a real value, never NA, because a null index key is
+    deleted by the next ``groupby`` (GH #323 3b)."""
+    return crop_condition_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table)).fillna(CONDITION_NA)
+
+
+def _crop_condition_labels(labels):
+    """The state as the survey recorded it, for the ``condition_native`` column.
+
+    *labels* is the state column read with ``convert_categoricals=True``, in
+    whatever language the survey labelled it.  A blank stays NA, never a sentinel:
+    a column has no NaN-key hazard, and NA says no state was recorded.  Only
+    surrounding whitespace is touched.  Ruling @ligon 2026-11-04 (GH #1436).
+    """
+    return crop_condition_labels(labels)
+
+
+def _crop_sold_conditions(codes, table):
+    """The ``Condition_sold`` column (GH #1462): raw sold-state CODES through the
+    same ``harmonize_crop_condition_*`` table as the harvest level, so the two
+    speak one fold.  Unlike :func:`_crop_conditions`, a blank stays NA and never
+    takes the sentinel: it is a column, with no NaN-key hazard, and NA says no sale
+    or no state recorded (canonical ``data_info.yml``)."""
+    return _map_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table))
+
+
 def _finish_crop_production(df, t):
-    """Common tail: tag t, build the (t, i, plot, crop, u) index, coerce
-    numeric columns, and guarantee the full schema column set (including the
-    NA-bearing ``Unit_sold`` column, GH #824)."""
+    """Common tail: tag t, build the (t, i, plot_id, crop, u, condition,
+    production_obs) index, coerce numeric columns, and guarantee the full schema
+    column set (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave
+    that passes no ``condition`` gets :data:`CONDITION_NA`; one that passes no
+    ``production_obs`` gets :data:`CROP_OBS_NA`; one that passes no
+    ``condition_native``, ``Condition_sold``, ``condition_sold_native``,
+    ``Quantity_kg`` or ``Quantity_sold_kg`` carries NA there."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
+    # Quantity_kg (GH #1436): the survey's total for the line, where its harvest
+    # module asks one.  2018-19 does not.  A 0 beside a positive quantity is no answer,
+    # not a harvest of nothing (3E 74 rows, 2014-15 101), so it is NA and the row falls
+    # down the ladder.  A 0 beside a 0 would stay; the file has none.
+    if 'Quantity_kg' not in df.columns:
+        df['Quantity_kg'] = pd.NA
+    df['Quantity_kg'] = pd.to_numeric(df['Quantity_kg'], errors='coerce').astype('Float64')
+    no_answer = (df['Quantity_kg'].eq(0).fillna(False).astype(bool)
+                 & df['Quantity'].gt(0).fillna(False).astype(bool))
+    df['Quantity_kg'] = df['Quantity_kg'].mask(no_answer)
+    # Quantity_sold_kg (GH #1560 / #1571, ruling @ligon 2026-11-12, "Treat 2021 as
+    # totals"): the survey's kilograms for the SALE, a TOTAL in the window of
+    # Quantity_sold, read literally.  The wave script clears each column's own code.
+    # The harvest rule applies on the sale side: a 0 beside a positive Quantity_sold is
+    # no answer, not a sale of nothing.  A 0 beside no positive sold quantity stays.
+    # It is never a factor: KgFactor_sold, kg per ONE sold unit, is not Niger's.
+    if 'Quantity_sold_kg' not in df.columns:
+        df['Quantity_sold_kg'] = pd.NA
+    df['Quantity_sold_kg'] = pd.to_numeric(df['Quantity_sold_kg'],
+                                           errors='coerce').astype('Float64')
+    no_sold_answer = (df['Quantity_sold_kg'].eq(0).fillna(False).astype(bool)
+                      & df['Quantity_sold'].gt(0).fillna(False).astype(bool))
+    df['Quantity_sold_kg'] = df['Quantity_sold_kg'].mask(no_sold_answer)
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
     # because >=1 wave has it).  planting_month / perennial are omitted from
     # the schema entirely — no Niger wave records them.
@@ -574,12 +708,434 @@ def _finish_crop_production(df, t):
     # row it touches was already being served, with a NaN key that the next
     # groupby would have deleted.
     df = fill_missing_u(df)
-    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'Quantity',
-            'Quantity_sold', 'Value_sold', 'Unit_sold', 'harvest_month',
-            'intercropped']
+    if 'condition' not in df.columns:
+        df['condition'] = CONDITION_NA
+    df['condition'] = df['condition'].astype('string').fillna(CONDITION_NA)
+    if 'condition_native' not in df.columns:
+        df['condition_native'] = pd.NA
+    df['condition_native'] = df['condition_native'].astype('string')
+    if 'Condition_sold' not in df.columns:
+        df['Condition_sold'] = pd.NA
+    df['Condition_sold'] = df['Condition_sold'].astype('string')
+    if 'condition_sold_native' not in df.columns:
+        df['condition_sold_native'] = pd.NA
+    df['condition_sold_native'] = df['condition_sold_native'].astype('string')
+    if 'production_obs' not in df.columns:
+        df['production_obs'] = CROP_OBS_NA
+    df['production_obs'] = df['production_obs'].astype('string')
+    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs',
+            'Quantity', 'Quantity_kg', 'Quantity_sold', 'Quantity_sold_kg', 'Value_sold',
+            'Unit_sold', 'Condition_sold',
+            'harvest_month', 'intercropped', 'condition_native', 'condition_sold_native']
     df = df[[c for c in keep if c in df.columns]]
-    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u'])
+    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
     return df
+
+
+# ---------------------------------------------------------------------------
+# A household-crop sale: its one harvest line, or Farm-level (GH #1457)
+# ---------------------------------------------------------------------------
+#
+# 2014-15 AS2E2 and 2021-22 s16d record a sale per household and crop, with no plot.
+# The wave scripts attach one to the crop's single harvest LINE (GH #1360).  Any other
+# sale goes on ONE row with plot_id = FARM_LEVEL, no harvest Quantity and the sentinels
+# of a row with no harvest on the index (ruling on GH #843, option (d); in bulk here,
+# 2026-11-04).  No sale is split, summed or dropped.
+
+HH_CROP_SALE = 'Niger::crop_production::hh-crop-sale-single-row'
+
+
+def is_crop_sale(frame):
+    """A sale is a record with a positive sold quantity or a positive value."""
+    return (pd.to_numeric(frame['Quantity_sold'], errors='coerce').astype('float64').gt(0)
+            | pd.to_numeric(frame['Value_sold'], errors='coerce').astype('float64').gt(0))
+
+
+def served_harvest_lines(df):
+    """True on a harvest line a crop-level sale can sit on: one that will be SERVED.
+
+    A line with no quantity, month, stand or native state is all-NA on its columns, so
+    ``_finalize_result``'s ``dropna(how='all')`` removes it at the API unless a sale
+    keeps it.  So it does not count as a line of its crop, and does not take the sale,
+    where the crop has a line that does serve.  A crop with no such line keeps all of
+    its lines: one alone takes its sale, as a lone line always has, and two or more
+    mean a Farm-level row.  (GH #1457: 19 sales in 2014-15; none in 2021-22, whose
+    lines carry ``intercropped``.)
+    """
+    columns = [c for c in ('Quantity', 'harvest_month', 'intercropped', 'condition_native')
+               if c in df.columns]
+    content = df[columns].notna().any(axis=1)
+    keys = ['i', 'crop']
+    any_content = content.groupby([df[k] for k in keys], dropna=False).transform('any')
+    return (content | ~any_content).to_numpy(dtype=bool)
+
+
+def derive_hh_crop_sale_attachment(harvest, records):
+    """``harvest`` with ONE new row for each sale the line rule did not attach.
+
+    ``harvest`` is the wave's rows after the script's merge: a sale is on a crop's one
+    line, or nowhere.  ``records`` holds the crop-level records before that merge's
+    filters, one row per (i, crop, sold unit[, sold state]).  A pair that sold in two
+    units or states would need two rows on one key, which the script's uniqueness
+    assert refuses: measured, none does.  A sale's own unit and state ride on the row;
+    ``u``, ``condition`` and ``production_obs`` describe a harvest, which it does not
+    have.  A record that is not a sale serves nothing here.
+    """
+    keys = ['i', 'crop']
+    on_a_row = (harvest.loc[harvest['Quantity_sold'].notna() | harvest['Value_sold'].notna(), keys]
+                .drop_duplicates())
+    sales = records[is_crop_sale(records)]
+    placed = sales.merge(on_a_row, on=keys, how='left', indicator=True)['_merge'].eq('both')
+    farm = sales[~placed.to_numpy()].copy()
+    farm['plot_id'] = FARM_LEVEL
+    if 'production_obs' in harvest.columns:
+        farm['production_obs'] = CROP_OBS_NA
+    return pd.concat([harvest, farm], ignore_index=True)
+
+
+def stamp_hh_crop_sale(df):
+    """The ``Derivation`` column of a finished 2014-15 / 2021-22 frame, a ``string``
+    Series on its index: :data:`HH_CROP_SALE` on a harvest line holding a sale, beside
+    any key already on that row (``MULTI_SEP``, sorted), and every other row's own.  A
+    Farm-level row's index discloses it, and a 0 is not a sale."""
+    plotted = df.index.get_level_values('plot_id') != FARM_LEVEL
+    sold = is_crop_sale(df).astype('boolean').fillna(False).to_numpy(dtype=bool)
+    out = (df['Derivation'].astype('string').copy() if 'Derivation' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    hit = plotted & sold
+    out[hit] = pd.array([union_keys((key, HH_CROP_SALE)) for key in out[hit]], dtype='string')
+    return out
+
+
+def inputs_hh_crop_sale_single_row(wave):
+    """The raw sale answers behind one wave's keyed rows, at (t, i, crop), under their
+    own names.  Registry ``inputs``; re-reads the source.  One row per keyed served row:
+    an s16d line repeated once per harvest line is one record (see the 2021-22 script),
+    and it needs one line to carry the key."""
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    if wave not in _HH_SALE_SOURCE:
+        raise ValueError(f'hh-crop-sale-single-row is {sorted(_HH_SALE_SOURCE)}, not {wave!r}')
+    spec = _HH_SALE_SOURCE[wave]
+    root = Path(countries_root()) / 'Niger' / wave / 'Data'
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        dirs=[f"{Path(countries_root()) / 'Niger' / wave / '_'}/",
+              f"{Path(countries_root()) / 'Niger' / '_'}/"],
+        **{'Preferred Label': 'Preferred Label'})
+
+    def read(name, crop, hh):
+        lab = get_dataframe(str(root / name), convert_categoricals=True)
+        code = get_dataframe(str(root / name), convert_categoricals=False)
+        out = code.copy()
+        out['t'] = wave
+        out['i'] = lab.apply(lambda r: i(pd.Series([r[v] for v in hh], index=hh)), axis=1).values
+        out['crop'] = _crop_labels(code[crop], lab[crop], crop_map).values
+        return out
+
+    lines = read(spec['harvest'], spec['harvest_crop'], spec['hh']).dropna(subset=['i', 'crop'])
+    # The same count as the wave script's: the served lines.
+    lines = lines.assign(
+        Quantity=_na_exact(lines[spec['harvest_qty']], spec.get('qty_codes', ())),
+        harvest_month=(pd.to_numeric(lines[spec['harvest_month']], errors='coerce').where(
+            lambda m: m.between(1, 12)) if spec.get('harvest_month') else pd.NA),
+        intercropped=(pd.to_numeric(lines[spec['harvest_stand']], errors='coerce').where(
+            lambda v: v.isin([1, 2])) if spec.get('harvest_stand') else pd.NA))
+    lines = lines[served_harvest_lines(lines)]
+    per_pair = lines.groupby(['i', 'crop']).size().rename('_lines').reset_index()
+    sale = read(spec['sale'], spec['sale_crop'], spec['hh'])
+    if spec.get('drop_repeats'):
+        sale = sale[~get_dataframe(str(root / spec['sale']),
+                                   convert_categoricals=False).duplicated(keep='first').to_numpy()]
+    sale = sale.dropna(subset=['i', 'crop'])
+    qty = _na_exact(sale[spec['qty']], spec.get('qty_codes', ()))
+    value = _na_exact(sale[spec['value']], spec.get('value_codes', ()))
+    sold = (qty.astype('float64').gt(0) | value.astype('float64').gt(0)).to_numpy(dtype=bool)
+    kept = sale[sold].merge(per_pair, on=['i', 'crop'], validate='many_to_one')
+    kept = kept[kept['_lines'] == 1]
+    return kept[['t', 'i', 'crop'] + spec['raw']].set_index(['t', 'i', 'crop'])
+
+
+#: Each wave's two crop files, as the wave scripts name them.
+_HH_SALE_SOURCE = {
+    '2014-15': dict(harvest='NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E1P2.dta',
+                    sale='NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta',
+                    harvest_crop='CULTURE', sale_crop='AS02EQ110B',
+                    harvest_qty='AS02EQ07A', harvest_month='AS02EQ06A',
+                    hh=['GRAPPE', 'MENAGE', 'EXTENSION'],
+                    qty='AS02EQ12A', value='AS02EQ13', qty_codes=(9999,), value_codes=(9999999,),
+                    raw=['AS02EQ110B', 'AS02EQ12A', 'AS02EQ12B', 'AS02EQ12C', 'AS02EQ13']),
+    '2021-22': dict(harvest='s16c_me_ner2021.dta', sale='s16d_me_ner2021.dta',
+                    harvest_crop='s16cq04', sale_crop='s16dq01', hh=['grappe', 'menage'],
+                    harvest_qty='s16cq16a', harvest_stand='s16cq07',
+                    qty='s16dq05a', value='s16dq06', drop_repeats=True,
+                    raw=['s16dq01', 's16dq05a', 's16dq05b', 's16dq05c', 's16dq05d', 's16dq06']),
+}
+
+
+# ---------------------------------------------------------------------------
+# The dry season: 2011-12 section 3E, ecvmaas3e_p1 (GH #1462)
+# ---------------------------------------------------------------------------
+#
+# Section 3E asks the contre-saison harvest by crop, "all fields combined", so a
+# line has no field or parcel: `plot_id` is the structural sentinel.  The quantity
+# is per cycle beside a cycle count, and both of these columns are registered in
+# _/derivations.yml.  2014-15 has no such module: see CONTENTS.org.
+FARM_LEVEL = 'Farm-level'
+DRY_SEASON_TOTAL = 'Niger::crop_production::dry-season-cycle-total'
+DRY_SEASON_SALE = 'Niger::crop_production::dry-season-sale-window'
+_DRY_SEASON_SOURCE = 'NER_2011_ECVMA_v01_M_Stata8/ecvmaas3e_p1.dta'
+
+
+def derive_dry_season_cycle_total(per_cycle, cycles):
+    """A dry-season crop's harvest over its cycles: per-cycle harvest x cycles.
+
+    Registered as ``Niger::crop_production::dry-season-cycle-total``, the Mali
+    tree precedent.  ``per_cycle`` is 3E.9a ``as03eq09a``, or its kilograms 3E.9c
+    ``as03eq09c`` for ``Quantity_kg`` (GH #1436), cleared of its code by the caller;
+    ``cycles`` is 3E.6 ``as03eq06``.  A zero answer is zero; a missing answer or
+    count is NA, and so is a positive answer beside a count of zero.  On the 526
+    one-cycle lines this is the identity.  Returns float64.
+    """
+    x = pd.to_numeric(per_cycle, errors='coerce').astype('float64')
+    n = pd.to_numeric(cycles, errors='coerce').astype('float64')
+    total = x * n
+    total = total.mask(x.eq(0), 0.0)
+    return total.mask(x.gt(0) & n.eq(0))
+
+
+def derive_dry_season_sale_window(quantity_sold, value_sold, kilograms_sold=None):
+    """A dry-season sale -> ``Quantity_sold`` / ``Value_sold``: THE IDENTITY.
+
+    Registered as ``Niger::crop_production::dry-season-sale-window``, the Mali
+    ``tree-sale-window`` precedent.  What the entry records is the WINDOW: 3E.11a
+    ``as03eq11a`` is asked per cycle and 3E.12 ``as03eq12`` states none, so the
+    pair is served as recorded beside a ``Quantity`` over all cycles, and on a
+    multi-cycle line ``Quantity_sold / Quantity`` is not a sold share.  Both inputs
+    are cleared of their codes by the caller.
+
+    ``kilograms_sold`` is 3E.11c ``as03eq11c`` (GH #1560), the sale in kilograms,
+    asked beside 3E.11a and so in its window: served as recorded, a TOTAL for that
+    window, and like ``Quantity_sold`` NOT multiplied by the cycle count, which the
+    harvest's ``Quantity_kg`` is.  Returned as ``Quantity_sold_kg`` when given.
+    """
+    out = pd.DataFrame({
+        'Quantity_sold': pd.to_numeric(quantity_sold, errors='coerce').astype('float64'),
+        'Value_sold': pd.to_numeric(value_sold, errors='coerce').astype('float64'),
+    })
+    if kilograms_sold is not None:
+        out['Quantity_sold_kg'] = pd.to_numeric(kilograms_sold, errors='coerce').astype('float64')
+    return out
+
+
+def stamp_dry_season_derivations(df):
+    """The ``Derivation`` column of the finished 2011-12 frame, as a ``string``
+    Series on its index: every ``Farm-level`` row carries :data:`DRY_SEASON_TOTAL`,
+    and one with a positive sale also :data:`DRY_SEASON_SALE`, joined with
+    ``MULTI_SEP`` in sorted order.  A zero sale is zero in any window.  Rainy rows
+    are NA."""
+    dry = (df.index.get_level_values('plot_id') == FARM_LEVEL)
+    sold = ((df['Quantity_sold'] > 0) | (df['Value_sold'] > 0)).astype(
+        'boolean').fillna(False).to_numpy(dtype=bool)
+    out = pd.Series(pd.NA, index=df.index, dtype='string')
+    out[dry] = DRY_SEASON_TOTAL
+    out[dry & sold] = MULTI_SEP.join(sorted((DRY_SEASON_TOTAL, DRY_SEASON_SALE)))
+    return out
+
+
+def _dry_season_inputs(wave, columns):
+    """Section 3E's raw answers, as recorded, under their own names, keyed by the
+    served ``(t, i, plot_id, production_obs)``.  The one byte-identical row is
+    dropped as the build drops it, or the key would repeat."""
+    from lsms_library.paths import countries_root
+    src = tools.get_dataframe(
+        str(countries_root() / 'Niger' / wave / 'Data' / _DRY_SEASON_SOURCE),
+        convert_categoricals=False)
+    src = src[~src.duplicated(keep='first')]
+    households = src['hid'].map(i)
+    out = src[columns].copy()
+    out['t'] = wave
+    out['i'] = households.values
+    out['plot_id'] = FARM_LEVEL
+    out['production_obs'] = _crop_reported_observations(
+        households, src['as03eq01'], module='3E').values
+    return out.set_index(['t', 'i', 'plot_id', 'production_obs'])
+
+
+def inputs_dry_season_cycle_total(wave):
+    """The registry ``inputs`` callable of dry-season-cycle-total."""
+    return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
+                                     'as03eq09a', 'as03eq09b', 'as03eq09c'])
+
+
+def inputs_dry_season_sale_window(wave):
+    """The registry ``inputs`` callable of dry-season-sale-window; the cycle count
+    is there so a user can rescale the sale."""
+    return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
+                                     'as03eq10', 'as03eq11a', 'as03eq11b', 'as03eq11c',
+                                     'as03eq12'])
+
+
+# Sold kilograms on a 3E record that states no sale (GH #1560 / #1571, ruling @ligon
+# 2026-11-12, "Sold-kg details" (a)).  Seven records give as03eq11c but no positive
+# as03eq11a or as03eq12; their own sold flag says Non on six, and six equal the line's
+# harvest kilograms.  The kilograms are masked; the row, a harvest, is served.
+DRY_SEASON_SOLD_KG_NO_SALE = 'Niger::crop_production::dry-season-sold-kg-no-sale'
+#: 3E's codes, the wave script's DRY_QTY_SENTINELS and VALUE_SENTINELS.
+_DRY_SOLD_KG_CODES = (99999,)
+_DRY_VALUE_CODES = (9999999,)
+
+
+def derive_dry_season_sold_kg_no_sale(kilograms_sold, quantity_sold, value_sold):
+    """3E.11c ``as03eq11c`` -> ``Quantity_sold_kg``, NA on a record that states no sale.
+
+    Registered as ``Niger::crop_production::dry-season-sold-kg-no-sale``.  A sale is a
+    positive sold quantity (3E.11a) or a positive value (3E.12), the test every Niger
+    wave uses (:func:`is_crop_sale`); all three inputs are cleared of their codes by the
+    caller.  Where there is none, the sold kilograms are NA, whatever the sold flag
+    (3E.10) says.  Elsewhere the identity.  Returns float64.
+    """
+    kg = pd.to_numeric(kilograms_sold, errors='coerce').astype('float64')
+    q = pd.to_numeric(quantity_sold, errors='coerce').astype('float64')
+    v = pd.to_numeric(value_sold, errors='coerce').astype('float64')
+    return kg.where(q.gt(0) | v.gt(0))
+
+
+def stamp_dry_season_sold_kg_no_sale(df, masked):
+    """The ``Derivation`` column of the finished 2011-12 frame with
+    :data:`DRY_SEASON_SOLD_KG_NO_SALE` joined (``MULTI_SEP``, sorted) onto the Farm-level
+    rows whose ``(i, production_obs)`` is in *masked*: the records whose sold kilograms
+    the rule removed.  The row keeps its other keys."""
+    out = df['Derivation'].astype('string').copy()
+    idx = df.index
+    hit = ((idx.get_level_values('plot_id') == FARM_LEVEL)
+           & pd.MultiIndex.from_arrays([idx.get_level_values('i'),
+                                        idx.get_level_values('production_obs')]).isin(
+               list(masked)))
+    out[hit] = pd.array([union_keys((key, DRY_SEASON_SOLD_KG_NO_SALE)) for key in out[hit]],
+                        dtype='string')
+    return out
+
+
+def inputs_dry_season_sold_kg_no_sale(wave):
+    """The registry ``inputs`` callable of dry-season-sold-kg-no-sale: the 3E records
+    whose sold kilograms are masked, as recorded, with their sold flag, sale and harvest
+    kilograms, keyed by the served ``(t, i, plot_id, production_obs)``."""
+    raw = _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06', 'as03eq09a',
+                                    'as03eq09b', 'as03eq09c', 'as03eq10', 'as03eq11a',
+                                    'as03eq11b', 'as03eq11c', 'as03eq12'])
+    kg = _na_exact(raw['as03eq11c'], _DRY_SOLD_KG_CODES)
+    kept = derive_dry_season_sold_kg_no_sale(kg, _na_exact(raw['as03eq11a'], _DRY_SOLD_KG_CODES),
+                                             _na_exact(raw['as03eq12'], _DRY_VALUE_CODES))
+    return raw[(kg.notna() & kept.isna()).to_numpy()]
+
+
+# ---------------------------------------------------------------------------
+# Quantity_kg as an estimate: 2021-22 s16cq16c (GH #1436)
+# ---------------------------------------------------------------------------
+#
+# The instrument prints "Estimation Quantite totale UML en kg", and the file is
+# exactly 2.5 per Tiya on 2,881 of 4,402 rows.  So this is the survey's conversion,
+# served under a column that reads like a measured mass, and the key says so on the
+# row.  The ECVMA modules ask "quantite en kgs recoltee", carry no such word, and
+# carry no such key.  CONTENTS.org, "the survey's harvest kilograms".
+SURVEY_KG_ESTIMATE = 'Niger::crop_production::survey-kg-estimate'
+
+
+def derive_survey_kg_estimate(kilograms):
+    """2021-22 s16cq16c -> ``Quantity_kg``: THE IDENTITY.
+
+    Registered as ``Niger::crop_production::survey-kg-estimate``.  Nothing is computed;
+    the registry says what the number is.  Returns float64.
+    """
+    return pd.to_numeric(kilograms, errors='coerce').astype('float64')
+
+
+def stamp_survey_kg_estimate(df):
+    """The ``Derivation`` column of the finished 2021-22 frame, as a ``string`` Series
+    on its index.  The key is APPENDED wherever ``Quantity_kg`` holds a value, joined
+    with ``MULTI_SEP`` in sorted order to whatever the row already carries, as Mali's
+    ``_with_key`` does, so that a second key on this wave's rows loses neither."""
+    out = (df['Derivation'].astype('string').copy() if 'Derivation' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    mask = df['Quantity_kg'].notna().to_numpy(dtype=bool)
+    out[mask] = pd.array([union_keys((value, SURVEY_KG_ESTIMATE)) for value in out[mask]],
+                         dtype='string')
+    return out
+
+
+# The SALE's kilograms in 2021-22, s16dq05c, carry the sibling key (GH #1560, ruling
+# @ligon 2026-11-12, "Sold-kg details" (c)): the same "Estimation Quantite totale UML en
+# kg", on the crop-level sale record rather than the harvest line, so its inputs are
+# s16d's and not s16c's.
+SOLD_KG_ESTIMATE = 'Niger::crop_production::sold-kg-estimate'
+
+
+def derive_sold_kg_estimate(kilograms):
+    """2021-22 s16dq05c -> ``Quantity_sold_kg``: THE IDENTITY, read as a total.
+
+    Registered as ``Niger::crop_production::sold-kg-estimate``.  Nothing is computed; the
+    registry says what the number is: the instrument's estimate of the sale in kilograms,
+    served as a total by ruling (2026-11-12, "Treat 2021 as totals").  Returns float64.
+    """
+    return pd.to_numeric(kilograms, errors='coerce').astype('float64')
+
+
+def stamp_sold_kg_estimate(df):
+    """The ``Derivation`` column of the finished 2021-22 frame with
+    :data:`SOLD_KG_ESTIMATE` APPENDED (``MULTI_SEP``, sorted) wherever ``Quantity_sold_kg``
+    holds a value, a Farm-level sale row included."""
+    out = (df['Derivation'].astype('string').copy() if 'Derivation' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    mask = df['Quantity_sold_kg'].notna().to_numpy(dtype=bool)
+    out[mask] = pd.array([union_keys((value, SOLD_KG_ESTIMATE)) for value in out[mask]],
+                         dtype='string')
+    return out
+
+
+def inputs_sold_kg_estimate(wave):
+    """The registry ``inputs`` callable of sold-kg-estimate: the s16d sale records whose
+    s16dq05c holds a value, as recorded, once each (the exact repeats dropped as the build
+    drops them), keyed by the served ``(t, i, crop)``."""
+    from lsms_library.paths import countries_root
+    if wave != '2021-22':
+        raise ValueError(f"sold-kg-estimate is ['2021-22'], not {wave!r}")
+    root = Path(countries_root()) / 'Niger' / wave
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        dirs=[f"{root / '_'}/", f"{Path(countries_root()) / 'Niger' / '_'}/"],
+        **{'Preferred Label': 'Preferred Label'})
+    path = str(root / 'Data' / 's16d_me_ner2021.dta')
+    lab = tools.get_dataframe(path, convert_categoricals=True)
+    code = tools.get_dataframe(path, convert_categoricals=False)
+    keep = ~code.duplicated(keep='first').to_numpy()
+    lab, code = lab[keep], code[keep]
+    out = code[['s16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq05c', 's16dq05d',
+                's16dq06']].copy()
+    out['t'] = wave
+    out['i'] = lab.apply(lambda r: i(pd.Series([r['grappe'], r['menage']],
+                                               index=['grappe', 'menage'])), axis=1).values
+    out['crop'] = _crop_labels(code['s16dq01'], lab['s16dq01'], crop_map).values
+    has_kg = pd.to_numeric(out['s16dq05c'], errors='coerce').notna().to_numpy()
+    return out[has_kg & out['crop'].notna().to_numpy()].set_index(['t', 'i', 'crop'])
+
+
+def inputs_survey_kg_estimate(wave):
+    """The registry ``inputs`` callable of survey-kg-estimate: the quantity, unit, kg
+    and state as recorded, keyed by the served ``(t, i, plot_id, production_obs)``."""
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Niger' / wave / 'Data' / 's16c_me_ner2021.dta'
+    src = tools.get_dataframe(str(path), convert_categoricals=False)
+    observations = _crop_row_observations(len(src), path, script_path=__file__)
+    keep = pd.to_numeric(src['s16cq16c'], errors='coerce').notna().to_numpy()
+    out = src[['s16cq04', 's16cq16a', 's16cq16b', 's16cq16c', 's16cq16d']].copy()
+    out['t'] = wave
+    out['i'] = src.apply(lambda r: i(pd.Series([r['grappe'], r['menage']],
+                                               index=['grappe', 'menage'])), axis=1).values
+    out['plot_id'] = (src['s16cq02'].apply(tools.format_id).astype(str) + '_'
+                      + src['s16cq03'].apply(tools.format_id).astype(str)).values
+    out['production_obs'] = observations.values
+    return out[keep].set_index(['t', 'i', 'plot_id', 'production_obs'])
 
 
 # ---------------------------------------------------------------------------
@@ -587,9 +1143,10 @@ def _finish_crop_production(df, t):
 # ---------------------------------------------------------------------------
 #
 # One row per REPORTED agricultural input applied by a household in a wave:
-# its harmonized input identity (Seed / Urea / DAP / NPK / Phosphate / Mixed
-# fertilizer / Organic manure / Organic compost / Pesticide / Herbicide /
-# Fungicide / Other phytosanitary), reported quantity used + native unit, the
+# its harmonized input identity (Seed / Urea / DAP / NPK (EHCVM) / NPK 15-15-15
+# (ECVMA, GH #1445) / Phosphate / Mixed fertilizer / Organic manure / Organic
+# compost / Pesticide / Herbicide / Fungicide / Other phytosanitary), reported
+# quantity used + native unit, the
 # purchased flag + reported purchased quantity, and — for seed rows — the
 # seed's crop (on the shared harmonize_food labels).  No aggregation: every
 # reported input line is kept.  seed_kg, nitrogen_kg, inorganic_fertilizer
@@ -668,10 +1225,42 @@ def _seed_crop_labels(source_labels, seed_crop_map):
 CROP_NA = '(not crop-specific)'
 
 
+def _ecvma_input_observations(households, slots, source_path, *, script_path):
+    """Recorded roster slots, scoped to a declared source release (GH #1123).
+
+    Together with the unchanged household key, each token identifies exactly
+    one applied source line. Equal payloads in different slots are NOT repeats.
+    Reuse Malawi's sidecar-only release reference (#1323), but use ECVMA's
+    recorded slot rather than a constructed physical row number.
+    """
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import cached_file_hash
+
+    path = Path(source_path)
+    if not path.is_absolute():
+        path = Path(script_path).resolve().parent / path
+    path = path.resolve()
+    relative = path.relative_to(countries_root().resolve()).as_posix()
+    sidecar_hash = cached_file_hash(path.with_name(path.name + '.dvc'))
+    if sidecar_hash is None:
+        raise ValueError('Niger input observations require a declared sidecar')
+    numeric = pd.to_numeric(slots, errors='coerce')
+    if (households.isna().any() or numeric.isna().any()
+            or not ((numeric > 0) & (numeric % 1 == 0)).all()):
+        raise ValueError('Niger input observations require household and integer slot')
+    keys = pd.DataFrame({'i': households.to_numpy(), 'slot': numeric.to_numpy()})
+    if keys.duplicated().any():
+        raise ValueError('Niger input observations repeat a native household/slot')
+    reference = f'{relative}@dvc:{path.name}:{sidecar_hash}'
+    return ('slot:' + reference + ':' + str(slots.name) + '='
+            + numeric.astype('Int64').astype('string'))
+
+
 def _finish_plot_inputs(df, t):
     """Common tail for the wave-level plot_inputs scripts: coerce numeric
     columns, guarantee the full schema column set, build the
-    (t, i, input, crop, u) index.  Mirrors _finish_crop_production.
+    (t, i, input, crop, u, input_obs) index. Mirrors _finish_crop_production.
 
     Drops rows with no input identity (input NA) — a roster placeholder
     line, not a reported input.  The `crop` index level is filled with the
@@ -698,10 +1287,15 @@ def _finish_plot_inputs(df, t):
     # `Manquant`, which is the spelling that was retired -- see U_NA.
     df = fill_missing_u(df)
     df = df[df['input'].notna()]
-    keep = ['t', 'i', 'input', 'crop', 'u',
+    # EHCVM keeps its existing grain and uniqueness guards. Only ECVMA has
+    # recorded slot tokens; never invent a row ordinal for other inputs.
+    if 'input_obs' not in df.columns:
+        df['input_obs'] = 'unresolved_observation'
+    df['input_obs'] = df['input_obs'].astype('string')
+    keep = ['t', 'i', 'input', 'crop', 'u', 'input_obs',
             'Quantity', 'Purchased', 'Quantity_purchased']
     df = df[[c for c in keep if c in df.columns]]
-    df = df.set_index(['t', 'i', 'input', 'crop', 'u'])
+    df = df.set_index(['t', 'i', 'input', 'crop', 'u', 'input_obs'])
     return df
 
 
@@ -1026,7 +1620,7 @@ def _finish_plot_labor(df, t):
 #   wage_work  — worked for a wage / employer (bool)
 #              REFERENCE PERIOD VARIES BY WAVE (GH #877): 7 days in 2014-15
 #              and the EHCVM waves; 2011-12 asks no 7-day question -- its
-#              farm_work/SOB_work are 30-day and wage_work is 12-month.
+#              three dummies are all 30-day (wage_work ms04q01, GH #882).
 #   farm_hrs   — annual-average weekly hours on farm work (float; ECVMA only)
 #   SB_hrs     — annual-average weekly hours in own business (float; ECVMA)
 #   wage_hrs   — annual-average weekly hours in wage work (float; ECVMA)
@@ -1282,32 +1876,46 @@ def _finish_people_last7days(df, t):
 #              questionnaire, not second readings: 2011-12 passage 2 ships
 #              150 of its 232 grappes twice, and 2014-15 grappe 212 has two
 #              questionnaires (numquest 1, 2) that agree on the obs-1 Price
-#              of all 67 varieties both price.  A second record's slot that
-#              repeats a served row is dropped (lossless); the 30 slots
-#              that repeat no served row are kept as slot + 3, the
-#              GhanaLSS `obs` precedent (see _community_price_triples).
-# NOTHING IS SELECTED.  Until GH #840 one row per (t, v, j, u) was kept --
-# post-harvest passage first, then questionnaire order -- and this comment's
-# own `obs` sentence below was not true of the code.
+#              of all 67 varieties both price.  The FIRST entry is served
+#              (GH #1087, ruling @ligon 2026-11-04).  A second entry's slot
+#              that repeats a first-entry row is a copy; the 30 that repeat
+#              nothing are not served, and the first entry's rows of that
+#              record carry `second_entry_disagrees` = True.  See
+#              derive_cs07_first_entry.  2018-19 s05 is a different mechanism
+#              and keeps obs 3 / 4.
+# Within a first entry nothing is selected.  Until GH #840 one row per
+# (t, v, j, u) was kept -- post-harvest passage first, then questionnaire order
+# -- and this comment's own `obs` sentence below was not true of the code.
 #
-# WAVE COVERAGE: only the two ECVMA waves carry an EA-level community price
-# module.  The EHCVM waves (2018-19, 2021-22) replaced it with a separate
-# region/market-level price survey (ehcvm_prix_ner2021: region × milieu ×
-# point_de_vente, NO grappe — not the EA grain; and ehcvm_nsu, a region/strata
-# p50/mu MEDIAN — a forbidden imputation), and 2018-19 ships no community price
-# file at all.  So those two waves are silently absent (the country-level
-# concatenator skips a wave with no parquet), NOT faked.
+# WAVE COVERAGE: three of the four waves carry a GRAPPE-level community price
+# module -- the two ECVMA waves (CS07) and EHCVM 2018-19 (section 5 of the
+# community questionnaire, s05_co_ner2018.dta; wired by GH #823).  2021-22's
+# community questionnaire stops at s04_co, and its only price files are
+# ehcvm_prix_ner2021 (region × milieu × point_de_vente, NO grappe -- not the EA
+# grain) and ehcvm_nsu (a region/strata p50/mu MEDIAN -- a forbidden
+# imputation), so 2021-22 has no wave script and is absent, NOT faked.  (This
+# comment used to say 2018-19 "ships no community price file at all"; it does,
+# and 2018-19 ships no ehcvm_prix / ehcvm_nsu file.)
 #
-# Community-price instrument by wave (both ECVMA; module CS07):
-#   2011-12  ecvmacoms07_p1 (passage 1) + ecvmacoms07_p2 (passage 2).
+# Community-price instrument by wave:
+#   2011-12  ECVMA CS07: ecvmacoms07_p1 (passage 1) + ecvmacoms07_p2 (passage 2).
 #            grappe; cs07q01 item; THREE (price, qty, unit) triples:
 #            (cs07q03, cs07q04, cs07q05), (cs07q06, cs07q07, cs07q08),
 #            (cs07q09, cs07q10, cs07q11).  Unit is a STRING column per triple.
-#   2014-15  comprixcs07.  grappe; cs07q01 item; ONE unit column cs07q03
-#            shared by THREE (price, qty) pairs: (cs07q04, cs07q05),
+#   2014-15  ECVMA CS07: comprixcs07.  grappe; cs07q01 item; ONE unit column
+#            cs07q03 shared by THREE (price, qty) pairs: (cs07q04, cs07q05),
 #            (cs07q06, cs07q07), (cs07q08, cs07q09).
-# Both load convert_categoricals=True so the item / unit labels arrive as the
-# strings harmonize_food / u key on.
+#   2018-19  EHCVM s05: s05_co_ner2018.  One row per (grappe, s05q01 product,
+#            s05q02 unit-size) with TWO price readings, s05q03 "Relevé 1 Prix"
+#            and s05q04 "Relevé 2 Prix" -> obs 1 / 2, and NO quantity: the
+#            Niger CAPI price questionnaire prices ONE item of the selected
+#            unit-size (Quantity = 1 is the registered derivation
+#            Niger::community_prices::one-item-per-price).  No variety field
+#            (variety = the canonical 'unknown_variety'); visit = vague.  See
+#            _s05_code_maps / _s05_community_prices below.
+# The CS07 files load convert_categoricals=True so the item / unit labels
+# arrive as the strings harmonize_food / u key on; s05 is joined to the
+# household food module BY CODE instead (see _s05_code_maps).
 #
 # COLUMNS (reported, item-level):
 #   Price    — the surveyed price the enumerator recorded for `Quantity` units
@@ -1325,19 +1933,26 @@ def _finish_people_last7days(df, t):
 # 'produit absent' / 'manquant' missing-marker, carry no surveyed price and are
 # dropped.  `obs` (1/2/3) keeps the multiple within-cluster observations as
 # distinct rows without summing.
+#   second_entry_disagrees -- CS07 only: True on a first-entry row whose record
+#              has a second entry that disagrees (GH #1087); NA on 2018-19 s05.
 
 
-def _community_prices_maps():
+def _community_prices_maps(dirs=None):
     """Load the harmonize_food (item -> j Preferred Label) and u (unit ->
     Preferred Label) string maps, keyed on Original Label — exactly the two
     shared label tables crop_production / food_acquired use, so a priced food
-    joins consumed food and harvested crop on (j, u)."""
+    joins consumed food and harvested crop on (j, u).
+
+    ``dirs`` defaults to the cwd-relative wave/country rungs a wave script
+    sees; a caller running elsewhere (a registry ``inputs`` callable) passes
+    the absolute wave and country ``_/`` directories instead."""
+    kw = {} if dirs is None else {'dirs': [str(d) for d in dirs]}
     item_map = tools.get_categorical_mapping(
         tablename='harmonize_food', idxvars='Original Label',
-        **{'Preferred Label': 'Preferred Label'})
+        **kw, **{'Preferred Label': 'Preferred Label'})
     unit_map = tools.get_categorical_mapping(
         tablename='u', idxvars='Original Label',
-        **{'Preferred Label': 'Preferred Label'})
+        **kw, **{'Preferred Label': 'Preferred Label'})
     return item_map, unit_map
 
 
@@ -1352,6 +1967,13 @@ def _item_labels(item_series, item_map):
 
 # Price sentinels meaning "no answer / not recorded" in the CS07 grids.
 _COMMUNITY_PRICE_SENTINELS = (9999.0, 99999.0)
+# Quantity additionally carries the nominal 9999.9 missing code (GH #1088;
+# ledger 1088, section 4).  The held 2014 columns are Stata doubles holding
+# 9999.900390625, the promoted float32 representation; their earlier storage
+# history is unknown.  Match both exact forms, without rounding other weights
+# or extending the Price filter.
+_COMMUNITY_QUANTITY_SENTINELS = _COMMUNITY_PRICE_SENTINELS + (
+    9999.9, float(np.float32(9999.9)))
 # Unit Preferred Labels that mark the product as absent / missing in the
 # cluster — these rows carry no surveyed price and are dropped.
 #
@@ -1372,13 +1994,55 @@ _COMMUNITY_MISSING_UNITS = {U_NA}
 _COMMUNITY_PRICE_CONTENT = ['v', 'j', 'u', 'variety', 'visit', 'slot',
                             'Price', 'Quantity', 'Description']
 
+# CS07 varieties whose `j` is set by VARIETY CODE, overriding the cs07q01
+# product label (GH #1090).  HARMONISATION CHOICE, ruled by @ligon 2026-11-03,
+# not instrument evidence.  CS07 product "Riz" (cs07q01) maps through
+# harmonize_food to `Autre Riz local` for BOTH its varieties, which served
+# imported rice as local:
+#   7031 "Riz thailandais vendu en vrac au kilo" -> `Riz importé non parfumé`,
+#        the household EHCVM label for imported non-scented rice (96-99% of
+#        household imported-rice rows: 3,646 of 3,719 in 2018-19, 5,064 of
+#        5,095 in 2021-22).  The variety label does not say scented or not;
+#        non-scented is the choice, so the price joins the modal household
+#        imported-rice item on (j, u).
+#   7032 "Riz local vendu en vrac au kilo" keeps `Autre Riz local` (no entry
+#        here): the label does not decide Riz du Niger versus Autre Riz local.
+# Keyed on the cs07q02 CODE, which is identical in all three CS07 files (the
+# labels are not).  `variety` and `Description` are unchanged.
+_CS07_VARIETY_J = {'7031': 'Riz importé non parfumé'}
 
-def _community_price_triples(df, item_map, unit_map, triples, passage=1,
-                             codes=None):
-    """Reshape a wide CS07 community-price frame into long (v, j, u, variety,
-    visit, obs, Description, Price, Quantity) rows -- one per recorded price.
 
-    `triples` is a list of (price_col, qty_col, unit_col) — the unit_col may be
+#: The (price, quantity, unit) columns of each CS07 observation slot.  2011-12
+#: gives each slot its own unit column; 2014-15 shares one across the three.
+CS07_TRIPLES = {
+    '2011-12': (('cs07q03', 'cs07q04', 'cs07q05'),
+                ('cs07q06', 'cs07q07', 'cs07q08'),
+                ('cs07q09', 'cs07q10', 'cs07q11')),
+    '2014-15': (('cs07q04', 'cs07q05', 'cs07q03'),
+                ('cs07q06', 'cs07q07', 'cs07q03'),
+                ('cs07q08', 'cs07q09', 'cs07q03')),
+}
+#: Each wave's CS07 files (under its ``Data/``) and the passage each one is.
+#: Read by the registry ``inputs`` callable below; the wave scripts keep their
+#: own literal paths, which is how the content hash finds the DVC sidecars.
+_CS07_FILES = {
+    '2011-12': (('NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p1.dta', 1),
+                ('NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p2.dta', 2)),
+    '2014-15': (('NER_2014_ECVMA-II_v02_M_STATA8/comprixcs07.dta', 1),),
+}
+#: Column on the served CS07 rows, GH #1087.  See derive_cs07_first_entry.
+SECOND_ENTRY_FLAG = 'second_entry_disagrees'
+
+
+def _community_price_slots(df, item_map, unit_map, triples, passage=1,
+                           codes=None):
+    """Reshape a wide CS07 community-price frame into one long row per recorded
+    price of every record, first entry and second, under the two lossless drops
+    below.  Columns: ``v, j, u, variety, visit, obs, Description, Price,
+    Quantity`` plus the bookkeeping ``rank`` (0 for a record's first entry),
+    ``slot`` and ``source_row`` (zero-based row of the file as read).
+
+    `triples` is a list of (price_col, qty_col, unit_col) -- the unit_col may be
     a single shared column repeated across triples (2014-15) or per-triple
     (2011-12).  The instrument records up to three within-questionnaire price
     observations; the k-th triple is observation slot `obs = k`.  `codes` is
@@ -1416,21 +2080,16 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
        de-dup class, not a selection: the dropped row is a copy, and which
        copy keeps the lower `obs` is fixed (the first record's).
 
-    What remains of a second record is the 30 slots that repeat NO served
-    row -- served as observation slots 4-6 (`obs = slot + 3 *
-    rank`, rank in (numquest, file order)), the GhanaLSS convention for a
-    second source record of one cell.  How those 30 should be represented is
-    an open maintainer decision (CONTENTS.org).  This drop is deliberately
-    HERE and not in _finish_community_prices: that tail is the builder GH
-    #840 says selects nothing, and a test greps it for `drop_duplicates`.
+    What remains with ``rank > 0`` is the 30 slots that repeat NO first-entry
+    row.  derive_cs07_first_entry decides what happens to them (GH #1087).
 
     Rows with no usable price (NA / 0 / sentinel) or a missing-marker unit are
     dropped here so they never reach the index."""
     if codes is None:
-        raise ValueError("_community_price_triples: pass `codes`, the same CS07 "
+        raise ValueError("_community_price_slots: pass `codes`, the same CS07 "
                          "file read with convert_categoricals=False (GH #840)")
     if len(codes) != len(df):
-        raise ValueError("_community_price_triples: `codes` and `df` differ in "
+        raise ValueError("_community_price_slots: `codes` and `df` differ in "
                          "length; they must be the same file in the same order")
     df = df.reset_index(drop=True)
     codes = codes.reset_index(drop=True)
@@ -1447,21 +2106,24 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
     v = df['grappe'].apply(tools.format_id).astype('string')
     j = _item_labels(df['cs07q01'].astype(str).str.strip(), item_map)
     variety = pd.to_numeric(codes['cs07q02']).astype('Int64').astype('string')
+    # A variety-code override wins over the product label (GH #1090).
+    j = variety.map(_CS07_VARIETY_J).astype('string').fillna(j)
     description = df['cs07q02'].astype('string').str.strip()
     pieces = []
     for slot, (pcol, qcol, ucol) in enumerate(triples, start=1):
         price = pd.to_numeric(df[pcol], errors='coerce').astype('Float64')
         qty = pd.to_numeric(df[qcol], errors='coerce').astype('Float64')
-        # Quantity 0 / 9999 / 99999 are "no answer" markers, not a measured
+        # Quantity 0 / 9999 / 9999.9 / 99999 are "no answer" markers, not a measured
         # basis — null them (the surveyed Price row is still kept; only the
         # missing quantity basis is dropped, per the reported-only rule).
         qty = qty.where((qty > 0)
-                        & (~qty.isin(_COMMUNITY_PRICE_SENTINELS)), pd.NA)
+                        & (~qty.isin(_COMMUNITY_QUANTITY_SENTINELS)), pd.NA)
         u = _unit_labels(df[ucol].astype(str).str.strip(), unit_map)
         piece = pd.DataFrame({
             'v': v.values, 'j': j.values, 'u': u.values,
             'variety': variety.values, 'visit': passage,
-            'obs': (slot + 3 * rank).values, 'slot': slot,
+            'obs': (slot + 3 * rank).values, 'slot': slot, 'rank': rank.values,
+            'source_row': df.index.values,
             'Description': description.values,
             'Price': price.values, 'Quantity': qty.values,
         })
@@ -1479,9 +2141,89 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
     # that stays.
     out = (out.sort_values('obs', kind='stable')
               .drop_duplicates(_COMMUNITY_PRICE_CONTENT, keep='first')
-              .drop(columns='slot')
               .sort_index())
     return out
+
+
+def derive_cs07_first_entry(slots):
+    """Serve a CS07 record's FIRST entry, and say where a second one disagrees.
+
+    Registered as ``Niger::community_prices::first-entry-of-duplicate``, a
+    deletion entry (``rows: 0``): the rows it removes have nowhere to carry a
+    key, so the registry is their disclosure and
+    ``Country.derivation_inputs(key)`` returns them.  Ruling @ligon 2026-11-04
+    (GH #1087): the second entries are duplicate entries of one questionnaire
+    (see _community_price_slots), so a slot of one is not a further reading.
+
+    *slots* is the frame _community_price_slots returns.  THE RULE: every row of
+    ``rank`` 0 is served as ``obs = slot``, no row of a higher rank is served,
+    and :data:`SECOND_ENTRY_FLAG` is True on every served row of a (grappe,
+    variety, passage) with a higher-rank row left, False on every other.
+
+    It is a property of the RECORD, because "a disagreeing second entry exists"
+    is: it does not say which slot disagrees, and a flagged row's own slot may
+    agree with the second entry.  ``derivation_inputs`` has the slot.  Measured
+    (held files): 30 slots leave (2011-12 15, 2014-15 15), 23 records.  One
+    record has no first-entry row to carry the flag: 2011-12 passage 2, variety
+    7311, whose first entry holds the 99999 sentinel and whose second holds a
+    price.  That price is the record's only one and is no longer served.
+
+    THE FLAG IS ONE-DIRECTIONAL, and this is a known blind spot.  It sees a second
+    entry that prices a slot differently, not one that blanks it: a 0 or a sentinel
+    never reaches *slots*.  In the held files 5 served slots have a second entry at
+    0 (4) or at a sentinel (1), and 3 of them sit in 2 records that nothing else
+    flags, so those stay False.  Disclosed, not extended: a blanked slot offers no
+    competing reading, and the first entry's price is served either way.
+    """
+    key = ['v', 'variety', 'visit']
+    second = pd.MultiIndex.from_frame(slots.loc[slots['rank'] > 0, key])
+    out = slots[slots['rank'] == 0].copy()
+    out['obs'] = out['slot']
+    out[SECOND_ENTRY_FLAG] = pd.array(
+        pd.MultiIndex.from_frame(out[key]).isin(second), dtype='boolean')
+    return out.drop(columns=['rank', 'slot', 'source_row'])
+
+
+def _community_price_triples(df, item_map, unit_map, triples, passage=1,
+                             codes=None):
+    """Long (v, j, u, variety, visit, obs, Description, Price, Quantity,
+    second_entry_disagrees) rows of a wide CS07 frame, one per recorded price of
+    each record's first entry: _community_price_slots, then
+    derive_cs07_first_entry.  This selection is deliberately HERE and not in
+    _finish_community_prices: that tail is the builder GH #840 says selects
+    nothing, and a test greps it for `drop_duplicates`."""
+    return derive_cs07_first_entry(_community_price_slots(
+        df, item_map, unit_map, triples, passage=passage, codes=codes))
+
+
+def inputs_cs07_second_entries(wave):
+    """The registry ``inputs`` callable of first-entry-of-duplicate: one row per
+    slot derive_cs07_first_entry does not serve, keyed ``(t, v, variety, visit,
+    slot)``.  The columns are the second entry's whole source row, under its own
+    variable names, so a slot's price, quantity and unit are in the
+    :data:`CS07_TRIPLES` columns of ``slot``; ``source_row`` is its zero-based
+    row in the file (2011-12 passage 2's two blocks share one ``numquest``)."""
+    from lsms_library.paths import countries_root
+    root = countries_root() / 'Niger'
+    item_map, unit_map = _community_prices_maps(dirs=[root / wave / '_', root / '_'])
+    frames = []
+    for name, passage in _CS07_FILES[wave]:
+        src = str(root / wave / 'Data' / name)
+        labels = tools.get_dataframe(src, convert_categoricals=True)
+        codes = tools.get_dataframe(src, convert_categoricals=False).reset_index(drop=True)
+        slots = _community_price_slots(labels, item_map, unit_map,
+                                       CS07_TRIPLES[wave], passage=passage,
+                                       codes=codes)
+        slots = slots[slots['rank'] > 0]
+        frame = codes.loc[slots['source_row'].values].reset_index(drop=True)
+        frame = frame.assign(t=wave, v=slots['v'].values,
+                             variety=slots['variety'].values,
+                             visit=slots['visit'].values,
+                             slot=slots['slot'].values,
+                             source_row=slots['source_row'].values)
+        frames.append(frame)
+    return pd.concat(frames, ignore_index=True).set_index(
+        ['t', 'v', 'variety', 'visit', 'slot'])
 
 
 COMMUNITY_PRICES_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
@@ -1493,14 +2235,16 @@ def _finish_community_prices(df, t):
     (t, v, j, u, variety, visit, obs) index -- one row per survey-recorded
     price.
 
-    NO ROW IS SELECTED (GH #840; @ligon 2026-10-18).  Until #840 this kept ONE
-    observation per (t, v, j, u) -- post-harvest (passage 2) before
+    NO ROW IS SELECTED HERE (GH #840; @ligon 2026-10-18).  Until #840 this kept
+    ONE observation per (t, v, j, u) -- post-harvest (passage 2) before
     post-planting (passage 1), then questionnaire order -- and so discarded
     other varieties, other passages and other observation slots of the same
     cell, by row order.  A duplicate key is now an error: the instrument
     records one price per (cluster, variety, passage, slot), and
-    _community_price_triples has already dropped a second source record's
-    repeats and enumerated what remains of it as obs 4-6."""
+    _community_price_triples has already served a CS07 record's first entry
+    only (GH #1087).  :data:`SECOND_ENTRY_FLAG` is passed through; a wave that
+    does not set it (2018-19 s05, whose second records stay obs 3 / 4) carries
+    NA."""
     df = df.copy()
     for col in ['Price', 'Quantity']:
         if col not in df.columns:
@@ -1514,6 +2258,9 @@ def _finish_community_prices(df, t):
     df['visit'] = pd.to_numeric(df['visit']).astype('int64')
     df['obs'] = pd.to_numeric(df['obs']).astype('int64')
     df['Description'] = df['Description'].astype('string')
+    if SECOND_ENTRY_FLAG not in df.columns:
+        df[SECOND_ENTRY_FLAG] = pd.NA
+    df[SECOND_ENTRY_FLAG] = df[SECOND_ENTRY_FLAG].astype('boolean')
     # Every index level must be non-null (the framework drops NaN-key rows).
     #
     # DELIBERATELY A DROP, NOT A `fill_missing_u` (GH #842).  Measured on the
@@ -1540,10 +2287,192 @@ def _finish_community_prices(df, t):
     # Mali/Malawi/Tanzania/Ethiopia community_prices shim.
     df['i'] = df['v']
     keep = ['t', 'v', 'i', 'j', 'u', 'variety', 'visit', 'obs',
-            'Price', 'Quantity', 'Description']
+            'Price', 'Quantity', 'Description', SECOND_ENTRY_FLAG]
     df = df[keep]
     df = df.set_index(['t', 'v', 'i', 'j', 'u', 'variety', 'visit', 'obs']).sort_index()
     return df
+
+
+# ---------------------------------------------------------------------------
+# EHCVM 2018-19 section 5 (s05_co_ner2018.dta) -- GH #823
+# ---------------------------------------------------------------------------
+#
+# The instrument (Niger CAPI "Qx Communautaire Prix- NIGER_V1_VF", UEMOA
+# regional catalogue entry 48; NOT the Excel file WB catalog 4296 ships under
+# Niger's name, which is Chad's template): per market, product existence, up
+# to six unit-sizes (5.02), then "5.03 Relevé 1 Prix (en FCFA)" and "5.04
+# Relevé 2 Prix (en FCFA)", both integer, multiple of 5, > 0.  No quantity,
+# no variety.  Measured on the held file (Niger CONTENTS.org, GH #823):
+# 42,247 rows, 504 grappes, every grappe in one vague, 160 (grappe, product,
+# unit-size) keys twice -- 20 byte-identical, 140 with different prices.
+
+#: The two price readings, in form order -> obs 1, 2.
+S05_PRICE_SLOTS = ('s05q03', 's05q04')
+#: s05 names no variety finer than the product: the canonical sentinel
+#: (lsms_library/data_info.yml, missing_level_sentinels: community_prices).
+S05_VARIETY = 'unknown_variety'
+#: The served columns a second record's slot must repeat to be a copy (the
+#: GH #840 content-equality drop; `slot` stands in for the manufactured obs).
+_S05_CONTENT = ['v', 'j', 'u', 'variety', 'visit', 'slot', 'Price',
+                'Description']
+
+
+def _s05_unit_label(code, hh_units, hh_sizes, unit_map, decode=lambda s: s):
+    """Served ``u`` for one s05 ``releveID`` code.
+
+    ``releveID = 10 * s07bq03b + s07bq03c``: the community unit-size code is
+    the HOUSEHOLD food module's unit code with its size code (0 Taille unique,
+    1 Petit, 2 Moyen, 3 Grand, 4 Quart, 5 Demi, 6 Entier) as the last digit
+    (all 74 used codes; Niger CONTENTS.org).  The unit part is resolved through
+    the household's own label for that unit code, by the household pipeline
+    (mojibake decode, then the ``u`` table), so a size-0 code serves exactly
+    the ``u`` Niger ``food_acquired`` serves (``Kg``, ``Litre``, ``Tiya``).  A
+    sized code keeps its size INSIDE the label, Uganda's ``Unit (Size)`` form
+    with the household's own size word: ``Tas (Petit)``, ``Tiya (Entier)``.
+    Never ``Tas, petit`` -> ``Tas``: a small heap is not a heap, and no
+    conversion between sizes exists.
+
+    The size comes from the code's DIGIT, never from the s05 value label:
+    releveID 1252 / 1253 are labelled ``Louche ..., grand`` / ``..., moyen``
+    in the .dta, the reverse of the digit, while the CAPI instrument's own
+    code list prints 1252 = moyen, 1253 = grand -- the digit agrees with the
+    instrument.
+
+    A code whose unit or size part the household label sets lack raises
+    ``KeyError``: there is no honest label to serve."""
+    unit_code, size_code = divmod(int(code), 10)
+    base = decode(str(hh_units[unit_code]).strip()).strip()
+    base = unit_map.get(base, base)
+    if size_code == 0:
+        return base
+    size = decode(str(hh_sizes[size_code]).strip()).strip()
+    return f'{base} ({size})'
+
+
+def _s05_code_maps(item_codes, unit_codes, hh_categories, item_map, unit_map,
+                   decode=lambda s: s):
+    """``(j_by_code, u_by_code)`` for the s05 product and unit-size codes.
+
+    Joined to the household food module BY CODE (GH #823 decision D3): the
+    s05 file and s07b_me_ner2018 share the ``produitID`` code list, but not its
+    strings -- s05 stores mostly clean UTF-8 (``Thé vert``; 2 of 55 product
+    and 3 of 74 unit labels are mojibake, e.g. ``MÃ¢choiron``), s07b the
+    double-encoded form 2018-19's ``mapping.py`` repairs (``ThÃ©``), and three s05 codes name
+    a NARROWER product than the household's label for the same code (67
+    ``Pastèque`` vs ``Pastèque, Melon``; 77 ``Courge/courgette`` vs
+    ``Aubergine, Courge/Courgette``; 130 ``Thé vert`` vs ``Thé``).  So ``j`` is
+    the household's label for the code through the household pipeline
+    (``harmonize_food`` on the raw label, then the decode) -- the j Niger
+    ``food_acquired`` serves -- and the s05 label is kept as ``Description``.
+
+    ``hh_categories`` is ``get_dataframe(s07b, categories_only=True)``:
+    ``{variable: {code: label}}`` for ``s07bq01``, ``s07bq03b`` and
+    ``s07bq03c``.  Both maps must be one-to-one over the codes served, or two
+    source keys would share a served key; that raises."""
+    hh_items = {int(k): v for k, v in hh_categories['s07bq01'].items()}
+    hh_units = {int(k): v for k, v in hh_categories['s07bq03b'].items()}
+    hh_sizes = {int(k): v for k, v in hh_categories['s07bq03c'].items()}
+    j_by_code = {}
+    for code in sorted({int(c) for c in item_codes}):
+        raw = str(hh_items[code]).strip()
+        j_by_code[code] = str(decode(item_map.get(raw, raw))).strip()
+    u_by_code = {int(c): _s05_unit_label(c, hh_units, hh_sizes, unit_map, decode)
+                 for c in sorted({int(c) for c in unit_codes})}
+    for name, m in (('product', j_by_code), ('unit-size', u_by_code)):
+        labels = pd.Series(m)
+        clash = labels[labels.duplicated(keep=False)]
+        if len(clash):
+            raise ValueError(f"s05 {name} codes share a served label: "
+                             f"{clash.to_dict()}")
+    return j_by_code, u_by_code
+
+
+def _s05_community_prices(codes, labels, j_by_code, u_by_code):
+    """Reshape s05_co_ner2018 into long community_prices rows -- one per
+    recorded price.  Returns columns ``v, j, u, variety, visit, obs,
+    Description, Price`` (no Quantity: the file records none).
+
+    ``codes`` is the file read with ``convert_categoricals=False``, ``labels``
+    the same file with labels (same rows, same order); ``labels`` supplies
+    only ``Description``, the s05 product label as recorded.
+
+    * Rows whose ``Existe`` is not 1 carry no price (none in the held file).
+    * A byte-identical repeat of an earlier row (20 in the held file) is a
+      copy and is dropped before ranking (the GH #840 lossless class).
+    * Records sharing a (grappe, s05q01, s05q02) key are ranked in file
+      order; slot ``k`` of the ``r``-th record is ``obs = k + 2 * r`` --
+      s05q03 / s05q04 are obs 1 / 2, a second record's are obs 3 / 4 (the
+      CS07 ``slot + 3 * rank`` convention, two slots here).  140 keys in the
+      held file have a second, disagreeing record (GH #823 decision D5).
+    * After the melt, a second record's slot identical in every served column
+      to the first record's SAME slot is a copy and is dropped (10 in the held
+      file); every other reading is served, none averaged or selected.
+    * Rows with no usable price (NA / not positive) are dropped (none in the
+      held file: its prices are already cleaned).
+
+    ``v`` = format_id(grappe), the ``sample()`` keyspace; ``visit`` = vague
+    (each grappe is fielded in exactly one vague); ``variety`` = the
+    canonical ``unknown_variety``."""
+    if len(codes) != len(labels):
+        raise ValueError("_s05_community_prices: `codes` and `labels` must be "
+                         "the same file in the same order")
+    codes = codes.reset_index(drop=True)
+    labels = labels.reset_index(drop=True)
+    keep = (pd.to_numeric(codes['Existe'], errors='coerce') == 1)
+    keep &= ~codes.duplicated(keep='first')
+    codes, labels = codes[keep], labels[keep]
+    key = ['grappe', 's05q01', 's05q02']
+    rank = codes.groupby(key, sort=False).cumcount()
+
+    v = codes['grappe'].map(tools.format_id).astype('string')
+    j = codes['s05q01'].map(lambda c: j_by_code[int(c)]).astype('string')
+    u = codes['s05q02'].map(lambda c: u_by_code[int(c)]).astype('string')
+    visit = pd.to_numeric(codes['vague']).astype('int64')
+    description = labels['s05q01'].astype('string').str.strip()
+    pieces = []
+    for slot, col in enumerate(S05_PRICE_SLOTS, start=1):
+        pieces.append(pd.DataFrame({
+            'v': v.values, 'j': j.values, 'u': u.values,
+            'variety': S05_VARIETY, 'visit': visit.values,
+            'obs': (slot + len(S05_PRICE_SLOTS) * rank).values, 'slot': slot,
+            'Description': description.values,
+            'Price': pd.to_numeric(codes[col], errors='coerce')
+                       .astype('Float64').values,
+        }))
+    out = pd.concat(pieces, ignore_index=True)
+    out = out[out['Price'].notna() & (out['Price'] > 0)]
+    out = (out.sort_values('obs', kind='stable')
+              .drop_duplicates(_S05_CONTENT, keep='first')
+              .drop(columns='slot')
+              .sort_index())
+    return out
+
+
+def _s05_raw_inputs(decode=lambda s: s, wave='2018-19'):
+    """The raw s05 answers behind every served 2018-19 community price, at
+    the SOURCE-ROW grain, under their original variable names (grappe, vague,
+    Existe, s05q01, s05q02, s05q03, s05q04), plus the served join keys
+    ``t, v, j, u, visit`` computed by the build's own code maps.  All 42,247
+    rows, the 20 byte-identical copies included: one source row is up to two
+    served rows (obs 1/2, or 3/4 for a key's second record)."""
+    from lsms_library.paths import countries_root
+    root = countries_root() / 'Niger'
+    wave_dir, country_dir = root / wave / '_', root / '_'
+    src = str(root / wave / 'Data' / 's05_co_ner2018.dta')
+    codes = tools.get_dataframe(src, convert_categoricals=False)
+    hh_cats = tools.get_dataframe(str(root / wave / 'Data' / 's07b_me_ner2018.dta'),
+                                  categories_only=True)
+    item_map, unit_map = _community_prices_maps(dirs=[wave_dir, country_dir])
+    j_by_code, u_by_code = _s05_code_maps(codes['s05q01'].unique(),
+                                          codes['s05q02'].unique(), hh_cats,
+                                          item_map, unit_map, decode)
+    out = codes.copy()
+    out['t'] = wave
+    out['v'] = codes['grappe'].map(tools.format_id).astype('string')
+    out['j'] = codes['s05q01'].map(lambda c: j_by_code[int(c)]).astype('string')
+    out['u'] = codes['s05q02'].map(lambda c: u_by_code[int(c)]).astype('string')
+    out['visit'] = pd.to_numeric(codes['vague']).astype('int64')
+    return out.set_index(['t', 'v', 'j', 'u', 'visit'])
 
 
 def interview_date(df):
@@ -1553,3 +2482,58 @@ def interview_date(df):
     'Interview end'; collapsing `visit` with `first` reproduces the legacy
     single-date table."""
     return tools.melt_visit_intervals(df)
+
+
+def concat_wave_parquets(table, waves=None):
+    """Concatenate declared wave outputs, REFUSING a missing output (GH #1123).
+
+    The one implementation behind Niger's five country concatenators,
+    ``_/{plot_inputs, crop_production, livestock, plot_labor,
+    people_last7days}.py``.  Each runs with cwd ``Niger/_`` (the Makefile
+    recipe and the framework's ``try_script`` fallback both run it there) and
+    keeps its own ``to_parquet(p, '../var/<table>.parquet')`` call, because
+    ``_resolve_data_path`` infers the destination from the calling script.
+
+    Country/Wave metadata owns eligibility, including native scripts and YAML
+    keys. A genuinely undeclared wave is skipped before output access; a
+    declared missing or unreadable output fails before the caller can write
+    a partial country frame. ``waves`` optionally selects registered logical
+    waves for existing subset callers; country compilers discover all waves.
+    See ledger 1287-niger-five-compiler-declarations, especially the retained
+    Make-producer routing limitation. The historical Python fallback could
+    serve 29,034 plot_inputs rows with all 13,401 of 2018-19 gone; current
+    failed Make recipes are terminal under GH #1288.
+
+    The parquet is looked up where ``to_parquet`` writes it, under
+    ``data_root()`` (as ``Ethiopia/_/food_coping.py`` does), never in-tree
+    (GH #803).  Only an ABSENT wave parquet is caught: a stale one left by an
+    earlier successful build is read like any other.
+    """
+    from lsms_library import Country
+
+    country = Country('Niger')
+    pieces = []
+    seen_physical, seen_logical = set(), set()
+    for t in country.waves if waves is None else waves:
+        wave = country[t]
+        if table not in wave.data_scheme:
+            continue
+        # A native/YAML physical output may contain several logical years.
+        # Preserve it whole once for distinct logical aliases, without a t
+        # filter or native-row reduction (integration ledger §§3-5). Explicit
+        # repetitions of the same logical wave retain legacy multiplicity.
+        physical = wave.file_path.resolve()
+        repeated_logical = t in seen_logical
+        seen_logical.add(t)
+        if physical in seen_physical and not repeated_logical:
+            continue
+        seen_physical.add(physical)
+        fn = Path(tools.data_root('Niger')) / wave.wave_folder / '_' / f'{table}.parquet'
+        if not fn.exists():
+            raise FileNotFoundError(
+                f'Niger {table}: wave {t} declares {table} '
+                f'but its parquet was not built; refusing '
+                f'to concatenate the other waves without it (GH #1123).  Run that '
+                f'wave script and read its error.')
+        pieces.append(tools.get_dataframe(fn))
+    return pd.concat(pieces)

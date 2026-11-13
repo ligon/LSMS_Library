@@ -66,6 +66,10 @@ wave_folder_map = {
 # path does this with `converted_categoricals:` on the sub-df) and the
 # composite is assembled from the raw numeric codes.
 #
+# The PH same-location refinement below is an explicit exception: ea=0
+# alone is not proof of physical relocation. Nonzero EAs may also accompany
+# recorded dwelling moves; this helper formats keys, not movement events.
+#
 # THE `Moved` SENTINEL.  From W2 on, a tracked household that left its
 # original EA is recorded with ea == 0 -- surfacing as the label 'Moved'
 # (W2), '0. Moved' (W3), or a bare 0 (W4).  It is a MISSING-VALUE
@@ -138,6 +142,453 @@ def v(row):
 
 
 # ---------------------------------------------------------------------
+# sample / cluster_features -- ONE COVER PAGE PER ROUND (GH #1120 D1)
+# ---------------------------------------------------------------------
+#
+# Every wave folder holds two rounds, and each round ships its OWN household
+# cover page: secta_planting{wN} (post-planting, t = PP_QUARTER) and
+# secta_harvest{wN} (post-harvest, t = PH_QUARTER).  Until 2026-10-23 the
+# wave YAML read the PP cover for BOTH rounds (one data_info.yml per folder,
+# so both Wave(t)s ran the same block), which tagged a PH round with the PP
+# round's households and clusters.  Measured on the raw covers:
+#
+#   wave     PP hh  PH hh  PP-only  PH-only  v differs (common hh)
+#   2010-11  5,000  4,939      61        0       0
+#   2012-13  4,859  4,854      49       44      17
+#   2015-16  4,696  4,592     104        0      41
+#   2018-19  5,263  5,025     238        0      66
+#   2023-24  5,067  4,771     296        0      64
+#
+# Weights are identical on every common household (weight and panel_weight,
+# all five waves).  These are historical pre-refinement counts: ea == 0
+# alone does not establish relocation. Owner comment6380186741 rules that
+# W4/W5's labelled same-location answer reuses the complete own PP identity
+# (registered below); W3 stays sentinel. W2 also has 2 the other way:
+# moved at PP, a real EA at PH. The
+# 44 W2 PH-only households carry state/lga/ea and NULL weights; served under
+# the PP cover they had no 2013Q1 `v` at all, which is the 108 NaN-`v`
+# plot_labor rows of GH #1120 and the 39 geo-only households of GH #1261.
+#
+# RULING (@ligon, 2026-10-23, GH #1120 D1): per round, sample() takes
+# households from THAT ROUND's own cover, with that cover's weight -- the PP
+# cover for Q3 rows, the PH cover for Q1 rows.  A household's cluster is a
+# per-ROUND fact (Tanzania 2008-15/_/sample.py says the same of its four
+# rounds).  cluster_features follows the same covers so that sample.v and
+# cluster_features.v stay one keyspace in every round.
+#
+# The ruling's general form ("households the survey recorded in another
+# cover come from that cover, with that cover's weight"; Ethiopia: the
+# agriculture cover) also reaches one more W2 file: the PP AGRICULTURE cover
+# (Post Planting Wave 2/Agriculture/secta_plantingw2.dta) lists 21 of the 44
+# PH-only households -- the post-planting agriculture module was fielded for
+# them although the PP household cover does not list them.  plot_inputs
+# (t = PP_QUARTER) serves 63 rows for 20 of them, which no PH cover can give a
+# 2012Q3 `v`.  They are added to 2012Q3 from that cover (`pp_supplement`),
+# households already on the PP household cover winning; it has no weight
+# columns, so their weight / panel_weight are NA.  Its state/lga/ea agree
+# with the PH cover's on all 21.
+#
+# A household the ROUND'S OWN ROSTER (sect1_{planting,harvest}{wN}, the file
+# household_roster reads) records but no cover lists is located by that
+# roster: every member row carries the household's zone/state/lga/sector/ea.
+# Measured: the roster's location is constant within every household and
+# agrees with the round's cover on every shared household (one W1 PH household
+# excepted, 4,916 of 4,917; the cover wins), and only one round has roster
+# households absent from its covers -- 2016Q1, two households, 39 served rows
+# (roster, education, anthropometry, non-food) that had no `v`.  One is on the
+# 2015-16 PP cover (refused at PP) and the PH roster records it with ea == 0,
+# so it is `moved-{hhid}` there; the other is on neither cover and its PH
+# roster gives a real EA.  Both come from the roster (D1), with NA weights.
+#
+# GH #1120 D2 (@ligon, 2026-10-23): a household that no file locates gets a
+# SINGLETON `v` per household, never a shared sentinel.  It is spelled
+# `unlocated-{hhid}`, NOT `moved-{hhid}`: `moved-` is the survey's own
+# ea == 0 Moved sentinel (see the note above cluster_id), a recorded fact
+# that the sampling.yml / CONTENTS.org mover counts rely on; a D2 household
+# has no recorded location at all, so reusing `moved-` would assert a move
+# nobody recorded.  Both spellings are singletons and can never be pooled.
+# In these data D2 fires on NO household: every roster household is located
+# by a cover or by its own roster.  (The 2015Q3 individual_education row
+# with no `v` is not a D2 case -- see CONTENTS.org: it is a post-harvest
+# record that the individual_education YAML stamps onto the PP quarter too.)
+#
+# #1261: the geovariables join is a LEFT join onto the round's cover.  Under
+# the old outer YAML merge, 39 geo-only W2 households arrived with a null `v`
+# and the cluster-grain collapse deleted them; all 39 are on the PH cover, so
+# 2013Q1 now serves them with a real `v`, and leaving them out of 2012Q3 (the
+# 18 that no PP cover lists) hides nothing.  The one W3 geo-only household is
+# on neither cover and has no `ea`.
+
+# `sector` label -> Rural, the union of the per-wave YAML mappings it
+# replaces (W1/W2 spell rural/RURAL, W3-W5 '1. URBAN' / '2. Rural').
+_COVER_RURAL = {
+    '1. URBAN': 'Urban', '2. RURAL': 'Rural',
+    '1. Urban': 'Urban', '2. Rural': 'Rural',
+    'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural',
+    'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban',
+}
+
+# W5's `strata` is an unlabelled 1-6 code: the zone it names.
+_W5_STRATA = {1: 'North Central', 2: 'North East', 3: 'North West',
+              4: 'South East', 5: 'South South', 6: 'South West'}
+
+# Per wave folder: each round's cover (relative to the folder's Data/), each
+# round's household roster (the D1 locator of last resort), the weight
+# variables (identical names on both covers), the strata source, each round's
+# result field (GH #1444), an optional PP supplement cover, and the household
+# geovariables file (file,
+# latitude, longitude). W5's acquired v02 file lives at the Data/ root and
+# supplies anonymized household reference fixes, not an EA centroid (#978).
+# The coordinate
+# columns' CASING differs by wave (W1/W4 lowercase, W2/W3 uppercase); a wrong
+# name raises a KeyError here.  Under the old YAML it was the GH #515 soft drop
+# of the whole geo sub-frame, which is how W2-W4 once lost their coordinates.
+ROUND_COVERS = {
+    '2010-11': dict(
+        pp='Post Planting Wave 1/Household/secta_plantingw1.dta',
+        ph='Post Harvest Wave 1/Household/secta_harvestw1.dta',
+        pp_roster='Post Planting Wave 1/Household/sect1_plantingw1.dta',
+        ph_roster='Post Harvest Wave 1/Household/sect1_harvestw1.dta',
+        pp_result='saq22a', ph_result='sq1',
+        weight='wt_wave1', panel_weight='wt_wave1', strata='zone',
+        geo=('nga_householdgeovariables_y1.csv', 'lat_dd_mod', 'lon_dd_mod')),
+    '2012-13': dict(
+        pp='Post Planting Wave 2/Household/secta_plantingw2.dta',
+        ph='Post Harvest Wave 2/Household/secta_harvestw2.dta',
+        pp_supplement='Post Planting Wave 2/Agriculture/secta_plantingw2.dta',
+        pp_roster='Post Planting Wave 2/Household/sect1_plantingw2.dta',
+        ph_roster='Post Harvest Wave 2/Household/sect1_harvestw2.dta',
+        pp_result='saq22a', ph_result='saq1',
+        weight='wt_wave2', panel_weight='wt_combined', strata='zone',
+        geo=('nga_householdgeovars_y2.csv', 'LAT_DD_MOD', 'LON_DD_MOD')),
+    '2015-16': dict(
+        pp='secta_plantingw3.dta', ph='secta_harvestw3.dta',
+        pp_roster='sect1_plantingw3.dta', ph_roster='sect1_harvestw3.dta',
+        pp_result='saq22a', ph_result='saq22a',
+        weight='wt_wave3', panel_weight='wt_w1_w2_w3', strata='zone',
+        geo=('NGA_HouseholdGeovars_Y3.dta', 'LAT_DD_MOD', 'LON_DD_MOD')),
+    '2018-19': dict(
+        pp='secta_plantingw4.dta', ph='secta_harvestw4.dta',
+        pp_roster='sect1_plantingw4.dta', ph_roster='sect1_harvestw4.dta',
+        pp_result='interview_result', ph_result='interview_result',
+        weight='wt_wave4', panel_weight='wt_longpanel', strata='strata',
+        geo=('nga_householdgeovars_y4.dta', 'lat_dd_mod', 'lon_dd_mod')),
+    '2023-24': dict(
+        pp='Post Planting Wave 5/Household/secta_plantingw5.dta',
+        ph='Post Harvest Wave 5/Household/secta_harvestw5.dta',
+        pp_roster='Post Planting Wave 5/Household/sect1_plantingw5.dta',
+        ph_roster='Post Harvest Wave 5/Household/sect1_harvestw5.dta',
+        pp_result='interview_result', ph_result='interview_result',
+        weight='wt_cross_wave5', panel_weight='wt_longpanel_wave5',
+        strata=('strata', _W5_STRATA),
+        geo=('nga_householdgeovariables_y5.dta', 'lat_mod', 'lon_mod')),
+}
+
+
+def _data_path(folder, fn):
+    from lsms_library.paths import countries_root
+    return str(countries_root() / 'Nigeria' / folder / 'Data' / fn)
+
+
+def _cover_frame(fn, spec, *, weights=True):
+    """One cover page at household grain (index ``i``).
+
+    Read exactly as the pre-#1120 YAML blocks read it: ``v`` from the raw
+    CODES (``convert_categoricals=False``; see the keyspace note above), the
+    rest from the decoded labels.  Columns: v, weight, panel_weight, strata,
+    Rural, Region (= zone), District (= state).  ``weights=False`` (a cover
+    with no weight columns) serves weight / panel_weight as NA.  A round's
+    household cover also yields InterviewResult (GH #1444); the W2 agriculture
+    supplement records no such round status here, and is not asked.
+    """
+    from lsms_library.local_tools import df_data_grabber
+    key = df_data_grabber(fn, {'i': 'hhid'}, convert_categoricals=False,
+                          v=(['state', 'lga', 'ea', 'hhid'], v))
+    strata = spec['strata']
+    strata = (strata if isinstance(strata, str)
+              else ([strata[0]], strata[1]))
+    myvars = dict(strata=strata, Rural=('sector', _COVER_RURAL),
+                  Region='zone', District='state')
+    if weights:
+        myvars.update(weight=spec['weight'], panel_weight=spec['panel_weight'])
+    for visit in ('pp', 'ph'):
+        result = spec.get(visit + '_result')
+        if result and str(fn).endswith('/' + spec[visit]):
+            myvars['InterviewResult'] = (result, interview_result_label)
+    main = df_data_grabber(fn, {'i': 'hhid'}, **myvars)
+    if not weights:
+        main['weight'] = np.nan
+        main['panel_weight'] = np.nan
+    assert key.index.is_unique and main.index.is_unique, \
+        f'{fn}: a cover page lists a household twice'
+    out = key.join(main, how='outer')
+    assert out['v'].notna().all(), f'{fn}: a cover row with no cluster'
+    return out
+
+
+_PH_SAME_LOCATION = {
+    '2018-19': ('hhsmlc', '1', {'YES', '1. YES'}),
+    '2023-24': ('hh_moved', '2', {'NO, IN ORIGINAL DWELLING',
+                                 '2. NO, IN ORIGINAL DWELLING'}),
+}
+_PH_SAME_LOCATION_KEY = 'Nigeria::sample::ph-same-location'
+
+
+def derive_ph_same_location_v(inputs):
+    """Ruled PH identity from original named PP/PH answers (ledger sections 3-4).
+
+    Only PH ea=0 plus the approved *labelled* movement answer reuses a known
+    own-PP composite. Raw numeric answers, wrong labels/codes and unknown PP
+    remain sentinels. PH state/lga never supply components of the PP identity.
+    """
+    if inputs.empty:
+        return pd.Series(index=inputs.index, name='v', dtype=object)
+    fields = [f for f in ('hhsmlc', 'hh_moved') if f in inputs]
+    assert len(fields) == 1, 'PH derivation needs one named movement answer'
+    field = fields[0]
+    code, labels = next((code, labels) for name, code, labels in
+                        _PH_SAME_LOCATION.values() if name == field)
+    out = inputs.apply(lambda r: cluster_id(r['state'], r['lga'], r['ea'],
+                                           r['hhid']), axis=1).rename('v')
+    pp = inputs.apply(lambda r: cluster_id(r['pp_state'], r['pp_lga'],
+                                          r['pp_ea'], r['pp_hhid']), axis=1)
+    label = inputs[field + '_label'].map(
+        lambda x: ' '.join(str(x).upper().split()) if pd.notna(x) else '')
+    take = (inputs['ea'].map(_geo_code).eq('0')
+            & inputs[field].map(_geo_code).eq(code) & label.isin(labels)
+            & pp.notna() & ~pp.str.startswith(('moved-', UNLOCATED_PREFIX), na=False))
+    out.loc[take] = pp.loc[take]
+    return out
+
+
+def _ph_same_location_answers(folder):
+    """Exact PH fields plus namespaced PP operands; never read another wave.
+
+    PP names retain their original suffix (pp_state is PP's state). Boxing PP
+    scalars before a missing-match join avoids float rounding of integer IDs;
+    source storage dtypes are recorded separately, not claimed as output dtypes.
+    """
+    from lsms_library.local_tools import get_dataframe
+    spec = ROUND_COVERS[folder]
+    field = _PH_SAME_LOCATION[folder][0]
+    pp = get_dataframe(_data_path(folder, spec['pp']), convert_categoricals=False)
+    ph = get_dataframe(_data_path(folder, spec['ph']), convert_categoricals=False)
+    labelled = get_dataframe(_data_path(folder, spec['ph']), convert_categoricals=True)
+    assert ph.index.equals(labelled.index) and ph['hhid'].equals(labelled['hhid']), \
+        'PH numeric/labelled household order differs'
+    cols = ['hhid', 'state', 'lga', 'ea']
+    left = ph[cols + [field]].copy()
+    left[field + '_label'] = labelled[field].astype(object)
+    left.index = pd.Index(ph['hhid'].map(format_id), name='i')
+    right = pp[cols].astype(object).copy()
+    right.index = pd.Index(pp['hhid'].map(format_id), name='i')
+    assert left.index.is_unique and right.index.is_unique, \
+        'PH derivation cover lists a household twice'
+    out = left.join(right.rename(columns=lambda c: 'pp_' + c), how='left')
+    out.attrs['source_dtypes'] = {
+        'PP': {c: str(pp[c].dtype) for c in cols},
+        'PH': {c: str(ph[c].dtype) for c in cols + [field]},
+    }
+    return out
+
+
+def inputs_ph_same_location(wave):
+    """Original named operands for repaired cover rows, at (t,i) input grain.
+
+    This is finer than cluster_features' selected cluster grain; existing Site
+    2 keeps only the selected household's provenance. No builder/API is called.
+    """
+    folder = wave_folder_map.get(wave, wave)
+    inputs = _ph_same_location_answers(folder)
+    repaired = derive_ph_same_location_v(inputs)
+    take = inputs['ea'].map(_geo_code).eq('0') & repaired.notna() \
+        & ~repaired.str.startswith(('moved-', UNLOCATED_PREFIX), na=False)
+    out = inputs.loc[take].copy()
+    out = out.assign(t=PH_QUARTER[folder]).set_index('t', append=True)
+    return out.reorder_levels(['t', 'i'])
+
+
+UNLOCATED_PREFIX = 'unlocated-'   # GH #1120 D2 singleton -- see the note above
+
+
+def unlocated_id(hhid):
+    """The D2 singleton `v` of a household no file locates."""
+    hh = format_id(hhid)
+    return f'{UNLOCATED_PREFIX}{hh}' if hh is not None else None
+
+
+def _roster_locator(fn, spec, cover_fn):
+    """Household-grain location of every household a ROSTER records.
+
+    Same columns as ``_cover_frame``: ``v`` from the raw codes through
+    ``cluster_id`` (so ea == 0 is ``moved-{hhid}``) and NA weights (a roster
+    carries none).  Region / District / strata / Rural are the round's COVER
+    labels for the roster's codes (*cover_fn*): the two files spell the same
+    code differently (W3 roster '32. Rivers' / '5. SOUTH SOUTH', cover
+    'rivers' / 'south south'), and a cluster must not hold two spellings.  A
+    code the cover never uses keeps the roster's own label.  A roster that
+    lacks a required real-EA component (2015Q3's has no ``state``), or a
+    household whose location is blank, gets ``unlocated-{hhid}``; recorded
+    ea=0 still uses cluster_id's mover branch even without state/lga. Every
+    column must be constant within a household; a roster that disagrees with
+    itself raises rather than picking a row.
+    """
+    from lsms_library.local_tools import get_dataframe
+    raw = get_dataframe(fn, convert_categoricals=False)
+    dec = get_dataframe(fn, convert_categoricals=True)
+    craw = get_dataframe(cover_fn, convert_categoricals=False)
+    cdec = get_dataframe(cover_fn, convert_categoricals=True)
+
+    def cover_label(col):
+        """The roster's `col` as the cover spells it (NA if absent)."""
+        if col not in raw.columns:
+            return pd.Series(pd.NA, index=raw.index, dtype='object')
+        own = dec[col].astype(object)
+        if col not in craw.columns:
+            return own
+        pairs = pd.DataFrame({'c': craw[col].map(_geo_code),
+                              'l': cdec[col].astype(object)}).dropna()
+        assert (pairs.groupby('c')['l'].nunique() <= 1).all(), \
+            f'{cover_fn}: {col} code with two labels'
+        cmap = pairs.drop_duplicates('c').set_index('c')['l']
+        mapped = raw[col].map(_geo_code).map(cmap)
+        return mapped.where(mapped.notna(), own).astype(object)
+
+    i = raw['hhid'].map(format_id)
+    # Reuse cluster_id's ea=0-first semantics, even if another component is
+    # absent. A real EA still needs state and lga (ledger sections 2-4).
+    vv = [cluster_id(st, lg, e, h) for st, lg, e, h in zip(
+        raw.get('state', [None] * len(raw)),
+        raw.get('lga', [None] * len(raw)),
+        raw.get('ea', [None] * len(raw)), raw['hhid'])]
+    strata = spec['strata']
+    if isinstance(strata, str):
+        strata_s = cover_label(strata)
+    else:
+        strata_s = cover_label(strata[0]).map(lambda x: strata[1].get(x, x))
+    df = pd.DataFrame({
+        'i': i.values, 'v': vv,
+        'strata': strata_s.astype(object).values,
+        'Rural': cover_label('sector').map(
+            lambda x: _COVER_RURAL.get(x, x)).astype(object).values,
+        'Region': cover_label('zone').values,
+        'District': cover_label('state').values,
+    })
+    df = df[df['i'].notna()]
+    # Every column is the household's, stamped on each member row: require
+    # it constant (NA included), so the selection below picks identical rows
+    # rather than composing one (GH #871).
+    n_val = df.groupby('i').nunique(dropna=False)
+    n_bad = int((n_val > 1).any(axis=1).sum())
+    assert n_bad == 0, f'{fn}: {n_bad} household(s) with two locations'
+    out = df.groupby('i', sort=True).head(1).set_index('i').sort_index()
+    blank = out['v'].isna()
+    out.loc[blank, 'v'] = [unlocated_id(h) for h in out.index[blank]]
+    out['weight'] = np.nan
+    out['panel_weight'] = np.nan
+    return out
+
+
+def round_covers(folder):
+    """``{t: household-grain cover frame}`` for the two rounds of *folder*.
+
+    The PP round reads the PP household cover (plus ``pp_supplement``'s
+    households that cover does not list); the PH round reads the PH
+    household cover.  Then, for either round, a household the round's own
+    roster records and no cover lists is located by that roster (D1, NA
+    weights), or gets the D2 singleton ``unlocated-{hhid}`` where the roster
+    records no location.  Precedence: cover, supplement cover, roster.
+    GH #1120 D1 / D2 -- see the section note above. The labelled W4/W5
+    same-location refinement changes only qualifying PH household-cover v.
+    """
+    spec = ROUND_COVERS[folder]
+    out = {}
+    for rnd, t in (('pp', PP_QUARTER[folder]), ('ph', PH_QUARTER[folder])):
+        df = _cover_frame(_data_path(folder, spec[rnd]), spec)
+        if rnd == 'ph' and folder in _PH_SAME_LOCATION:
+            answers = _ph_same_location_answers(folder)
+            repaired = derive_ph_same_location_v(answers).reindex(df.index)
+            take = (answers['ea'].map(_geo_code).eq('0').reindex(df.index)
+                    & df['v'].ne(repaired) & repaired.notna())
+            if take.any():
+                df.loc[take, 'v'] = repaired.loc[take]
+                df['Derivation'] = pd.Series(pd.NA, index=df.index, dtype='string')
+                df.loc[take, 'Derivation'] = _PH_SAME_LOCATION_KEY
+        sup = spec.get(rnd + '_supplement')
+        if sup:
+            extra = _cover_frame(_data_path(folder, sup), spec, weights=False)
+            extra = extra[~extra.index.isin(df.index)]
+            if not extra.empty:
+                df = pd.concat([df, extra])
+        ros = spec.get(rnd + '_roster')
+        if ros:
+            loc = _roster_locator(_data_path(folder, ros), spec,
+                                  _data_path(folder, spec[rnd]))
+            loc = loc[~loc.index.isin(df.index)]
+            # Zero rows must not widen the cover's native dtypes (ledger 4).
+            if not loc.empty:
+                df = pd.concat([df, loc.reindex(columns=df.columns)])
+        out[t] = df
+    return out
+
+
+def sample_for_wave(folder):
+    """``sample`` for one wave folder: both rounds, each from its own cover.
+
+    Index ``(t, i)``; columns v, weight, panel_weight, strata, Rural,
+    InterviewResult (what the round's own household cover records, NA for a
+    household only a supplement cover or a roster lists; it gates nothing, GH
+    #1444) and a sparse Derivation column only where the labelled PH rule repairs
+    rows.
+    """
+    cols = ['v', 'weight', 'panel_weight', 'strata', 'Rural']
+    parts = []
+    for t, df in round_covers(folder).items():
+        keep = cols + [c for c in ('InterviewResult', 'Derivation') if c in df]
+        parts.append(df[keep].assign(t=t).set_index('t', append=True))
+    out = pd.concat(parts).reorder_levels(['t', 'i']).sort_index()
+    assert out.index.is_unique, f'sample {folder}: (t, i) not unique'
+    return out
+
+
+def cluster_features_for_wave(folder):
+    """``cluster_features`` for one wave folder at HOUSEHOLD grain.
+
+    Index ``(t, i, v)``; columns Region, District, Rural, Latitude,
+    Longitude.  ``Wave.cluster_features`` projects it onto ``(t, v)``
+    through the audited Site 2 collapse.  The geovariables are household
+    level, so they join on ``i`` -- LEFT, onto the round's cover (#1261:
+    the cover says which households the round holds; see above). W5's v02
+    anonymized reference coordinates use this same household join (#978).
+    Site 2 retains an observed household row; no coordinate averaging occurs.
+    """
+    from lsms_library.local_tools import df_data_grabber
+    spec = ROUND_COVERS[folder]
+    geo = None
+    if spec['geo'] is not None:
+        fn, lat, lon = spec['geo']
+        geo = df_data_grabber(_data_path(folder, fn), {'i': 'hhid'},
+                              Latitude=lat, Longitude=lon)
+        assert geo.index.is_unique, f'{fn}: a household has two fixes'
+    cols = ['v', 'Region', 'District', 'Rural']
+    parts = []
+    for t, df in round_covers(folder).items():
+        keep = cols + (['Derivation'] if 'Derivation' in df else [])
+        df = df[keep].copy()
+        if 'Derivation' in df:
+            df['Derivation'] = df['Derivation'].replace({
+                _PH_SAME_LOCATION_KEY: 'Nigeria::cluster_features::ph-same-location'})
+        if geo is not None:
+            df = df.join(geo, how='left')
+        else:
+            df = df.assign(Latitude=np.nan, Longitude=np.nan)
+        parts.append(df.assign(t=t).set_index(['t', 'v'], append=True))
+    out = pd.concat(parts).reorder_levels(['t', 'i', 'v']).sort_index()
+    assert out.index.is_unique, f'cluster_features {folder}: (t, i) not unique'
+    return out
+
+
+# ---------------------------------------------------------------------
 # plot_features (GH #167)
 # ---------------------------------------------------------------------
 
@@ -173,8 +624,8 @@ PH_QUARTER = {
 # crop_production (GAP 1) -- item-level reported crop harvest
 # ---------------------------------------------------------------------
 #
-# Natural grain (t, i, plot, crop): one row per crop grown on a plot in
-# the post-harvest crop module (secta3*).  Stores REPORTED item-level
+# Natural grain (t, i, plot_id, crop, production_obs): one row per harvest
+# line of the post-harvest crop module (secta3*).  Stores REPORTED item-level
 # fields only -- Quantity (native harvest qty) + u (native unit),
 # Quantity_sold + Value_sold (reported), planting_month + harvest_month
 # (item dates), intercropped + perennial flags.  No kg conversion, no
@@ -187,7 +638,7 @@ PH_QUARTER = {
 # Preferred Label registered in the `u` table.
 
 
-def harmonized_food_labels():
+def harmonized_food_labels(t=None, *, observed_codes=None, dirs=None):
     """{int itemcode: Preferred Label} from the Code-keyed harmonize_food
     table.  This is the SAME resolver crop_production uses (see
     ``_crop_labels``), exposed for food_acquired so its ``j`` resolves to
@@ -197,10 +648,19 @@ def harmonized_food_labels():
     (``item_cd`` is int64 in the source CSVs), while harmonize_food's Code
     column is string-keyed; this returns an INT-keyed dict so a numeric
     ``j`` matches.  Codes with a blank / '---' Preferred Label are dropped
-    (they legitimately stay raw)."""
+    (they legitimately stay raw).
+
+    With ``t``, decode the food module's own quarter instead (GH #1144).
+    The no-argument branch remains the crop/community Code contract.  The table
+    resolves relative to cwd, where the country scripts run, unless ``dirs``
+    names where to look.
+    """
+    if t is not None:
+        return _food_item_labels(t, observed_codes=observed_codes)
     from lsms_library.local_tools import get_categorical_mapping
+    where = {} if dirs is None else {'dirs': dirs}
     raw = get_categorical_mapping(tablename='harmonize_food', idxvars='Code',
-                                  **{'Preferred Label': 'Preferred Label'})
+                                  **where, **{'Preferred Label': 'Preferred Label'})
     out = {}
     for k, v in raw.items():
         try:
@@ -213,10 +673,104 @@ def harmonized_food_labels():
     return out
 
 
-def _crop_labels():
+class FoodItemDecodeWarning(UserWarning):
+    """Known food codes whose quarter curation cannot place them safely."""
+
+
+def _food_item_labels(t, *, observed_codes=None):
+    """Food-only quarter codebook, preserving the detail actually recorded.
+
+    Exact Preferred names beat historical aliases: colliding codes polluted
+    several aliases (Leaves -> Dry Pepper, for example). Only the reviewed
+    example-only Other Spices alias is used; the recorded unqualified foods
+    stay unqualified. See ledger #1144 sections 3-5 and CONTENTS.org.
+    """
+    from collections import Counter, defaultdict
+    from lsms_library.local_tools import df_from_orgfile
+    import warnings
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    tab = df_from_orgfile(os.path.join(here, 'categorical_mapping.org'),
+                          name='harmonize_food')
+    quarter_columns = [c for c in tab.columns if re.fullmatch(r'\d{4}Q[1-4]', str(c))]
+    if t not in quarter_columns:
+        raise KeyError(f"Nigeria food items have no quarter codebook for {t!r}")
+
+    def present(value):
+        return pd.notna(value) and str(value).strip() not in ('', '---')
+
+    def normalized(value):
+        return ' '.join(str(value).split()).casefold()
+
+    def code_key(value):
+        try:
+            return int(format_id(value))
+        except (TypeError, ValueError, OverflowError):
+            return None
+
+    exact = defaultdict(set)
+    aliases = defaultdict(set)
+    for _, row in tab.iterrows():
+        preferred = row['Preferred Label']
+        if not present(preferred):
+            continue
+        preferred = str(preferred).strip()
+        exact[normalized(preferred)].add(preferred)
+        for quarter in quarter_columns:
+            if present(row[quarter]):
+                aliases[normalized(row[quarter])].add(preferred)
+
+    native_names = {normalized(v): v for v in
+                    ('Groundnuts', 'Pepper', 'Maize (shelled)')}
+    reviewed_aliases = {normalized('Other Spices (e.g. Maggi)'): 'Other Spices'}
+    out, unresolved = {}, {}
+    for code, native in zip(tab['Code'], tab[t]):
+        code = code_key(code)
+        if code is None:
+            continue
+        if not present(native):
+            unresolved[code] = 'missing quarter label; raw code kept'
+            continue
+        native = str(native).strip()
+        key = normalized(native)
+        if len(exact[key]) == 1:
+            label = next(iter(exact[key]))
+        elif key in native_names:
+            label = native_names[key]
+        elif (key in reviewed_aliases
+              and aliases[key] == {reviewed_aliases[key]}):
+            label = reviewed_aliases[key]
+        else:
+            label = native
+            unresolved[code] = (
+                f"native label {native!r} kept; Preferred alias is "
+                f"ambiguous or unreviewed ({sorted(aliases[key])})")
+        out.update({code: label, str(code): label, f'{code}.0': label})
+
+    observed = Counter(code_key(v) for v in
+                       (() if observed_codes is None else observed_codes))
+    reports = {code: {'raw_rows': observed[code], 'reason': reason}
+               for code, reason in unresolved.items() if observed[code]}
+    if reports:
+        warnings.warn(
+            f"Nigeria food_acquired {t}: known item codes need quarter "
+            f"curation: {reports}. Native labels/raw codes are preserved; "
+            "no other round's global meaning was substituted.",
+            FoodItemDecodeWarning, stacklevel=2)
+    return out
+
+
+def _crop_labels(dirs=None):
     """{int cropcode: Preferred Label} from harmonize_food (shared with
     food_acquired)."""
-    return harmonized_food_labels()
+    return harmonized_food_labels(dirs=dirs)
+
+
+def _crop_labels_from_anywhere():
+    """`_crop_labels()` for a caller whose cwd is not a Nigeria `_/`, such as a
+    registered `inputs` callable reached through `Country.derivation_inputs`."""
+    from lsms_library.paths import countries_root
+    return _crop_labels(dirs=[f"{countries_root() / 'Nigeria' / '_'}/"])
 
 
 def _strip_code_prefix(s):
@@ -378,30 +932,73 @@ def _canon_input_unit(s):
 class UnplacedUnitLabelWarning(UserWarning):
     """A recorded unit LABEL the canonicaliser cannot place (GH #1047).
 
-    Such a row is served ``U_UNKNOWN`` like a blank one, which would be a
-    silent loss of a unit the survey recorded -- so it is named here."""
+    Name the label and the caller's disposition rather than silently losing
+    a unit the survey recorded."""
 
 
-def _canon_units(labels, canon=_canon_unit, where=''):
-    """Map a decoded unit-label Series through `canon`, REPORTING what it
-    cannot place.  A blank, or a bare numeric code with no value label, is
-    NA silently (a missing unit; the caller serves it ``U_UNKNOWN``).  A
-    non-numeric label that `canon` returns NA for is NA too, but raises an
-    `UnplacedUnitLabelWarning` naming each label and its row count."""
-    import warnings
-    out = labels.map(canon).astype('string')
+def _recorded_label(labels):
+    """True where a unit cell holds a label: not blank, and not a bare numeric
+    code with no value label, either of which means no unit was recorded."""
     text = labels.astype('string').str.strip()
     body = text.map(lambda s: s if pd.isna(s) else _strip_code_prefix(s))
-    unplaced = (out.isna() & body.notna() & (body != '')
-                & ~body.str.fullmatch(r'[\d.]+').fillna(False))
+    return (body.notna() & (body != '')
+            & ~body.str.fullmatch(r'[\d.]+').fillna(False)).astype(bool)
+
+
+def _canon_units(labels, canon=_canon_unit, where='',
+                 disposition='served as Unknown'):
+    """Map a decoded unit-label Series through `canon`, REPORTING what it
+    cannot place.  A blank, or a bare numeric code with no value label, is
+    NA silently (a missing unit).  A
+    non-numeric label that `canon` returns NA for is NA too, but raises an
+    `UnplacedUnitLabelWarning` naming each label, its row count and the
+    caller's disposition.  The crop/input default remains ``U_UNKNOWN``."""
+    import warnings
+    out = labels.map(canon).astype('string')
+    unplaced = _recorded_label(labels) & out.isna()
     if unplaced.any():
-        counts = text[unplaced].value_counts().to_dict()
+        counts = labels.astype('string').str.strip()[unplaced].value_counts().to_dict()
         warnings.warn(
             f"Nigeria {where}: {int(unplaced.sum())} row(s) carry a unit label "
-            f"that cannot be placed and are served as Unknown: {counts}. "
+            f"that cannot be placed and are {disposition}: {counts}. "
             "Teach the canonicaliser in nigeria.py (GH #1047).",
             UnplacedUnitLabelWarning, stacklevel=2)
     return out
+
+
+# C8 labels already registered in categorical_mapping.org's `u` table.
+# Keep this extension local to community prices (ledger #1095, sections 2-5):
+# `_canon_unit` also serves harvest and sold units, with a different codebook.
+_COMMUNITY_UNIT_LABELS = {
+    'loaf': 'Loaf',
+    'bottle/can': 'Bottle/Can',
+    'cube': 'Cube',
+    'metric cup': 'Metric Cup',
+    'wrap': 'Wrap',
+    'tea spoon': 'Tea Spoon',
+    'table spoon': 'Table Spoon',
+    'crate': 'Crate',
+    'slice': 'Slice',
+    'whole animal': 'Whole Animal',
+    # GH #587 (2026-11-12): two W4/W5 labels the substring decoder below
+    # places WRONGLY, not unplaced.  '251. BAG OF 20 SACHETS' hits 'bag' and
+    # was served 'Sack/Bag' (PH 2019Q1 148 rows, 2024Q1 261); W5's typo
+    # '4. CENTLITRES (CL)' misses 'centilitre', hits 'litre' and was served
+    # 'l' (2024Q1 49 rows, all with a blank size -- as 'cl' they fall under
+    # the existing c8-unrecorded-size-drop).  Both are the `u` table's own
+    # Preferred Labels (codes 251 and 4).
+    'bag of 20 sachets': 'Bag of 20 Sachets',
+    'centlitres (cl)': 'cl',
+}
+
+
+def _canon_community_unit(s):
+    """Place exact C8 label bodies, then use the existing base-unit decoder."""
+    if not pd.isna(s):
+        label = _COMMUNITY_UNIT_LABELS.get(_strip_code_prefix(s).lower())
+        if label is not None:
+            return label
+    return _canon_unit(s)
 
 
 def _month_str(month_series, year_series):
@@ -420,7 +1017,50 @@ def _month_str(month_series, year_series):
     return out
 
 
-def crop_production_for_wave(t, frames, crop_labels):
+# ---------------------------------------------------------------------
+# crop_production: the native harvest line (GH #1433)
+# ---------------------------------------------------------------------
+#
+# (t, i, plot_id, crop) is not a harvest line.  `harmonize_food` folds several
+# codes onto one label (Yam--roots is 1120-1124, which is 1,449 of the 1,616 lines
+# concerned; also Fresh Pepper 2141/2142, Orange/tangerine 3150/3170), and the W1-W3
+# rosters can repeat one code on a plot (37 / 13 / 5 keys).  A keep-first dedup used
+# to discard the lines past the first, and they were distinct answers: only 70 of
+# the 794 keys agree across quantity, unit, value and sale.  The canonical
+# `production_obs` level names the line (lsms_library/data_info.yml, GH #1198):
+#   W1-W3  `reported:crop_id:<n>` -- the roster's `cropid`.  No recorded id repeats
+#          within a plot.  W1's has values -1 and 0, carried as recorded, and is
+#          blank on 6 labelled lines:
+#          `missing-id:row:<source_fingerprint>:<n>`, the zero-based row of the held
+#          release, bound to its sidecar.  CONSTRUCTED, not a survey id.
+#   W4/W5  `reported:crop_code:<n>` -- these files ship no `cropid`, and the code is
+#          unique within a plot across the annual and tree files together.
+#   a Farm-level sale row  CROP_OBS_NA: it answers no harvest line.
+# Not a persistent id: the spelling differs across waves, as it does in Ethiopia.
+CROP_OBS_NA = 'unresolved_observation'
+
+
+def _crop_line_observations(df, crop, line=None, source_ref=None):
+    """`production_obs` tokens for one plot-crop file, aligned to its rows.
+
+    `df` is the file as read, before any filter, so a constructed ordinal names
+    one physical line of the held release.  A line with no id and no `source_ref`
+    comes back NA, which `crop_production_for_wave` refuses if the line is served.
+    """
+    if line is None:
+        code = pd.to_numeric(df[crop], errors='coerce').astype('Int64')
+        return 'reported:crop_code:' + code.astype('string')
+    native = pd.to_numeric(df[line], errors='coerce').astype('Int64')
+    token = 'reported:crop_id:' + native.astype('string')
+    if source_ref is None:
+        return token
+    if not source_ref.startswith('dvc:'):
+        raise ValueError(f'constructed crop observations need a sidecar: {source_ref}')
+    row = pd.Series(np.arange(len(df)), index=df.index).astype('string')
+    return token.fillna('missing-id:row:' + source_ref + ':' + row)
+
+
+def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
     """Assemble item-level crop_production for one Nigeria GHS-Panel wave.
 
     Parameters
@@ -428,11 +1068,18 @@ def crop_production_for_wave(t, frames, crop_labels):
     t : str
         PH-quarter wave id (e.g. '2011Q1'), used as the `t` index.
     frames : list of dict
-        Each dict describes one source frame (annual harvest, perennial,
-        and/or an hh-crop sold frame) with keys:
+        Each dict describes one plot-crop source frame (annual harvest or
+        perennial) with keys:
             df        : raw DataFrame (convert_categoricals as noted below)
             dec       : decoded-label DataFrame (for crop/unit label decode)
             hhid, plot, crop                 column names (plot may be None)
+            line                             the roster's own line id (W1-W3
+                                             `cropid`); absent where the file
+                                             has none and the crop code names
+                                             the line (W4/W5).  See
+                                             `_crop_line_observations`
+            source_ref                       `source_fingerprint` of the file,
+                                             for a line whose id is missing (W1)
             qty, unit                        harvest qty / unit columns
             kg_factor                        SURVEY-REPORTED "Kg/L conversion
                                              factor" column asked BESIDE
@@ -443,29 +1090,45 @@ def crop_production_for_wave(t, frames, crop_labels):
                                              #824), decoded via `dec` and
                                              canonicalised with _canon_unit
                                              exactly as `unit` is
+            value_harvested                  the respondent's own Naira
+                                             VALUATION of the harvest `qty`
+                                             measures, asked on the same
+                                             plot-crop row (GH #844; W1/W2
+                                             sa3q18, W3/W4 sa3iq6a, W4
+                                             sa3iiiq14, W5 sa3iq10 /
+                                             sa3iiiq24).  Not a transaction.
             plant_m, plant_y                 planting/harvest-start month/yr
             harv_m, harv_y                   harvest-end month/yr (optional)
             intercropped                     bool Series aligned to df (opt)
             perennial                        bool flag for the whole frame
-            sold_on                          'plot' | 'hh' join grain for sale
+            sold_on                          'plot' where the frame carries
+                                             the sale on the plot-crop row
+                                             (W1/W2); absent otherwise
     crop_labels : dict
         {int cropcode: Preferred Label}.
+    hh_sales : DataFrame, optional
+        The wave's household-crop sale records (`hh_crop_sale_records`, the
+        W3-W5 A3.ii block), which name NO plot.  Each household and served crop
+        is placed on the one served line that states a harvest, or else on a
+        Farm-level row (GH #843; `_attach_hh_crop_sales`).
 
     Returns
     -------
-    DataFrame indexed by (t, i, plot, crop) with reported columns.
-    Sale columns are populated only for frames where they sit at the
-    plot-crop grain; hh-crop sale frames are merged on (i, crop) where
-    that is the survey's grain (W3-W5 record sales at hh-crop level, so
-    the same sale value applies to every plot row of that hh-crop --
-    a reported attribute, not a per-plot allocation).
+    DataFrame indexed by (t, i, plot_id, crop, production_obs), one row per
+    harvest line with a labelled crop (GH #1433), with reported columns.
+    W1/W2 read the sale off the plot-crop row.  W3-W5 place each household-crop
+    sale on the household's one row for that crop that states a harvest, or else
+    on ONE `plot_id='Farm-level'` row with no harvest Quantity (GH #843) and
+    `production_obs` the canonical sentinel, so a sale is never on two rows and
+    never split.
 
     `Unit_sold` (GH #824) is the unit the SALE was reported in, a second
     unit distinct from the row's `u` (the HARVEST unit).  It is a plain
     NA-bearing `string` column, never an index level and never
-    sentinel-filled: NA means the frame names no sold-unit column (W3-W5),
-    the row records no sale, OR the sale's unit was simply not recorded
-    (41 positive-sale rows in 2011Q1, 6 in 2013Q1; measured 2026-10-14).
+    sentinel-filled: NA means the row records no sale, the sale's unit was
+    simply not recorded (44 positive-sale rows in 2011Q1, 6 in 2013Q1;
+    measured 2026-11-04), or the household sold the crop in two units and no
+    single quantity can be served (GH #843).
     Where it disagrees with `u` the row is a
     data-quality FLAG, not an identification of the price denominator
     (canonical note, lsms_library/data_info.yml `crop_production.
@@ -489,6 +1152,9 @@ def crop_production_for_wave(t, frames, crop_labels):
             'i': i.values,
             'plot_id': plot.values,
             'crop': crop.values,
+            'production_obs': _crop_line_observations(
+                df, fr['crop'], line=fr.get('line'),
+                source_ref=fr.get('source_ref')).values,
         }, index=df.index)
 
         piece['Quantity'] = (pd.to_numeric(df[fr['qty']], errors='coerce')
@@ -520,7 +1186,8 @@ def crop_production_for_wave(t, frames, crop_labels):
         # KgFactor`.  Only a `*_conv` asked beside THIS frame's own
         # quantity/unit pair may be named here (GH #859): the expected-future
         # harvest blocks carry their own unit columns and their own factor,
-        # and secta3ii's factor is hh-crop grain -- see _/CONTENTS.org.
+        # and secta3ii's factor rates the household total, not this row's
+        # quantity, so it is the SALE's `KgFactor_sold` -- see _/CONTENTS.org.
         # A non-positive value is read as "not recorded" (0 kg per unit is
         # not a weight); measured no-op on every Nigeria wave -- all four
         # wired columns report positive-or-null only.
@@ -529,6 +1196,22 @@ def crop_production_for_wave(t, frames, crop_labels):
             piece['KgFactor'] = kgf.where(kgf > 0, np.nan).astype('float64').values
         else:
             piece['KgFactor'] = np.nan
+
+        # The household's own Naira VALUATION of the harvest this row's `qty`
+        # measures (GH #844), read positionally off the SAME plot-crop row --
+        # no join, no allocation.  W1/W2 ask it in the sale block ("If you had
+        # sold all [CROP] harvested since the last visit, what would be the
+        # total value?", sa3q18); W3-W5 ask it beside the harvest quantity
+        # ("What is the estimated value of the [CROP] harvested ...?").  Both
+        # are a hypothetical valuation of the whole harvest, never a
+        # transaction, so it is a column distinct from `Value_sold`.
+        # REPORTED, stored as recorded: no clip, no sentinel strip (none
+        # measured; see _/CONTENTS.org for the one W5 outlier).
+        if fr.get('value_harvested') in df.columns:
+            piece['Value_harvested'] = pd.to_numeric(
+                df[fr['value_harvested']], errors='coerce').astype('float64').values
+        else:
+            piece['Value_harvested'] = np.nan
 
         # Reported sale at plot-crop grain (W1/W2); hh-crop sales merged
         # separately below.
@@ -576,8 +1259,8 @@ def crop_production_for_wave(t, frames, crop_labels):
         if col not in out.columns:
             out[col] = pd.NA
     # Unit_sold is a `string` column, not object: a wave whose frames name
-    # no sold-unit column (W3-W5, whose sales sit in secta3ii at hh-crop
-    # grain) must still deliver an all-NA STRING column, for the same
+    # no sold-unit column (W3-W5 harvest frames, whose sales arrive separately
+    # as `hh_sales`) must still deliver a STRING column, for the same
     # concat-dtype reason KgFactor is pinned to float below.
     if 'Unit_sold' not in out.columns:
         out['Unit_sold'] = pd.Series(pd.NA, index=out.index, dtype='string')
@@ -588,25 +1271,373 @@ def crop_production_for_wave(t, frames, crop_labels):
     if 'KgFactor' not in out.columns:
         out['KgFactor'] = np.nan
     out['KgFactor'] = pd.to_numeric(out['KgFactor'], errors='coerce').astype('float64')
+    # Same float pin for Value_harvested (GH #844): a frame naming no
+    # valuation column delivers all-NaN FLOAT, not object.
+    if 'Value_harvested' not in out.columns:
+        out['Value_harvested'] = np.nan
+    out['Value_harvested'] = pd.to_numeric(
+        out['Value_harvested'], errors='coerce').astype('float64')
+    # Reported kg per ONE sold unit (GH #843).  Only W4/W5's hh_sales carry it;
+    # W1-W3 ship no such factor, so the column is float NaN there.
+    out['KgFactor_sold'] = pd.Series(np.nan, index=out.index, dtype='float64')
 
     # Drop rows with no crop label resolved (free-text junk codes) and no
     # household.  Keep rows with a crop even if Quantity is NaN (the
     # survey recorded the crop on the plot but no harvest qty).
     out = out[out['i'].notna() & out['crop'].notna()]
 
-    # Existing first-row dedup at (t,i,plot_id,crop) grain. It discards
-    # positive sales on 96 W1 / 66 W2 rows, not just exact duplicates;
-    # see CONTENTS.org Unit_sold residual and release_landing_2026-10-14/
-    # nigeria824.org. Keep this behaviour pending source-grain adjudication.
-    # drop_duplicates keeps a whole row, including any nulls on that row.
-    out = out.sort_values(['i', 'plot_id', 'crop'])
-    out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'crop'], keep='first')
-
-    out = out.set_index(['t', 'i', 'plot_id', 'crop']).sort_index()
+    # production_obs names every line, so a repeat is a source defect: raise,
+    # never select one (GH #1433; the Ethiopia GH #1461 / Niger GH #1360 rule).
+    # This used to be a keep-first dedup at (t, i, plot_id, crop), which threw
+    # away 822 harvest lines, 163 of them positive sales.
+    if out['production_obs'].isna().any():
+        raise ValueError(f'crop_production {t}: a served harvest line has no line id')
+    out = out.set_index(['t', 'i', 'plot_id', 'crop', 'production_obs']).sort_index()
+    if not out.index.is_unique:
+        raise ValueError(
+            f'crop_production {t}: production_obs does not identify every harvest '
+            f'line ({int(out.index.duplicated().sum())} repeated)')
     out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold', 'Unit_sold',
                'planting_month', 'harvest_month', 'intercropped', 'perennial',
-               'KgFactor']]
+               'KgFactor', 'Value_harvested', 'KgFactor_sold']]
+    # The registry key of a constructed sale (GH #843), NA on a reported row.
+    # The canonical schema declares it; a data_scheme.yml may not.
+    out['Derivation'] = pd.Series(pd.NA, index=out.index, dtype='string')
+    if hh_sales is not None:
+        out = _attach_hh_crop_sales(t, out, hh_sales)
     return out
+
+
+# ---------------------------------------------------------------------
+# crop_production: W3-W5 household-crop sales (GH #843)
+# ---------------------------------------------------------------------
+#
+# From W3 the sale block is A3.ii (secta3ii): one record per crop the
+# household harvested, with no plot.  W5's form says so outright: "CAPI WILL
+# MAKE A LIST OF ALL HARVESTED CROPS FROM FLAP D ... IF THE RESPONDENTS
+# HARVESTED MAIZE FROM 2 DIFFERENT PLOTS, CAPI WILL LIST MAIZE ONCE."  Rulings
+# (@ligon, 2026-11-03 and 2026-11-04): the one row of that household and crop
+# that states a harvest -> the sale goes on it, even beside explicit "did not
+# harvest" rows; zero such rows, or two or more -> ONE plot_id='Farm-level' row,
+# no harvest Quantity.  No split, no double count, nothing dropped.
+# _/CONTENTS.org has the measured partition; _/derivations.yml has the keys.
+
+#: `plot_id` of a sale the survey does not resolve to a plot.  STRUCTURAL, the
+#: canonical sentinel (lsms_library/data_info.yml, `plot_id:`).
+FARM_LEVEL = 'Farm-level'
+
+_HH_SALE_SINGLE_ROW = 'Nigeria::crop_production::hh-crop-sale-single-row'
+_HH_SALE_SUMMED = 'Nigeria::crop_production::hh-crop-sale-records-summed'
+_HH_SALE_TWO_UNITS = 'Nigeria::crop_production::hh-crop-sale-two-units'
+
+# The sale block per wave folder, and the plot-crop files (with their harvest
+# quantity) it is placed against.
+# W3 asks the sale's own unit (Q5 QUANTITY + PROD. UNIT CODE; the code embeds
+# the size).  W4/W5 ask only a QUANTITY -- "Of the [QTY] [UNIT] [CONDITION] of
+# [CROP] harvested, how much of it did your household sell?" -- so the form
+# itself states the sale in the unit of the household's total harvest, which
+# is therefore the unit, size and condition named here.  The W5 interviewer
+# manual (p. 99) says so: "the respondent MUST provide the quantity ... sold in
+# the SAME UNIT AS THE QUANTITY HARVESTED".  So `sa3iiq1_conv`, the form's Kg/L
+# factor for that unit, rates the SALE, which is why it is `conv` here.  It
+# never rates a plot row's harvest: that is `KgFactor`, from the plot's own
+# `*_conv`.  W3 ships no factor.
+_HH_SALE_SOURCE = {
+    '2015-16': dict(
+        fn='Data/secta3ii_harvestw3.dta',
+        harvest=[('Data/secta3i_harvestw3.dta', 'sa3iq6i')], line='cropid',
+        sold='sa3iiq3', qty='sa3iiq5a', unit='sa3iiq5b', value='sa3iiq6'),
+    '2018-19': dict(
+        fn='Data/secta3ii_harvestw4.dta',
+        harvest=[('Data/secta3i_harvestw4.dta', 'sa3iq6i'),
+                 ('Data/secta3iii_harvestw4.dta', 'sa3iiiq13a')],
+        sold='sa3iiq3', qty='sa3iiq5a', unit='sa3iiq1c', size='sa3iiq1d',
+        condition='sa3iiq1b', conv='sa3iiq1_conv', value='sa3iiq6'),
+    '2023-24': dict(
+        fn='Data/Post Harvest Wave 5/Agriculture/secta3ii_harvestw5.dta',
+        harvest=[('Data/Post Harvest Wave 5/Agriculture/secta3i_harvestw5.dta', 'sa3iq9a'),
+                 ('Data/Post Harvest Wave 5/Agriculture/secta3iii_harvestw5.dta', 'sa3iiiq23a')],
+        sold='sa3iiq4', qty='sa3iiq6', unit='sa3iiq3b', size='sa3iiq3c',
+        condition='sa3iiq3d', conv='sa3iiq1_conv', value='sa3iiq7'),
+}
+
+
+def _hh_sale_answer_columns(spec):
+    """The ORIGINAL variable names of one wave's sale answers."""
+    return [spec[k] for k in ('sold', 'qty', 'unit', 'size', 'condition', 'conv', 'value')
+            if spec.get(k) is not None]
+
+
+def _hh_crop_sale_frame(raw, dec, spec, crop_labels):
+    """The records of one A3.ii file that record a SALE, one row per record.
+
+    A sale is a record with a positive sold quantity or a positive sale value.
+    "Did not sell", an empty answer and a zero quantity with a zero value are
+    not sales and return no row: a table that has no sale leaves the columns
+    NA, it does not state a zero.  A recorded zero VALUE beside a positive
+    quantity (W3, 14 records) is the survey's answer and stays 0.
+
+    A crop code `harmonize_food` does not map keeps its own label, as an
+    unmapped crop does elsewhere in the corpus (W4 codes 9001-9012).  Unlike a
+    harvest row, a sale with such a code is not dropped: the ruling drops
+    nothing, and no table extends the crop vocabulary to serve it.
+    """
+    q = pd.to_numeric(raw[spec['qty']], errors='coerce').astype('float64')
+    v = pd.to_numeric(raw[spec['value']], errors='coerce').astype('float64')
+    is_sale = ((q > 0) | (v > 0)).values
+    source_row = pd.Series(range(len(raw)), index=raw.index)[is_sale]
+    raw, dec, q, v = raw[is_sale], dec[is_sale], q[is_sale], v[is_sale]
+
+    code = pd.to_numeric(raw['cropcode'], errors='coerce').astype('Int64')
+    crop = code.map(crop_labels).astype('string')
+    named = dec['cropcode'].astype('string')
+    named = named.map(_strip_code_prefix, na_action='ignore').astype('string')
+    crop = crop.fillna(named).fillna('unknown_crop')
+    # What makes two records' quantities commensurable: the raw unit code,
+    # plus the separately-asked size and condition where the form has them.
+    # `_canon_unit` is size-agnostic, so its label is not enough to sum on.
+    unit_key = pd.Series('', index=raw.index, dtype='string')
+    for col in ('unit', 'size', 'condition'):
+        if spec.get(col) is not None:
+            unit_key = unit_key + '/' + raw[spec[col]].astype('string').fillna('')
+    # Reported kg per one sold unit.  A non-positive value is read as "not
+    # recorded", as for the harvest KgFactor (0 kg per unit is not a weight).
+    if spec.get('conv') is not None:
+        factor = pd.to_numeric(raw[spec['conv']], errors='coerce').astype('float64')
+        factor = factor.where(factor > 0)
+    else:
+        factor = pd.Series(np.nan, index=raw.index, dtype='float64')
+    out = pd.DataFrame({
+        'i': raw['hhid'].apply(format_id).astype('string').values,
+        'crop': crop.values,
+        'source_row': source_row.values,
+        'Quantity_sold': q.values,
+        'Value_sold': v.values,
+        'Unit_sold': _canon_units(
+            dec[spec['unit']],
+            where=f"crop_production {spec['fn']} {spec['unit']}",
+            disposition='served with Unit_sold NA').values,
+        'KgFactor_sold': factor.values,
+        '_unit_key': unit_key.values,
+    }, index=raw.index)
+    answers = ['cropcode'] + _hh_sale_answer_columns(spec)
+    if 'crop_number' in raw.columns:   # W3's roster line
+        answers = ['crop_number'] + answers
+    return out.join(raw[answers])
+
+
+def hh_crop_sale_records(folder, crop_labels=None):
+    """The sale records of one wave folder's A3.ii file (`_HH_SALE_SOURCE`)."""
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    spec = _HH_SALE_SOURCE[folder]
+    fn = str(countries_root() / 'Nigeria' / folder / spec['fn'])
+    raw = get_dataframe(fn, convert_categoricals=False)
+    dec = get_dataframe(fn, convert_categoricals=True)
+    return _hh_crop_sale_frame(
+        raw, dec, spec,
+        _crop_labels_from_anywhere() if crop_labels is None else crop_labels)
+
+
+def derive_hh_crop_sale_attachment(records, served):
+    """Where each household-crop sale lands, and what it says there.
+
+    Parameters
+    ----------
+    records : DataFrame
+        `hh_crop_sale_records`: one row per A3.ii sale record.
+    served : DataFrame
+        Columns `i`, `plot_id`, `crop`, `production_obs`, `Quantity`, one row per
+        SERVED harvest line of the wave.
+
+    Returns
+    -------
+    DataFrame indexed by `(i, crop)`, one row per household and served crop:
+    `plot_id`, `production_obs`, `Quantity_sold`, `Value_sold`, `Unit_sold`,
+    `KgFactor_sold`, `Derivation`, `cause` ('one-states-harvest' /
+    'several-state-harvest' / 'none-states-harvest' / 'no-served-row'),
+    `n_records`.
+
+    The rule, from the rulings on GH #843 (@ligon, 2026-11-03, 2026-11-04):
+
+    * exactly one served row of that household and crop STATES A HARVEST -> that
+      row's `plot_id` and `production_obs`, even where its other rows are explicit
+      "did not harvest";
+    * otherwise (two or more state one, or none does, or there is no row) ->
+      `FARM_LEVEL` and `CROP_OBS_NA`.  Two lines of one plot are two rows here
+      (GH #1433): the plot is known and the line is not, and the rule does not
+      pick one.  CONTENTS.org has the count.
+
+    A row states a harvest when its harvest `Quantity` is POSITIVE.  So:
+
+    * a blank does not: no harvest quantity was recorded on the row;
+    * a zero does not: a recorded zero is not a harvest, even under a YES;
+    * an explicit "did not harvest" does not.  The screener (W3-W5 sa3iq3, W4
+      sa3iiiq7, W5 sa3iiiq17) needs no separate read: every NO line in the files
+      has a blank quantity, and every positive quantity sits under a YES.
+
+    One household and crop can hold several records, because `harmonize_food`
+    gives several codes one label (Yam--roots is 1120-1124) and W3's roster can
+    repeat a code.  The sale is placed once per household and crop, so:
+
+    * every record's quantity in one unit -> quantity and value are summed;
+    * two units (raw code, size or condition differ) -> `Value_sold` is
+      summed, since Naira add, and `Quantity_sold` / `Unit_sold` are NA: no sum
+      across units is served.  The answers stay in `derivation_inputs`.
+
+    `KgFactor_sold` is never summed or chosen between.  A one-record row carries
+    its record's factor.  Agreement policy for a summed row, the canonical
+    note's, as Mali's: every record must report the same factor, missingness
+    included, or the row's is NA and its quantity stays.  A two-unit row's is NA.
+    """
+    keys = ['i', 'crop']
+    grouped = records.groupby(keys, sort=True)
+    out = pd.DataFrame({'n_records': grouped.size()})
+    out['Value_sold'] = grouped['Value_sold'].sum(min_count=1)
+    quantity = grouped['Quantity_sold'].sum(min_count=1)
+
+    # Only a record that states a quantity has a unit to disagree about.
+    stated = records[records['Quantity_sold'] > 0].groupby(keys)
+    n_units = stated['_unit_key'].nunique().reindex(out.index, fill_value=0)
+    out['Quantity_sold'] = quantity.where(n_units <= 1)
+    out['Unit_sold'] = (stated['Unit_sold'].first().reindex(out.index)
+                        .astype('string').where(n_units <= 1))
+    factors = grouped['KgFactor_sold']
+    out['KgFactor_sold'] = factors.first().where(
+        (factors.nunique(dropna=False) == 1) & (n_units <= 1)).astype('float64')
+
+    n_rows = served.groupby(keys).size().reindex(out.index, fill_value=0)
+    stating = served[pd.to_numeric(served['Quantity'], errors='coerce') > 0]
+    stating = stating.groupby(keys)
+    n_stating = stating.size().reindex(out.index, fill_value=0)
+    for level, otherwise in (('plot_id', FARM_LEVEL), ('production_obs', CROP_OBS_NA)):
+        only = stating[level].first().reindex(out.index).astype('string')
+        out[level] = only.where(n_stating == 1, otherwise)
+    out['cause'] = 'none-states-harvest'
+    out.loc[n_stating == 1, 'cause'] = 'one-states-harvest'
+    out.loc[n_stating >= 2, 'cause'] = 'several-state-harvest'
+    out.loc[n_rows == 0, 'cause'] = 'no-served-row'
+
+    # A key per path.  A Farm-level row holding ONE record is a survey answer
+    # at its own grain and the index discloses it, so it carries none.
+    # Two keys on one row are '+'-joined in sorted order (derivations.py).
+    picks = zip(n_stating == 1,
+                (out['n_records'] > 1) & (n_units <= 1),
+                n_units > 1)
+    out['Derivation'] = pd.array(
+        ['+'.join(sorted(k for k, on in zip(
+            (_HH_SALE_SINGLE_ROW, _HH_SALE_SUMMED, _HH_SALE_TWO_UNITS), pick)
+            if on)) or pd.NA for pick in picks], dtype='string')
+    return out
+
+
+def _attach_hh_crop_sales(t, out, records):
+    """Place a wave's household-crop sales on `out`, the served frame.
+
+    Each `(i, crop)` lands on exactly one row, by construction, so no sale is on
+    two rows.
+    """
+    from lsms_library.transformations import U_UNKNOWN
+    served = out.index.to_frame(index=False)[['i', 'plot_id', 'crop', 'production_obs']]
+    # The new rows' index levels take the served frame's dtypes, so adding them
+    # moves no pre-existing level's dtype.
+    levels = {level: served[level].dtype for level in served.columns}
+    served['Quantity'] = out['Quantity'].to_numpy()
+    placed = derive_hh_crop_sale_attachment(records, served).reset_index()
+    placed['t'] = t
+    placed = placed.astype(levels)
+    placed = placed.set_index(['t', 'i', 'plot_id', 'crop', 'production_obs'])
+
+    out = out.copy()
+    for col in ('Quantity_sold', 'Value_sold'):
+        out[col] = pd.to_numeric(out[col], errors='coerce').astype('float64')
+    sale_cols = ['Quantity_sold', 'Value_sold', 'Unit_sold', 'KgFactor_sold',
+                 'Derivation']
+
+    on_row = placed[placed['cause'] == 'one-states-harvest']
+    for col in sale_cols:
+        out.loc[on_row.index, col] = on_row[col]
+
+    # No harvest, no month, no valuation and no annual/perennial answer: a
+    # Farm-level row states the sale and nothing else.  `u` describes the
+    # harvest Quantity, which the row does not have, so it is the missing-unit
+    # sentinel; the sale's unit is in Unit_sold.
+    farm = placed.loc[placed['cause'] != 'one-states-harvest', sale_cols].copy()
+    for col in out.columns.difference(sale_cols):
+        farm[col] = pd.Series(pd.NA, index=farm.index, dtype='object')
+    farm['u'] = U_UNKNOWN
+    for col in ('Quantity', 'KgFactor', 'Value_harvested'):
+        farm[col] = pd.Series(np.nan, index=farm.index, dtype='float64')
+    for col in ('planting_month', 'harvest_month'):
+        farm[col] = farm[col].astype('string')
+    out['perennial'] = out['perennial'].astype('boolean')
+    farm['perennial'] = farm['perennial'].astype('boolean')
+    out = pd.concat([out, farm[out.columns]]).sort_index()
+    assert out.index.is_unique, f'crop_production {t}: a sale reached two rows'
+    return out
+
+
+def _served_plot_crop_keys(folder, crop_labels):
+    """`(i, plot_id, crop, production_obs, Quantity)` of a wave's served harvest
+    lines, from source: the lines `crop_production_for_wave` keeps, a labelled crop
+    and a household present.
+    """
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    root = countries_root() / 'Nigeria' / folder
+    spec = _HH_SALE_SOURCE[folder]
+    pieces = []
+    for fn, qty in spec['harvest']:
+        raw = get_dataframe(str(root / fn), convert_categoricals=False)
+        code = pd.to_numeric(raw['cropcode'], errors='coerce').astype('Int64')
+        pieces.append(pd.DataFrame({
+            'i': raw['hhid'].apply(format_id).astype('string').values,
+            'plot_id': raw['plotid'].apply(format_id).astype('string').values,
+            'crop': code.map(crop_labels).astype('string').values,
+            'production_obs': _crop_line_observations(
+                raw, 'cropcode', line=spec.get('line')).values,
+            'Quantity': pd.to_numeric(raw[qty], errors='coerce').values,
+        }))
+    return pd.concat(pieces, ignore_index=True).dropna(subset=['i', 'crop'])
+
+
+def _inputs_hh_crop_sale(wave, key):
+    """The raw A3.ii answers behind the rows carrying `key`.
+
+    One row per source record, at `(t, i, plot_id, crop, production_obs,
+    source_row)`, so the frame joins to the served row on its first five levels.
+    `source_row` is
+    the zero-based row of the held release.  Several records can sit behind one
+    served row, which is what a summed row is.  Original variable names.
+    Re-reads the sources; nothing is cached.
+    """
+    folder = wave_folder_map.get(wave, wave)
+    labels = _crop_labels_from_anywhere()
+    records = hh_crop_sale_records(folder, labels)
+    placed = derive_hh_crop_sale_attachment(
+        records, _served_plot_crop_keys(folder, labels))
+    carrying = placed[placed['Derivation'].str.contains(key, regex=False, na=False)]
+    spec = _HH_SALE_SOURCE[folder]
+    answers = ['cropcode'] + _hh_sale_answer_columns(spec)
+    if 'crop_number' in records.columns:
+        answers = ['crop_number'] + answers
+    frame = records.merge(carrying[['plot_id', 'production_obs']].reset_index(),
+                          on=['i', 'crop'])
+    frame['t'] = PH_QUARTER[folder]
+    return frame.set_index(['t', 'i', 'plot_id', 'crop', 'production_obs',
+                            'source_row'])[answers]
+
+
+def inputs_hh_crop_sale_single_row(wave):
+    return _inputs_hh_crop_sale(wave, _HH_SALE_SINGLE_ROW)
+
+
+def inputs_hh_crop_sale_records_summed(wave):
+    return _inputs_hh_crop_sale(wave, _HH_SALE_SUMMED)
+
+
+def inputs_hh_crop_sale_two_units(wave):
+    return _inputs_hh_crop_sale(wave, _HH_SALE_TWO_UNITS)
 
 
 # ---------------------------------------------------------------------
@@ -620,12 +1651,13 @@ def crop_production_for_wave(t, frames, crop_labels):
 # Tractor-Machinery) carried on the harmonize_input categorical table.
 # A `crop` index level (harmonize_food labels) disambiguates the multiple
 # seed rows a plot can carry (one per crop); non-seed inputs are not
-# crop-specific and carry crop = 'n/a' (a non-null sentinel so the index
-# stays unique and free of null index levels).
+# crop-specific and carry crop = '(not crop-specific)' (GH #1119).
+# A private legacy key is retained until the existing dedup finishes so the index
+# stays unique and free of null index levels.
 #
 # Stores REPORTED item-level fields ONLY:
 #   input               harmonized input-type label (index)
-#   crop                seed's crop (index; 'n/a' for non-seed inputs)
+#   crop                seed's crop (index; structural marker for non-seed inputs)
 #   Quantity, u         reported quantity + native unit
 #   Purchased           bool: any of this input acquired by purchase
 #   Quantity_purchased  reported purchased quantity (where recorded)
@@ -654,7 +1686,8 @@ INPUT_HERBICIDE = 'Herbicide'
 INPUT_ANIMAL = 'Animal Traction'
 INPUT_TRACTOR = 'Tractor/Machinery'
 
-NO_CROP = 'n/a'      # crop-level sentinel for non-seed (crop-agnostic) rows
+NO_CROP = '(not crop-specific)'
+_LEGACY_NO_CROP = 'n/a'  # old sort/dedup key, never the new structural label
 
 
 def _seed_unit_label(unit_series, unit_dec, where=''):
@@ -791,6 +1824,9 @@ def seed_rows_for_wave(df, dec, hhid, plot, crop, channels, crop_labels,
         out['Improved'] = pd.Series(pd.NA, index=out.index, dtype='boolean')
     # Keep only rows with a household, a plot, and a resolved crop.
     out = out[out['i'].notna() & out['plot_id'].notna() & out['crop'].notna()]
+    # Crop-specific provenance is attached only AFTER the old eligibility gate.
+    # Missing/unmapped lookups are not made eligible by a nonmissing marker.
+    out['_crop_label'] = out['crop']
     return out
 
 
@@ -858,7 +1894,8 @@ def fert_rows_long_typed(df, dec, hhid, plot, channels, type_map):
         pqsum = pq.sum() if len(pq) else pd.NA
         purchased = (pd.NA if (pqsum is pd.NA or pd.isna(pqsum))
                      else (True if pqsum > 0 else False))
-        recs.append({'i': i_, 'plot_id': p_, 'input': typ, 'crop': NO_CROP,
+        recs.append({'i': i_, 'plot_id': p_, 'input': typ,
+                     'crop': _LEGACY_NO_CROP, '_crop_label': NO_CROP,
                      'Quantity': qty, 'u': uu, 'Purchased': purchased,
                      'Quantity_purchased': pqsum, 'Improved': pd.NA})
     out = pd.DataFrame.from_records(recs)
@@ -893,7 +1930,8 @@ def fert_rows_wide_typed(df, dec, hhid, plot, specs):
              else pd.Series('Kg', index=df.index, dtype='string'))
         piece = pd.DataFrame({
             'i': i.values, 'plot_id': plot_id.values, 'input': sp['input'],
-            'crop': NO_CROP, 'Quantity': q.values, 'u': u.values,
+            'crop': _LEGACY_NO_CROP, '_crop_label': NO_CROP,
+            'Quantity': q.values, 'u': u.values,
             'Purchased': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
             'Quantity_purchased': pd.Series(pd.NA, index=df.index, dtype='Float64').values,
             'Improved': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
@@ -952,7 +1990,8 @@ def chem_rows(df, dec, hhid, plot, specs):
         emit = (q.fillna(0) > 0)
         piece = pd.DataFrame({
             'i': i.values, 'plot_id': plot_id.values, 'input': sp['input'],
-            'crop': NO_CROP, 'Quantity': q.values, 'u': u.values,
+            'crop': _LEGACY_NO_CROP, '_crop_label': NO_CROP,
+            'Quantity': q.values, 'u': u.values,
             'Purchased': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
             'Quantity_purchased': pd.Series(pd.NA, index=df.index, dtype='Float64').values,
             'Improved': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
@@ -970,42 +2009,84 @@ def chem_rows(df, dec, hhid, plot, specs):
 
 def assemble_plot_inputs(t, parts):
     """Concatenate the per-module row frames for one wave, attach `t`,
-    drop empties, set the (t, i, plot, input, crop) index and dedup."""
+    drop empties, set the (t, i, plot, input, crop) index and dedup.
+
+    Constructors carry `_crop_label` separately from their legacy crop key.
+    Explicit nonnull labels from direct callers remain supported; an untagged
+    missing/legacy marker cannot identify structural versus crop-specific data.
+    """
     parts = [p for p in parts if p is not None and len(p)]
-    cols = ['i', 'plot_id', 'input', 'crop', 'Quantity', 'u', 'Purchased',
-            'Quantity_purchased', 'Improved']
+    payload = ['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']
+    cols = ['i', 'plot_id', 'input', 'crop'] + payload
     if not parts:
         return pd.DataFrame(columns=cols).set_index(
             ['i', 'plot_id', 'input', 'crop'])
-    out = pd.concat(parts, ignore_index=True)
+    classified = []
+    for part in parts:
+        part = part.copy()
+        if '_crop_label' not in part:
+            crop = (part['crop'] if 'crop' in part else
+                    pd.Series(pd.NA, index=part.index, dtype='string'))
+            if (crop.isna() | crop.eq(_LEGACY_NO_CROP)).any():
+                raise ValueError(
+                    f'Nigeria plot_inputs {t}: missing/legacy crop label needs '
+                    'explicit source provenance in _crop_label (GH #1119)')
+            part['_crop_label'] = crop
+        if part['_crop_label'].isna().any():
+            raise ValueError(
+                f'Nigeria plot_inputs {t}: _crop_label must identify the '
+                'source crop or an explicit crop marker (GH #1119)')
+        classified.append(part)
+    out = pd.concat(classified, ignore_index=True)
     for c in cols:
         if c not in out.columns:
             out[c] = pd.NA
     out['t'] = t
-    out['crop'] = out['crop'].fillna(NO_CROP).astype('string')
+    out['crop'] = out['crop'].fillna(_LEGACY_NO_CROP).astype('string')
+    out['_crop_label'] = out['_crop_label'].astype('string')
     out['input'] = out['input'].astype('string')
-    # A row that records an AMOUNT and no unit is U_UNKNOWN (GH #1047, the
-    # #1041 ruling): 178 served rows, 164 with a quantity (a blank code, or
-    # a code with no value label) and 14 with a zero.  A row that records NO
-    # quantity in any channel keeps u = NA (dispatcher decision 2026-10-19):
-    # `u` is a COLUMN here, so no groupby can delete the row, and NA says
-    # "no amount, so no unit" where `Unknown` would claim an amount.  5,546
-    # seed rows (W1-W3 "no seed used on this plot" or no channel answered;
-    # W4/W5 tree crops, whose planting quantity is not asked).  Filled HERE,
-    # after every per-channel collapse, never per channel: `_pick_channel` /
-    # `fert_rows_long_typed` decide "one unit -> sum, mixed -> keep the
-    # largest" on the NA-aware units, and a per-channel fill would turn a
-    # blank channel into a second "unit".  See CONTENTS.org.
+    # Preserve the existing finalizer's all-payload-NA boundary: a sentinel
+    # must not make an otherwise hollow record eligible (ledger #1118 §8).
+    # False/zero and recorded unit strings remain observed payloads.
+    retained_payload = out[payload].notna().any(axis=1)
+    # Every RETAINED missing unit is U_UNKNOWN (#1041/#1118), including
+    # no-channel/tree-crop rows. This does not decide their eligibility.
+    # Fill only after channel collapse: a per-channel sentinel would change
+    # "one unit -> sum, mixed -> keep the largest". Keep recorded units even
+    # when their channel has no quantity (see CONTENTS.org).
     from lsms_library.transformations import U_UNKNOWN
     out['u'] = out['u'].astype('string')
-    out.loc[out['u'].isna() & out['Quantity'].notna(), 'u'] = U_UNKNOWN
+    missing_u = (out['u'].isna() | out['u'].str.strip().eq('')
+                 | out['u'].isin(['nan', '<NA>']))  # map_index's string markers
+    out['u'] = out['u'].mask(missing_u & retained_payload, U_UNKNOWN)
     # Dedup on the index grain (defensive: a handful of duplicate
     # (i, plot, input, crop) rows can survive the per-module collapse).
+    keys = ['t', 'i', 'plot_id', 'input', 'crop']
+    identities = out.groupby(keys, dropna=False, sort=False)['_crop_label']
+    if identities.nunique(dropna=False).gt(1).any():
+        raise ValueError(
+            f'Nigeria plot_inputs {t}: legacy crop dedup conflates distinct '
+            'source crop identities; cannot relabel losslessly (GH #1119/#1120)')
     out = out.sort_values(['i', 'plot_id', 'input', 'crop'])
     out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'input', 'crop'],
                               keep='first')
     out = out.set_index(['t', 'i', 'plot_id', 'input', 'crop']).sort_index()
-    return out[['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']]
+    # Relabel only AFTER the original ordering and keep-first winner settle.
+    # Replace only crop's dictionary/codes; preserve every other full axis.
+    labels = out.pop('_crop_label')
+    position = out.index.names.index('crop')
+    codes, levels = pd.factorize(labels, sort=True)
+    all_levels = list(out.index.levels)
+    all_codes = list(out.index.codes)
+    all_levels[position] = pd.Index(levels, name='crop')
+    all_codes[position] = codes
+    out.index = pd.MultiIndex(levels=all_levels, codes=all_codes,
+                             names=out.index.names, verify_integrity=True)
+    if not out.index.is_unique:
+        raise ValueError(
+            f'Nigeria plot_inputs {t}: crop relabel creates duplicate source '
+            'identities; cannot merge them (GH #1119/#1120)')
+    return out[payload]
 
 
 # ---------------------------------------------------------------------
@@ -1154,10 +2235,11 @@ def livestock_for_wave(t, df, animal_code, owned, head_now, head_acquired,
 # GHS section 9 ("Food Security") is a coping day-count battery, NOT an
 # HFIAS occurrence/frequency scale.  Items s9q1a..s9q1i ask "HOW MANY
 # DAYS [in the last 7] HAD TO..." for each coping strategy, coded 0-7.
-# Collected in the post-planting round only (sect9_plantingwN.dta), so
-# each wave maps to a single t = PP_QUARTER[wave].  The post-harvest
-# round has no equivalent battery.  sect9b (W4+) is FIES and is wired
-# separately (do not include here).
+# The existing W1-W3 PP bindings use sect9_plantingwN.dta. The historical
+# assertion "the post-harvest round has no equivalent battery" is contradicted
+# for W3 by its own PH Section 12 Q1 and released s12q1a..i labels (GH #587).
+# W3 now supplies those separate PH answers through an explicit items mapping;
+# no other PH round is inferred. sect9b (W4+) is FIES, wired separately.
 #
 # Canonical rCSI strategy names (LessPreferred, LimitVariety,
 # LimitPortion, ReduceMeals, RestrictAdults, BorrowFood) plus the
@@ -1177,14 +2259,14 @@ FOOD_COPING_ITEMS = {
 
 
 def food_coping_for_wave(t, df, id_col='hhid', items=None):
-    """Reshape a sect9 coping battery into long-form food_coping.
+    """Reshape a day-count coping battery into long-form food_coping.
 
     Parameters
     ----------
     t : str
-        The single post-planting quarter for this wave (e.g. '2010Q3').
+        The source's logical round (e.g. '2010Q3' or W3 PH '2016Q1').
     df : DataFrame
-        Raw sect9_plantingwN data (one row per household), read with
+        Raw source battery (one row per household), read with
         ``convert_categoricals=False`` so the day counts stay numeric.
     id_col : str
         Household id column (Nigeria GHS uses 'hhid').
@@ -1337,7 +2419,7 @@ def plot_features_for_wave(t, area, detail, colmap, geovar=None):
             fallow                         (in `detail`; -> Fallow, code 1=fallow)
             fallow_cultivated              (in `detail`; W1 only override:
                                             value 1 forces Fallow=False)
-            slope                          (in `geovar`; -> PlotSlope, degrees)
+            slope                          (in `geovar`; -> PlotSlope, percent)
         Omitted / absent columns yield NaN for the corresponding output.
     geovar : pd.DataFrame | None
         Raw plot-geovariables frame (``nga_plotgeovariables_y*``), loaded
@@ -1354,7 +2436,7 @@ def plot_features_for_wave(t, area, detail, colmap, geovar=None):
         boolean: holds a land-ownership certificate), ``ErosionProtection``
         (nullable boolean: erosion-control measure present), ``Fallow``
         (nullable boolean: plot left fallow this season) and ``PlotSlope``
-        (float, SRTM-derived slope in degrees).  Latitude / Longitude are
+        (float, SRTM-derived slope in percent).  Latitude / Longitude are
         deferred (Nigeria has no decimal-degree parcel coordinates;
         only GPS area in m^2).  ``PlotCertificate`` / ``ErosionProtection``
         / ``Fallow`` are the *reported* per-plot item flags; the HH-level
@@ -2077,7 +3159,8 @@ def people_last7days_from_s4aq(t, df, hhid='hhid', indiv='indiv'):
 # community_prices (GAP C) -- item-level reported community food prices
 # ---------------------------------------------------------------------
 #
-# Natural grain (t, v, j, u): one row per (cluster/EA x food-item x unit)
+# Natural grain (t, v, j, u, variety, obs): native item/size identities
+# in W1/W2; existing unknown_variety in W3-W5, plus physical reading slot
 # from the post-harvest COMMUNITY questionnaire's food-price module
 # (Section C8 "Food Prices", file sectc8_harvest{wN}; W3 splits it across
 # sectc8a / sectc8b; W5 lives under Post Harvest Wave 5/Community/).  This
@@ -2110,8 +3193,10 @@ def people_last7days_from_s4aq(t, df, hhid='hhid', indiv='indiv'):
 #         per-item unit is supplied from _W1W2_PRICE_UNIT (Section C8's
 #         column heads: KG / PIECE / BUNCH / LITRE / TIN / BOTTLE / ...).
 #
-# t = PH_QUARTER[wave] (the price module sits in the post-harvest round,
-# matching crop_production / anthropometry).
+# t = PH_QUARTER[wave] for the post-harvest C8 rows built here.  The
+# post-planting round prices food too (Section C2, not C8; GH #587): its rows
+# are built by pp_community_prices.py at PP_QUARTER[wave] and appended by
+# each wave script (combine_rounds).  Everything below describes C8 / PH.
 
 
 # W1/W2 community-price questionnaire (Section C8) item codes -> canonical
@@ -2207,6 +3292,11 @@ def _resolve_w1w2_price_item(code):
     return None, None
 
 
+# W3-W5 have no finer variety than their priced item; preserve the canonical
+# sentinel already supplied by Feature (Niger S05_VARIETY precedent).
+C8_NO_VARIETY = 'unknown_variety'
+
+
 def community_prices_for_wave(t, frames, mode, crop_labels=None):
     """Assemble item-level community_prices for one Nigeria GHS-Panel wave.
 
@@ -2226,6 +3316,16 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             unit   unit column name (W3-W5; None for W1/W2)
             size   coded size column (W4 c8q2c, W5 c8aq2_c; None otherwise)
             size_text  free-text size column (W3 c8q2b; None otherwise)
+            obs    the form's reading slot this frame records (default 1).
+                   W3 is the one wave whose C8 has TWO slots: sectc8a is
+                   "C8a: FOOD PRICES - 1ST LOCATION" (obs 1) and sectc8b
+                   "C8b: FOOD PRICES - 2ND LOCATION" (obs 2) --
+                   PH_W3_Community_Quest.pdf, SECTIONS list "8 Food Prices /
+                   a. First location 18 / b. Second location 24"; each
+                   section opens with its own location type, name,
+                   description, collection date and GPS over the same item
+                   list (GH #637 defect C; the GH #840 `obs` contract,
+                   lsms_library/data_info.yml Index Info).
     mode : {'codes', 'names'}
         'codes' -> item_cd is the consumption-module scheme already in
                    harmonize_food (W3-W5): resolve via crop_labels (Code).
@@ -2242,11 +3342,14 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     row's unit becomes the metric base unit -- 'g' or 'cl' -- making the
     served number the per-unit price data_scheme.yml documents.  Such rows
     carry the `Derivation` key `Nigeria::community_prices::c8-metric-size`.
-    A metric-unit row whose package size is UNRECORDED -- all of W3's
+    A row whose recorded unit label is still unplaced after that step keeps the
+    label as `u` and warns (GH #1095; no such label today).  A metric-unit row
+    whose package size is UNRECORDED -- all of W3's
     13,768 g/cl rows bar one (c8q2b is free text, blank on the rest), all
     3,433 of W3's Kg/l rows (the same blank free text, caught only when the
     deletion entry's inputs were written), and W5's 133 rows on '2. GRAMS
-    (G)' (c8aq2_c blank) -- is DROPPED: its price is of an unrecorded
+    (G)' and 49 on '4. CENTLITRES (CL)' (c8aq2_c blank; the second set was
+    served as 'l' until GH #587 corrected the decoder) -- is DROPPED: its price is of an unrecorded
     package and per-unit normalization is impossible; serving it under the
     base unit would misprice by the package size (~189x/~42x measured).
     The drop is registered as the deletion entry
@@ -2265,13 +3368,31 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
 
     Returns
     -------
-    DataFrame indexed by (t, v, j, u) with the `Price` column and, where any
-    row was derived, a `Derivation` column (registry key on derived rows,
-    NA elsewhere).  One row per (cluster, item, unit); the price kept for a
-    cluster listing an item more than once at the same unit (sectc8a +
-    sectc8b overlap; size variants mapping to one base unit) is the FIRST
-    reported price -- a within-row dedup of the SAME surveyed quantity,
-    never a cross-cluster aggregate.
+    DataFrame indexed by (t, v, j, u, variety, obs) with the `Price` column and,
+    where any row was derived, a `Derivation` column (registry key on
+    derived rows, NA elsewhere).  `obs` is each frame's reading slot, so
+    W3's two locations are two rows, never one selected from the pair
+    (GH #637 defect C: until 2026-10-23 the collapse below kept location 1
+    in all 2,591 W3 cells both locations priced -- 983 of them at a
+    different price -- and served the 3,218 location-2-only rows
+    indistinguishable from location 1).
+
+    In 'codes' mode (W3-W5) the key is asserted UNIQUE before the collapse:
+    each C8 file is (ea, item_cd)-unique, so a collision would be a broken
+    key, not a cell to select from (GH #840).  The Niger duplicate-entry
+    drop (a SECOND source record of the same slot that repeats a served
+    row) has nothing to act on here -- no W3-W5 file carries a second
+    record -- and a W3 location-2 price equal to location 1's is a second
+    slot, not a repeat: it is served (Niger's content key includes the
+    slot; GhanaLSS serves equal vendor prices).
+
+    In 'names' mode (W1/W2), `variety` is the FULL source item code,
+    including the size digit (GH #637, @ligon 2026-10-23). Distinct items
+    sharing j/u and size variants such as 1511/1512 remain separate even
+    when prices agree. No row is selected. W3-W5 retain their existing
+    canonical `unknown_variety` identity and physical location `obs`;
+    adding the constant variety axis changes no source answer there.
+    A duplicate complete source key is an error in either mode.
     """
     DERIVATION_KEY = 'Nigeria::community_prices::c8-metric-size'
     pieces = []
@@ -2293,11 +3414,14 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             axis=1)
         code = pd.to_numeric(df[fr['item']], errors='coerce')
         price = pd.to_numeric(df[fr['price']], errors='coerce')
+        unit_labels = None
 
         if mode == 'codes':
             j = code.astype('Int64').map(crop_labels).astype('string')
             if fr.get('unit') and fr['unit'] in dec.columns:
-                u = dec[fr['unit']].map(_canon_unit).astype('string')
+                unit_labels = dec[fr['unit']]
+                u = unit_labels.map(_canon_community_unit).astype('string')
+                initially_unplaced = u.isna()
             else:
                 u = pd.Series(pd.NA, index=df.index, dtype='string')
         else:  # names (W1/W2)
@@ -2317,6 +3441,10 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             'v': v.values,
             'j': j.values,
             'u': u.values,
+            'obs': int(fr.get('obs', 1)),
+            # Retain the original code, not code//10 used to resolve j/u.
+            # Validate only after the unchanged eligibility filter below.
+            'variety': code.values if mode == 'names' else C8_NO_VARIETY,
             # float64 up-front: the size division below writes non-integer
             # per-unit prices, and a raw int16 price column would refuse
             # them (pandas 3 raises on the silent downcast).
@@ -2350,7 +3478,8 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             # on g/cl with no size: nothing in W4 (its g/cl unit labels
             # carry a coded size on every row or none -- see
             # _/derivations.yml, c8-unrecorded-size-drop), and in W5 the
-            # 133 rows on '2. GRAMS (G)' with a BLANK c8aq2_c.  Exempt the
+            # 133 rows on '2. GRAMS (G)' and 49 on '4. CENTLITRES (CL)'
+            # with a BLANK c8aq2_c (GH #587).  Exempt the
             # questionnaire's own '99. ONE SIZE ONLY' code.
             one_size = size_lab.str.match(_C8_SIZE_ONE_SIZE_ONLY,
                                           na=False)
@@ -2377,6 +3506,27 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
                           & qty.isna())
             piece.loc[unrecorded, 'u'] = pd.NA
 
+        if unit_labels is not None:
+            # Report only labels still unplaced AFTER the existing metric
+            # rescue.  Reporting up-front falsely counts rescued g/cl rows;
+            # known metric units dropped for unrecorded sizes are separate.
+            report = (initially_unplaced & piece['u'].isna()
+                      & piece['v'].notna() & piece['j'].notna()
+                      & piece['Price'].notna() & (piece['Price'] > 0))
+            _canon_units(unit_labels[report], canon=_canon_community_unit,
+                         where=f'community_prices {t}',
+                         disposition='served under the recorded label, with no '
+                                     'factor')
+            # GH #1095 (ruling @ligon 2026-11-04): such a row keeps its recorded
+            # label as `u`, verbatim.  The code prefix is part of it: two units
+            # that differ only there stay two units, where a shared Unknown would
+            # merge them on one (v, j).  No factor is inferred from the label or
+            # from an ordinal size, and Price stays the native-unit price
+            # reported.  A blank or a bare code records no unit and is dropped
+            # below, as before.
+            keep = report & _recorded_label(unit_labels)
+            piece.loc[keep, 'u'] = unit_labels[keep].astype('string').str.strip()
+
         pieces.append(piece)
 
     out = pd.concat(pieces, ignore_index=True)
@@ -2390,19 +3540,36 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     out = out[out['v'].notna() & out['j'].notna() & out['u'].notna()
               & out['Price'].notna() & (out['Price'] > 0)]
 
-    # Collapse same-(cluster,item,unit) duplicates to one row.  A cluster can
-    # list the same item/unit more than once (W3 sectc8a+sectc8b overlap;
-    # multiple size variants mapping to one base unit) -- keep the FIRST reported
-    # price (a genuine REPORTED surveyed value, consistent with every sibling
-    # community_prices feature), NOT a computed median.  Within-(t,v,j,u) only,
-    # never a cross-cluster aggregate.
-    out = (out.groupby(['t', 'v', 'j', 'u'], as_index=False)
+    if mode == 'names':
+        # Only admitted source rows require a valid native identity. A junk
+        # code on an already-excluded row must not create a new failure.
+        try:
+            out['variety'] = out['variety'].astype('Int64').astype('string')
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ValueError(
+                f"community_prices {t}: retained W1/W2 item codes must be "
+                "finite integers for native variety (GH #637)") from exc
+    # Codes-mode scalar construction keeps the same dtype as Feature's
+    # existing constant fabrication; do not coerce its missing-value policy.
+
+    # Native item/size code distinguishes W1/W2's lumped j/u; obs keeps W3's
+    # two physical locations. Full-key repeats, even equal prices, are a key
+    # defect rather than permission to select one (Tanzania #840 precedent).
+    key = ['t', 'v', 'j', 'u', 'variety', 'obs']
+    dup = out.duplicated(key, keep=False)
+    assert not dup.any(), (
+        f"community_prices {t}: {int(dup.sum())} rows share a "
+        f"{tuple(key)} key -- a broken key, not a cell to select from "
+        "(GH #840 / #637)")
+    # All groups are singletons after the source-key assertion. Retain the
+    # existing grouping's dtype and ordering behavior, with no row selection.
+    out = (out.groupby(key, as_index=False)
               .agg({'Price': 'first', 'Derivation': 'first'}))
     if out['Derivation'].isna().all():
         out = out.drop(columns='Derivation')
 
     # community_prices is a CLUSTER table -- there is no household i, the
-    # natural grain is (t, v, j, u).  But the framework's
+    # natural grain is (t, v, j, u, obs).  But the framework's
     # local_tools.map_index() (run on EVERY read path) unconditionally swaps
     # j -> i whenever a `j` index level is present and an `i` level is NOT.
     # That swap would rename our item level `j` to `i`, drop `j`, and collapse
@@ -2410,13 +3577,14 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     # framework, carry a redundant `i` level (set equal to the cluster v)
     # positioned BEFORE `j`: map_index then sees i present and j after i, so it
     # does NOT swap, and the framework's _normalize_dataframe_index drops the
-    # undeclared `i` level (data_scheme declares (t, v, j, u)), leaving the
-    # canonical (t, v, j, u) grain.  v already in the index means
+    # undeclared `i` level (data_scheme declares variety/obs too), leaving
+    # the declared (t, v, j, u, variety, obs) grain.  v already in the index means
     # _join_v_from_sample is skipped; the spurious i==v never reaches the API.
     # (Same framework-compatibility shim Tanzania/Malawi/Ethiopia/Mali
     # community_prices use.)
+    out['obs'] = out['obs'].astype('int64')
     out['i'] = out['v']
-    out = out.set_index(['t', 'v', 'i', 'j', 'u']).sort_index()
+    out = out.set_index(['t', 'v', 'i', 'j', 'u', 'variety', 'obs']).sort_index()
     value_cols = ['Price'] + (['Derivation'] if 'Derivation' in out else [])
     return out[value_cols]
 
@@ -2478,28 +3646,128 @@ def round_wave(t):
 def food_unit_labels(t):
     """``{raw code: label}`` for the food-module unit codes of round ``t``.
 
-    Read from the per-wave column of the ``u`` table in
-    ``categorical_mapping.org`` (the column named by :func:`round_wave`),
-    NOT from its Preferred Label column, which records only the W3/W4
-    meaning of a colliding code (GH #607).  Keys are registered as int,
-    int-string and float-string (``4``, ``'4'``, ``'4.0'``) because the CSV
-    sources arrive as floats.  Codes the wave's column marks ``---`` are
-    absent, so the caller can keep their raw code.
+    Read from the ``u`` table in ``categorical_mapping.org``: the column named
+    ``t`` where the rounds of a wave have their own (W4, whose value labels
+    differ on 14, 40, 120, 250, 300 and 340, GH #1033), otherwise the column named
+    by :func:`round_wave`.  NOT from its Preferred Label column, which records
+    only the W3 meaning of a colliding code (GH #607).  Keys are registered as
+    int, int-string and float-string (``4``, ``'4'``, ``'4.0'``) because the
+    CSV sources arrive as floats.  Codes the column marks ``---`` are absent,
+    so the caller can keep their raw code.
     """
     from lsms_library.local_tools import df_from_orgfile
 
     here = os.path.dirname(os.path.abspath(__file__))
     tab = df_from_orgfile(os.path.join(here, 'categorical_mapping.org'),
                           name='u')
-    wave = round_wave(t)
+    column = t if t in tab.columns else round_wave(t)
     out = {}
-    for code, lab in zip(tab['Code'], tab[wave]):
+    for code, lab in zip(tab['Code'], tab[column]):
         if pd.isna(lab) or str(lab).strip() in ('', '---'):
             continue
         c = int(float(code))
         lab = str(lab).strip()
         out.update({c: lab, float(c): lab, str(c): lab, f'{c}.0': lab})
     return out
+
+
+# W3 prints the size in the unit code (20 CONGO SMALL, 21 CONGO LARGE); W4 asks
+# it separately (20 CONGO, then s7bq2c "CONSUMPTION SIZE" 0. SMALL / 2. LARGE).
+# These are the W4 codes the `u` table used to label W3's `small ...`, whatever
+# the row's size said.  `food_unit_labels` gives each its size-less label, and
+# `sized_food_unit` prefixes the size the row records, in W3's own spelling (GH
+# #1033).  Every (code, size) pair W4 records among these lands on a W3 label,
+# PH's 40 DERICA/TIN and 120 SACHET included: the survey's own factors treat each
+# as W3's unit.  They are not every unit W3 sizes: its card also has 130-132
+# Sack/Bag, 140-142 Basket, 150-152 Basin and 160-162 Bundle, and W4's Basin and
+# Basket keep a plain label by ruling (CONTENTS.org).
+W4_SIZED_UNIT_CODES = frozenset((20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120))
+_FOOD_UNIT_SIZES = {0: 'small', 1: 'medium', 2: 'large', 3: 'very large'}
+
+
+def sized_food_unit(unit, size, unit_codes):
+    """Decoded ``u`` for a round that records the size in its own column.
+
+    ``unit`` and ``size`` are raw code columns, ``unit_codes`` the round's
+    :func:`food_unit_labels`.  A code in :data:`W4_SIZED_UNIT_CODES` with an
+    ordinal size is ``'<size> <label>'``.  A blank size, a metric size
+    (``30. 20 GRAMS``) or ``99. ONE SIZE ONLY`` asserts no ordinal size and
+    leaves the size-less label.  Any other code keeps its plain decode whatever
+    its size says: it was never served a false size.  A code the round's column
+    does not list is NA, as for :func:`food_unit_labels`.
+    """
+    base = unit.map(unit_codes).astype(object)
+    prefix = pd.to_numeric(size, errors='coerce').map(_FOOD_UNIT_SIZES)
+    take = (pd.to_numeric(unit, errors='coerce').isin(W4_SIZED_UNIT_CODES)
+            & prefix.notna() & base.notna())
+    out = base.copy()
+    out[take] = prefix[take].astype(str) + ' ' + base[take].astype(str)
+    return out
+
+
+# ---------------------------------------------------------------------
+# interview_date -- what the visit produced (GH #1096 / #1444)
+# ---------------------------------------------------------------------
+#
+# Every cover records the visit whether or not anyone was interviewed, so a
+# date may date an attempt.  These label the cover's own result field, read by
+# each round's interview_date.py and by `sample`: W1-PP / W2-PP / W3 `saq22a`,
+# W1-PH `sq1`, W2-PH `saq1`, W4 / W5 `interview_result`.  `saq22b` is the status of
+# DATA ENTRY and W3-PH's `saq22` is a yes/no on observations.  Status gates no
+# table's rows (GH #1444): the D1 rule in round_covers decides who a round's frame
+# admits.
+
+# Recorded label, code prefix stripped and lower-cased -> what is served.  The
+# two wordings of one answer share a spelling so a filter works across waves.
+# Two answers are not folded: W4's two partials differ, and W2's "not located"
+# is not W4's "unable to identify".
+_INTERVIEW_RESULT_LABELS = {
+    'completed': 'Completed',
+    'complete': 'Completed',
+    'partially completed': 'Partially completed',
+    'partially complete (refused)': 'Partially completed (refused)',
+    'partially complete (unavailable)': 'Partially completed (unavailable)',
+    'not at home': 'Not at home',
+    'refused': 'Refused',
+    'household not located': 'Household not located',
+    'moved away': 'Moved away',
+    'household has moved away': 'Moved away',
+    'other (specify)': 'Other',
+    'unable to identify household': 'Unable to identify household',
+    'long term unavailable': 'Long-term unavailable',
+    'unavailable for interview': 'Unavailable for interview',
+    'all hh members deceased': 'All household members deceased',
+}
+
+# The W1-W3 response-status card.  W3's interview_date reads codes (GH #1037).
+# W4's codes differ (its 4 is "unable to identify", its 7 "refused"), and W4
+# reads labels, so this card is never applied to it.
+_RESPONSE_STATUS_CARD = {1: 'completed', 2: 'partially completed',
+                         3: 'not at home', 4: 'refused',
+                         5: 'household not located', 6: 'moved away',
+                         7: 'other (specify)'}
+
+
+def interview_result_label(value):
+    """The served ``InterviewResult`` for a cover's recorded result label.
+
+    A blank stays missing.  A label outside the table is refused, not guessed.
+    """
+    if pd.isna(value):
+        return pd.NA
+    body = _strip_code_prefix(value).lower()
+    if body not in _INTERVIEW_RESULT_LABELS:
+        raise ValueError(f'Nigeria: unrecognised interview result {value!r}')
+    return _INTERVIEW_RESULT_LABELS[body]
+
+
+def response_status_label(code):
+    """:func:`interview_result_label` for a W1-W3 response-status CODE."""
+    if pd.isna(code):
+        return pd.NA
+    if code not in _RESPONSE_STATUS_CARD:
+        raise ValueError(f'Nigeria: unrecognised interview result code {code!r}')
+    return interview_result_label(_RESPONSE_STATUS_CARD[code])
 
 
 def food_acquired_for_wave(fn, t, sources, expenditure,
@@ -2518,7 +3786,9 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         each acquisition source ``s`` in ``purchased`` / ``produced`` /
         ``inkind``.  ``kg_factor`` (optional) names a per-row survey-supplied
         Kg/L conversion factor (W4's ``*_cvn``); when given, the row's exact
-        ``Quantity_kg`` is carried (GH #378).
+        ``Quantity_kg`` is carried (GH #378).  ``size`` (optional) names the
+        column recording the unit's size (W4's ``*c``), read by
+        :func:`sized_food_unit` (GH #1033).
     expenditure : str
         The variable holding the cash outlay.  Attached to the
         ``s='purchased'`` row ONLY -- produced / in-kind rows carry no cash
@@ -2542,12 +3812,15 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
 
     df = get_dataframe(fn)
 
-    food_labels = harmonized_food_labels()
+    E = pd.to_numeric(df[expenditure], errors='coerce')
+    active = E.gt(0)
+    for spec in sources.values():
+        active |= pd.to_numeric(df[spec['quantity']], errors='coerce').gt(0)
+    food_labels = harmonized_food_labels(t, observed_codes=df.loc[active, item])
     unit_codes = food_unit_labels(t)
 
     i = df[hhid].astype(int).astype(str)
     j = df[item].replace(food_labels)
-    E = pd.to_numeric(df[expenditure], errors='coerce')
 
     pieces = []
     for s, spec in sources.items():
@@ -2564,7 +3837,9 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         # missing-unit sentinel, which means "no unit recorded").  The raw
         # code is read through `format_id`: the CSV columns are float, so
         # an unlisted 65 would otherwise be served as '65.0' (GH #1047).
-        u = df[spec['unit']].map(unit_codes)
+        size = spec.get('size')
+        u = (df[spec['unit']].map(unit_codes) if size is None
+             else sized_food_unit(df[spec['unit']], df[size], unit_codes))
         u = u.where(u.notna(), df[spec['unit']].map(format_id))
         piece = pd.DataFrame({
             't': t,
@@ -2631,10 +3906,14 @@ _C8_DROP_DERIVATION_KEY = 'Nigeria::community_prices::c8-unrecorded-size-drop'
 
 # The C8 source per wave folder, exactly as the wave's `community_prices.py`
 # reads it.  Shared by the derivation and deletion `inputs` callables.
+# `obs` is the frame's reading slot, as the wave script passes it to
+# community_prices_for_wave (W3: sectc8a = 1st location, sectc8b = 2nd), so
+# the inputs frames join the served (t, v, j, u, obs) grain (GH #637).
 _C8_SOURCE = {
     '2015-16': [dict(fn=f'Data/sectc8{ab}_harvestw3.dta', item='item_cd',
-                     unit='c8q2', size=None, size_text='c8q2b', price='c8q3')
-                for ab in ('a', 'b')],
+                     unit='c8q2', size=None, size_text='c8q2b', price='c8q3',
+                     obs=obs)
+                for obs, ab in ((1, 'a'), (2, 'b'))],
     '2018-19': [dict(fn='Data/sectc8_harvestw4.dta', item='item_cd',
                      unit='c8q2', size='c8q2c', size_text=None,
                      price='c8q3')],
@@ -2655,13 +3934,14 @@ def _c8_raw_inputs(folder, keep):
     the c8-metric-size derivation divides); ``'dropped'`` keeps the
     metric-unit records with an UNRECORDED size (exactly the rows the build
     drops, named by the c8-unrecorded-size-drop deletion entry).  Columns:
-    t, v, item_cd, unit_label, size_label, size_quantity_g_or_cl,
-    reported_price.
+    t, v, obs, item_cd, unit_label, size_label, size_quantity_g_or_cl,
+    reported_price (`obs` is the C8 reading slot -- W3 location 1 / 2 --
+    so a row joins the served (t, v, j, u, obs) grain; GH #637).
     """
     from lsms_library.paths import countries_root
     from lsms_library.local_tools import get_dataframe
     root = countries_root() / 'Nigeria'
-    cols = ['t', 'v', 'item_cd', 'unit_label', 'size_label',
+    cols = ['t', 'v', 'obs', 'item_cd', 'unit_label', 'size_label',
             'size_quantity_g_or_cl', 'reported_price']
     frames = []
     for sp in _C8_SOURCE.get(folder, []):
@@ -2687,20 +3967,24 @@ def _c8_raw_inputs(folder, keep):
             # blank, non-'99. ONE SIZE ONLY' size -- a blank size beside
             # KILOGRAMS / LITRES there reads as one kilogram / one litre
             # and is SERVED, not dropped (W4 drops 0; W5 drops the 133
-            # 'GRAMS (G)' rows).  The free-text wave (W3) drops its WHOLE
+            # 'GRAMS (G)' and, since GH #587, 49 'CENTLITRES (CL)' rows).  The free-text wave (W3) drops its WHOLE
             # metric block -- g, cl AND the base Kg/l -- because c8q2b is
             # blank on all of them (14,603 rows: 13,767 g/cl + 2,597 Kg +
             # 836 l, the Kg/l share previously uncounted anywhere).
+            # The build decodes C8 units with `_canon_community_unit`, so
+            # the deletion mask must too (GH #587: W5 '4. CENTLITRES (CL)'
+            # is 'cl' there and 'l' under the shared `_canon_unit`).
             if sp['size'] is not None:
                 one_size = size_lab.str.match(_C8_SIZE_ONE_SIZE_ONLY,
                                               na=False)
-                mask = (unit_lab.map(_canon_unit).isin(['g', 'cl'])
+                mask = (unit_lab.map(_canon_community_unit).isin(['g', 'cl'])
                         & qty.isna() & ~one_size)
             else:
-                mask = (unit_lab.map(_canon_unit).isin(['g', 'cl', 'Kg', 'l'])
-                        & qty.isna())
+                mask = (unit_lab.map(_canon_community_unit)
+                        .isin(['g', 'cl', 'Kg', 'l']) & qty.isna())
         frames.append(pd.DataFrame({
             't': PH_QUARTER[folder], 'v': v[mask].values,
+            'obs': int(sp.get('obs', 1)),
             'item_cd': pd.to_numeric(raw[sp['item']], errors='coerce')[mask].values,
             'unit_label': unit_lab[mask].values,
             'size_label': size_lab[mask].values,

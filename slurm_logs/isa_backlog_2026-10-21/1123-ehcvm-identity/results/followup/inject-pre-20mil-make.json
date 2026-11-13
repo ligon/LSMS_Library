@@ -1,0 +1,16 @@
+{
+ "backend": "make",
+ "countries_root_is_scratch": true,
+ "error": null,
+ "rows": 29034,
+ "rows_by_wave": {
+  "2011-12": 8465,
+  "2014-15": 8134,
+  "2021-22": 12435
+ },
+ "warning_categories": {
+  "GrainCollapseWarning": 1,
+  "NullReadWarning": 1
+ },
+ "warning_heads": []
+}

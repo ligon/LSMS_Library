@@ -1,0 +1,97 @@
+{
+  "status": "FROZEN_QUIESCENT",
+  "time_UTC": "2026-10-22T00:12:49.350444+00:00",
+  "candidate_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+  "runtime_tests": "fdadc0698efcd300f5f09c21b60c30f570f96621",
+  "baseline": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+  "sources": {
+    "/local/job40255479/worktrees/isa-review-Mali-1091": {
+      "head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "tracked_paths": 14897,
+      "bytes_modes_symlinks_index_head_clean_exact": true
+    },
+    "/local/job40255479/worktrees/isa-review-Mali-1091-base": {
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "tracked_paths": 14891,
+      "bytes_modes_symlinks_index_head_clean_exact": true
+    },
+    "/local/job40255479/worktrees/isa-Mali-1091-fix": {
+      "head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "tracked_paths": 14897,
+      "bytes_modes_symlinks_index_head_clean_exact": true
+    },
+    "/local/job40255479/worktrees/isa-Mali-1091": {
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "tracked_paths": 14891,
+      "bytes_modes_symlinks_index_head_clean_exact": true
+    },
+    "/local/job40255479/worktrees/isa-Mali": {
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "tracked_paths": 14891,
+      "bytes_modes_symlinks_index_head_clean_exact": true
+    },
+    "/local/job40255479/worktrees/isa-baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_paths": 14880,
+      "bytes_modes_symlinks_index_head_clean_exact": true
+    }
+  },
+  "candidate_writer_library_test_ledger_filesystem_bytes_modes_exact": true,
+  "protected_evidence_files_exact": {
+    "/local/job40255479/control/isa-backlog-20261021/Mali/1091-fix": 1311,
+    "/local/job40255479/control/isa-backlog-20261021/Mali/1091": 398,
+    "/local/job40255479/control/isa-backlog-20261021/Mali/822": 81,
+    "/local/job40255479/control/isa-backlog-20261021/review-1078-unit-attribution": 1758
+  },
+  "physical_source_copy_receipts_exact": 72,
+  "both_layouts_MD5_verified": true,
+  "physical_reference_copies_exact": 5,
+  "naturally_populated_L2_copies_exact": 16,
+  "healthy_Niger_full_current_L2_source_and_copies_bytes_modes_mtimes_exact": true,
+  "metadata_symlinks_exact": 2,
+  "network_or_protected_write_attempts": 0,
+  "in_tree_parquets": 0,
+  "active_consumers": [],
+  "data_inventory_file_counts": {
+    "data-baseline-default-2017": 6,
+    "data-baseline-default-2018": 6,
+    "data-baseline-default-2021": 6,
+    "data-baseline-default-all": 6,
+    "data-baseline-default-unsupported": 6,
+    "data-baseline-default-valid": 6,
+    "data-baseline-feature": 2,
+    "data-baseline-hash": 0,
+    "data-baseline-make-2017": 6,
+    "data-baseline-make-2018": 6,
+    "data-baseline-make-2021": 6,
+    "data-baseline-make-all": 6,
+    "data-baseline-make-unsupported": 6,
+    "data-baseline-make-valid": 6,
+    "data-baseline-tests": 0,
+    "data-candidate-default-2017": 0,
+    "data-candidate-default-2018": 0,
+    "data-candidate-default-2021": 0,
+    "data-candidate-default-all": 7,
+    "data-candidate-default-populated-2017": 2,
+    "data-candidate-default-populated-2018": 2,
+    "data-candidate-default-populated-2021": 2,
+    "data-candidate-default-populated-unsupported": 2,
+    "data-candidate-default-unsupported": 0,
+    "data-candidate-default-valid": 6,
+    "data-candidate-hash": 0,
+    "data-candidate-make-2017": 0,
+    "data-candidate-make-2018": 0,
+    "data-candidate-make-2021": 0,
+    "data-candidate-make-all": 5,
+    "data-candidate-make-populated-2017": 2,
+    "data-candidate-make-populated-2018": 2,
+    "data-candidate-make-populated-2021": 2,
+    "data-candidate-make-populated-unsupported": 2,
+    "data-candidate-make-unsupported": 0,
+    "data-candidate-make-valid": 5,
+    "data-candidate-tests": 6,
+    "data-candidate-verify": 4
+  },
+  "no_git_ref_checkout_GH_mutation": true,
+  "no_other23_Mali_output_or_fullsuite_claim": true
+}

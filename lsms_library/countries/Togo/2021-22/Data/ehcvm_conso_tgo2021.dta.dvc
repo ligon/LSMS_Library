@@ -1,0 +1,5 @@
+outs:
+- md5: 4f8da263641b4d5acf23cc91c9cd86dc
+  size: 13320450
+  hash: md5
+  path: ehcvm_conso_tgo2021.dta

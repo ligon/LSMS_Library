@@ -417,6 +417,7 @@
 | ulanga                                   | Ulanga                                   |
 | URAMBO                                   | Urambo                                   |
 | urambo                                   | Urambo                                   |
+| URBAN                                    | Urban                                    |
 | USHETU                                   | Ushetu                                   |
 | ushetu                                   | Ushetu                                   |
 | USHETU KAHAMA                            | Ushetu Kahama                            |

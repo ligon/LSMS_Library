@@ -1,0 +1,208 @@
+[
+  {
+    "wave": "2009-10",
+    "native_identity_candidate_columns": {
+      "A": [],
+      "B": []
+    },
+    "native_identity_variable_labels": {
+      "A": {},
+      "B": {}
+    },
+    "raw_factor_conflict_groups": 0,
+    "conflict_groups_with_multiple_distinct_native_production_ids": 0,
+    "conflict_groups_with_exactly_one_native_production_id": 0,
+    "conflict_groups_with_no_native_production_id": 0,
+    "conflict_source_records_with_missing_native_production_id": 0,
+    "conflict_groups_multiple_source_positions": 0,
+    "conflict_groups_multiple_native_condition_slots": 0,
+    "private_locator_fields": [
+      "source_relative",
+      "source_md5",
+      "season",
+      "source_position (zero-based held-file row order)",
+      "source_slot (actual mapped field suffix, 1 for long-form)"
+    ],
+    "private_row_position_is_not_an_instrument_id_or_approved_API_axis": true
+  },
+  {
+    "wave": "2010-11",
+    "native_identity_candidate_columns": {
+      "A": [],
+      "B": []
+    },
+    "native_identity_variable_labels": {
+      "A": {},
+      "B": {}
+    },
+    "raw_factor_conflict_groups": 41,
+    "conflict_groups_with_multiple_distinct_native_production_ids": 0,
+    "conflict_groups_with_exactly_one_native_production_id": 0,
+    "conflict_groups_with_no_native_production_id": 41,
+    "conflict_source_records_with_missing_native_production_id": 82,
+    "conflict_groups_multiple_source_positions": 41,
+    "conflict_groups_multiple_native_condition_slots": 0,
+    "private_locator_fields": [
+      "source_relative",
+      "source_md5",
+      "season",
+      "source_position (zero-based held-file row order)",
+      "source_slot (actual mapped field suffix, 1 for long-form)"
+    ],
+    "private_row_position_is_not_an_instrument_id_or_approved_API_axis": true
+  },
+  {
+    "wave": "2011-12",
+    "native_identity_candidate_columns": {
+      "A": [
+        "productionID"
+      ],
+      "B": [
+        "production2ID"
+      ]
+    },
+    "native_identity_variable_labels": {
+      "A": {
+        "productionID": "Crop Production & Disposition"
+      },
+      "B": {
+        "production2ID": "ACrop2_Production"
+      }
+    },
+    "raw_factor_conflict_groups": 19,
+    "conflict_groups_with_multiple_distinct_native_production_ids": 19,
+    "conflict_groups_with_exactly_one_native_production_id": 0,
+    "conflict_groups_with_no_native_production_id": 0,
+    "conflict_source_records_with_missing_native_production_id": 0,
+    "conflict_groups_multiple_source_positions": 19,
+    "conflict_groups_multiple_native_condition_slots": 0,
+    "private_locator_fields": [
+      "source_relative",
+      "source_md5",
+      "season",
+      "source_position (zero-based held-file row order)",
+      "source_slot (actual mapped field suffix, 1 for long-form)"
+    ],
+    "private_row_position_is_not_an_instrument_id_or_approved_API_axis": true
+  },
+  {
+    "wave": "2013-14",
+    "native_identity_candidate_columns": {
+      "A": [
+        "Production_ID"
+      ],
+      "B": [
+        "Production2_ID"
+      ]
+    },
+    "native_identity_variable_labels": {
+      "A": {
+        "Production_ID": "Crop Production & Disposition"
+      },
+      "B": {
+        "Production2_ID": "ACrop2_Production"
+      }
+    },
+    "raw_factor_conflict_groups": 20,
+    "conflict_groups_with_multiple_distinct_native_production_ids": 20,
+    "conflict_groups_with_exactly_one_native_production_id": 0,
+    "conflict_groups_with_no_native_production_id": 0,
+    "conflict_source_records_with_missing_native_production_id": 0,
+    "conflict_groups_multiple_source_positions": 20,
+    "conflict_groups_multiple_native_condition_slots": 0,
+    "private_locator_fields": [
+      "source_relative",
+      "source_md5",
+      "season",
+      "source_position (zero-based held-file row order)",
+      "source_slot (actual mapped field suffix, 1 for long-form)"
+    ],
+    "private_row_position_is_not_an_instrument_id_or_approved_API_axis": true
+  },
+  {
+    "wave": "2015-16",
+    "native_identity_candidate_columns": {
+      "A": [
+        "Production_ID"
+      ],
+      "B": [
+        "Production2_ID"
+      ]
+    },
+    "native_identity_variable_labels": {
+      "A": {
+        "Production_ID": "Crop production & disposition"
+      },
+      "B": {
+        "Production2_ID": "Acrop2_production"
+      }
+    },
+    "raw_factor_conflict_groups": 23,
+    "conflict_groups_with_multiple_distinct_native_production_ids": 23,
+    "conflict_groups_with_exactly_one_native_production_id": 0,
+    "conflict_groups_with_no_native_production_id": 0,
+    "conflict_source_records_with_missing_native_production_id": 0,
+    "conflict_groups_multiple_source_positions": 23,
+    "conflict_groups_multiple_native_condition_slots": 0,
+    "private_locator_fields": [
+      "source_relative",
+      "source_md5",
+      "season",
+      "source_position (zero-based held-file row order)",
+      "source_slot (actual mapped field suffix, 1 for long-form)"
+    ],
+    "private_row_position_is_not_an_instrument_id_or_approved_API_axis": true
+  },
+  {
+    "wave": "2018-19",
+    "native_identity_candidate_columns": {
+      "A": [],
+      "B": []
+    },
+    "native_identity_variable_labels": {
+      "A": {},
+      "B": {}
+    },
+    "raw_factor_conflict_groups": 6,
+    "conflict_groups_with_multiple_distinct_native_production_ids": 0,
+    "conflict_groups_with_exactly_one_native_production_id": 0,
+    "conflict_groups_with_no_native_production_id": 6,
+    "conflict_source_records_with_missing_native_production_id": 12,
+    "conflict_groups_multiple_source_positions": 0,
+    "conflict_groups_multiple_native_condition_slots": 6,
+    "private_locator_fields": [
+      "source_relative",
+      "source_md5",
+      "season",
+      "source_position (zero-based held-file row order)",
+      "source_slot (actual mapped field suffix, 1 for long-form)"
+    ],
+    "private_row_position_is_not_an_instrument_id_or_approved_API_axis": true
+  },
+  {
+    "wave": "2019-20",
+    "native_identity_candidate_columns": {
+      "A": [],
+      "B": []
+    },
+    "native_identity_variable_labels": {
+      "A": {},
+      "B": {}
+    },
+    "raw_factor_conflict_groups": 12,
+    "conflict_groups_with_multiple_distinct_native_production_ids": 0,
+    "conflict_groups_with_exactly_one_native_production_id": 0,
+    "conflict_groups_with_no_native_production_id": 12,
+    "conflict_source_records_with_missing_native_production_id": 24,
+    "conflict_groups_multiple_source_positions": 0,
+    "conflict_groups_multiple_native_condition_slots": 12,
+    "private_locator_fields": [
+      "source_relative",
+      "source_md5",
+      "season",
+      "source_position (zero-based held-file row order)",
+      "source_slot (actual mapped field suffix, 1 for long-form)"
+    ],
+    "private_row_position_is_not_an_instrument_id_or_approved_API_axis": true
+  }
+]

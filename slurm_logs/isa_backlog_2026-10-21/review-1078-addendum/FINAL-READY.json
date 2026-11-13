@@ -1,0 +1,84 @@
+{
+  "status": "PASS_FROZEN_QUIESCENT_FOR_ROOT_REVIEW",
+  "time_utc": "2026-10-21T23:47:43.727665+00:00",
+  "runtime_head": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+  "final_author_head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+  "safe_report_allowlist": {
+    "ADDENDUM.org": {
+      "sha256": "c65a79d3a23d1d2ea76db7c3b3ba1961a0c8a1d1a57fa5cb804bdf260ac4e1fc",
+      "bytes": 11880,
+      "mode": 384
+    },
+    "verdict.json": {
+      "sha256": "aefeab1780723bc0ef964d5c4b174f575f490e2668b53a589efd63111e61ad09",
+      "bytes": 1651,
+      "mode": 384
+    },
+    "attribution-proof.json": {
+      "sha256": "bd06b1b95a310434b933a26aa0a63cec490cef670a64d6828c0af804780f782f",
+      "bytes": 2457,
+      "mode": 384
+    },
+    "exact-artifact-proof.json": {
+      "sha256": "d8f480c2439a5e2d9d96a7dab54bd330d144e5025f17d7592c5a42feef17e630",
+      "bytes": 2635,
+      "mode": 420
+    },
+    "freeze-proof.json": {
+      "sha256": "2b1ff5b1ca1ba1f1763996da42d4ae29f2b060a6d14aeddbefc9b4ff2d789d86",
+      "bytes": 3061,
+      "mode": 384
+    },
+    "guard-policy-proof.json": {
+      "sha256": "e0aeba2936bff672cce06cecf0687abe95f3fec8d54947f939dc51174f45b1e5",
+      "bytes": 688,
+      "mode": 420
+    },
+    "REPRODUCE.md": {
+      "sha256": "fe7133e65b73c73ddf62d1b2f426b136646e850cdef41d9ad27e44935ec6da99",
+      "bytes": 3460,
+      "mode": 384
+    }
+  },
+  "source_safe_reproduction_checker_allowlist": {
+    "exact_artifacts.py": {
+      "sha256": "27885c7fa967e37ce6a5adc6deb03f5d44b284865a4b2a1556908579a45eeb46",
+      "bytes": 13858,
+      "mode": 420
+    },
+    "attribute_and_compare.py": {
+      "sha256": "f8f3c81438519eb9082a4b8bf36f46d0660b6b03c37dae20a7296959f8d0eeb1",
+      "bytes": 5893,
+      "mode": 384
+    },
+    "run_diagnostic_unit.py": {
+      "sha256": "1df727fae417257f3277f4446a6a489c267c71d3d4ef1fb8490f401dc7420401",
+      "bytes": 5762,
+      "mode": 420
+    },
+    "run_artifact_check.py": {
+      "sha256": "97c955bf0d3a6245d7f00a5443c8822253b381dab9ee68a968e2f69c5dbdee9e",
+      "bytes": 1685,
+      "mode": 420
+    },
+    "freeze_addendum.py": {
+      "sha256": "4476a8ea1bf4dd91c0e8a717ccd778838e78404ceceb4d3678b86da0dc9df08f",
+      "bytes": 9328,
+      "mode": 384
+    },
+    "finish_addendum.py": {
+      "sha256": "adc89905f4d6a5f2cec36aa0dee47b5a486250f7cfba22487a76949672c17367",
+      "bytes": 5466,
+      "mode": 384
+    },
+    "guard/sitecustomize.py": {
+      "sha256": "dd40f5c1cbe15421d05a600ae4eff3b95622be72bc05d8035e53c199e9095f9d",
+      "bytes": 4742,
+      "mode": 420
+    }
+  },
+  "all_other_frames_IDs_coordinates_source_fields_stack_diagnostics_logs_and_manifests_private": true,
+  "active_private_consumers": [],
+  "original_full_suite_FAIL_and_separate_nine_case_PASS_retained": true,
+  "no_additional_authorization_or_test_run_pending": true
+}

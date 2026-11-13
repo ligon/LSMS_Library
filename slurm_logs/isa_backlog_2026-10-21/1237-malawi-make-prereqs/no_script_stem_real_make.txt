@@ -1,0 +1,4 @@
+[base-1237] community_prices 2016-17 rc=2 :: python: can't open file '/local/job40390255/worktrees/base-1237/lsms_library/countries/Malawi/2016-17/_/community_prices.py': [Errno 2] No such file or directory|make: *** [Makefile:152: <root>/Malawi/2016-17/_/community_prices.parquet] Error 2|
+[base-1237] plot_inputs 2004-05 rc=2 :: python: can't open file '/local/job40390255/worktrees/base-1237/lsms_library/countries/Malawi/2004-05/_/plot_inputs.py': [Errno 2] No such file or directory|make: *** [Makefile:74: <root>/Malawi/2004-05/_/plot_inputs.parquet] Error 2|
+[1237] community_prices 2016-17 rc=2 :: make: *** No rule to make target '<root>/Malawi/2016-17/_/community_prices.parquet'.  Stop.|
+[1237] plot_inputs 2004-05 rc=2 :: make: *** No rule to make target '<root>/Malawi/2004-05/_/plot_inputs.parquet'.  Stop.|

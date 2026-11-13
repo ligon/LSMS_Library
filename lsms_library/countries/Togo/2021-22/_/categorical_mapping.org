@@ -1,0 +1,162 @@
+#+title: Categorical mappings of Togo 2021-22 (read before the country's)
+
+# nonfood_items for THIS WAVE ONLY (GH #1697).  Section 9's item codes moved: 2018's
+# table is keyed on code, and on this wave's codes it would call a washable face mask
+# Perfume (415) and a solar panel Crockery (618).  Every Preferred Label below is the
+# one 2018 serves for the same item, matched on the value labels of the two files; the
+# nine new items of this wave carry new labels.  Moved codes: 53 of 131.
+
+#+NAME: nonfood_items
+| Code | Preferred Label                             |
+|------+---------------------------------------------|
+|  201 | Cigarettes and Tobacco                      |
+|  202 | Kerosene                                    |
+|  203 | Charcoal and Coal                           |
+|  204 | Firewood (Purchased)                        |
+|  205 | Firewood (Collected, Imputed)               |
+|  206 | Candles                                     |
+|  207 | Matches                                     |
+|  208 | Vehicle Fuel                                |
+|  209 | Motorcycle Fuel                             |
+|  210 | Urban Transport (Taxi)                      |
+|  211 | Urban Transport (Bus)                       |
+|  212 | Transport (Motorcycle Taxi)                 |
+|  213 | Urban Transport (Train)                     |
+|  214 | Transport (Water)                           |
+|  215 | Transport (Animal Traction)                 |
+|  216 | Newspapers                                  |
+|  217 | Grain Milling Fees                          |
+|  301 | Whisky and Other Spirits                    |
+|  302 | Wine                                        |
+|  303 | Cooking Gas                                 |
+|  304 | Generator Fuel (Domestic)                   |
+|  305 | Batteries (Dry Cells)                       |
+|  306 | Washing Soap and Detergents                 |
+|  307 | Insecticide and Mosquito Coils              |
+|  308 | Domestic Staff Wages                        |
+|  309 | Laundry and Dry Cleaning                    |
+|  310 | Refuse Collection Fees                      |
+|  311 | Vehicle Washing                             |
+|  312 | Parking Fees                                |
+|  313 | Telephone Calls (Public Phone)              |
+|  314 | Lottery and Betting Tickets                 |
+|  315 | Magazines and Periodicals                   |
+|  316 | Barber, Hairdressing and Beauty Services    |
+|  317 | Bathing Soap and Shampoo                    |
+|  318 | Tooth Paste                                 |
+|  319 | Toilet Paper                                |
+|  320 | Sanitary Pads and Nappies                   |
+|  321 | Body Lotion and Cosmetics                   |
+|  322 | Disposable Face Masks (COVID-19)            |
+|  323 | Hand Sanitizer Gel                          |
+|  324 | Other Toiletries                            |
+|  401 | Shoe Repair and Care                        |
+|  402 | Light Bulbs                                 |
+|  403 | Lubricants                                  |
+|  404 | Vehicle Repair and Servicing                |
+|  405 | Intercity Transport (Car)                   |
+|  406 | Intercity Transport (Animal Traction)       |
+|  407 | Intercity Transport (Water)                 |
+|  408 | Postage and Money Orders                    |
+|  409 | Fax Fees                                    |
+|  410 | Gardening Products (Ornamental)             |
+|  411 | Pet Food and Veterinary Care                |
+|  412 | Sporting Event Admission                    |
+|  413 | Cinema, Concert and Museum Admission        |
+|  414 | Photography and Other Recreational Services |
+|  415 | Washable Face Masks (COVID-19)              |
+|  416 | Pharmacy Medicines (Non-Prescription)       |
+|  417 | Perfume                                     |
+|  418 | Tooth Brush                                 |
+|  419 | Contraceptives                              |
+|  420 | Photocopying Fees                           |
+|  421 | Road Tolls                                  |
+|  501 | Cloth and Fabric                            |
+|  502 | Clothing (Women 15+)                        |
+|  503 | Underwear (Women 15+)                       |
+|  504 | Clothing (Children 0-14)                    |
+|  505 | Clothing (Men 15+)                          |
+|  506 | Underwear (Men 15+)                         |
+|  507 | Tailoring and Repair (Men's Clothing)       |
+|  508 | Tailoring and Repair (Women's Clothing)     |
+|  509 | Tailoring and Repair (Children's Clothing)  |
+|  510 | Footwear (Men)                              |
+|  511 | Footwear (Women)                            |
+|  512 | Footwear (Children)                         |
+|  601 | Dwelling Maintenance Materials              |
+|  602 | Dwelling Maintenance Labour                 |
+|  603 | Masonry Construction Materials              |
+|  604 | Other Construction Materials                |
+|  605 | Construction Labour                         |
+|  606 | Well Digging and Borehole Construction      |
+|  607 | Land or Dwelling Purchase                   |
+|  608 | Architect and Survey Fees                   |
+|  609 | Water Subscription Fees                     |
+|  610 | Electricity Subscription Fees               |
+|  611 | Water Connection Fees                       |
+|  612 | Electricity Connection Fees                 |
+|  613 | Living and Dining Room Furniture            |
+|  614 | Bedroom Furniture                           |
+|  615 | Furniture Repair                            |
+|  616 | Household Linen                             |
+|  617 | Household Appliances                        |
+|  618 | Solar Panels                                |
+|  619 | Solar Batteries and Equipment               |
+|  620 | Household Appliance Repair                  |
+|  621 | Crockery and Cutlery                        |
+|  622 | Kitchen Utensils                            |
+|  623 | Other Household Utensils                    |
+|  624 | Household and Garden Tools                  |
+|  625 | Lamps and Torches                           |
+|  626 | Car Purchase                                |
+|  627 | Motorcycle or Bicycle Purchase              |
+|  628 | Vehicle Spare Parts                         |
+|  629 | Vehicle and Travel Insurance                |
+|  630 | Vehicle Road Tax                            |
+|  631 | Vehicle Rental                              |
+|  632 | Intercity Transport (Train)                 |
+|  633 | Air Transport                               |
+|  634 | Moving Costs                                |
+|  635 | Visa and Airport Taxes                      |
+|  636 | Mobile Phone Purchase                       |
+|  637 | Audio and Video Equipment                   |
+|  638 | Computers and Printers                      |
+|  639 | Electronics Repair                          |
+|  640 | Small Electronic Media and Supplies         |
+|  641 | Sports Equipment and Toys                   |
+|  642 | Books (Non-School)                          |
+|  643 | Stationery and Art Supplies                 |
+|  644 | Pilgrimage Costs                            |
+|  645 | Vocational Training                         |
+|  646 | Adult Literacy and Tutoring                 |
+|  647 | Accommodation Services                      |
+|  648 | Watches and Clocks                          |
+|  649 | Jewellery                                   |
+|  650 | Other Personal Effects                      |
+|  651 | Property Insurance                          |
+|  652 | Property and Municipal Taxes                |
+|  653 | Life Insurance                              |
+|  654 | Health Insurance                            |
+|  655 | Medical Evacuation Abroad                   |
+|  656 | Administrative Document Fees                |
+|  657 | Other Services                              |
+
+# harmonize_crop_condition_ehcvm2 (GH #1436): "Etat du produit", s16cq16d, read by code.
+# This wave has its own eight-code list: 2018's s16cq12c has five (and its code 3 is
+# Decortique, here Tubercule), and Niger 2021-22's has three.  Unlike 2018, whose file holds
+# five codes where its form prints eight, this file's crops fit its labels: Tubercule falls
+# on yam and cassava, Regime on bananas.  The ruled fold (@ligon 2026-11-04) covers Epis,
+# Grain, Decortique, Non-decortique and Non concerne.  It does not name Tubercule (1,008
+# rows), Regime (24) or Gousse (0): those serve `other_condition`, per the coordinator's
+# direction of 2026-11-04, with the answer in `condition_native`, and a ruling is asked for.
+#+NAME: harmonize_crop_condition_ehcvm2
+| Code | Preferred Label      | Source Label   |
+|------+----------------------+----------------|
+|    1 | unshelled            | Epis           |
+|    2 | shelled              | Grain          |
+|    3 | other_condition      | Tubercule      |
+|    4 | other_condition      | Gousse         |
+|    5 | other_condition      | Régime         |
+|    6 | shelled              | Décortiqué     |
+|    7 | unshelled            | Non-décortiqué |
+|    8 | shell_not_applicable | Non concerné   |

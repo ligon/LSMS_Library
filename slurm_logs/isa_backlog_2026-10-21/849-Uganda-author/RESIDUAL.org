@@ -1,0 +1,36 @@
+#+TITLE: GH849 remaining scope and evidence qualifications
+#+AUTHOR: Sue
+
+* Existing issue owners
+
+- #1204 :: Uganda country Make ignores wave subsets; this patch preserves it and measures supported/unsupported/combined calls on both exact heads.
+- #1205 :: Real parcel-area coverage is incomplete;42841 area rows remain exact, parcel-yield keys14022 ->14520 reflect conversion coverage, and literal plot yield remains empty. No ID/area repair.
+- #1196 :: Distinct Uganda cluster_features/v and Niger food/u NA-representation observations are recorded; common cause remains unproved. Cold/warm support dtype is not normalized.
+- #829 :: Preserve the2015 sales-release x100 WAITING caveat independently of source factor agreement; no new wave-wide scientific exception.
+
+* Scope not adjudicated
+
+2009 factor wiring stays absent; no additional carrier or claim of all-round factor coverage is introduced.
+Raw Factor==Quantity and extreme/label-disagreeing reports remain source-quality diagnostics under the existing screens, not grounds for a reported_total layer, averaging, rescaling or automatic repair.
+All native observation/source-slot identities are retained; no new grain or helper is introduced.
+Hash movement invalidates28 Uganda API caches operationally, while this held-source validation rebuilds only its declared scoped prerequisites and output table, not all moved APIs.
+No global composition, whole corpus, full suite, FCT/nutrition or FDC validation is claimed.
+
+* Exact execution and evidence limits
+
+The initial toy cohorts briefly requested four workers (two independent two-worker pytest runs); originals remain and later pytest is sequential at two total workers.
+Both current Make heads rewrite the same17 byte-identical paths0600 ->0644 plus mtime; this is separate from the prior1198 opposite direction and implies no initial-copy provenance or universal mode guarantee.
+The first parent-supported Default subset strict comparison saved actual/endpoints but not its in-memory expected filter.
+The separately named artifact-only reconstruction uses the surviving full reference and pinned unchanged restriction helper, with no API replay; it is not the original operand.
+Actual matched-route parent/candidate subset values/axes/dtypes/masks/full typed attrs are exact, including the2018 and empty full controls.
+Filtering an already-finalized full frame differs only in typed sampling/population/recall metadata, plus the empty population/sampling resolution keys.
+CLI prewrite-to-postread has existing v StringDtype and sampling/population/recall typed JSON changes; actual API and independently serialized artifact oracles match at their respective stages.
+Original hash-inventory/Niger-presence, categorical cwd, two launch-path and nullable-Boolean summary stops remain; the packaging checker stopped before writing any export because the prepared safe directory already existed empty.
+No private basename or original observation was overwritten.
+The original1198 XML overwrite and missing first-failed-Make warning-list limitations remain historical and unrecovered; current results do not erase them.
+Final source trees have byte/mode/HEAD/clean checks, not an invented initial mtime baseline.
+
+Author validation is complete; a different reviewer must assess the frozen head and all qualifications before acceptance.
+No GitHub issue closure, public PR merge or final independent PASS is implied.
+
+Sue.

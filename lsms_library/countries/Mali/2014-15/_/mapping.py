@@ -1,7 +1,24 @@
 import os
+from pathlib import Path as _Path
+
 import numpy as np
 import pandas as pd
-from lsms_library.local_tools import all_dfs_from_orgfile
+from lsms_library.local_tools import all_dfs_from_orgfile, get_formatting_functions as _get_formatting_functions
+
+# Bind the helper to this config tree by its exact path, as Burkina Faso 2014 does.
+_eaci14_i = _get_formatting_functions(
+    _Path(__file__).resolve().parents[2] / '_' / 'mali.py',
+    '_mali_eaci_namespace')['eaci14_i']
+
+
+def i(value):
+    '''2014-15 household id, NAMESPACED: ``'EACI14_' + grappe + '0' + menage``.
+
+    GH #1494.  Overrides the country ``i`` for every YAML table of this wave.
+    See ``mali.EACI14_PREFIX``.
+    '''
+    return _eaci14_i(value)
+
 
 # GH #380 (Phase 3 audit, 2026-06-07): the EACI 2014-15 Section 13
 # consumption module records quantity PER ACQUISITION SOURCE, not as a
@@ -101,7 +118,15 @@ def food_acquired(df):
         # quantity OR (purchased only) a positive expenditure.
         qpos = pd.to_numeric(sub['Quantity'], errors='coerce').fillna(0) > 0
         epos = pd.to_numeric(sub['Expenditure'], errors='coerce').fillna(0) > 0
-        return sub[qpos | epos]
+        eligible = qpos | epos
+        if exp_col == 'ExpenditurePurchased':
+            # GH #1594 / ledger §3-4: the user ruled that exact raw
+            # s13q03c=99,999,999 is missing in BOTH 2014 passages. Keep
+            # original contribution eligibility, including value-only rows;
+            # mask before the existing canonical additive collapse.
+            amount = pd.to_numeric(sub['Expenditure'], errors='coerce')
+            sub['Expenditure'] = amount.mask(amount.eq(99_999_999))
+        return sub[eligible]
 
     purchased = _stream('purchased', 'QuantityPurchased', 'UnitPurchased',
                         'ExpenditurePurchased')

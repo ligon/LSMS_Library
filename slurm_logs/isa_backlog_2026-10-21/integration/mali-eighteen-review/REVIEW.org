@@ -1,0 +1,163 @@
+#+TITLE: Bounded GLOBAL18 / Mali1199 independent review
+#+AUTHOR: Sue
+
+* Verdict and source pins
+PASS for the bounded runtime increment at f9feb3c807aff5206134c37768992302ceb431fa against actual17 7ecf8e95fef567554fe93870ba95abddd1955a86.
+Two sentences in the appended Mali CONTENTS note overstate a coverage-dependent empty representation; their precise correction is requested below.
+The zero-row unsupported behavior passed every tested route and coverage state.
+No source checkout was edited, no Git/ref/GitHub mutation occurred, and no publication or integration merge is authorized by this review.
+The runtime verdict remains pinned to f9; a future documentation descendant needs its own narrow byte/tree/hash confirmation.
+
+The ten-path delta has exactly the reviewed standalone1199 path/status set from 9e8ebeabb0e996684d325d05987763a8c3581cc8 versus aba2badfe2f701a8b3793f1243fd8ed4fce18a53.
+All changed non-CONTENTS Git blobs and modes are identical to that reviewed increment.
+Current Mali CONTENTS preserves the entire actual17 prefix plus the exact appended1199 note, including the leading blank; the1121 lower-case labor note remains.
+The removed country concatenator and var recipe leave the wave script, pattern/prerequisites, materialize:make declaration and shared runtime unchanged.
+Actual make -n discovery, wave/all targets, public/CLI callers and required Price/Quantity controls passed the focused tests and source-backed routes.
+Settled788/840/1086 authority and grain were not reopened.
+
+* Country grounding and tensions
+Both CURRENT Mali and Niger CONTENTS were read completely, including TODO, WAITING and LOGBOOK/history.
+Mali's EAC-I2014/2017 and EHCVM2018/2021 are distinct designs; 2014 rural agricultural holdings, urban household coverage and 2017 Lourd/Leger matter.
+Native EACI2014 community prices retain two passages and three Unit/Poids/Prix readings, variety CODE, visit and obs, with the deliberate native i==v shim removed at country normalization.
+Price is per lot and Quantity is lot Poids in KG;129 positive-priced unplaced-unit entries remain excluded without a claim that every one is valid.
+The opening EHCVM “Four waves are configured” description (lines8-9) contrasts with “Only *2018-19 and 2021-22* are EHCVM; *2014-15 and 2017-18 are EAC-I*” (line59); both statements are retained as a documentation tension rather than dismissed.
+The retired comment “no grappe key” conflicts with the already documented unwired2018 grappe-grain s05 versus2021 regional-grain source.
+This increment wires no EHCVM source and leaves GH821 separate.
+
+Niger's ECVMA and EHCVM sources differ;2014 EXTENSION tracks split-offs/movers, and native grappe v has an i==v shim.
+Original Label and Code are distinct curation keys.
+The established policy drops134 exact-entry repeats and retains30 nonrepeat late slots; this review preserves all those rows and does not settle their representation.
+Niger lines1185-1188 quote the older claims “ship no cluster-level community price questionnaire” and “ships no community price file at all”, then explicitly state “That is false for 2018-19”; neither claim is used to invent new coverage.
+The opening “each grappe is visited in exactly one =vague=” (line12) must be read with “holds *both* seasonal visits of the survey, each covering half of every EA” (lines160-161).
+
+* Preparation and immutable provenance
+Before decoding or API calls, the terminal source gate physically staged two declared Mali EACIS04 sources and three declared Niger CS07 sources, their five sidecars, both DVC L1 layouts and exact reviewed references.
+MD5, SHA256, size when declared, file size, filesystem mode, mtime, distinct inode, nlink=1 and nonsymlink receipts were verified.
+Mali source MD5s are d8ef05e89059993a76b082481feb3942 and ca8ed4d483fa9714c3cf3a4fb1519b96.
+An absent declared sidecar size was kept absent; no unmanifested seed raw file was used.
+There were191 initial physical copies, two later verified current Niger L2 copies and20 naturally generated partial-coverage cache copies.
+One initial private Mali oracle code copy was intentionally adapted for this review's paths/exact comparator signature; all190 other initial copies remained exact.
+Three populated cache destinations later changed through normal recorded builds; this is separated from copy preparation.
+
+The mounted interpreter, exact cwd/PYTHONPATH/package/countries/config/data identity, bytecode suppression, private XDG/temp/DVC and numeric/build/Make thread counts1 were asserted.
+All Python probes used unshare -rn plus active socket/write guards; pytest used two explicit loadfile workers.
+Only the two prepared ignored .dvc/tmp links resolving to exact private targets were permitted as checkout metadata exceptions.
+No acquisition, DVC CLI, cache stamping, assumed-fresh path, read-gate bypass or in-tree payload was used.
+Only normal source-backed builds and current verified cache reads were accepted.
+
+* Measured hash and test boundaries
+The independent separate-source-process census ran BEFORE builds:549 API hashes, exactly24 Mali changes,525 other-country hashes exact,39/39 framework fingerprints exact.
+The relevant Niger wave hashes were also exact across17/18; a pre1078 or old Mali-author Niger cache was not treated as current.
+Other23 Mali table outputs were not rebuilt, and no full suite or whole18-country cohort was run.
+
+Candidate focused tests:111 PASS,0 FAIL,0 ERROR,0 SKIP; one source-backed requires_s3 test was explicitly deselected and separately called unchanged with held data.
+That unchanged public test passed under the held, offline, normal API route; its pytest credential marker remains intact.
+The identical28 new tests physically copied to actual17 produced24 meaningful FAIL and4 PASS,0 ERROR,0 SKIP.
+Failure causes were one retained country script, one retained var rule,18 intercepted retired-country routes and four partial-coverage unsupported requests building the supported wave.
+The passed controls and failed functions were classified from exact JUnit node outcomes; no fixture error was accepted as a negative result.
+The strict API audit passed.
+
+* Source, API, cache and Feature proof
+The independent source oracle retains all155931 eligible Mali readings:66699/49014/40218 for obs1/2/3 and66159/89772 for passages1/2.
+All native eight-level frames remain hashless and exactly match the source oracle; country normalization produces the seven declared public levels.
+Full matching raw, public, axes/classes/levels/codes, column order, dtypes, masks, values and recursively typed FULLattrs passed explicit check_exact=True, rtol=0, atol=0 controls.
+Immutable record _FIELDS presence and field values are checked, with no attr stripping or normalization.
+Seven deliberate comparator mutations were rejected.
+The artifact checker verified177 saved pickle inputs without alteration and separately checked complete Arrow schemas, footer metadata and actual writer bytes.
+
+There are48 candidate cold/fresh-process warm stages:28 physically empty-root cases and20 initially populated cases across Default/Make, all/supported/unsupported/mixed requests.
+There are28 matching actual17 cold/fresh-process warm controls.
+Supported candidate routes preserve155931 rows and authoritative parent Default attrs.
+Parent Make lacked only id_converted=True; this explicit correction is distinguished from exact values/dtypes/nulls and other attrs.
+Parent Make unsupported requests wrongly return155931 old rows; parent Default returns zero but historically builds a full legacy eight-level fallback with unsupported-only coverage.
+Those parent raw layers were compared to their matching native/fallback oracle, not incorrectly to the normalized supported country frame.
+Candidate unsupported requests return zero without community-price builds or cache writes in tested cold and partial-coverage states.
+Default fresh warm calls are zero-write; supported Make fresh warm calls normally rewrite the native hashless wave, with identical bytes/size/mode and changed mtime, and create no new framework country cache.
+Existing current country caches in populated Make roots remain unchanged.
+Per-call before/after inventories and added/modified/deleted classifications were saved BEFORE assertions.
+
+A genuine source-backed actual17 Niger control was built from the three CS07 sources, independently projected, and gated at the current hash with all-four-wave coverage before physical copying for17/18 Features.
+It retains46043 rows,30 late obs and76 exact quantity masks43/32/1; source data and full corrected1088 references match exactly.
+Its fresh-process warm call leaves all cache bytes/modes/mtimes unchanged.
+This comparator is not the old aba/9e Mali-author Niger payload.
+Matched current Mali and Niger components sum to the observed201974 rows in both Feature(default currency) and Feature(currency=None), compared separately with full typed attrs and complete frames across17/18.
+Neither201974 nor a sentinel count was used as a substitute for current source/current-hash proof.
+
+Eight actual CLI materializations span both heads, both backends and supported/unsupported subsets.
+Supported candidate API frames match actual17 Default API; post-read artifacts match actual17 artifacts and actual generic-writer controls, including complete Arrow footer/schema/bytes.
+Unsupported candidate artifacts match the declared-empty route and existing writer controls rather than a different parent empty representation.
+PopulationRecord-to-dict/container changes from generic JSON attrs serialization and empty Description object-to-StringDtype changes are explicit API/artifact distinctions; strict failures are retained privately.
+
+* Empty-result documentation defect and proposed minimal correction
+Current Mali CONTENTS lines1310-1311 say:
+#+begin_quote
+valid subset product. Both backends now use the existing declared empty frame
+for unsupported subsets and the existing wave aggregation for supported data.
+#+end_quote
+Lines1321-1325 say:
+#+begin_quote
+Empty unsupported outputs use the existing declared shape: visit/obs have
+string index dtypes, rather than the integer dtypes left by filtering the old
+full table. Description is object at the API and becomes StringDtype through
+the unchanged generic parquet writer. These are explicit empty-output
+consequences
+#+end_quote
+These statements are too broad about representation, while their zero-row behavior is correct.
+The physically empty candidate roots return declared-empty string visit/obs, object Description and no id_converted.
+The ten populated roots began with a naturally built current country cache whose manifest was exactly [2014-15].
+For each unsupported singleton and combined unsupported request, both backends return the same declared-empty representation without writes.
+The mixed [2014-15,2018-19] Default request normally expands coverage to those two waves; it is not evidence that every cache miss uses the empty factory.
+The naturally built full Default cache has manifest [2014-15,2017-18,2018-19,2021-22].
+At both heads, its four unsupported queries return zero-row filtered slices with inherited integer visit/obs, StringDtype Description and id_converted attrs, unchanged from actual17 and with zero writes.
+Strict factory-versus-covered-slice differences are retained; no axis/attrs relaxation was used.
+
+Proposed replacement for the first quoted block:
+#+begin_quote
+valid subset product. Both backends now return zero rows for unsupported
+subsets and use the existing wave aggregation for supported data. The empty
+representation depends on the route and available cache coverage.
+#+end_quote
+Proposed replacement for the second block:
+#+begin_quote
+The declared-empty route has string visit/obs index dtypes and object
+Description at the API; the unchanged generic parquet writer converts
+Description to StringDtype. A filtered empty slice from a current covered
+Default cache can instead retain integer visit/obs, StringDtype Description
+and id_converted attrs. Both representations contain zero rows; compare
+API frames and CLI artifacts at their matching stages.
+#+end_quote
+No f9 or9e checkout was edited and no API was rerun for this documentation finding.
+Root owns the minimal documentation descendant and its separate equivalence confirmation.
+
+* Warnings, scanner and retained stops
+All40 matched parent/candidate Python category/message warning multisets are explicitly asserted equal, rather than merely recording booleans.
+The102 warning captures contain one warning: the expected CacheRebuildWarning for the populated mixed Default coverage expansion; all other captured calls are warning-free.
+Complete private log accounting additionally finds19 standard Python warning-header groups, all in synthetic focused pytest summaries:16 CacheRebuildWarning and three UserWarning from existing missing/broken fallback controls.
+These summary groups are not unique warning event counts; the actual source-backed probe and eight CLI child logs contain no such warning headers.
+Full logs and message evidence remain private; cross-checkout source file/line identity is not claimed.
+The unmodified scoped scanner phases1/2 yield exactly two WARN records: has_household_index for native cluster-grain Mali and Niger.
+Every complete record and the JSONL bytes match actual17; both scanner data roots remain byte/mode/mtime unchanged, with no hidden fail/error/skip and no phase2 kwargs grid claimed.
+
+Five unexpected review-harness stops are retained with original scripts/logs/full private tracebacks: initial wrong author manifest filename before copies, Mali oracle comparator-signature TypeError after source assertions (completed artifact-only), diagnostic allowlist refusal before strict audit entry, an accounting assumption that JUnit failure elements have a type attribute, and the first terminal seal's strict refusal of eight newly generated private fontconfig/matplotlib metadata files.
+The first seal's manifest, READY, sealer, package source, error and log are uniquely preserved under stops/final-seal-font-metadata.
+The replacement manifest includes those eight files and the final seal reuses that already initialized private metadata environment; no data/test/API run is repeated.
+The JUnit schema is actually message-only; its assertion classes, exact functions and source checks were verified without rerunning pytest or APIs.
+The expected actual17 negative pytest exit is separately retained as24 FAIL/4 PASS, not a harness failure or green suite.
+A plain python command was unavailable and did not enter Python; subsequent metadata-only JSON reading used the mounted interpreter.
+Root's preserved preparation also records its prior byte-resolution/conflict-marker stops and correction before the source18 commit.
+No stopped assertion was erased or converted into product success.
+
+* Limits and release
+This is bounded incremental coexistence proof, not a full GLOBAL18 suite/corpus acceptance.
+Actual17's historical full suite retains its13 FAIL, the doc-child guard/mtime qualification and other37-country output limits at its own pin.
+The separate preexisting Niger1196 StringDtype sentinel residual is not repaired or erased here; matched-stage current community-price controls do not establish a global cross-stage dtype repair.
+No EHCVM community prices were wired and the129 unresolved Mali unit entries remain excluded.
+No new country grain, quantity, currency, unit, eligibility or duplicate-tail policy was introduced.
+
+Final full source-byte/mode/mtime/inode/Git-blob/index/head/clean checks pass at both exact pins with zero in-tree parquets.
+All10404 payload entries across the old Mali review, Niger review, Mali author and actual17 frozen manifests were independently rehashed, and their protected manifest/READY control receipts remain exact.
+All used original source/reference endpoints remain unchanged; full frames, IDs, warnings, diagnostics and tracebacks remain private.
+Final manifest and zero-consumer checks are in FINAL-READY.json and its seal receipts.
+The naturally built current/full-four-wave Mali155931 cache is preserved as ordinary gated evidence for any future comparator assignment; no extra18 API was run for future19.
+
+Sue

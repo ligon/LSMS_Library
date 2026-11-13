@@ -1,0 +1,157 @@
+{
+ "backend": "make",
+ "label": "branch",
+ "tables": {
+  "crop_production": {
+   "columns": [
+    "Quantity",
+    "Quantity_sold",
+    "Value_sold",
+    "Unit_sold",
+    "harvest_month",
+    "intercropped"
+   ],
+   "error": null,
+   "index": [
+    "i",
+    "t",
+    "v",
+    "plot_id",
+    "crop",
+    "u"
+   ],
+   "rows": 46376,
+   "rows_by_wave": {
+    "2011-12": 11937,
+    "2014-15": 8799,
+    "2018-19": 13717,
+    "2021-22": 11923
+   },
+   "seconds": 53.1,
+   "type": "frame",
+   "warning_categories": {
+    "ClusterIdentityWarning": 1,
+    "GrainCollapseWarning": 1,
+    "NullIndexKeyWarning": 1,
+    "NullReadWarning": 2,
+    "QuantityImplausibleWarning": 1
+   },
+   "warning_heads": {}
+  },
+  "livestock": {
+   "columns": [
+    "HeadCount",
+    "HeadAcquired",
+    "HeadSold"
+   ],
+   "error": null,
+   "index": [
+    "i",
+    "t",
+    "animal"
+   ],
+   "rows": 30230,
+   "rows_by_wave": {
+    "2011-12": 6614,
+    "2014-15": 5018,
+    "2018-19": 9764,
+    "2021-22": 8834
+   },
+   "seconds": 38.9,
+   "type": "frame",
+   "warning_categories": {},
+   "warning_heads": {}
+  },
+  "people_last7days": {
+   "columns": [
+    "farm_work",
+    "SOB_work",
+    "wage_work",
+    "farm_hrs",
+    "SB_hrs",
+    "wage_hrs",
+    "Industry",
+    "working_age"
+   ],
+   "error": null,
+   "index": [
+    "i",
+    "t",
+    "v",
+    "pid"
+   ],
+   "rows": 125294,
+   "rows_by_wave": {
+    "2011-12": 25125,
+    "2014-15": 26579,
+    "2018-19": 35148,
+    "2021-22": 38442
+   },
+   "seconds": 66.1,
+   "type": "frame",
+   "warning_categories": {
+    "ClusterIdentityWarning": 1,
+    "NullReadWarning": 4
+   },
+   "warning_heads": {}
+  },
+  "plot_inputs": {
+   "columns": [
+    "Quantity",
+    "Purchased",
+    "Quantity_purchased"
+   ],
+   "error": null,
+   "index": [
+    "i",
+    "t",
+    "v",
+    "input",
+    "crop",
+    "u"
+   ],
+   "rows": 42435,
+   "rows_by_wave": {
+    "2011-12": 8465,
+    "2014-15": 8134,
+    "2018-19": 13401,
+    "2021-22": 12435
+   },
+   "seconds": 51.4,
+   "type": "frame",
+   "warning_categories": {
+    "ClusterIdentityWarning": 1,
+    "GrainCollapseWarning": 1,
+    "NullReadWarning": 1
+   },
+   "warning_heads": {}
+  },
+  "plot_labor": {
+   "columns": [
+    "PersonDays",
+    "Wage"
+   ],
+   "error": null,
+   "index": [
+    "i",
+    "t",
+    "v",
+    "plot_id",
+    "source"
+   ],
+   "rows": 53041,
+   "rows_by_wave": {
+    "2011-12": 19643,
+    "2014-15": 15935,
+    "2018-19": 9457,
+    "2021-22": 8006
+   },
+   "seconds": 50.7,
+   "type": "frame",
+   "warning_categories": {
+    "ClusterIdentityWarning": 1
+   },
+   "warning_heads": {}
+  }
+ }
+}

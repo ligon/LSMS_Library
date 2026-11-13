@@ -1,0 +1,39 @@
+{
+  "status": "FINAL_PROTECTION_QUALIFIED_METADATA_ONLY",
+  "diff_paths": [
+    ".coder/ledger/1210-invalid-food-waves.md",
+    "lsms_library/countries/Malawi/_/CONTENTS.org",
+    "lsms_library/country.py",
+    "tests/test_gh1210_invalid_food_waves.py"
+  ],
+  "shared_branch_head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+  "tested_framework_physical_receipts_exact": true,
+  "all_unrelated_source_receipts_exact": true,
+  "frozen1209_source_and_1085_manifest_entries_exact_in_v1": true,
+  "frozen218_817_entries_exact_in_v1": true,
+  "post_v1_frozen_provider_copy_physical_metadata_exact": true,
+  "qualification_scope": "Fresh metadata/source-only hashes and physical stat/link/pathset comparisons; full frozen/raw SHA comparisons bind actual v1 before its final guard-log assertion. No full checker, API, tests or data actors replayed.",
+  "held_binary_providers": 19,
+  "physical_binary_copies": 228,
+  "all_copies_distinct_and_exact_in_v1": true,
+  "runtime_exact": true,
+  "no_in_tree_payloads_in_v1": true,
+  "network_attempts_recorded": 0,
+  "write_denials_recorded": 6,
+  "guard_log": {
+    "sha256": "6ab8bdea5387bafde436a30cfc753d9000ee95815ed0e1801fa2e1bee89c380c",
+    "bytes": 285,
+    "mode": 420,
+    "mtime_ns": 1792683998481848504,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 59386435,
+    "symlink": false,
+    "link": null
+  },
+  "write_denial_qualification": "Original dir_fd, per-event timestamps and call stacks were not recorded. Last log mtime and static GH479 fixture support only a test-cleanup association, not resolved endpoint attribution or harmlessness.",
+  "unexecuted_prepared_full_checker": "protect-v2.py was prepared, not executed, following root no-replay instruction.",
+  "diagnostic_parent_worker_identity_exception": "First supposed-parent28-pass run is diagnostic only; worker cwd/package history was not captured.",
+  "no_universal_outside_write_claim": true,
+  "signed": "Sue"
+}

@@ -1,0 +1,77 @@
+{
+  "status": "PASS",
+  "explicit_numerical_comparison": {
+    "check_exact": true,
+    "rtol": 0,
+    "atol": 0,
+    "check_dtype": true,
+    "check_index_type": true,
+    "check_column_type": true,
+    "check_names": true,
+    "check_like": false,
+    "check_categorical": true,
+    "check_freq": true,
+    "check_flags": true
+  },
+  "typed_recursive_attrs": true,
+  "declared_record_fields_explicitly_checked": true,
+  "exact_comparator_negative_controls_rejected": 7,
+  "default_pandas_testing_assert_equal_not_used": true,
+  "pair_counts": {
+    "matched_stage_cold": 26,
+    "matched_stage_warm": 26,
+    "cross_stage_full_exact": 50,
+    "cross_stage_sole_u_dtype_exception": 2,
+    "added_cluster_caches": 12,
+    "healing_vs_reference": 4,
+    "healing_cross_stage": 3,
+    "healing_final_cache": 1,
+    "candidate_actual_writers": 4,
+    "candidate_final_cache": 1,
+    "candidate_actor_snapshots": 4,
+    "baseline_actual_writers": 4,
+    "baseline_final_cache": 1,
+    "baseline_actor_snapshots": 4,
+    "candidate_native_read": 1,
+    "exact_bad_reference_signature": 1,
+    "serial_saved_artifacts": 6,
+    "serial_final_caches": 2
+  },
+  "sole_cross_stage_dtype_exceptions": [
+    {
+      "side": "baseline",
+      "frame": "Niger-public-food_acquired-private.pkl",
+      "strict_dtype_failure_preserved": true,
+      "only_accepted_difference": "u StringDtype[pyarrow] pd.NA -> NaN missing sentinel metadata",
+      "payload_all_other_axis_dtypes_names_codes_masks_order_full_typed_attrs_exact": true
+    },
+    {
+      "side": "candidate",
+      "frame": "Niger-public-food_acquired-private.pkl",
+      "strict_dtype_failure_preserved": true,
+      "only_accepted_difference": "u StringDtype[pyarrow] pd.NA -> NaN missing sentinel metadata",
+      "payload_all_other_axis_dtypes_names_codes_masks_order_full_typed_attrs_exact": true
+    }
+  ],
+  "loaded_old_artifacts": 195,
+  "all_loaded_old_artifact_SHA_size_mode_mtime_before_after_exact": true,
+  "attrs_type_counts": {
+    "builtins.list": 1114,
+    "builtins.str": 364648,
+    "builtins.float": 1016,
+    "builtins.NoneType": 6266,
+    "builtins.dict": 767,
+    "pandas.api.typing.NAType": 124,
+    "lsms_library.population.PopulationRecord": 400,
+    "builtins.tuple": 1112,
+    "lsms_library.recall.RecallRecord": 392,
+    "builtins.int": 1928,
+    "lsms_library.sampling.SamplingRecord": 320,
+    "lsms_library.sampling._FrozenList": 2480,
+    "lsms_library.sampling._FrozenDict": 2560,
+    "builtins.bool": 643
+  },
+  "pre_artifact_read_package_config_data_cwd_socket_write_guard_identity_asserted": true,
+  "no_source_or_API_rerun": true,
+  "failures": []
+}

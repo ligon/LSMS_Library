@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "five_path_diff": [
+    ".coder/ledger/1209-malawi-food-builder.md",
+    "lsms_library/countries/Malawi/_/CONTENTS.org",
+    "lsms_library/countries/Malawi/_/Makefile",
+    "lsms_library/countries/Malawi/_/food_acquired.py",
+    "tests/test_gh1209_malawi_food_builder.py"
+  ],
+  "source_tracked_receipts": 29779,
+  "runtime_exact": true,
+  "author_frozen_files_exact": 1085,
+  "original_providers_exact": 19,
+  "physical_copies_exact": 304,
+  "endpoint_pickle_and_cache_receipts_exact": true,
+  "no_intree_payloads": true,
+  "network_attempts": 0,
+  "guard_denied_writes": 0
+}

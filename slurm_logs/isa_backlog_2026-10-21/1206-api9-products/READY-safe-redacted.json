@@ -1,0 +1,15 @@
+{
+  "scope": "api9-products",
+  "status": "READY_BOUNDED_SAVED_CONTENT_SUPPLEMENT_WITH_PRESERVED_FAILURES_AND_GAPS",
+  "pins": {
+    "api9-products-full-manifest-private.json": "bd49382ab666da604c7eb0b781afe23fb7044094043eab35ab8a1264a7a3d9cd",
+    "api9-products-postexit-private.json": "fe1decf81e678c05bda8be0197fdda86c06432b1873df64be31c37dc8868507f",
+    "api9-products-safe-allowlist.json": "2b2509e8431760c1086d85ffcb87573a97b20d420908b529b43f78f73d3cc2f8"
+  },
+  "final_safe_sha256": "ffb882acf0d12199aef581c909908c291b113c2e17e50539f62d9da0b07409fa",
+  "packager_terminal_exit": 0,
+  "postexit_terminal_exit": 0,
+  "remaining_consumers": 0,
+  "signed": "Sue",
+  "original_private_READY_sha256": "37305d1c4058ab0503c770fbb773de7c7ecef67e2e3bdca7002fa99f14fb39ef"
+}

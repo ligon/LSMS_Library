@@ -28,20 +28,50 @@ def _frame(rows):
 
 def _run_script(frames, updated_ids, tmp_path, monkeypatch):
     import lsms_library.local_tools as lt
+    from lsms_library import Country
+    from lsms_library.paths import countries_root
 
-    # Use the real id_walk, with wave selection and module lifetime isolated.
-    spec = importlib.util.spec_from_file_location("uganda", UGANDA / "uganda.py")
-    module = importlib.util.module_from_spec(spec)
-    monkeypatch.setitem(sys.modules, "uganda", module)
-    spec.loader.exec_module(module)
-    monkeypatch.setattr(module, "Waves", dict.fromkeys(frames))
-    sources = {f"../{wave}/_/assets.parquet": frame for wave, frame in frames.items()}
+    # Ledger1310-uganda-assets-ci-fixture §§2,4: use the actual registry API
+    # on owned two-wave metadata; module.Waves is not compiler authority.
+    root = tmp_path / "countries"
+    general = root / "Uganda" / "_"
+    general.mkdir(parents=True)
+    (general / "data_scheme.yml").write_text(
+        "Waves: " + json.dumps(list(frames)) + "\nData Scheme: {}\n"
+    )
+    for wave in frames:
+        native = root / "Uganda" / wave / "_"
+        native.mkdir(parents=True)
+        (native / "assets.py").write_text("# invented declaration; never executed\n")
+
     written = {}
-    monkeypatch.setattr(lt, "get_dataframe", lambda path: sources[path].copy())
-    monkeypatch.setattr(lt, "to_parquet", lambda frame, path: written.__setitem__(path, frame))
-    monkeypatch.chdir(tmp_path)
-    (tmp_path / "updated_ids.json").write_text(json.dumps(updated_ids))
-    runpy.run_path(str(UGANDA / "assets.py"), run_name="__main__")
+    try:
+        with monkeypatch.context() as fixture:
+            fixture.setenv("LSMS_COUNTRIES_ROOT", str(root))
+            countries_root.cache_clear()
+            country = Country("Uganda")
+            assert country.file_path.resolve() == (root / "Uganda").resolve()
+            assert country.waves == sorted(frames)
+            for wave in frames:
+                assert country[wave].wave_folder == wave
+                assert "assets" in country[wave].data_scheme
+
+            # Keep the real walker and compile bound source without pyc lookup.
+            helper = UGANDA / "uganda.py"
+            spec = importlib.util.spec_from_file_location("uganda", helper)
+            module = importlib.util.module_from_spec(spec)
+            fixture.setitem(sys.modules, "uganda", module)
+            exec(compile(helper.read_bytes(), str(helper), "exec"), module.__dict__)
+            assert Path(module.__file__).resolve() == helper.resolve()
+            sources = {f"../{wave}/_/assets.parquet": frame for wave, frame in frames.items()}
+            fixture.setattr(lt, "get_dataframe", lambda path: sources[path].copy())
+            fixture.setattr(lt, "to_parquet", lambda frame, path: written.__setitem__(path, frame))
+            fixture.chdir(general)
+            (general / "updated_ids.json").write_text(json.dumps(updated_ids))
+            runpy.run_path(str(UGANDA / "assets.py"), run_name="__main__")
+    finally:
+        # The context restores the environment before the cached path is cleared.
+        countries_root.cache_clear()
     assert list(written) == ["../var/assets.parquet"]
     return written["../var/assets.parquet"]
 

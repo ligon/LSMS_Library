@@ -1,0 +1,52 @@
+{
+ "backend": "make",
+ "broken_wave": "2018-19",
+ "case": "andandonly-people_last7days-2018-19",
+ "child_rc": 0,
+ "intree_parquets": 0,
+ "mode": "andand-only",
+ "result": {
+  "columns": [
+   "farm_work",
+   "SOB_work",
+   "wage_work",
+   "farm_hrs",
+   "SB_hrs",
+   "wage_hrs",
+   "Industry",
+   "working_age"
+  ],
+  "error": null,
+  "index": [
+   "i",
+   "t",
+   "v",
+   "pid"
+  ],
+  "rows": 51704,
+  "rows_by_wave": {
+   "2011-12": 25125,
+   "2014-15": 26579
+  },
+  "seconds": 39.9,
+  "type": "frame",
+  "warning_categories": {
+   "NullReadWarning": 1,
+   "UserWarning": 3
+  },
+  "warning_heads": {
+   "Makefile execution failed for Niger/_ people_last7days: Comm": 3
+  }
+ },
+ "stderr_injected_failures": 1,
+ "stderr_refusal_lines_any_wave": 0,
+ "stderr_refusal_lines_naming_wave": 0,
+ "table": "people_last7days",
+ "var_parquet_written": true,
+ "warn_makefile_failed": 3,
+ "warn_python_fallback_failed": 0,
+ "wave_parquets_built": [
+  "2011-12",
+  "2014-15"
+ ]
+}

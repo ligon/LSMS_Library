@@ -1,0 +1,18 @@
+{
+  "source_HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "branch": "diagnose/849-uganda-reported-kgfactor-20261021",
+  "source_clean": true,
+  "all_tracked_bytes_modes_exact": 14880,
+  "protected_1078_receipts_unchanged": 4,
+  "held_sources_MD5_SHA_size_mode_mtime_exact": 43,
+  "physical_distinct_inode_nlink1_nonsymlink_copies_exact": 129,
+  "baseline_cache_bytes_modes_mtimes_exact": 60,
+  "baseline_crop_hash_current_full8wave_coverage": true,
+  "scenario_no_parquets_promoted": true,
+  "no_intree_parquets": true,
+  "guard_events": {},
+  "network_attempts": 0,
+  "no_denied_writes": true,
+  "PR967_PR972_merge_ancestors_verified": true,
+  "no_source_Git_ref_or_GH_mutation": true
+}

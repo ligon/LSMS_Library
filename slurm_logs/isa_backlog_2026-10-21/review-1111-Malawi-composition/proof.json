@@ -1,0 +1,82 @@
+{
+  "HEAD": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+  "tracked_trees": {
+    "baseline": {
+      "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_files": 14880,
+      "content_mode_symlink_HEAD_status_exact": true,
+      "clean": true
+    },
+    "composed": {
+      "HEAD": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "tracked_files": 14918,
+      "content_mode_symlink_HEAD_status_exact": true,
+      "clean": true
+    },
+    "organic": {
+      "HEAD": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "tracked_files": 14910,
+      "content_mode_symlink_HEAD_status_exact": true,
+      "clean": true
+    },
+    "standalone": {
+      "HEAD": "a9356f2c5b2bb1709fedf9a288d12ef255ae44f3",
+      "tracked_files": 14888,
+      "content_mode_symlink_HEAD_status_exact": true,
+      "clean": true
+    },
+    "old_candidate": {
+      "HEAD": "9b883974a81d6ee664bbca425b7d484f0f14eb7a",
+      "tracked_files": 14887,
+      "content_mode_symlink_HEAD_status_exact": true,
+      "clean": true
+    },
+    "writer": {
+      "HEAD": "a9356f2c5b2bb1709fedf9a288d12ef255ae44f3",
+      "tracked_files": 14888,
+      "content_mode_symlink_HEAD_status_exact": true,
+      "clean": true
+    }
+  },
+  "quiescent_references": {
+    "organic-review": {
+      "files": 133,
+      "SHA256_size_mode_mtime_exact": true
+    },
+    "standalone-review": {
+      "files": 413,
+      "SHA256_size_mode_mtime_exact": true
+    }
+  },
+  "physical_copies": 140,
+  "all_copy_sources_content_size_mode_mtime_unchanged": true,
+  "all_L1_held_reference_copies_unchanged": true,
+  "normal_modified_copied_sample_caches": [
+    "data-candidate/Malawi/2010-11/_/sample.parquet",
+    "data-candidate/Malawi/2019-20/_/sample.parquet",
+    "data-candidate/Malawi/var/sample.parquet"
+  ],
+  "held_Stata_MD5_verified": 28,
+  "held_PDF_MD5_verified": 2,
+  "warm": {
+    "base": {
+      "parquets": 17,
+      "all_warm_receipts_still_exact_after_tests_oracle_and_scans": true,
+      "Uganda_all_cache_bytes_modes_mtimes_unchanged": true
+    },
+    "candidate": {
+      "parquets": 17,
+      "all_warm_receipts_still_exact_after_tests_oracle_and_scans": true,
+      "Uganda_all_cache_bytes_modes_mtimes_unchanged": true
+    }
+  },
+  "network_attempts": 0,
+  "denied_source_write_attempts": 0,
+  "source_write_guard_active": true,
+  "only_checkout_metadata_exception": "root-prepared ignored .dvc/tmp symlink to exact private checkout-dvc-tmp; DVC_SITE_CACHE_DIR also private",
+  "tmp_symlink_exact_root_receipt": true,
+  "in_tree_untracked_raw_or_parquet": 0,
+  "review_subprocesses_remaining": 0,
+  "no_refs_tracked_source_fixtures_dependencies_GH_shared_cache_or_acquisition_changes": true,
+  "scope": "bounded composition; no new549/39 census"
+}

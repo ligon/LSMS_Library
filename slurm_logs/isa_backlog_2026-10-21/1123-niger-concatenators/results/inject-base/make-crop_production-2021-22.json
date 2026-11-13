@@ -1,0 +1,58 @@
+{
+ "backend": "make",
+ "broken_wave": "2021-22",
+ "case": "make-crop_production-2021-22",
+ "child_rc": 0,
+ "intree_parquets": 0,
+ "mode": "raise",
+ "result": {
+  "columns": [
+   "Quantity",
+   "Quantity_sold",
+   "Value_sold",
+   "Unit_sold",
+   "harvest_month",
+   "intercropped"
+  ],
+  "error": null,
+  "index": [
+   "i",
+   "t",
+   "v",
+   "plot_id",
+   "crop",
+   "u"
+  ],
+  "rows": 34453,
+  "rows_by_wave": {
+   "2011-12": 11937,
+   "2014-15": 8799,
+   "2018-19": 13717
+  },
+  "seconds": 66.0,
+  "type": "frame",
+  "warning_categories": {
+   "ClusterIdentityWarning": 1,
+   "GrainCollapseWarning": 1,
+   "NullIndexKeyWarning": 1,
+   "NullReadWarning": 3,
+   "QuantityImplausibleWarning": 1,
+   "UserWarning": 3
+  },
+  "warning_heads": {
+   "Makefile execution failed for Niger/_ crop_production: Comma": 3
+  }
+ },
+ "stderr_injected_failures": 1,
+ "stderr_refusal_lines_any_wave": 0,
+ "stderr_refusal_lines_naming_wave": 0,
+ "table": "crop_production",
+ "var_parquet_written": true,
+ "warn_makefile_failed": 3,
+ "warn_python_fallback_failed": 0,
+ "wave_parquets_built": [
+  "2011-12",
+  "2014-15",
+  "2018-19"
+ ]
+}

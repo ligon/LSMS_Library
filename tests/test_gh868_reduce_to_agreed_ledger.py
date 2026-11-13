@@ -466,11 +466,11 @@ def test_every_uganda_wave_script_stamps_its_ledger_into_the_wave_parquet(script
     assert src == "grain_reports('Uganda', 'crop_production')", src
 
 
-def test_uganda_de_dup_names_its_cell_for_the_out_of_process_reducer():
+def test_uganda_native_observations_no_longer_invoke_the_lossy_reducer():
+    # GH1198 keeps native records and their sale labels. The wave/country
+    # stamp transport remains covered above; it need not manufacture reports.
     tree = ast.parse((UGANDA / "_" / "uganda.py").read_text())
-    calls = [c for c in _calls(tree, "reduce_to_agreed")]
-    named = [c for c in calls
-             if {k.arg for k in c.keywords} >= {"country", "table", "wave", "on_conflict"}]
-    assert len(named) == 1, "crop_production_for_wave's reduce_to_agreed must pass country/table/wave"
-    kw = {k.arg: ast.unparse(k.value) for k in named[0].keywords}
-    assert kw["country"] == "'Uganda'" and kw["table"] == "'crop_production'" and kw["wave"] == "t"
+    helper = next(n for n in tree.body if isinstance(n, ast.FunctionDef)
+                  and n.name == "crop_production_for_wave")
+    assert not list(_calls(helper, "reduce_to_agreed"))
+    assert "production_obs" in ast.unparse(helper)

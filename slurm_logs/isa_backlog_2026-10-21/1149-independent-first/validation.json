@@ -1,0 +1,102 @@
+{
+  "cohorts": {
+    "candidate": {
+      "counts": {
+        "tests": 266,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      },
+      "xml": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/candidate.xml",
+        "mode": 384,
+        "mtime_ns": 1792653949209960151,
+        "bytes": 39330,
+        "inode": 54272436,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "0aa18feea3474fd07030f1f091f7ee2823f2a8984868702e23891323888c477a"
+      }
+    },
+    "base": {
+      "counts": {
+        "tests": 47,
+        "failures": 45,
+        "errors": 0,
+        "skips": 0
+      },
+      "xml": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/base.xml",
+        "mode": 384,
+        "mtime_ns": 1792654031780401818,
+        "bytes": 115494,
+        "inode": 54272447,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "3de19b09d495b02de9560a6edd362232bcae292fab31c0e724a65f208f6d8a0b"
+      }
+    },
+    "adversarial": {
+      "counts": {
+        "tests": 9,
+        "failures": 2,
+        "errors": 0,
+        "skips": 0
+      },
+      "xml": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/adversarial.xml",
+        "mode": 384,
+        "mtime_ns": 1792654119182869911,
+        "bytes": 6355,
+        "inode": 54272457,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "f870ba1c42279748be217cc8d250713bf287d2151ee5eb5d6fb5db2860cd573d"
+      }
+    },
+    "adversarial-base": {
+      "counts": {
+        "tests": 2,
+        "failures": 2,
+        "errors": 0,
+        "skips": 0
+      },
+      "xml": {
+        "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/adversarial-base.xml",
+        "mode": 384,
+        "mtime_ns": 1792654279447729818,
+        "bytes": 5090,
+        "inode": 54272475,
+        "device": 64770,
+        "nlink": 1,
+        "type": "file",
+        "sha256": "aaa42871eb80586c016704eb69637edd46474d3e93a0117ab3c1399432f9ebff"
+      }
+    }
+  },
+  "actual_parent_47_is_new_coherent_cohort": true,
+  "author_separate_43_plus_4_history_not_rewritten": true,
+  "terminal_statuses": {
+    "candidate": 0,
+    "base": 1,
+    "adversarial": 1,
+    "adversarial-base": 1,
+    "hash_base": 0,
+    "hash_candidate": 0,
+    "warm_preparation": 0,
+    "four_warm_processes": 0,
+    "warm_comparison": 0,
+    "api_audit": 0,
+    "fixture_census": 0,
+    "final_source_protection": 0
+  },
+  "candidate_expected_mocked_GPG_warnings": 1,
+  "failed_control_names": [
+    "test_invalid_none_push_receipt_is_cleared[add_wave]",
+    "test_invalid_none_push_receipt_is_cleared[populate_and_push]"
+  ],
+  "test_predicate_or_product_edits": 0
+}

@@ -1,0 +1,72 @@
+{
+  "exact_allowlisted_files": [
+    {
+      "path": "REPORT.md",
+      "sha256": "845469eca343b524992818e669d6faafcb69c601094a2e637ef7667b0c181889",
+      "bytes": 5914,
+      "source_allowlist_sha256": "698fd2fae0436ee33dc7425fadd27713e440fd1f4b94f3d4ccc9b4f5c52341f4"
+    },
+    {
+      "path": "result-v2-safe.json",
+      "sha256": "483aad23273670beb1c3bbcc4b6cc0511b25ee8eeff3d6005a650d009ad7d7c7",
+      "bytes": 7978,
+      "source_allowlist_sha256": "698fd2fae0436ee33dc7425fadd27713e440fd1f4b94f3d4ccc9b4f5c52341f4"
+    },
+    {
+      "path": "findings-v2-safe.json",
+      "sha256": "fcc1c67cd11a8f0214aa6b429d7f66d5f934298e82d23ad92177331d62bfdfcb",
+      "bytes": 2945,
+      "source_allowlist_sha256": "698fd2fae0436ee33dc7425fadd27713e440fd1f4b94f3d4ccc9b4f5c52341f4"
+    },
+    {
+      "path": "denominator-safe.json",
+      "sha256": "f6018a5609e23a8abe2dd7aee0775060f09972abe91960fe2d421229f59162ed",
+      "bytes": 2679,
+      "source_allowlist_sha256": "698fd2fae0436ee33dc7425fadd27713e440fd1f4b94f3d4ccc9b4f5c52341f4"
+    },
+    {
+      "path": "grammar-eligibility-v2-safe.json",
+      "sha256": "fbd347e0f238d458979515ddb1b3a83c97cee1ecde06e970ec566dcb92ec0265",
+      "bytes": 3062,
+      "source_allowlist_sha256": "698fd2fae0436ee33dc7425fadd27713e440fd1f4b94f3d4ccc9b4f5c52341f4"
+    },
+    {
+      "path": "fingerprint-comparison-safe.json",
+      "sha256": "48b63de36961fd09cc1bde992fcab757abd2600c3c8c33d25bcad5724770a26b",
+      "bytes": 2056,
+      "source_allowlist_sha256": "698fd2fae0436ee33dc7425fadd27713e440fd1f4b94f3d4ccc9b4f5c52341f4"
+    },
+    {
+      "path": "comparator-calibration-safe.json",
+      "sha256": "229eccd080ed2c57964ac2953cb6c916a7898401337f432fe61bee8a016d3595",
+      "bytes": 1014,
+      "source_allowlist_sha256": "698fd2fae0436ee33dc7425fadd27713e440fd1f4b94f3d4ccc9b4f5c52341f4"
+    },
+    {
+      "path": "comparator-object-calibration-safe.json",
+      "sha256": "ca03a29092a1c0769085895d348f3f93017e7a64bbd5b54aae5eb19046ae3382",
+      "bytes": 1239,
+      "source_allowlist_sha256": "698fd2fae0436ee33dc7425fadd27713e440fd1f4b94f3d4ccc9b4f5c52341f4"
+    },
+    {
+      "path": "PHASE0-safe.json",
+      "sha256": "d415f0e2431a541402a8f664ddcd6ea3e13abb2b3f7cc5934d97685abf0d6de1",
+      "bytes": 3603,
+      "source_allowlist_sha256": "698fd2fae0436ee33dc7425fadd27713e440fd1f4b94f3d4ccc9b4f5c52341f4"
+    },
+    {
+      "path": "terminal-supplement/REPORT.md",
+      "sha256": "60afcd406d9ead6d1650863d9267724ad0327a6d76213afd423766cec61d963a",
+      "bytes": 2445,
+      "source_allowlist_sha256": "5ea4c00044d208d69e84a775778525f680a3f27168471caa3080afaa010520f3"
+    },
+    {
+      "path": "terminal-supplement/qualification-safe.json",
+      "sha256": "dd89872ac531c66d28257a7a6b9460f5a6db733779a7bc3cae4dc1f52334113e",
+      "bytes": 3179,
+      "source_allowlist_sha256": "5ea4c00044d208d69e84a775778525f680a3f27168471caa3080afaa010520f3"
+    }
+  ],
+  "no_private_frames_or_warning_logs_exported": true,
+  "signed": "Sue"
+}

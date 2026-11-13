@@ -1,0 +1,16 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2863
+
+#+CATALOG_ID: 2863
+#+CATALOG_IDNO: TZA_2016_NPS-FTFISS_v01_M
+#+CATALOG_TITLE: National Panel Survey Wave 4 - Feed the Future Interim Supplemental Survey 2016
+#+CATALOG_YEARS: 2016-2016
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/cme5-3n84
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2863
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-11-04
+#+PROVENANCE_NOTE: Acquired whole on 2026-11-04 by add_wave: all 12 of the 12 data files in 2863's WB datafile list, each pushed. The Feed the Future Interim Supplemental Survey 2016: 797 NPS Wave 4 households re-interviewed in six regions. Held, not in Country.waves, not wired.

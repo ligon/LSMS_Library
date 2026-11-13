@@ -1,0 +1,20 @@
+{
+  "status": "POSTEXIT_ALL_CRITICAL_PAYLOAD_AND_OLD_MANIFEST_RECEIPTS_EXACT",
+  "critical_manifest_entries": 449,
+  "critical_manifest_sha256": "ff982bd1561f6f79151f18a0b048cfb694990514a8ef5562fceb4f32795bd309",
+  "critical_READY_sha256": "63419e4e8f4559e34f411d346eefce85906877057641696351a92fc75affa91a",
+  "exact_critical_path_set": true,
+  "full_old_manifest_entries_after_analysis": {
+    "twenty": 2629,
+    "1196": 281
+  },
+  "old_manifests_payloads_preserved": true,
+  "zero_active_analysis_consumers_at_check": true,
+  "write_denials": 0,
+  "network_denials": 0,
+  "actual_packaging_source_sha256": "48893b550522e15f1f8d6d6aecca9b89e32473c587a84a9ef9739b9fdb2b9429",
+  "actual_postexit_source_sha256": "3058c92175ad102bfd56c58c45f00038e677e12839a393ead8696e71c1ab8fa7",
+  "source_checkout_clean": true,
+  "no_payload_decode_API_test_replay": true,
+  "signed": "Sue"
+}

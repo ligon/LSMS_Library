@@ -1,0 +1,15 @@
+{
+  "status": "NEEDS_NARROW_COMPLETION_CLEANUP_PER_DISPATCH",
+  "human_six_part_OptionC": "independently established in documented synthetic and bounded-warm scope",
+  "additional_dispatch_requirement": "invalid push receipt leaves no reusable completion receipt",
+  "finding": "None return raises TypeError outside the push-call cleanup boundary and leaves _ACQUIRED_RELEASES on both entrypoints",
+  "scope": "pre-existing on actual f8; helper normally promises list[Path]; SOURCE unchanged; no normal-helper regression, false-stamp or country-data-corruption claim",
+  "required_amendment": "clear current-call acquisition receipt on receipt-validation exception and re-raise existing exception; add both controls",
+  "root_acceptance": "pending root classification and author amendment",
+  "heads": {
+    "candidate": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+    "base": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+  },
+  "source_or_git_mutations": false,
+  "external_acquisition": false
+}

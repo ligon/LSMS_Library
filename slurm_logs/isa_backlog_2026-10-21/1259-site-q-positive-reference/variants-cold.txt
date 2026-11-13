@@ -1,0 +1,9 @@
+lsms_library: /local/job40390255/worktrees/1259/lsms_library/__init__.py
+
+#### data_root /local/job40390255/data-private/1259/cold
+crop_production.Quantity Malawi: {'A': 20, 'B': 19, 'C': 19, 'C0': 19} B-only=0 C-only=0
+crop_production.Quantity Nigeria: {'A': 9, 'B': 5, 'C': 5, 'C0': 5} B-only=0 C-only=0
+crop_production.Quantity Uganda: {'A': 26, 'B': 22, 'C': 22, 'C0': 22} B-only=0 C-only=0
+  crop_production.Quantity TOTAL {'A': 129, 'B': 120, 'C': 120, 'C0': 120}
+  food_acquired.Quantity TOTAL None
+  plot_features.Area TOTAL None

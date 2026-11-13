@@ -1,0 +1,51 @@
+{
+  "verdict": "PASS",
+  "frozen_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+  "previous_review_head": "58ccfc2ca03644006a5ddcf6bd399de81a25a415",
+  "previous_review_verdict": "NEEDS_FIX, preserved",
+  "findings": [],
+  "resolved_finding": {
+    "location": "lsms_library/countries/Uganda/_/income.py:23",
+    "mechanism": "try/finally pins dvc only during public sibling materialization and restores exact original backend before raw reads",
+    "previous_result_rows": 1810,
+    "amended_result_rows": 14740,
+    "amended_wave_count": 8,
+    "raw_siblings_and_raw_served_income_exact": true
+  },
+  "checks": {
+    "focused_tests_passed": 29,
+    "focused_workers": 2,
+    "independent_script_restoration_cases": 20,
+    "affected_order_steps_passed": 8,
+    "feature_warning_records": 6,
+    "feature_records_exact_to_owner": true,
+    "country_hash_inventory": 549,
+    "changed_country_hashes_only_Uganda": 28,
+    "unchanged_other_country_hashes": 521,
+    "unchanged_framework_fingerprints": 39,
+    "arithmetic_ast_identical": true,
+    "nutrition_Makefile_GH772_unchanged": true
+  },
+  "frozen_proof": {
+    "head_before": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+    "head_after": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+    "tracked_content_count": 14859,
+    "tracked_content_changes": [],
+    "git_status_porcelain": "",
+    "l1_files": 588,
+    "l1_bytes": 483097209
+  },
+  "setup_events": [
+    "Initial order copy carried old-generation hashes; its step0 correctly rebuilt the source inputs, so the warm-preservation assertion rejected that setup. Full current hashes/coverage/exact frames were verified before rerunning all8steps.",
+    "First Feature audit followed a Make-written hashless income output and included one expected cache-rebuild warning. Repeated audit with a current default-backend cache matches the6held warnings exactly."
+  ],
+  "limits": [
+    "No full suite/corpus rebuild",
+    "No live API/raw acquisition or shared-cache changes",
+    "Actual LSMS_NO_CACHE=1 survey rebuild not run; its exact inherited value was preserved in20actual-script controlled-IO cases",
+    "MAKEFLAGS=-j2 exercised on live coverage/order runs; -B preservation checked with controlled IO only",
+    "General arbitrary-stale Make policy and other countries outside scope",
+    "Explicit Make income own-output stamping contract unchanged"
+  ],
+  "author": "Sue"
+}

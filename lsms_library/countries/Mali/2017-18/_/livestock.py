@@ -35,7 +35,7 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
-from mali import i as mali_i, livestock_finalize
+from mali import eaci17_i as mali_i, livestock_finalize
 
 WAVE = '2017-18'
 

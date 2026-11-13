@@ -1,0 +1,25 @@
+{
+ "btf": {
+  "moved": 0,
+  "moved_by_country": [],
+  "total": 40
+ },
+ "country": {
+  "moved": 23,
+  "moved_by_country": {
+   "Niger": 23
+  },
+  "total": 549
+ },
+ "errors": {
+  "base": 0,
+  "cand": 0
+ },
+ "wave": {
+  "moved": 92,
+  "moved_by_country": {
+   "Niger": 92
+  },
+  "total": 2109
+ }
+}

@@ -1,0 +1,243 @@
+{
+  "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "historical_receipts_reverified": 5,
+  "current_declared_boundaries": [
+    {
+      "country": "GhanaLSS",
+      "from": "1987-88",
+      "to": "1988-89",
+      "continuity": "wave-scoped",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Ethiopia",
+      "from": "2011-12",
+      "to": "2013-14",
+      "continuity": "wave-scoped",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Tanzania",
+      "from": "2010-11",
+      "to": "2012-13",
+      "continuity": "wave-scoped",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Tanzania",
+      "from": "2012-13",
+      "to": "2014-15",
+      "continuity": "wave-scoped",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Tanzania",
+      "from": "2014-15",
+      "to": "2019-20",
+      "continuity": "wave-scoped",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Uganda",
+      "from": "2005-06",
+      "to": "2009-10",
+      "continuity": "mixed",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Uganda",
+      "from": "2009-10",
+      "to": "2010-11",
+      "continuity": "mixed",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Uganda",
+      "from": "2010-11",
+      "to": "2011-12",
+      "continuity": "wave-scoped",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Uganda",
+      "from": "2011-12",
+      "to": "2013-14",
+      "continuity": "redefined",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Uganda",
+      "from": "2015-16",
+      "to": "2018-19",
+      "continuity": "redefined",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Nigeria",
+      "from": "2016Q1",
+      "to": "2018Q3",
+      "continuity": "wave-scoped",
+      "structured_measurement_present": false
+    },
+    {
+      "country": "Nigeria",
+      "from": "2019Q1",
+      "to": "2023Q3",
+      "continuity": "wave-scoped",
+      "structured_measurement_present": false
+    }
+  ],
+  "historical_exact_count_records": [
+    {
+      "country": "GhanaLSS",
+      "from": "1987-88",
+      "to": "1988-89",
+      "continuity": "wave-scoped",
+      "historical_linked_nonnull_v_households": 712,
+      "historical_all_changed": 712,
+      "historical_changed_ex_moved_prefix": 712,
+      "historical_rate_ex_moved_prefix_exact_fraction": "712/712",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Ethiopia",
+      "from": "2011-12",
+      "to": "2013-14",
+      "continuity": "wave-scoped",
+      "historical_linked_nonnull_v_households": 3776,
+      "historical_all_changed": 3776,
+      "historical_changed_ex_moved_prefix": 3776,
+      "historical_rate_ex_moved_prefix_exact_fraction": "3776/3776",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Tanzania",
+      "from": "2010-11",
+      "to": "2012-13",
+      "continuity": "wave-scoped",
+      "historical_linked_nonnull_v_households": 2904,
+      "historical_all_changed": 591,
+      "historical_changed_ex_moved_prefix": 591,
+      "historical_rate_ex_moved_prefix_exact_fraction": "591/2904",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Tanzania",
+      "from": "2012-13",
+      "to": "2014-15",
+      "continuity": "wave-scoped",
+      "historical_linked_nonnull_v_households": 521,
+      "historical_all_changed": 108,
+      "historical_changed_ex_moved_prefix": 108,
+      "historical_rate_ex_moved_prefix_exact_fraction": "108/521",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Tanzania",
+      "from": "2014-15",
+      "to": "2019-20",
+      "continuity": "wave-scoped",
+      "historical_linked_nonnull_v_households": 849,
+      "historical_all_changed": 849,
+      "historical_changed_ex_moved_prefix": 849,
+      "historical_rate_ex_moved_prefix_exact_fraction": "849/849",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Uganda",
+      "from": "2005-06",
+      "to": "2009-10",
+      "continuity": "mixed",
+      "historical_linked_nonnull_v_households": 2601,
+      "historical_all_changed": 2601,
+      "historical_changed_ex_moved_prefix": 2601,
+      "historical_rate_ex_moved_prefix_exact_fraction": "2601/2601",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Uganda",
+      "from": "2009-10",
+      "to": "2010-11",
+      "continuity": "mixed",
+      "historical_linked_nonnull_v_households": 2640,
+      "historical_all_changed": 821,
+      "historical_changed_ex_moved_prefix": 821,
+      "historical_rate_ex_moved_prefix_exact_fraction": "821/2640",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Uganda",
+      "from": "2010-11",
+      "to": "2011-12",
+      "continuity": "wave-scoped",
+      "historical_linked_nonnull_v_households": 2510,
+      "historical_all_changed": 2510,
+      "historical_changed_ex_moved_prefix": 2510,
+      "historical_rate_ex_moved_prefix_exact_fraction": "2510/2510",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Uganda",
+      "from": "2011-12",
+      "to": "2013-14",
+      "continuity": "redefined",
+      "historical_linked_nonnull_v_households": 1717,
+      "historical_all_changed": 1717,
+      "historical_changed_ex_moved_prefix": 1717,
+      "historical_rate_ex_moved_prefix_exact_fraction": "1717/1717",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Uganda",
+      "from": "2015-16",
+      "to": "2018-19",
+      "continuity": "redefined",
+      "historical_linked_nonnull_v_households": 2973,
+      "historical_all_changed": 2973,
+      "historical_changed_ex_moved_prefix": 2973,
+      "historical_rate_ex_moved_prefix_exact_fraction": "2973/2973",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Nigeria",
+      "from": "2016Q1",
+      "to": "2018Q3",
+      "continuity": "wave-scoped",
+      "historical_linked_nonnull_v_households": 1493,
+      "historical_all_changed": 79,
+      "historical_changed_ex_moved_prefix": 10,
+      "historical_rate_ex_moved_prefix_exact_fraction": "10/1493",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    },
+    {
+      "country": "Nigeria",
+      "from": "2019Q1",
+      "to": "2023Q3",
+      "continuity": "wave-scoped",
+      "historical_linked_nonnull_v_households": 5067,
+      "historical_all_changed": 343,
+      "historical_changed_ex_moved_prefix": 112,
+      "historical_rate_ex_moved_prefix_exact_fraction": "112/5067",
+      "current_measurement_verified": false,
+      "clusters_renumbered_in_artifact": null
+    }
+  ],
+  "current_data_calls": 0,
+  "raw_source_builds": 0,
+  "historical_pairs_replayed_synthetic": 119,
+  "span_warn_requests": 77,
+  "adjacent_endpoint_warn_requests": 12,
+  "nested_json_parquet_attrs_roundtrip_exact": true,
+  "legacy_schema_data_source_scope": "metadata/synthetic only; no current survey sample count claims"
+}

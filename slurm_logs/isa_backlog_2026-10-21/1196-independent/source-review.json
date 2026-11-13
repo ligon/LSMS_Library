@@ -1,0 +1,39 @@
+{
+  "production": {
+    "lsms_library/local_tools.py": {
+      "sha256": "64e8da43640fceb38cb3d4d55e4a006f9f7f7a5be4b5a5c79996299db3c80569",
+      "added_functions": [
+        "_read_parquet_with_index_policy",
+        "_restore_parquet_index_string_policy"
+      ],
+      "changed_functions": [
+        "get_dataframe",
+        "read_file"
+      ]
+    },
+    "lsms_library/country.py": {
+      "sha256": "aae765551f8a9863b302697e8b70573085f96e067c72c4819ce7968e7247fb0f",
+      "added_functions": [],
+      "changed_functions": [
+        "_read_l2_wave_cache",
+        "grab_data"
+      ]
+    }
+  },
+  "runtime_to_final_documentation_paths": [
+    ".coder/ledger/1196-parquet-index-policy.md",
+    "lsms_library/countries/Niger/_/CONTENTS.org",
+    "lsms_library/countries/Uganda/_/CONTENTS.org",
+    "slurm_logs/isa_backlog_2026-10-21/1196-index-policy/ALLOWLIST.json",
+    "slurm_logs/isa_backlog_2026-10-21/1196-index-policy/REPORT.org",
+    "slurm_logs/isa_backlog_2026-10-21/1196-index-policy/REPRODUCE.org",
+    "slurm_logs/isa_backlog_2026-10-21/1196-index-policy/proof.json",
+    "slurm_logs/isa_backlog_2026-10-21/1196-index-policy/validation.json"
+  ],
+  "writer_map_index_and_df_data_grabber_AST_unchanged": true,
+  "no_schema_dependency_fingerprint_exclusion_change": true,
+  "same_open_stream_payload_footer_three_callers": true,
+  "original_payload_catch_semantics_preserved_footer_restore_loud": true,
+  "scope_review": "Read all changed functions, their generic/Wave callers and writer contexts; AST supplemented the manual review.",
+  "setup_stop": "Initial unsaved stdlib-only host Python 3.6 invocation rejected subprocess text keyword before git/source processing; corrected to guarded mounted Python."
+}

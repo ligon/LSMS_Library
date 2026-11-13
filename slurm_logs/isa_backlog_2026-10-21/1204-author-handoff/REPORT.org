@@ -1,0 +1,77 @@
+#+title: Uganda GH1204 requested-wave and raw-cache repair
+#+author: Sue
+#+date: 2026-10-22
+
+* Change and source binding
+
+The duplicate all-wave country crop compiler and var-target rule are retired.
+Default and Make now reuse existing framework wave assembly and the GH1099 absent-declaration path.
+The native-only phony crop_production alias retains direct Make builds of the seven productive waves.
+The five-path change contains only the task ledger, Uganda CONTENTS and Makefile, deleted country script, and targeted regression tests.
+Framework, scheme, native loaders, ID maps, factor bindings, reducers and transformations are unchanged.
+The actual parent is 491daf5654b9ee45332bec97e1296ae821ff46d5, reviewed PR1207 over PR1202.
+Runtime executes clean candidate 69bcbd5ff; the final commit changes only the task ledger and exact tested runtime source receipts remain equal.
+This is author evidence awaiting separate independent review, root acceptance and human merge.
+
+* Results and truthful raw state
+
+Eight targeted tests pass; exact actual-parent controls fail seven and pass one.
+Both controller and worker assert the actual source, cwd, rootdir and configuration before collection and again after collection.
+The selected existing ID, grain, factor, stale-cache and coverage tests pass all 170 cases, with no skip or error; API audit exits zero.
+The full measured prebuild scope is 28 of 549 country and 171 of 1362 wave hashes changed, all Uganda, and 0 of 39 framework hashes changed.
+Public names, materialization declarations and discovery are unchanged.
+Three real parent country footers grade stale under the candidate expected hash; the unchanged read gate checks that grade before reading data.
+No cache is planted, promoted, bypassed or manually stamped to show that mechanism.
+
+The bounded twelve-root grid completes 44 Country calls, 12 Feature calls, two unmodified scoped scanners and one direct native Make call, all with actual terminal zero.
+It covers true cold L2, supported 2018-19, barren 2005-06, alternating population orders and fresh-process warm reads on both backends and both heads.
+Actual 491 Default cold-barren returns zero public rows but caches 133761 raw rows from seven other waves under false 2005-06 coverage.
+The candidate cold-barren result is empty and creates no crop country cache.
+The candidate preserves valid existing crop raw caches byte-for-byte on populated barren requests and retains truthful supported/all-wave manifests.
+Actual 491 Make subset requests return all 133761 rows; candidate Make returns 15630 rows for 2018-19 and zero for 2005-06, without a country crop parquet.
+All-wave results retain 133761 rows, 928 eligible null-v rows, no null production_obs, and exact harvest total 42026694.99297963.
+The seven native observation and factor tables remain exact, including production_obs, typed axes and complete footer bytes.
+This held release emits no native crop audit footer or crop grain-ledger record on either head; nonempty footer replay is proved separately by the targeted synthetic native-write regressions under both backends and the unchanged transport source.
+All twelve final cache footprints match their exact expected paths and final producer receipts.
+The existing broad Make wave eviction after subset calls is recorded separately as GH1210.
+
+* Strict comparisons and explicit empty-column residual
+
+The accepted comparator rejects 49 seeded faults, covering exact numeric values/masks, tiny/nextafter doubles, nullable scalars, storage/NA policy, full axes and unused domains/codes/widths, and recursive typed attrs including record fields and key types.
+Of 65 full-frame pairs, 61 pass strictly and four remain FAIL.
+All 21 native pairs pass, as do all nonempty public, raw, Feature and derived-harvest pairs.
+Five additional actual-parent Make all-wave public/raw/harvest/cold-warm comparisons pass strictly.
+No comparison normalizes, reorders or casts frames.
+The four zero-row failures reflect column order only: native/covered-cache order puts Unit_sold and Condition_sold before harvest_month and intercropped; declared-empty order puts the required harvest_month and intercropped first.
+Complete empty axes and typed attrs pass in those four cases; additional per-name field dtype/storage/mask checks are narrower diagnostics, not full equality.
+Actual 491 has the unchanged required-then-optional constructor, but retiring Uganda's builder newly exposes it for cold and coverage-short barren calls.
+Actual 491 Default cold-barren and supported-cache-then-barren use native order while producing the wrong raw state; actual 491 and candidate covered-cache barren calls retain native order.
+Candidate Make barren calls use declared-empty order.
+The exact triggers, both column sequences, actual-parent counterparts, tiers and immutable strict FAILs are recorded in empty-order-residual.json.
+No framework or scheme edit, new API prefix, or normalized fix erases this residual.
+The two unmodified scanners return 22 literally equal ordered warning records each and no failures.
+These checks preserve the selected interface/data contract; they do not certify scientific validity or the full corpus.
+
+* Country conventions, guards and retained history
+
+The complete 3741-line Uganda CONTENTS, including TODO/WAITING/LOGBOOK, was read first.
+It records swapped 2013A unit/condition labels, the 2018A missing-unit/two-condition extract, mixed release names and source observation identity rules.
+The historical statement "Wired for 2018-19 only, deliberately" is retained beside the dated factor addendum saying "The five previously unwired rounds now carry their own reported kg-per-unit fields".
+The dated area-coverage caveat contradicts the old universal parcel-match claim; GH1205 remains separate.
+GH829's producer-undocumented 2015 sale-value correction remains WAITING and held-release conditional.
+No area, eligibility, factor screen, source slot, season or production quantity interpretation changes here.
+
+Verification actors use the mounted 20261019T221223Z interpreter, fresh offline namespaces, pre-import socket and dir_fd-aware write guards, private configuration/cache/temp roots, matching source identities and one-thread/build/Make pins.
+All 37 genuine binary providers pass declared MD5, SHA256, size and physical authentication before copying/decoding.
+The twelve roots contain 444 new distinct-inode, nonsymlink, nlink1 copies totaling 533307636 bytes, with one measured DVC3 layout each.
+Original providers, source, runtime, copied payloads, operands, footers and footprints pass final protection.
+Denied IPv6 loopback capability bind events are retained as unattributed original context; static urllib3 probe code does not establish their original call stacks.
+This report makes no whole-task zero-network-attempt claim.
+Two original execnet anonymous-pipe setup failures, both terminal statuses and streams remain retained; the fresh v2 guard permits only fstat-proved anonymous FIFO/socket descriptors and preserves regular-file/dir_fd checks.
+The initial synthetic fixture omitted two already-required fields; its four failures and confounded v2 parent control remain, followed by the scoped fixture correction and fresh v3 controls.
+The phase0 AST-literal metadata stop and a later absent-source-file metadata read also remain recorded.
+The first final-protection metadata process stopped on comparing enriched provider receipts with generic physical receipts; its original script, stream and exit status remain intact.
+Its local source-snapshot dictionaries were not serialized before the stop; the additive continuation checkpoints them and compares physical fields explicitly while rechecking genuine MD5/magic, without rerunning any API, test or data-grid prefix.
+No completed verification prefix is replayed for report packaging, and no shared cache, network source acquisition, new venv, Slurm job or GitHub write is performed.
+
+Sue

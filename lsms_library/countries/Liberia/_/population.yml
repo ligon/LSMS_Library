@@ -21,6 +21,36 @@
 # It is kept so the record is not lost, and is never returned by the loader.
 
 Population:
+  '2014-15':
+    universe_tag: national-all-households
+    source_type: local-documentation
+    confidence: high
+    survey: 'Household Income and Expenditure Survey 2014-2015, WB catalog id 2563 (LBR_2014_HIES_v01_M)'
+    language: 'English'
+    source_file: 'lsms_library/countries/Liberia/2014-15/Documentation/LISGIS_HIES_2014_BINFO_V.2016.03.21.pdf ; World Bank catalog DDI export for study 2563 (https://microdata.worldbank.org/metadata/export/2563/json, fetched 2026-11-04)'
+    locator: 'LISGIS_HIES_2014_BINFO_V.2016.03.21.pdf, section ''Sampling frame for the 2014/2015 HIES'', PDF p. 7; national-replicate design, PDF p. 12. The DDI''s universe field is null. Text extracted with pdfminer.'
+    population_statement: |-
+      "The sampling frame for the 2014/2015 HIES is based on the data and cartography from the 2008 Liberia Population and Housing Census. Liberia is divided administratively into 15 counties, with a total household population of 3.4 million (Table 3). This figure excludes the population living in institutions such as hospitals, schools and other public institutions."
+    exclusions: |-
+      "This figure excludes the population living in institutions such as hospitals, schools and other public institutions." (BID, PDF p. 7).
+    notes: |-
+      Registered 2026-11-04 and NOT YET WIRED: no table of this wave is served.  This is a different survey from Liberia 2018-19, whose frame is forest-proximate EAs (see that entry): the HIES frame is every county.  BID, PDF p. 12: "Four nationally representative replicates of 209 sample EAs each were defined".  A pooled Liberia frame would therefore span two universes.
+    record_source: slurm_logs/POPULATION_STATEMENTS_2026-07-21.org (section 3, 'Liberia 2014-15')
+  '2016-17':
+    universe_tag: national-all-households
+    source_type: local-documentation
+    confidence: high
+    survey: 'Household Income and Expenditure Survey 2016, WB catalog id 2986 (LBR_2016_HIES_v01_M)'
+    language: 'English'
+    source_file: 'lsms_library/countries/Liberia/2016-17/Documentation/LISGIS_HIES_2016_BINFO_Final.pdf ; World Bank catalog DDI export for study 2986 (https://microdata.worldbank.org/metadata/export/2986/json, fetched 2026-11-04)'
+    locator: 'LISGIS_HIES_2016_BINFO_Final.pdf, section ''Sampling frame for the 2016 HIES'', PDF p. 8; re-run statement, PDF p. 5. The DDI''s universe field is null. Text extracted with pdfminer.'
+    population_statement: |-
+      "The sampling frame for the 2016 HIES follows the same structure as the 2014 HIES, which was based on the data and cartography from the 2008 Liberia Population and Housing Census. Liberia is divided administratively into 15 counties, with a total household population of 3.4 million (Table 4). This figure excludes the population living in institutions such as hospitals, schools and other public institutions."
+    exclusions: |-
+      "This figure excludes the population living in institutions such as hospitals, schools and other public institutions." (BID, PDF p. 8).
+    notes: |-
+      Registered 2026-11-04 and NOT YET WIRED: no table of this wave is served.  BID, PDF p. 5: "The re-run uses the same sample methodology and design as the 2014 survey, which allows for nationally representative data to be collected each quarter".  The catalog dates this entry 2016-2017; its title says 2016.
+    record_source: slurm_logs/POPULATION_STATEMENTS_2026-07-21.org (section 3, 'Liberia 2016-17')
   '2018-19':
     universe_tag: specialized
     source_type: wb-catalog

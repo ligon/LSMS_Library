@@ -1,0 +1,39 @@
+{
+  "files": {
+    "REPORT.md": {
+      "bytes": 2184,
+      "sha256": "253c0f0a5ab2f0952c08f2970e0c7031df491e6c79f15f7ec2dd14f5ec7435ab"
+    },
+    "REPRO.md": {
+      "bytes": 1593,
+      "sha256": "5511534548fb016eb0abaf54b843568e294d6883d3bdd2b71e4bb5dd006d0078"
+    },
+    "finalize_pending.py": {
+      "bytes": 8254,
+      "sha256": "41c701753350d294d5259449328d1229692679e91bcf9fe7ff81ec5e36b11cc8"
+    },
+    "observe.py": {
+      "bytes": 4246,
+      "sha256": "dc966216dcbbedec49c11bce1fdba35c4442531f43ffccd5f3ededb095c48ca4"
+    },
+    "progress.json": {
+      "bytes": 1037,
+      "sha256": "0826d42dd25c851d82007d54cc05f717551d41773678e7e2310be94472ec96e9"
+    },
+    "progress.py": {
+      "bytes": 1431,
+      "sha256": "707230061bbaa0791c01d0b39f718c0555a8c6de87095d25dd38a2630b0f0f07"
+    },
+    "reconcile.py": {
+      "bytes": 9696,
+      "sha256": "12aad44f9850c6c0ae9161ae679065eee62e6a0d14d0aa0e7a86c436b4189d6e"
+    },
+    "status.json": {
+      "bytes": 3131,
+      "sha256": "671a700e87a8d3e398a009a02c11d3370ae844eeadfac2d262fb64f7e5bf8690"
+    }
+  },
+  "raw_metadata_kept_private": true,
+  "source_sha": "097283459f80016b0f00a51b814a0cb964a42789",
+  "verdict": "PENDING_TERMINAL_PROOF_UNAVAILABLE"
+}

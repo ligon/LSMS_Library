@@ -1,0 +1,42 @@
+{
+ "committed_with_guard/closure": {
+  "entries": 3147,
+  "chain_keys": 0,
+  "households": 3227,
+  "linked_correctly": 3147,
+  "wrong_household": 8,
+  "unlinked": 72,
+  "duplicate_ids": 0,
+  "households_in_dup_groups": 0
+ },
+ "committed_with_guard/single_pass": {
+  "entries": 3147,
+  "chain_keys": 0,
+  "households": 3227,
+  "linked_correctly": 3147,
+  "wrong_household": 8,
+  "unlinked": 72,
+  "duplicate_ids": 0,
+  "households_in_dup_groups": 0
+ },
+ "no_guard/closure": {
+  "entries": 3227,
+  "chain_keys": 80,
+  "households": 3227,
+  "linked_correctly": 3147,
+  "wrong_household": 80,
+  "unlinked": 0,
+  "duplicate_ids": 80,
+  "households_in_dup_groups": 157
+ },
+ "no_guard/single_pass": {
+  "entries": 3227,
+  "chain_keys": 80,
+  "households": 3227,
+  "linked_correctly": 3227,
+  "wrong_household": 0,
+  "unlinked": 0,
+  "duplicate_ids": 0,
+  "households_in_dup_groups": 0
+ }
+}

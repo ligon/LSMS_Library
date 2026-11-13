@@ -13,7 +13,10 @@ sample:
                 - grappe
                 - menage
         myvars:
-            strata: s00q01
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
             Rural:
                 - s00q04
                 - mapping:
@@ -223,8 +226,17 @@ shocks:
                 Aumentou: True
                 Não se alterou: False
                 Não abrangido: False
+        # Six columns in both vagues: e is food stock, f food purchases;
+        # d is livestock despite its stale source variable label (GH #1561).
+        AffectedFoodStock:
+            - s14q04e
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
         AffectedConsumption:
-            - s14q04d
+            - s14q04f
             - mapping:
                 Diminuiu: True
                 Aumentou: True

@@ -1,0 +1,74 @@
+{
+  "NEXT-REASSESSMENT-BRIEF.md": {
+    "sha256": "82b10c85ce9fa7af4a0ec348e4891496a840627c2be254265c6db1b0199b0058",
+    "bytes": 7800,
+    "mode": 384,
+    "mtime_ns": 1792649641926209223
+  },
+  "bootstrap.py": {
+    "sha256": "3a3aca0d72e4d3b919bc1708947f8edc413e712cab125d2badb74e104199b522",
+    "bytes": 2560,
+    "mode": 420,
+    "mtime_ns": 1792650727641300176
+  },
+  "run-critical.sh": {
+    "sha256": "b7fb54cd9a04e6f4561bd0e12aba4b09f1a30a00eb0f41dd7f1264284373b26c",
+    "bytes": 674,
+    "mode": 420,
+    "mtime_ns": 1792650727686300425
+  },
+  "exact_strict.py": {
+    "sha256": "c42164e9d7e01027ac264b1442e5157d44aa0207655ab8c53d080659084f812d",
+    "bytes": 5155,
+    "mode": 420,
+    "mtime_ns": 1792650727680300392
+  },
+  "exact_strict_fast_v2.py": {
+    "sha256": "7b35e1126adb8c624b97714fe5b6c5baf20200413a5b373a0e1954287d2fe7b3",
+    "bytes": 5188,
+    "mode": 420,
+    "mtime_ns": 1792652470616013896
+  },
+  "fast-v2-calibration-safe.json": {
+    "sha256": "fd936a23797c2ce46d0b3baf60e3f2d63e151f5ed4071fe10c4943a33ce80911",
+    "bytes": 502,
+    "mode": 384,
+    "mtime_ns": 1792652473148025571
+  },
+  "check-critical.py": {
+    "sha256": "947bc88204df04cdc9d23b70624f697fcd279fe20cfb01c2f5f7a3ed4658f808",
+    "bytes": 9585,
+    "mode": 420,
+    "mtime_ns": 1792650827403867387
+  },
+  "prepare-seventeen.py": {
+    "sha256": "cbd1a57c695f67e9d9ddbf76f0aef812f1f58392c926f2065772bfdd60fca3b3",
+    "bytes": 7368,
+    "mode": 420,
+    "mtime_ns": 1792651748539053511
+  },
+  "prepare-seventeen-extra.py": {
+    "sha256": "eb361796ef84bfcedd01523917be078262d40fcd6bb3561feab3539e3035e54a",
+    "bytes": 5246,
+    "mode": 420,
+    "mtime_ns": 1792652591940676757
+  },
+  "check-seventeen-extra.py": {
+    "sha256": "cef15eb27bbe7029b21842853458347f90d280bbadcba1557eca9905685cfaa4",
+    "bytes": 3667,
+    "mode": 384,
+    "mtime_ns": 1792652954151665619
+  },
+  "package-critical.py": {
+    "sha256": "48893b550522e15f1f8d6d6aecca9b89e32473c587a84a9ef9739b9fdb2b9429",
+    "bytes": 11529,
+    "mode": 420,
+    "mtime_ns": 1792651370859017520
+  },
+  "attest-critical.py": {
+    "sha256": "3058c92175ad102bfd56c58c45f00038e677e12839a393ead8696e71c1ab8fa7",
+    "bytes": 3840,
+    "mode": 420,
+    "mtime_ns": 1792651462519541048
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "pooled_rows": 264400,
+  "rows_by_country": {
+    "Malawi": 180184,
+    "Uganda": 84216
+  },
+  "both_countries_retained": true,
+  "index_order_labels_dtypes_exact": true,
+  "preexisting_measures_exact_except_11075_organic_Quantity_zero_to_NA": true,
+  "organic_Applied_true": 11075,
+  "Uganda_unchanged": true,
+  "Malawi_cold_warm_exact": true
+}

@@ -1,0 +1,24 @@
+{
+  "status": "AUTHOR_READY_FOR_INDEPENDENT_REVIEW",
+  "source_head": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+  "runtime_tests_head": "299fb8675e785fd392b1259ab1f4fb535eb69c34",
+  "parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "branch": "fix/218-malawi-derived-registrations-20261022",
+  "source_clean_and_FS_published": true,
+  "manifest_path": "/local/job40255479/control/isa-backlog-20261021/Malawi/218/final-private-manifest.json",
+  "manifest_entries": 815,
+  "manifest_sha256": "b60023a579e8850a1ba2d1d2a002ae2871d01be872c25f8708f8dc6198cb234f",
+  "safe_export_allowlist_sha256": "e655eb8a48817de10f886242fb479e4f51ce24e425f4faefc6adc7c49f80c57f",
+  "freeze_proof_sha256": "71e4160a8aef6c5fc2e0cd72b2ad80f3506a659d356e1c094ba9188464a18194",
+  "safe_exports": [
+    "ALLOWLIST.json",
+    "REPORT.org",
+    "REPRODUCE.sh",
+    "RESIDUALS.md",
+    "proof.json",
+    "scanner-occurrences.json",
+    "validation.json"
+  ],
+  "zero_remaining_consumers_excluding_this_sealer": true,
+  "no_public_writes_or_merge_or_closure": true
+}

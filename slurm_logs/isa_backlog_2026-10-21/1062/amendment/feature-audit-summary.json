@@ -1,0 +1,30 @@
+[
+  {
+    "feature": "earnings",
+    "check": "index_levels_match_scheme",
+    "status": "warn",
+    "severity": "C",
+    "count": 1
+  },
+  {
+    "feature": "earnings",
+    "check": "runtime_warning",
+    "status": "warn",
+    "severity": "C",
+    "count": 2
+  },
+  {
+    "feature": "enterprise_income",
+    "check": "index_levels_match_scheme",
+    "status": "warn",
+    "severity": "C",
+    "count": 1
+  },
+  {
+    "feature": "enterprise_income",
+    "check": "runtime_warning",
+    "status": "warn",
+    "severity": "C",
+    "count": 2
+  }
+]

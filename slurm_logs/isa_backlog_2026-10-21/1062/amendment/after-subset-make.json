@@ -1,0 +1,81 @@
+{
+  "earnings": {
+    "subset_shape": [
+      2805,
+      1
+    ],
+    "before_coverage": [
+      "2011-12"
+    ],
+    "before_bytes": "3865212a81ce7bc9787b8c5f74dd895d099528f125fd834ef3f082d0fc89be8c",
+    "valid_hash_before": true,
+    "after_coverage": [
+      "2005-06",
+      "2009-10",
+      "2010-11",
+      "2011-12",
+      "2013-14",
+      "2015-16",
+      "2018-19",
+      "2019-20"
+    ],
+    "hash_verified_after": true,
+    "raw_exact_to_original": true
+  },
+  "enterprise_income": {
+    "subset_shape": [
+      1577,
+      6
+    ],
+    "before_coverage": [
+      "2011-12"
+    ],
+    "before_bytes": "d164318a80c9c6abd5a7ab3dc3fad4c35c8b93c75df42196656e30918a055303",
+    "valid_hash_before": true,
+    "after_coverage": [
+      "2005-06",
+      "2009-10",
+      "2010-11",
+      "2011-12",
+      "2013-14",
+      "2015-16",
+      "2018-19",
+      "2019-20"
+    ],
+    "hash_verified_after": true,
+    "raw_exact_to_original": true
+  },
+  "income": {
+    "shape": [
+      14740,
+      1
+    ],
+    "expected_shape": [
+      14740,
+      1
+    ],
+    "waves": [
+      "2005-06",
+      "2009-10",
+      "2010-11",
+      "2011-12",
+      "2013-14",
+      "2015-16",
+      "2018-19",
+      "2019-20"
+    ],
+    "expected_waves": [
+      "2005-06",
+      "2009-10",
+      "2010-11",
+      "2011-12",
+      "2013-14",
+      "2015-16",
+      "2018-19",
+      "2019-20"
+    ],
+    "seconds": 52.258,
+    "served_exact_to_original": true,
+    "raw_exact_to_original": true
+  }
+}

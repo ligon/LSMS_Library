@@ -61,10 +61,11 @@ df = assemble_crop_production(WAVE, harvest, sale)
 # COLUMNS out of assemble_crop_production (the framework promotes them), so
 # the uniqueness that matters is on the full declared grain, not on the
 # 4-level index.  (t, i, plot, crop) is legitimately non-unique now: one
-# plot-crop can be reported shelled AND unshelled.
-_GRAIN = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
+# plot-crop can be reported shelled AND unshelled; production_obs keeps
+# distinct native crop codes apart (GH #637).
+_GRAIN = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs']
 assert not df.reset_index().duplicated(_GRAIN).any(), \
-    f"Non-unique (t,i,plot,crop,u,condition) in crop_production {WAVE}"
+    f"Non-unique (t,i,plot,crop,u,condition,production_obs) in crop_production {WAVE}"
 assert len(df) > 0, f"crop_production {WAVE} produced no rows"
 
 to_parquet(df, 'crop_production.parquet')

@@ -1,0 +1,28 @@
+OK import /local/job40390255/worktrees/894/lsms_library/__init__.py data_root /local/job40390255/data-private/894/branch
+Malawi sample (57118, 7) ['i', 't'] dup idx 0 secs 5
+Malawi household_roster (260612, 7) ['i', 't', 'v', 'pid'] dup idx 0 secs 10
+==== check_panel_consistency Malawi
+Sanity report: Malawi/[panel]
+  8 checks: 7 pass, 1 warn, 0 fail
+  [+] has_panel_ids: 5686 panel ID mappings
+  [+] has_updated_ids: 3 waves with ID mappings
+  [~] updated_ids_cover_waves: No ID mappings for follow-up waves: ['2004-05', '2010-11'] (baselines inferred: ['2013-14'])
+  [+] ids_self_consistent
+  [+] panel_ids_targets_exist: All 5686 chain endpoints present in cached household_roster.parquet [5 of 5 waves]
+  [+] attrition_monotonic: Attrition chains OK (cached household_roster.parquet [5 of 5 waves]): 2013-14->2016-17: 1908 HH (48%); 2016-17->2019-20: 2372 HH (16%)
+  [+] ids_applied_consistently: Spine IDs look canonical (cached household_roster.parquet [5 of 5 waves])
+  [+] id_walk_idempotent: id_walk is idempotent on cached household_roster.parquet [5 of 5 waves] (57118 rows)
+Nigeria sample (49770, 5) ['i', 't'] dup idx 0 secs 4
+Nigeria household_roster (287630, 7) ['i', 't', 'v', 'pid'] dup idx 0 secs 42
+==== check_panel_consistency Nigeria
+Sanity report: Nigeria/[panel]
+  8 checks: 5 pass, 2 warn, 1 fail
+  [+] has_panel_ids: 14251 panel ID mappings
+  [+] has_updated_ids: 4 waves with ID mappings
+  [~] updated_ids_cover_waves: No ID mappings for follow-up waves: ['2010Q3', '2011Q1', '2018Q3', '2019Q1', '2023Q3', '2024Q1'] (baselines inferred: ['2012Q3'])
+  [~] ids_self_consistent: 2012Q3: 4859 orphaned self-referential ID(s)
+  [!] panel_ids_targets_exist: 328/14251 current-wave targets MISSING (2%), 328/14251 previous-wave targets MISSING (2%), 0/14251 inconsistent (0%) vs spine from cached household_roster.parquet [10 of 10 waves]; sample: ['cur (2013Q1,10005)', 'cur (2013Q1,10007)', 'prev (2012Q3,10007)']
+  [+] attrition_monotonic: Attrition chains OK (cached household_roster.parquet [10 of 10 waves]): 2012Q3->2013Q1: 4716 HH (99%); 2013Q1->2015Q3: 4523 HH (98%); 2015Q3->2016Q1: 4580 HH (100%)
+  [+] ids_applied_consistently: Spine IDs look canonical (cached household_roster.parquet [10 of 10 waves])
+  [+] id_walk_idempotent: id_walk is idempotent on cached household_roster.parquet [10 of 10 waves] (48141 rows)
+DONE

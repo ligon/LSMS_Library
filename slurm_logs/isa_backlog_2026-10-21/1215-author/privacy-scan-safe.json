@@ -1,0 +1,16 @@
+{
+  "status": "ZERO_LITERAL_IDENTIFIER_MATCHES_REQUIRED_AT_FREEZE",
+  "export_files": [
+    "author-report-safe.md",
+    "safe-proof.json",
+    "source.diff",
+    "privacy-scan-safe.json"
+  ],
+  "full_warning_unique_identifiers": 49,
+  "current_exposed_lexemes": 4,
+  "historical_source_comment_literals": 4,
+  "unique_screened_literals": 54,
+  "exact_source_diff_not_rewritten": true,
+  "identifier_values_exported": 0,
+  "signed": "Sue"
+}

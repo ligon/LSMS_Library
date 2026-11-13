@@ -1,0 +1,24 @@
+{
+  "at_UTC": "2026-10-22T16:05:43.355055+00:00",
+  "source_physical_entries": 14880,
+  "old_frozen_entries": 687,
+  "no_package_import_payload_decode_or_API_test_cache_replay_by_root": true,
+  "root_read_actual_checkers_and_decoder_record_stage_binding": true,
+  "all22_or_campaign_acceptance": false,
+  "root_checker_sha256": "549552e53b46eeceb58eee8431e8b7caf8a1540f89600784c053d001d12a0cf0",
+  "signed": "Sue",
+  "cohort": {
+    "status": "ROOT_ACCEPTED_BOUNDED_ARCHIVE_BACKED_SAVED_EVIDENCE_WITH_ORIGINAL_GAPS",
+    "original_public_pairs": 12,
+    "strict_pass": 12,
+    "strict_failure": 0,
+    "original_rename_projection_and_saved_scalar_predicates_pass": true,
+    "READY_sha256": "a624eea2fed5d7923b21519517cf653260233864bd69367a0848ab20dc83c38c",
+    "manifest_sha256": "48dbdb007ea09ad28c09b9b7fef5b4c7bc7012f4e752dffbb57375f4975b09bc",
+    "manifest_entries": 76,
+    "authorized_products": 12,
+    "original_historical_nanosecond_mtime_inode_nlink_continuity_not_claimed": true,
+    "old_hold_packets_unchanged": true,
+    "original_API_raw_source_Make_helper_and_fixture_memories_not_recovered": true
+  }
+}

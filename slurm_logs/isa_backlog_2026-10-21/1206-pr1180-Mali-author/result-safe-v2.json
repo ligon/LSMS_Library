@@ -1,0 +1,12 @@
+{
+  "PR": 1180,
+  "scope": "author822_saved_results_only",
+  "status": "PASS_NEW_NUMERIC_SUPPLEMENT_WITH_UNUSED_DOMAIN_QUALIFICATIONS",
+  "complete_strict_cold_warm_pairs": 2,
+  "obs3_numeric_typed_attrs_used_tuples_qualified_pairs": 2,
+  "full_complete_axis_failures_retained": 2,
+  "unexplained_domain_differences": 0,
+  "numeric_mismatches_observed": 0,
+  "independent_review822_objects_or_authority_not_recovered": true,
+  "signed": "Sue"
+}

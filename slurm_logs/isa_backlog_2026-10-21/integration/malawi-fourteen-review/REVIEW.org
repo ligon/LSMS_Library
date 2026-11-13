@@ -1,0 +1,145 @@
+#+TITLE: Bounded global14 Malawi coexistence review
+#+DATE: 2026-10-21
+#+AUTHOR: Sue (GPT-6)
+
+* Verdict and immutable scope
+PASS for frozen clean global14 =653f77b1437886138f6b29078dcfb6108bf1e9c6= against actual global13 =5dde66645a444b025aa69682838cdf7c033a6e88=.
+No blocking coexistence finding was found.
+The independent standalone a935 and composed fd235 reviews, including their historical limitations, remain unchanged.
+This review makes no Git, tracked-file, ref or GitHub mutation; the public PRs remain unmerged.
+
+All eleven incremental blobs and modes equal reviewed fd235.
+The complete production increment is exactly the reviewed 2010-11 and 2019-20 plot_inputs driver blobs, also exact to standalone a935.
+The entire shared Malawi helper equals global13, fd235 and organic de9; every other global13 path is preserved.
+The merge's two actual parents are global13 and fd235.
+See =composition.json= for the exact path list and current country-document SHA256 receipts.
+
+* Country grounding and contradictions
+I started with the current full Malawi and Uganda CONTENTS files (3,096 and 3,626 lines), including TODO/WAITING/LOGBOOK material, then read both independent #1111 reviews/proofs, both task ledgers and the standing baseline.
+Malawi CONTENTS is byte-identical to the independently reviewed fd235 document; Uganda is byte-identical to actual global13.
+
+Malawi's 2010 builder reads Full_Sample only and excludes its redundant Panel input.
+The 2016 XS namespace needs =cs-17-=, and its Module D has an unrelated bad byte requiring the existing restricted reader (CONTENTS:1239-1248).
+2019 XS emits bare IDs and relies on the unchanged ID walk; modern garden/plot keys differ from older plot keys.
+Cross-sectional and tracking-panel universes are distinct, and the IHPS2019 catalog/report disagreement about Likoma is explicitly unresolved (CONTENTS:2431).
+The two live #116 food conversion/FCT TODOs remain outside scope; Malawi has no WAITING/LOGBOOK entries.
+
+The historical "Module D records no organic quantity" is explicitly contradicted by the source correction at Malawi CONTENTS:3025 and 3088.
+The seven held dictionaries carry ag_d37a/b; this reviewed union preserves their recovered answers, rather than restoring old fabricated zeros.
+The helper still says "SAME bag-size coding" for the purported applied-unit fields (malawi.py:2906); the instrument-covered drivers instead distinguish native quantity/unit, enumerator TOTAL KGs and timing.
+CONTENTS:3080-3086 records the contradiction, including IHS3 timing 11/12 as November/December, while retaining the helper for excluded waves.
+CONTENTS:3089 still describes "this f8-based branch", and ledger:42 says "Retain f8's organic behavior".
+Those historical standalone boundaries conflict with the current union if read as live instructions; the ledger's explicit root-owned delivery composition at line105 and the full organic comparisons establish the authorized present boundary without rewriting history.
+
+Uganda's agriculture tables cover the agriculturally active subset, not the full household sampling universe (CONTENTS:714-728).
+Its plot vocabulary differs between ag modules and plot_features despite the common plot_id name (CONTENTS:3590-3612).
+Its v boundaries include mixed synthetic 2009 bins, unharmonized comm renderings and later district/parish composites; their existing warnings are retained.
+The blanket sample Region claim "complete for every household" (CONTENTS:253) is qualified by three missing 2019-20 Regions at line270.
+The unqualified "one-third ... refreshed each wave" is contradicted by the DDI's "This same sample was used" for 2015-16 (CONTENTS:689-698).
+The live panel-weight LOGBOOK's "Appears to be panel-only" (line3394) remains unsettled by the evidence at lines700-712.
+The still-WAITING #829 sale-value qualification and other TODOs were not treated as resolved merely because another issue is closed.
+None of these country decisions is changed by this review.
+
+* Preparation and held-source authority
+Preparation reached terminal success before any source-reader/API/test probe.
+Both Country roots and two dedicated Feature roots began with no Malawi L2.
+All 28 held Malawi Stata inputs and both instrument PDFs were MD5-gated against current sidecars, then physically copied.
+The instrument identities remain IHS3 p.13 =d6e0d71486fd6ae4d7dda5b8e1854278= and IHS5/IHPS p.10 =86cc1f419c1320eb969d11a6d24a63e0=.
+The prior independent layout-text instrument verification is preserved; no new page-image or acquisition claim is made.
+The literal C4 gate for 2013/2016 remains unsatisfied.
+
+Initial Uganda seeds failed current-hash checks, and were never stamped or served as fresh.
+A metadata-only search found genuine current-hash/full-coverage plot_inputs and sample in the immutable api-eleven review; their physical copies were then fully checked against the reviewed healthy output.
+All 30 declared Uganda plot-input/sample raw prerequisites were independently located and MD5-gated into private L1 as well.
+No shared cache write, acquisition, DVC CLI, assumed-fresh serve, NO_CACHE override, manual stamp or read-gate bypass was used.
+The four roots contain 392 checked physical copies in total, with distinct inodes, link count1, no symlinks, and exact source/destination SHA256, size, mode and mtime receipts.
+
+Three preparation-harness stops remain private and preserved: the initial stale seeds, an assertion that overlooked an automatically created empty data directory, and an organic reference whose verdict is in REVIEW.md rather than verdict.json.
+All preceded terminal preparation success and all dependent probes.
+Resuming preparation verified existing physical copy receipts; it did not delete, replace or promote cache payloads.
+
+* Complete runtime and independent source comparisons
+Two full parent-based expectations pass: correct only the covered inorganic unit keys in actual global13 before unchanged additive grouping, and restore the complete de9 organic answers/Applied onto the original ordered standalone kg result.
+The candidate also equals the complete independently reviewed fd235 public/native result directly.
+Ordered frame values, null masks, dtypes, keys, axis metadata and full attrs are compared exactly; no product value, attrs, index, order or path is normalized away.
+
+| Frame | actual global13 | global14 |
+|-------+-----------------+----------|
+| Malawi Country | 180184 | 179949 |
+| Malawi 2010-11 native | 46627 | 46576 |
+| Malawi 2013-14 native | 16188 | 16188 |
+| Malawi 2016-17 native | 52494 | 52494 |
+| Malawi 2019-20 native | 64875 | 64691 |
+| Default Malawi/Uganda Feature | 264400 | 264165 |
+| Malawi sample | 57118 | 57118 |
+| Uganda plot_inputs | 84216 | 84216 |
+| Uganda sample | 24362 | 24362 |
+
+All five native-wave/raw-country Malawi plot_inputs frames pass complete ordered comparisons.
+All old 2013/2016 and nonfertilizer payloads and attrs are exact.
+All 11,075 organic records retain full native/public identity, quantity, unit, other values, order, dtype, full attrs and Applied=True; nonorganic Applied remains NA.
+There are 11,068 positive organic quantities and seven missing amounts, with units 5,518 Kilogramme / 2,155 Ox-Cart / 1,451 Bucket / 1,204 Other (Specify) / 733 Wheelbarrow / 8 Unknown / 5 Organic unit code1 / 1 Organic unit code3.
+The qualified units remain distinct from unrelated food-unit aliases, and no organic nutrient share or weight inference is introduced.
+
+The reused independent source oracle rereads the held numeric sources and metadata without calling the production fertilizer decoder or assembler; only established ID closure is reused.
+It reconstructs 33,193 slots and 1,765,763.95 kg for the two instrument-covered waves.
+All 51+184 newly coalesced pairs are the same source's slots1/2, affirmative use and positive observed amounts.
+Every source-group sum and pair contribution is exact, including the pair-member sums 4,670 and 17,322 kg.
+The existing source-No/missing-use, zero/missing-amount retention boundary is preserved.
+
+The full inorganic numeric Quantity sum is conserved at 2,899,339.95.
+That includes excluded-wave values and is not a new physically validated kg total for 2013/2016.
+Nitrogen's complete frame and full attrs equal reviewed fd235 and standalone a935 at 1,028,195.63206, versus 840,235.7795800001 in actual global13.
+This is a diagnostic under unchanged factors/shares; no new scientific composition choice is made.
+
+* Cold Feature provenance, cache freshness and warm proof
+The immutable organic warm-pooled reference used explicit currency=None.
+It is compared only to a new explicit currency=None call; all default Feature comparisons use fresh controls with exactly the default argument set.
+The ordinary Country-process Feature returns are saved before any expectation check.
+Separate empty-target roots also call the normal default Feature as their first target entry, save each returned cold public frame immediately, and compare the complete frame/attrs to the matched current control/candidate expectations.
+Both dedicated cold Feature captures pass at 264,400 and 264,165 rows.
+The original fd235 first-cold Feature serialization limit remains historical fact; it is not retroactively filled in by these new captures.
+
+Independent fresh processes repeat Country, sample, nitrogen and Feature outputs, including new Country/Feature objects, with exact complete results.
+The normal country caches carry their genuine current hashes and complete declared-wave coverage for both plot_inputs and sample.
+Native script cache hashes remain governed by their existing policy; no manual stamp is used.
+All 90 data-root files in each of four roots retain exact bytes, modes and mtimes on warm reads, and remain exact after tests, source oracle and scanner.
+All 17 Uganda cache parquet files are byte-identical across all four roots; its complete public plot_inputs and sample frames/attrs are exact.
+This is a verified healthy warm Uganda comparator, not a claim of a cold Uganda reconstruction.
+
+* Tests and scanner accounting
+The meaningful cohort passes 129 tests, zero skips/errors/failures:12 actual-driver,28 organic and89 existing supporting cases.
+Existing warm helper cases are excluded by -k not warm; normal independent warm proofs above supply that coverage.
+Tests use two loadfile workers, mounted image Python, exact checkout/import/config identity and one numerical/build/Make thread.
+
+Actual global13/global14 scanner phases1,2 each return15 warnings and no failures/errors/skips.
+All15 complete ordered findings are individually reconciled, without filtering or normalization.
+Eleven full records are exact; four have only the expected counts: native null-crop67,888->67,653 and null-unit17,649->6,067 (also in assembly), Improved scope rows180,184->179,949, and null-crop rate37.7%->37.6%.
+Constant fields, Uganda null keys/clusters/index, canonical alignment metadata and population-universe findings are full-record exact.
+The current global13 records also equal the preserved earlier composition control's full records.
+Safe per-record hashes and changes are in =scanner-comparison.json=.
+The actual scanner has no plot_inputs phase2 kwargs grid; no nonexistent variants are claimed.
+
+* Frozen proof, isolation and release
+All execution used exact frozen cwd/PYTHONPATH/countries/data identities, the mounted image, private writable caches/config/site/temp directories, active socket guards and unshare -rn.
+No network attempt or unauthorized mutation occurred.
+The sole checkout-path metadata allowance is root's exact ignored baseline DVC tmp symlink resolving into this review's private baseline-dvc-tmp; the private DVC site cache is separate.
+Eight existing candidate exclusive-create attempts raised FileExistsError without writing, and the candidate ignored tmp receipt is exact.
+
+Full tracked content/mode/symlink/HEAD/clean snapshots are unchanged for global14 (15,006 files), global13 (14,998), fd235 (14,918), de9 (14,910) and a935 (14,888).
+All reference receipts are exact:413 standalone-review files,255 composed-review files,133 organic-review files and169 immutable global13-review files.
+All 392 physical source/reference/cache copy receipts remain exact.
+The metadata preparation receipt and baseline tmp link are unchanged; no in-tree parquet exists in the frozen trees.
+All review subprocesses have completed and no review data consumer remains active.
+All same-UID command lines were checked; ten unrelated process environments were inaccessible and their command lines contain no review path.
+The roots are released quiescent; global14 remains frozen at 653f77b.
+
+* Limits and residual
+This bounded review does not repeat the full suite, broad549/39 census, prior standalone fault controls, or other countries/features' scientific source studies.
+The exact reviewed runtime union and fresh scoped hashes/coverage are verified here.
+No new 2013/2016 instrument was acquired, and the existing C4 authority boundary remains open.
+#1118 missing-unit handling, qualified unlisted seed identities, #1190 purchase/planted units, #1106 composition, #1174 retention, and free-text/container interpretations remain separate.
+The original first-cold fd235 Feature capture limit and historical failed/rejected receipts remain intact.
+Only safe aggregate REVIEW/verdict/proof/commands are exported; full source identities, frames, warnings and logs remain private.
+
+Sue

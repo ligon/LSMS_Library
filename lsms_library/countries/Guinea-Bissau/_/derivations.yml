@@ -92,3 +92,91 @@ Guinea-Bissau::food_acquired::7day-purchase-at-last-purchase-unit-value:
     13.1% / 0.0%, Don 99.7% of 1,255.)
   contents: 'Guinea-Bissau/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
+
+Guinea-Bissau::community_prices::one-item-per-price:
+  waves: ['2018-19']
+  columns: [Quantity]
+  rule: >-
+    Quantity = 1 on every served community_prices row, in the row's own
+    unit-size `u`.  s05_co_gnb2018.dta records, per (grappe, product s05q01,
+    unit-size s05q02), two prices -- s05q03 -> obs 1 and s05q04 -> obs 2 -- and
+    NO quantity.  The form prices one item of the selected unit-size, so the
+    quantity a price was recorded for is one `u` by construction of the form,
+    not by any answer.  Price is served as recorded; nothing is divided,
+    rescaled or converted, and no size is collapsed.
+  function: lsms_library.countries.Guinea-Bissau.2018-19._.mapping:derive_s05_one_item_per_price
+  inputs: lsms_library.countries.Guinea-Bissau.2018-19._.mapping:inputs_community_prices
+  raw_variables: [grappe, vague, Existe, s05q01, s05q02, s05q03, s05q04]
+  assumptions:
+    - text: >-
+        each recorded price is the price of ONE item of the selected unit-size.
+        Guinea-Bissau's CAPI price form ("QUESTIONÁRIO COMUNITÁRIO- PARTE DO
+        PREÇO", cover REPÚBLICA DA GUINÉ-BISSAU / INSTITUTO NACIONAL DE
+        ESTATÍSTICA) has, per product present in the market, a multiple choice
+        of at most six unit-sizes (5.02) and, per selected unit-size,
+        "5.03. Levantamento 1 Preços (CFAC)" and "5.04. Levantamento 2 Preços
+        (CFAC)", both NUMERIC: INTEGER, validated as multiples of 5 and above 0.
+        There is no quantity question.  No questionnaire is held for this
+        country; only the DDI report is.
+      basis: questionnaire
+      evidence: >-
+        UEMOA regional catalogue entry 46,
+        https://phmecv.uemoa.int/nada/index.php/catalog/46/download/161 and
+        /download/162 (GNB-EHCVM1-QNR-PRIX-CAPI-VAGUE1 / VAGUE2; not held).
+    - text: >-
+        the distributed prices are served as recorded, including the 68 s05q03
+        and 83 s05q04 values that are not integers.  The instrument accepted
+        only integers that are multiples of 5, so those values were produced
+        after collection, by a mechanism no held document describes; they are
+        taken to be per one item like the rest and are neither reversed nor
+        flagged.
+      basis: modelling-choice
+      evidence: Guinea-Bissau/_/CONTENTS.org, "2018-19 community prices are wired (GH #1226)"
+  validated_against: >-
+    the instrument only.  No held file records the quantity behind a price, so
+    the one-item reading cannot be checked against data.
+  contents: 'Guinea-Bissau/_/CONTENTS.org, "2018-19 community prices are wired (GH #1226)"'
+  since: '2026-11-04'
+
+Guinea-Bissau::sample::region-milieu-stratum:
+  waves: ['2018-19']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<s00q01 label> <s00q04 label>', the cover page's own region
+    and residence milieu, stripped and separated by one space. Labels, never
+    numeric codes; NA where either component is missing or blank. The region
+    part is spelled through this country's strata aliases at read time,
+    preserving the native Portuguese Urbano/Rural suffix.
+  function: lsms_library.ehcvm:derive_region_milieu_stratum
+  inputs: lsms_library.countries.Guinea-Bissau.2018-19._.mapping:inputs_strata
+  raw_variables: [s00q01, s00q04]
+  assumptions:
+    - text: >-
+        the original 2018/19 design defines a stratum as region combined with
+        residence milieu. The later survey revisits the original clusters;
+        this entry wires only the existing 2018-19 sample.
+      basis: questionnaire
+      evidence: >-
+        Own INE Basic Information Document (survey design documentation, not a
+        questionnaire question), 2021-22/Documentation/gnb_ehcvm2_information_de_base.pdf,
+        section 4.1, PDF p.16 (English edition p.13): "La strate est la
+        combinaison région/milieu de résidence." Catalog 6274/download/100359;
+        retrospective description of the original 2018/19 design.
+    - text: >-
+        SAB is documented as urban-only. The later allocation table is labeled
+        2021/22 while surrounding prose describes the original design; its
+        nonzero-cell arithmetic is not a formally quoted stratum count and
+        imposes no observed-count requirement or row exclusion.
+      basis: questionnaire
+      evidence: >-
+        Own 2018 DDI p.4 / basicinformationdocument_gnb.pdf p.10, and own
+        second-edition BID Table 1a; Guinea-Bissau/_/CONTENTS.org, "documented
+        planned region/milieu strata (GH #1575)". No allocation is inferred
+        from sampling weights.
+  validated_against: >-
+    Documentary definition and static wiring only. Actual-row validation,
+    missingness, cluster consistency, non-strata conservation, normal cold/warm
+    sample and Feature acceptance are UNRUN in this source/pure worker.
+  contents: 'Guinea-Bissau/_/CONTENTS.org, "Selected 2018-19 region/milieu strata (GH #1575)"'
+  since: '2026-11-10'

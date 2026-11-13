@@ -1,0 +1,23 @@
+{
+  "status": "ARCHIVE29_DURABLE_VERIFIED",
+  "archive_sha256": "06f48a8e4f0ca5365c55aa4a60dec68e581730a6dfca8e6532c39d1c1e8f3f12",
+  "archive_bytes": 163291151,
+  "manifest_sha256": "1e951c78cf1611035ea429e97995d86e5b759fe607c2d1ad8e790fdf27fae5b3",
+  "plan_sha256": "e0c8799dac9e639f414ad7b6188211c54f11ed8c36de8fd5c100b11748a20a56",
+  "files_verified": 416,
+  "included_source_bytes": 905657034,
+  "uncompressed_tar_bytes": 906414080,
+  "native_operand_exceptions": 20,
+  "source_after_exact": true,
+  "verifier_terminal_exit": 0,
+  "active_consumers": [],
+  "destination_existing_SGID_preserved": true,
+  "destination_access0700_files_owner0600": true,
+  "no_product_import_decode_API_test_or_old_controller_replay": true,
+  "signed": "Sue",
+  "root_verified_at_UTC": "2026-10-22T17:58:34.718927+00:00",
+  "root_verified_archive_compressed_SHA": true,
+  "root_verified_exact_plan_approval_manifest_controllers_and_terminal_records": true,
+  "member_and_source_verification_authority": "Observed new archive29 writer38595 terminal0 and its exact-member/source-after verifier terminal0; root checked opaque compressed bytes and metadata without replay.",
+  "root_checker_sha256": "575d78e20fd08221a67c18f1b57d5ee06763544ffc50db6653d4bf51c65e072c"
+}

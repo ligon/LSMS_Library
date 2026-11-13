@@ -1,0 +1,349 @@
+{
+ "crop_production_dev_vs_new": {
+  "rows": {
+   "base": {
+    "2019-20": 3001,
+    "2020-21": 11125
+   },
+   "new": {
+    "2019-20": 3393,
+    "2020-21": 12676
+   }
+  },
+  "rows_added": {
+   "2019-20": 392,
+   "2020-21": 1551
+  },
+  "singleton_keys": 12908,
+  "singleton_keys_cells_differing": {
+   "Quantity": 19,
+   "u": 2184,
+   "Quantity_sold": 1,
+   "Value_sold": 1,
+   "harvest_month": 0,
+   "intercropped": 0,
+   "perennial": 0
+  },
+  "split_keys": {
+   "2019-20": 260,
+   "2020-21": 958
+  },
+  "split_keys_quantity_conserved": true,
+  "split_keys_Quantity_sold_gained": {
+   "2019-20": 1813.0,
+   "2020-21": 10062.0
+  },
+  "split_keys_Quantity_sold_keys_gaining": {
+   "2019-20": 14,
+   "2020-21": 52
+  },
+  "split_keys_Quantity_sold_keys_losing": 0,
+  "split_keys_Value_sold_gained": {
+   "2019-20": 2136000.0,
+   "2020-21": 10762200.0
+  },
+  "split_keys_Value_sold_keys_gaining": {
+   "2019-20": 14,
+   "2020-21": 52
+  },
+  "split_keys_Value_sold_keys_losing": 0,
+  "split_keys_with_two_or_more_sales": {
+   "2019-20": 14,
+   "2020-21": 52
+  },
+  "split_keys_harvest_month_rows_now_disagree": {
+   "2019-20": 111,
+   "2020-21": 396
+  },
+  "split_keys_intercropped_rows_now_disagree": {
+   "2019-20": 22,
+   "2020-21": 79
+  },
+  "totals": {
+   "Quantity": {
+    "base": {
+     "2019-20": 1917599.5,
+     "2020-21": 24679822.2
+    },
+    "new": {
+     "2019-20": 1917599.5,
+     "2020-21": 24679822.2
+    }
+   },
+   "Quantity_sold": {
+    "base": {
+     "2019-20": 1412831.0,
+     "2020-21": 11875732.0
+    },
+    "new": {
+     "2019-20": 1414644.0,
+     "2020-21": 11885924.0
+    }
+   },
+   "Value_sold": {
+    "base": {
+     "2019-20": 189955250.0,
+     "2020-21": 856481400.0
+    },
+    "new": {
+     "2019-20": 192091250.0,
+     "2020-21": 867363600.0
+    }
+   }
+  },
+  "new_index_unique": true,
+  "production_obs_modules": {
+   "4A": 6985,
+   "6A": 5876,
+   "6B": 3208
+  },
+  "downstream": {
+   "harvest_kg": "frame-equal",
+   "yield_kg": "frame-equal",
+   "seed_kg": {
+    "DIFFERS": {
+     "rows": [
+      4379,
+      4379
+     ],
+     "sum_by_t": {
+      "2019-20": [
+       25475.510000000002,
+       25425.510000000002
+      ],
+      "2020-21": [
+       501520.37,
+       500941.37
+      ]
+     }
+    }
+   },
+   "nitrogen_kg": "frame-equal",
+   "gross_crop_revenue": {
+    "rows": [
+     1868,
+     1869
+    ],
+    "total": {
+     "2019-20": [
+      189955250.0,
+      192091250.0
+     ],
+     "2020-21": [
+      856481400.0,
+      867363600.0
+     ]
+    },
+    "households_changed": 66,
+    "households_new": 1,
+    "households_lower": 0
+   },
+   "gross_crop_revenue_by_j": {
+    "rows": [
+     2874,
+     2875
+    ],
+    "total": {
+     "2019-20": [
+      189955250.0,
+      192091250.0
+     ],
+     "2020-21": [
+      856481400.0,
+      867363600.0
+     ]
+    },
+    "households_changed": 67,
+    "households_new": 1,
+    "households_lower": 0
+   }
+  }
+ },
+ "plot_inputs_dev_vs_new": {
+  "rows": [
+   9698,
+   9709
+  ]
+ },
+ "crop_production_old_vs_new": {
+  "rows": {
+   "base": {
+    "2019-20": 3001,
+    "2020-21": 11125
+   },
+   "new": {
+    "2019-20": 3393,
+    "2020-21": 12676
+   }
+  },
+  "rows_added": {
+   "2019-20": 392,
+   "2020-21": 1551
+  },
+  "singleton_keys": 12908,
+  "singleton_keys_cells_differing": {
+   "Quantity": 0,
+   "u": 0,
+   "Quantity_sold": 1,
+   "Value_sold": 1,
+   "harvest_month": 0,
+   "intercropped": 0,
+   "perennial": 0
+  },
+  "split_keys": {
+   "2019-20": 260,
+   "2020-21": 958
+  },
+  "split_keys_quantity_conserved": true,
+  "split_keys_Quantity_sold_gained": {
+   "2019-20": 1813.0,
+   "2020-21": 10062.0
+  },
+  "split_keys_Quantity_sold_keys_gaining": {
+   "2019-20": 14,
+   "2020-21": 52
+  },
+  "split_keys_Quantity_sold_keys_losing": 0,
+  "split_keys_Value_sold_gained": {
+   "2019-20": 2136000.0,
+   "2020-21": 10762200.0
+  },
+  "split_keys_Value_sold_keys_gaining": {
+   "2019-20": 14,
+   "2020-21": 52
+  },
+  "split_keys_Value_sold_keys_losing": 0,
+  "split_keys_with_two_or_more_sales": {
+   "2019-20": 14,
+   "2020-21": 52
+  },
+  "split_keys_harvest_month_rows_now_disagree": {
+   "2019-20": 111,
+   "2020-21": 396
+  },
+  "split_keys_intercropped_rows_now_disagree": {
+   "2019-20": 22,
+   "2020-21": 79
+  },
+  "totals": {
+   "Quantity": {
+    "base": {
+     "2019-20": 1917599.5,
+     "2020-21": 24679822.2
+    },
+    "new": {
+     "2019-20": 1917599.5,
+     "2020-21": 24679822.2
+    }
+   },
+   "Quantity_sold": {
+    "base": {
+     "2019-20": 1412831.0,
+     "2020-21": 11875732.0
+    },
+    "new": {
+     "2019-20": 1414644.0,
+     "2020-21": 11885924.0
+    }
+   },
+   "Value_sold": {
+    "base": {
+     "2019-20": 189955250.0,
+     "2020-21": 856481400.0
+    },
+    "new": {
+     "2019-20": 192091250.0,
+     "2020-21": 867363600.0
+    }
+   }
+  },
+  "new_index_unique": true,
+  "production_obs_modules": {
+   "4A": 6985,
+   "6A": 5876,
+   "6B": 3208
+  },
+  "downstream": {
+   "harvest_kg": "frame-equal",
+   "yield_kg": "frame-equal",
+   "seed_kg": "frame-equal",
+   "nitrogen_kg": "frame-equal",
+   "gross_crop_revenue": {
+    "rows": [
+     1868,
+     1869
+    ],
+    "total": {
+     "2019-20": [
+      189955250.0,
+      192091250.0
+     ],
+     "2020-21": [
+      856481400.0,
+      867363600.0
+     ]
+    },
+    "households_changed": 66,
+    "households_new": 1,
+    "households_lower": 0
+   },
+   "gross_crop_revenue_by_j": {
+    "rows": [
+     2874,
+     2875
+    ],
+    "total": {
+     "2019-20": [
+      189955250.0,
+      192091250.0
+     ],
+     "2020-21": [
+      856481400.0,
+      867363600.0
+     ]
+    },
+    "households_changed": 67,
+    "households_new": 1,
+    "households_lower": 0
+   }
+  }
+ },
+ "plot_inputs_old_vs_new": {
+  "rows": [
+   9709,
+   9709
+  ],
+  "index_equal": true,
+  "columns_added": [
+   "Unit_purchased"
+  ],
+  "other_columns": "frame-equal"
+ },
+ "unit_purchased": {
+  "dtype": "string",
+  "coverage_by_input": {
+   "CAN|<NA>": 190,
+   "DAP|<NA>": 228,
+   "Herbicide|<NA>": 319,
+   "NPK|<NA>": 43,
+   "Organic Fertilizer|<NA>": 617,
+   "Organic Fertilizer|Kg": 110,
+   "Other Fertilizer|<NA>": 32,
+   "Pesticide|<NA>": 724,
+   "SA|<NA>": 94,
+   "Seed|20l Bucket": 98,
+   "Seed|<NA>": 4267,
+   "Seed|Kg": 2349,
+   "Seed|Large Cup": 29,
+   "Seed|Small Cup": 30,
+   "Seed|Unknown": 106,
+   "TSP|<NA>": 2,
+   "Urea|<NA>": 471
+  },
+  "quantity_purchased_without_unit": {},
+  "served_rows_unit_purchased_ne_u": {
+   "2019-20": 1,
+   "2020-21": 11
+  }
+ }
+}

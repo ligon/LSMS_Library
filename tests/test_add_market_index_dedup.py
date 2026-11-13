@@ -66,16 +66,18 @@ class TestAddMarketIndexDedup:
         )
 
     def test_row_count_not_inflated(self, uga_shocks_bare, uga_shocks_market):
-        """Adding the market index can only drop rows (NaN m), never
-        multiply them.  Pre-fix Uganda: 27,268 vs 14,457 -> 88% inflation."""
+        """Adding the market index neither multiplies rows nor drops them.
+        Pre-fix #266 Uganda: 27,268 vs 14,457 -> 88% inflation.  This used to
+        be ``<=`` because ``_add_market_index`` silently deleted rows with no
+        market label; it now keeps them with ``m`` NA and warns, so the row
+        count is exactly preserved."""
         n_bare = len(uga_shocks_bare)
         n_market = len(uga_shocks_market)
-        assert n_market <= n_bare, (
-            f"shocks(market='Region') = {n_market} rows exceeds "
-            f"shocks() = {n_bare}.  _add_market_index should never "
-            f"multiply rows -- it may only drop NaN-m rows.  "
-            f"GH #266: pre-fix inflation factor ~1.88x via Cartesian "
-            f"product on tall input."
+        assert n_market == n_bare, (
+            f"shocks(market='Region') = {n_market} rows vs "
+            f"shocks() = {n_bare}.  _add_market_index must neither "
+            f"multiply rows (GH #266: ~1.88x via Cartesian product on tall "
+            f"input) nor drop them (an unlabelled row is kept with m NA)."
         )
 
     def test_shock_distribution_preserved(self, uga_shocks_bare, uga_shocks_market):
@@ -101,17 +103,13 @@ class TestAddMarketIndexDedup:
             .sort_index()
             .to_dict()
         )
-        # market_dist may have fewer (i, t) HH-periods than bare (if
-        # _add_market_index drops some for NaN m), but for any *k*
-        # value that appears in market_dist, the count must be <= the
-        # bare count for the same *k* -- never higher.  Pre-fix the
-        # market counts were precisely the squares (k=2: 1999 -> 3998,
-        # k=3: 525 -> 1575, etc.).
-        for k, market_n in market_dist.items():
-            bare_n = bare_dist.get(k, 0)
-            assert market_n <= bare_n, (
-                f"shocks(market='Region') has {market_n} HH-periods with "
-                f"k={k} shocks, vs {bare_n} in shocks().  Pre-fix #266 "
-                f"inflated each k to k^2; the market version must be a "
-                f"subset of the bare version."
-            )
+        # The distributions must be IDENTICAL.  This used to allow a subset
+        # (market_n <= bare_n) because _add_market_index silently dropped
+        # rows with no market label; those rows are now kept with m NA.
+        # Pre-fix #266 the market counts were precisely the squares
+        # (k=2: 1999 -> 3998, k=3: 525 -> 1575, etc.).
+        assert market_dist == bare_dist, (
+            f"shocks(market='Region') (k -> HH-periods) {market_dist} != "
+            f"shocks() {bare_dist}.  Pre-fix #266 inflated each k to k^2; "
+            f"since the market-label fix no HH-period may be dropped either."
+        )

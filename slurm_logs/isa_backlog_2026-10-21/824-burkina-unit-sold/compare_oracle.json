@@ -1,0 +1,252 @@
+{
+ "rows": {
+  "development": 15587,
+  "branch": 15587
+ },
+ "index_names_equal": true,
+ "index_equal": true,
+ "new_columns": [
+  "Unit_sold"
+ ],
+ "dropped_columns": [],
+ "pre_existing_columns_identical": true,
+ "coverage": {
+  "Unit_sold_dtype": "string",
+  "Unit_sold_non_null": 5356,
+  "priced": 5347,
+  "priced_with_Unit_sold": 5347,
+  "priced_without_Unit_sold": 0,
+  "Unit_sold_on_unpriced_rows": 9,
+  "Unit_sold_on_rows_with_Quantity_sold_gt0": 5356,
+  "priced_knowing_both": 5347,
+  "priced_agree": 4801,
+  "priced_differ": 546,
+  "Unit_sold_labels": {
+   "<NA>": 10231,
+   "Sac gros": 2631,
+   "Kg": 885,
+   "Plat yorouba": 783,
+   "Sac moyen": 498,
+   "Tine": 284,
+   "Autres (à préciser)": 267,
+   "Unité": 8
+  },
+  "u_is_unit_sentinel_on_priced": 0
+ },
+ "disagreeing_priced_cells_u_to_Unit_sold": [
+  {
+   "u": "Sac gros",
+   "Unit_sold": "Plat yorouba",
+   "n": 126
+  },
+  {
+   "u": "Sac gros",
+   "Unit_sold": "Tine",
+   "n": 68
+  },
+  {
+   "u": "Sac gros",
+   "Unit_sold": "Sac moyen",
+   "n": 62
+  },
+  {
+   "u": "Sac moyen",
+   "Unit_sold": "Plat yorouba",
+   "n": 44
+  },
+  {
+   "u": "Autres (à préciser)",
+   "Unit_sold": "Sac gros",
+   "n": 43
+  },
+  {
+   "u": "Sac moyen",
+   "Unit_sold": "Sac gros",
+   "n": 39
+  },
+  {
+   "u": "Sac moyen",
+   "Unit_sold": "Tine",
+   "n": 21
+  },
+  {
+   "u": "Kg",
+   "Unit_sold": "Plat yorouba",
+   "n": 17
+  },
+  {
+   "u": "Sac gros",
+   "Unit_sold": "Kg",
+   "n": 16
+  },
+  {
+   "u": "Autres (à préciser)",
+   "Unit_sold": "Plat yorouba",
+   "n": 15
+  },
+  {
+   "u": "Sac gros",
+   "Unit_sold": "Autres (à préciser)",
+   "n": 13
+  },
+  {
+   "u": "Autres (à préciser)",
+   "Unit_sold": "Tine",
+   "n": 9
+  },
+  {
+   "u": "Tine",
+   "Unit_sold": "Plat yorouba",
+   "n": 8
+  },
+  {
+   "u": "Autres (à préciser)",
+   "Unit_sold": "Sac moyen",
+   "n": 7
+  },
+  {
+   "u": "Kg",
+   "Unit_sold": "Sac gros",
+   "n": 7
+  },
+  {
+   "u": "Tine",
+   "Unit_sold": "Sac gros",
+   "n": 6
+  },
+  {
+   "u": "Sac moyen",
+   "Unit_sold": "Kg",
+   "n": 6
+  },
+  {
+   "u": "Sac moyen",
+   "Unit_sold": "Autres (à préciser)",
+   "n": 5
+  },
+  {
+   "u": "Tine",
+   "Unit_sold": "Autres (à préciser)",
+   "n": 5
+  },
+  {
+   "u": "Autres (à préciser)",
+   "Unit_sold": "Kg",
+   "n": 3
+  },
+  {
+   "u": "Unité",
+   "Unit_sold": "Sac gros",
+   "n": 3
+  },
+  {
+   "u": "Plat yorouba",
+   "Unit_sold": "Kg",
+   "n": 3
+  },
+  {
+   "u": "Kg",
+   "Unit_sold": "Unité",
+   "n": 3
+  },
+  {
+   "u": "Plat yorouba",
+   "Unit_sold": "Sac gros",
+   "n": 3
+  },
+  {
+   "u": "Unité",
+   "Unit_sold": "Kg",
+   "n": 3
+  },
+  {
+   "u": "Kg",
+   "Unit_sold": "Tine",
+   "n": 2
+  },
+  {
+   "u": "Plat yorouba",
+   "Unit_sold": "Tine",
+   "n": 2
+  },
+  {
+   "u": "Plat yorouba",
+   "Unit_sold": "Sac moyen",
+   "n": 2
+  },
+  {
+   "u": "Tine",
+   "Unit_sold": "Sac moyen",
+   "n": 2
+  },
+  {
+   "u": "Kg",
+   "Unit_sold": "Autres (à préciser)",
+   "n": 1
+  },
+  {
+   "u": "Autres (à préciser)",
+   "Unit_sold": "Unité",
+   "n": 1
+  },
+  {
+   "u": "Sac moyen",
+   "Unit_sold": "Unité",
+   "n": 1
+  }
+ ],
+ "oracle": {
+  "raw_rows": 15593,
+  "raw_s16cq16b_non_null": 5356,
+  "raw_s16cq16b_labels": [
+   "Autres (à préciser)",
+   "Kg",
+   "Plat yorouba",
+   "Sac gros",
+   "Sac moyen",
+   "Tine",
+   "Unité"
+  ],
+  "raw_s16cq12b_labels": [
+   "Autres (à préciser)",
+   "Kg",
+   "Plat yorouba",
+   "Sac gros",
+   "Sac moyen",
+   "Tine",
+   "Unité"
+  ],
+  "wave_rows": 15593,
+  "raw_key_unique": true,
+  "joined_both": 15593,
+  "raw_only": 0,
+  "wave_only": 0,
+  "Unit_sold_mismatch_rows": 0,
+  "Unit_sold_match_rows": 15593,
+  "served_minus_wave_Unit_sold_counts": {
+   "<NA>": -6,
+   "Autres (à préciser)": 0,
+   "Kg": 0,
+   "Plat yorouba": 0,
+   "Sac gros": 0,
+   "Sac moyen": 0,
+   "Tine": 0,
+   "Unité": 0
+  },
+  "raw_priced": 5347,
+  "raw_priced_agree_unmapped": 4801,
+  "raw_priced_differ_unmapped": 546
+ },
+ "price_test_served": {
+  "min_n=5": {
+   "disagreeing": 546,
+   "benchmarkable": 451,
+   "Unit_sold_closer": 361
+  },
+  "min_n=10": {
+   "disagreeing": 546,
+   "benchmarkable": 414,
+   "Unit_sold_closer": 334
+  }
+ }
+}

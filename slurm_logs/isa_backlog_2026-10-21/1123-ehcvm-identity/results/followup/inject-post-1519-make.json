@@ -1,0 +1,12 @@
+{
+ "backend": "make",
+ "countries_root_is_scratch": true,
+ "error": "RuntimeError: Could not materialize Niger/plot_inputs: no wave-level build succeeded and no cached parquet was found at /local/job40390255/data-private/1123/scratch/roots/post-1519/data/Niger/var/plot_inputs.parquet.\n\nCommon causes:\n  - installed via `pi",
+ "warning_categories": {
+  "UserWarning": 4
+ },
+ "warning_heads": [
+  "Makefile execution failed for Niger/_ plot_inputs: Command '['make', '-s', '-j6', '/local/job40390255/data-pri",
+  "Python fallback failed for /local/job40390255/data-private/1123/scratch/roots/post-1519/countries/Niger/_/plot"
+ ]
+}

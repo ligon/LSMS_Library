@@ -28,7 +28,7 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
-from mali import i as mali_i
+from mali import eaci14_i as mali_i
 
 WAVE = '2014-15'
 

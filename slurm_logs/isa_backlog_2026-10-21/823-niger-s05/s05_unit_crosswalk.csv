@@ -1,0 +1,75 @@
+code,label,rows,unit_code,size_code,hh_unit_label,hh_size_label,unit_label_matches_hh,unit_label_matches_hh_unaccented,hh_unit_via_code,hh_unit_via_code_in_household_served_u,size_suffix_matches_code,hh_pair_rows,class,u_table_hit,u_if_wired,u_if_wired_in_household_served_u
+1000,Kg,2538,100,0,Kg,Taille unique,True,True,Kg,True,True,7638,bare,True,Kg,True
+1010,Litre,733,101,0,Litre,Taille unique,True,True,Litre,True,True,3636,bare,True,Litre,True
+1030,Avec os au Kg,198,103,0,Avec os au Kg,Taille unique,True,True,Avec os au Kg,True,True,152,bare,True,Avec os au Kg,True
+1041,"Avec os au tas, petit",310,104,1,Avec os au tas,Petit,True,True,Avec os au tas,True,True,353,size-qualified,False,"Avec os au tas, petit",False
+1042,"Avec os au tas, moyen",248,104,2,Avec os au tas,Moyen,True,True,Avec os au tas,True,True,512,size-qualified,False,"Avec os au tas, moyen",False
+1043,"Avec os au tas, grand",89,104,3,Avec os au tas,Grand,True,True,Avec os au tas,True,True,99,size-qualified,False,"Avec os au tas, grand",False
+1061,"Bidon, petit",151,106,1,Bidon,Petit,True,True,Bidon,True,True,21,size-qualified,False,"Bidon, petit",False
+1062,"Bidon, moyen",218,106,2,Bidon,Moyen,True,True,Bidon,True,True,40,size-qualified,False,"Bidon, moyen",False
+1063,"Bidon, grand",284,106,3,Bidon,Grand,True,True,Bidon,True,True,1,size-qualified,False,"Bidon, grand",False
+1071,"Boite, petit",664,107,1,BoÃ®te,Petit,False,True,Boîte,True,True,802,size-qualified,False,"Boite, petit",False
+1072,"Boite, moyen",585,107,2,BoÃ®te,Moyen,False,True,Boîte,True,True,461,size-qualified,False,"Boite, moyen",False
+1073,"Boite, grand",585,107,3,BoÃ®te,Grand,False,True,Boîte,True,True,69,size-qualified,False,"Boite, grand",False
+1080,Boite de tomate,15,108,0,BoÃ®te de tomate,Taille unique,False,True,Boîte de tomate,True,True,0,bare,False,Boite de tomate,False
+1081,"Boite de tomate, petit",61,108,1,BoÃ®te de tomate,Petit,False,True,Boîte de tomate,True,True,179,size-qualified,False,"Boite de tomate, petit",False
+1082,"Boite de tomate, moyen",122,108,2,BoÃ®te de tomate,Moyen,False,True,Boîte de tomate,True,True,715,size-qualified,False,"Boite de tomate, moyen",False
+1083,"Boite de tomate, grand",12,108,3,BoÃ®te de tomate,Grand,False,True,Boîte de tomate,True,True,37,size-qualified,False,"Boite de tomate, grand",False
+1100,Botte,10,110,0,Botte,Taille unique,True,True,Botte,True,True,25,bare,True,Botte,True
+1121,"Bouquet, petit",121,112,1,Bouquet,Petit,True,True,Bouquet,True,True,223,size-qualified,False,"Bouquet, petit",False
+1122,"Bouquet, moyen",115,112,2,Bouquet,Moyen,True,True,Bouquet,True,True,184,size-qualified,False,"Bouquet, moyen",False
+1123,"Bouquet, grand",71,112,3,Bouquet,Grand,True,True,Bouquet,True,True,40,size-qualified,False,"Bouquet, grand",False
+1131,"Bouteille, petit",756,113,1,Bouteille,Petit,True,True,Bouteille,True,True,513,size-qualified,False,"Bouteille, petit",False
+1132,"Bouteille, moyen",615,113,2,Bouteille,Moyen,True,True,Bouteille,True,True,790,size-qualified,False,"Bouteille, moyen",False
+1133,"Bouteille, grand",227,113,3,Bouteille,Grand,True,True,Bouteille,True,True,115,size-qualified,False,"Bouteille, grand",False
+1151,"Calebasse, petit",89,115,1,Calebasse,Petit,True,True,Calebasse,True,True,566,size-qualified,False,"Calebasse, petit",False
+1152,"Calebasse, moyen",151,115,2,Calebasse,Moyen,True,True,Calebasse,True,True,563,size-qualified,False,"Calebasse, moyen",False
+1153,"Calebasse, grand",98,115,3,Calebasse,Grand,True,True,Calebasse,True,True,22,size-qualified,False,"Calebasse, grand",False
+1170,"Canette,n/a",355,117,0,Cannette,Taille unique,False,False,Cannette,True,True,19,bare,False,"Canette,n/a",False
+1180,Carton,392,118,0,Carton,Taille unique,True,True,Carton,True,True,4,bare,True,Carton,True
+1201,"CueillÃ¨re, petit",32,120,1,CueillÃ¨re,Petit,True,True,Cueillère,True,True,63,size-qualified,False,"Cueillère, petit",False
+1202,"CueillÃ¨re, moyen",29,120,2,CueillÃ¨re,Moyen,True,True,Cueillère,True,True,76,size-qualified,False,"Cueillère, moyen",False
+1203,"CueillÃ¨re, grand",18,120,3,CueillÃ¨re,Grand,True,True,Cueillère,True,True,31,size-qualified,False,"Cueillère, grand",False
+1220,Filet au kilogramme,51,122,0,Filet au Kg,Taille unique,False,False,Filet au Kg,False,True,0,bare,False,Filet au kilogramme,False
+1251," Louche (Djoni/Djéni), petit",207,125,1,Louche,Petit,False,False,Louche,True,True,480,size-qualified,False,"Louche (Djoni/Djéni), petit",False
+1252," Louche (Djoni/Djini), grand",73,125,2,Louche,Moyen,False,False,Louche,True,False,663,size-qualified,False,"Louche (Djoni/Djini), grand",False
+1253," Louche (Djoni/Djini), moyen",6,125,3,Louche,Grand,False,False,Louche,True,False,139,size-qualified,False,"Louche (Djoni/Djini), moyen",False
+1261,"Morceau, petit",578,126,1,Morceau,Petit,True,True,Morceau,True,True,492,size-qualified,False,"Morceau, petit",False
+1262,"Morceau, moyen",502,126,2,Morceau,Moyen,True,True,Morceau,True,True,416,size-qualified,False,"Morceau, moyen",False
+1263,"Morceau, grand",416,126,3,Morceau,Grand,True,True,Morceau,True,True,97,size-qualified,False,"Morceau, grand",False
+1270,Moudou,5,127,0,Moudou,Taille unique,True,True,Moudou,True,True,20,bare,True,Moudou,True
+1283,"Panier, grand",19,128,3,Panier,Grand,True,True,Panier,True,True,0,size-qualified,False,"Panier, grand",False
+1290,Paquet,953,129,0,Paquet,Taille unique,True,True,Paquet,True,True,2112,bare,True,Paquet,True
+1291,"Paquet, petit",459,129,1,Paquet,Petit,True,True,Paquet,True,True,1159,size-qualified,False,"Paquet, petit",False
+1292,"Paquet, moyen",171,129,2,Paquet,Moyen,True,True,Paquet,True,True,201,size-qualified,False,"Paquet, moyen",False
+1293,"Paquet, grand",198,129,3,Paquet,Grand,True,True,Paquet,True,True,114,size-qualified,False,"Paquet, grand",False
+1300,Plaquette,117,130,0,Plaquette,Taille unique,True,True,Plaquette,True,True,17,bare,True,Plaquette,True
+1340,Sac (10 Kg),1,134,0,Sac (10 Kg),Taille unique,True,True,Sac (10 Kg),False,True,0,bare,False,Sac (10 Kg),False
+1350,Sac (100 Kg),1320,135,0,Sac (100 Kg),Taille unique,True,True,Sac (100 Kg),True,True,1,bare,True,Sac (100 Kg),True
+1360,Sac (25 Kg),1204,136,0,Sac (25 Kg),Taille unique,True,True,Sac (25 Kg),True,True,5,bare,True,Sac (25 Kg),True
+1370,Sac (5 Kg),51,137,0,Sac (5 kg),Taille unique,True,True,Sac (5 kg),False,True,0,bare,False,Sac (5 Kg),False
+1380,Sac (50 Kg),1098,138,0,Sac (50 Kg),Taille unique,True,True,Sac (50 Kg),True,True,1,bare,True,Sac (50 Kg),True
+1391,"Sachet, petit",4330,139,1,Sachet,Petit,True,True,Sachet,True,True,19561,size-qualified,False,"Sachet, petit",False
+1392,"Sachet, moyen",2590,139,2,Sachet,Moyen,True,True,Sachet,True,True,13116,size-qualified,False,"Sachet, moyen",False
+1393,"Sachet, grand",1202,139,3,Sachet,Grand,True,True,Sachet,True,True,3321,size-qualified,False,"Sachet, grand",False
+1400,Sans os au Kg,149,140,0,Sans os au Kg,Taille unique,True,True,Sans os au Kg,True,True,33,bare,True,Sans os au Kg,True
+1411,"Sans os au tas, petit",51,141,1,Sans os au tas,Petit,True,True,Sans os au tas,True,True,0,size-qualified,False,"Sans os au tas, petit",False
+1412,"Sans os au tas, moyen",45,141,2,Sans os au tas,Moyen,True,True,Sans os au tas,True,True,3,size-qualified,False,"Sans os au tas, moyen",False
+1413,"Sans os au tas, grand",27,141,3,Sans os au tas,Grand,True,True,Sans os au tas,True,True,1,size-qualified,False,"Sans os au tas, grand",False
+1421,"Seau, petit",12,142,1,Seau,Petit,True,True,Seau,True,True,5,size-qualified,False,"Seau, petit",False
+1422,"Seau, moyen",31,142,2,Seau,Moyen,True,True,Seau,True,True,6,size-qualified,False,"Seau, moyen",False
+1423,"Seau, grand",36,142,3,Seau,Grand,True,True,Seau,True,True,0,size-qualified,False,"Seau, grand",False
+1431,"Tas, petit",2872,143,1,Tas,Petit,True,True,Tas,True,True,4255,size-qualified,False,"Tas, petit",False
+1432,"Tas, moyen",2384,143,2,Tas,Moyen,True,True,Tas,True,True,5518,size-qualified,False,"Tas, moyen",False
+1433,"Tas, grand",1442,143,3,Tas,Grand,True,True,Tas,True,True,1031,size-qualified,False,"Tas, grand",False
+1460,Tongolo,7,146,0,Tongolo,Taille unique,True,True,Tongolo,True,True,0,bare,True,Tongolo,True
+1461,"Tongolo, petit",6,146,1,Tongolo,Petit,True,True,Tongolo,True,True,26,size-qualified,False,"Tongolo, petit",False
+1462,"Tongolo, moyen",6,146,2,Tongolo,Moyen,True,True,Tongolo,True,True,68,size-qualified,False,"Tongolo, moyen",False
+1463,"Tongolo, grand",32,146,3,Tongolo,Grand,True,True,Tongolo,True,True,111,size-qualified,False,"Tongolo, grand",False
+1471,"Unité, petit",3023,147,1,UnitÃ©,Petit,True,True,Unité,True,True,4450,size-qualified,False,"Unité, petit",False
+1472,"Unité, moyen",1703,147,2,UnitÃ©,Moyen,True,True,Unité,True,True,5313,size-qualified,False,"Unité, moyen",False
+1473,"Unité, grand",1379,147,3,UnitÃ©,Grand,True,True,Unité,True,True,5215,size-qualified,False,"Unité, grand",False
+5120,Tiya,2,512,0,Tiya,Taille unique,True,True,Tiya,True,True,0,bare,True,Tiya,True
+5124,"Tiya, quart",751,512,4,Tiya,Quart,True,True,Tiya,True,True,2628,size-qualified,False,"Tiya, quart",False
+5125,"Tiya, demi",1136,512,5,Tiya,Demi,True,True,Tiya,True,True,3274,size-qualified,False,"Tiya, demi",False
+5126,"Tiya, entier",1710,512,6,Tiya,Entier,True,True,Tiya,True,True,12455,size-qualified,False,"Tiya, entier",False

@@ -1,0 +1,312 @@
+{
+  "verdict": "PASS",
+  "frozen_head": "6fda46bc5437758bd650cf4016f0782a124281cf",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "frozen_tree_clean_unchanged": true,
+  "findings": [],
+  "static-source": {
+    "existing_changed_cells": [
+      [
+        131,
+        "2015-16",
+        "other specify (131)",
+        "Sack/Bag Medium"
+      ],
+      [
+        151,
+        "2015-16",
+        "other specify (151)",
+        "Basin Medium"
+      ],
+      [
+        152,
+        "2015-16",
+        "other specify (152)",
+        "Basin Large"
+      ]
+    ],
+    "new_code": 161,
+    "existing_preferred_exact": true,
+    "source": {
+      "2015Q3": {
+        "blob_md5_verified": {
+          ".dta": {
+            "sidecar": "1e2e4166560aeef8c725e4c9e53ce74b",
+            "byte_digest": "1e2e4166560aeef8c725e4c9e53ce74b",
+            "legacy_dvc_digest": "1e2e4166560aeef8c725e4c9e53ce74b"
+          },
+          ".csv": {
+            "sidecar": "10859e683857cc9611e5eacf9e630691",
+            "byte_digest": "ccaa568ebd91bbacc170733e63df933d",
+            "legacy_dvc_digest": "10859e683857cc9611e5eacf9e630691"
+          }
+        },
+        "labels": {
+          "s7bq2b": {
+            "131": null,
+            "151": null,
+            "152": null,
+            "161": null
+          },
+          "s7bq3b": {
+            "131": "131. SACK/BAG MEDIUM",
+            "151": "151. BASIN MEDIUM",
+            "152": "152. BASIN LARGE",
+            "161": "161. BUNDLE MEDIUM"
+          },
+          "s7bq6b": {
+            "131": null,
+            "151": null,
+            "152": null,
+            "161": null
+          },
+          "s7bq7b": {
+            "131": null,
+            "151": null,
+            "152": null,
+            "161": null
+          }
+        },
+        "positive_counts": {
+          "purchased": {
+            "131": 0,
+            "151": 1,
+            "152": 1,
+            "161": 0
+          },
+          "produced": {
+            "131": 3,
+            "151": 5,
+            "152": 0,
+            "161": 0
+          },
+          "inkind": {
+            "131": 0,
+            "151": 2,
+            "152": 0,
+            "161": 0
+          }
+        },
+        "any_counts": {
+          "purchased": {
+            "131": 0,
+            "151": 1,
+            "152": 1,
+            "161": 0
+          },
+          "produced": {
+            "131": 3,
+            "151": 5,
+            "152": 0,
+            "161": 0
+          },
+          "inkind": {
+            "131": 0,
+            "151": 2,
+            "152": 0,
+            "161": 0
+          }
+        }
+      },
+      "2016Q1": {
+        "blob_md5_verified": {
+          ".dta": {
+            "sidecar": "b4f414efd1adf000a09e9f39eb6cdaae",
+            "byte_digest": "b4f414efd1adf000a09e9f39eb6cdaae",
+            "legacy_dvc_digest": "b4f414efd1adf000a09e9f39eb6cdaae"
+          },
+          ".csv": {
+            "sidecar": "752950c54ae2c499ec7b69633a16d987",
+            "byte_digest": "9819dbdc7a3d077d010efd0abd1a6548",
+            "legacy_dvc_digest": "752950c54ae2c499ec7b69633a16d987"
+          }
+        },
+        "labels": {
+          "s10bq2b": {
+            "131": "131. SACK/BAG MEDIUM",
+            "151": "151. BASIN MEDIUM",
+            "152": "152. BASIN LARGE",
+            "161": "161. BUNDLE MEDIUM"
+          },
+          "s10bq3b": {
+            "131": null,
+            "151": null,
+            "152": null,
+            "161": null
+          },
+          "s10bq6b": {
+            "131": null,
+            "151": null,
+            "152": null,
+            "161": null
+          },
+          "s10bq7b": {
+            "131": null,
+            "151": null,
+            "152": null,
+            "161": null
+          }
+        },
+        "positive_counts": {
+          "purchased": {
+            "131": 0,
+            "151": 0,
+            "152": 0,
+            "161": 0
+          },
+          "produced": {
+            "131": 0,
+            "151": 0,
+            "152": 0,
+            "161": 0
+          },
+          "inkind": {
+            "131": 0,
+            "151": 0,
+            "152": 0,
+            "161": 0
+          }
+        },
+        "any_counts": {
+          "purchased": {
+            "131": 0,
+            "151": 0,
+            "152": 0,
+            "161": 0
+          },
+          "produced": {
+            "131": 0,
+            "151": 0,
+            "152": 0,
+            "161": 0
+          },
+          "inkind": {
+            "131": 0,
+            "151": 0,
+            "152": 0,
+            "161": 0
+          }
+        }
+      }
+    }
+  },
+  "cold-derived": {
+    "rows": 595725,
+    "frozen_exact_writer_after": true,
+    "baseline_exact_after_unit_rename": true,
+    "other_7_rounds_exact": true,
+    "changed_label_counts": {
+      "other specify (131)": 3,
+      "other specify (151)": 8,
+      "other specify (152)": 1
+    },
+    "derived": {
+      "food_quantities": {
+        "rows": 595053,
+        "writer_after_exact": true,
+        "common_changed": 93,
+        "changed_by_t_u": {
+          "('2011Q1', 'kg')": 85,
+          "('2015Q3', 'kg')": 8
+        },
+        "old_only": 3,
+        "new_only": 3,
+        "kg_before": 1467177.4931960062,
+        "kg_after": 1467196.4975769585,
+        "kg_delta": 19.00438095233403,
+        "common_kg_delta": 15.48057142857146,
+        "newly_kg_quantity": 3.5238095238095237,
+        "formerly_native_quantity": 4.0,
+        "per_wave_kg_delta": {
+          "2010Q3": 0.0,
+          "2011Q1": -6.279428571404424,
+          "2012Q3": 0.0,
+          "2013Q1": 0.0,
+          "2015Q3": 25.283809523811215,
+          "2016Q1": 0.0,
+          "2018Q3": 0.0,
+          "2019Q1": 0.0
+        }
+      },
+      "food_prices": {
+        "rows": 481191,
+        "writer_after_exact": true,
+        "common_changed": 14,
+        "changed_by_t_u": {
+          "('2011Q1', 'Basin Medium')": 13,
+          "('2015Q3', 'Basin Medium')": 1
+        },
+        "old_only": 0,
+        "new_only": 0
+      }
+    },
+    "seconds": 55.439238290302455
+  },
+  "audit-hashes": {
+    "writer_audit_multiset_exact": true,
+    "records": 455,
+    "counts": {
+      "warn": 452,
+      "pass": 3
+    },
+    "comparator": {
+      "food_acquired": {
+        "writer_warm_frames_exact": true,
+        "rows": 355571
+      },
+      "sample": {
+        "writer_warm_frames_exact": true,
+        "rows": 24362
+      }
+    },
+    "hashes": {
+      "Nigeria": {
+        "total": 24,
+        "changed": [
+          "sample",
+          "cluster_features",
+          "shocks",
+          "food_acquired",
+          "household_roster",
+          "individual_education",
+          "panel_ids",
+          "assets",
+          "interview_date",
+          "housing",
+          "plot_features",
+          "crop_production",
+          "plot_inputs",
+          "food_coping",
+          "livestock",
+          "anthropometry",
+          "plot_labor",
+          "people_last7days",
+          "community_prices",
+          "nonfood_expenditures",
+          "food_expenditures",
+          "food_prices",
+          "food_quantities",
+          "household_characteristics"
+        ]
+      },
+      "Uganda": {
+        "total": 28,
+        "changed": []
+      }
+    }
+  },
+  "positive-tests": {
+    "total": 53,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exitcode": 0
+  },
+  "counterfactual-tests": {
+    "total": 3,
+    "failed": 3,
+    "errors": 0,
+    "skipped": 0,
+    "exitcode": 1
+  }
+}

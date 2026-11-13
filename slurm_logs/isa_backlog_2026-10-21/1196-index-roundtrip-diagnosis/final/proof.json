@@ -1,0 +1,41 @@
+{
+  "source_HEAD_clean_tracked_bytes_modes_mtimes_literal_links_exact": true,
+  "source_tracked_files": 14880,
+  "protected_old_selected_receipts": 72,
+  "physical_copies_exact": 63,
+  "original_copy_sources_unchanged": true,
+  "used_library_dependency_pins_exact": 8,
+  "previous_own_Malawi": {
+    "815_manifest_entries_exact": true,
+    "source_heads_clean_full_tracked_receipts_exact": {
+      "candidate": 14889,
+      "base": 14880
+    },
+    "original_followed_target_SHA_convention_and_independent_literal_Git_blobs_exact": true,
+    "initial94_cross_convention_SHA_stop_preserved_not_source_mutation": true
+  },
+  "guard_events": {
+    "DENIED-os.remove": 6,
+    "mkdir-existing": 2,
+    "DENIED-os.mkdir": 2
+  },
+  "guarded_IP_attempts": 0,
+  "new_normal_warm_cache_files_per_process": 21,
+  "no_tracked_or_Git_mutations": true,
+  "sourcepin": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "scope": "Selected immutable old operands/manifests, all815 previous own Malawi evidence entries and its source receipts; not a whole-old-Uganda/Niger-farm payload rehash",
+  "signed": "Sue",
+  "retained_guard_denials": 8,
+  "denial_attribution_qualification": {
+    "denied_remove_relative_t_parquet": 6,
+    "denied_pytest_cache_mkdir": 2,
+    "existing_mkdir_FIE": 2,
+    "exact_retrospective_call_stacks_or_dir_fd_not_recorded": true,
+    "six_remove_pattern": "consistent with six GH645 TemporaryDirectory roundtrips and shutil dir_fd-relative unlink; tempfile PermissionError fallback can unlink absolute private path; not individually attributed",
+    "two_mkdir_pattern": "matches pytest cacheprovider._ensure_cache_dir_and_supporting_files TemporaryDirectory prefix under cachedir.parent; no successful source write",
+    "test_replay_or_guard_weakening": false,
+    "full_original_guard_log_retained": true,
+    "source_bytes_modes_mtimes_HEAD_clean_exact": true
+  },
+  "route_evidence_additional_physical_JSON_copies": 4
+}

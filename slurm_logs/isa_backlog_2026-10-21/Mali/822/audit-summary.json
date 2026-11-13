@@ -1,0 +1,62 @@
+{
+  "countries": [
+    "Mali",
+    "Niger"
+  ],
+  "baseline_findings": 3,
+  "candidate_findings": 2,
+  "added_findings": [],
+  "removed_findings": [
+    {
+      "phase": "1b-assembly",
+      "feature": "community_prices",
+      "check": "runtime_warning",
+      "status": "warn",
+      "country": null,
+      "kwargs": {},
+      "severity": "C",
+      "expected": false,
+      "detail": "community_prices: aligned country frames to the canonical index declared in data_info.yml -- added constant sentinel level(s) for countries whose instrument does not record them: {'Mali': {'obs': 1}}. No rows were added, removed or collapsed; see df.attrs['canonical_alignment'].",
+      "metrics": {},
+      "fingerprint": "community_prices|ALL||runtime_warning"
+    }
+  ],
+  "unchanged_findings": [
+    {
+      "phase": "1a-sanity",
+      "feature": "community_prices",
+      "check": "has_household_index",
+      "status": "warn",
+      "country": "Mali",
+      "kwargs": {},
+      "severity": "C",
+      "expected": false,
+      "detail": "No 'i' level in index",
+      "metrics": {},
+      "fingerprint": "community_prices|Mali||has_household_index"
+    },
+    {
+      "phase": "1a-sanity",
+      "feature": "community_prices",
+      "check": "has_household_index",
+      "status": "warn",
+      "country": "Niger",
+      "kwargs": {},
+      "severity": "C",
+      "expected": false,
+      "detail": "No 'i' level in index",
+      "metrics": {},
+      "fingerprint": "community_prices|Niger||has_household_index"
+    }
+  ],
+  "baseline_country_rows": {
+    "Mali": 40218,
+    "Niger": 46043
+  },
+  "candidate_country_rows": {
+    "Mali": 155931,
+    "Niger": 46043
+  },
+  "phase2": "community_prices has no kwarg grid; no phase2 cells were omitted by a cap",
+  "outbound_network_attempts": 0
+}

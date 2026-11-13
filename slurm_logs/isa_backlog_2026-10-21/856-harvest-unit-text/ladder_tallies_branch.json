@@ -1,0 +1,57 @@
+{
+ "unresolved": {
+  "2010-11": [
+   94,
+   1088250.0
+  ],
+  "2013-14": [
+   21,
+   315300.0
+  ],
+  "2016-17": [
+   89,
+   6009600.0
+  ],
+  "2019-20": [
+   137,
+   6244030.0
+  ]
+ },
+ "grounds_by_wave": {
+  "2010-11": {
+   "contradiction_no_separation": 80,
+   "contradiction_price_undecided": 10,
+   "na_sale_price_undecided": 4,
+   "na_harvest_price_undecided": 0,
+   "claimed_by_tier_a": 0
+  },
+  "2013-14": {
+   "contradiction_no_separation": 16,
+   "contradiction_price_undecided": 5,
+   "na_sale_price_undecided": 0,
+   "na_harvest_price_undecided": 0,
+   "claimed_by_tier_a": 0
+  },
+  "2016-17": {
+   "contradiction_no_separation": 71,
+   "contradiction_price_undecided": 18,
+   "na_sale_price_undecided": 0,
+   "na_harvest_price_undecided": 0,
+   "claimed_by_tier_a": 0
+  },
+  "2019-20": {
+   "contradiction_no_separation": 104,
+   "contradiction_price_undecided": 24,
+   "na_sale_price_undecided": 2,
+   "na_harvest_price_undecided": 7,
+   "claimed_by_tier_a": 0
+  }
+ },
+ "grounds_sum": {
+  "contradiction_no_separation": 271,
+  "contradiction_price_undecided": 57,
+  "na_sale_price_undecided": 6,
+  "na_harvest_price_undecided": 7,
+  "claimed_by_tier_a": 0
+ }
+}

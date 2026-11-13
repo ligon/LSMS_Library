@@ -1,0 +1,224 @@
+{
+  "first_cohorts": {
+    "status": "PASS_SAVED_NUMERIC_SUPPLEMENT",
+    "cohort_pairs": {
+      "twenty": 329,
+      "1196": 12
+    },
+    "full_strict": 316,
+    "qualified_stage_pairs": 25,
+    "groups": {
+      "twenty/cold_warm": 40,
+      "twenty/candidate_Make_cold_populated": 10,
+      "twenty/candidate_backends": 10,
+      "twenty/supported_authoritative_public": 10,
+      "twenty/populated_default_crosshead": 10,
+      "twenty/empty-stage-qualification": 10,
+      "twenty/native_layers_crosshead": 10,
+      "twenty/Make_native_crosshead": 4,
+      "twenty/raw_country": 1,
+      "twenty/old-stage-qualification": 1,
+      "twenty/old_Make_raw_layer": 1,
+      "twenty/extras_fresh_process": 36,
+      "twenty/healthy_current19_references": 8,
+      "twenty/healthy_Mali": 2,
+      "twenty/pooled_Feature": 4,
+      "twenty/authoritative_Make_Feature": 4,
+      "twenty/CLI_Default_crosshead_matched_stage": 8,
+      "twenty/CLI_Make_supported_API": 2,
+      "twenty/CLI_Make_existing_empty_factory": 2,
+      "twenty/source_bound_cache_native-writer": 102,
+      "twenty/source_bound_cache_normalized-country-request-coverage": 20,
+      "twenty/source_bound_cache_legacy-native-country-fallback": 30,
+      "twenty/native-walked-qualified": 4,
+      "1196/original-cold-warm": 2,
+      "1196/input-prepared": 4,
+      "1196/prepared-read": 4,
+      "1196/actual-warm-process": 2
+    },
+    "array_checks": {
+      "int64": 82,
+      "numeric_nonmissing_arrays": 467,
+      "str": 2187,
+      "float64": 2,
+      "Float64": 383,
+      "string": 362,
+      "object": 23
+    },
+    "rows_including_repeated_operands": 7602506,
+    "physical_saved_operands": 375,
+    "failures": [],
+    "originals_and_copies_preserved": true,
+    "API_source_test_replays": 0,
+    "all_campaign_result": false,
+    "qualifications": "Original NA-policy/JSON/writer-preparation/id_converted/empty dtype and missing child-log limits remain; this is additional saved-frame equality evidence only."
+  },
+  "additional_cache": {
+    "status": "PASS_SAVED_DIRECT_CACHE_PAIRS",
+    "pairs": 76,
+    "rows_including_repeated_operands": 811835,
+    "numeric_nonmissing_arrays": 76,
+    "originals_and_copies_verified_before_unpickle": true,
+    "source_API_test_replay": 0,
+    "overlaps_main_source_bound_cache_family": true
+  },
+  "additional1196": {
+    "status": "PASS_SAVED_1196_RETAINED_ARTIFACT_AND_SYNTHETIC_SUPPLEMENT",
+    "pairs": 16,
+    "retained_artifact_new_read_stage": 14,
+    "saved_synthetic_pairs": 2,
+    "full_strict": 15,
+    "qualified": 1,
+    "rows_including_repeats": 734067,
+    "original_prewrite_memory_available": false,
+    "new_read_is_not_recovered_original_memory": true,
+    "numeric_arrays": 28,
+    "all_copies_originals_preserved": true,
+    "source_decodes_API_builds_tests": 0,
+    "unrecovered_raw-map_operand": "Original mapped frame existed only in memory. No original mapped operand is manufactured; no new map_index replay occurs."
+  },
+  "CLI": {
+    "status": "PASS_SAVED_BYTE_CONTROLS",
+    "pairs": 16,
+    "checks": [
+      {
+        "side": "base",
+        "backend": "default",
+        "phase": "first",
+        "request": "2019",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "phase": "first",
+        "request": "2008",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "phase": "fresh",
+        "request": "2019",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "base",
+        "backend": "default",
+        "phase": "fresh",
+        "request": "2008",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "phase": "first",
+        "request": "2019",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "phase": "first",
+        "request": "2008",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "phase": "fresh",
+        "request": "2019",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "base",
+        "backend": "make",
+        "phase": "fresh",
+        "request": "2008",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "phase": "first",
+        "request": "2019",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "phase": "first",
+        "request": "2008",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "phase": "fresh",
+        "request": "2019",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "candidate",
+        "backend": "default",
+        "phase": "fresh",
+        "request": "2008",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "phase": "first",
+        "request": "2019",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "phase": "first",
+        "request": "2008",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "phase": "fresh",
+        "request": "2019",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      },
+      {
+        "side": "candidate",
+        "backend": "make",
+        "phase": "fresh",
+        "request": "2008",
+        "full_file_bytes_equal": true,
+        "original_manifest_verified": true
+      }
+    ],
+    "parquet_decodes_CLI_or_writers": 0
+  },
+  "source_import_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "country_note_full_reading_blobs": {
+    "Tanzania": "c1130989b7a656de1f7367720e0120f9a869a47b",
+    "Niger": "f4e280252f00640d265fbf63cfcf82072c2e47c8",
+    "Uganda": "6bad560bef33eb6b2b9decaf6f96c901f67bf67b"
+  },
+  "combined20_note_deltas_also_read_in_full": true,
+  "initial_full_tracked_mtime_baseline_not_captured": true,
+  "tracked_source_clean_after_analysis": true
+}

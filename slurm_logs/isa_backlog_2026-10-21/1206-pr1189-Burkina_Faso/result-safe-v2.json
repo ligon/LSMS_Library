@@ -1,0 +1,13 @@
+{
+  "PR": 1189,
+  "status": "PASS_NEW_NUMERIC_SUPPLEMENT_WITH_EXPLICIT_COMPLETE_AXIS_QUALIFICATIONS",
+  "same_stage_full_strict_pairs": 16,
+  "original_intended_crop_exclusion_projection": 1,
+  "NEW_source_pinned_native_rekey_reconstruction": 1,
+  "Feature_views_numeric_typed_attrs_used_tuples_with_explicit_unused_domain_qualification": 2,
+  "complete_axis_failures_retained": 2,
+  "numeric_mismatches_observed": 0,
+  "unexplained_domain_differences": 0,
+  "all_v1_original_unsaved_object_gaps_retained": true,
+  "signed": "Sue"
+}

@@ -1,0 +1,55 @@
+{
+  "status": "EXACT_EIGHT_SAFE_EXPORTS_ROOT_ACCEPTED_WITH_FOUR_NEW_ORDER_FAILURES",
+  "files": [
+    {
+      "name": "REPORT.md",
+      "sha256": "abb4772ce87fee0b5a171483e4ee56590c7af695b4f02ad028fbf2c761b26b9d",
+      "bytes": 5328
+    },
+    {
+      "name": "commands.json",
+      "sha256": "4700265824ffc6d7b382b3de4537d85e862ebc440314e62887988b31c195721b",
+      "bytes": 237687
+    },
+    {
+      "name": "empty-order-residual.json",
+      "sha256": "463164f445bb08247ec7fc01cb7a1aa4464d48238c02870bebc73847177317ae",
+      "bytes": 3662
+    },
+    {
+      "name": "pins.json",
+      "sha256": "f45b735be461396fb8b5171cbea59edc23e5f719248b6bfd1bf091928a43f038",
+      "bytes": 2034
+    },
+    {
+      "name": "protection.json",
+      "sha256": "fc1279be95b786d397284f37f35b293361d09a1b3f3e917f9eae9bca80284df7",
+      "bytes": 818
+    },
+    {
+      "name": "qualifications.json",
+      "sha256": "488e39f79af2134f355bb4309abaef4374e246c5d683e274ea262adc0712415e",
+      "bytes": 3625
+    },
+    {
+      "name": "source.diff",
+      "sha256": "9d29e954ad19cc237c79e37ffd149aa481ce6aa460f511327a157e82737c4fbe",
+      "bytes": 28728
+    },
+    {
+      "name": "validation.json",
+      "sha256": "7fcb277bfb941ff47d603571a6e45faeff63fabf25f1762719d5eeedc394a148",
+      "bytes": 3525
+    }
+  ],
+  "safe_allowlist_sha256": "a62dc738a5dfbcd2c10bbba62754a3441cab645a1f278e63cbed0b33f01b6796",
+  "root_acceptance_sha256": "e8ad5e648f1d54aaf1d2c2bbe4cc95544d92892ee97a80e722e1305cdb259532",
+  "root_actual_session": 86543,
+  "root_actual_terminal_chunk": "328892",
+  "root_actual_exit": 0,
+  "literal_source_diff_qualification": "source.diff is verbatim9d29e954ad19cc237c79e37ffd149aa481ce6aa460f511327a157e82737c4fbe and repeats eight known historical context whitespace warnings. The actual source diff check passes; never normalize this evidence.",
+  "known_new_failures": 4,
+  "residual_issue": 1215,
+  "original_privacy_scope_denial_network_metadata_mode_and_oracle_stage_qualifications_retained": true,
+  "signed": "Sue"
+}

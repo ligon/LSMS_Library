@@ -1,0 +1,42 @@
+{
+  "status": "DESIGN_AND_PRIVATE_PROTOTYPE_FROZEN_FOR_ROOT_ENGINEERING_REVIEW",
+  "source_head": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+  "runtime_config_schema_tests_exact_f8": true,
+  "production_axis_contract_approved": false,
+  "ledger_first": "4332afede90648d2438ba0844151840e8fc80d82",
+  "ledger_verification": "74e6031ab34ec1897f2166f480f8cd0da33cba5c",
+  "private_files_pinned": 241,
+  "private_manifest_sha256": "c336abbaad17d4b9dadab19f6c5abd00319aa55f118162ad773525faa49cc223",
+  "safe_export_allowlist": {
+    "DESIGN.md": {
+      "sha256": "58a84aac3a61350f554ae73f5a97edd7bff5e11bcab0068cd2f940fe756ca51f",
+      "bytes": 13812,
+      "mode": 420,
+      "mtime_ns": 1792629619731703867
+    },
+    "PROTOTYPE.md": {
+      "sha256": "1ae6f8127e24ea48afb7c41ba83e3e3a17d60067dfcd312da876a9c0cf02be1e",
+      "bytes": 5028,
+      "mode": 420,
+      "mtime_ns": 1792629740238320248
+    },
+    "REPRODUCE.md": {
+      "sha256": "1d82395c962d7676bb0f6eda5252800c52d4d4d07b6124ed06fa49a320884455",
+      "bytes": 2290,
+      "mode": 420,
+      "mtime_ns": 1792629576017462021
+    },
+    "validation.json": {
+      "sha256": "6c0dadd00bce370d63f7e5f007a3fe8f20d114f46a7a9c6a94a5002d48914c18",
+      "bytes": 7218,
+      "mode": 420,
+      "mtime_ns": 1792629740238320248
+    }
+  },
+  "tracked_safe_evidence_directory": "/local/job40255479/worktrees/isa-Uganda-1198/slurm_logs/isa_backlog_2026-10-21/Uganda/1198",
+  "private_script_oracle_receipts_and_all_frames_IDs_logs_NOT_exported": true,
+  "diagnostic_stops_and_both_handling_errors_explicit": true,
+  "active_consumers": [],
+  "root_action": "Review concrete coordinate/provenance/sentinel and migration/test scope before authorizing any production/schema change.",
+  "source_and_all_prior_evidence_frozen": true
+}

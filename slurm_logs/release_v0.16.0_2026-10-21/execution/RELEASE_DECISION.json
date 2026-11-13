@@ -1,0 +1,29 @@
+{
+  "utc": "2026-10-21T13:55:51.137692+00:00",
+  "author": "Sue",
+  "decision": "Retire the additional duplicate-master-CI wait; reuse completed exact-code evidence and finish the remaining tag recipe",
+  "reason": "User challenged idle whole-node waiting. The wait was an agent-added gate, beyond the release skill. Actual master local suite passed; all non-report Git inputs match the already-successful credentialed GitHub candidate. No test result is waived or relabeled.",
+  "local_suite_passed": true,
+  "local_counts": {
+    "passed": 8851,
+    "skipped": 276,
+    "xfailed": 9,
+    "xpassed": 1,
+    "failed": 0,
+    "error": 0,
+    "warnings": 1222
+  },
+  "baseline_transitions": 0,
+  "validated_credentialed_run": 39533863014,
+  "validated_source": "532d58700fa46e52a0b390198604eca1dc4de00e",
+  "release_source": "097283459f80016b0f00a51b814a0cb964a42789",
+  "exact_source_proof": "master-source-identity.json",
+  "actual_master_platform_jobs": "PASS including credentialed native Windows",
+  "additional_master_run": 39604418333,
+  "additional_master_data_state": "Still running; will be reported separately",
+  "waiting_adapter_pid_terminated": 3700067,
+  "make_process_exit_expected": "Nonzero due to operator-retired extra wait; pytest had returned zero. Execute the unchanged final git tag command explicitly after checks.",
+  "no_github_job_cancelled": true,
+  "no_controller_or_runtime_changes": true,
+  "old_gate_summary_retained": true
+}

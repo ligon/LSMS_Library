@@ -1,0 +1,473 @@
+{
+  "source_use": {
+    "2011-12": {
+      "Manure": {
+        "raw_use_yes_rows": 6273,
+        "unique_source_use_keys": 6273
+      },
+      "Compost": {
+        "raw_use_yes_rows": 1051,
+        "unique_source_use_keys": 1051
+      },
+      "Other Organic": {
+        "raw_use_yes_rows": 1236,
+        "unique_source_use_keys": 1236
+      },
+      "Pesticide": {
+        "raw_use_yes_and_gate_crop_rows": 581,
+        "unique_source_use_keys": 581
+      }
+    },
+    "2013-14": {
+      "Manure": {
+        "raw_use_yes_rows": 6681,
+        "unique_source_use_keys": 6681
+      },
+      "Compost": {
+        "raw_use_yes_rows": 1260,
+        "unique_source_use_keys": 1260
+      },
+      "Other Organic": {
+        "raw_use_yes_rows": 272,
+        "unique_source_use_keys": 272
+      },
+      "Pesticide": {
+        "raw_use_yes_and_gate_crop_rows": 668,
+        "unique_source_use_keys": 668
+      }
+    },
+    "2015-16": {
+      "Manure": {
+        "raw_use_yes_rows": 6690,
+        "unique_source_use_keys": 6690
+      },
+      "Compost": {
+        "raw_use_yes_rows": 957,
+        "unique_source_use_keys": 957
+      },
+      "Other Organic": {
+        "raw_use_yes_rows": 423,
+        "unique_source_use_keys": 423
+      },
+      "Pesticide": {
+        "raw_use_yes_and_gate_crop_rows": 809,
+        "unique_source_use_keys": 809
+      }
+    },
+    "2018-19": {
+      "Manure": {
+        "raw_use_yes_rows": 4114,
+        "unique_source_use_keys": 4114
+      },
+      "Compost": {
+        "raw_use_yes_rows": 647,
+        "unique_source_use_keys": 647
+      },
+      "Other Organic": {
+        "raw_use_yes_rows": 237,
+        "unique_source_use_keys": 237
+      },
+      "Pesticide": {
+        "raw_use_yes_and_gate_crop_rows": 569,
+        "unique_source_use_keys": 569
+      }
+    },
+    "2021-22": {
+      "Manure": {
+        "raw_use_yes_rows": 3503,
+        "unique_source_use_keys": 3503
+      },
+      "Compost": {
+        "raw_use_yes_rows": 380,
+        "unique_source_use_keys": 380
+      },
+      "Other Organic": {
+        "raw_use_yes_rows": 483,
+        "unique_source_use_keys": 483
+      },
+      "Pesticide": {
+        "raw_use_yes_and_gate_crop_rows": 536,
+        "unique_source_use_keys": 536
+      }
+    }
+  },
+  "helper_rows_and_units": {
+    "2011-12": {
+      "rows": 45149,
+      "null_units": 9141,
+      "blank_units": 0,
+      "unit_forms": [
+        {
+          "value": "Kg",
+          "type": "str",
+          "rows": 36008
+        },
+        {
+          "value": "<NA>",
+          "type": "NAType",
+          "rows": 9141
+        }
+      ],
+      "missing_by_input": {
+        "Compost": 1051,
+        "Manure": 6273,
+        "Other Organic": 1236,
+        "Pesticide": 581
+      },
+      "missing_with_quantity": 0,
+      "missing_with_purchased_quantity": 0,
+      "missing_Applied_true": 9141,
+      "index_unique": true,
+      "columns": [
+        "Quantity",
+        "u",
+        "Purchased",
+        "Quantity_purchased",
+        "Improved",
+        "Applied"
+      ],
+      "attrs_keys": []
+    },
+    "2013-14": {
+      "rows": 47416,
+      "null_units": 8881,
+      "blank_units": 0,
+      "unit_forms": [
+        {
+          "value": "Kg",
+          "type": "str",
+          "rows": 38535
+        },
+        {
+          "value": "<NA>",
+          "type": "NAType",
+          "rows": 8881
+        }
+      ],
+      "missing_by_input": {
+        "Compost": 1260,
+        "Manure": 6681,
+        "Other Organic": 272,
+        "Pesticide": 668
+      },
+      "missing_with_quantity": 0,
+      "missing_with_purchased_quantity": 0,
+      "missing_Applied_true": 8881,
+      "index_unique": true,
+      "columns": [
+        "Quantity",
+        "u",
+        "Purchased",
+        "Quantity_purchased",
+        "Improved",
+        "Applied"
+      ],
+      "attrs_keys": []
+    },
+    "2015-16": {
+      "rows": 47426,
+      "null_units": 8879,
+      "blank_units": 0,
+      "unit_forms": [
+        {
+          "value": "Kg",
+          "type": "str",
+          "rows": 38547
+        },
+        {
+          "value": "<NA>",
+          "type": "NAType",
+          "rows": 8879
+        }
+      ],
+      "missing_by_input": {
+        "Compost": 957,
+        "Manure": 6690,
+        "Other Organic": 423,
+        "Pesticide": 809
+      },
+      "missing_with_quantity": 0,
+      "missing_with_purchased_quantity": 0,
+      "missing_Applied_true": 8879,
+      "index_unique": true,
+      "columns": [
+        "Quantity",
+        "u",
+        "Purchased",
+        "Quantity_purchased",
+        "Improved",
+        "Applied"
+      ],
+      "attrs_keys": []
+    },
+    "2018-19": {
+      "rows": 23271,
+      "null_units": 5567,
+      "blank_units": 0,
+      "unit_forms": [
+        {
+          "value": "Kg",
+          "type": "str",
+          "rows": 17704
+        },
+        {
+          "value": "<NA>",
+          "type": "NAType",
+          "rows": 5567
+        }
+      ],
+      "missing_by_input": {
+        "Compost": 647,
+        "Manure": 4114,
+        "Other Organic": 237,
+        "Pesticide": 569
+      },
+      "missing_with_quantity": 0,
+      "missing_with_purchased_quantity": 0,
+      "missing_Applied_true": 5567,
+      "index_unique": true,
+      "columns": [
+        "Quantity",
+        "u",
+        "Purchased",
+        "Quantity_purchased",
+        "Improved",
+        "Applied"
+      ],
+      "attrs_keys": []
+    },
+    "2021-22": {
+      "rows": 17638,
+      "null_units": 4902,
+      "blank_units": 0,
+      "unit_forms": [
+        {
+          "value": "Kg",
+          "type": "str",
+          "rows": 12736
+        },
+        {
+          "value": "<NA>",
+          "type": "NAType",
+          "rows": 4902
+        }
+      ],
+      "missing_by_input": {
+        "Compost": 380,
+        "Manure": 3503,
+        "Other Organic": 483,
+        "Pesticide": 536
+      },
+      "missing_with_quantity": 0,
+      "missing_with_purchased_quantity": 0,
+      "missing_Applied_true": 4902,
+      "index_unique": true,
+      "columns": [
+        "Quantity",
+        "u",
+        "Purchased",
+        "Quantity_purchased",
+        "Improved",
+        "Applied"
+      ],
+      "attrs_keys": []
+    }
+  },
+  "source_metadata": {
+    "2011-12": {
+      "manure_used": {
+        "variable": "pp_s3q21",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "compost_used": {
+        "variable": "pp_s3q23",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "other_organic_used": {
+        "variable": "pp_s3q25",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "pest_used": {
+        "variable": "pp_s4q05",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "pest_gate": {
+        "variable": "pp_s4q04",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      }
+    },
+    "2013-14": {
+      "manure_used": {
+        "variable": "pp_s3q21",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "compost_used": {
+        "variable": "pp_s3q23",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "other_organic_used": {
+        "variable": "pp_s3q25",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "pest_used": {
+        "variable": "pp_s4q05",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "pest_gate": {
+        "variable": "pp_s4q04",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      }
+    },
+    "2015-16": {
+      "manure_used": {
+        "variable": "pp_s3q21",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "compost_used": {
+        "variable": "pp_s3q23",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "other_organic_used": {
+        "variable": "pp_s3q25",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "pest_used": {
+        "variable": "pp_s4q05",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      },
+      "pest_gate": {
+        "variable": "pp_s4q04",
+        "value_labels": {
+          "1": "Yes",
+          "2": "No"
+        }
+      }
+    },
+    "2018-19": {
+      "manure_used": {
+        "variable": "s3q25",
+        "value_labels": {
+          "1": "1. YES",
+          "2": "2. NO"
+        }
+      },
+      "compost_used": {
+        "variable": "s3q26",
+        "value_labels": {
+          "1": "1. YES",
+          "2": "2. NO"
+        }
+      },
+      "other_organic_used": {
+        "variable": "s3q27",
+        "value_labels": {
+          "1": "1. YES",
+          "2": "2. NO"
+        }
+      },
+      "pest_used": {
+        "variable": "s4q05",
+        "value_labels": {
+          "1": "1. YES",
+          "2": "2. NO"
+        }
+      },
+      "pest_gate": {
+        "variable": "s4q04",
+        "value_labels": {
+          "1": "1. YES",
+          "2": "2. NO"
+        }
+      }
+    },
+    "2021-22": {
+      "manure_used": {
+        "variable": "s3q25",
+        "value_labels": {
+          "1": "1. YES",
+          "2": "2. NO"
+        }
+      },
+      "compost_used": {
+        "variable": "s3q26",
+        "value_labels": {
+          "1": "1. YES",
+          "2": "2. NO"
+        }
+      },
+      "other_organic_used": {
+        "variable": "s3q27",
+        "value_labels": {
+          "1": "1. YES",
+          "2": "2. NO"
+        }
+      },
+      "pest_used": {
+        "variable": "s4q05",
+        "value_labels": {
+          "1": "1. YES",
+          "2": "2. NO"
+        }
+      },
+      "pest_gate": {
+        "variable": "s4q04",
+        "value_labels": {
+          "1": "1. YES",
+          "2": "2. NO"
+        }
+      }
+    }
+  },
+  "source_integrity": {
+    "source_sidecars": 48,
+    "unique_physical_blobs": 47,
+    "unique_bytes": 161128465,
+    "md5_matches_sidecar": true,
+    "separate_inodes_no_symlinks": true,
+    "grounded_use_fields": 25,
+    "five_wave_yes_no_metadata_confirmed": true
+  },
+  "note": "All contents are aggregate counts or instrument/config labels; no household identifiers or warning examples."
+}

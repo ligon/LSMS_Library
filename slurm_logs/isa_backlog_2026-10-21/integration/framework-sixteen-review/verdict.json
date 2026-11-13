@@ -1,0 +1,5574 @@
+{
+  "verdict": "PASS",
+  "candidate_head": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+  "control_head": "4227e3a802c7349b11f41ec70a924d712159e587",
+  "findings_requiring_fix": [],
+  "checks": {
+    "candidate_head": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+    "actual15_head": "4227e3a802c7349b11f41ec70a924d712159e587",
+    "candidate_tests": {
+      "tests": 354,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "original1081_cases": 235,
+    "joint1077_regressions": 119,
+    "baseline_counterfactual": {
+      "tests": 73,
+      "failed": 42,
+      "errors": 0,
+      "skipped": 0
+    },
+    "baseline_failed_sites": {
+      "source": 24,
+      "food_finalizer": 18
+    },
+    "counterfactual_AST_exact": true,
+    "generated_handler_controls_per_head": 166,
+    "generic_controls_per_head": 32,
+    "UnitsUnavailable_controls_per_head": 11,
+    "valuation_controls_per_head": 5,
+    "synthetic_real_Feature_controls_per_head": 6,
+    "additional_cause_context_notes_controls": 72,
+    "all_three_existing_typed_exception_objects_args_causes_context_notes_exact": true,
+    "normal_healthy_stages": [
+      {
+        "side": "baseline",
+        "stage": "initial",
+        "frames": 17,
+        "warnings": 110,
+        "all_values_order_axes_dtypes_nulls_full_attrs_exact": true
+      },
+      {
+        "side": "candidate",
+        "stage": "initial",
+        "frames": 17,
+        "warnings": 110,
+        "all_values_order_axes_dtypes_nulls_full_attrs_exact": true
+      },
+      {
+        "side": "baseline",
+        "stage": "warm",
+        "frames": 17,
+        "warnings": 133,
+        "all_values_order_axes_dtypes_nulls_full_attrs_exact": true
+      },
+      {
+        "side": "candidate",
+        "stage": "warm",
+        "frames": 17,
+        "warnings": 133,
+        "all_values_order_axes_dtypes_nulls_full_attrs_exact": true
+      }
+    ],
+    "healthy_complete_frames": 68,
+    "healthy_logical_attrs_exact_no_normalization": true,
+    "distinct_default_and_currency_None_feature_refs": true,
+    "Uganda_Aggregate_exact_Ethiopia_typed_absence_exact": true,
+    "healthy_warning_multisets": {
+      "initial": {
+        "records": 110,
+        "category_message_multiset_exact_to_actual15_and_standalone_healthy": true
+      },
+      "warm": {
+        "records": 133,
+        "category_message_multiset_exact_to_actual15_and_standalone_healthy": true
+      }
+    },
+    "parquets_per_root": 60,
+    "physical_copy_count": 120,
+    "all_cache_bytes_modes_mtimes_and_source_receipts_exact": true,
+    "metadata_tiers_per_head": {
+      "baseline": {
+        "YAML_wave_current": 34,
+        "script_wave_hashless": 18,
+        "country_current_full_coverage": 8
+      },
+      "candidate": {
+        "YAML_wave_current": 34,
+        "script_wave_hashless": 18,
+        "country_current_full_coverage": 8
+      }
+    },
+    "all_scoped_hashes_exact_across_actual15_16": true,
+    "approved_Ethiopia_source_backed_staging": {
+      "head": "4227e3a802c7349b11f41ec70a924d712159e587",
+      "held_L1": 20,
+      "empty_L2_natural_table_builds": 4,
+      "current_parquets": 24,
+      "frozen_staging_source_and_cache_receipts_exact": true
+    },
+    "Uganda_controls": "36 current held warm prerequisites from global12; no source-cold claim",
+    "derived_parquets_created": 0,
+    "scanner_scope": [
+      "food_acquired",
+      "food_expenditures",
+      "food_prices",
+      "food_quantities",
+      "household_roster",
+      "household_characteristics"
+    ],
+    "scanner_status": {
+      "warn": 393,
+      "pass": 5
+    },
+    "scanner_complete_multiset_exact_without_normalization": true,
+    "scanner_individual_records": [
+      {
+        "ordinal": 1,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 2,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 3,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 4,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 5,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 6,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 7,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": "Ethiopia",
+        "kwargs": {},
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|Ethiopia||index_levels_match_scheme",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 8,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 9,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 10,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 11,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 12,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 13,
+        "feature": "food_acquired",
+        "phase": "1a-sanity",
+        "country": "Uganda",
+        "kwargs": {},
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|Uganda||index_levels_match_scheme",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 14,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 15,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 16,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 17,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 18,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 19,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 20,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 21,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 22,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 23,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 24,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 25,
+        "feature": "food_acquired",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 26,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 27,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 28,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 29,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 30,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 31,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 32,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 33,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 34,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 35,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 36,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 37,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 38,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 39,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "reaggregate_conservation",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|reaggregate_conservation",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 40,
+        "feature": "food_acquired",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "reaggregate_conservation",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_acquired|ALL|labels=Aggregate|reaggregate_conservation",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 41,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 42,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 43,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 44,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 45,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 46,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 47,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 48,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 49,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 50,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 51,
+        "feature": "food_expenditures",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 52,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 53,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 54,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 55,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 56,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 57,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 58,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 59,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 60,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 61,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 62,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 63,
+        "feature": "food_expenditures",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 64,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 65,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 66,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 67,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 68,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 69,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 70,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 71,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 72,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 73,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 74,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 75,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 76,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 77,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "reaggregate_conservation",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|labels=Aggregate|reaggregate_conservation",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 78,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 79,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 80,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 81,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 82,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 83,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 84,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 85,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 86,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 87,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 88,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 89,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 90,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 91,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 92,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 93,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 94,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 95,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 96,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 97,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 98,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 99,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 100,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 101,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 102,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "market_adds_m",
+        "status": "pass",
+        "severity": null,
+        "fingerprint": "food_expenditures|ALL|market=Region|market_adds_m",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 103,
+        "feature": "food_expenditures",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_expenditures|ALL|market=Region|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 104,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 105,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 106,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 107,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 108,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 109,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 110,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 111,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 112,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 113,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 114,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 115,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 116,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 117,
+        "feature": "food_prices",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 118,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 119,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 120,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 121,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 122,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 123,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 124,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 125,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 126,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 127,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 128,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 129,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 130,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 131,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 132,
+        "feature": "food_prices",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 133,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 134,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 135,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 136,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 137,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 138,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 139,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 140,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 141,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 142,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 143,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 144,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 145,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 146,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 147,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 148,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 149,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 150,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 151,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 152,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 153,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 154,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 155,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 156,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 157,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 158,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 159,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 160,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 161,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitvalue"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitvalue|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 162,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 163,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 164,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 165,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 166,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 167,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 168,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 169,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 170,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 171,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 172,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 173,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 174,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 175,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 176,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=kgprice|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 177,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 178,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 179,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 180,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 181,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 182,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 183,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 184,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 185,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 186,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 187,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 188,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 189,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 190,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|units=unitprice|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 191,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 192,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 193,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 194,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 195,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 196,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 197,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 198,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 199,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 200,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 201,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 202,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 203,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 204,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 205,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 206,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|labels=Aggregate|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 207,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 208,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 209,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 210,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 211,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 212,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 213,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 214,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 215,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 216,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 217,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 218,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 219,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 220,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 221,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 222,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 223,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 224,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 225,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 226,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 227,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 228,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 229,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 230,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 231,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 232,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 233,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 234,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "market_adds_m",
+        "status": "pass",
+        "severity": null,
+        "fingerprint": "food_prices|ALL|market=Region|market_adds_m",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 235,
+        "feature": "food_prices",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_prices|ALL|market=Region|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 236,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 237,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 238,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 239,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 240,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 241,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 242,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 243,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 244,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 245,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 246,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 247,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 248,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 249,
+        "feature": "food_quantities",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 250,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 251,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 252,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 253,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 254,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 255,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 256,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 257,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 258,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 259,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 260,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 261,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 262,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 263,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 264,
+        "feature": "food_quantities",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 265,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 266,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 267,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 268,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 269,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 270,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 271,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 272,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 273,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 274,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 275,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 276,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 277,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 278,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 279,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "kgs"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=kgs|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 280,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 281,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 282,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 283,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 284,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 285,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 286,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 287,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 288,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 289,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 290,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 291,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 292,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 293,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "units": "units"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|units=units|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 294,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 295,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 296,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 297,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 298,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 299,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 300,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 301,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 302,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 303,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 304,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 305,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 306,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 307,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 308,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 309,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 310,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "labels": "Aggregate"
+        },
+        "check": "reaggregate_conservation",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|labels=Aggregate|reaggregate_conservation",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 311,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 312,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 313,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 314,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 315,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 316,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 317,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 318,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 319,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 320,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 321,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 322,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 323,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 324,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 325,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 326,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 327,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 328,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 329,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 330,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 331,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 332,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 333,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 334,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 335,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 336,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 337,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 338,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "market_adds_m",
+        "status": "pass",
+        "severity": null,
+        "fingerprint": "food_quantities|ALL|market=Region|market_adds_m",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 339,
+        "feature": "food_quantities",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "food_quantities|ALL|market=Region|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 340,
+        "feature": "household_roster",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 341,
+        "feature": "household_roster",
+        "phase": "1a-sanity",
+        "country": "Ethiopia",
+        "kwargs": {},
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|Ethiopia||index_levels_match_scheme",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 342,
+        "feature": "household_roster",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 343,
+        "feature": "household_roster",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 344,
+        "feature": "household_roster",
+        "phase": "1a-sanity",
+        "country": "Uganda",
+        "kwargs": {},
+        "check": "index_levels_match_scheme",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|Uganda||index_levels_match_scheme",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 345,
+        "feature": "household_roster",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 346,
+        "feature": "household_roster",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 347,
+        "feature": "household_roster",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 348,
+        "feature": "household_roster",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 349,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 350,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 351,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 352,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 353,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 354,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 355,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 356,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 357,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 358,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 359,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 360,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 361,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 362,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 363,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 364,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 365,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "market_adds_m",
+        "status": "pass",
+        "severity": null,
+        "fingerprint": "household_roster|ALL|market=Region|market_adds_m",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 366,
+        "feature": "household_roster",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_roster|ALL|market=Region|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 367,
+        "feature": "household_characteristics",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 368,
+        "feature": "household_characteristics",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 369,
+        "feature": "household_characteristics",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 370,
+        "feature": "household_characteristics",
+        "phase": "1a-sanity",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 371,
+        "feature": "household_characteristics",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 372,
+        "feature": "household_characteristics",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 373,
+        "feature": "household_characteristics",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 374,
+        "feature": "household_characteristics",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL||runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 375,
+        "feature": "household_characteristics",
+        "phase": "1b-assembly",
+        "country": null,
+        "kwargs": {},
+        "check": "missing_canonical_level",
+        "status": "warn",
+        "severity": "B",
+        "fingerprint": "household_characteristics|ALL||missing_canonical_level",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 376,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "age_cuts": [
+            5,
+            15,
+            60
+          ]
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|age_cuts=[5, 15, 60]|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 377,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "age_cuts": [
+            5,
+            15,
+            60
+          ]
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|age_cuts=[5, 15, 60]|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 378,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "age_cuts": [
+            5,
+            15,
+            60
+          ]
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|age_cuts=[5, 15, 60]|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 379,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "age_cuts": [
+            5,
+            15,
+            60
+          ]
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|age_cuts=[5, 15, 60]|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 380,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "age_cuts": [
+            5,
+            15,
+            60
+          ]
+        },
+        "check": "missing_canonical_level",
+        "status": "warn",
+        "severity": "B",
+        "fingerprint": "household_characteristics|ALL|age_cuts=[5, 15, 60]|missing_canonical_level",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 381,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 382,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 383,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 384,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 385,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 386,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 387,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 388,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 389,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 390,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 391,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 392,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 393,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 394,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 395,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 396,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "runtime_warning",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|runtime_warning",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 397,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "market_adds_m",
+        "status": "pass",
+        "severity": null,
+        "fingerprint": "household_characteristics|ALL|market=Region|market_adds_m",
+        "complete_record_exact_to_actual15": true
+      },
+      {
+        "ordinal": 398,
+        "feature": "household_characteristics",
+        "phase": "2-kwargs",
+        "country": null,
+        "kwargs": {
+          "market": "Region"
+        },
+        "check": "kwarg_changes_rowcount",
+        "status": "warn",
+        "severity": "C",
+        "fingerprint": "household_characteristics|ALL|market=Region|kwarg_changes_rowcount",
+        "complete_record_exact_to_actual15": true
+      }
+    ],
+    "full549_39_rerun": false,
+    "source_pinned_standalone_zero_scope_carried": true,
+    "strict_API_audit": "PASS",
+    "network_or_forbidden_write_attempts": 0,
+    "functional_guard_controls": {
+      "socket": 2,
+      "frozen_write": 3,
+      "existing_metadata": 4
+    },
+    "in_tree_parquets": 0,
+    "scope": "Bounded composed handler/Feature and four-source-table health; no whole-country source-cold or full-suite claim"
+  },
+  "source_boundary": {
+    "actual15": "4227e3a802c7349b11f41ec70a924d712159e587",
+    "actual16": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+    "reviewed1081": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+    "changed_paths": [
+      ".coder/ledger/1081-derived-categorical-errors.md",
+      "lsms_library/country.py",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/REPORT.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/REPRODUCE.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/RESIDUALS.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/VALIDATION.json",
+      "tests/test_1081_derived_categorical_errors.py"
+    ],
+    "production_added_lines": 9,
+    "entire_actual15_country_py_reconstructed": true,
+    "six_new_Git_blobs_equal_reviewed1081": true,
+    "UnitsUnavailable_handler_byte_exact": true,
+    "1077_1062_categorical_Feature_transform_country_config_fixture_dependencies_exact": true,
+    "unmerged_entries": 0,
+    "current_country_notes": {
+      "Ethiopia": {
+        "lines": 2385,
+        "sha256": "406a382f3f8bbf0fe9d4930e8633ecfa3ae122a081e6ec7b01718f39fba3d8fc",
+        "full_current_read_including_tasks": true
+      },
+      "Uganda": {
+        "lines": 3626,
+        "sha256": "afa5986fcdaeb7baef8da1743fb18951828263df0a3159e28cdd5cd6dff30f65",
+        "full_current_read_including_tasks": true
+      }
+    },
+    "standalone_zero_549_39_inventory_source_pin": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+    "standalone_zero_549_39_inventory_counts": {
+      "country_hashes": 549,
+      "framework_fingerprints": 39
+    },
+    "standalone_inventory_receipts": {
+      "baseline": "8a5a86db39951ce82bf7d1facfaffe43ac690467c50ce7021cc2e78d929854a0",
+      "candidate": "5b26d37a3ca2c9fa2a229c1ca05c8ea0abdbde5c077a52a87a9bbd227051b6b8"
+    },
+    "no_global_inventory_rerun": true,
+    "filesystem_modes": "Each tree retains its own initial modes. Five new writer docs0644 versus detached review0600 are identical Git100644 blobs; no cross-tree filesystem mode equality asserted."
+  },
+  "immutable_protection": {
+    "heads": {
+      "/local/job40255479/worktrees/isa-Burkina_Faso": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb",
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1058": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1058-fix": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1123": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "/local/job40255479/worktrees/isa-baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "/local/job40255479/worktrees/isa-baseline-fifteen-framework": "4227e3a802c7349b11f41ec70a924d712159e587",
+      "/local/job40255479/worktrees/isa-baseline-fourteen-Burkina": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+      "/local/job40255479/worktrees/isa-framework-1081": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "/local/job40255479/worktrees/isa-framework-1081-fix": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "/local/job40255479/worktrees/isa-integration": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+      "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso-base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "/local/job40255479/worktrees/isa-review-1081": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "/local/job40255479/worktrees/isa-review-1081-base": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    "tree_count": 14,
+    "immutable_evidence_count": 12,
+    "tracked_counts": {
+      "/local/job40255479/worktrees/isa-Burkina_Faso": 14889,
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1058": 14880,
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1058-fix": 14885,
+      "/local/job40255479/worktrees/isa-Burkina_Faso-1123": 14886,
+      "/local/job40255479/worktrees/isa-baseline": 14880,
+      "/local/job40255479/worktrees/isa-baseline-fifteen-framework": 15011,
+      "/local/job40255479/worktrees/isa-baseline-fourteen-Burkina": 15006,
+      "/local/job40255479/worktrees/isa-framework-1081": 14880,
+      "/local/job40255479/worktrees/isa-framework-1081-fix": 14886,
+      "/local/job40255479/worktrees/isa-integration": 15017,
+      "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso": 14885,
+      "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso-base": 14880,
+      "/local/job40255479/worktrees/isa-review-1081": 14886,
+      "/local/job40255479/worktrees/isa-review-1081-base": 14880
+    },
+    "all_clean": true,
+    "content_modes_symlink_mtime_heads_exact": true,
+    "candidate_existing_metadata_exact": true
+  },
+  "release": {
+    "task_consumers_remaining": 0,
+    "freeze_released": true
+  },
+  "limits": [
+    "Four Ethiopia prerequisites were naturally source-built from20 verified held sources in a separately approved actual15 staging root; main review APIs use current L2 copies.",
+    "Uganda remains a current held warm comparator; unresolved1078 concurrency defect is not repaired or excused.",
+    "No full-suite or549/39 rerun; exact nine-line union and source-pinned standalone zero-change inventories bound scope.",
+    "Initial preparation/sample-binding/sample-count/empty-directory verifier stops are preserved; none is accepted as product evidence.",
+    "Five new writer docs0644 versus detached review0600 are separately preserved; equal Git blobs do not imply equal filesystem modes.",
+    "No actual-price, units, Aggregate, generic fallback, quantity or other-country policy change is claimed."
+  ],
+  "country_note_proposals": [
+    "Ethiopia explicit food_prices(unitprice) raises UnitsUnavailableError because reported Price is absent; reconcile historical empty-frame prose.",
+    "Uganda historical unused-at-runtime quotation requires its existing build-decoder versus query-resolver qualification."
+  ],
+  "signed": "Sue"
+}

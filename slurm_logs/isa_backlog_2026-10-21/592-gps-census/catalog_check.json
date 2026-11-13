@@ -1,0 +1,925 @@
+[
+ {
+  "idno": "MWI_2004_IHS-II_v01_M",
+  "n_datafiles": 52,
+  "n_variables": 1901,
+  "n_variables_total_reported": 1901,
+  "geo_named_files": [],
+  "coordinate_like_variables": []
+ },
+ {
+  "idno": "MWI_2010-2016_IHPS_v03_M",
+  "n_datafiles": 291,
+  "n_variables": 10393,
+  "n_variables_total_reported": 10393,
+  "geo_named_files": [
+   {
+    "file": "HouseholdGeovariables_IHS3_Rerelease_10",
+    "cases": 1619,
+    "vars": 115
+   },
+   {
+    "file": "PlotGeovariables_IHS3_Rerelease_10",
+    "cases": 2392,
+    "vars": 61
+   },
+   {
+    "file": "HouseholdGeovariables_IHPS_13",
+    "cases": 1990,
+    "vars": 51
+   },
+   {
+    "file": "PlotGeovariables_IHPS_13",
+    "cases": 4549,
+    "vars": 6
+   },
+   {
+    "file": "PlotGeovariablesIHPSY3_16",
+    "cases": 4658,
+    "vars": 8
+   },
+   {
+    "file": "HouseholdGeovariablesIHPSY3",
+    "cases": 2508,
+    "vars": 39
+   }
+  ],
+  "coordinate_like_variables": [
+   {
+    "file": "HouseholdGeovariables_IHS3_Rerelease_10",
+    "name": "lat_modified",
+    "label": "EA Latitude Modified"
+   },
+   {
+    "file": "HouseholdGeovariables_IHS3_Rerelease_10",
+    "name": "lon_modified",
+    "label": "EA Longitude Modified"
+   },
+   {
+    "file": "ag_mod_c_10",
+    "name": "ag_c05d_os",
+    "label": "Reason GPS not taken"
+   },
+   {
+    "file": "ag_mod_j_10",
+    "name": "ag_j05c",
+    "label": "What is the area of this [PLOT]? (GPS MEASURE/AREA IN ACRES)"
+   },
+   {
+    "file": "HouseholdGeovariables_IHPS_13",
+    "name": "LAT_DD_MOD",
+    "label": "GPS Latitude Modified"
+   },
+   {
+    "file": "HouseholdGeovariables_IHPS_13",
+    "name": "LON_DD_MOD",
+    "label": "GPS Longitude Modified"
+   },
+   {
+    "file": "ag_mod_b1_13",
+    "name": "ag_b104c",
+    "label": "What is the area of this [GARDEN]? (GPS AREA IN ACRES)"
+   },
+   {
+    "file": "ag_mod_b1_13",
+    "name": "ag_b105e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_b1_13",
+    "name": "ag_b106",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE GARDEN COORDINATE"
+   },
+   {
+    "file": "ag_mod_c_13",
+    "name": "ag_c04c",
+    "label": "What is the area of this [PLOT]? (GPS AREA IN ACRES)"
+   },
+   {
+    "file": "ag_mod_c_13",
+    "name": "ag_c05e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_c_13",
+    "name": "ag_c06",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "ag_mod_i1_13",
+    "name": "ag_i105c",
+    "label": "What is the area of this [GARDEN]? (GPS AREA IN ACRES)"
+   },
+   {
+    "file": "ag_mod_i1_13",
+    "name": "ag_i106e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_i1_13",
+    "name": "ag_i107",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE GARDEN COORDINATE"
+   },
+   {
+    "file": "ag_mod_j_13",
+    "name": "ag_j06e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_j_13",
+    "name": "ag_j07",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "ag_mod_o1_13",
+    "name": "ag_o104c",
+    "label": "What is the area of this [GARDEN]? (GPS AREA IN ACRES)"
+   },
+   {
+    "file": "ag_mod_o1_13",
+    "name": "ag_o105e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_o1_13",
+    "name": "ag_o106",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE GARDEN COORDINATE"
+   },
+   {
+    "file": "ag_mod_o2_13",
+    "name": "ag_o05e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_o2_13",
+    "name": "ag_o06",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "hh_mod_f_16",
+    "name": "hh_f04_2b_1",
+    "label": "What is the area of this property? GPS MEASURE"
+   },
+   {
+    "file": "ag_mod_b1_16",
+    "name": "ag_b105c",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_b1_16",
+    "name": "ag_b105c_oth",
+    "label": "PLEASE SPECIFY REASON YOU DID NOT RECORD THE GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_b1_16",
+    "name": "ag_b106",
+    "label": "RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE COORDINATES"
+   },
+   {
+    "file": "ag_mod_b1_16",
+    "name": "ag_b106a",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "ag_mod_c_16",
+    "name": "ag_c04c",
+    "label": "Area of Plot Measured with GPS"
+   },
+   {
+    "file": "ag_mod_c_16",
+    "name": "ag_c05e",
+    "label": "Reason GPS Coordinates not recorded"
+   },
+   {
+    "file": "ag_mod_c_16",
+    "name": "ag_c05e_oth",
+    "label": "Other Reason GPS not taken"
+   },
+   {
+    "file": "ag_mod_c_16",
+    "name": "ag_c06",
+    "label": "Number of Tracked Sattelites on GPS"
+   },
+   {
+    "file": "ag_mod_c_16",
+    "name": "ag_c06_1",
+    "label": "GPS Accuracy"
+   },
+   {
+    "file": "ag_mod_i1_16",
+    "name": "ag_i106c",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_i1_16",
+    "name": "ag_i106c_oth",
+    "label": "Please specify the reason you did not record the GPS coordinates"
+   },
+   {
+    "file": "ag_mod_i1_16",
+    "name": "ag_i107",
+    "label": "NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "ag_mod_i1_16",
+    "name": "ag_i107a",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "ag_mod_j_16",
+    "name": "ag_j06e",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_j_16",
+    "name": "ag_j06e_oth",
+    "label": "Please specify the reason you did not record the GPS coordinates"
+   },
+   {
+    "file": "ag_mod_j_16",
+    "name": "ag_j07",
+    "label": "RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "ag_mod_j_16",
+    "name": "ag_j07_1",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "ag_mod_o1_16",
+    "name": "ag_o104a2",
+    "label": "Area of garden measured using GPS by Enumerator"
+   },
+   {
+    "file": "ag_mod_o1_16",
+    "name": "ag_o105c",
+    "label": "REASON GPS COORDINATES WERE NOT RECORDED"
+   },
+   {
+    "file": "ag_mod_o1_16",
+    "name": "ag_o105e",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_o1_16",
+    "name": "ag_o106",
+    "label": "Number Of Satellites GPS tracked to record plot coordinates"
+   },
+   {
+    "file": "ag_mod_o1_16",
+    "name": "ag_o106a",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "ag_mod_o2_16",
+    "name": "ag_o04c",
+    "label": "What is the area of this [PLOT]?  [GPS]"
+   },
+   {
+    "file": "ag_mod_o2_16",
+    "name": "ag_o05c",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_o2_16",
+    "name": "ag_o05c_oth",
+    "label": "PLEASE SPECIFY REASON YOU DID NOT RECORD THE GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_o2_16",
+    "name": "ag_o06",
+    "label": "Number of satelittes tracked to capture plot coordinates"
+   },
+   {
+    "file": "ag_mod_o2_16",
+    "name": "ag_o06a",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "PlotGeovariablesIHPSY3_16",
+    "name": "xy_src",
+    "label": "Source module for coordinates"
+   },
+   {
+    "file": "HouseholdGeovariablesIHPSY3",
+    "name": "lat_modified",
+    "label": "GPS Latitude Modified"
+   },
+   {
+    "file": "HouseholdGeovariablesIHPSY3",
+    "name": "lon_modified",
+    "label": "GPS Longitude Modified"
+   }
+  ]
+ },
+ {
+  "idno": "MWI_2010-2019_IHPS_v06_M",
+  "n_datafiles": 394,
+  "n_variables": 14262,
+  "n_variables_total_reported": 14262,
+  "geo_named_files": [
+   {
+    "file": "HouseholdGeovariables_IHS3_Rerelease_10",
+    "cases": 1619,
+    "vars": 115
+   },
+   {
+    "file": "PlotGeovariables_IHS3_Rerelease_10",
+    "cases": 2392,
+    "vars": 61
+   },
+   {
+    "file": "HouseholdGeovariables_IHPS_13",
+    "cases": 1990,
+    "vars": 51
+   },
+   {
+    "file": "PlotGeovariables_IHPS_13",
+    "cases": 4549,
+    "vars": 6
+   },
+   {
+    "file": "PlotGeovariablesIHPSY3_16",
+    "cases": 4658,
+    "vars": 8
+   },
+   {
+    "file": "HouseholdGeovariablesIHPSY3",
+    "cases": 2508,
+    "vars": 39
+   },
+   {
+    "file": "plotgeovariables_y4",
+    "cases": 6577,
+    "vars": 7
+   },
+   {
+    "file": "householdgeovariables_y4",
+    "cases": 3178,
+    "vars": 45
+   }
+  ],
+  "coordinate_like_variables": [
+   {
+    "file": "HouseholdGeovariables_IHS3_Rerelease_10",
+    "name": "lat_modified",
+    "label": "EA Latitude Modified"
+   },
+   {
+    "file": "HouseholdGeovariables_IHS3_Rerelease_10",
+    "name": "lon_modified",
+    "label": "EA Longitude Modified"
+   },
+   {
+    "file": "ag_mod_c_10",
+    "name": "ag_c05d_os",
+    "label": "Reason GPS not taken"
+   },
+   {
+    "file": "ag_mod_j_10",
+    "name": "ag_j05c",
+    "label": "What is the area of this [PLOT]? (GPS MEASURE/AREA IN ACRES)"
+   },
+   {
+    "file": "HouseholdGeovariables_IHPS_13",
+    "name": "LAT_DD_MOD",
+    "label": "GPS Latitude Modified"
+   },
+   {
+    "file": "HouseholdGeovariables_IHPS_13",
+    "name": "LON_DD_MOD",
+    "label": "GPS Longitude Modified"
+   },
+   {
+    "file": "ag_mod_b1_13",
+    "name": "ag_b104c",
+    "label": "What is the area of this [GARDEN]? (GPS AREA IN ACRES)"
+   },
+   {
+    "file": "ag_mod_b1_13",
+    "name": "ag_b105e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_b1_13",
+    "name": "ag_b106",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE GARDEN COORDINATE"
+   },
+   {
+    "file": "ag_mod_c_13",
+    "name": "ag_c04c",
+    "label": "What is the area of this [PLOT]? (GPS AREA IN ACRES)"
+   },
+   {
+    "file": "ag_mod_c_13",
+    "name": "ag_c05e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_c_13",
+    "name": "ag_c06",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "ag_mod_i1_13",
+    "name": "ag_i105c",
+    "label": "What is the area of this [GARDEN]? (GPS AREA IN ACRES)"
+   },
+   {
+    "file": "ag_mod_i1_13",
+    "name": "ag_i106e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_i1_13",
+    "name": "ag_i107",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE GARDEN COORDINATE"
+   },
+   {
+    "file": "ag_mod_j_13",
+    "name": "ag_j06e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_j_13",
+    "name": "ag_j07",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "ag_mod_o1_13",
+    "name": "ag_o104c",
+    "label": "What is the area of this [GARDEN]? (GPS AREA IN ACRES)"
+   },
+   {
+    "file": "ag_mod_o1_13",
+    "name": "ag_o105e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_o1_13",
+    "name": "ag_o106",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE GARDEN COORDINATE"
+   },
+   {
+    "file": "ag_mod_o2_13",
+    "name": "ag_o05e",
+    "label": "REASON DID NOT RECORD GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_o2_13",
+    "name": "ag_o06",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "hh_mod_f_16",
+    "name": "hh_f04_2b_1",
+    "label": "What is the area of this property? GPS MEASURE"
+   },
+   {
+    "file": "ag_mod_b1_16",
+    "name": "ag_b105c",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_b1_16",
+    "name": "ag_b105c_oth",
+    "label": "PLEASE SPECIFY REASON YOU DID NOT RECORD THE GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_b1_16",
+    "name": "ag_b106",
+    "label": "RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE COORDINATES"
+   },
+   {
+    "file": "ag_mod_b1_16",
+    "name": "ag_b106a",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "ag_mod_c_16",
+    "name": "ag_c04c",
+    "label": "Area of Plot Measured with GPS"
+   },
+   {
+    "file": "ag_mod_c_16",
+    "name": "ag_c05e",
+    "label": "Reason GPS Coordinates not recorded"
+   },
+   {
+    "file": "ag_mod_c_16",
+    "name": "ag_c05e_oth",
+    "label": "Other Reason GPS not taken"
+   },
+   {
+    "file": "ag_mod_c_16",
+    "name": "ag_c06",
+    "label": "Number of Tracked Sattelites on GPS"
+   },
+   {
+    "file": "ag_mod_c_16",
+    "name": "ag_c06_1",
+    "label": "GPS Accuracy"
+   },
+   {
+    "file": "ag_mod_i1_16",
+    "name": "ag_i106c",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_i1_16",
+    "name": "ag_i106c_oth",
+    "label": "Please specify the reason you did not record the GPS coordinates"
+   },
+   {
+    "file": "ag_mod_i1_16",
+    "name": "ag_i107",
+    "label": "NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "ag_mod_i1_16",
+    "name": "ag_i107a",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "ag_mod_j_16",
+    "name": "ag_j06e",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_j_16",
+    "name": "ag_j06e_oth",
+    "label": "Please specify the reason you did not record the GPS coordinates"
+   },
+   {
+    "file": "ag_mod_j_16",
+    "name": "ag_j07",
+    "label": "RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "ag_mod_j_16",
+    "name": "ag_j07_1",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "ag_mod_o1_16",
+    "name": "ag_o104a2",
+    "label": "Area of garden measured using GPS by Enumerator"
+   },
+   {
+    "file": "ag_mod_o1_16",
+    "name": "ag_o105c",
+    "label": "REASON GPS COORDINATES WERE NOT RECORDED"
+   },
+   {
+    "file": "ag_mod_o1_16",
+    "name": "ag_o105e",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_o1_16",
+    "name": "ag_o106",
+    "label": "Number Of Satellites GPS tracked to record plot coordinates"
+   },
+   {
+    "file": "ag_mod_o1_16",
+    "name": "ag_o106a",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "ag_mod_o2_16",
+    "name": "ag_o04c",
+    "label": "What is the area of this [PLOT]?  [GPS]"
+   },
+   {
+    "file": "ag_mod_o2_16",
+    "name": "ag_o05c",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_o2_16",
+    "name": "ag_o05c_oth",
+    "label": "PLEASE SPECIFY REASON YOU DID NOT RECORD THE GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_o2_16",
+    "name": "ag_o06",
+    "label": "Number of satelittes tracked to capture plot coordinates"
+   },
+   {
+    "file": "ag_mod_o2_16",
+    "name": "ag_o06a",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "PlotGeovariablesIHPSY3_16",
+    "name": "xy_src",
+    "label": "Source module for coordinates"
+   },
+   {
+    "file": "HouseholdGeovariablesIHPSY3",
+    "name": "lat_modified",
+    "label": "GPS Latitude Modified"
+   },
+   {
+    "file": "HouseholdGeovariablesIHPSY3",
+    "name": "lon_modified",
+    "label": "GPS Longitude Modified"
+   },
+   {
+    "file": "hh_mod_f1_19",
+    "name": "hh_f_1_1_02",
+    "label": "Were you told the GPS-based area for [GARDEN] in the last survey round?"
+   },
+   {
+    "file": "hh_mod_f1_19",
+    "name": "hh_f102b",
+    "label": "ENUMERATOR: GPS Measure Area in Acres"
+   },
+   {
+    "file": "hh_mod_f1_19",
+    "name": "hh_f102_2a",
+    "label": "Specify the HH members whom the GPS based area for [GARDEN] was shared... (ID 1)"
+   },
+   {
+    "file": "hh_mod_f1_19",
+    "name": "hh_f102_2b",
+    "label": "Specify the HH members whom the GPS based area for [GARDEN] was shared... (ID 2)"
+   },
+   {
+    "file": "hh_mod_f1_19",
+    "name": "hh_f102_2c",
+    "label": "Specify the HH members whom the GPS based area for [GARDEN] was shared... (ID 3)"
+   },
+   {
+    "file": "hh_mod_f1_19",
+    "name": "hh_f102e",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON"
+   },
+   {
+    "file": "hh_mod_f1_19",
+    "name": "hh_f102e_oth",
+    "label": "PLEASE SPECIFY REASON YOU DID NOT RECORD GPS."
+   },
+   {
+    "file": "ag_mod_c_19",
+    "name": "ag_c04c",
+    "label": "Area of Plot Measured with GPS"
+   },
+   {
+    "file": "ag_mod_c_19",
+    "name": "ag_c05c",
+    "label": "If you did not record the GPS coordiates, please specify reason."
+   },
+   {
+    "file": "ag_mod_c_19",
+    "name": "ag_c05c_oth",
+    "label": "Please specify reason you did not record the GPS coordinates."
+   },
+   {
+    "file": "ag_mod_c_19",
+    "name": "ag_c06",
+    "label": "Enumerator: Record number of satellites GPS racked to capture plot coordina.."
+   },
+   {
+    "file": "ag_mod_c_19",
+    "name": "ag_c06_1",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "ag_mod_j_19",
+    "name": "ag_j05c",
+    "label": "GPS Measured Area"
+   },
+   {
+    "file": "ag_mod_j_19",
+    "name": "ag_j06e",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_j_19",
+    "name": "ag_j06e_oth",
+    "label": "Please specify the reason you did not record the GPS coordinates"
+   },
+   {
+    "file": "ag_mod_j_19",
+    "name": "ag_j07",
+    "label": "ENUMERATOR: RECORD NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDIN..."
+   },
+   {
+    "file": "ag_mod_j_19",
+    "name": "ag_j07_1",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "ag_mod_o2_19",
+    "name": "ag_o04c",
+    "label": "What is the area of this [PLOT]?  [GPS]"
+   },
+   {
+    "file": "ag_mod_o2_19",
+    "name": "ag_o05e",
+    "label": "IF YOU DID NOT RECORD THE GPS COORDINATES, PLEASE SPECIFY REASON."
+   },
+   {
+    "file": "ag_mod_o2_19",
+    "name": "ag_o05e_oth",
+    "label": "PLEASE SPECIFY REASON YOU DID NOT RECORD THE GPS COORDINATES"
+   },
+   {
+    "file": "ag_mod_o2_19",
+    "name": "ag_o06",
+    "label": "RECORD THE NUMBER OF SATELLITES GPS TRACKED TO CAPTURE PLOT COORDINATES"
+   },
+   {
+    "file": "ag_mod_o2_19",
+    "name": "ag_o06a",
+    "label": "ENUMERATOR: RECORD GPS ACCURACY"
+   },
+   {
+    "file": "householdgeovariables_y4",
+    "name": "lat_mod",
+    "label": "Latitude Modified"
+   },
+   {
+    "file": "householdgeovariables_y4",
+    "name": "lon_mod",
+    "label": "Longitude Modified"
+   }
+  ]
+ },
+ {
+  "idno": "NER_2014_ECVMA-II_v02_M",
+  "n_datafiles": 74,
+  "n_variables": 2276,
+  "n_variables_total_reported": 2276,
+  "geo_named_files": [],
+  "coordinate_like_variables": [
+   {
+    "file": "ECVMA2_AS1P1",
+    "name": "AS01Q07",
+    "label": "Superficie de la parcelle GPS  (en m\u00e8tre carr\u00e9)"
+   },
+   {
+    "file": "ECVMA2_AS1P2",
+    "name": "AS01Q07",
+    "label": "Superficie de la parcelle GPS  (en m\u00e8tre carr\u00e9)"
+   }
+  ]
+ },
+ {
+  "idno": "UGA_2019_UNPS_v03_M",
+  "n_datafiles": 109,
+  "n_variables": 1963,
+  "n_variables_total_reported": 1963,
+  "geo_named_files": [],
+  "coordinate_like_variables": [
+   {
+    "file": "AGSEC2A",
+    "name": "s2aq4",
+    "label": "4. Size of this parcel in acres? GPS with two decimal digits"
+   },
+   {
+    "file": "AGSEC2B",
+    "name": "s2aq04",
+    "label": "4. Size of this parcel in acres? GPS with two decimal digits"
+   },
+   {
+    "file": "AGSEC3A",
+    "name": "s2aq04_1",
+    "label": "4_1. Size of this plot in acres? GPS with two decimal digits"
+   },
+   {
+    "file": "AGSEC3B",
+    "name": "s2aq05_211_1",
+    "label": "5.2. Was GPS captured?"
+   },
+   {
+    "file": "AGSEC3B",
+    "name": "s2aq04_1_1",
+    "label": "4_1 Size of the plot in acres? GPS with two decimal digits"
+   }
+  ]
+ },
+ {
+  "idno": "CIV_1985_EPAM_v01_M",
+  "n_datafiles": 109,
+  "n_variables": 1670,
+  "n_variables_total_reported": 1670,
+  "geo_named_files": [],
+  "coordinate_like_variables": []
+ },
+ {
+  "idno": "CIV_1986_EPAM_v01_M",
+  "n_datafiles": 114,
+  "n_variables": 1774,
+  "n_variables_total_reported": 1774,
+  "geo_named_files": [],
+  "coordinate_like_variables": []
+ },
+ {
+  "idno": "CIV_1987_EPAM_v01_M",
+  "n_datafiles": 112,
+  "n_variables": 2068,
+  "n_variables_total_reported": 2068,
+  "geo_named_files": [],
+  "coordinate_like_variables": []
+ },
+ {
+  "idno": "CIV_1988_EPAM_v01_M",
+  "n_datafiles": 110,
+  "n_variables": 1502,
+  "n_variables_total_reported": 1502,
+  "geo_named_files": [],
+  "coordinate_like_variables": []
+ },
+ {
+  "idno": "NGA_2023_GHSP-W5_v02_M",
+  "n_datafiles": 108,
+  "n_variables": 4531,
+  "n_variables_total_reported": 4531,
+  "geo_named_files": [
+   {
+    "file": "sect11a1_plantingw5",
+    "cases": 9232,
+    "vars": 23
+   },
+   {
+    "file": "secta1_harvestw5",
+    "cases": 9176,
+    "vars": 112
+   },
+   {
+    "file": "nga_householdgeovariables_y5",
+    "cases": 4883,
+    "vars": 55
+   }
+  ],
+  "coordinate_like_variables": [
+   {
+    "file": "secta_plantingw5",
+    "name": "wt_wave5",
+    "label": "Wave 5 longitudinal weight (for longitudinal analysis with wave 4)"
+   },
+   {
+    "file": "secta_plantingw5",
+    "name": "wt_longpanel_wave5",
+    "label": "Wave 5 long panel longitudinal weights (for longitudinal analysis with long pane"
+   },
+   {
+    "file": "sect11a1_plantingw5",
+    "name": "s11mq1",
+    "label": "WAS [PLOT] MEASURED BY GPS?"
+   },
+   {
+    "file": "sect11a1_plantingw5",
+    "name": "s11mq3",
+    "label": "WHAT IS THE AREA OF [PLOT]? USING A GPS DEVICE MEASURED IN SQ METERS"
+   },
+   {
+    "file": "sect11a1_plantingw5",
+    "name": "s11mq4a",
+    "label": "Why was [PLOT] not measured using GPS?"
+   },
+   {
+    "file": "secta_harvestw5",
+    "name": "wt_wave5",
+    "label": "Wave 5 longitudinal weight (for longitudinal analysis with wave 4)"
+   },
+   {
+    "file": "secta_harvestw5",
+    "name": "wt_longpanel_wave5",
+    "label": "Wave 5 long panel longitudinal weights (for longitudinal analysis with long pane"
+   },
+   {
+    "file": "sectaa_harvestw5",
+    "name": "wt_wave5",
+    "label": "Wave 5 longitudinal weight (for longitudinal analysis with wave 4)"
+   },
+   {
+    "file": "secta1_harvestw5",
+    "name": "sa1q1b",
+    "label": "WAS [PLOT] MEASURED USING GPS IN THE PREVIOUS VISIT?"
+   },
+   {
+    "file": "secta1_harvestw5",
+    "name": "sa1q1c",
+    "label": "GPS AREA IN SQUARE METERS OF [PLOT] FROM PREVIOUS VISIT"
+   },
+   {
+    "file": "nga_householdgeovariables_y5",
+    "name": "lat_mod",
+    "label": "Reference latitude, anonymized to maintain confidentiality of place"
+   },
+   {
+    "file": "nga_householdgeovariables_y5",
+    "name": "lon_mod",
+    "label": "Reference longitude, anonymized to maintain confidentiality of place"
+   },
+   {
+    "file": "totcons_final",
+    "name": "wt_wave5",
+    "label": "Wave 5 longitudinal weight (for longitudinal analysis with wave 4)"
+   }
+  ]
+ }
+]

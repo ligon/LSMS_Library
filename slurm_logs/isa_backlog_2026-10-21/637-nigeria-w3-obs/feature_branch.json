@@ -1,0 +1,45 @@
+{
+ "index": [
+  "country",
+  "t",
+  "v",
+  "j",
+  "u",
+  "variety",
+  "visit",
+  "obs",
+  "currency"
+ ],
+ "rows": 185200,
+ "unique": true,
+ "by_country": {
+  "Niger": 46043,
+  "Nigeria": 139157
+ },
+ "obs_dtype": "int64",
+ "visit_dtype": "int64",
+ "nigeria_by_t_obs": {
+  "2011Q1|1": 27104,
+  "2013Q1|1": 27079,
+  "2016Q1|1": 17344,
+  "2016Q1|2": 5809,
+  "2019Q1|1": 31757,
+  "2024Q1|1": 30064
+ },
+ "nigeria_variety": [
+  "unknown_variety"
+ ],
+ "nigeria_visit": [
+  1
+ ],
+ "warnings": {
+  "ClusterIdentityWarning": 1,
+  "UserWarning": 1,
+  "PopulationHeterogeneityWarning": 1
+ },
+ "grain_reports": 0,
+ "user_warnings": [
+  "community_prices: aligned country frames to the canonical index declared in data_info.yml -- added constant sentinel level(s) for countries whose instrument does not record them: {'Nigeria': {'variety': 'unknown_variety', 'visit': 1}}. No r"
+ ],
+ "grain_warnings": []
+}

@@ -116,13 +116,15 @@ such a result carried the *flat* Country report (`{'labels': …, 'n_unmatched':
 off a `Feature` result must index by country first. What the carrier *fixes*
 is the case of two or more kept countries whose reports differ, including
 when one of them has no report: there the concat dropped `attrs` entirely
-and the report was lost. No real call we have measured exercises that case. `Feature('food_prices')(['Malawi', 'Ethiopia'],
+and the report was lost. `Feature('food_prices')(['Malawi', 'Ethiopia'],
 labels='2004-05')` keeps only Malawi, because Ethiopia is dropped as
 unavailable, so it carried the flat report before the fix as well (32 of 147
 foods, 42,240 rows); it now carries `{'Malawi': …}`. `Feature('food_prices')(
-['Malawi', 'Uganda', 'Nigeria'], labels='Aggregate')` matches every label in
-all three countries, so it carries no report before or after. The evidence for
-the fix is therefore the synthetic two-country tests in
+['Malawi', 'Uganda', 'Nigeria'], labels='Aggregate')` is that case. Measured
+2026-11-04, Malawi and Uganda match every label and Nigeria passes 3 of 121
+through (`Groundnuts`, `Maize (shelled)`, `Pepper`; 11,649 rows, 2.4%), so it
+carries `{'Nigeria': …}`. When this section was written all three matched, so
+the evidence for the fix is the synthetic two-country tests in
 `tests/test_feature_attrs_carriers.py::TestLabelsUnmatchedSurvivesAssembly`.
 Four of its five tests fail on the pre-fix `feature.py`; the fifth,
 `test_no_labels_no_key`, is a control that passes either way.

@@ -1,0 +1,41 @@
+{
+  "physical_parquet_index_fields_only": true,
+  "mixed_unnamed_duplicate_logical_names_tested": true,
+  "actual_storage_preserved_no_global_cast": true,
+  "complete_axes_codes_levels_unused_levels_and_recursive_typed_attrs_checked": true,
+  "object_kind_EA_axis_nested_object_values_recursed": true,
+  "same_open_stream_for_generic_YAML_script_payload_and_footer": true,
+  "original_payload_error_dispositions_preserved": true,
+  "new_footer_and_restore_errors_remain_loud": true,
+  "writers_nonparquet_parsers_dependencies_and_schema_unchanged": true,
+  "Uganda2019_singleton": {
+    "Default_shape": [
+      824,
+      5
+    ],
+    "Make_shape": [
+      824,
+      3
+    ],
+    "two_extra_Default_columns_allnull_Float64": true,
+    "Default_v": "string/pd.NA",
+    "native_writer_footer_Make_v": "str/NaN",
+    "unused_level_difference_preexisting": true,
+    "full_equality_not_claimed": true
+  },
+  "country_notes_read_fully_before_runtime": {
+    "Niger_lines": 1567,
+    "Uganda_lines": 3619,
+    "TODO_WAITING_LOGBOOK_included": true
+  },
+  "retained_history_limits": [
+    "Author original bd80 full initial mtime snapshot absent; current source snapshots do not invent it.",
+    "Author six denied relative cleanup operations, existing mkdir/report-copy guard stop retained; no zero-author-denial claim.",
+    "Author missing-v4 attempted stdout/stderr basename reuse has no original raw-stream receipt; unique failure retained.",
+    "Own first host-Python 3.6 metadata-only source-inspection command failed before source processing; its tool-result trace is transcribed, not claimed to be an original raw stream receipt.",
+    "Own preflight dangling-symlink inventory, shadowed module import, and scanner expected-status-case checker stops retained with failed versions and unique failure traces.",
+    "Warnings have 20 location-qualified pairs; all 88 category/message pairs exact.",
+    "Scanner has one existing failure; only the two requested features/countries were exercised.",
+    "JSON attrs and pre-Arrow unused-level preparation are distinct existing writer boundaries."
+  ]
+}

@@ -1,0 +1,958 @@
+{
+  "verdict": "PASS",
+  "reviewer": "Sue (GPT-6)",
+  "finished_utc": "2026-10-21T21:49:42.200883+00:00",
+  "immutable_composition": {
+    "global13": "5dde66645a444b025aa69682838cdf7c033a6e88",
+    "global14": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "composed_parent": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+    "merge_parents_exact": true,
+    "all_incremental_blobs_and_modes_exact_composed": [
+      ".coder/ledger/1111-malawi-applied-kg.md",
+      "lsms_library/countries/Malawi/2010-11/_/plot_inputs.py",
+      "lsms_library/countries/Malawi/2019-20/_/plot_inputs.py",
+      "lsms_library/countries/Malawi/_/CONTENTS.org",
+      "slurm_logs/isa_backlog_2026-10-21/Malawi/1111/REPORT.md",
+      "slurm_logs/isa_backlog_2026-10-21/Malawi/1111/REPRODUCE.md",
+      "slurm_logs/isa_backlog_2026-10-21/Malawi/1111/RESIDUALS.md",
+      "slurm_logs/isa_backlog_2026-10-21/Malawi/1111/VALIDATION.md",
+      "slurm_logs/isa_backlog_2026-10-21/Malawi/1111/test-descendant-validation.json",
+      "slurm_logs/isa_backlog_2026-10-21/Malawi/1111/validation.json",
+      "tests/test_1111_malawi_applied_kg.py"
+    ],
+    "only_two_reviewed_production_driver_blobs_change": [
+      "lsms_library/countries/Malawi/2010-11/_/plot_inputs.py",
+      "lsms_library/countries/Malawi/2019-20/_/plot_inputs.py"
+    ],
+    "drivers_exact_standalone": true,
+    "shared_organic_helper_exact_all_four_parents": true,
+    "all_other_global13_paths_unchanged": true,
+    "country_contents": {
+      "Malawi": {
+        "lines": 3096,
+        "bytes": 211197,
+        "sha256": "41b159749719a73569f0fecc1c3a5ae47b5d525e389121faa8f283c724b12045"
+      },
+      "Uganda": {
+        "lines": 3626,
+        "bytes": 218232,
+        "sha256": "afa5986fcdaeb7baef8da1743fb18951828263df0a3159e28cdd5cd6dff30f65"
+      }
+    }
+  },
+  "preparation": {
+    "status": "COMPLETE_BEFORE_PROBES",
+    "held_Malawi_Stata_MD5_verified": 28,
+    "held_PDF_MD5_verified": 2,
+    "held_Uganda_declared_plot_sample_prerequisite_MD5_verified": 30,
+    "physical_copies": 242,
+    "all_copied_SHA256_size_modes_mtimes_exact_distinct_inodes_nlink1": true,
+    "both_Malawi_L2_absent": true,
+    "Uganda_seed_current_hash_full_coverage": true,
+    "Uganda_seed_hashes": {
+      "plot_inputs": "220da73270b2ad435aa4dfa111f98416eafcf5bc1a2a626d4c303c9197bfa8e5",
+      "sample": "470d3ca427e94137571937630b3a25fd403db9ff0a29d1bfd855f1d13a0f5e1f"
+    },
+    "reference_organic_warm_pooled_arguments": {
+      "currency": null
+    },
+    "new_default_Feature_controls_required": true
+  },
+  "dedicated_Feature_preparation": {
+    "status": "COMPLETE_BEFORE_FEATURE_PROBES",
+    "physical_copies": 150,
+    "both_Malawi_L2_absent": true,
+    "all_source_seed_receipts_exact": true
+  },
+  "source_oracle": {
+    "head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "source_slots": 33193,
+    "source_quantity_sum": 1765763.95,
+    "per_source_slot": [
+      {
+        "wave": "2010-11",
+        "source_half": "Full_Sample",
+        "slot": 1,
+        "rows": 11364,
+        "selected_quantity_sum": 662587.5,
+        "missing_quantities": 8,
+        "observed_zero_quantities": 0
+      },
+      {
+        "wave": "2010-11",
+        "source_half": "Full_Sample",
+        "slot": 2,
+        "rows": 5285,
+        "selected_quantity_sum": 306767.0,
+        "missing_quantities": 4,
+        "observed_zero_quantities": 0
+      },
+      {
+        "wave": "2019-20",
+        "source_half": "Cross_Sectional",
+        "slot": 1,
+        "rows": 8602,
+        "selected_quantity_sum": 409435.15,
+        "missing_quantities": 0,
+        "observed_zero_quantities": 11
+      },
+      {
+        "wave": "2019-20",
+        "source_half": "Cross_Sectional",
+        "slot": 2,
+        "rows": 3962,
+        "selected_quantity_sum": 199327.55,
+        "missing_quantities": 0,
+        "observed_zero_quantities": 2
+      },
+      {
+        "wave": "2019-20",
+        "source_half": "Panel",
+        "slot": 1,
+        "rows": 2763,
+        "selected_quantity_sum": 128137.75,
+        "missing_quantities": 0,
+        "observed_zero_quantities": 4
+      },
+      {
+        "wave": "2019-20",
+        "source_half": "Panel",
+        "slot": 2,
+        "rows": 1217,
+        "selected_quantity_sum": 59509.0,
+        "missing_quantities": 0,
+        "observed_zero_quantities": 1
+      }
+    ],
+    "pairs": [
+      {
+        "wave": "2010-11",
+        "same_source_positive_affirmative_pairs": 51,
+        "members": 102,
+        "member_quantity_sum": 4670.0
+      },
+      {
+        "wave": "2019-20",
+        "same_source_positive_affirmative_pairs": 184,
+        "members": 368,
+        "member_quantity_sum": 17322.0
+      }
+    ],
+    "new_coalescences": 235,
+    "observed": {
+      "base": {
+        "target_rows": 33152,
+        "every_source_group_amount_exact": true,
+        "every_purchase_and_Improved_payload_absent": true
+      },
+      "candidate": {
+        "target_rows": 32917,
+        "every_source_group_amount_exact": true,
+        "every_purchase_and_Improved_payload_absent": true
+      }
+    },
+    "existing_retention": {
+      "2010-11": {
+        "source_No_slots": 20,
+        "missing_use_slots": 13,
+        "missing_quantity_slots": 12,
+        "observed_zero_slots": 0
+      },
+      "2019-20": {
+        "source_No_slots": 0,
+        "missing_use_slots": 0,
+        "missing_quantity_slots": 0,
+        "observed_zero_slots": 18
+      }
+    },
+    "all_group_numeric_contributions_exact": true,
+    "oracle_uses_production_fertilizer_or_assembler": false,
+    "only_identifier_closure_reused": true,
+    "no_native_pair_substitution_or_rescaling": true
+  },
+  "tests": {
+    "HEAD": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "passed": 129,
+    "skips": 0,
+    "errors": 0,
+    "failures": 0,
+    "actual_driver_cases": 12,
+    "organic_regressions": 28,
+    "supporting_cases": 89,
+    "args": [
+      "-n",
+      "2",
+      "--dist=loadfile",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-p",
+      "pytest_identity",
+      "--basetemp=/local/job40255479/control/isa-backlog-20261021/integration/malawi-fourteen-review/pytest-composed",
+      "--junitxml=/local/job40255479/control/isa-backlog-20261021/integration/malawi-fourteen-review/tests-private.xml",
+      "tests/test_1111_malawi_applied_kg.py",
+      "tests/test_1109_malawi_input_quantity.py",
+      "tests/test_867_nitrogen_content.py",
+      "tests/test_863_transforms.py",
+      "tests/test_plot_id_canonical.py",
+      "-k",
+      "not warm"
+    ]
+  },
+  "all_fifteen_scanner_records": {
+    "base": "5dde66645a444b025aa69682838cdf7c033a6e88",
+    "candidate": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "actual_global13_records_exact_prior_composition_control": true,
+    "records": [
+      15,
+      15
+    ],
+    "exact_records": 11,
+    "expected_count_only_records": 4,
+    "failure_or_error_records": 0,
+    "normalization": false,
+    "delta": {
+      "Malawi_null_crop": [
+        67888,
+        67653
+      ],
+      "Malawi_native_null_unit": [
+        17649,
+        6067
+      ],
+      "Malawi_scope_rows": [
+        180184,
+        179949
+      ],
+      "Malawi_null_crop_percent": [
+        37.7,
+        37.6
+      ]
+    },
+    "phase2_plot_inputs_grid": false,
+    "individual_accounting": [
+      {
+        "ordinal": 1,
+        "meaning": "Malawi Improved all-null waves",
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "f804d3650257e26e82f7b058f7883e06ed6c2b9be29f9477d33438e67e9370c3",
+        "after_full_record_sha256": "f804d3650257e26e82f7b058f7883e06ed6c2b9be29f9477d33438e67e9370c3"
+      },
+      {
+        "ordinal": 2,
+        "meaning": "Malawi native null keys",
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": false,
+        "changed_fields": [
+          "detail"
+        ],
+        "before_full_record_sha256": "4ef121315154b58c499a650ff5d8cc4e1fda3cc9390dd9bf1d81a3f178d5ee0a",
+        "after_full_record_sha256": "b201e47eebb3dcfae06940eefab013ccc9bf1bde1dcc25e925680ba8c334c093"
+      },
+      {
+        "ordinal": 3,
+        "meaning": "Malawi Improved scope",
+        "phase": "1a-sanity",
+        "check": "null_content",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": false,
+        "changed_fields": [
+          "metrics"
+        ],
+        "before_full_record_sha256": "071747a5237829205734c5e6c582c80963d34b8fc45aca4d3c400c23b1621a24",
+        "after_full_record_sha256": "65e249c0bc29fd1261ae492b06937422b177b469e287ac115b7af106a99b1c64"
+      },
+      {
+        "ordinal": 4,
+        "meaning": "Malawi automatic v index",
+        "phase": "1a-sanity",
+        "check": "index_levels_match_scheme",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "03716c4e2d355d5e34238e35971eef6c022e6cffa2cad35b46340700c0904760",
+        "after_full_record_sha256": "03716c4e2d355d5e34238e35971eef6c022e6cffa2cad35b46340700c0904760"
+      },
+      {
+        "ordinal": 5,
+        "meaning": "Malawi null-crop rate",
+        "phase": "1a-sanity",
+        "check": "no_null_index_levels",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": false,
+        "changed_fields": [
+          "detail"
+        ],
+        "before_full_record_sha256": "15c541194ab52cf228f81095405d5e077578acaab4ee38e14eb0445547761d5e",
+        "after_full_record_sha256": "35ad31af7a2ea6d4e5a08a05aa709c08f7836bc6f93f2c4a7fd310892e2343a2"
+      },
+      {
+        "ordinal": 6,
+        "meaning": "Malawi constant Purchased and Applied",
+        "phase": "1a-sanity",
+        "check": "no_constant_columns",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "6d39c8f4de858ac5ca7dbc4ad9ab658ff925a218d2c4b14984cab7e6b37cb1df",
+        "after_full_record_sha256": "6d39c8f4de858ac5ca7dbc4ad9ab658ff925a218d2c4b14984cab7e6b37cb1df"
+      },
+      {
+        "ordinal": 7,
+        "meaning": "Uganda null keys",
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "c7155d2893c0d85e817ba6399377ad5e0fde404224f2823388e93caa656a400d",
+        "after_full_record_sha256": "c7155d2893c0d85e817ba6399377ad5e0fde404224f2823388e93caa656a400d"
+      },
+      {
+        "ordinal": 8,
+        "meaning": "Uganda cluster boundaries",
+        "phase": "1a-sanity",
+        "check": "runtime_warning",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "0785485eafce8d1bd0860b76058d0f898ae36cf78f3c3d7ce5b0b5de45184f46",
+        "after_full_record_sha256": "0785485eafce8d1bd0860b76058d0f898ae36cf78f3c3d7ce5b0b5de45184f46"
+      },
+      {
+        "ordinal": 9,
+        "meaning": "Uganda automatic v index",
+        "phase": "1a-sanity",
+        "check": "index_levels_match_scheme",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "6072ea800104933aaa804973b84a74d7e7da84847b9fc3484d4e8dcf4d07dca7",
+        "after_full_record_sha256": "6072ea800104933aaa804973b84a74d7e7da84847b9fc3484d4e8dcf4d07dca7"
+      },
+      {
+        "ordinal": 10,
+        "meaning": "assembly Improved warning",
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "632e66f4dd54c3d19162abb05cf865b78ba566952e9205b3f0e89aee6ce10571",
+        "after_full_record_sha256": "632e66f4dd54c3d19162abb05cf865b78ba566952e9205b3f0e89aee6ce10571"
+      },
+      {
+        "ordinal": 11,
+        "meaning": "assembly Malawi native null keys",
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": false,
+        "changed_fields": [
+          "detail"
+        ],
+        "before_full_record_sha256": "6ebffdde01beac5bbb1cd94440fc48757ce139a815f404207345493921f82dcb",
+        "after_full_record_sha256": "8632513d61ad8034ef5df484beba3d1d931bf639f7ead58370eb5d3cf5bee079"
+      },
+      {
+        "ordinal": 12,
+        "meaning": "assembly Uganda null keys",
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "bf19a34cbc933a1e797cd17c674ca027a3fc3e0795d6aa45253b9322a3df34a0",
+        "after_full_record_sha256": "bf19a34cbc933a1e797cd17c674ca027a3fc3e0795d6aa45253b9322a3df34a0"
+      },
+      {
+        "ordinal": 13,
+        "meaning": "assembly Uganda clusters",
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "fc7250c86cd9f57889348ac609ab73a769eb3c4b4fa83b6c0ca628f155c0e5ce",
+        "after_full_record_sha256": "fc7250c86cd9f57889348ac609ab73a769eb3c4b4fa83b6c0ca628f155c0e5ce"
+      },
+      {
+        "ordinal": 14,
+        "meaning": "canonical Feature alignment",
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "3cb3f22de760435b63c78773c52e6eb0dfa91ad8a6cd731752da177dbc8fcb55",
+        "after_full_record_sha256": "3cb3f22de760435b63c78773c52e6eb0dfa91ad8a6cd731752da177dbc8fcb55"
+      },
+      {
+        "ordinal": 15,
+        "meaning": "population-universe warning",
+        "phase": "1b-assembly",
+        "check": "runtime_warning",
+        "before_status": "warn",
+        "after_status": "warn",
+        "full_record_exact": true,
+        "changed_fields": [],
+        "before_full_record_sha256": "633a456816534f08f3ec7f5179a3f11f8aba5b388e292891e8360e6adeb7174b",
+        "after_full_record_sha256": "633a456816534f08f3ec7f5179a3f11f8aba5b388e292891e8360e6adeb7174b"
+      }
+    ]
+  },
+  "cache_source_isolation_and_cold_Feature_proof": {
+    "global14": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+    "roots": {
+      "base": {
+        "all_files": 90,
+        "complete_fresh_process_results_and_full_attrs_exact": true,
+        "all_bytes_modes_mtimes_still_exact_after_tests_oracle_scanner": true,
+        "cold_default_Feature_entry_return_serialized": false
+      },
+      "candidate": {
+        "all_files": 90,
+        "complete_fresh_process_results_and_full_attrs_exact": true,
+        "all_bytes_modes_mtimes_still_exact_after_tests_oracle_scanner": true,
+        "cold_default_Feature_entry_return_serialized": false
+      },
+      "base-feature": {
+        "all_files": 90,
+        "complete_fresh_process_results_and_full_attrs_exact": true,
+        "all_bytes_modes_mtimes_still_exact_after_tests_oracle_scanner": true,
+        "cold_default_Feature_entry_return_serialized": true
+      },
+      "candidate-feature": {
+        "all_files": 90,
+        "complete_fresh_process_results_and_full_attrs_exact": true,
+        "all_bytes_modes_mtimes_still_exact_after_tests_oracle_scanner": true,
+        "cold_default_Feature_entry_return_serialized": true
+      }
+    },
+    "physical_copies_source_and_destination_receipts_exact": 392,
+    "all_copies_distinct_inodes_nlink1_no_symlinks": true,
+    "healthy_Uganda_all_cache_files_byte_exact_four_roots": 17,
+    "healthy_Uganda_sample_full_frame_attrs_exact_rows": 24362,
+    "network_attempts": 0,
+    "unauthorized_mutations": 0,
+    "outside_checkout_existing_exclusive_creates_raise_FileExistsError": 8,
+    "guard_record_classes": {
+      "mkdir-existing": 8,
+      "exclusive-existing": 8
+    },
+    "no_assumed_fresh_manual_stamping_read_gate_bypass_or_NO_CACHE": true,
+    "normal_country_and_default_Feature_target_cold_entries_both_compared": true,
+    "original_fd235_cold_Feature_serialization_limit_unchanged": true
+  },
+  "frozen_trees_and_prior_evidence_exact": {
+    "mode": "after",
+    "all_tracked_content_modes_symlinks_HEAD_clean_exact": true,
+    "trees": {
+      "global14": {
+        "HEAD": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+        "clean": true,
+        "tracked_files": 15006
+      },
+      "global13": {
+        "HEAD": "5dde66645a444b025aa69682838cdf7c033a6e88",
+        "clean": true,
+        "tracked_files": 14998
+      },
+      "composed": {
+        "HEAD": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+        "clean": true,
+        "tracked_files": 14918
+      },
+      "organic": {
+        "HEAD": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+        "clean": true,
+        "tracked_files": 14910
+      },
+      "standalone": {
+        "HEAD": "a9356f2c5b2bb1709fedf9a288d12ef255ae44f3",
+        "clean": true,
+        "tracked_files": 14888
+      }
+    },
+    "all_reference_SHA256_bytes_modes_mtimes_exact": true,
+    "references": {
+      "standalone-review": 413,
+      "composed-review": 255,
+      "organic-review": 133,
+      "global13-review": 169
+    },
+    "root_metadata_candidate_tmp_and_baseline_link_exact": true
+  },
+  "private_full_before_manifest_sha256": "ee908ffd87a7acdf8575de21a9840f183dd2d8d6a78314bbddafdf8286cbbf08",
+  "runtime": {
+    "base": {
+      "cold": {
+        "HEAD": "5dde66645a444b025aa69682838cdf7c033a6e88",
+        "side": "base",
+        "stage": "cold",
+        "Country_rows": 180184,
+        "default_Feature_rows": 264400,
+        "default_Feature_arguments": {},
+        "historical_organic_reference_arguments": {
+          "currency": null
+        },
+        "all_public_frames_serialized_before_comparisons": true,
+        "Uganda_rows": 84216,
+        "Uganda_sample_rows": 24362,
+        "Malawi_sample_rows": 57118,
+        "nitrogen_total": 840235.7795800001,
+        "inorganic_numeric_sum": 2899339.95,
+        "organic_rows": 11075,
+        "organic_positive": 11068,
+        "organic_missing": 7,
+        "organic_units": {
+          "Kilogramme": 5518,
+          "Ox-Cart": 2155,
+          "Bucket": 1451,
+          "Other (Specify)": 1204,
+          "Wheelbarrow": 733,
+          "Unknown": 8,
+          "Organic unit code 1": 5,
+          "Organic unit code 3": 1
+        },
+        "Applied_exact": true,
+        "all_public_frames_and_full_attrs_exact": true,
+        "all_2013_2016_and_nonfertilizer_payload_order_attrs_exact": true,
+        "native_raw_country_frames": [
+          {
+            "path": "Malawi/2010-11/_/plot_inputs.parquet",
+            "rows": 46627,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2013-14/_/plot_inputs.parquet",
+            "rows": 16188,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2016-17/_/plot_inputs.parquet",
+            "rows": 52494,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2019-20/_/plot_inputs.parquet",
+            "rows": 64875,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/var/plot_inputs.parquet",
+            "rows": 180184,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          }
+        ],
+        "fresh_hash_full_wave_coverage": [
+          {
+            "country": "Malawi",
+            "table": "plot_inputs",
+            "current_hash": "a88577489ac4dba6c47762bc18d02a4f0b9e599b30bf2e33edc9e966322f2bcc",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Malawi",
+            "table": "sample",
+            "current_hash": "8540f7dd37190df7a71acbb9baacb6a9a3ce2c0ffd3ccd7d57e9e4b06003ee56",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Uganda",
+            "table": "plot_inputs",
+            "current_hash": "220da73270b2ad435aa4dfa111f98416eafcf5bc1a2a626d4c303c9197bfa8e5",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Uganda",
+            "table": "sample",
+            "current_hash": "470d3ca427e94137571937630b3a25fd403db9ff0a29d1bfd855f1d13a0f5e1f",
+            "fresh": true,
+            "full_wave_coverage": true
+          }
+        ],
+        "all_private_files": 90,
+        "all_private_L1_L2_companion_bytes_modes_mtimes_unchanged_on_warm": false,
+        "Uganda_cache_bytes_modes_mtimes_exact": true,
+        "warning_events_private": 36
+      },
+      "warm": {
+        "HEAD": "5dde66645a444b025aa69682838cdf7c033a6e88",
+        "side": "base",
+        "stage": "warm",
+        "Country_rows": 180184,
+        "default_Feature_rows": 264400,
+        "default_Feature_arguments": {},
+        "historical_organic_reference_arguments": {
+          "currency": null
+        },
+        "all_public_frames_serialized_before_comparisons": true,
+        "Uganda_rows": 84216,
+        "Uganda_sample_rows": 24362,
+        "Malawi_sample_rows": 57118,
+        "nitrogen_total": 840235.7795800001,
+        "inorganic_numeric_sum": 2899339.95,
+        "organic_rows": 11075,
+        "organic_positive": 11068,
+        "organic_missing": 7,
+        "organic_units": {
+          "Kilogramme": 5518,
+          "Ox-Cart": 2155,
+          "Bucket": 1451,
+          "Other (Specify)": 1204,
+          "Wheelbarrow": 733,
+          "Unknown": 8,
+          "Organic unit code 1": 5,
+          "Organic unit code 3": 1
+        },
+        "Applied_exact": true,
+        "all_public_frames_and_full_attrs_exact": true,
+        "all_2013_2016_and_nonfertilizer_payload_order_attrs_exact": true,
+        "native_raw_country_frames": [
+          {
+            "path": "Malawi/2010-11/_/plot_inputs.parquet",
+            "rows": 46627,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2013-14/_/plot_inputs.parquet",
+            "rows": 16188,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2016-17/_/plot_inputs.parquet",
+            "rows": 52494,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2019-20/_/plot_inputs.parquet",
+            "rows": 64875,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/var/plot_inputs.parquet",
+            "rows": 180184,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          }
+        ],
+        "fresh_hash_full_wave_coverage": [
+          {
+            "country": "Malawi",
+            "table": "plot_inputs",
+            "current_hash": "a88577489ac4dba6c47762bc18d02a4f0b9e599b30bf2e33edc9e966322f2bcc",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Malawi",
+            "table": "sample",
+            "current_hash": "8540f7dd37190df7a71acbb9baacb6a9a3ce2c0ffd3ccd7d57e9e4b06003ee56",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Uganda",
+            "table": "plot_inputs",
+            "current_hash": "220da73270b2ad435aa4dfa111f98416eafcf5bc1a2a626d4c303c9197bfa8e5",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Uganda",
+            "table": "sample",
+            "current_hash": "470d3ca427e94137571937630b3a25fd403db9ff0a29d1bfd855f1d13a0f5e1f",
+            "fresh": true,
+            "full_wave_coverage": true
+          }
+        ],
+        "all_private_files": 90,
+        "all_private_L1_L2_companion_bytes_modes_mtimes_unchanged_on_warm": true,
+        "Uganda_cache_bytes_modes_mtimes_exact": true,
+        "warning_events_private": 18
+      }
+    },
+    "candidate": {
+      "cold": {
+        "HEAD": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+        "side": "candidate",
+        "stage": "cold",
+        "Country_rows": 179949,
+        "default_Feature_rows": 264165,
+        "default_Feature_arguments": {},
+        "historical_organic_reference_arguments": {
+          "currency": null
+        },
+        "all_public_frames_serialized_before_comparisons": true,
+        "Uganda_rows": 84216,
+        "Uganda_sample_rows": 24362,
+        "Malawi_sample_rows": 57118,
+        "nitrogen_total": 1028195.63206,
+        "inorganic_numeric_sum": 2899339.95,
+        "organic_rows": 11075,
+        "organic_positive": 11068,
+        "organic_missing": 7,
+        "organic_units": {
+          "Kilogramme": 5518,
+          "Ox-Cart": 2155,
+          "Bucket": 1451,
+          "Other (Specify)": 1204,
+          "Wheelbarrow": 733,
+          "Unknown": 8,
+          "Organic unit code 1": 5,
+          "Organic unit code 3": 1
+        },
+        "Applied_exact": true,
+        "all_public_frames_and_full_attrs_exact": true,
+        "all_2013_2016_and_nonfertilizer_payload_order_attrs_exact": true,
+        "native_raw_country_frames": [
+          {
+            "path": "Malawi/2010-11/_/plot_inputs.parquet",
+            "rows": 46576,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2013-14/_/plot_inputs.parquet",
+            "rows": 16188,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2016-17/_/plot_inputs.parquet",
+            "rows": 52494,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2019-20/_/plot_inputs.parquet",
+            "rows": 64691,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/var/plot_inputs.parquet",
+            "rows": 179949,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          }
+        ],
+        "fresh_hash_full_wave_coverage": [
+          {
+            "country": "Malawi",
+            "table": "plot_inputs",
+            "current_hash": "6b2026832bc01bbe138d5ce3161fde0961811c235c35872198d56d4b5a4a1b8b",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Malawi",
+            "table": "sample",
+            "current_hash": "104d441918625ef4a480a7dc2413bc89619fcf28c7a7e90fa7c530c7f3970459",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Uganda",
+            "table": "plot_inputs",
+            "current_hash": "220da73270b2ad435aa4dfa111f98416eafcf5bc1a2a626d4c303c9197bfa8e5",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Uganda",
+            "table": "sample",
+            "current_hash": "470d3ca427e94137571937630b3a25fd403db9ff0a29d1bfd855f1d13a0f5e1f",
+            "fresh": true,
+            "full_wave_coverage": true
+          }
+        ],
+        "all_private_files": 90,
+        "all_private_L1_L2_companion_bytes_modes_mtimes_unchanged_on_warm": false,
+        "Uganda_cache_bytes_modes_mtimes_exact": true,
+        "warning_events_private": 36
+      },
+      "warm": {
+        "HEAD": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+        "side": "candidate",
+        "stage": "warm",
+        "Country_rows": 179949,
+        "default_Feature_rows": 264165,
+        "default_Feature_arguments": {},
+        "historical_organic_reference_arguments": {
+          "currency": null
+        },
+        "all_public_frames_serialized_before_comparisons": true,
+        "Uganda_rows": 84216,
+        "Uganda_sample_rows": 24362,
+        "Malawi_sample_rows": 57118,
+        "nitrogen_total": 1028195.63206,
+        "inorganic_numeric_sum": 2899339.95,
+        "organic_rows": 11075,
+        "organic_positive": 11068,
+        "organic_missing": 7,
+        "organic_units": {
+          "Kilogramme": 5518,
+          "Ox-Cart": 2155,
+          "Bucket": 1451,
+          "Other (Specify)": 1204,
+          "Wheelbarrow": 733,
+          "Unknown": 8,
+          "Organic unit code 1": 5,
+          "Organic unit code 3": 1
+        },
+        "Applied_exact": true,
+        "all_public_frames_and_full_attrs_exact": true,
+        "all_2013_2016_and_nonfertilizer_payload_order_attrs_exact": true,
+        "native_raw_country_frames": [
+          {
+            "path": "Malawi/2010-11/_/plot_inputs.parquet",
+            "rows": 46576,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2013-14/_/plot_inputs.parquet",
+            "rows": 16188,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2016-17/_/plot_inputs.parquet",
+            "rows": 52494,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/2019-20/_/plot_inputs.parquet",
+            "rows": 64691,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          },
+          {
+            "path": "Malawi/var/plot_inputs.parquet",
+            "rows": 179949,
+            "complete_order_values_masks_dtypes_axis_metadata_full_attrs_exact": true
+          }
+        ],
+        "fresh_hash_full_wave_coverage": [
+          {
+            "country": "Malawi",
+            "table": "plot_inputs",
+            "current_hash": "6b2026832bc01bbe138d5ce3161fde0961811c235c35872198d56d4b5a4a1b8b",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Malawi",
+            "table": "sample",
+            "current_hash": "104d441918625ef4a480a7dc2413bc89619fcf28c7a7e90fa7c530c7f3970459",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Uganda",
+            "table": "plot_inputs",
+            "current_hash": "220da73270b2ad435aa4dfa111f98416eafcf5bc1a2a626d4c303c9197bfa8e5",
+            "fresh": true,
+            "full_wave_coverage": true
+          },
+          {
+            "country": "Uganda",
+            "table": "sample",
+            "current_hash": "470d3ca427e94137571937630b3a25fd403db9ff0a29d1bfd855f1d13a0f5e1f",
+            "fresh": true,
+            "full_wave_coverage": true
+          }
+        ],
+        "all_private_files": 90,
+        "all_private_L1_L2_companion_bytes_modes_mtimes_unchanged_on_warm": true,
+        "Uganda_cache_bytes_modes_mtimes_exact": true,
+        "warning_events_private": 18
+      }
+    },
+    "base-feature": {
+      "cold": {
+        "HEAD": "5dde66645a444b025aa69682838cdf7c033a6e88",
+        "side": "base-feature",
+        "stage": "cold",
+        "normal_default_arguments": {},
+        "rows": 264400,
+        "target_cold_Feature_entry_and_return_serialized": true,
+        "complete_frame_order_dtypes_masks_axis_full_attrs_exact": true,
+        "fresh_current_hash_full_coverage": true,
+        "all_data_files": 90,
+        "all_warm_bytes_modes_mtimes_exact": false,
+        "healthy_Uganda_L1_receipts_exact": true
+      },
+      "warm": {
+        "HEAD": "5dde66645a444b025aa69682838cdf7c033a6e88",
+        "side": "base-feature",
+        "stage": "warm",
+        "normal_default_arguments": {},
+        "rows": 264400,
+        "target_cold_Feature_entry_and_return_serialized": false,
+        "complete_frame_order_dtypes_masks_axis_full_attrs_exact": true,
+        "fresh_current_hash_full_coverage": true,
+        "all_data_files": 90,
+        "all_warm_bytes_modes_mtimes_exact": true,
+        "healthy_Uganda_L1_receipts_exact": true
+      }
+    },
+    "candidate-feature": {
+      "cold": {
+        "HEAD": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+        "side": "candidate-feature",
+        "stage": "cold",
+        "normal_default_arguments": {},
+        "rows": 264165,
+        "target_cold_Feature_entry_and_return_serialized": true,
+        "complete_frame_order_dtypes_masks_axis_full_attrs_exact": true,
+        "fresh_current_hash_full_coverage": true,
+        "all_data_files": 90,
+        "all_warm_bytes_modes_mtimes_exact": false,
+        "healthy_Uganda_L1_receipts_exact": true
+      },
+      "warm": {
+        "HEAD": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+        "side": "candidate-feature",
+        "stage": "warm",
+        "normal_default_arguments": {},
+        "rows": 264165,
+        "target_cold_Feature_entry_and_return_serialized": false,
+        "complete_frame_order_dtypes_masks_axis_full_attrs_exact": true,
+        "fresh_current_hash_full_coverage": true,
+        "all_data_files": 90,
+        "all_warm_bytes_modes_mtimes_exact": true,
+        "healthy_Uganda_L1_receipts_exact": true
+      }
+    }
+  },
+  "quiescence": {
+    "quiescent_private_data_consumers": true,
+    "active_matching_consumers": 0,
+    "process_environments_checked": 9,
+    "same_uid_command_lines_checked": 19,
+    "other_uid_processes_excluded": 572,
+    "zombie_processes_without_running_consumers": 0,
+    "exited_processes": 0,
+    "unreadable_same_uid_environments_with_nonreview_command_lines": 10
+  },
+  "historical_fd235_first_cold_public_Feature_snapshot_serialized": false,
+  "new_global13_global14_default_Feature_cold_entries_serialized": true,
+  "no_broad_full_suite_or549_39_census_repeated": true
+}

@@ -1,0 +1,73 @@
+#+title: GH1218 -- validation of the composed fix on current development
+
+Sue (Claude Opus 5.5), 2026-10-22, job 40390255 on n0114.savio4.
+
+* What was validated
+
+Candidate =ab4e22a8b= is the reviewed fix =5fdbb937d= merged into ledger head =f0d0a1d2e=, which sits on development =60aa81e9e=.
+Its tree is =365d55b06b70=, the tree the integration ledger predicted.
+=lsms_library/_build_registry.py= is byte-identical to =5fdbb937d=, and the =country.py= patch against =60aa81e9e= is line-identical to =5fdbb937d='s patch against its parent =f7c33dd64=.
+
+Base is a detached =60aa81e9e= worktree.
+Every run used the mounted image (generation =20261019T221223Z=), =PYTHONPATH= and cwd set to the checkout under test with an import-identity assertion, a private =LSMS_DATA_DIR= per run (its =dvc-cache= a symlink to the shared L1), and BLAS/build workers pinned to one.
+No in-tree parquet was produced.
+
+* Results
+
+** Targeted tests (=targeted-tests.txt=)
+
+=tests/test_gh1039_make_backend_no_country_rule.py= and =tests/test_build_transform_hash.py=, =-n 4 --dist=loadfile=:
+
+| code under test    | test files      | result                 |
+|--------------------+-----------------+------------------------|
+| candidate          | candidate       | 161 passed             |
+| base =60aa=        | base            | 89 passed              |
+| base =60aa=        | candidate       | 56 failed, 105 passed  |
+
+The 56 base failures are the new GH1218 cases plus one pre-existing test, =test_empty_declared_frame_keeps_interleaved_optional_declaration_order=, whose all-=object= payload assertion the fix deliberately replaces with the typed contract.
+
+** Real data: Burkina Faso =plot_inputs= (=probe/=, =probe_1218.py=)
+
+Fresh process per cell; =waves=['2014']= and =waves=['2021-22']=, default and =LSMS_BUILD_BACKEND=make=.
+Every cell returns 0 rows, the same seven columns and the same index =(i, t, v, input, crop, u)=.
+
+| code      | backend       | =Unit_purchased= | =Received_as_gift= | =Quantity_received_as_gift= | =Unit_received_as_gift= |
+|-----------+---------------+------------------+--------------------+-----------------------------+-------------------------|
+| base      | default, make | object           | object             | object                      | object                  |
+| candidate | default, make | string           | boolean            | Float64                     | string                  |
+
+The three original fields are =Float64= / =boolean= / =Float64= in every cell.
+On the candidate the two backends agree on columns, dtypes, index names and dtypes, NA-value types and =attrs= keys.
+
+The issue text records the *default* backend as already typed on the author's runtime.
+In a cold private data root on =60aa= the default backend also reaches the constructed-empty path and serves =object=; the fix corrects both backends here.
+
+** Populated control (=populated_1218.py=)
+
+=plot_inputs(waves=['2018-19'])=, default backend: 22,877 rows.
+Base and candidate pass =assert_frame_equal(check_exact=True)= and their =attrs= compare equal.
+Both callers of =_empty_declared_frame= (=country.py:5084=, =:5460=) return it only for a request with no rows, so populated output cannot reach the change.
+
+** Cache-hash impact (=hash-impact.json=, =hash_census.py=)
+
+| hash                                       | moved / total |
+|--------------------------------------------+---------------|
+| =Country._table_cache_hash= (country, table) | 549 / 549     |
+| =build_transforms_fingerprint= (per table + all) | 40 / 40       |
+| =Wave._input_hash= (country, wave, table)  | 2,109 / 2,109 |
+
+Merging is a corpus-wide COLD re-warm: =_empty_declared_frame= and the =_ser= serializer are in every table's build closure.
+
+* Not run
+
+- A cross-country =Feature()= / seed / nitrogen comparison.  The populated control and the call-site argument above cover it by construction, not by measurement.
+- A comparison of raw-cache footprints.
+
+* Reproduce
+
+From each checkout, with =PY= the mounted interpreter and =DR= a fresh private data root whose =dvc-cache= links the shared L1:
+
+#+begin_src shell
+cd $CHECKOUT && env PYTHONPATH=$CHECKOUT LSMS_DATA_DIR=$DR OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 LSMS_BUILD_WORKERS=1 \
+  [LSMS_BUILD_BACKEND=make] $PY probe_1218.py $CHECKOUT 2014 out.json
+#+end_src

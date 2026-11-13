@@ -1,0 +1,484 @@
+{
+  "title": "Make no-builder empty results ignore nullable types of country-local optional fields",
+  "country": "Burkina_Faso",
+  "candidate_runtime": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+  "actual_parent": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "tier": "C, empty-interface datatype consistency; root owns dedup and severity decision",
+  "new_fields": [
+    "Unit_purchased",
+    "Received_as_gift",
+    "Quantity_received_as_gift",
+    "Unit_received_as_gift"
+  ],
+  "candidate_Default_types": [
+    "string",
+    "boolean",
+    "Float64",
+    "string"
+  ],
+  "candidate_Make_types": [
+    "object",
+    "object",
+    "object",
+    "object"
+  ],
+  "all_cases": [
+    {
+      "phase": "cold",
+      "request": "country-2014",
+      "candidate-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "string",
+          "Received_as_gift": "boolean",
+          "Quantity_received_as_gift": "Float64",
+          "Unit_received_as_gift": "string"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "candidate-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "object",
+          "Received_as_gift": "object",
+          "Quantity_received_as_gift": "object",
+          "Unit_received_as_gift": "object"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      }
+    },
+    {
+      "phase": "cold",
+      "request": "country-2021",
+      "candidate-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "string",
+          "Received_as_gift": "boolean",
+          "Quantity_received_as_gift": "Float64",
+          "Unit_received_as_gift": "string"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "candidate-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "object",
+          "Received_as_gift": "object",
+          "Quantity_received_as_gift": "object",
+          "Unit_received_as_gift": "object"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      }
+    },
+    {
+      "phase": "fresh-warm",
+      "request": "country-2014",
+      "candidate-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "string",
+          "Received_as_gift": "boolean",
+          "Quantity_received_as_gift": "Float64",
+          "Unit_received_as_gift": "string"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "candidate-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "object",
+          "Received_as_gift": "object",
+          "Quantity_received_as_gift": "object",
+          "Unit_received_as_gift": "object"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      }
+    },
+    {
+      "phase": "fresh-warm",
+      "request": "country-2021",
+      "candidate-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "string",
+          "Received_as_gift": "boolean",
+          "Quantity_received_as_gift": "Float64",
+          "Unit_received_as_gift": "string"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "candidate-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "object",
+          "Received_as_gift": "object",
+          "Quantity_received_as_gift": "object",
+          "Unit_received_as_gift": "object"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      }
+    }
+  ],
+  "full_strict_failures_retained": [
+    {
+      "name": "Default-Make-candidate-cold-country-2014",
+      "pass": false,
+      "tier": "observed-empty-optional-dtype",
+      "error_type": "AssertionError",
+      "detail": "Attributes of DataFrame.iloc[:, 3] (column name=\"Unit_purchased\") are different\n\nAttribute \"dtype\" are different\n[left]:  <StringDtype(na_value=<NA>)>\n[right]: object"
+    },
+    {
+      "name": "Default-Make-candidate-cold-country-2021",
+      "pass": false,
+      "tier": "observed-empty-optional-dtype",
+      "error_type": "AssertionError",
+      "detail": "Attributes of DataFrame.iloc[:, 3] (column name=\"Unit_purchased\") are different\n\nAttribute \"dtype\" are different\n[left]:  <StringDtype(na_value=<NA>)>\n[right]: object"
+    },
+    {
+      "name": "Default-Make-candidate-fresh-warm-country-2014",
+      "pass": false,
+      "tier": "observed-empty-optional-dtype",
+      "error_type": "AssertionError",
+      "detail": "Attributes of DataFrame.iloc[:, 3] (column name=\"Unit_purchased\") are different\n\nAttribute \"dtype\" are different\n[left]:  <StringDtype(na_value=<NA>)>\n[right]: object"
+    },
+    {
+      "name": "Default-Make-candidate-fresh-warm-country-2021",
+      "pass": false,
+      "tier": "observed-empty-optional-dtype",
+      "error_type": "AssertionError",
+      "detail": "Attributes of DataFrame.iloc[:, 3] (column name=\"Unit_purchased\") are different\n\nAttribute \"dtype\" are different\n[left]:  <StringDtype(na_value=<NA>)>\n[right]: object"
+    }
+  ],
+  "parent_qualification": "Actual parent has only original3columns; both backends match their types. Four new fields are absent, so this is newly exposed behavior using preexisting framework paths, not an identical parent four-field failure.",
+  "source_binding": [
+    "country.py:1050 _empty_declared_frame creates payload columns as object",
+    "country.py:5403 Make no-country-builder unsupported subset returns that empty frame",
+    "country.py:3953 finalizer calls scalar/list-only _enforce_declared_dtypes",
+    "country.py:7103 ignores extended optional dict type declarations",
+    "BF2018plot_inputs.py explicitly assigns native nullable new column types"
+  ],
+  "no_normalizing_fix": "No framework/global schema/map/builder/type weakening applied. Original comparisons and operands remain.",
+  "country_local_options": "No existing supported hook on this path; see empty-optional-dtype-static-options.md",
+  "signed": "Sue"
+}

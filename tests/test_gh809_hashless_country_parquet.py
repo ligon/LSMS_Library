@@ -31,6 +31,8 @@ visible failure.
 from __future__ import annotations
 
 import inspect
+import ast
+import textwrap
 import os
 import shutil
 from pathlib import Path
@@ -87,13 +89,31 @@ def test_the_wave_tier_still_trusts_once_and_stamps():
 # --------------------------------------------------------------------------
 
 def _country_read_path_source() -> str:
-    # GH #908 moved the L2-country read gate out of the tagged
-    # _aggregate_wave_data closure into Country._read_l2_country_cache (so an
-    # edit to it no longer cold-rebuilds the corpus).  Both pins below read the
-    # UNION of the two, so neither can be satisfied by the code simply having
-    # moved: the downgrade must exist in one of them, the stamp in neither.
-    return (inspect.getsource(country_mod.Country._aggregate_wave_data)
-            + inspect.getsource(country_mod.Country._read_l2_country_cache))
+    # Only the actual read gates, not fresh_make_country's verified producer
+    # stamp. Caller linkage/cache-hit branches are pinned independently below.
+    return (inspect.getsource(Country._read_l2_country_cache)
+            + inspect.getsource(Country._read_assumed_fresh_cache))
+
+
+def test_country_cache_hit_branches_reach_read_gate_and_never_write():
+    tree = ast.parse(textwrap.dedent(inspect.getsource(Country._aggregate_wave_data)))
+    routes = {n.name: n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
+    for route_name, hit_name in [('load_dataframe_with_dvc', 'cached_df'),
+                                  ('fresh_make_country', 'reused')]:
+        route = routes[route_name]
+        gates = [n for n in ast.walk(route) if isinstance(n, ast.Call)
+                 and ast.unparse(n.func) == 'self._read_l2_country_cache']
+        assert len(gates) == 1
+        hits = [n for n in ast.walk(route) if isinstance(n, ast.If)
+                and ((route_name == 'load_dataframe_with_dvc' and ast.unparse(n.test) == 'miss_reason is None')
+                     or (route_name == 'fresh_make_country' and ast.unparse(n.test) == 'reused is not None'))]
+        assert len(hits) == 1 and gates[0].lineno < hits[0].lineno
+        hit = ast.Module(body=hits[0].body, type_ignores=[])
+        assert any(isinstance(n, ast.Return) and hit_name in ast.unparse(n.value) for n in ast.walk(hit))
+        forbidden = {'stamp_parquet_hash', 'to_parquet', '_atomic_write_table', 'replace', 'unlink', 'write_bytes', 'write_text'}
+        calls = [n.func.id if isinstance(n.func, ast.Name) else n.func.attr
+                 for n in ast.walk(hit) if isinstance(n, ast.Call) and isinstance(n.func, (ast.Name, ast.Attribute))]
+        assert forbidden.isdisjoint(calls)
 
 
 def test_the_country_gate_converts_legacy_to_stale():
@@ -192,3 +212,27 @@ def test_a_destamped_parquet_rebuilds_once_and_does_not_loop(country, table,
     finally:
         shutil.copyfile(backup, p)
         backup.unlink(missing_ok=True)
+
+
+def test_fresh_invented_country_cache_hit_preserves_bytes_and_never_stamps(tmp_path, monkeypatch):
+    from types import SimpleNamespace, MethodType
+    import pandas as pd
+    from lsms_library import local_tools as LT
+    path = tmp_path / 'fresh.parquet'
+    frame = pd.DataFrame({'x': [1.0]}, index=pd.MultiIndex.from_tuples([('w1', 'h1')], names=['t', 'i']))
+    LT.to_parquet(frame, path, absolute_path=True, cache_hash='current', cache_waves=['w1'])
+    expected = LT.get_dataframe(path)
+    before = path.read_bytes(), path.stat().st_mtime_ns
+    receiver = SimpleNamespace(name='Invented', waves=['w1'], wave_folder_map={})
+    receiver._table_cache_hash = lambda table, waves: 'current'
+    for name in ['_cache_covers_waves', '_restrict_to_waves', '_grain_reports_for_waves']:
+        setattr(receiver, name, MethodType(getattr(Country, name), receiver))
+    def refuse(*args, **kwargs):
+        pytest.fail('cache hit attempted a write/stamp')
+    monkeypatch.setattr(country_mod, 'stamp_parquet_hash', refuse)
+    monkeypatch.setattr(country_mod, 'to_parquet', refuse)
+    for _ in range(2):
+        actual, covered, reason = Country._read_l2_country_cache(receiver, 'facts', path, ['w1'])
+        assert covered == ['w1'] and reason is None
+        pd.testing.assert_frame_equal(actual, expected, check_exact=True)
+        assert (path.read_bytes(), path.stat().st_mtime_ns) == before

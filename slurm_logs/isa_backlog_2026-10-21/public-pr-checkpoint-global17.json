@@ -1,0 +1,261 @@
+{
+  "observed_at_UTC": "2026-10-21 23:58:14 UTC",
+  "scope": "Seventeen implementation PRs individually open, unmerged, mergeable, with successful CI on exact heads. No global17 coexistence proof.",
+  "rows": [
+    {
+      "number": 1172,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1172",
+      "head": "fix/1034-nigeria-w3-unit-labels-20261021",
+      "head_sha": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39641986727,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1173,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1173",
+      "head": "fix/1062-uganda-sibling-writes-v2-20261021",
+      "head_sha": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39636912861,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1175,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1175",
+      "head": "fix/1109-malawi-organic-quantity-v2-20261021",
+      "head_sha": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39640824319,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1176,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1176",
+      "head": "fix/1088-niger-quantity-sentinel-20261021",
+      "head_sha": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39643227693,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1178,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1178",
+      "head": "fix/1144-nigeria-food-items-20261021",
+      "head_sha": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "base": "fix/1034-nigeria-w3-unit-labels-20261021",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39645861519,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1180,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1180",
+      "head": "fix/822-mali-community-readings-20261021",
+      "head_sha": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39649319628,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1181,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1181",
+      "head": "fix/1118-ethiopia-unknown-units-20261021",
+      "head_sha": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39657028262,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1182,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1182",
+      "head": "fix/1077-nonfinite-label-keys-20261021",
+      "head_sha": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39654667663,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1185,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1185",
+      "head": "fix/1118-tanzania-unknown-units-20261021",
+      "head_sha": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39657075627,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1186,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1186",
+      "head": "fix/1121-mali-labor-source-20261021",
+      "head_sha": "6e97eaeb488096459d673486c127043f016c4f8d",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39661144364,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1189,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1189",
+      "head": "fix/1123-burkina-input-identity-20261021",
+      "head_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39666499914,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1191,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1191",
+      "head": "fix/1006-uganda-derived-api-tests-20261021",
+      "head_sha": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39669180447,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1192,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1192",
+      "head": "fix/1095-nigeria-community-units-20261021",
+      "head_sha": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39676834859,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1193,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1193",
+      "head": "fix/1111-malawi-kg-on-organic-20261021",
+      "head_sha": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "base": "fix/1109-malawi-organic-quantity-v2-20261021",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39678420581,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1194,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1194",
+      "head": "fix/1058-burkina-parcel-coordinates-20261021",
+      "head_sha": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39683305731,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1195,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1195",
+      "head": "fix/1081-preserve-categorical-errors-20261021",
+      "head_sha": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39685546468,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    },
+    {
+      "number": 1197,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1197",
+      "head": "fix/1078-food-producer-provenance-20261021",
+      "head_sha": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "base": "development",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "ci": {
+        "id": 39696155414,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    }
+  ]
+}

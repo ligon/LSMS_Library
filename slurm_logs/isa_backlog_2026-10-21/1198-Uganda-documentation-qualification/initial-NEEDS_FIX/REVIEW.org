@@ -1,0 +1,47 @@
+#+TITLE: Uganda1198 documentation follow-up review
+#+AUTHOR: Sue
+#+DATE: 2026-10-22
+
+* Verdict
+
+NEEDS_FIX at73ad658420c020f81541306d51732e376d85955d against6e735eca93e3f68e63d79ce65ac71607ee9493bf.
+CONTENTS.org:3662 says the independent review "started from mode0644 copies".
+Its Uganda L2 files were produced by ordinary empty-L2 cold builds, not copied L2 operands.
+The frozen cold endpoint proves no initial Uganda cache, and the warm endpoints prove the same17 byte-identical paths changed0644 to0600 plus mtimes.
+Use a description of the actual measured transition without inferring copied inputs or a new starting-state provenance.
+Root acknowledged this wording issue and will provide a separate descendant; this snapshot remains unchanged.
+The prior runtime PASS is preserved and is not withdrawn.
+
+* Exact documentary and metadata boundary
+
+The previous full3,665-line Uganda reading carries by exact6e CONTENTS blob be81d30d8816827af537ba67dcef511e17a7bc08.
+The current3,671-line blob is821dfd401c658c4a35e43eef128ff48e6efdd905.
+The sole change is one sentence replaced by seven lines; mode100644 and every other tracked path/blob/mode are exact.
+Runtime/tests/config are unchanged.
+Actual549 API hashes and39 framework fingerprints are each identical in separate exact-source metadata-only guarded processes.
+No source decode, data API, unpickle, test or CLI replay was performed.
+Only empty private metadata directories were created; data roots contain no files or symlinks.
+Mounted image Python, exact cwd/import/countries/config/data identities, unshare-rn and socket/write guards were active before imports.
+Numeric/build/Make threads remain1; no pytest workers or source builders were launched.
+
+* Country context retained
+
+A/B is a module convention, not universal calendar order;2015A covers second2014 and B first2015.
+Native production IDs, actual wide slots, constructed release-row coordinates, conditional403 old-null exclusions and928 retained null-v observations remain unchanged.
+The2013 swapped labels,2018 missing A harvest unit/mixed B fields, separate sale units and season-specific crop-roster joins remain recorded qualifications.
+The misleading2018B slot2 calendar label is already explicitly adjudicated by CONTENTS1414-1434/2315-2324 and the loader35-38 using harvest dates/vocabulary.
+That settled ruling and the independent saved-date corroboration are retained; this is not a new calendar inference or design issue.
+The old coverage/registration contradictions, subset-routing/area residuals, support dtype distinction and historical XML/warning gaps remain qualified as in the frozen runtime review.
+
+* Evidence protection and limits
+
+Both current source trees retain exact initial/final tracked content, literal Git symlink bytes, modes, HEAD and clean state.
+Status/HEAD were checked before inventory launch; full actual-byte snapshots were captured while guarded metadata-only readers were active, and every byte matches immutable Git blobs.
+The frozen runtime proof's1,908 file sizes/modes/mtimes/types are exact before/after; its READY/manifest and14 safe exports are also content-hashed exactly.
+No old data file was decoded or rehashed; this is metadata continuity plus an outside-root write guard, not a new full1,908-content rehash claim.
+The original two inventory assertions stopped because library import legitimately created an empty private dvc-cache directory; they stopped before the hash loop.
+The separately named v2 checks permit empty metadata directories while rejecting every data file/symlink; original failures/logs remain.
+Network attempts are0; final READY records checker pins, a complete small proof manifest and zero other consumers.
+No source/product/Git/ref/GitHub edit occurred.
+
+Sue

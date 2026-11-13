@@ -1,0 +1,16 @@
+{
+  "number": 1203,
+  "url": "https://github.com/ligon/LSMS_Library/pull/1203",
+  "state": "open",
+  "merged": false,
+  "head_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "base": "fix/1123-burkina-input-identity-20261021",
+  "base_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+  "body_readback_exact": true,
+  "ci": {
+    "id": 39722612561,
+    "status": "in_progress",
+    "conclusion": null,
+    "data_suite_pass": false
+  }
+}

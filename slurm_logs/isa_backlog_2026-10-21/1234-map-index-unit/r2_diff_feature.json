@@ -1,0 +1,32 @@
+{
+ "Feature=Malawi/crop_production": {
+  "base_only": 0,
+  "base_only_u": {},
+  "branch_only": 0,
+  "branch_only_u": {},
+  "clean_relabel_only": true,
+  "columns_equal": true,
+  "common": 135078,
+  "common_diff": 0,
+  "common_diff_by_u": {},
+  "dup_index_base": 0,
+  "dup_index_branch": 0,
+  "index_equal": true,
+  "matched": 0,
+  "matched_u_pairs": {},
+  "matched_value_diff": 0,
+  "relabelled_by_t": {},
+  "rows_base": 135078,
+  "rows_branch": 135078,
+  "u_counts": {
+   "base_Unknown": 8902,
+   "base_null": 0,
+   "base_unit": 0,
+   "branch_Unknown": 8902,
+   "branch_null": 0,
+   "branch_unit": 0
+  },
+  "unmatched_base_only": 0,
+  "unmatched_branch_only": 0
+ }
+}

@@ -1,0 +1,9 @@
+{
+ "backend": "default",
+ "countries_root_is_scratch": true,
+ "error": "CalledProcessError: Command '['make', '-s', '-j6', '../2018-19/_/plot_inputs.parquet']' returned non-zero exit status 2.",
+ "warning_categories": {
+  "GrainCollapseWarning": 2
+ },
+ "warning_heads": []
+}

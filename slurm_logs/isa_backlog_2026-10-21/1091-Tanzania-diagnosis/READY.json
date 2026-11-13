@@ -1,0 +1,91 @@
+{
+  "status": "DIAGNOSIS_COMPLETE_PROPOSAL_AWAITS_ROOT_REVIEW",
+  "source_head": "99c824079da480ab2646e499c06ac70e457ff271",
+  "runtime_source": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+  "branch": "diagnose/1091-tanzania-community-builder-20261021",
+  "clean": true,
+  "runtime_tests_exact_baseline": true,
+  "zero_other_consumers_at_freeze": true,
+  "final_writer_exits_after_READY": true,
+  "private_manifest": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091/final-manifest-private.json",
+  "private_manifest_entries": 1216,
+  "private_manifest_sha256": "0d0519b90e77e918b695815d7174d942b4fe1a12ce777510c0521b0d92315784",
+  "private_proof": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091/freeze-final-proof-private.json",
+  "safe_exports_allowlist": [
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091/safe-exports/DIAGNOSIS.org",
+      "size": 16010,
+      "sha256": "b7af83a185e6b6c8a1588b6aec97b4a02b9ae0f139cbe7af626adf1e5f6fe006"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091/safe-exports/PROPOSAL.org",
+      "size": 10096,
+      "sha256": "ceacc6254f120bb21068de0ff8f2229db55554148a9a88724a53b1bc05e9de93"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091/safe-exports/validation.json",
+      "size": 112109,
+      "sha256": "a547b3ee6ab3bb7aba65ebc784936b4d1e2a357109df03910bb8729792c75712"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091/safe-exports/DRAFT-RESIDUAL.md",
+      "size": 2326,
+      "sha256": "d7e783db21d643fad56dbb57381f5545082e9c38cf4899f80987c4632f7d60fa"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091/safe-exports/REPRODUCE.sh",
+      "size": 2065,
+      "sha256": "5a5ad3a705cbd0d3d9258a74da3614d5ab5294c41e4e33eb1447af467927b7a2"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091/safe-exports/ledger.md",
+      "size": 13233,
+      "sha256": "c9be24cb2f173f4823c614c7b0ed9e98856eb4996815ca3d91669d497b090ea8"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/Tanzania/1091/safe-exports/freeze-proof.json",
+      "size": 1661,
+      "sha256": "2bf1e2d334eccce7f599849c907406b16ae27d2a16999d7a9a49a9bdbc71fcb4"
+    }
+  ],
+  "observed_community_rows": 17699,
+  "wave_rows": {
+    "2019-20": 3076,
+    "2020-21": 14623
+  },
+  "source_raw_physical_copies_exact": 44,
+  "healthy_Mali_rows": 40218,
+  "existing_focused_tests": {
+    "passed": 58,
+    "skipped": 0,
+    "errors": 0
+  },
+  "normal_request_probes": 60,
+  "scanner": {
+    "warn": 4,
+    "fail": 0,
+    "error": 0,
+    "skip": 0
+  },
+  "generic_and_wave_Make_rules_preserved_actual_dryrun_proof": true,
+  "future_production_allowlist": [
+    "DELETE lsms_library/countries/Tanzania/_/community_prices.py",
+    "REMOVE ONLY original Make145-149; retain wave151-152 and generic154-155 byte-exact"
+  ],
+  "candidate_hash_scope_PREDICTION_ONLY": {
+    "Tanzania_moved": 25,
+    "other_API_exact": 524,
+    "framework_exact": 39
+  },
+  "reviewed1185_408_units_prior_proof_only_no_AG_staging": true,
+  "root_reports_PR1185_open_unmerged_exact_runtime": true,
+  "qualification": [
+    "No implementation or candidate census/build.",
+    "No first cold Feature snapshot; warm argument-matched Feature and new CLI artifact observations only.",
+    "Retained strict serialization/empty/typed-attrs distinctions and actual Make warm writes.",
+    "Initial curation cwd failure, guarded Poetry audit failure, auxiliary unpickle launch failure, text-only packaging cwd failure and metadata-only interpreter lookup failure remain excluded/preserved.",
+    "The two generic non-record tool tracebacks were not captured as original private logs; no successful data operation is claimed for those failed invocations.",
+    "Final receipt rehashing read bytes only; no API/source decoding/tests were repeated."
+  ],
+  "signer": "Sue (GPT-6)"
+}

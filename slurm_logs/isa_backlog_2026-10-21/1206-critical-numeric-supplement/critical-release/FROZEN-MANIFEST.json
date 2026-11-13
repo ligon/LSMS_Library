@@ -1,0 +1,4492 @@
+{
+  "1196-extra-copy-receipts-private.json": {
+    "sha256": "e7a9a2ad33684409d33ffa6b8a1c91a05152ee576d13984cea1494951b8a3b3c",
+    "bytes": 18767,
+    "mode": 384,
+    "mtime_ns": 1792651210915103319,
+    "inode": 59385871,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "1196-extra-pair-plan-private.json": {
+    "sha256": "87f2fabdb35897de178fd33f0dcf4031ee8025857b8ae568948338da01c05818",
+    "bytes": 3810,
+    "mode": 384,
+    "mtime_ns": 1792651210914103313,
+    "inode": 59385870,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "1196-extra-pair-results-private.json": {
+    "sha256": "5bc79e9ea89a38de943347564d5739ef82d20d1d15c89a22241a4539ef49a26c",
+    "bytes": 4957,
+    "mode": 384,
+    "mtime_ns": 1792651249335323010,
+    "inode": 59385872,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "1196-extra-safe.json": {
+    "sha256": "6e7f2e12ce70242631506fa50d0d54751440edb333e20094a933e12bd4a825b6",
+    "bytes": 603,
+    "mode": 384,
+    "mtime_ns": 1792651249335323010,
+    "inode": 59385873,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "1196-original-exact.py": {
+    "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2",
+    "bytes": 4376,
+    "mode": 384,
+    "mtime_ns": 1792650621807714413,
+    "inode": 59385847,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "COVERAGE-REGISTRY-safe.json": {
+    "sha256": "3b1b280440e2bcec6077eb57126df8610797cec015cd452a6109d3c35f5d7bd8",
+    "bytes": 20573,
+    "mode": 384,
+    "mtime_ns": 1792651052022188750,
+    "inode": 59385864,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "NEXT-REASSESSMENT-BRIEF.md": {
+    "sha256": "82b10c85ce9fa7af4a0ec348e4891496a840627c2be254265c6db1b0199b0058",
+    "bytes": 7800,
+    "mode": 384,
+    "mtime_ns": 1792649641926209223,
+    "inode": 59385838,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "bootstrap.py": {
+    "sha256": "3a3aca0d72e4d3b919bc1708947f8edc413e712cab125d2badb74e104199b522",
+    "bytes": 2560,
+    "mode": 384,
+    "mtime_ns": 1792650727641300176,
+    "inode": 59385848,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "check-1196-extra-v1-private.log": {
+    "sha256": "d2ee4da451f8491041a822f654b7b90399093a386927922ef8e9e1b2c02597d5",
+    "bytes": 575,
+    "mode": 384,
+    "mtime_ns": 1792651249335323010,
+    "inode": 59385869,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "check-1196-extra.py": {
+    "sha256": "ee572ee02c071e0a499e0a1be22f3c0a6c0c8448ecbe6c6584959269506c0541",
+    "bytes": 2522,
+    "mode": 384,
+    "mtime_ns": 1792651241441277871,
+    "inode": 59385868,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "check-critical-cache-pairs.py": {
+    "sha256": "e481fd57b794fedbc167dc80b169bdf7cb65dea8243508578587b3e2c413c10f",
+    "bytes": 1728,
+    "mode": 384,
+    "mtime_ns": 1792651083929371838,
+    "inode": 59385858,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "check-critical-cache-v1-private.log": {
+    "sha256": "b83e5a87f1f91f87ff9e81201c0864db3526fd34cae1391f606963f0cb3c1e1b",
+    "bytes": 57,
+    "mode": 384,
+    "mtime_ns": 1792651092592421691,
+    "inode": 59385859,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "check-critical-v1-private.log": {
+    "sha256": "2f55f0f0b6a38edf9efb087876fcbf0a91b97ef32816c6e46b6c4efc506705de",
+    "bytes": 1687,
+    "mode": 384,
+    "mtime_ns": 1792650889371230106,
+    "inode": 59385852,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "check-critical.py": {
+    "sha256": "947bc88204df04cdc9d23b70624f697fcd279fe20cfb01c2f5f7a3ed4658f808",
+    "bytes": 9585,
+    "mode": 384,
+    "mtime_ns": 1792650827403867387,
+    "inode": 59385851,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-CLI-byte-controls-safe.json": {
+    "sha256": "3d0901b86fb1a02d0ce0967742bb96fbe99e1a48a3cd772fc22958f5db7a4cb8",
+    "bytes": 3171,
+    "mode": 384,
+    "mtime_ns": 1792651052036188830,
+    "inode": 59385865,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-calibration-safe.json": {
+    "sha256": "fd936a23797c2ce46d0b3baf60e3f2d63e151f5ed4071fe10c4943a33ce80911",
+    "bytes": 502,
+    "mode": 384,
+    "mtime_ns": 1792650831629895675,
+    "inode": 59385853,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-copy-receipts-private.json": {
+    "sha256": "41a4d3394c17bd339d2d793bd18d0aad4f152709e6648fa7da61c27724d6c6c7",
+    "bytes": 289241,
+    "mode": 384,
+    "mtime_ns": 1792650621818714472,
+    "inode": 59385844,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-direct-cache-pairs-private.json": {
+    "sha256": "dbe57271f9a3b8c9e1d46e43881ea6e8f5aa3360e3e0e0fd45864cae6e3e7ded",
+    "bytes": 21654,
+    "mode": 384,
+    "mtime_ns": 1792651092592421691,
+    "inode": 59385860,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-direct-cache-safe.json": {
+    "sha256": "bda6bc76c3d3eb9c413449055476669d0b1ca32ba5b55c09ff466f4b33e53690",
+    "bytes": 283,
+    "mode": 384,
+    "mtime_ns": 1792651092592421691,
+    "inode": 59385861,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-loaded-operands-private.json": {
+    "sha256": "7a93040e503711f64ef5a17f780d2f100988531a662089d7560ebdd35dec2f1e",
+    "bytes": 269300,
+    "mode": 384,
+    "mtime_ns": 1792650887092216605,
+    "inode": 59385856,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-pair-plan-private.json": {
+    "sha256": "1452e4342ad6750f5417324acb9f8c243bd68b879b5b20279333bf2edb53531f",
+    "bytes": 107806,
+    "mode": 384,
+    "mtime_ns": 1792650621810714429,
+    "inode": 59385843,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-pair-results-private.json": {
+    "sha256": "d41ca32a49bf6012af0945aaa9e301d8e3d4f765d724f5d320bf89813d6a42ff",
+    "bytes": 194843,
+    "mode": 384,
+    "mtime_ns": 1792650887084216558,
+    "inode": 59385855,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-preparation-safe.json": {
+    "sha256": "d9402a9a7f03c582a1b88fe853134d8faf5033b1b53a9f4b1ade9fe6e5957023",
+    "bytes": 1854,
+    "mode": 384,
+    "mtime_ns": 1792650621818714472,
+    "inode": 59385845,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-progress-safe.json": {
+    "sha256": "ba1222cf78d8bba7f503c43058410abfef3fc883392353b77cbb9d27a813701a",
+    "bytes": 98,
+    "mode": 384,
+    "mtime_ns": 1792650887078216522,
+    "inode": 59385857,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "critical-result-safe.json": {
+    "sha256": "756a7bf94a3a9c9af0c968019803c128448816db6183474a2ae8f4cfe3984db4",
+    "bytes": 1871,
+    "mode": 384,
+    "mtime_ns": 1792650889370230100,
+    "inode": 59385854,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "exact_strict.py": {
+    "sha256": "c42164e9d7e01027ac264b1442e5157d44aa0207655ab8c53d080659084f812d",
+    "bytes": 5155,
+    "mode": 384,
+    "mtime_ns": 1792650727680300392,
+    "inode": 59385849,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "inventory-and-cli-metadata.py": {
+    "sha256": "ae176a1bf697ce6885834f6e354975f6355cac23aca4affb239b4f2286c505df",
+    "bytes": 4143,
+    "mode": 384,
+    "mtime_ns": 1792651051644186584,
+    "inode": 59385862,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "inventory-v1-private.log": {
+    "sha256": "eaea05064b43ab0ede6fc7f655e9ae8ac6186289d312adf7f56380ce06876823",
+    "bytes": 131,
+    "mode": 384,
+    "mtime_ns": 1792651052036188830,
+    "inode": 59385863,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "ledger-draft.md": {
+    "sha256": "2fb4316671db6b0b65d75958bf2ea152aec0f4134bed510c2ffb06a59f576765",
+    "bytes": 3955,
+    "mode": 384,
+    "mtime_ns": 1792650320061062505,
+    "inode": 59385840,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/artifact-stages/Niger-metadata-read-private.pkl": {
+    "sha256": "9ffd4294c6e611f0ba7997e56054b37ba9f20f4fb7f4d8009ec03bf25df15617",
+    "bytes": 21573109,
+    "mode": 384,
+    "mtime_ns": 1792644875198954559,
+    "inode": 59516858,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/artifact-stages/Niger-metadata-returned-private.pkl": {
+    "sha256": "7e400d0e7cfb05c1b91919bcfee946e255444ee0a2ae53668025f6280b081fe5",
+    "bytes": 21573223,
+    "mode": 384,
+    "mtime_ns": 1792644875085953937,
+    "inode": 59516862,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/artifact-stages/Niger-plain-read-private.pkl": {
+    "sha256": "9ffd4294c6e611f0ba7997e56054b37ba9f20f4fb7f4d8009ec03bf25df15617",
+    "bytes": 21573109,
+    "mode": 384,
+    "mtime_ns": 1792644875612956839,
+    "inode": 59516864,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/artifact-stages/Niger-plain-returned-private.pkl": {
+    "sha256": "7e400d0e7cfb05c1b91919bcfee946e255444ee0a2ae53668025f6280b081fe5",
+    "bytes": 21573223,
+    "mode": 384,
+    "mtime_ns": 1792644875513956294,
+    "inode": 59516860,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/artifact-stages/Uganda-metadata-read-private.pkl": {
+    "sha256": "acd763a34c0f77882807c76956eab38e0eaf608a2ae49d016d3ebae7617401ec",
+    "bytes": 391015,
+    "mode": 384,
+    "mtime_ns": 1792644875891958376,
+    "inode": 59516857,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/artifact-stages/Uganda-metadata-returned-private.pkl": {
+    "sha256": "57352fa8a18b978a2b544c07fb9e51056242d98a660f4dbc761559c105c2929a",
+    "bytes": 392964,
+    "mode": 384,
+    "mtime_ns": 1792644875874958282,
+    "inode": 59516863,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/artifact-stages/Uganda-plain-read-private.pkl": {
+    "sha256": "acd763a34c0f77882807c76956eab38e0eaf608a2ae49d016d3ebae7617401ec",
+    "bytes": 391015,
+    "mode": 384,
+    "mtime_ns": 1792644875993958937,
+    "inode": 59516859,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/artifact-stages/Uganda-plain-returned-private.pkl": {
+    "sha256": "57352fa8a18b978a2b544c07fb9e51056242d98a660f4dbc761559c105c2929a",
+    "bytes": 392964,
+    "mode": 384,
+    "mtime_ns": 1792644875978958855,
+    "inode": 59516861,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/references/Niger/baseline-frames-cold/Niger-public-food_acquired-private.pkl": {
+    "sha256": "d5057af5557f75ffbb54f7ba188968aa411a1c5b9698914adae91915de64687b",
+    "bytes": 21573268,
+    "mode": 384,
+    "mtime_ns": 1792622834182610428,
+    "inode": 59516876,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/references/Niger/baseline-frames-warm-complete/Niger-public-food_acquired-private.pkl": {
+    "sha256": "a33b13f7f50d4e5497a3fb792eada5b2e0b449eae615b742b6120c456133871d",
+    "bytes": 21573275,
+    "mode": 384,
+    "mtime_ns": 1792623139931339490,
+    "inode": 59516874,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/references/Uganda/base/default-cold/Uganda-cluster_features-private.pkl": {
+    "sha256": "1dc5807b4cefcb044bfad94ecbdaedfbac887ef339b37834801834f536f23433",
+    "bytes": 392984,
+    "mode": 384,
+    "mtime_ns": 1792638610575654408,
+    "inode": 59516882,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/references/Uganda/base/default-warm/Uganda-cluster_features-private.pkl": {
+    "sha256": "dfbe7ba3611bdfa5d74ef3d604ccb9ab5545ce24ace5b5e594cd5f2f798dacf4",
+    "bytes": 392991,
+    "mode": 384,
+    "mtime_ns": 1792638852067050650,
+    "inode": 59516880,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/warm-fresh/Niger-public-private.pkl": {
+    "sha256": "a33b13f7f50d4e5497a3fb792eada5b2e0b449eae615b742b6120c456133871d",
+    "bytes": 21573275,
+    "mode": 384,
+    "mtime_ns": 1792644940741316774,
+    "inode": 59516869,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/warm-fresh/Uganda-public-private.pkl": {
+    "sha256": "dfbe7ba3611bdfa5d74ef3d604ccb9ab5545ce24ace5b5e594cd5f2f798dacf4",
+    "bytes": 392991,
+    "mode": 384,
+    "mtime_ns": 1792644941745322572,
+    "inode": 59516870,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/warm-observed/Niger-public-private.pkl": {
+    "sha256": "a33b13f7f50d4e5497a3fb792eada5b2e0b449eae615b742b6120c456133871d",
+    "bytes": 21573275,
+    "mode": 384,
+    "mtime_ns": 1792644928253246750,
+    "inode": 59516866,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/1196/warm-observed/Uganda-public-private.pkl": {
+    "sha256": "dfbe7ba3611bdfa5d74ef3d604ccb9ab5545ce24ace5b5e594cd5f2f798dacf4",
+    "bytes": 392991,
+    "mode": 384,
+    "mtime_ns": 1792644929265252323,
+    "inode": 59516867,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2008/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643734298340394,
+    "inode": 59650187,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2008/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643734311340474,
+    "inode": 59650191,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2008/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643734326340566,
+    "inode": 59650188,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2008/cold-public-private.pkl": {
+    "sha256": "51b7bd491406e2d59064bff098a52ef9896fc53962c9c895d5379ce8f85cc0b7",
+    "bytes": 23203,
+    "mode": 384,
+    "mtime_ns": 1792643734288340333,
+    "inode": 59650189,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2008/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643739176370340,
+    "inode": 59650193,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2008/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643739188370414,
+    "inode": 59650192,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2008/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643739202370499,
+    "inode": 59650186,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2008/warm-public-private.pkl": {
+    "sha256": "51b7bd491406e2d59064bff098a52ef9896fc53962c9c895d5379ce8f85cc0b7",
+    "bytes": 23203,
+    "mode": 384,
+    "mtime_ns": 1792643739165370272,
+    "inode": 59650190,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2010/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643751814447923,
+    "inode": 59516917,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2010/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643751829448016,
+    "inode": 59516921,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2010/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643751846448120,
+    "inode": 59516918,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2010/cold-public-private.pkl": {
+    "sha256": "51b7bd491406e2d59064bff098a52ef9896fc53962c9c895d5379ce8f85cc0b7",
+    "bytes": 23203,
+    "mode": 384,
+    "mtime_ns": 1792643751802447850,
+    "inode": 59516919,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2010/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643756627476024,
+    "inode": 59516923,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2010/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643756641476105,
+    "inode": 59516922,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2010/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643756658476203,
+    "inode": 59516916,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2010/warm-public-private.pkl": {
+    "sha256": "51b7bd491406e2d59064bff098a52ef9896fc53962c9c895d5379ce8f85cc0b7",
+    "bytes": 23203,
+    "mode": 384,
+    "mtime_ns": 1792643756613475943,
+    "inode": 59516920,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2012/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643769397549758,
+    "inode": 59650250,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2012/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643769413549850,
+    "inode": 59650254,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2012/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643769430549948,
+    "inode": 59650251,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2012/cold-public-private.pkl": {
+    "sha256": "51b7bd491406e2d59064bff098a52ef9896fc53962c9c895d5379ce8f85cc0b7",
+    "bytes": 23203,
+    "mode": 384,
+    "mtime_ns": 1792643769385549688,
+    "inode": 59650252,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2012/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643774530579421,
+    "inode": 59650256,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2012/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643774547579519,
+    "inode": 59650255,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2012/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643774564579617,
+    "inode": 59650249,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2012/warm-public-private.pkl": {
+    "sha256": "51b7bd491406e2d59064bff098a52ef9896fc53962c9c895d5379ce8f85cc0b7",
+    "bytes": 23203,
+    "mode": 384,
+    "mtime_ns": 1792643774515579334,
+    "inode": 59650253,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2014/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643787202652669,
+    "inode": 59650259,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2014/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643787215652744,
+    "inode": 59650263,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2014/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643787230652831,
+    "inode": 59650260,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2014/cold-public-private.pkl": {
+    "sha256": "51b7bd491406e2d59064bff098a52ef9896fc53962c9c895d5379ce8f85cc0b7",
+    "bytes": 23203,
+    "mode": 384,
+    "mtime_ns": 1792643787192652611,
+    "inode": 59650261,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2014/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643791972680241,
+    "inode": 59650265,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2014/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643791988680333,
+    "inode": 59650264,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2014/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643792004680426,
+    "inode": 59650258,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2014/warm-public-private.pkl": {
+    "sha256": "51b7bd491406e2d59064bff098a52ef9896fc53962c9c895d5379ce8f85cc0b7",
+    "bytes": 23203,
+    "mode": 384,
+    "mtime_ns": 1792643791961680177,
+    "inode": 59650262,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2019/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643687690060576,
+    "inode": 59650100,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2019/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "68e45feddcee224717de0ff60949a05461bf79af8f46ab1bc41041de167cfbc1",
+    "bytes": 101259,
+    "mode": 384,
+    "mtime_ns": 1792643687698060622,
+    "inode": 59650101,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2019/cold-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643687680060518,
+    "inode": 59650102,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2019/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643692291087217,
+    "inode": 59650104,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2019/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "68e45feddcee224717de0ff60949a05461bf79af8f46ab1bc41041de167cfbc1",
+    "bytes": 101259,
+    "mode": 384,
+    "mtime_ns": 1792643692300087269,
+    "inode": 59650099,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2019/warm-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643692280087153,
+    "inode": 59650103,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2020/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643700824136625,
+    "inode": 59516929,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2020/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "91592a231ba791f8657f96414c3fe7a8ff5938dfbe00c8eccea41539ea821cb3",
+    "bytes": 484997,
+    "mode": 384,
+    "mtime_ns": 1792643700837136700,
+    "inode": 59516926,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2020/cold-public-private.pkl": {
+    "sha256": "ab015eb56a2fe36b93a8a0e9bbc46df59189f42775bbece410450455a1e45366",
+    "bytes": 490002,
+    "mode": 384,
+    "mtime_ns": 1792643700804136509,
+    "inode": 59516927,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2020/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643705432163306,
+    "inode": 59516930,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2020/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "91592a231ba791f8657f96414c3fe7a8ff5938dfbe00c8eccea41539ea821cb3",
+    "bytes": 484997,
+    "mode": 384,
+    "mtime_ns": 1792643705447163393,
+    "inode": 59516925,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-2020/warm-public-private.pkl": {
+    "sha256": "ab015eb56a2fe36b93a8a0e9bbc46df59189f42775bbece410450455a1e45366",
+    "bytes": 490002,
+    "mode": 384,
+    "mtime_ns": 1792643705414163202,
+    "inode": 59516928,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643674975986959,
+    "inode": 59650107,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643674991987052,
+    "inode": 59650131,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "c7a0342ce656a2b2840dae2db94aae29666decde5bf49e4340bea1def8101d5a",
+    "bytes": 585890,
+    "mode": 384,
+    "mtime_ns": 1792643675005987133,
+    "inode": 59650114,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/cold-public-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643674958986861,
+    "inode": 59650123,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-CLI-api-2008-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792644346093982288,
+    "inode": 59650144,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-CLI-api-2019-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792644341675956664,
+    "inode": 59650108,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-CLI-artifact-2008-private.pkl": {
+    "sha256": "1119e2edf0bcd09c325800bbad68b2c17ee6f040967361939216f1c9a357feee",
+    "bytes": 22802,
+    "mode": 384,
+    "mtime_ns": 1792644350230006277,
+    "inode": 59650130,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-CLI-artifact-2019-private.pkl": {
+    "sha256": "ade38bdd749a5d35bc5e2a2d5b40d7f47270fb3bb2d877a6632c7001037e0e25",
+    "bytes": 105321,
+    "mode": 384,
+    "mtime_ns": 1792644345751980305,
+    "inode": 59650112,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-Feature-Tanzania-currency-None-private.pkl": {
+    "sha256": "d22cd31f65cccf0123bce1f939a5d40ddf8162133a406786a0815adf1f31e96c",
+    "bytes": 648137,
+    "mode": 384,
+    "mtime_ns": 1792644341363954854,
+    "inode": 59650116,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-Feature-Tanzania-default-private.pkl": {
+    "sha256": "a97c7fc2d25cb32ee84fec584d7a8c4c24f96d6ffa7a5a4c4e8cb47578512d0d",
+    "bytes": 666012,
+    "mode": 384,
+    "mtime_ns": 1792644340449949553,
+    "inode": 59650139,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-Feature-currency-None-private.pkl": {
+    "sha256": "1acf90f29966a335b5f19c02c99cf1ba588e57da8daf431d7a4c7414646812cf",
+    "bytes": 13414112,
+    "mode": 384,
+    "mtime_ns": 1792644339484943956,
+    "inode": 59650145,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-Feature-default-private.pkl": {
+    "sha256": "928ff6544aa1856ce0984a68c4a5325b9c63f8acc6c1b643a13dcde86067d2f5",
+    "bytes": 13633983,
+    "mode": 384,
+    "mtime_ns": 1792644337504932472,
+    "inode": 59650141,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-public-Mali-private.pkl": {
+    "sha256": "2209a5d4b04e8df854e0a2e70f4210d5ff4ff57bbd5fb3b5a1a1446798456423",
+    "bytes": 9113777,
+    "mode": 384,
+    "mtime_ns": 1792644334875917223,
+    "inode": 59650128,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-public-Niger-private.pkl": {
+    "sha256": "fd0367a7b36c1725f5986c68d106e7d4e7ed2fdd3928f421a325140febd7effb",
+    "bytes": 3079356,
+    "mode": 384,
+    "mtime_ns": 1792644335419920378,
+    "inode": 59650127,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/first-public-Tanzania-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792644334141912966,
+    "inode": 59650113,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-CLI-api-2008-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792644366360101992,
+    "inode": 59650138,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-CLI-api-2019-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792644362053076122,
+    "inode": 59650120,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-CLI-artifact-2008-private.pkl": {
+    "sha256": "1119e2edf0bcd09c325800bbad68b2c17ee6f040967361939216f1c9a357feee",
+    "bytes": 22802,
+    "mode": 384,
+    "mtime_ns": 1792644370360126019,
+    "inode": 59650126,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-CLI-artifact-2019-private.pkl": {
+    "sha256": "ade38bdd749a5d35bc5e2a2d5b40d7f47270fb3bb2d877a6632c7001037e0e25",
+    "bytes": 105321,
+    "mode": 384,
+    "mtime_ns": 1792644366012099902,
+    "inode": 59650146,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-Feature-Tanzania-currency-None-private.pkl": {
+    "sha256": "d22cd31f65cccf0123bce1f939a5d40ddf8162133a406786a0815adf1f31e96c",
+    "bytes": 648137,
+    "mode": 384,
+    "mtime_ns": 1792644361723074140,
+    "inode": 59650109,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-Feature-Tanzania-default-private.pkl": {
+    "sha256": "a97c7fc2d25cb32ee84fec584d7a8c4c24f96d6ffa7a5a4c4e8cb47578512d0d",
+    "bytes": 666012,
+    "mode": 384,
+    "mtime_ns": 1792644360796068572,
+    "inode": 59650133,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-Feature-currency-None-private.pkl": {
+    "sha256": "1acf90f29966a335b5f19c02c99cf1ba588e57da8daf431d7a4c7414646812cf",
+    "bytes": 13414112,
+    "mode": 384,
+    "mtime_ns": 1792644359649061682,
+    "inode": 59650143,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-Feature-default-private.pkl": {
+    "sha256": "928ff6544aa1856ce0984a68c4a5325b9c63f8acc6c1b643a13dcde86067d2f5",
+    "bytes": 13633983,
+    "mode": 384,
+    "mtime_ns": 1792644357785050486,
+    "inode": 59650136,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-public-Mali-private.pkl": {
+    "sha256": "2209a5d4b04e8df854e0a2e70f4210d5ff4ff57bbd5fb3b5a1a1446798456423",
+    "bytes": 9113777,
+    "mode": 384,
+    "mtime_ns": 1792644355087034448,
+    "inode": 59650121,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-public-Niger-private.pkl": {
+    "sha256": "fd0367a7b36c1725f5986c68d106e7d4e7ed2fdd3928f421a325140febd7effb",
+    "bytes": 3079356,
+    "mode": 384,
+    "mtime_ns": 1792644355727038160,
+    "inode": 59650140,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/fresh-public-Tanzania-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792644354372030301,
+    "inode": 59650115,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/helper-memory-2019-20-private.pkl": {
+    "sha256": "57d3df919472faaaf09cc492e524c3f490ea2f1926ab4c0b743bfef146df3abd",
+    "bytes": 106254,
+    "mode": 384,
+    "mtime_ns": 1792643849250011263,
+    "inode": 59650119,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/helper-memory-2020-21-private.pkl": {
+    "sha256": "887dcbf28a44467a3ba960f173ea70a21a0a65b7307bc200ae3edf7f71d9d9fa",
+    "bytes": 523570,
+    "mode": 384,
+    "mtime_ns": 1792643849498012695,
+    "inode": 59650137,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/native-2019-20-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643849252011274,
+    "inode": 59650117,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/native-2020-21-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643849501012713,
+    "inode": 59650110,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/normalized-2019-20-private.pkl": {
+    "sha256": "12f14cb8ed9adf53069ee07263328af4affc28576347b253b898f6812a054bad",
+    "bytes": 101183,
+    "mode": 384,
+    "mtime_ns": 1792643849256011297,
+    "inode": 59650134,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/normalized-2020-21-private.pkl": {
+    "sha256": "21b8e8141760c8c28bb59614863c63f67451c27379fbd8d8e3cd807e91e41426",
+    "bytes": 484921,
+    "mode": 384,
+    "mtime_ns": 1792643849507012747,
+    "inode": 59650124,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/raw-country-private.pkl": {
+    "sha256": "c7a0342ce656a2b2840dae2db94aae29666decde5bf49e4340bea1def8101d5a",
+    "bytes": 585890,
+    "mode": 384,
+    "mtime_ns": 1792643849545012967,
+    "inode": 59650111,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/source-oracle-2019-20-private.pkl": {
+    "sha256": "57d3df919472faaaf09cc492e524c3f490ea2f1926ab4c0b743bfef146df3abd",
+    "bytes": 106254,
+    "mode": 384,
+    "mtime_ns": 1792643849247011246,
+    "inode": 59650132,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/source-oracle-2020-21-private.pkl": {
+    "sha256": "887dcbf28a44467a3ba960f173ea70a21a0a65b7307bc200ae3edf7f71d9d9fa",
+    "bytes": 523570,
+    "mode": 384,
+    "mtime_ns": 1792643849495012678,
+    "inode": 59650129,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/walked-2019-20-private.pkl": {
+    "sha256": "96900decc146001a9c776ede1982d7d3679e674d8d2f90155073018dd34ed22c",
+    "bytes": 106219,
+    "mode": 384,
+    "mtime_ns": 1792643849254011286,
+    "inode": 59650122,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/walked-2020-21-private.pkl": {
+    "sha256": "d21447110c9fc5301eb25678337bec43fd3fb9625c8f342acdd288262d2449a8",
+    "bytes": 523544,
+    "mode": 384,
+    "mtime_ns": 1792643849505012736,
+    "inode": 59650118,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643679519013264,
+    "inode": 59650142,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643679532013339,
+    "inode": 59650135,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "c7a0342ce656a2b2840dae2db94aae29666decde5bf49e4340bea1def8101d5a",
+    "bytes": 585890,
+    "mode": 384,
+    "mtime_ns": 1792643679546013420,
+    "inode": 59650106,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-all/warm-public-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643679509013206,
+    "inode": 59650125,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-mixed/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643817673828800,
+    "inode": 59516887,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-mixed/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "68e45feddcee224717de0ff60949a05461bf79af8f46ab1bc41041de167cfbc1",
+    "bytes": 101259,
+    "mode": 384,
+    "mtime_ns": 1792643817681828846,
+    "inode": 59516888,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-mixed/cold-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643817664828748,
+    "inode": 59516889,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-mixed/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643822238855187,
+    "inode": 59516891,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-mixed/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "68e45feddcee224717de0ff60949a05461bf79af8f46ab1bc41041de167cfbc1",
+    "bytes": 101259,
+    "mode": 384,
+    "mtime_ns": 1792643822246855233,
+    "inode": 59516886,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-mixed/warm-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643822229855135,
+    "inode": 59516890,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-modern/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643717494237235,
+    "inode": 59650149,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-modern/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643717507237314,
+    "inode": 59650153,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-modern/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "c7a0342ce656a2b2840dae2db94aae29666decde5bf49e4340bea1def8101d5a",
+    "bytes": 585890,
+    "mode": 384,
+    "mtime_ns": 1792643717521237400,
+    "inode": 59650150,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-modern/cold-public-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643717482237161,
+    "inode": 59650151,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-modern/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643722171265947,
+    "inode": 59650155,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-modern/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643722184266026,
+    "inode": 59650154,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-modern/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "c7a0342ce656a2b2840dae2db94aae29666decde5bf49e4340bea1def8101d5a",
+    "bytes": 585890,
+    "mode": 384,
+    "mtime_ns": 1792643722198266112,
+    "inode": 59650148,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-modern/warm-public-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643722160265879,
+    "inode": 59650152,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-older/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643804341751737,
+    "inode": 59650268,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-older/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643804356751824,
+    "inode": 59650272,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-older/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643804372751916,
+    "inode": 59650269,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-older/cold-public-private.pkl": {
+    "sha256": "51b7bd491406e2d59064bff098a52ef9896fc53962c9c895d5379ce8f85cc0b7",
+    "bytes": 23203,
+    "mode": 384,
+    "mtime_ns": 1792643804331751679,
+    "inode": 59650270,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-older/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643809208779870,
+    "inode": 59650274,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-older/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643809221779945,
+    "inode": 59650273,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-older/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643809236780031,
+    "inode": 59650267,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/default-older/warm-public-private.pkl": {
+    "sha256": "51b7bd491406e2d59064bff098a52ef9896fc53962c9c895d5379ce8f85cc0b7",
+    "bytes": 23203,
+    "mode": 384,
+    "mtime_ns": 1792643809198779812,
+    "inode": 59650271,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2008/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643926718458897,
+    "inode": 59650091,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2008/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643926732458978,
+    "inode": 59650095,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2008/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643926747459064,
+    "inode": 59650092,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2008/cold-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643926705458822,
+    "inode": 59650093,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2008/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643938370526272,
+    "inode": 59650097,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2008/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643938385526358,
+    "inode": 59650096,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2008/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643938401526451,
+    "inode": 59650090,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2008/warm-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643938355526185,
+    "inode": 59650094,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2010/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643950080593982,
+    "inode": 59650223,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2010/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643950094594063,
+    "inode": 59650227,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2010/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643950109594149,
+    "inode": 59650224,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2010/cold-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643950068593912,
+    "inode": 59650225,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2010/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643961656660917,
+    "inode": 59650229,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2010/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643961670660998,
+    "inode": 59650228,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2010/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643961684661079,
+    "inode": 59650222,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2010/warm-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643961646660859,
+    "inode": 59650226,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2012/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643973357728565,
+    "inode": 59650241,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2012/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643973371728646,
+    "inode": 59650245,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2012/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643973385728727,
+    "inode": 59650242,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2012/cold-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643973347728507,
+    "inode": 59650243,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2012/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643984840794947,
+    "inode": 59650247,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2012/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643984853795022,
+    "inode": 59650246,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2012/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643984868795109,
+    "inode": 59650240,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2012/warm-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643984829794884,
+    "inode": 59650244,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2014/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643996114860121,
+    "inode": 59650214,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2014/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643996127860196,
+    "inode": 59650218,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2014/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643996142860283,
+    "inode": 59650215,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2014/cold-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643996103860058,
+    "inode": 59650216,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2014/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792644008152929712,
+    "inode": 59650220,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2014/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792644008168929805,
+    "inode": 59650219,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2014/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792644008184929897,
+    "inode": 59650213,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2014/warm-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644008141929649,
+    "inode": 59650217,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2019/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643856767054683,
+    "inode": 59650232,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2019/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643856781054764,
+    "inode": 59650236,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2019/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643856796054850,
+    "inode": 59650233,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2019/cold-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643856757054625,
+    "inode": 59650234,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2019/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643868189120659,
+    "inode": 59650238,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2019/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643868203120740,
+    "inode": 59650237,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2019/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643868218120827,
+    "inode": 59650231,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2019/warm-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643868178120596,
+    "inode": 59650235,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2020/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643879917188404,
+    "inode": 59650158,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2020/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643879931188484,
+    "inode": 59650162,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2020/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643879945188565,
+    "inode": 59650159,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2020/cold-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643879906188340,
+    "inode": 59650160,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2020/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643891474255160,
+    "inode": 59650164,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2020/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643891488255241,
+    "inode": 59650163,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2020/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643891504255333,
+    "inode": 59650157,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-2020/warm-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643891461255085,
+    "inode": 59650161,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643833274918978,
+    "inode": 59516894,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643833288919059,
+    "inode": 59516905,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643833303919146,
+    "inode": 59516898,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/cold-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643833264918920,
+    "inode": 59516901,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/first-CLI-api-2008-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644421801435045,
+    "inode": 59516912,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/first-CLI-api-2019-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644403804326904,
+    "inode": 59516895,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/first-CLI-artifact-2008-private.pkl": {
+    "sha256": "a003e8358fec85f7da0c1531f6883cff583d941207ec1bd10ae92bda39312047",
+    "bytes": 594372,
+    "mode": 384,
+    "mtime_ns": 1792644432186497782,
+    "inode": 59516904,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/first-CLI-artifact-2019-private.pkl": {
+    "sha256": "a003e8358fec85f7da0c1531f6883cff583d941207ec1bd10ae92bda39312047",
+    "bytes": 594372,
+    "mode": 384,
+    "mtime_ns": 1792644414353390268,
+    "inode": 59516896,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/first-Feature-currency-None-private.pkl": {
+    "sha256": "20a37181bf0923dca28a6d9836127d693b89f4c378e0f0cdec1a0ee5bd0fa6aa",
+    "bytes": 648121,
+    "mode": 384,
+    "mtime_ns": 1792644396522283164,
+    "inode": 59516913,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/first-Feature-default-private.pkl": {
+    "sha256": "74c43fae6fe38dddc4a38765ccdfdc2e000cd58e6303d42df1be5dfbc9f957a9",
+    "bytes": 665996,
+    "mode": 384,
+    "mtime_ns": 1792644388572235411,
+    "inode": 59516909,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/first-public-Tanzania-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644380806188764,
+    "inode": 59516897,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/fresh-CLI-api-2008-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644483103805380,
+    "inode": 59516908,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/fresh-CLI-api-2019-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644465640699883,
+    "inode": 59516900,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/fresh-CLI-artifact-2008-private.pkl": {
+    "sha256": "a003e8358fec85f7da0c1531f6883cff583d941207ec1bd10ae92bda39312047",
+    "bytes": 594372,
+    "mode": 384,
+    "mtime_ns": 1792644493735868946,
+    "inode": 59516903,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/fresh-CLI-artifact-2019-private.pkl": {
+    "sha256": "a003e8358fec85f7da0c1531f6883cff583d941207ec1bd10ae92bda39312047",
+    "bytes": 594372,
+    "mode": 384,
+    "mtime_ns": 1792644475954762192,
+    "inode": 59516914,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/fresh-Feature-currency-None-private.pkl": {
+    "sha256": "20a37181bf0923dca28a6d9836127d693b89f4c378e0f0cdec1a0ee5bd0fa6aa",
+    "bytes": 648121,
+    "mode": 384,
+    "mtime_ns": 1792644458268655348,
+    "inode": 59516911,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/fresh-Feature-default-private.pkl": {
+    "sha256": "74c43fae6fe38dddc4a38765ccdfdc2e000cd58e6303d42df1be5dfbc9f957a9",
+    "bytes": 665996,
+    "mode": 384,
+    "mtime_ns": 1792644450402607828,
+    "inode": 59516907,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/fresh-public-Tanzania-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644442736561516,
+    "inode": 59516899,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643845169987696,
+    "inode": 59516910,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643845183987777,
+    "inode": 59516906,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643845198987863,
+    "inode": 59516893,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-all/warm-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643845158987632,
+    "inode": 59516902,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-mixed/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792644043148132016,
+    "inode": 59650205,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-mixed/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792644043162132096,
+    "inode": 59650209,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-mixed/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792644043176132177,
+    "inode": 59650206,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-mixed/cold-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644043137131952,
+    "inode": 59650207,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-mixed/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792644054284196392,
+    "inode": 59650211,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-mixed/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792644054299196479,
+    "inode": 59650210,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-mixed/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792644054314196565,
+    "inode": 59650204,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-mixed/warm-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644054273196328,
+    "inode": 59650208,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-modern/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643903611325286,
+    "inode": 59650167,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-modern/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643903626325373,
+    "inode": 59650171,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-modern/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643903643325471,
+    "inode": 59650168,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-modern/cold-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643903598325211,
+    "inode": 59650169,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-modern/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643914896390539,
+    "inode": 59650173,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-modern/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643914910390620,
+    "inode": 59650172,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-modern/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792643914924390701,
+    "inode": 59650166,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-modern/warm-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792643914885390475,
+    "inode": 59650170,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-older/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792644020322000060,
+    "inode": 59650196,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-older/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792644020339000158,
+    "inode": 59650200,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-older/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792644020355000251,
+    "inode": 59650197,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-older/cold-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644020308999985,
+    "inode": 59650198,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-older/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792644031717065934,
+    "inode": 59650202,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-older/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792644031731066015,
+    "inode": 59650201,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-older/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "2f658355b6d9ad4b019e8c6c1edb50f368f6044dc7d9e417c3525096bbdc6839",
+    "bytes": 632437,
+    "mode": 384,
+    "mtime_ns": 1792644031745066096,
+    "inode": 59650195,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/make-older/warm-public-private.pkl": {
+    "sha256": "fe724a53a973feb79a804cc5d4ec33b872bcc4d13b6253558f8b1eb2708ce204",
+    "bytes": 594667,
+    "mode": 384,
+    "mtime_ns": 1792644031707065876,
+    "inode": 59650199,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/populated-default/2008-public-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792644198693031738,
+    "inode": 59650181,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/populated-default/2010-public-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792644203144057493,
+    "inode": 59650182,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/populated-default/2012-public-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792644207446082385,
+    "inode": 59650184,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/populated-default/2014-public-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792644211728107161,
+    "inode": 59650176,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/populated-default/2019-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792644185950958011,
+    "inode": 59650177,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/populated-default/2020-public-private.pkl": {
+    "sha256": "ab015eb56a2fe36b93a8a0e9bbc46df59189f42775bbece410450455a1e45366",
+    "bytes": 490002,
+    "mode": 384,
+    "mtime_ns": 1792644190257982932,
+    "inode": 59650178,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/populated-default/all-public-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792644181626932992,
+    "inode": 59650175,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/populated-default/mixed-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792644220431157518,
+    "inode": 59650179,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/populated-default/modern-public-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792644194471007309,
+    "inode": 59650180,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/base/populated-default/older-public-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792644216221133158,
+    "inode": 59650183,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2008/cold-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643727262297200,
+    "inode": 59778574,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2008/warm-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643731076320614,
+    "inode": 59778575,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2010/cold-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643735031344894,
+    "inode": 59778467,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2010/warm-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643738997369241,
+    "inode": 59778468,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2012/cold-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643742892393152,
+    "inode": 59910438,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2012/warm-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643746652416235,
+    "inode": 59910439,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2014/cold-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643750568440274,
+    "inode": 59910441,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2014/warm-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643754233462201,
+    "inode": 59910442,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2019/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643688638066065,
+    "inode": 59778481,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2019/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "68e45feddcee224717de0ff60949a05461bf79af8f46ab1bc41041de167cfbc1",
+    "bytes": 101259,
+    "mode": 384,
+    "mtime_ns": 1792643688645066106,
+    "inode": 59778482,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2019/cold-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643688629066013,
+    "inode": 59778483,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2019/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643693107091942,
+    "inode": 59778485,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2019/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "68e45feddcee224717de0ff60949a05461bf79af8f46ab1bc41041de167cfbc1",
+    "bytes": 101259,
+    "mode": 384,
+    "mtime_ns": 1792643693117091999,
+    "inode": 59778480,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2019/warm-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643693096091878,
+    "inode": 59778484,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2020/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643701752141998,
+    "inode": 59778474,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2020/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "91592a231ba791f8657f96414c3fe7a8ff5938dfbe00c8eccea41539ea821cb3",
+    "bytes": 484997,
+    "mode": 384,
+    "mtime_ns": 1792643701765142073,
+    "inode": 59778471,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2020/cold-public-private.pkl": {
+    "sha256": "ab015eb56a2fe36b93a8a0e9bbc46df59189f42775bbece410450455a1e45366",
+    "bytes": 490002,
+    "mode": 384,
+    "mtime_ns": 1792643701736141905,
+    "inode": 59778472,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2020/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643706366168920,
+    "inode": 59778475,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2020/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "91592a231ba791f8657f96414c3fe7a8ff5938dfbe00c8eccea41539ea821cb3",
+    "bytes": 484997,
+    "mode": 384,
+    "mtime_ns": 1792643706377168988,
+    "inode": 59778470,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-2020/warm-public-private.pkl": {
+    "sha256": "ab015eb56a2fe36b93a8a0e9bbc46df59189f42775bbece410450455a1e45366",
+    "bytes": 490002,
+    "mode": 384,
+    "mtime_ns": 1792643706353168840,
+    "inode": 59778473,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643675037987318,
+    "inode": 59778501,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643675049987388,
+    "inode": 59778525,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "c7a0342ce656a2b2840dae2db94aae29666decde5bf49e4340bea1def8101d5a",
+    "bytes": 585890,
+    "mode": 384,
+    "mtime_ns": 1792643675062987463,
+    "inode": 59778508,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/cold-public-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643675027987260,
+    "inode": 59778517,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-CLI-api-2008-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792644080550348234,
+    "inode": 59778538,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-CLI-api-2019-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792644075665319994,
+    "inode": 59778502,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-CLI-artifact-2008-private.pkl": {
+    "sha256": "1119e2edf0bcd09c325800bbad68b2c17ee6f040967361939216f1c9a357feee",
+    "bytes": 22802,
+    "mode": 384,
+    "mtime_ns": 1792644084765372600,
+    "inode": 59778524,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-CLI-artifact-2019-private.pkl": {
+    "sha256": "ade38bdd749a5d35bc5e2a2d5b40d7f47270fb3bb2d877a6632c7001037e0e25",
+    "bytes": 105321,
+    "mode": 384,
+    "mtime_ns": 1792644080191346158,
+    "inode": 59778506,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-Feature-Tanzania-currency-None-private.pkl": {
+    "sha256": "d22cd31f65cccf0123bce1f939a5d40ddf8162133a406786a0815adf1f31e96c",
+    "bytes": 648137,
+    "mode": 384,
+    "mtime_ns": 1792644075327318040,
+    "inode": 59778510,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-Feature-Tanzania-default-private.pkl": {
+    "sha256": "a97c7fc2d25cb32ee84fec584d7a8c4c24f96d6ffa7a5a4c4e8cb47578512d0d",
+    "bytes": 666012,
+    "mode": 384,
+    "mtime_ns": 1792644074393312641,
+    "inode": 59778533,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-Feature-currency-None-private.pkl": {
+    "sha256": "1acf90f29966a335b5f19c02c99cf1ba588e57da8daf431d7a4c7414646812cf",
+    "bytes": 13414112,
+    "mode": 384,
+    "mtime_ns": 1792644073408306946,
+    "inode": 59778539,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-Feature-default-private.pkl": {
+    "sha256": "928ff6544aa1856ce0984a68c4a5325b9c63f8acc6c1b643a13dcde86067d2f5",
+    "bytes": 13633983,
+    "mode": 384,
+    "mtime_ns": 1792644071648296772,
+    "inode": 59778535,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-public-Mali-private.pkl": {
+    "sha256": "2209a5d4b04e8df854e0a2e70f4210d5ff4ff57bbd5fb3b5a1a1446798456423",
+    "bytes": 9113777,
+    "mode": 384,
+    "mtime_ns": 1792644069068281857,
+    "inode": 59778522,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-public-Niger-private.pkl": {
+    "sha256": "fd0367a7b36c1725f5986c68d106e7d4e7ed2fdd3928f421a325140febd7effb",
+    "bytes": 3079356,
+    "mode": 384,
+    "mtime_ns": 1792644069618285037,
+    "inode": 59778521,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/first-public-Tanzania-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792644068346277683,
+    "inode": 59778507,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-CLI-api-2008-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792644101946471952,
+    "inode": 59778532,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-CLI-api-2019-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792644097367445458,
+    "inode": 59778514,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-CLI-artifact-2008-private.pkl": {
+    "sha256": "1119e2edf0bcd09c325800bbad68b2c17ee6f040967361939216f1c9a357feee",
+    "bytes": 22802,
+    "mode": 384,
+    "mtime_ns": 1792644106294497110,
+    "inode": 59778520,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-CLI-artifact-2019-private.pkl": {
+    "sha256": "ade38bdd749a5d35bc5e2a2d5b40d7f47270fb3bb2d877a6632c7001037e0e25",
+    "bytes": 105321,
+    "mode": 384,
+    "mtime_ns": 1792644101589469887,
+    "inode": 59778540,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-Feature-Tanzania-currency-None-private.pkl": {
+    "sha256": "d22cd31f65cccf0123bce1f939a5d40ddf8162133a406786a0815adf1f31e96c",
+    "bytes": 648137,
+    "mode": 384,
+    "mtime_ns": 1792644097017443432,
+    "inode": 59778503,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-Feature-Tanzania-default-private.pkl": {
+    "sha256": "a97c7fc2d25cb32ee84fec584d7a8c4c24f96d6ffa7a5a4c4e8cb47578512d0d",
+    "bytes": 666012,
+    "mode": 384,
+    "mtime_ns": 1792644096068437942,
+    "inode": 59778527,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-Feature-currency-None-private.pkl": {
+    "sha256": "1acf90f29966a335b5f19c02c99cf1ba588e57da8daf431d7a4c7414646812cf",
+    "bytes": 13414112,
+    "mode": 384,
+    "mtime_ns": 1792644094904431213,
+    "inode": 59778537,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-Feature-default-private.pkl": {
+    "sha256": "928ff6544aa1856ce0984a68c4a5325b9c63f8acc6c1b643a13dcde86067d2f5",
+    "bytes": 13633983,
+    "mode": 384,
+    "mtime_ns": 1792644092974420056,
+    "inode": 59778530,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-public-Mali-private.pkl": {
+    "sha256": "2209a5d4b04e8df854e0a2e70f4210d5ff4ff57bbd5fb3b5a1a1446798456423",
+    "bytes": 9113777,
+    "mode": 384,
+    "mtime_ns": 1792644090005402892,
+    "inode": 59778515,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-public-Niger-private.pkl": {
+    "sha256": "fd0367a7b36c1725f5986c68d106e7d4e7ed2fdd3928f421a325140febd7effb",
+    "bytes": 3079356,
+    "mode": 384,
+    "mtime_ns": 1792644090802407500,
+    "inode": 59778534,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/fresh-public-Tanzania-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792644089226398389,
+    "inode": 59778509,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/helper-memory-2019-20-private.pkl": {
+    "sha256": "57d3df919472faaaf09cc492e524c3f490ea2f1926ab4c0b743bfef146df3abd",
+    "bytes": 106254,
+    "mode": 384,
+    "mtime_ns": 1792643849393012089,
+    "inode": 59778513,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/helper-memory-2020-21-private.pkl": {
+    "sha256": "887dcbf28a44467a3ba960f173ea70a21a0a65b7307bc200ae3edf7f71d9d9fa",
+    "bytes": 523570,
+    "mode": 384,
+    "mtime_ns": 1792643849656013608,
+    "inode": 59778531,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/native-2019-20-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643849395012100,
+    "inode": 59778511,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/native-2020-21-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643849659013625,
+    "inode": 59778504,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/normalized-2019-20-private.pkl": {
+    "sha256": "12f14cb8ed9adf53069ee07263328af4affc28576347b253b898f6812a054bad",
+    "bytes": 101183,
+    "mode": 384,
+    "mtime_ns": 1792643849401012135,
+    "inode": 59778528,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/normalized-2020-21-private.pkl": {
+    "sha256": "21b8e8141760c8c28bb59614863c63f67451c27379fbd8d8e3cd807e91e41426",
+    "bytes": 484921,
+    "mode": 384,
+    "mtime_ns": 1792643849664013654,
+    "inode": 59778518,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/raw-country-private.pkl": {
+    "sha256": "c7a0342ce656a2b2840dae2db94aae29666decde5bf49e4340bea1def8101d5a",
+    "bytes": 585890,
+    "mode": 384,
+    "mtime_ns": 1792643849703013879,
+    "inode": 59778505,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/source-oracle-2019-20-private.pkl": {
+    "sha256": "57d3df919472faaaf09cc492e524c3f490ea2f1926ab4c0b743bfef146df3abd",
+    "bytes": 106254,
+    "mode": 384,
+    "mtime_ns": 1792643849389012066,
+    "inode": 59778526,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/source-oracle-2020-21-private.pkl": {
+    "sha256": "887dcbf28a44467a3ba960f173ea70a21a0a65b7307bc200ae3edf7f71d9d9fa",
+    "bytes": 523570,
+    "mode": 384,
+    "mtime_ns": 1792643849653013591,
+    "inode": 59778523,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/walked-2019-20-private.pkl": {
+    "sha256": "96900decc146001a9c776ede1982d7d3679e674d8d2f90155073018dd34ed22c",
+    "bytes": 106219,
+    "mode": 384,
+    "mtime_ns": 1792643849398012118,
+    "inode": 59778516,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/walked-2020-21-private.pkl": {
+    "sha256": "d21447110c9fc5301eb25678337bec43fd3fb9625c8f342acdd288262d2449a8",
+    "bytes": 523544,
+    "mode": 384,
+    "mtime_ns": 1792643849661013637,
+    "inode": 59778512,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643679472012992,
+    "inode": 59778536,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643679484013061,
+    "inode": 59778529,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "c7a0342ce656a2b2840dae2db94aae29666decde5bf49e4340bea1def8101d5a",
+    "bytes": 585890,
+    "mode": 384,
+    "mtime_ns": 1792643679498013142,
+    "inode": 59778500,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-all/warm-public-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643679462012934,
+    "inode": 59778519,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-mixed/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643771406561363,
+    "inode": 59778440,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-mixed/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "68e45feddcee224717de0ff60949a05461bf79af8f46ab1bc41041de167cfbc1",
+    "bytes": 101259,
+    "mode": 384,
+    "mtime_ns": 1792643771414561410,
+    "inode": 59778441,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-mixed/cold-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643771395561300,
+    "inode": 59778442,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-mixed/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643776480590693,
+    "inode": 59778444,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-mixed/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "68e45feddcee224717de0ff60949a05461bf79af8f46ab1bc41041de167cfbc1",
+    "bytes": 101259,
+    "mode": 384,
+    "mtime_ns": 1792643776488590739,
+    "inode": 59778439,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-mixed/warm-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643776469590629,
+    "inode": 59778443,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-modern/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643718538243644,
+    "inode": 59778543,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-modern/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643718552243730,
+    "inode": 59778547,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-modern/cold-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "c7a0342ce656a2b2840dae2db94aae29666decde5bf49e4340bea1def8101d5a",
+    "bytes": 585890,
+    "mode": 384,
+    "mtime_ns": 1792643718566243816,
+    "inode": 59778544,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-modern/cold-public-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643718526243570,
+    "inode": 59778545,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-modern/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643723235272478,
+    "inode": 59778549,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-modern/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643723249272564,
+    "inode": 59778548,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-modern/warm-cache-Tanzania_var_community_prices.parquet-private.pkl": {
+    "sha256": "c7a0342ce656a2b2840dae2db94aae29666decde5bf49e4340bea1def8101d5a",
+    "bytes": 585890,
+    "mode": 384,
+    "mtime_ns": 1792643723263272650,
+    "inode": 59778542,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-modern/warm-public-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643723224272411,
+    "inode": 59778546,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-older/cold-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643758056484275,
+    "inode": 59910444,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/default-older/warm-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643762211508266,
+    "inode": 59910445,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/empty-contract/finalized-empty-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792644208866090601,
+    "inode": 59778498,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2008/cold-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643863222091969,
+    "inode": 59778477,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2008/warm-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643867658117592,
+    "inode": 59778478,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2010/cold-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643872106143285,
+    "inode": 59910427,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2010/warm-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643876617169342,
+    "inode": 59910428,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2012/cold-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643880928194243,
+    "inode": 59910435,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2012/warm-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643885714221889,
+    "inode": 59910436,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2014/cold-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643890195247772,
+    "inode": 59910424,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2014/warm-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643894401272067,
+    "inode": 59910425,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2019/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643809621782257,
+    "inode": 59910430,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2019/cold-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643809611782199,
+    "inode": 59910431,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2019/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643817827829690,
+    "inode": 59910433,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2019/warm-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643817817829632,
+    "inode": 59910432,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2020/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643826462879603,
+    "inode": 59778553,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2020/cold-public-private.pkl": {
+    "sha256": "ab015eb56a2fe36b93a8a0e9bbc46df59189f42775bbece410450455a1e45366",
+    "bytes": 490002,
+    "mode": 384,
+    "mtime_ns": 1792643826446879510,
+    "inode": 59778551,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2020/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643834979928833,
+    "inode": 59778554,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-2020/warm-public-private.pkl": {
+    "sha256": "ab015eb56a2fe36b93a8a0e9bbc46df59189f42775bbece410450455a1e45366",
+    "bytes": 490002,
+    "mode": 384,
+    "mtime_ns": 1792643834964928747,
+    "inode": 59778552,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643789136663848,
+    "inode": 59778446,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643789149663923,
+    "inode": 59778456,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/cold-public-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643789125663784,
+    "inode": 59778452,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/first-CLI-api-2008-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792644146529729916,
+    "inode": 59778463,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/first-CLI-api-2019-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792644138060680913,
+    "inode": 59778447,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/first-CLI-artifact-2008-private.pkl": {
+    "sha256": "69cf1f903abece43af82eb331d279c6c2ada8c57ab4ade85452f248dcb87ebee",
+    "bytes": 22786,
+    "mode": 384,
+    "mtime_ns": 1792644150844754883,
+    "inode": 59778455,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/first-CLI-artifact-2019-private.pkl": {
+    "sha256": "ade38bdd749a5d35bc5e2a2d5b40d7f47270fb3bb2d877a6632c7001037e0e25",
+    "bytes": 105321,
+    "mode": 384,
+    "mtime_ns": 1792644145642724784,
+    "inode": 59778448,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/first-Feature-currency-None-private.pkl": {
+    "sha256": "d22cd31f65cccf0123bce1f939a5d40ddf8162133a406786a0815adf1f31e96c",
+    "bytes": 648137,
+    "mode": 384,
+    "mtime_ns": 1792644134184658486,
+    "inode": 59778464,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/first-Feature-default-private.pkl": {
+    "sha256": "a97c7fc2d25cb32ee84fec584d7a8c4c24f96d6ffa7a5a4c4e8cb47578512d0d",
+    "bytes": 666012,
+    "mode": 384,
+    "mtime_ns": 1792644125847610247,
+    "inode": 59778460,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/first-public-Tanzania-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792644118130565595,
+    "inode": 59778449,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/fresh-CLI-api-2008-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792644192291994701,
+    "inode": 59778459,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/fresh-CLI-api-2019-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792644183208942146,
+    "inode": 59778451,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/fresh-CLI-artifact-2008-private.pkl": {
+    "sha256": "69cf1f903abece43af82eb331d279c6c2ada8c57ab4ade85452f248dcb87ebee",
+    "bytes": 22786,
+    "mode": 384,
+    "mtime_ns": 1792644196639019854,
+    "inode": 59778454,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/fresh-CLI-artifact-2019-private.pkl": {
+    "sha256": "ade38bdd749a5d35bc5e2a2d5b40d7f47270fb3bb2d877a6632c7001037e0e25",
+    "bytes": 105321,
+    "mode": 384,
+    "mtime_ns": 1792644191364989338,
+    "inode": 59778465,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/fresh-Feature-currency-None-private.pkl": {
+    "sha256": "d22cd31f65cccf0123bce1f939a5d40ddf8162133a406786a0815adf1f31e96c",
+    "bytes": 648137,
+    "mode": 384,
+    "mtime_ns": 1792644179013917873,
+    "inode": 59778462,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/fresh-Feature-default-private.pkl": {
+    "sha256": "a97c7fc2d25cb32ee84fec584d7a8c4c24f96d6ffa7a5a4c4e8cb47578512d0d",
+    "bytes": 666012,
+    "mode": 384,
+    "mtime_ns": 1792644170674869622,
+    "inode": 59778458,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/fresh-public-Tanzania-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792644162273821013,
+    "inode": 59778450,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643801033732616,
+    "inode": 59778461,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643801046732691,
+    "inode": 59778457,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-all/warm-public-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643801022732552,
+    "inode": 59778453,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-mixed/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643911796372614,
+    "inode": 59910419,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-mixed/cold-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643911786372556,
+    "inode": 59910420,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-mixed/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643920142420873,
+    "inode": 59910422,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-mixed/warm-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643920131420809,
+    "inode": 59910421,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-modern/cold-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643846928997856,
+    "inode": 59778556,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-modern/cold-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643846941997931,
+    "inode": 59778559,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-modern/cold-public-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643846916997787,
+    "inode": 59778557,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-modern/warm-cache-Tanzania_2019-20___community_prices.parquet-private.pkl": {
+    "sha256": "933708168fad2adc5fd479d8d5d57536d4cc310320ea81a4223d73816c3bf8af",
+    "bytes": 106281,
+    "mode": 384,
+    "mtime_ns": 1792643858794066391,
+    "inode": 59778561,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-modern/warm-cache-Tanzania_2020-21___community_prices.parquet-private.pkl": {
+    "sha256": "b9396015cea8dc104e40d2530d079b7f240f3e917aeb13f4ce2d80e5b9d997d7",
+    "bytes": 523606,
+    "mode": 384,
+    "mtime_ns": 1792643858807066467,
+    "inode": 59778560,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-modern/warm-public-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643858784066334,
+    "inode": 59778558,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-older/cold-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643898829297645,
+    "inode": 59778577,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/make-older/warm-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792643903372323904,
+    "inode": 59778578,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-default/2008-public-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792643969166704337,
+    "inode": 59778569,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-default/2010-public-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792643973534729588,
+    "inode": 59778570,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-default/2012-public-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792643977964755198,
+    "inode": 59778572,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-default/2014-public-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792643982401780848,
+    "inode": 59778564,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-default/2019-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643955941627871,
+    "inode": 59778565,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-default/2020-public-private.pkl": {
+    "sha256": "ab015eb56a2fe36b93a8a0e9bbc46df59189f42775bbece410450455a1e45366",
+    "bytes": 490002,
+    "mode": 384,
+    "mtime_ns": 1792643960197652481,
+    "inode": 59778566,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-default/all-public-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643951584602678,
+    "inode": 59778563,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-default/mixed-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792643990811829465,
+    "inode": 59778567,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-default/modern-public-private.pkl": {
+    "sha256": "4800b68c181504d67da1f3525bab3fb83665efdb1c58f166fb39192c3650d22a",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792643964538677582,
+    "inode": 59778568,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-default/older-public-private.pkl": {
+    "sha256": "e6d56cadcc9d03c1e0f3e6e3d9a47fe5446e4b9edf597b87dea63d2b3943edce",
+    "bytes": 23219,
+    "mode": 384,
+    "mtime_ns": 1792643986522804671,
+    "inode": 59778571,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-make/2008-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792644034975084768,
+    "inode": 59778493,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-make/2010-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792644039363110135,
+    "inode": 59778494,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-make/2012-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792644043760135553,
+    "inode": 59778496,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-make/2014-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792644048266161602,
+    "inode": 59778488,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-make/2019-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792644011172947171,
+    "inode": 59778489,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-make/2020-public-private.pkl": {
+    "sha256": "ab015eb56a2fe36b93a8a0e9bbc46df59189f42775bbece410450455a1e45366",
+    "bytes": 490002,
+    "mode": 384,
+    "mtime_ns": 1792644019123993135,
+    "inode": 59778490,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-make/all-public-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792644003071900339,
+    "inode": 59778487,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-make/mixed-public-private.pkl": {
+    "sha256": "aecde4f7c7fd44ae63ebcd10aacf57a5207120751a1483679459fd2411f49f21",
+    "bytes": 105512,
+    "mode": 384,
+    "mtime_ns": 1792644060623233037,
+    "inode": 59778491,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-make/modern-public-private.pkl": {
+    "sha256": "6d6c2c54594efab9ef5b18da1d237ab64bef25bb3653c4b4633089b2664c4d6e",
+    "bytes": 594683,
+    "mode": 384,
+    "mtime_ns": 1792644030640059708,
+    "inode": 59778492,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/candidate/populated-make/older-public-private.pkl": {
+    "sha256": "88e720a3e14cbe02eaa423f39ce0e5a6353be50c064f61dbabff535d6367e967",
+    "bytes": 23204,
+    "mode": 384,
+    "mtime_ns": 1792644052604186680,
+    "inode": 59778495,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/references/Mali-current19-public-private.pkl": {
+    "sha256": "2209a5d4b04e8df854e0a2e70f4210d5ff4ff57bbd5fb3b5a1a1446798456423",
+    "bytes": 9113777,
+    "mode": 384,
+    "mtime_ns": 1792638204136249080,
+    "inode": 59778436,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands/twenty/references/Niger-current19-public-private.pkl": {
+    "sha256": "fd0367a7b36c1725f5986c68d106e7d4e7ed2fdd3928f421a325140febd7effb",
+    "bytes": 3079356,
+    "mode": 384,
+    "mtime_ns": 1792638205461256512,
+    "inode": 59778435,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Niger/2018-19/_/food_acquired.parquet": {
+    "sha256": "7a94860aa1ceb1c78265f199c03da13691fd65a87f900dbdbb8685e214cca919",
+    "bytes": 487223,
+    "mode": 384,
+    "mtime_ns": 1792622803718435703,
+    "inode": 59910456,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Niger/2021-22/_/food_acquired.parquet": {
+    "sha256": "0bc68054c79f857ca16869a31f04dc126d45a47d6cc6342de6c139f69c37dfe0",
+    "bytes": 803689,
+    "mode": 384,
+    "mtime_ns": 1792622832108598773,
+    "inode": 59910453,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Niger/var/food_acquired.parquet": {
+    "sha256": "bd6c633cc169607229ea1246f7a365cfb4c34e22658d03fdce63509fa3e164a0",
+    "bytes": 1016131,
+    "mode": 384,
+    "mtime_ns": 1792622833309605522,
+    "inode": 59910450,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Uganda/2005-06/_/cluster_features.parquet": {
+    "sha256": "a98cbd0379765f652f594685a404b83543bf3f8a9c6d6ab08e3c88811783b221",
+    "bytes": 12417,
+    "mode": 384,
+    "mtime_ns": 1792638607977638712,
+    "inode": 10229,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Uganda/2009-10/_/cluster_features.parquet": {
+    "sha256": "6c1f1d893ded719c81adffd1537acf6ae36ae8a08538ad11823b4a418f7bca38",
+    "bytes": 16633,
+    "mode": 384,
+    "mtime_ns": 1792638608246640337,
+    "inode": 10232,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Uganda/2010-11/_/cluster_features.parquet": {
+    "sha256": "fca153a4754199346285824157077bd45e8c78730a0cda94c742068f25492377",
+    "bytes": 10915,
+    "mode": 384,
+    "mtime_ns": 1792638608493641830,
+    "inode": 10223,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Uganda/2011-12/_/cluster_features.parquet": {
+    "sha256": "e2dad28d045050fd200f5dd18bc7f2852ad8446c30d7311d3a77e0f3a3f33007",
+    "bytes": 10643,
+    "mode": 384,
+    "mtime_ns": 1792638608735643292,
+    "inode": 10220,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Uganda/2013-14/_/cluster_features.parquet": {
+    "sha256": "dbcee110746ce4c26af7b8c641f00aadec33f6e976090bdabe68bb749f9fbf4f",
+    "bytes": 16929,
+    "mode": 384,
+    "mtime_ns": 1792638609017644995,
+    "inode": 10226,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Uganda/2015-16/_/cluster_features.parquet": {
+    "sha256": "72aa0c87f14731b61670707d21b4355018bb36d0be0ae46474c3a32eb0337945",
+    "bytes": 19585,
+    "mode": 384,
+    "mtime_ns": 1792638609249646397,
+    "inode": 10243,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Uganda/2018-19/_/cluster_features.parquet": {
+    "sha256": "a721ae3b1a3779b86e7559ff61836636cf555b245fa29a459cbbf137eac607aa",
+    "bytes": 22601,
+    "mode": 384,
+    "mtime_ns": 1792638609694649085,
+    "inode": 10237,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Uganda/2019-20/_/cluster_features.parquet": {
+    "sha256": "31b4e80f9cce91fb14f1b5684459705f1424627ef65168891abb7ca5b824427d",
+    "bytes": 16218,
+    "mode": 384,
+    "mtime_ns": 1792638610271652571,
+    "inode": 10240,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/data-warm/Uganda/var/cluster_features.parquet": {
+    "sha256": "282e84a4e07d0173705b4ec2ca4b1ae978c296f942041d2293b720f535616bfa",
+    "bytes": 71397,
+    "mode": 384,
+    "mtime_ns": 1792638610518654064,
+    "inode": 10234,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/native-stage-account/empty_pdNA-prepared-private.pkl": {
+    "sha256": "c5ec75452d988de0742ae8b1ea67daeb25ba5594271d57bf6b86827fbc77ee2b",
+    "bytes": 1214,
+    "mode": 384,
+    "mtime_ns": 1792645253772049252,
+    "inode": 140137,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/native-stage-account/empty_pdNA-read-private.pkl": {
+    "sha256": "735b87787615dbb5e1f47187d06dbd0e4e721c75b95cd7fc5caa3c9dfaf85340",
+    "bytes": 1202,
+    "mode": 384,
+    "mtime_ns": 1792645253773049258,
+    "inode": 140135,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/native-stage-account/plain_nan-prepared-private.pkl": {
+    "sha256": "07de53167b46af2d4d8d855e23a445b0e1d4055c0b0d5e0dba9938a674264da9",
+    "bytes": 1375,
+    "mode": 384,
+    "mtime_ns": 1792645253779049291,
+    "inode": 140138,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/native-stage-account/plain_nan-read-private.pkl": {
+    "sha256": "03dafc30a94c0ad5861e3e556cdfdc613e2fad27b589483c2ac09c49917bc51b",
+    "bytes": 1356,
+    "mode": 384,
+    "mtime_ns": 1792645253779049291,
+    "inode": 140136,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Niger/baseline-frames-cold/Niger-native-2018-19-private.pkl": {
+    "sha256": "e5c644121fcfdb03449cbd9286e950491963108ae25063e3004af26f65395566",
+    "bytes": 9353527,
+    "mode": 384,
+    "mtime_ns": 1792622843198661094,
+    "inode": 140117,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Niger/baseline-frames-cold/Niger-native-2021-22-private.pkl": {
+    "sha256": "4575b35126bb47f9485b00bdef92910538fc33b08bfb456b61afb75f2c4274ac",
+    "bytes": 11822531,
+    "mode": 384,
+    "mtime_ns": 1792622843265661470,
+    "inode": 140119,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Niger/baseline-frames-cold/Niger-raw-food_acquired-private.pkl": {
+    "sha256": "2ac9e2d7a20dfada56c958c31c1c2b2ec1f5a008be9399e67a597c5ff1f7e97d",
+    "bytes": 21086528,
+    "mode": 384,
+    "mtime_ns": 1792622843063660335,
+    "inode": 140118,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Niger/baseline-frames-warm-complete/Niger-raw-food_acquired-private.pkl": {
+    "sha256": "2ac9e2d7a20dfada56c958c31c1c2b2ec1f5a008be9399e67a597c5ff1f7e97d",
+    "bytes": 21086528,
+    "mode": 384,
+    "mtime_ns": 1792623149306392695,
+    "inode": 140115,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Uganda/base/default-cold/2005-06-cluster_features-native-private.pkl": {
+    "sha256": "e72202c2d637a6b5fd2cda329a94c4c1bf03e8697c236e430244241f2be48dbd",
+    "bytes": 26665,
+    "mode": 384,
+    "mtime_ns": 1792638613489672013,
+    "inode": 140127,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Uganda/base/default-cold/2009-10-cluster_features-native-private.pkl": {
+    "sha256": "c7456f6211151ff78d40c57677c2d5ef65d84018f6a17a3e33c81af13a4a9d45",
+    "bytes": 46652,
+    "mode": 384,
+    "mtime_ns": 1792638613493672037,
+    "inode": 140123,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Uganda/base/default-cold/2010-11-cluster_features-native-private.pkl": {
+    "sha256": "d294370a974569279ebb81ad11381cc03166f985c158b076bb0882711b108dd2",
+    "bytes": 23281,
+    "mode": 384,
+    "mtime_ns": 1792638613498672067,
+    "inode": 140124,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Uganda/base/default-cold/2011-12-cluster_features-native-private.pkl": {
+    "sha256": "99216b40fadfa2932e02ff92a18d2289d682698eebcf1b943a7377cef78b9000",
+    "bytes": 23300,
+    "mode": 384,
+    "mtime_ns": 1792638613502672091,
+    "inode": 140130,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Uganda/base/default-cold/2013-14-cluster_features-native-private.pkl": {
+    "sha256": "6f475f9950bb1968e1b661bab08f829f0249a313ef2c1111bd04b21e1a5f0cef",
+    "bytes": 48228,
+    "mode": 384,
+    "mtime_ns": 1792638613507672121,
+    "inode": 140131,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Uganda/base/default-cold/2015-16-cluster_features-native-private.pkl": {
+    "sha256": "98fd2196a60562bbd52d51885bbf10b8ff96171f4c4898eebe9b3650a615f514",
+    "bytes": 62353,
+    "mode": 384,
+    "mtime_ns": 1792638613511672146,
+    "inode": 140126,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Uganda/base/default-cold/2018-19-cluster_features-native-private.pkl": {
+    "sha256": "5f0e91c8ec25f3cffa870f1eadc1b044747d2a3185d8fbfabe951bbbbb988945",
+    "bytes": 60767,
+    "mode": 384,
+    "mtime_ns": 1792638613515672170,
+    "inode": 140129,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Uganda/base/default-cold/2019-20-cluster_features-native-private.pkl": {
+    "sha256": "2b8e8e01d3dbc8f2c9af8fbb2db964f19768cb768bcb767f976610ed9411e631",
+    "bytes": 57433,
+    "mode": 384,
+    "mtime_ns": 1792638613519672194,
+    "inode": 140128,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Uganda/base/default-cold/cluster_features-raw-country-private.pkl": {
+    "sha256": "48ce7ac8f6ac9bd52143c3bbbd14f9b27a00d3947abd51083ea2f4d83a588b2b",
+    "bytes": 344693,
+    "mode": 384,
+    "mtime_ns": 1792638612902668466,
+    "inode": 140125,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "operands-1196-extra/references/Uganda/base/default-warm-continuation/cluster_features-raw-country-private.pkl": {
+    "sha256": "48ce7ac8f6ac9bd52143c3bbbd14f9b27a00d3947abd51083ea2f4d83a588b2b",
+    "bytes": 344693,
+    "mode": 384,
+    "mtime_ns": 1792639239694171931,
+    "inode": 140133,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "prepare-1196-extra-v1-private.log": {
+    "sha256": "51528f29f798ceaaa462f52e31f42388e8de1b36281facf9d5acdfd7be792b59",
+    "bytes": 78,
+    "mode": 384,
+    "mtime_ns": 1792651210915103319,
+    "inode": 59385867,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "prepare-1196-extra.py": {
+    "sha256": "1ab7d8f670d08b5b37fbff3f2473b4ec83a75ed5646547cdbb316d1396dbcd2b",
+    "bytes": 2596,
+    "mode": 384,
+    "mtime_ns": 1792651210474100797,
+    "inode": 59385866,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "prepare-critical-v1-private.log": {
+    "sha256": "812460332ef05522e73863760fba197d69fa45dff664f7bf83eb8e20fc3b7102",
+    "bytes": 137,
+    "mode": 384,
+    "mtime_ns": 1792650621819714478,
+    "inode": 59385842,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "prepare-critical.py": {
+    "sha256": "aa61add0073b0feb71a001630e675f0598882480862f79286d91d638fef9b83e",
+    "bytes": 10706,
+    "mode": 384,
+    "mtime_ns": 1792650616445685339,
+    "inode": 59385841,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "release-copy-receipts-private.json": {
+    "sha256": "3696af23fd3aae643cce2a070e51b25fff05d678138400ec6a126d690d83d17a",
+    "bytes": 289869,
+    "mode": 384,
+    "mtime_ns": 1792651373905034947,
+    "inode": 59385876,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "root-metadata-preparation.json": {
+    "sha256": "912c9d2172a6aac2f6c56779e1b738b6157805954342391f962997788979cde5",
+    "bytes": 536,
+    "mode": 384,
+    "mtime_ns": 1792649419965016900,
+    "inode": 59385839,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "run-critical.sh": {
+    "sha256": "b7fb54cd9a04e6f4561bd0e12aba4b09f1a30a00eb0f41dd7f1264284373b26c",
+    "bytes": 674,
+    "mode": 384,
+    "mtime_ns": 1792650727686300425,
+    "inode": 59385850,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "safe-exports/REPRODUCE.md": {
+    "sha256": "ceffcb6ced07e09617ab8ee9c8f85a61e4b253c33ca2f32b2f938aae1fdca284",
+    "bytes": 1090,
+    "mode": 384,
+    "mtime_ns": 1792651373908034964,
+    "inode": 140144,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "safe-exports/REVIEW.md": {
+    "sha256": "a508a508fa3097675b573a2d8c5bad3280f24cd33a5c17a3ea400232cef98855",
+    "bytes": 4105,
+    "mode": 384,
+    "mtime_ns": 1792651373907034958,
+    "inode": 140143,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "safe-exports/calibration.json": {
+    "sha256": "fd936a23797c2ce46d0b3baf60e3f2d63e151f5ed4071fe10c4943a33ce80911",
+    "bytes": 502,
+    "mode": 384,
+    "mtime_ns": 1792651373907034958,
+    "inode": 140141,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "safe-exports/checker-sources.json": {
+    "sha256": "9613382b7e6fb5b3a7cfb45e178cbcd9ea0a6c2dbd0a65fbcd1818afeec41514",
+    "bytes": 2942,
+    "mode": 384,
+    "mtime_ns": 1792651373908034964,
+    "inode": 140145,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "safe-exports/coverage-registry.json": {
+    "sha256": "3b1b280440e2bcec6077eb57126df8610797cec015cd452a6109d3c35f5d7bd8",
+    "bytes": 20573,
+    "mode": 384,
+    "mtime_ns": 1792651373907034958,
+    "inode": 140142,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "safe-exports/proof.json": {
+    "sha256": "5af12d1d31d194fb594ac9ed1ad040d9aa57f16f805180e6ece94a8ad19efe68",
+    "bytes": 1178,
+    "mode": 384,
+    "mtime_ns": 1792651373907034958,
+    "inode": 140140,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "safe-exports/validation.json": {
+    "sha256": "139215e06b891724b7d5d29106206a13217a300eb8f4bc5c3f33bca2fc6560e7",
+    "bytes": 6868,
+    "mode": 384,
+    "mtime_ns": 1792651373943035164,
+    "inode": 140146,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "twenty-original-exact.py": {
+    "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2",
+    "bytes": 4376,
+    "mode": 384,
+    "mtime_ns": 1792650620812709018,
+    "inode": 59385846,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  }
+}

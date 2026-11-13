@@ -1,0 +1,5 @@
+outs:
+- md5: 3fb3b6490452240d9a82c7a0bb1c8be6
+  size: 5256
+  hash: md5
+  path: c0clustr.dta

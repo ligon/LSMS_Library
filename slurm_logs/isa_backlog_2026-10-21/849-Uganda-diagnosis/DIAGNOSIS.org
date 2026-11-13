@@ -1,0 +1,181 @@
+#+TITLE: GH849 Uganda reported harvest factors -- read-only diagnosis
+#+AUTHOR: Sue
+#+DATE: 2026-10-21
+
+* Finding and scope
+
+The five-wave source carriers exist, but an unqualified 12-key colmap-only promotion is not safe.
+The measured private scenario preserves all 133,331 crop rows and every other helper/raw/public value, key, order, dtype, null mask, axis and full attr, while projecting harvest kg from 29,093,322.407894 to 42,035,114.892980 (+12,941,792.485086).
+That coverage gain is a measurement, not a completed fix or permission to accept the existing scalar first-factor carrier.
+The existing helper sums native Quantities at a retained key while taking the first nonmissing factor; it thereby loses distinct source production/slot observations.
+This is a new/split Uganda carrier site, not an extension of the old GH637 tail or a claim that its reviewed condition fix resolved it.
+No tracked source/config/test/Git/ref/GitHub change was made.
+The checkout remains clean at f8d236694c26fe9e709c5548f02c70f74ea72c33; no implementation, public axis, unit/factor table or core layer was added.
+
+The issue's PR967/972 merge blocker is obsolete: both supplied merge commits are ancestors of this source and their current wiring is present.
+The remaining blocker is concrete native-record carrier loss, which needs a grain-preserving follow-up across all distinct records, including equal-factor groups.
+All 1078 source/diagnosis/author evidence roots remain frozen.
+
+* Grounding and country qualifications
+
+The complete previously read Uganda CONTENTS is carried only after exact blob verification: 6bad560bef33eb6b2b9decaf6f96c901f67bf67b, SHA256 774d5bc13c35ca5a6d9543766648f88dbc1efe508d73aa388d5ac6e81146256c, 3,604 lines, including TODO/WAITING/LOGBOOK.
+Harvest season A/B is the module/visit convention, not necessarily calendar order: 2015-16 A labels its harvest as the second season of 2014, B as the first season of 2015; the 2011 B factor label even says first season.
+The unit/condition decision follows the value vocabulary, not misleading variable labels (2013-14 A is swapped).
+2018-19 mixes legacy a5?q6{b,c,d} names with WB s5?q06*_2 names within one file; season A has no distributed harvest-unit column, and two condition columns.
+Wide _1/_2 slots are harvest-condition observations, not additional seasons; both B slots are already wired after GH848/PR972.
+AGSEC4A and AGSEC4B provide separate season crop-stand flags; this diagnosis preserves both.
+The sold unit/condition is separate from the harvest unit/condition.
+
+CONTENTS:2435 says the move would be "small and in the right direction"; the current measured projection is +12.94M kg, so that historical expectation is not used as an invariant.
+CONTENTS:1469 says harvest_kg "does not yet consume KgFactor" in its historical before/after section; current transformations.py:4282/4698 already prefers screened reports.
+CONTENTS:1366 discusses 79 cap outliers on the older scope, while the current 2018-19 canonical screen rejects 102 after the second slot and all three rules; the denominators/stages differ and are retained explicitly.
+CONTENTS:2449 quotes 431/43 null-key losses for 2009/2011; the current source-eligibility oracle finds 360/43. Those existing null-key losses are separate from this factor task and are not repaired or silently equated to the historical count.
+WAITING GH829 remains relevant: the existing 2015-16 Value_sold defect guard and x100 restoration are applied identically on both private helper sides; no factor/Quantity rescaling follows from that sales-value caveat.
+
+The prior842, crop-production-kgfactor and harvest-kg-shipped-factors ledgers, STANDING, current pure builder/screen/ladder, existing tests and crop/Feature contracts are reused.
+KG_FACTOR_MAX=250, kilogram factor tolerance=1%, integral calendar-year rejection1990..2030, finite-positive validity and counted reported_implausible remain unchanged.
+A reported factor is kg per ONE native unit on the SAME source observation; no reported_total layer, averaging, weighted scalar, clipping, silent factor NA or heuristic repair is introduced.
+
+* Actual source fields and complete preparation
+
+All 43 declared crop/sample/cluster held sources were found after checking both legacy and files/md5 DVC layouts; 129 physical copies passed MD5/SHA256/size/mode/mtime and distinct-inode/nlink-one gates before decoding/builds.
+Data values use sanctioned get_dataframe(convert_categoricals=False); StataReader.variable_labels is used only for held-file metadata, never to read observations.
+The factor labels identify conversion fields, although several legacy labels truncate at the Stata label width. The 2015 agriculture questionnaire is not separately revalidated here; its held DTA carriers, prior instrument evidence and actual numeric/unit checks are the stated basis.
+Raw field counts below are per declared slot over its whole DTA file, including blank slots; these are not canonical row counts.
+
+| wave | season | slot | factor field | nonmissing / source rows | finite positive |
+|------+--------+------+--------------+--------------------------+-----------------|
+| 2010-11 | A | 1 | =a5aq6d= | 10934 / 13873 | 10928 |
+| 2010-11 | B | 1 | =a5bq6d= | 9403 / 9413 | 9402 |
+| 2011-12 | A | 1 | =a5aq6d= | 7963 / 12361 | 7963 |
+| 2011-12 | B | 1 | =a5bq6d= | 7125 / 10348 | 7125 |
+| 2013-14 | A | 1 | =a5aq6d= | 6603 / 10774 | 6603 |
+| 2013-14 | B | 1 | =a5bq6d= | 6665 / 10424 | 6664 |
+| 2015-16 | A | 1 | =a5aq6d= | 10675 / 10678 | 10675 |
+| 2015-16 | B | 1 | =a5bq6d= | 6610 / 8971 | 6610 |
+| 2018-19 | A | 1 | =a5aq6d= | 7134 / 7153 | 7123 |
+| 2018-19 | B | 1 | =a5bq6d= | 7037 / 7041 | 7026 |
+| 2018-19 | B | 2 | =s5bq06d_2= | 935 / 7041 | 934 |
+| 2019-20 | A | 1 | =s5aq06d_1= | 6977 / 8429 | 6970 |
+| 2019-20 | A | 2 | =s5aq06d_2= | 936 / 8429 | 936 |
+| 2019-20 | B | 1 | =s5bq06d_1= | 7366 / 9356 | 7357 |
+| 2019-20 | B | 2 | =s5bq06d_2= | 921 / 9356 | 921 |
+
+2018-19 is the already-wired healthy control (three factor entries). The five requested waves require 12 currently absent entries: two each in2010/2011/2013/2015, four in2019.
+The 2019 season-A second factor field is also present (936 nonmissing); no part-harvest _11/_21 slot is added.
+Source labels, quantity/unit/condition fields, missing/zero/negative/nonfinite counts, retained eligibility and direct factor oracles are recorded in source-slots.json and raw-factor-counts.json.
+Raw positive factor records outside existing crop/measure eligibility remain excluded (14 in2013 and7 in2015); 51 raw positive factors in2010 have missing Quantity and are not made into harvest quantities.
+
+* Per-wave kilograms, conversion coverage and agreement
+
+Baseline is an ordinary empty-L2 Country crop build; fresh-process/new-object warm frames and all60 file bytes/modes/mtimes are exact. Default Country constructor output was separately checked strictly against the preload_panel_ids=False cold control.
+The private projection is produced by deep-copying the current colmap parameter into the existing pure helper, then using the existing Uganda ID walk/finalizer to match the real ordinary raw/public frame. Only KgFactor is replaced by exact source key; this is not an implemented API/source-hash candidate.
+
+| wave | baseline kg | projected kg | kg delta | factor coverage before / rows | after / rows | screened report-label pairs | within10% count | within20% count |
+|------+-------------+--------------+----------+-------------------------------+--------------+-----------------------------+----------------+----------------|
+| 2009-10 | 4,045,545.610003 | 4,045,545.610003 | 0.000000 | 14894 / 22408 | 14894 / 22408 | 0 | 0 | 0 |
+| 2010-11 | 3,676,764.405000 | 6,914,392.070000 | 3,237,627.665000 | 15130 / 20970 | 20968 / 20970 | 15061 | 9650 | 11233 |
+| 2011-12 | 4,513,141.530143 | 8,192,391.850240 | 3,679,250.320097 | 15215 / 20152 | 19441 / 20152 | 10742 | 5614 | 7377 |
+| 2013-14 | 3,371,198.950005 | 5,269,633.449995 | 1,898,434.499990 | 13569 / 17585 | 17203 / 17585 | 9500 | 5196 | 6062 |
+| 2015-16 | 3,500,953.500243 | 5,165,329.550242 | 1,664,376.049999 | 15872 / 19576 | 19575 / 19576 | 13504 | 8478 | 9641 |
+| 2018-19 | 6,152,896.012500 | 6,152,896.012500 | 0.000000 | 15528 / 15616 | 15528 / 15616 | 6238 | 4129 | 4752 |
+| 2019-20 | 3,832,822.400000 | 6,294,926.350000 | 2,462,103.950000 | 13509 / 17024 | 17011 / 17024 | 12587 | 8043 | 9454 |
+
+Agreement denominator is rows with BOTH factors finite and strictly positive, after the existing report screen; the reference is the reported factor and the gap is abs(label-reported)/reported, inclusive10%/20%. No Quantity filter is added to a factor-comparison denominator.
+The independent label route is existing KNOWN_METRIC plus explicit label parsing, volume_as_mass=True, with no declaration or price-ratio inference. Thus a15-litre basin is nominally read as15kg under an existing density assumption; disagreement is not by itself proof that the source label/dictionary is wrong.
+Unscreened sensitivity, exact shares/quantiles, survey-median comparisons, finite-positive Quantity coverage, contributing rows, plot-crop output rows and complete provenance counts are in wave-measurements.json.
+Newly covered kg versus changed previously convertible kg is separated in kg-delta-decomposition.json; zero/lost/missing/negative Quantity counts are explicit.
+2015-16 rejects24 canonical reports out of17,226 carried positives; the held evidence does not support a whole-wave junk-factor exception based on GH829.
+
+| wave | raw Factor == Quantity | raw Factor >250 | raw joint count | canonical rejected |
+|------+------------------------+-----------------+-----------------+--------------------|
+| 2010-11 | 437 | 24 | 1 | 76 |
+| 2011-12 | 320 | 69 | 0 | 69 |
+| 2013-14 | 350 | 86 | 1 | 85 |
+| 2015-16 | 275 | 23 | 0 | 24 |
+| 2018-19 | 307 | 82 | 12 | 102 |
+| 2019-20 | 173 | 28 | 1 | 82 |
+
+These raw counts sum declared source slots BEFORE coalescence; canonical factor==Quantity / cap / joint counts and overlapping screen reasons are separately recorded. No count authorizes reading a factor as a total.
+
+* Dispersion and systematic unit/condition disagreement
+
+unit-condition-dispersion-safe.json records every unit/condition cell with exact row/pair/report counts; factor quantiles/CV require at least20 screened reports and pair ratio quantiles require at least20 pairs.
+The ratio below is label factor / screened reported factor; all cells shown have at least20 pairs. These are descriptive source diagnostics, not proposed dictionary corrections.
+
+| wave | unit | condition | pairs | median label/report | reported p10 / median / p90 |
+|------+-------+-----------+-------+---------------------+-----------------------------|
+| 2010-11 | Plastic Basin (15 lts) | dried_grain | 1669 | 0.8333 | 15 / 18 / 20 |
+| 2010-11 | Plastic Basin (15 lts) | fresh | 861 | 0.8333 | 10 / 18 / 25 |
+| 2010-11 | Plastic Basin (15 lts) | fresh_in_pods | 588 | 1.5000 | 10 / 10 / 18 |
+| 2011-12 | Plastic Basin (15 lts) | dried_grain | 1115 | 0.8824 | 13 / 17 / 20 |
+| 2011-12 | Sack (100 kgs) | fresh | 991 | 0.8333 | 100 / 120 / 130 |
+| 2011-12 | Sack (100 kgs) | dried_with_shell | 300 | 1.6667 | 30 / 60 / 100 |
+| 2013-14 | Tin (Debe) (20 lts) | fresh_in_pods | 332 | 1.3333 | 8 / 15 / 20 |
+| 2013-14 | Sack (100 kgs) | dried_with_shell | 191 | 1.2500 | 40 / 80 / 100 |
+| 2013-14 | Sack (100 kgs) | fresh_in_pods | 178 | 1.1111 | 58.2 / 90 / 100 |
+| 2015-16 | Tin (Debe) (20 lts) | fresh_in_pods | 545 | 1.2500 | 6 / 16 / 20 |
+| 2015-16 | Plastic Basin (15 lts) | fresh_in_pods | 481 | 1.2500 | 5 / 12 / 16 |
+| 2015-16 | Sack (100 kgs) | dried_with_shell | 365 | 1.4286 | 40 / 70 / 100 |
+| 2018-19 | Sack (100 kgs) | dried_in_pods | 150 | 1.2500 | 50 / 80 / 110 |
+| 2018-19 | Sack (100 kgs) | dried | 120 | 1.1438 | 75 / 87.5 / 100 |
+| 2018-19 | Sack (100 kgs) | dried_with_shell | 70 | 1.6667 | 30 / 60 / 100 |
+| 2019-20 | Sack (100 kgs) | dried_in_pods | 369 | 1.2500 | 50 / 80 / 100 |
+| 2019-20 | Sack (100 kgs) | dried | 287 | 1.1111 | 65 / 90 / 100 |
+| 2019-20 | Sack (100 kgs) | fresh_in_pods | 197 | 1.2500 | 65 / 80 / 100 |
+
+* Retained-key carrier loss
+
+The existing helper (uganda.py:1583) sums Quantity/Quantity_sold/Value_sold and takes first nonmissing KgFactor. Source rates and their own quantities cease to be paired when distinct records share the retained key.
+The requested waves have115 raw positive-factor disagreement groups,113 with multiple surviving screened factors.112 have all Quantities finite/nonnegative, all factors screened usable and the same known unit/condition.
+Every one of these112 has a different first-factor-times-summed-Quantity result from the direct source contribution sum. This introduces unsupported higher/lower kg relative to those usable matched source operands; retaining old row counts is insufficient.
+The net requested-wave difference is +10,710.9000002kg, absolute26,602.0999998kg. These are carrier diagnostics within the much larger whole-scenario movement, not an alternate corrected API total.
+
+| wave | raw conflict | screened conflict | complete comparable groups | net carrier-source kg | absolute kg difference | excluded groups |
+|------+--------------+-------------------+----------------------------+-----------------------+------------------------+-----------------|
+| 2010-11 | 41 | 41 | 41 | 3,484.500000 | 12,066.500000 | 0 |
+| 2011-12 | 19 | 19 | 19 | 5,077.400000 | 5,802.600000 | 0 |
+| 2013-14 | 20 | 18 | 18 | 2,327.000000 | 4,911.000000 | 2 |
+| 2015-16 | 23 | 23 | 23 | 587.000000 | 1,907.000000 | 0 |
+| 2018-19 | 6 | 6 | 6 | -2,090.000000 | 2,130.000000 | 0 |
+| 2019-20 | 12 | 12 | 11 | -765.000000 | 1,915.000000 | 1 |
+
+Two2013 groups contain rejected operands; one2019 group has Unknown unit and no demonstrated common native unit. They are excluded from the complete-source claim, with their actual projected/baseline kg retained separately and no asserted supported source total.
+The six already-wired2018 groups have a pre-existing net-2,090kg carrier discrepancy (absolute2,130kg); the scenario leaves them unchanged. This is residual evidence, not justification to replicate the loss.
+There are no missing/zero/negative Quantity operands within the115 raw requested conflict groups. All-source orphan/missing Quantity and other coalescences are separately counted; partial-factor coalescences must also be retained in a future grain repair.
+Exact source keys/operands are private. Safe source slot counts, screen status, unit/condition quantity mass, group completeness and separate null-key losses are provided without household IDs.
+
+* All-record native identity audit and follow-up scope
+
+The native production IDs distinguish every nonnull-key eligible observation in2011/2013/2015, not only their62 conflicting groups. Actual condition-slot identity distinguishes every such2018/2019 observation. This supports a repair covering equal-factor groups too.
+2010 has no corresponding native production identifier; its zero-based physical row position is only an MD5-pinned source locator, not a reported instrument ID. The same qualification applies to outside-scope2009.
+Private trace locators retain source relative path, held MD5, season, physical row position, actual slot suffix and native production ID where present.
+
+| wave | current keys | keys retaining audited identity | gain | identity basis |
+|------+--------------+----------------------------------+------+----------------|
+| 2009-10 | 22408 | 22549 | 141 | source_position |
+| 2010-11 | 20970 | 21051 | 81 | source_position |
+| 2011-12 | 20152 | 20200 | 48 | native_production_id |
+| 2013-14 | 17585 | 17646 | 61 | native_production_id |
+| 2015-16 | 19576 | 19639 | 63 | native_production_id |
+| 2018-19 | 15616 | 15630 | 14 | source_slot |
+| 2019-20 | 17024 | 17046 | 22 | source_slot |
+
+The2010/2009 counts using physical position are private upper-bound key audits, not proof that every repeated source row is a distinct instrument entity or an approved public axis. No native-grain API/derived prototype is promoted here.
+The concrete follow-up must preserve all distinct native observations, audit full-row lossless duplicates and missing identity separately, then evaluate downstream median-pool counts/weights. Fixing only112 conflicts would miss equal-factor/partial-report groups and would condition identity on a measured value.
+Existing precedents: Uganda GH323/637 preserved actual condition grain; GhanaLSS retains native visit observations (grain_aggregation_policy.org:15); community_prices declares variety/visit/obs plus missing-level sentinels (data_info.yml:152/166/262); Country keeps its declared native index. None licenses averaging a reported factor.
+Feature currently drops undeclared extra levels and collapses (feature.py:703/737); an added country axis alone would reintroduce the loss during assembly. harvest_kg deliberately reduces to(t,i,plot_id,j), so conversion must occur while each Quantity still has its own factor, before that analyst reduction.
+PROPOSAL.md specifies the bounded engineering follow-up and mutation-sensitive acceptance tests. No public axis or framework change is approved by this diagnosis.
+
+* Validation, rewarm limits and freeze
+
+81 existing crop-factor/shipped-factor tests passed, zero failed/skipped in that focused cohort. The separately attempted real Uganda baseline pytest case skipped under its existing credential collection gate; that skip is preserved, not counted as a pass.
+The ordinary full held-source cold build, strict fresh warm/default-object comparisons and all baseline numeric/provenance assertions were measured directly, without credential/gate modification.
+All threads/build/Make counts are1; pytest uses two loadfile workers; the source probes are single consumers per private root. Exact cwd/import/countries/data identities, active socket/write guards and unshare-rn apply. No acquisition, DVC CLI, FDC/nutrition, clear, NO_CACHE, stamp, assume-fresh or in-tree payload was used.
+
+Current hashes remain f8:28/28 Uganda country API and224/224 API-wave hashes are enumerated and verifiable. A later uganda.py-only colmap change is expected to invalidate all28 Uganda tables/all224 API-wave hashes because the module is an unconditional input, not just crop caches. This is dependency-grounded expected scope, not measured after-patch proof; a broader grain/Feature design must measure its actual scope before rebuilding.
+The original failed helper cwd launch, independent-oracle index-dtype mismatch and the two projection harness setup failures (missing existing ID walk, list-valued data_scheme accessor) are retained privately; production data/paths/gates were not altered to make them pass.
+Safe aggregate files and exact commands are listed in validation.json. Full source rows, source identifiers, raw frame pickles, exact warnings and per-key diagnostics remain private.
+Final receipts prove the clean source HEAD/all tracked bytes/modes,43 held sources and129 physical copies, baseline60-file bytes/modes/mtimes, source hashes and protected1078 receipts unchanged. Final manifest/quiescence is recorded separately in READY.json.
+
+Sue

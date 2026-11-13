@@ -1,0 +1,139 @@
+{
+  "production_SHA256": {
+    "lsms_library/local_tools.py": "64e8da43640fceb38cb3d4d55e4a006f9f7f7a5be4b5a5c79996299db3c80569",
+    "lsms_library/country.py": "aae765551f8a9863b302697e8b70573085f96e067c72c4819ce7968e7247fb0f"
+  },
+  "corrected_comparator_SHA256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+  "checker_SHA256": {
+    "calibrate.py": "9d96e155c09a7e0e2b445294fbf72c9c3213ba95854489f300715ac3a770b357",
+    "policies.py": "0aff6f72996ba2412680efc2dbd4900595d800570f7befa98f047243cff238d6",
+    "compare.py": "dbce5fbadbc4ab1425605d9598e7301cb360cfb2695fddf4d02242658e0c7e09",
+    "extras-compare.py": "f61b8de121d8e2f541209dee06be49a49f26f2e5d69313849cbf4ef8b3500b45",
+    "footer-author.py": "bc151cefbb0f4fd009d6a84a62535eb4bebd8cb6e1eb665a0003121453236368",
+    "preflight.py": "bf26e14a8317ef4a19a9275bcaf46b07646543b547e9623102cd4fcc6b139d2d",
+    "post-protect.py": "0956f54312a5bf9d72245fb211fddd80151efd33a4fd37a67c5bee206b99a5cb",
+    "collect.py": "b43f6fe8cebbdfb0e4d170af33b8d30550b2a8915dc482aa3e9afa19dac42ce7",
+    "test_independent.py": "b97828bea048fe8e807b1807f5de350adc116c627d5c42eee89e8eecfa7c655a",
+    "run-tests.py": "c5b04320136dcc292acdf6b87870b721ca5b45f1225b6963fdc8be0bf77d18a9",
+    "run.sh": "f9ca44817ee355be71445b501bf4096eabdba19806484753ea5bd2edfa5e6afb",
+    "entry.py": "3fed895cb1551232f93b183fdb3dbf17b846dea7358dad9ad2385208a8ca618a",
+    "sitecustomize.py": "e3684821331671a36be4c8f109ffe1092efe4ec4f91551b008647da8fc7361ee",
+    "receipts.py": "45ff35fdb5b18ce996a99a20ef30df2f0fc79a753204c03e70e8ee3118e2ccc3",
+    "seal.py": "e4d4747e1c0be364310462b08e27bf957ac814cb5f7d68d1f3a66f132d8279da",
+    "postexit-check.py": "86b018f585514f3742c47ba6ed8c6c98fdba45b193b4005137319cdf640b51fb"
+  },
+  "scanner_occurrences": [
+    {
+      "sha256": "d386c9d492f4fc904808208b093c8c0a53f6bbf4907ec79bdba60b53cad07c55",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "c85085e30de2be0e0d74b91d9ce9987460d51e0b7c28677b71ac4f136e766526",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "62bcc82f8a9fa1a88960d84910b7405767869671389ffd3cd8ee62751ebc6526",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "df3be467df4137b508d2d4846db48ed78b5b1bf212975b28a4b5dd8ff672ab48",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "34b80bef668309fa3b55cde81b3d037734a306a6f25fedb909355b280a7eb2d7",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "53137f045bfbeb6a60cd3e0eece4ac45ec9b376af058c90f4e5846b4e5fb0b9a",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "61394da5cca629628e904612e7ad0786be03c4c73ea4af09b878e41500b98a50",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "243cb3284224bf54b3ea96ef51918ada79b8ba98ff1fb35e9a6c3e1edf608564",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "f3e33fb7c78ddb46220db3074961b669e7ccbdde47dff59846ed7845c0ea7c7e",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "379d9bea088f7c96372e5c2b9ce0861b36f87e9b2c3749159ce96f35a26bd62d",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "63e3328d4c60e334703232451e1f227b549ff1d2fae06beebc1d530ef5120990",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "6ffdf6f6c7516b1dbb3a076597b15ee6ccd6c13dea279d77f4caf74477964f1b",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "70beaff488f209340d9c466faa863d246d03ad0aa3f361ad97db0ee07fc5f230",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "09496da6396b2b3d18443277306d258608069bdd9992a2e7f08700bfa2053832",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "6e5350bd01a9d956b9bc98c6555aa8a046b6dbae9954af9de4fedb45d674b8b6",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "d7aaa62e20c66d79875946e248c29bcea243db131913d56e4bd859e33416264d",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "d0c79a09cc96871231559d868f1188b4bf73d0305cee7d8c5761cb3028f16af5",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "a20643c57d5574e390b2193300d5ff5cd1466a51e2d1928b6d72ba5b3a860f14",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "1ce91d4d2b0ce8d3ef34010c18ef815019c31b1acd52a0b0714e745a0eebcf2b",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "bf1dd554a6b91efb82116fb5139cabf352b7f86db376f7fe23037f6604a1470e",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "9eade5d7407ca15af41a8a59d892b0f8fb71650789e54f9a8db0c3ed842376f1",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "c6992002ceff86e75a3e8bb6a2805349804fd14f7e54d906e0e0033e863a89de",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "3cff477e1fa680336a019854d1ce0b7f37d7cd668063253ed4fbcdd4c1b4776b",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "0a15587616b72ec449e116d08824fc74f9276f9f8e8eaab7117c9baf28de1951",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "2b543d1c8e1704bf4fb3da6b7d07ff4bf4033fac2646d993e28b5780c4e76888",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "d4a46b71a6ae9ba0c2d28ad273258d56c373d223f343246585084ecfef5a47a0",
+      "multiplicity": 1
+    },
+    {
+      "sha256": "9b58ef72c087bc0ac40ade9c698df0436978e9d5b90701e5b11009cf55a2b47a",
+      "multiplicity": 1
+    }
+  ],
+  "complete_operands_warnings_traces_sources_receipts_private": true,
+  "no_source_Git_GitHub_edits": true,
+  "all_manifest_checkers_failed_versions_and_artifacts_in_final_manifest": true,
+  "final_READY_and_separate_postexit_required": true
+}

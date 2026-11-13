@@ -1,0 +1,6 @@
+{
+ "post-default vs 06d0749c9 default cold": "assert_frame_equal exact, same row order",
+ "post-make vs pre-make (06d0749c9 Niger tree, make backend)": "assert_frame_equal exact, same row order",
+ "make vs default backend": "equal after sort_index (row order differs, pre-existing)",
+ "rows": 42435
+}

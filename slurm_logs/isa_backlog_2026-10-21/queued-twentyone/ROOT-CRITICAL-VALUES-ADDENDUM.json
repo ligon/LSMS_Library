@@ -1,0 +1,15 @@
+{
+  "status": "ROOT_ACCEPTED_CRITICAL20_NUMERIC_SUPPLEMENT",
+  "critical_READY_sha256": "63419e4e8f4559e34f411d346eefce85906877057641696351a92fc75affa91a",
+  "critical_manifest_sha256": "ff982bd1561f6f79151f18a0b048cfb694990514a8ef5562fceb4f32795bd309",
+  "groups": 433,
+  "full_strict": 407,
+  "qualified": 26,
+  "overlapping_groups_not_unique_pairs": true,
+  "mismatches": 0,
+  "scope": "Critical20plus1196saved evidence only; earlier22review+17/18/19fullretrospective remainsopen",
+  "strict_helper_private_path": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/critical-release/exact_strict.py",
+  "strict_helper_sha256": "c42164e9d7e01027ac264b1442e5157d44aa0207655ab8c53d080659084f812d",
+  "source21_still_requires_own_strong_comparator_and_actual_hash_source_gates": true,
+  "Niger_CROP_older46376_not_automatically_current_after_global19": true
+}

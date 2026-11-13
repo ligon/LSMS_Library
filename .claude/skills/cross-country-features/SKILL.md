@@ -37,15 +37,19 @@ then fail (GH #325/#326).
 **Registration alone is not enough** — it needs the per-country level *names* to be
 consistent. Heterogeneity blocks it (and naive registration can make it worse):
 - Different names for the same level (`crop`→`j`, `plot`→`plot_id`) → **declare them in
-  `Index Info › level_aliases`** (GH #569, landed for `crop_production`). This used to
+  `Index Info › level_aliases`** (GH #569; `crop_production`, `plot_labor` and
+  `plot_inputs` are registered). `plot_inputs` aliases `crop` to `j`;
+  `plot_labor` needs no level-name alias. This used to
   say "harmonize the per-country index names first", i.e. curate ~14 country configs;
   it is now a two-line config entry applied at assembly by `_rename_index_levels`.
   The `Country()` path keeps its native names, which is why
   `transformations._CROP_LEVELS` / `_PLOT_LEVELS` still exist.
-  **The plot axis is `plot_id`** (@ligon, 2026-09-10) — the spelling all 23
-  `plot_features` countries already declare — so `crop_production` is registered
-  `(t, v, i, plot_id, j, u, condition, season)` and `plot` is the alias, not the
-  target. Every `transformations.py` plot-grain transform (`harvest_kg`,
+  **The plot axis is `plot_id`** (@ligon, 2026-09-10) — the spelling used by
+  `plot_features` — and `plot` is the alias, not the target. Read the current
+  full shapes from `index_info`: crop, labor and input registrations also keep
+  `production_obs`, `labor_obs` and `input_obs`, respectively. Labor keeps
+  `stage` and `worker`; inputs keep `u` and `season`, so registration preserves
+  those distinctions. Every `transformations.py` plot-grain transform (`harvest_kg`,
   `nitrogen_kg`, `seed_kg`, `yield_kg`, `fertilizer_rate`) EMITS `plot_id`
   whichever spelling it was handed. A shared axis NAME is not a shared
   VOCABULARY: `crop_production` keys Uganda's plots `{hhid}-{parcel}-{plot}`
@@ -117,12 +121,19 @@ canonical index by an `m` level (as `currency` does). Asterisks: the prepended
 `country` level, Feature-only defaults (`currency='index'`), property-features
 (`panel_ids`/`updated_ids` take no options).
 
-## 6. Verifying a fix — the `.pth` split
-- Config under `countries/{C}/_/…` → verify in a worktree with
-  `LSMS_COUNTRIES_ROOT=<wt>/lsms_library/countries` (delegatable to worktree agents).
-- Framework code AND `lsms_library/data_info.yml` are NOT under `countries/` → the
-  `.pth` pins them to the MAIN checkout; verify there (or build a fresh venv).
-  This split decides what can be parallel-delegated vs. done in the main checkout.
+## 6. Verifying a fix — exact checkout and runtime identity
+- Run from your own checkout and set `PYTHONPATH=<checkout>` before Python starts.
+  Assert the real `lsms_library.__file__` is beneath that exact checkout; do not
+  rely on cwd or an editable-install assumption. Framework code and
+  `lsms_library/data_info.yml` are verified there, alongside configuration edits.
+- Set `LSMS_COUNTRIES_ROOT=<checkout>/lsms_library/countries` before import so
+  configuration and script outputs use the same tree. Writable caches and DVC
+  metadata must be private to the worker/reviewer; preserve the shared mirror.
+- On Savio compute nodes reuse `bin/savio_venv.sh mount` and the approved image,
+  with explicit `LSMS_VENV_SHARE` when origin is private `results.git`. Verify
+  interpreter/prefix and import/config identity; do not build a fresh venv or
+  use the writable Lustre master. Other environments use their normal venv.
+  AGENTS.md contains the current runtime and cache-path contract.
 
 ## 7. Workflow shape that worked
 Scout inline → fan out. For N independent countries: profile (read-only) → harmonize

@@ -124,10 +124,12 @@ def test_only_the_bottom_layers_act_without_reports():
     """
     f = harvest_kg_factors(_frame(BASE_ROWS, with_kgfactor=False))
     # `declared` (GH #931) is 0: a bare frame carries no `unit_kg` record.
+    # `survey_kg` and `survey_kg_zero` (GH #1436) are 0: it has no `Quantity_kg`.
     assert f.attrs["kg_factor_sources"] == {
-        "reported": 0, "shipped": 0, "survey_median": 0, "metric": 2,
+        "survey_kg": 0, "reported": 0, "shipped": 0, "survey_median": 0, "metric": 2,
         "inferred": 0, "none": 2, "reported_implausible": 0,
-        "shipped_implausible": 0, "shipped_matched": 0, "declared": 0}
+        "shipped_implausible": 0, "shipped_matched": 0, "declared": 0,
+        "survey_kg_zero": 0}
 
 
 def test_returned_frame_carries_only_harvest_kg():
@@ -325,7 +327,8 @@ def test_the_screen_count_rides_beside_a_partition_that_still_sums():
     # the four SERVING layers still partition the frame ...
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     # ... and the rejected row is served by one of them, not lost
-    assert counts == {"reported": 1, "shipped": 0, "survey_median": 0,
+    # `survey_kg` and `survey_kg_zero`: GH #1436, 0 with no `Quantity_kg`.
+    assert counts == {"survey_kg": 0, "survey_kg_zero": 0, "reported": 1, "shipped": 0, "survey_median": 0,
                       "metric": 1, "inferred": 0, "none": 2,
                       "reported_implausible": 1,
                       "shipped_implausible": 0, "shipped_matched": 0,
@@ -421,17 +424,19 @@ def test_provenance_counts_sum_to_the_input_row_count():
     counts = harvest_kg_factors(df).attrs["kg_factor_sources"]
     # The SERVING layers partition the frame; `reported_implausible` is a
     # screen count that rides alongside and is deliberately outside it, as is
-    # `declared` (GH #931: rows the declared u_kg table offered a factor for).
+    # `declared` (GH #931: rows the declared u_kg table offered a factor for)
+    # and `survey_kg_zero` (GH #1436: a recorded 0 falls through).
     assert set(counts) == set(KG_FACTOR_LAYERS) | {"reported_implausible",
                                                    "shipped_implausible",
                                                    "shipped_matched",
-                                                   "declared"}
+                                                   "declared",
+                                                   "survey_kg_zero"}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
-    assert counts == {"reported": 2, "shipped": 0, "survey_median": 0,
+    assert counts == {"survey_kg": 0, "reported": 2, "shipped": 0, "survey_median": 0,
                       "metric": 1, "inferred": 0, "none": 1,
                       "reported_implausible": 0,
                       "shipped_implausible": 0, "shipped_matched": 0,
-                      "declared": 0}
+                      "declared": 0, "survey_kg_zero": 0}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
     # Two rows survive the sum: the zero-Quantity row drops despite being
     # counted `reported`, and the `none` row has no factor to apply.
@@ -490,7 +495,9 @@ def test_companion_exposes_every_layer_for_auditing():
     rows = [("2019-20", f"r{k}", f"r{k}-1-1", "Maize", POUND, "dried",
              "A", 1.0, 2.0) for k in range(SURVEY_MEDIAN_MIN_REPORTS)]
     f = harvest_kg_factors(_frame(rows))
-    assert list(f.columns) == ["kg_per_unit", "KgFactorSource", "kg_reported",
+    # `kg_survey` (GH #1436) joined what each layer offers.
+    assert list(f.columns) == ["kg_per_unit", "KgFactorSource", "kg_survey",
+                               "kg_survey_off_label", "kg_reported",
                                "kg_reported_rejected", "kg_shipped",
                                "kg_shipped_rejected", "kg_shipped_source",
                                "kg_metric", "kg_declared", "kg_survey_median",
@@ -577,14 +584,26 @@ def test_uganda_harvest_kg_baseline():
     cp = ll.Country("Uganda").crop_production()
     assert "KgFactor" in cp.columns
     res = harvest_kg(cp)
-    assert len(cp) == 133_331
-    assert len(res) == 78_571
-    assert res["Harvest_kg"].sum() == pytest.approx(29_093_322.407894, rel=1e-9)
+    # GH849, 2026-10-22: twelve reported-factor mappings at GH1198's native
+    # observation grain. The held-source row/slot and direct product/median
+    # oracles preserve every other payload and the existing screens.
+    # #1358 (GH #1120 D3): 403 rows whose source plot is missing (360 2009-10,
+    # 43 2011-12) are served under `unknown_plot`.  Everything on a known plot
+    # stays what it was; these are the pins to trust.
+    assert len(cp) == 134_164
+    assert (cp.index.get_level_values("plot_id") != "unknown_plot").sum() == 133_761
+    # GH #1460, ruled @ligon 2026-11-04: `harvest_kg` excludes `unknown_plot` and
+    # reports it, per the consumer rule in lsms_library/data_info.yml.
+    assert len(res) == 88_980
+    assert res["Harvest_kg"].sum() == pytest.approx(42_026_694.99297963, rel=1e-9)
+    assert res.attrs["unknown_plot_excluded"] == {
+        "rows": 403, "rows_with_kg": 304, "kg": pytest.approx(70_277.25)}
+    # `survey_kg` and `survey_kg_zero` (GH #1436) are 0: Uganda has no `Quantity_kg`.
     assert res.attrs["kg_factor_sources"] == {
-        "reported": 14_972, "shipped": 0, "survey_median": 555,
-        "metric": 88_190, "inferred": 0, "none": 29_614,
-        "reported_implausible": 102, "shipped_implausible": 0,
-        "shipped_matched": 0, "declared": 0}
+        "survey_kg": 0, "reported": 96_777, "shipped": 0, "survey_median": 4_841,
+        "metric": 23_679, "inferred": 0, "none": 8_867,
+        "reported_implausible": 439, "shipped_implausible": 0,
+        "shipped_matched": 0, "declared": 0, "survey_kg_zero": 0}
     # GH #931 (2026-10-19): `declared` joins the dict and NO NUMBER MOVES.
     # Uganda's own `u` table maps nothing to a unit the merged `u_kg` declares
     # (only `Quintal`, globally), so the crop ladder now READS the declaration

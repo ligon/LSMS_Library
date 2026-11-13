@@ -1,0 +1,602 @@
+{
+  "baseline": "6fda46bc5437758bd650cf4016f0782a124281cf",
+  "source_dictionary_metadata": {
+    "2010Q3": {
+      "source": "2010-11/Data/Post Planting Wave 1/Household/sect7b_plantingw1.dta",
+      "md5": "47cefb38178aee67f7d93821327ed36d",
+      "item_label_count": 90,
+      "raw_rows": 72928
+    },
+    "2011Q1": {
+      "source": "2010-11/Data/Post Harvest Wave 1/Household/sect10b_harvestw1.dta",
+      "md5": "9612e28be279c8c5d7542230c71eadc9",
+      "item_label_count": 90,
+      "raw_rows": 71026
+    },
+    "2012Q3": {
+      "source": "2012-13/Data/Post Planting Wave 2/Household/sect7b_plantingw2.dta",
+      "md5": "0ce334959d3875199558e2de60b92d20",
+      "item_label_count": 96,
+      "raw_rows": 450906
+    },
+    "2013Q1": {
+      "source": "2012-13/Data/Post Harvest Wave 2/Household/sect10b_harvestw2.dta",
+      "md5": "b9932dec7da2a2c99a4b6039161332f5",
+      "item_label_count": 104,
+      "raw_rows": 494866
+    },
+    "2015Q3": {
+      "source": "2015-16/Data/sect7b_plantingw3.dta",
+      "md5": "1e2e4166560aeef8c725e4c9e53ce74b",
+      "item_label_count": 116,
+      "raw_rows": 532555
+    },
+    "2016Q1": {
+      "source": "2015-16/Data/sect10b_harvestw3.dta",
+      "md5": "b4f414efd1adf000a09e9f39eb6cdaae",
+      "item_label_count": 116,
+      "raw_rows": 531280
+    },
+    "2018Q3": {
+      "source": "2018-19/Data/sect7b_plantingw4.dta",
+      "md5": "577247be1c8e0eeb9efda67f70c36ecb",
+      "item_label_count": 157,
+      "raw_rows": 555060
+    },
+    "2019Q1": {
+      "source": "2018-19/Data/sect10b_harvestw4.dta",
+      "md5": "a29b85af326bba4696d58e2f8a6cedd4",
+      "item_label_count": 154,
+      "raw_rows": 547360
+    }
+  },
+  "normalization": "strip + whitespace collapse + casefold only; source numeric prefix stripped for evidence comparison only",
+  "quarter_cell_corrections": {
+    "2012Q3": {
+      "20": "Maize (unshelled, on the cob)",
+      "43": "Groundnuts",
+      "44": "Other nuts/seeds/pulses",
+      "76": "Pepper",
+      "77": "Leaves (Cocoyam, Spinach, etc.)",
+      "78": "Other vegetables (fresh or canned)"
+    },
+    "2013Q1": {
+      "43": "Groundnuts (unshelled)",
+      "44": "Groundnuts (shelled)",
+      "76": "Fresh Pepper",
+      "77": "Dry Pepper",
+      "78": "Leaves (Cocoyam, Spinach, etc.)",
+      "45": "Other nuts/seeds/pulses",
+      "79": "Other vegetables (fresh or canned)",
+      "141": "Salt",
+      "142": "Unground Ogbono",
+      "143": "Ground Ogbono",
+      "144": "Ground Pepper",
+      "145": "Melon (shelled)",
+      "146": "Melon (unshelled)"
+    }
+  },
+  "items": [
+    {
+      "quarter": "2010Q3",
+      "code": 20,
+      "source_label": "Other grains and flour",
+      "baseline_quarter_cell": "Other grains and flour",
+      "old_preferred": "Maize (unshelled, on the cob)",
+      "served_target": "Other grains and flour",
+      "retained_source_rows": 100,
+      "source_counts": {
+        "purchased": 76,
+        "produced": 20,
+        "inkind": 4
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2010Q3",
+      "code": 43,
+      "source_label": "Groundnuts",
+      "baseline_quarter_cell": "Groundnuts",
+      "old_preferred": "Groundnuts (unshelled)",
+      "served_target": "Groundnuts",
+      "retained_source_rows": 1174,
+      "source_counts": {
+        "purchased": 923,
+        "produced": 230,
+        "inkind": 21
+      },
+      "policy": "recorded native"
+    },
+    {
+      "quarter": "2010Q3",
+      "code": 44,
+      "source_label": "Other nuts/seeds/pulses",
+      "baseline_quarter_cell": "Other nuts/seeds/pulses",
+      "old_preferred": "Groundnuts (shelled)",
+      "served_target": "Other nuts/seeds/pulses",
+      "retained_source_rows": 282,
+      "source_counts": {
+        "purchased": 238,
+        "produced": 41,
+        "inkind": 3
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2010Q3",
+      "code": 76,
+      "source_label": "Pepper",
+      "baseline_quarter_cell": "Pepper",
+      "old_preferred": "Fresh Pepper",
+      "served_target": "Pepper",
+      "retained_source_rows": 3496,
+      "source_counts": {
+        "purchased": 3011,
+        "produced": 425,
+        "inkind": 60
+      },
+      "policy": "recorded native"
+    },
+    {
+      "quarter": "2010Q3",
+      "code": 77,
+      "source_label": "Leaves (cocoyam, spinach, etc.)",
+      "baseline_quarter_cell": "Leaves (Cocoyam, Spinach, etc.)",
+      "old_preferred": "Dry Pepper",
+      "served_target": "Leaves (Cocoyam, Spinach, etc.)",
+      "retained_source_rows": 452,
+      "source_counts": {
+        "purchased": 317,
+        "produced": 122,
+        "inkind": 13
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2010Q3",
+      "code": 78,
+      "source_label": "Other vegetables (fresh or canned)",
+      "baseline_quarter_cell": "Other vegetables (fresh or canned)",
+      "old_preferred": "Leaves (Cocoyam, Spinach, etc.)",
+      "served_target": "Other vegetables (fresh or canned)",
+      "retained_source_rows": 900,
+      "source_counts": {
+        "purchased": 619,
+        "produced": 246,
+        "inkind": 35
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2010Q3",
+      "code": 114,
+      "source_label": "Other milk products",
+      "baseline_quarter_cell": "Other milk products",
+      "old_preferred": "Cheese (wara)",
+      "served_target": "Other milk products",
+      "retained_source_rows": 88,
+      "source_counts": {
+        "purchased": 87,
+        "produced": 1
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2011Q1",
+      "code": 20,
+      "source_label": "Grain and Flours: Other grains and flour",
+      "baseline_quarter_cell": "Other grains and flour",
+      "old_preferred": "Maize (unshelled, on the cob)",
+      "served_target": "Other grains and flour",
+      "retained_source_rows": 103,
+      "source_counts": {
+        "purchased": 81,
+        "produced": 16,
+        "inkind": 6
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2011Q1",
+      "code": 43,
+      "source_label": "Pulses, Nuts and Seeds:Groundnuts",
+      "baseline_quarter_cell": "Groundnuts",
+      "old_preferred": "Groundnuts (unshelled)",
+      "served_target": "Groundnuts",
+      "retained_source_rows": 678,
+      "source_counts": {
+        "purchased": 466,
+        "produced": 202,
+        "inkind": 10
+      },
+      "policy": "recorded native"
+    },
+    {
+      "quarter": "2011Q1",
+      "code": 44,
+      "source_label": "Pulses, Nuts and Seeds:Other nuts/seeds/pulses",
+      "baseline_quarter_cell": "Other nuts/seeds/pulses",
+      "old_preferred": "Groundnuts (shelled)",
+      "served_target": "Other nuts/seeds/pulses",
+      "retained_source_rows": 348,
+      "source_counts": {
+        "purchased": 318,
+        "produced": 28,
+        "inkind": 2
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2011Q1",
+      "code": 76,
+      "source_label": "Vegetables : Pepper",
+      "baseline_quarter_cell": "Pepper",
+      "old_preferred": "Fresh Pepper",
+      "served_target": "Pepper",
+      "retained_source_rows": 3496,
+      "source_counts": {
+        "purchased": 3196,
+        "produced": 226,
+        "inkind": 74
+      },
+      "policy": "recorded native"
+    },
+    {
+      "quarter": "2011Q1",
+      "code": 77,
+      "source_label": "Vegetables Leaves: (Cocoyam, Spinach, etc)",
+      "baseline_quarter_cell": "Leaves (Cocoyam, Spinach, etc.)",
+      "old_preferred": "Dry Pepper",
+      "served_target": "Leaves (Cocoyam, Spinach, etc.)",
+      "retained_source_rows": 407,
+      "source_counts": {
+        "purchased": 346,
+        "produced": 43,
+        "inkind": 18
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2011Q1",
+      "code": 78,
+      "source_label": "Vegetables : Other vegetables (fresh or canned)",
+      "baseline_quarter_cell": "Other vegetables (fresh or canned)",
+      "old_preferred": "Leaves (Cocoyam, Spinach, etc.)",
+      "served_target": "Other vegetables (fresh or canned)",
+      "retained_source_rows": 1175,
+      "source_counts": {
+        "purchased": 987,
+        "produced": 121,
+        "inkind": 67
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2011Q1",
+      "code": 114,
+      "source_label": "Milk and Milk Products: Other milk products",
+      "baseline_quarter_cell": "Other milk products",
+      "old_preferred": "Cheese (wara)",
+      "served_target": "Other milk products",
+      "retained_source_rows": 79,
+      "source_counts": {
+        "purchased": 79
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2012Q3",
+      "code": 21,
+      "source_label": "maize shelled",
+      "baseline_quarter_cell": "Maize (shelled)",
+      "old_preferred": "Maize (shelled, on the cob)",
+      "served_target": "Maize (shelled)",
+      "retained_source_rows": 792,
+      "source_counts": {
+        "purchased": 367,
+        "produced": 377,
+        "inkind": 48
+      },
+      "policy": "recorded native"
+    },
+    {
+      "quarter": "2012Q3",
+      "code": 22,
+      "source_label": "grain and flours: other grains and flour",
+      "baseline_quarter_cell": "Other grains and flour",
+      "old_preferred": "Maize (shelled, off the cob)",
+      "served_target": "Other grains and flour",
+      "retained_source_rows": 63,
+      "source_counts": {
+        "purchased": 50,
+        "produced": 6,
+        "inkind": 7
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2012Q3",
+      "code": 43,
+      "source_label": "pulses, nuts and seeds:groundnuts",
+      "baseline_quarter_cell": "Groundnuts (unshelled)",
+      "old_preferred": "Groundnuts (unshelled)",
+      "served_target": "Groundnuts",
+      "retained_source_rows": 987,
+      "source_counts": {
+        "purchased": 713,
+        "produced": 216,
+        "inkind": 58
+      },
+      "policy": "recorded native"
+    },
+    {
+      "quarter": "2012Q3",
+      "code": 44,
+      "source_label": "pulses, nuts and seeds:other nuts/seeds/pulses",
+      "baseline_quarter_cell": "Groundnuts (shelled)",
+      "old_preferred": "Groundnuts (shelled)",
+      "served_target": "Other nuts/seeds/pulses",
+      "retained_source_rows": 161,
+      "source_counts": {
+        "purchased": 135,
+        "produced": 17,
+        "inkind": 9
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2012Q3",
+      "code": 76,
+      "source_label": "vegetables : pepper",
+      "baseline_quarter_cell": "Fresh Pepper",
+      "old_preferred": "Fresh Pepper",
+      "served_target": "Pepper",
+      "retained_source_rows": 3454,
+      "source_counts": {
+        "purchased": 2843,
+        "produced": 450,
+        "inkind": 161
+      },
+      "policy": "recorded native"
+    },
+    {
+      "quarter": "2012Q3",
+      "code": 77,
+      "source_label": "vegetables leaves: (cocoyam, spinach, etc)",
+      "baseline_quarter_cell": "Dry Pepper",
+      "old_preferred": "Dry Pepper",
+      "served_target": "Leaves (Cocoyam, Spinach, etc.)",
+      "retained_source_rows": 286,
+      "source_counts": {
+        "purchased": 174,
+        "produced": 93,
+        "inkind": 19
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2012Q3",
+      "code": 78,
+      "source_label": "vegetables : other vegetables (fresh or canned)",
+      "baseline_quarter_cell": "Leaves (Cocoyam, Spinach, etc.)",
+      "old_preferred": "Leaves (Cocoyam, Spinach, etc.)",
+      "served_target": "Other vegetables (fresh or canned)",
+      "retained_source_rows": 1239,
+      "source_counts": {
+        "purchased": 655,
+        "produced": 434,
+        "inkind": 150
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2013Q1",
+      "code": 21,
+      "source_label": "maize shelled",
+      "baseline_quarter_cell": "Maize (shelled)",
+      "old_preferred": "Maize (shelled, on the cob)",
+      "served_target": "Maize (shelled)",
+      "retained_source_rows": 633,
+      "source_counts": {
+        "purchased": 251,
+        "produced": 349,
+        "inkind": 33
+      },
+      "policy": "recorded native"
+    },
+    {
+      "quarter": "2013Q1",
+      "code": 22,
+      "source_label": "grain and flours: other grains and flour",
+      "baseline_quarter_cell": "Other grains and flour",
+      "old_preferred": "Maize (shelled, off the cob)",
+      "served_target": "Other grains and flour",
+      "retained_source_rows": 106,
+      "source_counts": {
+        "purchased": 80,
+        "produced": 20,
+        "inkind": 6
+      },
+      "policy": "source-backed exact Preferred"
+    },
+    {
+      "quarter": "2013Q1",
+      "code": 45,
+      "source_label": "pulses, nuts and seeds:other nuts/seeds/pulses",
+      "baseline_quarter_cell": null,
+      "old_preferred": "Other nuts/seeds/pulses",
+      "served_target": "Other nuts/seeds/pulses",
+      "retained_source_rows": 87,
+      "source_counts": {
+        "purchased": 61,
+        "produced": 22,
+        "inkind": 4
+      },
+      "policy": "fill missing quarter; retain correct existing answer"
+    },
+    {
+      "quarter": "2013Q1",
+      "code": 79,
+      "source_label": "vegetables : other vegetables (fresh or canned)",
+      "baseline_quarter_cell": null,
+      "old_preferred": "Other vegetables (fresh or canned)",
+      "served_target": "Other vegetables (fresh or canned)",
+      "retained_source_rows": 1158,
+      "source_counts": {
+        "purchased": 634,
+        "produced": 318,
+        "inkind": 206
+      },
+      "policy": "fill missing quarter; retain correct existing answer"
+    },
+    {
+      "quarter": "2013Q1",
+      "code": 141,
+      "source_label": "salt",
+      "baseline_quarter_cell": null,
+      "old_preferred": "Salt",
+      "served_target": "Salt",
+      "retained_source_rows": 3114,
+      "source_counts": {
+        "purchased": 2953,
+        "produced": 40,
+        "inkind": 121
+      },
+      "policy": "fill missing quarter; retain correct existing answer"
+    },
+    {
+      "quarter": "2013Q1",
+      "code": 142,
+      "source_label": "ogbonno ungrinded",
+      "baseline_quarter_cell": null,
+      "old_preferred": "Unground Ogbono",
+      "served_target": "Unground Ogbono",
+      "retained_source_rows": 465,
+      "source_counts": {
+        "purchased": 396,
+        "produced": 47,
+        "inkind": 22
+      },
+      "policy": "fill missing quarter; retain correct existing answer"
+    },
+    {
+      "quarter": "2013Q1",
+      "code": 143,
+      "source_label": "ogbonno grinded",
+      "baseline_quarter_cell": null,
+      "old_preferred": "Ground Ogbono",
+      "served_target": "Ground Ogbono",
+      "retained_source_rows": 142,
+      "source_counts": {
+        "purchased": 118,
+        "produced": 20,
+        "inkind": 4
+      },
+      "policy": "fill missing quarter; retain correct existing answer"
+    },
+    {
+      "quarter": "2013Q1",
+      "code": 144,
+      "source_label": "grinded pepper",
+      "baseline_quarter_cell": null,
+      "old_preferred": "Ground Pepper",
+      "served_target": "Ground Pepper",
+      "retained_source_rows": 150,
+      "source_counts": {
+        "purchased": 135,
+        "produced": 8,
+        "inkind": 7
+      },
+      "policy": "fill missing quarter; retain correct existing answer"
+    },
+    {
+      "quarter": "2013Q1",
+      "code": 145,
+      "source_label": "melon (shelled)",
+      "baseline_quarter_cell": null,
+      "old_preferred": "Melon (shelled)",
+      "served_target": "Melon (shelled)",
+      "retained_source_rows": 1018,
+      "source_counts": {
+        "purchased": 946,
+        "produced": 44,
+        "inkind": 28
+      },
+      "policy": "fill missing quarter; retain correct existing answer"
+    },
+    {
+      "quarter": "2013Q1",
+      "code": 146,
+      "source_label": "melon (unshelled)",
+      "baseline_quarter_cell": null,
+      "old_preferred": "Melon (unshelled)",
+      "served_target": "Melon (unshelled)",
+      "retained_source_rows": 154,
+      "source_counts": {
+        "purchased": 129,
+        "produced": 11,
+        "inkind": 14
+      },
+      "policy": "fill missing quarter; retain correct existing answer"
+    },
+    {
+      "quarter": "2018Q3",
+      "code": 148,
+      "source_label": "148. Other Spices",
+      "baseline_quarter_cell": "Other Spices (e.g. Maggi)",
+      "old_preferred": "Other Spices",
+      "served_target": "Other Spices",
+      "retained_source_rows": 222,
+      "source_counts": {
+        "purchased": 212,
+        "produced": 2,
+        "inkind": 8
+      },
+      "policy": "reviewed example-only alias"
+    },
+    {
+      "quarter": "2019Q1",
+      "code": 20,
+      "source_label": "20. Maize (On the cob)",
+      "baseline_quarter_cell": "Maize (unshelled, on the cob)",
+      "old_preferred": "Maize (unshelled, on the cob)",
+      "served_target": "Maize (unshelled, on the cob)",
+      "retained_source_rows": 20,
+      "source_counts": {
+        "purchased": 3,
+        "produced": 16,
+        "inkind": 1
+      },
+      "policy": "inherited specificity residual; unchanged"
+    },
+    {
+      "quarter": "2019Q1",
+      "code": 113,
+      "source_label": "113. Milk tinned",
+      "baseline_quarter_cell": "Milk tinned (unsweetened)",
+      "old_preferred": "Milk tinned (unsweetened)",
+      "served_target": "Milk tinned (unsweetened)",
+      "retained_source_rows": 340,
+      "source_counts": {
+        "purchased": 304,
+        "inkind": 36
+      },
+      "policy": "inherited specificity residual; unchanged"
+    }
+  ],
+  "observed_retained_rows_by_quarter": {
+    "2010Q3": 72236,
+    "2011Q1": 69734,
+    "2012Q3": 65429,
+    "2013Q1": 70649,
+    "2015Q3": 77702,
+    "2016Q1": 70469,
+    "2018Q3": 82865,
+    "2019Q1": 86641
+  },
+  "safe_existing_preferred_renames": 5789,
+  "native_preservation_rows": 14710,
+  "total_renames": 20499,
+  "source_negative_control_naive_old_quarter_table_new_wrong_PH_rows": 2135,
+  "observed_new_multicode_merges": 0
+}

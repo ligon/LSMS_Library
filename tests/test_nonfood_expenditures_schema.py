@@ -79,6 +79,7 @@ EXPECTED_TOTALS = {
     ('Nigeria', '2018Q3'): 208182611.0,
     ('Nigeria', '2019Q1'): 248757023.0,
     ('Togo', '2018'): 716006884.0,
+    ('Togo', '2021-22'): 966590553.3,  # GH #1697: the sum of s09b..s09f, by oracle
 }
 
 

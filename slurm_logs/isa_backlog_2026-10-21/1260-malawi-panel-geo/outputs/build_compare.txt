@@ -1,0 +1,60 @@
+cluster_features shape base (3235, 5) tip (3235, 5) | index equal True | columns ['Region', 'District', 'Rural', 'Latitude', 'Longitude'] | dtypes equal True
+
+== 2016-17: wave rows base 14955 tip 14955 | cols tip ['t', 'v', 'i', 'Region', 'District', 'Rural', 'Latitude', 'Longitude']
+  households: CS 12447, panel 2508 | EAs: CS 779, panel 102, shared 1
+  household rows with Latitude: base 12444 tip 14947; panel households with Latitude tip 2503 of 2508
+  panel-only EAs (101): with GPS base 0 -> tip 101
+  shared EAs (1): with GPS base 1 -> tip 1
+  CS-only EAs (778): with GPS base 778 -> tip 778
+  all EAs (880): missing GPS base 101 -> tip 0
+  CS-only clusters identical (all 5 cols): True
+    Region: clusters changed 0
+    District: clusters changed 0
+    Rural: clusters changed 1
+  shared EA row identical: False
+  contested EAs (base): {'Region': 0, 'District': 0, 'Rural': 75, 'Latitude': 7, 'Longitude': 7}
+  contested EAs (tip): {'Region': 0, 'District': 0, 'Rural': 75, 'Latitude': 108, 'Longitude': 108}
+
+== 2019-20: wave rows base 14612 tip 14612 | cols tip ['t', 'v', 'i', 'Region', 'District', 'Rural', 'Latitude', 'Longitude']
+  households: CS 11434, panel 3178 | EAs: CS 717, panel 102, shared 0
+  household rows with Latitude: base 11426 tip 14601; panel households with Latitude tip 3175 of 3178
+  panel-only EAs (102): with GPS base 0 -> tip 102
+  shared EAs (0): with GPS base 0 -> tip 0
+  CS-only EAs (717): with GPS base 717 -> tip 717
+  all EAs (819): missing GPS base 102 -> tip 0
+  CS-only clusters identical (all 5 cols): True
+    Region: clusters changed 0
+    District: clusters changed 0
+    Rural: clusters changed 0
+  contested EAs (base): {'Region': 66, 'District': 98, 'Rural': 86, 'Latitude': 0, 'Longitude': 0}
+  contested EAs (tip): {'Region': 66, 'District': 98, 'Rural': 86, 'Latitude': 102, 'Longitude': 102}
+
+other waves identical: {'2004-05': True, '2010-11': True, '2013-14': True}
+sample.parquet shape (57118, 7) (57118, 7) | DataFrame.equals True
+housing.parquet shape (57118, 2) (57118, 2) | DataFrame.equals True
+
+grain reports (table, wave, site): base -> tip
+  ('cluster_features', '2013-14', 'Wave.cluster_features') {'rows': 4000, 'dropped': 3796, 'destroyed': 3540, 'conflicting_groups': 188, 'nan_key_rows': 0} -> {'rows': 4000, 'dropped': 3796, 'destroyed': 3540, 'conflicting_groups': 188, 'nan_key_rows': 0}
+  ('cluster_features', '2016-17', 'Wave.cluster_features') {'rows': 14955, 'dropped': 14075, 'destroyed': 1994, 'conflicting_groups': 85, 'nan_key_rows': 0} -> {'rows': 14955, 'dropped': 14075, 'destroyed': 2563, 'conflicting_groups': 111, 'nan_key_rows': 0}
+  ('cluster_features', '2019-20', 'Wave.cluster_features') {'rows': 14612, 'dropped': 13793, 'destroyed': 3146, 'conflicting_groups': 108, 'nan_key_rows': 0} -> {'rows': 14612, 'dropped': 13793, 'destroyed': 3184, 'conflicting_groups': 110, 'nan_key_rows': 0}
+2016-17 Region changed: panel-only 0, shared 0, CS-only 0
+2016-17 District changed: panel-only 0, shared 0, CS-only 0
+2016-17 Rural changed: panel-only 1, shared 0, CS-only 0
+2016-17 clusters whose existing GPS changed: 1 (CS-only 0, shared 1)
+2019-20 Region changed: panel-only 0, shared 0, CS-only 0
+2019-20 District changed: panel-only 0, shared 0, CS-only 0
+2019-20 Rural changed: panel-only 0, shared 0, CS-only 0
+2019-20 clusters whose existing GPS changed: 0 (CS-only 0, shared 0)
+## shared EA (2016-17)
+households by half {'panel': 30, 'CS': 16}
+Rural by half {('CS', 'rural'): 16, ('panel', 'RURAL'): 27, ('panel', 'URBAN'): 3}
+distinct coords by half {'Latitude': {'CS': 1, 'panel': 5}, 'Longitude': {'CS': 1, 'panel': 5}}
+CS distinct fixes 1
+panel households at the CS fix 0
+served Rural base Rural tip Rural
+served coordinate: base equals CS fix True | tip equals CS fix False
+first household in merged order is panel
+2019-20 i shapes: all-digit 11434 | contains "-" 3178 | starts cs- 0
+base ['Urban'] -> tip ['Rural']
+base served 2019-20 clusters outside loose box: 9 | of which panel EAs 0
+tip served 2019-20 clusters outside loose box: 9 | of which panel EAs 0

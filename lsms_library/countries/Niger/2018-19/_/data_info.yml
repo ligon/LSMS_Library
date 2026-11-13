@@ -22,6 +22,10 @@ sample:
                     Urbain: Urban
                     urbain: Urban
                     URBAIN: Urban
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
     df_weights:
         file: ehcvm_ponderations_ner2018.dta
         idxvars:
@@ -37,6 +41,19 @@ sample:
 
 food_acquired:
     file: s07b_me_ner2018.dta
+    # GH #1452.  Read by mapping.py's food_acquired hook, not by the grabber; declared so
+    # their DVC sidecars are in this table's input hash.  2021-22's source for its product
+    # labels: the table uses that wave's codes, which are not this wave's.
+    unit_weights:
+        file:
+            - ../../2021-22/Data/ehcvm_nsu_ner2021.dta
+            - ../../2021-22/Data/s07b_me_ner2021.dta
+    # GH #1708, ruling @ligon 2026-11-12 "Revalue at local median".  Read by mapping.py's
+    # food_acquired hook for each household's region (s00q01), the fallback level of the
+    # revaluation of flagged purchases; declared so its DVC sidecar is in this table's
+    # input hash.  If it cannot be fetched, food_acquired raises.
+    household_region:
+        file: s00_me_ner2018.dta
     idxvars:
         v: grappe
         visit: vague
@@ -203,8 +220,18 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
+        # Section 14.04 asks revenus, avoirs, production agricole, effectif du cheptel,
+        # stock, achats.  The .dta labels leave out the cheptel and so run one letter
+        # late: s14q04d is the cheptel, s14q04e the stock (GH #1556).
+        AffectedFoodStock:
+            - s14q04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
         AffectedConsumption:
-            - s14q04d
+            - s14q04f
             - mapping:
                 Diminué: True
                 Augmenté: True

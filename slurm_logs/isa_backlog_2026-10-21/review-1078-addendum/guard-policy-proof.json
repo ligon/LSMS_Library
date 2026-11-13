@@ -1,0 +1,16 @@
+{
+  "status": "SUCCESS",
+  "original_guard_sha256": "80b321710c5ec6c2242a28559f741cab46da0da00f1edafdc429c1d6f17b52aa",
+  "new_guard_sha256": "dd40f5c1cbe15421d05a600ae4eff3b95622be72bc05d8035e53c199e9095f9d",
+  "original_policy_AST_exact_after_removing_diagnostic_helper_and_call": true,
+  "namespace_only_changes": [
+    "new private root",
+    "single new checkout",
+    "exact root-prepared DVC metadata target"
+  ],
+  "existing_FileExistsError_handlers_unchanged": true,
+  "country_notes_exact_to_full_read_pins": {
+    "Uganda": "fa0918735dba0051544e0017a60eda7f9a3abd6de20912e6b5283a3ec8ffb423",
+    "Niger": "b1bf5794b242c794437995eb76742db763951397d8dfdb691d064af569ef67ee"
+  }
+}

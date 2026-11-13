@@ -1,0 +1,6 @@
+REPORT.md
+verification.json
+requirements-verification.json
+installed-smoke.json
+COPYLIST.txt
+MANIFEST.json

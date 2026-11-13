@@ -1,0 +1,10 @@
+{
+  "status": "POSTEXIT_1194_BOUNDED_SAVED_NUMERIC_SUPPLEMENT",
+  "READY_sha256": "cccc34f3112629a88a8966a18ac06133ba94d621fefe22e6af351017a0df338a",
+  "manifest_sha256": "97024d37d257ccf6aba5676c17158247682fc0b630b1b4b231b2e89923bc1d1c",
+  "manifest_entries": 110,
+  "all189_original_and58_copy_receipts_exact": true,
+  "source_clean_zero_consumers_zero_denials": true,
+  "source_projection_walked_expected_and_fixture_memory_gaps_preserved": true,
+  "signed": "Sue"
+}

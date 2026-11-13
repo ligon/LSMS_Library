@@ -1,0 +1,19 @@
+{
+  "status": "COMPLETE_LIVE_OPEN_COLLECTIONS_AND_EXACT_31_IMPLEMENTATION_HEAD_BASE_NAMES_VERIFIED",
+  "at_UTC": "2026-10-22T21:22:21.711766+00:00",
+  "repository_open_PRs": 32,
+  "repository_open_issues": 173,
+  "ISA_related_open_issue_records": 114,
+  "implementation_PRs_open_unmerged": 31,
+  "previous30_head_base_names_unchanged": true,
+  "new_PR1219_head": "657fed11a63354886772d0f978cec8adb2ad647e",
+  "new_PR1219_base": "fix/1119-burkina-seed-crop-labels-20261022",
+  "new_PR1219_exact_base_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "all114_issue_records_still_open": true,
+  "raw_metadata_collection_SHA256": {
+    "PRs": "ded7d05fce537470387cecaca08667198f56e3c2d40a464103d10841714e7b0b",
+    "issues": "96015c71d3f69fca151df1e2c092ce0b22a1ee5f39a72d95a2912f3ffcc1c2b0"
+  },
+  "collection_method": "GitHub connector exact PR1219 head/base/body/state readback plus gh pr/issue list complete<limit collections; connector list pagination cannot enumerate all173 issues. No CI/data acceptance inferred.",
+  "signed": "Sue"
+}

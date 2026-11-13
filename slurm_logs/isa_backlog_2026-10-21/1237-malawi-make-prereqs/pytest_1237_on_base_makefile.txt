@@ -1,0 +1,1267 @@
+.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF............................... [ 87%]
+.........F                                                               [100%]
+=================================== FAILURES ===================================
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[anthropometry-2010-11] __
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds0')
+table = 'anthropometry', wave = '2010-11'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: anthropometry 2010-11: make judged anthropometry.parquet current after an edit to ../2010-11/_/anthropometry.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds0/Malawi/2010-11/_/anthropometry.parquet' is up to date.
+E         
+E       assert 'cd ../2010-11/_/ && python anthropometry.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds0/Malawi/2010-11/_/anthropometry.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds0/Malawi/2010-11/_/anthropometry.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...-ligon/pytest-120/test_wave_script_edit_rebuilds0/Malawi/2010-11/_/anthropometry.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[anthropometry-2013-14] __
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds1')
+table = 'anthropometry', wave = '2013-14'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: anthropometry 2013-14: make judged anthropometry.parquet current after an edit to ../2013-14/_/anthropometry.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds1/Malawi/2013-14/_/anthropometry.parquet' is up to date.
+E         
+E       assert 'cd ../2013-14/_/ && python anthropometry.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds1/Malawi/2013-14/_/anthropometry.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds1/Malawi/2013-14/_/anthropometry.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...-ligon/pytest-120/test_wave_script_edit_rebuilds1/Malawi/2013-14/_/anthropometry.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[anthropometry-2016-17] __
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds2')
+table = 'anthropometry', wave = '2016-17'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: anthropometry 2016-17: make judged anthropometry.parquet current after an edit to ../2016-17/_/anthropometry.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds2/Malawi/2016-17/_/anthropometry.parquet' is up to date.
+E         
+E       assert 'cd ../2016-17/_/ && python anthropometry.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds2/Malawi/2016-17/_/anthropometry.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds2/Malawi/2016-17/_/anthropometry.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...-ligon/pytest-120/test_wave_script_edit_rebuilds2/Malawi/2016-17/_/anthropometry.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[anthropometry-2019-20] __
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds3')
+table = 'anthropometry', wave = '2019-20'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: anthropometry 2019-20: make judged anthropometry.parquet current after an edit to ../2019-20/_/anthropometry.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds3/Malawi/2019-20/_/anthropometry.parquet' is up to date.
+E         
+E       assert 'cd ../2019-20/_/ && python anthropometry.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds3/Malawi/2019-20/_/anthropometry.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds3/Malawi/2019-20/_/anthropometry.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...-ligon/pytest-120/test_wave_script_edit_rebuilds3/Malawi/2019-20/_/anthropometry.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[community_prices-2010-11] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds4')
+table = 'community_prices', wave = '2010-11'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: community_prices 2010-11: make judged community_prices.parquet current after an edit to ../2010-11/_/community_prices.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds4/Malawi/2010-11/_/community_prices.parquet' is up to date.
+E         
+E       assert 'cd ../2010-11/_/ && python community_prices.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds4/Malawi/2010-11/_/community_prices.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds4/Malawi/2010-11/_/community_prices.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...gon/pytest-120/test_wave_script_edit_rebuilds4/Malawi/2010-11/_/community_prices.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[community_prices-2013-14] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds5')
+table = 'community_prices', wave = '2013-14'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: community_prices 2013-14: make judged community_prices.parquet current after an edit to ../2013-14/_/community_prices.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds5/Malawi/2013-14/_/community_prices.parquet' is up to date.
+E         
+E       assert 'cd ../2013-14/_/ && python community_prices.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds5/Malawi/2013-14/_/community_prices.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds5/Malawi/2013-14/_/community_prices.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...gon/pytest-120/test_wave_script_edit_rebuilds5/Malawi/2013-14/_/community_prices.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[community_prices-2019-20] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds6')
+table = 'community_prices', wave = '2019-20'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: community_prices 2019-20: make judged community_prices.parquet current after an edit to ../2019-20/_/community_prices.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds6/Malawi/2019-20/_/community_prices.parquet' is up to date.
+E         
+E       assert 'cd ../2019-20/_/ && python community_prices.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds6/Malawi/2019-20/_/community_prices.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds6/Malawi/2019-20/_/community_prices.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...gon/pytest-120/test_wave_script_edit_rebuilds6/Malawi/2019-20/_/community_prices.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[crop_production-2010-11] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds7')
+table = 'crop_production', wave = '2010-11'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: crop_production 2010-11: make judged crop_production.parquet current after an edit to ../2010-11/_/crop_production.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds7/Malawi/2010-11/_/crop_production.parquet' is up to date.
+E         
+E       assert 'cd ../2010-11/_/ && python crop_production.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds7/Malawi/2010-11/_/crop_production.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds7/Malawi/2010-11/_/crop_production.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...igon/pytest-120/test_wave_script_edit_rebuilds7/Malawi/2010-11/_/crop_production.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[crop_production-2013-14] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds8')
+table = 'crop_production', wave = '2013-14'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: crop_production 2013-14: make judged crop_production.parquet current after an edit to ../2013-14/_/crop_production.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds8/Malawi/2013-14/_/crop_production.parquet' is up to date.
+E         
+E       assert 'cd ../2013-14/_/ && python crop_production.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds8/Malawi/2013-14/_/crop_production.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds8/Malawi/2013-14/_/crop_production.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...igon/pytest-120/test_wave_script_edit_rebuilds8/Malawi/2013-14/_/crop_production.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[crop_production-2016-17] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds9')
+table = 'crop_production', wave = '2016-17'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: crop_production 2016-17: make judged crop_production.parquet current after an edit to ../2016-17/_/crop_production.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds9/Malawi/2016-17/_/crop_production.parquet' is up to date.
+E         
+E       assert 'cd ../2016-17/_/ && python crop_production.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds9/Malawi/2016-17/_/crop_production.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds9/Malawi/2016-17/_/crop_production.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...igon/pytest-120/test_wave_script_edit_rebuilds9/Malawi/2016-17/_/crop_production.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[crop_production-2019-20] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds10')
+table = 'crop_production', wave = '2019-20'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: crop_production 2019-20: make judged crop_production.parquet current after an edit to ../2019-20/_/crop_production.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds10/Malawi/2019-20/_/crop_production.parquet' is up to date.
+E         
+E       assert 'cd ../2019-20/_/ && python crop_production.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds10/Malawi/2019-20/_/crop_production.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds10/Malawi/2019-20/_/crop_production.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...gon/pytest-120/test_wave_script_edit_rebuilds10/Malawi/2019-20/_/crop_production.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[food_acquired-2004-05] __
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds11')
+table = 'food_acquired', wave = '2004-05'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: food_acquired 2004-05: make judged food_acquired.parquet current after an edit to ../2004-05/_/food_acquired.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds11/Malawi/2004-05/_/food_acquired.parquet' is up to date.
+E         
+E       assert 'cd ../2004-05/_/ && python food_acquired.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds11/Malawi/2004-05/_/food_acquired.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds11/Malawi/2004-05/_/food_acquired.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...ligon/pytest-120/test_wave_script_edit_rebuilds11/Malawi/2004-05/_/food_acquired.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[food_acquired-2010-11] __
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds12')
+table = 'food_acquired', wave = '2010-11'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: food_acquired 2010-11: make judged food_acquired.parquet current after an edit to ../2010-11/_/food_acquired.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds12/Malawi/2010-11/_/food_acquired.parquet' is up to date.
+E         
+E       assert 'cd ../2010-11/_/ && python food_acquired.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds12/Malawi/2010-11/_/food_acquired.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds12/Malawi/2010-11/_/food_acquired.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...ligon/pytest-120/test_wave_script_edit_rebuilds12/Malawi/2010-11/_/food_acquired.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[food_acquired-2013-14] __
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds13')
+table = 'food_acquired', wave = '2013-14'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: food_acquired 2013-14: make judged food_acquired.parquet current after an edit to ../2013-14/_/food_acquired.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds13/Malawi/2013-14/_/food_acquired.parquet' is up to date.
+E         
+E       assert 'cd ../2013-14/_/ && python food_acquired.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds13/Malawi/2013-14/_/food_acquired.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds13/Malawi/2013-14/_/food_acquired.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...ligon/pytest-120/test_wave_script_edit_rebuilds13/Malawi/2013-14/_/food_acquired.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[food_acquired-2016-17] __
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds14')
+table = 'food_acquired', wave = '2016-17'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: food_acquired 2016-17: make judged food_acquired.parquet current after an edit to ../2016-17/_/food_acquired.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds14/Malawi/2016-17/_/food_acquired.parquet' is up to date.
+E         
+E       assert 'cd ../2016-17/_/ && python food_acquired.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds14/Malawi/2016-17/_/food_acquired.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds14/Malawi/2016-17/_/food_acquired.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...ligon/pytest-120/test_wave_script_edit_rebuilds14/Malawi/2016-17/_/food_acquired.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[food_acquired-2019-20] __
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds15')
+table = 'food_acquired', wave = '2019-20'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: food_acquired 2019-20: make judged food_acquired.parquet current after an edit to ../2019-20/_/food_acquired.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds15/Malawi/2019-20/_/food_acquired.parquet' is up to date.
+E         
+E       assert 'cd ../2019-20/_/ && python food_acquired.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds15/Malawi/2019-20/_/food_acquired.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds15/Malawi/2019-20/_/food_acquired.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...ligon/pytest-120/test_wave_script_edit_rebuilds15/Malawi/2019-20/_/food_acquired.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+__ test_wave_script_edit_rebuilds_existing_wave_parquet[food_coping-2010-11] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds16')
+table = 'food_coping', wave = '2010-11'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: food_coping 2010-11: make judged food_coping.parquet current after an edit to ../2010-11/_/food_coping.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds16/Malawi/2010-11/_/food_coping.parquet' is up to date.
+E         
+E       assert 'cd ../2010-11/_/ && python food_coping.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds16/Malawi/2010-11/_/food_coping.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds16/Malawi/2010-11/_/food_coping.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...f-ligon/pytest-120/test_wave_script_edit_rebuilds16/Malawi/2010-11/_/food_coping.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+__ test_wave_script_edit_rebuilds_existing_wave_parquet[food_coping-2013-14] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds17')
+table = 'food_coping', wave = '2013-14'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: food_coping 2013-14: make judged food_coping.parquet current after an edit to ../2013-14/_/food_coping.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds17/Malawi/2013-14/_/food_coping.parquet' is up to date.
+E         
+E       assert 'cd ../2013-14/_/ && python food_coping.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds17/Malawi/2013-14/_/food_coping.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds17/Malawi/2013-14/_/food_coping.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...f-ligon/pytest-120/test_wave_script_edit_rebuilds17/Malawi/2013-14/_/food_coping.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+__ test_wave_script_edit_rebuilds_existing_wave_parquet[food_coping-2016-17] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds18')
+table = 'food_coping', wave = '2016-17'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: food_coping 2016-17: make judged food_coping.parquet current after an edit to ../2016-17/_/food_coping.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds18/Malawi/2016-17/_/food_coping.parquet' is up to date.
+E         
+E       assert 'cd ../2016-17/_/ && python food_coping.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds18/Malawi/2016-17/_/food_coping.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds18/Malawi/2016-17/_/food_coping.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...f-ligon/pytest-120/test_wave_script_edit_rebuilds18/Malawi/2016-17/_/food_coping.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+__ test_wave_script_edit_rebuilds_existing_wave_parquet[food_coping-2019-20] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds19')
+table = 'food_coping', wave = '2019-20'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: food_coping 2019-20: make judged food_coping.parquet current after an edit to ../2019-20/_/food_coping.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds19/Malawi/2019-20/_/food_coping.parquet' is up to date.
+E         
+E       assert 'cd ../2019-20/_/ && python food_coping.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds19/Malawi/2019-20/_/food_coping.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds19/Malawi/2019-20/_/food_coping.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...f-ligon/pytest-120/test_wave_script_edit_rebuilds19/Malawi/2019-20/_/food_coping.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+___ test_wave_script_edit_rebuilds_existing_wave_parquet[livestock-2010-11] ____
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds20')
+table = 'livestock', wave = '2010-11'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: livestock 2010-11: make judged livestock.parquet current after an edit to ../2010-11/_/livestock.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds20/Malawi/2010-11/_/livestock.parquet' is up to date.
+E         
+E       assert 'cd ../2010-11/_/ && python livestock.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds20/Malawi/2010-11/_/livestock.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds20/Malawi/2010-11/_/livestock.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...-of-ligon/pytest-120/test_wave_script_edit_rebuilds20/Malawi/2010-11/_/livestock.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+___ test_wave_script_edit_rebuilds_existing_wave_parquet[livestock-2013-14] ____
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds21')
+table = 'livestock', wave = '2013-14'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: livestock 2013-14: make judged livestock.parquet current after an edit to ../2013-14/_/livestock.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds21/Malawi/2013-14/_/livestock.parquet' is up to date.
+E         
+E       assert 'cd ../2013-14/_/ && python livestock.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds21/Malawi/2013-14/_/livestock.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds21/Malawi/2013-14/_/livestock.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...-of-ligon/pytest-120/test_wave_script_edit_rebuilds21/Malawi/2013-14/_/livestock.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+___ test_wave_script_edit_rebuilds_existing_wave_parquet[livestock-2016-17] ____
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds22')
+table = 'livestock', wave = '2016-17'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: livestock 2016-17: make judged livestock.parquet current after an edit to ../2016-17/_/livestock.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds22/Malawi/2016-17/_/livestock.parquet' is up to date.
+E         
+E       assert 'cd ../2016-17/_/ && python livestock.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds22/Malawi/2016-17/_/livestock.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds22/Malawi/2016-17/_/livestock.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...-of-ligon/pytest-120/test_wave_script_edit_rebuilds22/Malawi/2016-17/_/livestock.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+___ test_wave_script_edit_rebuilds_existing_wave_parquet[livestock-2019-20] ____
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds23')
+table = 'livestock', wave = '2019-20'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: livestock 2019-20: make judged livestock.parquet current after an edit to ../2019-20/_/livestock.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds23/Malawi/2019-20/_/livestock.parquet' is up to date.
+E         
+E       assert 'cd ../2019-20/_/ && python livestock.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds23/Malawi/2019-20/_/livestock.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds23/Malawi/2019-20/_/livestock.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...-of-ligon/pytest-120/test_wave_script_edit_rebuilds23/Malawi/2019-20/_/livestock.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[months_food_inadequate-2010-11] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds24')
+table = 'months_food_inadequate', wave = '2010-11'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: months_food_inadequate 2010-11: make judged months_food_inadequate.parquet current after an edit to ../2010-11/_/months_food_inadequate.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds24/Malawi/2010-11/_/months_food_inadequate.parquet' is up to date.
+E         
+E       assert 'cd ../2010-11/_/ && python months_food_inadequate.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds24/Malawi/2010-11/_/months_food_inadequate.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds24/Malawi/2010-11/_/months_food_inadequate.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...est-120/test_wave_script_edit_rebuilds24/Malawi/2010-11/_/months_food_inadequate.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[months_food_inadequate-2013-14] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds25')
+table = 'months_food_inadequate', wave = '2013-14'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: months_food_inadequate 2013-14: make judged months_food_inadequate.parquet current after an edit to ../2013-14/_/months_food_inadequate.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds25/Malawi/2013-14/_/months_food_inadequate.parquet' is up to date.
+E         
+E       assert 'cd ../2013-14/_/ && python months_food_inadequate.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds25/Malawi/2013-14/_/months_food_inadequate.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds25/Malawi/2013-14/_/months_food_inadequate.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...est-120/test_wave_script_edit_rebuilds25/Malawi/2013-14/_/months_food_inadequate.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[months_food_inadequate-2016-17] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds26')
+table = 'months_food_inadequate', wave = '2016-17'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: months_food_inadequate 2016-17: make judged months_food_inadequate.parquet current after an edit to ../2016-17/_/months_food_inadequate.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds26/Malawi/2016-17/_/months_food_inadequate.parquet' is up to date.
+E         
+E       assert 'cd ../2016-17/_/ && python months_food_inadequate.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds26/Malawi/2016-17/_/months_food_inadequate.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds26/Malawi/2016-17/_/months_food_inadequate.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...est-120/test_wave_script_edit_rebuilds26/Malawi/2016-17/_/months_food_inadequate.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[months_food_inadequate-2019-20] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds27')
+table = 'months_food_inadequate', wave = '2019-20'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: months_food_inadequate 2019-20: make judged months_food_inadequate.parquet current after an edit to ../2019-20/_/months_food_inadequate.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds27/Malawi/2019-20/_/months_food_inadequate.parquet' is up to date.
+E         
+E       assert 'cd ../2019-20/_/ && python months_food_inadequate.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds27/Malawi/2019-20/_/months_food_inadequate.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds27/Malawi/2019-20/_/months_food_inadequate.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...est-120/test_wave_script_edit_rebuilds27/Malawi/2019-20/_/months_food_inadequate.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[people_last7days-2010-11] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds28')
+table = 'people_last7days', wave = '2010-11'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: people_last7days 2010-11: make judged people_last7days.parquet current after an edit to ../2010-11/_/people_last7days.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds28/Malawi/2010-11/_/people_last7days.parquet' is up to date.
+E         
+E       assert 'cd ../2010-11/_/ && python people_last7days.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds28/Malawi/2010-11/_/people_last7days.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds28/Malawi/2010-11/_/people_last7days.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...on/pytest-120/test_wave_script_edit_rebuilds28/Malawi/2010-11/_/people_last7days.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[people_last7days-2013-14] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds29')
+table = 'people_last7days', wave = '2013-14'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: people_last7days 2013-14: make judged people_last7days.parquet current after an edit to ../2013-14/_/people_last7days.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds29/Malawi/2013-14/_/people_last7days.parquet' is up to date.
+E         
+E       assert 'cd ../2013-14/_/ && python people_last7days.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds29/Malawi/2013-14/_/people_last7days.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds29/Malawi/2013-14/_/people_last7days.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...on/pytest-120/test_wave_script_edit_rebuilds29/Malawi/2013-14/_/people_last7days.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[people_last7days-2016-17] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds30')
+table = 'people_last7days', wave = '2016-17'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: people_last7days 2016-17: make judged people_last7days.parquet current after an edit to ../2016-17/_/people_last7days.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds30/Malawi/2016-17/_/people_last7days.parquet' is up to date.
+E         
+E       assert 'cd ../2016-17/_/ && python people_last7days.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds30/Malawi/2016-17/_/people_last7days.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds30/Malawi/2016-17/_/people_last7days.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...on/pytest-120/test_wave_script_edit_rebuilds30/Malawi/2016-17/_/people_last7days.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_ test_wave_script_edit_rebuilds_existing_wave_parquet[people_last7days-2019-20] _
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds31')
+table = 'people_last7days', wave = '2019-20'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: people_last7days 2019-20: make judged people_last7days.parquet current after an edit to ../2019-20/_/people_last7days.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds31/Malawi/2019-20/_/people_last7days.parquet' is up to date.
+E         
+E       assert 'cd ../2019-20/_/ && python people_last7days.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds31/Malawi/2019-20/_/people_last7days.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds31/Malawi/2019-20/_/people_last7days.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...on/pytest-120/test_wave_script_edit_rebuilds31/Malawi/2019-20/_/people_last7days.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+__ test_wave_script_edit_rebuilds_existing_wave_parquet[plot_inputs-2010-11] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds32')
+table = 'plot_inputs', wave = '2010-11'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: plot_inputs 2010-11: make judged plot_inputs.parquet current after an edit to ../2010-11/_/plot_inputs.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds32/Malawi/2010-11/_/plot_inputs.parquet' is up to date.
+E         
+E       assert 'cd ../2010-11/_/ && python plot_inputs.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds32/Malawi/2010-11/_/plot_inputs.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds32/Malawi/2010-11/_/plot_inputs.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...f-ligon/pytest-120/test_wave_script_edit_rebuilds32/Malawi/2010-11/_/plot_inputs.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+__ test_wave_script_edit_rebuilds_existing_wave_parquet[plot_inputs-2013-14] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds33')
+table = 'plot_inputs', wave = '2013-14'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: plot_inputs 2013-14: make judged plot_inputs.parquet current after an edit to ../2013-14/_/plot_inputs.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds33/Malawi/2013-14/_/plot_inputs.parquet' is up to date.
+E         
+E       assert 'cd ../2013-14/_/ && python plot_inputs.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds33/Malawi/2013-14/_/plot_inputs.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds33/Malawi/2013-14/_/plot_inputs.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...f-ligon/pytest-120/test_wave_script_edit_rebuilds33/Malawi/2013-14/_/plot_inputs.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+__ test_wave_script_edit_rebuilds_existing_wave_parquet[plot_inputs-2016-17] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds34')
+table = 'plot_inputs', wave = '2016-17'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: plot_inputs 2016-17: make judged plot_inputs.parquet current after an edit to ../2016-17/_/plot_inputs.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds34/Malawi/2016-17/_/plot_inputs.parquet' is up to date.
+E         
+E       assert 'cd ../2016-17/_/ && python plot_inputs.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds34/Malawi/2016-17/_/plot_inputs.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds34/Malawi/2016-17/_/plot_inputs.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...f-ligon/pytest-120/test_wave_script_edit_rebuilds34/Malawi/2016-17/_/plot_inputs.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+__ test_wave_script_edit_rebuilds_existing_wave_parquet[plot_inputs-2019-20] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds35')
+table = 'plot_inputs', wave = '2019-20'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: plot_inputs 2019-20: make judged plot_inputs.parquet current after an edit to ../2019-20/_/plot_inputs.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds35/Malawi/2019-20/_/plot_inputs.parquet' is up to date.
+E         
+E       assert 'cd ../2019-20/_/ && python plot_inputs.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds35/Malawi/2019-20/_/plot_inputs.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds35/Malawi/2019-20/_/plot_inputs.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...f-ligon/pytest-120/test_wave_script_edit_rebuilds35/Malawi/2019-20/_/plot_inputs.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+___ test_wave_script_edit_rebuilds_existing_wave_parquet[plot_labor-2010-11] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds36')
+table = 'plot_labor', wave = '2010-11'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: plot_labor 2010-11: make judged plot_labor.parquet current after an edit to ../2010-11/_/plot_labor.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds36/Malawi/2010-11/_/plot_labor.parquet' is up to date.
+E         
+E       assert 'cd ../2010-11/_/ && python plot_labor.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds36/Malawi/2010-11/_/plot_labor.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds36/Malawi/2010-11/_/plot_labor.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...of-ligon/pytest-120/test_wave_script_edit_rebuilds36/Malawi/2010-11/_/plot_labor.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+___ test_wave_script_edit_rebuilds_existing_wave_parquet[plot_labor-2013-14] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds37')
+table = 'plot_labor', wave = '2013-14'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: plot_labor 2013-14: make judged plot_labor.parquet current after an edit to ../2013-14/_/plot_labor.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds37/Malawi/2013-14/_/plot_labor.parquet' is up to date.
+E         
+E       assert 'cd ../2013-14/_/ && python plot_labor.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds37/Malawi/2013-14/_/plot_labor.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds37/Malawi/2013-14/_/plot_labor.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...of-ligon/pytest-120/test_wave_script_edit_rebuilds37/Malawi/2013-14/_/plot_labor.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+___ test_wave_script_edit_rebuilds_existing_wave_parquet[plot_labor-2016-17] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds38')
+table = 'plot_labor', wave = '2016-17'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: plot_labor 2016-17: make judged plot_labor.parquet current after an edit to ../2016-17/_/plot_labor.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds38/Malawi/2016-17/_/plot_labor.parquet' is up to date.
+E         
+E       assert 'cd ../2016-17/_/ && python plot_labor.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds38/Malawi/2016-17/_/plot_labor.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds38/Malawi/2016-17/_/plot_labor.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...of-ligon/pytest-120/test_wave_script_edit_rebuilds38/Malawi/2016-17/_/plot_labor.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+___ test_wave_script_edit_rebuilds_existing_wave_parquet[plot_labor-2019-20] ___
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds39')
+table = 'plot_labor', wave = '2019-20'
+
+    @needs_make
+    @pytest.mark.parametrize("table,wave", _cases())
+    def test_wave_script_edit_rebuilds_existing_wave_parquet(tmp_path, table, wave):
+        target = _warm_target(tmp_path, table, wave)
+        script = f"../{wave}/_/{table}.py"
+        recipe = f"cd ../{wave}/_/ && python {table}.py"
+    
+        # Control: nothing edited, the stand-in is current.
+        plain = _make(["-n", str(target)], tmp_path)
+        assert plain.returncode == 0, plain.stderr
+        assert recipe not in plain.stdout, plain.stdout
+    
+        # The wave script "just edited": the rule must depend on it.
+        edited = _make(["-n", "-W", script, str(target)], tmp_path)
+        assert edited.returncode == 0, edited.stderr
+>       assert recipe in edited.stdout, (
+            f"{table} {wave}: make judged {target.name} current after an edit "
+            f"to {script} (GH #1237)\n{edited.stdout}{edited.stderr}")
+E       AssertionError: plot_labor 2019-20: make judged plot_labor.parquet current after an edit to ../2019-20/_/plot_labor.py (GH #1237)
+E         make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds39/Malawi/2019-20/_/plot_labor.parquet' is up to date.
+E         
+E       assert 'cd ../2019-20/_/ && python plot_labor.py' in "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds39/Malawi/2019-20/_/plot_labor.parquet' is up to date.\n"
+E        +  where "make: '/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit_rebuilds39/Malawi/2019-20/_/plot_labor.parquet' is up to date.\n" = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_script_edit...of-ligon/pytest-120/test_wave_script_edit_rebuilds39/Malawi/2019-20/_/plot_labor.parquet' is up to date.\n", stderr='').stdout
+
+tests/test_gh1237_malawi_make_prereqs.py:132: AssertionError
+_____________________ test_wave_without_script_has_no_rule _____________________
+
+tmp_path = PosixPath('/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_without_script_has_n0')
+
+    @needs_make
+    def test_wave_without_script_has_no_rule(tmp_path):
+        missing = [(t, w) for t in _per_wave_tables() for w in _wave_dirs()
+                   if not (_make_dir().parent / w / "_" / f"{t}.py").exists()]
+        # 2004-05 carries only food_acquired; 2016-17 has no community_prices.
+        assert ("plot_inputs", "2004-05") in missing
+        assert ("community_prices", "2016-17") in missing
+        for table, wave in missing:
+            target = tmp_path / "Malawi" / wave / "_" / f"{table}.parquet"
+            res = _make(["-n", str(target)], tmp_path)
+>           assert res.returncode != 0, (table, wave, res.stdout)
+E           AssertionError: ('anthropometry', '2004-05', '(cd ../2004-05/_/ && python anthropometry.py)
+E             ')
+E           assert 0 != 0
+E            +  where 0 = CompletedProcess(args=['make', 'LSMS_DATA_ROOT=/local/job40390255/tmp/pytest-of-ligon/pytest-120/test_wave_without_scr...i/2004-05/_/anthropometry.parquet'], returncode=0, stdout='(cd ../2004-05/_/ && python anthropometry.py)\n', stderr='').returncode
+
+tests/test_gh1237_malawi_make_prereqs.py:159: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[anthropometry-2010-11]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[anthropometry-2013-14]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[anthropometry-2016-17]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[anthropometry-2019-20]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[community_prices-2010-11]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[community_prices-2013-14]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[community_prices-2019-20]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[crop_production-2010-11]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[crop_production-2013-14]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[crop_production-2016-17]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[crop_production-2019-20]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[food_acquired-2004-05]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[food_acquired-2010-11]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[food_acquired-2013-14]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[food_acquired-2016-17]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[food_acquired-2019-20]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[food_coping-2010-11]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[food_coping-2013-14]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[food_coping-2016-17]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[food_coping-2019-20]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[livestock-2010-11]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[livestock-2013-14]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[livestock-2016-17]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[livestock-2019-20]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[months_food_inadequate-2010-11]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[months_food_inadequate-2013-14]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[months_food_inadequate-2016-17]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[months_food_inadequate-2019-20]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[people_last7days-2010-11]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[people_last7days-2013-14]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[people_last7days-2016-17]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[people_last7days-2019-20]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[plot_inputs-2010-11]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[plot_inputs-2013-14]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[plot_inputs-2016-17]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[plot_inputs-2019-20]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[plot_labor-2010-11]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[plot_labor-2013-14]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[plot_labor-2016-17]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_script_edit_rebuilds_existing_wave_parquet[plot_labor-2019-20]
+FAILED tests/test_gh1237_malawi_make_prereqs.py::test_wave_without_script_has_no_rule
+41 failed, 41 passed in 8.41s

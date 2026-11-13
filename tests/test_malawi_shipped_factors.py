@@ -108,7 +108,8 @@ def cp():
                     f'{type(exc).__name__}: {exc}')
     if df is None or df.empty:                              # pragma: no cover
         pytest.skip('Malawi crop_production empty')
-    return df
+    # GH #1457: a sale's Farm-level row is not a harvest row; these pin harvest rows.
+    return df[df.index.get_level_values('plot_id') != 'Farm-level']
 
 
 def _strip_condition(cp):
@@ -403,9 +404,14 @@ class TestAgainstCropProduction:
         assert set(per['condition']) == {'unknown_condition'}
 
     def test_the_declared_grain_is_unique(self, cp):
+        """The grain is read from the declaration: #1373 (0377b733b) added
+        `production_obs`, and two codes of one label now legitimately share
+        the rest of the key."""
+        spec = yaml.safe_load((MALAWI_ / 'data_scheme.yml').read_text())
+        index = spec['Data Scheme']['crop_production']['index']
+        keys = [k.strip() for k in index.strip('() ').split(',')]
+        assert 'production_obs' in keys
         f = cp.reset_index()
-        keys = [k for k in ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
-                if k in f.columns]
         assert not f.duplicated(keys).any()
 
     def test_with_region_resolves_the_lower_case_key(self, malawi_mod, cp):
@@ -492,11 +498,10 @@ class TestAgainstCropProduction:
             '(86,657 vs 36,915 on the collapsed crop key, 2026-09-09)')
 
     def test_crop_variety_is_a_column_not_a_level(self, cp):
-        """A function of the crop code splits no key, so it is not a level.
+        """A function of the crop code, so it is not a level.
 
-        Putting it in the grain would only widen the index -- and widen the
-        index-shape divergence that already costs Malawi its place in
-        `Feature('crop_production')` (see the class below).
+        `production_obs` carries the code in the grain since #1373; putting
+        the variety there as well would only widen the index.
         """
         assert 'crop_variety' in cp.columns
         assert 'crop_variety' not in cp.index.names
@@ -558,6 +563,8 @@ class TestSaleSuppressionIsCounted:
             'plot_id': ['R1'] * 2,
             'crop': ['Maize'] * 2,
             '_crop_code': _pd.array([1, 1], dtype='Int64'),
+            # This fixture is _harvest_block output for seasonal raw code 1.
+            'production_obs': _pd.array(['reported:G:1'] * 2, dtype='string'),
             'u': _pd.array(['50 kg Bag'] * 2, dtype='string'),
             'condition': _pd.array(['shelled', 'unshelled'], dtype='string'),
             'crop_variety': _pd.array(['Maize Local'] * 2, dtype='string'),
@@ -576,11 +583,15 @@ class TestSaleSuppressionIsCounted:
         })
         with pytest.warns(malawi_mod.SaleAttachmentWarning, match='2,500 MWK'):
             out = malawi_mod.assemble_crop_production('2010-11', [harv], [sale])
+        # Re-pinned for GH #1457: the sale is on neither harvest row, and on its own row.
+        harvest_rows = out[out.index.get_level_values('plot_id') != 'Farm-level']
+        assert harvest_rows['production_obs'].tolist() == ['reported:G:1'] * 2
         tally = out.attrs['sale_suppressed']
         assert tally == {'wave': '2010-11', 'sales': 1, 'rows': 2,
                          'value': 2500.0}
         # and the sale really is on neither row -- not on one of them
-        assert pd.isna(out['Value_sold']).all()
+        assert pd.isna(harvest_rows['Value_sold']).all()
+        assert out.xs('Farm-level', level='plot_id')['Value_sold'].tolist() == [2500.0]
 
     def test_a_single_condition_plot_crop_still_gets_its_sale(self, malawi_mod):
         """The gate must not fire on the ordinary case."""
@@ -588,6 +599,8 @@ class TestSaleSuppressionIsCounted:
         harv = _pd.DataFrame({
             't': ['2010-11'], 'i': ['h1'], 'plot_id': ['R1'], 'crop': ['Maize'],
             '_crop_code': _pd.array([1], dtype='Int64'),
+            # Seasonal code 1 has the native identity minted by _harvest_block.
+            'production_obs': _pd.array(['reported:G:1'], dtype='string'),
             'u': _pd.array(['50 kg Bag'], dtype='string'),
             'condition': _pd.array(['shelled'], dtype='string'),
             'crop_variety': _pd.array(['Maize Local'], dtype='string'),
@@ -606,14 +619,16 @@ class TestSaleSuppressionIsCounted:
         with warnings.catch_warnings():
             warnings.simplefilter('error', malawi_mod.SaleAttachmentWarning)
             out = malawi_mod.assemble_crop_production('2010-11', [harv], [sale])
+        assert out['production_obs'].tolist() == ['reported:G:1']
         assert out['Value_sold'].iloc[0] == 2500.0
         assert out.attrs['sale_suppressed']['sales'] == 0
 
 
 class TestFeatureExclusionIsRecordedNotAccidental:
-    """`condition` costs Malawi its place in `Feature('crop_production')`.
+    """`condition` cost Malawi its place in `Feature('crop_production')`, since fixed
+    (`Feature` serves Malawi's rows; CONTENTS.org says so above the record kept here).
 
-    That is a FRAMEWORK defect (`crop_production` is not in `index_info`, so
+    That was a FRAMEWORK defect (`crop_production` is not in `index_info`, so
     `Feature` falls through to the modal-index-shape filter), fixed separately
     on `fix/feature-canonical-index-crop-production` -- GH #775 / #569.  The
     level is kept ON PURPOSE: without it the shipped table is refused outright,
@@ -660,6 +675,8 @@ class TestSaleConditionIsRead:
             't': ['2010-11'] * n, 'i': ['h1'] * n, 'plot_id': ['R1'] * n,
             'crop': ['Groundnut'] * n,
             '_crop_code': _pd.array([11] * n, dtype='Int64'),
+            # A condition split retains the SAME seasonal raw-code identity.
+            'production_obs': _pd.array(['reported:G:11'] * n, dtype='string'),
             'u': _pd.array(['Kilogramme'] * n, dtype='string'),
             'condition': _pd.array(list(conditions), dtype='string'),
             'crop_variety': _pd.array(['Groundnut Chalimbana'] * n,
@@ -713,6 +730,7 @@ class TestSaleConditionIsRead:
             out = malawi_mod.assemble_crop_production(
                 '2010-11', [self._harv(['shelled', 'unshelled'])],
                 [self._sale('unshelled')])
+        assert out['production_obs'].tolist() == ['reported:G:11'] * 2
         by_cond = out.set_index('condition')['Value_sold']
         assert by_cond['unshelled'] == 2500.0
         assert pd.isna(by_cond['shelled'])
@@ -725,8 +743,11 @@ class TestSaleConditionIsRead:
                           match='CONTRADICTS'):
             out = malawi_mod.assemble_crop_production(
                 '2010-11', [self._harv(['shelled'])], [self._sale('unshelled')])
-        assert pd.isna(out['Value_sold']).all()
-        assert pd.isna(out['Quantity_sold']).all()
+        # Re-pinned for GH #1457: off the harvest row, on its own Farm-level row.
+        harvest_row = out[out.index.get_level_values('plot_id') != 'Farm-level']
+        assert pd.isna(harvest_row['Value_sold']).all()
+        assert pd.isna(harvest_row['Quantity_sold']).all()
+        assert out.xs('Farm-level', level='plot_id')['Value_sold'].tolist() == [2500.0]
         assert out.attrs['sale_basis_mismatch'] == {
             'wave': '2010-11', 'sales': 1, 'rows': 1, 'value': 2500.0}
         # a contradiction is NOT an ambiguity: the #854 tally stays at zero
@@ -781,7 +802,11 @@ class TestSaleConditionIsRead:
         with pytest.warns(malawi_mod.SaleAttachmentWarning, match='AMBIGUOUS'):
             out = malawi_mod.assemble_crop_production(
                 '2010-11', [self._harv(['shelled'])], [sale])
-        assert pd.isna(out['Value_sold']).all()
+        # Re-pinned for GH #1457: on neither the row nor one sale's row: each its own.
+        assert pd.isna(out[out.index.get_level_values('plot_id') != 'Farm-level']['Value_sold']).all()
+        farm = out.xs('Farm-level', level='plot_id')
+        assert farm['Value_sold'].sum() == 5000.0 and len(farm) == 2
+        assert farm['production_obs'].is_unique
         assert out.attrs['sale_suppressed'] == {
             'wave': '2010-11', 'sales': 2, 'rows': 1, 'value': 5000.0}
         assert out.attrs['sale_basis_mismatch']['sales'] == 0

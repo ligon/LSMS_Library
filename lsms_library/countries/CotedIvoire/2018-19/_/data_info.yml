@@ -13,7 +13,10 @@ sample:
                 - grappe
                 - menage
         myvars:
-            strata: s00q01
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
             Rural:
                 - s00q04
                 - mapping:
@@ -217,6 +220,13 @@ assets:
 
 shocks:
     file: Menage/s14_me_CIV2018.dta
+    # Only the explicitly labelled Stata .d answer; ordinary missing stays NA.
+    stata_missing_map:
+        s14q04a: {'.d': 'Non-concerné'}
+        s14q04b: {'.d': 'Non-concerné'}
+        s14q04c: {'.d': 'Non-concerné'}
+        s14q04e: {'.d': 'Non-concerné'}
+        s14q04f: {'.d': 'Non-concerné'}
     idxvars:
         i:
             - grappe
@@ -244,8 +254,17 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
+        # Six columns in both vagues: e is food stock, f food purchases;
+        # d is livestock despite its stale source variable label (GH #1561).
+        AffectedFoodStock:
+            - s14q04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
         AffectedConsumption:
-            - s14q04d
+            - s14q04f
             - mapping:
                 Diminué: True
                 Augmenté: True

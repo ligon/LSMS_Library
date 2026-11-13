@@ -58,6 +58,7 @@ Data Scheme:
     AffectedAssets: bool
     AffectedProduction: bool
     AffectedConsumption: bool
+    AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
@@ -114,6 +115,22 @@ Data Scheme:
     aggregation:
       visit: first
 
+  # Native ECVMA2011-12 rosters: all source columns are retained WITHOUT
+  # dtype declarations, recoding or monetary-total aliases (GH1529).
+  # No v: these own household observations do not require a sample join.
+  cultivation_records:
+    # 3B field/parcel/subparcel/crop/seed/use answers. cultivation_obs is the
+    # recorded household/slot scoped to the declared source, not a plot ID.
+    index: (t, i, cultivation_obs)
+    materialize: make
+
+  farm_cost_operands:
+    # 3D incurred flag, payment count, MEAN FCFA/payment, financing and all
+    # original fields. cost_obs is a constructed PREfilter release position;
+    # no transaction identity, multiplication, Cost or Expenditure is implied.
+    index: (t, i, cost_obs)
+    materialize: make
+
   plot_features:
     # Lasting parcel-level characteristics from the EHCVM agriculture
     # module s16a (GH #167; Niger is an EHCVM sibling of the Mali
@@ -162,6 +179,8 @@ Data Scheme:
     # transformations, never columns here.  All four waves have an
     # agriculture harvest module (script-path):
     #   2011-12 ecvmaas2e_p2          (plot-crop harvest + sold + value)
+    #           + ecvmaas3e_p1        (dry season by crop, plot_id='Farm-level',
+    #                                  GH #1462; 2014-15 asks no dry-season harvest)
     #   2014-15 ECVMA2_AS2E1 (+AS2E2)  (harvest + months; sold crop-level)
     #   2018-19 s16c                   (harvest + sold + value + intercrop)
     #   2021-22 s16c (+s16d)           (harvest + intercrop; sold crop-level)
@@ -173,7 +192,10 @@ Data Scheme:
     # plot_id (verified 100% join on the EHCVM waves).  Quantity_sold /
     # Value_sold are at plot-crop grain only where the survey records them
     # there (2011-12, 2018-19); in 2014-15 / 2021-22 the sale block is
-    # crop-level and is attributed only to single-plot crops, else NaN.
+    # crop-level: a sale goes on the crop's single harvest line, keyed
+    # hh-crop-sale-single-row, and otherwise on ONE plot_id = 'Farm-level' row
+    # with no harvest Quantity (GH #1457).  EXCLUDE plot_id == 'Farm-level' for
+    # plot-grain work; KEEP it for household or crop totals.
     # Columns intentionally OMITTED (no Niger wave records them, so an
     # all-NaN column would just trip the sanity checker — GAP rule "only
     # include columns the source actually records"): planting_month (no
@@ -182,9 +204,54 @@ Data Scheme:
     # harvest_month is recorded only in 2014-15 (AS02EQ06A); intercropped
     # only in the EHCVM waves (s16cq07).  Both are present in >=1 wave so
     # they are carried (NaN in the waves that lack them).
-    index: (t, i, plot_id, crop, u)
+    # production_obs (GH #1360) is the canonical native crop-observation
+    # coordinate (data_info.yml, GH #1198): one (plot, crop, u) can carry
+    # several reported harvest lines in 2011-12 and 2021-22.  2011-12 serves
+    # the module's line number (`reported:<as02eq0>`); 2021-22 records none,
+    # so it serves the CONSTRUCTED `row:<source_fingerprint>:<n>`; 2014-15 and
+    # 2018-19 are unique without it and carry `unresolved_observation`.
+    #
+    # condition (GH #1436) is "Etat du produit", the state of the crop when the
+    # harvest Quantity was measured: 2018-19 s16cq12c, 2021-22 s16cq16d, through
+    # the `harmonize_crop_condition_*` tables in categorical_mapping.org.  Values
+    # are the BARE FORM tokens `shelled` / `unshelled` / `shell_not_applicable`
+    # (the instrument asks the form and never the dryness, as in Malawi), plus
+    # `unknown_condition` for a blank code and for every ECVMA row (2011-12,
+    # 2014-15), whose harvest module asks no state question.  2018-19's five
+    # answers fold onto those tokens the way the 2021-22 instrument folded them
+    # (ruled @ligon 2026-11-04); `condition_native` below keeps what was answered.
+    index: (t, i, plot_id, crop, u, condition, production_obs)
     Quantity: float
+    # Quantity_kg (GH #1436, ruling @ligon 2026-11-04) is the survey's own kilograms
+    # for the line, a TOTAL and not a factor: 2011-12 as02eq07c and, on Farm-level
+    # rows, as03eq09c x as03eq06; 2014-15 AS02EQ07C; 2021-22 s16cq16c, which the
+    # instrument calls an estimate and a Derivation key says so.  2018-19 asks none:
+    # its s16cq16c is the sold state.  Codes are NA, and so is a 0 beside a positive
+    # quantity.  harvest_kg reads it first (survey_kg).  `optional` because the canonical
+    # column is: it holds what an instrument asks, and most never do.  So Site B does not
+    # police it, and a wave losing it would be silent; tests/test_niger_crop_survey_kg.py
+    # reads each wave against its source instead.
+    Quantity_kg:
+      type: float
+      optional: true
     Quantity_sold: float
+    # Quantity_sold_kg (GH #1560 / #1571, ruling @ligon 2026-11-12 "Treat 2021 as
+    # totals") is the survey's kilograms for the SALE, a TOTAL in Quantity_sold's own
+    # window, read literally: 2011-12 as02eq12c and, on Farm-level rows, as03eq11c,
+    # which is PER FIRST PRODUCTION CYCLE (3E.11's window, like as03eq11a), NOT over
+    # the season and NOT multiplied by as03eq06 (ruled @ligon 2026-11-12; any cycle
+    # product waits on GH #1529), while Quantity_kg on those rows is over all cycles;
+    # 2014-15 AS02EQ12C;
+    # 2021-22 s16dq05c, whose released label says a total where both vague forms say
+    # kg per ONE unit.  2018-19 asks none.  Codes are NA (9999, 99999, 9999 by module),
+    # and so is a 0 beside a positive Quantity_sold, and so are 3E's sold kilograms on a
+    # record with no sale (dry-season-sold-kg-no-sale, ruling 2026-11-12).  It rides with the sale: on its
+    # line, or the crop's one line, or the Farm-level row.  NOT a factor (no
+    # KgFactor_sold here), and nothing reads it by default: median_price_valuation(
+    # kg_qty=...) is the caller's opt-in.  `optional` as Quantity_kg is.
+    Quantity_sold_kg:
+      type: float
+      optional: true
     Value_sold: float
     # THE SALE HAS ITS OWN UNIT (GH #824).  `u` is the HARVEST unit; every
     # wave records the sold unit in a column of its own (as02eq12b, AS02EQ12B,
@@ -194,22 +261,46 @@ Data Scheme:
     # data_info.yml, Unit_sold note): exclude or resolve, and report the
     # count.  NA-bearing, never sentinel-filled -- a column has no NaN-key
     # hazard, and NA means "no sale, or no sold unit recorded".  In 2014-15
-    # and 2021-22 the sale block is crop-level; the sale is attributed only to
-    # a crop grown on ONE plot and sold in ONE unit.  `optional` because a
+    # and 2021-22 the sale block is crop-level, so a sale lands on one served
+    # row: the crop's ONE harvest line (GH #1360) or a Farm-level row, whose `u`
+    # is `Unknown` and whose sold unit is here (GH #1457).  `optional` because a
     # row with no sale has no sold unit.
     Unit_sold:
       type: str
       optional: true
+    # Condition_sold (GH #1462) is the state of what was SOLD, a separate answer
+    # from `condition`: 2018-19 s16cq16c, 2021-22 s16dq05d, read through the same
+    # `harmonize_crop_condition_*` tables, so it speaks the same fold.  `optional`
+    # for the reason Unit_sold is, and because the ECVMA waves ask no state.  NA on
+    # no sale, never a sentinel: it is a column.
+    Condition_sold:
+      type: str
+      optional: true
     harvest_month: float
     intercropped: bool
+    # condition_native (GH #1436, ruling @ligon 2026-11-04) is the 2018-19 state
+    # label as recorded (s16cq12c), the answer the `condition` fold cannot show:
+    # the `crop_variety` shape in Malawi.  `optional` because only 2018-19 folds:
+    # the ECVMA waves ask no state, and 2021-22's three answers map one to one.
+    # NA on a blank state, never a sentinel.
+    condition_native:
+      type: str
+      optional: true
+    # condition_sold_native (ruling @ligon 2026-11-05) is the 2018-19 sold state as
+    # recorded (s16cq16c), the answer the Condition_sold fold cannot show.  `optional` for the reason
+    # condition_native is; NA on no sale, never a sentinel.
+    condition_sold_native:
+      type: str
+      optional: true
     materialize: make
 
   plot_inputs:
     # Item-level agricultural inputs (GAP 2, parity loop 2026-06-14).  One
     # row per REPORTED input applied by a household in a wave: input
-    # identity (Seed / Urea / DAP / NPK / Phosphate / Mixed fertilizer /
-    # Organic manure / Organic compost / Pesticide / Herbicide / Fungicide
-    # / Other phytosanitary), reported quantity used + native unit,
+    # identity (Seed / Urea / DAP / NPK (EHCVM) / NPK 15-15-15 (ECVMA, GH #1445)
+    # / Phosphate / Mixed fertilizer / Organic manure / Organic compost /
+    # Pesticide / Herbicide / Fungicide / Other phytosanitary), reported
+    # quantity used + native unit,
     # purchased flag + reported purchased quantity, and (seed rows) the
     # seed's crop on the shared harmonize_food labels.  REPORTED values
     # only: seed_kg / nitrogen_kg / inorganic_fertilizer any-use flags /
@@ -240,7 +331,9 @@ Data Scheme:
     # same non-null reason (GH #842 -- 'Unknown' is the corpus-canonical
     # missing-unit label, shared by every Niger table with a `u` level; it
     # used to be the French 'Manquant').
-    index: (t, i, input, crop, u)
+    # input_obs preserves ECVMA recorded slots, qualified by source release.
+    # EHCVM retains unresolved_observation and its existing native grain.
+    index: (t, i, input, crop, u, input_obs)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
@@ -356,10 +449,11 @@ Data Scheme:
     #       NOT UNIFORM ACROSS WAVES (GH #877, confirmed from the Stata
     #       labels + questionnaires): 2014-15 (MS04Q01-03) and the EHCVM
     #       waves ask about the last 7 DAYS; 2011-12 asks no 7-day question
-    #       at all -- farm_work (ms04q03) and SOB_work (ms04q05) are the
-    #       last 30 DAYS, wage_work (ms04q02) the last 12 MONTHS.  Whether
-    #       to re-point 2011-12 or serve NA is open on #877; the values
-    #       served today are unchanged and match the WB do-file.
+    #       at all -- farm_work (ms04q03), SOB_work (ms04q05) and
+    #       wage_work (ms04q01) are all the last 30 DAYS.  wage_work used to
+    #       read ms04q02 as the WB do-file does; that is a 12-month follow-up
+    #       asked only when ms04q01 = No, so it served NA for every current
+    #       wage worker (GH #882, option B, @ligon 2026-11-03).
     #   farm_hrs / SB_hrs / wage_hrs     -- ANNUAL-AVERAGE weekly hours in
     #       each activity (allocated by the job's occupation code, summed
     #       across jobs; ECVMA waves only).  NOT hours in the last 7 days,
@@ -412,7 +506,8 @@ Data Scheme:
     # Item-level community/market food prices (GAP C, parity loop 2026-06-14).
     # One row per REPORTED (cluster/EA × food item × unit × observation)
     # surveyed price from the ECVMA *community* price questionnaire (section
-    # CS07).  This is the OURS-ONLY parity arm: the WB panel surveys no
+    # CS07; 2011-12, 2014-15) and the EHCVM community price section (s05;
+    # 2018-19, GH #823).  This is the OURS-ONLY parity arm: the WB panel surveys no
     # community prices (their crop_price_EA is an HH-median imputation,
     # programs.do:31-89), so this records a surveyed price where they only
     # impute.  REPORTED values only -- any median / mean across clusters, or a
@@ -426,10 +521,10 @@ Data Scheme:
     # in a field passage (2011-12 has two), with up to three within-
     # questionnaire price observations.  Until #840 the grain was (t, v, j, u)
     # and ONE row per cell was kept -- post-harvest first, then questionnaire
-    # order -- and 15,423 rows were served of what is now 46,043 (2011-12
+    # order -- and 15,423 rows were served of what were then 46,043 (2011-12
     # 8,923 -> 32,352, 2014-15 6,500 -> 13,691, after the lossless
-    # duplicate-entry drops below).
-    # Nothing is averaged and, now, nothing is selected.
+    # duplicate-entry drops below; 46,013 since GH #1087 serves a record's
+    # first entry).  Nothing is averaged.
     #   variety -- the cs07q02 variety CODE as a string ('7011' = product 701,
     #          variety 1).  The code, not the label: the codes agree across all
     #          three files, the labels change case and drop their product
@@ -443,8 +538,10 @@ Data Scheme:
     #          two questionnaires agree on the obs-1 Price in 67 of 67.  A slot
     #          of a second record that repeats a served row in every column
     #          but obs is dropped (134 rows; lossless).  The 30 that repeat
-    #          nothing are slot + 3, the GhanaLSS `obs` precedent -- their
-    #          representation is an open maintainer decision (CONTENTS.org).
+    #          nothing are not served either (GH #1087, ruling @ligon
+    #          2026-11-04): the first entry is served, see second_entry_disagrees
+    #          below and the deletion entry
+    #          Niger::community_prices::first-entry-of-duplicate.
     #   v   -- the community questionnaire's grappe (EA), formatted into the
     #          SAME v keyspace as sample() (`v: grappe`/`GRAPPE` there), so
     #          community_prices.v == sample().v for the same cluster and the
@@ -469,21 +566,41 @@ Data Scheme:
     # framework behavior shared across all community_prices countries, not a
     # wiring defect.  The cached parquet carries the correct `j` index level.
     #
-    # WAVE COVERAGE: only the two ECVMA waves carry an EA-level community price
-    # module (script-path):
+    # WAVE COVERAGE: three waves carry a grappe-level community price module
+    # (all script-path):
     #   2011-12 ecvmacoms07_p1 + ecvmacoms07_p2  (three price/qty/UNIT triples,
     #                                             both field passages)
     #   2014-15 comprixcs07                       (one unit col, three price/qty
     #                                             pairs)
-    # The EHCVM waves (2018-19, 2021-22) replaced the community price module
-    # with a separate region/market-level price survey (ehcvm_prix: region ×
-    # milieu × point_de_vente, NO grappe -- not the EA grain; and ehcvm_nsu, a
-    # region/strata p50/mu MEDIAN -- a forbidden imputation).  [The claim that
-    # stood here, "2018-19 ships no community price file at all", is FALSE:
-    # s05_co_ner2018.dta is a grappe-grain price module, unwired -- see
-    # CONTENTS.org "2018-19 DOES ship a cluster-grain community price file".]
-    # Those two waves are silently absent (the concatenator skips a wave with
-    # no parquet), NOT faked.
+    #   2018-19 s05_co_ner2018 (EHCVM section 5;  (two price readings per
+    #           GH #823)                           grappe x product x unit-size,
+    #                                             no quantity)
+    # 2021-22 has none: its community questionnaire stops at s04_co, and its
+    # only price files are ehcvm_prix (region × milieu × point_de_vente, NO
+    # grappe -- not the EA grain) and ehcvm_nsu (a region/strata p50/mu MEDIAN
+    # -- a forbidden imputation).  It has no wave script and is absent, NOT
+    # faked.  [This comment used to say the ECVMA waves were the only ones and
+    # that both EHCVM waves replaced the module with ehcvm_prix; 2018-19 ships
+    # s05_co and no ehcvm_prix / ehcvm_nsu file at all.]
+    #
+    # 2018-19 (s05) differs from CS07, measured (CONTENTS.org, GH #823):
+    #   variety -- 'unknown_variety', the canonical sentinel: s05 names no
+    #          variety finer than the product.
+    #   visit -- vague (1/2).  Each grappe is fielded in exactly ONE vague, so
+    #          this is the fielding period, not a repeat visit (as in
+    #          food_acquired's visit: vague).
+    #   obs -- s05q03 "Relevé 1" = 1, s05q04 "Relevé 2" = 2; a key's second,
+    #          disagreeing record = 3 / 4 (slot + 2 * rank).
+    #   j -- BY CODE: the household s07bq01 label of the same produitID code,
+    #          through harmonize_food (the s05 label is the Description).
+    #   u -- BY CODE: releveID = 10 * household unit code + size code; size 0
+    #          serves the household unit label (Kg, Tiya), a sized code
+    #          `<unit> (<Size>)` (Tas (Petit), Tiya (Entier)) -- size is part of
+    #          the unit, never dropped and never converted.
+    #   Quantity -- 1, the registered derivation
+    #          Niger::community_prices::one-item-per-price (the instrument
+    #          prices one item of the selected unit-size; the file records no
+    #          quantity).  Those rows carry the key in `Derivation`.
     #
     # COLUMNS (reported, item-level):
     #   Price    -- the surveyed price recorded for `Quantity` units of the item
@@ -492,11 +609,25 @@ Data Scheme:
     #   Quantity -- the measured quantity Price was recorded for, in unit `u`
     #               (e.g. Price=11000 for Quantity=50, u='Sac de 50 kg').  The
     #               per-kg unit value Price/Quantity (×kg-factor) is a transform.
-    #   Description -- the cs07q02 variety label of that file.
+    #               2018-19: 1, a registered derivation (see above).
+    #   Description -- the cs07q02 variety label of that file; 2018-19: the
+    #               s05q01 product label as recorded.
+    #   second_entry_disagrees -- CS07 (2011-12, 2014-15): True on every served
+    #               row of a (grappe, variety, passage) entered twice whose second
+    #               entry has a slot repeating no first-entry row (GH #1087).  A
+    #               property of the record: it does not say which slot, and
+    #               derivation_inputs returns the slots.  False on every other
+    #               CS07 row, including a record whose second entry only blanks a
+    #               price (2 records, 3 slots).  `optional` because s05 (2018-19) serves its second
+    #               records as obs 3 / 4, so the question does not arise there and
+    #               the column is NA.
     index: (t, v, j, u, variety, visit, obs)
     Price: float
     Quantity: float
     Description:
       type: str
+      optional: true
+    second_entry_disagrees:
+      type: bool
       optional: true
     materialize: make

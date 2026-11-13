@@ -1,0 +1,171 @@
+#+TITLE: GH #1084 (ISA series) -- food recall windows, read from the instruments
+#+DATE: 2026-10-23
+
+Short quotes and page numbers only; no PDF, no extracted full text, no row-level
+data.  Every file below is a held Documentation file, fetched with
+=lsms_library.data_access.get_data_file= and extracted with pypdf (scratch
+=PYTHONPATH= only) or, for the EHCVM .xls forms, xlrd.  "PDF p." is the
+physical page; "printed" is the number on the page where it was checked.
+
+The "build check" lines read Stata variable LABELS (metadata only,
+=pyreadstat.read_dta(metadataonly=True)=) of exactly the columns the wave's
+build reads, plus two structural counts that are not row-level data: the
+number of rows per (household, item), and the range of the days-consumed
+column.  The CSV rows (=.coder/coverage/food_recall.csv=) carry the same
+citations.
+
+* Uganda (UNHS 2005-06 / UNPS)
+
+| wave | file | page | quote |
+|------+------+------+-------|
+| 2005-06 | =UNHS.2005-06.Household.Questionnaire.FINAL.pdf= | PDF 18 (printed 17), image-only scan read visually | "Section 14A: Household Consumption Expenditure" / "(Part A) Food, Beverage, and Tobacco (During the Last 7 Days)"; columns 4-11 Qty/Value from purchases (household, away from home), home produce, received in-kind/free; 12 market price, 13 farm gate price |
+| 2005-06 | =UNHS.2005-06.Interviewer.Manual.FINAL.pdf= | PDF 33 (printed 31) | "Part A: Expenditure on Foods, Beverages and Tobacco during Last Seven (7) Days" ... "It is the value of the former over the recall period, i.e., the last 7 days that should go into the consumption aggregate." |
+| 2009-10 | (no questionnaire held) =ddi-documentation-english_microdata-1001.pdf= | PDF 15, PDF 44, PDF 17 | Scope: "Food, beverage, and tobacco (during the last 7 days)"; file description: "Section 15B: Food, Beverage, and Tobacco (During the Last 7 days)" -- catalog metadata; p.17 "The UNPS will therefore interview each household twice each year, in visits six months apart" (the cropping-season design).  Recorded at variable-label, see below |
+| 2010-11 | =UNPS_2010-11_Household_Questionnaire.pdf= | PDF 29-30 (printed 27-28) | "Part B: Food, Beverage, and Tobacco (During the Last 7 Days)"; col 3B "How many days was [ITEM] consumed out of the last 7 days?" |
+| 2010-11 | =UNPS_2010-11_Basic-Info-2014.pdf= | PDF 20-21 | "approximately half of the households were randomly selected for the entire household questionnaire to be administered in visit 1 ... The rest of the sample received only the household roster in visit 1 ... and the rest of the household questionnaire along with the household roster update in visit 2" |
+| 2011-12 | =Uganda2011-12HouseholdQuestionnaire.pdf= | PDF 26-27 (printed 24-25) | "Part B: Food, Beverage, and Tobacco (During the Last 7 Days)"; col 3B as 2010-11 |
+| 2011-12 | =unps_2011_12_bid_rev2014july.pdf= | PDF 26 | same visit-1 / visit-2 split as 2010-11 |
+| 2013-14 | =unps_2013_14_household_qx.pdf= | PDF 9 (printed 7), 11 | "Part B: Food, Beverage, and Tobacco (During the Last 7 Days)"; "Part B cont'd: ..." ; col 3B as 2010-11 |
+| 2015-16 | =unps_2015_16_household_qx.pdf= | PDF 11 (printed 8)-13 | "Part B: Food, Beverage, and Tobacco (During the Last 7 Days)"; col 3B as 2010-11 |
+| 2015-16 | =ddi-documentation-english_microdata-3460.pdf= | PDF 6 | "during the Visit 1, the household questionnaire was fully administered to approximately half of the households randomly selected ... The other half ... the rest of the household questionnaire and roster update were administered during visit 2 ... Given the CAPI system being used" |
+| 2018-19 | =unps_hhq.pdf= | PDF 10-18 | "Part B: Food and Beverage (During the Last 7 Days)" on every page; "How many [CEB03C] of [ITEM] did your household consume out of purchases at home during the last 7 days?"; "How much did the household spend in total on these [CEB04] [CEB03C] of [ITEM] during the last 7 days for consumption at home?" |
+
+** Build check
+
+| wave | file the build reads | columns | labels | rows per (hh, item) | days-consumed range |
+|------+---------------------+---------+--------+---------------------+---------------------|
+| 2005-06 | GSEC14A.dta | h14aq4..h14aq13 = printed cols 4..13 | "hh consumption out of purchase.quantity" ... "farm gate price" (no window) | 1 (1 duplicated pair in 40,393) | n/a (no such column) |
+| 2009-10 | GSEC15b.dta | h15bq4..h15bq13 | "Qty consumed out of purchases" ...; h15bq3b "How many days was [ITEM] consumed out of the last 7 days?" | 1 | 0..8 (8 on 2 of 37,645) |
+| 2010-11 | GSEC15b.dta | h15bq4..h15bq13 = cols 4..13 | "How much came from purchases consumed at home in the past [RECALL]? QUANTITY" ... (un-substituted fill) | 1 | 1..7 on 35,222 |
+| 2011-12 | GSEC15B.dta | same | same template | 1 | 1..7 on 38,740 |
+| 2013-14 | GSEC15B.dta | same | same template | 1 (7 duplicated pairs in 50,415) | 1..7 on 50,387 |
+| 2015-16 | gsec15b.dta | same | same template, lower case | 1 | 1..7 on 49,749 |
+| 2018-19 | GSEC15B.dta | CEB06..CEB013, CEB14a/b/c, CEB15 | CEB06 "Quantity of hhold [item] purchased for consumptn at home during the last 7 days"; CEB10, CEB012 likewise "during the last 7 days" | 1 | CEB04 1..7 on 53,207 |
+
+*2018-19 numbering mismatch (content matches):* the printed form numbers the
+purchase-at-home qty/value CEB04/CEB05 ... in-kind CEB10/CEB11; the shipped
+=GSEC15B.dta= calls the same columns CEB06/CEB07 ... CEB012/CEB013 and splits
+the market price into CEB14a/b/c.  The wave script reads the .dta names, whose
+labels carry the same 7-day questions; the window is unaffected.
+
+*The =[RECALL]= fill.*  2010-11..2015-16 food labels carry the un-substituted
+=[RECALL]= / =[PERIOD]= placeholders, the template Uganda/_/CONTENTS.org
+discusses for the NON-food GSEC15C.  For food, every printed form fixes the
+window at 7 days, and the days-consumed column never exceeds 7 in any of the
+five waves -- an item-specific window longer than 7 days would push daily
+staples past 7.
+
+* Malawi (IHS2 / IHS3 / IHPS / IHS4 / IHS5)
+
+The trap: =Malawi/_/data_scheme.yml='s "Recall: last 7 days" belongs to the
+rCSI coping battery (=food_coping=).  Everything below is the FOOD module's
+own text (IHS2 Module I, IHS3+ Module G).
+
+| wave | file | page | quote |
+|------+------+------+-------|
+| 2004-05 | =IHS-2 HH questionnaire final draft.pdf= | PDF 21-25 (printed 21-25) | "MODULE I: CONSUMPTION OF FOOD OVER PAST ONE WEEK"; I02 "Over the past one week (7 days), did you or others in your household consume any [. . .]?"; I03 "How much in total did your household consume in the past week?"; I04 "How much came from purchases?"; I05 "How much did you spend?"; I06 "How much came from own-production?"; I07 "How much came from gifts and other sources?" |
+| 2010-11 | =IHS3.Household.Qx.FINAL.pdf= | PDF 28-33 (printed 28-33) | "MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK" (every page); G01 "Over the past one week (7 days), did you or others in your household consume any [. . .]?"; G03 "How much in total did your household consume in the past week?"; G04-G07 as I04-I07 |
+| 2013-14 | =IHPS.Household.Qx.FINAL.PRINT.pdf= | PDF 30-37 | same Module G title, G01 and G03 text |
+| 2016-17 | =fourth_integrated_household_survey_2016_2017_household_questionnaire.pdf= | PDF 30-37 | same Module G title, G01 and G03 text |
+| 2016-17 (panel) | =ihps_2016_bid_updated_final.pdf= (the panel's own instrument is not held) | PDF 10-11; PDF 8; PDF 9 | "Module G: ... Consumption of food Over past one week ... collects information on all food consumed by the household in the past 7 days"; Panel Group A gets the household questionnaire in full at visit 1, Group B at visit 2; "near-identical to the content and organization of the IHS3" |
+| 2019-20 | =fifth_integrated_household_survey_2019_2020_and_the_integrated_household_panel_survey_2019_household_questionnaire.pdf= | PDF 39-46 | G01 and G03 as above; title "MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK" (PDF 46) |
+| 2019-20 | =fifth_integrated_household_survey_ihs5_2019_2020_basic_information_document.pdf= | PDF 17-18; PDF 20 | "the cross-sectional households were visited only once during the IHS5"; "Module G: Consumption of food Over past one week ... all food consumed by the household in the past 7 days" |
+
+** Build check
+
+| wave | file(s) the build reads | columns | hh_g03a / i03a label | rows per (hh, item) |
+|------+------------------------+---------+----------------------+---------------------|
+| 2004-05 | sec_i.dta | i03a/b, i04a/b, i05, i06a/b, i07a/b = I03..I07 | "How much in total did your HH consume in the past week" | 1 |
+| 2010-11 | Full_Sample/Household/hh_mod_g1.dta | hh_g03a..hh_g07b = G03..G07 | "How much in total did your household consume in the past week (Quantity)?" | 1 (6 duplicated pairs in 1,521,568) |
+| 2013-14 | HH_MOD_G1_13.dta | same | "How much in total did your household consume in the past week? (Quantity)" | 1 |
+| 2016-17 | Cross_Sectional/hh_mod_g1.dta + Panel/hh_mod_g1_16.dta | same | "How much in total did your household consume in the past week? Quantity" (both) | 1 (both) |
+| 2019-20 | Cross_Sectional/HH_MOD_G1.dta + Panel/hh_mod_g1_19.dta | same | "... in the past week? Quantity" / "How much in total did your HH consume in past week?" | 1 (both) |
+
+The 2013-14 form also prints a short "MODULE B2: FOOD CONSUMPTION" list (PDF
+8); the build does not read it.
+
+* EHCVM (Mali, Niger, Burkina Faso 2018-19 / 2021-22)
+
+All five held instruments carry the same Section 7B.  Quoted from the Mali
+2018-19 vague 1 form; the others were checked line for line (the vague 1 and
+vague 2 forms of each wave are identical in 7B).
+
+#+begin_quote
+SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS
+(7B.02) Votre ménage a-t-il consommé [PRODUIT] au cours des 7 derniers jours?
+(7B.03) Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?
+(7B.04) Parmi cette quantité consommée, quelle est celle qui provient de la production propre du ménage (...)?
+(7B.05) Parmi cette quantité consommée, quelle est celle qui provient d'autres sources (cadeau, prélèvement de son propre commerce, troc, etc.)?
+(7B.06) Quelle est la dernière fois que le [PRODUIT] a été acheté dans le ménage? 1=Hier 2=7 dernier jours 3=30 derniers jours 4=Plus de 30 jours 5=Jamais
+(7B.07) Quelle est la quantité du [PRODUIT] acheté la dernière fois?
+(7B.08) Quelle est la valeur du [PRODUIT] acheté la dernière fois?
+#+end_quote
+
+| country / wave | file | where |
+|----------------+------+-------|
+| Mali 2018-19 | =mli_ehcvm1_qnr_household_excel_vague1.xls=, =_vague2.xls= | sheet =S7b_Conso_Al=, r1 (title), r4-r6 (7B.01-7B.08) |
+| Mali 2021-22 | =mli_ehcvm2_qnr_men_excel_vague1.pdf=, =_vague2.pdf= | PDF 38 (printed 37), cont'd PDF 39 |
+| Niger 2018-19 | =ner_ehcvm1_qnr_household_excel_vague1.xls=, =_vague2.xls= | sheet =S7b_Conso_Al=, r1, r4-r6 |
+| Niger 2021-22 | *no questionnaire held* (=Documentation/= has only =SOURCE.org=, catalog 6276) | -- left not-recorded |
+| Burkina Faso 2018-19 | =Questionnaire/bfa_ehcvm1_qnr_household_excel_vague1.xls=, =_vague2.xls= | sheet =S7b_Conso_Al=, r1, r4-r6 |
+| Burkina Faso 2021-22 | =Questionnaire/bfa_ehcvm2_vague1.pdf=, =bfa_ehcvm2_vague2.pdf= | PDF 38 (printed 37), cont'd PDF 39 |
+
+** Build check
+
+Every wave's =data_info.yml= reads =s07b_me_<iso><year>.dta=: =Quantity=
+s07bq03a (7B.03), =Produced= s07bq04, =GiftQuantity= s07bq05, and the
+last-purchase triple s07bq07a/b/c + s07bq08 that =ehcvm.derive_ehcvm_purchase_value=
+turns into a unit value (GH #876).  Section 7A (meals away from home) is not
+read.
+
+| file | s07bq03a label | households in more than one =vague= |
+|------+----------------+-------------------------------------|
+| Mali 2018-19 =s07b_me_mli2018.dta= | "7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours" | 0 of 6,596 |
+| Mali 2021-22 =s07b_me_mli2021.dta= | same | 0 of 6,138 |
+| Niger 2018-19 =s07b_me_ner2018.dta= | same | 0 of 5,987 |
+| Niger 2021-22 =s07b_me_ner2021.dta= | same (variable-label grade only; NOT promoted) | 0 of 6,622 |
+| Burkina Faso 2018-19 =s07b_me_bfa2018.dta= | same | 0 of 6,959 |
+| Burkina Faso 2021-22 =s07b_me_bfa2021.dta= | "7B.03a. Quelle est la quantité totale du %rostertitle% consommé par le ménage au" (cut at 80 characters) | 0 of 3,227 (grappe, menage) keys |
+
+So the delivered flows are 7 days, asked once; 7B.06-7B.08 contribute only
+the unit value of the last purchase, which may be up to 30 days old -- the GH
+#876 caveat already in the CSV notes, unchanged.
+
+** Uganda 2009-10: recorded on @ligon's statement, at variable-label (2026-10-23)
+
+@ligon, 2026-10-23: "Questionnaires for Uganda 2009-10 more or less overlap
+with Uganda 2005-06."  The 2009-10 instrument itself is still not held.
+
+*Column correspondence.*  The build (=2009-10/_/food_acquired.py=) reads
+=GSEC15b.dta=: =itmcd=, =untcd=, =h15bq4=..=h15bq13=.
+
+| 2009-10 column | label | 2005-06 Section 14A (printed) | 2010-11 Part B (printed) | read by build |
+|---+---+---+---+---|
+| itmcd | "item Description  Code" | col 2 Code | col 2 Code | yes |
+| untcd | "Unit of Qty" | col 3 Unit of Quantity | col 3C Unit of Qty | yes |
+| h15bq3b | "How many days was [ITEM] consumed out of the last 7 days?" | *no such column* | col 3B | no |
+| h15bq4 / h15bq5 | "Qty consumed out of purchases" / "Value of consumption out of purchases" | cols 4 / 5 | cols 4 / 5 | yes |
+| h15bq6 / h15bq7 | "... away from home" | cols 6 / 7 | cols 6 / 7 | yes |
+| h15bq8 / h15bq9 | "... out of home produce" | cols 8 / 9 | cols 8 / 9 | yes |
+| h15bq10 / h15bq11 | "... recieved in-kind/free" | cols 10 / 11 | cols 10 / 11 | yes |
+| h15bq12 / h15bq13 | "Market Price" / "Farm-Gate price" | cols 12 / 13 | cols 12 / 13 | yes |
+
+(2010-11 also has col 3A "Did you consume [ITEM]?", which the 2009-10 file
+does not ship.)  Item codes: 2009-10 has 63, including all 61 of 2005-06's,
+plus 100 and 170; 61 are shared with 2010-11's 70.
+
+So the overlap holds for every column the build reads, and fails for exactly
+one column, =h15bq3b=, which carries the only window statement on this wave's
+own data.  Its =q3b= numbering follows 2010-11's 3B.
+
+*Days consumed.*  =h15bq3b= is 8 on 2 of 37,645 answered rows (items 104
+and 139) and 0 on 5; every other row is 1..7.
+
+*Asks.*  One row per (hh, itmcd) over 2,929 households, with no visit
+column, so =n_asks= is 1.
+
+*Rung.*  The record is =variable-label=, not =questionnaire=.  Of the four
+pieces of evidence, the =h15bq3b= label is the only statement of the window
+made about this wave's data.  The 2005-06 form belongs to another survey
+(UNHS) and lacks a column that 2009-10 has.  The DDI is catalog metadata.  The
+maintainer statement is an assertion.  Either rung converts under =period==.

@@ -1,0 +1,5016 @@
+{
+ "column_u": {},
+ "errors": [],
+ "index_u": {
+  "Benin|crop_production|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 1005,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 9056,
+     "served_null": 1005,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Benin|crop_production|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 1005,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 9056,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 1005
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Benin|food_acquired|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 187930,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Benin|food_acquired|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 1286,
+     "dup_served": 1286,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 189216,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Benin|plot_inputs|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 10605,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Benin|plot_inputs|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 10605,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Burkina_Faso|crop_production|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 546,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 15593,
+     "served_null": 546,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Burkina_Faso|crop_production|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 546,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 15593,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 546
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Burkina_Faso|food_acquired|var|": {
+   "by_t": {
+    "2014": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 460331,
+     "rows": 557692,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 460331
+    },
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 138416,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 69708,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Burkina_Faso|food_acquired|wave|2014": {
+   "by_t": {
+    "2014": {
+     "dup_raw": 130,
+     "dup_served": 130,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 460438,
+     "rows": 557822,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 460438
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Burkina_Faso|food_acquired|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 159,
+     "dup_served": 159,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 138575,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Burkina_Faso|food_acquired|wave|2021-22": {
+   "by_t": {
+    "2021-22": {
+     "dup_raw": 159,
+     "dup_served": 159,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 69867,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Burkina_Faso|plot_inputs|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 22694,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Burkina_Faso|plot_inputs|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 183,
+     "dup_served": 183,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 22877,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Cambodia|food_acquired|var|": {
+   "by_t": {
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 38201,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Cambodia|food_acquired|wave|2019-20": {
+   "by_t": {
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 38201,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "CotedIvoire|crop_production|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 6365,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 22223,
+     "served_null": 6365,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "CotedIvoire|crop_production|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 6365,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 22223,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 6365
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "CotedIvoire|food_acquired|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 296945,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "CotedIvoire|food_acquired|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 296945,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "CotedIvoire|plot_inputs|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 11250,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "CotedIvoire|plot_inputs|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 9,
+     "dup_served": 9,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 11259,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "EthiopiaRHS|community_prices|var|": {
+   "by_t": {
+    "1994a": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 306,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1994b": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 306,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1995": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 306,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1997": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 558,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2004": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 598,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2009": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 617,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "EthiopiaRHS|crop_production|var|": {
+   "by_t": {
+    "1994a": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 3404,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1994b": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 1967,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1995": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 3350,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1997": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 3021,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2004": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 2998,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2009": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 2783,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "EthiopiaRHS|crop_production|wave|1994a": {
+   "by_t": {
+    "1994a": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 3404,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "EthiopiaRHS|crop_production|wave|1994b": {
+   "by_t": {
+    "1994b": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 1967,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "EthiopiaRHS|crop_production|wave|1995": {
+   "by_t": {
+    "1995": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 3350,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "EthiopiaRHS|crop_production|wave|1997": {
+   "by_t": {
+    "1997": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 3021,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "EthiopiaRHS|crop_production|wave|2004": {
+   "by_t": {
+    "2004": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 2998,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "EthiopiaRHS|crop_production|wave|2009": {
+   "by_t": {
+    "2009": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 2783,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "EthiopiaRHS|food_acquired|var|": {
+   "by_t": {
+    "1989": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 14,
+     "rows": 2068,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 14
+    },
+    "1994a": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 78,
+     "rows": 13049,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 78
+    },
+    "1994b": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 37,
+     "rows": 13370,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 37
+    },
+    "1995": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 79,
+     "rows": 12035,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 79
+    },
+    "1997": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 18,
+     "rows": 14383,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 18
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "EthiopiaRHS|food_acquired|wave|1989": {
+   "by_t": {
+    "1989": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 14,
+     "rows": 2068,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 14
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "EthiopiaRHS|food_acquired|wave|1994a": {
+   "by_t": {
+    "1994a": {
+     "dup_raw": 48,
+     "dup_served": 48,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 78,
+     "rows": 13097,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 78
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "EthiopiaRHS|food_acquired|wave|1994b": {
+   "by_t": {
+    "1994b": {
+     "dup_raw": 30,
+     "dup_served": 30,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 37,
+     "rows": 13400,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 37
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "EthiopiaRHS|food_acquired|wave|1995": {
+   "by_t": {
+    "1995": {
+     "dup_raw": 30,
+     "dup_served": 30,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 79,
+     "rows": 12065,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 79
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "EthiopiaRHS|food_acquired|wave|1997": {
+   "by_t": {
+    "1997": {
+     "dup_raw": 19,
+     "dup_served": 19,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 18,
+     "rows": 14402,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 18
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Ethiopia|community_prices|var|": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 4340,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 5370,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2015-16": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 9226,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 13994,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 12327,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Ethiopia|community_prices|wave|2011-12": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 4340,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Ethiopia|community_prices|wave|2013-14": {
+   "by_t": {
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 5370,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Ethiopia|community_prices|wave|2015-16": {
+   "by_t": {
+    "2015-16": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 9226,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Ethiopia|community_prices|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 13994,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Ethiopia|community_prices|wave|2021-22": {
+   "by_t": {
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 12327,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Ethiopia|crop_production|var|": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 7744,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 26159,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2015-16": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 25920,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 14092,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 11604,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Ethiopia|crop_production|wave|2011-12": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 2,
+     "dup_served": 2,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 7746,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Ethiopia|crop_production|wave|2013-14": {
+   "by_t": {
+    "2013-14": {
+     "dup_raw": 606,
+     "dup_served": 606,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 26765,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Ethiopia|crop_production|wave|2015-16": {
+   "by_t": {
+    "2015-16": {
+     "dup_raw": 4,
+     "dup_served": 4,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 25924,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Ethiopia|crop_production|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 10,
+     "dup_served": 10,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 14102,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Ethiopia|crop_production|wave|2021-22": {
+   "by_t": {
+    "2021-22": {
+     "dup_raw": 19,
+     "dup_served": 19,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 11623,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Ethiopia|food_acquired|var|": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 253,
+     "rows": 30815,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 253
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 338,
+     "rows": 44304,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 338
+    },
+    "2015-16": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 12,
+     "rows": 67209,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 12
+    },
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 99541,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 84587,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Ethiopia|food_acquired|wave|2011-12": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 253,
+     "rows": 30815,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 253
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Ethiopia|food_acquired|wave|2013-14": {
+   "by_t": {
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 338,
+     "rows": 44304,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 338
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Ethiopia|food_acquired|wave|2015-16": {
+   "by_t": {
+    "2015-16": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 12,
+     "rows": 67209,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 12
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Ethiopia|food_acquired|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 99541,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Ethiopia|food_acquired|wave|2021-22": {
+   "by_t": {
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 84587,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaLSS|community_prices|var|": {
+   "by_t": {
+    "1987-88": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 16582,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1988-89": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 12642,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1991-92": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 58348,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1998-99": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 63445,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2012-13": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 288243,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2016-17": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 1,
+     "raw_unknown": 0,
+     "rows": 220908,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaLSS|community_prices|wave|1987-88": {
+   "by_t": {
+    "1987-88": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 16582,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "GhanaLSS|community_prices|wave|1988-89": {
+   "by_t": {
+    "1988-89": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 12642,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "GhanaLSS|community_prices|wave|1991-92": {
+   "by_t": {
+    "1991-92": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 58348,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "GhanaLSS|community_prices|wave|1998-99": {
+   "by_t": {
+    "1998-99": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 63445,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "GhanaLSS|community_prices|wave|2012-13": {
+   "by_t": {
+    "2012-13": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 288243,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "GhanaLSS|community_prices|wave|2016-17": {
+   "by_t": {
+    "2016-17": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 1,
+     "raw_unknown": 0,
+     "rows": 220908,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "GhanaLSS|food_acquired|var|": {
+   "by_t": {
+    "1987-88": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 71605,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1988-89": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 72649,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1991-92": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 682547,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "1998-99": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 88,
+     "rows": 542195,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 88
+    },
+    "2005-06": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 1038,
+     "rows": 1136888,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 1038
+    },
+    "2012-13": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 723,
+     "rows": 1709675,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 723
+    },
+    "2016-17": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 13380,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 1125047,
+     "served_null": 13380,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaLSS|food_acquired|wave|1987-88": {
+   "by_t": {
+    "1987-88": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 71605,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaLSS|food_acquired|wave|1988-89": {
+   "by_t": {
+    "1988-89": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 72649,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaLSS|food_acquired|wave|1991-92": {
+   "by_t": {
+    "1991-92": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 682547,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaLSS|food_acquired|wave|1998-99": {
+   "by_t": {
+    "1998-99": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 88,
+     "rows": 542195,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 88
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaLSS|food_acquired|wave|2005-06": {
+   "by_t": {
+    "2005-06": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 1038,
+     "rows": 1136888,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 1038
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaLSS|food_acquired|wave|2012-13": {
+   "by_t": {
+    "2012-13": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 723,
+     "rows": 1709675,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 723
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaLSS|food_acquired|wave|2016-17": {
+   "by_t": {
+    "2016-17": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 13380,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 1125047,
+     "served_null": 13380,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaSPS|crop_production|var|": {
+   "by_t": {
+    "2009-10": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 249,
+     "rows": 11795,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 249
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 6886,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2017-18": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 6428,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaSPS|crop_production|wave|2009-10": {
+   "by_t": {
+    "2009-10": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 249,
+     "rows": 11795,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 249
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaSPS|crop_production|wave|2013-14": {
+   "by_t": {
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 6886,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaSPS|crop_production|wave|2017-18": {
+   "by_t": {
+    "2017-18": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 6428,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaSPS|food_acquired|var|": {
+   "by_t": {
+    "2009-10": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 4839,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 119847,
+     "served_null": 4839,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 139339,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2017-18": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 9064,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 148743,
+     "served_null": 9064,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaSPS|food_acquired|wave|2009-10": {
+   "by_t": {
+    "2009-10": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 4839,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 119847,
+     "served_null": 4839,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaSPS|food_acquired|wave|2013-14": {
+   "by_t": {
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 139339,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "GhanaSPS|food_acquired|wave|2017-18": {
+   "by_t": {
+    "2017-18": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 9064,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 148743,
+     "served_null": 9064,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Guatemala|food_acquired|var|": {
+   "by_t": {
+    "2000": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 215982,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Guatemala|food_acquired|wave|2000": {
+   "by_t": {
+    "2000": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 215982,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Guinea-Bissau|crop_production|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 10579,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Guinea-Bissau|crop_production|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 15,
+     "dup_served": 15,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 1596,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 12188,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 1596
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Guinea-Bissau|food_acquired|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 126925,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Guinea-Bissau|food_acquired|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 126925,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Guinea-Bissau|plot_inputs|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 5534,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Guinea-Bissau|plot_inputs|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 5534,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Malawi|community_prices|var|": {
+   "by_t": {
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 17612,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 39168,
+     "served_null": 17612,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 4430,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 6528,
+     "served_null": 4430,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 20886,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 41361,
+     "served_null": 20886,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Malawi|community_prices|wave|2010-11": {
+   "by_t": {
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 17612,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 39168,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 17612
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Malawi|community_prices|wave|2013-14": {
+   "by_t": {
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 4430,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 6528,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 4430
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Malawi|community_prices|wave|2019-20": {
+   "by_t": {
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 20886,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 41361,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 20886
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Malawi|crop_production|var|": {
+   "by_t": {
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 1279,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 33420,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 1279
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 594,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 12616,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 594
+    },
+    "2016-17": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 3408,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 37170,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 3408
+    },
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 3621,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 51872,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 3621
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Malawi|food_acquired|var|": {
+   "by_t": {
+    "2004-05": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 39,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 176193,
+     "served_null": 39,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 95,
+     "raw_unit": 0,
+     "raw_unit_ci": 8,
+     "raw_unknown": 0,
+     "rows": 198354,
+     "served_null": 95,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 81680,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2016-17": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 307,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 245459,
+     "served_null": 307,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 269845,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Malawi|food_acquired|wave|2004-05": {
+   "by_t": {
+    "2004-05": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 39,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 176193,
+     "served_null": 39,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Malawi|food_acquired|wave|2010-11": {
+   "by_t": {
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 95,
+     "raw_unit": 0,
+     "raw_unit_ci": 8,
+     "raw_unknown": 0,
+     "rows": 198354,
+     "served_null": 95,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Malawi|food_acquired|wave|2013-14": {
+   "by_t": {
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 81680,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Malawi|food_acquired|wave|2016-17": {
+   "by_t": {
+    "2016-17": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 307,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 245459,
+     "served_null": 307,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Malawi|food_acquired|wave|2019-20": {
+   "by_t": {
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 269845,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Malawi|plot_inputs|var|": {
+   "by_t": {
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 8578,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 46627,
+     "served_null": 8578,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 923,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 16188,
+     "served_null": 923,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2016-17": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 9193,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 52494,
+     "served_null": 9193,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 10030,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 64875,
+     "served_null": 10030,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Malawi|plot_inputs|wave|2010-11": {
+   "by_t": {
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 8578,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 46627,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 8578
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Malawi|plot_inputs|wave|2013-14": {
+   "by_t": {
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 923,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 16188,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 923
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Malawi|plot_inputs|wave|2016-17": {
+   "by_t": {
+    "2016-17": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 9193,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 52494,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 9193
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Malawi|plot_inputs|wave|2019-20": {
+   "by_t": {
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 10030,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 64875,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 10030
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Mali|community_prices|var|": {
+   "by_t": {
+    "2014-15": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 40218,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Mali|community_prices|wave|2014-15": {
+   "by_t": {
+    "2014-15": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 40218,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Mali|food_acquired|var|": {
+   "by_t": {
+    "2014-15": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 1534,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 122085,
+     "served_null": 0,
+     "served_unit": 1534,
+     "served_unknown": 0
+    },
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 162032,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 146929,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Mali|food_acquired|wave|2014-15": {
+   "by_t": {
+    "2014-15": {
+     "dup_raw": 34591,
+     "dup_served": 34591,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 1912,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 156676,
+     "served_null": 0,
+     "served_unit": 1912,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Mali|food_acquired|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 1,
+     "dup_served": 1,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 162033,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Mali|food_acquired|wave|2021-22": {
+   "by_t": {
+    "2021-22": {
+     "dup_raw": 768,
+     "dup_served": 768,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 147697,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Nigeria|community_prices|var|": {
+   "by_t": {
+    "2011Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 27104,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2013Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 27079,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2016Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 20562,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2019Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 29275,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2024Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 27318,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Nigeria|community_prices|wave|2010-11": {
+   "by_t": {
+    "2011Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 27104,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Nigeria|community_prices|wave|2012-13": {
+   "by_t": {
+    "2013Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 27079,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Nigeria|community_prices|wave|2015-16": {
+   "by_t": {
+    "2016Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 20562,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Nigeria|community_prices|wave|2018-19": {
+   "by_t": {
+    "2019Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 29275,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Nigeria|community_prices|wave|2023-24": {
+   "by_t": {
+    "2024Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 27318,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Nigeria|food_acquired|var|": {
+   "by_t": {
+    "2010Q3": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 112,
+     "rows": 72236,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 112
+    },
+    "2011Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 98,
+     "rows": 69734,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 98
+    },
+    "2012Q3": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 154,
+     "rows": 65429,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 154
+    },
+    "2013Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 463,
+     "rows": 70649,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 463
+    },
+    "2015Q3": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 14,
+     "rows": 77702,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 14
+    },
+    "2016Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 6,
+     "rows": 70469,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 6
+    },
+    "2018Q3": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 82865,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2019Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 86641,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Nigeria|food_acquired|wave|2010-11": {
+   "by_t": {
+    "2010Q3": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 112,
+     "rows": 72236,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 112
+    },
+    "2011Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 98,
+     "rows": 69734,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 98
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Nigeria|food_acquired|wave|2012-13": {
+   "by_t": {
+    "2012Q3": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 154,
+     "rows": 65429,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 154
+    },
+    "2013Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 463,
+     "rows": 70649,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 463
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Nigeria|food_acquired|wave|2015-16": {
+   "by_t": {
+    "2015Q3": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 14,
+     "rows": 77702,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 14
+    },
+    "2016Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 6,
+     "rows": 70469,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 6
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Nigeria|food_acquired|wave|2018-19": {
+   "by_t": {
+    "2018Q3": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 82865,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2019Q1": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 86641,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Niger|community_prices|var|": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 32352,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2014-15": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 13691,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Niger|community_prices|wave|2011-12": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 32352,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|community_prices|wave|2014-15": {
+   "by_t": {
+    "2014-15": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 13691,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|crop_production|var|": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 3151,
+     "rows": 11953,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 3151
+    },
+    "2014-15": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 1102,
+     "rows": 9528,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 1102
+    },
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 443,
+     "rows": 13719,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 443
+    },
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 960,
+     "rows": 11923,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 960
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Niger|crop_production|wave|2011-12": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 30,
+     "dup_served": 30,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 3161,
+     "rows": 11983,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 3161
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|crop_production|wave|2014-15": {
+   "by_t": {
+    "2014-15": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 1102,
+     "rows": 9528,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 1102
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|crop_production|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 443,
+     "rows": 13719,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 443
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|crop_production|wave|2021-22": {
+   "by_t": {
+    "2021-22": {
+     "dup_raw": 1010,
+     "dup_served": 1010,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 991,
+     "rows": 12933,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 991
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|food_acquired|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 108333,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 8,
+     "rows": 131544,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 8
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|food_acquired|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 108333,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|food_acquired|wave|2021-22": {
+   "by_t": {
+    "2021-22": {
+     "dup_raw": 5,
+     "dup_served": 5,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 8,
+     "rows": 131549,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 8
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|plot_inputs|var|": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 44,
+     "rows": 8465,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 44
+    },
+    "2014-15": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 15,
+     "rows": 8134,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 15
+    },
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 2,
+     "rows": 13395,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 2
+    },
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 16,
+     "rows": 12436,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 16
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Niger|plot_inputs|wave|2011-12": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 73,
+     "dup_served": 73,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 44,
+     "rows": 8538,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 44
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|plot_inputs|wave|2014-15": {
+   "by_t": {
+    "2014-15": {
+     "dup_raw": 45,
+     "dup_served": 45,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 15,
+     "rows": 8179,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 15
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|plot_inputs|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 6,
+     "dup_served": 6,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 2,
+     "rows": 13401,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 2
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Niger|plot_inputs|wave|2021-22": {
+   "by_t": {
+    "2021-22": {
+     "dup_raw": 3,
+     "dup_served": 3,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 16,
+     "rows": 12439,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 16
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Panama|food_acquired|var|": {
+   "by_t": {
+    "1997": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 437,
+     "raw_unit": 25825,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 155742,
+     "served_null": 437,
+     "served_unit": 25825,
+     "served_unknown": 0
+    },
+    "2003": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 1,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 194866,
+     "served_null": 1,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2008": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 5,
+     "raw_unit": 33244,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 220334,
+     "served_null": 5,
+     "served_unit": 33244,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Panama|food_acquired|wave|1997": {
+   "by_t": {
+    "1997": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 437,
+     "raw_unit": 25825,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 155742,
+     "served_null": 0,
+     "served_unit": 25825,
+     "served_unknown": 437
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Panama|food_acquired|wave|2003": {
+   "by_t": {
+    "2003": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 1,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 194866,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 1
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Panama|food_acquired|wave|2008": {
+   "by_t": {
+    "2008": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 5,
+     "raw_unit": 33244,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 220334,
+     "served_null": 0,
+     "served_unit": 33244,
+     "served_unknown": 5
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Senegal|crop_production|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 597,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 8428,
+     "served_null": 597,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Senegal|crop_production|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 597,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 8428,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 597
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Senegal|food_acquired|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 21,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 215660,
+     "served_null": 21,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2021-22": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 220916,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Senegal|food_acquired|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 21,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 215660,
+     "served_null": 21,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Senegal|food_acquired|wave|2021-22": {
+   "by_t": {
+    "2021-22": {
+     "dup_raw": 208,
+     "dup_served": 208,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 221124,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Senegal|plot_inputs|var|": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 9901,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Senegal|plot_inputs|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 15,
+     "dup_served": 15,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 9916,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Serbia|food_acquired|var|": {
+   "by_t": {
+    "2007": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 200046,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Serbia|food_acquired|wave|2007": {
+   "by_t": {
+    "2007": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 200046,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Tanzania|community_prices|var|": {
+   "by_t": {
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 3076,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2020-21": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 14623,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Tanzania|community_prices|wave|2019-20": {
+   "by_t": {
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 3076,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Tanzania|community_prices|wave|2020-21": {
+   "by_t": {
+    "2020-21": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 14623,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Tanzania|food_acquired|var|": {
+   "by_t": {
+    "2008-09": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 44969,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 54775,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2012-13": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 67918,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2014-15": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 61987,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 16179,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2020-21": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 5902,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Tanzania|food_acquired|wave|2008-15": {
+   "by_t": {
+    "2008-09": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 44969,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 54775,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2012-13": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 67918,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2014-15": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 61987,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Tanzania|food_acquired|wave|2019-20": {
+   "by_t": {
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 16179,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Tanzania|food_acquired|wave|2020-21": {
+   "by_t": {
+    "2020-21": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 5902,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Togo|crop_production|var|": {
+   "by_t": {
+    "2018": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 606,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 11565,
+     "served_null": 606,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Togo|crop_production|wave|2018": {
+   "by_t": {
+    "2018": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 606,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 11565,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 606
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Togo|food_acquired|var|": {
+   "by_t": {
+    "2018": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 112445,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Togo|food_acquired|wave|2018": {
+   "by_t": {
+    "2018": {
+     "dup_raw": 552,
+     "dup_served": 552,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 112997,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Togo|plot_inputs|var|": {
+   "by_t": {
+    "2018": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 13733,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Togo|plot_inputs|wave|2018": {
+   "by_t": {
+    "2018": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 13733,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "string",
+   "u_numpy_type_recorded": "string"
+  },
+  "Uganda|crop_production|var|": {
+   "by_t": {
+    "2009-10": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 2585,
+     "rows": 22408,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 2585
+    },
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 130,
+     "rows": 20970,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 130
+    },
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 711,
+     "rows": 20152,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 711
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 383,
+     "rows": 17585,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 383
+    },
+    "2015-16": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 19576,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 7157,
+     "rows": 15616,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 7157
+    },
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 278,
+     "rows": 17024,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 278
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|crop_production|wave|2009-10": {
+   "by_t": {
+    "2009-10": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 2585,
+     "rows": 22408,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 2585
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|crop_production|wave|2010-11": {
+   "by_t": {
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 130,
+     "rows": 20970,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 130
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|crop_production|wave|2011-12": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 711,
+     "rows": 20152,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 711
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|crop_production|wave|2013-14": {
+   "by_t": {
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 383,
+     "rows": 17585,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 383
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|crop_production|wave|2015-16": {
+   "by_t": {
+    "2015-16": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 19576,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|crop_production|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 7157,
+     "rows": 15616,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 7157
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|crop_production|wave|2019-20": {
+   "by_t": {
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 278,
+     "rows": 17024,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 278
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|food_acquired|var|": {
+   "by_t": {
+    "2005-06": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 40749,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2009-10": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 38107,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    },
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 397,
+     "rows": 35489,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 397
+    },
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 435,
+     "rows": 38983,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 435
+    },
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 4,
+     "rows": 50703,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 4
+    },
+    "2015-16": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 2,
+     "rows": 50108,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 2
+    },
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 55,
+     "rows": 53288,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 55
+    },
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 12,
+     "rows": 48144,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 12
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|food_acquired|wave|2005-06": {
+   "by_t": {
+    "2005-06": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 40749,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|food_acquired|wave|2009-10": {
+   "by_t": {
+    "2009-10": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 0,
+     "rows": 38107,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 0
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|food_acquired|wave|2010-11": {
+   "by_t": {
+    "2010-11": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 397,
+     "rows": 35489,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 397
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|food_acquired|wave|2011-12": {
+   "by_t": {
+    "2011-12": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 435,
+     "rows": 38983,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 435
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|food_acquired|wave|2013-14": {
+   "by_t": {
+    "2013-14": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 4,
+     "rows": 50703,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 4
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|food_acquired|wave|2015-16": {
+   "by_t": {
+    "2015-16": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 2,
+     "rows": 50108,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 2
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|food_acquired|wave|2018-19": {
+   "by_t": {
+    "2018-19": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 55,
+     "rows": 53288,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 55
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  },
+  "Uganda|food_acquired|wave|2019-20": {
+   "by_t": {
+    "2019-20": {
+     "dup_raw": 0,
+     "dup_served": 0,
+     "raw_na_str": 0,
+     "raw_nan_str": 0,
+     "raw_null": 0,
+     "raw_unit": 0,
+     "raw_unit_ci": 0,
+     "raw_unknown": 12,
+     "rows": 48144,
+     "served_null": 0,
+     "served_unit": 0,
+     "served_unknown": 12
+    }
+   },
+   "u_level_dtype_read": "str",
+   "u_numpy_type_recorded": "str"
+  }
+ }
+}

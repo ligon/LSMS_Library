@@ -1,0 +1,28 @@
+{
+  "PR": 1175,
+  "status": "NEW_SAVED_NUMERIC_SUPPLEMENT_WITH_EXPLICIT_AXIS_QUALIFICATIONS_AND_ORIGINAL_GAPS",
+  "saved_operands_authenticated": 6,
+  "distinct_positive_groups": 6,
+  "full_strict_groups": 1,
+  "strict_actual_intended_field_projection_groups": 2,
+  "numeric_typed_attrs_used_tuples_groups_with_full_axis_qualification": 3,
+  "complete_MultiIndex_failures_preserved": 3,
+  "unexplained_axis_differences": 0,
+  "numeric_mismatches_observed": 0,
+  "original_scalar_predicates_rechecked": 14,
+  "toy_faults_rejected": 42,
+  "positive_calibrations": 6,
+  "source_records": 18,
+  "overlapping_static_locator_sites": 764,
+  "locator_sites_are_not_independent_pairs": true,
+  "gaps": [
+    "Original independent raw-source expected/wave_actual/public_expected and derived key objects were not serialized; no raw/API/panel-map prefix reconstructed.",
+    "Original standalone warm Malawi/Uganda Country objects and Feature expected assembly objects are unsaved; cold-versus-warm equality cannot be repeated from saved pooled output.",
+    "Original tests and rejected-c08 negative-control in-memory fixture/results are not replayed. Test declarations are enumerated, never counted as new saved-pair proof.",
+    "Original kg-factor and qualified-code nitrogen transformed memory objects are unsaved; no transformation replay.",
+    "Historical tracked compare_feature CLI baseline permits c08 and directly compares Applied; its exact arguments are not assumed equivalent to f8. Explicit original f8 review projections were checked."
+  ],
+  "no_source_API_Feature_CLI_pytest_cache_or_acquisition_replay": true,
+  "old_evidence_and_product_unchanged": true,
+  "signed": "Sue"
+}

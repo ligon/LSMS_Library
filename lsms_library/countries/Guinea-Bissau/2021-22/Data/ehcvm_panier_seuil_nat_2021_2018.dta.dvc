@@ -1,0 +1,5 @@
+outs:
+- md5: dda06c12126d0528d901d35ca83973e5
+  size: 18712
+  hash: md5
+  path: ehcvm_panier_seuil_nat_2021_2018.dta

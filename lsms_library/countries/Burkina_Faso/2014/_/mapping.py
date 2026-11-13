@@ -1,26 +1,165 @@
 """Formatting functions for Burkina Faso 2014 (EMC).
 
-food_acquired canonical reshape (GH #169 / #107): the wave's
-``data_info.yml`` extracts the wide form (Quantity-total, Produced-subset,
-Expenditure); the ``food_acquired`` post-processor below wraps
-``food_acquired_to_canonical``, so grab_data reshapes the wide form into the
-canonical long form on the ``s`` (acquisition-source) axis — matching the
-2018-19 / 2021-22 waves.  Before this, 2014 emitted the legacy wide shape (a
-``Produced`` column, no ``s``), which leaked into
-``Country('Burkina_Faso').food_acquired()`` and broke the ``food_quantities``
-kg derivation (0% resolved).
+food_acquired canonical reshape (GH #169 / #107, #864): the wave's
+``data_info.yml`` extracts one wide row per (household, item, passage) carrying
+the questionnaire's three DISJOINT section-C blocks -- C04 purchases consumed,
+C05 own production, C06 gifts / in-kind / barter -- each with its own quantity
+and unit.  The ``food_acquired`` post-processor below serves each block on its
+own ``s`` row (``purchased`` / ``produced`` / ``inkind``) in its own unit, the
+canonical long form of the 2018-19 / 2021-22 waves.  It deliberately does NOT
+use ``food_acquired_to_canonical``: that helper reads ``Quantity`` as a TOTAL
+and subtracts ``Produced`` from it, which is wrong for this instrument (see
+:func:`_section_c_to_canonical`).
 """
+
+from pathlib import Path as _Path
 
 import pandas as pd
 
 from lsms_library.build_transforms import add_visit_level
-from lsms_library.local_tools import format_id
-from lsms_library.transformations import (
-    food_acquired_to_canonical as _food_acquired_canonical)
+from lsms_library.local_tools import format_id, get_formatting_functions as _get_formatting_functions
+
+# Bind the helper to this config tree, including when another checkout's bare
+# burkina_faso module is already cached. Reuse the framework's exact-path loader.
+_emc_i = _get_formatting_functions(
+    _Path(__file__).resolve().parents[2] / '_' / 'burkina_faso.py',
+    '_burkina_emc_namespace')['emc_i']
 
 
 def strata(x):
     return format_id(x)
+
+
+def i(value):
+    """2014 household id, NAMESPACED: ``'EMC_' + zd + menage.zfill(3)``.
+
+    GH #1244 (@ligon's ruling): the EMC 2014 sample is independent of the
+    EHCVM waves, yet its ids used to collide with 2018-19's -- ``zd +
+    menage.zfill(3)`` here and ``grappe + '0' + menage.zfill(2)`` there spell
+    the same string for a two-digit menage whenever the cluster serials agree:
+    583 shared ids, whose clusters' Region agreed for 80.  See
+    ``burkina_faso.EMC_PREFIX`` for the prefix and why.  Overrides the country
+    ``i`` for every 2014 table; ``value`` is the row of ``[zd, menage]`` (or
+    ``[grappe, menage]`` in emc2014_welfare.dta, which spells the ZD
+    ``grappe``).
+    """
+    return _emc_i(value.iloc[0], value.iloc[1])
+
+
+# ---------------------------------------------------------------------------
+# sample: the households the welfare file leaves out (GH #1464)
+# ---------------------------------------------------------------------------
+class EmcSampleError(Exception):
+    """The two files behind the 2014 ``sample`` disagree in a way nothing here can settle.
+
+    Subclasses ``Exception``, as ``IdWalkError`` and Tanzania's ``SplitOffClusterError`` do.
+    ``_join_v_from_sample`` catches ``ValueError``, ``KeyError``, ``FileNotFoundError`` and
+    ``AttributeError``, and the derived-table paths catch ``RuntimeError`` too, so any of those
+    would serve every 2014 household table with no ``v`` and only a warning.
+
+    With one build worker it reaches the caller as itself.  With parallel workers a class in a
+    by-path ``mapping.py`` does not pickle (Tanzania/_/CONTENTS.org, GH #1441), so ``sample``
+    and ``household_roster`` raise a ``RuntimeError`` naming it, and the derived tables catch
+    that: see ``_/CONTENTS.org``, "2014 =sample= holds the 389", for what they then return.
+    The held files give it nothing to refuse.
+    """
+
+
+# GH #1573, user-approved 2026-11-10: decode the released EMC 2014 strata.
+# Exact own welfare (strate, region, milieu) triples were sealed in
+# R1573-burkina-welfare-crosswalk-20261110. Preferred Region spellings reuse
+# categorical_mapping.org. Native keys remain explicit and invertible;
+# matching labels do not imply equal PSUs or cross-wave sampling designs.
+_EMC_2014_STRATA_LABELS = {
+    '1': 'Hauts-Bassins Urbain',
+    '2': 'Hauts-Bassins Rural',
+    '3': 'Boucle du Mouhoun Urbain',
+    '4': 'Boucle du Mouhoun Rural',
+    '5': 'Sahel Urbain',
+    '6': 'Sahel Rural',
+    '7': 'Est Urbain',
+    '8': 'Est Rural',
+    '9': 'Sud-Ouest Urbain',
+    '10': 'Sud-Ouest Rural',
+    '11': 'Centre-Nord Urbain',
+    '12': 'Centre-Nord Rural',
+    '13': 'Centre-Ouest Urbain',
+    '14': 'Centre-Ouest Rural',
+    '15': 'Plateau-Central Urbain',
+    '16': 'Plateau-Central Rural',
+    '17': 'Nord Urbain',
+    '18': 'Nord Rural',
+    '19': 'Centre-Est Urbain',
+    '20': 'Centre-Est Rural',
+    '21': 'Centre Urbain',
+    '22': 'Centre Rural',
+    '23': 'Cascades Urbain',
+    '24': 'Cascades Rural',
+    '25': 'Centre-Sud Urbain',
+    '26': 'Centre-Sud Rural',
+}
+
+
+def sample(df):
+    """``sample`` post-processor: extend the welfare file with the p1 households.
+
+    ``df`` is the concatenation ``data_info.yml`` asks for, at ``(t, i)``: one row
+    per welfare household (which carries ``hhweight``), then one row per food item of
+    every household of ``emc2014_p1_conso7jours`` (which has no such column, so its
+    ``weight`` and ``panel_weight`` are NaN).  Returned: the welfare rows first,
+    then one row for each household the welfare file does not hold, in
+    first-seen order, with ``v`` = ``zd``, ``Rural`` from ``milieu``, ``weight`` and
+    ``panel_weight`` NA.  Ethiopia's agriculture-cover households follow the same
+    rules (GH #1120, ``ethiopia.with_agriculture_cover_households``), each enforced:
+
+    * the added file is item grain, so a household's rows must agree on ``v``,
+      ``Rural`` and ``strata`` before they are reduced to one;
+    * ``strata`` is spelled as the welfare file spells it.  The food file records the
+      same stratum as a code (``BM_R``) where the welfare file has a number, so the
+      code is translated through the households both files hold, and a translation
+      that is not one-to-one, or a code it does not reach, RAISES.
+
+    Nothing is guessed, and no value here is a construction: each is the survey's own
+    answer for that household. After the proof and extension, only ``strata`` is
+    decoded from the welfare spelling through its own reversible #1573 lookup;
+    all other fields, NA weights, row order and attrs remain unchanged.
+    """
+    names = list(df.index.names)
+    flat = df.reset_index()
+    has_weight = flat['weight'].notna()
+    welfare = flat[has_weight]
+    if welfare['i'].duplicated().any():
+        raise EmcSampleError(
+            'Burkina_Faso/2014 sample: emc2014_welfare.dta repeats a household.')
+    added = flat[~has_weight]
+    vary = added.groupby('i')[['v', 'Rural', 'strata']].nunique(dropna=False)
+    n_vary = int((vary > 1).any(axis=1).sum())
+    if n_vary:
+        raise EmcSampleError(
+            f'Burkina_Faso/2014 sample: {n_vary} household(s) carry more than one '
+            'zd / milieu / strate across their rows of the p1 food file; which is '
+            "the household's is not something the survey says.")
+    pairs = (welfare[['i', 'strata']]
+             .merge(added[['i', 'strata']].drop_duplicates(), on='i',
+                    suffixes=('_welfare', '_food'))
+             .dropna()[['strata_food', 'strata_welfare']].drop_duplicates())
+    if pairs['strata_food'].duplicated().any() or pairs['strata_welfare'].duplicated().any():
+        raise EmcSampleError(
+            'Burkina_Faso/2014 sample: strate is not one-to-one between '
+            'emc2014_welfare.dta and the p1 food file.')
+    new = added[~added['i'].isin(welfare['i'])].drop_duplicates('i').copy()
+    strata = new['strata'].map(pairs.set_index('strata_food')['strata_welfare'])
+    if strata.isna().any():
+        raise EmcSampleError(
+            f"Burkina_Faso/2014 sample: {int(strata.isna().sum())} added household(s) "
+            'carry a strate the households of both files never use.')
+    new['strata'] = strata
+    out = pd.concat([welfare, new], ignore_index=True).set_index(names)
+    out.attrs = dict(df.attrs)
+    # Do not alter either operand of the food-to-welfare correspondence above.
+    # Unknown nonmissing codes and true NA pass through without a guessed label.
+    out['strata'] = out['strata'].replace(_EMC_2014_STRATA_LABELS)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -77,9 +216,13 @@ def visit_p4(_row):
 # `Unknown` is the corpus-canonical spelling (lsms_library/data_info.yml `u`;
 # Niger `niger.py::U_NA`, Uganda `crop_production`).
 #
-# CONSUMER RULE: `u == 'Unknown'` is NOT a unit.  These rows carry an
-# Expenditure and no physical quantity; exclude them before any per-unit price
-# or kg conversion, and report how many you excluded.
+# CONSUMER RULE: `u == 'Unknown'` is NOT a unit.  Almost all of these rows
+# carry an Expenditure and no physical quantity (the money-only passages and
+# items).  The exceptions are 56 passage-1 produced / inkind rows (41 + 15)
+# whose quantity was recorded without its unit (GH #864); several of those
+# quantities look like CFA amounts keyed into the quantity box.  Exclude
+# `Unknown` rows before any per-unit price or kg conversion, and report how
+# many you excluded.
 U_NA = 'Unknown'
 
 
@@ -100,55 +243,96 @@ def _fill_missing_u(df):
 
 
 # ---------------------------------------------------------------------------
-# Quantity is NaN where the survey asked for none (GH #864)
+# Section C: three disjoint blocks, each in its own unit (GH #864)
 # ---------------------------------------------------------------------------
 #
-# `food_acquired_to_canonical` computes the purchased quantity as
-# `(Quantity.fillna(0) - Produced.fillna(0)).clip(lower=0)`, so a source row
-# with NO quantity answer is served as a purchased quantity of ZERO -- and 0
-# means "bought none", not "not asked".  In this wave the not-asked case is
-# the RULE, not the exception: passages 2-4 field no quantity grid at all
-# (`qachat` does not exist in their files, 405,127 served rows), and in
-# passage 1 `qachat` is null on 43,906 of the 140,908 rows with `achat > 0`,
-# concentrated on items for which the grid was evidently not administered
-# (Sel 10,244 of 10,259; Oignons 7,668 of 7,672; Soumbala 7,138 of 7,190;
-# Feuilles, Gombo, Pate d'arachide, Haricot, Beurre de Karite, Fruits all at
-# >= 99%).  `qachat` is NEVER 0 where `achat > 0` (0 of 140,908), so a served
-# purchased 0 beside an expenditure can only be a filled NaN or a clipped
-# `Produced >= Quantity` row.
+# Questionnaire_EMC_2014_Passage_1.pdf, section C (PDF pp. 15-18), asks for each
+# item C04 « la quantite totale et la valeur des achats consommes [...] », C05
+# the same for own production and C06 for gifts / in-kind / barter -- each block
+# with its OWN quantity, unit and value boxes.  The file's labels bind them:
+# qachat/uachat/achat = C04, qautocons/uautocons/autocons = C05,
+# qcadeau/ucadeau/cadeau = C06.  So:
 #
-# `_restore_missing_quantity` puts the NaN back on purchased rows whose
-# SOURCE quantity was null, keyed on the wide frame's own index, so the rule
-# is "NaN in, NaN out" for every passage rather than a per-passage special
-# case.  Expenditure is untouched; no row is added or removed; the wave's
-# Quantity total is unchanged (a NaN and a 0 sum alike).  Downstream,
-# `food_prices` sees `Expenditure / NaN` instead of `Expenditure / 0` and
-# can tell a money-only recall occasion from the GH #591 zero-quantity
-# defect (`transformations._money_only_rows`).  The corpus-wide `fillna(0)`
-# in `build_transforms` is deliberately NOT changed here: it is
-# `@build_transform`-tagged and every reshaped country would re-warm.
-def _restore_missing_quantity(wide, canonical):
-    """Set purchased ``Quantity`` back to NaN where ``wide``'s own Quantity
-    was null, after :func:`food_acquired_to_canonical` filled it with 0.
+# * ``qachat`` is the PURCHASED quantity.  The shared
+#   ``food_acquired_to_canonical`` read it as a total and served
+#   ``(qachat - qautocons).clip(0)``: 283 passage-1 rows carry both, 238 of
+#   them clipped to 0 (the 219 served zeros) and 45 subtracted across units.
+# * own production is served in ``uautocons``, not in the purchase unit
+#   ``uachat``: on the old shape 11,123 of 11,418 produced rows carried
+#   ``u = 'Unknown'`` although their own unit was recorded.
+# * the C06 gift quantity ``qcadeau`` (1,468 rows > 0) is served as
+#   ``s = 'inkind'`` in ``ucadeau``.
+#
+# @ligon's ruling, 2026-11-03.  Every served number is a direct survey answer
+# (C04 quantity and value, C05 quantity, C06 quantity), so nothing here is a
+# registered derivation.  ``Expenditure`` is C04's ``achat`` and is NaN on the
+# produced / inkind rows, as in the EHCVM waves; the C05 / C06 VALUES
+# (``autocons`` / ``cadeau``) and C02 ``mtt_dep`` stay unread.
+#
+# A quantity the survey did not ask for stays NaN: passages 2-4 have no
+# quantity grid, and the printed passage-1 grid has no quantity boxes for nine
+# items (Sel, Oignons, Soumbala, Feuilles, Gombo, Pate d'arachide, Haricot,
+# Beurre de Karite, Fruits).  Nothing is filled with 0, so no NaN has to be
+# restored afterwards.
+_BLOCKS = (
+    # s,           quantity column, unit column (None = the index's `u`), value
+    ('purchased', 'Quantity',      None,           'Expenditure'),
+    ('produced',  'Produced',      'ProducedUnit', None),
+    ('inkind',    'GiftQuantity',  'GiftUnit',     None),
+)
 
-    ``wide`` is one passage's wide frame (index ``(t, v, i, j, u)``, columns
-    ``Quantity`` / ``Produced`` / ``Expenditure``); ``canonical`` is its
-    reshaped long form (``s`` appended to the index).  Only a purchased row
-    that is exactly 0 and shares its key with a null-quantity source row is
-    touched -- a reported positive quantity on the same key (a genuine
-    within-passage duplicate) is left alone.
+
+def _unit_label(value):
+    """The block's unit label, formatted as the ``u`` idxvar is (``format_id``
+    strips surrounding whitespace); missing stays missing."""
+    if value is None or (not isinstance(value, str) and pd.isna(value)):
+        return None
+    return format_id(value)
+
+
+def _section_c_to_canonical(part):
+    """One passage's wide frame -> canonical long form on ``s``.
+
+    ``part`` is indexed ``(t, v, i, j, u[, visit])`` with ``u`` = ``uachat``
+    and columns ``Quantity`` / ``Expenditure`` (C04), ``Produced`` /
+    ``ProducedUnit`` (C05), ``GiftQuantity`` / ``GiftUnit`` (C06).  A block's
+    columns may be absent (a test frame, or a passage file that lacks them);
+    they are then treated as all-NaN.  Returns a frame indexed
+    ``(t, v, i, j, u, s)`` with ``Quantity`` / ``Expenditure``:
+
+    * ``purchased`` -- kept where ``Quantity > 0`` or ``Expenditure > 0``,
+      ``Quantity`` exactly as reported (NaN where not asked);
+    * ``produced`` / ``inkind`` -- kept where their quantity is ``> 0``, in
+      their own unit, ``Expenditure`` NaN.
+
+    A missing unit is left NaN here; the caller's :func:`_fill_missing_u`
+    turns it into the ``Unknown`` sentinel.
     """
-    src_null = wide.index[wide['Quantity'].isna()]
-    if len(src_null) == 0:
-        return canonical
-    s = canonical.index.get_level_values('s')
-    key = canonical.index.droplevel('s')
-    q = pd.to_numeric(canonical['Quantity'], errors='coerce')
-    mask = (s == 'purchased') & (q == 0) & key.isin(src_null)
-    if mask.any():
-        canonical = canonical.copy()
-        canonical.loc[mask, 'Quantity'] = float('nan')
-    return canonical
+    work = part.reset_index()
+    if 'visit' in work.columns:
+        work = work.drop(columns=['visit'])
+    keys = ['t', 'v', 'i', 'j']
+    pieces = []
+    for source, qcol, ucol, xcol in _BLOCKS:
+        qty = pd.to_numeric(work[qcol], errors='coerce') if qcol in work \
+            else pd.Series(float('nan'), index=work.index)
+        value = pd.to_numeric(work[xcol], errors='coerce') if xcol and xcol in work \
+            else pd.Series(float('nan'), index=work.index)
+        if ucol is None:
+            unit = work['u']
+        elif ucol in work:
+            unit = work[ucol].astype(object).map(_unit_label)
+        else:
+            unit = pd.Series(None, index=work.index, dtype=object)
+        keep = (qty > 0) | (value > 0)
+        block = work.loc[keep, keys].copy()
+        block['u'] = unit[keep].values
+        block['s'] = source
+        block['Quantity'] = qty[keep].values
+        block['Expenditure'] = value[keep].values
+        pieces.append(block)
+    out = pd.concat(pieces, ignore_index=True)
+    return out.set_index(keys + ['u', 's'])
 
 
 # ---------------------------------------------------------------------------
@@ -238,16 +422,14 @@ def food_acquired(df):
     ``visit`` is an int 1-4 matching the passage number in the source
     filename.
 
-    Two further steps, both value-only (no row is added or removed):
-
-    * :func:`_restore_missing_quantity` -- a purchased ``Quantity`` is NaN
-      where the source quantity was null (GH #864): all of passages 2-4,
-      and the passage-1 items the grid was not administered for.  The
-      ``Unknown`` ``u`` fill is taken BEFORE the reshape so the wide and
-      long frames share one key.
-    * :func:`_repair_index_labels` -- the GH #794 safety net on ``j`` / ``u``
-      (a UTF-8 double encoding; the cp1252 class is repaired by the reader
-      since GH #805), after the build-time crosswalk.
+    Each passage is reshaped by :func:`_section_c_to_canonical` (GH #864):
+    C04 / C05 / C06 become ``purchased`` / ``produced`` / ``inkind`` rows, each
+    in its own unit, with a quantity that was not asked left NaN.  Then two
+    value-only steps (no row is added or removed): a missing ``u`` becomes the
+    ``Unknown`` sentinel (:func:`_fill_missing_u`), and
+    :func:`_repair_index_labels` applies the GH #794 safety net on ``j`` /
+    ``u`` (a UTF-8 double encoding; the cp1252 class is repaired by the reader
+    since GH #805), after the build-time crosswalk.
     """
     if 'visit' not in df.columns:
         # Defensive: a caller (or a future config edit) that does not stamp the
@@ -273,9 +455,7 @@ def food_acquired(df):
 
     out = []
     for passage, part in df.groupby('visit', sort=True):
-        part = _fill_missing_u(part)                  # one key for both tiers
-        canonical = _food_acquired_canonical(part)   # drops the visit column
-        canonical = _restore_missing_quantity(part, canonical)
+        canonical = _section_c_to_canonical(part)    # drops the visit column
         out.append(add_visit_level(canonical, visit=int(passage)))
     result = _fill_missing_u(pd.concat(out))
     return _repair_index_labels(result)
@@ -303,3 +483,88 @@ def household_roster(df):
     if 'Relationship' in df.columns:
         df['Relationship'] = df['Relationship'].replace(_RELATIONSHIP_FIX)
     return df
+
+
+# ---------------------------------------------------------------------------
+# cluster_features: a zd's most common province (GH #1060)
+# ---------------------------------------------------------------------------
+#
+# EMC 2014 records `province` per household, and it varies within 94 of the 900
+# zd (`region` and `milieu` never do).  It is a source property, not a config
+# error: emc2014_welfare.dta agrees with the logement file household for
+# household.  90 households in 67 of those zd name a province outside their zd's
+# region, which reads as miscoding rather than an EA straddling a boundary.
+#
+# The hook makes the rows of a zd AGREE, and it stamps every one of them, so the
+# (t, v) collapse downstream is lossless and carries the key on the row it
+# selects.  Core does not aggregate; this is the wave doing it, by name.  Keep the
+# row order: a tied zd is resolved by the collapse, which takes its first row.
+ZD_MODAL_PROVINCE_DERIVATION = 'Burkina_Faso::cluster_features::zd-modal-province'
+
+_LOGEMENT_FILE = 'emc2014_p1_logement_27022015.dta'
+
+
+def _modal_province_by_zd(zd, province):
+    """``{zd: province}`` for each zd naming more than one province, where one
+    of them is strictly the most common.  A tied zd is absent: nothing here
+    breaks a tie (the ruling on GH #1060)."""
+    counts = (pd.DataFrame({'zd': zd, 'province': province})
+              .dropna()
+              .value_counts()
+              .rename('n')
+              .reset_index())
+    by_zd = counts.groupby('zd')
+    leaders = counts[(by_zd['province'].transform('size') > 1)
+                     & (counts['n'] == by_zd['n'].transform('max'))]
+    sole = leaders[~leaders['zd'].duplicated(keep=False)]
+    return dict(zip(sole['zd'], sole['province']))
+
+
+def derive_zd_modal_province(df):
+    """Serve the most common province of a zd whose households disagree.
+
+    Takes a household-grain frame with a ``v`` index level and a ``District``
+    column.  Every row of a zd with a strict mode gets that mode in ``District``
+    and the registry key in ``Derivation``, including a zd whose served value
+    would have been the mode anyway: the key describes the construction, not
+    whether it moved the value.  The other 806 zd and the 2 tied zd are returned
+    untouched and carry no key.  Row order is preserved.
+    """
+    out = df.copy()
+    zd = out.index.get_level_values('v').to_numpy(dtype=object)
+    target = pd.Series(zd, dtype=object).map(
+        _modal_province_by_zd(zd, out['District'].to_numpy(dtype=object))
+    ).to_numpy(dtype=object)
+    constructed = pd.notna(target)
+    district = out['District'].to_numpy(dtype=object, copy=True)
+    district[constructed] = target[constructed]
+    out['District'] = pd.Series(district, index=out.index, dtype=out['District'].dtype)
+    out['Derivation'] = pd.Series(pd.NA, index=out.index, dtype='string')
+    out.loc[constructed, 'Derivation'] = ZD_MODAL_PROVINCE_DERIVATION
+    return out
+
+
+def cluster_features(df):
+    """``cluster_features`` post-processor: see :func:`derive_zd_modal_province`."""
+    return derive_zd_modal_province(df)
+
+
+def inputs_cluster_features(wave='2014'):
+    """The registry `inputs` callable: the raw logement answers of every zd whose
+    served ``District`` is constructed, one row per household, at ``(t, v, menage)``.
+
+    ``province`` is what the survey recorded; a user who wants another reading of
+    a zd re-derives it from here.  A tied zd is not returned, because its served
+    value is not constructed: it is the row the collapse selects.
+    """
+    if wave != '2014':
+        raise ValueError(f'{ZD_MODAL_PROVINCE_DERIVATION} covers 2014 only, not {wave!r}')
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    raw = get_dataframe(countries_root() / 'Burkina_Faso' / wave / 'Data' / _LOGEMENT_FILE)
+    v = raw['zd'].map(format_id)
+    keep = v.isin(list(_modal_province_by_zd(v.to_numpy(dtype=object),
+                                             raw['province'].to_numpy(dtype=object))))
+    out = raw.loc[keep, ['zd', 'menage', 'region', 'province', 'milieu']].assign(
+        t=wave, v=v[keep])
+    return out.set_index(['t', 'v', 'menage'])

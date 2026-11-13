@@ -1,0 +1,842 @@
+[
+{
+"t": "2011-12",
+"j": "Chat/Kat",
+"pos_before": 0,
+"pos_after": 22,
+"added": 22
+},
+{
+"t": "2011-12",
+"j": "Banana",
+"pos_before": 0,
+"pos_after": 18,
+"added": 18
+},
+{
+"t": "2011-12",
+"j": "Avocado",
+"pos_before": 0,
+"pos_after": 15,
+"added": 15
+},
+{
+"t": "2011-12",
+"j": "Coffee",
+"pos_before": 0,
+"pos_after": 15,
+"added": 15
+},
+{
+"t": "2011-12",
+"j": "Leafy Greens",
+"pos_before": 0,
+"pos_after": 12,
+"added": 12
+},
+{
+"t": "2011-12",
+"j": "Enset",
+"pos_before": 0,
+"pos_after": 11,
+"added": 11
+},
+{
+"t": "2011-12",
+"j": "Hops (gesho)",
+"pos_before": 0,
+"pos_after": 8,
+"added": 8
+},
+{
+"t": "2011-12",
+"j": "Orange",
+"pos_before": 0,
+"pos_after": 7,
+"added": 7
+},
+{
+"t": "2011-12",
+"j": "Mango",
+"pos_before": 0,
+"pos_after": 6,
+"added": 6
+},
+{
+"t": "2011-12",
+"j": "Sugar Cane",
+"pos_before": 0,
+"pos_after": 6,
+"added": 6
+},
+{
+"t": "2011-12",
+"j": "Sweet potato",
+"pos_before": 0,
+"pos_after": 6,
+"added": 6
+},
+{
+"t": "2011-12",
+"j": "Kariya",
+"pos_before": 0,
+"pos_after": 5,
+"added": 5
+},
+{
+"t": "2011-12",
+"j": "Onion",
+"pos_before": 0,
+"pos_after": 5,
+"added": 5
+},
+{
+"t": "2011-12",
+"j": "Garlic",
+"pos_before": 0,
+"pos_after": 4,
+"added": 4
+},
+{
+"t": "2011-12",
+"j": "Berbere",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2011-12",
+"j": "Cotton",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2011-12",
+"j": "Gishita",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2011-12",
+"j": "Lemon",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2011-12",
+"j": "Papaya",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2011-12",
+"j": "Potato",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2011-12",
+"j": "Tomato",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2011-12",
+"j": "Beetroot",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2011-12",
+"j": "Godere",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2011-12",
+"j": "Guava",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2011-12",
+"j": "Other tuber or stem",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2011-12",
+"j": "Peach",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2011-12",
+"j": "Red Kidney Beans",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2013-14",
+"j": "Chat/Kat",
+"pos_before": 1,
+"pos_after": 180,
+"added": 179
+},
+{
+"t": "2013-14",
+"j": "Coffee",
+"pos_before": 1,
+"pos_after": 137,
+"added": 136
+},
+{
+"t": "2013-14",
+"j": "Banana",
+"pos_before": 0,
+"pos_after": 128,
+"added": 128
+},
+{
+"t": "2013-14",
+"j": "Hops (gesho)",
+"pos_before": 0,
+"pos_after": 123,
+"added": 123
+},
+{
+"t": "2013-14",
+"j": "Leafy Greens",
+"pos_before": 1,
+"pos_after": 92,
+"added": 91
+},
+{
+"t": "2013-14",
+"j": "Avocado",
+"pos_before": 0,
+"pos_after": 62,
+"added": 62
+},
+{
+"t": "2013-14",
+"j": "Mango",
+"pos_before": 1,
+"pos_after": 54,
+"added": 53
+},
+{
+"t": "2013-14",
+"j": "Berbere",
+"pos_before": 3,
+"pos_after": 55,
+"added": 52
+},
+{
+"t": "2013-14",
+"j": "Garlic",
+"pos_before": 0,
+"pos_after": 45,
+"added": 45
+},
+{
+"t": "2013-14",
+"j": "Sugar Cane",
+"pos_before": 0,
+"pos_after": 45,
+"added": 45
+},
+{
+"t": "2013-14",
+"j": "Enset",
+"pos_before": 2,
+"pos_after": 44,
+"added": 42
+},
+{
+"t": "2013-14",
+"j": "Onion",
+"pos_before": 1,
+"pos_after": 36,
+"added": 35
+},
+{
+"t": "2013-14",
+"j": "Sweet potato",
+"pos_before": 0,
+"pos_after": 34,
+"added": 34
+},
+{
+"t": "2013-14",
+"j": "Lemon",
+"pos_before": 0,
+"pos_after": 33,
+"added": 33
+},
+{
+"t": "2013-14",
+"j": "Papaya",
+"pos_before": 0,
+"pos_after": 31,
+"added": 31
+},
+{
+"t": "2013-14",
+"j": "Potato",
+"pos_before": 2,
+"pos_after": 32,
+"added": 30
+},
+{
+"t": "2013-14",
+"j": "Pumpkin",
+"pos_before": 1,
+"pos_after": 29,
+"added": 28
+},
+{
+"t": "2013-14",
+"j": "Tomato",
+"pos_before": 0,
+"pos_after": 28,
+"added": 28
+},
+{
+"t": "2013-14",
+"j": "Orange",
+"pos_before": 0,
+"pos_after": 26,
+"added": 26
+},
+{
+"t": "2013-14",
+"j": "Godere",
+"pos_before": 0,
+"pos_after": 19,
+"added": 19
+},
+{
+"t": "2013-14",
+"j": "Guava",
+"pos_before": 0,
+"pos_after": 19,
+"added": 19
+},
+{
+"t": "2013-14",
+"j": "Kariya",
+"pos_before": 2,
+"pos_after": 21,
+"added": 19
+},
+{
+"t": "2013-14",
+"j": "Other vegetable",
+"pos_before": 0,
+"pos_after": 18,
+"added": 18
+},
+{
+"t": "2013-14",
+"j": "Cardamon",
+"pos_before": 1,
+"pos_after": 16,
+"added": 15
+},
+{
+"t": "2013-14",
+"j": "Other condiments",
+"pos_before": 0,
+"pos_after": 13,
+"added": 13
+},
+{
+"t": "2013-14",
+"j": "Other tuber or stem",
+"pos_before": 0,
+"pos_after": 12,
+"added": 12
+},
+{
+"t": "2013-14",
+"j": "Other fruit",
+"pos_before": 0,
+"pos_after": 9,
+"added": 9
+},
+{
+"t": "2013-14",
+"j": "Beetroot",
+"pos_before": 0,
+"pos_after": 8,
+"added": 8
+},
+{
+"t": "2013-14",
+"j": "Peach",
+"pos_before": 0,
+"pos_after": 8,
+"added": 8
+},
+{
+"t": "2013-14",
+"j": "Boye/Yam",
+"pos_before": 0,
+"pos_after": 6,
+"added": 6
+},
+{
+"t": "2013-14",
+"j": "Cassava",
+"pos_before": 0,
+"pos_after": 5,
+"added": 5
+},
+{
+"t": "2013-14",
+"j": "Ginger",
+"pos_before": 0,
+"pos_after": 5,
+"added": 5
+},
+{
+"t": "2013-14",
+"j": "Red Kidney Beans",
+"pos_before": 0,
+"pos_after": 4,
+"added": 4
+},
+{
+"t": "2013-14",
+"j": "Rue",
+"pos_before": 0,
+"pos_after": 4,
+"added": 4
+},
+{
+"t": "2013-14",
+"j": "Cotton",
+"pos_before": 2,
+"pos_after": 5,
+"added": 3
+},
+{
+"t": "2013-14",
+"j": "Pineapple",
+"pos_before": 0,
+"pos_after": 3,
+"added": 3
+},
+{
+"t": "2013-14",
+"j": "Tobacco",
+"pos_before": 4,
+"pos_after": 7,
+"added": 3
+},
+{
+"t": "2013-14",
+"j": "Black Cumin",
+"pos_before": 1,
+"pos_after": 3,
+"added": 2
+},
+{
+"t": "2013-14",
+"j": "Carrot",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2013-14",
+"j": "Gishita",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2013-14",
+"j": "Mandarin",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2013-14",
+"j": "Turmeric",
+"pos_before": 0,
+"pos_after": 2,
+"added": 2
+},
+{
+"t": "2013-14",
+"j": "Amboshika",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2013-14",
+"j": "Citron",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2013-14",
+"j": "Coriander",
+"pos_before": 2,
+"pos_after": 3,
+"added": 1
+},
+{
+"t": "2013-14",
+"j": "Kazmir",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2013-14",
+"j": "Timiz Kimem",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2013-14",
+"j": "White Cumin",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2015-16",
+"j": "Chat/Kat",
+"pos_before": 0,
+"pos_after": 158,
+"added": 158
+},
+{
+"t": "2015-16",
+"j": "Coffee",
+"pos_before": 0,
+"pos_after": 138,
+"added": 138
+},
+{
+"t": "2015-16",
+"j": "Hops (gesho)",
+"pos_before": 0,
+"pos_after": 122,
+"added": 122
+},
+{
+"t": "2015-16",
+"j": "Banana",
+"pos_before": 0,
+"pos_after": 114,
+"added": 114
+},
+{
+"t": "2015-16",
+"j": "Mango",
+"pos_before": 0,
+"pos_after": 66,
+"added": 66
+},
+{
+"t": "2015-16",
+"j": "Leafy Greens",
+"pos_before": 1,
+"pos_after": 61,
+"added": 60
+},
+{
+"t": "2015-16",
+"j": "Avocado",
+"pos_before": 0,
+"pos_after": 56,
+"added": 56
+},
+{
+"t": "2015-16",
+"j": "Sugar Cane",
+"pos_before": 0,
+"pos_after": 53,
+"added": 53
+},
+{
+"t": "2015-16",
+"j": "Berbere",
+"pos_before": 0,
+"pos_after": 47,
+"added": 47
+},
+{
+"t": "2015-16",
+"j": "Lemon",
+"pos_before": 0,
+"pos_after": 37,
+"added": 37
+},
+{
+"t": "2015-16",
+"j": "Onion",
+"pos_before": 2,
+"pos_after": 39,
+"added": 37
+},
+{
+"t": "2015-16",
+"j": "Garlic",
+"pos_before": 1,
+"pos_after": 37,
+"added": 36
+},
+{
+"t": "2015-16",
+"j": "Papaya",
+"pos_before": 0,
+"pos_after": 34,
+"added": 34
+},
+{
+"t": "2015-16",
+"j": "Tomato",
+"pos_before": 2,
+"pos_after": 28,
+"added": 26
+},
+{
+"t": "2015-16",
+"j": "Kariya",
+"pos_before": 1,
+"pos_after": 26,
+"added": 25
+},
+{
+"t": "2015-16",
+"j": "Orange",
+"pos_before": 0,
+"pos_after": 25,
+"added": 25
+},
+{
+"t": "2015-16",
+"j": "Sweet potato",
+"pos_before": 0,
+"pos_after": 24,
+"added": 24
+},
+{
+"t": "2015-16",
+"j": "Other tuber or stem",
+"pos_before": 0,
+"pos_after": 22,
+"added": 22
+},
+{
+"t": "2015-16",
+"j": "Enset",
+"pos_before": 0,
+"pos_after": 18,
+"added": 18
+},
+{
+"t": "2015-16",
+"j": "Other fruit",
+"pos_before": 0,
+"pos_after": 17,
+"added": 17
+},
+{
+"t": "2015-16",
+"j": "Potato",
+"pos_before": 1,
+"pos_after": 18,
+"added": 17
+},
+{
+"t": "2015-16",
+"j": "Cardamon",
+"pos_before": 0,
+"pos_after": 16,
+"added": 16
+},
+{
+"t": "2015-16",
+"j": "Guava",
+"pos_before": 0,
+"pos_after": 15,
+"added": 15
+},
+{
+"t": "2015-16",
+"j": "Other vegetable",
+"pos_before": 0,
+"pos_after": 15,
+"added": 15
+},
+{
+"t": "2015-16",
+"j": "Beetroot",
+"pos_before": 0,
+"pos_after": 13,
+"added": 13
+},
+{
+"t": "2015-16",
+"j": "Pumpkin",
+"pos_before": 0,
+"pos_after": 12,
+"added": 12
+},
+{
+"t": "2015-16",
+"j": "Rue",
+"pos_before": 0,
+"pos_after": 9,
+"added": 9
+},
+{
+"t": "2015-16",
+"j": "Turmeric",
+"pos_before": 0,
+"pos_after": 9,
+"added": 9
+},
+{
+"t": "2015-16",
+"j": "Godere",
+"pos_before": 0,
+"pos_after": 7,
+"added": 7
+},
+{
+"t": "2015-16",
+"j": "Pineapple",
+"pos_before": 0,
+"pos_after": 7,
+"added": 7
+},
+{
+"t": "2015-16",
+"j": "Other condiments",
+"pos_before": 0,
+"pos_after": 6,
+"added": 6
+},
+{
+"t": "2015-16",
+"j": "Chilies",
+"pos_before": 0,
+"pos_after": 5,
+"added": 5
+},
+{
+"t": "2015-16",
+"j": "Ginger",
+"pos_before": 0,
+"pos_after": 5,
+"added": 5
+},
+{
+"t": "2015-16",
+"j": "Peach",
+"pos_before": 0,
+"pos_after": 5,
+"added": 5
+},
+{
+"t": "2015-16",
+"j": "Tobacco",
+"pos_before": 0,
+"pos_after": 5,
+"added": 5
+},
+{
+"t": "2015-16",
+"j": "Carrot",
+"pos_before": 0,
+"pos_after": 4,
+"added": 4
+},
+{
+"t": "2015-16",
+"j": "Mandarin",
+"pos_before": 0,
+"pos_after": 4,
+"added": 4
+},
+{
+"t": "2015-16",
+"j": "Gishita",
+"pos_before": 0,
+"pos_after": 3,
+"added": 3
+},
+{
+"t": "2015-16",
+"j": "Kazmir",
+"pos_before": 0,
+"pos_after": 3,
+"added": 3
+},
+{
+"t": "2015-16",
+"j": "Sacred Basil",
+"pos_before": 2,
+"pos_after": 5,
+"added": 3
+},
+{
+"t": "2015-16",
+"j": "Apple",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2015-16",
+"j": "Cassava",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2015-16",
+"j": "Coriander",
+"pos_before": 0,
+"pos_after": 1,
+"added": 1
+},
+{
+"t": "2015-16",
+"j": "Cotton",
+"pos_before": 3,
+"pos_after": 4,
+"added": 1
+},
+{
+"t": "2015-16",
+"j": "Other seed",
+"pos_before": 4,
+"pos_after": 5,
+"added": 1
+}
+]

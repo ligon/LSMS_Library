@@ -47,7 +47,8 @@ CANONICAL = ["t", "v", "i", "plot_id", "j", "u", "condition", "season"]
 
 class TestDeclarations:
     def test_crop_production_is_registered(self):
-        assert _canonical_index_levels("crop_production") == CANONICAL
+        # GH1198 adds the native observation coordinate after the core grain.
+        assert _canonical_index_levels("crop_production") == CANONICAL + ["production_obs"]
 
     def test_canonical_index_keeps_v(self):
         """Load-bearing: `country._compute_no_v_join` exempts any table whose
@@ -64,7 +65,8 @@ class TestDeclarations:
     def test_missing_level_sentinels_are_non_null_strings(self):
         sentinels = _missing_level_sentinels("crop_production")
         assert sentinels == {"u": "Unknown", "condition": "unknown_condition",
-                             "season": "unknown_season"}
+                             "season": "unknown_season",
+                             "production_obs": "unresolved_observation"}
         for lvl, value in sentinels.items():
             assert isinstance(value, str) and value, lvl
             assert pd.notna(value), (
@@ -510,6 +512,10 @@ class TestFeatureEndToEnd:
             "Ethiopia":   ["i", "t", "v", "plot_id", "j", "u"],
             "GhanaSPS":   ["i", "t", "v", "plot_id", "j", "u", "season"],
             "Malawi":     ["i", "t", "v", "plot", "crop", "u", "condition"],
+            # Tanzania serves `production_obs` since GH #637 (2026-10-23),
+            # Uganda since GH #1198 and Ethiopia since GH #1461; these older
+            # shapes are kept because they exercise the promote-`u` and
+            # fabricate-sentinel branches.
             "Tanzania":   ["i", "t", "v", "plot_id", "j"],
             "Uganda":     ["i", "t", "v", "plot", "j", "u", "condition", "season"],
         }
@@ -528,7 +534,8 @@ class TestFeatureEndToEnd:
             warnings.simplefilter("ignore")
             out = f(list(shapes), currency=None)
 
-        assert list(out.index.names) == ["country"] + CANONICAL
+        assert list(out.index.names) == ["country"] + CANONICAL + ["production_obs"]
+        assert set(out.index.get_level_values("production_obs")) == {"unresolved_observation"}
         assert sorted(out.index.get_level_values("country").unique()) == sorted(shapes)
         assert len(out) == len(shapes)
         assert out.index.is_unique
@@ -607,28 +614,31 @@ def test_unnamed_index_is_left_alone():
 # Feature('plot_inputs') kept only the seven EHCVM countries and excluded the
 # other seven (676,635 rows), measured warm 2026-10-19.
 
-PLOT_LABOR = ["t", "v", "i", "plot_id", "stage", "source", "worker", "season"]
-PLOT_INPUTS = ["t", "v", "i", "plot_id", "input", "j", "u", "season"]
+PLOT_LABOR = ["t", "v", "i", "plot_id", "stage", "source", "worker", "season", "labor_obs"]
+PLOT_INPUTS = ["t", "v", "i", "plot_id", "input", "j", "u", "season", "input_obs"]
 
 # The real per-country index shapes, as `Country(c).<table>()` serves them
 # (measured warm on the corpus, 2026-10-19).  Countries listed together share a
 # shape.  `u_column` marks the six plot_inputs countries that carry `u` as a
 # COLUMN, which the assembly promotes.
 LABOR_SHAPES = {
-    # Benin, Burkina_Faso, CotedIvoire, Ethiopia, Guinea-Bissau, Malawi, Mali,
+    # Benin, Burkina_Faso, CotedIvoire, Ethiopia, Guinea-Bissau, Mali,
     # Niger, Nigeria, Senegal, Tanzania, Togo
     "Benin":    ["i", "t", "v", "plot_id", "source"],
     "GhanaLSS": ["i", "t", "v", "plot_id", "stage", "source", "worker"],
     "GhanaSPS": ["i", "t", "v", "plot_id", "season", "stage", "source"],
-    "Uganda":   ["i", "t", "v", "plot_id", "source", "season"],
+    "Uganda":   ["i", "t", "v", "plot_id", "source", "season", "labor_obs"],
+    # GH1120 source successor; no new actual native census is claimed here.
+    "Malawi":   ["i", "t", "v", "plot_id", "source", "labor_obs"],
 }
 INPUT_SHAPES = {
     # the seven EHCVM countries: no plot level at all
     "Benin":    (["i", "t", "v", "input", "crop", "u"], False),
     # Ethiopia, GhanaLSS
     "Ethiopia": (["i", "t", "v", "plot_id", "input", "j"], True),
+    # Malawi, Tanzania (Tanzania since GH #637, 2026-10-23)
     "Malawi":   (["i", "t", "v", "plot_id", "input", "crop", "u"], False),
-    # Mali, Nigeria, Tanzania
+    # Mali, Nigeria (and Tanzania before GH #637)
     "Mali":     (["i", "t", "v", "plot_id", "input", "crop"], True),
     "Uganda":   (["i", "t", "v", "plot_id", "input", "j", "season"], True),
 }
@@ -659,10 +669,10 @@ class TestPlotTableDeclarations:
     def test_sentinels(self):
         assert _missing_level_sentinels("plot_labor") == {
             "stage": "Farm-level", "worker": "Farm-level",
-            "season": "unknown_season"}
+            "season": "unknown_season", "labor_obs": "unresolved_observation"}
         assert _missing_level_sentinels("plot_inputs") == {
             "plot_id": "Farm-level", "u": "Unknown",
-            "season": "unknown_season"}
+            "season": "unknown_season", "input_obs": "unresolved_observation"}
 
     def test_shared_axes_share_one_sentinel_spelling(self):
         """`season` and `u` are the same axes crop_production carries; a
@@ -722,6 +732,8 @@ class TestPlotLaborHarmonize:
         (LABOR_SHAPES["GhanaLSS"], "worker", ("male", "female")),
         # Uganda: two rows differing only on season
         (LABOR_SHAPES["Uganda"], "season", ("A", "B")),
+        (LABOR_SHAPES["Uganda"], "labor_obs", ("row:source:0", "row:source:1")),
+        (LABOR_SHAPES["Malawi"], "labor_obs", ("row:CS:0", "row:Panel:0")),
     ])
     def test_rows_differing_only_on_a_kept_level_are_not_collapsed(
             self, names, level, values):
@@ -777,7 +789,8 @@ class TestPlotInputsHarmonize:
 
     def test_u_column_nulls_become_unknown_not_NA(self):
         """GhanaLSS / Ethiopia / Mali / Nigeria / Tanzania carry `u` as a
-        column with nulls (8,763 / 37,370 / 42,089 / 5,546 / 408 rows)."""
+        column with nulls (8,763 / 37,370 / 42,089 / 5,546 / 408 rows).
+        (Tanzania's plot_inputs `u` is an index level since GH #637.)"""
         names = INPUT_SHAPES["Mali"][0]
         df = _frame(names,
                     [("h1", "2017-18", "c1", "1_1", "Seed", "Mil"),

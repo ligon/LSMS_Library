@@ -1,0 +1,15 @@
+{
+ "rows": [
+  180900,
+  180900
+ ],
+ "relabelled_rows_by_wave_and_label": {
+  "2013-14 Red Kidney Beans -> Cactus": 39,
+  "2013-14 Mung bean -> Roman": 15,
+  "2011-12 Red Kidney Beans -> Cactus": 13,
+  "2018-19 Fallow Land -> Temporary Grass": 4,
+  "2011-12 Mung bean -> Roman": 1
+ },
+ "index_identical_after_relabel": true,
+ "changed_cells": {}
+}

@@ -1,0 +1,32 @@
+{
+  "runtime_classes": {
+    "NullReadWarning": 2,
+    "QuantityImplausibleWarning": 6,
+    "PopulationHeterogeneityWarning": 1
+  },
+  "sanity_findings": [
+    {
+      "country": "Burkina_Faso",
+      "check": "index_levels_match_scheme",
+      "detail": "Extra index levels not in scheme: ['v']; expected: ['t', 'i', 'plot_id'], actual: ['i', 't', 'v', 'plot_id']"
+    },
+    {
+      "country": "Burkina_Faso",
+      "check": "no_constant_columns",
+      "detail": "1 constant column(s): ['AreaUnit']"
+    },
+    {
+      "country": "Senegal",
+      "check": "index_levels_match_scheme",
+      "detail": "Extra index levels not in scheme: ['v']; expected: ['t', 'i', 'plot_id'], actual: ['i', 't', 'v', 'plot_id']"
+    },
+    {
+      "country": "Senegal",
+      "check": "no_constant_columns",
+      "detail": "1 constant column(s): ['AreaUnit']"
+    }
+  ],
+  "total_findings": 13,
+  "fails_errors_skips": 0,
+  "phase2_kwarg_cases": 0
+}

@@ -1,0 +1,137 @@
+{
+  "status": "AUTHOR_READY_FOR_INDEPENDENT_REVIEW",
+  "runtime_tests_pin": "299fb8675e785fd392b1259ab1f4fb535eb69c34",
+  "actual_parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "ledger_first": "61f2236e91ab51eb3e7f09aa2a029d380dac147e",
+  "production_change": "Exactly two null derived registration deletions; no framework/Make/science change.",
+  "hashes": {
+    "status": "PASS_MEASURED_BEFORE_REBUILD",
+    "API_cells": 549,
+    "country_changes": 26,
+    "other_country_changes": 0,
+    "framework_total": 39,
+    "framework_changes": 0,
+    "Malawi_wave_cells": 0,
+    "wave_inventory": 97,
+    "public_names_order_metadata_exact": true,
+    "raw_offenders_before": [
+      {
+        "country": "Malawi",
+        "table": "food_expenditures",
+        "entry": null
+      },
+      {
+        "country": "Malawi",
+        "table": "food_prices",
+        "entry": null
+      }
+    ],
+    "raw_offenders_after": []
+  },
+  "tests": {
+    "candidate_passed": 51,
+    "candidate_failed": 0,
+    "candidate_errors": 0,
+    "candidate_skipped": 0,
+    "new_actual_parent_failed": 1,
+    "new_actual_parent_passed": 1,
+    "comparator_fault_controls_rejected": 8,
+    "strict_api_audit_exit": 0,
+    "Uganda_only_requires_s3_dtype_file": "read, explicitly excluded as outside country cohort; no hidden skip"
+  },
+  "source_staging": {
+    "private_roots": 4,
+    "held_declared_sources": 19,
+    "physical_source_copies": 152,
+    "both_L1_layouts": true,
+    "healthy_Niger_parquets_copied_per_root": 13,
+    "distinct_original_copy_sources_rechecked": 32,
+    "Malawi_geo_sources_staged_but_unused": 4,
+    "no_acquisition_or_stamps_or_bypasses": true
+  },
+  "frames": {
+    "saved_matched_stage_pairs_exact": 72,
+    "current_cache_frames_exact": 11,
+    "native_wave_pairs_exact": 5,
+    "Default_pre_invalid_Make_native_byte_bindings": 10,
+    "exact_full_typed_attrs_axes_dtypes_masks_order": true,
+    "check_exact": true,
+    "rtol": 0,
+    "atol": 0,
+    "CLI_postread_frames_footer_and_bytes_exact": 3,
+    "country_footer_hash_only_nested_Arrow_reconstruction_exact": 2
+  },
+  "Malawi_all_wave_rows": {
+    "food_acquired": 971531,
+    "food_expenditures": 681980,
+    "food_prices": 680400,
+    "food_quantities": 971028
+  },
+  "Malawi_2013_rows": {
+    "food_acquired": 81680,
+    "food_expenditures": 59264,
+    "food_prices": 59180,
+    "food_quantities": 81675,
+    "prices_unitvalue": 59263,
+    "quantities_units": 81677,
+    "expenditures_total": 59264
+  },
+  "joint_Feature_default_rows": {
+    "food_acquired": 1211408,
+    "food_expenditures": 846994,
+    "food_prices": 845427,
+    "food_quantities": 1210883
+  },
+  "warm": {
+    "Default_files_per_head": 62,
+    "Default_complete_bytes_modes_mtimes_changed": 0,
+    "Feature_complete_bytes_modes_mtimes_changed": 0,
+    "scanner_complete_bytes_modes_mtimes_changed": 0,
+    "CLI_complete_bytes_modes_mtimes_changed": 0,
+    "Make_warm_source_error_calls_per_head": 2,
+    "Make_cache_file_changes": 0
+  },
+  "scanner": {
+    "records_per_head": 205,
+    "statuses": {
+      "warn": 200,
+      "pass": 3,
+      "fail": 2
+    },
+    "full_order_and_multiset_exact": true,
+    "existing_failures": [
+      {
+        "table": "food_prices",
+        "check": "assembly_nonempty",
+        "units": "kgprice"
+      },
+      {
+        "table": "food_prices",
+        "check": "assembly_nonempty",
+        "units": "unitprice"
+      }
+    ]
+  },
+  "warnings": {
+    "endpoint_pairs": 77,
+    "parent_process_occurrences_per_head": 330,
+    "Default_category_message_multiset_exact_endpoint_pairs": 70,
+    "Make_raw_category_message_inequality_endpoint_pairs": 7,
+    "Make_literal_checkout_and_data_path_reconstruction_exact_endpoint_pairs": 7,
+    "scanner": "Complete raw finding/messages; no complete category/stack claim.",
+    "Make_children": "Full private stderr text; no reconstructed structured warning-event equality claim."
+  },
+  "residuals": [
+    "Original GH218 remaining non-Malawi/shared cleanup stays OPEN",
+    "Existing Malawi Make country concatenator shape failure; all food-derived callers still raise RuntimeError",
+    "Invalid-wave KeyError evicts five hashless companions on both heads"
+  ],
+  "limits": [
+    "Healthy Niger is a current-hash/full-coverage warm comparator, not source-cold.",
+    "No Malawi cluster source rebuild or output claim: Region uses sample.Region.",
+    "No other Malawi table output or broad corpus/full-suite claim.",
+    "API before-write and CLI post-read are separate matched stages; no cross-stage typed-attrs equality claim.",
+    "Raw Make warning inequality retained; expected path reconstruction is separate proof.",
+    "Independent review, GitHub writes, PR and merge are not performed."
+  ]
+}

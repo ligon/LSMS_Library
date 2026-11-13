@@ -690,7 +690,7 @@
       "Onset",
       "Year"
     ],
-    "content_hash": "ff72c8a8372976efdc7d08c2eb1157bed3e6a0a03b895ef7432a4c08822b9e70",
+    "content_hash": "a8d044b4a7e6a547a54bb65e8a0219de9339e36c6ab25ca8b6700566a64df17b",
     "dtypes": {
       "AffectedAssets": "boolean",
       "AffectedConsumption": "boolean",
@@ -709,7 +709,7 @@
       "Shock"
     ],
     "shape": [
-      1021,
+      1023,
       10
     ]
   },
@@ -953,14 +953,16 @@
   },
   "var/cluster_features.parquet": {
     "columns": [
+      "Derivation",
       "District",
       "Latitude",
       "Longitude",
       "Region",
       "Rural"
     ],
-    "content_hash": "35e1a58c40846521dacd5f7ff33f4fe653f18f70c13d88316f91462f58d4b0bf",
+    "content_hash": "811081b76d5a3d0ffdf3ce2755f73dd4d0ffa6adeea11aeb4ba21dc452cd06d8",
     "dtypes": {
+      "Derivation": "string",
       "District": "str",
       "Latitude": "float64",
       "Longitude": "float64",
@@ -972,8 +974,8 @@
       "v"
     ],
     "shape": [
-      4809,
-      5
+      4968,
+      6
     ]
   },
   "var/earnings.parquet": {
@@ -1313,7 +1315,7 @@
       "Floor",
       "Roof"
     ],
-    "content_hash": "aa027a50167a6f2c6570c2f73d4dcd78a2a2c95f6b0f6fecc366455dce14f815",
+    "content_hash": "7ad3dfddc31e7ab23ad7ee8761d6b06524cf363090951f07cf69fe211e24c8f4",
     "dtypes": {
       "Floor": "string",
       "Roof": "string"
@@ -1379,9 +1381,9 @@
       "Vitamin C",
       "Zinc"
     ],
-    "content_hash": "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a",
+    "content_hash": "e9fb4c67b2463694a2ec7b46ee5e6df1ef424db19753a74c2b82ad6a48a6a600",
     "content_hash_variants": [
-      "f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6"
+      "324429c1e855440cbd87465c3853087fd7a044f9e4473438297a94960acbd07e"
     ],
     "dtypes": {
       "Calcium": "float64",
@@ -1434,17 +1436,23 @@
   },
   "var/sample.parquet": {
     "columns": [
+      "Derivation",
+      "District",
       "Region",
       "Rural",
+      "ea",
       "panel_weight",
       "strata",
       "v",
       "weight"
     ],
-    "content_hash": "d68ae382effa904a33e9cb08b8d155890ba34cefb595f5ca7e7d1d40ce4faa52",
+    "content_hash": "0803aacc9bef97e898eb9545ed317a6b1890f373c6e7eca67f1e413766b7fd24",
     "dtypes": {
+      "Derivation": "string",
+      "District": "str",
       "Region": "string",
       "Rural": "string",
+      "ea": "str",
       "panel_weight": "float64",
       "strata": "string",
       "v": "string",
@@ -1455,8 +1463,8 @@
       "t"
     ],
     "shape": [
-      24362,
-      6
+      24561,
+      9
     ]
   },
   "var/shocks.parquet": {
@@ -1472,7 +1480,7 @@
       "Onset",
       "Year"
     ],
-    "content_hash": "9906923f4464a738b2a04107d9b27eabef388d9a2c43f7729886dd36e7ba03d7",
+    "content_hash": "db2c50854342a70511b936c4747fc1852a5c04a2b94075673c48948c3937adf1",
     "dtypes": {
       "AffectedAssets": "string",
       "AffectedConsumption": "string",
@@ -1491,7 +1499,7 @@
       "Shock"
     ],
     "shape": [
-      14457,
+      14459,
       10
     ]
   }

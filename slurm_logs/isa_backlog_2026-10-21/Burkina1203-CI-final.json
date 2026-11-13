@@ -1,0 +1,60 @@
+{
+  "recorded_at_UTC": "2026-10-22 04:38:02 UTC",
+  "PR": 1203,
+  "head": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "workflow": {
+    "id": 39722612561,
+    "name": "CI",
+    "status": "completed",
+    "conclusion": "success",
+    "run_number": 2888,
+    "jobs_url": "https://api.github.com/repos/ligon/LSMS_Library/actions/runs/39722612561/jobs",
+    "logs_url": "https://api.github.com/repos/ligon/LSMS_Library/actions/runs/39722612561/logs",
+    "workflow_id": 209110098
+  },
+  "jobs": [
+    {
+      "name": "unit-tests",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "windows-smoke",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "data-tests",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "windows-script-build",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "dvc-remote-reachability",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "dvc-lock-check",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "refresh-dvc-locks",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "docs",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "public_body_readback_exact": true,
+  "data_suite_pass": false,
+  "signed": "Sue"
+}

@@ -1,0 +1,5 @@
+outs:
+- md5: cb72e5a5303fefd1451dc67ffc663ae6
+  size: 25511106
+  hash: md5
+  path: sect07_12month.dta

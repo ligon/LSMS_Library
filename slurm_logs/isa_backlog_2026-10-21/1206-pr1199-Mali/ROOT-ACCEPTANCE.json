@@ -1,0 +1,22 @@
+{
+  "positive_groups": 209,
+  "full_strict": 208,
+  "qualified": 1,
+  "attrs_only_empty": 3,
+  "missing_empty_factory_memory": 1,
+  "negative_stage_controls": 10,
+  "fullfooter_fullbyte_controls": 6,
+  "historical_mtime_absent_entries": 1190,
+  "status": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_EXPLICIT_LIMITS",
+  "READY_sha256": "ba8e4e5b1d78085596329ca7f65db98aa1be986c64e95ce5d008b9b4ee9b5dd0",
+  "manifest_sha256": "b9da253fa7d3b1dc7cf1965c5b188992e29a0dbadef1bbebc393c2800d4938c5",
+  "manifest_entries_with_attestation": 276,
+  "historical_entries": 1190,
+  "physical_selected_products": 193,
+  "shared_v3_calibration_faults": 42,
+  "historical_memory_and_policy_gaps_preserved": true,
+  "families_overlap_not_unique_pairs": true,
+  "no_API_source_test_or_payload_decode_replay_by_root": true,
+  "no_all_campaign_verdict": true,
+  "signed": "Sue"
+}

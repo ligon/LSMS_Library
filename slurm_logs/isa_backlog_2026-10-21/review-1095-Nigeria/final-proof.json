@@ -1,0 +1,80 @@
+{
+  "features": {
+    "Feature": {
+      "before": 177381,
+      "after": 182609,
+      "all_old_payload_dtypes_axis_metadata_and_full_attrs_exact": true,
+      "Niger_rows": 46043
+    },
+    "Feature-default": {
+      "before": 177381,
+      "after": 182609,
+      "all_old_payload_dtypes_axis_metadata_and_full_attrs_exact": true,
+      "Niger_rows": 46043
+    }
+  },
+  "scanner_full_normalized_multiset_exact": true,
+  "scanner_normalization": "checkout and private-data root strings only; no metric/timing/key removal",
+  "scanner_records": [
+    {
+      "phase": "1a-sanity",
+      "check": "has_household_index",
+      "country": "Niger",
+      "classification": "deliberate cluster-level frame without household i",
+      "status": "warn",
+      "normalized_record_sha256": "d0b5e49cdef7deec0ad8a085c29dd40eccb322fb968940e70220825520e489b7"
+    },
+    {
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "country": null,
+      "classification": "ClusterIdentityWarning",
+      "status": "warn",
+      "normalized_record_sha256": "09d799d52ea5831eb9beaa8493c7e8d8e6a89eb2cc56045806a5c05b71d02f30"
+    },
+    {
+      "phase": "1a-sanity",
+      "check": "has_household_index",
+      "country": "Nigeria",
+      "classification": "deliberate cluster-level frame without household i",
+      "status": "warn",
+      "normalized_record_sha256": "60c746ac34393b6b0d17aa7733970d26aa31e060179554f879d88a790b214649"
+    },
+    {
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "country": null,
+      "classification": "ClusterIdentityWarning",
+      "status": "warn",
+      "normalized_record_sha256": "ee1f03e2ec45fe776c223f002ba708b91c0ec7f2de6135bf4bd2ad1989c1e2f8"
+    },
+    {
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "country": null,
+      "classification": "UserWarning",
+      "status": "warn",
+      "normalized_record_sha256": "809f10058006d8ceb8681570a1d25ace30de8e5c5433d9d677b00b5bd1a11771"
+    },
+    {
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "country": null,
+      "classification": "PopulationHeterogeneityWarning",
+      "status": "warn",
+      "normalized_record_sha256": "1efab37eaaff39b9b8f458fb9155cb188be219fed5de63bbf462d157bd856dbf"
+    }
+  ],
+  "phase2_grid": false,
+  "hash_census": {
+    "evaluated_country_cells": 549,
+    "changed_Nigeria": 24,
+    "other_unchanged": 525,
+    "evaluated_framework_fingerprints": 39,
+    "framework_exact": 39
+  },
+  "healthy_Niger_cache_files_byte_exact": 3,
+  "all_13_sources_still_match_initial_receipts_both_roots": true,
+  "network_connect_attempts": 0,
+  "warm_country_and_Feature_all_country_files_bytes_mtimes_exact": true
+}

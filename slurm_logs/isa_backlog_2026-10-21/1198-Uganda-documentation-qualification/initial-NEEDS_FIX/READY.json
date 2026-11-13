@@ -1,0 +1,59 @@
+{
+  "status": "FROZEN_NEEDS_FIX",
+  "verdict": "NEEDS_FIX",
+  "source_head": "73ad658420c020f81541306d51732e376d85955d",
+  "base_head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "finding": {
+    "path": "lsms_library/countries/Uganda/_/CONTENTS.org",
+    "line": 3662,
+    "text": "independent review started from mode0644 copies",
+    "reason": "Uganda L2 files were outputs of ordinary empty-L2 cold builds, not copied L2 inputs.",
+    "required_change": "Describe measured0644-to0600+mtime without inferring copy/start provenance."
+  },
+  "hashes": {
+    "country_hashes": {
+      "total": 549,
+      "identical": 549,
+      "changed": 0
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "identical": 39,
+      "changed": 0
+    }
+  },
+  "runtime_tests_config_other_tracked_paths_exact": true,
+  "both_source_snapshots_initial_final_HEAD_bytes_modes_clean_exact": true,
+  "prior1908_runtime_proof_metadata_and16_small_content_receipts_exact": true,
+  "no_source_data_decode_API_unpickle_test_CLI_replay": true,
+  "data_roots_no_files_or_symlinks": true,
+  "other_consumers": [],
+  "sealer_exits_after_READY": true,
+  "safe_exports_allowlist": {
+    "REPRODUCE.md": {
+      "sha256": "e4d5ea7406bc674932348ef2658ab487061980bb31915f8e1da82698790ad372",
+      "bytes": 722
+    },
+    "REVIEW.org": {
+      "sha256": "ba542196a9a773459ee0246a6146ce010f31073d470fbe2a5376dbe6e61202c7",
+      "bytes": 3755
+    },
+    "checkers.json": {
+      "sha256": "4d72e198a9a19977fae8211175386bd5c4da5acd5d71b7bfa587a23030379d39",
+      "bytes": 810
+    },
+    "validation.json": {
+      "sha256": "31967019b2a131b1f3110306e72ad351efc8d3b0b42e8953f8f9029036a071e3",
+      "bytes": 3636
+    },
+    "verdict.json": {
+      "sha256": "3c6de21e6758be1eb695488b440c676401c4643b7709f5a74027fa0fe2767fe2",
+      "bytes": 746
+    }
+  },
+  "manifest": "final-private-manifest.json",
+  "manifest_entries": 52,
+  "manifest_sha256": "80f2f9500e7f23b330ce0fe20d09c5427b58b599bd614112f0fb5d8cde3e210d",
+  "created_UTC": "2026-10-22T03:57:13.138135+00:00",
+  "signed": "Sue"
+}

@@ -1,0 +1,125 @@
+#+title: Bounded joint eleven-fix API review
+#+date: 2026-10-21
+#+author: Sue (GPT-6)
+
+* Verdict and exact scope
+PASS for the requested eleventh-fix coexistence boundary at frozen integration =7886f7ece49767b2357a2f559c474e0eb710561f=.
+The complete Burkina Faso, Benin and Togo outputs match their independently reviewed references in the combined production context, including shared #1077.
+No source, tracked file, Git ref or GitHub write was made.
+The earlier nine-fix proof at =483b4aa117c2c05ac00bf023adab97e47782df46= and root's ten-fix proof at =bbdcf3457= retain their own pins; this bounded check does not repeat or expand those claims.
+
+The Burkina references come from full independent PASS =3848778d0e8676c798883c11ea3e33fc88e8a591=, runtime =69ed4d2028a6f989a8ac45d117a5cffc60a831fd=.
+The documentation descendant =cfd0782766068da6dc7e7605334e957f988a4ab1= has a separate root narrow PASS: four authorized prose files, no additional 549 country-hash or 39 framework-fingerprint movement.
+I read that full review, verdict, descendant receipt and root narrow proof.
+All three relevant country trees in this integration are blob/mode-identical to the descendant; the shared #1077 runtime commit is in this integration's ancestry.
+No full hash census or fingerprint sweep was repeated here.
+
+* Grounding and source decisions
+I read the full 1,466-line Burkina Faso CONTENTS FIRST, including the three live TODO entries (food_items.org, nutrition and Makefile); no additional WAITING or LOGBOOK entry is present.
+I read the relevant Benin/Togo design, grain and comparator caveats, and the code-review, cross-country assembly and Org reporting guidance.
+Burkina's 2018 roster is household x native input slot, without a parcel axis.
+The EHCVM household namespace differs from the old EMC formatter; vague is a sample split, not a repeated measurement.
+EMC 2014 has four recall passages, while 2021-22 is a restricted half-panel with distinct panel weights.
+These idiosyncrasies require unchanged supporting sample/cluster policy during normal all-wave rebuilds.
+
+The existing API names Purchased and Quantity_purchased still bind gift/donation questions, not verified purchase quantities.
+CONTENTS quotes q05: "16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de don?" whereas the builder comments call it "purchased?".
+The existing q07a binding is gift quantity; actual purchase questions are q08/q09a with separate units.
+The independent source review found actual purchases on 18 of the recovered native lines.
+Exact complete-frame/NA-mask comparisons here preserve those records and the existing bindings; this review does not rebind fields, choose a physical-unit representation or change eligibility.
+GH #1188 retains the separate gift/purchase routing and unit diagnosis.
+
+All 602 unlabelled-21 records retain the exact crop identity =Unknown [Burkina_Faso 2018-19 s16bq01=21]= and the explicitly unverified legacy input=Seed classification.
+No 2021 code meaning is borrowed; GH #1187 remains the source-authority limit.
+No named-crop vocabulary, reducer, quantity or physical-unit policy changes.
+
+The country-document contradictions remain reportable evidence rather than grounds to assume documentation stale:
+- Burkina sample notes say "10,224 households", "6,961 households" and "3,218 households"; both the independent reference and this integration return 10,411 / 7,010 / 3,227, with 900 / 585 / 550 clusters.
+- Benin's DDI says it "randomly divided each enumeration area into two equal groups", while its recorded distributed-file result has no grappe in both vague and the existing index convention remains (grappe, menage).
+- Togo's coverage statement says Lome Commune respondents are "from rural areas"; CONTENTS explicitly records the tension and forbids silently correcting it.
+- Burkina's dated descendant note says the identity implementation "remains unmerged at this writing"; this task tests the subsequently integrated tree and does not rewrite that historical statement.
+
+Benin's 71 and Togo's 165 recovered native lines include distinct slots even where measurements coincide.
+Purchased is a measured attribute, never an additional identity key.
+Togo's separate three all-payload-missing rows remain the standing eligibility policy.
+No new source idiosyncrasy was discovered here; the still-current sample-count discrepancy is a fact to carry into future notes without broadening this task into sample-policy diagnosis.
+
+* Normal API and complete conservation proof
+I physically copied the quiescent ten-fix root into a new private root: 1,519 L2 parquets and 1,288 held L1 blobs.
+I supplemented ten independently held Burkina blobs after sidecar MD5 checks: eight support the authorized rebuilds, two are held diagnostic counterparts; no new source interpretation or acquisition was needed.
+All 1,298 private L1 blobs are physical single-link copies, not symlinks.
+Twenty complete independent reference frames were also physically copied with source/copy SHA, mode and nanosecond-mtime receipts.
+
+All three Burkina country cache grades were genuinely stale before the first normal calls.
+The ordinary API rebuilt exactly ten Burkina parquet files for plot_inputs plus all-wave sample/cluster support; the other 1,509 parquets stayed exact.
+No assume_cache_fresh, LSMS_NO_CACHE, hash bypass, manual stamp, cache clear or in-tree artifact was used.
+This is normal stale-cache rebuilding from held sources, not a blanket cold-country or full-corpus rebuild claim.
+
+| Normal Country output | Rows | Full-frame comparison |
+|-----------------------+------+-----------------------|
+| Burkina_Faso plot_inputs | 22,877 | exact |
+| Burkina_Faso sample | 20,648 | exact |
+| Burkina_Faso cluster_features | 2,035 | exact |
+| Benin plot_inputs | 10,605 | exact |
+| Togo plot_inputs | 13,730 | exact |
+
+Both Benin/Togo sample and cluster outputs also match completely.
+All three Burkina raw-country outputs and all seven available raw-wave references match exactly.
+The actual =Feature('plot_inputs')(['Burkina_Faso','Benin','Togo'], currency=None)= matches the complete independent 47,212-row reference, including country parts, crop-to-j alias, canonical plot/season sentinels, dtypes, null masks and full attrs.
+That is twenty complete reference comparisons per process, with no row sorting, path substitution, value normalization or attr omission.
+The two unsupported Burkina plot_inputs wave subsets remain empty.
+A new Country instance repeats all three Burkina APIs exactly.
+
+A separate fresh Python process repeats every requested API, raw-frame comparison, the Feature and all three new-Country calls.
+All twenty full comparisons and attrs remain exact.
+Zero of 1,519 parquets changes bytes, mode or nanosecond mtime during warm repeat; the focused tests also write none.
+All twelve relevant comparator caches remain byte/mode/mtime-exact.
+Their six country caches are hash-fresh with complete all-wave coverage, four YAML wave caches are hash-fresh, and the two existing hashless plot_inputs script wave outputs retain their normal legacy grade.
+No false freshness was manufactured for those script outputs.
+
+* Focused tests and exact exclusions
+The requested command passes 13 tests: nine Burkina identity cases and four existing Benin/Togo comparator guards, zero skipped or failed.
+Exactly four parameter cases of test_plot_inputs_recovers_the_discarded_line_item are deselected by the requested -k expression.
+They are the cross product of fixture country Benin/Togo and target case Benin/Togo, recorded with exact parameter IDs only in =focused-nodeids-private.json= because those IDs contain household keys.
+No deselected case is claimed as tested.
+
+#+begin_src sh
+P=/local/job40255479/control/isa-backlog-20261021/integration/api-eleven-review
+cd /local/job40255479/worktrees/isa-integration
+# Setup ran once and refuses an existing destination data root.
+/local/job40255479/venv_img/bin/python "$P/prepare.py"
+bash "$P/run.sh" "$P/check_api.py" initial
+# check_tests.py calls the exact pytest selection below, with a private recorder:
+# python -m pytest -q -p no:cacheprovider #   tests/test_burkina_faso_plot_inputs_identity.py #   tests/test_gh323_benin_togo.py -k 'not recovers_the_discarded_line_item'
+bash "$P/run.sh" "$P/check_tests.py"
+bash "$P/run.sh" "$P/check_api.py" warm
+bash "$P/run.sh" "$P/finish.py"
+#+end_src
+
+Actual logs are initial-api-v2-private.log, focused-tests-v2-private.log, warm-api-private.log and final-proof-private.log.
+The wrapper pins the exact mounted image, cwd/PYTHONPATH/countries/data roots, numeric/build/make threads one and private config/temp/issue paths.
+It runs under unshare -rn and validates active connect/connect_ex guards without replacing the socket class.
+The focused run is serial, below the four-worker cap.
+For independent reruns, use another physical private copy and adapt checkout/output constants, preserving frozen-head, hash/coverage and reference assertions; do not overwrite retained setup roots.
+
+Two initial private harness failures are preserved with their original scripts/logs.
+The first counted all Benin/Togo parquets as the twelve requested three-table controls and stopped before API calls; filtering the three tables corrected the harness.
+The second used a pytest hook argument named r instead of the hookspec report and failed plugin registration before executing tests.
+The corrected selection/repeats pass without changing source code or weakening a conservation assertion.
+
+* Immutable proof and limits
+HEAD remains =7886f7ece49767b2357a2f559c474e0eb710561f= and status is empty.
+All 14,988 tracked file paths, SHA256 contents, symlink tokens and modes match the pre-run snapshot.
+The canonical tracked-manifest SHA256 is =ce0aef65bef3af9f9d6ccbf56479eb8eccb6d6844251702dafe019018808e834=.
+All 2,807 quiescent source-file SHA/mode/mtime receipts, twenty original/copied frame-reference receipts and ten supplemental MD5 receipts remain exact.
+No introduced/untracked source file or parquet exists in the country tree; the nine existing tracked curation CSVs remain unchanged.
+No network attempt, acquisition, DVC CLI, shared-cache write/clear/promotion, dependency/fixture/baseline edit, Git mutation or GitHub write occurred.
+The full frames, source IDs, warnings and logs stay private.
+Safe aggregate results are in =verdict.json=, =proof.json= and =context-proof.json=; full receipts and exact deselected cases remain private.
+
+This verifies the bounded Burkina increment in the eleven-fix production context.
+It does not repeat the full prior nine/ten data cohort, full suite, source-oracle studies, scanner phases or all-549/all-39 census, and it makes no output claim for other invalidated Burkina tables.
+The unheld questionnaires, purchase/gift unit routing, code-21 meaning, other-wave input builders and previously recorded residuals remain outside scope.
+No task worker remains after completion.
+
+Sue

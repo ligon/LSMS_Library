@@ -1,0 +1,91 @@
+{
+  "status": "TERMINAL_METADATA_QUALIFICATION_ONLY",
+  "main_scoped_GO_unchanged": true,
+  "main_451_full_postexit_preserved": true,
+  "cause": "The auxiliary capture parsed full physical receipt JSON through JS JSON.parse/Number and JSON.stringify, rounding integer nanosecond mtimes above2**53. The subsequent stdlib exact-receipt assertion caught it at READY equality (actual terminal1, chunk8c1f13).",
+  "failed_excluded_record_SHA256": "526ded223fdf31a3f813a2143f0557c41439f3d73c62f0b3aa82d1a4e5b5778f",
+  "failed_record_preserved_byte_and_metadata_exact": true,
+  "correction": "All ns-bearing JSON in this supplement is read/written with stdlib json and unbounded Python ints. Exact historical READY/manifest/allowlist/source receipts come from original Python-written packet objects; streams receive explicitly NEW current full baselines.",
+  "no_main_packet_or_product_defect": true,
+  "no_runtime_API_test_raw_decode_or_protection_replay": true,
+  "original_terminal_records": {
+    "sealer": {
+      "session_id": 2617,
+      "completion_chunk": "810b2e",
+      "exit_code": 0
+    },
+    "postexit": {
+      "session_id": 1492,
+      "completion_chunk": "12d2c6",
+      "exit_code": 0
+    }
+  },
+  "denominator": {
+    "converted_source_parcels": 31959,
+    "served_eligible_yield_keys": 27755,
+    "unserved": 4204,
+    "both_area_reports_missing": 3918,
+    "nonpositive_chosen_GPS": 276,
+    "parcel_absent_from_present_native_household_area_roster": 10,
+    "pre_conversion_quantity_versus_factor_exclusions_not_partitioned": true,
+    "no_blanket_full_coverage_claim": true
+  },
+  "original_main": {
+    "READY.json": {
+      "sha256": "50f65d91593d06a46f3dea9030fbe5676d7a9cd9915a3aab28670a5273ad0a42",
+      "bytes": 6701,
+      "mode": 384,
+      "mtime_ns": 1792693221200978419,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 3945002,
+      "symlink": false,
+      "link": null
+    },
+    "manifest.json": {
+      "sha256": "8196ff96ede2a923517b49815863118cc31a2796fd0ee4f94d17f16847526e46",
+      "bytes": 187791,
+      "mode": 384,
+      "mtime_ns": 1792693221051977602,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 3945001,
+      "symlink": false,
+      "link": null
+    },
+    "EXPORT-ALLOWLIST.json": {
+      "sha256": "698fd2fae0436ee33dc7425fadd27713e440fd1f4b94f3d4ccc9b4f5c52341f4",
+      "bytes": 3449,
+      "mode": 384,
+      "mtime_ns": 1792693214864943702,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 3945000,
+      "symlink": false,
+      "link": null
+    },
+    "postexit-safe.json": {
+      "sha256": "684658f6bcd530942313903d6ad516d8337c732cf7302559ce2143a4afeb5f70",
+      "bytes": 2017,
+      "mode": 384,
+      "mtime_ns": 1792693238947075656,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 3945005,
+      "symlink": false,
+      "link": null
+    },
+    "tool-terminal-records-private.json": {
+      "sha256": "526ded223fdf31a3f813a2143f0557c41439f3d73c62f0b3aa82d1a4e5b5778f",
+      "bytes": 3964,
+      "mode": 384,
+      "mtime_ns": 1792693280109297867,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 3945006,
+      "symlink": false,
+      "link": null
+    }
+  },
+  "signed": "Sue"
+}

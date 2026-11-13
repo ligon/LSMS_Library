@@ -1,0 +1,288 @@
+{
+  "parent": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+  "tested_runtime": "929149222e43a8fe500cc08420cdc68357170af3",
+  "physical_test_copy_sha256": "e69b476793e882e7c459819a22cf498fce7a00c3cc9472d8b7c784acd5a9bb90",
+  "cases": [
+    {
+      "test": "test_every_eligible_record_retains_its_own_complete_payload[distinct]",
+      "outcome": "failure",
+      "cause": "actual_old_helper_coalesces_two_eligible_records_into_one",
+      "exception_classes": []
+    },
+    {
+      "test": "test_every_eligible_record_retains_its_own_complete_payload[equal]",
+      "outcome": "failure",
+      "cause": "actual_old_helper_coalesces_two_eligible_records_into_one",
+      "exception_classes": []
+    },
+    {
+      "test": "test_every_eligible_record_retains_its_own_complete_payload[partial]",
+      "outcome": "failure",
+      "cause": "actual_old_helper_coalesces_two_eligible_records_into_one",
+      "exception_classes": []
+    },
+    {
+      "test": "test_every_eligible_record_retains_its_own_complete_payload[sale-only]",
+      "outcome": "failure",
+      "cause": "actual_old_helper_coalesces_two_eligible_records_into_one",
+      "exception_classes": []
+    },
+    {
+      "test": "test_reported_id_is_stable_under_reordering",
+      "outcome": "failure",
+      "cause": "other_actual_assertion_negative",
+      "exception_classes": [
+        "IndexError"
+      ]
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[None]",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[nan]",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[missing2]",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[]",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[  ]",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_missing_id_values_use_explicit_physical_fallback[.]",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_named_missing_id_column_is_loud",
+      "outcome": "failure",
+      "cause": "old_helper_lacks_new_validation_contract",
+      "exception_classes": [
+        "CropColmapError"
+      ]
+    },
+    {
+      "test": "test_repeated_id_suffixes_every_occurrence[True]",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_repeated_id_suffixes_every_occurrence[False]",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_physical_positions_precede_filtering_and_ignore_dataframe_labels",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_constructed_release_and_order_semantics",
+      "outcome": "failure",
+      "cause": "other_actual_assertion_negative",
+      "exception_classes": []
+    },
+    {
+      "test": "test_actual_condition_slots_remain_distinct_even_with_equal_payload",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_repeated_slot_suffixes_all_source_rows",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_reordered_condition_declarations_keep_actual_slot_bindings",
+      "outcome": "failure",
+      "cause": "old_output_lacks_observation_axis",
+      "exception_classes": [
+        "KeyError"
+      ]
+    },
+    {
+      "test": "test_duplicate_declared_slot_is_loud_even_with_distinct_condition_keys",
+      "outcome": "failure",
+      "cause": "old_helper_lacks_new_validation_contract",
+      "exception_classes": [
+        "ValueError"
+      ]
+    },
+    {
+      "test": "test_duplicate_physical_source_row_slot_is_an_error",
+      "outcome": "failure",
+      "cause": "direct_new_source_signature_contract_negative",
+      "exception_classes": [
+        "TypeError"
+      ]
+    },
+    {
+      "test": "test_constructed_identity_requires_verifiable_explicit_source[None]",
+      "outcome": "failure",
+      "cause": "old_helper_lacks_new_validation_contract",
+      "exception_classes": [
+        "ValueError"
+      ]
+    },
+    {
+      "test": "test_constructed_identity_requires_verifiable_explicit_source[]",
+      "outcome": "failure",
+      "cause": "old_helper_lacks_new_validation_contract",
+      "exception_classes": [
+        "ValueError"
+      ]
+    },
+    {
+      "test": "test_constructed_identity_requires_verifiable_explicit_source[  ]",
+      "outcome": "failure",
+      "cause": "old_helper_lacks_new_validation_contract",
+      "exception_classes": [
+        "ValueError"
+      ]
+    },
+    {
+      "test": "test_constructed_identity_requires_verifiable_explicit_source[missing:AGSEC5A.dta]",
+      "outcome": "failure",
+      "cause": "old_helper_lacks_new_validation_contract",
+      "exception_classes": [
+        "ValueError"
+      ]
+    },
+    {
+      "test": "test_missing_source_reference_does_not_guess_from_wave",
+      "outcome": "failure",
+      "cause": "old_helper_lacks_new_validation_contract",
+      "exception_classes": [
+        "ValueError"
+      ]
+    },
+    {
+      "test": "test_unique_old_key_with_null_is_retained",
+      "outcome": "pass",
+      "cause": "preserved_parent_boundary_pass",
+      "exception_classes": []
+    },
+    {
+      "test": "test_duplicate_null_old_keys_keep_the_old_exclusion",
+      "outcome": "pass",
+      "cause": "preserved_parent_boundary_pass",
+      "exception_classes": []
+    },
+    {
+      "test": "test_nonunique_old_index_keeps_its_existing_null_key_boundary",
+      "outcome": "failure",
+      "cause": "other_actual_assertion_negative",
+      "exception_classes": []
+    },
+    {
+      "test": "test_empty_input_needs_no_constructed_identity",
+      "outcome": "pass",
+      "cause": "preserved_parent_boundary_pass",
+      "exception_classes": []
+    },
+    {
+      "test": "test_conversion_uses_each_observations_own_factor_before_harvest_sum",
+      "outcome": "failure",
+      "cause": "old_sum_first_factor_pairing_changes_harvest",
+      "exception_classes": []
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2009-10]",
+      "outcome": "failure",
+      "cause": "actual_old_loader_has_no_explicit_source_binding",
+      "exception_classes": []
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2010-11]",
+      "outcome": "failure",
+      "cause": "actual_old_loader_has_no_explicit_source_binding",
+      "exception_classes": []
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2011-12]",
+      "outcome": "failure",
+      "cause": "actual_old_loader_has_no_explicit_source_binding",
+      "exception_classes": []
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2013-14]",
+      "outcome": "failure",
+      "cause": "actual_old_loader_has_no_explicit_source_binding",
+      "exception_classes": []
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2015-16]",
+      "outcome": "failure",
+      "cause": "actual_old_loader_has_no_explicit_source_binding",
+      "exception_classes": []
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2018-19]",
+      "outcome": "failure",
+      "cause": "actual_old_loader_has_no_explicit_source_binding",
+      "exception_classes": []
+    },
+    {
+      "test": "test_actual_loader_fingerprints_the_same_literal_sources_it_reads[2019-20]",
+      "outcome": "failure",
+      "cause": "actual_old_loader_has_no_explicit_source_binding",
+      "exception_classes": []
+    },
+    {
+      "test": "test_canonical_axis_has_honest_unresolved_sentinel",
+      "outcome": "failure",
+      "cause": "old_canonical_declaration_lacks_axis_and_sentinel",
+      "exception_classes": [
+        "AssertionError"
+      ]
+    }
+  ],
+  "fixture_errors": 0,
+  "skips": 0,
+  "distinction": "Only the four explicitly classified row-loss controls are labelled row-loss proof; loader/declaration/signature/validation contracts are separate negatives."
+}

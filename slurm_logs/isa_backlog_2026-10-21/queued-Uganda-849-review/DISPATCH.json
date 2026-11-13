@@ -1,0 +1,10 @@
+{
+  "assigned": true,
+  "reviewer": "niger_lane",
+  "independent_verdict": null,
+  "candidate": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "actual_parent": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "original_brief_UNASSIGNED_superseded_by_this_explicit_dispatch": true,
+  "root_v1_receipt_schema_stop": "Literal author type is link, not assumed symlink; old root stop retained outside author, v2 passed all1858 without changing author receipts.",
+  "signed": "Sue"
+}

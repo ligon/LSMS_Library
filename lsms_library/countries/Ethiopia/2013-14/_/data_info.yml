@@ -67,14 +67,6 @@ cluster_features:
         - v
         - i
 
-panel_ids:
-    file:
-        - ../Data/sect_cover_ls_w2.dta
-    idxvars:
-        i: household_id2
-    myvars:
-        previous_i: household_id
-
 household_roster:
     file: sect1_hh_w2.dta
     idxvars:

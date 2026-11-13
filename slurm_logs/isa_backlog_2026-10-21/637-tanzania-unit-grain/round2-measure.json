@@ -1,0 +1,227 @@
+{
+ "plot_inputs_groups": {
+  "2019-20": {
+   "dup_groups_5key": 13,
+   "classes_5key": {
+    "same recorded unit (commensurable)": 12,
+    "Unknown + recorded unit": 1
+   },
+   "dup_groups_6key": 12,
+   "dup_6key_recorded_unit": 10,
+   "dup_6key_unknown": 2,
+   "dup_6key_unknown_with_>=2_quantities": 2,
+   "dup_6key_unknown_inputs_crops": [
+    [
+     [
+      "Seed",
+      "Vegetables (fresh)"
+     ],
+     2
+    ]
+   ],
+   "seed_unit_code_counts_where_label_missing": {
+    "5.0": 73,
+    "<NA>": 14
+   }
+  },
+  "2020-21": {
+   "dup_groups_5key": 101,
+   "classes_5key": {
+    "two recorded units": 6,
+    "same recorded unit (commensurable)": 91,
+    "Unknown + recorded unit": 4
+   },
+   "dup_groups_6key": 92,
+   "dup_6key_recorded_unit": 90,
+   "dup_6key_unknown": 2,
+   "dup_6key_unknown_with_>=2_quantities": 2,
+   "dup_6key_unknown_inputs_crops": [
+    [
+     [
+      "Seed",
+      "Pulses"
+     ],
+     1
+    ],
+    [
+     [
+      "Seed",
+      "Vegetables (fresh)"
+     ],
+     1
+    ]
+   ],
+   "seed_unit_code_counts_where_label_missing": {
+    "5.0": 302,
+    "<NA>": 15
+   }
+  }
+ },
+ "seed_kg_split_groups": [
+  {
+   "t": "2019-20",
+   "crop": "Yams/Cocoyams",
+   "base_served": "55 Kg",
+   "branch_served": "5 Kg + 50 Unknown",
+   "seed_kg_base": 55.0,
+   "seed_kg_branch": 5.0,
+   "delta": -50.0
+  },
+  {
+   "t": "2020-21",
+   "crop": "Pulses",
+   "base_served": "251 Kg",
+   "branch_served": "1 Kg + 250 Unknown",
+   "seed_kg_base": 253.0,
+   "seed_kg_branch": 3.0,
+   "delta": -250.0
+  },
+  {
+   "t": "2020-21",
+   "crop": "Pulses",
+   "base_served": "13 20l Bucket",
+   "branch_served": "1 20l Bucket + 12 Kg",
+   "seed_kg_base": 268.0,
+   "seed_kg_branch": 40.0,
+   "delta": -228.0
+  },
+  {
+   "t": "2020-21",
+   "crop": "Pulses",
+   "base_served": "6 20l Bucket",
+   "branch_served": "2 20l Bucket + 4 Kg",
+   "seed_kg_base": 130.0,
+   "seed_kg_branch": 54.0,
+   "delta": -76.0
+  },
+  {
+   "t": "2020-21",
+   "crop": "Pulses",
+   "base_served": "9 20l Bucket",
+   "branch_served": "8 20l Bucket + 1 Small Cup",
+   "seed_kg_base": 185.0,
+   "seed_kg_branch": 165.0,
+   "delta": -20.0
+  },
+  {
+   "t": "2020-21",
+   "crop": "Pulses",
+   "base_served": "3.5 Kg",
+   "branch_served": "1.5 Kg + 2 Unknown",
+   "seed_kg_base": 9.5,
+   "seed_kg_branch": 7.5,
+   "delta": -2.0
+  },
+  {
+   "t": "2020-21",
+   "crop": "Pulses",
+   "base_served": "14 Kg",
+   "branch_served": "12 Kg + 2 Large Cup",
+   "seed_kg_base": 87.0,
+   "seed_kg_branch": 85.0,
+   "delta": -2.0
+  },
+  {
+   "t": "2020-21",
+   "crop": "Pulses",
+   "base_served": "2 Kg",
+   "branch_served": "1 Kg + 1 Unknown",
+   "seed_kg_base": 14.5,
+   "seed_kg_branch": 13.5,
+   "delta": -1.0
+  },
+  {
+   "t": "2020-21",
+   "crop": "Pulses",
+   "base_served": "58 Kg",
+   "branch_served": "57 Kg + 1 Large Cup",
+   "seed_kg_base": 168.0,
+   "seed_kg_branch": 167.0,
+   "delta": -1.0
+  },
+  {
+   "t": "2020-21",
+   "crop": "Pulses",
+   "base_served": "2 Large Cup",
+   "branch_served": "1 Large Cup + 1 Unknown",
+   "seed_kg_base": 4.0,
+   "seed_kg_branch": 4.0,
+   "delta": 0.0
+  },
+  {
+   "t": "2020-21",
+   "crop": "Pulses",
+   "base_served": "2 Small Cup",
+   "branch_served": "1 Kg + 1 Small Cup",
+   "seed_kg_base": 3.0,
+   "seed_kg_branch": 4.0,
+   "delta": 1.0
+  }
+ ],
+ "seed_kg_summary": {
+  "groups": 11,
+  "plots_moved": 10,
+  "total_delta": -629.0,
+  "delta_where_base_served_bucket": -324.0,
+  "delta_where_base_served_kg": -306.0,
+  "delta_other": 1.0,
+  "positive_deltas": 1
+ },
+ "site_q": {
+  "base_full": 14,
+  "branch_full": 30,
+  "base_positive_only": 14,
+  "branch_positive_only": 14,
+  "base_positive_only_equals_base_full": true,
+  "branch_positive_only_equals_base_full": true,
+  "new_offenders": 16,
+  "dropped_offenders": 0,
+  "new_by_wave_j": {
+   "2019-20|Timber": 3,
+   "2020-21|Citrus Fruits": 1,
+   "2020-21|Coconuts": 1,
+   "2020-21|Timber": 10,
+   "2020-21|Ripe Bananas": 1
+  },
+  "new_survive_positive_only": 0,
+  "timber_kg_cell_2019-20": {
+   "rows_with_quantity": 117,
+   "zeros": 104,
+   "p90_all": 56.00000000000023,
+   "p90_positive": 34100.00000000002
+  },
+  "timber_kg_cell_2020-21": {
+   "rows_with_quantity": 346,
+   "zeros": 309,
+   "p90_all": 17.0,
+   "p90_positive": 23087.999999999985
+  }
+ },
+ "recorded_zero_quantities": {
+  "2019-20|AG_SEC_4A": {
+   "q0_harvested_yes": 2,
+   "q0_other": 0
+  },
+  "2019-20|AG_SEC_6A": {
+   "q0_harvested_yes": 0,
+   "q0_other": 0
+  },
+  "2019-20|AG_SEC_6B": {
+   "q0_harvested_yes": 1,
+   "q0_other": 0
+  },
+  "2020-21|ag_sec_4a": {
+   "q0_harvested_yes": 0,
+   "q0_other": 0
+  },
+  "2020-21|ag_sec_6a": {
+   "q0_harvested_yes": 2,
+   "q0_other": 0
+  },
+  "2020-21|ag_sec_6b": {
+   "q0_harvested_yes": 1,
+   "q0_other": 0
+  }
+ },
+ "recorded_zero_quantities_total_yes": 6
+}

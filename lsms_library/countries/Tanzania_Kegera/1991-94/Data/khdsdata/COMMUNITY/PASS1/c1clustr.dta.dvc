@@ -1,0 +1,5 @@
+outs:
+- md5: a70fa1acd2a3e8ff075e2af0dd13e4e5
+  size: 3802
+  hash: md5
+  path: c1clustr.dta

@@ -1,0 +1,17 @@
+{
+  "base": "c08abb3f1dd03fd211d5071b45369dcbae42857f",
+  "runtime_module_sha256": "33b3f4d1e009825016c2e446bbb964683dfa4fc3b02ef39ad3c857b6fc7914a4",
+  "input_sha256": {
+    "lsms_library/countries/Malawi/_/malawi.py": "33b3f4d1e009825016c2e446bbb964683dfa4fc3b02ef39ad3c857b6fc7914a4",
+    "lsms_library/countries/Malawi/_/data_scheme.yml": "f3b8c56e608b0eaeec957ac4c096617eef21e5ebb01ac08567f677ddd8a14ca9",
+    "lsms_library/countries/Malawi/2016-17/_/plot_inputs.py": "b59d75422c677e97929e33adda56ff4373a0788e2ce022e83bdd6e427f5a066d",
+    "tests/test_1109_malawi_input_quantity.py": "b324c184797f702f4f6820fc107fbf68b0d597951390b7a798f6480a8754d0e6"
+  },
+  "image_python": "/local/job40255479/venv_img/bin/python",
+  "checkout": "/local/job40255479/worktrees/isa-Malawi",
+  "data_root": "/local/job40255479/control/isa-backlog-20261021/Malawi/source-amendment/final-seeded",
+  "L1_sources": 28,
+  "private_cold_build": true,
+  "shared_cache_edits": false,
+  "acquisition": false
+}

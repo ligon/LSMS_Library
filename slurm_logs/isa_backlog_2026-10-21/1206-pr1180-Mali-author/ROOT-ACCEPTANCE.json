@@ -1,0 +1,21 @@
+{
+  "full_strict_cold_warm_pairs": 2,
+  "qualified_obs3_views": 2,
+  "strict_findings_preserved": 2,
+  "author_only_scope": true,
+  "historical_exact_candidate_HEAD_not_established": true,
+  "status": "ROOT_ACCEPTED_BOUNDED_SAVED_EVIDENCE_WITH_EXPLICIT_QUALIFICATIONS",
+  "READY_sha256": "666e9cf6e1c9dbf185f99d5133475dd2a7347b555caa5e84b2c3d10244206bb3",
+  "manifest_sha256": "728d804c6a2a543c24d0a2692e7ddc4b590a2b542786186e8399032e74512fad",
+  "manifest_entries": 55,
+  "physical_products": 4,
+  "source_records": 5,
+  "overlapping_locator_sites_not_pair_counts": 137,
+  "all_original_unsaved_and_authority_gaps_preserved": true,
+  "old_failures_and_initial_locator_corrections_preserved": true,
+  "root_read_preparation_checker_and_characterization_sources": true,
+  "root_metadata_only_no_payload_API_source_test_replay": true,
+  "no_unexplained_numeric_mismatch_established": true,
+  "no_all_campaign_verdict": true,
+  "signed": "Sue"
+}

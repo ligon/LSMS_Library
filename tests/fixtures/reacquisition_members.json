@@ -1,0 +1,736 @@
+{
+  "scope": "Held-sidecar-derived member basename fixture with synthetic payloads; not an original zip replay or actual release comparison. Archive directory choices in tests are synthetic.",
+  "source_commit": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "cases": {
+    "Nigeria": {
+      "wave": "2023-24",
+      "held": [
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta11c2_harvestw5.dta",
+          "sidecar_sha256": "042591a20c3ff865c7e54162dc9ee02a3866a2ef65861d693dc12a26a56f97be"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta11c3_harvestw5.dta",
+          "sidecar_sha256": "20b8e4c3cdac8adf50f8bd6c54f0e0ed18aff93de8577fd5b6fddd12f8a15adb"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta11c3q12_harvestw5.dta",
+          "sidecar_sha256": "cb4d1ae1485d263bbb657e321c4bdfccfcc5286db1285467f5ca5bd962cf6ae5"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta12_harvestw5.dta",
+          "sidecar_sha256": "434c17544a8de7be39ea05c640888297daf75ba52a7ab4a70c83e22c655a402f"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta1_harvestw5.dta",
+          "sidecar_sha256": "d024a6d87b547925143aa033a30046a4a908a5be1dd843ca0329ee5b37faa0d6"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta2a_harvestw5.dta",
+          "sidecar_sha256": "e0ac5d07c4b97c85868bfb5a127ec4d83474df4bef9fa03b042c255a7eefea75"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta2b_harvestw5.dta",
+          "sidecar_sha256": "3ab7fd495e6bca7ce1b0d1417629a2c58ce5253e492dcf1288ab25a70e56aaa1"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta3i_harvestw5.dta",
+          "sidecar_sha256": "8e4419577c4f80c8ab960a29248a2919196cec1a167562d02a6d8f852c60522f"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta3ii_harvestw5.dta",
+          "sidecar_sha256": "9686a873a8556d1786bb0c54d6d2a70345993b3335cbab3a65b5107391fa108d"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta3iii_harvestw5.dta",
+          "sidecar_sha256": "cb97413758aae13698668b76cb2400c4651b86934fa873023b536d9d268da1d4"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta4_harvestw5.dta",
+          "sidecar_sha256": "bd66fbf4fbdc92dd98d95776a4e5d67efd1b0be1d29e46ec50216c13c9201e86"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/secta5b_harvestw5.dta",
+          "sidecar_sha256": "b0d999b3088774231fa4e79c4b96cb8327b8635d7fb1ef9d396ca82fa681f9bf"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/sectaa_harvestw5.dta",
+          "sidecar_sha256": "fa6d534dc83a4353fb15c95bfb440d07c5e8d59fb94ccf0cfb839903a6b15a04"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/sectaphl1_harvestw5.dta",
+          "sidecar_sha256": "a9a1c7a5876c190fdd9a9577c8342aacf392dd67d13e8d0f9869b0bee7cbe2fb"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Agriculture/sectaphl2_harvestw5.dta",
+          "sidecar_sha256": "07c32a8a8095adedd8a5d69a60733e69647ef1f6a4291dbddc8d5e0c16202673"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Community/sectc1_harvestw5.dta",
+          "sidecar_sha256": "88023a9bdcb6a4baac98af0582734f1d0cdbb8b4d3dc731d6272a1cf5503b624"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Community/sectc2a_harvestw5.dta",
+          "sidecar_sha256": "1c83bd47496e168a1c115bc45f824d93cff7529eca8f0641459a31e2c9bfaca0"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Community/sectc2b_harvestw5.dta",
+          "sidecar_sha256": "b3976a2cac8a4147ae7bca3304a85e6a1f4077593600638425214f8fc130359a"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Community/sectc3_harvestw5.dta",
+          "sidecar_sha256": "95df1994e5456006c5572017d99f68cba3569bf7b8514d6b5fcddc689511b2f3"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Community/sectc4_harvestw5.dta",
+          "sidecar_sha256": "5c06e10a001d081cc2caec6ea26a3f2057b22f15e9771207a16dd04a8b0e9251"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Community/sectc5_harvestw5.dta",
+          "sidecar_sha256": "9609b79719be663434f022a369a49dccf38d7c457620eb471a6266fcbda93f1b"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Community/sectc6_harvestw5.dta",
+          "sidecar_sha256": "9f6dffec9492f4aec5d52a9dedd83c3caad0cf4c4c89f2eb05a047e4ff3b94ff"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Community/sectc6b_harvestw5.dta",
+          "sidecar_sha256": "0549ffa54ffd89eecabd60a18ca2a9e7974a56f7942559698d0dc193b52aa3e3"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Community/sectc8_harvestw5.dta",
+          "sidecar_sha256": "26657f66ea35fd685cc21664c0af1406d4c31225276f8a2e705e08dfc1604238"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Community/sectc_harvestw5.dta",
+          "sidecar_sha256": "bfeb297fb36bd5ab17336ac049be0ae9c26e2f66543355c269208bc241aa6429"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect10_harvestw5.dta",
+          "sidecar_sha256": "6f938a63f766d336a092d429a8dd5526dd6b16f5b82eadf315fe3e2b43c9ad91"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect11a_harvestw5.dta",
+          "sidecar_sha256": "fc2fb0995a851fa9b52c9b0585ad0495ff850f5530529924086e0c3838f4e066"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect11b_harvestw5.dta",
+          "sidecar_sha256": "0dfe0bd10eda7e47307fe74779d6c528c69ea67a9c7498fbad445bf33b8bd571"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect12_harvestw5.dta",
+          "sidecar_sha256": "c78421f1a6362a4350bc47a106f2dfec003237562957079e6a710fde0a8578da"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect1_harvestw5.dta",
+          "sidecar_sha256": "4fed9ff6defd4508d583188b6374f4e735996592bf73ba1c705bdd07a718ca9f"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect2_harvestw5.dta",
+          "sidecar_sha256": "dcc0291f0a59a7f5c1764e88235d6649d1bc13af3a6c8671c7a597142eb0d9cf"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect2b_harvestw5.dta",
+          "sidecar_sha256": "e1c72fd5e15dfe86e4e2135ab8bf9adace733c74bf030b55150027f984723711"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect2c_harvestw5.dta",
+          "sidecar_sha256": "99ca284f4045ea5b46a3a558a50992f29e8c7c9d83e91b18a4780379ad22c157"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect3a_harvestw5.dta",
+          "sidecar_sha256": "fd449e3e1a3ed3e0479963c1d651f843c668636c7594c6db14ad7a679b55f2f4"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect3b_harvestw5.dta",
+          "sidecar_sha256": "48af184b34732b8acc45b6c82801d3b2eaca6dc46255b2d687167798fc147673"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect3c_harvestw5.dta",
+          "sidecar_sha256": "576950d388ae325702a5cd3e7d112c4985dc2da21e4ed2dd3b8d100031c6a25a"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect3d_harvestw5.dta",
+          "sidecar_sha256": "a13e4a2e5f02852c8fe17474ba8d8ff910ab87c05e7c25b061e85149e3485903"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect4a_harvestw5.dta",
+          "sidecar_sha256": "f7aaa17eabed9b413b008f2aec198b1eb3841f31b0b9f0a1ce944354fb4740a9"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect4b_harvestw5.dta",
+          "sidecar_sha256": "9059230c70ec0ba37d837edc4e2442b45528207f8008955e817ccb93fda3b482"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect5a_harvestw5.dta",
+          "sidecar_sha256": "69f894f3eef02dbc74079a474bae93973fa2887ab8fdaa8bcb403062aef48fc1"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect5b_harvestw5.dta",
+          "sidecar_sha256": "003380d5e8251af9ac54efc369453a74eec8be8f8b4bf8d20dbadc596a5c6f39"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect5c_harvestw5.dta",
+          "sidecar_sha256": "6120a24adab8c9079178cd1b5ae712da9ec59540acecc359d45e934e138335cb"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect6a_harvestw5.dta",
+          "sidecar_sha256": "57cc2d652e594fa16bfcaf57f87d6d12fc8a29fbb107c341b608a9ae6700bc4e"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect6b_harvestw5.dta",
+          "sidecar_sha256": "c7bc16bb0001ecf8d1823155b5ca7b9eb3fe7a10effb7ae017cf892f35edea02"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect6c_harvestw5.dta",
+          "sidecar_sha256": "766f27393a17067be5c295608477848cd09c23cf1f138325fa1c3d5f1dc6cb98"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect7_harvestw5.dta",
+          "sidecar_sha256": "58638cc5194beb6415424c5c34b098fcbeeb4fbddba70fa17a50871a634661ae"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect8a_harvestw5.dta",
+          "sidecar_sha256": "f0265fa073a99e93e5a28d66e3d72ebc27ba6238cbd7af7f19153a4c56359333"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect8b_harvestw5.dta",
+          "sidecar_sha256": "bdc32cb074f38e706d2cb75dcd2e6d446b578cb9b237c79a253c61a49c581f61"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect8c_harvestw5.dta",
+          "sidecar_sha256": "e486406a681b35838325a9ad6b8a2098b8ca7f0344ec67246dbc325f1a0c072f"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect8d_harvestw5.dta",
+          "sidecar_sha256": "4c8773e5cac1428827229522433461aaebd551f0a2b63108e641b2c50a44b94a"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/sect9_harvestw5.dta",
+          "sidecar_sha256": "ad618f73707c6d48e0c9a19fa38db5fdd18d3f79bb1d89a4bbeece12e3e11868"
+        },
+        {
+          "held_path": "Post Harvest Wave 5/Household/secta_harvestw5.dta",
+          "sidecar_sha256": "63b7152b2cebebb0960b2a66c63afd6bc01596f64083631e7bb49c713426267c"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11a1_plantingw5.dta",
+          "sidecar_sha256": "1d3c4a8bf984b49c6398dc3da41232655c35d34ae8d0c0b18d4a37d3823cb398"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11a_plantingw5.dta",
+          "sidecar_sha256": "a293f2e1531cc0b51b9d1d66c35fa0c9074e6b2664ed5ddec88af7d682967f33"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11b1_plantingw5.dta",
+          "sidecar_sha256": "57c6e784c500a841ed48cab9b5c703e7cff3ab5d1278df5a0cb1124472cea413"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11c1_plantingw5.dta",
+          "sidecar_sha256": "419b84f454aced84df2c2c09fa8ba53cc60faaa66fd245a4179ea4b7288bde49"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11c1a_plantingw5.dta",
+          "sidecar_sha256": "7a8c0a128253505be2651c74d52274724c9ed6f0152b8688fd13471f872d19d4"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11c1b_plantingw5.dta",
+          "sidecar_sha256": "5ab986522f7b4ed6c87ad4f7ce053bd75ad5681e23851016478632379aba6299"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11e1_plantingw5.dta",
+          "sidecar_sha256": "7a2395e3a4af024ac1814fe4e208ac8c316b7f2a99ba72248dab423f2f66f0f5"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11e2_plantingw5.dta",
+          "sidecar_sha256": "517e5bde8a0fbe86d38dc5fe7c05b8a12658a7db42f6d0d7501b18b4cca89a59"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11f_plantingw5.dta",
+          "sidecar_sha256": "b3384a10f4a4cb32020cb392ec8a9087bab6ed5ba83b29b2bac189690d256643"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11i_plantingw5.dta",
+          "sidecar_sha256": "cd95558e41f4bea402c3a8ba63d5209e5eaf0fbbd0cb9cd7c33560bb54bf2a86"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11j_plantingw5.dta",
+          "sidecar_sha256": "a9779e9a3f0cb932f2cc8aee18096cc486b6cbfe96f53e87948725df2cc656a3"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11k1_plantingw5.dta",
+          "sidecar_sha256": "1ab017f1a11e62ce395347da9a4f98b6c58501d707876929c9247de253550539"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11k2_plantingw5.dta",
+          "sidecar_sha256": "f48d87c693731b7b305f470269665332c0ca53b64259ce8b12fabc5dea0ca24c"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11k3_plantingw5.dta",
+          "sidecar_sha256": "56744b968f96fd659d3c6955c0595e6432f1bffb1475ee71c09dd4bde105dc3d"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11l1_plantingw5.dta",
+          "sidecar_sha256": "825f5d8991e41f0868efd9b2900c791d475a97f1e72d1fea40d711b3f331d2e4"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect11l2_plantingw5.dta",
+          "sidecar_sha256": "21295722118bc594c042ec97afc467b63dd8df9e26d09437d6218c9d12b867d1"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Agriculture/sect12_plantingw5.dta",
+          "sidecar_sha256": "21c3ca26deefa92313793c8250e26dc81b20d4d2d03865a301fd5d86d188c9f0"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc1_plantingw5.dta",
+          "sidecar_sha256": "1957eb58ddd650675ad4dcc248d22490f4938861cd9be148ce230e5627cec2ec"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc2_plantingw5.dta",
+          "sidecar_sha256": "8b65f3d5b6bac5aa51ef48dba86f2b66834c4913c929681e67eb9cc30e644f91"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc3a_plantingw5.dta",
+          "sidecar_sha256": "0e8ea5db9d63be45f3fdf4e42a4bcf7fd3e566f553c8e8cd04c6b2fee79d14b6"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc3b_plantingw5.dta",
+          "sidecar_sha256": "d50bbeca0cce017a387eb1259ac1a404b428041cb74aaba7001204e2da9ec894"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc4a_plantingw5.dta",
+          "sidecar_sha256": "a133f780a59d9a2913d1c374c7daada6e28bace5ce07421440b72d2fe2b91300"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc4b_plantingw5.dta",
+          "sidecar_sha256": "5ffdd3b1953d34a64965bcf25099628c504533bebe80b679faa206ea916dcd11"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc4c_plantingw5.dta",
+          "sidecar_sha256": "2398c5bcef8ce9e38dba25ab3982e98b925392ef5659b34d755b15c643b6e4bb"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc5_plantingw5.dta",
+          "sidecar_sha256": "40ccfed3540f10f42b69dbcf539298f157a8105b3168edb4964998cee8ff710e"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc6_plantingw5.dta",
+          "sidecar_sha256": "882e84c2361de29f222d816a25a24023ac004fc9d34014c4a84c9ebaf9cdb59e"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc7_plantingw5.dta",
+          "sidecar_sha256": "e429aa5efb6769bd104d14bd4ba0f30993291ff09f4c9b4719f9c731a36360de"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Community/sectc_plantingw5.dta",
+          "sidecar_sha256": "e94046c99200bda57218651b35024aaed3f1bfb0fa7bdf4d622f1149bbb37702"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect10_plantingw5.dta",
+          "sidecar_sha256": "9b3b44add56619e5f7e15cca7601d4b25fb674fd6ed042d7eb8ffed409535a12"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect11_plantingw5.dta",
+          "sidecar_sha256": "4284ac9d77faf0511b12c70b375fa73073bc24b9d08654d71b0b1f9d761fe74e"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect1_plantingw5.dta",
+          "sidecar_sha256": "bd25d0cedba55d2146a9f860a4820e780fe9487428920ac3b6c099f6e53c3350"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect1a_plantingw5.dta",
+          "sidecar_sha256": "db63db0b491ec4bb3358433d550f908cc365981a0b5ee0e74df4d77af95dd5cf"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect1b_plantingw5.dta",
+          "sidecar_sha256": "c16389da74a9dc8bf3afe3a776c3c98af8609bb1a0e05fbbd9d5dd97acbfc70e"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect1c_plantingw5.dta",
+          "sidecar_sha256": "9d76d7c86b79223dbfe383a9d55da1e773a39c54d085bdadcb6a55e4da42bcfb"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect1ca_plantingw5.dta",
+          "sidecar_sha256": "44de508d4141dc14c3623e36ac5d2f37aed1f127a4b422237608215021aa18c1"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect1d_plantingw5.dta",
+          "sidecar_sha256": "b0e763748e4e77004efd53dd6d6a697c963bc747c3a084b86d4e7ef7e822bb89"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect1e_plantingw5.dta",
+          "sidecar_sha256": "b7658bb9cbc751eeec4d19efc7c60eb05bc3d428c55d26aefe3a6d955203fedf"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect3_plantingw5.dta",
+          "sidecar_sha256": "35e52f8f2d44cf01b66633b849b6fcccc1e4f1668b968028122255efbe4a4a49"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect4a_plantingw5.dta",
+          "sidecar_sha256": "e89944a581e534e72dcab082988ca5187287078ebdbe5e60c555b98851f0fde7"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect4b_plantingw5.dta",
+          "sidecar_sha256": "03bf6ef585716fd3885ae13358aa0fa617d8901d98ae5ae20c704f2f5af9d8b7"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect5a1_plantingw5.dta",
+          "sidecar_sha256": "1038be276f2d5f72c2237dd48a307c756d02569c08852db7576013ca5feabeb7"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect5a2_plantingw5.dta",
+          "sidecar_sha256": "eeb6d2e2f65a033dbbc511f52f62595561249b191175a95e9671ac50a88332e7"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect5b_plantingw5.dta",
+          "sidecar_sha256": "6fe2be5d59e919ef36f4d54f37a089b507cf14cb6ea893089447e3e1e78d4d75"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect5c1_plantingw5.dta",
+          "sidecar_sha256": "d32d3254c097da8e0837874c5d23e883c86d8209be29fe2234dab2709c9654dc"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect5c2_plantingw5.dta",
+          "sidecar_sha256": "1139dbc9e466c560d9ccab8db187b7daddcaf5f437539261993b88cb452c2274"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect6a_plantingw5.dta",
+          "sidecar_sha256": "f2cee8e2a3a4bb54b5e85367a95957de5865f41886df5014f69cad6002293528"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect6b_plantingw5.dta",
+          "sidecar_sha256": "223a890a668f67985dabc772416361dc6b973889e52e1d248c75bc9a19eef643"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect6c_plantingw5.dta",
+          "sidecar_sha256": "b163aba0c40fbe00ef9ea04d85aa242f9e8f87dec6b9f5c8a0278f70db44cc3f"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect7a_plantingw5.dta",
+          "sidecar_sha256": "beaa0d7f174a108821dbc72b20dc2b9b9ccede13383434cb10a621d1c1b95f75"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect7b_plantingw5.dta",
+          "sidecar_sha256": "4317bc4b7c79543f6a3c33d2fd872611a48e0685cfdd297c8794bf074e2b867d"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect7c_plantingw5.dta",
+          "sidecar_sha256": "d093803751c0012b8ee5417f30d506018cd49e69847c15a6421c52d0a2fcca62"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect8_plantingw5.dta",
+          "sidecar_sha256": "239049a63b6defbca0b02e673f47b8ff1b501961766bfa5ee034c50f67f1e853"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/sect9_plantingw5.dta",
+          "sidecar_sha256": "a370c99b54b39aeb3ccc2b2f4b24d40065618f04fc92d7602381ea965f75b65e"
+        },
+        {
+          "held_path": "Post Planting Wave 5/Household/secta_plantingw5.dta",
+          "sidecar_sha256": "6743eab52e8712382c930552a8206e13f918fa9880d691e7ffe6805643c68fbd"
+        }
+      ],
+      "evidence": [
+        "https://github.com/ligon/LSMS_Library/issues/1149",
+        "https://github.com/ligon/LSMS_Library/issues/978"
+      ],
+      "revised": [
+        "sect2b_harvestw5.dta",
+        "sect3d_harvestw5.dta"
+      ],
+      "removed": [],
+      "new": [
+        "NGA_HouseholdGeovariables_Y5.dta",
+        "totcons_final.dta"
+      ]
+    },
+    "Ethiopia": {
+      "wave": "2021-22",
+      "held": [
+        {
+          "held_path": "cons_agg_w5.dta",
+          "sidecar_sha256": "3f17e7c0de85a617c366b8e22073257e0893233c04afdb7e0334090efa17bba1"
+        },
+        {
+          "held_path": "crop_cf_wave5.dta",
+          "sidecar_sha256": "2adaf7fac9570fa216251b1e623c626d20e8b2e014b1d35547174bd0881b13a9"
+        },
+        {
+          "held_path": "eth_householdgeovariables_y5.dta",
+          "sidecar_sha256": "05a5e47b53b2f4b8ce115fe8dca8498c18e0e2925d73c18c02fcf7d3045a7de6"
+        },
+        {
+          "held_path": "eth_plotgeovariables_y5.dta",
+          "sidecar_sha256": "17a056607af23cca905382f75f06212581526fe6e5aaf38ffcfb74c6bc3d1a66"
+        },
+        {
+          "held_path": "food_cf_wave5.dta",
+          "sidecar_sha256": "f1a16d7c4e04e821988fb056698d88c9c73b5084bcedb8797a2875cb01ce5b31"
+        },
+        {
+          "held_path": "sect01a_com_w5.dta",
+          "sidecar_sha256": "6c8c8b39d09704e0e568acaab30ec5b8f6448e38c7f660816c9df96ce398e5eb"
+        },
+        {
+          "held_path": "sect01b_com_w5.dta",
+          "sidecar_sha256": "af9777169f0c04e3d5667280a963a2eee6bd09d07438214c7db1186b68cca3da"
+        },
+        {
+          "held_path": "sect02_com_w5.dta",
+          "sidecar_sha256": "154a5dc998de7c62e059ae3edc76385d23d8f377a52323adc7338cb7c834e0dc"
+        },
+        {
+          "held_path": "sect03_com_w5.dta",
+          "sidecar_sha256": "358e5c2d36bef5df9f300f7121399e2a1d9da7a0e694866f1416574ed4e7ff56"
+        },
+        {
+          "held_path": "sect04_com_w5.dta",
+          "sidecar_sha256": "061693ceaf122725528c32db7fc9153d5a96500ebbc6b3a104ef144a3ec92f79"
+        },
+        {
+          "held_path": "sect05_com_w5.dta",
+          "sidecar_sha256": "471c99b3d076d1fef736529283407e093e5b65b2e10c2d32f7fe1ac2b6bf823d"
+        },
+        {
+          "held_path": "sect06_com_w5.dta",
+          "sidecar_sha256": "556a0e26ff8b46bd1d57ef50f6f38df74996213164d4cba9211f5f4f5896f5d5"
+        },
+        {
+          "held_path": "sect07_com_w5.dta",
+          "sidecar_sha256": "8ddfc3b5f5eae9ce3a5f0a339ef68606cdb6a09821af8be9d01ca9e260cbd32f"
+        },
+        {
+          "held_path": "sect08_com_w5.dta",
+          "sidecar_sha256": "6f2b7360b5f0ee9df1f0b3512d0a7f9369f3a84a4b87bd2db1b19ac82c480161"
+        },
+        {
+          "held_path": "sect09_com_w5.dta",
+          "sidecar_sha256": "b3ccd3f3cc7d66229ba9e65574787008d54cacb9c933befc26de29fc9ee84998"
+        },
+        {
+          "held_path": "sect10_ph_w5.dta",
+          "sidecar_sha256": "f038c2ce7e3df50da4ede52f21a18c33c295b19b04c7f1907d11f7e5041e3490"
+        },
+        {
+          "held_path": "sect10a_com_w5.dta",
+          "sidecar_sha256": "e76a833efe6b30740703c16e8fb677d4ce7dc5deb7a7b1c934d15c179b9afd51"
+        },
+        {
+          "held_path": "sect10a_hh_w5.dta",
+          "sidecar_sha256": "17a428e54111e7d41a1ffc2adebabb061b8a22b99e18f48953409cf7b316621c"
+        },
+        {
+          "held_path": "sect10b_com_w5.dta",
+          "sidecar_sha256": "3cc1240a2fd9fc6eb60e29a4745b9cb90eb2dad84f5079dcdb6f5301f2a17d69"
+        },
+        {
+          "held_path": "sect11_com_w5.dta",
+          "sidecar_sha256": "4def5f0514bcbaee620e2d408f760657456c2c49f01391558fb639c3d23fedcd"
+        },
+        {
+          "held_path": "sect11_hh_w5.dta",
+          "sidecar_sha256": "3d33a44bc3fc321bf06f1f3eca5df71612eeca629b3722287dd531ad7a8e93a1"
+        },
+        {
+          "held_path": "sect11_ph_w5.dta",
+          "sidecar_sha256": "457ed537516692bc51d76cc91687d68982c7471994ebb82e481a98b316df073a"
+        },
+        {
+          "held_path": "sect12_com_w5.dta",
+          "sidecar_sha256": "cefc9d719ba2b039ad280d023b11901eb9bf523fe5d90c19bb4d582937ece160"
+        },
+        {
+          "held_path": "sect12a_hh_w5.dta",
+          "sidecar_sha256": "e4026b0779e98c3b0973ce51823f3dcca7562b13ed6b550eca2478d7ee7327a8"
+        },
+        {
+          "held_path": "sect12b1_hh_w5.dta",
+          "sidecar_sha256": "1d7c786da9b3a61ff73beec6766011d46a18d14dc00a18789a43a1ef2b4bdb75"
+        },
+        {
+          "held_path": "sect12b2_hh_w5.dta",
+          "sidecar_sha256": "b6f6fe812ee6b10c22c1e96375c913aa6239de18e7dcc2bd7dd2f9c573d54ae9"
+        },
+        {
+          "held_path": "sect12c_hh_w5.dta",
+          "sidecar_sha256": "210d565eb6efab7070dbcd6379499fe0ef76069473c4e5ad556999b25e16b4d8"
+        },
+        {
+          "held_path": "sect12c_q1_hh_w5.dta",
+          "sidecar_sha256": "9bb2fd595fa4b5da02c5d1ece57791e4cb2428dfe40dca8ece4d654cc59ea931"
+        },
+        {
+          "held_path": "sect12d_hh_w5.dta",
+          "sidecar_sha256": "3e71d397a5e7acc9fffd1c92b7f2322236ce88b6805e9771f7148bfef23c7573"
+        },
+        {
+          "held_path": "sect12e_hh_w5.dta",
+          "sidecar_sha256": "159d5fc8efe9c85f78733d1c441bf5f34d57da98d7f9dabb952fc1559ab426c0"
+        },
+        {
+          "held_path": "sect12f_hh_w5.dta",
+          "sidecar_sha256": "90afd5ef73315bbf6b468ddba799b389dd0999e3aa7983e48ab742e72fbc9041"
+        },
+        {
+          "held_path": "sect13_hh_w5.dta",
+          "sidecar_sha256": "20ea2adbbf0adc0728cd5b4a0a41b2fb8309d9bf70f210181bfeb7ca397a7f16"
+        },
+        {
+          "held_path": "sect14_hh_w5.dta",
+          "sidecar_sha256": "6671413d24b5b4bbd72cea6a666af4d8231d20cfb1542ce6da917c2b84937118"
+        },
+        {
+          "held_path": "sect15a_hh_w5.dta",
+          "sidecar_sha256": "01b150297ea7c17230b898d5a5c700e6ec9259c179929c484f81f9ec0797f2fa"
+        },
+        {
+          "held_path": "sect15b_hh_w5.dta",
+          "sidecar_sha256": "43a16d4fbc332fc64422bb409cbe57ab18decc493c2fa369149a4f7932a0e365"
+        },
+        {
+          "held_path": "sect1_hh_w5.dta",
+          "sidecar_sha256": "8fecae8758fb4eee021494c0d8075a78db6c1f9259a882d44010232f5c31b7c7"
+        },
+        {
+          "held_path": "sect1_ph_w5.dta",
+          "sidecar_sha256": "9843dd82939f506b7913aa0bcee2d9dfd4b8c11e0a56b76aa9de8f08e03690f8"
+        },
+        {
+          "held_path": "sect1_pp_w5.dta",
+          "sidecar_sha256": "0205fd9edf086d3be493ba0a4e9dd507593945006bbfb9f319171b9347d6529e"
+        },
+        {
+          "held_path": "sect2_hh_w5.dta",
+          "sidecar_sha256": "88fdb42fd7f3e6fa86b7cd020759649fd28f6b802ff14f7b68df04937da9ad52"
+        },
+        {
+          "held_path": "sect2_pp_w5.dta",
+          "sidecar_sha256": "0fdd56c9522a87fffdd61715e801c0f4883f926f636b696f73d8f7dc88337ccc"
+        },
+        {
+          "held_path": "sect3_hh_w5.dta",
+          "sidecar_sha256": "5d0a6292f05859e0a6c19d2fa242170415bcbfe59020a692cc286e79ec4d91a3"
+        },
+        {
+          "held_path": "sect3_pp_w5.dta",
+          "sidecar_sha256": "58f1ddaecd6d09a916fb25b79fa06371315de18bb8a3875431c75bd60d9309ec"
+        },
+        {
+          "held_path": "sect3b_hh_w5.dta",
+          "sidecar_sha256": "1a4b75d5253748760f6f64cdce044fc19ec8738af69d6a9c4ee01b2a221b349d"
+        },
+        {
+          "held_path": "sect4_hh_w5.dta",
+          "sidecar_sha256": "147f975b6bc9556905a79e9940545d80f95b0e493b83e222f5018868da115f57"
+        },
+        {
+          "held_path": "sect4_pp_w5.dta",
+          "sidecar_sha256": "c1fad8a73f81514f4e0f90e7c5ff023a23660b6be84cb040d988b6441db46254"
+        },
+        {
+          "held_path": "sect5_pp_w5.dta",
+          "sidecar_sha256": "b16a4c2ab42661dd082c0d168f6db270b6108a5fe5e51fd8ef71c37b7af436c9"
+        },
+        {
+          "held_path": "sect5a_hh_w5.dta",
+          "sidecar_sha256": "90cd5f24d0efa2ba9e71a5a6a91fd2527f1c4dea92e0503ff81515feaac39e1b"
+        },
+        {
+          "held_path": "sect5b_hh_w5.dta",
+          "sidecar_sha256": "992712ff7f253a7c9e69dd60f28d0f71ac59956f339ab3aeff1fc194c598a0c3"
+        },
+        {
+          "held_path": "sect6a_hh_w5.dta",
+          "sidecar_sha256": "0ca24f3f535d99c9179a9df5bd2df8fa41e8cd9d77f681485696bd24088abe57"
+        },
+        {
+          "held_path": "sect6b2_hh_w5.dta",
+          "sidecar_sha256": "07034e06f0495cec986985ace98d1d0877b89d7a92b2088e1c687b4d88a8bcc5"
+        },
+        {
+          "held_path": "sect6b3_hh_w5.dta",
+          "sidecar_sha256": "1f668ef4859a6cb43b4490858cc97b287653f3b82bf644a5969ad9a667be1285"
+        },
+        {
+          "held_path": "sect6b4_hh_w5.dta",
+          "sidecar_sha256": "ace60aae3bfdd581dd286c444f7655a058c2613526c12dffbec1730bba6fc525"
+        },
+        {
+          "held_path": "sect6c_hh_w5.dta",
+          "sidecar_sha256": "08ee8854c236f7b22092732b50164f1bb4dde17517e25c1ffafc35fc52cb2d33"
+        },
+        {
+          "held_path": "sect7_pp_w5.dta",
+          "sidecar_sha256": "658ed5887ec19d26f2d7c1709ddc2e2b75f5814ccc53bfac30994d8b07ab67e7"
+        },
+        {
+          "held_path": "sect7a_hh_w5.dta",
+          "sidecar_sha256": "895d8d95627ed5673567364589868ffd511a4dfb94c041cb75a389f838f8fb23"
+        },
+        {
+          "held_path": "sect7b_hh_w5.dta",
+          "sidecar_sha256": "1282ffc3e2917e724047bee0330b64ae46e8be1bc51a24fe48e2de6f65e23e8b"
+        },
+        {
+          "held_path": "sect8_1_ls_w5.dta",
+          "sidecar_sha256": "5dd1d28f2a663ea727f6ab3f83fe6aff34bee6427eca44d0e9187c127e03ea20"
+        },
+        {
+          "held_path": "sect8_2_ls_w5.dta",
+          "sidecar_sha256": "f76c5877c49fe5daf059144c30a7244fe8402b2c7be484468c9033668a7ad671"
+        },
+        {
+          "held_path": "sect8_3_ls_w5.dta",
+          "sidecar_sha256": "dad699c5221e9af8ad9196427e3ac39f79927e236a3d4f1f4e7b1c30067be658"
+        },
+        {
+          "held_path": "sect8_4_ls_w5.dta",
+          "sidecar_sha256": "00d1e791b93b816b1f3ab47ec2111d41f0fe9f78d08b27012a8da3c8861800d0"
+        },
+        {
+          "held_path": "sect8_hh_w5.dta",
+          "sidecar_sha256": "23068b69e5f34b52c796ace3148721dfe4f4eae235a86edb7f48b7a574caf7cf"
+        },
+        {
+          "held_path": "sect9_hh_w5.dta",
+          "sidecar_sha256": "3311932dc32776f822d0f54487d80f762549484da2ea975c0cc06e24dce12fab"
+        },
+        {
+          "held_path": "sect9_ph_w5.dta",
+          "sidecar_sha256": "369180b4c27fe99247f2a071db69b1a918905f535f18fb335270f67304d51c74"
+        },
+        {
+          "held_path": "sect9a_pp_w5.dta",
+          "sidecar_sha256": "2c36a7237c0b1ada407d85dc20a62b7c9e590a36bd9f059ee7fb3bcdff1b5673"
+        },
+        {
+          "held_path": "sect_cover_hh_w5.dta",
+          "sidecar_sha256": "670f35f64a734be3f4c263bf00d2589ac8994abd5670951be1b24759a28266f4"
+        },
+        {
+          "held_path": "sect_cover_ls_w5.dta",
+          "sidecar_sha256": "b1328bac1162dcfcf8760f546128ac1ff7b91801ead4eb851f303b505caea2b3"
+        },
+        {
+          "held_path": "sect_cover_ph_w5.dta",
+          "sidecar_sha256": "ecd9dcdb24123c01179c5cc905eecda6e5dd6bf9530b6cb23e8915309566565a"
+        },
+        {
+          "held_path": "sect_cover_pp_w5.dta",
+          "sidecar_sha256": "055f6c6948d92714e54517ccba936721f518e31283559b3593168bd69930af2f"
+        }
+      ],
+      "evidence": [
+        "https://github.com/ligon/LSMS_Library/issues/1149",
+        "https://github.com/ligon/LSMS_Library/issues/1127"
+      ],
+      "revised": [],
+      "removed": [
+        "eth_plotgeovariables_y5.dta"
+      ],
+      "new": [
+        "Pub_ETH_PlotGeovariables_Y5.dta"
+      ]
+    }
+  }
+}

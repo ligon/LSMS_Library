@@ -1,0 +1,33 @@
+{
+  "recorded_at_UTC": "2026-10-22T02:20:58.755274+00:00",
+  "candidate": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+  "base": "f9feb3c807aff5206134c37768992302ceb431fa",
+  "scope": "Two Mali documentation paragraphs on the eighteen-change integration; zero data API/decode/test replay",
+  "changed_paths": [
+    "lsms_library/countries/Mali/_/CONTENTS.org"
+  ],
+  "tests_tree_exact": true,
+  "other_tracked_blobs_modes_exact": true,
+  "changed_path_Git_mode": "100644 unchanged",
+  "API_hashes_unchanged": 549,
+  "framework_fingerprints_unchanged": 39,
+  "changed_hashes": 0,
+  "actual_separate_process_inventory": true,
+  "network_attempts": 0,
+  "unexpected_write_denials": 0,
+  "parquets_written": 0,
+  "hash_receipts": {
+    "base18-hashes.json": {
+      "sha256": "833370f26847ee3941833ea4ece57cf538a1cb3b150dd099baaccb79ea01060d",
+      "bytes": 57498
+    },
+    "candidate18-hashes.json": {
+      "sha256": "d460eb238dcd9a38a993bb452e053f09741410a98d30a8f7442647c39ed27b25",
+      "bytes": 57498
+    }
+  },
+  "old_runtime_proofs_retained_at_exact_heads": true,
+  "independent_wording_review": "pending",
+  "GitHub_publication": false,
+  "signed": "Sue"
+}

@@ -1,0 +1,5 @@
+outs:
+- md5: 8dff6d14006404c0d4d89e2dc5955138
+  size: 5239
+  hash: md5
+  path: s12c_exp.dta

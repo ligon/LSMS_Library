@@ -1,0 +1,13 @@
+{
+  "PR": 1220,
+  "head": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "base": "fix/1204-uganda-crop-wave-coverage-20261022",
+  "base_sha": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "state": "OPEN",
+  "merged": false,
+  "PR_body_exact": true,
+  "issue1215_body_exact": true,
+  "source_head_complete_collection_verified": true,
+  "CI": "not yet observed",
+  "signed": "Sue"
+}

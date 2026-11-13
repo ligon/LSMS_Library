@@ -1,0 +1,30 @@
+LICENSE (CIV_2021_EHCVM-2_v01_M)
+
+https://microdata.worldbank.org/index.php/catalog/6273/study-description#metadata-data_access
+
+1. Access policy
+CONTACTS
+
+Institut National de la Statistique (INS)	 Institut National de la Statistique (INS)   Gouvernement du Côte d’Ivoire 		
+
+CONFIDENTIALITY
+Before being granted access to the dataset, all users have to formally agree: 1. To make no copies of any files or portions of files to which s/he is granted access except those authorized by the data depositor. 2. Not to use any technique in an attempt to learn the identity of any person, establishment, or sampling unit not identified on public use data files. 3. To hold in strictest confidence the identification of any establishment or individual that may be inadvertently revealed in any documents or discussion, or analysis. Such inadvertent identification revealed in her/his analysis will be immediately brought to the attention of the data depositor.
+
+
+CITATION REQUIREMENT
+Use of the dataset must be acknowledged using a citation which would include: 
+ - the Identification of the Primary Investigator
+ - the title of the survey (including country, acronym and year of implementation)
+ - the survey reference number
+ - the source and date of download
+
+ Example:
+ Institut National de la Statistique (INS) (Gouvernement du Côte d’Ivoire ). Côte d’Ivoire - Enquête Harmonisée sur le Conditions de Vie des Ménages, 2021-2022 (CIV EHCVM-2 2021-2022). Ref: CIV_2021_EHCVM-2_v01_M. Downloaded from [uri] on [date].
+
+
+DISCLAIMER
+The user of the data acknowledges that the original collector of the data, the authorized distributor of the data, and the relevant funding agency bear no responsibility for use of the data or for interpretations or inferences based upon such uses.
+
+
+(Text copied from the World Bank catalog DDI export, https://microdata.worldbank.org/metadata/export/6273/json, 2026-11-04.)
+

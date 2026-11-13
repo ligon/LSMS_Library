@@ -1,0 +1,17 @@
+{
+  "verdict": "AUTHOR_PASS_PENDING_INDEPENDENT_REVIEW",
+  "issue": 1149,
+  "source_head": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+  "runtime_tests_head": "f85a871fb8772b0bf1c296927e739ea0f7211214",
+  "parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "all_six_OptionC_parts_covered": true,
+  "real_acquisition_not_performed": true,
+  "residuals": [
+    "Independent red-team and human merge remain.",
+    "Real978/1127 release acquisition/content review and sidecar/SOURCE promotion are separate.",
+    "Original2026-10-19 zip-relative directory spellings are unavailable; fixtures establish real basenames, not original archives.",
+    "Atomic per-file placement does not promise whole-release rollback; failures never stamp completion.",
+    "First warm process cohort lacks an embedded source receipt and began before the last two acquisition-only lines changed; final follow-up pins the current source.",
+    "Private root0700 preserves measured0644 warm cache copies, without post-read mode normalization."
+  ]
+}

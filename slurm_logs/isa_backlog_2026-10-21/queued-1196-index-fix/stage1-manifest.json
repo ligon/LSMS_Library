@@ -1,0 +1,83 @@
+[
+  {
+    "name": "DESIGN.md",
+    "sha256": "bb8c47fa06cfc77d0aee6db59d1eeae5c94364157bc5d84cf9ddeee4c647aed2",
+    "size": 15128,
+    "mode": 384,
+    "mtime_ns": 1792647817427726002,
+    "nlink": 1,
+    "inode": 53223729
+  },
+  {
+    "name": "ROOT-STAGE2-APPROVAL.json",
+    "sha256": "8609f1bb6415b7b2d8c84a8776f9767f29a591c3c5c66b222a17903e76093b5b",
+    "size": 2189,
+    "mode": 384,
+    "mtime_ns": 1792647858322976342,
+    "nlink": 1,
+    "inode": 53223730
+  },
+  {
+    "name": "make-proposal.py",
+    "sha256": "d17de466f4bdd74475c8746093a898842988e1b471d367b5732422ddb5420148",
+    "size": 4883,
+    "mode": 384,
+    "mtime_ns": 1792647575821248858,
+    "nlink": 1,
+    "inode": 53223726
+  },
+  {
+    "name": "proposal-generation.json",
+    "sha256": "39d5951a8d0135c55d419067bda5586ee15083928ecbb43ab15e8cc577cd7cc8",
+    "size": 534,
+    "mode": 384,
+    "mtime_ns": 1792647576741254467,
+    "nlink": 1,
+    "inode": 53223728
+  },
+  {
+    "name": "proposed.patch",
+    "sha256": "6fa0329189b79af399be0bcd89e2367b71041ebe39b648a1c88145906d879482",
+    "size": 3744,
+    "mode": 384,
+    "mtime_ns": 1792647576740254461,
+    "nlink": 1,
+    "inode": 53223727
+  },
+  {
+    "name": "root-metadata-preparation.json",
+    "sha256": "ac24584f6ca7ff80504052c71aca2c45369c1ee867190d79771a9a9f50d14845",
+    "size": 960,
+    "mode": 384,
+    "mtime_ns": 1792647060880165380,
+    "nlink": 1,
+    "inode": 53223659
+  },
+  {
+    "name": "root-terminal-preparation-addendum.json",
+    "sha256": "46a60b52c05f11b6eb0c44190660e4cfddf1f49e9f15ef820166b722c19826b9",
+    "size": 496,
+    "mode": 384,
+    "mtime_ns": 1792647080583280764,
+    "nlink": 1,
+    "inode": 53223660
+  },
+  {
+    "name": "stage1-proof.json",
+    "sha256": "959cf514e784db2e138d4e5806206a543bfaa0720ed8ee50d030775445330315",
+    "size": 1569,
+    "mode": 384,
+    "mtime_ns": 1792647896939212809,
+    "nlink": 1,
+    "inode": 53223732
+  },
+  {
+    "name": "stage1-proof.py",
+    "sha256": "068da2a0f34576267e6040a5d5ec7ba554c8f56dd17bb4a7b3d72f4ad5fc9c46",
+    "size": 6827,
+    "mode": 384,
+    "mtime_ns": 1792647893916194297,
+    "nlink": 1,
+    "inode": 53223731
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "status": "PROTECTED",
+  "original_private_file_receipts_exact": 1960,
+  "actual_parent_tracked_bytes_modes_mtimes_exact": 14839,
+  "global17_complete_private_manifest_entries_exact": 6468,
+  "original_Mali_private_receipts": 1311,
+  "source_HEAD_Git_bytes_modes_clean": [
+    {
+      "root": "/local/job40255479/worktrees/isa-Uganda-1198-fix-base",
+      "head": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+      "Git_clean": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-Uganda-1198",
+      "head": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+      "Git_clean": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-Uganda-849",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "Git_clean": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-Mali-1091-fix",
+      "head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "Git_clean": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-integration-seventeen",
+      "head": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+      "Git_clean": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-integration",
+      "head": "d527249ba9d3eaebf190a075e39043e36d2dbb85",
+      "Git_clean": true
+    }
+  ],
+  "historical_source_mtime_scope": "Actual parent tracked mtimes and all protected private mtimes compared. Older source checkouts have byte/mode/HEAD/Git checks; no newly invented before-mtime baseline.",
+  "network_attempts": 0,
+  "guard_events": {
+    "mkdir-existing": 31,
+    "DENIED-open": 1
+  },
+  "denied_attempts_are_preserved_stops": true,
+  "in_tree_parquets": 0
+}

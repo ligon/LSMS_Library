@@ -1,0 +1,11 @@
+{
+  "status": "ROOT_STATIC_AST_LOCATOR_STOP_AFTER_PAYLOAD_SOURCE_PROVIDER_HASH_GATES",
+  "original_session_id": 85264,
+  "initial_chunk": "140ccc",
+  "terminal_chunk": "52f636",
+  "exit_code": 1,
+  "cause": "Root checker assumed _empty_declared_frame is a Country class method; it is a module-level helper. No product/API/data-decoding actor ran. v2 changes only static AST locator.",
+  "original_checker_sha256": "a546680746ffc8f49467e9d49adf2134a0e559f036068f4bd7c28b09700c2c19",
+  "source_unchanged": true,
+  "signed": "Sue"
+}

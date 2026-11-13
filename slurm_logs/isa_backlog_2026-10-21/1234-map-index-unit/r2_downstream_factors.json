@@ -1,0 +1,76 @@
+{
+ "Mali": {
+  "columns": [
+   "kg_per_unit",
+   "KgFactorSource",
+   "kg_survey",
+   "kg_metric",
+   "kg_item_unit",
+   "kg_item_n_waves",
+   "kg_item_wave_spread",
+   "baseline_refused_spread",
+   "kg_unit"
+  ],
+  "genuine_unit": {
+   "factor_changed": 0,
+   "ratio_max": null,
+   "ratio_median": null,
+   "ratio_min": null,
+   "rows": 0,
+   "source_pairs_changed": {}
+  },
+  "other_rows_factor_changed": 0,
+  "relabelled": {
+   "n": 1534,
+   "source_pairs": {
+    "none->none": 1534
+   },
+   "u_pairs": {
+    "unit->Unknown": 1534
+   }
+  },
+  "rows": [
+   431046,
+   431046
+  ]
+ },
+ "Panama": {
+  "columns": [
+   "kg_per_unit",
+   "KgFactorSource",
+   "kg_survey",
+   "kg_metric",
+   "kg_item_unit",
+   "kg_item_n_waves",
+   "kg_item_wave_spread",
+   "baseline_refused_spread",
+   "kg_unit"
+  ],
+  "genuine_unit": {
+   "factor_changed": 26282,
+   "ratio_max": 2.3,
+   "ratio_median": 0.99475,
+   "ratio_min": 0.99475,
+   "rows": 59069,
+   "source_pairs_changed": {
+    "item_unit->unit": 3,
+    "unit->unit": 26279
+   }
+  },
+  "other_rows_factor_changed": 0,
+  "relabelled": {
+   "n": 440,
+   "source_pairs": {
+    "item_unit->none": 46,
+    "unit->none": 394
+   },
+   "u_pairs": {
+    "unit->Unknown": 440
+   }
+  },
+  "rows": [
+   570939,
+   570942
+  ]
+ }
+}

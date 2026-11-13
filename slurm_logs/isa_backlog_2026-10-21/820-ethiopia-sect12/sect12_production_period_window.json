@@ -1,0 +1,40 @@
+{
+ "2011-12": {
+  "positive_sale_lines_with_period": 1952,
+  "period_months_median": 3.0,
+  "share_ge_12_months": 0.081,
+  "share_le_6_months": 0.786,
+  "ph_visit_ec_year": 2004,
+  "share_end_before_ph_ec_year": 0.061,
+  "end_ec_year_counts": {
+   "2002": 1,
+   "2003": 118,
+   "2004": 1833
+  }
+ },
+ "2013-14": {
+  "positive_sale_lines_with_period": 2708,
+  "period_months_median": 3.0,
+  "share_ge_12_months": 0.119,
+  "share_le_6_months": 0.775,
+  "ph_visit_ec_year": 2006,
+  "share_end_before_ph_ec_year": 0.056,
+  "end_ec_year_counts": {
+   "2004": 1,
+   "2005": 150,
+   "2006": 2557
+  }
+ },
+ "2015-16": {
+  "positive_sale_lines_with_period": 2627,
+  "period_months_median": 3.0,
+  "share_ge_12_months": 0.126,
+  "share_le_6_months": 0.759,
+  "ph_visit_ec_year": 2008,
+  "share_end_before_ph_ec_year": 0.06,
+  "end_ec_year_counts": {
+   "2007": 157,
+   "2008": 2470
+  }
+ }
+}

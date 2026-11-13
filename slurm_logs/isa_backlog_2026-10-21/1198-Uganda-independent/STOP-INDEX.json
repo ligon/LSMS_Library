@@ -1,0 +1,78 @@
+{
+  "stops": [
+    {
+      "side": "base",
+      "receipt": "base/failure-1792638446226282508-safe.json",
+      "script": "build.py",
+      "exception_type": "NameError",
+      "meaning": "preserved strict or reviewer-harness stop; see REVIEW"
+    },
+    {
+      "side": "base",
+      "receipt": "base/failure-1792638852373749015-safe.json",
+      "script": "build-v2.py",
+      "exception_type": "AssertionError",
+      "meaning": "preserved strict or reviewer-harness stop; see REVIEW"
+    },
+    {
+      "side": "base",
+      "receipt": "base/failure-1792638943160642342-safe.json",
+      "script": "negative-tests.py",
+      "exception_type": "SystemExit",
+      "meaning": "expected actual-parent negative cohort"
+    },
+    {
+      "side": "base",
+      "receipt": "base/failure-1792639351451353735-safe.json",
+      "script": "derived.py",
+      "exception_type": "AssertionError",
+      "meaning": "preserved strict or reviewer-harness stop; see REVIEW"
+    },
+    {
+      "side": "base",
+      "receipt": "base/failure-1792639638730443489-safe.json",
+      "script": "finish-warm.py",
+      "exception_type": "AssertionError",
+      "meaning": "preserved strict or reviewer-harness stop; see REVIEW"
+    },
+    {
+      "side": "candidate",
+      "receipt": "candidate/failure-1792638447248521967-safe.json",
+      "script": "build.py",
+      "exception_type": "NameError",
+      "meaning": "preserved strict or reviewer-harness stop; see REVIEW"
+    },
+    {
+      "side": "candidate",
+      "receipt": "candidate/failure-1792638854136587385-safe.json",
+      "script": "build-v2.py",
+      "exception_type": "AssertionError",
+      "meaning": "preserved strict or reviewer-harness stop; see REVIEW"
+    },
+    {
+      "side": "candidate",
+      "receipt": "candidate/failure-1792639643938475867-safe.json",
+      "script": "finish-warm.py",
+      "exception_type": "AssertionError",
+      "meaning": "preserved strict or reviewer-harness stop; see REVIEW"
+    },
+    {
+      "side": "candidate",
+      "receipt": "candidate/failure-1792639747928306533-safe.json",
+      "script": "saved-frame-account.py",
+      "exception_type": "AssertionError",
+      "meaning": "preserved strict or reviewer-harness stop; see REVIEW"
+    },
+    {
+      "side": "candidate",
+      "receipt": "candidate/failure-1792640166059463596-safe.json",
+      "script": "final-protection.py",
+      "exception_type": "AssertionError",
+      "meaning": "preserved strict or reviewer-harness stop; see REVIEW"
+    }
+  ],
+  "shell_focused_attempt1_exit126_before_API": true,
+  "historical_XML_and_warning_gaps_retained": true,
+  "deterministic_final_snapshot_retry": "Second protection attempt rewrote identical deterministic JSON bytes; no distinct first-attempt file mtime baseline retained. Initial tracked snapshot remains the comparison reference.",
+  "corrected_label_interpretation": "Existing explicit date/vocabulary adjudication was omitted from initial message, then independently corroborated; not new unresolved mapping."
+}

@@ -126,8 +126,8 @@ def inputs_food_acquired_w1_card_weight(wave='2010-11'):
 
     One row per DERIVED served row, indexed ``(t, i, j, u, s)`` exactly as
     the served table is -- ``i`` and ``j`` decoded as the build decodes
-    them (``j`` through ``harmonized_food_labels``, so it carries the
-    wave-blind item decode of GH #1144 just as the served row does), ``u``
+    them (``j`` through ``harmonized_food_labels(W1_PH_ROUND)``, the same
+    quarter-specific food decode as the served row, GH #1144), ``u``
     through the per-round unit decode -- with the source row's ORIGINAL
     variables as columns: ``hhid``, ``item_cd``, ``s10bq3a`` / ``s10bq3b`` /
     ``s10bq4`` (purchases), ``s10bq5a`` / ``s10bq5b`` (own production),
@@ -141,13 +141,13 @@ def inputs_food_acquired_w1_card_weight(wave='2010-11'):
 
     raw_vars = ['hhid', 'item_cd', 's10bq3a', 's10bq3b', W1_PH_EXPENDITURE,
                 's10bq5a', 's10bq5b', 's10bq6a', 's10bq6b']
-    # The build runs with cwd = this directory (make), and
-    # `harmonized_food_labels` resolves categorical_mapping.org relative to it.
+    # Match the build's cwd (make) for its relative raw-source path.
+    # Both served rows and raw input keys use the same food quarter.
     with contextlib.chdir(_HERE):
         served = stamp_w1_card_weight(nigeria.food_acquired_for_wave(
             W1_PH_FOOD_FILE, W1_PH_ROUND, sources=W1_PH_SOURCES,
             expenditure=W1_PH_EXPENDITURE))
-        food_labels = nigeria.harmonized_food_labels()
+        food_labels = nigeria.harmonized_food_labels(W1_PH_ROUND)
         df = get_dataframe(W1_PH_FOOD_FILE)
     derived = served.index[served['Derivation'].notna()]
     unit_codes = nigeria.food_unit_labels(W1_PH_ROUND)

@@ -1,0 +1,469 @@
+{
+ "recovered": {
+  "90 KG BAG": {
+   "to_code": 3,
+   "total": 759,
+   "by_cell": {
+    "G:2016-17:Cross_Sectional": 434,
+    "P:2016-17:Cross_Sectional": 5,
+    "I:2016-17:Cross_Sectional": 127,
+    "Q:2016-17:Cross_Sectional": 14,
+    "G:2016-17:Panel": 41,
+    "P:2016-17:Panel": 2,
+    "I:2016-17:Panel": 7,
+    "Q:2016-17:Panel": 2,
+    "G:2019-20:Cross_Sectional": 57,
+    "P:2019-20:Cross_Sectional": 1,
+    "I:2019-20:Cross_Sectional": 9,
+    "Q:2019-20:Cross_Sectional": 11,
+    "G:2019-20:Panel": 33,
+    "P:2019-20:Panel": 1,
+    "I:2019-20:Panel": 7,
+    "Q:2019-20:Panel": 8
+   }
+  },
+  "90KG BAG": {
+   "to_code": 3,
+   "total": 153,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 97,
+    "P:2019-20:Cross_Sectional": 3,
+    "I:2019-20:Cross_Sectional": 45,
+    "Q:2019-20:Cross_Sectional": 8
+   }
+  },
+  "DENGU": {
+   "to_code": 11,
+   "total": 145,
+   "by_cell": {
+    "G:2016-17:Cross_Sectional": 31,
+    "G:2016-17:Panel": 2,
+    "G:2019-20:Cross_Sectional": 60,
+    "P:2019-20:Cross_Sectional": 1,
+    "I:2019-20:Cross_Sectional": 6,
+    "Q:2019-20:Cross_Sectional": 40,
+    "G:2019-20:Panel": 4,
+    "P:2019-20:Panel": 1
+   }
+  },
+  "BASKET": {
+   "to_code": 11,
+   "total": 100,
+   "by_cell": {
+    "G:2016-17:Cross_Sectional": 2,
+    "P:2016-17:Cross_Sectional": 1,
+    "G:2016-17:Panel": 1,
+    "G:2019-20:Cross_Sectional": 58,
+    "I:2019-20:Cross_Sectional": 1,
+    "Q:2019-20:Cross_Sectional": 15,
+    "G:2019-20:Panel": 5,
+    "I:2019-20:Panel": 1,
+    "Q:2019-20:Panel": 16
+   }
+  },
+  "BASKET (UNSPECIFIED SIZE)": {
+   "to_code": 11,
+   "total": 61,
+   "by_cell": {
+    "P:2016-17:Cross_Sectional": 2,
+    "Q:2016-17:Cross_Sectional": 53,
+    "Q:2016-17:Panel": 6
+   }
+  },
+  "90KG": {
+   "to_code": 3,
+   "total": 15,
+   "by_cell": {
+    "P:2016-17:Cross_Sectional": 1,
+    "G:2019-20:Cross_Sectional": 10,
+    "P:2019-20:Cross_Sectional": 1,
+    "I:2019-20:Cross_Sectional": 3
+   }
+  },
+  "BASKETS": {
+   "to_code": 11,
+   "total": 14,
+   "by_cell": {
+    "Q:2016-17:Cross_Sectional": 1,
+    "Q:2016-17:Panel": 2,
+    "G:2019-20:Cross_Sectional": 5,
+    "I:2019-20:Cross_Sectional": 3,
+    "Q:2019-20:Cross_Sectional": 1,
+    "G:2019-20:Panel": 1,
+    "I:2019-20:Panel": 1
+   }
+  },
+  "BASKET (BAMBOO)": {
+   "to_code": 11,
+   "total": 13,
+   "by_cell": {
+    "I:2016-17:Cross_Sectional": 10,
+    "I:2016-17:Panel": 3
+   }
+  },
+  "BASKET (DENGU)": {
+   "to_code": 11,
+   "total": 13,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 6,
+    "I:2019-20:Cross_Sectional": 1,
+    "Q:2019-20:Cross_Sectional": 5,
+    "G:2019-20:Panel": 1
+   }
+  },
+  "90KG BAGS": {
+   "to_code": 3,
+   "total": 7,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 6,
+    "I:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BASKET (DENGUE)": {
+   "to_code": 11,
+   "total": 5,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1,
+    "Q:2019-20:Cross_Sectional": 4
+   }
+  },
+  "90KGS": {
+   "to_code": 3,
+   "total": 4,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 2,
+    "I:2019-20:Cross_Sectional": 2
+   }
+  },
+  "BASKET(DENGU)": {
+   "to_code": 11,
+   "total": 4,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 2,
+    "Q:2019-20:Cross_Sectional": 2
+   }
+  },
+  "90KGBAG": {
+   "to_code": 3,
+   "total": 3,
+   "by_cell": {
+    "P:2016-17:Cross_Sectional": 3
+   }
+  },
+  "90 KG BAGS": {
+   "to_code": 3,
+   "total": 2,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 2
+   }
+  },
+  "BUSKET": {
+   "to_code": 11,
+   "total": 2,
+   "by_cell": {
+    "Q:2019-20:Cross_Sectional": 2
+   }
+  },
+  "DENGU ( BASKET )": {
+   "to_code": 11,
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BAGS OF 90 KGS": {
+   "to_code": 3,
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "90 KGS": {
+   "to_code": 3,
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "90 KG": {
+   "to_code": 3,
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BASKET DENGU": {
+   "to_code": 11,
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "90 KG BAD": {
+   "to_code": 3,
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BASKET ( DENGU)": {
+   "to_code": 11,
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BASKET ( DENGU )": {
+   "to_code": 11,
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "90KG BAY": {
+   "to_code": 3,
+   "total": 1,
+   "by_cell": {
+    "I:2019-20:Cross_Sectional": 1
+   }
+  },
+  "90 KGBAG": {
+   "to_code": 3,
+   "total": 1,
+   "by_cell": {
+    "Q:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BASKET-DENGU": {
+   "to_code": 11,
+   "total": 1,
+   "by_cell": {
+    "Q:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BASKET/ DENGU": {
+   "to_code": 11,
+   "total": 1,
+   "by_cell": {
+    "Q:2019-20:Cross_Sectional": 1
+   }
+  },
+  "DENGU/BUSKET": {
+   "to_code": 11,
+   "total": 1,
+   "by_cell": {
+    "Q:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BUSKET/DENGU": {
+   "to_code": 11,
+   "total": 1,
+   "by_cell": {
+    "Q:2019-20:Cross_Sectional": 1
+   }
+  },
+  "DENGU/BASKET": {
+   "to_code": 11,
+   "total": 1,
+   "by_cell": {
+    "Q:2019-20:Cross_Sectional": 1
+   }
+  },
+  "DENGU( BASKET )": {
+   "to_code": 11,
+   "total": 1,
+   "by_cell": {
+    "Q:2019-20:Cross_Sectional": 1
+   }
+  }
+ },
+ "unused_whitelist_entries": [],
+ "left_near_misses": {
+  "BASKET (LARGE)": {
+   "total": 13,
+   "by_cell": {
+    "G:2016-17:Cross_Sectional": 3,
+    "Q:2016-17:Cross_Sectional": 10
+   }
+  },
+  "LARGE BASKET": {
+   "total": 11,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 4,
+    "I:2019-20:Cross_Sectional": 3,
+    "Q:2019-20:Cross_Sectional": 1,
+    "I:2019-20:Panel": 1,
+    "Q:2019-20:Panel": 2
+   }
+  },
+  "WEAVING BASKET": {
+   "total": 3,
+   "by_cell": {
+    "Q:2016-17:Cross_Sectional": 2,
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BASKET (SMALL)": {
+   "total": 2,
+   "by_cell": {
+    "G:2016-17:Cross_Sectional": 2
+   }
+  },
+  "DENGU(GOGODA)": {
+   "total": 2,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 2
+   }
+  },
+  "SMALL BASKET": {
+   "total": 2,
+   "by_cell": {
+    "G:2019-20:Panel": 1,
+    "I:2019-20:Panel": 1
+   }
+  },
+  "MEDIUM WEAVING BASKET": {
+   "total": 1,
+   "by_cell": {
+    "G:2016-17:Cross_Sectional": 1
+   }
+  },
+  "1 90 KG": {
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BASKET OF VEGETABLES ONLY NOT PUMPKINS": {
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "BASKET OF NKHWANI LEAVES": {
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "09KG BAG": {
+   "total": 1,
+   "by_cell": {
+    "G:2019-20:Cross_Sectional": 1
+   }
+  },
+  "LARGE DENGU": {
+   "total": 1,
+   "by_cell": {
+    "P:2019-20:Cross_Sectional": 1
+   }
+  },
+  "LARGE BASKETS": {
+   "total": 1,
+   "by_cell": {
+    "I:2019-20:Cross_Sectional": 1
+   }
+  },
+  "DENGU(LARGE)": {
+   "total": 1,
+   "by_cell": {
+    "Q:2019-20:Cross_Sectional": 1
+   }
+  },
+  "MEDIAM BASKET": {
+   "total": 1,
+   "by_cell": {
+    "Q:2019-20:Panel": 1
+   }
+  }
+ },
+ "left_restating_a_listed_code": {
+  "Ox-Cart (code 12)": {
+   "total": 4,
+   "exact_plain": 1,
+   "strings": {
+    "OXCART": 1,
+    "HALF OXCART": 1,
+    "OX-CART": 1,
+    "HALF.OXCART": 1
+   }
+  },
+  "Piece (code 9)": {
+   "total": 11,
+   "exact_plain": 5,
+   "strings": {
+    "PIECES": 5,
+    "PIECE": 5,
+    "BUNDLES OF 12 PIECES SUGARCANE": 1
+   }
+  },
+  "Bunch (code 8)": {
+   "total": 11,
+   "exact_plain": 8,
+   "strings": {
+    "BUNCH": 8,
+    "BUNCHES": 2,
+    "BIG BUNCHES": 1
+   }
+  },
+  "50 kg Bag (code 2)": {
+   "total": 19,
+   "exact_plain": 11,
+   "strings": {
+    "50 KG BAG": 11,
+    "50KG BAG": 4,
+    "50KGBAG": 1,
+    "HALF50KGBAG": 1,
+    "HALF BAG OF 50KG": 1,
+    "50KG AND HALF": 1
+   }
+  },
+  "Pail (codes 4/5)": {
+   "total": 66,
+   "exact_plain": 6,
+   "strings": {
+    "PAIL (MEDIUM)": 9,
+    "40LITRE PAIL": 9,
+    "PAIL (LARGE)": 8,
+    "PAIL (SMALL)": 6,
+    "PAIL": 6,
+    "LARGE PAIL": 5,
+    "PAIL (40 LITRE)": 3,
+    "PAIL (20 LITRE)": 3,
+    "MEDIUM PAIL": 3,
+    "PAIL (UNSPECIFIED SIZE)": 2,
+    "PAIL MEDIUM": 2,
+    "PAIL (40L)": 1,
+    "10 LITRE PAIL": 1,
+    "PAIL LARGE": 1,
+    "20LITRES PAIL": 1,
+    "SMALL PAIL": 1,
+    "PAIL( MEDIUM)": 1,
+    "PAIL CHIGOBA": 1,
+    "GABA PAILS": 1,
+    "LARGE PAILS": 1,
+    "HALF LARGE PAIL": 1
+   }
+  },
+  "Plate (codes 6/7)": {
+   "total": 8,
+   "exact_plain": 1,
+   "strings": {
+    "PHAZI PLATE": 4,
+    "NO 12 PLATE": 1,
+    "PHAZI PLATE HEAPED": 1,
+    "PLATE": 1,
+    "PLATES": 1
+   }
+  },
+  "Bale (code 10)": {
+   "total": 6,
+   "exact_plain": 1,
+   "strings": {
+    "80 KG BALE": 3,
+    "85 KG BALE": 2,
+    "BALE": 1
+   }
+  }
+ }
+}

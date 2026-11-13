@@ -1,0 +1,82 @@
+{
+  "status": "AUTHOR_PASS_PENDING_INDEPENDENT_DELTA_ACCEPTANCE",
+  "source_head": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+  "runtime_tests_head": "21f5cb7f91152c5a86eba8cfd264dd24124b523a",
+  "base": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+  "branch": "fix/1149-staged-reacquisition-v2-20261022",
+  "source_clean_FS_published": true,
+  "runtime_library_and_test_trees_identical_to_final": true,
+  "only_ledger_descendant": true,
+  "runtime_source": {
+    "path": "/local/job40255479/worktrees/isa-1149-acquisition-amendment/lsms_library/data_access.py",
+    "mode": 384,
+    "mtime_ns": 1792655603052954027,
+    "bytes": 117978,
+    "inode": 20331675,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file",
+    "sha256": "3c8e103a0e697c5e8f9f52d97e188ac54fc5e1d87482a7f866d74c27270674c6"
+  },
+  "scope": {
+    "status": "PASS",
+    "runtime_change": "Only expected/confirmed assignment pairs wrapped in current-key pop/bare-reraise at two entrypoints; entire module AST otherwise equals actualfb",
+    "original_test_AST_exact_after_removing_one_parametrized_regression": true,
+    "new_cases": 4,
+    "exception_type_and_args_preserved": true,
+    "normal_helper_list_contract_unchanged": true
+  },
+  "fingerprints": {
+    "measurement": "ACTUAL_WORKING_PRODUCT_SOURCE",
+    "moves": {
+      "country": {
+        "total": 549,
+        "moved": 0,
+        "keys_exact": true
+      },
+      "framework": {
+        "total": 39,
+        "moved": 0,
+        "keys_exact": true
+      },
+      "declared_wave": {
+        "total": 1362,
+        "moved": 0,
+        "keys_exact": true
+      }
+    },
+    "country_data_builds": 0,
+    "zero_data_endpoint_changes": true
+  },
+  "old_manifest_entries_verified": 5932,
+  "tracked_sources_observed": 89292,
+  "old_source_artifacts_and_verdicts_unchanged": true,
+  "current_270_file_counts": {
+    "staged_acquisition": 49,
+    "provenance": 157,
+    "data_access": 41,
+    "intree_source_policy": 17,
+    "no_runtime_config_writes": 6
+  },
+  "warnings": {
+    "candidate_expected_mocked_bad_GPG": 1,
+    "census_per_head_nonISA_Peru_missing_underscore_diagnostics": 3,
+    "census_warning_checkout_prefixes_distinct": true
+  },
+  "Country_Feature_CLI_data_calls": 0,
+  "real_external_WB_S3_DVC_calls": 0,
+  "real_payload_copies": 0,
+  "new_runtime_warm_measurement": false,
+  "prior_fb_warm_review_remains_separately_pinned": true,
+  "zero_network_attempts_write_denials": true,
+  "old_root_ready_pins": [
+    [
+      "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/READY.json",
+      "8b6dab49f9d877103ad498ae9f48c2cd516e628a32b7afdb47541fbbfd1f3ffd"
+    ],
+    [
+      "/local/job40255479/control/isa-backlog-20261021/review-1149-acquisition/FINAL-READY.json",
+      "aac79aacbcd34eb7482348ac32a7a734e92b14d146ea62cadb6fa4894e3b9e63"
+    ]
+  ]
+}

@@ -1,0 +1,130 @@
+#+TITLE: GH #1078 independent review addendum
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Verdict and scope
+
+PASS for the two bounded follow-up concerns: reproducible denial attribution and explicit exact-value artifact verification.
+No additional production blocker was found.
+The original full selection remains FAIL: 4,689 passed, 4,453 skipped and nine isolation failures.
+The separate unchanged nine-case run on physically private country operands remains a separate PASS from the frozen review; it was not repeated here.
+The one new diagnostic full selection also has 4,689 passed, 4,453 skipped and nine failures, with no errors and 70 warnings.
+This addendum does not claim a full-suite PASS.
+
+The read-only runtime snapshot is =a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b=.
+Final author head =d46795c303e2409ddb8ed5e4c62efca4e87ca347= has the identical library tree =cc18a441cca4c69a24c2f24d513f4f23c3937d86= and tests tree =9b685fc972bbbcec464bf6176963e4f0773ba674=, including Git modes.
+Library/test filesystem content and modes also remain exact.
+The first ledger commit remains =695b57970c17fdaec5a3e63a8c0f283b29b86282=, based on f8.
+All new evidence is confined to the new =review-1078-unit-attribution= private root.
+No held-microdata/source-backed API build, acquisition, additional runtime source phase, corpus rebuild, fixture edit, Git/ref mutation or GitHub write occurred in this follow-up.
+The full synthetic unit selection legitimately exercises Country/API machinery and writes synthetic private outputs; the artifact checker invokes no Country/Feature/data API.
+The separate Uganda #849 review is outside this task and was not touched.
+
+* Country contracts carried by exact blob identity
+
+The complete prior Uganda and Niger CONTENTS readings, including TODO/WAITING/LOGBOOK, were carried only after exact current blob verification.
+Uganda SHA256 is =fa0918735dba0051544e0017a60eda7f9a3abd6de20912e6b5283a3ec8ffb423=; Niger is =b1bf5794b242c794437995eb76742db763951397d8dfdb691d064af569ef67ee=.
+Uganda mixes real EA identifiers and synthetic GPS bins in 2009-10, then uses parish and district/parish identities in later waves; its household Region fallback is therefore relevant to the market control.
+Its statement Region "is complete for every household" (CONTENTS:253) coexists with "three have missing Region" (:271) for 2019-20.
+The claim of refresh "each wave" (:280) also coexists with "This same sample was used for the UNPS 2015/16 (Wave 5)" (:693).
+Niger's pre-EHCVM GRAPPE/MENAGE/EXTENSION identity and split-off handling differ from its EHCVM identity, and the unit dictionary's explicit Original Label key rejection remains binding (#928).
+Its opening "each grappe is visited in exactly one vague" coexists with the later quoted design that "divided each enumeration area into two equal groups" interviewed separately.
+These are documentary tensions, not permission for identifier, retention or sampling changes.
+The existing Niger cold/warm unit-index dtype finding remains a proposed country caveat, not a repair in #1078.
+
+* One diagnostic full selection and all-node comparison
+
+The diagnostic launcher uses eight explicit =loadfile= workers, one numerical/build/Make thread, the mounted image Python, exact cwd/package/config/countries/data identity, private empty data/config/XDG/temp/DVC/matplotlib paths and =unshare -rn= plus the active socket guard.
+AWS environment credentials/profiles/session variables were removed, credential paths were set to absent private files and the actual test conftest returned =aws_creds_available() == False= before collection.
+The original deny policy is AST-identical after removing the additive diagnostic helper/call and adapting only the private root, checkout and root-prepared exact ignored DVC metadata target.
+Existing =FileExistsError= behavior is unchanged.
+No permission allowance, assertion removal, test monkeypatch, failure-to-skip conversion or test selection change was introduced.
+
+All 9,151 full JUnit identities and outcomes were compared as a multiset of =(classname, parameterized name, outcome)=, preserving duplicates.
+There are zero added, removed or changed outcomes; the canonical multiset SHA256 is =679b8c7720ee143f8be5915b07001843abafa683bc52842149064449e2a70a8d=.
+The private comparison retains both complete sets and any differences, rather than comparing totals alone.
+The guarded selection leaves zero parquets in either private LSMS data root or in-tree, and records zero IP attempts.
+Its 251 synthetic test parquet outputs are confined to private pytest-temp.
+A first freeze attempt stopped on an overbroad assertion of zero parquets anywhere in the new root; that stopped log is preserved and the final assertion checks these distinct scopes explicitly.
+
+* All new denied operations are attributed
+
+Every one of the 24 new generic denials has a diagnostic record with operation, resolved path, PID/parent PID, worker, current full test label, phase and stack provenance.
+There are no diagnostic recording errors and no collection/import denials.
+Eighteen are two =os.utime= calls in each of the nine existing =test_make_never_regenerates_the_crosswalk= cases on tracked country =panel_ids.py= operands.
+Those nine remain failures under the unchanged deny policy.
+
+The remaining six are =os.unlink= cleanup attempts in these passing controls:
+
+| Test in tests/test_s3_fetch_retry.py | Test line | Cleanup attempts |
+|------------------------------------+-----------+------------------|
+| test_retry_succeeds_after_transient_tls_errors | 36 | 2 |
+| test_non_transient_error_is_not_retried | 50 | 1 |
+| test_exhausts_attempts_then_reraises | 57 | 3 |
+
+The actual stacks reach =local_tools._get_file_with_retry= at =lsms_library/local_tools.py:311= through =Path(dst).unlink()=.
+The complete test fixture (:21-31) increments a fake filesystem call counter and raises queued exceptions; it creates no target and makes no network request.
+The production handler (:310-313) catches cleanup =OSError=, including the guard's =PermissionError=, then classifies the original outer =exc= and retries or uses bare =raise= (:314-316).
+The transient success test asserts exactly three fake calls after two TLS errors; the non-transient control asserts the original ValueError and one call; the exhaustion control asserts the original TLS exception and three calls.
+All three assertions execute and pass, so the denied cleanup does not replace or bypass their intended retry/re-raise path.
+The FileNotFoundError control also passes and follows the separate immediate re-raise branch (:307-308), without an unlink denial.
+This is fake-filesystem retry coverage, not proof of successfully deleting a real partial download.
+No further dependent product probe was needed for these explained test cleanups.
+
+The original generic log did not record operation, test or stack metadata.
+The new run reproduces the same six-event remainder with the same complete node-outcome multiset, but cannot retroactively identify the original six individual events.
+That historical attribution limit remains explicit.
+
+* Explicit exact artifact comparisons
+
+The earlier =collect.py=, =final_checks.py= and =scanner_verify.py= calls used pandas' default floating-point tolerances; those assertions alone did not establish the reports' exact-value claim.
+A new read-only artifact checker now uses =check_exact=True= and =rtol=atol=0= explicitly, checks full row/column axes, classes, order, names, level codes, dtypes and null masks, and compares every logical attr recursively with exact types.
+It never calls =pandas._testing.assert_equal= for attrs.
+PopulationRecord, RecallRecord and SamplingRecord are immutable dict subclasses with =__slots__=()= and declared =_FIELDS=; the checker explicitly compares each declared field's presence and typed attribute value, then all typed stored keys/values.
+Absent optional fields therefore retain their exact absence and None attribute behavior.
+Frozen nested mappings/lists retain exact container classes and recursively exact values; dataclasses use declared fields, and numpy/pandas arrays and scalars use explicit exact checks.
+Seven deliberate comparator controls reject a one-nextafter payload change, a changed null mask, an axis name, row order, an extension dtype, a one-nextafter nested attr change and int-versus-float attrs.
+No stored or returned frame was normalized, rewritten or loosened to pass.
+
+All 195 saved inputs retain SHA256, size, mode and mtime before/after the final artifact check.
+The required comparisons pass:
+
+| Saved evidence | Exact comparisons |
+|----------------+-------------------|
+| Matched baseline/candidate stages | 26 cold and 26 warm |
+| Cross-stage frames | 50 complete exact, plus the two qualified Niger frames below |
+| Newly added cluster caches | 12 complete pairs |
+| Healing cold/warm versus correct reference | 4, plus 3 cross-stage and the final cache |
+| Actual candidate Arrow writer inputs/outputs | 4, plus final cache and 4 actor snapshots |
+| f8 bad/correct writer inputs/outputs | 4, plus final cache and 4 actor snapshots |
+| Candidate captured native read | 1 |
+| f8 bad reference differs only in the specified nine NaN-to-zero cells | 1 complete frame |
+| Candidate serial saved artifacts | 6, plus 2 final caches |
+
+The sole full strict cross-stage mismatch remains Niger public food's =u= index level under BOTH heads: Arrow StringDtype missing-sentinel metadata changes from pd.NA to NaN.
+Both new strict dtype failure messages are preserved privately.
+The separate exact comparison retains every payload dtype, mask, column and full typed attr; it compares every index level's values and codes exactly and retains every other level dtype.
+Only the explicitly asserted =u= dtype metadata difference is excepted after confirming the same Arrow array class/storage and exact values/masks.
+This does not claim strict full-frame cross-stage equality for those two frames and changes no stored data.
+
+* Execution qualification
+
+Before the isolated checker, a preliminary read-only attrs-type census unpickled 104 old stage artifacts without the required private configuration, socket or write guards.
+The mounted interpreter and new checkout cwd were used, but LSMS-specific configuration/data/PYTHONPATH and DVC-site settings were unset; the XDG cache setting was inherited.
+Unpickling record classes caused an ordinary lsms_library import.
+No Country/API, raw-source call or build was invoked by that census.
+Its execution was not guarded and cannot retrospectively be claimed network-free; no broader incident or product failure is inferred without evidence.
+Every subsequent artifact-reading checker process used the isolated environment; the final checker asserts exact cwd/package/countries/config/data and active socket/write guard identity before its first artifact read.
+The protected original receipts and tracked-source snapshots pass afterward.
+This qualification is additive in the new root; no frozen original report or manifest was rewritten.
+
+* Preserved review limits and release
+
+The accepted source-backed review remains pinned to its original f8/runtime/final artifacts.
+The broad measured cache cost remains 549/549 API hashes, 39/39 framework fingerprints and 1,362/1,362 declared wave hashes, with no corpus rebuild performed.
+Historical suite interleaving and composition with #1062/global16 remain unproved; this follow-up does not broaden those claims.
+Original source, author, review and reference receipts, exact tracked bytes/modes/index/head/clean status, ignored metadata target and zero consumers are recorded in =freeze-proof.json=.
+The safe export allowlist is pinned in =FINAL-READY.json=; full frames, IDs, source fields, diagnostics, paths/stacks and logs remain private.
+The addendum is released quiescent for root's inspection before public preparation.
+
+Sue

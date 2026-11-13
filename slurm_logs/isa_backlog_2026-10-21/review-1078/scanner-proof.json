@@ -1,0 +1,47 @@
+{
+  "status": "SUCCESS",
+  "full_raw_record_occurrences_equal": 217,
+  "removed": 0,
+  "added": 0,
+  "statuses": {
+    "warn": 214,
+    "pass": 3
+  },
+  "phases": {
+    "1a-sanity": 30,
+    "1b-assembly": 29,
+    "2-kwargs": 158
+  },
+  "normalization": "none; raw complete record multisets exact",
+  "all_record_occurrences_also_exact_to_author": true,
+  "baseline": {
+    "pre_scanner_existing_files": 73,
+    "all_existing_bytes_modes_mtimes_exact": true,
+    "new_wave_cluster_files": 12,
+    "all_new_yaml_hashes_actual_checkout_current": true,
+    "final_files": 85
+  },
+  "candidate": {
+    "pre_scanner_existing_files": 73,
+    "all_existing_bytes_modes_mtimes_exact": true,
+    "new_wave_cluster_files": 12,
+    "all_new_yaml_hashes_actual_checkout_current": true,
+    "final_files": 85
+  },
+  "all_12_new_full_frames_attrs_strictly_equal_between_heads": true,
+  "new_cache_paths": [
+    "Niger/2011-12/_/cluster_features.parquet",
+    "Niger/2014-15/_/cluster_features.parquet",
+    "Niger/2018-19/_/cluster_features.parquet",
+    "Niger/2021-22/_/cluster_features.parquet",
+    "Uganda/2005-06/_/cluster_features.parquet",
+    "Uganda/2009-10/_/cluster_features.parquet",
+    "Uganda/2010-11/_/cluster_features.parquet",
+    "Uganda/2011-12/_/cluster_features.parquet",
+    "Uganda/2013-14/_/cluster_features.parquet",
+    "Uganda/2015-16/_/cluster_features.parquet",
+    "Uganda/2018-19/_/cluster_features.parquet",
+    "Uganda/2019-20/_/cluster_features.parquet"
+  ],
+  "first_stronger_zero_write_assertion_stop": "Preserved final-checks-private.log; normal first grid adds 12 absent prerequisites per head. This does not change the separate earlier 73-file freshwarm zero-write proof."
+}

@@ -1,0 +1,9 @@
+{
+  "status": "PRESERVED_ROOT_METADATA_COUNT_ASSERTION_STOP",
+  "actual_session": 70636,
+  "actual_exit": 1,
+  "source_sha256": "95f8f4bcf4396ce753b8ddc2c8fead63e5845e3619567e91567c6b34b6049828",
+  "stderr_sha256": "2c9bde861c34a29c20b37c8d8c8cb42a862f52525d05878465923ee89fc8aba5",
+  "reason": "Root initially expected all14 fault rejections in one file; immutable evidence contains12 frame faults plus2 separately captured code-width/record-presence faults. All preceding manifest/source/hash checks completed before the metadata assertion. No product/runtime/API/test prefix is replayed.",
+  "signed": "Sue"
+}

@@ -18,10 +18,12 @@ What each wave actually ships (measured; evidence in ``_/CONTENTS.org``,
   a-t-elle ete mesuree par le GPS?" and ``V22``, the measured area in
   hectares.  ``df_geo`` is removed rather than pointed elsewhere.
 - **2021-22** -- the household GPS variables in ``s00_me_bfa2021.dta`` are
-  present and 100% empty, and no grappe-level file ships.
+  present and 100% empty, and no grappe-level file ships.  A panel grappe now
+  carries its 2018-19 fix as a registered derivation (GH #1057;
+  ``tests/test_gh1060_1057_burkina_cluster_features.py``).
 
-So ``optional: true`` stays: two of three waves have no cluster GPS, and the
-flag is country-grain.  ``test_optional_matches_the_waves_that_lack_gps`` pins
+So ``optional: true`` stays: 2014 has no cluster GPS at all, and the flag is
+country-grain.  ``test_optional_matches_the_waves_that_lack_gps`` pins
 that it stays *only* while that is true.
 
 WHICH TESTS DISCRIMINATE (measured, each revert alone against the fix).
@@ -77,10 +79,10 @@ LON = (-5.6, 2.5)
 
 @pytest.fixture(scope="module", autouse=True)
 def _non_strict():
-    """Warn-mode grain checks.  2014 carries a pre-existing, unrelated
-    ``GrainCollapseWarning`` (94 zd whose households disagree on
-    Region/District/Rural) that ``LSMS_GRAIN_STRICT=1`` would turn into an
-    abort of the whole country build."""
+    """Warn-mode grain checks.  2014 carries an unrelated
+    ``GrainCollapseWarning`` (2 tied zd whose households disagree on District,
+    GH #1060) that ``LSMS_GRAIN_STRICT=1`` would turn into an abort of the
+    whole country build."""
     prior = os.environ.pop("LSMS_GRAIN_STRICT", None)
     yield
     if prior is not None:
@@ -159,7 +161,8 @@ def test_optional_matches_the_waves_that_lack_gps(bf_root):
         optional = isinstance(entry, dict) and bool(entry.get("optional"))
         assert optional == bool(lacking), (
             f"{col}: optional={optional} but waves without GPS = {lacking}")
-    assert lacking == ["2014", "2021-22"]
+    # Re-pinned for GH #1057: 2021-22 now maps the 2018-19 fix through df_geo.
+    assert lacking == ["2014"]
 
 
 # --------------------------------------------------------------------------
@@ -230,7 +233,8 @@ def test_2018_19_clusters_carry_gps(clusters):
     w = _wave(clusters, "2018-19")
     assert len(w) == 585 and not w["v"].duplicated().any()
     fixed = w.dropna(subset=["Latitude"])
-    assert len(fixed) == 555, len(fixed)
+    # 555 in the file; 9 are withheld as not readings of their grappe (ruling of 2026-11-05).
+    assert len(fixed) == 546, len(fixed)
     assert fixed["Longitude"].notna().all()
     assert fixed["Latitude"].between(*LAT).all()
     assert fixed["Longitude"].between(*LON).all()
@@ -238,10 +242,11 @@ def test_2018_19_clusters_carry_gps(clusters):
 
 @requires_s3
 def test_waves_without_gps_are_served_empty_not_invented(clusters):
-    for wave in ("2014", "2021-22"):
-        w = _wave(clusters, wave)
-        assert len(w) > 0, wave
-        assert w["Latitude"].isna().all() and w["Longitude"].isna().all(), wave
+    # Re-pinned for GH #1057: 2021-22 is no longer empty, so this now names the
+    # one wave that is; 2021-22's rule is pinned by the GH #1060/#1057 test file.
+    w = _wave(clusters, "2014")
+    assert len(w) > 0
+    assert w["Latitude"].isna().all() and w["Longitude"].isna().all()
 
 
 @requires_s3

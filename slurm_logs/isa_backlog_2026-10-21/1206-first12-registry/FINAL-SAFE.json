@@ -1,0 +1,57 @@
+{
+  "status": "BOUNDED_12_PR_SOURCE_ASSERTION_AUTHORITY_HANDOFF",
+  "assigned_PRs": [
+    1172,
+    1173,
+    1175,
+    1176,
+    1178,
+    1180,
+    1181,
+    1182,
+    1185,
+    1186,
+    1189,
+    1191
+  ],
+  "source_records": 177,
+  "original_shell_sources": 11,
+  "overlapping_static_locator_sites": 6950,
+  "helper_definition_records": 55,
+  "locator_counts_not_runtime_or_pair_counts": true,
+  "five_frozen_saved_result_packets": 5,
+  "authority_holds_without_payload_decode": [
+    1172,
+    1173,
+    1186
+  ],
+  "other_original_baseline_expected_warm_test_or_source_memory_gaps_explicit": true,
+  "numeric_mismatches_observed_in_authorized_checked_pairs": 0,
+  "preserved_complete_unused_domain_findings": 7,
+  "preserved_API9_typed_record_class_findings": 4,
+  "no_full_frame_equality_claim_for_qualified_groups": true,
+  "all_eight_country_document_readings_own_complete_or_exact_identity_carried": true,
+  "raw_source_API_Feature_CLI_pytest_cache_acquisition_replays": 0,
+  "Git_GitHub_or_product_writes": 0,
+  "task_sequencing_stop_requested_by_root": true,
+  "overall_campaign_completion_claimed": false,
+  "limits": [
+    "This census covers all located original review Python sources, nested documentary checkers, literal/changed/explicit-shell-selected product tests, tracked issue producer scripts and original shell command files. Alias and helper definitions are retained. Static assert/Compare/call sites overlap and are not counts of runtime executed checks or independent pairs.",
+    "Original anonymous Python/shell bodies or runtime objects never persisted cannot be recovered from final summaries. They remain missing evidence, not regenerated expected operands.",
+    "Product test files may contain more declarations than the original selected nodeids; exact original pytest selectors remain in captured launchers/reports. Every test fixture object is an original unsaved-memory gap unless explicitly serialized and authenticated elsewhere.",
+    "Known source/JSON/hash/scalar predicates are captured and identified separately from affected numeric equality. Original exact byte witnesses do not establish new complete-frame numeric equality.",
+    "The root retains further authority discovery and science/product classification. This bounded stop follows explicit task sequencing, not a campaign goal pause or completion."
+  ],
+  "signed": "Sue",
+  "coverage_refinement": "v5 supplies explicit per-node final disposition, actual original positive/negative context, exact mapped packet nodes, same-line unsaved repeated-Code gap, helper definitions not counted as pairs, and precise historical authority/memory requirements. Separate author822/API9 complete censuses and pair maps are linked without conflating streams.",
+  "precision_supplement_expected_separately": false,
+  "six_frozen_saved_result_and_precision_packets": 6,
+  "precision_supplement_READY_sha256": "ef2077d0f19f8ad33f08e7bd1bf299b5b8fdef0b12be7fe002e4e43a63c508b6",
+  "precision_supplement_verified": {
+    "three_PR1175_u_code_views_exact_int8_one_byte_no_width_change": true,
+    "eight_API9_record_boundaries_all_present_declared_keys_exact_builtins_str_and_eq_typed": true,
+    "old_frozen_findings_unchanged": true
+  },
+  "final_census": "complete-assertion-census-private-v5.json",
+  "guard_threads_identity_scope": "Mounted Python and unshare-rn + pre-import socket/write audit guards for all package imports/payload reads; actual environment pins are captured in run-own.sh. Metadata-only stdlib/Git reads use no library import or payload decode."
+}

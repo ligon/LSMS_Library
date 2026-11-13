@@ -1,0 +1,14 @@
+{
+  "PR": 1189,
+  "terminal_checker_exit_expected": 0,
+  "manifest_sha256": "b7d5d511cf8075d744bd7d123b25748e244ea02d95d3874eaac4e609dcf6edd7",
+  "manifest_entries": 103,
+  "source_tracked_physical_receipts_exact": 14880,
+  "source_head_clean_exact": true,
+  "original_authority_selected_operands_and_review_sources_exact": true,
+  "distinct_inode_copies_exact": true,
+  "remaining_consumers": 0,
+  "full_axis_failures_retained": 2,
+  "numeric_axis_qualified_groups_not_full_frame_equality": true,
+  "signed": "Sue"
+}

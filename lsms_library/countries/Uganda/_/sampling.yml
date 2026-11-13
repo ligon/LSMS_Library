@@ -144,16 +144,34 @@ Sampling:
       cluster_id_note: |-
         339 of this wave's 656 `v` values are synthetic 0.05-degree GPS bins
         ('@lat,lon'), not clusters: movers and split-offs whose `comm` is blank get a
-        `coalesce_coord_bin` label (CONTENTS.org, "Hybrid v in 2009-10").  The rest
-        are the 2005-06 frame EA, but the survey files render `comm` as a 7-character
-        string here and as an int32 8-digit code in 2005-06, and the library serves
-        both un-harmonised -- a harmonisation gap, not a redraw (the Uganda `comm`
-        rendering issue, to be filed; DESIGN.org Q5).  Measured: 0 of 2,607 linked
-        households keep `v`.
+        `coalesce_coord_bin` label (CONTENTS.org, "Hybrid v in 2009-10").  The other
+        317 are the 2005-06 frame EA, served as the same 8-digit code 2005-06 writes
+        (GH #1133, the `comm_frame_ea` table).  Measured: 2,410 of 2,607 linked
+        households (92.4%) keep `v`; the 197 that do not are this wave's bin (191)
+        and no-`v` (6) households.
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-22 through Country("Uganda").sample() after GH #1133'
+      cluster_id_measurement:
+        linked_households: 2601
+        households_changed: 191
+        not_applicable: [clusters_renumbered]
+        note: |-
+          Historical measurement recorded 2026-10-22 after GH #1133, before
+          later cover/singleton extensions (GH #1120); not remeasured here.
+          2,607 households then linked across the boundary; 6 had no 2009-10
+          `v`, so 2,601 carried `v` on both sides. 2,410 kept it; the 191
+          that changed carried this wave's synthetic `@lat,lon` bins, with a
+          blank `comm`. The historical note described these as movers and
+          split-offs, mostly movers, but applied no movement classification;
+          the net-of-movers count remains unknown. A bin is not a cluster,
+          so a renumbered-cluster count does not apply. The historical record
+          reported no real EA id changes (0 of 0); this is not a numeric K.
+          These counts do not assert the current sample or singleton policy.
+        source_type: derived-from-data
+        confidence: high
+        locator: '79f5979cf8022e64928c5150950dfb00456994da:lsms_library/countries/Uganda/_/sampling.yml, Sampling.2009-10.panel.cluster_id_note (historical measurement 2026-10-22 after GH #1133); lsms_library/countries/Uganda/_/CONTENTS.org, "v across waves: three different defects (GH #942)"; reviewed GH #1135 source f1cf7d06f30367cd1e34a4b3db4012f951b2e497, supplied COUNTRY-INPUT.json rows[0].measurement_text'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -205,12 +223,34 @@ Sampling:
         The 2009-10 side of this boundary is mixed: its 339 synthetic GPS-bin `v`
         resolve here to the household's original-sample EA `comm`, which 2010-11
         populates for every household (CONTENTS.org, "Hybrid v in 2009-10").
-        Measured: 1,819 of 2,647 linked households (68.7%) keep `v`; both waves
-        render `comm` 7-digit.
+        Measured: 2,207 of 2,647 linked households (83.4%) keep `v`; the 440 that do
+        not are 2009-10 bin (433) and no-`v` (7) households.  Both waves are served
+        the 8-digit frame EA (GH #1133); in the raw files 2009-10 writes 2005/06
+        district definitions and 2010-11 writes 2010/11 definitions for 50 EAs, which
+        had cost a further 388 households before the harmonisation (1,819 / 2,647).
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-22 through Country("Uganda").sample() after GH #1133'
+      cluster_id_measurement:
+        linked_households: 2640
+        households_changed: 433
+        not_applicable: [clusters_renumbered]
+        note: |-
+          Historical measurement recorded 2026-10-22 after GH #1133, before
+          later cover/singleton extensions (GH #1120); not remeasured here.
+          2,647 households then linked across the boundary; 7 had no 2009-10
+          `v`, so 2,640 carried `v` on both sides. 2,207 kept it; the 433
+          that changed had a synthetic `@lat,lon` bin in 2009-10 and their
+          original-sample EA here. No movement classification was applied,
+          so the net-of-movers count remains unknown. A bin is not a cluster,
+          so a renumbered-cluster count does not apply; the historical record
+          reported no real EA id changes. Before GH #1133 harmonised the
+          renderings of `comm`, a further 388 households changed `v`.
+          These counts do not assert the current sample or singleton policy.
+        source_type: derived-from-data
+        confidence: high
+        locator: '79f5979cf8022e64928c5150950dfb00456994da:lsms_library/countries/Uganda/_/sampling.yml, Sampling.2010-11.panel.cluster_id_note (historical measurement 2026-10-22 after GH #1133); lsms_library/countries/Uganda/_/CONTENTS.org, "v across waves: three different defects (GH #942)"; reviewed GH #1135 source f1cf7d06f30367cd1e34a4b3db4012f951b2e497, supplied COUNTRY-INPUT.json rows[1].measurement_text'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -251,26 +291,27 @@ Sampling:
       role: panel
       rotation: null
       household_continuity: panel
-      cluster_id_continuity: wave-scoped
+      cluster_id_continuity: stable
       cluster_id_note: |-
-        Same EA, two ids: 0 of 2,510 linked households keep `v` across 2010-11 ->
-        2011-12, though both waves map `v: comm`.  The survey files carry two
-        renderings of the same EA code (int32 8-digit in 2005-06/2011-12,
-        7-character string in 2009-10/2010-11); the library serves both
-        un-harmonised, so the 0% is a harmonisation gap, not a redraw.  For 272 of
-        the 322 cluster pairs the 8-digit form is the 7-digit form with one digit
-        inserted at position 3 (1020001 -> 10210001); the other 50 also re-code the
-        district field, and the region digit and EA serial survive in all 322.  So
-        the `v` values differ only by that rendering -- the Uganda `comm` rendering
-        issue (to be filed; DESIGN.org Q5, ruling 2026-10-18) -- and this boundary
-        becomes `stable` once it is harmonised.  `wave-scoped`, not `unobservable`,
-        because the linkage IS verified (2,510 households) and `unobservable` means
-        "no verified linkage" (dispatcher call on red team r1 H1, 2026-10-19,
-        @ligon informed; reversible).
+        Same EA code both sides once harmonised: 2,510 of 2,510 linked households
+        with a located `v` in 2011-12 (100%) keep `v` across 2010-11 -> 2011-12.
+        2,540 link in all; the other 30 are on 2011-12's AGSEC1 only, which records
+        no location, so they carry an `unlocated-` singleton (GH #1120 D2).  The raw
+        files render `comm` as an int32 8-digit code here (and in 2005-06) and as a 7-character string in
+        2009-10/2010-11; since GH #1133 the 7-character waves are served the 8-digit
+        frame EA through the reviewed `comm_frame_ea` table
+        (categorical_mapping.org).  That is a 370-pair table from household
+        linkage, corroborated by the community files' own comm/comcod crosswalks,
+        not a digit rule: for 50 EAs 2010-11 re-codes the district field (2010/11
+        district definitions), e.g. 1140003 -> 11030003.  Before the harmonisation
+        this boundary measured 0 of 2,510 and was declared `wave-scoped`
+        (2026-10-19; `unobservable` was rejected because the linkage is verified).
+        One 2010-11 code (1530040, one household, no linkage) is not in the table
+        and keeps its 7-character rendering.
       source_type: derived-from-data
       confidence: high
-      source_file: 'lsms_library/countries/Uganda/2011-12/Data/GSEC1.dta'
-      locator: '`comm` dtype and width in each wave''s Data/GSEC1.dta, read via get_dataframe on 2026-10-19: 2005-06 int32 8-digit (3,123), 2009-10 7-char str (2,410, plus 565 blank), 2010-11 7-char str (2,716), 2011-12 int32 8-digit (2,850); served `v` re-measured through Country("Uganda").sample(); slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2.3a'
+      source_file: 'lsms_library/countries/Uganda/_/categorical_mapping.org'
+      locator: '`comm_frame_ea` table and its header comment; raw `comm` read via get_dataframe: 2005-06 / 2011-12 GSEC1 int32 8-digit, 2009-10 / 2010-11 GSEC1 7-char str, CSECTION1 comm/comcod and CSEC1 comm/comcod; served `v` re-measured 2026-10-22 through Country("Uganda").sample(); slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2.3a'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -318,12 +359,33 @@ Sampling:
       cluster_id_note: |-
         `v` changes KIND here: the EA code `comm` through 2011-12, the parish code
         `h1aq4a` from 2013-14 (CONTENTS.org, "Cluster (PSU) identifier").  A parish
-        is not an EA, so no crosswalk can exist.  Measured: 0 of 1,717 linked
-        households keep `v`.
+        is not an EA, so `v` has no crosswalk across this boundary, but the EA is not
+        lost: `sample()`'s `ea` serves the design PSU from this wave (GH #689), and
+        `GSEC1.ea` pairs one-to-one with 2011-12 `comm` on all 212 linked EAs.
+        Measured: 0 of 1,717 linked households keep `v`.
       source_type: derived-from-data
       confidence: high
       source_file: null
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
+      cluster_id_measurement:
+        linked_households: 1717
+        households_changed: 1717
+        not_applicable: [clusters_renumbered]
+        note: |-
+          Historical measurement recorded 2026-10-19; not remeasured here.
+          None of the 1,717 then-linked households kept `v`, because it
+          changed kind (EA code -> parish code): every household changed,
+          mover or not, so a renumbered-cluster count does not apply.
+          The reviewed record also reports 65 of the 212 earlier EA ids
+          mapping one-to-one to a parish id (measured 2026-10-23); a parish
+          is not an EA, so those pairs are not a renumbering count.
+          No movement classification was applied; the net count is unknown.
+          This concerns served `v`, not the separately recorded design PSU
+          `sample.ea` (GH #689). The counts are historical, not a claim
+          about the current sample.
+        source_type: derived-from-data
+        confidence: high
+        locator: '79f5979cf8022e64928c5150950dfb00456994da:lsms_library/countries/Uganda/_/sampling.yml, Sampling.2013-14.panel.cluster_id_note (historical measurement 2026-10-19); lsms_library/countries/Uganda/_/CONTENTS.org, "v across waves: three different defects (GH #942)"; reviewed GH #1135 source f1cf7d06f30367cd1e34a4b3db4012f951b2e497, supplied COUNTRY-INPUT.json rows[2].measurement_text; historical one-to-one pairs measured 2026-10-23: slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json (locator retained from reviewed record, not rerun)'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -342,6 +404,8 @@ Sampling:
       selected from the 783 EAs of UNHS 2005/06" -- the 2009-10 design, not
       this wave's sample.  Treat the household/EA counts in that sentence as
       boilerplate.  The rotation above IS wave-specific and begins here.
+      The `psu` above is served as `sample()`'s `ea`, direct from `GSEC1.ea`;
+      `v` is a parish from this wave (GH #689).
     record_source: 'CONTENTS.org "Sampling Design" > "Rotating panel and refreshment sample" + oversamples'
 
   '2015-16':
@@ -388,7 +452,11 @@ Sampling:
     design_statement: |-
       However, the probabilities of selection for the rural portions of ten districts that had been oversampled by the UNHS 2005/06 were adjusted accordingly.
     documentation_status: carried-forward
-    notes: 'population.yml notes repeat the 2009-10 "3,123 households over 322 EAs" boilerplate.'
+    notes: |-
+      population.yml notes repeat the 2009-10 "3,123 households over 322 EAs"
+      boilerplate.  The `psu` above is served as `sample()`'s `ea`, direct from
+      `gsec1.ea`, and from `AGSEC1.ea` for the 72 households only AGSEC1 records;
+      `v` is a parish (GH #689).
     record_source: 'CONTENTS.org "Sampling Design" > oversamples'
 
   '2018-19':
@@ -427,6 +495,26 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Uganda rows); re-measured 2026-10-19 through Country("Uganda").sample()'
+      cluster_id_measurement:
+        linked_households: 2973
+        households_changed: 2973
+        not_applicable: [clusters_renumbered]
+        note: |-
+          Historical measurement recorded 2026-10-19; not remeasured here.
+          None of the 2,973 then-linked households kept `v`, because it
+          changed kind again (numeric parish code -> DISTRICT/PARISH name
+          composite): every household changed, mover or not, so a
+          renumbered-cluster count does not apply. The reviewed record
+          also reports 576 of the 788 earlier parish codes mapping
+          one-to-one to a name composite (measured 2026-10-23), described
+          there as possible renaming of the same parishes for most of the
+          sample. The existing `redefined` declaration is not revisited.
+          No movement classification was applied; the net count is unknown.
+          These counts do not assert the current sample, cover extensions
+          or the separately recorded `sample.ea` inheritance (GH #689).
+        source_type: derived-from-data
+        confidence: high
+        locator: '79f5979cf8022e64928c5150950dfb00456994da:lsms_library/countries/Uganda/_/sampling.yml, Sampling.2018-19.panel.cluster_id_note (historical measurement 2026-10-19); lsms_library/countries/Uganda/_/CONTENTS.org, "v across waves: three different defects (GH #942)"; reviewed GH #1135 source f1cf7d06f30367cd1e34a4b3db4012f951b2e497, supplied COUNTRY-INPUT.json rows[3].measurement_text; historical one-to-one pairs measured 2026-10-23: slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json (locator retained from reviewed record, not rerun)'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -439,7 +527,10 @@ Sampling:
       CONTENTS.org records that this wave's universe statement exists ONLY in
       WB catalog metadata and that the library holds no copy of the claim; the
       design entry here is inherited from the panel design, not read off a
-      wave-specific document.
+      wave-specific document.  No household file of this wave ships an EA:
+      `sample()`'s `ea` is the 2015-16 `ea` of the household `GSEC1.t0_hhid`
+      names, for 3,027 of 3,242 households and NA for the rest (GH #689,
+      derivation `Uganda::sample::ea-tracking-key`).
     record_source: 'CONTENTS.org "Sampling Design"'
 
   '2019-20':
@@ -489,5 +580,8 @@ Sampling:
       Households whose last interview was Wave 0 or Wave 1 are out of scope for
       this wave (CONTENTS.org, "Exclusions").  CONTENTS.org also records an
       open TODO: this wave provides only a single `wgt` variable and appears
-      panel-only, so `wgt` is used for both weight columns.
+      panel-only, so `wgt` is used for both weight columns.  No household file
+      of this wave ships an EA: `sample()`'s `ea` follows `gsec1.hhidold` to
+      2018-19 and `t0_hhid` to the 2015-16 `ea`, for 2,868 of 3,098 households
+      and NA for the rest (GH #689, derivation `Uganda::sample::ea-tracking-key`).
     record_source: 'CONTENTS.org "Sampling Design"'

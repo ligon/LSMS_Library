@@ -1,0 +1,27 @@
+{
+  "observed_at_UTC": "2026-10-22T17:55:35.719067+00:00",
+  "head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+  "run": 39822550698,
+  "workflow_metadata": {
+    "status": "completed",
+    "conclusion": "success",
+    "updated_at": "2026-10-22T17:29:38Z"
+  },
+  "job_metadata": {
+    "unit_tests": {
+      "id": 119977316030,
+      "status": "in_progress",
+      "conclusion": null,
+      "completed_at": null
+    },
+    "windows_smoke": {
+      "status": "completed",
+      "conclusion": "success",
+      "completed_at": "2026-10-22T17:27:37Z"
+    },
+    "skipped_jobs": 6
+  },
+  "verified_by": "Connector run/jobs and direct gh api run/jobs plus individual unit job all reproduce the inconsistent metadata.",
+  "qualification": "Workflow success metadata conflicts with unfinished unit job. No completed unit-tests, full data suite or overall campaign CI pass is claimed. No CI restart was performed.",
+  "signed": "Sue"
+}

@@ -1,0 +1,43 @@
+{
+  "BF_config_commit": "657fed11a63354886772d0f978cec8adb2ad647e",
+  "BF_config_composition_requires_fresh_prepared_literal_source_and_private_DVC_identity": true,
+  "actual_project_numerical_imports": 0,
+  "actual_tests_API_builds_payload_hash_copy_decode": 0,
+  "canonical_precedence_preserved": true,
+  "combined1215_direct_helper_object_assertion_requires_intentional_update": true,
+  "current_hash_inventory_measurement": "HELD; predict549/39/1362 broad moves",
+  "independent_runtime_review_required": true,
+  "index_payload_collision_excluded": true,
+  "ledger_first_commit": "d60275ada3997d5fd5b78282c1c5fa3f0cee53e3",
+  "mechanism": "empty-only payload declaration projection feeding unchanged nullable enforcer after existing index construction",
+  "only_changed_source_path": ".coder/ledger/1218-constructed-empty-explicit-types.md",
+  "optional_type_scope": "explicit existing types on constructed empty results only",
+  "planned_binary_copy_bytes": 25343300,
+  "planned_distinct_binary_copies": 24,
+  "planned_fresh_roots": 4,
+  "planned_normal_actors": 8,
+  "planned_normal_returns": 56,
+  "planned_unique_providers": 6,
+  "prior_original_BF_parent_lacks_four_fields": true,
+  "production_runtime_or_genuine_release": false,
+  "proposed_production_paths": [
+    "lsms_library/country.py",
+    "tests/test_gh1039_make_backend_no_country_rule.py",
+    ".coder/ledger/1218-constructed-empty-explicit-types.md"
+  ],
+  "qualifications": [
+    "Static source observations only; root-provided BF data findings are attributed, not independently reproduced.",
+    "Older skills no-auto-hash/.pth/core-first and AGENTS Age Int64 examples conflict with current source.",
+    "Missing python command and locator/truncated-output stops preserved; no payload was opened."
+  ],
+  "recommended_prerequisite": "GH1215; no BF country-chain merge",
+  "root_decisions_needed": [
+    "final base/prerequisite",
+    "new BF657 config checkout/privateDVCtmp",
+    "concrete source/runtime implementation release"
+  ],
+  "signed": "Sue",
+  "source_head": "9aaee25552176f31c3aa6d1c920b621e2cb1dd4d",
+  "source_production_edits": 0,
+  "status": "GH1218_PHASE0_STATIC_READY_FOR_ROOT_REVIEW"
+}

@@ -1,0 +1,11 @@
+{
+  "status": "ROOT_METADATA_CHECK_STOP_PRESERVED",
+  "actual_session": 70523,
+  "actual_terminal_exit": 1,
+  "chunk": "3283ab",
+  "source_sha256": "d6f1aecfa8fa5df83a899aaf3039b2ca36f1529e38f9ef9b093c0bd09bb9e558",
+  "stderr_sha256": "6fb9a8501f2fd767d524c006e65d83862cf98c670df2d8e41e313932b618a3bd",
+  "cause": "Root asserted optional declared_size against integer file size;27legacy sidecars omit size. All1839manifest and29825source full checks preceded the failure. Provider has unchanged physical size and must still match real declaredMD5/SHA/binary. No data/test/API actor ran.",
+  "correction": "Use size from genuine provider receipt and require declared size equality only where present; retain missing-size count. No source/provider/sidecar edits.",
+  "signed": "Sue"
+}

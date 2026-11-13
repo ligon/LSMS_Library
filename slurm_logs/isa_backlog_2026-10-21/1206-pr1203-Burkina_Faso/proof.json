@@ -1,0 +1,38 @@
+{
+  "status": "PASS_BOUNDED_NEW_SAVED_PR1203_NUMERIC_SUPPLEMENT",
+  "PR": 1203,
+  "positive_nonself_fullframe_groups": 192,
+  "original_payload_only_reset_diagnostic": 1,
+  "original_negative_stages_retained": 5,
+  "original_fullfooter_schema_metadata_bytes_controls": 4,
+  "groups": {
+    "cross_head_unchanged": 63,
+    "cross_head_two_labels_only": 25,
+    "fresh_warm_and_new_objects": 72,
+    "independent_source_oracle": 8,
+    "Feature_argument_matched_complete": 8,
+    "Feature_fresh_warm": 8,
+    "producer_CLI_original_writer": 4,
+    "NEW_retained_actual_CLI": 4
+  },
+  "numeric_array_checks": {
+    "str": 1039,
+    "string": 249,
+    "int16": 2,
+    "numeric_nonmissing_arrays": 578,
+    "float64": 12,
+    "Float64": 430,
+    "boolean": 126,
+    "float32": 8,
+    "object": 8
+  },
+  "NEW_Feature_expected_constructions_using_original_pure_helper_arguments_not_recovered_memory": 8,
+  "two_label_counterfactuals_are_NEW_saved_expected_frames": true,
+  "original_direct_real_source_test_memory_pairs_unavailable": 2,
+  "old_native_unit_oracle_failure_not_erased": true,
+  "original_copy_receipts_exact_before_after": true,
+  "source_API_CLI_pytest_cache_replays": 0,
+  "all_campaign_result": false,
+  "failures": [],
+  "signed": "Sue"
+}

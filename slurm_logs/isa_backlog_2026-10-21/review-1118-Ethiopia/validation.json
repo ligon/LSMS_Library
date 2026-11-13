@@ -1,0 +1,181 @@
+{
+  "verdict": "PASS",
+  "scope_deviations": [],
+  "reviewed_head": "286108cf7ecc1a6e1e07150b8eec8411f5326b05",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "independence": "Reviewer did not author the patch; held sources and actual builds independently rerun",
+  "country": {
+    "rows": 180900,
+    "exact_unit_replacements": 37370,
+    "by_input": {
+      "Compost": 4295,
+      "Manure": 27261,
+      "Other Organic": 2651,
+      "Pesticide": 3163
+    },
+    "by_wave": {
+      "2011-12": 9141,
+      "2013-14": 8881,
+      "2015-16": 8879,
+      "2018-19": 5567,
+      "2021-22": 4902
+    },
+    "Kg_rows_unchanged": 143530,
+    "Kg_rows_with_missing_Quantity_unchanged": 40977,
+    "all_replaced_rows_Applied_true": true,
+    "all_replaced_rows_Quantity_and_Quantity_purchased_missing": true,
+    "complete_helpers_and_Country_exact_except_unit": true,
+    "all_attrs_exact": true,
+    "actual_cold_and_fresh_process_warm": true,
+    "warm_parquets_byte_size_mtime_unchanged": {
+      "baseline": 38,
+      "candidate": 38
+    }
+  },
+  "sources": {
+    "section_3_4_5_files": 15,
+    "waves": 5,
+    "source_yes_no_label_columns": 30,
+    "independent_numeric_eligible_use_keys": 37370,
+    "all_eligible_use_keys_retained": true,
+    "ambiguous_holder_crop_seed_rows_no_fanout_checked": 47941,
+    "known_purchase_answer_attachments_checked": 49119,
+    "source_unknown_purchase_residual_selected_rows": {
+      "2011-12": 4421,
+      "2013-14": 60
+    },
+    "input_integrity": {
+      "baseline": {
+        "held_L1_blobs_verified": 84,
+        "Ethiopia_source_files_verified": 15,
+        "separate_physical_copies": true
+      },
+      "candidate": {
+        "held_L1_blobs_verified": 84,
+        "Ethiopia_source_files_verified": 15,
+        "separate_physical_copies": true
+      }
+    }
+  },
+  "nitrogen": {
+    "complete_frame_and_attrs_unchanged": true,
+    "Nitrogen_kg_total": 500847.2208579673
+  },
+  "Feature": {
+    "countries": [
+      "Ethiopia",
+      "Uganda"
+    ],
+    "rows": 265116,
+    "Uganda_rows": 84216,
+    "frame_exact": true,
+    "sole_attrs_delta": {
+      "canonical_alignment.promoted.Ethiopia.u": [
+        37370,
+        0
+      ]
+    },
+    "all_other_attrs_exact": true,
+    "Uganda_comparator_current_full_coverage_and_byte_unchanged": true
+  },
+  "tests": {
+    "focused_pass": 58,
+    "focused_skip": 0,
+    "adversarial_pass": 6,
+    "baseline_new_tests_fail": 8,
+    "baseline_new_tests_pass": 6
+  },
+  "audit": {
+    "before_records": 13,
+    "after_records": 12,
+    "before_warnings": 13,
+    "after_warnings": 12,
+    "unchanged_exact_records": 11,
+    "removed_records": 2,
+    "added_records": 1,
+    "errors": 0,
+    "failures": 0,
+    "removed_constant_unit_warning": true,
+    "alignment_warning_only_fillcount_delta": [
+      37370,
+      0
+    ],
+    "normalization": "Only checkout/private-data paths and elapsed/duration fields",
+    "unchanged_records_sha256": "dbb497534ec01305d84d60bc7b4b23e4d78c2d92617103154600c83a8fc0f03a"
+  },
+  "hashes": {
+    "country_pairs": 549,
+    "Ethiopia_changed": 25,
+    "other_country_pairs_unchanged": 524,
+    "tagged_fingerprints_unchanged": 39,
+    "changed_country_pairs": [
+      "Ethiopia/sample",
+      "Ethiopia/cluster_features",
+      "Ethiopia/shocks",
+      "Ethiopia/household_roster",
+      "Ethiopia/individual_education",
+      "Ethiopia/panel_ids",
+      "Ethiopia/assets",
+      "Ethiopia/housing",
+      "Ethiopia/interview_date",
+      "Ethiopia/food_acquired",
+      "Ethiopia/plot_features",
+      "Ethiopia/crop_production",
+      "Ethiopia/plot_inputs",
+      "Ethiopia/livestock",
+      "Ethiopia/food_security",
+      "Ethiopia/food_coping",
+      "Ethiopia/anthropometry",
+      "Ethiopia/plot_labor",
+      "Ethiopia/people_last7days",
+      "Ethiopia/community_prices",
+      "Ethiopia/nutrition",
+      "Ethiopia/food_expenditures",
+      "Ethiopia/food_prices",
+      "Ethiopia/food_quantities",
+      "Ethiopia/household_characteristics"
+    ]
+  },
+  "strict_frame_check_count": 17,
+  "descendant": {
+    "head": "9e698a3677da8097da42fec90c90525cdaaf3e68",
+    "only_changed_file": "slurm_logs/isa_backlog_2026-10-21/1118-Ethiopia/REPORT.org",
+    "insertions": 23,
+    "identical_trees": {
+      "lsms_library": "6d41e733634de9a75dae1a298205bfdcab1dccc5",
+      "tests": "d1505c79c5270531aa4f87ed0ba57c4aac7faf44"
+    },
+    "exact_test_selector": true
+  },
+  "immutable": {
+    "tracked_content_and_modes_unchanged": true,
+    "tracked_files": {
+      "isa-baseline": 14880,
+      "isa-review-1118-Ethiopia": 14885
+    },
+    "heads_unchanged": true,
+    "clean_status_both": true,
+    "no_task_processes": true,
+    "no_in_tree_parquets_or_dta": true
+  },
+  "offline": {
+    "guard_active_in_review_processes": true,
+    "intercepted_internet_socket_connects": 8,
+    "successful_network_acquisitions": 0,
+    "DVC_CLI_calls": 0,
+    "shared_cache_changes": 0
+  },
+  "residuals": [
+    "Unchanged missing purchase-answer recode/quantity behavior requires source skip-pattern diagnosis",
+    "#660 cover keys",
+    "#1110 fertilizer-rate land grain",
+    "#820 sales",
+    "#1118 other-country scopes remain open",
+    "Recorded sampling/weight and improved-code documentation tensions retained"
+  ],
+  "limits": [
+    "Hash-only coverage is not an output claim for other Ethiopia features",
+    "No questionnaire PDF newly acquired or inspected",
+    "Detailed raw frames and scanner findings remain private"
+  ]
+}

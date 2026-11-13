@@ -1,0 +1,26 @@
+{
+  "PR": 1175,
+  "status": "FINDINGS_REQUIRE_CLASSIFICATION",
+  "positive_pairs": 6,
+  "pass_pairs": 3,
+  "full_strict": 1,
+  "qualified_preexisting_field_projections": 5,
+  "original_saved_operands": 6,
+  "array_checks": {
+    "str": 34,
+    "string": 5,
+    "Float64": 3,
+    "numeric_nonmissing_arrays": 7,
+    "boolean": 4
+  },
+  "original_receipts_and_copies_preserved": true,
+  "source_API_cli_pytest_cache_replays": 0,
+  "scope": "Synthetic comparator calibration plus authenticated saved harmonized pairs. Not sourceoracle/scienceapproval or allcampaigncompletion.",
+  "gaps": [
+    "Original raw-source expected/wave/public expected objects and sixqualifiedcode nitrogen expected objects were not serialized; no source-prefix replay.",
+    "Original source count/metadata assertions and original pytest fixtures/negativecontrol objects are not replayed.",
+    "No saved standalone warm country object exists in this review; warm pooled is distinct Feature stage.",
+    "Original compatibility did not assert complete attrs; this NEW supplement checks complete typed attrs on its exact selected fields."
+  ],
+  "signed": "Sue"
+}

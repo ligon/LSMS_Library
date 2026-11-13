@@ -6,7 +6,20 @@ from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
+    inputs_region_milieu_stratum as _inputs_region_milieu_stratum,
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
 )
+
+
+# GH #1575; reuse the GH812 construction (ledger 1575-togo1575-stratawiring §2).
+def inputs_strata(wave):
+    return _inputs_region_milieu_stratum('Togo', wave)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Togo')
+
 
 # GH #876.  `food_acquired` is no longer the bare canonical reshape: the wide
 # frame's `Expenditure` used to be `s07bq08`, the value of ONE purchase made up
@@ -16,8 +29,30 @@ from lsms_library.ehcvm import (
 # purchased row.  See lsms_library/ehcvm.py and Togo/_/derivations.yml.
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Togo')
 
+#: GH #1557, ruling @ligon 2026-11-12, "Decode 2018 with 2021 labels (Recommended)".
+#: This file's s07bq03b keeps no value labels and `ehcvm_units` (built from the sibling
+#: countries' labels) names no 659, 660 or 662.  Togo 2021-22's own s07b labels them Main,
+#: Quartier and Tête, and its unit-weight file ehcvm_nsu_tgo2021.dta uses them for the same
+#: goods 2018 records them on: 659 Main on Banane douce and Plantain (2018: Banane douce
+#: 437, Plantain 77 rows), 660 Quartier on six meats (2018: goat, mutton, other meat,
+#: beef), 662 Tête on Igname, Manioc, Taro (2018: Igname 1,317, Manioc 148, Plantain 21).
+#: So the code book is read as one across the waves.  Code 114 (one row) has no label in
+#: either wave and stays a code.  The only change this ruling makes to an older wave.
+UNIT_CODES_DECODED_FROM_2021 = {'659': 'Main', '660': 'Quartier', '662': 'Tête'}
+
+
+def _decode_unit(value):
+    '''A bare 659, 660 or 662 as 2021-22 labels it; anything else unchanged.'''
+    key = str(value).strip()
+    if key.endswith('.0'):
+        key = key[:-2]
+    return UNIT_CODES_DECODED_FROM_2021.get(key, value)
+
 
 def food_acquired(df):
+    # The unit level only: ConsumptionUnitCode and LastPurchaseUnitCode keep the codes
+    # that unit_match compares, so no Expenditure moves.
+    df = df.rename(index=_decode_unit, level='u')
     return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
 
 
@@ -147,7 +182,40 @@ def Age(value):
     return result
 
 
+class ShockLayoutError(Exception):
+    """Section 14.04 differs from the documented five/six-column layout.
+
+    Not a ValueError/KeyError/RuntimeError: build fallbacks must not hide it.
+    """
+
+
+def _food_effects_by_vague(df):
+    """Select stock and purchases per row, preserving mapped missing answers.
+
+    Vague 1: d = stock, e = purchases, f blank.  Vague 2: d = livestock,
+    e = stock, f = purchases (GH #1561).  The raw f sentinel checks this
+    layout independently of the answer-to-boolean mapping, as in the core
+    EHCVM 2018-19 hooks.  The same e is purchases in vague 1 and stock in 2.
+    """
+    vague = pd.to_numeric(df.pop('vague'))
+    stock_vague2 = df.pop('StockVague2')
+    purchases = df.pop('PurchasesVague2')
+    five = vague.eq(1)
+    asked = stock_vague2.notna() | df['AffectedFoodStock'].notna()
+    if not vague.isin([1, 2]).all() or purchases[five].notna().any() \
+            or purchases[~five & asked].isna().any():
+        raise ShockLayoutError(
+            f"s14q04f should be blank in vague 1 and filled in vague 2: "
+            f"{int(purchases[five].notna().sum())} filled in vague 1, "
+            f"{int(purchases[~five & asked].isna().sum())} blank in vague 2, "
+            f"vague values {sorted(vague.dropna().unique().tolist())}")
+    df['AffectedFoodStock'] = df['AffectedFoodStock'].where(five, stock_vague2)
+    df['AffectedConsumption'] = df['AffectedConsumption'].where(~five, stock_vague2)
+    return df
+
+
 def shocks(df):
+    df = _food_effects_by_vague(df)
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
     how_coped = {0: [], 1: [], 2: []}

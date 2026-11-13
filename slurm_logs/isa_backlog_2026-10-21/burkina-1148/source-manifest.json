@@ -1,0 +1,498 @@
+[
+  {
+    "columns": 87,
+    "held": true,
+    "md5": "d02097d373403f431ad563d548a0041d",
+    "path": "emc2014_agri_caracteristiques_cultures.dta",
+    "rows": 35264,
+    "sha256": "fa2d8c4b56bccb903b2ab8c5a0ae0dc2591453e6c702281ef3ac6957c3c71996",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_agri_caracteristiques_cultures.dta.dvc",
+    "size": 6792751
+  },
+  {
+    "columns": 141,
+    "held": true,
+    "md5": "cc23cd20f414a45f6d461c6aa9efbd2e",
+    "path": "emc2014_agri_caracteristiques_parcelles.dta",
+    "rows": 29146,
+    "sha256": "9cd13c95d1cfcb4c88efb25fd7adb5a00709c15c65d56739141cda7e0baa8d4a",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_agri_caracteristiques_parcelles.dta.dvc",
+    "size": 8310868
+  },
+  {
+    "columns": 57,
+    "held": true,
+    "md5": "be199cb415435688f2f2478e63fb8e3c",
+    "path": "emc2014_agri_couts_intrants.dta",
+    "rows": 138242,
+    "sha256": "7fb2d8e1e238d110488741f678b9f2deb53c312347867f51cee746377430cb42",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_agri_couts_intrants.dta.dvc",
+    "size": 21302637
+  },
+  {
+    "columns": 51,
+    "held": true,
+    "md5": "76008d0b271a97bedaf5f34e7404cf36",
+    "path": "emc2014_agri_equipements.dta",
+    "rows": 169820,
+    "sha256": "be44d9cd93da39e6fc1da934c2fbd7874a4536545e613633d3de19ef1a077b7d",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_agri_equipements.dta.dvc",
+    "size": 25314637
+  },
+  {
+    "columns": 31,
+    "held": true,
+    "md5": "ebbe9ce008b8a6cadc0081aa79a795a0",
+    "path": "emc2014_agri_gps.dta",
+    "rows": 3978,
+    "sha256": "7b9d68b845cc5989ac55af6afc32202186bda0e53db965b737d98ab134585011",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_agri_gps.dta.dvc",
+    "size": 221784
+  },
+  {
+    "columns": 13,
+    "held": true,
+    "md5": "cef633853c1c3a7189cc1f480bee813b",
+    "path": "emc2014_p1_biensdurables_27022015.dta",
+    "rows": 280775,
+    "sha256": "c33b7d6062eb42bcd59813f7828417981ff96ce18affdde1d2159b42d827c30f",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p1_biensdurables_27022015.dta.dvc",
+    "size": 6179709
+  },
+  {
+    "columns": 13,
+    "held": true,
+    "md5": "488711f60df9a8b708489ad7d1c3e5c2",
+    "path": "emc2014_p1_conso3mois_16032015.dta",
+    "rows": 192728,
+    "sha256": "0963ba9a99bef5e2442cc29e8cf65938f47bf49551ac0133d4b4fdcafe787ff1",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p1_conso3mois_16032015.dta.dvc",
+    "size": 5985579
+  },
+  {
+    "columns": 23,
+    "held": true,
+    "md5": "1feffa4212dc1d2a70ce680be9a868b7",
+    "path": "emc2014_p1_conso7jours_16032015.dta",
+    "rows": 171236,
+    "sha256": "608726e269bfae33626de031b22cf99e321daed9559c3d06760cec2b4202832a",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p1_conso7jours_16032015.dta.dvc",
+    "size": 9432465
+  },
+  {
+    "columns": 31,
+    "held": true,
+    "md5": "219072f123a813469dc12bb78e8c3a65",
+    "path": "emc2014_p1_emploi_27022015.dta",
+    "rows": 78543,
+    "sha256": "02a8af45554f014a99c177af86ef2f0e08ee54ec2759bfde754903ff66ff955e",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p1_emploi_27022015.dta.dvc",
+    "size": 2965884
+  },
+  {
+    "columns": 45,
+    "held": true,
+    "md5": "a496ac03487611c86e4d3f63f2d52ca7",
+    "path": "emc2014_p1_individu_27022015.dta",
+    "rows": 78543,
+    "sha256": "074e1e410e936b255fa764e8aebc300aebd7d7ab2b60621a1167b258ab59551e",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p1_individu_27022015.dta.dvc",
+    "size": 3627820
+  },
+  {
+    "columns": 39,
+    "held": true,
+    "md5": "8925253ab9c8c6479fb927b8f6c7130e",
+    "path": "emc2014_p1_logement_27022015.dta",
+    "rows": 10800,
+    "sha256": "0d41e77616612bda5b05bdf328bc2963d5eaee36641874554f9d6fa7d1ef6445",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p1_logement_27022015.dta.dvc",
+    "size": 510816
+  },
+  {
+    "columns": 22,
+    "held": true,
+    "md5": "4db50c355be71d94faa5736004365715",
+    "path": "emc2014_p1_prix_27022015.dta",
+    "rows": 13266,
+    "sha256": "60f97224487844360c1ac849143676ff17544c3b3adb9b7f464d0cc3eabeacd0",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p1_prix_27022015.dta.dvc",
+    "size": 1375141
+  },
+  {
+    "columns": 17,
+    "held": true,
+    "md5": "d895ec0d35982bf9ecd3036fa78f72fc",
+    "path": "emc2014_p2_conso3mois_16032015.dta",
+    "rows": 144873,
+    "sha256": "12d9f48dfa9995e8be51335092dd2b579c2fef4942bede8963fe7069dce0bbb0",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_conso3mois_16032015.dta.dvc",
+    "size": 5083268
+  },
+  {
+    "columns": 20,
+    "held": true,
+    "md5": "b05bd41a470926a24ec251b8ee3ca625",
+    "path": "emc2014_p2_conso7jours_16032015.dta",
+    "rows": 166913,
+    "sha256": "d862120fbcbe93630f1d177547d58f32d306e2f1769eccc57f9e767d62327e85",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_conso7jours_16032015.dta.dvc",
+    "size": 7190532
+  },
+  {
+    "columns": 17,
+    "held": true,
+    "md5": "68a94214903fa7a844e0e5f03c5b2fcc",
+    "path": "emc2014_p2_conso7nonalimjours_17032015.dta",
+    "rows": 47880,
+    "sha256": "c56dc27077a5943ec8abef335f98e4a561c777955ab223e61fc79438ed57d5b1",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_conso7nonalimjours_17032015.dta.dvc",
+    "size": 2119933
+  },
+  {
+    "columns": 112,
+    "held": true,
+    "md5": "67b690a2161ed8b28de8513422f37f13",
+    "path": "emc2014_p2_emploi_27022015.dta",
+    "rows": 50808,
+    "sha256": "194aa9fa1b454d4a6c6b5af321508d7ca69a67f205413a72cef8969f5a5b6925",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_emploi_27022015.dta.dvc",
+    "size": 6760371
+  },
+  {
+    "columns": 77,
+    "held": true,
+    "md5": "cc518dc8ce0588670cbf70b223b64da9",
+    "path": "emc2014_p2_entreprise_indiv1_27022015.dta",
+    "rows": 1105,
+    "sha256": "ffd149a53d60bb8d8a1c4b45faaf028ea3d7e88a546ac21902c6488d601ec15a",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_entreprise_indiv1_27022015.dta.dvc",
+    "size": 210993
+  },
+  {
+    "columns": 89,
+    "held": true,
+    "md5": "41f1d187a8da2594c98a3b9497bcbca9",
+    "path": "emc2014_p2_entreprise_indiv1_27022105.dta",
+    "rows": 16186,
+    "sha256": "5e35ca7844e07dc44143665414f788d8e9c2bbc8141aa86f1baba97803143f5f",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_entreprise_indiv1_27022105.dta.dvc",
+    "size": 2368219
+  },
+  {
+    "columns": 51,
+    "held": true,
+    "md5": "08de03cd828c09ce8a2221437365c567",
+    "path": "emc2014_p2_individu_27022015.dta",
+    "rows": 77721,
+    "sha256": "6446fc6c70c5304888827b8c78e11c2cd31d86e396b8b01d1dbb5b7afde3eaf3",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_individu_27022015.dta.dvc",
+    "size": 4056179
+  },
+  {
+    "columns": 14,
+    "held": true,
+    "md5": "bbfe733ae552aae26cbe230e2eef8ee4",
+    "path": "emc2014_p2_prix_27022015.dta",
+    "rows": 3705,
+    "sha256": "a9125b00440b6f9430aeeeccadc9c422ec5912ec4b53c25b530a6d47e3f2fe08",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_prix_27022015.dta.dvc",
+    "size": 232202
+  },
+  {
+    "columns": 46,
+    "held": true,
+    "md5": "14c9e20a7375607abad93a38d4d9baba",
+    "path": "emc2014_p2_revenus_27022014.dta",
+    "rows": 95550,
+    "sha256": "53d3317ffeeb278d2797b7e2dcfbf6f1a286b42e156b47e24a2a6e2b7d9894df",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_revenus_27022014.dta.dvc",
+    "size": 6030709
+  },
+  {
+    "columns": 52,
+    "held": true,
+    "md5": "23af9a9e7c8b229f0e46d1649eab132d",
+    "path": "emc2014_p2_transfert_recu_27022015.dta",
+    "rows": 11832,
+    "sha256": "0812bbcd532a32cf05fe1bf95b3cbd0219b0d4a60c856a3d63f92aedd7aaac1c",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_transfert_recu_27022015.dta.dvc",
+    "size": 841475
+  },
+  {
+    "columns": 52,
+    "held": true,
+    "md5": "363197d8598ca51b7875e8e1ad263bac",
+    "path": "emc2014_p2_transfert_verse_27022015.dta",
+    "rows": 11918,
+    "sha256": "bdca2ade4482855910f779a7c68066e6c7632799de4287954f3f5aaa23f10fbf",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p2_transfert_verse_27022015.dta.dvc",
+    "size": 847467
+  },
+  {
+    "columns": 16,
+    "held": true,
+    "md5": "07523e1fee3c284487381ad297b96b9a",
+    "path": "emc2014_p3_chocs_27022015.dta",
+    "rows": 194246,
+    "sha256": "f2875b3a00707e43b6a5bc079054b1afb4ca64b298ca518e27f3e2beaa5dfe59",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p3_chocs_27022015.dta.dvc",
+    "size": 3505030
+  },
+  {
+    "columns": 17,
+    "held": true,
+    "md5": "12fe9a4207d317ffb565cd8ac2dc9ff6",
+    "path": "emc2014_p3_conso3mois_16032015.dta",
+    "rows": 138163,
+    "sha256": "7a62c8fe1fd16a2009976bc144ba868aa24802229b519ac693838ea384ef312b",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p3_conso3mois_16032015.dta.dvc",
+    "size": 4991524
+  },
+  {
+    "columns": 20,
+    "held": true,
+    "md5": "a4bc3da7466f98b35e1c2191c3caa570",
+    "path": "emc2014_p3_conso7jours_16032015.dta",
+    "rows": 164366,
+    "sha256": "8344d83baf5d563865c95180c666116fb202f31e4e9067a4b0fc7d8d590d6c2c",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p3_conso7jours_16032015.dta.dvc",
+    "size": 7581900
+  },
+  {
+    "columns": 18,
+    "held": true,
+    "md5": "8ddd2e71ec92dcb8fe9d4862687e7959",
+    "path": "emc2014_p3_conso7nonalimjours_16032015.dta",
+    "rows": 47540,
+    "sha256": "d29d878de62f1864b96331958327f210628803c3f2ae5550cbd3fc3d60f7e8a2",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p3_conso7nonalimjours_16032015.dta.dvc",
+    "size": 1915155
+  },
+  {
+    "columns": 31,
+    "held": true,
+    "md5": "18b10607df8cac8d678b83b00795485d",
+    "path": "emc2014_p3_emploi_27022015.dta",
+    "rows": 49969,
+    "sha256": "a58edc8a4b24e5554be9bc6f12463fa7f6d4ae4d31ec417db625f9bb561754fe",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p3_emploi_27022015.dta.dvc",
+    "size": 1757198
+  },
+  {
+    "columns": 40,
+    "held": true,
+    "md5": "8939b6d3dd5915d01c430df3934eb332",
+    "path": "emc2014_p3_individu_27022015.dta",
+    "rows": 80935,
+    "sha256": "03baaf035285c62433fbc05737a6f0e829da52b2d7d4c104c869cfbf4668a772",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p3_individu_27022015.dta.dvc",
+    "size": 3329006
+  },
+  {
+    "columns": 14,
+    "held": true,
+    "md5": "531047cde3fd9cfc234b76189563cdfb",
+    "path": "emc2014_p3_prix_27022015.dta",
+    "rows": 3674,
+    "sha256": "caead7034b140e31170edfb9dd4ec9a038ba8fdfb09114e38ec4b87d0655e199",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p3_prix_27022015.dta.dvc",
+    "size": 230280
+  },
+  {
+    "columns": 10,
+    "held": true,
+    "md5": "2a1d90a4d4af2389995152b632ecbf05",
+    "path": "emc2014_p3_risques_27022015.dta",
+    "rows": 35432,
+    "sha256": "caf66445aa869278bc727edc4e87bae1d5d6cad6cd921e891148a2f988462c6c",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p3_risques_27022015.dta.dvc",
+    "size": 392068
+  },
+  {
+    "columns": 71,
+    "held": true,
+    "md5": "92885f71e3db837d089b343220fc178b",
+    "path": "emc2014_p3_sante_27022015.dta",
+    "rows": 77165,
+    "sha256": "ac40354ae69e9f4e68223242a786c92feac2569167afcad0a0f6c4365349e604",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p3_sante_27022015.dta.dvc",
+    "size": 7659688
+  },
+  {
+    "columns": 31,
+    "held": true,
+    "md5": "9f9ffd3020313558a8db8797d4a277c4",
+    "path": "emc2014_p3_securitealimentaire_27022015.dta",
+    "rows": 10230,
+    "sha256": "2721a0f4ae45bbbc5b8e01ee140ac2acd253473cb79e47b24b20e846ea2d9a99",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p3_securitealimentaire_27022015.dta.dvc",
+    "size": 336183
+  },
+  {
+    "columns": 34,
+    "held": true,
+    "md5": "cd4f038adebc6e691093e61e1683a7fc",
+    "path": "emc2014_p4_anthropometrie_27022015.dta",
+    "rows": 16495,
+    "sha256": "19d2af0c67961269d803f86c2065abc51a7bd59184078b978f92b331873f36e7",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_anthropometrie_27022015.dta.dvc",
+    "size": 816421
+  },
+  {
+    "columns": 15,
+    "held": true,
+    "md5": "e8f505aa1046d502c68062f2e506cbb4",
+    "path": "emc2014_p4_conso3mois_10032015.dta",
+    "rows": 135701,
+    "sha256": "12f2eccd69f9eae653216a53b84586b58cff6f5849e4af38606c9218cc944c3c",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_conso3mois_10032015.dta.dvc",
+    "size": 4630269
+  },
+  {
+    "columns": 16,
+    "held": true,
+    "md5": "a002baddec6dd0e241589e3a5c85204a",
+    "path": "emc2014_p4_conso3mois_16032015.dta",
+    "rows": 136033,
+    "sha256": "942551ad67950409b3da66240c76fa056339ae1588f2774a3006d3e033e46de2",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_conso3mois_16032015.dta.dvc",
+    "size": 4778509
+  },
+  {
+    "columns": 18,
+    "held": true,
+    "md5": "90811a0f605a71531b554a968391208b",
+    "path": "emc2014_p4_conso7jours_10032015.dta",
+    "rows": 167324,
+    "sha256": "eb96102cea7231149cbe4ce368e3598a1db827d1ea6b56c7f20b3adc525968d8",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_conso7jours_10032015.dta.dvc",
+    "size": 7046834
+  },
+  {
+    "columns": 21,
+    "held": true,
+    "md5": "502bf09748ad2b44c55d37c7505b8ed5",
+    "path": "emc2014_p4_conso7jours_16032015.dta",
+    "rows": 168463,
+    "sha256": "5fb36d25d0ca5bdf95fa3846d041b068e63efa8b0e4dfae159e253864385a3c1",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_conso7jours_16032015.dta.dvc",
+    "size": 7602236
+  },
+  {
+    "columns": 17,
+    "held": true,
+    "md5": "8575f137f4e9397ace37abd80ac48ffb",
+    "path": "emc2014_p4_conso7nonalimjours_10032015.dta",
+    "rows": 45768,
+    "sha256": "bfe838b723417caad27836e20be9e7ccc9338eac1c2c373683a7077b6099594a",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_conso7nonalimjours_10032015.dta.dvc",
+    "size": 1706052
+  },
+  {
+    "columns": 17,
+    "held": true,
+    "md5": "43ef9525f8a256e84f3318617c390782",
+    "path": "emc2014_p4_conso7nonalimjours_16032015.dta",
+    "rows": 45870,
+    "sha256": "163fd2bbb02b842f1b49477a651e26d042b3d55be6ea62f2f617c8e81b10d662",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_conso7nonalimjours_16032015.dta.dvc",
+    "size": 1710408
+  },
+  {
+    "columns": 50,
+    "held": true,
+    "md5": "e26ffa6d1e724999bf6ec3032b0c3398",
+    "path": "emc2014_p4_education_27022015.dta",
+    "rows": 67160,
+    "sha256": "9d7123b050f6aae93fbc0c18c457b4b614e9f0b7c10b98040d11685ec15f2774",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_education_27022015.dta.dvc",
+    "size": 4715010
+  },
+  {
+    "columns": 28,
+    "held": true,
+    "md5": "d43415bfcf5e1a27749ba0161c70a7c7",
+    "path": "emc2014_p4_emploi_27022015.dta",
+    "rows": 48766,
+    "sha256": "542598b7c75b47b5a0b3781559574aaaac3c99ebfc6b73fff67c5ce0d2eaf042",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_emploi_27022015.dta.dvc",
+    "size": 1568213
+  },
+  {
+    "columns": 29,
+    "held": true,
+    "md5": "835b43ed3a413d0ddce04681fb2204e4",
+    "path": "emc2014_p4_epargnecredit_27022015.dta",
+    "rows": 38539,
+    "sha256": "e97158bd34904ecdf7876858484dd47f9e5cbb95827981fbf7898b346bdf7282",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_epargnecredit_27022015.dta.dvc",
+    "size": 1510514
+  },
+  {
+    "columns": 32,
+    "held": true,
+    "md5": "e7c50f142c9d6c9b229d41eda09d1ca7",
+    "path": "emc2014_p4_individu_27022015.dta",
+    "rows": 82528,
+    "sha256": "c276c50e42a84667efda0e2ad0210e242ab68fd90ba1e2aa8b8db19d8e008dba",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_individu_27022015.dta.dvc",
+    "size": 2731754
+  },
+  {
+    "columns": 14,
+    "held": true,
+    "md5": "340d76d584741d26a4d9e4defea8587b",
+    "path": "emc2014_p4_prix_27022015.dta",
+    "rows": 3522,
+    "sha256": "870749f39076395c2433f74f5691223142faa29fac0e6cc123d5b479738166e9",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_prix_27022015.dta.dvc",
+    "size": 220844
+  },
+  {
+    "columns": 9,
+    "held": true,
+    "md5": "59123e96e29722f4d30e00cca9d0df59",
+    "path": "emc2014_p4_risque_27022015.dta",
+    "rows": 34194,
+    "sha256": "24c1d302668daf7c2c615e52cfcef024c09de70c260408217d22fd9fb419a775",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_risque_27022015.dta.dvc",
+    "size": 344022
+  },
+  {
+    "columns": 17,
+    "held": true,
+    "md5": "6a0f21c97206b6b4ab9d2856404059f4",
+    "path": "emc2014_p4_securitealimentaire_27022015.dta",
+    "rows": 10796,
+    "sha256": "5c8374f7dbf929fc1bfece07714153c198cc2315ea17b04682cec4525ad2f04c",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_p4_securitealimentaire_27022015.dta.dvc",
+    "size": 198742
+  },
+  {
+    "columns": 28,
+    "held": true,
+    "md5": "0b0e21c43e914bb9d6c061a3cf70552b",
+    "path": "emc2014_welfare.dta",
+    "rows": 10411,
+    "sha256": "656b6876dbe677df0671a6bffc2327fda86fe79d17d117d58b8220e8cae6a761",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Data/emc2014_welfare.dta.dvc",
+    "size": 923269
+  },
+  {
+    "held": true,
+    "md5": "de2adcb755ac8524c287564dbd9fac8c",
+    "path": "Questionnaire_EMC_2014_Passage_1.pdf",
+    "sha256": "bc9eb509b9b9d01a87acda3f7b11e3fd2f60ae229af21e07cd707e1abe581220",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Documentation/Questionnaire_EMC_2014_Passage_1.pdf.dvc",
+    "size": 911418
+  },
+  {
+    "held": true,
+    "md5": "e837008041d92c147fd2e0bfa38cc701",
+    "path": "Report.pdf",
+    "sha256": "512fe1fc4e60478a2645062c2fcfb8139b1ebf0535a7e7fd5d5eb1f2410036ac",
+    "sidecar": "lsms_library/countries/Burkina_Faso/2014/Documentation/Report.pdf.dvc",
+    "size": 827833
+  }
+]

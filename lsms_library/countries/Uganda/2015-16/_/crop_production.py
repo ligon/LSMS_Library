@@ -4,7 +4,7 @@
 Reads AGSEC5A (season 1), AGSEC5B (season 2) and the two plot-crop
 rosters AGSEC4A / AGSEC4B (the crop-stand flag, ONE PER SEASON -- GH #872;
 season B's flag comes from AGSEC4B and is never borrowed from AGSEC4A)
-via get_dataframe and emits a canonical (t,i,plot,j,u,condition,season)
+via get_dataframe and emits a canonical (t,i,plot_id,j,u,condition,season,production_obs)
 parquet of REPORTED harvest values.  Harvest unit is a5aq6c (the column
 whose labels decode to Kg/Sack/Bunch); the harvest CONDITION is a5aq6b,
 now an index level in its own right (GH #323/#637) so fresh and dry
@@ -22,7 +22,7 @@ fix, #829.)
 import sys
 sys.path.append('../../_/')
 import pandas as pd
-from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.local_tools import get_dataframe, to_parquet, source_fingerprint
 from lsms_library.country import grain_reports
 from uganda import crop_production_for_wave, CROP_COLMAPS
 
@@ -96,11 +96,12 @@ for _df, _col in ((df5a, 'a5aq8'), (df5b, 'a5bq8')):
         )
         _df[_col] = _v * _VALUE_SOLD_SCALE
 
-df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t], df4b=df4b)
+df = crop_production_for_wave(t, df5a, df5b, df4a, CROP_COLMAPS[t], df4b=df4b,
+    source_refs={'A': source_fingerprint('../Data/AGSEC5A.dta'),
+                 'B': source_fingerprint('../Data/AGSEC5B.dta')})
 assert len(df) > 0, f"crop_production produced no rows for {t}"
 assert df.index.is_unique, f"Non-unique crop_production index for {t}"
-# GH #868: the de-dup's reduce_to_agreed(on_conflict='na') files a grain
-# report in THIS process; stamp it into the wave parquet so the framework
-# can replay it warm (it cannot re-detect it from the de-duplicated frame).
+# Retain grain-audit transport for any reports from the existing build path.
+# GH1198 retains native observations rather than reducing their sale labels.
 to_parquet(df, 'crop_production.parquet',
            grain_audit=grain_reports('Uganda', 'crop_production'))

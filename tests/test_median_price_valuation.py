@@ -327,3 +327,276 @@ def test_duplicate_index_labels_are_safe():
     out = median_price_valuation(df, ['v'], kg_qty=_kg(df), threshold=3,
                                  weight_col='weight')
     assert set(_prices(out)) == {5.0}   # total 14, half 7; cum 1,2,3,4,14
+
+
+# GH #824 owner ruling: Quantity_sold has its OWN unit. These are literal
+# price oracles, independent of the resolver and its implementation.
+def _sold_frame(units=('Kg',), harvest=None, **columns):
+    n = len(units)
+    df = pd.DataFrame({
+        'j': ['crop'] * n, 'u': harvest if harvest is not None else ['Kg'] * n,
+        'Unit_sold': pd.array(units, dtype='string'),
+        'Quantity_sold': pd.array([2.] * n, dtype='Float64'),
+        'Value_sold': pd.array([200.] * n, dtype='Float64'),
+        'Quantity': pd.array([10.] * n, dtype='Float64'),
+    })
+    for key, values in columns.items():
+        df[key] = values
+    return df
+
+
+def _sold_price(df, **kwargs):
+    return median_price_valuation(df, [], threshold=1, **kwargs)
+
+
+@pytest.mark.parametrize('unit_axis', ['column', 'index'])
+def test_sold_unit_literal_price_oracle(unit_axis):
+    df = _sold_frame(['Sack (100 kgs)', 'Kg'], ['Kg', 'Sack (100 kgs)'])
+    if unit_axis == 'index':
+        df = df.set_index(['j', 'u'])
+    # 200/(2*100)=1 and 200/(2*1)=100; median=50.5, value=505.
+    out = _sold_price(df)
+    assert out['_unit_price'].tolist() == [50.5, 50.5]
+    assert out['Value'].tolist() == [505., 505.]
+    assert out.attrs['sold_quantity_conversion'] == {
+        'mode': 'units', 'rows': 2, 'supplied_factor': 0, 'sold_unit': 2,
+        'harvest_fallback': 0, 'unresolved': 0,
+        'harvest_fallback_attempted': 0, 'known_unit_pairs': 2,
+        'unit_disagreement': 2, 'supplied_factor_invalid': 0,
+        'supplied_factor_rejected': 0,
+    }
+
+
+def test_sold_different_unit_one_row_negative_control():
+    df = _sold_frame(['Sack (100 kgs)'])
+    # Public baseline uses harvest Kg and returns 100, not the ruled 1.
+    assert _sold_price(df)['_unit_price'].tolist() == [1.]
+
+
+@pytest.mark.parametrize('unit', ['Basket', None, 'Unknown'])
+def test_sold_reported_factor_precedes_label_and_missing_label(unit):
+    df = _sold_frame([unit], KgFactor_sold=[25.], KgFactor=[99.])
+    out = _sold_price(df, unit_kg={'Basket': 50.})
+    assert out['_unit_price'].tolist() == [4.]  # 200/(2*25)
+    count = out.attrs['sold_quantity_conversion']
+    assert count['supplied_factor'] == 1
+    assert count['harvest_fallback_attempted'] == 0
+    assert count['harvest_fallback'] == 0
+
+
+@pytest.mark.parametrize('unit', ['Unknown', 'Manquant', 'Basket', '', 'NA'])
+def test_recorded_unconvertible_sold_unit_never_falls_back(unit):
+    df = _sold_frame([unit], KgFactor=[20.])
+    out = _sold_price(df)
+    assert out['_unit_price'].isna().all()
+    count = out.attrs['sold_quantity_conversion']
+    assert count['unresolved'] == 1
+    assert count['harvest_fallback_attempted'] == 0
+
+
+@pytest.mark.parametrize('absent_column', [False, True])
+def test_absent_sold_unit_falls_back_with_exact_count(absent_column):
+    df = _sold_frame([None, None], ['Sack (100 kgs)', 'Basket'])
+    if absent_column:
+        df = df.drop(columns='Unit_sold')
+    out = _sold_price(df)
+    assert out['_unit_price'].tolist() == [1., 1.]
+    c = out.attrs['sold_quantity_conversion']
+    assert (c['harvest_fallback_attempted'], c['harvest_fallback'],
+            c['unresolved'], c['known_unit_pairs']) == (2, 1, 1, 0)
+
+
+@pytest.mark.parametrize('bad', [0, -2, np.inf, -np.inf, np.nan, pd.NA, 'bad'])
+def test_invalid_sold_factors_never_become_mass(bad):
+    df = _sold_frame(['Basket'], KgFactor_sold=[bad])
+    out = _sold_price(df)
+    assert out['_unit_price'].isna().all()
+    c = out.attrs['sold_quantity_conversion']
+    assert c['supplied_factor'] == 0
+    assert c['supplied_factor_invalid'] == int(pd.notna(bad))
+    assert c['supplied_factor_rejected'] == 0
+    assert c['harvest_fallback'] == 0
+
+
+@pytest.mark.parametrize('unit,factor,price', [
+    ('Kg', 2., 100.), ('Basket', 251., None), ('Basket', 2017., None),
+    ('Tonne', 1000., .1), ('Kg', 1., 100.), ('Basket', 250., .4),
+])
+def test_sold_reported_screen_uses_sold_context(unit, factor, price):
+    df = _sold_frame([unit], ['Sack (100 kgs)'], KgFactor_sold=[factor])
+    out = _sold_price(df)
+    if price is None:
+        assert out['_unit_price'].isna().all()
+    else:
+        assert out['_unit_price'].tolist() == [price]
+    c = out.attrs['sold_quantity_conversion']
+    assert c['supplied_factor_rejected'] == int(factor not in [1., 250.])
+
+
+def test_zero_missing_sales_and_exact_disclosure_population():
+    df = _sold_frame(['Kg', None, 'Basket', None, 'Sack (100 kgs)', 'Kg'],
+                     ['Kg', 'Kg', 'Kg', 'Basket', 'Kg', 'Kg'],
+                     Quantity_sold=pd.array([2, 0, None, 2, 2, 2], dtype='Float64'),
+                     KgFactor_sold=[np.nan, np.nan, np.nan, np.nan, np.nan, 1.])
+    out = _sold_price(df)
+    # Only rows 0,4,5 speak: prices 100,1,100; others still receive median.
+    assert out['_unit_price'].tolist() == [100.] * 6
+    assert out.attrs['sold_quantity_conversion'] == {
+        'mode': 'units', 'rows': 6, 'supplied_factor': 1, 'sold_unit': 2,
+        'harvest_fallback': 1, 'unresolved': 2,
+        'harvest_fallback_attempted': 2, 'known_unit_pairs': 4,
+        'unit_disagreement': 2, 'supplied_factor_invalid': 0,
+        'supplied_factor_rejected': 0,
+    }
+
+
+def test_explicit_sold_kg_bypasses_all_unit_work():
+    df = _sold_frame(['Basket'], KgFactor_sold=['bad']).drop(columns=['u', 'Quantity_sold'])
+    out = _sold_price(df, kg_qty=pd.Series([50.]), unit_kg='invalid mapping')
+    assert out['_unit_price'].tolist() == [4.]
+    assert out.attrs['sold_quantity_conversion'] == {'mode': 'explicit', 'rows': 1}
+
+
+@pytest.mark.parametrize('origin', ['flat', 'nested', 'attrs', 'empty', 'none'])
+def test_sold_declarations_precedence(origin):
+    df = _sold_frame(['Basket'])
+    kwargs = {}
+    if origin in ['attrs', 'empty']:
+        df.attrs['unit_kg'] = {'A': {'basket': 25.}}
+    if origin == 'flat':
+        kwargs['unit_kg'] = {'BASKET': 25.}
+    if origin == 'nested':
+        kwargs['unit_kg'] = {'A': {'basket': 25.}}
+    if origin == 'empty':
+        kwargs['unit_kg'] = {}
+    out = _sold_price(df, **kwargs)
+    if origin in ['empty', 'none']:
+        assert out['_unit_price'].isna().all()
+    else:
+        assert out['_unit_price'].tolist() == [4.]
+
+
+@pytest.mark.parametrize('country_axis', ['index', 'column', 'attrs'])
+def test_sold_country_qualified_collision(country_axis):
+    df = _sold_frame(['Basket', 'Basket'], country=['A', 'B'], j=['a', 'b'])
+    df.attrs['unit_kg'] = {'A': {'basket': 25.}, 'B': {'basket': 50.}}
+    if country_axis == 'index':
+        df = df.set_index(['country', 'u'])
+    if country_axis == 'attrs':
+        df = df.drop(columns='country')
+        df.attrs['country'] = 'B'
+    assert _sold_price(df)['_unit_price'].tolist() == (
+        [2., 2.] if country_axis == 'attrs' else [4., 2.])
+
+
+@pytest.mark.parametrize('volume', [False, True])
+def test_sold_volume_behavior(volume):
+    out = _sold_price(_sold_frame(['Litre']), volume_as_mass=volume)
+    if volume:
+        assert out['_unit_price'].tolist() == [100.]
+    else:
+        assert out['_unit_price'].isna().all()
+
+
+def test_sold_missing_harvest_key_and_required_keys():
+    df = _sold_frame(['Sack (100 kgs)']).drop(columns='u')
+    assert _sold_price(df)['_unit_price'].tolist() == [1.]
+    for col in ['Quantity_sold', 'Value_sold', 'Quantity', 'j']:
+        with pytest.raises(ValueError):
+            _sold_price(df.drop(columns=col))
+    with pytest.raises(ValueError, match="unit level or column"):
+        _sold_price(df.drop(columns='Unit_sold'))
+
+
+def _strict_typed_equal(a, b):
+    assert type(a) is type(b)
+    if isinstance(a, dict):
+        assert list(a) == list(b)
+        for key in a:
+            _strict_typed_equal(a[key], b[key])
+    elif isinstance(a, (list, tuple)):
+        assert len(a) == len(b)
+        for x, y in zip(a, b):
+            _strict_typed_equal(x, y)
+    else:
+        assert a == b
+
+
+def _strict_frame_payload(a, b):
+    pd.testing.assert_frame_equal(a, b, check_exact=True)
+    _strict_typed_equal(a.attrs, b.attrs)
+    for col in a.columns:
+        x, y = a[col], b[col]
+        if isinstance(x.dtype, pd.api.extensions.ExtensionDtype):
+            pd.testing.assert_extension_array_equal(x.array, y.array, check_exact=True)
+        np.testing.assert_array_equal(x.isna().to_numpy(), y.isna().to_numpy())
+        np.testing.assert_array_equal(x[x.notna()].to_numpy(), y[y.notna()].to_numpy())
+
+
+def test_sold_preserves_duplicate_axes_payload_and_typed_attrs():
+    df = _sold_frame(['Sack (100 kgs)', 'Kg'], j=['a', 'b'])
+    df.index = pd.MultiIndex(levels=[['same', 'unused'], ['Kg', 'unused']],
+                             codes=[[0, 0], [0, 0]], names=['i', 'u'])
+    df = df.drop(columns='u')
+    df.columns.name = 'measure'
+    df.attrs = {'record': {'tuple': (np.int64(1), 'x'), 'list': [True]},
+                'unit_kg': {'A': {'Sack (100 kgs)': 100.}}}
+    before = df.copy(deep=True)
+    out = _sold_price(df)
+    assert out['_unit_price'].tolist() == [1., 100.]
+    pd.testing.assert_index_equal(out.index, before.index, exact=True)
+    for a, b in zip(out.index.levels, before.index.levels):
+        pd.testing.assert_index_equal(a, b, exact=True)
+    for a, b in zip(out.index.codes, before.index.codes):
+        np.testing.assert_array_equal(a, b)
+    _strict_frame_payload(df, before)
+
+
+@pytest.mark.parametrize('delta', ['nextafter', 'tiny', 'mask', 'attrs_type'])
+def test_strict_payload_comparator_calibration(delta):
+    df = _sold_frame(['Kg'])
+    df.attrs = {'nested': {'value': (np.int64(1),)}}
+    changed = df.copy(deep=True)
+    if delta == 'attrs_type':
+        changed.attrs['nested']['value'] = (1,)
+    elif delta == 'mask':
+        changed.loc[0, 'Quantity'] = pd.NA
+    else:
+        changed.loc[0, 'Quantity'] = (np.nextafter(10., np.inf)
+                                     if delta == 'nextafter' else 10. + 1e-12)
+    with pytest.raises(AssertionError):
+        _strict_frame_payload(changed, df)
+
+
+def test_sold_units_keep_weighted_ladder_and_target_quantity():
+    df = _sold_frame(['Sack (100 kgs)', 'Kg', 'Kg'],
+                     weight=[8., 1., 1.], v=['local', 'local', 'far'],
+                     Value_sold=[200., 200., 400.], Quantity=[7., 9., 11.])
+    # Observed prices 1,100,200. Local clears threshold=2; far uses national.
+    out = median_price_valuation(df, ['v'], threshold=2, weight_col='weight')
+    assert out['_unit_price'].tolist() == [1., 1., 1.]
+    assert out['Value'].tolist() == [7., 9., 11.]
+    plain = median_price_valuation(df, ['v'], threshold=2)
+    assert plain['_unit_price'].tolist() == [50.5, 50.5, 100.]
+    assert plain['Value'].tolist() == [353.5, 454.5, 1100.]
+
+
+def test_sold_agreement_case_and_invalid_declaration():
+    df = _sold_frame(['kg', 'Basket'], ['Kg', 'Kg'], j=['a', 'b'])
+    out = _sold_price(df, unit_kg={'kg': -1, 'basket': np.inf})
+    assert out['_unit_price'].iloc[0] == 100.
+    assert pd.isna(out['_unit_price'].iloc[1])
+    c = out.attrs['sold_quantity_conversion']
+    assert (c['known_unit_pairs'], c['unit_disagreement']) == (2, 1)
+
+
+def test_sold_factor_without_either_unit_and_no_gram_heuristic():
+    df = _sold_frame([None], KgFactor_sold=[.001]).drop(columns=['u', 'Unit_sold'])
+    assert _sold_price(df)['_unit_price'].tolist() == [100000.]
+
+
+def test_sold_sentinel_declaration_cannot_fabricate_a_unit():
+    df = _sold_frame(['Unknown', 'Manquant'])
+    out = _sold_price(df, unit_kg={'Unknown': 100, 'Manquant': 100})
+    assert out['_unit_price'].isna().all()
+    assert out.attrs['sold_quantity_conversion']['harvest_fallback_attempted'] == 0

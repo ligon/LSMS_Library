@@ -1,0 +1,6 @@
+country: total base=549 branch=549 only_base=0 only_branch=0 moved=26 by_country={'Malawi': 26}
+   Malawi keys=26 moved=26
+btf: total base=40 branch=40 only_base=0 only_branch=0 moved=0 by_country={}
+wave: total base=2109 branch=2109 only_base=0 only_branch=0 moved=0 by_country={}
+   Malawi keys=130 moved=0
+errors base 0 branch 0 same keys True

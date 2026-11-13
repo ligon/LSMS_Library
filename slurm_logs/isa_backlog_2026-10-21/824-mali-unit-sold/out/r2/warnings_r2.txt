@@ -1,0 +1,42 @@
+== dev (category, count, message head; offender detail omitted)
+  WARN 1 NullIndexKeyWarning Mali/crop_production: declared index level(s) carried NaN key(s): level 'plot_id' (
+  WARN 1 NullReadWarning Mali/crop_production: required declared column 'intercropped' is 100% NULL in wave(s) [
+  WARN 1 NullReadWarning Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-1
+  WARN 1 QuantityImplausibleWarning Mali/crop_production 2014-15: 2 of 10,341 row(s) report a 'Quantity' more th
+  WARN 1 QuantityImplausibleWarning Mali/crop_production 2017-18: 16 of 24,719 row(s) report a 'Quantity' more t
+grain reports (Mali) 0 []
+quantity reports 2
+     offenders md5 06e9e5829ecf<id>
+     offenders md5 a1dd16467d3ab48d089afdd42128a161
+null_read reports 1
+null_index reports 1
+  WARN 1 NullReadWarning Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-1
+  WARN 1 QuantityImplausibleWarning Mali/plot_features 2018-19: 3 of 7,323 row(s) report a 'Area' more than 100x
+== e28 (category, count, message head; offender detail omitted)
+  WARN 1 NullIndexKeyWarning Mali/crop_production: declared index level(s) carried NaN key(s): level 'plot_id' (
+  WARN 1 NullReadWarning Mali/crop_production: required declared column 'intercropped' is 100% NULL in wave(s) [
+  WARN 1 NullReadWarning Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-1
+  WARN 1 QuantityImplausibleWarning Mali/crop_production 2014-15: 2 of 10,341 row(s) report a 'Quantity' more th
+  WARN 1 QuantityImplausibleWarning Mali/crop_production 2017-18: 16 of 24,719 row(s) report a 'Quantity' more t
+grain reports (Mali) 0 []
+quantity reports 2
+     offenders md5 06e9e5829ecf<id>
+     offenders md5 a1dd16467d3ab48d089afdd42128a161
+null_read reports 1
+null_index reports 1
+  WARN 1 NullReadWarning Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-1
+  WARN 1 QuantityImplausibleWarning Mali/plot_features 2018-19: 3 of 7,323 row(s) report a 'Area' more than 100x
+== new (category, count, message head; offender detail omitted)
+  WARN 1 NullIndexKeyWarning Mali/crop_production: declared index level(s) carried NaN key(s): level 'plot_id' (
+  WARN 1 NullReadWarning Mali/crop_production: required declared column 'intercropped' is 100% NULL in wave(s) [
+  WARN 1 NullReadWarning Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-1
+  WARN 1 QuantityImplausibleWarning Mali/crop_production 2014-15: 3 of 10,341 row(s) report a 'Quantity' more th
+  WARN 1 QuantityImplausibleWarning Mali/crop_production 2017-18: 16 of 24,719 row(s) report a 'Quantity' more t
+grain reports (Mali) 0 []
+quantity reports 2
+     offenders md5 c2a7ab19a<id>
+     offenders md5 a1dd16467d3ab48d089afdd42128a161
+null_read reports 1
+null_index reports 1
+  WARN 1 NullReadWarning Mali/sample: required declared column 'strata' is 100% NULL in wave(s) [2014-15, 2018-1
+  WARN 1 QuantityImplausibleWarning Mali/plot_features 2018-19: 3 of 7,323 row(s) report a 'Area' more than 100x

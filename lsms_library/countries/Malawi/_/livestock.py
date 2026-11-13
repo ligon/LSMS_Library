@@ -2,9 +2,12 @@
 
 Each buildable wave's ``Malawi/<wave>/_/livestock.py`` produces a parquet
 indexed (t, i, animal) with the canonical item-level columns (HeadCount,
-HeadAcquired, HeadSold, ValuePerAnimal).  This script concatenates them.
-Cross-wave id_walk (panel-id chaining) is applied by the framework at API time in
-_finalize_result.  ``v`` is NOT joined: 'livestock' is in the framework
+HeadAcquired, HeadSold, ValuePerAnimal, HeadCount12MonthsAgo, RaisedOrOwned).  This
+script concatenates them.
+The country cache stores household IDs after the existing single-pass id_walk
+(GH #1288 / CLAUDE "Panel ID Transitive Chains"). The unchanged writer retains
+id_converted, so _finalize_result does not walk it again. Other Malawi country
+compilers retain their own raw-ID contracts. ``v`` is NOT joined: 'livestock' is in the framework
 _no_v_join set (a household-level holding, not a cluster-keyed roster), so
 the grain stays (t, i, animal) with no cluster level.
 
@@ -16,24 +19,34 @@ livestock roster.
 """
 import pandas as pd
 
-from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library import Country
+from lsms_library.local_tools import get_dataframe, id_walk, to_parquet
 
 
-WAVES = ['2010-11', '2013-14', '2016-17', '2019-20']
+country = Country('Malawi')
+assert 'livestock' in country.data_scheme, "livestock: not declared for Malawi"
 
 pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/livestock.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not yet wired / parquet not built (DVC raises
-        # PathMissingError here, not FileNotFoundError).
+# Reuse actual table discovery, including native scripts and YAML declarations.
+# Ledger: malawi-compiler-declarations-20261028.md §§2–5.
+for t in country.waves:
+    wave = country[t]
+    if 'livestock' not in wave.data_scheme:
         continue
+    fn = f'../{wave.wave_folder}/_/livestock.parquet'
+    # A declared output that cannot be read is a failed build, not absence.
+    df = get_dataframe(fn)
     pieces.append(df)
 
 assert pieces, "livestock: no wave-level parquets found"
 
 p = pd.concat(pieces)
+
+# Complete known-native input, before the unchanged writer (ledger1288 §§3–5).
+# Keep the ordinary no-map/already-converted behavior; never invent a map.
+if 'i' in p.index.names and not p.attrs.get('id_converted'):
+    updated_ids = country.updated_ids
+    if updated_ids is not None:
+        p = id_walk(p, updated_ids, state='raw')
 
 to_parquet(p, '../var/livestock.parquet')

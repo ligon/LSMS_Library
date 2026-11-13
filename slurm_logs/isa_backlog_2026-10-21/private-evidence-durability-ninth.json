@@ -1,0 +1,25 @@
+{
+  "verified_at_UTC": "2026-10-22T00:16:58.222037+00:00",
+  "archive_name": "quiescent-followup-00h15.tar.gz",
+  "archive_sha256": "17d99ac26f72c81f1b7985e26363ec982abc93916dd3c16e4c2c672784d132bb",
+  "archive_bytes": 67143657,
+  "included_files": 734,
+  "included_source_bytes": 694677659,
+  "roots": [
+    "Uganda/849",
+    "Uganda/849-exact-addendum",
+    "Niger/1091"
+  ],
+  "excluded_entries": 55,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "453779e49bd03216376fe4c72d4311d808ff86cc250922d13e2009d026757519",
+  "private_full_manifest_sha256": "67ec959c0fa2a55b657ff114d7de1efef8d220e97b1766ed744b0ccc5577404c",
+  "private_evidence_not_exported_to_Git": true
+}

@@ -246,12 +246,16 @@ def test_malawi_published_gps_is_the_cluster_fix_not_a_household_fix(wave):
 
 
 def test_malawi_2019_20_panel_half_has_no_geovariables():
-    """The NaN coordinates on the IHPS half are absent data, not a broken join.
+    """The IHS5 geo file holds no IHPS panel EA: their coordinates are not
+    absent from the join, they live in a different catalog entry.
 
     Pinned because it is the one thing that could be mistaken for damage done
-    by the re-key: 102 panel EAs carry no coordinates before or after, because
-    IHS5 publishes no geovariables for the panel.  If a future release DOES
-    ship them, this fails and someone wires them up.
+    by the re-key: under the IHS5 file alone the 102 panel EAs carry no
+    coordinates before or after.  GH #1260: IHPS 2019 (catalog 3819) publishes
+    them in ``Panel/householdgeovariables_y4.dta``, which is now held and
+    stacked into ``df_geo`` (see tests/test_gh1260_malawi_panel_geo.py).  If
+    a future IHS5 release ships panel EAs in its own file, this fails and the
+    two sources must be reconciled.
     """
     panel = _source('Malawi', '2019-20', 'Panel/hh_mod_a_filt_19.dta')
     geo = _source('Malawi', '2019-20',

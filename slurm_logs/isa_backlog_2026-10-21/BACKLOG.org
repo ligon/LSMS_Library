@@ -1,0 +1,69 @@
+#+title: Post-v0.16.0 LSMS-ISA backlog
+#+author: Sue
+#+date: 2026-10-21
+
+* Reviewed scope
+
+All 156 open GitHub issues were reviewed once against current source, country notes, issue comments and 300 recent merged PRs.
+97 issue references contain work in the eight-country scope; 59 belong outside this campaign.
+The 97 include 10 assembly/test issues, 32 source/wiring/loss issues, 48 design/research/enhancement references and seven acquisition/source-availability references.
+These are issue counts, not distinct confirmed defects: umbrella references and one duplicate overlap.
+All 37 partial records in the complete inventory have a drafted exact residual.
+No existing issue is recommended fully resolved merely because an older fix merged.
+The complete machine-readable inventory is =triage.json=, with counts in =summary.json=.
+
+Scope: Burkina_Faso, Ethiopia, Malawi, Mali, Niger, Nigeria, Tanzania and Uganda.
+EthiopiaRHS and Tanzania_Kegera are separate surveys outside this scope.
+
+* First implementation batch
+
+| Issue | Country | Concrete change | State |
+|-------+---------+-----------------+-------|
+| 1034 | Nigeria | Decode four W3 unit codes using the recorded survey labels; preserve all other mappings. | Isolated worker; verification pending |
+| 1109 | Malawi | Preserve all-missing organic fertilizer Quantity with min_count=1; retain genuine zero/numeric sums. | Isolated worker; verification pending |
+| 1062 | Uganda | Make nutrition/FCT write only the requested output; route earnings/enterprise prerequisites through framework authority. | Isolated worker; verification pending |
+
+All three worktrees start at =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+Each has a per-task ledger before implementation and a separate physical data root for verification.
+No PR is claimed ready before an independent skeptic reviews the frozen change and the measured evidence.
+
+* Next diagnosis and dispatch
+
+- Source-backed small repairs :: Niger #1088 quantity sentinel; Mali #1121 labor-source casing; Nigeria #1095 silently dropped recorded price units.
+- High-impact source identity :: Nigeria #1144 needs a food-only per-round item decoder, preserving separate crop/community code spaces and accounting for food-price changes.
+- Missing index identity :: #1118 follows the existing Unknown-unit ruling for five ISA countries; Malawi #1111 applied-unit interpretation is a related questionnaire diagnosis, not a prerequisite for filling truly missing identity.
+- Lost source readings :: Mali #822 and its duplicate #1089 share one owner; Mali #821 and Niger #823 add separate 2018-19 modules on the current variety/visit/obs schema.
+- Source grain :: Burkina Faso #1123 and #637 require slot/entity diagnosis before any reduction; #1119's bounded spelling repair must remain separate from its noncrop-marker design.
+- Panel/units :: Uganda #1133 requires the actual crosswalk, not digit surgery; #849 requires per-wave kilogram movement before wiring reported factors.
+
+Root prioritizes shared causes and demonstrated silent loss before cosmetic cleanup.
+The dependency fields retain issue/PR references; only the concrete dispatch briefs establish blocking order.
+
+* Reconciliation and decisions
+
+Mali #1089 duplicates #822's exact missing-reading residual; consolidate it without claiming a fix.
+#932 remains open for enforced credentialed PR execution, and #1066 for assumed-fresh grain replay.
+#698's delivered Uganda/shared kinship work does not close its Ghana-only remainder.
+Tanzania's closed #114 retains a live WAITING caveat about UPHI back-casting and cross-table grain.
+
+Some titles say DECISION although a maintainer has already ruled.
+In particular, #1134 vocabulary, #851 period API and #894 committed panel crosswalks have chosen designs and pending implementation.
+Do not ask the maintainer to make those same decisions again.
+
+Unresolved scientific choices remain explicit: Nigerian purchased-food windows (#881), Ethiopian missing harvest-unit interpretation (#1043), Malawi fertilizer-product identity (#1106), land-grain defaults (#1110) and disagreeing Niger price records (#1087).
+The acquisition queue includes Nigeria's revised W5 release (#978), Ethiopia's revised W5 geovariables (#1127), and Tanzania's older geovariables (#449).
+Historical approvals are recorded; this campaign does not silently re-acquire or rewrite held-release provenance while fixing unrelated code.
+
+* Verification and limitations
+
+Reuse =bench/feature_audit/scan.py= for country sanity, assembly conservation and relevant kwargs.
+Run targeted regression tests and paired source builds with exact package/config identity, numerical/build threads set to one, bounded loadfile pytest workers and private writable L2 caches.
+Preserve source grain, null identity signals and existing country conventions.
+Report existing audit findings honestly; do not make an unrelated warning disappear to obtain a green summary.
+Do not promote caches, change dependency pins/baselines, or merge PRs automatically.
+
+Current triage survey counts are historical source/issue evidence unless explicitly labeled as freshly measured.
+Synthetic current-helper reproductions established the first small candidate defects; actual cold comparisons are part of each fix's pending verification.
+Raw snapshots, comments, microdata and detailed logs remain private under =/local/job40255479/control/isa-backlog-20261021/=.
+
+Sue

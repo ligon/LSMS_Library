@@ -48,7 +48,13 @@ EXPECTED_ENTRY_POINTS = {
     # GH #871: SITE 2 (the household -> cluster projection) reached no
     # fingerprint before this tag; scoped to the one table it builds.
     "lsms_library.country.Wave.cluster_features",
+    # GH #1078: the producer-dependent food compatibility route changes
+    # cached content and must heal already-corrupt current-hash country food.
+    "lsms_library.country.Wave.food_acquired",
     "lsms_library.country.Country._aggregate_wave_data",
+    # GH1288: isolated child dispatch is not a static callable edge.
+    "lsms_library.country.Country._materialize_make_yaml",
+    "lsms_library.country.Country._materialize_make_other",
     "lsms_library.local_tools.df_data_grabber",
     # GH #1045: the build-time calendar parser, tagged for exactly the tables
     # that carry a calendar column (datetime_parse.CALENDAR_TABLES) and
@@ -447,6 +453,13 @@ def test_no_transformations_symbol_reaches_any_fingerprint():
     imports: ``transformations`` may be imported by build-path code (it is,
     for ``validate_acquisition_source``) as long as no kg-inference symbol is
     reachable from a tagged entry point.
+
+    It is a statement about ``build_transforms_fingerprint`` ONLY.  A country
+    whose ``_/*.py`` imports a kg-inference transform folds it through
+    ``framework_imports_fingerprint`` instead, and a kg edit re-warms that
+    whole country: GhanaLSS, Uganda and Ethiopia, whose ``nutrition.py``
+    scripts read the kilogram ladder at build time (GH #1509, "Make the
+    dependency visible"; ``test_gh1509_build_time_food_api_dependency.py``).
     """
     seen = set()
     for _qn, (fn, _tables) in sorted(R._BUILD_TRANSFORMS.items()):
@@ -467,6 +480,13 @@ def test_no_transformations_symbol_reaches_any_fingerprint():
         "lsms_library.transformations._EXPLICIT_METRIC_PATTERNS",
         "lsms_library.transformations.FOOD_KG_MIN_BASELINE",
         "lsms_library.transformations.FOOD_KG_TIGHT_TOLERANCE",
+        # GH #1450: the size pool behind both inferred rungs is read-path too.
+        "lsms_library.transformations._UNIT_SIZE_WORDS",
+        "lsms_library.transformations._unit_size_base",
+        "lsms_library.transformations._size_pooled_frame",
+        "lsms_library.transformations._inferred_kg_rungs",
+        # GH #1254: analysis-time wave pooling must not rebuild native caches.
+        "lsms_library.transformations.median_price_valuation",
     }
     joined = "\x1f".join(_all_parts())
     reached = sorted(s for s in kg_symbols if s in seen)
@@ -506,6 +526,241 @@ def test_standalone_pattern_is_in_closure(monkeypatch):
     assert any('._GH780_PATTERN=' in part for part in before)
     monkeypatch.setattr(module, '_GH780_PATTERN', re.compile('kg', re.I))
     assert R._closure_parts(uses_pattern, set()) != before
+
+
+# GH1218: nullable types are actual build constants after empty-only enforcement.
+@pytest.mark.parametrize('factory', ['BooleanDtype', 'Int64Dtype', 'Float64Dtype', 'StringDtype'])
+def test_nullable_dtype_serialization_is_stable_and_nested(factory):
+    import pandas as pd
+
+    make = getattr(pd, factory)
+    value = make()
+    encoded = R._ser(value, set(), [])
+    assert encoded == R._ser(make(), set(), [])
+    assert factory in encoded and ' at 0x' not in encoded
+    assert encoded in R._ser({'declared': [value]}, set(), [])
+    assert encoded != R._ser(value.name, set(), [])
+
+
+def test_string_dtype_storage_and_missing_semantics_are_distinct():
+    import pandas as pd
+
+    encodings = {}
+    for storage in ('python', 'pyarrow'):
+        for missing_name, missing in (('NA', pd.NA), ('NaN', float('nan'))):
+            value = pd.StringDtype(storage=storage, na_value=missing)
+            encoded = R._ser(value, set(), [])
+            encodings[storage, missing_name] = encoded
+            assert encoded == R._ser(pd.StringDtype(storage=storage, na_value=missing), set(), [])
+    assert len(set(encodings.values())) == 4
+
+
+@pytest.mark.parametrize('before_spec,after_spec', [
+    ('BooleanDtype', 'Int64Dtype'),
+    ('Int64Dtype', 'Float64Dtype'),
+    ('Float64Dtype', 'BooleanDtype'),
+    ('string-python-NA', 'string-pyarrow-NA'),
+    ('string-python-NA', 'string-python-NaN'),
+])
+def test_standalone_nullable_dtype_changes_reach_closure(monkeypatch, before_spec, after_spec):
+    import sys
+    import pandas as pd
+
+    def make(spec):
+        if spec.startswith('string-'):
+            _, storage, missing = spec.split('-')
+            return pd.StringDtype(storage=storage, na_value=pd.NA if missing == 'NA' else float('nan'))
+        return getattr(pd, spec)()
+
+    module = sys.modules[__name__]
+    monkeypatch.setattr(module, '_GH1218_DTYPE', make(before_spec), raising=False)
+
+    def uses_dtype():
+        return _GH1218_DTYPE
+
+    before = R._closure_parts(uses_dtype, set())
+    assert any('._GH1218_DTYPE=' in part for part in before)
+    monkeypatch.setattr(module, '_GH1218_DTYPE', make(after_spec))
+    assert R._closure_parts(uses_dtype, set()) != before
+
+
+# The READ-path dtype code PR #1221 pulled into every closure through
+# ``_empty_declared_frame`` (measured on 326b6e3de against 60aa81e9e).
+_EMPTY_FRAME_READ_PATH = (
+    "lsms_library.country._empty_declared_frame",
+    "lsms_library.country._enforce_declared_dtypes",
+    "lsms_library.country._coerce_datetime_column",
+    "lsms_library.country._to_datetime_mixed",
+    "lsms_library.country._coerce_to_boolean",
+    "lsms_library.country._SCHEME_DTYPE_MAP",
+    "lsms_library.country._SCHEME_SKIP_KEYS",
+    "lsms_library.country._STR_TO_BOOL",
+    "lsms_library.country._YEAR_LAST_DATE",
+)
+
+
+def test_empty_constructor_dtype_code_is_not_in_any_build_closure(monkeypatch):
+    """GH #1218 / PR #1221 follow-up: the constructed empty frame is served,
+    never written, so neither it nor the read-path dtype code it calls may
+    reach a build fingerprint.  Until the exclusion they did, and every hash
+    depended on ``mode.string_storage`` (through ``_SCHEME_DTYPE_MAP``'s
+    ``StringDtype``) and on the text of the read-time date cast.
+
+    Structural (no part names any of them, from any entry point), then
+    measured: re-typing a ``_SCHEME_DTYPE_MAP`` entry, or a no-op edit to the
+    helper or to ``_coerce_datetime_column``, moves no fingerprint."""
+    import pandas as pd
+    from lsms_library import country
+
+    # The build code still reaches it (else the checks below pass vacuously).
+    import inspect
+    assert "_empty_declared_frame(" in inspect.getsource(
+        country.Country._aggregate_wave_data)
+    R.clear_caches()
+    try:
+        names = {p.split('=', 1)[0] for p in _all_parts()}
+        leaked = sorted(names & set(_EMPTY_FRAME_READ_PATH))
+        assert not leaked, f"read-path dtype code leaked into the build closure: {leaked}"
+        assert "lsms_library.country._empty_declared_frame" in R._EXCLUDED_CALLABLES
+        tables = sorted({t for _q, (_f, ts) in R._BUILD_TRANSFORMS.items() for t in ts}
+                        | {'household_roster', 'interview_date', 'plot_inputs'})
+        before = {t: R.build_transforms_fingerprint(t) for t in tables + [None]}
+        with monkeypatch.context() as patch:
+            patch.setitem(country._SCHEME_DTYPE_MAP, 'bool', pd.Int64Dtype())
+            patch.setitem(country._SCHEME_DTYPE_MAP, 'str',
+                          pd.StringDtype(storage='python'))
+            R.clear_caches()
+            assert {t: R.build_transforms_fingerprint(t) for t in before} == before
+        for target in (country._empty_declared_frame, country._coerce_datetime_column):
+            with monkeypatch.context() as patch:
+                real = inspect.getsource
+                patch.setattr(inspect, "getsource",
+                              lambda o, _t=target, _r=real: _r(o) + "\n_redteam_probe = 1\n"
+                              if inspect.unwrap(o) is _t else _r(o))
+                R.clear_caches()
+                assert {t: R.build_transforms_fingerprint(t) for t in before} == before, \
+                    target.__name__
+    finally:
+        R.clear_caches()
+
+
+def test_hashes_do_not_depend_on_pandas_string_storage(tmp_path):
+    """GH #1218 / PR #1221 follow-up, in fresh processes: the fingerprint and
+    three small countries' ``_table_cache_hash`` values are identical with
+    ``mode.string_storage`` set to ``'python'`` BEFORE the library is imported
+    (``_SCHEME_DTYPE_MAP`` snapshots ``pd.StringDtype()`` at import) and left at
+    its default.  On 326b6e3de every hash moved."""
+    import json
+    import subprocess
+    import sys
+
+    code = """
+import json, os, sys, warnings
+import pandas as pd
+if sys.argv[1] != 'default':
+    pd.set_option('mode.string_storage', sys.argv[1])
+import lsms_library
+from lsms_library import _build_registry as R
+from lsms_library.country import Country, _SCHEME_DTYPE_MAP
+warnings.simplefilter('ignore')
+out = {'storage': _SCHEME_DTYPE_MAP['str'].storage, 'file': lsms_library.__file__,
+       'btf': {str(t): R.build_transforms_fingerprint(t)
+               for t in (None, 'household_roster', 'interview_date', 'plot_inputs')},
+       'tch': {}}
+for name in ('Kosovo', 'Guyana', 'Tajikistan'):
+    c = Country(name, preload_panel_ids=False)
+    for t in sorted(c.data_scheme)[:3]:
+        out['tch'][name + '/' + t] = c._table_cache_hash(t, c.waves)
+print(json.dumps(out))
+"""
+    env = dict(os.environ, LSMS_DATA_DIR=str(tmp_path / 'data'))
+    results = {}
+    for storage in ('default', 'python'):
+        proc = subprocess.run([sys.executable, '-B', '-c', code, storage],
+                              capture_output=True, text=True, env=env)
+        assert proc.returncode == 0, proc.stderr[-2000:]
+        results[storage] = json.loads(proc.stdout.strip().splitlines()[-1])
+    pkg = os.path.dirname(lsms_library.__file__)
+    for r in results.values():
+        assert os.path.dirname(r['file']) == pkg, r['file']
+    # The option took effect, so the comparison below can fail.
+    assert results['python']['storage'] == 'python'
+    assert results['default']['storage'] != 'python', results['default']['storage']
+    assert len(results['default']['tch']) >= 3
+    assert results['python']['btf'] == results['default']['btf']
+    assert results['python']['tch'] == results['default']['tch']
+
+
+@pytest.mark.parametrize('factory', ['Int32Dtype', 'Float32Dtype', 'CategoricalDtype'])
+def test_nullable_dtype_serialiser_rejects_other_families(factory):
+    import pandas as pd
+
+    with pytest.raises(TypeError, match='un-serialisable type'):
+        R._ser(getattr(pd, factory)(), set(), [])
+
+
+def test_nullable_dtype_serialiser_rejects_custom_subclasses(monkeypatch):
+    import sys
+    import pandas as pd
+
+    class CustomStringDtype(pd.StringDtype):
+        pass
+
+    value = CustomStringDtype(storage='python')
+    with pytest.raises(TypeError, match='CustomStringDtype'):
+        R._ser(value, set(), [])
+    monkeypatch.setattr(sys.modules[__name__], '_GH1218_CUSTOM_DTYPE', value, raising=False)
+
+    def uses_custom_dtype():
+        return _GH1218_CUSTOM_DTYPE
+
+    with pytest.raises(TypeError, match='CustomStringDtype'):
+        R._closure_parts(uses_custom_dtype, set())
+
+
+def test_nullable_dtype_serialization_stable_across_hashseeds(tmp_path):
+    import json
+    import subprocess
+    import sys
+    import time
+
+    code = """
+import json, os, sys, time
+from pathlib import Path
+boot = dict(pid=os.getpid(), ppid=os.getppid(), time_ns=time.time_ns(),
+            cwd=os.getcwd(), executable=sys.executable, prefix=sys.prefix,
+            maps={kind: Path('/proc/self/'+kind+'_map').read_text()
+                  if Path('/proc/self/'+kind+'_map').exists() else None
+                  for kind in ('uid', 'gid')})
+Path(sys.argv[1]).write_text(json.dumps(boot))
+import pandas as pd
+from lsms_library import _build_registry as R
+values = [pd.BooleanDtype(), pd.Int64Dtype(), pd.Float64Dtype()] + [
+    pd.StringDtype(storage=s, na_value=n) for s in ('python', 'pyarrow')
+    for n in (pd.NA, float('nan'))]
+print(R._ser({'nested': values}, set(), []))
+"""
+    outputs = []
+    records = []
+    for seed in ('0', '1'):
+        boot_path = tmp_path / ('hashseed-'+seed+'-boot.json')
+        command = [sys.executable, '-B', '-c', code, str(boot_path)]
+        before = time.time_ns()
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   text=True, env=dict(os.environ, PYTHONHASHSEED=seed))
+        stdout, stderr = process.communicate()
+        after = time.time_ns()
+        boot = json.loads(boot_path.read_text()) if boot_path.exists() else None
+        records.append(dict(seed=seed, parent_pid=os.getpid(), child_pid=process.pid,
+                            before_Popen_ns=before, after_wait_ns=after, command=command,
+                            returncode=process.returncode, stdout=stdout, stderr=stderr,
+                            original_child_boot=boot))
+        (tmp_path / 'dtype-hashseed-process-records.json').write_text(json.dumps(records))
+        assert process.returncode == 0, stderr
+        assert boot['pid'] == process.pid and boot['ppid'] == os.getpid()
+        assert before <= boot['time_ns'] <= after
+        outputs.append(stdout.strip())
+    assert outputs[0] == outputs[1] and ' at 0x' not in outputs[0]
 
 
 def test_country_framework_closures_are_serializable():

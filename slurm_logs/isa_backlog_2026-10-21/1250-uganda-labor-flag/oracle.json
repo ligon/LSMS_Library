@@ -1,0 +1,1442 @@
+{
+ "oracle": {
+  "new": {
+   "by_cell": {
+    "2009-10/A/family/False": {
+     "positive": 7266,
+     "rows": 8498,
+     "total": 307901.0,
+     "zeros": 1232
+    },
+    "2009-10/A/family/True": {
+     "positive": 5,
+     "rows": 7,
+     "total": 147.0,
+     "zeros": 2
+    },
+    "2009-10/A/hired/False": {
+     "positive": 2322,
+     "rows": 8405,
+     "total": 46262.0,
+     "zeros": 6083
+    },
+    "2009-10/A/hired/True": {
+     "positive": 3,
+     "rows": 8,
+     "total": 106.0,
+     "zeros": 5
+    },
+    "2009-10/B/family/False": {
+     "positive": 6813,
+     "rows": 7834,
+     "total": 263195.0,
+     "zeros": 1021
+    },
+    "2009-10/B/family/True": {
+     "positive": 27,
+     "rows": 35,
+     "total": 914.0,
+     "zeros": 8
+    },
+    "2009-10/B/hired/False": {
+     "positive": 1725,
+     "rows": 7826,
+     "total": 57980.0,
+     "zeros": 6101
+    },
+    "2009-10/B/hired/True": {
+     "positive": 10,
+     "rows": 35,
+     "total": 169.0,
+     "zeros": 25
+    },
+    "2010-11/A/family/False": {
+     "positive": 7312,
+     "rows": 7947,
+     "total": 282563.0,
+     "zeros": 635
+    },
+    "2010-11/A/hired/False": {
+     "positive": 2161,
+     "rows": 7932,
+     "total": 37835.0,
+     "zeros": 5771
+    },
+    "2010-11/B/family/False": {
+     "positive": 6208,
+     "rows": 6787,
+     "total": 214783.0,
+     "zeros": 579
+    },
+    "2010-11/B/hired/False": {
+     "positive": 1447,
+     "rows": 6764,
+     "total": 21705.0,
+     "zeros": 5317
+    },
+    "2011-12/A/family/False": {
+     "positive": 7075,
+     "rows": 7075,
+     "total": 233470.0,
+     "zeros": 0
+    },
+    "2011-12/A/hired/False": {
+     "positive": 1652,
+     "rows": 7521,
+     "total": 27399.0,
+     "zeros": 5869
+    },
+    "2011-12/A/hired/True": {
+     "positive": 0,
+     "rows": 1,
+     "total": 0.0,
+     "zeros": 1
+    },
+    "2011-12/A/other/False": {
+     "positive": 576,
+     "rows": 582,
+     "total": 7986.0,
+     "zeros": 6
+    },
+    "2011-12/B/family/False": {
+     "positive": 6140,
+     "rows": 6140,
+     "total": 203808.0,
+     "zeros": 0
+    },
+    "2011-12/B/family/True": {
+     "positive": 1,
+     "rows": 1,
+     "total": 1.0,
+     "zeros": 0
+    },
+    "2011-12/B/hired/False": {
+     "positive": 1156,
+     "rows": 6474,
+     "total": 17084.0,
+     "zeros": 5318
+    },
+    "2011-12/B/hired/True": {
+     "positive": 0,
+     "rows": 3,
+     "total": 0.0,
+     "zeros": 3
+    },
+    "2011-12/B/other/False": {
+     "positive": 438,
+     "rows": 440,
+     "total": 5263.0,
+     "zeros": 2
+    },
+    "2013-14/A/family/False": {
+     "positive": 7087,
+     "rows": 7087,
+     "total": 317219.0,
+     "zeros": 0
+    },
+    "2013-14/A/family/True": {
+     "positive": 1,
+     "rows": 1,
+     "total": 12.0,
+     "zeros": 0
+    },
+    "2013-14/A/hired/False": {
+     "positive": 1881,
+     "rows": 7543,
+     "total": 22094.0,
+     "zeros": 5662
+    },
+    "2013-14/A/hired/True": {
+     "positive": 2,
+     "rows": 2,
+     "total": 10.0,
+     "zeros": 0
+    },
+    "2013-14/B/family/False": {
+     "positive": 6399,
+     "rows": 6399,
+     "total": 268073.0,
+     "zeros": 0
+    },
+    "2013-14/B/family/True": {
+     "positive": 1,
+     "rows": 1,
+     "total": 80.0,
+     "zeros": 0
+    },
+    "2013-14/B/hired/False": {
+     "positive": 1359,
+     "rows": 6746,
+     "total": 14056.0,
+     "zeros": 5387
+    },
+    "2013-14/B/hired/True": {
+     "positive": 0,
+     "rows": 1,
+     "total": 0.0,
+     "zeros": 1
+    },
+    "2015-16/A/family/False": {
+     "positive": 7368,
+     "rows": 7368,
+     "total": 321735.0,
+     "zeros": 0
+    },
+    "2015-16/A/hired/False": {
+     "positive": 1845,
+     "rows": 7782,
+     "total": 23194.0,
+     "zeros": 5937
+    },
+    "2015-16/B/family/False": {
+     "positive": 6488,
+     "rows": 6488,
+     "total": 289461.0,
+     "zeros": 0
+    },
+    "2015-16/B/hired/False": {
+     "positive": 1445,
+     "rows": 6791,
+     "total": 17592.0,
+     "zeros": 5346
+    },
+    "2018-19/A/hired/False": {
+     "positive": 1750,
+     "rows": 6050,
+     "total": 17069.0,
+     "zeros": 4300
+    },
+    "2019-20/A/hired/False": {
+     "positive": 1550,
+     "rows": 5803,
+     "total": 17700.0,
+     "zeros": 4253
+    },
+    "2019-20/B/hired/False": {
+     "positive": 1638,
+     "rows": 6315,
+     "total": 17936.0,
+     "zeros": 4677
+    }
+   },
+   "nan_plot_positive_fold": {
+    "2009-10/A": {
+     "positive_source_rows": 15,
+     "served_keys": 8
+    },
+    "2009-10/B": {
+     "positive_source_rows": 55,
+     "served_keys": 37
+    },
+    "2011-12/B": {
+     "positive_source_rows": 2,
+     "served_keys": 1
+    },
+    "2013-14/A": {
+     "positive_source_rows": 3,
+     "served_keys": 3
+    },
+    "2013-14/B": {
+     "positive_source_rows": 1,
+     "served_keys": 1
+    }
+   },
+   "negative_rows": 0,
+   "served_rows": 164692,
+   "served_total": 3054802.0,
+   "valid_plot_positive_dup_keys": 2,
+   "valid_plot_positive_rows_in_dup_keys": 4
+  },
+  "old": {
+   "by_cell": {
+    "2009-10/A/family/False": {
+     "positive": 7260,
+     "rows": 8767,
+     "total": 307443.0,
+     "zeros": 1507
+    },
+    "2009-10/A/family/True": {
+     "positive": 5,
+     "rows": 776,
+     "total": 147.0,
+     "zeros": 771
+    },
+    "2009-10/A/hired/False": {
+     "positive": 2303,
+     "rows": 8750,
+     "total": 45560.0,
+     "zeros": 6447
+    },
+    "2009-10/A/hired/True": {
+     "positive": 2,
+     "rows": 776,
+     "total": 78.0,
+     "zeros": 774
+    },
+    "2009-10/B/family/False": {
+     "positive": 6804,
+     "rows": 7955,
+     "total": 262760.0,
+     "zeros": 1151
+    },
+    "2009-10/B/family/True": {
+     "positive": 27,
+     "rows": 1047,
+     "total": 914.0,
+     "zeros": 1020
+    },
+    "2009-10/B/hired/False": {
+     "positive": 1715,
+     "rows": 7989,
+     "total": 57896.0,
+     "zeros": 6274
+    },
+    "2009-10/B/hired/True": {
+     "positive": 10,
+     "rows": 1047,
+     "total": 169.0,
+     "zeros": 1037
+    },
+    "2010-11/A/family/False": {
+     "positive": 7285,
+     "rows": 8090,
+     "total": 281966.0,
+     "zeros": 805
+    },
+    "2010-11/A/hired/False": {
+     "positive": 2161,
+     "rows": 8089,
+     "total": 37835.0,
+     "zeros": 5928
+    },
+    "2010-11/B/family/False": {
+     "positive": 6192,
+     "rows": 6884,
+     "total": 214486.0,
+     "zeros": 692
+    },
+    "2010-11/B/hired/False": {
+     "positive": 1447,
+     "rows": 6893,
+     "total": 21705.0,
+     "zeros": 5446
+    },
+    "2011-12/A/family/False": {
+     "positive": 7075,
+     "rows": 7075,
+     "total": 233470.0,
+     "zeros": 0
+    },
+    "2011-12/A/hired/False": {
+     "positive": 1652,
+     "rows": 7526,
+     "total": 27399.0,
+     "zeros": 5874
+    },
+    "2011-12/A/hired/True": {
+     "positive": 0,
+     "rows": 1,
+     "total": 0.0,
+     "zeros": 1
+    },
+    "2011-12/A/other/False": {
+     "positive": 576,
+     "rows": 582,
+     "total": 7986.0,
+     "zeros": 6
+    },
+    "2011-12/B/family/False": {
+     "positive": 6140,
+     "rows": 6140,
+     "total": 203808.0,
+     "zeros": 0
+    },
+    "2011-12/B/family/True": {
+     "positive": 1,
+     "rows": 1,
+     "total": 1.0,
+     "zeros": 0
+    },
+    "2011-12/B/hired/False": {
+     "positive": 1156,
+     "rows": 6487,
+     "total": 17084.0,
+     "zeros": 5331
+    },
+    "2011-12/B/hired/True": {
+     "positive": 0,
+     "rows": 3,
+     "total": 0.0,
+     "zeros": 3
+    },
+    "2011-12/B/other/False": {
+     "positive": 438,
+     "rows": 440,
+     "total": 5263.0,
+     "zeros": 2
+    },
+    "2013-14/A/family/False": {
+     "positive": 7087,
+     "rows": 7087,
+     "total": 317219.0,
+     "zeros": 0
+    },
+    "2013-14/A/family/True": {
+     "positive": 1,
+     "rows": 1,
+     "total": 12.0,
+     "zeros": 0
+    },
+    "2013-14/A/hired/False": {
+     "positive": 1881,
+     "rows": 7548,
+     "total": 22094.0,
+     "zeros": 5667
+    },
+    "2013-14/A/hired/True": {
+     "positive": 2,
+     "rows": 2,
+     "total": 10.0,
+     "zeros": 0
+    },
+    "2013-14/B/family/False": {
+     "positive": 6399,
+     "rows": 6399,
+     "total": 268073.0,
+     "zeros": 0
+    },
+    "2013-14/B/family/True": {
+     "positive": 1,
+     "rows": 1,
+     "total": 80.0,
+     "zeros": 0
+    },
+    "2013-14/B/hired/False": {
+     "positive": 1359,
+     "rows": 6755,
+     "total": 14056.0,
+     "zeros": 5396
+    },
+    "2013-14/B/hired/True": {
+     "positive": 0,
+     "rows": 1,
+     "total": 0.0,
+     "zeros": 1
+    },
+    "2015-16/A/family/False": {
+     "positive": 7368,
+     "rows": 7368,
+     "total": 321735.0,
+     "zeros": 0
+    },
+    "2015-16/A/hired/False": {
+     "positive": 1845,
+     "rows": 7784,
+     "total": 23194.0,
+     "zeros": 5939
+    },
+    "2015-16/B/family/False": {
+     "positive": 6488,
+     "rows": 6488,
+     "total": 289461.0,
+     "zeros": 0
+    },
+    "2015-16/B/hired/False": {
+     "positive": 1445,
+     "rows": 6791,
+     "total": 17592.0,
+     "zeros": 5346
+    },
+    "2018-19/A/hired/False": {
+     "positive": 1750,
+     "rows": 6072,
+     "total": 17069.0,
+     "zeros": 4322
+    },
+    "2019-20/A/hired/False": {
+     "positive": 1550,
+     "rows": 5884,
+     "total": 17700.0,
+     "zeros": 4334
+    },
+    "2019-20/B/hired/False": {
+     "positive": 1629,
+     "rows": 6378,
+     "total": 17792.0,
+     "zeros": 4749
+    }
+   },
+   "nan_plot_positive_fold": {
+    "2009-10/A": {
+     "positive_source_rows": 14,
+     "served_keys": 7
+    },
+    "2009-10/B": {
+     "positive_source_rows": 55,
+     "served_keys": 37
+    },
+    "2011-12/B": {
+     "positive_source_rows": 2,
+     "served_keys": 1
+    },
+    "2013-14/A": {
+     "positive_source_rows": 3,
+     "served_keys": 3
+    },
+    "2013-14/B": {
+     "positive_source_rows": 1,
+     "served_keys": 1
+    }
+   },
+   "negative_rows": 0,
+   "served_rows": 169877,
+   "served_total": 3052057.0,
+   "valid_plot_positive_dup_keys": 2,
+   "valid_plot_positive_rows_in_dup_keys": 4
+  }
+ },
+ "raw": {
+  "2009-10/A/family": {
+   "flag_code_no": 0,
+   "flag_col": "a3aq38",
+   "flag_na&cells_empty": {
+    "n": 1356,
+    "plot_nan": 1087,
+    "plot_valid": 269
+   },
+   "flag_na&cells_present": {
+    "days_sum": 458.0,
+    "n": 9,
+    "plot_nan": 0,
+    "plot_valid": 9,
+    "positive_sum": 6
+   },
+   "flag_no&cells_empty": {
+    "n": 78,
+    "plot_nan": 1,
+    "plot_valid": 77
+   },
+   "flag_no&cells_present": {
+    "days_sum": 54.0,
+    "n": 1136,
+    "plot_nan": 1,
+    "plot_valid": 1135,
+    "positive_sum": 6
+   },
+   "flag_other&cells_empty": {
+    "n": 34,
+    "plot_nan": 1,
+    "plot_valid": 33
+   },
+   "flag_other&cells_present": {
+    "days_sum": 307608.0,
+    "n": 7285,
+    "plot_nan": 8,
+    "plot_valid": 7277,
+    "positive_sum": 7268
+   },
+   "flag_value_counts": {
+    "0.0": 1214,
+    "1.0": 1425,
+    "10.0": 31,
+    "11.0": 5,
+    "12.0": 11,
+    "13.0": 3,
+    "14.0": 1,
+    "15.0": 3,
+    "2.0": 2562,
+    "25.0": 1,
+    "3.0": 1422,
+    "30.0": 1,
+    "34.0": 1,
+    "4.0": 991,
+    "40.0": 1,
+    "5.0": 480,
+    "6.0": 218,
+    "62.0": 1,
+    "7.0": 98,
+    "70.0": 1,
+    "76.0": 1,
+    "8.0": 47,
+    "80.0": 1,
+    "82.0": 1,
+    "9.0": 12,
+    "94.0": 1,
+    "nan": 1365
+   },
+   "plot_id_nan_rows": 1098,
+   "rows": 9898
+  },
+  "2009-10/A/hired": {
+   "flag_code_no": 2,
+   "flag_col": "a3aq41",
+   "flag_na&cells_empty": {
+    "n": 1431,
+    "plot_nan": 1086,
+    "plot_valid": 345
+   },
+   "flag_na&cells_empty&wage_reported": 2,
+   "flag_na&cells_present": {
+    "days_sum": 730.0,
+    "n": 21,
+    "plot_nan": 1,
+    "plot_valid": 20,
+    "positive_sum": 20
+   },
+   "flag_no&cells_empty": {
+    "n": 6076,
+    "plot_nan": 5,
+    "plot_valid": 6071
+   },
+   "flag_no&cells_empty&wage_reported": 0,
+   "flag_no&cells_present": {
+    "days_sum": 83.0,
+    "n": 8,
+    "plot_nan": 0,
+    "plot_valid": 8,
+    "positive_sum": 7
+   },
+   "flag_other&cells_empty": {
+    "n": 50,
+    "plot_nan": 0,
+    "plot_valid": 50
+   },
+   "flag_other&cells_present": {
+    "days_sum": 45749.0,
+    "n": 2312,
+    "plot_nan": 6,
+    "plot_valid": 2306,
+    "positive_sum": 2309
+   },
+   "flag_value_counts": {
+    "0.0": 2,
+    "1.0": 2360,
+    "2.0": 6084,
+    "nan": 1452
+   },
+   "plot_id_nan_rows": 1098,
+   "rows": 9898
+  },
+  "2009-10/B/family": {
+   "flag_code_no": 0,
+   "flag_col": "a3bq38",
+   "flag_na&cells_empty": {
+    "n": 1827,
+    "plot_nan": 1706,
+    "plot_valid": 121
+   },
+   "flag_na&cells_present": {
+    "days_sum": 435.0,
+    "n": 9,
+    "plot_nan": 0,
+    "plot_valid": 9,
+    "positive_sum": 9
+   },
+   "flag_no&cells_empty": {
+    "n": 72,
+    "plot_nan": 0,
+    "plot_valid": 72
+   },
+   "flag_no&cells_present": {
+    "days_sum": 527.0,
+    "n": 952,
+    "plot_nan": 12,
+    "plot_valid": 940,
+    "positive_sum": 12
+   },
+   "flag_other&cells_empty": {
+    "n": 75,
+    "plot_nan": 0,
+    "plot_valid": 75
+   },
+   "flag_other&cells_present": {
+    "days_sum": 264082.0,
+    "n": 6854,
+    "plot_nan": 41,
+    "plot_valid": 6813,
+    "positive_sum": 6845
+   },
+   "flag_value_counts": {
+    "0.0": 1024,
+    "1.0": 1207,
+    "10.0": 14,
+    "11.0": 4,
+    "12.0": 14,
+    "13.0": 2,
+    "14.0": 6,
+    "15.0": 1,
+    "16.0": 1,
+    "17.0": 1,
+    "2.0": 2325,
+    "20.0": 2,
+    "22.0": 1,
+    "3.0": 1236,
+    "4.0": 1115,
+    "43.0": 1,
+    "5.0": 538,
+    "50.0": 1,
+    "6.0": 318,
+    "65.0": 1,
+    "7.0": 80,
+    "8.0": 39,
+    "9.0": 21,
+    "92.0": 1,
+    "nan": 1836
+   },
+   "plot_id_nan_rows": 1759,
+   "rows": 9789
+  },
+  "2009-10/B/hired": {
+   "flag_code_no": 2,
+   "flag_col": "a3bq41",
+   "flag_na&cells_empty": {
+    "n": 1869,
+    "plot_nan": 1706,
+    "plot_valid": 163
+   },
+   "flag_na&cells_empty&wage_reported": 3,
+   "flag_na&cells_present": {
+    "days_sum": 84.0,
+    "n": 10,
+    "plot_nan": 0,
+    "plot_valid": 10,
+    "positive_sum": 10
+   },
+   "flag_no&cells_empty": {
+    "n": 6127,
+    "plot_nan": 39,
+    "plot_valid": 6088
+   },
+   "flag_no&cells_empty&wage_reported": 1,
+   "flag_no&cells_present": {
+    "days_sum": 61.0,
+    "n": 8,
+    "plot_nan": 0,
+    "plot_valid": 8,
+    "positive_sum": 6
+   },
+   "flag_other&cells_empty": {
+    "n": 41,
+    "plot_nan": 0,
+    "plot_valid": 41
+   },
+   "flag_other&cells_present": {
+    "days_sum": 58104.0,
+    "n": 1734,
+    "plot_nan": 14,
+    "plot_valid": 1720,
+    "positive_sum": 1729
+   },
+   "flag_value_counts": {
+    "0.0": 2,
+    "1.0": 1772,
+    "2.0": 6135,
+    "3.0": 1,
+    "nan": 1879
+   },
+   "plot_id_nan_rows": 1759,
+   "rows": 9789
+  },
+  "2010-11/A/family": {
+   "flag_code_no": 0,
+   "flag_col": "a3aq38",
+   "flag_na&cells_empty": {
+    "n": 143,
+    "plot_nan": 0,
+    "plot_valid": 143
+   },
+   "flag_na&cells_present": {
+    "days_sum": 597.0,
+    "n": 27,
+    "plot_nan": 0,
+    "plot_valid": 27,
+    "positive_sum": 27
+   },
+   "flag_no&cells_empty": {
+    "n": 635,
+    "plot_nan": 0,
+    "plot_valid": 635
+   },
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 17,
+    "plot_nan": 0,
+    "plot_valid": 17
+   },
+   "flag_other&cells_present": {
+    "days_sum": 281966.0,
+    "n": 7285,
+    "plot_nan": 0,
+    "plot_valid": 7285,
+    "positive_sum": 7285
+   },
+   "flag_value_counts": {
+    "0.0": 635,
+    "1.0": 1169,
+    "10.0": 23,
+    "2.0": 2272,
+    "3.0": 1533,
+    "4.0": 1127,
+    "5.0": 687,
+    "6.0": 329,
+    "7.0": 74,
+    "8.0": 77,
+    "9.0": 11,
+    "nan": 170
+   },
+   "plot_id_nan_rows": 0,
+   "rows": 8107
+  },
+  "2010-11/A/hired": {
+   "flag_code_no": 2,
+   "flag_col": "a3aq41",
+   "flag_na&cells_empty": {
+    "n": 157,
+    "plot_nan": 0,
+    "plot_valid": 157
+   },
+   "flag_na&cells_empty&wage_reported": 0,
+   "flag_na&cells_present": {
+    "days_sum": 0.0,
+    "n": 2,
+    "plot_nan": 0,
+    "plot_valid": 2,
+    "positive_sum": 0
+   },
+   "flag_no&cells_empty": {
+    "n": 5761,
+    "plot_nan": 0,
+    "plot_valid": 5761
+   },
+   "flag_no&cells_empty&wage_reported": 1,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 1,
+    "plot_nan": 0,
+    "plot_valid": 1,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 18,
+    "plot_nan": 0,
+    "plot_valid": 18
+   },
+   "flag_other&cells_present": {
+    "days_sum": 37835.0,
+    "n": 2168,
+    "plot_nan": 0,
+    "plot_valid": 2168,
+    "positive_sum": 2161
+   },
+   "flag_value_counts": {
+    "1.0": 2186,
+    "2.0": 5762,
+    "nan": 159
+   },
+   "plot_id_nan_rows": 0,
+   "rows": 8107
+  },
+  "2010-11/B/family": {
+   "flag_code_no": 0,
+   "flag_col": "a3bq38",
+   "flag_na&cells_empty": {
+    "n": 97,
+    "plot_nan": 0,
+    "plot_valid": 97
+   },
+   "flag_na&cells_present": {
+    "days_sum": 297.0,
+    "n": 16,
+    "plot_nan": 0,
+    "plot_valid": 16,
+    "positive_sum": 16
+   },
+   "flag_no&cells_empty": {
+    "n": 579,
+    "plot_nan": 0,
+    "plot_valid": 579
+   },
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 27,
+    "plot_nan": 0,
+    "plot_valid": 27
+   },
+   "flag_other&cells_present": {
+    "days_sum": 214486.0,
+    "n": 6192,
+    "plot_nan": 0,
+    "plot_valid": 6192,
+    "positive_sum": 6192
+   },
+   "flag_value_counts": {
+    "0.0": 579,
+    "1.0": 924,
+    "10.0": 18,
+    "11.0": 1,
+    "12.0": 2,
+    "16.0": 1,
+    "2.0": 1932,
+    "3.0": 1219,
+    "4.0": 1097,
+    "5.0": 664,
+    "6.0": 258,
+    "7.0": 52,
+    "8.0": 46,
+    "9.0": 5,
+    "nan": 113
+   },
+   "plot_id_nan_rows": 0,
+   "rows": 6911
+  },
+  "2010-11/B/hired": {
+   "flag_code_no": 2,
+   "flag_col": "a3bq41",
+   "flag_na&cells_empty": {
+    "n": 129,
+    "plot_nan": 0,
+    "plot_valid": 129
+   },
+   "flag_na&cells_empty&wage_reported": 2,
+   "flag_na&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_no&cells_empty": {
+    "n": 5307,
+    "plot_nan": 0,
+    "plot_valid": 5307
+   },
+   "flag_no&cells_empty&wage_reported": 3,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 18,
+    "plot_nan": 0,
+    "plot_valid": 18
+   },
+   "flag_other&cells_present": {
+    "days_sum": 21705.0,
+    "n": 1457,
+    "plot_nan": 0,
+    "plot_valid": 1457,
+    "positive_sum": 1447
+   },
+   "flag_value_counts": {
+    "1.0": 1475,
+    "2.0": 5307,
+    "nan": 129
+   },
+   "plot_id_nan_rows": 0,
+   "rows": 6911
+  },
+  "2011-12/A/family": {
+   "flag_code_no": 0,
+   "flag_col": null,
+   "plot_id_nan_rows": 1,
+   "rows": 7529
+  },
+  "2011-12/A/hired": {
+   "flag_code_no": 2,
+   "flag_col": "a3aq34",
+   "flag_na&cells_empty": {
+    "n": 5,
+    "plot_nan": 0,
+    "plot_valid": 5
+   },
+   "flag_na&cells_empty&wage_reported": 0,
+   "flag_na&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_no&cells_empty": {
+    "n": 5867,
+    "plot_nan": 1,
+    "plot_valid": 5866
+   },
+   "flag_no&cells_empty&wage_reported": 0,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 2,
+    "plot_nan": 0,
+    "plot_valid": 2
+   },
+   "flag_other&cells_present": {
+    "days_sum": 27399.0,
+    "n": 1655,
+    "plot_nan": 0,
+    "plot_valid": 1655,
+    "positive_sum": 1652
+   },
+   "flag_value_counts": {
+    "1.0": 1657,
+    "2.0": 5867,
+    "nan": 5
+   },
+   "plot_id_nan_rows": 1,
+   "rows": 7529
+  },
+  "2011-12/A/other": {
+   "flag_code_no": null,
+   "flag_col": null,
+   "plot_id_nan_rows": 1,
+   "rows": 7529
+  },
+  "2011-12/B/family": {
+   "flag_code_no": 0,
+   "flag_col": null,
+   "plot_id_nan_rows": 5,
+   "rows": 6500
+  },
+  "2011-12/B/hired": {
+   "flag_code_no": 2,
+   "flag_col": "a3bq34",
+   "flag_na&cells_empty": {
+    "n": 13,
+    "plot_nan": 0,
+    "plot_valid": 13
+   },
+   "flag_na&cells_empty&wage_reported": 0,
+   "flag_na&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_no&cells_empty": {
+    "n": 5326,
+    "plot_nan": 5,
+    "plot_valid": 5321
+   },
+   "flag_no&cells_empty&wage_reported": 0,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 5,
+    "plot_nan": 0,
+    "plot_valid": 5
+   },
+   "flag_other&cells_present": {
+    "days_sum": 17084.0,
+    "n": 1156,
+    "plot_nan": 0,
+    "plot_valid": 1156,
+    "positive_sum": 1156
+   },
+   "flag_value_counts": {
+    "1.0": 1161,
+    "2.0": 5326,
+    "nan": 13
+   },
+   "plot_id_nan_rows": 5,
+   "rows": 6500
+  },
+  "2011-12/B/other": {
+   "flag_code_no": null,
+   "flag_col": null,
+   "plot_id_nan_rows": 5,
+   "rows": 6500
+  },
+  "2013-14/A/family": {
+   "flag_code_no": 0,
+   "flag_col": null,
+   "plot_id_nan_rows": 2,
+   "rows": 7550
+  },
+  "2013-14/A/hired": {
+   "flag_code_no": 2,
+   "flag_col": "a3aq34",
+   "flag_na&cells_empty": {
+    "n": 5,
+    "plot_nan": 0,
+    "plot_valid": 5
+   },
+   "flag_na&cells_empty&wage_reported": 0,
+   "flag_na&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_no&cells_empty": {
+    "n": 5657,
+    "plot_nan": 0,
+    "plot_valid": 5657
+   },
+   "flag_no&cells_empty&wage_reported": 0,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0
+   },
+   "flag_other&cells_present": {
+    "days_sum": 22104.0,
+    "n": 1888,
+    "plot_nan": 2,
+    "plot_valid": 1886,
+    "positive_sum": 1883
+   },
+   "flag_value_counts": {
+    "1.0": 1888,
+    "2.0": 5657,
+    "nan": 5
+   },
+   "plot_id_nan_rows": 2,
+   "rows": 7550
+  },
+  "2013-14/B/family": {
+   "flag_code_no": 0,
+   "flag_col": null,
+   "plot_id_nan_rows": 1,
+   "rows": 6756
+  },
+  "2013-14/B/hired": {
+   "flag_code_no": 2,
+   "flag_col": "a3bq34",
+   "flag_na&cells_empty": {
+    "n": 9,
+    "plot_nan": 0,
+    "plot_valid": 9
+   },
+   "flag_na&cells_empty&wage_reported": 0,
+   "flag_na&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_no&cells_empty": {
+    "n": 5387,
+    "plot_nan": 1,
+    "plot_valid": 5386
+   },
+   "flag_no&cells_empty&wage_reported": 0,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0
+   },
+   "flag_other&cells_present": {
+    "days_sum": 14056.0,
+    "n": 1360,
+    "plot_nan": 0,
+    "plot_valid": 1360,
+    "positive_sum": 1359
+   },
+   "flag_value_counts": {
+    "1.0": 1360,
+    "2.0": 5387,
+    "nan": 9
+   },
+   "plot_id_nan_rows": 1,
+   "rows": 6756
+  },
+  "2015-16/A/family": {
+   "flag_code_no": 0,
+   "flag_col": null,
+   "plot_id_nan_rows": 0,
+   "rows": 7787
+  },
+  "2015-16/A/hired": {
+   "flag_code_no": 2,
+   "flag_col": "a3aq34",
+   "flag_na&cells_empty": {
+    "n": 2,
+    "plot_nan": 0,
+    "plot_valid": 2
+   },
+   "flag_na&cells_empty&wage_reported": 0,
+   "flag_na&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_no&cells_empty": {
+    "n": 5935,
+    "plot_nan": 0,
+    "plot_valid": 5935
+   },
+   "flag_no&cells_empty&wage_reported": 0,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 3,
+    "plot_nan": 0,
+    "plot_valid": 3
+   },
+   "flag_other&cells_present": {
+    "days_sum": 23194.0,
+    "n": 1847,
+    "plot_nan": 0,
+    "plot_valid": 1847,
+    "positive_sum": 1845
+   },
+   "flag_value_counts": {
+    "1.0": 1850,
+    "2.0": 5935,
+    "nan": 2
+   },
+   "plot_id_nan_rows": 0,
+   "rows": 7787
+  },
+  "2015-16/B/family": {
+   "flag_code_no": 0,
+   "flag_col": null,
+   "plot_id_nan_rows": 0,
+   "rows": 6792
+  },
+  "2015-16/B/hired": {
+   "flag_code_no": 2,
+   "flag_col": "a3bq34",
+   "flag_na&cells_empty": {
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0
+   },
+   "flag_na&cells_empty&wage_reported": 0,
+   "flag_na&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_no&cells_empty": {
+    "n": 5343,
+    "plot_nan": 0,
+    "plot_valid": 5343
+   },
+   "flag_no&cells_empty&wage_reported": 0,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 1,
+    "plot_nan": 0,
+    "plot_valid": 1
+   },
+   "flag_other&cells_present": {
+    "days_sum": 17592.0,
+    "n": 1448,
+    "plot_nan": 0,
+    "plot_valid": 1448,
+    "positive_sum": 1445
+   },
+   "flag_value_counts": {
+    "1": 1449,
+    "2": 5343
+   },
+   "plot_id_nan_rows": 0,
+   "rows": 6792
+  },
+  "2018-19/A/hired": {
+   "flag_code_no": 2,
+   "flag_col": "s3aq34",
+   "flag_na&cells_empty": {
+    "n": 22,
+    "plot_nan": 0,
+    "plot_valid": 22
+   },
+   "flag_na&cells_empty&wage_reported": 0,
+   "flag_na&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_no&cells_empty": {
+    "n": 4299,
+    "plot_nan": 0,
+    "plot_valid": 4299
+   },
+   "flag_no&cells_empty&wage_reported": 0,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 1,
+    "plot_nan": 0,
+    "plot_valid": 1
+   },
+   "flag_other&cells_present": {
+    "days_sum": 17069.0,
+    "n": 1751,
+    "plot_nan": 0,
+    "plot_valid": 1751,
+    "positive_sum": 1750
+   },
+   "flag_value_counts": {
+    "1.0": 1752,
+    "2.0": 4299,
+    "nan": 22
+   },
+   "plot_id_nan_rows": 0,
+   "rows": 6073
+  },
+  "2019-20/A/hired": {
+   "flag_code_no": 2,
+   "flag_col": "s3aq34",
+   "flag_na&cells_empty": {
+    "n": 81,
+    "plot_nan": 0,
+    "plot_valid": 81
+   },
+   "flag_na&cells_empty&wage_reported": 0,
+   "flag_na&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_no&cells_empty": {
+    "n": 4253,
+    "plot_nan": 0,
+    "plot_valid": 4253
+   },
+   "flag_no&cells_empty&wage_reported": 0,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0
+   },
+   "flag_other&cells_present": {
+    "days_sum": 17700.0,
+    "n": 1550,
+    "plot_nan": 0,
+    "plot_valid": 1550,
+    "positive_sum": 1550
+   },
+   "flag_value_counts": {
+    "1.0": 1550,
+    "2.0": 4253,
+    "nan": 81
+   },
+   "plot_id_nan_rows": 0,
+   "rows": 5884
+  },
+  "2019-20/B/hired": {
+   "flag_code_no": 2,
+   "flag_col": "s3bq34",
+   "flag_na&cells_empty": {
+    "n": 63,
+    "plot_nan": 0,
+    "plot_valid": 63
+   },
+   "flag_na&cells_empty&wage_reported": 0,
+   "flag_na&cells_present": {
+    "days_sum": 144.0,
+    "n": 16,
+    "plot_nan": 0,
+    "plot_valid": 16,
+    "positive_sum": 9
+   },
+   "flag_no&cells_empty": {
+    "n": 4670,
+    "plot_nan": 0,
+    "plot_valid": 4670
+   },
+   "flag_no&cells_empty&wage_reported": 0,
+   "flag_no&cells_present": {
+    "days_sum": 0.0,
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0,
+    "positive_sum": 0
+   },
+   "flag_other&cells_empty": {
+    "n": 0,
+    "plot_nan": 0,
+    "plot_valid": 0
+   },
+   "flag_other&cells_present": {
+    "days_sum": 17792.0,
+    "n": 1629,
+    "plot_nan": 0,
+    "plot_valid": 1629,
+    "positive_sum": 1629
+   },
+   "flag_value_counts": {
+    "1.0": 1629,
+    "2.0": 4670,
+    "nan": 79
+   },
+   "plot_id_nan_rows": 0,
+   "rows": 6378
+  }
+ }
+}

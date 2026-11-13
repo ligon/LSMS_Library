@@ -7,6 +7,7 @@ Security' module carries the food-deprivation item are present:
 2009-10, 2010-11, 2011-12, 2013-14, 2015-16.  (2005-06 GSEC17 is a
 land-rights module; 2018-19 / 2019-20 lack the item.)
 """
+from lsms_library import Country
 from lsms_library.local_tools import to_parquet, get_dataframe
 import sys
 sys.path.append('../../_/')
@@ -14,12 +15,14 @@ import pandas as pd
 from uganda import id_walk
 import json
 
-WAVES = ['2009-10', '2010-11', '2011-12', '2013-14', '2015-16']
-
 x = {}
-for t in WAVES:
+country = Country('Uganda')
+for t in country.waves:
+    wave = country[t]
+    if 'months_food_inadequate' not in wave.data_scheme:
+        continue
     print(t, file=sys.stderr)
-    x[t] = get_dataframe('../' + t + '/_/months_food_inadequate.parquet')
+    x[t] = get_dataframe('../' + wave.wave_folder + '/_/months_food_inadequate.parquet')
 
 x = pd.concat(x.values())
 

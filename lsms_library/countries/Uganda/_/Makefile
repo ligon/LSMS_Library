@@ -23,7 +23,6 @@ var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DI
 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/income.parquet \
 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
 	  $(VAR_DIR)/plot_features.parquet \
-	  $(VAR_DIR)/crop_production.parquet \
 	  $(VAR_DIR)/plot_inputs.parquet \
 	  $(VAR_DIR)/plot_labor.parquet \
 	  $(VAR_DIR)/livestock.parquet \
@@ -60,8 +59,10 @@ $(VAR_DIR)/interview_date.parquet: interview_date.py $(interview_date_parquet)
 enterprise_income = $(shell find $(rounds) -name enterprise_income.py)
 enterprise_income_parquet := $(enterprise_income:.py=.parquet)
 
-$(VAR_DIR)/enterprise_income.parquet: enterprise_income.py $(enterprise_income_parquet)
-	python enterprise_income.py
+# Country concatenators are historical references only (GH #788 / #1062).
+# Pin the subprocess backend so a make-backend call cannot recurse here.
+$(VAR_DIR)/enterprise_income.parquet:
+	LSMS_BUILD_BACKEND=dvc python -c "import lsms_library as ll; ll.Country('Uganda').enterprise_income()"
 
 assets = $(shell find $(rounds) -name assets.py)
 assets_parquet := $(assets:.py=.parquet)
@@ -72,8 +73,9 @@ $(VAR_DIR)/assets.parquet: assets.py $(assets_parquet)
 earnings = $(shell find $(rounds) -name earnings.py)
 earnings_parquet := $(earnings:.py=.parquet)
 
-$(VAR_DIR)/earnings.parquet: earnings.py $(earnings_parquet)
-	python earnings.py
+$(VAR_DIR)/earnings.parquet:
+	LSMS_BUILD_BACKEND=dvc python -c "import lsms_library as ll; ll.Country('Uganda').earnings()"
+
 
 shocks = $(shell find $(rounds) -name shocks.py)
 shocks_parquet := $(shocks:.py=.parquet)
@@ -103,8 +105,10 @@ $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 crop_production = $(shell find $(rounds) -name crop_production.py)
 crop_production_parquet := $(crop_production:.py=.parquet)
 
-$(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet)
-	python crop_production.py
+# GH1204: Country owns requested-wave assembly, ID conversion and audit
+# transport. Direct Make builds native waves without a second country writer.
+.PHONY: crop_production
+crop_production: $(crop_production_parquet)
 
 plot_inputs = $(shell find $(rounds) -name plot_inputs.py)
 plot_inputs_parquet := $(plot_inputs:.py=.parquet)
@@ -136,11 +140,14 @@ months_food_inadequate_parquet := $(months_food_inadequate:.py=.parquet)
 $(VAR_DIR)/months_food_inadequate.parquet: months_food_inadequate.py $(months_food_inadequate_parquet)
 	python months_food_inadequate.py
 
-$(VAR_DIR)/income.parquet: income.py $(VAR_DIR)/enterprise_income.parquet $(VAR_DIR)/earnings.parquet
+$(VAR_DIR)/income.parquet: income.py
 	python income.py
 
-$(VAR_DIR)/nutrition.parquet $(VAR_DIR)/fct.parquet: nutrition.py $(VAR_DIR)/food_acquired.parquet nutrition.org
-	python nutrition.py
+$(VAR_DIR)/nutrition.parquet: nutrition.py nutrition.org
+	python nutrition.py nutrition
+
+$(VAR_DIR)/fct.parquet: nutrition.py nutrition.org
+	python nutrition.py fct
 
 %.parquet: %.py categorical_mapping.org uganda.py
 	(cd $(@D) && python ./$(<F))

@@ -1,0 +1,19 @@
+{
+  "status": "FROZEN_CRITICAL_POSTEXIT_ATTESTATION",
+  "manifest_entries": 3,
+  "manifest_sha256": "598f1016f1dca1c0454176ac8735e34af82906caffe5a527817a8d865b910bb3",
+  "safe_export_allowlist": {
+    "POSTEXIT-safe.json": {
+      "sha256": "177d0762e37588b13f8b2e6563804f6e60450ac342882ec9764c17d8c4dbd073",
+      "bytes": 878,
+      "mode": 384,
+      "mtime_ns": 1792651466510560300,
+      "inode": 53881221,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file"
+    }
+  },
+  "original_critical_release_unchanged": true,
+  "signed": "Sue"
+}

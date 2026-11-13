@@ -13,19 +13,26 @@ the framework joins it from sample() at API time.
 """
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 from nigeria import Waves
 
+country = Country('Nigeria')
+declared_folders = set()
+for quarter in country.waves:
+    wave = country[quarter]
+    if 'plot_features' in wave.data_scheme:
+        declared_folders.add(wave.wave_folder)
+
 pieces = []
 for t in Waves.keys():
-    fn = f'../{t}/_/plot_features.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired (script absent or parquet not yet built).
-        # DVC raises PathMissingError here, not FileNotFoundError.
+    # PP/PH quarters share a physical folder. Consult the actual native/YAML
+    # declaration once per logical wave, but read each declared folder once.
+    if t not in declared_folders:
         continue
-    pieces.append(df)
+    fn = f'../{t}/_/plot_features.parquet'
+    # A failed declared input must stop before any partial country write.
+    pieces.append(get_dataframe(fn))
 
 assert pieces, "plot_features: no wave-level parquets found"
 

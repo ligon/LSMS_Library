@@ -1,0 +1,30 @@
+{
+  "status": "SAVED_NUMERIC_EVIDENCE_AND_SOURCE_BOUND_INDEX_FINDINGS_PENDING_ROOT_CLASSIFICATION",
+  "PR": 1192,
+  "original_terminal1_immutable": true,
+  "original_strict_fullaxis_pass_groups": 25,
+  "original_strict_fullaxis_findings": 12,
+  "source_bound_crosshead_domain_expansion_groups": 8,
+  "source_bound_producer_payload_only_groups_attrs_never_asserted": 4,
+  "NEW_full_Feature_axes_payload_reconstructions_no_attrs_claim": 2,
+  "observed_numeric_values_masks_dtypes_coordinates_exact_in_all12": true,
+  "all_full_levels_codes_dtypes_storage_names_sortorder_characterized": true,
+  "actual_axes_normalized_or_levels_removed": false,
+  "historical_original_receipt_entries": 149,
+  "selected_product_copies": 44,
+  "original_unsaved_memory_predicates": {
+    "source_helper_crosshead": 5,
+    "unchanged_early_source_helpers": 3,
+    "gained_source_expected": 2,
+    "helper_to_wave": 10,
+    "helper_to_public": 10,
+    "drop_mask_Series": 4,
+    "warm_and_new_Country": 8,
+    "adversarial_mixed_Series": 1,
+    "adversarial_metric_helper_frames": 6
+  },
+  "fixture_memory_not_recovered": true,
+  "source_API_pytest_CLI_cache_replays": 0,
+  "all_campaign_result": false,
+  "signed": "Sue"
+}

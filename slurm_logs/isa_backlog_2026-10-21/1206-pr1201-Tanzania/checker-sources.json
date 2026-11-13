@@ -1,0 +1,542 @@
+{
+  "1196-original-exact.py": {
+    "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2",
+    "bytes": 4376,
+    "mode": 384,
+    "mtime_ns": 1792650621807714413,
+    "inode": 56759621,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "attest-pr1201-tanzania.py": {
+    "sha256": "b58ff8905607bcfa2da99af06b076fd52049dcadf61fcb8624ce3a92ec793bd3",
+    "bytes": 3647,
+    "mode": 384,
+    "mtime_ns": 1792657040055046400,
+    "inode": 56759624,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "bootstrap.py": {
+    "sha256": "3a3aca0d72e4d3b919bc1708947f8edc413e712cab125d2badb74e104199b522",
+    "bytes": 2560,
+    "mode": 384,
+    "mtime_ns": 1792650727641300176,
+    "inode": 56759625,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "calibrate-object-v3.py": {
+    "sha256": "d592d0346bf80f7dca6a8a716e3681552a96562da17c3117c32b3fde563d9639",
+    "bytes": 2866,
+    "mode": 384,
+    "mtime_ns": 1792655052211984941,
+    "inode": 56759626,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "check-critical.py": {
+    "sha256": "947bc88204df04cdc9d23b70624f697fcd279fe20cfb01c2f5f7a3ed4658f808",
+    "bytes": 9585,
+    "mode": 384,
+    "mtime_ns": 1792650827403867387,
+    "inode": 56759627,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "check-pr1201-author-supplement.py": {
+    "sha256": "e11b330a2ec46ccd5e6f03631b363e2f677bf1142b86c0afec12a7e2e49d589a",
+    "bytes": 1847,
+    "mode": 384,
+    "mtime_ns": 1792656894537274687,
+    "inode": 56759629,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "check-pr1201-tanzania.py": {
+    "sha256": "a72f25c431d94fa29b6017285b8deb9fe230ab4aff7cbc82b3474fe7bd5ebac3",
+    "bytes": 3954,
+    "mode": 384,
+    "mtime_ns": 1792656730832408609,
+    "inode": 56759631,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact_strict.py": {
+    "sha256": "c42164e9d7e01027ac264b1442e5157d44aa0207655ab8c53d080659084f812d",
+    "bytes": 5155,
+    "mode": 384,
+    "mtime_ns": 1792650727680300392,
+    "inode": 56759635,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "exact_strict_fast_v3.py": {
+    "sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+    "bytes": 5198,
+    "mode": 384,
+    "mtime_ns": 1792655052211984941,
+    "inode": 56759636,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/api-audit-direct.py": {
+    "sha256": "2873d35c9546482a22df242b117be841799eb466afd1a49ee855cf9ddfb1ff4f",
+    "bytes": 402,
+    "mode": 384,
+    "mtime_ns": 1792657056524133603,
+    "inode": 57683265,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/artifact-final-checks.py": {
+    "sha256": "211ac9b238883f59923284914e9b1989b8ef6edacecc294e44fda4973733fcc0",
+    "bytes": 3572,
+    "mode": 384,
+    "mtime_ns": 1792657056525133608,
+    "inode": 57683266,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/assess.py": {
+    "sha256": "dba2277bca39e3b8d7f23f76c467636d6b47e8bc9adf1e311ca70ca94f2ef20d",
+    "bytes": 12477,
+    "mode": 384,
+    "mtime_ns": 1792657056525133608,
+    "inode": 57683267,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/bootstrap.py": {
+    "sha256": "37caccf3dacfee9ceb0e43fde2be02aab04111209d4c94a943e10257821f3b51",
+    "bytes": 2565,
+    "mode": 384,
+    "mtime_ns": 1792657056525133608,
+    "inode": 57683268,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/built-assertions.py": {
+    "sha256": "04d9b70efc5c47a6b7d5e7f941f322f2734aeafd958b414e1f830393c5605fb2",
+    "bytes": 1461,
+    "mode": 384,
+    "mtime_ns": 1792657056525133608,
+    "inode": 57683269,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/cli-launch.py": {
+    "sha256": "6dce036966d9e2708ec42824ce0e6f00fa81e194aaa1283e3da3b8d0b7525e83",
+    "bytes": 291,
+    "mode": 384,
+    "mtime_ns": 1792657056525133608,
+    "inode": 57683270,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/common.py": {
+    "sha256": "16f61d5c321265838104fa95436641be4dea6124572a2370f4693cf436abd7f5",
+    "bytes": 2844,
+    "mode": 384,
+    "mtime_ns": 1792657056525133608,
+    "inode": 57683271,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/comparator-controls.py": {
+    "sha256": "0067bcf158d7cc578a202d1f1f8484c41cd6d3240fe7315a7db46ef06fdb1ffa",
+    "bytes": 1452,
+    "mode": 384,
+    "mtime_ns": 1792657056525133608,
+    "inode": 57683272,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/coverage-stop.py": {
+    "sha256": "0c89db47a616839583e227a2442c84c7bae8ed847994987716d98e26704e99a8",
+    "bytes": 676,
+    "mode": 384,
+    "mtime_ns": 1792657056526133614,
+    "inode": 57683273,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/discovery.py": {
+    "sha256": "41d7c40a0f82d139ac4cabdc87323f0584251d57752ddcd9cad9666a32afb074",
+    "bytes": 1695,
+    "mode": 384,
+    "mtime_ns": 1792657056526133614,
+    "inode": 57683274,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/empty-contract.py": {
+    "sha256": "1d13236c6919f6eddd604ff506397325728b03b9b4c36fbadcd3790938a616a9",
+    "bytes": 717,
+    "mode": 384,
+    "mtime_ns": 1792657056526133614,
+    "inode": 57683275,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/entry.py": {
+    "sha256": "f0d7183b0d88ecfe2e092a972d326796471b31d34fde372abef2faa726232704",
+    "bytes": 1464,
+    "mode": 384,
+    "mtime_ns": 1792657056526133614,
+    "inode": 57683276,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/evidence-gaps.py": {
+    "sha256": "f8b29ed8c1552df276061cc67852b255368ea810d8018320635895e8764e7d89",
+    "bytes": 3713,
+    "mode": 384,
+    "mtime_ns": 1792657056526133614,
+    "inode": 57683277,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/exact.py": {
+    "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2",
+    "bytes": 4376,
+    "mode": 384,
+    "mtime_ns": 1792657056526133614,
+    "inode": 57683278,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/extra-tooling.py": {
+    "sha256": "0672d5e9fb55d6a4cc42ecf0f8aede5ad60ba7cf1f1270e769e3c05a79318778",
+    "bytes": 327,
+    "mode": 384,
+    "mtime_ns": 1792657056526133614,
+    "inode": 57683279,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/extras.py": {
+    "sha256": "be944bb7088fefb63bd1b723dbeba2fedde5b5618f05393a3b307c605eada8ff",
+    "bytes": 4728,
+    "mode": 384,
+    "mtime_ns": 1792657056527133619,
+    "inode": 57683280,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/final-freeze.py": {
+    "sha256": "f354a251d47af745f1024fac6bcaa30c4e9c948856bd43c6e2a3550847714a9b",
+    "bytes": 6735,
+    "mode": 384,
+    "mtime_ns": 1792657056527133619,
+    "inode": 57683281,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/hash-gate.py": {
+    "sha256": "a158b1e3026a0a4db21d52b57e434a69670e03733a3534c60506bc49d94609cd",
+    "bytes": 913,
+    "mode": 384,
+    "mtime_ns": 1792657056527133619,
+    "inode": 57683282,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/hash_inventory.py": {
+    "sha256": "1e4eb6c8e02af6ca9e3b257fadc6959878e740ad65e72984368feb42f0205e67",
+    "bytes": 977,
+    "mode": 384,
+    "mtime_ns": 1792657056527133619,
+    "inode": 57683283,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/identity.py": {
+    "sha256": "311e4d4cbeee1e383351282e60a0f97340314fbfb0d47a6095b7c9c17bc66c57",
+    "bytes": 472,
+    "mode": 384,
+    "mtime_ns": 1792657056527133619,
+    "inode": 57683284,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/label-summary.py": {
+    "sha256": "10bb36afdaad7d6febbc494efc54fe5b9c49984e20d83424e84d7f6493630b02",
+    "bytes": 385,
+    "mode": 384,
+    "mtime_ns": 1792657056527133619,
+    "inode": 57683285,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/manifest-shape.py": {
+    "sha256": "b00c19a6838047a8717c12d517ebfdddd7cbda9114804326c76a301d4bcf1254",
+    "bytes": 373,
+    "mode": 384,
+    "mtime_ns": 1792657056527133619,
+    "inode": 57683286,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/matrix-gate.py": {
+    "sha256": "8e35885053d5c9ad31e9d9db1a532e8f64916b9684f4706285354cd0df5ce8de",
+    "bytes": 736,
+    "mode": 384,
+    "mtime_ns": 1792657056528133624,
+    "inode": 57683287,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/new-tests/test_gh1091_tanzania_community_builder.py": {
+    "sha256": "cc64075e6edfc5be063c23ab0b63ddcb0f42e6b24a87c0b40b9f01f0fd619c77",
+    "bytes": 11270,
+    "mode": 384,
+    "mtime_ns": 1792657056530133635,
+    "inode": 57683306,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/oracle.py": {
+    "sha256": "ab58a7d5523663f93968ebe53b2cb585db6b31d63065963d86284af73003ff53",
+    "bytes": 4896,
+    "mode": 384,
+    "mtime_ns": 1792657056528133624,
+    "inode": 57683288,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/package.py": {
+    "sha256": "ff919752fcc7e64218d5e1190fb4aed038cc8cdaa344b86b6cb934e33d113581",
+    "bytes": 4678,
+    "mode": 384,
+    "mtime_ns": 1792657056528133624,
+    "inode": 57683289,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/populated-prepare.py": {
+    "sha256": "0597f25f9e6f3ba93fb05897f3d3f14cfe3b32b69f903de698768028c3495846",
+    "bytes": 1558,
+    "mode": 384,
+    "mtime_ns": 1792657056528133624,
+    "inode": 57683290,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/populated.py": {
+    "sha256": "38e885a70a657bd42d4b0e15fdb0bd0a0fb4b12b62923f9927aacbff1546f515",
+    "bytes": 1654,
+    "mode": 384,
+    "mtime_ns": 1792657056528133624,
+    "inode": 57683291,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/post-stop-check.py": {
+    "sha256": "57169fcc600269ea6e1ebc8c7f650518f413a1c5aef8f987f5b18557a2a18ffd",
+    "bytes": 978,
+    "mode": 384,
+    "mtime_ns": 1792657056528133624,
+    "inode": 57683292,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/preflight-v2.py": {
+    "sha256": "2baf17ee27f01b809df9671d0aa57d41fc2f247cae8e4b1e3dca18d1408ddc84",
+    "bytes": 4492,
+    "mode": 384,
+    "mtime_ns": 1792657056529133630,
+    "inode": 57683293,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/preflight.py": {
+    "sha256": "c505783318faff06414ef269590e3c2b3ecf60eb12f3fd377c65e0eaf4184d23",
+    "bytes": 4360,
+    "mode": 384,
+    "mtime_ns": 1792657056529133630,
+    "inode": 57683294,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/preparation.py": {
+    "sha256": "15ff44f67f6608a6a463f3277e45835690f0acbf1ef958a626fdcdfa6dea6a15",
+    "bytes": 3205,
+    "mode": 384,
+    "mtime_ns": 1792657056529133630,
+    "inode": 57683295,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/prepare-tools.py": {
+    "sha256": "46f0541bd99300321e935ce53f5ea375e5e98faf06624b60d8f84824609e0ec7",
+    "bytes": 5356,
+    "mode": 384,
+    "mtime_ns": 1792657056529133630,
+    "inode": 57683296,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/probe.py": {
+    "sha256": "4af3aacf2f12d850fb4c20fb5021a7a9cce7975bf02d3622188b99524393fe3e",
+    "bytes": 2702,
+    "mode": 384,
+    "mtime_ns": 1792657056529133630,
+    "inode": 57683297,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/scanner-run.py": {
+    "sha256": "1d048fb81f3578c8332ef0331f5abce8a33e27ed31bc5b8f3be076c46da7f0a4",
+    "bytes": 714,
+    "mode": 384,
+    "mtime_ns": 1792657056529133630,
+    "inode": 57683298,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/sitecustomize.py": {
+    "sha256": "279806c51d6053033d6cd8b66a12065145cf409748fbd7130adb57ff146a681b",
+    "bytes": 2437,
+    "mode": 384,
+    "mtime_ns": 1792657056529133630,
+    "inode": 57683299,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/status.py": {
+    "sha256": "af05d781cc2be6acd4275cad9e942acd2f9030a224ce9f06c8dd99c5e63460f2",
+    "bytes": 429,
+    "mode": 384,
+    "mtime_ns": 1792657056530133635,
+    "inode": 57683300,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/terminal-proof-v2.py": {
+    "sha256": "fbcea225ce762f3213e6c92c3d858e5fcaf968013897f029b34c13cd7d15b3e1",
+    "bytes": 8670,
+    "mode": 384,
+    "mtime_ns": 1792657056530133635,
+    "inode": 57683301,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/terminal-proof.py": {
+    "sha256": "f7ea8df99a9d92571ab7ef7caeb859cff444cc668681b35ae02804328352da2e",
+    "bytes": 8622,
+    "mode": 384,
+    "mtime_ns": 1792657056530133635,
+    "inode": 57683302,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/tests.py": {
+    "sha256": "d9a399aaa5321a8eb3d41a8184bed870906ebf8d58b8bf336b6fc6bcba3e9f11",
+    "bytes": 1415,
+    "mode": 384,
+    "mtime_ns": 1792657056530133635,
+    "inode": 57683303,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "original-checkers/tighten-probe.py": {
+    "sha256": "b72441f2bb73d3018a6bf7605b15aaaeac23d13b2c5e2643abb22b21c0aa0fa6",
+    "bytes": 600,
+    "mode": 384,
+    "mtime_ns": 1792657056530133635,
+    "inode": 57683304,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "package-pr1201-tanzania.py": {
+    "sha256": "62752d1818b97994edf0dc185ab9efa36e243c512920eb849098f5e03f4c820b",
+    "bytes": 10978,
+    "mode": 384,
+    "mtime_ns": 1792657010282888787,
+    "inode": 56759656,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "prepare-pr1201-author-supplement.py": {
+    "sha256": "7399b95620fffa740e8411bac97e525710e69f372352d67d02142ba61187159f",
+    "bytes": 3392,
+    "mode": 384,
+    "mtime_ns": 1792656861177098443,
+    "inode": 56759672,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "prepare-pr1201-tanzania.py": {
+    "sha256": "676643e8bd325796f8fa1b27aa61bbbe1124af62f07cfe27782807ea04cc9de1",
+    "bytes": 10373,
+    "mode": 384,
+    "mtime_ns": 1792656652070716833,
+    "inode": 56759674,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  },
+  "twenty-original-exact.py": {
+    "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2",
+    "bytes": 4376,
+    "mode": 384,
+    "mtime_ns": 1792650620812709018,
+    "inode": 56759677,
+    "device": 64770,
+    "nlink": 1,
+    "symlink": false
+  }
+}

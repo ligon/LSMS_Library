@@ -269,11 +269,13 @@ def test_the_stamp_is_on_exactly_the_derived_rows(food_acquired):
     in-kind; 4,740.73 kg), all 2011Q1."""
     d = food_acquired['Derivation']
     t = food_acquired.index.get_level_values('t').astype(str)
-    assert (d.dropna() == KEY).all()
-    assert d.notna().sum() > 0
-    assert set(t[d.notna().to_numpy()]) == {'2011Q1'}
+    mine = (d == KEY).fillna(False).to_numpy()
+    assert mine.sum() > 0
+    assert set(t[mine]) == {'2011Q1'}
+    # 2011Q1 carries no other key (GH #881's stamp is on W4 rows only).
     q11 = t == '2011Q1'
-    assert (d.notna().to_numpy()[q11]
+    assert (d.notna().to_numpy()[q11] == mine[q11]).all()
+    assert (mine[q11]
             == food_acquired['Quantity_kg'].notna().to_numpy()[q11]).all()
     summ = food_acquired.attrs['derivations'][COUNTRY][KEY]
     assert summ['in'] == 'food_acquired'
@@ -297,9 +299,16 @@ def test_kg_ladder_on_the_sized_labels(food_acquired, w1ph):
     q = food_acquired['Quantity'].reindex(f.index).to_numpy()
     src = f['KgFactorSource'].to_numpy()
     sized = u.isin(set(mass) | litres).to_numpy()
-    assert set(t[sized]) == {'2011Q1'}
+    w1 = (t == '2011Q1').to_numpy()
+    assert set(t[sized & w1]) == {'2011Q1'}
+    # GH #1034: W3 shares these native names, but not W1's stated card.
+    later_shared = sized & ~w1
+    assert later_shared.any()
+    assert not (src[later_shared] == 'survey_kg').any()
+    stamp = food_acquired['Derivation'].reindex(f.index).to_numpy()
+    assert not pd.Series(stamp[later_shared]).eq(KEY).fillna(False).any()
     assert not (src[sized] == 'metric').any()
-    on_mass = u.isin(mass).to_numpy() & (q > 0)
+    on_mass = w1 & u.isin(mass).to_numpy() & (q > 0)
     frac = on_mass & (q < 1)
     whole = on_mass & (q >= 1)
     assert frac.sum() > 0 and whole.sum() > 0

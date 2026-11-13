@@ -1,0 +1,60 @@
+{
+ "branch_equals_f7f567c82_except_Derivation": true,
+ "stamped_rows": 9502,
+ "filled_rows_vs_development": 9502,
+ "stamped_equals_filled": true,
+ "other_keys": [],
+ "per_wave": {
+  "2011-12": {
+   "stamped": 544,
+   "stamped_positive_value": 160,
+   "positive_value_rows_dev": 694,
+   "positive_value_rows_branch": 854
+  },
+  "2013-14": {
+   "stamped": 4463,
+   "stamped_positive_value": 1390,
+   "positive_value_rows_dev": 1347,
+   "positive_value_rows_branch": 2737
+  },
+  "2015-16": {
+   "stamped": 4495,
+   "stamped_positive_value": 1283,
+   "positive_value_rows_dev": 1017,
+   "positive_value_rows_branch": 2300
+  },
+  "2018-19": {
+   "stamped": 0,
+   "stamped_positive_value": 0,
+   "positive_value_rows_dev": 1368,
+   "positive_value_rows_branch": 1368
+  },
+  "2021-22": {
+   "stamped": 0,
+   "stamped_positive_value": 0,
+   "positive_value_rows_dev": 1292,
+   "positive_value_rows_branch": 1292
+  }
+ },
+ "attrs_summary": null,
+ "quantity_sold_exceeds_harvest": {
+  "2011-12": {
+   "sect12_rows": 7,
+   "sect12_sold_gt_harvest": 0.8571,
+   "sect11_rows": 542,
+   "sect11_sold_gt_harvest": 0.1402
+  },
+  "2013-14": {
+   "sect12_rows": 439,
+   "sect12_sold_gt_harvest": 0.0752,
+   "sect11_rows": 406,
+   "sect11_sold_gt_harvest": 0.0542
+  },
+  "2015-16": {
+   "sect12_rows": 971,
+   "sect12_sold_gt_harvest": 0.0268,
+   "sect11_rows": 643,
+   "sect11_sold_gt_harvest": 0.014
+  }
+ }
+}

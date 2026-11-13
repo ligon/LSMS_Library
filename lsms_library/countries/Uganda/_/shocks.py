@@ -2,19 +2,24 @@
 """
 Compile data on reported shocks.
 """
+from lsms_library import Country
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
 import sys
 sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
-from uganda import Waves, id_walk
+from uganda import id_walk
 import json
 x = {}
 
-for t in list(Waves.keys()):
+country = Country('Uganda')
+for t in country.waves:
+    wave = country[t]
+    if 'shocks' not in wave.data_scheme:
+        continue
     print(t, file=sys.stderr)
-    x[t] = get_dataframe('../'+t+'/_/shocks.parquet')
+    x[t] = get_dataframe('../'+wave.wave_folder+'/_/shocks.parquet')
 
 x = pd.concat(x.values())
 

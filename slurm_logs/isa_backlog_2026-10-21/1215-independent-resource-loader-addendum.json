@@ -1,0 +1,44 @@
+{
+  "status": "ROOT_APPROVED_IDENTITY_LOADER_RESOURCE_PROTOCOL_DELEGATION",
+  "original_genuine_release_sha256": "c194be1c414f83c77779a28631520a7b9ed03cec0dd6ad85c8fcb05d50137b70",
+  "prior_startup_addendum_sha256": "663413b505416faf0c62e716c299c384f4061612c922e99a28472373940adfbd",
+  "pins": {
+    "offline/sitecustomize.py": "993fc4077a95e5b7da11eae757b68b07093b0b25a43d948c15f93c7b5762b3b4",
+    "genuine_startup.py": "3c2fb90bd56859ef0cc75eaa824de3961048352ac85d51b0a2244d585f24d825",
+    "offline-genuine-closed/sitecustomize.py": "ba0345ef18e4fa43e81892ddc2a62c0d0749ca9d74c92d25ccf9252f39a43e3a",
+    "genuine_startup_v2.py": "1535c78dcbe0b4f7c532cab73c2d52c9e5b29062d7f052a0af6c5d7753d0c5d9",
+    "offline-genuine-closed-v2/sitecustomize.py": "031bc2b5791f662f6a850be6863a8f224cfce9991fa7b150b91677f03613306a"
+  },
+  "exact_new_diff": "Only __getattr__ delegates resource APIs to original loader and startup receipt names its new source path; fatal entrypoint changes only startup path/pin. Original guard and versions remain byte-exact.",
+  "first_normal_failure": {
+    "session_id": 72812,
+    "Popen_pid": 231288,
+    "terminal_chunk": "2323d6",
+    "exit_code": 1,
+    "dispatch_expression_attempts": 1,
+    "crop_method_invocations": 0,
+    "normal_results": 0,
+    "L2_products": 0,
+    "scope": "Review loader did not delegate package resource APIs; failure during Country attribute/currency metadata loading before crop method invocation, build or raw decode. This is instrumentation interference, not product regression. Original traces/footprint preserved."
+  },
+  "root_current_metadata_gate": {
+    "normal_roots": 4,
+    "files": 148,
+    "all_files_are_exact_planned_L1_copies": true,
+    "L2_files": 0,
+    "root_payload_opens_decodes": 0
+  },
+  "new_metadata_only_controls": {
+    "actors": 2,
+    "heads": [
+      "candidate",
+      "parent"
+    ],
+    "data_roots": "Existing approved Default roots; no new root/copy.",
+    "assertions": "Normal importlib.resources data_info bytes and original loader source/resource protocols match literal package source SHA; actual source/config/data/DVC/runtime/release identities and current L1-only footprint remain bound.",
+    "normal_API_calls": 0,
+    "data_decodes": 0
+  },
+  "after_both_controls_actual0": "Retry only failed-before-invocation first normal actor, then seven never-started normal actors and two never-started scanners under original exact grid. No provider/staging/calibration/census/test/four-preflight replay. Every actual terminal/dispatch count retained.",
+  "signed": "Sue"
+}

@@ -275,7 +275,9 @@ Savanes), Benin 31.4% between 12 (0.65x Zou to 1.77x Donga, where the DDI
 *does* state a disproportionate allocation), CotedIvoire 36.5% between 33
 (0.33x Abidjan to 6.17x Folon).  Senegal, Mali, Niger and Burkina Faso's
 EHCVM waves (2018-19 and 2021-22) wire no =strata= key at all, so the check
-cannot run there -- a gap of its own.
+cannot run there -- a gap of its own.  /Closed 2026-11-04 (GH #812): those four now
+serve region x milieu, not the region alone as here; their =CONTENTS.org= give the
+shares./
 
 ** 2018-19 -- where the statement lives
 
@@ -395,6 +397,7 @@ Portuguese unit names (=Kg=, =Litro=, =Sachet=, =Pacote=, =Unidade=,
 =Pedaço=, =Dúzia=, ...) -- 29 distinct values total.  No =u= table is
 wired into =_/categorical_mapping.org=; the framework's auto-discovery
 on =u= would be a no-op (the labels are already canonical).
+[2026-11-04, GH #1226: "No =u= table is wired" is wrong.  =_/categorical_mapping.org= has opened with =#+name: u= since =c7f5c33dc= (2026-06-06, GH #223): 29 rows, all identity, so the no-op part still holds.  Since GH #1224 the served count is 67 labels, not 29.]
 
 The clean labels come from a per-wave mojibake fix in
 =2018-19/_/mapping.py=:
@@ -619,8 +622,268 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - The served =u= index still carries only =s07bq03b=, not the unit SIZE
   =s07bq03c=, so two rows differing only in container size collapse onto one
   =u=.  The derivation does distinguish them; the index does not.
+- [2026-11-03, GH #1224: no longer true.  =u= is now =<unit> (<Size>)= where =s07bq03c= names a size, in the instrument's Portuguese: the served base units are Portuguese (=Unidade=, =Monte=), so =Monte (Medio)=, =Pedaço (Grande)=, no translation; =Tamanho único= is the size-free code.  Cold 2018-19: rows unchanged at 126,925, =u= 29 -> 67, (j, u) 404 -> 705; =lsms_library/ehcvm.py=.]
 - The price still comes from a purchase up to 30 days old.  That is what the
   instrument asked; the assumption is recorded rather than hidden.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* 2026-11-04 -- =nitrogen_kg= is empty here (GH #1445)
+
+Measured, nothing changed.  Code 5 of =s16bq01= is =Adubos inorgânicos - NPK/Fórmula
+única= (46 applied rows); no grade.  There is no
+=harmonize_input=, so every label passes through and none keys =_NITROGEN_CONTENT=:
+=nitrogen_kg= matches 0 rows and returns nothing, whatever the share.  Separately
+=Quilograma= and =Grama= have no kg factor, so the 38 + 2 NPK rows in them have no mass
+either.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 60 positive), which the
+=data_scheme.yml= grain note says it does not.
+
+* 2026-11-04 -- 2021-22 held and registered, not wired (GH #552)
+
+Acquired whole by =add_wave=: EHCVM-2 (6274, =GNB_2021_EHCVM-2_v01_M=) in =2021-22/Data/=, 60
+files, 178 MB, with the BIDs and both household questionnaires in
+=Documentation/=.  No table of this wave is served: =_/data_info.yml= declares
+nothing.  Each new table is its own piece of work; the 2021-22 waves of Niger,
+Mali and Senegal are the template.  For the wiring:
+
+- *A panel by cluster.*  BID section 4: "The survey is a panel survey by cluster".
+  Measured: all 450 grappes recur from 2018-19, and 4,893 of 5,351
+  =(grappe, menage)= keys do.  Whether a recurring key is the same household is
+  not checked here: =s00_me= has a =PanelHH= column, and Burkina renumbers its
+  households (GH #1245).
+- *GPS.*  =s00_me= names its coordinates =GPS__Latitude_m= / =GPS__Longitude_m=,
+  populated on all 5,351 households; the other EHCVM-2 covers measured here have
+  no =_m=.  What the suffix means, and whether they are displaced, is not known;
+  read GH #791 first.
+- *Prices.*  =ehcvm_prix= comes from a separate sample of markets (BID section
+  3.3), and the community files are =s00_co= to =s04_co= only, with no =s05_co=.
+  So there is no grappe-grain price file for =community_prices=.
+- *Size.*  Of the 12 source files the 2018-19 config names that have a 2021
+  analogue, 83% of columns keep their name; =s11= and =s16c= move most.
+
+Registration moves every Guinea-Bissau =Country._table_cache_hash=, because the wave set
+is folded into the hash, and no existing wave's =Wave._input_hash=.  When
+=food_acquired= is wired for 2021-22, pooled kg factors change for every
+Guinea-Bissau wave at read time (GH #1487).
+* 2018-19 community prices are wired (GH #1226, 2026-11-04)
+
+=community_prices= was declared nowhere for Guinea-Bissau although =2018-19/Data/s05_co_gnb2018.dta= holds section 5 of the community questionnaire.  Now built by =2018-19/_/community_prices.py= on Niger's template (rulings D1-D6, =Niger/_/CONTENTS.org=, "2018-19 community prices are wired"), with the household's sized unit form and no folding (#1453 ruling, @ligon 2026-11-04).  Helpers and registry callables are in =2018-19/_/mapping.py=.
+
+*Served, cold private root:* 80,202 rows = both readings of all 40,101 source records; 449 grappes, 80 =j=, 70 =u=.  =visit= 1: 40,876, 2: 39,326.  =obs= 1 and 2: 40,101 each.
+
+*The file.*  One row per (grappe, =s05q01= product, =s05q02= unit-size) with two prices.  0 repeated keys, 0 byte-identical rows, =Existe= constant 1.  No price is NA, zero, negative or a sentinel; 5.46 to 50,500 FCFA.  68 =s05q03= and 83 =s05q04= values are not integers, and the two readings agree in 84.7% of records.  Niger's 0.85 pattern is absent: 1 and 2 records at that exact ratio.
+
+*Coverage.*  449 of the 450 =sample().v=, every s05 grappe among them; each grappe's =vague= equals the cover page's.  20,438 records are in vague 1 and 19,663 in vague 2.  The five duplicated grappes of =grappe_gps_gnb2018.dta= and =s00a_co_gnb2018.dta= are not duplicated here.
+
+*Settles the question left open above* ("one vague per grappe, or two?").  In =s00_me_gnb2018.dta=, 0 of the 450 grappes appear in both vagues, 225 and 225.  The convention holds, and the DDI sentence is wrong for this file, as in Senegal and Benin.
+
+*The instrument.*  *No questionnaire is held for this country*; =Documentation/= has only the DDI report.  The CAPI price form is on the UEMOA catalogue (entry 46, =/download/161=, =/162=; "QUESTIONÁRIO COMUNITÁRIO- PARTE DO PREÇO", cover REPÚBLICA DA GUINÉ-BISSAU / INSTITUTO NACIONAL DE ESTATÍSTICA): at most six unit-sizes per product (5.02) and "5.03. Levantamento 1 Preços (CFAC)" / "5.04. Levantamento 2 Preços (CFAC)", integer, multiple of 5, above 0, with no quantity.  So =Quantity= = 1 is =Guinea-Bissau::community_prices::one-item-per-price=.
+
+*How Guinea-Bissau differs from Niger.*
+
+- *Every label is double-encoded.*  =j=, =u= and =Description= all go through this wave's =_decode_mojibake=, as every other table here does.  =Description= is therefore repaired, where Niger's is as recorded.
+- *Portuguese sizes, in the household's words.*  =Monte (Medio)=, =Pedaço (Grande)=.  The form says =Médio= and the household =Medio=; the form says =Inteiro= and the household =Integer=, so =Corda (Integer)= (7 records) is the household's word, carried over untranslated (#1224).
+- *The unit-size code has two forms.*  =10 x unit + size=, but sizes 98 and 99 (=Outro tamanho 1 / 2=) make it =100 x unit + size=: =41398= is Monte, size 98.  4 codes, 59 records.  The household labels list neither size, so the form's word is served.
+- *Product 94 has no household label.*  =Feijão seco= (348 records) is on the price form but not in =s07bq01=, whose nearest code is 95, =Feijão-frade, feijão seco=.  D3 bridges by code and there is no code to bridge by, so it is served under its own label and meets no household row.  Whether 94 is the household's 95 is not established here.
+
+*The join.*  Household (t, j, u) cells with a community price: 445 of 705, covering 109,331 of 126,925 =food_acquired= rows.  77,158 of the 80,202 community rows find a household cell.  78 of the 80 =j= occur in the household table.  =Feijão seco= does not, and neither does =Cube alimentaire (Maggi, Jumbo, )=, because the household file has 4,882 rows of product 121 and none with a positive quantity.
+
+*Recorded, not repaired.*  Prices are served as recorded, including the non-integer ones.  =j= is the household's label by code, so code 37, =Carapau fresco= on the form and =Bentaninha fresco= in the household file, takes the household's label and keeps its own in =Description=.
+
+*Cost.*  =data_scheme.yml= and a new wave script move every Guinea-Bissau hash: one re-warm.  =.coder/coverage/latest.csv= grades the cell =absent= until the next =make matrix=.
+
+* 2026-11-05 -- Interview dates as a conversion key (GH #1585)
+
+=numeraire== now dates each household by its first dated =Interview start= row,
+which is visit 1 (=s00q23a=) for every 2018-19 household.  Measured cold at
+=e5dd343d4= plus the fix: every =food_expenditures= household has a date, and all
+but two lie in their own =vague='s window in the World Bank catalog (4293: 2018-09
+to 12 and 2019-04 to 06).  The two are households whose cover says vague 2 but
+whose visit-1 start is inside the first-visit window, so they convert at the 2018
+rate.  Recorded, not repaired.
+
+* Shocks: food purchases and food stocks (2026-11-06, GH #1561)
+
+The maintainer ruling is =AffectedConsumption= for food *purchases* and
+=AffectedFoodStock= for food stocks, following Ethiopia. Neither field
+measures food eaten. Both are nullable booleans using the existing answer
+map: increases and decreases are True, unchanged and ordinary
+not-concerned answers False, and missing answers stay missing.
+
+Both vagues have six consequences: =s14q04d= is livestock, =e= food
+stock, =f= food purchases. This is not the five/six-column split in Benin
+and Togo; the same e/f selectors apply in both vagues.
+
+The source variable label still calls d "Stock Produit Alimentaire" and e
+"Achat de Produit Alimentaire"; these labels conflict with the fielded
+six-column layout. The independent 2026-11-05 EHCVM shocks review
+(=reports/review-ehcvm-shocks/VERDICT.md= in the isa-sm-20261103 burst)
+identifies the layouts using source structure, animal disease/ownership
+contrasts and purchase responses, not the misleading labels. The source
+controls in =tests/test_shocks_extension_food_effects.py= independently
+select the expected columns and check the livestock-specific behaviour
+of d. No contradictory shocks-layout statement was found in this file.
+
+The Portuguese answer mapping is retained (=Aumentou=/=Diminuiu= true;
+=Não se alterou=/=Não abrangido= false). The existing coping-code-25
+interpretation is not adjudicated by this food-effects change.
+
+Only the existing 2018-19 declaration is changed. Registered but unfinished
+2021-22 wiring is outside this change. Other effects, coping strategies,
+row/index identity and timing are preserved.
+
+* 2026-11-08 — documented planned region/milieu strata (GH #1575)
+
+The own INE second-edition BID,
+=2021-22/Documentation/gnb_ehcvm2_information_de_base.pdf=, section 4.1,
+PDF p. 16 (English edition p. 13), explicitly describes the *original
+2018/19* design: "La strate est la combinaison région/milieu de résidence."
+Source: https://microdata.worldbank.org/catalog/6274/download/100359 .
+Its frontmatter p. 2 names an Abidjan workshop of 11–22 September 2023;
+the cover has no publication date. Clusters were selected PPS within
+strata, then 12 households with equal probability per cluster. The
+2021/22 strategy revisits these clusters and completes households to 12
+where needed; it is not a new independent first-stage draw.
+
+The own 2018 DDI p. 4 / BID p. 10 explicitly describe SAB as urban-only.
+Table 1a of the later BID also allocates SAB 92 urban / 0 rural clusters.
+Seventeen nonzero region/milieu cells is our table count, not an official
+quoted stratum count. Its table is labeled 2021/22 while surrounding
+text describes the original design; retain that qualification.
+
+The earlier "Treat the design as region-stratified for inference"
+recommendation remains above; this adds the own planned definition,
+independently of weights. The previously open vague/grappe question has
+an explicit later resolution in the community-prices note; it is not
+reopened here. No sample/strata/weights/defaults change: 2018-19 still
+wires region alone, and 2021-22 is registered but unwired at this source
+pin. Exact document identities are in the GH #1575 evidence packet.
+
+* 2026-11-08 — original EHCVM2018 BID managed holding (GH #1575)
+
+The own original2018/19 Basic Information Document, a separate source from
+the second-edition BID discussed above, is now held at =2018-19/Documentation/basicinformationdocument_gnb.pdf=
+through its normal managed DVC sidecar. A fresh same-source reader tree,
+empty private L1 and read-only profile retrieved the exact public original
+via normal =get_data_file=; verified 2026-11-08T20:45:27.792449+00:00.
+MD5 =1e0d877afa3d2b838debe1f8f7ceb95f=; 329823 bytes. Exact public source and
+SHA256 provenance are appended to =2018-19/Documentation/SOURCE.org=.
+
+This adds document availability only. Existing planned2018-design versus
+2021-cluster-revisit distinctions and all prior notes remain intact.
+The SAB urban-only qualification remains as documented.
+No sample, strata, native labels, weights, schema or defaults change.
+No new download, PDF parse, microdata read or source/table campaign was
+needed for this holding; the earlier document-check evidence is reused.
+See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
+
+* 2026-11-09 — GPS question units and the distinct m² export (GH #1531)
+
+The own 2018 household instrument asks GPS question 47 in *hectares*:
+=2018-19/Documentation/gnb_ehcvm1_qnr_household_excel_vague1.xlsx=,
+=S16a_Agri!EO5/EO6= (16A.47), "Qual é a área da parcela (em hectares) de
+acordo com as medidas GPS?". The vague 2 sidecar declares the *same physical
+workbook*: MD5 =0f3d80b68800a577659f5ead1032cdf9=, 673,399 bytes;
+these are not two independently verified forms.
+
+The released =2018-19/Data/s16a_me_gnb2018.dta= (MD5
+=39a00532332e724fa9c50bf206c58334=, 6,531,988 bytes) labels bound
+=s16aq47= as GPS area without a unit. Its DISTINCT =s16aq47a= explicitly
+asks GPS area "em m2". The instrument's Q47 wording supports the question-level
+hectares interpretation, but the inspected 16A cells, amendment notes,
+defined names and comments supply no official export/cleaning relationship
+between these fields or row-specific unit assignment. No unit is transferred
+between them; their coexistence does not establish mixed-unit q47 rows.
+
+Current =plot_features= still selects =s16aq47= when GPS flag =s16aq45 == 1=
+and that field is present, otherwise the farmer estimate =s16aq09a=.
+Farmer unit =s16aq09b= is 1 hectare / 2 m² (instrument =K5/K6=, Q9);
+the farmer estimate is divided by 10,000 for code 2. It is not a GPS unit.
+The GPS flag is Sim/Não
+(=EL5/EL6=, Q45), not a unit code. The existing nonpositive/>1000 ha clamp,
+source binding, fallback, rows and defaults are unchanged by this diagnosis.
+
+Presence in all 9,873 source rows, not unique plots or a sample join:
+
+| GPS fields present | source rows |
+|--------------------+-------------|
+| both q47 and q47a   |        1191 |
+| q47 only           |        3612 |
+| q47a only          |           0 |
+| neither            |        5070 |
+
+All 1,191 q47a rows are literal vague 2 / GPS flag 1 and also have q47.
+Their farmer units are 1 on 442 rows and 2 on 749; these remain farmer units.
+Flag 2 (5,057 rows) and missing flags (13) are distinct; neither has a GPS area.
+No ratios, magnitudes, mixed-row classification or candidate table were used.
+The explicit-m² q47a supports dimensional conversion by 1/10,000 on its own;
+selecting or combining it with q47/farmer estimates remains unruled.
+
+Read the earlier "No questionnaire is held" note alongside these verified
+own declarations, and "there is no 2021-22 wave" alongside the later held,
+registered-but-unwired record. At source =6d9563f7=, 2021 has only Country/Wave
+metadata, no plot driver, and is absent from the plot concatenator. Its declared
+s16a (MD5 =00d948d16d402ebf8b60fa6c03763705=, 5,594,481 bytes) was missing
+from the admitted staging and its header remains unread; no 2018 unit authority
+or serving claim is transferred to it.
+
+Diagnosis frozen at =d41aa628ea929cd49bf9414a4c78bcbe3b693bba=;
+see =.coder/ledger/1531-remote-task.md=. Durable report:
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/private/Guinea-Bissau-1531-GPS-unit-audit-6d/dispatch/2172b44031b04472ade9414bade8d4fc/evidence/report.md=.
+
+* 2026-11-10 — Selected 2018-19 region/milieu strata (GH #1575)
+
+The user selected the documented combination on 2026-11-10. Only the
+existing =2018-19= sample now derives =strata= from its own cover-page
+=s00q01= region label and =s00q04= residence-milieu label through the
+unchanged shared EHCVM helpers. The retrospective INE BID definition and
+its original-2018-design versus 2021-cluster-revisit qualification are in
+the earlier planned-strata note. The older "Treat the design as
+region-stratified for inference" recommendation and the earlier statement
+that served Region/strata vocabularies are identical remain as history;
+the selected construction now uses a composite whose *region part* shares
+the established Region spelling.
+
+The country-specific spelling consequence is that a bare alias such as
+=bafata -> Bafata= does not match =bafata Urbano=. The strata spelling table
+therefore adds the full existing Region alias pairs crossed with the own
+Portuguese =Urbano=/=Rural= suffixes, as required by the approved binding.
+Every bare alias and the Region table are preserved. These spelling rows
+are not observed-cell assertions or eligibility rules: in particular,
+=sab Rural -> SAB Rural= does not assert that SAB has a rural sample.
+SAB's documented urban-only design and the qualification that nonzero
+allocation arithmetic is not a formally quoted stratum count remain.
+No new native label card or code meanings are claimed by this source edit;
+the full managed-cover metadata-card request is with the manager/deputy.
+
+Missing or blank either component gives NA, without filling from the old
+region-only value or other households. Nonstring codes retain the shared
+=StratumError= refusal. The new registered key is
+=Guinea-Bissau::sample::region-milieu-stratum=, only for =2018-19=, carried
+in nullable =Derivation= only where strata exists. Raw operands remain
+retrievable by their original names through the registered inputs helper.
+
+Source and invented-frame checks cover the actual YAML/thin hooks/shared
+helpers, non-strata rows/order/IDs/v/weights/Rural, attrs and typed provenance.
+They are not native-data acceptance. Full native cards, observed missingness
+and cluster consistency, the reserved existing vocabulary test, original
+versus candidate normal sample, cold/warm/Feature acceptance and final
+metadata footprint/full gates remain UNRUN here. No normal Country/Feature
+sample data was read. Existing sources, joins, extraction of every other
+field, weights, panel/ID behavior and registered-but-unwired 2021-22 are
+unchanged. See =.coder/ledger/1575-guineabissau1575-stratawiring.md=.
+
+* 2026-11-10 — GH #1575 normal sample validation completed
+
+The construction-stage pending/UNRUN wording above records the state at
+that stage. For =2018-19 sample=, the own native cover and weights, cold
+baseline/candidate whole frames, unchanged IDs/weights/Rural, documented
+region or department × milieu strata and derivation inputs passed the
+finite normal validation. Four warm Country.sample returns and two scoped
+Feature.sample returns passed full typed frame/axes/attrs comparison from
+eight authenticated L2 parquets, with zero warm raw getters or writers.
+The cross-run cold and warm capture comparisons, source seals and prior
+failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
+=5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
+earlier job-local caches were reaped; source and survey values did not change.

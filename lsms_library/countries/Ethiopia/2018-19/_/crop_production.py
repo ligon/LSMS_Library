@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 """Build crop_production for Ethiopia ESS 2018-19 (Wave 4; GAP 1).
 
-Item-level harvest at (t, i, plot_id, j, u) from §9 (sect9_ph_w4), with
-planting month from §4 (sect4_pp_w4) and reported sale qty/value from §11
+Item-level harvest at (t, i, plot_id, j, u, production_obs) from §9
+(sect9_ph_w4), with planting month from §4 (sect4_pp_w4) and reported sale
+qty/value from §11
 (sect11_ph_w4).
 
 W4 specifics: the crop code lives in s9q00b (§9), s4q01b (§4), s11q01
@@ -10,6 +11,17 @@ W4 specifics: the crop code lives in s9q00b (§9), s4q01b (§4), s11q01
 NATIVE unit (code s9q05b).  intercropped from §9 s9q02.  §11 sale qty
 s11q11a (native unit s11q11b), value s11q12, sold-flag s11q07.
 i = household_id (W4 is an entirely new sample).
+
+GH #1256: a PERMANENT crop's harvest and sales here cover a fixed 12 months,
+not the season (§9 Q4: "for permanent crop harvested between March 10, 2018
+to March 9, 2019"; §11 Q1: "FOR PERMANENT CROPS PLEASE INCLUDE CROP
+HARVESTED BETWEEN MARCH 10, 2018 TO MARCH 9, 2019").  The rows whose crop the
+§4 roster flags permanent (PP §4 Q15 "IS THIS CROP A FRUIT TREE CROP?",
+s4q15; colmap ``pl_permanent``) are stamped
+``Derivation = 'Ethiopia::crop_production::permanent-crop-12-month-window'``.
+
+production_obs (GH #1461): reported:crop_id:<n>, §9's "Unique Crop
+Identifier".  A plot can list one crop code on two crop_id lines.
 """
 import sys
 
@@ -29,10 +41,12 @@ colmap = dict(
     hhid='household_id', holder_id='holder_id',
     parcel_id='parcel_id', field_id='field_id',
     crop_code='s9q00b',
+    production_id='crop_id',       # "Unique Crop Identifier" (GH #1461)
     quantity='s9q05a', unit='s9q05b',
     harvest_month='s9q08b',
     intercrop='s9q02',
     pl_crop_code='s4q01b', pl_month='s4q13a',
+    pl_permanent='s4q15',          # §4 per-crop permanent/tree flag (GH #1256)
     s_crop_code='s11q01', s_sold_flag='s11q07',
     s_qty='s11q11a', s_value='s11q12',
 )

@@ -1,0 +1,133 @@
+#+TITLE: Independent bounded composition review: Malawi #1111 on organic PR1175
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-21
+
+* Verdict and scope
+PASS for frozen clean =fd2356ee94ecfc7448527dc0085b9e4d60368049= at =/local/job40255479/worktrees/isa-Malawi-1111-composed=.
+The two reviewed corrections coexist without a further production change.
+No actionable composition defect was found.
+This is a bounded composition review, not a repeat of the completed independent source studies, full suite or549/39 census.
+The original standalone a935, organic de9 and f8 reviews remain immutable.
+
+I independently verified that the runtime diff from de9 consists only of the2010-11 and2019-20 fertilizer drivers, whose bytes equal a935.
+The shared Malawi helper and all other production files equal de9.
+The delivery ledger note identifies this composition rather than rewriting the standalone receipts.
+No unmerged state, tracked edit, ref operation or GitHub write was made.
+
+* Country grounding and instrument boundary
+I read the full current3,096-line Malawi CONTENTS first, including live TODO/WAITING/LOGBOOK material.
+Its SHA256 is =41b159749719a73569f0fecc1c3a5ae47b5d525e389121faa8f283c724b12045=.
+A full-byte comparison with the previously read a935 CONTENTS identifies only the organic source-correction replacement; that full replacement was read explicitly.
+I then read both current task ledgers and both independent reviews.
+
+The country-specific constraints remain:2010 uses Full_Sample and excludes redundant Panel input;2016 XS needs =cs-17-= identifiers and its restricted bad-byte reader;2019 XS uses bare IDs and the established ID walk; garden/plot keys differ across rounds; modern cross-sectional and tracked-panel universes are not interchangeable; and Likoma frame coverage varies.
+CONTENTS' IHPS2019 sources disagree about Likoma, which this composition does not adjudicate.
+The live #116 food conversion/FCT TODOs remain unrelated.
+
+The old statement "Module D records no organic quantity" is explicitly contradicted by the seven source dictionaries and the organic correction now present in CONTENTS.
+The shared helper's historical "SAME bag-size coding" claim for applied fields, and its interpretation of11/12 as free-text units, remain contradicted for the two instrument-covered waves by separate native pairs, enumerator TOTAL KGs and timing.
+The current country notes record that contradiction; IHS3 timing11/12 means November/December.
+The #1111 ledger's "Retain f8's organic behavior" and standalone verification paragraphs describe the historical a935 boundary; its new root-owned delivery-composition section expressly adds de9 without changing those historical receipts.
+They are not a requirement to restore f8's fabricated organic zeros in this composed result.
+
+Literal C4 remains limited to held IHS3 agriculture p.13 MD5=d6e0d71486fd6ae4d7dda5b8e1854278= and IHS5/IHPS p.10 MD5=86cc1f419c1320eb969d11a6d24a63e0=.
+The former identifies total-kg d/i, native b/c and g/h, timing e/j; the latter total-kg d/j, native b/c and h/i, first-application timing e.
+Both PDFs were physically copied and MD5-reverified here; the standalone independent layout-text instrument verification remains the authority, with no image-inspection claim.
+2013/2016 remain excluded: no new physical-unit assertion, native-pair substitution, rescaling, eligibility or scientific composition decision is made.
+
+* Preparation and isolation
+Before any API/source-reader probe, preparation MD5-gated28 held Stata sources and both PDFs against the composed sidecars.
+It made140 physical copies with matching SHA256/size/mode/mtime, distinct inodes and link count1.
+The candidate root began with no Malawi plot_inputs parquet; de9 control and supporting caches were physical copies of the quiescent independent organic review.
+All inputs, L1, L2, configuration, temporary files and DVC site cache are private.
+
+Runtime uses mounted image Python, exact cwd/package/countries/data realpaths and frozen HEAD assertions, active socket-method guards plus =unshare -rn=, single numeric/build/Make threads and at most two loadfile test workers.
+A write-path guard rejects protected checkout/reference writes.
+Its sole checkout metadata allowance is the root-prepared ignored =countries/.dvc/tmp= symlink, whose resolved path remains this review's exact private =checkout-dvc-tmp=.
+No read-gate patch, assume-fresh setting, NO_CACHE override, manual hash stamp, acquisition, DVC CLI, shared-cache operation or in-tree payload was used.
+
+* Complete composition comparisons
+Two independent full-frame expectations pass:
+- Start with de9, assign Kilogramme only to the evidenced2010/2019 inorganic keys, then apply the unchanged additive full-key reducer.
+- Start with the independently reviewed a935 output in original order, restore only de9's complete organic quantity/unit answers and optional Applied carrier.
+
+The first proves the authorized delta; the second proves full original order and exact cross-parent payload, axis metadata and dtypes.
+No values, attrs, index levels or serialized paths were normalized away.
+Every unaffected de9 row is exact in original order, including2013/2016.
+All five native-wave/raw-country plot_inputs cache frames pass complete ordered comparisons with full attrs, dtypes, null masks and index/axis metadata.
+Normal public Country, default Feature, sample, Uganda and nitrogen frames pass complete comparisons.
+
+| Result | de9 -> composed |
+|--------+-----------------|
+| Malawi Country rows |180,184 ->179,949 |
+| Default Malawi/Uganda Feature rows |264,400 ->264,165 |
+| Healthy Uganda Country rows |84,216 exact |
+| All-wave Malawi sample rows |57,118 exact |
+| Inorganic numeric Quantity sum |2,899,339.95 conserved |
+| Nitrogen diagnostic |840,235.7795800001 ->1,028,195.63206 |
+
+The all-inorganic numeric sum is not a newly validated physical total for excluded waves.
+Nitrogen's complete frame and all attrs equal standalone a935 under unchanged factors/shares; organic remains refused a nominal share.
+
+All11,075 de9 affirmative organic rows retain exact quantity, unit, complete native/public identity, original order, other fields, dtypes, attrs and nullable Applied=True.
+There are11,068 positive quantities and seven missing amounts; the seven missing rows survive.
+The final unit counts remain5,518 Kilogramme /2,155 Ox-Cart /1,451 Bucket /1,204 =Other (Specify)= /733 Wheelbarrow /8 Unknown /5 =Organic unit code 1= /1 =Organic unit code 3=.
+The six source-qualified identities remain distinct from unrelated food-unit aliases; no factor or nutrient share is inferred.
+Every nonorganic Applied value is NA.
+No permanent test pins f8 organic zeros or absence of Applied.
+
+The reused independent source oracle rereads the held numeric sources and reconstructs33,193 slots and1,765,763.95 kg across the instrument-covered sources without calling the production fertilizer decoder or assembler.
+All51+184 new pairs are same-source slots1/2 with affirmative use and positive amounts; every group contribution and pair sum is exact.
+The old source-No/missing-use/missing/zero retention boundary remains unchanged.
+
+* Cold, argument provenance and warm proof
+The first normal candidate target-cold API call completed and persisted all five target raw cache frames.
+Its full public Country comparison passed before a reference-argument mismatch interrupted the private harness's Feature comparison.
+The immutable organic =warm-pooled.pkl= was produced with explicit =currency=None=; normal default Feature has an additional currency index level.
+The initial de9-control and candidate harness failures are preserved in private logs.
+They are not accepted product failures or treated as proof that the default outputs are equal.
+
+I verified explicit =currency=None= against that immutable full artifact, including attrs, and captured a fresh ordinary default de9 control with its full currency index.
+The composition's normal-default comparison uses that argument-matched fresh control.
+The first cold harness had not serialized its returned public Feature before failing while constructing the wrong expectation.
+All persisted cold raw frames are nevertheless fully compared, and the subsequent ordinary API captures complete public frames from exactly unchanged cold cache bytes and mtimes.
+This provenance limit is recorded explicitly in =composition-summary.json=; no new source rebuild was performed merely to repair the reference argument.
+
+A separate fresh process then repeats all public frames, plus new Country/Feature instances, with exact full results and zero writes to any of17 parquets in each private root.
+The final receipts remain byte/size/mode/mtime exact after tests, oracle and scanner.
+Uganda's full frames and every comparator cache byte/mode/mtime remain exact.
+Malawi and Uganda plot_inputs/sample country caches all grade fresh with complete declared-wave coverage under their current hashes.
+Native script caches are hashless by design; none was manually stamped.
+
+* Tests, scanner and scope
+The composed tree passes129 cases, zero skips/failures/errors:12 actual-driver cases,28 organic regressions and89 existing transform/nitrogen/plot-ID cases.
+The selection contains no accepted expected failures and excludes existing assumed-fresh warm helpers, whose evidence is supplied by the normal warm proof above.
+It exercises the two actual drivers, early unit binding, sums, zero/missing totals, namespaces, seed/pesticide independence, organic use/amount/unit/finalizer behavior, qualified codes and nitrogen refusal.
+
+Actual scoped scanner phases1,2 on fresh de9 and composed normal caches each emit15 warnings and zero failures/errors.
+Fresh de9's full ordered records exactly equal its immutable earlier scanner receipt.
+Every composed record is reconciled against de9:11 full records are exact and four have only the expected counts.
+The changes are native null-crop67,888->67,653, native null-unit17,649->6,067 (also repeated in assembly), Improved scope rows180,184->179,949, and null-crop rate37.7%->37.6%.
+Constant Purchased/Applied, Uganda null keys/clusters/index, canonical alignment metadata and population-universe warnings remain full-record exact.
+=scanner-comparison.json= accounts for each of the15 ordered records individually, without filtering or normalization.
+There is no plot_inputs phase2 kwargs grid.
+
+The runtime union matches the reviewed parents exactly, so no unexpected scope concern justified repeating the completed549/39 census.
+The actual normal cache hashes/coverage are freshly checked here.
+The prior complete parent hash measurements remain attributed to their original source states.
+
+* Frozen proof and remaining boundary
+=proof.json= proves six clean frozen checkouts retain identical tracked bytes/modes/symlink tokens/HEADs: composed, organic de9, standalone a935, f8, old rejected9b and the standalone writer.
+The133 organic-review files and413 standalone-review files remain SHA256/size/mode/mtime exact.
+All140 physical-copy sources and held/L1/reference destinations remain exact; only three seeded candidate sample parquets change through normal authorized rebuilding.
+No network or denied source-write attempt was recorded.
+The root-prepared tmp symlink is unchanged and no in-tree untracked raw source or parquet exists.
+All review subprocesses are stopped.
+
+The delivery may proceed to root's stacked partial PR boundary.
+This does not close #1111:2013/2016 questionnaire authority remains outstanding.
+#1118 genuine missing-unit normalization, source-qualified unlisted seed identities, purchase/planted-unit separation (#1190), nominal nutrient composition (#1106), existing retention (#1174), and free-text/container-weight interpretation remain separate.
+No new residual diagnosis, production correction or external write was performed.
+Full frames, source IDs, warnings and failure traces remain private.
+
+Sue.

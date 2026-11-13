@@ -1,0 +1,23 @@
+{
+  "PR": 1175,
+  "status": "PASS_NEW_NUMERIC_SUPPLEMENT_WITH_AXIS_QUALIFICATION",
+  "original_positive_groups": 6,
+  "full_strict_groups": 1,
+  "intended_field_projection_groups": 2,
+  "numeric_groups_with_explicit_unused_u_axis_qualification": 3,
+  "numeric_mismatches_observed": 0,
+  "full_axis_invariance_failures_retained": 3,
+  "saved_harmonized_operands": 6,
+  "qualified_array_checks": {
+    "str": 55,
+    "string": 10,
+    "Float64": 6,
+    "numeric_nonmissing_arrays": 12,
+    "boolean": 6
+  },
+  "no_normalization_or_numeric_cast": true,
+  "all_original_gaps_in_v1_retained": true,
+  "v1_stop_was_expected_new_complete_axis_check_not_numeric_difference": true,
+  "old_evidence_unchanged": true,
+  "signed": "Sue"
+}

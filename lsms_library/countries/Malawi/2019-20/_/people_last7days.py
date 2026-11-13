@@ -1,16 +1,15 @@
 """Build people_last7days for Malawi IHS5 / IHPS 2019-20 (GAP 3, individual).
 
 Item-level (t, i, pid) 7-day individual time-use feature.  IHS5 ships a
-Cross_Sectional half (bare case_id, pid: PID) and a Panel half (y4_hhid,
-pid: id_code), concatenated into the single 2019-20 wave -- exactly like
+Cross_Sectional half (cs-19-prefixed case_id, pid: PID) and a Panel half
+(y4_hhid, pid: id_code), concatenated into the single 2019-20 wave -- exactly like
 household_roster / anthropometry.  Source: HH_MOD_E (labor module) per half,
 joined to HH_MOD_B (roster) for working_age.
 
-ID NOTE: like anthropometry, the 2019-20 household_roster's final
-Cross_Sectional i is the RAW 12-digit case_id (NO 'cs-19-' prefix; the
-Panel y4_hhid is walked to that id space by updated_ids), so we emit the
-raw case_id for the CS half (no i_prefix) and key pid on PID (the roster's
-CS pid).  The framework id_walk remaps the Panel half + joins v at API time.
+ID NOTE: like anthropometry, the household_roster's Cross_Sectional i is
+'cs-19-' + case_id (GH #1278), so the CS half passes that i_prefix and keys
+pid on PID (the roster's CS pid).  The framework id_walk remaps the Panel
+half to its IHS3 baseline id + joins v at API time.
 
 Module E layout is the IHS4/IHS5 (modern) generation: farm = hh_e07a (+
 hh_e07b, hh_e07c), SOB = hh_e08 (+ hh_e09), wage = hh_e11 (+ ganyu
@@ -29,14 +28,14 @@ WAVE = '2019-20'
 
 pieces = []
 
-# --- Cross_Sectional half (raw case_id, no prefix; pid: PID) ---
+# --- Cross_Sectional half (cs-19 prefix; pid: PID) ---
 e_xs = get_dataframe('../Data/Cross_Sectional/HH_MOD_E.dta',
                      convert_categoricals=False)
 b_xs = get_dataframe('../Data/Cross_Sectional/HH_MOD_B.dta',
                      convert_categoricals=False)
 pieces.append(_people_last7days_block(
     e_xs, t=WAVE, hhid='case_id', pid='PID', layout='modern',
-    roster=b_xs, roster_hhid='case_id', roster_pid='PID',
+    i_prefix='cs-19-', roster=b_xs, roster_hhid='case_id', roster_pid='PID',
 ))
 
 # --- Panel half (y4_hhid; pid: id_code) ---

@@ -255,8 +255,14 @@ def test_runtime_sentinel_semantics_with_working_inference_control(uganda):
     assert values.xs('inkind', level='s')['Quantity'].eq(30).all()
     native = food_quantities_from_acquired(out, units='units')
     assert native.xs(COUNT, level='u')['Quantity'].eq(2).all()
+    # GH #1068 (ruling @ligon 2026-11-12): no Unknown pseudo-unit in 'units'.
+    assert U_UNKNOWN not in native.index.get_level_values('u')
     unitvalues = food_prices_from_acquired(out, units='unitvalue')
-    assert unitvalues.xs('Value', level='u')['Price'].eq(1).all()
+    # GH #1129 / #1068: the 1.0 "cedi per cedi" and the per-Unknown value are
+    # dropped and counted; they used to be served (Value rows at exactly 1).
+    assert not {'Value', U_UNKNOWN} & set(unitvalues.index.get_level_values('u'))
+    assert unitvalues.attrs['price_rows_dropped']['currency'] >= 20
+    assert unitvalues.attrs['price_rows_dropped']['unknown'] >= 20
     unitprices = food_prices_from_acquired(out, units='unitprice')
     assert 'Value' not in unitprices.index.get_level_values('u')
     assert unitprices.xs(U_UNKNOWN, level='u')['Price'].eq(100).all()
@@ -524,18 +530,12 @@ MINTED_UNIT_SPELLINGS = {
         'Orphan script, as 2012-13.'),
     ('Nigeria/2018-19/_/individual_unit_values.py', 'None'): (
         'Orphan script, as 2012-13.'),
-    ('Ethiopia/_/ethiopia.py', 'Other (Specify)'): (
-        'crop_production (not food): a harvest quantity with an unrecorded '
-        'unit is tagged with the existing u-table value "Other (Specify)", '
-        'so _unit_sentinel_mask does not see it.  Crop-side sentinel '
-        'question, outside #962 food scope; reported as a residual.'),
     ('Ethiopia/_/ethiopia.py', 'Kg'): (
-        'crop_production, two sites.  (a) harvest u (`out["u"] = "Kg"`): '
+        'crop_production: harvest u (`out["u"] = "Kg"`): '
         'the else-branch for a wave with no harvest unit column; the site '
-        'comments that W1 reports kilograms directly.  (b) sale unit '
-        '(fillna): the site comments that W1/W2 sale quantities are kilos; '
-        'whether a NaN DECODED sale unit in a later wave is also kilos is '
-        'UNVERIFIED (#962 inventory did not cover crop tables).'),
+        'comments that W1 reports kilograms directly. W1/W2 sale quantities '
+        'are also instrument-defined kilos; merged GH1253 already preserves '
+        'blank decoded sale units as NA in later waves.'),
     ('EthiopiaRHS/_/community_prices.py', 'Kg'): (
         'community_prices (module constant U): the ERHS price instruments '
         'record price per kilogram (module docstring: price1234_rev p_r1..'
@@ -554,6 +554,16 @@ MINTED_UNIT_SPELLINGS = {
     ('Tanzania/_/food_unitvalues.py', 'Kg'): (
         'Legacy script, as food_quantities.py (read only by the equally '
         'legacy food_expenditures.py; no Makefile rule).'),
+    ('Malawi/2024-25/_/food_borrowing.py', 'kg'): (
+        'GH #1275 / PR #1604 (red team F1): _served_unit gives a '
+        'derivation_inputs row the u the shared metric choke point serves it '
+        'under.  It writes "kg" exactly where _rescaled_at_choke_point holds, '
+        'the predicate of malawi.py food_acquired_to_canonical: a '
+        'leading-magnitude metric label with no cfactor is scaled to '
+        'kilograms and written u = "kg" there.  So "kg" is the converted '
+        'unit, not a missing-unit spelling.  The frame is the registered '
+        'borrow-ihs5-factor inputs, which no kg ladder reads.  Recorded at '
+        'integration (#1604 had not run the full offline suite).'),
 }
 
 #: A unit column, by subscript key or receiver text: ``u`` itself, or any

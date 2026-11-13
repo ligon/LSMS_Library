@@ -1,0 +1,154 @@
+{
+ "checkout": "/local/job40390255/worktrees/1259",
+ "data_root": "/local/job40390255/data-private/1259/cold",
+ "head": "9a0ed5f3cc81b5d2ce8d1fdffba4f477e33b9f7f",
+ "quantity_audit_dirty": true,
+ "tables": {
+  "crop_production.Quantity": {
+   "Benin": {
+    "audit_ms_best": 6.2,
+    "finite": 8056,
+    "fired": 2,
+    "judged": 9056,
+    "negative": 0,
+    "rows": 9056,
+    "zero": 5
+   },
+   "Burkina_Faso": {
+    "audit_ms_best": 8.9,
+    "finite": 15059,
+    "fired": 1,
+    "judged": 15593,
+    "negative": 0,
+    "rows": 15593,
+    "zero": 12
+   },
+   "CotedIvoire": {
+    "audit_ms_best": 13.7,
+    "finite": 15886,
+    "fired": 16,
+    "judged": 22223,
+    "negative": 0,
+    "rows": 22223,
+    "zero": 28
+   },
+   "Ethiopia": {
+    "audit_ms_best": 59.1,
+    "finite": 81819,
+    "fired": 10,
+    "judged": 85519,
+    "negative": 0,
+    "rows": 85519,
+    "zero": 186
+   },
+   "EthiopiaRHS": {
+    "audit_ms_best": 3.7,
+    "finite": 15340,
+    "fired": 2,
+    "judged": 17523,
+    "negative": 0,
+    "rows": 17523,
+    "zero": 950
+   },
+   "GhanaLSS": {
+    "audit_ms_best": 0.4,
+    "finite": 0,
+    "fired": 0,
+    "judged": 0,
+    "negative": 0,
+    "rows": 37280,
+    "zero": 0
+   },
+   "GhanaSPS": {
+    "audit_ms_best": 14.8,
+    "finite": 24872,
+    "fired": 7,
+    "judged": 25109,
+    "negative": 0,
+    "rows": 25109,
+    "zero": 144
+   },
+   "Guinea-Bissau": {
+    "audit_ms_best": 7.3,
+    "finite": 12173,
+    "fired": 1,
+    "judged": 12173,
+    "negative": 0,
+    "rows": 12173,
+    "zero": 1593
+   },
+   "Malawi": {
+    "audit_ms_best": 84.1,
+    "finite": 135078,
+    "fired": 19,
+    "judged": 135078,
+    "negative": 0,
+    "rows": 135078,
+    "zero": 9422
+   },
+   "Mali": {
+    "audit_ms_best": 26.7,
+    "finite": 33799,
+    "fired": 18,
+    "judged": 35060,
+    "negative": 0,
+    "rows": 35060,
+    "zero": 540
+   },
+   "Niger": {
+    "audit_ms_best": 25.4,
+    "finite": 45016,
+    "fired": 1,
+    "judged": 47123,
+    "negative": 0,
+    "rows": 47123,
+    "zero": 3545
+   },
+   "Nigeria": {
+    "audit_ms_best": 43.5,
+    "finite": 49953,
+    "fired": 5,
+    "judged": 62844,
+    "negative": 0,
+    "rows": 62844,
+    "zero": 207
+   },
+   "Senegal": {
+    "audit_ms_best": 5.5,
+    "finite": 8409,
+    "fired": 1,
+    "judged": 8428,
+    "negative": 0,
+    "rows": 8428,
+    "zero": 583
+   },
+   "Tanzania": {
+    "audit_ms_best": 11.3,
+    "finite": 14126,
+    "fired": 14,
+    "judged": 14126,
+    "negative": 0,
+    "rows": 14126,
+    "zero": 2754
+   },
+   "Togo": {
+    "audit_ms_best": 7.8,
+    "finite": 10984,
+    "fired": 1,
+    "judged": 11565,
+    "negative": 0,
+    "rows": 11565,
+    "zero": 26
+   },
+   "Uganda": {
+    "audit_ms_best": 95.6,
+    "finite": 133699,
+    "fired": 22,
+    "judged": 133761,
+    "negative": 0,
+    "rows": 133761,
+    "zero": 4208
+   }
+  }
+ }
+}

@@ -1,0 +1,29 @@
+{
+  "recorded_at_UTC": "2026-10-22T04:03:05.074087+00:00",
+  "old_parent": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "accepted_parent": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "rows": [
+    {
+      "label": "candidate",
+      "checkout": "/local/job40255479/worktrees/isa-Uganda-849-fix",
+      "head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "ignored_link": "/local/job40255479/worktrees/isa-Uganda-849-fix/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-fix/candidate-dvc-tmp"
+    },
+    {
+      "label": "base",
+      "checkout": "/local/job40255479/worktrees/isa-Uganda-849-fix-base",
+      "head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "ignored_link": "/local/job40255479/worktrees/isa-Uganda-849-fix-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-fix/base-dvc-tmp"
+    }
+  ],
+  "original_preassignment_brief_SHA256": "1e75f4a965cd5b91865277d83a73645cddb6a1bbbe012b7eecba5f9da8077640",
+  "current_brief_SHA256": "8cf5e5629237f692ca2ec0fce19f83259da2b98bb7819552978bb3b04bf1af7f",
+  "runtime_acceptance": "Uganda1198-root-verification.json",
+  "documentation_acceptance": "Uganda1198-doc-root-verification.json",
+  "all549_API_and39_framework_hashes_identical_for_doc_change": true,
+  "unused_clean_fastforward_only": true,
+  "writer_edits_tests_builds": 0,
+  "assigned_to": "review_nigeria_1034"
+}

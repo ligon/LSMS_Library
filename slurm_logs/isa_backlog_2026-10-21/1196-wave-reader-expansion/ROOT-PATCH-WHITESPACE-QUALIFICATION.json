@@ -1,0 +1,5 @@
+{
+  "artifact": "proposed.patch",
+  "sha256": "942527406d9abaa3a58e853b11255ef5740de4d59a982ca028dd72dce7b26c31",
+  "qualification": "Literal unified-diff context lines have a leading space. Preserve exact reviewed patch bytes; cached whitespace check will exclude only this artifact, all other changed files checked."
+}

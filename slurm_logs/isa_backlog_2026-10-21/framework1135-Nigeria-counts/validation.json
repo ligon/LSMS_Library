@@ -1,0 +1,479 @@
+{
+  "result": "READ_ONLY_DIAGNOSIS_COMPLETE",
+  "source_pin": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "no_implementation": true,
+  "policy": {
+    "SPAN": "settled preserved",
+    "threshold": "none settled preserved"
+  },
+  "counts": {
+    "source_pin": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "source_projections": 4,
+    "ambiguous_served_i_t": 0,
+    "source_key_sets_exact": true,
+    "boundaries": [
+      {
+        "from": "2016Q1",
+        "to": "2018Q3",
+        "N_linked_unique_served_i_nonnull_v": 1493,
+        "all_changed": 79,
+        "historical_prefix_exclusion_current_P": 10,
+        "either_ea0_or_prefix_among_changed": 69,
+        "later_flag_name": "hhsmlc",
+        "source_flag_variable_label": "DOES THE HOUSEHOLD LIVE AT THE SAME LOCATION?",
+        "later_flag_full_source_counts": {
+          "nan": 3783,
+          "1.0": 1354,
+          "2.0": 126
+        },
+        "later_flag_linked_counts": {
+          "1.0": 1354,
+          "2.0": 126,
+          "nan": 13
+        },
+        "later_flag_among_real_recode_counts": {
+          "1.0": 10
+        },
+        "current_flag_qualified_R": 10,
+        "real_recode_unknown_flags": 0,
+        "flag_interpreted_nonmove_bound": [
+          10,
+          10
+        ],
+        "reference_period_not_independently_verified": true,
+        "earlier_real_IDs_with_coherent_recode_relation": 1,
+        "old_real_IDs_with_at_least_one_reported_nonmover": 1,
+        "pair_relation_bijective": true,
+        "full_served_v_projection_matches_source_oracle": true,
+        "source_flag_vs_current_ea0": [
+          {
+            "a": "1.0",
+            "b": "False",
+            "n": 1241
+          },
+          {
+            "a": "1.0",
+            "b": "True",
+            "n": 113
+          },
+          {
+            "a": "2.0",
+            "b": "False",
+            "n": 83
+          },
+          {
+            "a": "2.0",
+            "b": "True",
+            "n": 43
+          },
+          {
+            "a": "<missing>",
+            "b": "False",
+            "n": 3773
+          },
+          {
+            "a": "<missing>",
+            "b": "True",
+            "n": 10
+          }
+        ],
+        "linked_flag_vs_either_prefix": [
+          {
+            "a": "1.0",
+            "b": "False",
+            "n": 1241
+          },
+          {
+            "a": "1.0",
+            "b": "True",
+            "n": 113
+          },
+          {
+            "a": "2.0",
+            "b": "False",
+            "n": 83
+          },
+          {
+            "a": "2.0",
+            "b": "True",
+            "n": 43
+          },
+          {
+            "a": "<missing>",
+            "b": "False",
+            "n": 3
+          },
+          {
+            "a": "<missing>",
+            "b": "True",
+            "n": 10
+          }
+        ],
+        "changed_real_group_size_distribution": {
+          "10": 1
+        }
+      },
+      {
+        "from": "2019Q1",
+        "to": "2023Q3",
+        "N_linked_unique_served_i_nonnull_v": 5067,
+        "all_changed": 343,
+        "historical_prefix_exclusion_current_P": 112,
+        "either_ea0_or_prefix_among_changed": 231,
+        "later_flag_name": "hh_moved",
+        "source_flag_variable_label": "HAS THE HOUSEHOLD MOVED FROM THE ORIGINAL LOCATION?",
+        "later_flag_full_source_counts": {
+          "2.0": 4299,
+          "1.0": 585,
+          "nan": 163,
+          "3.0": 20
+        },
+        "later_flag_linked_counts": {
+          "2.0": 4299,
+          "1.0": 585,
+          "nan": 163,
+          "3.0": 20
+        },
+        "later_flag_among_real_recode_counts": {
+          "2.0": 86,
+          "nan": 20,
+          "1.0": 6
+        },
+        "current_flag_qualified_R": 86,
+        "real_recode_unknown_flags": 20,
+        "flag_interpreted_nonmove_bound": [
+          86,
+          106
+        ],
+        "reference_period_not_independently_verified": true,
+        "earlier_real_IDs_with_coherent_recode_relation": 12,
+        "old_real_IDs_with_at_least_one_reported_nonmover": 10,
+        "pair_relation_bijective": true,
+        "full_served_v_projection_matches_source_oracle": true,
+        "source_flag_vs_current_ea0": [
+          {
+            "a": "1.0",
+            "b": "False",
+            "n": 461
+          },
+          {
+            "a": "1.0",
+            "b": "True",
+            "n": 124
+          },
+          {
+            "a": "2.0",
+            "b": "False",
+            "n": 4045
+          },
+          {
+            "a": "2.0",
+            "b": "True",
+            "n": 254
+          },
+          {
+            "a": "3.0",
+            "b": "False",
+            "n": 19
+          },
+          {
+            "a": "3.0",
+            "b": "True",
+            "n": 1
+          },
+          {
+            "a": "<missing>",
+            "b": "False",
+            "n": 149
+          },
+          {
+            "a": "<missing>",
+            "b": "True",
+            "n": 14
+          }
+        ],
+        "linked_flag_vs_either_prefix": [
+          {
+            "a": "1.0",
+            "b": "False",
+            "n": 461
+          },
+          {
+            "a": "1.0",
+            "b": "True",
+            "n": 124
+          },
+          {
+            "a": "2.0",
+            "b": "False",
+            "n": 4045
+          },
+          {
+            "a": "2.0",
+            "b": "True",
+            "n": 254
+          },
+          {
+            "a": "3.0",
+            "b": "False",
+            "n": 19
+          },
+          {
+            "a": "3.0",
+            "b": "True",
+            "n": 1
+          },
+          {
+            "a": "<missing>",
+            "b": "False",
+            "n": 149
+          },
+          {
+            "a": "<missing>",
+            "b": "True",
+            "n": 14
+          }
+        ],
+        "changed_real_group_size_distribution": {
+          "10": 8,
+          "8": 2,
+          "9": 1,
+          "7": 1
+        }
+      }
+    ],
+    "qualification": "Counts conditional on recorded movement flags; original/same-location reference intervals not established by missing instruments; do not equate sentinel-only P to all-mover-adjusted R."
+  },
+  "normal_API": {
+    "initial": {
+      "side": "initial",
+      "source_pin": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "normal_API_calls": [
+        {
+          "key": "default",
+          "Country_args": [
+            "Nigeria"
+          ],
+          "Country_kwargs": {},
+          "sample_kwargs": {},
+          "rows": 49770,
+          "per_wave": {
+            "2010Q3": 5000,
+            "2011Q1": 5000,
+            "2012Q3": 4859,
+            "2013Q1": 4859,
+            "2015Q3": 4696,
+            "2016Q1": 4696,
+            "2018Q3": 5263,
+            "2019Q1": 5263,
+            "2023Q3": 5067,
+            "2024Q1": 5067
+          },
+          "ambiguous_i_t": 0,
+          "null_v": 0
+        },
+        {
+          "key": "boundary1",
+          "Country_args": [
+            "Nigeria"
+          ],
+          "Country_kwargs": {},
+          "sample_kwargs": {
+            "waves": [
+              "2016Q1",
+              "2018Q3"
+            ]
+          },
+          "rows": 9959,
+          "per_wave": {
+            "2016Q1": 4696,
+            "2018Q3": 5263
+          },
+          "ambiguous_i_t": 0,
+          "null_v": 0
+        },
+        {
+          "key": "boundary2",
+          "Country_args": [
+            "Nigeria"
+          ],
+          "Country_kwargs": {},
+          "sample_kwargs": {
+            "waves": [
+              "2019Q1",
+              "2023Q3"
+            ]
+          },
+          "rows": 10330,
+          "per_wave": {
+            "2019Q1": 5263,
+            "2023Q3": 5067
+          },
+          "ambiguous_i_t": 0,
+          "null_v": 0
+        }
+      ],
+      "cache_files": 14,
+      "cache_bytes_modes_mtimes_exact": true,
+      "source_builds": 0,
+      "route_events": {
+        "_compute_panel_ids": 3,
+        "load_json_cache": 3,
+        "_read_l2_country_cache": 3
+      },
+      "warning_counts": {
+        "default": 1,
+        "boundary1": 1,
+        "boundary2": 1
+      },
+      "all_full_frames_axes_dtypes_nulls_values_fullattrs_exact": false
+    },
+    "fresh_process_warm": {
+      "side": "warm",
+      "source_pin": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "normal_API_calls": [
+        {
+          "key": "default",
+          "Country_args": [
+            "Nigeria"
+          ],
+          "Country_kwargs": {},
+          "sample_kwargs": {},
+          "rows": 49770,
+          "per_wave": {
+            "2010Q3": 5000,
+            "2011Q1": 5000,
+            "2012Q3": 4859,
+            "2013Q1": 4859,
+            "2015Q3": 4696,
+            "2016Q1": 4696,
+            "2018Q3": 5263,
+            "2019Q1": 5263,
+            "2023Q3": 5067,
+            "2024Q1": 5067
+          },
+          "ambiguous_i_t": 0,
+          "null_v": 0
+        },
+        {
+          "key": "boundary1",
+          "Country_args": [
+            "Nigeria"
+          ],
+          "Country_kwargs": {},
+          "sample_kwargs": {
+            "waves": [
+              "2016Q1",
+              "2018Q3"
+            ]
+          },
+          "rows": 9959,
+          "per_wave": {
+            "2016Q1": 4696,
+            "2018Q3": 5263
+          },
+          "ambiguous_i_t": 0,
+          "null_v": 0
+        },
+        {
+          "key": "boundary2",
+          "Country_args": [
+            "Nigeria"
+          ],
+          "Country_kwargs": {},
+          "sample_kwargs": {
+            "waves": [
+              "2019Q1",
+              "2023Q3"
+            ]
+          },
+          "rows": 10330,
+          "per_wave": {
+            "2019Q1": 5263,
+            "2023Q3": 5067
+          },
+          "ambiguous_i_t": 0,
+          "null_v": 0
+        }
+      ],
+      "cache_files": 14,
+      "cache_bytes_modes_mtimes_exact": true,
+      "source_builds": 0,
+      "route_events": {
+        "_compute_panel_ids": 3,
+        "load_json_cache": 3,
+        "_read_l2_country_cache": 3
+      },
+      "warning_counts": {
+        "default": 1,
+        "boundary1": 1,
+        "boundary2": 1
+      },
+      "all_full_frames_axes_dtypes_nulls_values_fullattrs_exact": true
+    },
+    "total_normal_calls": 6,
+    "full_frame_fullattrs_warning_multisets_exact": true,
+    "14private_files_bytes_modes_mtimes_exact": true
+  },
+  "preparation": {
+    "manifest_parquets": 6,
+    "MD5_L1_source_covers": 4,
+    "sample_current_hash_full10wave_gate": true,
+    "four_panel_wave_current_hashes": true,
+    "legacy_companion19110rows_source_verified_no_hash_stamp": true,
+    "missing_instrument_PDFs": [
+      {
+        "path": "Nigeria/2015-16/Documentation/PP_W3_Household_Quest.pdf",
+        "md5": "c40e97568cf203a6735e71f9dd16f9b2",
+        "reason": "held L1 blob absent"
+      },
+      {
+        "path": "Nigeria/2018-19/Documentation/pp_w4_household_quest.pdf",
+        "md5": "da641e8c226502f32b80183b1de59a7b",
+        "reason": "held L1 blob absent"
+      },
+      {
+        "path": "Nigeria/2023-24/Documentation/ghs_panel_w5_pp_household_questionnaire.pdf",
+        "md5": "c096dce419806f6d0eecf91606c28a63",
+        "reason": "held L1 blob absent"
+      },
+      {
+        "path": "Nigeria/2023-24/Documentation/ghs_panel_w5_pp_interviewer_manual.pdf",
+        "md5": "4c0f81f1f720f4d84f3bc1328f57b542",
+        "reason": "held L1 blob absent"
+      },
+      {
+        "path": "Nigeria/2023-24/Documentation/ghs_panel_wave_5_basic_information_document_v1.pdf",
+        "md5": "bd68d6b4bd1f6292113d80c507ce1f09",
+        "reason": "held L1 blob absent"
+      }
+    ],
+    "unmanifested_seed_raw_sources_used": 0
+  },
+  "limits": [
+    "N/P and source status/group counts verified; true interval movement-adjusted R/K unverified",
+    "W5 P112 includes86reported-original,6reported-close-move,20unknown;86..106 is conditional on reference-period interpretation",
+    "Observed ID reassignment groups1/12; reported-nonmover anchored groups1/10; no unqualified physical total",
+    "Source-cold builds not performed; normal current-hash L2 proof only",
+    "Other10boundaries retain original frozen diagnosis evidence gaps"
+  ],
+  "network_attempts": 0,
+  "protected_write_attempts": 0,
+  "source_builds": 0,
+  "acquisition": 0,
+  "shared_cache_writes": 0,
+  "DVC_CLI": 0,
+  "cache_bypass_or_stamps": 0,
+  "tracked_edits": 0,
+  "GitHub_writes": 0,
+  "broad_tests_or_scanner_runs": 0,
+  "freeze_proof": "freeze-proof.json",
+  "reports": [
+    "DIAGNOSIS.md",
+    "PROPOSAL.md",
+    "ledger-DRAFT.md",
+    "REPRODUCE.md"
+  ],
+  "author": "Sue (GPT-6)",
+  "quiescent": true
+}

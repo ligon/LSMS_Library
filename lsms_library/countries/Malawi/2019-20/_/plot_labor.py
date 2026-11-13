@@ -1,10 +1,9 @@
 """Build plot_labor for Malawi IHS5 / IHPS 2019-20 (GAP 3, plot grain).
 
 Item-level (t, i, plot, source) plot-labor feature.  IHS5 ships a
-Cross_Sectional half (bare case_id -- sample().i for 2019-20 is the bare
-case_id, NOT cs-prefixed) and a Panel half (y4_hhid), concatenated into the
-single 2019-20 wave -- exactly like plot_inputs / crop_production.  Plot key
-is gardenid_plotid in both halves.
+Cross_Sectional half (cs-19-prefixed case_id, GH #1278) and a Panel half
+(y4_hhid), concatenated into the single 2019-20 wave -- exactly like
+plot_inputs / crop_production.  Plot key is gardenid_plotid in both halves.
 
 Module D plot-labor layout is the IHS4/IHS5 generation:
   * family = ag_d4{2,3,4}b{n} * ag_d4{2,3,4}c{n} day*#people products;
@@ -22,10 +21,12 @@ only the Module D plot-labor reported days).  See
 lsms_library/countries/Malawi/_/malawi.py:_plot_labor_block.
 """
 import sys
+import numpy as np
 
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
-from malawi import _plot_labor_block, assemble_plot_labor
+from malawi import (_plot_labor_block, assemble_plot_labor,
+                    _labor_source_reference)
 
 
 WAVE = '2019-20'
@@ -38,24 +39,32 @@ def _plotkey(df):
 
 pieces = []
 
-# --- Cross_Sectional half (bare case_id; no "other" labor columns) ---
+# --- Cross_Sectional half (cs-19 prefix; no "other" labor columns) ---
 d_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_d.dta',
                      convert_categoricals=False)
-d_xs['hhid'] = d_xs['case_id'].apply(format_id)
+d_xs_labor_positions = np.arange(len(d_xs), dtype=np.int64)
+d_xs['hhid'] = 'cs-19-' + d_xs['case_id'].apply(format_id)
 d_xs['plotkey'] = _plotkey(d_xs)
 pieces.append(_plot_labor_block(d_xs, hhid='hhid', plotkey='plotkey', t=WAVE,
-                                hired_suffix='1/2/3', include_other=False))
+                                hired_suffix='1/2/3', include_other=False,
+                                source_ref=_labor_source_reference(
+                                    '../Data/Cross_Sectional/ag_mod_d.dta', script_path=__file__),
+                                row_positions=d_xs_labor_positions))
 
 # --- Panel half (y4_hhid; has "other" labor) ---
 d_pn = get_dataframe('../Data/Panel/ag_mod_d_19.dta', convert_categoricals=False)
+d_pn_labor_positions = np.arange(len(d_pn), dtype=np.int64)
 d_pn['hhid'] = d_pn['y4_hhid'].apply(format_id)
 d_pn['plotkey'] = _plotkey(d_pn)
 pieces.append(_plot_labor_block(d_pn, hhid='hhid', plotkey='plotkey', t=WAVE,
-                                hired_suffix='1/2/3', include_other=True))
+                                hired_suffix='1/2/3', include_other=True,
+                                source_ref=_labor_source_reference(
+                                    '../Data/Panel/ag_mod_d_19.dta', script_path=__file__),
+                                row_positions=d_pn_labor_positions))
 
 df = assemble_plot_labor(WAVE, pieces)
 
-assert df.index.is_unique, f"Non-unique (t,i,plot,source) in plot_labor {WAVE}"
+assert df.index.is_unique, f"Non-unique (t,i,plot,source,labor_obs) in plot_labor {WAVE}"
 assert len(df) > 0, f"plot_labor {WAVE} produced no rows"
 
 to_parquet(df, 'plot_labor.parquet')

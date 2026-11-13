@@ -1,0 +1,19 @@
+{
+  "source_ready_sha256": "40eab369166bdea2c4b147d3aec8dd29ead3a7065f9192166d3f8adcc72c0732",
+  "copied_safe_source_sha256": {
+    "ADDENDUM.org": "5b8ad6fb317e45eb2abf506aad5884be1c26d7046fd42d0e987ec6b9c348ff03",
+    "validation.json": "690196d580fcb8f75238a067cde8b47bb451bc26cc667eecd6b19ac7476cc24a",
+    "EXACT-COMPARATOR.py": "658b3417858790fe0810706e8b7ac195a91fc5ee39a70a3ea3bbb6d2bd2e1b1b",
+    "comparator-provenance.json": "2c595fbf6e90db92b9517d298a54638783aec0179abcc2175de636d940f2863a",
+    "four-native-source-dtype-checks.json": "a58b9b81fa2cdc0f9a4d6089c7f1c152d64fa6b99f0e0636c795123305c5b4fe",
+    "guard-policy-proof.json": "633dbdff9cf8d593abd1de524536e01b56e36d68bbb77a14dc6fab36fb263f65",
+    "protection-before.json": "66378f3498a391ff815d0f29174616d474da53a52c06b6f4386169b2ae70f71e",
+    "protection-after.json": "7f7feb9043dabcef1dc4f427066db805d76b4b97e65ae41b8086df4eb58d3d00",
+    "REPRODUCE.sh": "3382d927dfba9cc2b600419174b0e711b8aabf373359e4ee300f98d86d21a711",
+    "run.sh": "390420dfe5487edcc498cf03f19242d8eec47401184308568112bd8f40a00053",
+    "bootstrap.py": "b068b0f50744fadbd6014e923600ee6b09038e185eb865115897a58fab84d82c",
+    "exact_addendum.py": "c0633951ed736831dfd14833abbe727786182ac4fb4868fb345449d68e3eeb07",
+    "verify_four_operands.py": "8cac6280fbe34c8c1c53bd7175a862a5c86808008e639ca2a2ab2eafc17caa14"
+  },
+  "all_source_bytes_verified": true
+}

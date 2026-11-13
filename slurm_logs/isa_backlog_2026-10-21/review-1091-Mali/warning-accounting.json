@@ -1,0 +1,15 @@
+{
+  "focused_pytest_warning_categories": {
+    "CacheRebuildWarning": 4,
+    "UserWarning": 3
+  },
+  "synthetic_rebuild_warnings": 4,
+  "synthetic_make_failure_warnings": 2,
+  "other_synthetic_missing_builder_warnings": 1,
+  "all_seven_complete_records_retained_privately": true,
+  "complete_record_digest": "6d35620ed1ab06d19e0d7bbc34be71f1d0fbec4e01860898ac0b9b60158cc38b",
+  "terminal_runtime_main_and_child_warning_headers": 0,
+  "Feature_and_CLI_warnings": 0,
+  "scanner_WARN_records_separately_accounted": 2,
+  "optional_metadata_get_data_file_logger_warning_stop_preserved": true
+}

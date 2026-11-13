@@ -1,0 +1,15 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/6273
+
+#+CATALOG_ID: 6273
+#+CATALOG_IDNO: CIV_2021_EHCVM-2_v01_M
+#+CATALOG_TITLE: Enquête Harmonisée sur le Conditions de Vie des Ménages, 2021-2022
+#+CATALOG_YEARS: 2021-2022
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/6273
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-11-04
+#+PROVENANCE_NOTE: Acquired whole on 2026-11-04 by add_wave: all 58 of the 58 data files in 6273's WB datafile list, each pushed. Registered, not wired (GH #552).

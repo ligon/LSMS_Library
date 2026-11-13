@@ -1,0 +1,8 @@
+{
+  "status": "ROOT_TOOL_CAPTURE_TEXT_REPRESENTATION_STOP",
+  "chunk_id": "31b9fd",
+  "exit_code": 1,
+  "cause": "Root assumed every frozen-file receipt embeds exact text. Five code/manifest files carry full SHA/physical receipts only. v2 checks exact text when present and full SHA/physical for all files; original code/manifest already full-hashed by packet authentication.",
+  "product_API_data_decode_replay": false,
+  "signed": "Sue"
+}

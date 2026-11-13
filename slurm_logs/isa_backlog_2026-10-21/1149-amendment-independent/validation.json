@@ -1,0 +1,76 @@
+{
+  "cohorts": {
+    "cohorts": {
+      "candidate": {
+        "tests": 270,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      },
+      "base-four": {
+        "tests": 4,
+        "failures": 4,
+        "errors": 0,
+        "skips": 0
+      },
+      "adversarial-candidate": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0
+      }
+    },
+    "parent_failures_only_current_receipt_assertions": true,
+    "guard_network_events": 0,
+    "adversarial_controls": "two entrypoints x ValueError/custom BaseException raised by invalid PathLike; original exception object/args and SOURCE/unrelated entry identity retained"
+  },
+  "XML_receipts": {
+    "candidate": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/candidate.xml",
+      "mode": 384,
+      "mtime_ns": 1792673118414623553,
+      "bytes": 40008,
+      "inode": 56625336,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "9243f6f34d2322ab1935a4847c8d7fa6b84500d75868af630dac27a49fd600f7"
+    },
+    "base-four": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/base-four.xml",
+      "mode": 384,
+      "mtime_ns": 1792673177527927459,
+      "bytes": 15820,
+      "inode": 56625346,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "707770f4aeee9f4577518ba69c79632c305ba577fb13ed401169349d28a1a2de"
+    },
+    "adversarial-candidate": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/adversarial-candidate.xml",
+      "mode": 384,
+      "mtime_ns": 1792673215059119841,
+      "bytes": 1122,
+      "inode": 56625351,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "7f05a25690c5923cf8a55acaaf44a2bbab8992132e0b486fa5d75494e696a18f"
+    }
+  },
+  "terminal_outcomes": {
+    "candidate_270": 0,
+    "actual_fb_copied_4": 1,
+    "independent_pathlike_4": 0,
+    "hash_base": 0,
+    "hash_candidate": 0,
+    "AST_scope": 0,
+    "protection_before": 0,
+    "protection_after": 0
+  },
+  "expected_candidate_mocked_bad_GPG_warning": 1,
+  "new_warm_actors_or_data_calls": 0,
+  "old_original_failure_cohorts_replayed": false,
+  "setup_read_stop": "Optional author snapshot.py absent; read-only cat exit1 before imports/tests; actual protect.py then read, original tool transcript and own JSON note retained."
+}

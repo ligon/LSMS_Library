@@ -1,0 +1,211 @@
+{
+  "status": "DIAGNOSIS_COMPLETE_NO_IMPLEMENTATION",
+  "tests": {
+    "passed": 12,
+    "skipped": 0,
+    "failed": 0
+  },
+  "test_scenarios": [
+    {
+      "revision": "baseline",
+      "scenario": "market-then-currency",
+      "role": "observer",
+      "tests_passed": 2
+    },
+    {
+      "revision": "baseline",
+      "scenario": "currency-then-market",
+      "role": "observer",
+      "tests_passed": 2
+    },
+    {
+      "revision": "baseline",
+      "scenario": "timed-pair",
+      "role": "A",
+      "tests_passed": 1
+    },
+    {
+      "revision": "baseline",
+      "scenario": "timed-pair",
+      "role": "B",
+      "tests_passed": 1
+    },
+    {
+      "revision": "with1062",
+      "scenario": "market-then-currency",
+      "role": "observer",
+      "tests_passed": 2
+    },
+    {
+      "revision": "with1062",
+      "scenario": "currency-then-market",
+      "role": "observer",
+      "tests_passed": 2
+    },
+    {
+      "revision": "with1062",
+      "scenario": "timed-pair",
+      "role": "A",
+      "tests_passed": 1
+    },
+    {
+      "revision": "with1062",
+      "scenario": "timed-pair",
+      "role": "B",
+      "tests_passed": 1
+    }
+  ],
+  "four_serial_order_controls": [
+    {
+      "revision": "baseline",
+      "scenario": "market-then-currency",
+      "whole_frame_full_attrs_exact": true
+    },
+    {
+      "revision": "baseline",
+      "scenario": "currency-then-market",
+      "whole_frame_full_attrs_exact": true
+    },
+    {
+      "revision": "with1062",
+      "scenario": "market-then-currency",
+      "whole_frame_full_attrs_exact": true
+    },
+    {
+      "revision": "with1062",
+      "scenario": "currency-then-market",
+      "whole_frame_full_attrs_exact": true
+    }
+  ],
+  "physical_private_source_copies": 341,
+  "all_source_originals_copies_SHA_MD5_mode_mtime_exact": true,
+  "distinct_copy_inodes_nlink1_no_symlinks": true,
+  "declared_held_raw_sources": 31,
+  "complete_terminal_source_gates_before_API": true,
+  "nutrition_FCT": {
+    "baseline": {
+      "normal_nonempty_API_calls": 4,
+      "food_country_writes_observed": 6,
+      "hashless_food_country_writes": 3,
+      "every_actual_food_write_input_and_output_full_frame_attrs_exact": true,
+      "FDC_fallback_attempts": 0,
+      "observations": [
+        {
+          "label": "initial-empty-L2",
+          "files": 0,
+          "food_frame_full_attrs_exact": null,
+          "food_hash": null,
+          "fct_hash": null,
+          "nutrition_hash": null,
+          "fct_SHA": null,
+          "nutrition_SHA": null
+        },
+        {
+          "label": "0-after-fct",
+          "files": 20,
+          "food_frame_full_attrs_exact": true,
+          "food_hash": "d61dd3d715d7b192c6bf04f92c2ced3378b7d398c11d6edfc5d4eee8f4c51dba",
+          "fct_hash": "02fa27a96359021ccc8d3b5729b9a15f38304a525b21ff0df3b745b898488edd",
+          "nutrition_hash": "",
+          "fct_SHA": "8c6e00bd994e86138e189329d6391fd78050a5f5b8f48e2dd651be1956b69948",
+          "nutrition_SHA": "6cd206387a02646c9d7fc08b6413468c08d36e0b6530a0a04cc424a0ea013e0a"
+        },
+        {
+          "label": "1-after-nutrition",
+          "files": 20,
+          "food_frame_full_attrs_exact": true,
+          "food_hash": "d61dd3d715d7b192c6bf04f92c2ced3378b7d398c11d6edfc5d4eee8f4c51dba",
+          "fct_hash": "",
+          "nutrition_hash": "8934b068a814e99092b5421e8ad6cfff54dc216115c77fd46ce5973350e5d9fe",
+          "fct_SHA": "87d9a01f9448f939b46959a861f556b006aaaea29c5fbb42578a346e313e36e0",
+          "nutrition_SHA": "20767b8a51a261f0ea3dcf1ea3026609f1ff405174bbabde58cdacb4009fc5f9"
+        },
+        {
+          "label": "2-after-fct",
+          "files": 20,
+          "food_frame_full_attrs_exact": true,
+          "food_hash": "d61dd3d715d7b192c6bf04f92c2ced3378b7d398c11d6edfc5d4eee8f4c51dba",
+          "fct_hash": "02fa27a96359021ccc8d3b5729b9a15f38304a525b21ff0df3b745b898488edd",
+          "nutrition_hash": "",
+          "fct_SHA": "8c6e00bd994e86138e189329d6391fd78050a5f5b8f48e2dd651be1956b69948",
+          "nutrition_SHA": "6cd206387a02646c9d7fc08b6413468c08d36e0b6530a0a04cc424a0ea013e0a"
+        },
+        {
+          "label": "3-after-food_acquired",
+          "files": 20,
+          "food_frame_full_attrs_exact": true,
+          "food_hash": "d61dd3d715d7b192c6bf04f92c2ced3378b7d398c11d6edfc5d4eee8f4c51dba",
+          "fct_hash": "02fa27a96359021ccc8d3b5729b9a15f38304a525b21ff0df3b745b898488edd",
+          "nutrition_hash": "",
+          "fct_SHA": "8c6e00bd994e86138e189329d6391fd78050a5f5b8f48e2dd651be1956b69948",
+          "nutrition_SHA": "6cd206387a02646c9d7fc08b6413468c08d36e0b6530a0a04cc424a0ea013e0a"
+        }
+      ]
+    },
+    "with1062": {
+      "normal_nonempty_API_calls": 4,
+      "food_country_writes_observed": 1,
+      "hashless_food_country_writes": 0,
+      "every_actual_food_write_input_and_output_full_frame_attrs_exact": true,
+      "FDC_fallback_attempts": 0,
+      "observations": [
+        {
+          "label": "initial-empty-L2",
+          "files": 0,
+          "food_frame_full_attrs_exact": null,
+          "food_hash": null,
+          "fct_hash": null,
+          "nutrition_hash": null,
+          "fct_SHA": null,
+          "nutrition_SHA": null
+        },
+        {
+          "label": "0-after-fct",
+          "files": 19,
+          "food_frame_full_attrs_exact": true,
+          "food_hash": "ae9480ac317d124b6a2461743c745c1e0316954267f00a28b18fe63c202bfdb8",
+          "fct_hash": "139af9573daf722fb6d0d9fe135afda1b359da524eadbe7dae48b5523a67fb0c",
+          "nutrition_hash": null,
+          "fct_SHA": "750674b0290261d81c0ac7f93a3ab76b9be22ea0004d8666616aae39e7107cda",
+          "nutrition_SHA": null
+        },
+        {
+          "label": "1-after-nutrition",
+          "files": 20,
+          "food_frame_full_attrs_exact": true,
+          "food_hash": "ae9480ac317d124b6a2461743c745c1e0316954267f00a28b18fe63c202bfdb8",
+          "fct_hash": "139af9573daf722fb6d0d9fe135afda1b359da524eadbe7dae48b5523a67fb0c",
+          "nutrition_hash": "27785042d02d328a447fb217eaa130745e5de6b1b7a497da39b94284ca3911c2",
+          "fct_SHA": "750674b0290261d81c0ac7f93a3ab76b9be22ea0004d8666616aae39e7107cda",
+          "nutrition_SHA": "5d6be265ea5b3843f80341b1c24adff3c769d26d5fea78108487c26082e9a53c"
+        },
+        {
+          "label": "2-after-fct",
+          "files": 20,
+          "food_frame_full_attrs_exact": true,
+          "food_hash": "ae9480ac317d124b6a2461743c745c1e0316954267f00a28b18fe63c202bfdb8",
+          "fct_hash": "139af9573daf722fb6d0d9fe135afda1b359da524eadbe7dae48b5523a67fb0c",
+          "nutrition_hash": "27785042d02d328a447fb217eaa130745e5de6b1b7a497da39b94284ca3911c2",
+          "fct_SHA": "750674b0290261d81c0ac7f93a3ab76b9be22ea0004d8666616aae39e7107cda",
+          "nutrition_SHA": "5d6be265ea5b3843f80341b1c24adff3c769d26d5fea78108487c26082e9a53c"
+        },
+        {
+          "label": "3-after-food_acquired",
+          "files": 20,
+          "food_frame_full_attrs_exact": true,
+          "food_hash": "ae9480ac317d124b6a2461743c745c1e0316954267f00a28b18fe63c202bfdb8",
+          "fct_hash": "139af9573daf722fb6d0d9fe135afda1b359da524eadbe7dae48b5523a67fb0c",
+          "nutrition_hash": "27785042d02d328a447fb217eaa130745e5de6b1b7a497da39b94284ca3911c2",
+          "fct_SHA": "750674b0290261d81c0ac7f93a3ab76b9be22ea0004d8666616aae39e7107cda",
+          "nutrition_SHA": "5d6be265ea5b3843f80341b1c24adff3c769d26d5fea78108487c26082e9a53c"
+        }
+      ]
+    }
+  },
+  "network_attempts": 0,
+  "FDC_fallback_attempts": 0,
+  "active_traced_consumers": [],
+  "quiescent": true,
+  "no_production_git_or_cache_gate_changes": true,
+  "historical_interleaving_and_original_writer_remain_unidentified": true
+}

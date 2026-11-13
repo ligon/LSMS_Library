@@ -36,18 +36,13 @@ or `format_id` change that breaks a key is caught rather than silently
   as_the_roster` below).  Malawi passes it at 100% in every wave of all three
   tables — and not vacuously: the id strings match literally.
 
-  Worth running rather than waving away, because Malawi 2019-20 has the
-  surface shape of a namespace split: its `data_info.yml` runs `case_id`
-  through `cs_i` (`'cs-19-' + format_id`) for `sample` / `household_roster` /
-  `cluster_features`, while all three wave scripts here pass `i_prefix=''` /
-  bare `format_id`.  That asymmetry is a DELIBERATE, ALREADY-RECORDED decision
-  — `Malawi/_/CONTENTS.org`, "plot_features (GH #167)": *"2016-17
-  cross-sectional id is `cs-17-`-prefixed in `sample()` ...; the wave script
-  applies the same prefix so XS plots are not ~100% orphaned.  All other halves
-  emit the raw wave hhid and rely on framework id_walk / `panel_ids`
-  chaining."*  Measured, the `cs-19-` prefix survives to the API on NEITHER
-  side, so both are in the raw `case_id` namespace and `i` joins exactly.  The
-  test below keeps it that way.
+  Worth running rather than waving away, because a Cross_Sectional half has to
+  spell its prefix in two places: `data_info.yml` runs `case_id` through `cs_i`
+  for `sample` / `household_roster` / `cluster_features`, and the wave scripts
+  here pass the same `i_prefix` / `'cs-NN-' + format_id`.  2016-17 uses
+  `cs-17-`, and since GH #1278 2019-20 uses `cs-19-` on both sides (until then
+  the YAML's `function: cs_i` was a dead key and both sides were bare).  The
+  test below keeps the two sides in one namespace.
 """
 import importlib.util as _iu
 from pathlib import Path as _Path
@@ -84,7 +79,7 @@ MODULE_C = {
         (15751, 27),
     ('2016-17', 'Panel/ag_mod_c_16.dta', 'y3_hhid', ('gardenid', 'plotid'), ''):
         (4042, 6),
-    ('2019-20', 'Cross_Sectional/ag_mod_c.dta', 'case_id', ('gardenid', 'plotid'), 'cs-17-'):
+    ('2019-20', 'Cross_Sectional/ag_mod_c.dta', 'case_id', ('gardenid', 'plotid'), 'cs-19-'):
         (17693, 0),
     ('2019-20', 'Panel/ag_mod_c_19.dta', 'y4_hhid', ('gardenid', 'plotid'), ''):
         (5570, 2),

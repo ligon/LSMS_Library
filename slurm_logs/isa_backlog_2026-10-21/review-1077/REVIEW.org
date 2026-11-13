@@ -1,0 +1,121 @@
+#+TITLE: Independent adversarial review of GH #1077
+#+AUTHOR: Sue
+#+DATE: 2026-10-21
+
+* Verdict
+
+PASS at =3f520e09ff2d21501e30d8ac657f7f8ea571152d=.
+No blocking runtime, data-retention, fingerprint or test finding.
+The baseline is =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+This review did not author the patch and changed no tracked file or ref.
+A pre-existing Uganda documentation overstatement is quoted below and in =REVIEW.md= for a possible documentation-only descendant.
+
+* Grounding and bounded scope
+
+Read repository guidance, =code-reviewer=, =prior-art-ledger=, the standing and task ledgers with their history, label-selection contract, cross-country skill, scanner guidance, and producer report/validation.
+Used git, ripgrep and AST inspection; no GitNexus MCP was needed.
+Only =country.py= changes at runtime: the existing additive helper checks finiteness before =int=; the existing categorical mapping caller drops rows with an actually missing RESOLVED SOURCE before building its dictionary.
+The resolver, curated tables, target handling, schema, build dependencies and fingerprint exclusions are unchanged.
+The other four changed files are a new regression file, task ledger and two evidence files.
+No fixture, golden, dependency or lock refresh exists.
+
+Against ledger sections 2-5: OK for reuse, original-key preservation, source-only missing filtering, unchanged error taxonomy/sentinels and measured cache scope.
+No remaining runtime CONTRADICTION or REINVENTION found.
+The initial zero-cache-cost premise and the finite-only proposal were already corrected in the ledger before the final implementation.
+
+* Country idiosyncrasies and documentation qualification
+
+Uganda CONTENTS was read before source work, including relevant TODO/WAITING/LOGBOOK entries.
+Its build decoder uses =Code -> Preferred Label=; accepted numeric residuals remain distinct, and missing-unit handling distinguishes reported-quantity =Unknown= from value-only =Value= before duplicate aggregation (CONTENTS:826-890).
+The off-map food-unit row drop is a recorded live caveat, unlike crop production's retention policy; this patch preserves that behavior (892-931).
+The survey's reported prices are largely producer-derived value/quantity, and the recent waves fold per-leg fields by a row median (933-965).
+Cluster identity changes and synthetic GPS bins explain existing identity warnings; they are not introduced by this patch.
+Live tasks include the 2005-06 outer geovar merge's 368 phantom rows (2053 LOGBOOK), 2019-20 GPS absence (2066 LOGBOOK), crop duplicate collapse dropping null keys (2445), and the measured but producer-unconfirmed x100 sales correction still marked WAITING (2455).
+The missing 2019-20 panel-weight entry remains a TODO requiring confirmation (3368 LOGBOOK), and item-specific nonfood RecallWindow remains WAITING (3502).
+No decision on any of these was changed.
+
+The exact existing statement at CONTENTS:833 is:
+#+begin_quote
+These extra columns are unused at runtime but preserve the cross-wave provenance previously captured in the retired =_/unitlabels.py= file.
+#+end_quote
+
+That blanket wording conflicts with the existing query-time path.
+At =Uganda/_/uganda.py:278,386=, the build decoder explicitly requests =Code -> Preferred Label= and does not use the per-wave columns.
+At =country.py:3530,3535,3543=, the query-time caller resolves the source with =_categorical_key_column=, builds the selected target dictionary, then augments numeric aliases.
+For the current Uganda =u= table and =labels={'u':'Code'}=, the resolved SOURCE is =2005-06=.
+Thus the per-wave columns are active query-time inputs, even though they are not build-decoder inputs.
+This is a documentation qualification to preserve, not a reason to assume CONTENTS stale or alter source selection.
+See =REVIEW.md= for a minimal replacement.
+
+Niger's =u= explicitly declares =#+key: Original Label= (categorical_mapping.org:90).
+GH #928 intentionally forbids using that same column as the selected target; the existing plain KeyError remains correct.
+Preferred Label, Code, 2018-19 and 2021-22 remain usable.
+
+* Independent defect and contract probes
+
+The census independently walks every current country table and target through the existing resolver and the immutable baseline helper.
+It reproduces 34 crashing cells across 12 tables and seven countries: 19 ISA cells and 15 GhanaLSS/Guatemala cells.
+Country totals: Ethiopia 8, GhanaLSS 14, Guatemala 1, Mali 2, Nigeria 2, Tanzania 6, Uganda 1.
+These are real metadata tables and real mapping methods with synthetic observations, not 34 raw-survey builds.
+The historical 36-cell count is not asserted as a current result.
+
+An independently restored old caller with the final finite guard fabricates nonmissing outputs from actual null inputs in 21 column cells and eight index cells.
+The final caller does so in zero cells for both paths.
+Separate controls cover actual None/pd.NA/NaN/NaT, literal nan/NaN/inf strings, positive/negative nonmissing infinities, finite scientific spellings, native fractional keys, alias collisions, duplicate valid keys, explicitly null targets, declared keys away from the first column, reserved kg/Value and ordinary Unknown, payload dtypes and logical attrs.
+All controls pass.
+The helper remains additive, retaining supplied nonfinite keys; the caller prevents those actually missing source keys from labeling observations.
+
+The independently rerun focused suite gives 230 passed, zero failed/skipped, one explicitly excluded all-country source test.
+All 119 new tests on immutable f8 give 118 failures and one already-correct Niger control.
+Restoring only the old caller under the finite guard gives 52 failures and 67 passes.
+The counterfactuals distinguish the exception guard from the source-null factory defect.
+
+* Held-source cold and fresh-process warm evidence
+
+Two physically absent Uganda L2 roots were prepared with physical private copies of 23 held blobs referenced by 25 current sidecars, 121,541,917 bytes per root.
+Each blob was checked against its sidecar MD5; no hard links, acquisition or shared-cache mutation was used.
+Every execution used the image interpreter, matching cwd/PYTHONPATH/config realpath assertions, single numerical/build threads and an active isolated network namespace containing only loopback.
+
+Both cold builds return 355,571 rows.
+The entire default public frame, pre-final country frame and all eight pre-final wave frames compare exactly in values, indexes and dtypes, with full logical attrs equality.
+Private pickles preserve objects for comparison; pickle-byte equality is never used as an attrs oracle.
+Wave counts are 40,749 / 38,107 / 35,489 / 38,983 / 50,703 / 50,108 / 53,288 / 48,144 in chronological order.
+Default and Preferred remain identical.
+Baseline Code raises the original NaN-to-integer ValueError; candidate Code succeeds with 355,571 rows, no null unit keys and 74,603 numeric unit keys versus 24 in default.
+Every payload value, non-u key and full logical attr remains exact.
+
+Separate fresh processes perform default, Code, default-after-Code, Preferred and new-Country Code calls.
+Results match the first cold snapshots exactly under their request, and parquet byte hashes plus nanosecond mtimes prove no warm writes.
+The additional public Feature Code result has 355,571 rows and exactly equals its matching public Country result after canonical index reordering and removal of the country level.
+That check also writes no parquet.
+
+* Full fingerprint and Feature finding accounting
+
+The complete inventory covers 549 country/table hashes and 39 tagged framework fingerprints.
+Exactly all 28 Uganda hashes change because the existing Uganda build imports/calls the helper.
+The 521 other-country hashes and all 39 tagged framework fingerprints remain exact.
+No build dependency is hidden through an exclusion.
+
+The existing Feature harness phases 1/2 were rerun for Uganda food_acquired with a private runtime-only Preferred/Aggregate/Code grid.
+Baseline: 23 records, 22 warnings and one failure.
+Candidate: 26 warnings, zero failures/errors/skips.
+The full normalized record MULTISET of all 21 default/Preferred/Aggregate records is exact; only checkout/data paths were normalized.
+Code removes the old class-A load warning and class-B empty-assembly failure.
+Its five newly reachable diagnostics are three QuantityImplausibleWarning, one NullIndexKeyWarning and one ClusterIdentityWarning.
+Every added warning body exactly matches a directly captured public Code Feature warning of that concrete class.
+Four bodies also match existing default/Preferred bodies exactly; the fifth is exact after substituting the observed unit-label-to-Code spellings, with all other warning text unchanged.
+This accounts for the full finding delta without exporting warning examples or source identifiers.
+
+* Immutable proof and reproducibility
+
+=validation.json= records independent assertions and source-safe aggregates.
+Initial and final SHA256 manifests cover every tracked file, including symlink text: candidate 14,884 and baseline 14,880 files.
+HEADs remain pinned and both git statuses are clean.
+Held private L1 blob hashes remain unchanged; no new in-tree source or parquet exists.
+No review task process remains after the finishing check.
+
+Runnable commands are in =COMMANDS.sh=.
+Full scanner records, raw frames, source paths, warning examples and complete logs remain private in this review directory.
+The actual source rebuild covers Uganda; other countries receive the complete metadata census and hash inventory, not an invented source rebuild claim.
+
+Sue

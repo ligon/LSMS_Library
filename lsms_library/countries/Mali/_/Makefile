@@ -42,24 +42,27 @@ panel-ids:
 $(VAR_DIR)/food_coping.parquet: food_coping.py ../2014-15/_/food_coping.parquet
 	python food_coping.py
 
-# crop_production (item-level harvest, GAP 1 / parity loop).  The crop
-# module lives in the EACI waves only (2014-15, 2017-18).  The wave
-# pattern rule materializes each wave parquet; the country-level
-# concatenator (crop_production.py) aggregates into var/crop_production.parquet.
+# crop_production (item-level harvest, GAP 1 / parity loop).  All four waves
+# carry a crop module: EACI 2014-15 and 2017-18, EHCVM 2018-19 and 2021-22
+# (s16c / s16d, GH #824).  The wave pattern rule materializes each wave parquet;
+# the country-level concatenator (crop_production.py) aggregates into
+# var/crop_production.parquet.
 ../%/_/crop_production.parquet: ../%/_/crop_production.py
 	(cd $(@D) && python crop_production.py)
 
-$(VAR_DIR)/crop_production.parquet: crop_production.py ../2014-15/_/crop_production.parquet ../2017-18/_/crop_production.parquet
+$(VAR_DIR)/crop_production.parquet: crop_production.py ../2014-15/_/crop_production.parquet ../2017-18/_/crop_production.parquet ../2018-19/_/crop_production.parquet ../2021-22/_/crop_production.parquet
 	python crop_production.py
 
 # plot_inputs (item-level ag inputs, GAP 2 / parity loop).  The input
-# module lives in the EACI waves only (2014-15, 2017-18).  The wave pattern
+# modules are EACI plot rosters and EHCVM household s16b (GH #1483). The wave pattern
 # rule materializes each wave parquet; the country-level concatenator
 # (plot_inputs.py) aggregates into var/plot_inputs.parquet.
 ../%/_/plot_inputs.parquet: ../%/_/plot_inputs.py
 	(cd $(@D) && python plot_inputs.py)
 
-$(VAR_DIR)/plot_inputs.parquet: plot_inputs.py ../2014-15/_/plot_inputs.parquet ../2017-18/_/plot_inputs.parquet
+../2018-19/_/plot_inputs.parquet ../2021-22/_/plot_inputs.parquet: s16b_header_adapter.py
+
+$(VAR_DIR)/plot_inputs.parquet: plot_inputs.py ../2014-15/_/plot_inputs.parquet ../2017-18/_/plot_inputs.parquet ../2018-19/_/plot_inputs.parquet ../2021-22/_/plot_inputs.parquet
 	python plot_inputs.py
 
 # livestock (item-level animal roster, GAP 4 / parity loop).  The livestock
@@ -93,17 +96,12 @@ $(VAR_DIR)/plot_labor.parquet: plot_labor.py ../2014-15/_/plot_labor.parquet ../
 $(VAR_DIR)/people_last7days.parquet: people_last7days.py ../2014-15/_/people_last7days.parquet ../2017-18/_/people_last7days.parquet
 	python people_last7days.py
 
-# community_prices (item-level cluster food prices, GAP C / parity loop).  The
-# community price questionnaire lives in the 2014-15 EACI wave only (EACIS04
-# p1/p2); 2017-18 dropped it and the EHCVM waves price only at region x milieu
-# (no grappe key).  The wave pattern rule materializes the wave parquet; the
-# country-level concatenator (community_prices.py) aggregates into
-# var/community_prices.parquet.
+# community_prices: the framework aggregates the native wave parquets (#788,
+# #1091); there is no country-level script or var rule.  Retain this wave
+# target for EAC-I 2014-15 and EHCVM 2018-19 (both s05 quotes, GH #821).
+# 2017-18 and 2021-22 have no cluster-price module wired.
 ../%/_/community_prices.parquet: ../%/_/community_prices.py
 	(cd $(@D) && python community_prices.py)
-
-$(VAR_DIR)/community_prices.parquet: community_prices.py ../2014-15/_/community_prices.parquet
-	python community_prices.py
 
 clean:
 	@echo "nothing to clean: panel_ids.json / updated_ids.json are committed"

@@ -1,0 +1,8 @@
+{
+  "root": "/local/job40255479/worktrees/isa-1196-index-fix-bd80",
+  "head": "bd80d86c26786ca92680160abd790260bc924c3f",
+  "ignored_link": "/local/job40255479/worktrees/isa-1196-index-fix-bd80/lsms_library/countries/.dvc/tmp",
+  "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/shared1196-fix/wave-expansion-control/dvc-tmp",
+  "terminal_checkout_and_clean_gate_before_metadata": true,
+  "imports_tests_builds_started": false
+}

@@ -1,0 +1,62 @@
+{
+  "verdict": "NEEDS_FIX",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "frozen_head": "58ccfc2ca03644006a5ddcf6bd399de81a25a415",
+  "findings": [
+    {
+      "priority": "P1",
+      "title": "Pin the verified backend when materializing income inputs",
+      "location": "lsms_library/countries/Uganda/_/income.py:20",
+      "related_locations": [
+        "lsms_library/countries/Uganda/_/Makefile:65",
+        "lsms_library/countries/Uganda/_/Makefile:77"
+      ],
+      "trigger": "Build both source country caches for 2011-12 through the default public API, then request all-wave income under LSMS_BUILD_BACKEND=make with income absent.",
+      "candidate_rows": 1810,
+      "baseline_rows": 14740,
+      "candidate_waves": [
+        "2011-12"
+      ],
+      "baseline_wave_count": 8,
+      "cause": "The inherited make backend bypasses coverage validation and mtime-skips the new prerequisite-free wrapper targets; get_dataframe then consumes valid but partial raw siblings.",
+      "requested_fix": "Pin LSMS_BUILD_BACKEND=dvc during public sibling materialization in income.py and restore its prior environment state in finally; retain the raw arithmetic."
+    }
+  ],
+  "checks": {
+    "focused_tests_passed": 19,
+    "exact_writer_frame_pairs_rechecked": 14,
+    "official_order_steps_repeated": 13,
+    "order_step_failures": 0,
+    "first_income_default_cold": "PASS",
+    "first_income_make_cold_MAKEFLAGS_j2": "PASS",
+    "partial_siblings_default_backend": "PASS",
+    "partial_siblings_make_backend": "FAIL on candidate; baseline PASS",
+    "feature_records": 11,
+    "feature_status_counts": {
+      "warn": 11
+    },
+    "feature_exact_normalized_match_to_writer": true,
+    "country_hash_inventory_count": 549,
+    "only_Uganda_hashes_changed": 28,
+    "framework_fingerprints_unchanged": 39
+  },
+  "frozen_proof": {
+    "head_before": "58ccfc2ca03644006a5ddcf6bd399de81a25a415",
+    "head_after": "58ccfc2ca03644006a5ddcf6bd399de81a25a415",
+    "tracked_file_count": 14851,
+    "tracked_byte_changes": [],
+    "git_status_porcelain": "",
+    "income_prior_arithmetic_ast_identical": true,
+    "nutrition_prior_arithmetic_ast_identical": true,
+    "l1_private_count": 588,
+    "l1_private_bytes": 483097209
+  },
+  "limits": [
+    "No broad suite or corpus rebuild",
+    "No FDC calls, raw acquisition, shared-cache edits or promotion",
+    "General arbitrary-stale Make bypass not investigated",
+    "Ethiopia source census remains diagnosis only; no Ethiopia live-build assertion",
+    "Amended mutable Uganda implementation outside this frozen review"
+  ],
+  "author": "Sue"
+}

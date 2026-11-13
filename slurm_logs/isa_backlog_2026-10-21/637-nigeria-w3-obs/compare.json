@@ -1,0 +1,81 @@
+{
+ "dev_index": [
+  "t",
+  "v",
+  "j",
+  "u"
+ ],
+ "branch_index": [
+  "t",
+  "v",
+  "j",
+  "u",
+  "obs"
+ ],
+ "dev_cols": {
+  "Price": "Float64",
+  "Derivation": "string"
+ },
+ "branch_cols": {
+  "Price": "Float64",
+  "Derivation": "string"
+ },
+ "branch_obs_dtype": "int64",
+ "branch_unique": true,
+ "per_round": {
+  "2011Q1": {
+   "dev_rows": 27104,
+   "branch_rows": 27104,
+   "branch_by_obs": {
+    "1": 27104
+   },
+   "frame_equal_after_dropping_obs": true
+  },
+  "2013Q1": {
+   "dev_rows": 27079,
+   "branch_rows": 27079,
+   "branch_by_obs": {
+    "1": 27079
+   },
+   "frame_equal_after_dropping_obs": true
+  },
+  "2016Q1": {
+   "dev_rows": 20562,
+   "branch_rows": 23153,
+   "branch_by_obs": {
+    "1": 17344,
+    "2": 5809
+   },
+   "dev_rows_with_obs1": 17344,
+   "dev_rows_obs2_only": 3218,
+   "dev_rows_unmatched": 0,
+   "dev_price_eq_branch_obs1": 17344,
+   "dev_price_eq_branch_obs2_only": 3218,
+   "derivation_equal": 20562,
+   "cells_both_obs": 2591,
+   "cells_both_obs_price_differs": 983,
+   "cells_both_obs_price_equal": 1608,
+   "differing_ratio_median": 1.25,
+   "differing_ratio_max": 21.43,
+   "rows_added": 2591,
+   "derived_rows_branch": 1,
+   "derived_rows_dev": 1
+  },
+  "2019Q1": {
+   "dev_rows": 31757,
+   "branch_rows": 31757,
+   "branch_by_obs": {
+    "1": 31757
+   },
+   "frame_equal_after_dropping_obs": true
+  },
+  "2024Q1": {
+   "dev_rows": 30064,
+   "branch_rows": 30064,
+   "branch_by_obs": {
+    "1": 30064
+   },
+   "frame_equal_after_dropping_obs": true
+  }
+ }
+}

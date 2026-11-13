@@ -1,0 +1,177 @@
+Independent adversarial review -- Uganda GH #1062
+Sue, 2026-10-21
+Verdict: NEEDS_FIX
+
+Reviewed frozen detached tree:
+  /local/job40255479/worktrees/isa-review-1062
+  58ccfc2ca03644006a5ddcf6bd399de81a25a415
+Against:
+  f8d236694c26fe9e709c5548f02c70f74ea72c33
+No mutable Uganda source was reviewed. A subsequent amendment requires a
+separate review.
+
+P1 -- All-wave Make-backend income can silently consume partial siblings
+
+Location: lsms_library/countries/Uganda/_/income.py:20
+Related: lsms_library/countries/Uganda/_/Makefile:65 and :77
+Ledger anchor: sections 3/4 require framework-authoritative, verified raw
+operands. A one-wave cache is valid for that wave, but cannot satisfy an
+all-wave income request.
+
+Trigger, from a private physical cache copy with the three country outputs
+initially absent (wave caches may be present):
+
+  import os, lsms_library as ll
+  uga = ll.Country('Uganda')
+  os.environ['LSMS_BUILD_BACKEND'] = 'dvc'
+  uga.earnings(waves=['2011-12'])
+  uga.enterprise_income(waves=['2011-12'])
+  os.environ['LSMS_BUILD_BACKEND'] = 'make'
+  result = uga.income()  # Requests every Uganda wave.
+
+Frozen candidate returns 1,810 x 1 and only t=2011-12. Both source country
+parquets keep their one-wave coverage and byte contents. The expected
+all-wave answer is 14,740 x 1 over eight waves: 12,930 rows are missing.
+The identical baseline sequence returns 14,740 x 1 over all eight waves,
+and passes exact frame equality against the held full-income evidence.
+
+Cause: income's new public sibling calls inherit LSMS_BUILD_BACKEND=make.
+That route reaches run_make_target rather than the coverage-aware read gate.
+The new wrapper targets have no raw-wave prerequisites; their dvc-pinned
+recipes are skipped because the existing partial targets are newer than
+panel_ids.json/updated_ids.json. Thus the pin inside the recipe never runs.
+The following get_dataframe reads the partial raw inputs and the unchanged
+arithmetic correctly computes the wrong requested coverage. The subprocess
+trace shows no wrapper Python subprocess was launched for either sibling.
+
+This is a demonstrated regression under an ordinary valid cache state,
+without a fabricated stale hash, input mutation, or acquisition. The official
+order sweep misses it because its Make tests remove the requested sibling
+first, and its subset tests use full warm caches with the default backend.
+
+Requested correction, agreed by dispatcher: explicitly pin dvc while income
+materializes its inputs through the public API; restore the inherited
+environment in finally, including the originally-unset case. Continue reading
+the verified raw caches and preserve the arithmetic. Add an integration
+regression for the combined partial-sibling/Make-income sequence.
+
+Direct evidence:
+  subset-make-result.json -- candidate 1,810 rows, one wave
+  subset-make-baseline-result.json -- baseline 14,740 rows, eight waves
+  subset-make-subprocess.jsonl -- candidate wrapper recipes skipped
+  subset_make.py / subset_make_baseline.py -- runnable bounded reproductions
+
+Checks completed
+
+1. Nineteen focused tests passed independently with two loadfile workers:
+   tests/test_gh1062_uganda_sibling_writes.py
+   tests/test_gh772_uganda_earnings_shape.py
+   Existing numeric assertions remain intact; only the materialization IO
+   stub was extended. The new tests exercise real script arithmetic.
+
+2. Repeated all 13 writer order controls on another physical candidate L2
+   copy, asserting the resulting records. All preserve watched sibling
+   bytes, mtime, hash and coverage; requested outputs are stamped. Includes
+   alternating FCT/nutrition, forced requested rebuilds, both Make wrapper
+   builds, and warm default-backend subset serves.
+
+3. Income as FIRST request with both source country AND wave parquets
+   absent passes on default and inherited Make backends, with MAKEFLAGS=-j2.
+   Both create verified all-wave raw siblings; income is exactly identical
+   to the baseline and candidate held raw/served frames. Every other existing
+   L2 file remains byte/mtime/metadata identical. No recursion occurred.
+
+4. A separate default-backend first income call correctly expands valid
+   one-wave earnings and enterprise caches to all-wave coverage; its answer
+   and raw operands match exactly. The corresponding inherited Make case
+   is the sole new failing control described above.
+
+5. Independently compared all 14 baseline/candidate raw and served evidence
+   frame pairs with check_exact=True and an additional attrs equality check.
+   Values, IDs, index/column ordering, names and dtypes agree. Raw source
+   operands use (t,i) and id_converted=True; finalized earnings/enterprise
+   answers add/reorder v. Income's existing raw/final ID-flag behavior is
+   preserved on the successful paths. No finalized source values are used
+   as income operands.
+
+6. Independently rechecked the 549-country-table inventory: only 28 Uganda
+   hashes change; all 39 framework fingerprints remain equal. Recomputed all
+   28 frozen Uganda hashes and all 39 frozen framework fingerprints.
+   AST comparisons, removing only the new routing nodes/selector wrappers,
+   prove the original income and nutrition arithmetic is identical.
+
+7. Re-ran the Uganda Feature audit for earnings, enterprise_income, income,
+   fct and nutrition on a physical warm cache copy. Its 11 warning records
+   exactly match the writer audit; no new finding. The skill-index audit
+   enumerates all 15 listed hand-authored skills.
+
+8. Frozen-tree proof: all 14,851 tracked regular-file/symlink-target contents
+   SHA-256 match the before manifest. HEAD remains 58ccfc2; git status is
+   clean. No tracked edits, git mutations, commits, GitHub writes, DVC CLI,
+   shared-cache writes/deletions, fixture changes or dependency changes.
+   The private L1 copy still contains 588 files / 483,097,209 bytes.
+
+Reproduction commands and environment
+
+Interpreter: /local/job40255479/venv_img/bin/python
+Frozen cwd: /local/job40255479/worktrees/isa-review-1062
+Set PYTHONPATH to that exact checkout and this report directory's guard/;
+set LSMS_COUNTRIES_ROOT to its lsms_library/countries. Every runner asserts
+package/config realpaths. Use a dedicated physical L2 root for each scenario,
+with only the private L1 copy shared between these review scenarios.
+
+Pinned: PYTHONDONTWRITEBYTECODE=1, OPENBLAS_NUM_THREADS=1,
+OMP_NUM_THREADS=1, MKL_NUM_THREADS=1, LSMS_BUILD_WORKERS=1.
+The reproducer, baseline comparison, order sweep and Feature audit also pin
+LSMS_MAKE_JOBS=1. Initial first-request controls used Make's default -j16
+ceiling with one selected wave target at a time; the wave build worker count
+was one. Their logs preserve the invocation details.
+The external sitecustomize guard blocks outbound socket connections and
+DVC CLI dispatch. It is inherited by build subprocesses.
+
+Focused tests:
+  python -m pytest tests/test_gh1062_uganda_sibling_writes.py \
+    tests/test_gh772_uganda_earnings_shape.py -n 2 --dist=loadfile \
+    -p no:cacheprovider --basetemp=<review>/pytest-tmp -q
+  Output: pytest.log
+
+Cold/default-partial controls (environment setup is inside run_cases.py):
+  python <review>/run_cases.py default-cold
+  python <review>/run_cases.py make-cold
+  python <review>/run_cases.py subset
+
+Partial/Make regression, with distinct LSMS_DATA_DIR per revision:
+  python <review>/subset_make.py            # exit 1 on frozen candidate
+  python <review>/subset_make_baseline.py   # exit 0 on f8d236694
+
+Order sweep, EVIDENCE_OUT=<review>/orders-evidence:
+  python slurm_logs/isa_backlog_2026-10-21/1062/verify_orders.py
+  Output: orders-evidence/orders-summary.json; orders.log
+
+Feature audit:
+  python bench/feature_audit/scan.py \
+    --features earnings enterprise_income income fct nutrition \
+    --countries Uganda --out <review>/feature-audit.jsonl
+
+Remaining files:
+  validation.json -- structured verdict/counts/limits
+  evidence-independent.json -- exact comparisons and hash checks
+  frozen-before.json / frozen-after.json -- byte-level frozen-tree proof
+  finalize_review.py -- AST/invariant/proof checks
+
+Limits
+
+No broad/full suite or corpus rebuild was run. No live FDC requests or raw
+acquisition; FCT CSVs and already-held L1 inputs suffice. No scientific inputs,
+API credentials, fixture fingerprints or tolerance policy were changed.
+General arbitrary-stale Make behavior was not investigated. Ethiopia's
+source-only census remains diagnosis-only; this review makes no live-build
+or live-corruption claim for Ethiopia or other countries. GH #1078 remains
+unproven. The approved amended implementation is outside this frozen verdict.
+
+Operational exception: an unchanged credential-bearing diff context line was
+inadvertently displayed during the initial source read. The dispatcher was
+informed immediately. Its literal value was not repeated or saved in these
+reports/scripts, and subsequent reads redact credential-bearing lines.
+
+Sue

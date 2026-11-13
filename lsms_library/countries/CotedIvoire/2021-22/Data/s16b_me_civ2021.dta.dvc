@@ -1,0 +1,5 @@
+outs:
+- md5: 64063dbff5fe1713cf0832f7349b4682
+  size: 12368204
+  hash: md5
+  path: s16b_me_civ2021.dta

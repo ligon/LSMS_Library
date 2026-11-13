@@ -12,27 +12,18 @@ apply ``id_walk`` here; the framework runs it in ``_finalize_result`` on
 every read.  The ``(t, i, pid)`` index is unique within each wave
 (``_finish_people_last7days`` collapses to one row per individual), so no
 rows are lost to the framework's canonical-index de-dup collapse.
+
+``niger.concat_wave_parquets`` discovers registered logical waves and checks
+their actual native-script/YAML declarations before output access (GH #1287).
+Undeclared waves skip; declared missing/unreadable outputs fail before a
+country write (GH #1123). Make-producer routing is a separate boundary; see
+the helper's docstring and the country ledger.
 """
-import pandas as pd
+from lsms_library.local_tools import to_parquet
+from niger import concat_wave_parquets
 
-from lsms_library.local_tools import get_dataframe, to_parquet
 
 
-WAVES = ['2011-12', '2014-15', '2018-19', '2021-22']
-
-pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/people_last7days.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired for people_last7days (no .py script / no parquet).
-        # DVC raises PathMissingError here, not FileNotFoundError.
-        continue
-    pieces.append(df)
-
-assert pieces, 'people_last7days: no wave-level parquets found'
-
-p = pd.concat(pieces)
+p = concat_wave_parquets('people_last7days')
 
 to_parquet(p, '../var/people_last7days.parquet')

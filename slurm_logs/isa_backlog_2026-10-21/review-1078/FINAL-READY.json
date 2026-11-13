@@ -1,0 +1,86 @@
+{
+  "status": "PASS_FROZEN_QUIESCENT",
+  "source_pins": {
+    "ledger_first": "695b57970c17fdaec5a3e63a8c0f283b29b86282",
+    "runtime": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+    "final_docs": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+    "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+  },
+  "all_required_review_gates_complete": true,
+  "full_suite_qualified": true,
+  "active_private_consumers": [],
+  "time_utc": "2026-10-21T23:28:26.328391+00:00",
+  "safe_allowlisted_exports": {
+    "REVIEW.org": {
+      "sha256": "ebaef07d10254fab681f9e0e6c5e2c487306ce3a328ff32c66b6b45a1256ff1e",
+      "bytes": 14667,
+      "mode": 420
+    },
+    "verdict.json": {
+      "sha256": "1073fc99679a2099a1f2122f0b04f8b70a984fdb072312e955c7e764dd6e46cf",
+      "bytes": 15916,
+      "mode": 420
+    },
+    "REPRODUCE.md": {
+      "sha256": "739f7871c66ca6f5fe9473c1ad4aae3c919c08bed61d4bc01eb5b2c959953de1",
+      "bytes": 4423,
+      "mode": 420
+    },
+    "freeze-proof.json": {
+      "sha256": "34963c074cf5f9465c8a5b90e30adcddd17754a5a66b0aa5effd3bdd9ff52b37",
+      "bytes": 2586,
+      "mode": 420
+    },
+    "matched-stage-proof.json": {
+      "sha256": "e39d2329c7896e36f4599703e88e5d93da52fc67935a4eefcb8a6f9ee9f141b3",
+      "bytes": 523,
+      "mode": 384
+    },
+    "source-oracle.json": {
+      "sha256": "222563e955ab83613649eb7ae481269e79de3fb7c10787687f1cc9ef258aa96b",
+      "bytes": 398,
+      "mode": 420
+    },
+    "writer-proof.json": {
+      "sha256": "a32bbaadba62313cd183e38a4b93df8cbc67ac71fac417b119fcd85e98415f3d",
+      "bytes": 871,
+      "mode": 420
+    },
+    "baseline-race-proof.json": {
+      "sha256": "766239704ea61950d26c91ba7bcd95bbd31527e0fc79309c3151212197c19f73",
+      "bytes": 513,
+      "mode": 420
+    },
+    "serial-proof.json": {
+      "sha256": "765c10d0b086dcb0d959474fc0c42638d915e8dd9c7c283d22f46ecfac29474a",
+      "bytes": 244,
+      "mode": 420
+    },
+    "scanner-proof.json": {
+      "sha256": "a8a4d5916672b505874c129384d60d4a62f1a3694a77c97c4e3684cc15292909",
+      "bytes": 1700,
+      "mode": 420
+    },
+    "hash-scope.json": {
+      "sha256": "f4d81f20ed80f90dd101629dcc1c4bdedbc4d68b6cce6daf502df4d91b943d11",
+      "bytes": 505,
+      "mode": 420
+    },
+    "docs-descendant-proof.json": {
+      "sha256": "53ad6c8b87f070ec7b886b29748ff2966ffe3d487bf06613a167c90f32ed82ba",
+      "bytes": 1306,
+      "mode": 384
+    },
+    "warning-accounting.json": {
+      "sha256": "2f2d6014b5066fdb04ebd43791a0875a0248646eaee500a00132ef042e34c2ef",
+      "bytes": 1525,
+      "mode": 384
+    },
+    "focused-from-full.json": {
+      "sha256": "c9f9a79fd39b002bee0ddffeaac2a193581c47e05e1b9985958f656d43ddf97c",
+      "bytes": 221,
+      "mode": 384
+    }
+  },
+  "all_other_frames_IDs_sources_warnings_logs_traces_private": true
+}

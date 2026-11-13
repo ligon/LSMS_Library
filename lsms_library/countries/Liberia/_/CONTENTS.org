@@ -359,3 +359,21 @@ normalization, survey value, cache or baseline was changed.  The finding is
 limited to this table and does not explain the separate missing-wave date
 coverage issue in other countries under GH #798.  Aggregate proof and
 reproduction scripts are in the release =dtype-roundtrip= evidence bundle.
+
+* 2026-11-04 -- HIES 2014-15 and 2016-17 held and registered, not wired
+
+Two national surveys, from WB =central= (2563 and 2986): 28 files, 132 MB; 49 files,
+233 MB; with BIDs, questionnaires and reports in =Documentation/=.  =_/data_info.yml=
+declares nothing in either wave, so no table moves.
+
+- *A different survey from 2018-19.*  That wave is the forest-proximate NHFS; these are
+  LISGIS's national Household Income and Expenditure Surveys.  Their files share no
+  layout with it (=HH_A.dta= against =Household/sect2_public.dta=), so the 2018-19 config is
+  not a template.  Pooling the country's waves would span two universes.
+- *2016-17 was a re-run.*  The BID says it uses the 2014 design, so the same 836-EA
+  structure; whether any EA or household repeats is not checked here.
+- *One catalog file is missing from the release.*  2986's list names =HH_R1=; the Stata zip
+  does not ship it.
+- *Size.*  24 file names are shared between the two HIES waves, and 512 of 809 of those
+  files' columns keep their names, so the 2014-15 and 2016-17 wiring can share a template.
+  All tables are new work: no block carries over from 2018-19.

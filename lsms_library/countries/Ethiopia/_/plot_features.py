@@ -21,19 +21,24 @@ import json
 
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, id_walk, to_parquet
-from ethiopia import Waves
 
 
+country = Country('Ethiopia', preload_panel_ids=False)
 pieces = []
-for t in Waves.keys():
-    fn = f'../{t}/_/plot_features.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not yet wired / parquet not built (DVC raises
-        # PathMissingError here, not FileNotFoundError).
+seen_folders = set()
+for t in country.waves:
+    wave = country[t]
+    folder = wave.wave_folder
+    if folder in seen_folders:
         continue
+    seen_folders.add(folder)
+    if 'plot_features' not in wave.data_scheme:
+        continue
+    # A failed declared output is not a legitimate table retirement.
+    fn = f'../{folder}/_/plot_features.parquet'
+    df = get_dataframe(fn)
     pieces.append(df)
 
 assert pieces, "plot_features: no wave-level parquets found"

@@ -1,0 +1,317 @@
+{
+  "verdict": "PASS",
+  "boundary": "Only Malawi two raw null derived-food registrations removed; broader GH218 remains open.",
+  "source_pins": {
+    "candidate": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+    "runtime_tests": "299fb8675e785fd392b1259ab1f4fb535eb69c34",
+    "actual_parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+  },
+  "actual_prebuild_scope": {
+    "status": "PASS_MEASURED_BEFORE_REBUILD",
+    "API_total": 549,
+    "API_changed": 26,
+    "other_country_exact": 523,
+    "changed_keys": [
+      "Malawi/sample",
+      "Malawi/cluster_features",
+      "Malawi/household_roster",
+      "Malawi/individual_education",
+      "Malawi/subjective_well_being",
+      "Malawi/food_security",
+      "Malawi/panel_ids",
+      "Malawi/housing",
+      "Malawi/food_acquired",
+      "Malawi/interview_date",
+      "Malawi/shocks",
+      "Malawi/assets",
+      "Malawi/plot_features",
+      "Malawi/food_coping",
+      "Malawi/months_food_inadequate",
+      "Malawi/crop_production",
+      "Malawi/plot_inputs",
+      "Malawi/livestock",
+      "Malawi/anthropometry",
+      "Malawi/plot_labor",
+      "Malawi/people_last7days",
+      "Malawi/community_prices",
+      "Malawi/food_expenditures",
+      "Malawi/food_prices",
+      "Malawi/food_quantities",
+      "Malawi/household_characteristics"
+    ],
+    "framework_total": 39,
+    "framework_changed": 0,
+    "Malawi_wave_total": 97,
+    "Malawi_wave_changed": 0,
+    "raw_offenders_before": [
+      {
+        "country": "Malawi",
+        "table": "food_prices",
+        "entry": null
+      },
+      {
+        "country": "Malawi",
+        "table": "food_expenditures",
+        "entry": null
+      }
+    ],
+    "raw_offenders_after": [],
+    "public_names_order_Feature_discovery_materialization_exact": true,
+    "production_exact_two_null_key_tail_deletions": true,
+    "candidate_runtime_tests_exact299_except_CONTENTS": true,
+    "no_source_API_build_before_gate": true,
+    "current_Malawi_CONTENTS_complete_read_lines": 3090,
+    "Niger_full_read_carry_blob": "f4e280252f00640d265fbf63cfcf82072c2e47c8"
+  },
+  "tests": [
+    {
+      "side": "candidate",
+      "selection": "focused",
+      "tests": 51,
+      "passed": 51,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failed_names": []
+    },
+    {
+      "side": "base",
+      "selection": "parent",
+      "tests": 2,
+      "passed": 1,
+      "failed": 1,
+      "errors": 0,
+      "skipped": 0,
+      "failed_names": [
+        "test_runtime_derived_tables_are_not_raw_registrations"
+      ]
+    }
+  ],
+  "strict_v2_artifact_reassessment": {
+    "comparator": "common_strict.py",
+    "strict_frame_checks": 209,
+    "unique_ordered_operand_pairs": 177,
+    "rows_compared_including_repeated_controls": 101256963,
+    "all_exact": true,
+    "old_common_and_original_check_results_unchanged": true,
+    "API_source_and_pytest_replay": false
+  },
+  "strict_comparator_negative_controls": {
+    "comparator_sha256": "6f984078f00b0aa4a3e4561c3218070877b65c31111fda1eb16a46d5fe721f11",
+    "new_controls": [
+      {
+        "case": "nullable_Float64_tiny",
+        "legacy_accepts": true,
+        "strict_rejects": true,
+        "difference": 1.000088900582341e-12
+      },
+      {
+        "case": "nullable_Float64_nextafter",
+        "legacy_accepts": true,
+        "strict_rejects": true,
+        "difference": 2.220446049250313e-16
+      },
+      {
+        "case": "object_missing_None_vs_nan",
+        "strict_rejects": true
+      }
+    ],
+    "original_basic_controls": 8,
+    "dtype_controls": 4,
+    "all_new_and_repeated_synthetic_controls": 15,
+    "no_API_source_or_pytest_replay": true
+  },
+  "legacy_comparison_checks_historical_not_sufficient_alone": {
+    "cold": 57,
+    "warm": 36,
+    "cache": 24,
+    "feature-cold": 15,
+    "feature-warm": 24,
+    "cli": 3
+  },
+  "source_preparation": {
+    "held_DTA_sources": 19,
+    "declared_size_absences": 0,
+    "raw_physical_copies_two_layouts_four_roots": 152,
+    "healthy_Niger_files_per_root": 13,
+    "all_staged_copies_protected": 204,
+    "origins": 32,
+    "terminal_gates_before_decode_API_unpickle": true
+  },
+  "Malawi_rows": {
+    "food_acquired": {
+      "all": 971531,
+      "2013-14": 81680
+    },
+    "food_expenditures": {
+      "all": 681980,
+      "2013-14": 59264
+    },
+    "food_prices": {
+      "all": 680400,
+      "2013-14": 59180
+    },
+    "food_quantities": {
+      "all": 971028,
+      "2013-14": 81675
+    }
+  },
+  "Feature_rows_both_default_and_None": {
+    "food_acquired": 1211408,
+    "food_expenditures": 846994,
+    "food_prices": 845427,
+    "food_quantities": 1210883
+  },
+  "scanner": {
+    "records_per_head": 205,
+    "statuses": {
+      "warn": 200,
+      "pass": 3,
+      "fail": 2
+    },
+    "full_multiset_exact": true,
+    "full_order_exact": true,
+    "DATA_receipt_deltas": {
+      "base": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      },
+      "candidate": {
+        "added": [],
+        "deleted": [],
+        "modified": []
+      }
+    },
+    "failures": [
+      {
+        "feature": "food_prices",
+        "check": "assembly_nonempty",
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "status": "fail"
+      },
+      {
+        "feature": "food_prices",
+        "check": "assembly_nonempty",
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "status": "fail"
+      }
+    ],
+    "warning_scope": "Unmodified harness preserves full finding/message records, not full category/file/line structured warning events. Parent endpoint warnings are accounted separately."
+  },
+  "warning_accounting": {
+    "endpoint_pairs": 67,
+    "occurrences_per_head": 353,
+    "raw_category_message_equal_pairs": 60,
+    "raw_full_four_field_equal_pairs": 4,
+    "qualified_full_four_field_equal_pairs": 67,
+    "qualified_full_order_equal_pairs": 67,
+    "raw_Make_path_inequality_kept": true,
+    "per_call_child_stderr_absent_outer_FD_logs_retained": true
+  },
+  "protection": {
+    "protected_review_sources": [
+      {
+        "label": "base",
+        "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+        "tracked_entries": 14880,
+        "full_tracked_bytes_modes_literal_symlinks_head_clean_exact": true
+      },
+      {
+        "label": "candidate",
+        "head": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+        "tracked_entries": 14889,
+        "full_tracked_bytes_modes_literal_symlinks_head_clean_exact": true
+      },
+      {
+        "label": "author",
+        "head": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+        "tracked_entries": 14889,
+        "full_tracked_bytes_modes_literal_symlinks_clean_exact_Git": true,
+        "matches_separate_review_checkout": true
+      },
+      {
+        "label": "author-parent",
+        "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+        "tracked_entries": 14880,
+        "full_tracked_bytes_modes_literal_symlinks_clean_exact_Git": true,
+        "matches_separate_review_checkout": true
+      },
+      {
+        "label": "protected-Uganda849",
+        "head": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+        "tracked_entries": 14912,
+        "full_tracked_bytes_modes_literal_symlinks_clean_exact_Git": true,
+        "matches_separate_review_checkout": false
+      },
+      {
+        "label": "protected-Uganda849-parent",
+        "head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+        "tracked_entries": 14893,
+        "full_tracked_bytes_modes_literal_symlinks_clean_exact_Git": true,
+        "matches_separate_review_checkout": false
+      }
+    ],
+    "author_actual_frozen_OS_modes_mtimes_verified_against_its_own_final_snapshot": true,
+    "protected_frozen_manifests": [
+      {
+        "root": "/local/job40255479/control/isa-backlog-20261021/Malawi/218",
+        "manifest_sha256": "b60023a579e8850a1ba2d1d2a002ae2871d01be872c25f8708f8dc6198cb234f",
+        "entries": 815,
+        "full_bytes_size_mode_mtime_exact": true
+      },
+      {
+        "root": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-fix",
+        "manifest_sha256": "eb0e0d07305d820b05f6d34a4ef313f4ef5c18130150a95d8d66bd54655beb84",
+        "entries": 1858,
+        "full_bytes_size_mode_mtime_exact": true
+      }
+    ],
+    "copy_origins_exact": 32,
+    "staged_source_and_healthy_copies_exact": 204,
+    "all_source_MD5s_exact": 19,
+    "network_attempts": 0,
+    "guard_events": {},
+    "exact_ignored_metadata_links_preserved": true,
+    "no_tracked_edits_or_Git_ref_mutations_by_reviewer": true
+  },
+  "CLI_stage_qualification": {
+    "actual_calls": 6,
+    "all_exit0": true,
+    "matched_API_prewrite_and_independent_existing_serialization_oracles_rechecked_strictly": true,
+    "same_stage_Arrow_footers_schema_bytes_exact": true,
+    "API_vs_artifact_full_equality": false,
+    "v_API": "StringDtype(storage=pyarrow,na_value=pd.NA)",
+    "v_generic_artifact": "StringDtype(storage=pyarrow,na_value=nan)",
+    "v_nulls_each_case": 0,
+    "index_codes_values_order_and_numeric_cells_preserved": true,
+    "recursive_attrs_type_differences": [
+      "population",
+      "recall"
+    ],
+    "no_normalization": true
+  },
+  "limits": [
+    "No whole suite/corpus/other Malawi output rebuild.",
+    "Healthy Niger is current full-coverage held-warm only, not source-cold.",
+    "Make food country builder remains broken and invalid1900 eviction remains.",
+    "Original first assembly expected operand absent; later artifact-only reconstructions are new evidence.",
+    "Legacy precision guarantees qualified by mounted pandas gap; separate strict209-pair reassessment supplies current numerical proof.",
+    "Original metadata/artifact checker failures and absent per-call child stderr remain qualified."
+  ],
+  "no_production_test_Git_GitHub_edits": true,
+  "no_API_source_pytest_replay_after_comparator_announcement": true,
+  "strict_historical_diagnostic_and_cross_stage_classifications": {
+    "historical_diagnostic_pairs": 16,
+    "diagnostic_equal": 14,
+    "diagnostic_wrong_grain_expected_rejections": 2,
+    "intentional_CLI_cross_stage_pairs": 6,
+    "intentional_CLI_expected_rejections": 6,
+    "original_first_assembly_expected_operand": "Absent; not re-created or claimed original.",
+    "all_classifications_confirmed": true
+  }
+}

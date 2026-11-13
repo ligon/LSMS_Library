@@ -1,0 +1,5 @@
+outs:
+- md5: 1fd352941e7ccb28d8f71ab008ca1d4b
+  size: 640512
+  hash: md5
+  path: coicop_english2013.xls

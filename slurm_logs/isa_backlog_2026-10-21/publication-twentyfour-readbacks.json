@@ -1,0 +1,93 @@
+{
+  "checked_at_UTC": "2026-10-22T07:02:31.852104+00:00",
+  "exact_readbacks": [
+    {
+      "tag": "PR1207",
+      "number": 1207,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1207",
+      "state": "open",
+      "head_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "base_sha": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "title": "Uganda: carry reported kg factors at native production grain",
+      "body_readback_exact": true,
+      "body_sha256": "55a1f67c8ecf2273a72f100ed96e14d840d8cee237081ef549d948e51127deb8"
+    },
+    {
+      "tag": "PR1208",
+      "number": 1208,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1208",
+      "state": "open",
+      "head_sha": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "title": "Malawi: remove obsolete raw derived-food registrations",
+      "body_readback_exact": true,
+      "body_sha256": "a48779526e08e763429545bd8abe2bd69b7e04fc9ce3341441dd35434d34fa8e"
+    },
+    {
+      "tag": "Campaign1170",
+      "number": 1170,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1170",
+      "state": "open",
+      "head_sha": "bc41dc0713967fdf8fe7b03ae588793d7e13dced",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "title": "LSMS-ISA backlog: inventory, precise residuals and execution evidence",
+      "body_readback_exact": true,
+      "body_sha256": "bfb2b40a6c50279b7a0041b929d4b24a4eb8a54f0ee77d11bad08c898205da3b"
+    },
+    {
+      "tag": "Issue849",
+      "number": 849,
+      "url": "https://github.com/ligon/LSMS_Library/issues/849",
+      "state": "open",
+      "title": "Uganda: wire reported kg factors in the remaining five waves after preserving native production records",
+      "body_readback_exact": true,
+      "body_sha256": "9a1e0015d219db36267c9b0d877ea632e61d852e02cd391605d7bfe69d363a96"
+    },
+    {
+      "tag": "Issue218",
+      "number": 218,
+      "url": "https://github.com/ligon/LSMS_Library/issues/218",
+      "state": "open",
+      "title": "Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)",
+      "body_readback_exact": true,
+      "body_sha256": "33207e29ed2764a74da716247de9a9b75d610f03b5b172a53b326295495c083f"
+    },
+    {
+      "tag": "Issue1206",
+      "number": 1206,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1206",
+      "state": "open",
+      "title": "Campaign validation: exact frame comparison misses nullable Float64 differences",
+      "body_readback_exact": true,
+      "body_sha256": "92be5ccf368aec5b60dfe14edd1608908d4987707b58d0b1f39e811d92de80fd"
+    },
+    {
+      "tag": "Issue1196",
+      "number": 1196,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1196",
+      "state": "open",
+      "title": "Cold/warm index StringDtype drift: Niger food_acquired and Uganda cluster_features",
+      "body_readback_exact": true,
+      "body_sha256": "f76ed02517b34e46436c60db403f6d6088589b9f0f4d300648b083833be42879"
+    },
+    {
+      "tag": "Issue1209",
+      "number": 1209,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1209",
+      "state": "open",
+      "title": "Malawi: country food_acquired Make builder expects retired wave columns",
+      "body_readback_exact": true,
+      "body_sha256": "9e8bfee69359f712730c9b289fa89b975e51428d27381d470ddbeca0d35fd040"
+    },
+    {
+      "tag": "Issue1210",
+      "number": 1210,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1210",
+      "state": "open",
+      "title": "Malawi: invalid food wave request evicts native caches before raising",
+      "body_readback_exact": true,
+      "body_sha256": "045b4cd810b1b20ae6cb5aa455118db6a1e1c2f4384d2aabbe11c178d612f398"
+    }
+  ],
+  "public_implementation_merges": 0
+}

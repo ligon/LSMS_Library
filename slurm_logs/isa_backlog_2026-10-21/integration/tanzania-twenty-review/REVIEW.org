@@ -1,0 +1,167 @@
+#+TITLE: Independent bounded GLOBAL20 Tanzania composition review
+#+AUTHOR: Sue (GPT-6)
+
+* Verdict and exact increment
+PASS for the bounded functional Tanzania country-builder retirement increment at =de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2= against actual19 =2566a3e490c0aefe03ab31d538d7d04e9b77c77e=, with the populated child-log history limitation below.
+This is an independently measured twenty-increment result, not an inherited leaf PASS or unrestricted twenty-change validation.
+Root acceptance and publication are separate actions; no public merge or issue closure is performed.
+
+The exact nine changed paths, Git blobs and modes match accepted leaf =fa457f90edbedfd7282eaf988c8231e4e87ba082= versus actual PR1185 =e75be9c56fa6c318ce32cea5a8be6d448578bed1=.
+Production removes only the45-line Tanzania country concatenator and original Make145--149 five-line block.
+Every other Make byte, native wave script, helper, field binding, own village price/basis, eligibility, variety/Description, units, ID, schema/materialize declaration, crosswalk, registry and framework stays exact.
+PR1185's408 plot-input replacements remain prior proof plus exact runtime/test identity; no agriculture source or plot-input output was rebuilt.
+The ledger =.coder/ledger/1091-tanzania-community-builder.md= and standing/backlog/cross-country/Feature-audit contracts anchor this review.
+
+* Country grounding and documentary tensions
+The complete current2170-line Tanzania CONTENTS was read including TODO/WAITING/LOGBOOK and its additive1091 note.
+UPHI is the Round4 descendant household back-cast into earlier rounds, whereas r_hhid identifies the interviewed-round household; neither key uniqueness nor an exact duplicate alone resolves that panel-grain decision.
+Live WAITING114 and its asserted wave-level lossless duplicate caveat remain.
+Four logical waves share2008-15;2014-15 pools Extended and Refresh,2019-20 follows Extended and2020-21 follows Refresh plus545 urban booster households.
+Those latter cohorts have no household overlap by design.
+Native community v is interview__key, distinct from household sample cluster v; the helper's redundant i==v shim is removed by existing framework normalization.
+Variety retains source item CODE and Description the questionnaire label.
+Own positive village cm_f063/cm_f062 per native cm_f061 is preserved; district-capital prices remain a separate instrument.
+No Quantity, household join, reducer, xwalk, screening, unit or grain policy is added.
+
+Quote contradictions as evidence, without deleting either dated layer.
+CONTENTS:735 calls linking "infeasible without a lossy, unverifiable crosswalk", while :879 calls the2020 cluster "BAKED INTO the community admin codes" and the subsequent section records an implemented confidence-tagged crosswalk.
+The unchanged helper's older region-only comment is the same historical tension, not authorization to repair that crosswalk here.
+The early panel section says "This inconsistency is unresolved"; the dated WAITING114 update narrows the food-specific residue after retirement of its old concatenator.
+The old quantity table says "MISSING", while its2026-09-08 LOGBOOK says "all three are present".
+The addendum at the actual file end already records the1091 route and coverage qualifications; no new tracked note is proposed by this review.
+
+Current complete Mali1332-line and Niger1626-line prior readings, tasks/history included, carry only after explicit SHA256 identity proof:
+Mali =56419d904c82721934072b230ee28553586d88a0d2ad7d79edfd87933b88d24d=;
+Niger =a25ce239aa77e8a0d9d1da9ff130eab8d8043830e74445f3f9019448cbc1df52=.
+Guidance/standing/backlog/cross-country/audit sources also match the previously fully read actual19 bytes.
+Mali retains two EACI passages/three native readings, variety CODE, i==v/drop-i, per-lot Price/lot-weight KG and129 positive-priced unresolved-unit exclusions; none is certified valid or newly admitted.
+Its corrected coverage-qualified empty paragraphs and1121 append note are exact.
+Niger retains ECVMA versus EHCVM,2014 EXTENSION, grappe v/i==v, Original Label versus Code,134 exact melted repeats excluded and30 late nonrepeat readings retained.
+Niger's helper says2018 "ships no community price file at all", whereas CONTENTS says2018 "DOES ship a cluster-grain community price file"; the unwired module and contradiction remain.
+Accepted788/840/1086 authority and native variety/visit/obs grain are not reopened.
+
+* Before-build inventories and physical gates
+Two separate exact-source processes measured549 API cells,39 framework fingerprints and14 relevant community-price wave cells BEFORE any rebuild.
+Exactly25 Tanzania API hashes move;524 others and all39 framework fingerprints stay exact.
+Only the six Tanzania wave hashes change; eight Mali/Niger wave hashes remain exact.
+The shared country Makefile causes a country-wide re-warm cost; the other24 Tanzania outputs were not rebuilt.
+A current hash classification alone is not a proof of healthy payload/coverage, particularly for deliberately negative parent fallback artifacts.
+
+Preparation terminal exit0 was independently confirmed before source decode/API/unpickle.
+Only two declared held Tanzania community modules and their actual sidecars were used.
+Both L1 layouts are private physical nlink1, nonsymlink copies with sidecar MD5, actual SHA/size/mode/mtime/distinct-inode receipts before access.
+There are176 raw copies including later gated populated roots.
+No unmanifested seed raw, acquisition, DVC CLI, shared cache mutation/clear/promotion, bypass, manual stamp or in-tree payload was used.
+
+Healthy controls are the frozen actual19 CURRENT/full-four-wave Mali155931 and Niger46043 country caches, physically copied after manifest/footer/current-hash/coverage gates at both source heads.
+They are not the leaf's standalone Mali40218 or an old pooled Feature.
+Two current19 public reference frames were separately physically receipt-gated before unpickling; all first/fresh public controls equal those references with complete typed attrs.
+All46043 Niger readings,30 late observations and the76 quantity masks43/32/1 are preserved by full current19 reference equality.
+The mask counts come from the accepted19 source oracle, not a new20 CS07 source census; nominal9999.9 remains the existing issue/docs ruling, with metadata double.
+No Mali/Niger source-cold or Make-pooled claim follows.
+Healthy components and pooled Feature are scoped to normal current default warm routing; Make Feature is Tanzania-only on the two gated sources.
+
+* Source oracle and complete frame evidence
+An independent raw-field oracle binds community/item/unit/quantity-basis/village-price fields directly; eligibility is not derived through candidate helper output.
+It retains3076 of5148 source rows in2019-20 and14623 of25376 in2020-21, all17699 eligible readings and52 varieties per wave.
+Each Price is its own positive village price divided by its own positive basis, not a cross-row reduction.
+The261/1281 multiple-variety coarse groups and243/1149 price-disagreeing coarse groups remain distinct.
+Source labels distinguish the village triple from the district-capital triple.
+Full raw and labelled source frames remain private.
+
+There are162 main full exact pairs,152 additional independently source-bound saved cache pairs, ten source-oracle/helper/writer/normalized-country pairs and eight rejected comparator mutations.
+These are enumerated groups, not a claim that every pair is disjoint.
+Frame/axis classes, unused levels, codes and their dtypes, order, masks, all column/index dtypes and recursively TYPED full attrs are checked.
+Immutable record _FIELDS declarations, presence and values are included.
+All numeric comparisons explicitly use check_exact=True,rtol=atol=0; no pandas default float tolerance, attr stripping or stored-frame normalization is used.
+Native six-level i==v, walked/normalized five-level, raw-country and public layers stay separate.
+Source-memory/native serialization dtype distinctions and the old Make-only missing id_converted attr remain explicit strict mismatches with preserved operands; authoritative Default is the matching reference.
+The eight controls reject nextafter payload/attrs changes, null/order/name/unused-level/dtype and scalar-type mutations.
+
+* Requests, current coverage and natural cache effects
+Each head completed20 target-cold,20 separate-process/new-object warm and20 populated requests:120 main matrix calls across both backends.
+The ten request sets include all six waves, both supported singletons, supported combined, each older singleton, older combined and mixed older/supported.
+Every per-call before/after endpoint and added/modified/deleted classification is saved BEFORE assertions.
+Candidate Default and Make return17699 for all/modern,3076 for2019/mixed,14623 for2020, and zero unsupported.
+The parent Make returns all17699 for every request; those wrong-wave results remain negative controls.
+Parent Default unsupported public results are zero, but its fallback builds unrelated modern native country rows and stamps unsupported-only coverage; raw-layer/manifest mismatch and public zero are separately measured.
+Matching fallback raw frames are compared to native concatenation, not forced to the normalized authoritative country layer.
+
+All Default fresh-warm and populated calls change zero data-root bytes/modes/mtimes.
+Candidate Make creates no country cache and preserves an existing genuinely current populated one byte/mode/mtime/footer exactly.
+Its ordinary requested-native rewrites and unrequested-sibling evictions are fully classified from saved endpoints, with no assumption that both sides exist.
+Fresh empty-target make-n confirms no country builder/target, while both native rules and actual all discovery remain.
+The generic older-folder dry-run still prints its recipe without proving an older community script/source exists; no such build is claimed.
+
+Empty representation is route/coverage dependent.
+Measured fresh/no-country-cache unsupported subsets use the existing factory/object Description; covered Default slices retain cached StringDtype Description and id_converted.
+Both serve zero rows.
+Actual singleton/mixed manifests and full-coverage populated operands are preserved; no universal claim is made for every partial-coverage miss or union rebuild.
+API attrs and writer JSON/container forms are not called identical; comparisons use actual matched API versus actual matched artifact stages.
+
+* Tests, Feature, CLI, scanner and warning scope
+Candidate27 new plus58 identical leaf-focused existing cases pass, zero FAIL/ERROR/SKIP.
+The unchanged27 new cases on actual19 produce20 meaningful assertion failures and seven passes, zero errors/skips or permission/fixture causes.
+Failures are one discovery,15 request cases, two wrong-country-cache cases and two populated-cache cases.
+The58 selection uses the same leaf declaration/assembly/duplicate-entry classes and GH1039 cases; unrelated later Niger sentinel cases are not silently added to an85 claim.
+Eleven existing held assertion bodies pass per head, separately from pytest collection and genuine requires_s3 deselections.
+The unmodified mounted API-audit entry point passes per head; no Poetry/dependency setup or broad suite was run.
+
+Actual argument-matched three-country Features contain219673 rows:155931 Mali+46043 Niger+17699 Tanzania, unique index and no row loss.
+Default currency='index' and explicit currency=None remain separate provenance; neither is inferred from the other.
+All first/fresh and parent/candidate full frames/typed attrs match; Tanzania-only Make Features match actual19 Default at the same arguments.
+These are warm comparator/pooled observations, not first source-cold multi-country builds.
+Sixteen actual CLI artifacts pass complete self-matched Arrow footer/schema/bytes controls; six additional matching cross-head artifacts equal actual19 Default bytes/footer/schema.
+Supported/unsupported API prewrite and writer postread stages remain distinct.
+Existing generic empty serialization and typed record-to-dict/container changes are qualified, without forced equality to a wrong stage.
+
+The unmodified phases1/2 scanner has five WARN records per head, zero FAIL/ERROR/SKIP: three legitimate native community tables without household i, declared sentinel alignment without row loss, and Tanzania's missing2020 population statement.
+The complete occurrences, typed records and JSONL bytes are exact across heads, with zero scanner data-root changes.
+There is no community_prices phase2 kwargs grid.
+
+All92 structured main-call category/full-message multiset fields are literally True and collectively asserted.
+There are176 structured main-call warning captures:24 UserWarning and24 PopulationHeterogeneityWarning occurrences in the capture census.
+File/line fields are preserved privately but no cross-checkout fileline equality is claimed.
+One hundred surviving known runtime logs contain zero parsed warning-header groups; that is not a claim of a complete child-warning trace.
+
+An own populated-child-log history gap narrows that evidence claim.
+The copied post-v2 driver used backend-only stdout/stderr names, so successive populated keys overwrote earlier per-key child log bytes/occurrences.
+The exact driver and surviving four backend logs remain; missing original bytes/occurrences are unavailable.
+Every per-key full frame, call argument/status, endpoint/delta and structured main-call warning is uniquely retained, so the functional/coverage conclusions have direct operands.
+No completed prefix was replayed to repair the log history, and no complete populated-child-log or populated-child-warning equality is claimed.
+Root was informed and separated this limitation from the bounded functional verdict.
+
+* Preserved stops and historical limits
+Three premature metadata gate/preparation attempts stopped on an absent terminal census receipt before staging/decoding/API; census exit0 and terminal scope were later independently read before resuming never-started preparation.
+A subsequent preparation stopped before any copy because the author's modern-layout source path was absent; its legacy layout was present.
+Versioned preparation-v2 uses the frozen independent leaf review's manifest-pinned two-layout sources and passes both terminals.
+Original scripts, four safe exception receipts and complete private logs remain; no source/expected-data/guard change or successful-prefix replay hides them.
+Two shell-only metadata stops also remain recorded: unavailable bare python exit127 and a missing hash-scope diagnostic cat exit1, before terminal preparation.
+No raw failure log/traceback was searched or printed; guarded diagnostics export only class/location/aggregate facts.
+Safe shell source/metadata inspection is not retroactively described as guarded; all preparation/import/unpickle/decode/API/test/artifact/freeze processes assert exact environment/guard identity inside unshare-rn.
+
+The original leaf normalized-eight-link snapshots, missing original partial aggregate byte/size/SHA history, seven surviving per-call operands and172 message files lacking every category/stack field remain at original pins.
+The accepted leaf and19 manifests were freshly rehashed here, not rewritten or replayed.
+Historical17 remains5148 PASS/4459 SKIP/13 FAIL/0 ERROR, including nine protected utime and four warning-glob failures, its docs-child Python-guard/mtime qualification and eight unrequested stale companions.
+Issue1196 remains the prior both-head food u StringDtype missing-sentinel residual; no food/source phase or full-suite repeat was performed for20.
+No unrestricted20/full-suite/other24 Tanzania-output/other-country source-cold claim follows.
+
+* Protection and release
+Final protection rechecks30085 tracked source endpoints across both exact heads, including literal symlinks, bytes, modes, mtimes/inodes, index/HEAD/clean state; no in-tree parquet exists.
+It rehashes8162 protected private payloads:2894 leaf author+2426 independent leaf+2842 accepted current19, plus control receipts.
+That is the direct protection scope; older accepted receipt chains remain pinned, not claimed as a new unbounded census.
+All176 physical raw copies, held originals/sidecars, healthy source/copies and44 final cache roots remain exact against their appropriate saved endpoints.
+The90 data-root parquets comprise22 current-hash country classifications,57 legitimate hashless natives and11 deliberately negative parent-Make hashless countries.
+Current-hash is a footer classification, not certification of the parent unsupported fallback payload/coverage.
+There are293 private parquets total:90 data-root,167 synthetic pytest-temp and36 source-writer/CLI controls; no blanket zero-private-parquet assertion is made.
+The guard records176 ordinary existing-directory probes, zero unexpected write denials and zero IP attempts.
+Only the exact two root-prepared ignored DVC tmp resolutions are write exceptions outside this private root.
+Numerical/build/Make threads are one; at most two explicit loadfile test workers were used.
+The final immutable manifest/READY pins all private payloads, actual checker sources, safe allowlist and zero consumers before release.
+No further API/source/test run is needed or authorized for sealing.
+
+Full frames, IDs, source fields, warnings, logs and traces remain private.
+Dedicated safe exports are the only release allowlist.
+No production, fixture, dependency, Git/ref/branch or GitHub mutation was performed by this reviewer.
+
+Sue

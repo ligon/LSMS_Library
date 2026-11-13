@@ -1,0 +1,5 @@
+outs:
+- md5: 539b71168e875b10e53eacfcc827eb28
+  size: 471224
+  hash: md5
+  path: coicop.dta

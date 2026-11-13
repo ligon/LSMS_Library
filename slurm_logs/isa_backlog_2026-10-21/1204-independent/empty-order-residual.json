@@ -1,0 +1,143 @@
+{
+  "issue": "GH1215",
+  "severity": "P2 observable empty-result column ordering",
+  "source": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "actual_parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "new_observable_changes": true,
+  "full_strict_result": "FOUR_FAIL",
+  "manual_normalization_or_promoting_named_field_equality_to_full_pass": false,
+  "cases": [
+    {
+      "label": "candidate-Default-Make/a/fresh-barren/public",
+      "left_rows": 0,
+      "right_rows": 0,
+      "status": "FAIL",
+      "left_columns": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "Unit_sold",
+        "Condition_sold",
+        "harvest_month",
+        "intercropped",
+        "KgFactor"
+      ],
+      "right_columns": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "harvest_month",
+        "intercropped",
+        "Unit_sold",
+        "Condition_sold",
+        "KgFactor"
+      ],
+      "component_status": {
+        "full_frame": "FAIL",
+        "complete_columns": "FAIL",
+        "complete_index": "PASS",
+        "complete_typed_attrs": "PASS"
+      },
+      "named_fields_dtypes_storage_masks_equal_narrower_only": true
+    },
+    {
+      "label": "Default-parent-candidate/s/populated-barren/public",
+      "left_rows": 0,
+      "right_rows": 0,
+      "status": "FAIL",
+      "left_columns": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "Unit_sold",
+        "Condition_sold",
+        "harvest_month",
+        "intercropped",
+        "KgFactor"
+      ],
+      "right_columns": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "harvest_month",
+        "intercropped",
+        "Unit_sold",
+        "Condition_sold",
+        "KgFactor"
+      ],
+      "component_status": {
+        "full_frame": "FAIL",
+        "complete_columns": "FAIL",
+        "complete_index": "PASS",
+        "complete_typed_attrs": "PASS"
+      },
+      "named_fields_dtypes_storage_masks_equal_narrower_only": true
+    },
+    {
+      "label": "Default-parent-candidate/b/cold-barren/public",
+      "left_rows": 0,
+      "right_rows": 0,
+      "status": "FAIL",
+      "left_columns": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "Unit_sold",
+        "Condition_sold",
+        "harvest_month",
+        "intercropped",
+        "KgFactor"
+      ],
+      "right_columns": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "harvest_month",
+        "intercropped",
+        "Unit_sold",
+        "Condition_sold",
+        "KgFactor"
+      ],
+      "component_status": {
+        "full_frame": "FAIL",
+        "complete_columns": "FAIL",
+        "complete_index": "PASS",
+        "complete_typed_attrs": "PASS"
+      },
+      "named_fields_dtypes_storage_masks_equal_narrower_only": true
+    },
+    {
+      "label": "candidate-Default-Make/b/after-all-barren/public",
+      "left_rows": 0,
+      "right_rows": 0,
+      "status": "FAIL",
+      "left_columns": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "Unit_sold",
+        "Condition_sold",
+        "harvest_month",
+        "intercropped",
+        "KgFactor"
+      ],
+      "right_columns": [
+        "Quantity",
+        "Quantity_sold",
+        "Value_sold",
+        "harvest_month",
+        "intercropped",
+        "Unit_sold",
+        "Condition_sold",
+        "KgFactor"
+      ],
+      "component_status": {
+        "full_frame": "FAIL",
+        "complete_columns": "FAIL",
+        "complete_index": "PASS",
+        "complete_typed_attrs": "PASS"
+      },
+      "named_fields_dtypes_storage_masks_equal_narrower_only": true
+    }
+  ]
+}

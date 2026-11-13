@@ -1,0 +1,12 @@
+{
+  "source": "/local/job40255479/control/isa-backlog-20261021/review-1078-unit-attribution/exact_artifacts.py",
+  "sha256": "27885c7fa967e37ce6a5adc6deb03f5d44b284865a4b2a1556908579a45eeb46",
+  "reused_functions": [
+    "dtype",
+    "frame",
+    "index",
+    "typed"
+  ],
+  "explicit_zero_tolerances": true,
+  "typed_declared_record_fields": true
+}

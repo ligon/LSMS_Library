@@ -1,0 +1,150 @@
+{
+  "sources": {
+    "ast-independent.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/ast-independent.py",
+      "mode": 384,
+      "mtime_ns": 1792673042906236128,
+      "bytes": 2699,
+      "inode": 56625319,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "cf82e442cbade7c61173962abd839f739c0b79a8c55cc5fc1114df4cbdf5e72b"
+    },
+    "entry.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/entry.py",
+      "mode": 384,
+      "mtime_ns": 1792672942088722176,
+      "bytes": 1419,
+      "inode": 56625311,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "3fed895cb1551232f93b183fdb3dbf17b846dea7358dad9ad2385208a8ca618a"
+    },
+    "hash-census.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/hash-census.py",
+      "mode": 384,
+      "mtime_ns": 1792673093564495798,
+      "bytes": 1136,
+      "inode": 56625324,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "fb216fbe2bc14a8bcc98f85b9cea5104cc29ef08b4c2c1a882291ec6ad76cc2e"
+    },
+    "identity.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/identity.py",
+      "mode": 384,
+      "mtime_ns": 1792672942088722176,
+      "bytes": 472,
+      "inode": 56625312,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "311e4d4cbeee1e383351282e60a0f97340314fbfb0d47a6095b7c9c17bc66c57"
+    },
+    "package.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/package.py",
+      "mode": 384,
+      "mtime_ns": 1792673455982352131,
+      "bytes": 6796,
+      "inode": 56625362,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "d850eb0585e853be79acf5740fc6f1f0bf5b9795df20ed75d613ea05d3086604"
+    },
+    "postexit-readonly.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/postexit-readonly.py",
+      "mode": 384,
+      "mtime_ns": 1792673455977352105,
+      "bytes": 911,
+      "inode": 56625361,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "d95be343eb9c8fd7841f6796681f54907c5d03ba74260155593c43766a1fdfc2"
+    },
+    "protect.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/protect.py",
+      "mode": 384,
+      "mtime_ns": 1792673042905236123,
+      "bytes": 3243,
+      "inode": 56625318,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "2d2b3c53f79f2edd7aa4ebdf84cd42f58e2428ca930f0542b65e7932e4108288"
+    },
+    "receipts.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/receipts.py",
+      "mode": 384,
+      "mtime_ns": 1792672942088722176,
+      "bytes": 830,
+      "inode": 56625313,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "150a6664211502321f68e0464e78956953d9fcdeada257abf08a52571399039d"
+    },
+    "run-pytest.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/run-pytest.py",
+      "mode": 384,
+      "mtime_ns": 1792672942088722176,
+      "bytes": 85,
+      "inode": 56625314,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "7631327bffed04933109fa99b0c7462d081d36d6986db520bb8b8aceec1fc3c7"
+    },
+    "run.sh": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/run.sh",
+      "mode": 384,
+      "mtime_ns": 1792672942088722176,
+      "bytes": 1246,
+      "inode": 56625315,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "57dddf91e3f8474586a1aab54b57d1fad0fc78aaad79cd38e9fc4055ec318b6d"
+    },
+    "seal.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/seal.py",
+      "mode": 384,
+      "mtime_ns": 1792673455976352100,
+      "bytes": 2657,
+      "inode": 56625360,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "d6e37814c92e1309755944cfc3ff1fa0563f8258379679c0c71255004e68afcd"
+    },
+    "sitecustomize.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/sitecustomize.py",
+      "mode": 384,
+      "mtime_ns": 1792672942088722176,
+      "bytes": 2724,
+      "inode": 56625310,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "5b0e10cb5a99f71ff25ecba7ec724f251c56407df0c051a68e745613d1d3f7be"
+    },
+    "test_independent_exception.py": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/test_independent_exception.py",
+      "mode": 384,
+      "mtime_ns": 1792673093573495844,
+      "bytes": 2427,
+      "inode": 56625326,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "fb9085449fc4ed650a498b53714d7520b8b0ac74173bbd0d20cbec0f5a8455f2"
+    }
+  },
+  "reviewer_reuse": "Previously personally read private guard/runner/hash/receipt/sealer patterns copied into new root and rebound; independent AST checks and PathLike exception controls authored here. Original evidence roots remain read-only.",
+  "actual_tests": "current repository 270-case selection, physically identical actual-fb 4-case control copy, and own private 4-case PathLike control",
+  "no_new_frame_comparator_or_payload_decode": true
+}

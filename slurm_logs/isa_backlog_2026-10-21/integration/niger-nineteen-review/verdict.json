@@ -1,0 +1,64 @@
+{
+  "verdict": "PASS",
+  "scope": "Bounded GLOBAL19 Niger country-builder retirement on actual18 documentation-qualified control; independent source/API/runtime review, not an unrestricted nineteen-change validation.",
+  "candidate": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+  "actual18_control": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+  "exact_twelve_path_increment": true,
+  "production_deletions": 56,
+  "API_hashes": {
+    "total": 549,
+    "Niger_changed": 23,
+    "others_unchanged": 526
+  },
+  "framework_fingerprints_unchanged": 39,
+  "focused_tests": {
+    "passed": 114,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "actual18_new_test_counterfactual": {
+    "failed": 12,
+    "passed": 5,
+    "errors": 0,
+    "skipped": 0
+  },
+  "matrix_stages": 112,
+  "source_readings": 46043,
+  "supported_singletons": [
+    32352,
+    13691
+  ],
+  "quantity_masks": [
+    43,
+    32,
+    1
+  ],
+  "retained_late_observations": 30,
+  "healthy_current18_Mali_rows": 155931,
+  "healthy_Mali_full_wave_coverage": 4,
+  "measured_matched_Feature_rows": 201974,
+  "strict_input_pickles": 440,
+  "negative_comparator_controls": 7,
+  "warnings_multisets_literal_true": 82,
+  "scanner_records_per_head": {
+    "warn": 2,
+    "fail": 0,
+    "error": 0,
+    "skip": 0
+  },
+  "protected_payload_receipts_exact": 5035,
+  "tracked_source_file_endpoints_exact": 30072,
+  "initial_physical_copy_receipts_exact": 406,
+  "unexpected_guard_denials": 0,
+  "outbound_IP_attempts_in_guarded_processes": 0,
+  "retained_limitations": [
+    "Existing issue1196 food u StringDtype pd.NA versus NaN cold/warm difference on BOTH heads; all other compared payload/axes/full attrs exact.",
+    "Declared factory empty, covered cached slice and CLI artifact are distinct matching stages; no universal empty dtype/attrs equality claim.",
+    "Historical GLOBAL17 full selection remains5148PASS/4459SKIP/13FAIL/0ERROR; doc-child mtime/guard and eight stale unrequested companion qualifications remain historical.",
+    "Original Niger1091 author auxiliary direct-Wave zero-write delta was not recorded; original overwritten detailed validation.json size/SHA unavailable. Reconstruction is new evidence. No replay to explain these.",
+    "No full suite, all-other-Niger-output or Mali source-cold claim; only this bounded increment and the enumerated controls.",
+    "One direct invocation of non-executable run.sh exited126 before Python; original log preserved, corrected bash invocation completed. No API replay."
+  ],
+  "reviewer": "Sue / GPT-6"
+}

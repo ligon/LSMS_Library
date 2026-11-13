@@ -4,8 +4,54 @@ Single Index:
   j: expenditure item
   t: wave
   pid: individual id
+  # `plot_id` -- plot.  Two sentinels, and they mean different things
+  # (GH #1120 D3 / GH #1119, @ligon 2026-10-23):
+  #   Farm-level   -- STRUCTURAL: the record is household-grain by design and
+  #                   is not allocated to an individual plot (plot_inputs'
+  #                   `missing_level_sentinels`
+  #                   below; GhanaLSS/_/CONTENTS.org "The Farm-level
+  #                   convention").
+  #   unknown_plot -- EPISTEMIC: the survey records a plot-grain answer but the
+  #                   plot identifier is missing in the source (Malawi 2010-11
+  #                   `ag_mod_d` stubs with blank `ag_d00`; a Uganda residual).
+  #                   Named like `unknown_condition` / `unknown_season`.  Never
+  #                   leave such a row NaN on `plot_id`: a NULL on a declared
+  #                   index level is a deferred silent deletion (the `u:`
+  #                   comment below; CLAUDE.md "Grain Collapse" 3b).
+  # CONSUMER RULE: `plot_id == 'unknown_plot'` is NOT a plot.  It joins to no
+  # plot_features row (no area, no GPS), so exclude it from any per-plot
+  # quantity and REPORT how many rows you excluded.  Two `unknown_plot` rows of
+  # one household are not one plot.  `transformations.harvest_kg` and
+  # `crop_diversity(weight='count')` do this, in `attrs['unknown_plot_excluded']`
+  # (GH #1460).
+  # `plot_id == 'Farm-level'` is not a plot either, so a count of plots drops
+  # every such row.  On `crop_production` a Farm-level row may carry a sale,
+  # a harvest, or both.  It may hold a sale no plot can own
+  # (Mali 2017-18 and 2021-22; Nigeria W3-W5; Niger 2014-15 and 2021-22; Tanzania;
+  # Malawi; Ethiopia, GH #843 / #824 / #1457) or a harvest from a roster off
+  # the field grid (Mali's EAC-I trees, GH #1476), or household-level harvest records
+  # (Mali 2021-22, GH #1437).  In a count of crop occurrences,
+  # drop it where the household has a plot row of that crop and keep it where it
+  # has none, because it is then the only record of the crop (GH #1469;
+  # `transformations.crop_diversity(weight='count')`).  All 37,280 rows of GhanaLSS
+  # 1987-88 / 1988-89 are Farm-level, so a blanket filter there deletes every crop
+  # record.  A value sum keeps every such row's value where present.
   plot_id: plot id
   int_t: interview date
+  # Opaque crop-observation coordinate within the full native key (GH1198).
+  # reported:<ID> is an instrument ID; slot:<n> is a mapped condition slot.
+  # row:<source-fingerprint>:<ordinal> is CONSTRUCTED, zero-based release order.
+  # A dvc fingerprint is source name plus SHA256 of its declared sidecar, not
+  # raw MD5. Missing IDs use missing-id:row:...; repeated IDs/slots suffix
+  # EVERY occurrence with /row:... . These are not persistent panel entities.
+  # unresolved_observation means a served row does not resolve this axis; it
+  # does not assert one native observation or a particular reducer.
+  # input_obs may also be reported:<module>:<native code>, e.g. Tanzania
+  # AG_SEC_4A seed reported:4A:<cropid> (GH #637): an instrument ID, which,
+  # unlike a constructed row ordinal, does not shift between source releases.
+  production_obs: native crop observation or explicitly unresolved coordinate
+  input_obs: source-release-qualified original input row or unresolved coordinate
+  labor_obs: source-release-qualified original labor row or unresolved coordinate
   # `visit` -- recall occasion.  An INTEGER ordinal of the enumerator call the
   # observation was collected at, for the surveys that revisit a household
   # several times within one wave (GhanaLSS food_acquired; EHCVM
@@ -55,6 +101,9 @@ Index Info:
     household_roster: (t, v, i, pid)
     household_characteristics: (t, v, i, m)
     plot_features: (t, v, i, plot_id)
+    # Native seasonal roster/expense operands, not lasting parcels or totals.
+    cultivation_records: (t, i, cultivation_obs)
+    farm_cost_operands: (t, i, cost_obs)
     food_acquired: (t, v, i, j, u, s)
     interview_date: (t, v, i, visit)
     shocks: (t, i, Shock)
@@ -104,7 +153,7 @@ Index Info:
     # Ethiopia / GhanaSPS / Tanzania already declare on crop_production; `plot`
     # was Uganda's spelling and is now an ALIAS.  See
     # `.coder/ledger/crop-production-plot-id.md`.
-    crop_production: (t, v, i, plot_id, j, u, condition, season)
+    crop_production: (t, v, i, plot_id, j, u, condition, season, production_obs)
     # GH #569 (ruling @ligon, 2026-10-18): "`plot_labor` keeps `stage` and
     # `worker` as index levels, with a sentinel where a country lacks them."
     # Twelve of the fifteen declaring countries emit (t, i, plot_id, source);
@@ -118,7 +167,7 @@ Index Info:
     # crop_production above: plot_labor is household-grain and is v-joined
     # today, so a `v`-less registration would strip `v` from every
     # Country(...).plot_labor() frame.
-    plot_labor: (t, v, i, plot_id, stage, source, worker, season)
+    plot_labor: (t, v, i, plot_id, stage, source, worker, season, labor_obs)
     # GH #569 (same ruling): "The seven EHCVM `plot_inputs` tables with no plot
     # level are registered with a household-grain sentinel on `plot_id`
     # through `missing_level_sentinels`, not excluded."  Benin, Burkina_Faso,
@@ -130,7 +179,26 @@ Index Info:
     # below); only Uganda carries `season`.  `u` and `season` are canonical
     # because Malawi and the EHCVM seven key rows on `u`, and Uganda on
     # `season` -- dropping either would collapse distinct reported line-items.
-    plot_inputs: (t, v, i, plot_id, input, j, u, season)
+    #
+    # USE ANSWERS on `input` (GH #1118, maintainer decision 2026-10-22).  An
+    # `input` label ending in `?` (`transformations.is_use_answer_label`) is
+    # NOT an input: it is the survey's own yes/no answer to a use question
+    # asked once per plot about a GROUP of inputs (Mali: `Inorganic
+    # Fertilizer?`, `Phytosanitary products?`).  Such a row carries the answer
+    # in `Applied` (True / False), no `Quantity`, `u = Unknown` (Mali:
+    # `Applied` is NA on every type row; Ethiopia and Malawi, which serve no
+    # `?` rows, set `Applied` on ordinary input rows as a reported use flag
+    # -- see their data_scheme.yml).  The plot-input transforms skip
+    # these rows (`nitrogen_kg` counts them on its tally as
+    # `use_answer_rows`).  COUNTING TRAP: the rows carry the NO answers too,
+    # so counting plots by `input` label counts plots that said "no" --
+    # filter `Applied` first.  A country that serves `?` rows declares
+    # `Applied` in its plot_inputs scheme.  tests/test_use_answer_convention.py
+    # checks this ONLY for `?` labels in a `harmonize_input` table (country or
+    # wave categorical_mapping, file or directory spelling); a `?` label
+    # written inline in a script (GhanaLSS writes its `input` labels as
+    # constants in its plot_inputs.py) or read from any other table escapes it.
+    plot_inputs: (t, v, i, plot_id, input, j, u, season, input_obs)
     # GH #840.  ONE ROW PER SURVEY-RECORDED PRICE.  A community price form
     # prices a (product, VARIETY) pair, in a field VISIT, as one of several
     # within-form OBSERVATIONS; `(t, v, j, u)` names none of the three, so
@@ -165,6 +233,18 @@ Index Info:
     # the modal rule its `obs` level made it the excluded minority.
     community_prices: (t, v, j, u, variety, visit, obs)
 
+  # Provider requirements are distinct from the preferred canonical shape.
+  # GH1588: household characteristics/food expenditure requirements remain
+  # unchanged; GH1529 also requires native roster observation coordinates.
+  # m is optional on household characteristics and s on food expenditures. This does
+  # not register food_expenditures or change the healthy shape winner. Other
+  # tables' reduced/optional-axis contracts have not been censused here.
+  required_index_levels:
+    household_characteristics: [t, v, i]
+    cultivation_records: [t, i, cultivation_obs]
+    farm_cost_operands: [t, i, cost_obs]
+    food_expenditures: [t, v, i, j]
+
   # Per-feature canonical level-name ALIASES: `<the name a country emits>:
   # <the canonical name>`.  Applied by `feature._rename_index_levels` to each
   # country's frame BEFORE alignment, so a country that names the same axis
@@ -184,20 +264,39 @@ Index Info:
   # plot_inputs: `crop` -> `j` is the SAME pair as crop_production's, and it
   # was checked rather than assumed (GH #569, 2026-10-19), per country, on the
   # warm corpus.  In SIX countries the plot_inputs `crop` labels are that
-  # country's crop_production labels, spelled the same way: Mali 42 of 42
-  # shared, Malawi 26/26, Tanzania 20/20, Nigeria 72/74, Niger 35/43, Benin
-  # 8/11 (counts include the "not crop-specific" marker).  The misses are the
-  # marker, catch-alls (Benin `Autre tubercule` / `Autre céréale`) and crops
+  # country's crop_production labels, spelled the same way: Mali 42 of 47
+  # shared (42 of 42 before 2026-10-23, when its plot_inputs gained the "not
+  # crop-specific" marker and its unmapped seed crops began to pass through --
+  # `Echalotte`, `Poireaux`, `Non-Exploitée` / `Non exploitée`, the last pair
+  # one raw spelling split), Malawi 26/26, Tanzania 20/20, Nigeria 72/74,
+  # Niger 35/45, Benin 8/11 (counts include the "not crop-specific" marker).
+  # The misses are the marker, catch-alls (Benin and, since GH #1123, Niger
+  # `Autre tubercule` / `Autre céréale`) and crops
   # crop_production does not record at all (Niger's seven are real crops --
   # `Carotte`, `Igname`, `Jaxatu`, ...; Nigeria `Date palm`), never the same
-  # crop spelled twice.  That claim is NOT true everywhere: Burkina_Faso (5 of
-  # 9) and Senegal (6 of 10) spell two crops differently in the two tables --
+  # crop spelled twice.  (Niger was 35/43 before GH #1123 split its seed
+  # catch-alls.)  That claim is NOT true everywhere: Burkina_Faso (5 of
+  # 9) and Senegal (6 of 12; 6 of 10 before GH #1123) spell two crops
+  # differently in the two tables --
   # plot_inputs `Maïs en grain` (2,274 / 735 rows) and `Niébé/Haricots secs`
   # (2,156 / 460) where crop_production has `Maïs` and `Niébé` -- so on those
   # two countries the shared axis name does not yet mean a shared vocabulary.
-  # What the rename does NOT do is harmonize that marker: it is spelled
-  # `(not crop-specific)` (EHCVM), `Whole Plot` (Ethiopia), `Farm-level`
-  # (GhanaLSS), `n/a` (Nigeria, Uganda) and NaN (Malawi, Mali, Tanzania).
+  # The "not crop-specific" marker on plot_inputs `j` (an input applied to the
+  # plot or the farm as a whole, not to one crop) has ONE canonical spelling:
+  # `(not crop-specific)` (GH #1119, @ligon 2026-10-23).  It is in force for
+  # the EHCVM countries and Mali; the other spellings -- `Whole Plot`
+  # (Ethiopia), `Farm-level` (GhanaLSS), `n/a` (Nigeria, Uganda) and NaN
+  # (Malawi, Tanzania) -- are migrated per country.  It is a `j` value, distinct
+  # from the STRUCTURAL `plot_id` sentinel `Farm-level` (see `plot_id:` at the
+  # top of this file); do not reuse `Farm-level` for it.
+  # A crop-specific record whose crop the survey did NOT record (e.g. a seed
+  # purchase with crop code 0 and no value label; Uganda 2011-12) is NOT
+  # `(not crop-specific)`: it gets the EPISTEMIC `j` sentinel `unknown_crop`,
+  # named like `unknown_plot` / `unknown_condition` / `unknown_season` /
+  # `unknown_variety` (GH #1120 / #1119, 2026-10-23).  A crop code that is
+  # recorded but unmapped passes through as itself (Mali / Niger precedent).
+  # CONSUMER RULE: `unknown_crop` is not a crop; exclude it from per-crop
+  # quantities and report how many rows you excluded.
   # plot_labor needs no alias: every country already spells `plot_id` and
   # `source`.
   level_aliases:
@@ -274,10 +373,12 @@ Index Info:
   #               `obs = 3` -- a served value that will move.
   missing_level_sentinels:
     crop_production:
+      production_obs: unresolved_observation
       u: Unknown
       condition: unknown_condition
       season: unknown_season
     plot_labor:
+      labor_obs: unresolved_observation
       stage: Farm-level
       worker: Farm-level
       season: unknown_season
@@ -285,6 +386,7 @@ Index Info:
       plot_id: Farm-level
       u: Unknown
       season: unknown_season
+      input_obs: unresolved_observation
     community_prices:
       variety: unknown_variety
       visit: 1
@@ -411,6 +513,28 @@ Columns:
         # stratum is entirely metro=1), so there is no evidence they are urban.
         # Kept as a distinct, VISIBLE value rather than guessed away.  GH #602.
         Informal: []
+    ea:
+      # The design PSU where a country's `v` is not one (GH #689; Uganda only
+      # today).  It is the enumeration area a household was SAMPLED in, carried
+      # with it when it moves, so it says how the sample was drawn and is a
+      # poor location key.  It is NOT `v` and is not joined onto other tables.  It is
+      # NA where the survey offers no route to it.  Where the EA is what `v` already
+      # holds, under another label, `ea` serves it on one scale (Uganda's early waves,
+      # from `comm`, GH #1459); a `v` that is not an EA, such as a GPS bin, never fills it.
+      type: str
+      optional: true
+    InterviewResult:
+      # As under `interview_date`: what the round's household cover records, so
+      # a user can filter.  It gates nothing.  Nigeria alone serves it (GH #1444).
+      type: str
+      optional: true
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`: the registry key of a constructed
+        field on this household's row (its `columns` entry names which one).
+        Stays on `sample`: `_join_v_from_sample` carries `v` alone.
   cluster_features:
     Region:
       type: str
@@ -441,12 +565,48 @@ Columns:
       type: float
     Longitude:
       type: float
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`.  Declared here for GH #1060 and
+        GH #1057: `Burkina_Faso::cluster_features::zd-modal-province` (2014;
+        `province` varies within 94 of 900 zd in the source, and the served
+        District is the zd's most common one) and
+        `Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19`
+        (2021-22; the wave ships no cluster fix, and a panel grappe's
+        Latitude / Longitude are the 2018-19 fix of that grappe).  They are not
+        the first on this table: `Nigeria::cluster_features::ph-same-location`,
+        `Uganda::cluster_features::agriculture-cover` and
+        `Uganda::cluster_features::unlocated-identity` already served the column
+        undeclared, and this declaration covers them too.
   plot_features:
     # Lasting plot/parcel characteristics (GH #167).  Per-season detail
     # (which crop, who farmed it this season, season-specific inputs,
     # crop-share %) belongs in a future plot_cultivation table.  See
     # slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org for the design
     # rationale; Uganda is the Phase-1 pilot.
+    PlotSlope:
+      type: float
+      optional: true
+      note: >-
+        WB geospatial/raster plot slope in percent rise/run, not degrees and
+        not survey-reported. Ethiopia plot_srtmslp and Nigeria srtmslp_nga
+        are served in their native percent unit without conversion.
+    PlotElevation:
+      type: float
+      optional: true
+      note: WB SRTM plot elevation in metres; not survey-reported.
+    PlotWetnessIndex:
+      type: float
+      optional: true
+      note: WB plot Potential Wetness Index (dimensionless); not survey-reported.
+    PlotDistanceToHousehold:
+      type: float
+      optional: true
+      note: >-
+        WB geospatial plot-to-household distance in kilometres. Text NA/blanks
+        become missing; values including the long distance tail are not clipped.
     Area:
       type: float
       required: true
@@ -517,6 +677,18 @@ Columns:
       type: bool
     AffectedConsumption:
       type: bool
+      note: |
+        Reported effect of the shock on FOOD PURCHASES (maintainer ruling,
+        2026-11-06). Increase or decrease is True; unchanged is False.
+        This is a qualitative response, not measured food consumption.
+        Food-stock responses belong in AffectedFoodStock, never in this field.
+    AffectedFoodStock:
+      type: bool
+      optional: true
+      note: |
+        Reported effect of the shock on FOOD STOCKS, separately from purchases.
+        Follow the source's effect/missing-response mapping. Omit when the
+        instrument does not ask the question; do not substitute purchases.
     HowCoped0:
       type: str
     HowCoped1:
@@ -556,6 +728,15 @@ Columns:
       type: datetime
     Interview end:
       type: datetime
+    InterviewResult:
+      type: str
+      optional: true
+      note: |
+        What the visit produced, as the household cover records it, where a
+        date may date an attempt.  Country vocabulary, not a canonical list:
+        filter on the country's own labels.  Nigeria alone serves it (GH #1096);
+        see its CONTENTS.org for the labels and for what the rows do not cover.
+        Also under `sample`.
   individual_education:
     Educational Attainment:
       type: str
@@ -666,6 +847,29 @@ Columns:
       note: |
         Head SOLD alive during the recall window.  A flow, and the
         denominator that turns SalesValue into a per-animal sale price.
+    RaisedOrOwned:
+      type: bool
+      optional: true
+      note: |
+        The survey's own answer to whether the household raised or owned this
+        animal in the last 12 months, True / False as answered, NA where
+        unanswered (Malawi Module R ag_r01, GH #1435; named Owned until
+        2026-11-05).  NOT a stock and NOT ownership at interview: RaisedOrOwned
+        True beside HeadCount 0 is an answer.  The IHS3, IHPS 2013, IHS4 and IHS5
+        agriculture questionnaires print "During the last 12 months, have you or
+        any member of your household raised or owned any [LIVESTOCK]?".  The
+        Stata label of the 2016-17 and 2019-20 files shortens it to "Did you own
+        [LIVESTOCK]?", which is not a different question.
+    HeadCount12MonthsAgo:
+      type: float
+      note: |
+        Head of this animal the household owned EXACTLY 12 months before
+        interview (Malawi Module R ag_r07, GH #855).  A STOCK at a second
+        point in time, not a flow.  Never a fallback for a missing
+        HeadCount, and never differenced against HeadCount into an
+        acquisition or loss: the surveys that ask it also ask the flows
+        (HeadAcquired, HeadSold, births, gifts) directly, and the two
+        routes disagree.
     ValuePerAnimal:
       type: float
       monetary: true
@@ -829,6 +1033,32 @@ Columns:
         shell_not_applicable: []
         other_condition: []
         unknown_condition: []
+    condition_native:
+      type: str
+      optional: true
+      note: |
+        The state of the crop as the survey recorded it, in the survey's own
+        words, where the `condition` level folds several answers onto one token.
+        Ruling @ligon 2026-11-04 (GH #1436): the five-answer EHCVM instruments
+        record Epis, Grain, Décortiqué, Non-décortiqué and Non concerné; their
+        level serves three tokens, so this column keeps the recorded answer.
+        Answer domains remain instrument-specific. Cote d'Ivoire's vague 1 has
+        those five answers; its vague 2 adds two more, Fève and Autre à
+        préciser, which its .dta does not label, so its column takes those two from
+        the instrument.
+        It is the `crop_variety` shape: a COLUMN named for the level it refines,
+        at the native grain, never an index level.  Filtering or grouping on
+        states belongs on `condition`; this is for reading what was answered.
+
+        NA where the survey recorded no state, and in a wave whose answers the
+        level serves one to one, because nothing was folded there (Niger's and
+        Senegal's three-answer 2021-22 list).  Never a sentinel: a column has no
+        NaN-key hazard.
+
+        DELIBERATELY NO `spellings:` BLOCK.  The labels are the survey's, and
+        they differ by country (Guinea-Bissau's are Portuguese), so they are not
+        a vocabulary.  `diagnostics._check_declared_spellings` reads a block as
+        CLOSED and would fail them, the reasoning of the `u` and `season` notes.
     season:
       type: str
       note: |
@@ -898,26 +1128,132 @@ Columns:
         table)", which pointed a loader author at this column; it does not
         any more.
 
-        A FACTOR HERE, A PRODUCT IN `food_acquired`.  The antecedent is
+        A FACTOR HERE, A PRODUCT IN `Quantity_kg`.  The antecedent is
         `food_acquired.Quantity_kg` (Nigeria `s10bq2_cvn`, Malawi
         `cfactor`), which carries the exact per-row kilogram AMOUNT and is
         preferred over the inferred factor by the same rule -- see
         `transformations.conversion_to_kgs` and
-        `food_quantities_from_acquired`.  The two are one design with one
-        difference of carrier, and the difference is forced by the grain.
-        Food rows are SUMMED across units within an acquisition source, so
-        food needs the summable product.  Crop rows sit at
-        (t, i, plot_id, j, u, condition, season) and are never summed across
-        `u` or `condition`, so the factor is the natural carrier: it
-        identifies the container (a 100 kg sack is not a 120 kg sack), it
-        can be audited against the library's inferred factors for the same
-        `u`, and the product is one multiplication away.
+        `food_quantities_from_acquired`.  Which column a crop instrument
+        fills is decided by what it wrote down, not by the table.  An
+        instrument that asks a conversion factor (UNPS `a5?q6d`) fills this
+        column: it identifies the container (a 100 kg sack is not a 120 kg
+        sack), it can be audited against the library's inferred factors for
+        the same `u`, and the product is one multiplication away.  One that
+        asks the line's total kilograms (Niger, Mali 2021-22) fills
+        `Quantity_kg`, and never this column by dividing: that would be a
+        number no instrument wrote.  This paragraph used to argue from the
+        crop grain that crops need only the factor, which held until a crop
+        instrument turned out to ask the total (GH #1436).
 
         CONSUMERS MUST NEVER TREAT THIS AS A QUANTITY.  It is kg per unit,
         not kg.  Summing it, averaging it across rows of different `u`, or
         reading it as a harvest is a category error; the only sanctioned
         use is `Quantity * KgFactor` on the SAME row, which is what
         `harvest_kg` does.
+    Quantity_kg:
+      type: float
+      optional: true
+      note: |
+        The harvest of this LINE in kilograms, AS THE SURVEY WROTE IT DOWN --
+        e.g. Niger 2011-12 `as02eq07c` "quantite en kgs recoltee", or 2021-22
+        `s16cq16c` "Estimation Quantite totale UML en kg".  A TOTAL, not a
+        factor: within a unit it scales with `Quantity`, where a factor per unit
+        would not move.  NaN where the survey does not record it; optional
+        because most countries never ask.
+
+        `harvest_kg` reads it first (`KgFactorSource == 'survey_kg'`, ruling
+        @ligon 2026-11-04, GH #1436), ahead of a reported `KgFactor`, and serves
+        it as the row's kilograms in any unit, or with no unit or quantity at
+        all.  The two columns must never be converted into each other:
+        `Quantity_kg / Quantity` is what `kg_survey` reports, and it enters no
+        median and no sibling row.
+
+        THE SURVEY'S, NOT NECESSARILY WEIGHED.  It says who supplied the number,
+        as `survey_kg` does on the food ladder.  Niger and Mali 2021-22 label it
+        an estimate, and it is exactly 2.5 per Tiya on 2,881 of Niger's 4,402
+        Tiya rows, so a registered key names those rows in `Derivation`.  It has
+        junk of its own, and a low or high total is served as recorded and at most
+        NAMED, by Site Q or, against its unit's label, by `kg_survey_off_label` in
+        `harvest_kg_factors`; never clipped or refused (ruling @ligon 2026-11-05).  Two
+        things are not totals and are NA here:
+        a "don't know" code, and a 0 beside a positive `Quantity`, which is no
+        answer rather than a harvest of nothing.  Count both in the country's
+        CONTENTS.org.  The ladder refuses a 0 anyway (`survey_kg_zero`).
+
+        The state of the product is not in it.  `condition` applies, and on Niger
+        2021-22 the median kg / q of a unit is the same in both states (Tiya 2.5,
+        Sac de 100kg 100), so an estimate does not see the state and summing
+        across `condition` mixes states exactly as it does for `Quantity`.  It
+        covers what `Quantity` covers, so a registered window or product on
+        `Quantity` applies here too.
+    KgFactor_sold:
+      type: float
+      optional: true
+      note: |
+        Reported kilograms per ONE sold unit on this row, distinct from the
+        harvest KgFactor and from a total sold kilogram amount. Never sum,
+        average or infer it from sale quantities or values. A producer that
+        folds rows must state its agreement policy. Mali's field-sale folds
+        require all reports to agree, including missingness; conflicting
+        factor cells remain NA with persistent audit, retaining quantity rows.
+        Tree total-equivalent fields are not per-unit factors. The existing
+        sold-quantity consumer screens supplied factors and retains its
+        Unit_sold/fallback/disagreement policy; wiring does not change it.
+    Quantity_sold_kg:
+      type: float
+      optional: true
+      note: |
+        The SALE in kilograms, AS THE SURVEY WROTE IT DOWN: the sold-side twin
+        of `Quantity_kg`.  A TOTAL for the sale this row carries, in the window
+        of `Quantity_sold`, not a factor per sold unit; within a sold unit it
+        scales with `Quantity_sold`.  First instances (GH #1560 / #1571, ruling
+        @ligon 2026-11-12, "Treat 2021 as totals"): Niger 2011-12 `as02eq12c`
+        and `as03eq11c`, 2014-15 `AS02EQ12C`, Niger and Mali 2021-22
+        `s16dq05c` ("Estimation Quantite totale UML en kg"), which is served as
+        a total on its released label and its Kg controls although the own
+        vague forms instruct kg per ONE unit.
+
+        ITS WINDOW IS THE SALE'S, NOT THE SEASON'S.  Niger 2011-12 section 3E
+        (the dry season, `plot_id = 'Farm-level'`) asks the sale for the FIRST
+        production cycle, so its `Quantity_sold_kg` is per first cycle, beside
+        a `Quantity_kg` over all cycles: not a sold share there (ruling @ligon
+        2026-11-12; any cycle product waits on GH #1529).
+
+        NEVER CONVERTED INTO `KgFactor_sold`.  That column is kg per ONE sold
+        unit and only what an instrument wrote per unit; dividing this total
+        by `Quantity_sold` to fill it would be a number no instrument wrote.
+        `Value_sold / Quantity_sold_kg` is a price per kilogram on the same
+        row, and nothing computes it by default: `median_price_valuation`
+        reads it only when a caller passes it as `kg_qty=` (an explicit kg
+        denominator bypasses all unit work).
+
+        A "don't know" code is NA, and so is a 0 beside a positive
+        `Quantity_sold`, as on the harvest side; count both in the country's
+        CONTENTS.org.  Sold kilograms on a record with no positive sold
+        quantity or value are not a sale's weight: Niger 2011-12 3E's seven
+        are NA under the registered rule `dry-season-sold-kg-no-sale` (ruling
+        @ligon 2026-11-12), and no other served wave has one.  A total is
+        served as recorded and at most NAMED: Site Q screens this column on
+        both tails, report-only (`quantity_audit._SCREENED_COLUMNS`, ruling
+        2026-11-12).  It rides with the sale wherever the sale is placed, a
+        `plot_id = 'Farm-level'` row included.  The state of what was sold is
+        `Condition_sold`, not `condition`.
+
+        SOME TOTALS ARE NOT TOTALS, AND NOTHING NAMES THEM.  Under the totals
+        reading, a few answers look like the weight of ONE sold unit (5 or
+        more sized sacks sold, kilograms within 25% of one sack's stated
+        mass) or like the unit count typed as kilograms (kilograms equal to
+        `Quantity_sold`, more than one sack).  Counted by the independent red
+        team on 2026-11-12 (GH #1560, F4): one sack's weight on Niger 25 and
+        Mali 15 rows, the sack count on Mali 30 and Niger 4.  On such a row
+        `Value_sold / Quantity_sold_kg` is wrong by about `Quantity_sold`
+        (one-sack rows) or about the sack's stated mass (count rows), and
+        Site Q does not name it, because the value is an ordinary size for
+        its cell.  They are served as recorded, as the ruling asks; screen
+        them before using this column as a price denominator.  Per-wave
+        counts are in each country's CONTENTS.org.  Site Q's warning prints
+        this column's comparison unit as `harvest_u` and its value as "kg
+        sold".
     Unit_sold:
       type: str
       optional: true
@@ -963,25 +1299,28 @@ Columns:
         ~70x, an error in the opposite direction from the one this column
         exists to prevent.
 
-        SO: a consumer forming a per-unit or per-kg price must treat
-        `Unit_sold != u` rows as AMBIGUOUS -- exclude them, or resolve them
-        with further evidence (a reported per-row sold kg factor, where the
-        survey has one) -- and must REPORT how many were excluded.  An
-        earlier version of this note said "a price per ONE `Unit_sold` --
-        NEVER per `u`"; that instruction was measured to be wrong on the
-        majority of exactly the rows it governed, and canonical-schema prose
-        is the worst place for such a rule.  Where `Unit_sold` is NA the
-        survey recorded no unit for that sale and the ratio has no
-        denominator you can name; that is not licence to substitute `u`
-        either.
+        APPROVED CONSUMER DEFAULT (GH #824, owner ruling 2026-10-23):
+        https://github.com/ligon/LSMS_Library/issues/824#issuecomment-6367367289
+        median_price_valuation converts Quantity_sold with its OWN Unit_sold
+        or a valid supplied KgFactor_sold (kg per sold unit). Only an NA sold
+        label or absent Unit_sold column permits harvest-u fallback. A recorded
+        unconvertible label does not. This supersedes the former instruction
+        to exclude every disagreement and never substitute u for an absent
+        sold label. Disagreement remains a quality flag, not proof that either
+        answer is true. The consumer reports fallback and disagreement counts
+        in attrs['sold_quantity_conversion']; its docstring defines the counted
+        populations, factor screening and explicit-kg_qty bypass. Survey factor
+        wiring and the scientific interpretation of disagreements remain open.
 
         HOW OFTEN IT MATTERS is a per-country fact and must be measured, not
         assumed: sold and harvest unit agree on 95-97% of Nigeria's sale
         rows, 63-99% of Niger's by wave, and 96.1% of Uganda's (measured
         2026-09-10 over the 40,083 rows with a positive `Quantity_sold` that
         know both units, GH #824; 41,162 rows and the same 96.1% since GH
-        #848, 2026-09-24).  Tanzania records every sale in kilograms
-        and needs no such column.
+        #848, 2026-09-24; 41,340 rows and the same 96.1% measured 2026-11-04).
+        Tanzania records every sale in kilograms,
+        and carries the constant only because a Farm-level sale has no harvest `u`
+        (GH #1457).
 
         NA-BEARING, NEVER SENTINEL-FILLED.  `u` carries the string
         `Unknown` because it is a declared INDEX level and a null index key
@@ -991,15 +1330,17 @@ Columns:
         or records one whose unit the survey did not capture.
 
         A COUNTRY MAY LEGITIMATELY NOT DECLARE IT.  Where the sale module
-        is a SEPARATE file at a coarser grain, the honest fix is to attach
+        is a SEPARATE file at a coarser grain, one honest fix is to attach
         the sale only to the harvest row measured in the SAME unit, so the
         ratio is a price per `u` BY CONSTRUCTION -- which is what Malawi
-        does (`malawi._sale_block` / `assemble_crop_production`, commit
-        85947ff5, merging on `(i, _crop_code, u)`).  Both shapes are
+        does on a harvest row (`malawi._sale_block` / `assemble_crop_production`,
+        commit 85947ff5, merging on `(i, _crop_code, u)`).  Both shapes are
         correct; what is not correct is dividing by a quantity whose unit
-        the table never states.  `optional: true` because of exactly this:
-        the column exists where the instrument asks a second unit on the
-        same row (Uganda), and is absent where it does not.
+        the table never states.  A `plot_id = 'Farm-level'` sale has no harvest
+        `u`, so it needs this column (GH #843, #1457).  `optional: true` because
+        of exactly this: the column exists where the instrument asks a second
+        unit on the same row (Uganda) or a sale has no row of its own, and is
+        absent where neither holds.
     Condition_sold:
       type: str
       optional: true
@@ -1019,6 +1360,39 @@ Columns:
         NA-bearing for the same reason `Unit_sold` is, and unlike the
         `condition` INDEX level, which must carry `unknown_condition`.
       spellings: *crop_condition_vocabulary
+    planting_month:
+      type: str
+      optional: true
+      note: |
+        Survey-specific month answer, carried as nullable text so countries
+        with numeric month codes and countries with year-month strings can
+        be stacked and saved together (GH #1535). Numeric codes retain their
+        textual form; existing strings are preserved verbatim. This does not
+        supply a year, parse a date, validate a month or equate calendars.
+        Native builders and pre-finalize parquets keep their own types.
+    harvest_month:
+      type: str
+      optional: true
+      note: |
+        Survey-specific harvest month answer, carried as nullable text for
+        cross-country assembly and Parquet export (GH #1535). Retain complete
+        multi-month answers (GhanaSPS) and year-month strings (Nigeria), and
+        stringify numeric scalars without selecting, rounding or parsing a
+        month. Missing stays missing. Text is a common carrier, not a common
+        calendar or event: a survey's harvest-start, harvest-end or season-end
+        proxy retains its documented meaning. Native builders and cached
+        pre-finalize values retain their original representations.
+    condition_sold_native:
+      type: str
+      optional: true
+      note: |
+        The state of what was sold as the survey recorded it, where
+        `Condition_sold` folds several answers onto one token.  Ruling @ligon
+        2026-11-05: the sold-side twin of `condition_native`, for the same
+        reason.  A COLUMN, at the native
+        grain, in the survey's own words, with no `spellings` block because the
+        labels are not a vocabulary.  NA on a row with no sale, and where nothing
+        was folded.  First instance: Niger 2018-19 `s16cq16c`.
   food_acquired:
     # Acquisition source 's' is an INDEX level (see Index Info above),
     # not a column.  Canonical values: purchased, produced, inkind,

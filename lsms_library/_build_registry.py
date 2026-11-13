@@ -57,11 +57,14 @@ import functools
 import hashlib
 import importlib
 import inspect
+import math
 import re
 import sys
 import textwrap
 import types
 from typing import Callable
+
+from pandas import BooleanDtype, Float64Dtype, Int64Dtype, NA, StringDtype
 
 # qualname -> (callable, tables).  ``tables == ()`` means "every table".
 _BUILD_TRANSFORMS: dict[str, tuple[Callable, tuple]] = {}
@@ -141,6 +144,10 @@ _EXCLUDED_CALLABLES = frozenset({
     # tests/test_build_transform_hash.py::
     # test_editing_a_wave_read_gate_moves_no_hash.
     "lsms_library.country.Wave._read_l2_wave_cache",
+    # The reading of LSMS_NO_CACHE (GH #1455).  It decides whether a parquet is
+    # read or written, and a no-cache build writes the same bytes of data as an
+    # ordinary one, so it determines no byte of content.
+    "lsms_library.country._no_cache",
     "lsms_library.country.Wave._fresh_script_parquet",
     "lsms_library.country.Country._read_assumed_fresh_cache",
     # GH #675: the degraded-build record.  Filing a drop, grading a stamped
@@ -192,6 +199,16 @@ _EXCLUDED_CALLABLES = frozenset({
     # the make backend writes no L2-country parquet.  Without this entry a
     # re-worded log line in it would move every table's hash.
     "lsms_library.country.Country._has_country_builder",
+    # Its uncached body since the per-instance memo of completed answers
+    # (GH #1218 / PR #1221 follow-up); reached only through the predicate,
+    # listed so a future direct call from build code cannot fold the probe
+    # into every hash.
+    "lsms_library.country.Country._probe_country_builder",
+    # GH #381 / #1516: this established availability/failure-routing handler
+    # now has a direct build-path caller. It chooses a route, never parquet
+    # content; handler edits must remain outside content fingerprints. The
+    # calling orchestrator stays versioned. Revisit if the handler shapes data.
+    "lsms_library.country.Country._legacy_can_build",
     # The wave-script RUNNER (GH #968): make if installed, else the wave
     # script directly.  It decides which program executes the script, not
     # what the script writes -- the script text and the country _/Makefile
@@ -199,6 +216,33 @@ _EXCLUDED_CALLABLES = frozenset({
     # invocation (the #964 as_posix fix, the #968 fallback) moved every
     # table's hash.  Pinned by tests/test_windows_portability.py.
     "lsms_library.country._build_wave_script_target",
+    # GH #1218 / PR #1221: the constructed EMPTY answer -- the 0-row,
+    # declared-shape frame served for a request whose waves all lack the table
+    # (GH #1039/#1099).  It determines no byte a cache holds, and that is
+    # ENFORCED, not incidental, by the marker guard (#1221 follow-up): it
+    # marks its output (country._CONSTRUCTED_EMPTY_ATTR), and every cache
+    # write of a load_from_waves result skips a marked 0-row frame.  Without
+    # it, the two absence checks of one default-backend request (top of
+    # load_dataframe_with_dvc, then inside load_from_waves) could disagree --
+    # the make -n probe answers True on OSError/timeout -- and True-then-False
+    # wrote the frame to var/ with the union coverage manifest: review repro,
+    # Iraq `shocks`, 8,812 rows of 2012 served as 0 after one empty 2006-07
+    # request.  Country._has_country_builder memoises COMPLETED probe answers
+    # only; a faulted probe's fail-safe True is not stored (a stored one
+    # served a rule-less var/ under the make backend for the instance's
+    # lifetime), so one request can still see True then False and the guard
+    # is what makes that harmless.  Pinned by
+    # tests/test_gh1039_make_backend_no_country_rule.py (the race tests).
+    # PR #1221 made the helper apply declared dtypes, which pulled the READ-
+    # path dtype code (_enforce_declared_dtypes, _coerce_datetime_column,
+    # _to_datetime_mixed, _coerce_to_boolean, _SCHEME_DTYPE_MAP and their
+    # constants) into every table's closure: every hash then depended on
+    # pandas' `mode.string_storage` option (through the StringDtype in
+    # _SCHEME_DTYPE_MAP), and any edit to the read-time date cast cold-
+    # rebuilt the corpus.  Excluded for the reason _finalize_result is.
+    # Pinned by tests/test_build_transform_hash.py::
+    # test_empty_constructor_dtype_code_is_not_in_any_build_closure.
+    "lsms_library.country._empty_declared_frame",
     # The null-content audit (null_read_audit): pure REPORTING.  It measures the
     # frame and warns; it provably returns its input unchanged, so no byte of
     # any parquet depends on it.  `check_read` is called from `get_dataframe`,
@@ -222,6 +266,7 @@ _EXCLUDED_CALLABLES = frozenset({
     # cannot silently cold-rebuild the corpus by re-wording a warning.
     "lsms_library.quantity_audit.check_quantities",
     "lsms_library.quantity_audit.audit_quantities",
+    "lsms_library.quantity_audit.audit_near_zero",
     # The null-index-key audit (null_index_audit, GH #847): the same argument,
     # one of the four guards up.  Counts NaN keys on declared index levels and
     # warns; provably returns its input unchanged.
@@ -403,6 +448,9 @@ def _import_map(fn) -> dict:
     return out
 
 
+_NULLABLE_DTYPE_TYPES = (BooleanDtype, Int64Dtype, Float64Dtype, StringDtype)
+
+
 def _ser(obj, seen, parts) -> str:
     """Deterministic serialisation of a referenced build constant.
 
@@ -416,6 +464,22 @@ def _ser(obj, seen, parts) -> str:
     # matching behavior; reuse the deterministic dispatch (ledger #780, §4).
     if isinstance(obj, re.Pattern):
         return f"<re.Pattern {obj.pattern!r} flags={obj.flags}>"
+    # GH1218: reuse the explicit dispatch/standalone convention (ledger sections2-4).
+    # These fixed nullable families occur in country._SCHEME_DTYPE_MAP. String
+    # additionally carries storage and NA-versus-NaN behavior; its name alone
+    # does not capture the complete build input. Unknown families still reject.
+    if type(obj) in _NULLABLE_DTYPE_TYPES:
+        if type(obj) is StringDtype:
+            if type(obj.storage) is not str or obj.storage not in ('python', 'pyarrow'):
+                raise TypeError('unsupported StringDtype storage in build constant')
+            if obj.na_value is NA:
+                missing = 'pandas.NA'
+            elif type(obj.na_value) is float and math.isnan(obj.na_value):
+                missing = 'NaN'
+            else:
+                raise TypeError('unsupported StringDtype missing value in build constant')
+            return f"<pandas.StringDtype storage={obj.storage!r} na={missing}>"
+        return f"<pandas.{type(obj).__name__}>"
     if isinstance(obj, (str, int, float, bool, type(None))):
         return repr(obj)
     if callable(obj) and _is_ours(obj):
@@ -440,7 +504,8 @@ def _ser(obj, seen, parts) -> str:
 
 
 # Types we know how to fold into the fingerprint as a referenced constant.
-_CONST_TYPES = (dict, list, tuple, set, frozenset, str, int, float, bool, re.Pattern)
+_CONST_TYPES = (dict, list, tuple, set, frozenset, str, int, float, bool, re.Pattern,
+                *_NULLABLE_DTYPE_TYPES)
 
 
 def _all_co_names(code) -> set:

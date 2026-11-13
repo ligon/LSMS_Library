@@ -1,0 +1,5 @@
+# base 9a0ed5f3c:
+1618 passed, 97 skipped, 4 xfailed, 267 warnings in 1004.22s (0:16:44)
+# branch:
+1632 passed, 97 skipped, 4 xfailed, 278 warnings in 1173.25s (0:19:33)
+# core files on base (earlier run): 98 passed in 360.67s (0:06:00)

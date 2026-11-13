@@ -1,0 +1,18 @@
+#+title: GH #1144 corrected documentation amendment
+#+date: 2026-10-21
+
+* Verdict
+
+PASS at =a1ba246f59d341c331c69471f914d3ca798e6894=.
+The one-line change from 47f9 uses the source-exact labels =Basin Large= and =Basin Big/Large=.
+The eleven shared-spelling rows versus twelve total relabels and historical 115+1 versus integrated 116-pass results are accurate.
+
+* Immutable proof
+
+Only REPORT.org differs from the fully reviewed 1e611 snapshot.
+The complete lsms_library and tests Git tree objects remain identical; their IDs are in =documentation-amendment-pass.json=.
+The original full source/runtime PASS remains preserved.
+No cohort/test rerun or tracked/Git/GitHub mutation was performed.
+The frozen worktree remains clean at 1e611.
+
+Sue

@@ -1,0 +1,115 @@
+{
+  "status": "ALL_RETAINED_NATIVE_GRAMMAR_AND_AB_ELIGIBILITY_PASS",
+  "retained_unique_native_plot_tuples": 56841,
+  "associated_raw_crop_rows": 140961,
+  "all_raw_crop_rows": 149497,
+  "all_raw_area_rows": 42841,
+  "all_raw_rows": 192338,
+  "all_retained_raw_crop_suffixes_nonempty_ASCII_decimal": true,
+  "all_native_HH_nonempty": true,
+  "all_retained_source_tuples_invert_exactly": true,
+  "unmatched_retained_tuples": 0,
+  "public_plot_keys_with_multiple_native_HH": 0,
+  "source_area_parcel_visit_eligibility": [
+    {
+      "present": "A",
+      "positive": "",
+      "keys": 3786
+    },
+    {
+      "present": "A",
+      "positive": "A",
+      "keys": 28227
+    },
+    {
+      "present": "AB",
+      "positive": "A",
+      "keys": 2
+    },
+    {
+      "present": "AB",
+      "positive": "AB",
+      "keys": 2
+    },
+    {
+      "present": "B",
+      "positive": "",
+      "keys": 1417
+    },
+    {
+      "present": "B",
+      "positive": "B",
+      "keys": 9403
+    }
+  ],
+  "native_crop_public_witness_rows": 56841,
+  "native_area_public_witness_rows": 42841,
+  "denominator_scope": "Associated raw crop rows are the subset whose native plot tuple is retained. All decoded source rows and area rows are separately reported.",
+  "waves": [
+    {
+      "wave": "2005-06",
+      "retained_unique_native_plot_tuples": 0,
+      "associated_raw_crop_rows": 0,
+      "all_raw_crop_rows": 0,
+      "raw_area_rows": 5463,
+      "positive_area_rows": 5429
+    },
+    {
+      "wave": "2009-10",
+      "retained_unique_native_plot_tuples": 9278,
+      "associated_raw_crop_rows": 25837,
+      "all_raw_crop_rows": 30676,
+      "raw_area_rows": 5825,
+      "positive_area_rows": 5356
+    },
+    {
+      "wave": "2010-11",
+      "retained_unique_native_plot_tuples": 8103,
+      "associated_raw_crop_rows": 22491,
+      "all_raw_crop_rows": 23286,
+      "raw_area_rows": 4520,
+      "positive_area_rows": 4498
+    },
+    {
+      "wave": "2011-12",
+      "retained_unique_native_plot_tuples": 8416,
+      "associated_raw_crop_rows": 22004,
+      "all_raw_crop_rows": 22709,
+      "raw_area_rows": 4840,
+      "positive_area_rows": 4840
+    },
+    {
+      "wave": "2013-14",
+      "retained_unique_native_plot_tuples": 7968,
+      "associated_raw_crop_rows": 19919,
+      "all_raw_crop_rows": 21198,
+      "raw_area_rows": 5436,
+      "positive_area_rows": 5436
+    },
+    {
+      "wave": "2015-16",
+      "retained_unique_native_plot_tuples": 8480,
+      "associated_raw_crop_rows": 19644,
+      "all_raw_crop_rows": 19649,
+      "raw_area_rows": 5581,
+      "positive_area_rows": 5578
+    },
+    {
+      "wave": "2018-19",
+      "retained_unique_native_plot_tuples": 7818,
+      "associated_raw_crop_rows": 14194,
+      "all_raw_crop_rows": 14194,
+      "raw_area_rows": 5811,
+      "positive_area_rows": 1240
+    },
+    {
+      "wave": "2019-20",
+      "retained_unique_native_plot_tuples": 6778,
+      "associated_raw_crop_rows": 16872,
+      "all_raw_crop_rows": 17785,
+      "raw_area_rows": 5365,
+      "positive_area_rows": 5259
+    }
+  ],
+  "signed": "Sue"
+}

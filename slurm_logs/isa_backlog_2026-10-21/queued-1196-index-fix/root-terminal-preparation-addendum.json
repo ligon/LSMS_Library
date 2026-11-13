@@ -1,0 +1,8 @@
+{
+  "recorded_at_UTC": "2026-10-22T05:31:20.583260+00:00",
+  "base_worktree_add_terminal_exit": 0,
+  "original_root_metadata_before_terminal_handle_poll": true,
+  "initial_physical_clean_HEAD_checks_passed": true,
+  "qualification": "Root private metadata preparation followed the completed checkout output before polling its terminal handle. Handle now confirmed exit0; both HEAD/clean checks repeated before dispatch. No imports/tests/decode/API/product changes occurred.",
+  "signed": "Sue"
+}

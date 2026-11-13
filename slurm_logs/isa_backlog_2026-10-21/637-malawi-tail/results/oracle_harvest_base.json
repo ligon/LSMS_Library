@@ -1,0 +1,50 @@
+{
+ "2010-11": {
+  "oracle_rows": 33420,
+  "built_rows": 33420,
+  "only_oracle": 0,
+  "only_built": 0,
+  "quantity_mismatch": 0,
+  "oracle_na": 0,
+  "built_na": 0,
+  "oracle_sum": 970155.7999998778,
+  "built_sum": 970155.7999998778,
+  "raw_records": 33609
+ },
+ "2013-14": {
+  "oracle_rows": 12616,
+  "built_rows": 12616,
+  "only_oracle": 0,
+  "only_built": 0,
+  "quantity_mismatch": 0,
+  "oracle_na": 0,
+  "built_na": 0,
+  "oracle_sum": 257839.0,
+  "built_sum": 257839.0,
+  "raw_records": 12675
+ },
+ "2016-17": {
+  "oracle_rows": 37170,
+  "built_rows": 37170,
+  "only_oracle": 0,
+  "only_built": 0,
+  "quantity_mismatch": 0,
+  "oracle_na": 0,
+  "built_na": 0,
+  "oracle_sum": 1871058.4000000001,
+  "built_sum": 1871058.4000000001,
+  "raw_records": 37187
+ },
+ "2019-20": {
+  "oracle_rows": 51872,
+  "built_rows": 51872,
+  "only_oracle": 0,
+  "only_built": 0,
+  "quantity_mismatch": 0,
+  "oracle_na": 0,
+  "built_na": 0,
+  "oracle_sum": 1260873.9,
+  "built_sum": 1260873.9,
+  "raw_records": 52032
+ }
+}

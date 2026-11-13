@@ -30,6 +30,7 @@ exactly where a redirected ``to_parquet`` would.
 """
 from __future__ import annotations
 
+import copy
 import inspect
 import shutil
 import warnings
@@ -298,12 +299,15 @@ def test_full_request_with_no_wave_rows_still_fails_loudly(fakeland2):
 
 
 @needs_make
-def test_barren_subset_with_a_country_builder_keeps_the_legacy_fallback(fakeland2):
-    """Only the NO-builder route is cut off from the country fallback.  A
-    country script still answers a barren subset exactly as before (whether
-    it should is #1039-a's business)."""
+def test_barren_subset_with_a_country_builder_filters_its_result(fakeland2):
+    """The builder still runs, but its other-wave rows are not the answer.
+
+    GH1039 intentionally left this direct-builder subset defect for follow-up;
+    the wave-subset fix now applies the existing restriction to its result.
+    """
     c = fakeland2.build(country_script=_COUNTRY_SCRIPT)
-    assert _x(_barren(c)) == COUNTRY_X
+    _assert_empty_and_shaped(_barren(c))
+    assert _x(pd.read_parquet(fakeland2.var)) == COUNTRY_X
 
 
 @pytest.mark.parametrize("backend", ["dvc", "make"])
@@ -428,6 +432,176 @@ def test_absent_subset_without_make_preserves_unknown_country_rules(
     assert not fakeland2.var.exists()
 
 
+# ---------------------------------------------------------------------------
+# GH #1218 / PR #1221 follow-up: the constructed empty frame is never cached
+# ---------------------------------------------------------------------------
+#
+# A default-backend request asks ``absent_subset_frame`` twice: at the top of
+# ``load_dataframe_with_dvc`` and again inside ``load_from_waves(build_waves)``.
+# If ``_has_country_builder`` answered True and then False (its ``make -n``
+# probe answers True on OSError/timeout), the constructed empty frame came back
+# from the second check and was WRITTEN to var/ with the union coverage
+# manifest.  Review repro on development, Iraq ``shocks``: 8,812 rows of 2012,
+# then one empty 2006-07 request, then 0 rows of 2012.
+
+def _var_waves(fake) -> list[str] | None:
+    from lsms_library.local_tools import read_parquet_cache_waves
+    return read_parquet_cache_waves(fake.var)
+
+
+def _populate_one_wave(fake) -> bytes:
+    """Step 1: the populated wave builds and is cached with coverage [WAVE]."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        assert _x(C.Country(COUNTRY).build_me(waves=[WAVE])) == WAVE_X
+    assert fake.var.exists() and _var_waves(fake) == [WAVE]
+    return fake.var.read_bytes()
+
+
+def _assert_populated_wave_survives(fake, before: bytes | None) -> None:
+    """Step 3: the populated wave still serves its rows from a fresh instance."""
+    if before is not None:
+        assert fake.var.read_bytes() == before, \
+            f"var/ was rewritten; coverage now {_var_waves(fake)}"
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        again = C.Country(COUNTRY).build_me(waves=[WAVE])
+    assert _x(again) == WAVE_X and len(again) == 2, \
+        f"the populated wave now serves {len(again)} rows"
+
+
+def test_constructed_empty_is_marked_never_cache():
+    frame = C._empty_declared_frame({"index": "(t, i)", "x": "float"})
+    assert frame.attrs.get(C._CONSTRUCTED_EMPTY_ATTR) is True
+    assert C._is_constructed_empty(frame)
+    # A built frame that happens to be empty is not a constructed answer.
+    assert not C._is_constructed_empty(pd.DataFrame({"x": pd.Series([], dtype=float)}))
+    assert not C._is_constructed_empty({}) and not C._is_constructed_empty(None)
+
+
+def test_a_marked_frame_with_rows_is_never_skipped():
+    """``attrs`` ride through single-input operations, so a frame grown from
+    the constructed empty one can carry the marker with rows; the write guard
+    must not skip it (round-3 review: ``reindex``, ``combine_first``,
+    ``align`` and ``.loc`` enlargement all propagate it in pandas 3)."""
+    frame = C._empty_declared_frame({"index": "(t, i)", "x": "float"})
+    grown = frame.reindex(pd.MultiIndex.from_tuples([("2001", "h1")], names=["t", "i"]))
+    assert len(grown) == 1 and grown.attrs.get(C._CONSTRUCTED_EMPTY_ATTR) is True
+    assert not C._is_constructed_empty(grown)
+
+
+@pytest.mark.parametrize("write_site", ["no_stage", "dvc_fallback"])
+def test_flaky_predicate_cannot_cache_the_constructed_empty(
+        fakeland2, monkeypatch, caplog, write_site):
+    """The reviewer's forced race, hermetic: the predicate says True to the
+    first absence check and False to the second.  At BOTH write sites of
+    ``load_dataframe_with_dvc`` the constructed empty frame must be served and
+    not written; the populated wave's cache and rows must survive."""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    fakeland2.build(makefile=None)
+
+    class _NoStageRepo:          # a DVC repo with no materialize stages
+        def __init__(self, *a, **k):
+            pass
+
+        def close(self):
+            pass
+
+    def _no_repo(*a, **k):
+        raise C.DvcException("not a DVC repo (test)")
+
+    monkeypatch.setattr(C, "Repo", _NoStageRepo if write_site == "no_stage" else _no_repo)
+    monkeypatch.setattr(C.Country, "_resolve_materialize_stages", lambda self, m, w: [])
+
+    before = _populate_one_wave(fakeland2)
+
+    real = C.Country._has_country_builder
+    calls = []
+
+    def flaky(self, method_name):
+        calls.append(method_name)
+        return True if len(calls) == 1 else real(self, method_name)
+
+    monkeypatch.setattr(C.Country, "_has_country_builder", flaky)
+    caplog.clear()
+    with caplog.at_level("WARNING"):
+        _assert_empty_and_shaped(_barren(C.Country(COUNTRY)))
+    monkeypatch.setattr(C.Country, "_has_country_builder", real)
+    assert calls == [TABLE, TABLE], f"the race did not happen: {calls}"
+    fell_back = any("DVC unavailable for build_me" in r.getMessage() for r in caplog.records)
+    assert fell_back is (write_site == "dvc_fallback"), "wrong write site exercised"
+    assert _var_waves(fakeland2) == [WAVE]
+    _assert_populated_wave_survives(fakeland2, before)
+
+
+def _fault_first_probe(monkeypatch) -> list:
+    """Make the first ``make -n`` rule probe raise OSError; later ones run."""
+    real_run = C.subprocess.run
+    probes = []
+
+    def first_probe_fails(command, *args, **kwargs):
+        if isinstance(command, list) and command[:2] == ["make", "-n"]:
+            probes.append(command[-1])
+            if len(probes) == 1:
+                raise OSError(11, "Resource temporarily unavailable (test)")
+        return real_run(command, *args, **kwargs)
+
+    monkeypatch.setattr(C.subprocess, "run", first_probe_fails)
+    return probes
+
+
+@needs_make
+def test_a_faulted_probe_cannot_cache_the_empty_or_stick(fakeland2, monkeypatch):
+    """A real ``make -n`` probe on a wave-only Makefile whose FIRST call raises
+    OSError (the fail-safe True), inside a default-backend barren request.
+    The request's second absence check probes again and gets False, so the
+    request does see True then False -- and the marker guard keeps the
+    constructed empty frame out of var/.  The fail-safe True is not memoised;
+    the completed answer is."""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    fakeland2.build()                      # wave-only Makefile: no country rule
+    before = _populate_one_wave(fakeland2)
+    probes = _fault_first_probe(monkeypatch)
+    c = C.Country(COUNTRY)
+    _assert_empty_and_shaped(_barren(c))
+    assert len(probes) == 2, f"expected the fault then one completed probe: {probes}"
+    _assert_populated_wave_survives(fakeland2, before)   # var/ byte-identical
+    # The completed answer (no rule) is the instance's memo: no third probe.
+    assert c._has_country_builder(TABLE) is False
+    assert len(probes) == 2
+
+
+@needs_make
+@pytest.mark.parametrize("backend", ["make", "dvc"])
+def test_a_transient_probe_fault_is_not_sticky(fakeland2, monkeypatch, backend):
+    """Round-3 review of the memo: storing the fail-safe True made one probe
+    fault last for the instance's lifetime.  Under the make backend, later
+    calls served the rule-less (here: poisoned) var/ -- call 2 gave 3 rows of
+    x=99 for a wave that lacks the table, call 3 the same 3 rows for the
+    populated wave; on a cold default-backend root every later barren
+    request raised ``Could not materialize``.  Development re-probes and
+    answers correctly; so must the memo.  Call 1 is the faulted call itself
+    and keeps its pre-existing (development) behaviour, so it is not
+    asserted."""
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", backend)
+    c = fakeland2.build()                  # wave-only Makefile: no country rule
+    if backend == "make":
+        fakeland2.plant_var()              # rule-less, wrong var/ (x=99)
+    probes = _fault_first_probe(monkeypatch)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        try:
+            c.build_me(waves=[BARREN])     # call 1: the faulted probe
+        except RuntimeError:
+            pass
+        _assert_empty_and_shaped(c.build_me(waves=[BARREN]))       # call 2
+        populated = c.build_me(waves=[WAVE])                         # call 3
+    assert _x(populated) == WAVE_X and len(populated) == 2, \
+        f"call 3 served {len(populated)} rows x={sorted(_x(populated))}"
+    assert len(probes) >= 2, "the instance never probed again after the fault"
+    assert c._has_country_builder(TABLE) is False
+
+
 def test_empty_declared_frame_has_the_declared_shape():
     entry = {"index": "(t, v, i)", "x": "float", "y": {"type": "str", "optional": True},
              "materialize": "make"}
@@ -438,6 +612,232 @@ def test_empty_declared_frame_has_the_declared_shape():
     assert all(str(df.index.get_level_values(n).dtype) == "str" for n in df.index.names)
     assert list(C._empty_declared_frame({"x": "float"}).columns) == ["x"]
     assert C._empty_declared_frame(None).empty
+
+
+def test_empty_declared_frame_keeps_interleaved_optional_declaration_order():
+    entry = {
+        'index': '(t, i)',
+        'Unit': {'type': 'str', 'optional': True},
+        'Quantity': 'float',
+        'Flag': {'type': 'bool', 'optional': True},
+        'Count': 'int',
+        'Factor': {'type': 'float', 'optional': True},
+        'Label': {'type': 'str', 'optional': False},
+        't': 'str',
+        'i': {'type': 'str', 'optional': True},
+        'materialize': 'make',
+        'backend': 'make',
+        'aggregation': {'Quantity': 'sum'},
+        1: 'str',
+    }
+    frame = C._empty_declared_frame(entry)
+    # A source declaration is the oracle; requiredness is not a sort key.
+    assert list(frame.columns) == ['Unit', 'Quantity', 'Flag', 'Count',
+                                   'Factor', 'Label']
+    assert frame.empty and list(frame.index.names) == ['t', 'i']
+    assert all(str(frame.index.get_level_values(n).dtype) == 'str'
+               for n in frame.index.names)
+    # GH #1218 intentionally extends this empty-only dtype contract; the
+    # declaration order and index contract from GH #1215 stay the same.
+    assert list(frame.dtypes) == [pd.StringDtype(), pd.Float64Dtype(),
+                                  pd.BooleanDtype(), pd.Int64Dtype(),
+                                  pd.Float64Dtype(), pd.StringDtype()]
+
+
+@pytest.mark.parametrize('entry,columns,levels', [
+    ({'Z': 'float', 'A': 'str'}, ['Z', 'A'], [None]),
+    ({'Z': {'type': 'float', 'optional': True},
+      'A': {'type': 'str', 'optional': True}}, ['Z', 'A'], [None]),
+    ({'index': '(t, i)', 't': 'str', 'i': 'str'}, [], ['t', 'i']),
+    ({'index': '(t, i)', 'Z': 'float',
+      'A': {'type': 'str', 'optional': False}}, ['Z', 'A'], ['t', 'i']),
+    (None, [], [None]),
+    ('not a mapping', [], [None]),
+])
+def test_empty_declared_order_preserves_existing_shapes(entry, columns, levels):
+    frame = C._empty_declared_frame(entry)
+    assert frame.empty
+    assert list(frame.columns) == columns
+    assert list(frame.index.names) == levels
+
+
+# GH #1218: type and optional membership are independent declarations.
+@pytest.mark.parametrize('form', ['scalar', 'required', 'implicit-required', 'optional'])
+@pytest.mark.parametrize('declared,expected', [
+    ('str', pd.StringDtype()), ('string', pd.StringDtype()),
+    ('bool', pd.BooleanDtype()), ('int', pd.Int64Dtype()),
+    ('float', pd.Float64Dtype()),
+    ('datetime', 'calendar'), ('date', 'calendar'), ('timestamp', 'calendar'),
+])
+def test_constructed_empty_uses_existing_explicit_nullable_types(form, declared, expected):
+    spec = declared if form == 'scalar' else {
+        'type': declared, 'optional': form == 'optional'}
+    if form == 'implicit-required':
+        spec.pop('optional')
+    entry = {'index': '(t, i)', 'Local': spec}
+    before = copy.deepcopy(entry)
+    frame = C._empty_declared_frame(entry)
+    if expected == 'calendar':
+        # The library's stored date resolution (GH #1045: build-time dates
+        # are datetime64[us]), not pandas' inference on an empty object
+        # column, which is [s] (PR #1221 follow-up).
+        expected = 'datetime64[us]'
+    pd.testing.assert_series_equal(
+        frame.Local, pd.Series([], index=frame.index, dtype=expected, name='Local'),
+        check_exact=True)
+    assert entry == before, 'empty construction mutated a source declaration'
+
+
+@pytest.mark.parametrize('declared', [
+    None, 'unknown', {'type': 'unknown', 'optional': True},
+    {'optional': True}, {'type': None, 'optional': True},
+    {'type': ['a', 'b'], 'optional': True},
+    {'type': {'name': 'float'}, 'optional': True},
+    {'type': True, 'optional': True}, {'type': 1, 'optional': False},
+])
+def test_constructed_empty_does_not_guess_missing_or_unknown_types(declared):
+    entry = {'index': '(t, i)', 'Local': declared}
+    before = copy.deepcopy(entry)
+    frame = C._empty_declared_frame(entry)
+    assert frame.empty and list(frame.columns) == ['Local']
+    assert frame.Local.dtype == object
+    assert entry == before
+
+
+@pytest.mark.parametrize('labels', [[], ['a', 'b']])
+def test_constructed_empty_keeps_existing_bare_list_string_semantics(labels):
+    frame = C._empty_declared_frame({'Local': labels})
+    pd.testing.assert_series_equal(
+        frame.Local, pd.Series([], dtype=pd.StringDtype(), name='Local'),
+        check_exact=True)
+
+
+def test_constructed_empty_payload_types_never_recast_declared_index_names():
+    entry = {'index': ['LocalInt', 'LocalString'],
+             'LocalInt': {'type': 'int', 'optional': False},
+             'LocalString': {'type': 'bool', 'optional': True},
+             'Payload': {'type': 'float', 'optional': True}}
+    frame = C._empty_declared_frame(entry)
+    expected = pd.MultiIndex.from_arrays(
+        [pd.Series([], dtype='str'), pd.Series([], dtype='str')],
+        names=['LocalInt', 'LocalString'])
+    pd.testing.assert_index_equal(frame.index, expected, exact=True)
+    for actual, original in zip(frame.index.codes, expected.codes):
+        assert actual.dtype == original.dtype
+    for actual, original in zip(frame.index.levels, expected.levels):
+        assert type(actual.dtype) is type(original.dtype)
+        assert actual.dtype.storage == original.dtype.storage
+        assert type(actual.dtype.na_value) is type(original.dtype.na_value)
+    assert list(frame.columns) == ['Payload']
+    assert frame.Payload.dtype == pd.Float64Dtype()
+
+
+def test_constructed_empty_canonical_dtype_still_wins_in_finalize(fakeland2):
+    country = fakeland2.build(makefile=None)
+    entry = {'index': '(t, i)', 'Age': {'type': 'bool', 'optional': True}}
+    frame = C._empty_declared_frame(entry)
+    assert frame.Age.dtype == pd.BooleanDtype()
+    expected = C._SCHEME_DTYPE_MAP[C._load_canonical_dtypes()['household_roster']['Age']]
+    assert expected != frame.Age.dtype, 'fixture must conflict with canonical Age'
+    result = country._finalize_result(frame, entry, 'household_roster')
+    assert result.empty and result.Age.dtype == expected
+
+
+@pytest.mark.parametrize('optional', [False, True])
+def test_populated_dict_coercion_and_optional_absence_remain_unchanged(optional):
+    frame = pd.DataFrame({'Local': [1.25, None]})
+    frame.attrs['marker'] = ('native', 'unchanged')
+    expected = frame.copy(deep=True)
+    C._enforce_declared_dtypes(frame, {
+        'Local': {'type': 'bool', 'optional': optional},
+        'Absent': {'type': 'str', 'optional': True},
+    })
+    pd.testing.assert_frame_equal(frame, expected, check_exact=True)
+    assert frame.attrs == expected.attrs
+    assert 'Absent' not in frame.columns
+
+
+_LOCAL_OPTIONAL_FIELDS = """\
+    Unit_purchased: {type: str, optional: true}
+    Received_as_gift: {type: bool, optional: true}
+    Quantity_received_as_gift: {type: float, optional: true}
+    Unit_received_as_gift: {type: str, optional: true}
+"""
+
+
+@needs_make
+@pytest.mark.parametrize('backend', ['dvc', 'make'])
+def test_optional_type_declarations_do_not_require_populated_fields(
+        fakeland2, monkeypatch, backend):
+    monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
+    scheme = _SCHEME_TWO_WAVES.replace(
+        '    x: float\n', '    x: float\n' + _LOCAL_OPTIONAL_FIELDS)
+    (fakeland2.country_dir / '_' / 'data_scheme.yml').write_text(scheme)
+    country = fakeland2.build()
+    frame = country.build_me(waves=[WAVE])
+    assert _x(frame) == WAVE_X
+    assert list(frame.columns) == ['x']
+    assert frame.x.dtype == pd.Float64Dtype()
+
+
+@pytest.fixture
+def typed_fakeland(fakeland2):
+    """Identical explicit country-local types on both framework heads."""
+    scheme = _SCHEME_TWO_WAVES.replace(
+        '    x: float\n', '    x: float\n' + _LOCAL_OPTIONAL_FIELDS)
+    (fakeland2.country_dir / '_' / 'data_scheme.yml').write_text(scheme)
+    script = _WAVE_SCRIPT.replace('"x": [1.0, 2.0]', '''"x": [1.0, 2.0],
+    "Unit_purchased": pd.Series(["bag", pd.NA], dtype="string"),
+    "Received_as_gift": pd.Series([True, pd.NA], dtype="boolean"),
+    "Quantity_received_as_gift": pd.Series([2.0, pd.NA], dtype="Float64"),
+    "Unit_received_as_gift": pd.Series(["tin", pd.NA], dtype="string")''')
+    (fakeland2.country_dir / WAVE / '_' / f'{TABLE}.py').write_text(script)
+    return fakeland2
+
+
+def _assert_local_empty_types(frame):
+    assert frame.empty
+    assert list(frame.columns) == [
+        'x', 'Unit_purchased', 'Received_as_gift',
+        'Quantity_received_as_gift', 'Unit_received_as_gift']
+    assert list(frame.dtypes) == [pd.Float64Dtype(), pd.StringDtype(),
+                                  pd.BooleanDtype(), pd.Float64Dtype(),
+                                  pd.StringDtype()]
+
+
+@needs_make
+@pytest.mark.parametrize('backend', ['dvc', 'make'])
+@pytest.mark.parametrize('prior', ['cold', 'supported', 'all'])
+def test_constructed_empty_country_local_types_across_no_builder_routes(
+        typed_fakeland, monkeypatch, backend, prior):
+    monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
+    country = typed_fakeland.build()
+    if prior != 'cold':
+        populated = country.build_me(waves=[WAVE] if prior == 'supported' else None)
+        assert _x(populated) == WAVE_X
+        assert populated.Unit_purchased.dtype == pd.StringDtype()
+        assert populated.Received_as_gift.dtype == pd.BooleanDtype()
+    before = {p: (p.read_bytes(), p.stat().st_mode, p.stat().st_mtime_ns)
+              for p in typed_fakeland.country_dir.parent.parent.rglob('*.parquet')}
+    _assert_local_empty_types(_barren(country))
+    after = {p: (p.read_bytes(), p.stat().st_mode, p.stat().st_mtime_ns)
+             for p in typed_fakeland.country_dir.parent.parent.rglob('*.parquet')}
+    assert after == before, 'absent-wave request changed a populated cache'
+
+
+@needs_make
+def test_constructed_empty_after_declared_wave_produces_no_rows(typed_fakeland):
+    # This wave declares the table, so absent_subset_frame cannot short-circuit.
+    # Its real script writes a shaped empty result; load_from_waves reaches the
+    # separate no-country-builder/no-results constructor.
+    script = _WAVE_SCRIPT.replace('["2001", "2001"]', '[]').replace(
+        '["h1", "h2"]', '[]').replace('[1.0, 2.0]', '[]')
+    (typed_fakeland.country_dir / WAVE / '_' / f'{TABLE}.py').write_text(script)
+    country = typed_fakeland.build()
+    _assert_local_empty_types(country.build_me(waves=[WAVE]))
+    assert typed_fakeland.wave_out.exists(), 'declared wave script did not run'
+    assert pd.read_parquet(typed_fakeland.wave_out).empty
+    assert not typed_fakeland.var.exists()
 
 
 # ---------------------------------------------------------------------------

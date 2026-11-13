@@ -36,7 +36,7 @@ import pandas as pd
 import numpy as np
 
 from lsms_library.local_tools import get_dataframe, to_parquet
-from mali import i as mali_i, pid as mali_pid, people_last7days_finalize
+from mali import eaci14_i as mali_i, pid as mali_pid, people_last7days_finalize
 
 WAVE = '2014-15'
 

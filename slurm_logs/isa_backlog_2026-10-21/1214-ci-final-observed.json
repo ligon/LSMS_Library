@@ -1,0 +1,71 @@
+{
+  "observed_at_UTC": "2026-10-22 20:32:57 UTC",
+  "head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+  "run": 39822550698,
+  "workflow": [
+    {
+      "id": 39822550698,
+      "name": "CI",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 2932,
+      "jobs_url": "https://api.github.com/repos/ligon/LSMS_Library/actions/runs/39822550698/jobs",
+      "logs_url": "https://api.github.com/repos/ligon/LSMS_Library/actions/runs/39822550698/logs",
+      "workflow_id": 209110098
+    }
+  ],
+  "jobs": [
+    {
+      "id": 119977316030,
+      "name": "unit-tests",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 119977316502,
+      "name": "windows-smoke",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 119977317724,
+      "name": "windows-script-build",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119977318009,
+      "name": "data-tests",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119977318196,
+      "name": "docs",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119977318353,
+      "name": "dvc-remote-reachability",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119977318397,
+      "name": "refresh-dvc-locks",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 119977319595,
+      "name": "dvc-lock-check",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "supersedes_current_pending_status_only": "1214-ci-metadata-qualification.json remains immutable historical observation. Same original run queried; no rerun triggered.",
+  "data_suite_pass": false,
+  "scope": "Exact-head unit-tests and Windows smoke only; six other jobs including data-tests skipped.",
+  "signed": "Sue"
+}

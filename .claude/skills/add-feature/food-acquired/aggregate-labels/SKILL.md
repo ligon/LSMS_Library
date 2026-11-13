@@ -6,7 +6,7 @@ description: This skill should be used when calling `labels='Aggregate'` (or any
 # The `labels='Aggregate'` contract
 
 `labels='Aggregate'` collapses a country's fine `j` food items onto a coarser
-grouping for demand estimation (Uganda: **175 fine items → 80 groups**; every
+grouping for demand estimation (Uganda: **175 fine items → 90 groups**; every
 `Matoke (bunch)`/`(heap)`/`(cluster)` → `Matoke`). The *design* of those buckets
 — when to add them, the CFE β-spread criterion, carve-outs, the `Aggregate
 (short)` companion — is owned by the parent skill's **"Designing the `Aggregate

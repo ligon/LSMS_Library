@@ -1,0 +1,123 @@
+#+TITLE: Independent review - Nigeria #1095 partial C8 unit repair
+#+AUTHOR: Sue
+#+DATE: 2026-10-21
+
+* Verdict
+
+PASS for the approved partial boundary at detached =b8b03e448783c6803648623dcf5318673b3ddde1=, against immutable f8 =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+No blocking defect was found.
+Runtime/tests match =e55de22856064ab3b01f1bc5fcfac681f2f3ebc8=; the ledger-first commit is =f4d17e5d5535859a06a1382e79be7788d45322c3=.
+This does not complete #1095's literal retention intent: future unplaced recorded labels are accurately warned and then dropped under the unchanged policy.
+Keep the explicit Tier C residual at =slurm_logs/isa_backlog_2026-10-21/Nigeria/1095/DRAFT-RESIDUAL.md:3= open or split it explicitly.
+
+* Code and country grounding
+
+Read full =Nigeria/_/CONTENTS.org= first, including TODO/WAITING/LOGBOOK material, then the task/standing ledgers, source-safe evidence and reproduction/residual notes.
+C8 is PH-only; W1/W2 fix units by item, W3 has text sizes and split C8a/C8b sources, and W4/W5 use coded sizes.
+Its cluster key is composite state/LGA/EA, with the existing =i==v= shim protecting item identity on intermediate reads.
+The existing metric rescue, unrecorded-size deletions and first-row reducer remain deliberate parts of the contract.
+The nonfood WAITING recall-window caveat and sampling/security limitations are unrelated to these label aliases.
+
+The ten aliases at =Nigeria/_/nigeria.py:412= already exist as Preferred Labels; the categorical dictionary is unchanged.
+Actual community wiring uses =_canon_community_unit=; shared =_canon_unit=, input/food/crop functions and both size algorithms have unchanged AST bodies.
+The only changed existing bodies are the community builder, the reporter and its warning-class documentation.
+The optional disposition at =nigeria.py:385= preserves the old default output and exact warning text, including a mixed Series with duplicate index labels, nulls, blanks, codes and repeated unknown labels.
+The report mask at =nigeria.py:2416= runs after rescue and limits warnings to otherwise eligible positive-price/resolved-cluster/item rows.
+Two distinct unknown labels at one cluster/item are counted honestly, warned, then dropped; no retention fallback or physical factor is implied.
+
+Two historical documentation claims require qualification and are already explicitly qualified by the candidate:
+- =CONTENTS.org:1173= says "124,539 priced rows"; normal held-source f8 cold output is 131,338, as the added note at line 1283 records.
+- =CONTENTS.org:1314= says the W5 quantity/factor fields "agree with it and are a cross-check"; only 54 / 5,339 metric-size rows record quantity and 5,167 record factor, with 258 quantity observations in all 56,388 source rows.
+These are measured limits on the old notes, not grounds to silently rewrite their history or change #834's size rule.
+
+* Independent source and data results
+
+Preparation completed before all dependent probes: 13 sources and 28,426,011 original bytes per new physical root, including both lazy panel-ID covers and the two held Stata twins.
+Original and copied SHA256 receipts match; DVC sidecars and the existing DVC hash reader verify identity.
+The two CSVs retain their CRLF bytes and pass =md5-dos2unix=; no byte rewriting or raw-MD5-equals-text-key assumption was used.
+Both roots began with absent Nigeria/Niger L2, and all source reads remained offline under socket guards plus =unshare -rn=.
+
+| PH round | f8 rows | candidate rows | source-key gains | intentional drop | derived rows |
+|----------+---------+----------------+------------------+------------------+--------------|
+| 2011Q1   |   27104 |          27104 |                0 |                0 |            0 |
+| 2013Q1   |   27079 |          27079 |                0 |                0 |            0 |
+| 2016Q1   |   20562 |          20562 |                0 |            14603 |            1 |
+| 2019Q1   |   29275 |          31757 |             2482 |                0 |         5393 |
+| 2024Q1   |   27318 |          30064 |             2746 |              133 |         5339 |
+| Total    |  131338 |         136566 |             5228 |                  |              |
+
+The gained-row oracle uses held raw prices, decoded source label bodies, existing Preferred Labels, source cluster/item keys and an independent metric-size regex; it does not call the candidate alias function or use its staged output to decide recovery eligibility.
+Every gained key and native Price matches, Derivation is missing on every gain, and there is no collision or fanout.
+The two gained W5 Bottle/Can cells have ordinal =0. SMALL= sizes and retain native Price.
+No new cluster or item identity is introduced.
+All old helper, actual wave, raw-country and public Country rows retain exact values, null masks, dtypes, axis names/types and full attrs; W1-W3 full frames match exactly.
+Helper-to-parquet/API checks allow only the existing string/dtype serialization/coercion, separately from strict before/after equality within each layer.
+Exact source drop masks, not just their counts, match for W3/W4/W5.
+
+Fresh-process warm Country reads match cold frames/attrs with current hashes and complete wave manifests, and no private country-file byte or nanosecond mtime changes.
+Both =Feature(..., currency=None)= and the ordinary default Feature preserve every old row, dtypes, axis metadata and full attrs while growing 177,381 -> 182,609.
+The candidate parts match normal Country values after existing canonical neutral levels and column union.
+Healthy Niger remains 46,043 rows with all payloads/attrs exact; its two wave caches and one country cache are byte-identical across the independent roots.
+
+* Scanner, tests and hash census
+
+All six scanner records match individually and as a full multiset after normalizing checkout/private-data paths only; no metric, key or timing field is removed.
+The six are two intentional cluster-level =has_household_index= warnings, two known =ClusterIdentityWarning= records, one neutral-axis alignment =UserWarning=, and one existing =PopulationHeterogeneityWarning=.
+There are zero fail/error findings and no community_prices phase-2 kwargs grid.
+Safe classification and per-record digests are in =proof.json=; full warning text stays private.
+
+The exact author-focused selection independently passes 60 tests with zero skips, using two loadfile workers and the same three explicit unstaged food/crop/input deselections.
+All ten actual-builder recovery tests fail on unchanged f8 (35 other cases deselected).
+Twenty-three additional reviewer control groups pass: default text/data conservation; malformed/missing/bare-code labels; two same-key unknown labels; eligibility exclusions; metric rescue before reporting; and invalid/zero/ordinal/ONE SIZE ONLY behavior under the old rule.
+Both baseline and candidate =make api-audit= runs pass via the mounted-image adapter.
+
+Actually computed all 549 country/table cells and all 39 framework fingerprints on both trees.
+Exactly 24 Nigeria cells change, 525 other-country cells remain exact, and all 39 framework fingerprints remain exact.
+This establishes cache scope, not output equality for unbuilt Nigeria tables.
+
+* Commands, preservation and limits
+
+Private working evidence root: =/local/job40255479/control/isa-backlog-20261021/review-1095-Nigeria=.
+The new =run.sh= binds candidate to the immutable review tree and baseline to f8, asserts identity in each probe, sets numerical/build/Make threads to one and runs mounted Python in a network namespace with the socket guard.
+Preparation was completed before cold builds; each data root had one data consumer at a time.
+The independently inspected API/build/audit harnesses were adapted privately; the source oracle and extra adversarial controls were written independently.
+
+#+begin_src sh
+P=/local/job40255479/control/isa-backlog-20261021/review-1095-Nigeria
+bash "$P/run.sh" candidate "$P/build.py" candidate cold > "$P/candidate-cold.log" 2>&1
+bash "$P/run.sh" baseline "$P/build.py" baseline cold > "$P/baseline-cold.log" 2>&1
+bash "$P/run.sh" candidate "$P/build.py" candidate warm > "$P/candidate-warm.log" 2>&1
+bash "$P/run.sh" baseline "$P/build.py" baseline warm > "$P/baseline-warm.log" 2>&1
+bash "$P/run.sh" candidate "$P/source-proof.py" > "$P/source-proof-complete.log" 2>&1
+bash "$P/run.sh" candidate "$P/adversarial.py" > "$P/adversarial.log" 2>&1
+bash "$P/run.sh" candidate "$P/feature_probe.py" candidate > "$P/candidate-feature.log" 2>&1
+bash "$P/run.sh" baseline "$P/feature_probe.py" baseline > "$P/baseline-feature.log" 2>&1
+bash "$P/run.sh" candidate "$P/hash_inventory.py" "$P/candidate-hashes.json"
+bash "$P/run.sh" baseline "$P/hash_inventory.py" "$P/baseline-hashes.json"
+bash "$P/run.sh" candidate "$P/final-proof.py"
+bash "$P/run.sh" candidate -m pytest -q -n 2 --dist=loadfile -p no:cacheprovider --basetemp="$P/pytest-focused-repeat" \
+  tests/test_nigeria_community_units.py tests/test_gh1047_nigeria_unit_codes.py \
+  tests/test_nigeria_cluster_identity.py::test_community_prices_is_post_harvest_only \
+  tests/test_nigeria_cluster_identity.py::test_community_prices_metric_sizes_are_per_unit \
+  tests/test_nigeria_cluster_identity.py::test_community_prices_unrecorded_package_sizes_dropped \
+  -k 'not no_food_unit_is_float_stringified and not no_crop_row_has_a_nan_unit and not no_plot_input_has_a_nan_unit' \
+  > "$P/tests-focused-repeat.log" 2>&1
+bash "$P/run.sh" baseline -m pytest -q -p no:cacheprovider --basetemp="$P/pytest-baseline-repeat" \
+  /local/job40255479/worktrees/isa-review-1095-Nigeria/tests/test_nigeria_community_units.py \
+  -k recorded_c8_unit_survives_actual_builder > "$P/baseline-ten-tests-repeat.log" 2>&1
+# The last command must exit 1 with exactly ten recovery failures.
+#+end_src
+
+Cold commands refuse existing L2; replay cold only in a new physically seeded private root with preparation gated first.
+The existing review root is warm and is preserved as evidence.
+Private failed checker-development logs are retained; they reflect corrected cross-layer dtype, nullable-mask and warning-classification assumptions, not successful runs or product failures.
+Author interrupted/overlapping first-root evidence was excluded; only the quiescent READY receipts and final source root were used for held-source preparation/reference.
+
+Full content, file modes, HEAD and clean status match before/after for the review tree, frozen writer, f8, earlier Nigeria writer, both protected #1034 snapshots and protected #1144 snapshot.
+All 173 source/reference files retain their full receipt hashes, modes, sizes and mtimes.
+No tracked edit, Git/ref mutation, GitHub write, acquisition, DVC CLI, shared-cache write, read-gate bypass, in-tree payload, fixture/golden/dependency change or composition occurred.
+There are zero owned live Python data consumers and zero network connect attempts at release.
+
+Limits: held C8 sources and required identity dependencies only; no new questionnaire PDF, no blanket suite or other-table cold output claim, no arbitrary-unit retention design, and no composition with the other Nigeria fixes.
+
+Sue

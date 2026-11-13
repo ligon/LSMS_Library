@@ -1,0 +1,109 @@
+#+title: GH1210 invalid food-wave author verification
+#+author: Sue
+#+date: 2026-10-22
+
+* Source and change
+
+Final clean source =128cc095a62cbd210e30d2256359acfe53d4a2c5= and separate ledger =cf95d6812c190304b38af4ce492c3339285528c8= descend independently from actual release parent =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+Both commits completed exit0 with =SUCODER: published= through normal hooks.
+The four-path diff adds the ledger, 17 framework lines, 14 country-note lines and the 28-case regression file.
+Data actors ran on dirty f8 with the patch; final protection binds their physical Country receipts and the tested regression SHA to the committed framework/test bytes.
+The prior GH1209 source and evidence remain frozen and read-only.
+No GitHub publication, merge or acceptance is claimed.
+
+The new Country helper prepares explicit non-list iterables once, retains order/duplicates, and asks existing =self[bad]= only for the first invalid identifier.
+Valid Wave objects are not constructed just to validate a selection.
+The internal aggregate guard precedes cache/panel maintenance; the public guard follows existing argument validation and precedes valuation/derived pre-work.
+None, empty selections, list/tuple controls, order, duplicates and the existing string-as-characters behavior are preserved in the bounded tests.
+The parent exhausted a one-shot iterator and returned empty; the candidate returns its requested data.
+That seventeenth parent failure is a measured behavior change, not evidence of universal iterable compatibility.
+
+* Runtime, preparation and fingerprint cost
+
+The guarded package/data launch wrapper fixes the mounted interpreter under =unshare -rn=, pre-import socket/write guards, clean credential-free environment, exact intended checkout/PYTHONPATH/countries/config/data identities and fresh private roots.
+The initial supposed-parent xdist worker identity history is unrecorded and diagnostic only, as detailed below.
+Numerical/build/Make settings are one, including explicit LSMS_MAKE_JOBS=1, actual helper result None and MAKEFLAGS=-j1.
+Only root-prepared exact DVC-temp links may receive ignored writes through source paths.
+The mounted generation is read directly from VENV_GENERATION; no status utility, dependency/image update, DVC CLI, network/acquisition, bypass, manual cache stamp/promotion, FDC or nutrition call is used.
+Precise interpreter, dependency, source and script SHA256 pins are in pins.json and private actor records.
+
+Nineteen declared binary Stata providers were authenticated before decoding with genuine binary MD5, SHA256, declared size, mode/mtime, nonsymlink and nlink1 checks.
+Six physically new L1-only roots contain 19 x 2 x 6 = 228 binary copies: both legacy and files/md5 cache layouts for each provider.
+All copies have distinct inodes and nlink1, separate from held providers.
+No sidecars were copied; their nineteen declared hashes are recorded separately.
+The threatened native wave parquets were copied to evidence-only archives before each invalid request; those archives never enter a data root or cache/build path.
+Evicted parent evidence was not reconstructed by replay.
+
+The pre-data census compares all 549 country, 39 framework and 1,362 declared-wave keys against actual f8.
+All 1,950 fingerprints move because the aggregate entry is tagged build code.
+No exclusion was added to hide this cost, and no corpus rebuild was run to compensate.
+Ordered public API names remain exact, and complete legacy-registration metadata remains equal as a multiset.
+Fingerprint invalidation is distinct from the measured valid-output equality below.
+
+* Results and error contracts
+
+The candidate has 28 passing regressions.
+The corrected actual-parent control has sixteen invalid/mixed failures, one separate exhausted-iterator failure and eleven passing ordinary controls.
+Twenty-one bounded existing GH479/GH891/GH1039 tests and the unmodified API/skill audit pass.
+Existing test selection omits S3, cache-bypass and unrelated broad-suite paths.
+
+For actual held sources, both all-bad and supported-plus-invalid f8 requests delete five native food parquets and alter five parent directories before raising KeyError.
+Their L1 blobs and country food parquet remain exact.
+The candidate preserves the complete 105-path L1/L2 physical state in both cases: pathset, bytes, size, mode, mtime, link/inode/device receipts and directories.
+Direct-food KeyError type/args match =__getitem__= exactly, with one KeyError in each captured cause/context chain.
+
+Controlled Default derived routes also pass the exact existing KeyError-args check before the parent fails the physical-state assertion.
+Their root cause is the invalid wave lookup; candidate validation deliberately moves that failure ahead of valuation lookup or legacy fallback.
+Detailed exception cause objects were not retained in those synthetic test cases, so no identical derived cause-chain claim is made.
+The two old controlled Make cases hit an explicit external-builder sentinel AssertionError; their underlying ordinary backend error was not measured there.
+The candidate exposes the selection KeyError before that builder.
+No claim is made that every legacy wrapped error class remains unchanged.
+The known f8 Malawi Make builder defect is retained outside this patch, with no new valid-Make data grid.
+
+All 56 corrected-comparator pairs pass strictly without normalization: 34 Country, twelve Feature and ten native-parquet pairs.
+These bind exact numeric values/null positions, used keys, complete axes including unused levels/codes, storage/null policy and typed attrs.
+The comparator passed all 39 named numeric/axis/typed-object controls and three supplemental string-storage controls.
+The Country grid covers valid Default cold/warm all-wave and 2013-14 singleton calls for food_acquired and its three derived callers, plus the independently built mixed-request roots.
+The native index is t,i,j,u,s; the actual food API index is i,t,v,j,u,s.
+All-wave food/expenditure/price/quantity row counts are 971531/681980/680400/971028; singleton counts are 81680/59264/59180/81675.
+Six valid warm cases write no parquet, and every stamped endpoint parquet has the actual current expected hash and adequate requested/full coverage.
+GH479 absent/stale hashless rebuilding and GH891 coverage growth remain tested.
+
+Both unmodified scoped scanners exit0 with 163 literally equal ordered records: 158 warnings, three passes and two retained assembly_nonempty failures for food_prices units=kgprice/unitprice.
+All sixteen valid Country warning sequences retain exact category/message order.
+Original warning filenames/line numbers and full child streams remain private; equal warning locations are not claimed.
+
+* Diagnostic history and limitations
+
+The first metadata scope checker stopped because it incorrectly required list order from set-derived legacy-registration discovery.
+Only that artifact checker was corrected to compare the complete metadata multiset; public ordered API names still compare in order.
+Original inventories, the stop record and command transcript are retained; no actor was replayed to fix the checker.
+
+The final full protection actor completed every source, frozen1209/218, provider, 228-copy and runtime comparison, then stopped at its last assertion because it incorrectly expected no guard log.
+Its actual terminal is exit1, not a full successful actor.
+The retained 285-byte log has six relative remove/rmdir denials (SHA256 6ab8bdea5387bafde436a30cfc753d9000ee95815ed0e1801fa2e1bee89c380c).
+Original per-event timestamps, dir_fd values and call stacks were not recorded.
+Last log mtime and the static GH479 fixture's Albania/2002/2003 cleanup support only an association with the 21-test run, not resolved endpoint attribution or harmlessness.
+No zero-denial or universal outside-write claim is made.
+The original source, empty redirected stream, last-assert traceback and exact full log remain private and immutable.
+Root requested no replay: a standalone stdlib metadata qualification binds that actual v1 stop, freshly checks source hashes and unchanged physical baseline metadata, and records the six denials.
+The prepared full v2 checker was not executed; no API/test/data actor or successful grid was replayed for this qualification.
+The final manifest and separate read-only postexit still hash every file inside this task prefix.
+
+The first supposed-parent xdist run unexpectedly passed all 28 tests.
+It is diagnostic only: controller identity did not establish worker identity, and worker cwd/package history was not captured.
+An absolute candidate test path selecting candidate rootdir/cwd is the identified likely mechanism, not invented recovered process history.
+The corrected parent run uses explicit base rootdir/importlib and a plugin that imports the full identity assertions in every fresh controller/worker before collection.
+That plugin version emitted no dynamic worker receipt files; its exact source bytes are archived, and actual f8 failure traces bind the Base implementation.
+The later existing-test run records every controller/worker import/session identity explicitly.
+The successful aligned candidate run and unaffected census/calibration actors were not replayed solely for this parent-launch correction.
+
+No universal other-country valid-output claim follows from the generic entry guard or corpus fingerprint measurement.
+Only Malawi source data were built; other-country existing checks are controlled/metadata tests.
+GH1208 registrations, GH1209 Make assembly, GH1204 valid-subset fallback, GH1196 string policy and scientific/unit residuals remain separate.
+Named scanner no-Price failures remain unchanged.
+Full warnings, identifiers, coordinates, row frames, provider paths and traces stay private.
+Only ALLOWLIST.json exports are safe to copy.
+READY is an author handoff for independent review, with complete physical/source/provider protection, host-level zero-consumer proof and separate read-only terminal-zero postexit verification; it is not acceptance.
+
+Sue

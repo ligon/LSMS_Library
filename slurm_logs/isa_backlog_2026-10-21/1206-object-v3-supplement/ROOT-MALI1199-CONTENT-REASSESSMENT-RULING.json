@@ -1,0 +1,22 @@
+{
+  "status": "PERMIT_NEW_CONTENT_COMPARISON_WITH_EXPLICIT_HISTORICAL_MTIME_GAP",
+  "at_UTC": "2026-10-22T12:38:12.962500+00:00",
+  "PR": 1199,
+  "authority_chain": "accepted Niger9bf full manifest -> protected-before Mali READYb8c receipt -> Mali declared9f0 manifest",
+  "READY_sha256": "b8c9abc6e691b0f185afd5089ae898292627e4020028308a9c35bcba42307da9",
+  "manifest_sha256": "9f0d0f55b5f9a94baf27c89660be29e5d0d7362796c1ed463178a9653abfe6f9",
+  "entries_all_SHA_bytes_mode_verified": 1190,
+  "historical_output_mtime_absent_entries": 1190,
+  "root_reason": "Historical SHA/bytes/mode establishes the original saved content. Current physical endpoints may be measured before new copies/decodes; that is a new baseline and cannot prove historical mtime continuity.",
+  "required": [
+    "Retain the initial historical-mtime gate stop and original manifests unchanged.",
+    "Create an explicitly new full current pre-read receipt baseline bound to the old authoritative SHA/bytes/mode for each selected original; reverify before every physical copy/decode.",
+    "Require no-symlink single-link originals/copies and distinct inodes; record declared MD5 where available, absent explicitly; no invented historical field.",
+    "Use a new output/cohort/version and corrected-v3 comparator, active offline/write guards and actual source class-module pins.",
+    "Report numerical/typed equality and historical-mtime gap as separate facts; do not upgrade old freeze/mtime claims or recover absent in-memory expectations.",
+    "No Country/Feature/source/pytest/CLI replay, stamping, cache bypass, or mutations of old evidence."
+  ],
+  "actual_historical_mtime_continuity_established": false,
+  "imports_payload_decodes_or_API": 0,
+  "signed": "Sue"
+}

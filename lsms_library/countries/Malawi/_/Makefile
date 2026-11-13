@@ -12,17 +12,38 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # _ROSTER_DERIVED — no country-level parquet is built or consulted.
 # See GH #218.
 
-all: $(parquet) $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet $(VAR_DIR)/people_last7days.parquet $(VAR_DIR)/community_prices.parquet
+all: $(parquet) food_acquired $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_food_inadequate.parquet $(VAR_DIR)/crop_production.parquet $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet $(VAR_DIR)/people_last7days.parquet $(VAR_DIR)/community_prices.parquet
 
-food_acquired = $(shell find $(rounds) -name food_acquired.py)
-# Wave-level parquets live in data_root, not in-tree
-food_acquired_parquet := $(foreach r,$(rounds),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(notdir $(r))/_/food_acquired.parquet)
+# Wave-level parquets live in data_root, not in-tree.
+#
+# GH #1237: every per-wave rule below names the wave's OWN script
+# (../%/_/<table>.py) as a prerequisite, beside malawi.py and, where a
+# malawi.py helper reads it by path, categorical_mapping.org.  Without the
+# wave script, an edit to it never rebuilt an existing wave parquet under
+# LSMS_BUILD_BACKEND=make (make judged the parquet current).  Same spelling
+# as GhanaAHIES/_/Makefile's data-root rule.  Under a pattern rule a
+# prerequisite that does not exist makes the rule inapplicable for that
+# stem, so a wave with no script answers "No rule to make target" rather
+# than running a recipe that cannot work: every wave named in a *_waves
+# list below must carry the script (tests/test_gh1237_malawi_make_prereqs.py).
+# A wave without the script is not asked for: a wave can be registered ahead
+# of its tables (2024-25 was, GH #1275), and naming it here failed the whole
+# target.
+food_acquired_parquet := $(foreach r,$(rounds),$(if $(wildcard $(r)/_/food_acquired.py),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(notdir $(r))/_/food_acquired.parquet))
 
-$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/food_acquired.parquet:
+# GH #1209: build the native waves here; Country assembles them through the
+# existing no-country-builder route (ledger 1209-malawi-food-builder, section 2).
+# This target does not write a country-level var/food_acquired.parquet.
+.PHONY: food_acquired
+food_acquired: $(food_acquired_parquet)
+
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/food_acquired.parquet: ../%/_/food_acquired.py malawi.py categorical_mapping.org
 	(cd ../$(*)/_/ && python food_acquired.py)
 
-$(VAR_DIR)/food_acquired.parquet: food_acquired.py $(food_acquired_parquet)
-	python food_acquired.py
+# 2024-25's script delegates to a wave-local helper that reads a wave-local
+# dictionary (PR #1604, IHS5 factor borrowing).  Prerequisites only: the
+# pattern rule above still supplies the recipe (GH #1237 class).
+$(LSMS_DATA_ROOT)/$(COUNTRY)/2024-25/_/food_acquired.parquet: ../2024-25/_/food_borrowing.py ../2024-25/_/borrow_dictionaries.json
 
 # --- non-FIES food security (GH #332) -------------------------------------
 # food_coping and months_food_inadequate are built only for the four IHS3+/
@@ -35,10 +56,10 @@ nonfies_waves := 2010-11 2013-14 2016-17 2019-20
 food_coping_parquet := $(foreach r,$(nonfies_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/food_coping.parquet)
 months_food_inadequate_parquet := $(foreach r,$(nonfies_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/months_food_inadequate.parquet)
 
-$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/food_coping.parquet: malawi.py
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/food_coping.parquet: ../%/_/food_coping.py malawi.py
 	(cd ../$(*)/_/ && python food_coping.py)
 
-$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/months_food_inadequate.parquet: malawi.py
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/months_food_inadequate.parquet: ../%/_/months_food_inadequate.py malawi.py
 	(cd ../$(*)/_/ && python months_food_inadequate.py)
 
 $(VAR_DIR)/food_coping.parquet: food_coping.py $(food_coping_parquet)
@@ -54,7 +75,7 @@ $(VAR_DIR)/months_food_inadequate.parquet: months_food_inadequate.py $(months_fo
 crop_waves := 2010-11 2013-14 2016-17 2019-20
 crop_production_parquet := $(foreach r,$(crop_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/crop_production.parquet)
 
-$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/crop_production.parquet: malawi.py
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/crop_production.parquet: ../%/_/crop_production.py malawi.py categorical_mapping.org
 	(cd ../$(*)/_/ && python crop_production.py)
 
 $(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet)
@@ -68,7 +89,7 @@ $(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet
 input_waves := 2010-11 2013-14 2016-17 2019-20
 plot_inputs_parquet := $(foreach r,$(input_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/plot_inputs.parquet)
 
-$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_inputs.parquet: malawi.py
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_inputs.parquet: ../%/_/plot_inputs.py malawi.py categorical_mapping.org
 	(cd ../$(*)/_/ && python plot_inputs.py)
 
 $(VAR_DIR)/plot_inputs.parquet: plot_inputs.py $(plot_inputs_parquet)
@@ -82,7 +103,7 @@ $(VAR_DIR)/plot_inputs.parquet: plot_inputs.py $(plot_inputs_parquet)
 livestock_waves := 2010-11 2013-14 2016-17 2019-20
 livestock_parquet := $(foreach r,$(livestock_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/livestock.parquet)
 
-$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/livestock.parquet: malawi.py
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/livestock.parquet: ../%/_/livestock.py malawi.py categorical_mapping.org
 	(cd ../$(*)/_/ && python livestock.py)
 
 $(VAR_DIR)/livestock.parquet: livestock.py $(livestock_parquet)
@@ -97,7 +118,7 @@ $(VAR_DIR)/livestock.parquet: livestock.py $(livestock_parquet)
 anthropometry_waves := 2010-11 2013-14 2016-17 2019-20
 anthropometry_parquet := $(foreach r,$(anthropometry_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/anthropometry.parquet)
 
-$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/anthropometry.parquet: malawi.py
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/anthropometry.parquet: ../%/_/anthropometry.py malawi.py
 	(cd ../$(*)/_/ && python anthropometry.py)
 
 $(VAR_DIR)/anthropometry.parquet: anthropometry.py $(anthropometry_parquet)
@@ -113,7 +134,7 @@ $(VAR_DIR)/anthropometry.parquet: anthropometry.py $(anthropometry_parquet)
 plot_labor_waves := 2010-11 2013-14 2016-17 2019-20
 plot_labor_parquet := $(foreach r,$(plot_labor_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/plot_labor.parquet)
 
-$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_labor.parquet: malawi.py
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_labor.parquet: ../%/_/plot_labor.py malawi.py categorical_mapping.org
 	(cd ../$(*)/_/ && python plot_labor.py)
 
 $(VAR_DIR)/plot_labor.parquet: plot_labor.py $(plot_labor_parquet)
@@ -128,7 +149,7 @@ $(VAR_DIR)/plot_labor.parquet: plot_labor.py $(plot_labor_parquet)
 people_last7days_waves := 2010-11 2013-14 2016-17 2019-20
 people_last7days_parquet := $(foreach r,$(people_last7days_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/people_last7days.parquet)
 
-$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/people_last7days.parquet: malawi.py
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/people_last7days.parquet: ../%/_/people_last7days.py malawi.py
 	(cd ../$(*)/_/ && python people_last7days.py)
 
 $(VAR_DIR)/people_last7days.parquet: people_last7days.py $(people_last7days_parquet)
@@ -146,7 +167,7 @@ $(VAR_DIR)/people_last7days.parquet: people_last7days.py $(people_last7days_parq
 community_prices_waves := 2010-11 2013-14 2019-20
 community_prices_parquet := $(foreach r,$(community_prices_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/community_prices.parquet)
 
-$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/community_prices.parquet: malawi.py
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/community_prices.parquet: ../%/_/community_prices.py malawi.py categorical_mapping.org
 	(cd ../$(*)/_/ && python community_prices.py)
 
 $(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parquet)
@@ -154,6 +175,23 @@ $(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parq
 
 %.parquet: %.py malawi.py
 	(cd $(@D) && python ./$(<F))
+
+# panel_ids.json / updated_ids.json are REVIEWED SOURCES, committed to the
+# config tree -- NOT build products (GH #914, #894).  They deliberately carry
+# no rule.  A rule here fires whenever panel_ids.py happens to be the newer
+# file, and on a pip install which of the two is newer is decided by the
+# millisecond the wheel was unpacked (measured on the real 0.13.0 wheel).  The
+# recipe then writes into site-packages, which on any shared install is not
+# writable by the user running the code -- PermissionError from three layers
+# inside a `make` subprocess.  Regenerating the crosswalk is a deliberate
+# maintainer action, reviewed as a diff to the committed JSON:
+#
+#     make panel-ids
+#
+# panel_ids.py reads each wave's `panel_ids:` block in data_info.yml.
+.PHONY: panel-ids
+panel-ids:
+	python panel_ids.py
 
 clean:
 	-rm $(parquet)

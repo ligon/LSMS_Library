@@ -11,20 +11,27 @@ import json
 
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
-from uganda import Waves, id_walk
+from uganda import id_walk
 
 
 pieces = []
-for t in Waves.keys():
-    fn = f'../{t}/_/plot_features.parquet'
+country = Country('Uganda')
+for t in country.waves:
+    wave = country[t]
+    # GH #1287; ledger §§2–4: absence is a declaration, not a read failure.
+    # Wave.data_scheme includes both YAML and native script declarations.
+    if 'plot_features' not in wave.data_scheme:
+        continue
+    fn = f'../{wave.wave_folder}/_/plot_features.parquet'
     try:
         df = get_dataframe(fn)
-    except Exception:
-        # Wave not yet wired for plot_features (either the .py
-        # script doesn't exist or the parquet hasn't been built).
-        # DVC raises PathMissingError here, not FileNotFoundError.
-        continue
+    except Exception as error:
+        raise RuntimeError(
+            f'Uganda/{t}: declared plot_features failed to load {fn}; '
+            'refusing a partial country table.'
+        ) from error
     pieces.append(df)
 
 assert pieces, "plot_features: no wave-level parquets found"

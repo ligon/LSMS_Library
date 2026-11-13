@@ -1,0 +1,54 @@
+{
+  "captured_at_UTC": "2026-10-22T20:42:31.807466+00:00",
+  "status": "READ_ONLY_NEXT_FRONTIER_RECHECK_NO_NEW_IMPLEMENTATION_ASSIGNED",
+  "current_active_issues": [
+    1188,
+    1215
+  ],
+  "scope_records_unchanged": 114,
+  "findings": [
+    {
+      "issue": 1135,
+      "fresh_issue_state": "open",
+      "dispatch_assessment": "Initial A classification is historical; current source measurements do not satisfy the complete settled measurement contract. Do not dispatch an all-unknown formatter patch or treat moved-prefix filtering as all-movers removal.",
+      "primary_source": "https://github.com/ligon/LSMS_Library/issues/1135",
+      "fixed_policy": "SPAN/no threshold/first-line physical-cluster count plus net-of-movers linked-household share; do not re-ask.",
+      "remaining_evidence": "All12boundaries need complete movement/physical-cluster measurements; Nigeria W5 retains20unknownmovement statuses. Public instrument follow-up does not resolve them."
+    },
+    {
+      "issue": 1118,
+      "fresh_issue_state": "open",
+      "dispatch_assessment": "Mali and Malawi remaining null-unit normalization are stronger next mechanical candidates under settled1041. Stack Malawi after1175/1193; preserve source eligibility, unchanged known units and postcollapse grain. Nigeria fill-vs-drop remains a separate source-eligibility decision.",
+      "primary_source": "https://github.com/ligon/LSMS_Library/issues/1118",
+      "current_reviewed_country_PRs": [
+        1181,
+        1185
+      ],
+      "historical_counts_not_current_runtime": [
+        42089,
+        28724
+      ]
+    },
+    {
+      "issue": 821,
+      "fresh_issue_state": "open",
+      "dispatch_assessment": "Mali2018community price wiring remains viable; direct currentCONTENTS901-946 contradict issue proposal to copy2014Poids denominator. Source2018declaredfields shown in notes are unit-size/code and two recordedPrices, not2014weight fields. Preserve native size labels; do not fabricateWeight/Quantity or unit crosswalk. Use actual pre-code ledger, full country docs and source-field diagnosis.",
+      "primary_source": "https://github.com/ligon/LSMS_Library/issues/821",
+      "base_prerequisite_candidate": 1199,
+      "source_md5": "458c323792c9d7d05e36ad7c6686774f",
+      "source_bytes": 880931
+    },
+    {
+      "issue": 823,
+      "fresh_issue_state": "open",
+      "dispatch_assessment": "Niger2018community price wiring viable but countryCONTENTS1183-1206 explicitly defers while native size-qualified unit crosswalk is missing. Quote/reconcile that note; preserving native reported labels and delivering downstream comparability are separate claims. Do not infer2014weight basis.",
+      "primary_source": "https://github.com/ligon/LSMS_Library/issues/823",
+      "base_prerequisite_candidate": 1200,
+      "source_md5": "586edb9feb45f4593058bdfb0a7b83b5",
+      "source_bytes": 1020560
+    }
+  ],
+  "provider_observations": "Exact two declared S05blob paths locally regular/nonsymlink/nlink1 with declared sizes at metadata-onlylstat; no bytes opened/hashed/decoded, no ready-source authenticity claim.",
+  "no_new_goals_permissions_or_implementations": true,
+  "signed": "Sue"
+}

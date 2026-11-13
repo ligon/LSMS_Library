@@ -1,0 +1,674 @@
+{
+ "2010-11/Full_Sample": {
+  "struck_rows": 13056,
+  "struck_with_ucode": 0,
+  "struck_with_n": 0,
+  "struck_priced": 9784,
+  "struck_avail_no": 3269,
+  "struck_avail_na": 1,
+  "asked_rows": 26112,
+  "asked_avail_no": 4525,
+  "asked_avail_no_with_u": 0,
+  "asked_avail_no_with_price": 0,
+  "asked_avail_na": 1,
+  "asked_avail_na_priced": 0,
+  "asked_avail_other": {},
+  "asked_priced": 21582,
+  "asked_priced_ucode_nan": 26,
+  "asked_priced_ucode_nan_n_nan": 19,
+  "asked_priced_ucode_nan_n_present": 7,
+  "asked_priced_ucode_unmapped": {
+   "23.0": 1
+  },
+  "asked_unpriced_avail_yes": 4,
+  "asked_unpriced_avail_yes_with_u": 1,
+  "codes_16_23_by_item": {
+   "16": {
+    "1:Maize Grain (Not As Ufa)": 3,
+    "2:Maize Ufa Mgaiwa (Normal Flour)": 1,
+    "5:Rice": 2,
+    "7:Mandazi, Doughnut (Vendor)": 1,
+    "8:Beans": 17,
+    "12:Fresh Milk": 8,
+    "14:Chicken": 1,
+    "15:Sun Dried Fish": 1,
+    "17:Tea": 6,
+    "18:Salt": 12,
+    "20:Cooking Oil": 2,
+    "21:Chips (Vendor)": 9,
+    "38:Paraffin": 86
+   },
+   "17": {
+    "1:Maize Grain (Not As Ufa)": 1,
+    "2:Maize Ufa Mgaiwa (Normal Flour)": 1,
+    "8:Beans": 1,
+    "12:Fresh Milk": 1,
+    "26:Vaseline/Glycerin": 1,
+    "40:Pesticides/Insecticides": 1
+   },
+   "19": {
+    "5:Rice": 1,
+    "6:Bread": 1,
+    "7:Mandazi, Doughnut (Vendor)": 1,
+    "9:Cabbage": 1,
+    "11:Banana": 2,
+    "12:Fresh Milk": 253,
+    "13:Eggs": 3,
+    "17:Tea": 2,
+    "20:Cooking Oil": 254,
+    "21:Chips (Vendor)": 2,
+    "22:Bar Soap": 2,
+    "23:Toothbrush": 6,
+    "24:Toothpaste": 73,
+    "25:Clothes Soap": 12,
+    "26:Vaseline/Glycerin": 434,
+    "27:Aspirin Or Panadol": 2,
+    "36:Firewood": 1,
+    "37:Charcoal": 2,
+    "38:Paraffin": 188,
+    "39:Chemical Fertilizer": 1,
+    "40:Pesticides/Insecticides": 45,
+    "41:Herbicides/Fungicides": 12
+   },
+   "20": {
+    "12:Fresh Milk": 8,
+    "14:Chicken": 1,
+    "16:Beef": 1,
+    "17:Tea": 26,
+    "18:Salt": 34,
+    "19:Sugar": 1,
+    "20:Cooking Oil": 243,
+    "21:Chips (Vendor)": 3,
+    "22:Bar Soap": 1,
+    "23:Toothbrush": 1,
+    "24:Toothpaste": 25,
+    "25:Clothes Soap": 37,
+    "26:Vaseline/Glycerin": 15,
+    "27:Aspirin Or Panadol": 13,
+    "28:Fansidar": 2,
+    "29:Chitenje Cloth": 4,
+    "37:Charcoal": 14,
+    "38:Paraffin": 47,
+    "39:Chemical Fertilizer": 1,
+    "40:Pesticides/Insecticides": 2
+   },
+   "21": {
+    "1:Maize Grain (Not As Ufa)": 1,
+    "2:Maize Ufa Mgaiwa (Normal Flour)": 2,
+    "6:Bread": 7,
+    "7:Mandazi, Doughnut (Vendor)": 3,
+    "8:Beans": 3,
+    "9:Cabbage": 7,
+    "13:Eggs": 16,
+    "14:Chicken": 95,
+    "15:Sun Dried Fish": 1,
+    "17:Tea": 10,
+    "18:Salt": 13,
+    "19:Sugar": 2,
+    "20:Cooking Oil": 3,
+    "21:Chips (Vendor)": 116,
+    "22:Bar Soap": 4,
+    "23:Toothbrush": 4,
+    "24:Toothpaste": 17,
+    "25:Clothes Soap": 4,
+    "26:Vaseline/Glycerin": 7,
+    "27:Aspirin Or Panadol": 281,
+    "28:Fansidar": 54,
+    "29:Chitenje Cloth": 174,
+    "36:Firewood": 54,
+    "37:Charcoal": 78,
+    "38:Paraffin": 19,
+    "39:Chemical Fertilizer": 1,
+    "40:Pesticides/Insecticides": 1
+   },
+   "23": {
+    "27:Aspirin Or Panadol": 1
+   }
+  },
+  "unmapped_by_item": {
+   "23:27:Aspirin Or Panadol": 1
+  },
+  "asked_priced_ucode_nan_by_item": {
+   "5:Rice": 1,
+   "6:Bread": 1,
+   "7:Mandazi, Doughnut (Vendor)": 1,
+   "9:Cabbage": 2,
+   "11:Banana": 1,
+   "17:Tea": 1,
+   "18:Salt": 1,
+   "22:Bar Soap": 1,
+   "25:Clothes Soap": 1,
+   "26:Vaseline/Glycerin": 1,
+   "27:Aspirin Or Panadol": 2,
+   "28:Fansidar": 1,
+   "29:Chitenje Cloth": 5,
+   "36:Firewood": 2,
+   "37:Charcoal": 1,
+   "40:Pesticides/Insecticides": 1,
+   "41:Herbicides/Fungicides": 1,
+   "43:Hybrid Maize Seed": 2
+  },
+  "os_on_ucode_nan": {
+   "METERS": 5,
+   "2 TABLET PACKET": 2,
+   "ONE PACKET": 1,
+   "WHOLE CHICKEN": 1,
+   "TABLETS": 1,
+   "PACKET": 1,
+   "2 METRES": 1
+  },
+  "os_on_ucode_nan_priced": 0,
+  "os_on_ucode_nan_by_item": {
+   "28:Fansidar": 7,
+   "12:Fresh Milk": 2,
+   "39:Chemical Fertilizer": 1,
+   "16:Beef": 1,
+   "26:Vaseline/Glycerin": 1
+  },
+  "os_on_code21_top": {
+   "2 TABLET PACKET": 157,
+   "METERS": 147,
+   "PACKET": 119,
+   "WHOLE CHICKEN": 91,
+   "SPOON": 64,
+   "JUMBO": 33,
+   "PER SPOON": 31,
+   "MTOLO": 31,
+   "TABLETS": 29,
+   "PLASTIC BAG": 22,
+   "3 TABLET PACKET": 19,
+   "BUNDLE": 17,
+   "2 METRES": 16,
+   "1 EGG": 10,
+   "50G TUBE": 10,
+   "TABLET": 10,
+   "ONE PACKET": 10,
+   "PLASTIC PAPER": 8,
+   "LOAF": 7,
+   "PLASTIC": 7,
+   "SMALL PLASTIC BAG": 6,
+   "ONE EGG": 6,
+   "TABLES": 5,
+   "PER JUMBO": 5,
+   "PER SMALL CUP": 5,
+   "PER SMALL CONTAINER": 4,
+   "PLATE": 3,
+   "150G TUBE": 3,
+   "SMALL CONTAINER": 3,
+   "ONE CABBAGE": 3,
+   "2 MTS": 3,
+   "KANKEBE": 3,
+   "1EGG": 2,
+   "1 BAR": 2,
+   "TUBE": 2,
+   "MAN MADE CUP": 2,
+   "OX-CART": 2,
+   "PER SMALL JUMBO": 2,
+   "ONE HEAD": 2,
+   "ONE TOOTHBRUSH": 2
+  },
+  "os_on_mapped_non21": {
+   "18|2 TABLET PACKET": 3,
+   "18|PACKET": 3,
+   "19|2 TABLET PACKET": 3,
+   "19|PER SPOON": 3,
+   "19|PACKET": 2,
+   "15|WHOLE CHICKEN": 1,
+   "9|50G TUBE": 1,
+   "9|150G TUBE": 1,
+   "19|SPOON": 1,
+   "19|BUNDLE": 1,
+   "18|MILLIGRAMS": 1,
+   "9|SPOON": 1,
+   "1|PER SPOON": 1,
+   "18|SPOON": 1,
+   "9|ONE SMALL BOTTLE": 1,
+   "20|ONE TUBE": 1,
+   "20|SACHET": 1,
+   "20|JUMBO": 1,
+   "9|2 SACHET": 1,
+   "6|NONE": 1,
+   "20|NONE": 1,
+   "18|TABLETS": 1,
+   "1|PACKET": 1,
+   "15|SPOON": 1
+  }
+ },
+ "2013-14/Panel": {
+  "struck_rows": 3264,
+  "struck_with_ucode": 0,
+  "struck_with_n": 0,
+  "struck_priced": 2201,
+  "struck_avail_no": 1050,
+  "struck_avail_na": 19,
+  "asked_rows": 3264,
+  "asked_avail_no": 964,
+  "asked_avail_no_with_u": 0,
+  "asked_avail_no_with_price": 0,
+  "asked_avail_na": 26,
+  "asked_avail_na_priced": 14,
+  "asked_avail_other": {
+   "3.0": 2
+  },
+  "asked_priced": 2285,
+  "asked_priced_ucode_nan": 33,
+  "asked_priced_ucode_nan_n_nan": 15,
+  "asked_priced_ucode_nan_n_present": 18,
+  "asked_priced_ucode_unmapped": {
+   "23.0": 88,
+   "22.0": 47,
+   "0.0": 10,
+   "50.0": 7,
+   "500.0": 1,
+   "48.0": 1,
+   "200.0": 1,
+   "69.0": 1,
+   "25.0": 1
+  },
+  "asked_unpriced_avail_yes": 3,
+  "asked_unpriced_avail_yes_with_u": 2,
+  "codes_16_23_by_item": {
+   "16": {
+    "38:Paraffin": 3
+   },
+   "19": {
+    "24:Toothpaste": 11,
+    "25:Clothes Soap": 1,
+    "26:Vaseline/Glycerin": 102,
+    "27:Aspirin Or Panadol": 9,
+    "28:Fansidar": 2,
+    "37:Charcoal": 1,
+    "38:Paraffin": 24,
+    "40:Pesticides/Insecticides": 16,
+    "41:Herbicides/Fungicides": 10
+   },
+   "21": {
+    "27:Aspirin Or Panadol": 1
+   },
+   "22": {
+    "24:Toothpaste": 1,
+    "25:Clothes Soap": 4,
+    "27:Aspirin Or Panadol": 15,
+    "28:Fansidar": 6,
+    "37:Charcoal": 9,
+    "38:Paraffin": 11,
+    "41:Herbicides/Fungicides": 1
+   },
+   "23": {
+    "1:Maize Grain (Not As Ufa)": 10,
+    "25:Clothes Soap": 1,
+    "27:Aspirin Or Panadol": 20,
+    "29:Chitenje Cloth": 24,
+    "36:Firewood": 8,
+    "37:Charcoal": 19,
+    "38:Paraffin": 6
+   }
+  },
+  "unmapped_by_item": {
+   "0:1:Maize Grain (Not As Ufa)": 1,
+   "0:22:Bar Soap": 1,
+   "0:24:Toothpaste": 1,
+   "0:25:Clothes Soap": 1,
+   "0:26:Vaseline/Glycerin": 1,
+   "0:27:Aspirin Or Panadol": 2,
+   "0:29:Chitenje Cloth": 1,
+   "0:36:Firewood": 1,
+   "0:37:Charcoal": 1,
+   "22:24:Toothpaste": 1,
+   "22:25:Clothes Soap": 4,
+   "22:27:Aspirin Or Panadol": 15,
+   "22:28:Fansidar": 6,
+   "22:37:Charcoal": 9,
+   "22:38:Paraffin": 11,
+   "22:41:Herbicides/Fungicides": 1,
+   "23:1:Maize Grain (Not As Ufa)": 10,
+   "23:25:Clothes Soap": 1,
+   "23:27:Aspirin Or Panadol": 20,
+   "23:29:Chitenje Cloth": 24,
+   "23:36:Firewood": 8,
+   "23:37:Charcoal": 19,
+   "23:38:Paraffin": 6,
+   "25:27:Aspirin Or Panadol": 1,
+   "48:1:Maize Grain (Not As Ufa)": 1,
+   "50:1:Maize Grain (Not As Ufa)": 1,
+   "50:24:Toothpaste": 1,
+   "50:26:Vaseline/Glycerin": 3,
+   "50:39:Chemical Fertilizer": 2,
+   "69:26:Vaseline/Glycerin": 1,
+   "200:25:Clothes Soap": 1,
+   "500:40:Pesticides/Insecticides": 1
+  },
+  "asked_priced_ucode_nan_by_item": {
+   "1:Maize Grain (Not As Ufa)": 5,
+   "22:Bar Soap": 1,
+   "24:Toothpaste": 1,
+   "25:Clothes Soap": 1,
+   "26:Vaseline/Glycerin": 2,
+   "27:Aspirin Or Panadol": 2,
+   "29:Chitenje Cloth": 4,
+   "36:Firewood": 3,
+   "37:Charcoal": 6,
+   "38:Paraffin": 1,
+   "39:Chemical Fertilizer": 1,
+   "40:Pesticides/Insecticides": 2,
+   "41:Herbicides/Fungicides": 2,
+   "43:Hybrid Maize Seed": 2
+  },
+  "desc_by_code": {
+   "1": [
+    "Maize grain"
+   ],
+   "3": [
+    "Cost to grind 50 kg"
+   ],
+   "4": [
+    "Cost to grind 50 kg"
+   ],
+   "22": [
+    "Bar soap (Maluwa)"
+   ],
+   "23": [
+    "Toothbrush"
+   ],
+   "24": [
+    "Toothpaste (50 g tub"
+   ],
+   "25": [
+    "Clothes soap (Omo, S"
+   ],
+   "26": [
+    "Vaseline/glycerin"
+   ],
+   "27": [
+    "Aspirin or Panadol"
+   ],
+   "28": [
+    "Fansidar (3 tablet p"
+   ],
+   "29": [
+    "Chitenje cloth"
+   ],
+   "30": [
+    "Trousers (kaunjika)"
+   ],
+   "31": [
+    "Coca-Cola, Fanta (bo"
+   ],
+   "32": [
+    "Carlsberg beer (bott"
+   ],
+   "33": [
+    "Cigarettes, Embassy"
+   ],
+   "34": [
+    "Battery (dry cell) f"
+   ],
+   "35": [
+    "Watch, digital (simp"
+   ],
+   "36": [
+    "Firewood"
+   ],
+   "37": [
+    "Charcoal"
+   ],
+   "38": [
+    "Paraffin"
+   ],
+   "39": [
+    "Chemical fertilizer"
+   ],
+   "40": [
+    "Pesticides/Insectici"
+   ],
+   "41": [
+    "Herbicides/Fungicide"
+   ],
+   "42": [
+    "Motorized transport"
+   ],
+   "43": [
+    "Hybrid maize seed (m"
+   ],
+   "44": [
+    "Hand hoe, without ha"
+   ],
+   "45": [
+    "Panga"
+   ],
+   "46": [
+    "Sickle"
+   ],
+   "47": [
+    "Axe"
+   ],
+   "48": [
+    "Bicycle"
+   ],
+   "49": [
+    "Foam mattress (10 cm"
+   ],
+   "50": [
+    "Mosquito net (white,"
+   ]
+  }
+ },
+ "2019-20/Cross_Sectional": {
+  "struck_rows": 12070,
+  "struck_with_ucode": 0,
+  "struck_with_n": 0,
+  "struck_priced": 8641,
+  "struck_avail_no": 2366,
+  "struck_avail_na": 1056,
+  "asked_rows": 24140,
+  "asked_avail_no": 3695,
+  "asked_avail_no_with_u": 0,
+  "asked_avail_no_with_price": 0,
+  "asked_avail_na": 2112,
+  "asked_avail_na_priced": 0,
+  "asked_avail_other": {},
+  "asked_priced": 18322,
+  "asked_priced_ucode_nan": 2,
+  "asked_priced_ucode_nan_n_nan": 2,
+  "asked_priced_ucode_nan_n_present": 0,
+  "asked_priced_ucode_unmapped": {},
+  "asked_unpriced_avail_yes": 11,
+  "asked_unpriced_avail_yes_with_u": 0,
+  "codes_16_23_by_item": {
+   "16": {
+    "1:Maize Grain (Not As Ufa)": 15,
+    "2:Maize Ufa Mgaiwa (Normal Flour)": 6,
+    "5:Rice": 32,
+    "8:Beans": 53,
+    "12:Fresh Milk": 6,
+    "15:Sun Dried Fish": 1,
+    "17:Tea": 1,
+    "18:Salt": 23,
+    "21:Chips (Vendor)": 5,
+    "25:Clothes Soap": 10,
+    "26:Vaseline/Glycerin": 1,
+    "38:Paraffin": 1,
+    "40:Pesticides/Insecticides": 1,
+    "43:Hybrid Maize Seed": 1
+   },
+   "17": {
+    "1:Maize Grain (Not As Ufa)": 3,
+    "2:Maize Ufa Mgaiwa (Normal Flour)": 3,
+    "5:Rice": 6,
+    "8:Beans": 12,
+    "10:Tomato": 1,
+    "18:Salt": 4,
+    "21:Chips (Vendor)": 35,
+    "26:Vaseline/Glycerin": 27,
+    "37:Charcoal": 5,
+    "40:Pesticides/Insecticides": 9,
+    "41:Herbicides/Fungicides": 3
+   },
+   "19": {
+    "1:Maize Grain (Not As Ufa)": 1,
+    "6:Bread": 1,
+    "12:Fresh Milk": 363,
+    "17:Tea": 1,
+    "18:Salt": 3,
+    "19:Sugar": 1,
+    "20:Cooking Oil": 60,
+    "21:Chips (Vendor)": 1,
+    "24:Toothpaste": 61,
+    "25:Clothes Soap": 6,
+    "26:Vaseline/Glycerin": 319,
+    "38:Paraffin": 18,
+    "39:Chemical Fertilizer": 2,
+    "40:Pesticides/Insecticides": 141,
+    "41:Herbicides/Fungicides": 55
+   },
+   "20": {
+    "12:Fresh Milk": 27,
+    "17:Tea": 105,
+    "18:Salt": 115,
+    "19:Sugar": 5,
+    "20:Cooking Oil": 132,
+    "22:Bar Soap": 1,
+    "23:Toothbrush": 5,
+    "24:Toothpaste": 138,
+    "25:Clothes Soap": 35,
+    "26:Vaseline/Glycerin": 19,
+    "27:Aspirin Or Panadol": 207,
+    "28:Fansidar": 11,
+    "37:Charcoal": 14,
+    "38:Paraffin": 19,
+    "40:Pesticides/Insecticides": 8,
+    "41:Herbicides/Fungicides": 2
+   },
+   "21": {
+    "1:Maize Grain (Not As Ufa)": 23,
+    "2:Maize Ufa Mgaiwa (Normal Flour)": 2,
+    "5:Rice": 4,
+    "6:Bread": 138,
+    "7:Mandazi, Doughnut (Vendor)": 62,
+    "8:Beans": 13,
+    "9:Cabbage": 74,
+    "10:Tomato": 34,
+    "11:Banana": 55,
+    "12:Fresh Milk": 16,
+    "13:Eggs": 83,
+    "14:Chicken": 209,
+    "15:Sun Dried Fish": 4,
+    "17:Tea": 21,
+    "18:Salt": 33,
+    "19:Sugar": 7,
+    "20:Cooking Oil": 15,
+    "21:Chips (Vendor)": 90,
+    "22:Bar Soap": 69,
+    "23:Toothbrush": 79,
+    "24:Toothpaste": 53,
+    "25:Clothes Soap": 43,
+    "26:Vaseline/Glycerin": 79,
+    "27:Aspirin Or Panadol": 190,
+    "28:Fansidar": 45,
+    "29:Chitenje Cloth": 113,
+    "36:Firewood": 56,
+    "37:Charcoal": 61,
+    "38:Paraffin": 5,
+    "39:Chemical Fertilizer": 12,
+    "40:Pesticides/Insecticides": 25,
+    "41:Herbicides/Fungicides": 19
+   }
+  },
+  "unmapped_by_item": {},
+  "asked_priced_ucode_nan_by_item": {
+   "22:Bar Soap": 1,
+   "39:Chemical Fertilizer": 1
+  }
+ },
+ "2019-20/Panel": {
+  "struck_rows": 1717,
+  "struck_with_ucode": 0,
+  "struck_with_n": 0,
+  "struck_priced": 1015,
+  "struck_avail_no": 290,
+  "struck_avail_na": 412,
+  "asked_rows": 3434,
+  "asked_avail_no": 456,
+  "asked_avail_no_with_u": 0,
+  "asked_avail_no_with_price": 0,
+  "asked_avail_na": 823,
+  "asked_avail_na_priced": 0,
+  "asked_avail_other": {},
+  "asked_priced": 2155,
+  "asked_priced_ucode_nan": 0,
+  "asked_priced_ucode_nan_n_nan": 0,
+  "asked_priced_ucode_nan_n_present": 0,
+  "asked_priced_ucode_unmapped": {},
+  "asked_unpriced_avail_yes": 0,
+  "asked_unpriced_avail_yes_with_u": 0,
+  "codes_16_23_by_item": {
+   "16": {
+    "1:Maize Grain (Not As Ufa)": 2,
+    "2:Maize Ufa Mgaiwa (Normal Flour)": 2,
+    "5:Rice": 2,
+    "8:Beans": 4,
+    "18:Salt": 5,
+    "21:Chips (Vendor)": 1,
+    "22:Bar Soap": 1,
+    "25:Clothes Soap": 1
+   },
+   "17": {
+    "8:Beans": 3,
+    "21:Chips (Vendor)": 7,
+    "26:Vaseline/Glycerin": 5
+   },
+   "19": {
+    "12:Fresh Milk": 49,
+    "18:Salt": 1,
+    "20:Cooking Oil": 12,
+    "24:Toothpaste": 5,
+    "26:Vaseline/Glycerin": 36,
+    "38:Paraffin": 2,
+    "40:Pesticides/Insecticides": 19,
+    "41:Herbicides/Fungicides": 8
+   },
+   "20": {
+    "12:Fresh Milk": 1,
+    "17:Tea": 9,
+    "18:Salt": 12,
+    "20:Cooking Oil": 19,
+    "23:Toothbrush": 1,
+    "24:Toothpaste": 18,
+    "25:Clothes Soap": 5,
+    "26:Vaseline/Glycerin": 4,
+    "27:Aspirin Or Panadol": 17,
+    "37:Charcoal": 2,
+    "38:Paraffin": 6
+   },
+   "21": {
+    "1:Maize Grain (Not As Ufa)": 2,
+    "5:Rice": 1,
+    "6:Bread": 15,
+    "7:Mandazi, Doughnut (Vendor)": 4,
+    "9:Cabbage": 9,
+    "10:Tomato": 2,
+    "11:Banana": 4,
+    "13:Eggs": 7,
+    "14:Chicken": 26,
+    "15:Sun Dried Fish": 1,
+    "18:Salt": 4,
+    "19:Sugar": 4,
+    "20:Cooking Oil": 1,
+    "21:Chips (Vendor)": 10,
+    "22:Bar Soap": 4,
+    "23:Toothbrush": 7,
+    "24:Toothpaste": 3,
+    "26:Vaseline/Glycerin": 4,
+    "27:Aspirin Or Panadol": 23,
+    "28:Fansidar": 3,
+    "29:Chitenje Cloth": 16,
+    "36:Firewood": 5,
+    "37:Charcoal": 8,
+    "40:Pesticides/Insecticides": 1,
+    "41:Herbicides/Fungicides": 2
+   }
+  },
+  "unmapped_by_item": {},
+  "asked_priced_ucode_nan_by_item": {}
+ }
+}

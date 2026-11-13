@@ -1,0 +1,10 @@
+{
+  "status": "POSTEXIT_PR1195_BOUNDED_SAVED_NUMERIC_SUPPLEMENT",
+  "READY_sha256": "7c41e97b3fa40b83dd9722ff5f11a9e6b248acf74d83c420fd8a39a6685c65d5",
+  "manifest_sha256": "a1b65ab532262a716b79c70a0e72923b0faf805878981b25bd53838ae142815e",
+  "manifest_entries": 156,
+  "all1298_review856_author97copies_receipts_exact": true,
+  "source_clean_zero_consumers_zero_denials": true,
+  "old_original_memory_qualifications_unchanged": true,
+  "signed": "Sue"
+}

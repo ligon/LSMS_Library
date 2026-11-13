@@ -1,0 +1,66 @@
+{
+ "cold": true,
+ "columns": [
+  "Quantity",
+  "Purchased",
+  "Quantity_purchased"
+ ],
+ "country": "Senegal",
+ "grain_collapse_warnings": 1,
+ "grain_reports": [
+  {
+   "conflicting_groups": 10,
+   "destroyed": 10,
+   "dropped": 15,
+   "nan_key_rows": 0,
+   "rows": 9916,
+   "wave": "2018-19"
+  }
+ ],
+ "index_names": [
+  "i",
+  "t",
+  "v",
+  "input",
+  "crop",
+  "u"
+ ],
+ "index_unique": true,
+ "label": "base-cold",
+ "nitrogen_input_match": {
+  "matched_rows": 1977,
+  "unmatched_rows": 7924
+ },
+ "nitrogen_kg": {
+  "by_wave": {
+   "2018-19": 82701.772425
+  },
+  "rows": 932,
+  "total": 82701.772425
+ },
+ "report_keys": [
+  "additive",
+  "conflicting_groups",
+  "country",
+  "destroyed",
+  "dropped",
+  "levels",
+  "missing_levels",
+  "nan_key_rows",
+  "rows",
+  "table",
+  "wave"
+ ],
+ "rows": 9901,
+ "rows_by_wave": {
+  "2018-19": 9901
+ },
+ "seconds": 9.5,
+ "seed_kg": {
+  "by_wave": {
+   "2018-19": 381403.1015
+  },
+  "rows": 2430,
+  "total": 381403.10150000005
+ }
+}

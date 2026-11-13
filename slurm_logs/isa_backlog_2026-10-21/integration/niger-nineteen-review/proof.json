@@ -1,0 +1,238 @@
+{
+  "source_pins": {
+    "candidate": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+    "actual18_control": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3"
+  },
+  "hash_scope": {
+    "status": "PASS_BEFORE_ANY_BUILD",
+    "API_cells": 549,
+    "changed_Niger": 23,
+    "unchanged_others": 526,
+    "framework_unchanged": 39,
+    "changed": [
+      "Niger/sample",
+      "Niger/cluster_features",
+      "Niger/household_roster",
+      "Niger/individual_education",
+      "Niger/panel_ids",
+      "Niger/food_acquired",
+      "Niger/shocks",
+      "Niger/assets",
+      "Niger/housing",
+      "Niger/food_security",
+      "Niger/subjective_well_being",
+      "Niger/interview_date",
+      "Niger/plot_features",
+      "Niger/crop_production",
+      "Niger/plot_inputs",
+      "Niger/livestock",
+      "Niger/plot_labor",
+      "Niger/people_last7days",
+      "Niger/community_prices",
+      "Niger/food_expenditures",
+      "Niger/food_prices",
+      "Niger/food_quantities",
+      "Niger/household_characteristics"
+    ],
+    "relevant_wave_hashes": {
+      "base": {
+        "Mali/2014-15": "6893c13e8b1174fc7134bcf2b8817ca6e0cb4492b16d4d7d8bf00d2985d73837",
+        "Mali/2017-18": "1bf9a7d06ee8b384f5614962c7e8473def7945bd37f99e4203bd393c6d6f2b2f",
+        "Mali/2018-19": "d8dced559150db81327d20b97ad329d2a575ee3158bff758609521f0a796e08f",
+        "Mali/2021-22": "1014c3cec16a06ee65e1dd5992963c0785f3eea97b3709cbf43b350938d97d85",
+        "Niger/2011-12": "411f25a1bc5ed6582cf5130891c3880b927120a785a6452c59290e3773cbc040",
+        "Niger/2014-15": "5d0b2889184de7505b0bd09858e7125f82b01ee14319410c7d7e7218a7d164af",
+        "Niger/2018-19": "82d7b587422ab469c604089693704445e9f8ba85e1968be719a9bbd3754b54e3",
+        "Niger/2021-22": "a2d7ee314033f344b613866edbfb6cdf97c25650aafaa4ef7c69cbb3f2c00010"
+      },
+      "candidate": {
+        "Mali/2014-15": "6893c13e8b1174fc7134bcf2b8817ca6e0cb4492b16d4d7d8bf00d2985d73837",
+        "Mali/2017-18": "1bf9a7d06ee8b384f5614962c7e8473def7945bd37f99e4203bd393c6d6f2b2f",
+        "Mali/2018-19": "d8dced559150db81327d20b97ad329d2a575ee3158bff758609521f0a796e08f",
+        "Mali/2021-22": "1014c3cec16a06ee65e1dd5992963c0785f3eea97b3709cbf43b350938d97d85",
+        "Niger/2011-12": "dd745f859e168873ac1db3c98016dc1c7683588ac0960fee88cbf1dca5fa2bd9",
+        "Niger/2014-15": "c3247253c3ef1037034b5a30fa20e8941650dcef68f94907eaedd5a88fcb4631",
+        "Niger/2018-19": "5dbf9f1d12caf636f260de9c711233a3710130b672b9199c1fb6043616d4862b",
+        "Niger/2021-22": "b93304b3eb473a96ddfaf7c2044ac031e8045a7d90ce04454c200efddb6dd82b"
+      }
+    }
+  },
+  "source_preparation": {
+    "status": "TERMINAL_SUCCESS",
+    "source_files": 11,
+    "sidecars": 11,
+    "physical_copies": 406,
+    "before_decode_and_API": true,
+    "hash_scope_before_build": true,
+    "healthy_Mali_rows": 155931
+  },
+  "exact_comparisons": {
+    "pair_counts": {
+      "normal_populated_cold_warm": 56,
+      "all_native_source_oracle": 176,
+      "normalized_country_layers": 72,
+      "legacy_raw_native_concat": 20,
+      "candidate_supported_actual18": 16,
+      "candidate_existing_factory": 9,
+      "covered_empty_parent": 3,
+      "current_raw_parent": 1,
+      "old_Make_sole_flag_difference_exact_elsewhere": 1,
+      "matched_current_Country_Feature_science": 20,
+      "extra_crossstage_full_exact": 18,
+      "1196_sole_dtype_exception_exact_elsewhere": 2,
+      "Make_Feature_actual18_matching_arguments": 2,
+      "CLI_actual_writer_fullattrs": 8,
+      "CLI_full_Arrow_footer_schema_bytes_controls": 8,
+      "CLI_supported_parent": 4,
+      "CLI_full_Arrow_parent_bytes": 2,
+      "CLI_empty_factory": 2
+    },
+    "input_pickles": 440,
+    "mutations_rejected": 7,
+    "check_exact": true,
+    "rtol": 0,
+    "atol": 0,
+    "full_recursive_typed_attrs_and_FIELDS": true
+  },
+  "warnings": {
+    "all82_warning_multisets_literal_true": true,
+    "captured_warning_files": 162,
+    "captured_warning_category_counts": {
+      "NullReadWarning": 12,
+      "StatedVsInferredKgWarning": 8
+    },
+    "standard_log_warning_header_groups": {
+      "CacheRebuildWarning": 17,
+      "UserWarning": 3
+    },
+    "header_groups_not_unique_warning_event_counts": true,
+    "scanner": {
+      "base": {
+        "records": 2,
+        "statuses": {
+          "warn": 2
+        },
+        "checks": [
+          {
+            "country": "Mali",
+            "check": "has_household_index",
+            "phase": "1a-sanity",
+            "status": "warn"
+          },
+          {
+            "country": "Niger",
+            "check": "has_household_index",
+            "phase": "1a-sanity",
+            "status": "warn"
+          }
+        ]
+      },
+      "candidate": {
+        "records": 2,
+        "statuses": {
+          "warn": 2
+        },
+        "checks": [
+          {
+            "country": "Mali",
+            "check": "has_household_index",
+            "phase": "1a-sanity",
+            "status": "warn"
+          },
+          {
+            "country": "Niger",
+            "check": "has_household_index",
+            "phase": "1a-sanity",
+            "status": "warn"
+          }
+        ]
+      }
+    },
+    "complete_scanner_records_and_bytes_exact": true,
+    "scanner_both_data_roots_zero_changes": true,
+    "tests": {
+      "candidate": {
+        "outcomes": {
+          "pass": 114
+        },
+        "failed_functions": {}
+      },
+      "base": {
+        "outcomes": {
+          "fail": 12,
+          "pass": 5
+        },
+        "failed_functions": {
+          "test_real_country_discovery_and_wave_make_rules": 1,
+          "test_requests_use_only_the_requested_native_waves": 9,
+          "test_make_never_reads_an_existing_wrong_wave_country_payload": 2
+        }
+      }
+    }
+  },
+  "preservation": {
+    "status": "PASS",
+    "tracked_files_exact": 30072,
+    "source_heads_clean": {
+      "/local/job40255479/worktrees/isa-integration-nineteen-docs": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+      "/local/job40255479/worktrees/isa-integration-nineteen-docs-base": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3"
+    },
+    "tracked_bytes_modes_mtimes_inodes_index_blobs_exact": true,
+    "in_tree_parquets": 0,
+    "initial_physical_copies_unchanged": 406,
+    "source_files_and_sidecars_unchanged": 11,
+    "populated_copy_endpoints": {
+      "unchanged": 76,
+      "modified": 5,
+      "deleted": 3
+    },
+    "protected_manifest_payloads_exact": 5035,
+    "protected_manifests": [
+      {
+        "root": "/local/job40255479/control/isa-backlog-20261021/review-Niger-1091",
+        "entries": 1437,
+        "sha256": "9bf86ab634b8913e2e5bfcbadec051de05206b2475cef0b6db58e7f274402808"
+      },
+      {
+        "root": "/local/job40255479/control/isa-backlog-20261021/integration/mali-eighteen-review",
+        "entries": 1885,
+        "sha256": "2406d10a2c013a08df6da2336a2fdc2643213e88981c3f1b2167c6f87284ea02"
+      },
+      {
+        "root": "/local/job40255479/control/isa-backlog-20261021/integration/mali-eighteen-doc-review",
+        "entries": 12,
+        "sha256": "2979f29e85c9559d7344b06b40e0cce2343d9abce19e9482c09719432d333228"
+      },
+      {
+        "root": "/local/job40255479/control/isa-backlog-20261021/Niger/1091-fix",
+        "entries": 1701,
+        "sha256": "237003a67682a1a354406df29d6fe31fbcfffdfe90569a1a7749999ff65e635b"
+      }
+    ],
+    "all_protected_control_receipts_exact": true,
+    "Mali_current18_full4_source_unchanged": true,
+    "final_data_parquet_count": 152,
+    "final_data_categories": {
+      "hashless-native-wave": 88,
+      "current-hash-country": 45,
+      "stamped-wave": 12,
+      "hashless-parent-Make-negative-country": 7
+    },
+    "all_private_parquets": 274,
+    "guard_events": {
+      "mkdir-existing": 132
+    },
+    "unexpected_denials": 0,
+    "outbound_IP_attempts": 0,
+    "no_all_parent_cache_health_claim": true,
+    "source_and_baseline_cache_layers_qualified": true
+  },
+  "private_parquet_accounting": {
+    "data_roots": 152,
+    "pytest_synthetic": 104,
+    "frame_writer_oracles_and_CLI_artifacts": 18,
+    "total": 274
+  },
+  "no_source_or_API_replay_for_author_gaps": true,
+  "final_seal_and_zero_consumers": "See FINAL-READY.json; do not treat this pre-seal report as a terminal release."
+}

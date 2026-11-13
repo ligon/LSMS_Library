@@ -27,13 +27,14 @@ Key functions
   optional zero-padding. Auto-applied to ``idxvars`` by
   :func:`df_data_grabber`, but NOT to ``myvars`` — see ``CLAUDE.md``.
 - :func:`id_walk` — applies a country's ``updated_ids`` mapping to
-  rewrite household IDs into a canonical wave's coordinates.
-  Idempotent by construction: each wave's mapping is closure-resolved
-  via :func:`_close_id_map` before application, so running ``id_walk``
-  twice on the same DataFrame produces the same result. The
-  ``df.attrs['id_converted']`` flag remains as a fast-path
-  optimization — losing it (e.g. via :meth:`.set_index` or
-  :meth:`.merge`) is no longer a correctness hazard.
+  rewrite household IDs into a canonical wave's coordinates.  A
+  single-pass rename (GH #1245): every id goes to its own target, chains
+  are never followed.  Exactly once: each wave is classified from its
+  own ids (:func:`_walk_partition`) and an already-walked wave is left
+  alone, so running ``id_walk`` twice produces the same result.  The
+  ``df.attrs['id_converted']`` flag remains as a fast path; losing it
+  (e.g. via :meth:`.merge`, or a table derived from a served one) is not
+  a correctness hazard.
 - :func:`panel_ids` — returns households observed in at least two
   waves after applying ``id_walk``.
 - :func:`map_index` — remaps an old parquet's index structure to the
@@ -86,8 +87,14 @@ import hashlib
 import ssl
 import time
 import uuid
+import threading
+import socket
+from urllib.parse import urlsplit, unquote
 from importlib.resources import files
 from dvc.api import DVCFileSystem
+from ._dvc_runtime import (
+    DVCMetadataCompatibilityError, RuntimeDVCFileSystem,
+)
 import pyreadstat
 import inspect
 from typing import Any
@@ -182,7 +189,7 @@ def _s3_explicit_credentials() -> dict[str, str]:
     return {}
 
 
-def _build_dvcfs() -> DVCFileSystem:
+def _build_dvcfs() -> RuntimeDVCFileSystem:
     config: dict[str, Any] = {"cache": {"dir": os.fspath(_DVC_CACHE_DIR)}}
     # The remote override carries credentials but no ``url``; DVC validates
     # each config level on its own, so the stanza is only legal when the
@@ -200,7 +207,7 @@ def _build_dvcfs() -> DVCFileSystem:
                 **_s3_explicit_credentials(),
             },
         }
-    return DVCFileSystem(os.fspath(_COUNTRIES_DIR), config=config)
+    return RuntimeDVCFileSystem(os.fspath(_COUNTRIES_DIR), config=config)
 
 
 DVCFS = _build_dvcfs()
@@ -286,10 +293,313 @@ def _is_transient_fetch_error(exc: BaseException) -> bool:
     )
 
 
+# GH1051D; ledger §3–§5. Private advisory state, never a build/read gate.
+_FAST_CONNECT_SECONDS = 5.0
+_FAST_CONNECT_LIMIT = 16
+class _FastConnectState:
+    # Opaque runtime state, like the existing ContextVar state: never a
+    # serializable build constant. No fingerprint exclusion is needed.
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.pid = os.getpid()
+        self.epoch = 0
+        self.owner = None
+        self.windows = []
+
+
+_FAST_CONNECT_STATE = _FastConnectState()
+_FAST_PROBE_OUTCOME = contextvars.ContextVar("_fast_probe_outcome", default=None)
+
+
+def _reset_fast_connect_windows():
+    """Release references without closing clients another caller may own."""
+    state = _FAST_CONNECT_STATE
+    with state.lock:
+        state.epoch += 1
+        released, owner = state.windows, state.owner
+        state.windows = []
+        state.owner = None
+    # Drop last references outside the lock; SDK finalizers may perform IO.
+    del released, owner
+
+
+def _fast_connect_after_fork():
+    # Never acquire a lock inherited from a vanished parent's thread.
+    state = _FAST_CONNECT_STATE
+    state.lock = threading.Lock()
+    state.pid = os.getpid()
+    _reset_fast_connect_windows()
+
+
+if hasattr(os, 'register_at_fork'):
+    os.register_at_fork(after_in_child=_fast_connect_after_fork)
+
+
+def _fast_frozen(value):
+    """Opaque comparison only; never format/log this effective configuration."""
+    if value is None or type(value) in (str, bool, int, float):
+        return value
+    if isinstance(value, dict) and all(type(k) is str for k in value):
+        return tuple((k, _fast_frozen(v)) for k, v in sorted(value.items()))
+    if type(value) in (list, tuple):
+        return tuple(_fast_frozen(v) for v in value)
+    raise ValueError('unsupported advisory configuration')
+
+
+def _fast_authority(url):
+    parsed = urlsplit(url)
+    if (parsed.scheme not in ('http', 'https') or not parsed.hostname
+            or parsed.username or parsed.password or parsed.fragment):
+        raise ValueError('unsupported advisory authority')
+    return (parsed.scheme, parsed.hostname.lower(),
+            parsed.port or (443 if parsed.scheme == 'https' else 80))
+
+
+def _fast_scope(remote, fs):
+    """Resolve wrapper options normally, but NEVER touch a fresh native .fs."""
+    from dvc_s3 import S3FileSystem
+    if type(fs) is not S3FileSystem:
+        return None
+    try:
+        path = remote.path.removeprefix('s3://')
+        bucket, _, prefix = path.partition('/')
+        if (not re.fullmatch(r'[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]', bucket)
+                or '..' in bucket or ':' in path or '?' in path or '#' in path):
+            return None
+        args = fs.fs_args  # existing normal backend preparation, no native client
+        sdk_config = args.get('config_kwargs', {})
+        s3 = sdk_config.get('s3', {})
+        if (sdk_config.get('proxies') or any(os.environ.get(k) for k in (
+                'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'http_proxy', 'https_proxy', 'all_proxy'))):
+            return None  # a target URL does not prove the proxy route connected
+        if (s3.get('use_accelerate_endpoint') or s3.get('use_dualstack_endpoint')
+                or s3.get('addressing_style') not in (None, 'auto', 'path', 'virtual')):
+            return None
+        repo = DVCFS.repo
+        # Environment values stay opaque, including credentials/proxies. No files
+        # or credential getters are consulted. Static retained sessions do not
+        # reread a profile file during this finite window.
+        environment = tuple(sorted((k, v) for k, v in os.environ.items()
+                            if k.startswith('AWS_') or k.upper() in {
+                                'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'NO_PROXY',
+                                'SSL_CERT_FILE', 'SSL_CERT_DIR', 'REQUESTS_CA_BUNDLE'}))
+        owner = (DVCFS, repo, os.path.realpath(_COUNTRIES_DIR),
+                 os.path.realpath(_DVC_CACHE_DIR), environment)
+        config = _fast_frozen((repo.config, fs.config, args))
+        return (owner, repo.config['core'].get('remote'), remote.path,
+                type(fs), config, bucket, prefix, s3.get('addressing_style', 'auto'))
+    except (AttributeError, TypeError, ValueError, KeyError):
+        return None
+
+
+def _fast_route(fs, bucket):
+    """Already-populated S3 route/auth/session metadata only; no SDK getters."""
+    from aiobotocore.credentials import AioCredentials
+    from botocore.credentials import Credentials
+    from s3fs import S3FileSystem
+    try:
+        native = vars(fs).get('fs')
+        if type(native) is not S3FileSystem:
+            return None
+        state = vars(native)
+        session, general, creator = (state.get(k) for k in ('session', '_s3', '_s3creator'))
+        if session is None or general is None or creator is None:
+            return None
+        cached = state.get('cache_regions')
+        buckets = vars(creator).get('_buckets') if cached else None
+        if cached and (type(buckets) is not dict or vars(creator).get('_client') is not general):
+            return None
+        client = buckets.get(bucket, general) if cached else general
+        discovery = bool(cached and bucket not in buckets)
+        http = client._endpoint.http_session
+        sessions = vars(http).get('_sessions')
+        if sessions is None or (sessions and all(s.closed for s in sessions.values())):
+            return None
+        # s3fs can refresh the general client even when routing to a bucket client.
+        general_sessions = vars(general._endpoint.http_session).get('_sessions')
+        if general_sessions is None or (general_sessions and all(s.closed for s in general_sessions.values())):
+            return None
+        credentials = vars(client._request_signer).get('_credentials')
+        if state.get('anon') is True:
+            if credentials is not None:
+                return None
+        elif type(credentials) not in (AioCredentials, Credentials):
+            return None  # refreshable, deferred or unknown provider
+        elif credentials.method not in ('explicit', 'shared-credentials-file', 'config-file'):
+            return None
+        elif credentials.method != 'explicit' and vars(session).get('_credentials') is not credentials:
+            return None
+        authority = _fast_authority(client.meta.endpoint_url)
+        return (native, session, general, creator, client, credentials,
+                http, authority, discovery, cached)
+    except (AttributeError, TypeError, ValueError):
+        return None
+
+
+def _fast_same_route(left, right):
+    return (left is not None and right is not None
+            and all(a is b for a, b in zip(left[:7], right[:7]))
+            and left[7:] == right[7:])
+
+
+def _fast_connect_error(error, source, scope, route):
+    from botocore.exceptions import ConnectTimeoutError, EndpointConnectionError
+    from aiohttp import (ClientConnectorError, ClientConnectorSSLError,
+                         ClientConnectorCertificateError, ClientProxyConnectionError)
+    if type(error) not in (ConnectTimeoutError, EndpointConnectionError):
+        return False
+    if type(error) is EndpointConnectionError:
+        cause = error.kwargs.get('error')
+        if cause is None:
+            cause = error.__cause__
+        if not (type(cause) is socket.gaierror or (
+                isinstance(cause, ClientConnectorError)
+                and not isinstance(cause, (ClientConnectorSSLError,
+                                           ClientConnectorCertificateError,
+                                           ClientProxyConnectionError)))):
+            return False
+    if getattr(error, 'response', None) is not None or route is None:
+        return False
+    try:
+        url = error.kwargs['endpoint_url']
+        parsed = urlsplit(url)
+        authority = _fast_authority(url)
+        scheme, host, port = route[7]
+        bucket = scope[5]
+        virtual = (scheme, bucket + '.' + host, port)
+        if authority not in (route[7], virtual):
+            return False
+        if scope[7] == 'path' and authority != route[7]:
+            return False
+        if scope[7] == 'virtual' and authority != virtual and not host.startswith(bucket + '.'):
+            return False
+        if type(error) is EndpointConnectionError and isinstance(cause, ClientConnectorError):
+            if cause.host.lower() != authority[1] or (cause.port or port) != authority[2]:
+                return False
+        key = source.removeprefix('s3://').split('/', 1)[1]
+        expected = '/' + (key if authority == virtual else bucket + '/' + key)
+        # An explicit endpoint can already name the virtual-host bucket.
+        if host.startswith(bucket + '.') and authority == route[7]:
+            expected = '/' + key
+        allowed = {expected}
+        if route[8]:  # retained general client is about to discover this bucket
+            allowed.add('/' if authority == virtual else '/' + bucket)
+        return unquote(parsed.path) in allowed and not parsed.query
+    except (AttributeError, TypeError, ValueError, KeyError, IndexError):
+        return False
+
+
+class _FastProbeOutcome:
+    """Per invocation, never a persisted or source-memoized result."""
+    def __init__(self):
+        self.suppressed = False
+        self.scope = self.route = self.fs = self.remote = None
+        self.epoch = None
+        self.errors = 0
+        self.failure_authority = None
+        self.eligible = True
+
+    def observe(self, fs, source, destination, error):
+        self.errors += 1
+        route = _fast_route(fs, self.scope[5]) if self.scope else None
+        if self.route is None:
+            self.route = route
+        try:
+            # Before cleanup: even a zero-byte temp proves response/progress.
+            progressed = Path(destination).exists()
+        except OSError:
+            progressed = True
+        positive = _fast_connect_error(error, source, self.scope, route)
+        authority = _fast_authority(error.kwargs['endpoint_url']) if positive else None
+        if self.failure_authority is None:
+            self.failure_authority = authority
+        self.eligible &= (not progressed and _fast_same_route(self.route, route)
+                          and positive and authority == self.failure_authority)
+        if not self.eligible:
+            self.clear()
+
+    def clear(self):
+        # A response or unknown outcome conservatively invalidates old in-flight
+        # publishers too. No IO under the transition lock.
+        with _FAST_CONNECT_STATE.lock:
+            _FAST_CONNECT_STATE.epoch += 1
+            released = _FAST_CONNECT_STATE.windows
+            _FAST_CONNECT_STATE.windows = []
+        del released
+
+
+def _fast_window_select(outcome, remote, fs):
+    pid = os.getpid()
+    if pid != _FAST_CONNECT_STATE.pid:
+        _fast_connect_after_fork()
+    scope = _fast_scope(remote, fs)
+    outcome.remote = remote
+    now = time.monotonic()
+    # Route metadata is inspected outside the lock. Entries are immutable after
+    # insertion; publication verifies the epoch captured by this transition.
+    with _FAST_CONNECT_STATE.lock:
+        entries = list(_FAST_CONNECT_STATE.windows)
+    valid = [entry for entry in entries
+             if entry[0] > now and _fast_same_route(entry[4], _fast_route(entry[3], entry[2][5]))]
+    with _FAST_CONNECT_STATE.lock:
+        # Only the snapshot was validated. Preserve later publications, and
+        # retain ALL live entries as well as the snapshot until mutex exit:
+        # pruning or the owner/options transitions below may drop a last owner
+        # whose SDK finalizer can perform IO.
+        released = _FAST_CONNECT_STATE.windows
+        _FAST_CONNECT_STATE.windows = [e for e in released
+            if not any(e is s for s in entries) or any(e is v for v in valid)]
+        if scope is not None:
+            owner = scope[0]
+            old = _FAST_CONNECT_STATE.owner
+            if old is None or not (old[0] is owner[0] and old[1] is owner[1] and old[2:] == owner[2:]):
+                _FAST_CONNECT_STATE.windows.clear()
+                _FAST_CONNECT_STATE.epoch += 1
+                _FAST_CONNECT_STATE.owner = owner
+            # Same alias/path with changed effective options invalidates its old
+            # generation. Distinct routes may coexist up to the finite cap.
+            changed = [e for e in _FAST_CONNECT_STATE.windows if e[2][1:3] == scope[1:3] and e[2][3:] != scope[3:]]
+            if changed:
+                _FAST_CONNECT_STATE.windows[:] = [e for e in _FAST_CONNECT_STATE.windows if not any(e is c for c in changed)]
+                _FAST_CONNECT_STATE.epoch += 1
+            for entry in _FAST_CONNECT_STATE.windows:
+                # A late publication survives pruning for the next caller, but
+                # this caller may select only an identity it route-validated.
+                if any(entry is v for v in valid) and entry[2][1:] == scope[1:]:
+                    outcome.suppressed = True
+                    outcome.fs = entry[3]  # SELECT retained route, no fresh native
+                    return entry[3]
+        outcome.scope, outcome.fs = scope, fs
+        outcome.epoch = _FAST_CONNECT_STATE.epoch
+    return fs
+
+
+def _fast_window_publish(outcome):
+    if not (outcome.scope and outcome.eligible and outcome.errors >= 2
+            and _fast_same_route(outcome.route, _fast_route(outcome.fs, outcome.scope[5]))):
+        return
+    current = _fast_scope(outcome.remote, outcome.fs)
+    if (current is None or current[0][0] is not outcome.scope[0][0]
+            or current[0][1] is not outcome.scope[0][1] or current != outcome.scope):
+        return
+    now = time.monotonic()
+    deadline = now + _FAST_CONNECT_SECONDS
+    with _FAST_CONNECT_STATE.lock:
+        released = list(_FAST_CONNECT_STATE.windows)
+        _FAST_CONNECT_STATE.windows[:] = [e for e in released if e[0] > now]
+        if outcome.epoch != _FAST_CONNECT_STATE.epoch:
+            return
+        # No sliding extension, replacement or cross-scope eviction at capacity.
+        if (len(_FAST_CONNECT_STATE.windows) < _FAST_CONNECT_LIMIT
+                and not any(e[2][1:] == outcome.scope[1:] for e in _FAST_CONNECT_STATE.windows)):
+            _FAST_CONNECT_STATE.windows.append((deadline, outcome.epoch, outcome.scope,
+                                          outcome.fs, outcome.route))
+
+
 def _get_file_with_retry(fs, src: str, dst: str, *,
                          attempts: int | None = None,
                          base_delay: float = _FETCH_BASE_DELAY,
-                         sleep=time.sleep) -> None:
+                         sleep=time.sleep, _fast_probe=None) -> None:
     """``fs.get_file(src, dst)`` with bounded retry on transient TLS errors.
 
     Re-raises ``FileNotFoundError`` immediately (the caller then tries the next
@@ -304,9 +614,13 @@ def _get_file_with_retry(fs, src: str, dst: str, *,
         try:
             fs.get_file(src, dst)
             return
-        except FileNotFoundError:
+        except FileNotFoundError as exc:
+            if _fast_probe is not None:
+                _fast_probe.observe(fs, src, dst, exc)
             raise
         except Exception as exc:  # noqa: BLE001 -- classify, then retry or re-raise
+            if _fast_probe is not None:
+                _fast_probe.observe(fs, src, dst, exc)
             try:
                 Path(dst).unlink()
             except OSError:
@@ -316,7 +630,37 @@ def _get_file_with_retry(fs, src: str, dst: str, *,
             sleep(base_delay * (2 ** attempt))
 
 
-def _ensure_dvc_pulled(fn) -> None:
+def _local_cache_write_denied(error, temporary_path=None) -> bool:
+    """Positive EACCES/EROFS evidence for a known local cache operation.
+
+    With a get_file error, only its primary failing filename naming the exact
+    local destination qualifies. A remote/absent/ambiguous filename does not.
+    Callers omit temporary_path only for direct local mkdir/rename operations.
+    """
+    if not isinstance(error, OSError) or error.errno not in (errno.EACCES, errno.EROFS):
+        return False
+    if temporary_path is None:
+        return True
+    if error.filename is None:
+        return False
+    try:
+        return os.path.abspath(os.fsdecode(error.filename)) == os.path.abspath(os.fspath(temporary_path))
+    except (TypeError, ValueError):
+        return False
+
+
+def _remote_md5_available(fs, source_keys) -> bool:
+    """Best-effort metadata only, on the two already-resolved DVC keys."""
+    for source in source_keys:
+        try:
+            if fs.exists(source):
+                return True
+        except Exception:  # availability probe only; no extra retry or decoder
+            continue
+    return False
+
+
+def _ensure_dvc_pulled(fn, *, _metadata_on_local_write_denied: bool = False) -> bool | None:
     """Best-effort warm of the local DVC cache for a tracked path.
 
     The hot path (cache hit) is two ``os.path.exists`` calls and a tiny
@@ -350,10 +694,12 @@ def _ensure_dvc_pulled(fn) -> None:
     which was a big improvement, but still paid the index walk cost
     on every miss.  The current bypass eliminates it.
 
-    Every error is swallowed.  This function is best-effort warming
-    glue; the caller's ``DVCFS.open`` streaming fallback handles any
-    failure to populate the cache.
+    Every operational error is swallowed. Ordinary callers retain the
+    best-effort/None warming contract and streaming fallback. Only the fast
+    heal probe opts into metadata availability after positively local
+    EACCES/EROFS: at most two exists checks, not proof of decoding/rebuilding.
     """
+    _fast_probe = _FAST_PROBE_OUTCOME.get() if _metadata_on_local_write_denied else None
     try:
         # Try several interpretations of fn to find the .dvc sidecar.
         # Wave scripts pass cwd-relative paths like '../Data/foo.dta'.
@@ -467,16 +813,35 @@ def _ensure_dvc_pulled(fn) -> None:
         # blob concurrently (rare in practice; each contender wants a
         # different blob).
         dst = cache_layouts[0]
-        dst.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            dst.parent.mkdir(parents=True, exist_ok=True)
+        except OSError as error:
+            if _metadata_on_local_write_denied and _local_cache_write_denied(error):
+                available = _remote_md5_available(fs, src_candidates)
+                if available and _fast_probe is not None:
+                    _fast_probe.clear()
+                return available
+            raise
+        if _fast_probe is not None:
+            fs = _fast_window_select(_fast_probe, remote, fs)
+            if _fast_probe.suppressed:
+                return False
         tmp = dst.with_suffix(dst.suffix + f".tmp.{os.getpid()}")
         for src in src_candidates:
+            operation = 'fetch'
             try:
-                _get_file_with_retry(fs, src, str(tmp))
+                if _fast_probe is None:
+                    _get_file_with_retry(fs, src, str(tmp))
+                else:
+                    _get_file_with_retry(fs, src, str(tmp), _fast_probe=_fast_probe)
+                if _fast_probe is not None:
+                    _fast_probe.clear()
+                operation = 'rename'
                 tmp.rename(dst)
                 return
             except FileNotFoundError:
                 continue  # wrong layout -- try the other one
-            except Exception:  # noqa: BLE001
+            except Exception as error:  # noqa: BLE001
                 # Transient retries exhausted, or a non-transient remote / disk
                 # error (incl. aiohttp ClientPayloadError, not an OSError).
                 # Clean up any partial temp and fall through to the streaming
@@ -485,7 +850,15 @@ def _ensure_dvc_pulled(fn) -> None:
                     tmp.unlink()
                 except OSError:
                     pass
+                if (_metadata_on_local_write_denied
+                        and _local_cache_write_denied(error, None if operation == 'rename' else tmp)):
+                    available = _remote_md5_available(fs, src_candidates)
+                    if available and _fast_probe is not None:
+                        _fast_probe.clear()
+                    return available
                 continue
+        if _fast_probe is not None:
+            _fast_window_publish(_fast_probe)
         # Both layouts missed -- the blob is genuinely not on the
         # remote.  Fall through to streaming fallback at the call site.
         try:
@@ -566,10 +939,13 @@ def source_tier(path: str | Path) -> str | None:
     return None
 
 
-def source_fetchable_fast(path: str | Path) -> bool:
+def source_fetchable_fast(path: str | Path, *, _outcome=None) -> bool:
     """Can the source at absolute ``path`` be read from the FAST tiers -- an
     untracked local file, or the DVC sidecar plus its L1 blob (fetched into the
     blob cache under ``data_root()`` if absent, by ``_ensure_dvc_pulled``)?
+    After positively local cache-write EACCES/EROFS only, metadata existence on
+    either configured remote md5 key is also availability evidence. This does
+    not parse the source or prove a later rebuild will decode it successfully.
 
     Deliberately NOT the full ``get_dataframe`` chain: no ``DVCFS.open``
     streaming fallback (a sidecar-tree walk) and no World Bank download.  This
@@ -583,7 +959,16 @@ def source_fetchable_fast(path: str | Path) -> bool:
     if tier == "local":
         return True
     if tier == "dvc":
-        _ensure_dvc_pulled(path)
+        outcome = _outcome if _outcome is not None else _FAST_PROBE_OUTCOME.get()
+        if outcome is None:
+            outcome = _FastProbeOutcome()
+        token = _FAST_PROBE_OUTCOME.set(outcome)
+        try:
+            availability = _ensure_dvc_pulled(path, _metadata_on_local_write_denied=True)
+        finally:
+            _FAST_PROBE_OUTCOME.reset(token)
+        if availability is not None:
+            return availability
         return _dvc_cache_path(path) is not None
     return False
 
@@ -740,9 +1125,9 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
             if not block:
                 continue
             for fn in _collect_file_paths_from_block(block):
-                # Resolve relative to the wave's _/ directory (matches
-                # the convention wave scripts use).
-                abs_path = (wave_obj.file_path / "_" / fn).resolve()
+                # Match the YAML loader and Wave._input_hash (ledger1602§2),
+                # using the actual Wave's mapped physical folder.
+                abs_path = Path(os.path.normpath(wave_obj.file_path / "Data" / fn))
                 sidecar = abs_path.with_name(abs_path.name + ".dvc")
                 if not sidecar.exists():
                     continue  # untracked source — no DVC fetch needed
@@ -798,6 +1183,8 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
                     tmp.unlink()
                 except OSError:
                     pass
+    except DVCMetadataCompatibilityError:
+        raise
     except Exception:
         # Last-ditch swallow: never let pre-warm break a build.
         pass
@@ -805,17 +1192,31 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
 
 def _collect_file_paths_from_block(block):
     """Walk a data_info.yml feature block and yield every ``file:`` value
-    encountered, including those nested in ``dfs:`` sub-blocks."""
+    encountered, including those nested in ``dfs:`` sub-blocks.
+
+    A list member may override variables for one source. Match
+    ``Wave.column_mapping``: the first mapping key is the consumed path;
+    the override payload contains variables, not further declarations. Names
+    listed in ``dfs`` designate sibling subframes even when they happen to
+    spell ``file``, ``idxvars`` or ``myvars``.
+    """
     if isinstance(block, dict):
-        f = block.get("file")
+        names = block.get("dfs")
+        subframes = names if isinstance(names, (list, dict)) else ()
+        f = block.get("file") if "file" not in subframes else None
         if isinstance(f, str):
             yield f
         elif isinstance(f, list):
             for x in f:
                 if isinstance(x, str):
                     yield x
-        for v in block.values():
-            yield from _collect_file_paths_from_block(v)
+                elif isinstance(x, dict) and x:
+                    path = next(iter(x))
+                    if isinstance(path, str):
+                        yield path
+        for key, value in block.items():
+            if key in subframes or key not in {"file", "idxvars", "myvars"}:
+                yield from _collect_file_paths_from_block(value)
     elif isinstance(block, list):
         for item in block:
             yield from _collect_file_paths_from_block(item)
@@ -1683,12 +2084,176 @@ def _read_sas_xport(f, fn, encoding: str | None) -> pd.DataFrame:
     return pd.read_sas(f, format='xport', encoding=encoding or 'latin-1')
 
 
-def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
+def _restore_parquet_index_string_policy(df, pandas_metadata):
+    """Restore only the recorded string NA policy of physical index fields.
+
+    Arrow reconstructs index fields before its data-column extension-dtype
+    restoration. Bind physical descriptors to positions, not logical names:
+    those can be absent or duplicated. Keep the storage Arrow actually read.
+    Missing/ambiguous mappings and non-physical (e.g. range) descriptors are
+    left alone; this is not a metadata repair or a general index cast.
+    """
+    if not isinstance(pandas_metadata, dict):
+        return df
+    fields = pandas_metadata.get('index_columns')
+    columns = pandas_metadata.get('columns')
+    if (not isinstance(fields, list) or not fields
+            or not all(isinstance(field, str) for field in fields)
+            or len(fields) != df.index.nlevels
+            or len(set(fields)) != len(fields)
+            or not isinstance(columns, list)):
+        return df
+
+    by_field = {}
+    for column in columns:
+        if not isinstance(column, dict):
+            return df
+        field = column.get('field_name')
+        if not isinstance(field, str) or field not in fields:
+            continue
+        if field in by_field:
+            return df
+        by_field[field] = column
+    if len(by_field) != len(fields):
+        return df
+
+    index = df.index
+    levels = index.levels if isinstance(index, pd.MultiIndex) else [index]
+    positions = []
+    replacements = []
+    for position, field in enumerate(fields):
+        recorded = by_field[field].get('numpy_type')
+        level = levels[position]
+        if (recorded not in ('string', 'str')
+                or not isinstance(level.dtype, pd.StringDtype)):
+            continue
+        dtype = pd.StringDtype(
+            storage=level.dtype.storage,
+            na_value=pd.NA if recorded == 'string' else np.nan,
+        )
+        if level.dtype != dtype:
+            positions.append(position)
+            replacements.append(level.astype(dtype))
+
+    if positions:
+        if isinstance(index, pd.MultiIndex):
+            # Only NA policy changes: level labels/order/length are identical.
+            # Do not recode, prune unused levels or re-infer code dtypes.
+            df.index = index.set_levels(
+                replacements, level=positions, verify_integrity=False,
+            )
+        else:
+            df.index = replacements[0]
+    return df
+
+
+def _read_parquet_with_index_policy(f, *, read_errors=(), **kwargs):
+    """Read an already-open parquet stream and its same-file index policy.
+
+    Return (frame, None), or (None, error) for only the caller's existing
+    payload-read errors. Footer/metadata/restoration errors stay outside
+    that catch. Callers retain their own miss, format and fallback policy.
+    No source lookup, path reopening, audit or non-parquet parser runs here.
+    """
+    try:
+        df = pd.read_parquet(f, **kwargs)
+    except read_errors as error:
+        return None, error
+    import pyarrow.parquet as pq
+    metadata = pq.read_schema(f).pandas_metadata
+    return _restore_parquet_index_string_policy(df, metadata), None
+
+
+def _read_managed_parquet_cache(path, *, open_errors=(), check_null=False, engine=None):
+    """Read one caller-owned cache, separating payload failure from policy.
+
+    Only initial pd.read_parquet OSError/ArrowInvalid is recoverable1071.
+    Open errors retain each gate's existing policy; footer/index restoration
+    and the former get_dataframe null audit remain outside that catch.
+    Engine is explicit only on former get_dataframe routes (pyarrow); wave
+    gates keep their previous pandas default. The opened identity lets the
+    owner reject precisely the old entry.
+    Raw/user files and newly produced outputs must keep their strict reader.
+    """
+    try:
+        stream = open(path, 'rb')
+    except open_errors as error:
+        return None, error, None
+    with stream:
+        identity = os.fstat(stream.fileno())
+        frame, error = _read_parquet_with_index_policy(
+            stream, read_errors=(OSError, ArrowInvalid),
+            **({'engine': engine} if engine is not None else {}))
+    if error is not None:
+        return None, error, identity
+    if check_null:
+        frame = check_read(frame, path)
+    return frame, None, identity
+
+
+def _validate_stata_missing_map(option):
+    """Validate the explicit source-column -> extended-tag -> label option."""
+    if option is None:
+        return {}
+    if not isinstance(option, dict):
+        raise ValueError('stata_missing_map must be a column/tag/label dictionary')
+    if not option:
+        return {}
+    for column, tags in option.items():
+        if not isinstance(column, str) or not column or not isinstance(tags, dict) or not tags:
+            raise ValueError('stata_missing_map needs named source columns and nonempty tag maps')
+        for tag, label in tags.items():
+            if (not isinstance(tag, str) or len(tag) != 2 or tag[0] != '.'
+                    or tag[1] not in 'abcdefghijklmnopqrstuvwxyz' or not isinstance(label, str)):
+                raise ValueError('stata_missing_map requires extended tags .a through .z and string labels')
+    return option
+
+
+def _overlay_stata_missing_map(frame, stream, option, release):
+    """Overlay only requested typed tags onto the ordinary decoder output.
+
+    Finite values, labels and encoding remain owned by normal from_dta.
+    Formats <=111 have only a single missing distinction in pandas' reader.
+    """
+    if release is None or release <= 111:
+        raise ValueError('stata_missing_map requires a Stata format supporting extended missing tags')
+    from pandas.io.stata import StataMissingValue
+    stream.seek(0)
+    with pd.io.stata.StataReader(stream) as reader:
+        native = reader.read(columns=list(option), convert_missing=True,
+                             convert_categoricals=False, convert_dates=False)
+    if (not isinstance(frame, pd.DataFrame) or len(native) != len(frame)
+            or not native.index.identical(frame.index)
+            or any(column not in frame.columns or column not in native.columns for column in option)):
+        raise ValueError('stata_missing_map native scan does not match decoded rows/index/columns')
+    out = frame.copy(deep=True)
+    for column, tags in option.items():
+        for tag, label in tags.items():
+            mask = native[column].map(lambda value: isinstance(value, StataMissingValue)
+                                      and value.string == tag)
+            if mask.any():
+                values = out[column]
+                if not (pd.api.types.is_object_dtype(values.dtype)
+                        or isinstance(values.dtype, pd.StringDtype)):
+                    values = values.astype(object)
+                out[column] = values.mask(mask, label)
+    return out
+
+
+def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False, stata_missing_map: dict[str, dict[str, str]] | None = None) -> pd.DataFrame:
     """From a file named fn, try to return a dataframe.
 
     Hope is that caller can be agnostic about file type,
     or if file is local or on a dvc remote.
+
+    stata_missing_map explicitly maps selected Stata source-column extended
+    tags (e.g. {"answer": {".d": "Not applicable"}}) to labels before
+    extraction. It adds one selected-column native scan; all other decoding
+    and the omitted/empty-option fallback remain unchanged.
     """
+    missing_map = _validate_stata_missing_map(stata_missing_map)
+    if missing_map and categories_only:
+        raise ValueError('stata_missing_map requires a data read, not categories_only')
     fn = _resolve_data_path(fn)
 
     def local_file(fn):
@@ -1773,6 +2338,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # chain below, unchanged.
         dct = _load_dct_for(fn)
         if dct is not None:
+            if missing_map:
+                raise ValueError('stata_missing_map is only supported for Stata data')
             if isinstance(f, str):
                 raw = Path(f).read_bytes()
             else:
@@ -1785,6 +2352,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # first bytes say the file is (see the block comment above
         # ``_sniff_head``).
         head = _sniff_head(f)
+        if missing_map and not _is_stata_dta(head):
+            raise ValueError('stata_missing_map is only supported for Stata data')
         if Path(fn).suffix.lower() == '.dta' and not _is_stata_dta(head):
             raise ValueError(f'{fn} has a .dta suffix but no Stata header')
         # GH #1070: likewise a ``.parquet``.  Its CSV fallback served a
@@ -1833,12 +2402,15 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                         NotImplementedError) as exc:
                     raise ValueError(f'{fn} claims SPSS but cannot be decoded') from exc
 
-        try:
-            return pd.read_parquet(f, engine='pyarrow')
-        except (ArrowInvalid,) as exc:
+        df, parquet_error = _read_parquet_with_index_policy(
+            f, engine='pyarrow', read_errors=(ArrowInvalid,),
+        )
+        if parquet_error is not None:
             if Path(fn).suffix.lower() == '.parquet':
-                raise ParquetFormatError(f'{fn} has a Parquet header but cannot be decoded') from exc
-            failure = exc
+                raise ParquetFormatError(f'{fn} has a Parquet header but cannot be decoded') from parquet_error
+            failure = parquet_error
+        else:
+            return df
 
         # Stata -- only when the header says so (GH #712).  Handed a file
         # that is NOT Stata, ``StataReader`` reads a garbage header and dies
@@ -1850,6 +2422,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 f.seek(0)
                 out = from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
             except (ValueError, struct.error) as exc:
+                if missing_map:
+                    raise ValueError('stata_missing_map cannot use a tag-losing fallback decoder') from exc
                 failure = exc
             else:
                 # GH #805: pandas decoded this file as latin-1; re-decode its
@@ -1857,6 +2431,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 release = _stata_release(head)
                 if encoding is None and release is not None and release < 118:
                     out = _redecode_cp1252(out, f)
+                if missing_map:
+                    out = _overlay_stata_missing_map(out, f, missing_map, release)
                 return out
 
             try:
@@ -2034,7 +2610,7 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
 #def regularize_string(s):
 
 @build_transform()  # build-path: extraction/formatting baked verbatim into the L2 parquet (#522)
-def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categoricals: bool = True, encoding: str | None = None, orgtbl: str | None = None, missing_ok: bool = False, **kwargs: Any) -> pd.DataFrame:
+def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categoricals: bool = True, encoding: str | None = None, orgtbl: str | None = None, missing_ok: bool = False, stata_missing_map: dict[str, dict[str, str]] | None = None, **kwargs: Any) -> pd.DataFrame:
     """From a file named fn, grab both index variables and additional variables
     specified in kwargs and construct a pandas dataframe.
 
@@ -2093,15 +2669,23 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
                         # s is a single column name (string) or single-element list
                         col = s if isinstance(s, str) else s[0]
                         return df[col].map(lambda x: f.get(x, x))
-            elif isinstance(f, tuple):
-                for i in f:
-                    return grabber(df, (s, i))
+            elif isinstance(f, tuple) and f:
+                # The first stage may consume several source columns. Every
+                # later stage consumes the preceding Series, not the raw input.
+                for step in f:
+                    result = grabber(df, (s, step))
+                    df = result.to_frame(name="__mapped_value__")
+                    s = "__mapped_value__"
+                return result
 
         raise ValueError(df_data_grabber.__doc__)
 
     if orgtbl is None:
-        df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+        options = {} if stata_missing_map is None else {'stata_missing_map': stata_missing_map}
+        df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding, **options)
     else:
+        if _validate_stata_missing_map(stata_missing_map):
+            raise ValueError('stata_missing_map is not supported for Org tables')
         df = df_from_orgfile(fn,name=orgtbl,encoding=encoding)
         if df.shape[0]==0:
             raise KeyError(f'No table {orgtbl} in {fn}.')
@@ -3188,13 +3772,46 @@ def cache_freshness(path: str | Path, expected_hash: str | None) -> str:
     return "fresh" if stored == expected_hash else "stale"
 
 
-def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
+def read_parquet_make_inputs(path: str | Path, *, _with_presence=False):
+    """Declared-input witness for direct Make reuse (GH1288); footer only."""
+    result, present = None, False
+    try:
+        import pyarrow.parquet as pq
+        md = pq.read_schema(str(path)).metadata or {}
+        present = b'lsms_make_inputs' in md
+        value = json.loads(md[b'lsms_make_inputs'])
+        if (isinstance(value, dict) and set(value) == {'sources', 'tables'}
+                and all(isinstance(part, dict)
+                        and all(isinstance(k, str) and isinstance(v, str)
+                                for k, v in part.items()) for part in value.values())):
+            result = value
+    except (OSError, ValueError, KeyError, TypeError, ArrowInvalid):
+        pass
+    return (result, present) if _with_presence else result
+
+
+def stamp_parquet_hash(path: str | Path, expected_hash: str | None, *,
+                       cache_waves: list[str] | None = None,
+                       make_inputs: dict | None = None,
+                       grain_audit: list[dict] | None = None,
+                       datetime_audit: list[dict] | None = None,
+                       build_drops: list[dict] | None = None) -> bool:
     """Best-effort: embed *expected_hash* into an existing parquet's
     schema metadata via an atomic rewrite.
 
     Used for trust-once-then-stamp migration of legacy / script-written
     parquets so subsequent reads are guarded.  Never raises; returns
     ``True`` on success (or when the stamp is already present).
+
+    ``cache_waves`` is explicit producer coverage, never inferred from rows.
+    The isolated Make transaction supplies it only AFTER verifying its inputs
+    and output (GH1288 repair ledger §4). Other callers retain the old behavior.
+    Arrow/pandas metadata and all audit stamps are retained verbatim.
+    ``make_inputs`` similarly records verified declared prerequisite/source
+    fingerprints, because a selected-table hash need not fold Other tables.
+    Optional audit records carry the verified producer's input evidence when
+    the native country builder did not relay its wave subprocesses' footers.
+    No DataFrame is serialized here; raw payload, attrs and other metadata stay.
     """
     if expected_hash is None:
         return False
@@ -3210,9 +3827,24 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
         import pyarrow.parquet as pq
         table = pq.read_table(str(path))
         md = dict(table.schema.metadata or {})
-        if md.get(_CACHE_HASH_KEY) == expected_hash.encode():
+        coverage = (json.dumps([str(w) for w in cache_waves]).encode()
+                    if cache_waves is not None else None)
+        inputs = (json.dumps(make_inputs, sort_keys=True).encode()
+                  if make_inputs is not None else None)
+        audits = {key: json.dumps(value).encode() for key, value in (
+            (_GRAIN_AUDIT_KEY, grain_audit), (_DATETIME_AUDIT_KEY, datetime_audit),
+            (_BUILD_DROPS_KEY, build_drops)) if value is not None}
+        if (md.get(_CACHE_HASH_KEY) == expected_hash.encode()
+                and (coverage is None or md.get(_CACHE_WAVES_KEY) == coverage)
+                and (inputs is None or md.get(b'lsms_make_inputs') == inputs)
+                and all(md.get(key) == value for key, value in audits.items())):
             return True
         md[_CACHE_HASH_KEY] = expected_hash.encode()
+        if coverage is not None:
+            md[_CACHE_WAVES_KEY] = coverage
+        if inputs is not None:
+            md[b'lsms_make_inputs'] = inputs
+        md.update(audits)
         table = table.replace_schema_metadata(md)
         _atomic_write_table(table, path)
         return True
@@ -3316,7 +3948,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         df = all
 
     fn = Path(fn)
-    if cache_hash is not None or grain_audit or cache_waves or datetime_audit or build_drops:
+    if cache_hash is not None or grain_audit or cache_waves is not None or datetime_audit or build_drops:
         import pyarrow as pa
         table = pa.Table.from_pandas(df, preserve_index=index)
         md = dict(table.schema.metadata or {})
@@ -3327,7 +3959,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
             # so the warm read can re-emit it (the pre-collapse frame that
             # proved the loss is long gone by then).
             md[_GRAIN_AUDIT_KEY] = json.dumps(grain_audit).encode()
-        if cache_waves:
+        if cache_waves is not None:
             # GH #891: carry the wave coverage with the data, so a request for
             # a subset of these waves is a hit rather than a rebuild.
             md[_CACHE_WAVES_KEY] = json.dumps([str(w) for w in cache_waves]).encode()
@@ -3360,10 +3992,12 @@ class RecursiveDict(UserDict):
 
     Used to collapse household-ID rewrite chains like ``A → B → C`` into
     a single lookup: ``RecursiveDict({'A': 'B', 'B': 'C'})['A'] == 'C'``.
-    Keys that are not themselves values are returned unchanged. Backs
-    :func:`id_walk` when applying a country's ``updated_ids`` mapping
-    across waves. See the "Panel ID Transitive Chains" section of
-    ``CLAUDE.md`` for the downstream consequences of getting this wrong.
+    Keys that are not themselves values are returned unchanged.  Its keys
+    are ``(wave, id)`` pairs, so a chain here crosses WAVES (the
+    ``panel_ids`` record); it is NOT how :func:`id_walk` applies a wave's
+    ``updated_ids`` map, which is a single-pass rename within one wave
+    (GH #1245).  See the "Panel ID Transitive Chains" section of
+    ``CLAUDE.md``.
     """
     def __init__(self,*arg,**kw):
       super(RecursiveDict, self).__init__(*arg, **kw)
@@ -3577,127 +4211,241 @@ def panel_ids(Waves: dict[str, Any] | pd.DataFrame) -> tuple[RecursiveDict, dict
         updated_wave[wave_year] = wave_matches
     return recursive_D, updated_wave
 
-def _close_id_map(mapping: dict[str, str], wave: str | None = None) -> dict[str, str]:
-    """Resolve transitive chains in an id-rename mapping.
-
-    ``pandas.DataFrame.rename(index=mapping)`` performs a single
-    substitution per index entry (``x -> mapping.get(x, x)``); it does
-    not iterate to a fixed point.  When ``mapping`` contains a chain
-    ``{A: B, B: C}`` the rename only advances each entry by one link,
-    leaving the result in a non-canonical state.  A *second* application
-    then advances the survivors another step, which is how
-    already-walked rows can collide with already-canonical rows and
-    produce duplicate ``(i, t)`` tuples.  This is the bug class fixed
-    in commit ``4db41a27`` (Burkina Faso 2021-22) by patching the
-    ``df.attrs`` propagation; closure-resolving the mapping fixes the
-    underlying non-idempotence at the source.
-
-    Given ``{A: B, B: C}`` returns ``{A: C, B: C}``: every value in the
-    returned mapping is a *terminal* id — it is never itself a key
-    (except for self-mappings, which are left intact as harmless
-    no-ops).  Applying the closed mapping twice is therefore the same
-    as applying it once.
-
-    Cycles (``A -> B -> A``) raise ``ValueError`` since they indicate
-    corrupt panel-id data — there is no consistent terminal id.
-
-    Parameters
-    ----------
-    mapping : dict[str, str]
-        One wave's slice of ``updated_ids``.
-    wave : str, optional
-        Wave label, used only in error messages.
-
-    Returns
-    -------
-    dict[str, str]
-        Closure-resolved mapping with the same domain as ``mapping``.
-    """
-    closed: dict[str, str] = {}
-    for k in mapping:
-        # Walk until ``v`` is terminal: not a key, or self-mapped.
-        # A self-map is the natural fixed point and not a cycle.  Any
-        # other revisit of an id is a true cycle.
-        seen = [k]
-        v = mapping[k]
-        while v in mapping and mapping[v] != v:
-            if v in seen:
-                chain = ' -> '.join(seen + [v])
-                raise ValueError(
-                    f"Cycle detected in updated_ids"
-                    f"{f' for wave {wave!r}' if wave else ''}: {chain}"
-                )
-            seen.append(v)
-            v = mapping[v]
-        closed[k] = v
-    return closed
-
-
-def id_walk(df: pd.DataFrame, updated_ids: dict[str, dict[str, str]], hh_index: str = 'i') -> pd.DataFrame:
+def update_id_reserving(d: dict[str, str], id_splits: dict[str, int],
+                        reserved: set[str]) -> tuple[dict[str, str], dict[str, int]]:
     '''
-    Updates household IDs in panel data across different waves separately.
+    :func:`update_id`, with one more guard: a minted split suffix ``k_N`` also
+    avoids every id in ``reserved``.
+
+    ``update_id`` guards a mint only against the ids live in the CURRENT wave
+    (GH #504).  An id issued in an EARLIER wave to a lineage that has since
+    left the panel is not live, and ``id_splits[k]`` is reset to 0 whenever
+    ``k`` has a single claimant, so a later wave can mint it again for a
+    different household.  Malawi 2024-25 did so 25 times, 17 of them with
+    2019-20 ids (GH #1275 review).
+    Pass the ids earlier waves issued as ``reserved``.
+
+    Kept separate from ``update_id`` on purpose: ``update_id``'s source is in
+    every panel country's cache fingerprint (their ``panel_ids.py`` imports
+    it), and only the waves a country opts into should move.  With an empty
+    ``reserved`` the two agree (tests/test_malawi_panel_id_guard.py::
+    test_empty_reservations_preserve_legacy_values_and_split_counters).
+    '''
+    D_inv: dict[str, list[str]] = {}
+    for k, v in d.items():
+        D_inv.setdefault(v, []).append(k)
+    live = set(d.values()) | set(reserved)
+    emitted: set[str] = set()
+    updated_id: dict[str, str] = {}
+    for k, v in D_inv.items():
+        if len(v) == 1:
+            updated_id[v[0]] = k
+            id_splits[k] = 0
+            emitted.add(k)
+        else:
+            for it, v_element in enumerate(v):
+                if it == 0:
+                    cand = k
+                else:
+                    split = id_splits.get(k, 0) + it
+                    cand = '%s_%d' % (k, split)
+                    while cand in live or cand in emitted:
+                        split += 1
+                        cand = '%s_%d' % (k, split)
+                updated_id[v_element] = cand
+                emitted.add(cand)
+            id_splits[k] = id_splits.get(k, 0) + len(v) - 1
+    return updated_id, id_splits
+
+
+def panel_ids_guarding(frame: pd.DataFrame, *, guard_from: str
+                       ) -> tuple[RecursiveDict, dict[str, dict[str, str]]]:
+    '''
+    :func:`panel_ids` for a ``(t, i) -> previous_i`` frame, except that from
+    wave ``guard_from`` on, a minted split suffix also avoids every id an
+    earlier wave issued (:func:`update_id_reserving`).
+
+    Waves before ``guard_from`` go through ``update_id`` itself, so their maps
+    are byte-identical to :func:`panel_ids`'s.  A country opts in with
+    ``Panel IDs: guard_minted_from: <wave>`` in its ``data_scheme.yml``, read
+    only by the country's ``panel_ids.py``, which writes the committed
+    crosswalk that both build backends serve (GH #1275).
+    ``Country._compute_panel_ids`` does not read it: its DataFrame fallback,
+    reached only when a country ships no committed JSON, builds with
+    :func:`panel_ids` (PR #1604 review -- a guarded branch there moved every
+    table's build fingerprint corpus-wide for a route production never takes).
+    '''
+    updated_wave: dict[str, dict[str, str]] = {}
+    check_id_split: dict[str, int] = {}
+    issued: set[str] = set()
+    sorted_waves = sorted(frame.index.get_level_values('t').unique())
+    recursive_D = RecursiveDict()
+    for n, wave_year in enumerate(sorted_waves):
+        df = frame[frame.index.get_level_values('t') == wave_year].copy().reset_index()
+        wave_matches = df[['i', 'previous_i']].dropna().set_index('i')['previous_i'].to_dict()
+        previous_wave = sorted_waves[n - 1] if n > 0 else None
+        if previous_wave:
+            previous_wave_matches = updated_wave[previous_wave]
+            wave_matches = {k: previous_wave_matches.get(v, v) for k, v in wave_matches.items()}
+            recursive_D.update({(wave_year, k): (previous_wave, v) for k, v in wave_matches.items()})
+        if wave_year >= guard_from:
+            wave_matches, check_id_split = update_id_reserving(
+                wave_matches, check_id_split, issued)
+        else:
+            wave_matches, check_id_split = update_id(wave_matches, check_id_split)
+        updated_wave[wave_year] = wave_matches
+        issued |= set(wave_matches.values())
+    return recursive_D, updated_wave
+
+
+class IdWalkError(Exception):
+    """``id_walk`` cannot tell whether a wave's household ids are raw or walked.
+
+    Raised for a wave whose ids are *mixed* -- some exist only before a walk,
+    others only after it -- or which hold nothing but ids that are both a
+    moving key and another key's target (see :func:`_walk_partition`).  Either
+    way, renaming would risk walking some rows twice and not renaming would
+    risk serving raw ids, so the walk refuses (GH #1245).
+
+    Subclasses ``Exception``, not ``RuntimeError`` / ``ValueError`` /
+    ``KeyError``: the derived-table and legacy-fallback paths in ``country.py``
+    catch those three and would quietly retry another build.
+    """
+
+
+def _walk_partition(mapping: dict[str, str]) -> tuple[frozenset, frozenset, frozenset]:
+    """Split one wave's ``updated_ids`` map into the id classes ``id_walk`` uses.
+
+    With ``K`` the keys that move (``mapping[k] != k``) and ``V`` their targets:
+
+    - ``raw_only = K - V``: an id that moves and is nobody's target.  It can
+      appear only BEFORE a walk -- after one, every moved row holds a target and
+      every unmoved row holds an id that is not a moving key.  Exact.
+    - ``walked_only = V - K``: a target that does not itself move.  It can
+      appear only AFTER a walk, provided no current-wave household that keeps
+      its id already holds it -- the condition under which the walk is
+      collision-free (``panel_ids.py`` guards and ``update_id`` ensure it).
+    - ``chained = K & V``: a moving key that is also another key's target.  It
+      appears on both sides, which is exactly why a closure-resolved map sent a
+      household to the wrong id (GH #1245) and why a second single-pass
+      application would move it again.
+    """
+    moving = {k: v for k, v in mapping.items() if k != v}
+    keys, targets = set(moving), set(moving.values())
+    return (frozenset(keys - targets), frozenset(targets - keys),
+            frozenset(keys & targets))
+
+
+def id_walk(df: pd.DataFrame, updated_ids: dict[str, dict[str, str]], hh_index: str = 'i',
+            state: str = 'unknown') -> pd.DataFrame:
+    '''Re-key household ids into the panel's canonical ids, EXACTLY ONCE.
 
     Parameters:
         df (DataFrame): Panel data with a MultiIndex, including 't' for wave and 'i' (default) for household ID.
-        updated_ids (dict): A dictionary mapping each wave to another dictionary that maps original household IDs to updated IDs.
-            Format:
-                {wave_1: {original_id: new_id, ...},
-                 wave_2: {original_id: new_id, ...}, ...}
+        updated_ids (dict): ``{wave: {current_id: canonical_id, ...}, ...}``.
         hh_index (str): Index name for the household ID level (default is 'i').
+        state (str): ``'unknown'`` (default) or ``'raw'``.  Pass ``'raw'`` only
+            when the caller knows ``df`` has not been walked -- stage 2 of
+            ``load_from_waves`` (a wave's own build) and ``derivation_inputs``
+            (raw survey rows).  It changes one thing: a wave whose ids cannot
+            say whether it was walked (see below) is renamed instead of
+            refused.
 
-    Example:
-        updated_ids = {
-            '2013-14': {'0001-001': '101012150028', '0009-001': '101015620053', '0005-001': '101012150022'},
-            '2016-17': {'0001-002': '0001-001', '0003-001': '0005-001', '0005-001': '0009-001'}
-        }
+    Single-pass rename (GH #1245)
+    ------------------------------
+    Each wave's map is applied as ONE substitution, ``x -> mapping.get(x, x)``,
+    never following chains.  Within a wave the keys are that wave's raw ids and
+    the values are canonical (earlier-wave) ids: two namespaces sharing one
+    string space.  When a survey renumbers households (Burkina Faso 2021-22),
+    household ``X`` maps to ``T`` (its true earlier id) while the household
+    whose raw id is ``T`` maps to ``U``.  The old closure resolution
+    (``_close_id_map``) sent ``X`` on to ``U`` -- the wrong household -- which
+    is why Burkina's ``panel_ids.py`` dropped every such link.
 
-        In this example, IDs are updated independently for each wave.
-        Because the same original household ID across different waves may not represent the same household.
-        Specifically, household '0005-001' in wave '2016-17' corresponds to household '0009-001' from wave '2013-14', not '0005-001' from '2013-14'.
+    Exactly once
+    ------------
+    A single-pass rename is NOT idempotent when a map has such chains: a second
+    application moves ``T`` on to ``U``.  And frames are offered to ``id_walk``
+    more than once: ``_finalize_result`` re-walks any frame that has lost
+    ``attrs['id_converted']``, which a table DERIVED from an already-served one
+    always has (measured on d353b7ea7: ``food_quantities`` is walked twice,
+    Uganda ``nutrition`` three times).  So each wave decides from its own ids,
+    using the classes of :func:`_walk_partition`:
 
-    The function handles these wave-specific mappings separately, ensuring accurate household identification over time.
+    ==================================  =======================================
+    the wave holds                      action
+    ==================================  =======================================
+    a ``raw_only`` id, no walked_only   rename (unwalked)
+    a ``walked_only`` id, no raw_only   leave as is (already walked)
+    both                                raise :class:`IdWalkError` (mixed)
+    neither, but a ``chained`` id       raise :class:`IdWalkError`
+                                        (undecidable); ``state='raw'``: rename
+    neither, and no ``chained`` id      rename (a no-op on these ids)
+    ==================================  =======================================
 
-    Idempotence
-    -----------
-    Each wave's mapping is closure-resolved via :func:`_close_id_map`
-    before application, so ``id_walk(id_walk(df, ui)) == id_walk(df, ui)``
-    by construction.  ``df.attrs['id_converted']`` is still set as a
-    fast-path hint — the framework checks it in ``_finalize_result`` to
-    skip a redundant pass — but losing the flag (e.g. via
-    :meth:`.set_index`, :meth:`.merge`) is no longer a correctness
-    hazard.  See ``tests/test_id_walk.py`` for the regression cases.
+    So ``id_walk(id_walk(df)) == id_walk(df)`` for a frame whose first walk
+    left at least one ``walked_only`` id in each walked wave, and losing
+    ``attrs`` is not a correctness hazard there.  The flag is still set:
+    callers use it to skip the work.  A wave with no map, or an empty one, is
+    returned untouched.
+
+    Limits, stated (pinned by ``tests/test_id_walk.py``):
+
+    - A *mixed* wave -- walked and unwalked rows of one wave in one frame -- is
+      refused only when each side shows its own class.  If one side holds
+      nothing but ``chained`` or inert ids it escapes: a walked ``{Q}`` beside a
+      raw ``{T}`` is left alone (``T`` stays raw); a walked ``{T}`` beside a
+      raw ``{P}`` is renamed (``T`` walked twice).  No code path builds such a
+      frame today (measured: 0 mixed waves in 1,250 reads).
+    - ``walked_only`` ids in a raw frame mean a target held by a household that
+      keeps its id -- a crosswalk collision, which a rename would turn into a
+      merge.  Such a wave alone is left as is; beside ``raw_only`` ids it is
+      refused as mixed.  Base renamed both (0 occurrences in the corpus).
+    - Rows whose ``t`` is NaN are dropped (``unique()`` keeps NaN, the ``==``
+      mask matches none of it); unchanged from the closure version.
     '''
-    # Guard: a frame with no rows (e.g. a wave whose source yielded nothing)
+    if state not in ('unknown', 'raw'):
+        raise ValueError(f"id_walk: state must be 'unknown' or 'raw', not {state!r}")
+    # Guard: a frame with no ROWS (e.g. a wave whose source yielded nothing)
     # or one lacking a 't' level has no waves to split on; the final
     # ``pd.concat([])`` would otherwise raise "No objects to concatenate".
-    # Empty-in -> empty-out, and the id_converted flag keeps it idempotent.
-    if df.empty or 't' not in (df.index.names or []):
+    # ``len``, not ``df.empty``: an index-only frame (no columns) is "empty" to
+    # pandas but has rows to walk -- the panel diagnostics' spine is one, and
+    # ``df.empty`` returned it unwalked (GH #1245 review).
+    if len(df.index) == 0 or 't' not in (df.index.names or []):
         df.attrs['id_converted'] = True
         return df
 
-    #seperate df into different waves:
     dfs = {}
-    waves = df.index.get_level_values('t').unique()
-    for wave in waves:
-        dfs[wave] = df[df.index.get_level_values('t') == wave].copy()
-    #update ids for each wave
-    for wave, df_wave in dfs.items():
-        #update ids
-        if wave in updated_ids and updated_ids[wave]:
-            closed = _close_id_map(updated_ids[wave], wave=wave)
-            df_wave = df_wave.rename(index=closed, level=hh_index)
-            #update the dataframe with the new ids
-            dfs[wave] = df_wave
-        else:
-            continue
-    #combine the updated dataframes
+    for wave in df.index.get_level_values('t').unique():
+        df_wave = df[df.index.get_level_values('t') == wave].copy()
+        mapping = updated_ids.get(wave)
+        if mapping:
+            raw_only, walked_only, chained = _walk_partition(mapping)
+            ids = set(df_wave.index.get_level_values(hh_index).unique())
+            n_raw, n_walked = len(ids & raw_only), len(ids & walked_only)
+            if n_raw and n_walked:
+                raise IdWalkError(
+                    f"id_walk: wave {wave!r} holds {n_raw} id(s) that exist only "
+                    f"before a walk and {n_walked} that exist only after one -- "
+                    f"unwalked and walked rows mixed in one frame, or a crosswalk "
+                    f"target held by a household that keeps its id; e.g. "
+                    f"{sorted(ids & raw_only)[:3]} / {sorted(ids & walked_only)[:3]}")
+            if not n_raw and not n_walked and ids & chained and state != 'raw':
+                raise IdWalkError(
+                    f"id_walk: wave {wave!r} holds only ids that are both a moving "
+                    f"key and another key's target "
+                    f"(e.g. {sorted(ids & chained)[:3]}), so whether it is already "
+                    f"walked cannot be told from its ids (GH #1245); a caller that "
+                    f"knows the frame is unwalked passes state='raw'")
+            if not n_walked:
+                df_wave = df_wave.rename(index=mapping, level=hh_index)
+        dfs[wave] = df_wave
     df = pd.concat(dfs.values(), axis=0)
-
-    # df= df.rename(index=updated_ids,level=['t', hh_index])
     df.attrs['id_converted'] = True
     return df
 
-        
+
 def conversion_table_matching_global(df: pd.DataFrame, conversions: pd.DataFrame, conversion_label_name: str, num_matches: int = 3, cutoff: float = 0.6) -> tuple[pd.DataFrame, dict[str, str]]:
     """
     Returns a Dataframe containing matches and Dictionary mapping top choice
@@ -3849,7 +4597,15 @@ def map_index(df: pd.DataFrame) -> pd.DataFrame:
         mapping_rules['w'] = 't'
 
     if 'u' in df.index.names:
-        df = df.rename(index={k: 'unit' for k in ['<NA>', 'nan', pd.NA]}, level='u')
+        # A missing unit is the canonical sentinel, never a minted spelling
+        # (GH #1041 ruling; GH #1234).  This used to mint the literal 'unit',
+        # which reads as a real unit and collides with genuine ones (Panama's
+        # 'unidad').  Function-level import: transformations imports
+        # local_tools.  Same keys as before: pd.NA (a StringDtype NA-policy
+        # level) and the stringified 'nan' / '<NA>'.  A NaN-policy NaN is
+        # still not matched by this rename (GH #1118 residual).
+        from .transformations import U_UNKNOWN
+        df = df.rename(index={k: U_UNKNOWN for k in ['<NA>', 'nan', pd.NA]}, level='u')
 
     if mapping_rules:
         df = df.rename_axis(index=mapping_rules)

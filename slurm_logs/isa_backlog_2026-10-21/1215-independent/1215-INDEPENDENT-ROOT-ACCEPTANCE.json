@@ -1,0 +1,31 @@
+{
+  "status": "ROOT_ACCEPTED_ORDER_ONLY_1215_WITH_RETAINED_FAILURES_AND_HISTORY",
+  "candidate": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "pins": {
+    "READY.json": "dd8d1b6c7fc97cd01276abfaeb1e2c55b5505ea2f25b62b13f15af36e7e061b4",
+    "final-private-manifest.json": "5b349ae255827c9c1a5e8d8f553acacd617b17d888fca9e492d0467ff62eff47",
+    "safe-exports/ALLOWLIST.json": "544dc5d8491ea3a7b299077092951c7b6432e847628c38cba57ab636397e84fa"
+  },
+  "packet_entries": 2848,
+  "file_bytes": 545526967,
+  "sources": {
+    "regular_fresh_hashes": 29727,
+    "links": 94,
+    "historical_metadata_only": 6
+  },
+  "providers": 37,
+  "copies": 148,
+  "copy_bytes": 177769212,
+  "strict": {
+    "PASS": 82,
+    "FAIL": 10
+  },
+  "scanners_each_WARN": 22,
+  "source_historical_exception": "Initial independent snapshot SHA-read six files; root did not reopen them. Untraced Git internals qualified.",
+  "original_sealer_and_separate_postexit_actual_exit": 0,
+  "literal_harness_recovery": "Separate root recovery pending; exact SDK values and process records verified.",
+  "new_root_interval_ns": 1792706266209582292,
+  "root_metadata_stop": "Earlier source inspection requested nonexistent FINAL-PROTECTION.json; actual protection-private.json read without product replay.",
+  "signed": "Sue (GPT-6)"
+}

@@ -1,0 +1,36 @@
+{
+  "recorded_at_UTC": "2026-10-22T03:54:29.185433+00:00",
+  "rows": [
+    {
+      "label": "candidate",
+      "checkout": "/local/job40255479/worktrees/isa-integration-twenty",
+      "head": "de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2",
+      "ignored_link": "/local/job40255479/worktrees/isa-integration-twenty/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/integration/tanzania-twenty-review/candidate-dvc-tmp"
+    },
+    {
+      "label": "base",
+      "checkout": "/local/job40255479/worktrees/isa-integration-twenty-base",
+      "head": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+      "ignored_link": "/local/job40255479/worktrees/isa-integration-twenty-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/integration/tanzania-twenty-review/base-dvc-tmp"
+    }
+  ],
+  "exact_nine_path_mode_blob_increment_matches_fa_vs_e75": true,
+  "changed_paths": [
+    ".coder/ledger/1091-tanzania-community-builder.md",
+    "lsms_library/countries/Tanzania/_/CONTENTS.org",
+    "lsms_library/countries/Tanzania/_/Makefile",
+    "lsms_library/countries/Tanzania/_/community_prices.py",
+    "slurm_logs/isa_backlog_2026-10-21/Tanzania/1091/DRAFT-RESIDUAL.md",
+    "slurm_logs/isa_backlog_2026-10-21/Tanzania/1091/REPORT.org",
+    "slurm_logs/isa_backlog_2026-10-21/Tanzania/1091/REPRODUCE.sh",
+    "slurm_logs/isa_backlog_2026-10-21/Tanzania/1091/validation.json",
+    "tests/test_gh1091_tanzania_community_builder.py"
+  ],
+  "review_assigned": false,
+  "builds_tests": 0,
+  "source_filesystem_origin_published": true,
+  "source_GitHub_published": false,
+  "root_acceptance": null
+}

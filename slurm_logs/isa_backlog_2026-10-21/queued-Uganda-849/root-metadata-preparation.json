@@ -1,0 +1,24 @@
+{
+  "recorded_at_UTC": "2026-10-22T03:34:57.938528+00:00",
+  "rows": [
+    {
+      "label": "candidate",
+      "checkout": "/local/job40255479/worktrees/isa-Uganda-849-fix",
+      "head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+      "ignored_link": "/local/job40255479/worktrees/isa-Uganda-849-fix/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-fix/candidate-dvc-tmp",
+      "clean": true
+    },
+    {
+      "label": "base",
+      "checkout": "/local/job40255479/worktrees/isa-Uganda-849-fix-base",
+      "head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+      "ignored_link": "/local/job40255479/worktrees/isa-Uganda-849-fix-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/Uganda/849-fix/base-dvc-tmp",
+      "clean": true
+    }
+  ],
+  "writer_assigned": false,
+  "edits_tests_builds": 0,
+  "prerequisite": "Root independent acceptance of1198; not yet granted"
+}

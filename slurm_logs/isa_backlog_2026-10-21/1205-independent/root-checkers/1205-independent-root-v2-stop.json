@@ -1,0 +1,11 @@
+{
+  "status": "ROOT_METADATA_VERIFICATION_STOP_PRESERVED",
+  "session": 6244,
+  "actual_terminal_exit": 1,
+  "terminal_chunk": "63833c",
+  "source_sha256": "f1aace2d2a4025a38a93383c5832fb5838f505b9190a8ee2ec3c642b86ba5ee9",
+  "stderr_sha256": "5518722488d513539b3990f0bb8e00e0d1d70f4adda3a738d5a23c567fdb7edc",
+  "cause": "Root compared complete declaration physical receipts across distinct worktrees; only inode and mtime differ. All474frozen hashes,29826source receipts,53providers/106copies and full549/39/1362hash maps passed before this assertion.",
+  "correction": "Bind each declaration receipt to its own exact source path, compare declaration SHA/bytes/mode/link semantic content across heads, and retain physical identity difference. No dataframe/API/source-data replay.",
+  "signed": "Sue"
+}

@@ -1,0 +1,51 @@
+{
+  "recorded_at_UTC": "2026-10-22T03:38:17.526420+00:00",
+  "verdict": "ROOT_ACCEPT_BOUNDED_TANZANIA1091_WITH_EXPLICIT_EVIDENCE_LIMITS",
+  "source": {
+    "candidate": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+    "base": "99c824079da480ab2646e499c06ac70e457ff271"
+  },
+  "READY_sha256": "f521ddd16122e579b69189e4764a162e41ff3458eb1aa5ac639a4ac18e0fa256",
+  "manifest_sha256": "be946a042d9678a49d9a10d12b652b64890c50f2a7c643655a060bac8aa6adf1",
+  "all_manifest_entries_verified": 2426,
+  "safe_export_receipts_verified": 7,
+  "root_read_full_review_actual_exact_oracle_probe_extras_assessment_artifact_gap_and_seal_sources": true,
+  "root_independent_JUnit": {
+    "base/new-junit-private.xml": {
+      "fail": 20,
+      "pass": 7
+    },
+    "candidate/new-junit-private.xml": {
+      "pass": 27
+    },
+    "candidate/existing-junit-private.xml": {
+      "pass": 58
+    }
+  },
+  "root_independent_hash_scope": {
+    "Tanzania_changed": 25,
+    "other_API_exact": 524,
+    "framework_exact": 39
+  },
+  "root_independent_scanner": {
+    "records_per_head": 4,
+    "complete_occurrence_multisets_exact": true
+  },
+  "comparison_counts": {
+    "main": 152,
+    "native_raw": 76,
+    "source_oracle": 10
+  },
+  "actual_cli_artifacts": 16,
+  "source_rows": 17699,
+  "limits": [
+    "Bounded leaf Tanzania community_prices plus compatible held-warm Mali40218; no combined20/full suite/other25 outputs claim.",
+    "172 captured warning-message files/24 nonempty; not all categories/stack fields saved. No complete structured-warning-event equality claim.",
+    "Factory/covered empty and native/writer/API/JSON stage distinctions retained without normalization.",
+    "Original normalized8 symlink snapshots and missing original partial aggregate JSON remain author evidence gaps; surviving7 per-call artifacts verified, no original recovery claim.",
+    "Three independent harness stops retained; no completed data/test/API prefix replay.",
+    "Prior1196/global17 thirteen failures/doc-child guard-mtime/stale8 limits retain original pins."
+  ],
+  "external_merge_or_issue_closure": false,
+  "signed": "Sue"
+}

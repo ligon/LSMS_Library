@@ -1,0 +1,94 @@
+{
+  "verdict": "PASS",
+  "reviewer": "Sue (GPT-6)",
+  "candidate": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+  "parent": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "runtime_tests": "6be6576607f1862b603d123acfb74ace4026fd3f",
+  "candidate_tests_tree": "a2c9ba05f0faf6625885bc6a0bd5f3bd71bece43",
+  "candidate_package_tree": "00cb01e7c1ca727dcefd5ed04d3de49d951a5276",
+  "scope": "Niger-only retirement; no public merge/closure/composition",
+  "candidate_focused": {
+    "pass": 114,
+    "fail": 0,
+    "error": 0,
+    "skip": 0
+  },
+  "parent_identical_new_cases": {
+    "pass": 5,
+    "fail": 12,
+    "error": 0,
+    "skip": 0,
+    "meaningful_assertion_failures": true
+  },
+  "source_rows": 46043,
+  "by_supported_wave": [
+    32352,
+    13691
+  ],
+  "retained_late_obs": 30,
+  "exact_quantity_masks": [
+    43,
+    32,
+    1
+  ],
+  "Mali_comparator_rows": 40218,
+  "Feature_rows": 86261,
+  "actual_hash_scope": {
+    "API_total": 549,
+    "Niger_changed": 23,
+    "other_unchanged": 526,
+    "framework_total_unchanged": 39
+  },
+  "typed_exact_checker": {
+    "saved_inputs": 104,
+    "full_exact_frame_pairs": 91,
+    "qualified_GH1196_pairs": 2,
+    "Arrow_footer_schema_byte_pairs": 5,
+    "negative_controls_rejected": 7,
+    "check_exact": true,
+    "rtol": 0,
+    "atol": 0,
+    "FIELDS_presence_values": true
+  },
+  "additional_full_Mali_and_parent_unsupported_controls": true,
+  "matched_warning_multisets": 28,
+  "scanner": {
+    "records": 3,
+    "warn": 3,
+    "fail": 0,
+    "error": 0,
+    "skip": 0,
+    "individually_exact_parent_records": true,
+    "cache_changes": 0,
+    "kwargs_grid_exists": false
+  },
+  "physical_source_copies": 160,
+  "declared_sources_sidecars": [
+    11,
+    11
+  ],
+  "author_manifest_payloads_unchanged": 1701,
+  "protected_old_manifest_entries": [
+    690,
+    241,
+    1190
+  ],
+  "in_tree_parquets": 0,
+  "unexpected_write_denials": 0,
+  "IP_attempts": 0,
+  "default_warm_cache_changes": 0,
+  "Make_native_writes": "Normal hashless rewrites; singleton eviction can delete other-wave native cache; no new country cache",
+  "clean_source_heads": true,
+  "live_task_consumers": 0,
+  "limits": [
+    "Author auxiliary direct-Wave original zero-write delta unidentified",
+    "Original detailed aggregate validation overwritten before first manifest; original final size/SHA unavailable; reconstruction is new artifact-only evidence",
+    "Review populated Make prefix individual all-call endpoints unpersisted; complete public frames and combined delta retained, remaining requests executed only once",
+    "Review2011 singleton receipt reconstructed from saved evidence, not original missing receipt bytes",
+    "Existing GH1196 food u cold/warm dtype distinction independently reproduced, not normalized",
+    "Existing empty-state and CLI record serialization layer differences retained",
+    "Two new safe JSON report FS modes writer0644/review0600; same bytes/Git100644, runtime/test modes match",
+    "No broad suite, corpus build, other23 Niger table builds, Mali source-cold reconstruction or composition proof"
+  ],
+  "signed": "Sue"
+}

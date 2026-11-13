@@ -1,0 +1,8 @@
+== 2014-15
+  Quantity       raw-sentinel 2 (months there: [nan, 1.0]); per-month==0 & months NA 3; per-month>0 & months NA 3; per-month>0 & months 0 3; per-month NA & months 0 0; clean product in {99,9999} 0; max per-month 9999.900390625
+  Quantity_sold  raw-sentinel 2 (months there: [1.0, 1.0]); per-month==0 & months NA 3; per-month>0 & months NA 3; per-month>0 & months 0 3; per-month NA & months 0 0; clean product in {99,9999} 0; max per-month 9999.900390625
+  Value_sold     raw-sentinel 0 (months there: []); per-month==0 & months NA 0; per-month>0 & months NA 3; per-month>0 & months 0 3; per-month NA & months 0 89; clean product in {99,9999} 0; max per-month 999999.0
+== 2017-18
+  Quantity       raw-sentinel 0 (months there: []); per-month==0 & months NA 0; per-month>0 & months NA 0; per-month>0 & months 0 1; per-month NA & months 0 85; clean product in {99,9999} 0; max per-month 10000.0
+  Quantity_sold  raw-sentinel 0 (months there: []); per-month==0 & months NA 0; per-month>0 & months NA 0; per-month>0 & months 0 0; per-month NA & months 0 85; clean product in {99,9999} 0; max per-month 250000.0
+  Value_sold     raw-sentinel 0 (months there: []); per-month==0 & months NA 0; per-month>0 & months NA 0; per-month>0 & months 0 0; per-month NA & months 0 107; clean product in {99,9999} 0; max per-month 4500000.0

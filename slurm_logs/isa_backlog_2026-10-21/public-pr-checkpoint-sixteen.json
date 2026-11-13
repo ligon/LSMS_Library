@@ -1,0 +1,181 @@
+{
+  "checked_at_UTC": "2026-10-21 22:24:35 UTC",
+  "prs": [
+    {
+      "number": 1172,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1034-nigeria-w3-unit-labels-20261021",
+      "head_sha": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1172"
+    },
+    {
+      "number": 1173,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1062-uganda-sibling-writes-v2-20261021",
+      "head_sha": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1173"
+    },
+    {
+      "number": 1175,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1109-malawi-organic-quantity-v2-20261021",
+      "head_sha": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1175"
+    },
+    {
+      "number": 1176,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1088-niger-quantity-sentinel-20261021",
+      "head_sha": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1176"
+    },
+    {
+      "number": 1178,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1144-nigeria-food-items-20261021",
+      "head_sha": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "base": "fix/1034-nigeria-w3-unit-labels-20261021",
+      "base_sha": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1178"
+    },
+    {
+      "number": 1180,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/822-mali-community-readings-20261021",
+      "head_sha": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1180"
+    },
+    {
+      "number": 1181,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1118-ethiopia-unknown-units-20261021",
+      "head_sha": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1181"
+    },
+    {
+      "number": 1182,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1077-nonfinite-label-keys-20261021",
+      "head_sha": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1182"
+    },
+    {
+      "number": 1185,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1118-tanzania-unknown-units-20261021",
+      "head_sha": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1185"
+    },
+    {
+      "number": 1186,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1121-mali-labor-source-20261021",
+      "head_sha": "6e97eaeb488096459d673486c127043f016c4f8d",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1186"
+    },
+    {
+      "number": 1189,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1123-burkina-input-identity-20261021",
+      "head_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1189"
+    },
+    {
+      "number": 1191,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1006-uganda-derived-api-tests-20261021",
+      "head_sha": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1191"
+    },
+    {
+      "number": 1192,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1095-nigeria-community-units-20261021",
+      "head_sha": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1192"
+    },
+    {
+      "number": 1193,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1111-malawi-kg-on-organic-20261021",
+      "head_sha": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "base": "fix/1109-malawi-organic-quantity-v2-20261021",
+      "base_sha": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1193"
+    },
+    {
+      "number": 1194,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1058-burkina-parcel-coordinates-20261021",
+      "head_sha": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1194"
+    },
+    {
+      "number": 1195,
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head": "fix/1081-preserve-categorical-errors-20261021",
+      "head_sha": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1195"
+    }
+  ]
+}

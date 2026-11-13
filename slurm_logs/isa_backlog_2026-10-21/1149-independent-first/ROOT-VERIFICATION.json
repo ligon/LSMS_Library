@@ -1,0 +1,39 @@
+{
+  "status": "ROOT_ACCEPTS_BOUNDED_REVIEW_AND_REQUESTS_NARROW_AMENDMENT",
+  "recorded_at_UTC": "2026-10-22T07:44:34.873916+00:00",
+  "manifest_entries_verified": 1918,
+  "safe_exports_verified": 7,
+  "exact_pathset": true,
+  "counts": {
+    "candidate": {
+      "tests": 266,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "base": {
+      "tests": 47,
+      "failures": 45,
+      "errors": 0,
+      "skips": 0
+    },
+    "adversarial": {
+      "tests": 9,
+      "failures": 2,
+      "errors": 0,
+      "skips": 0
+    },
+    "adversarial-base": {
+      "tests": 2,
+      "failures": 2,
+      "errors": 0,
+      "skips": 0
+    }
+  },
+  "human_six_requirements": "established in synthetic and bounded-warm scope",
+  "cleanup": "additional dispatcher requirement; invalid None push receipt preserves SOURCE and TypeError but retains completion; pre-existing on f8; ordinary helper promises list",
+  "no_actual_acquisition": true,
+  "no_payload_decode_API_or_test_replay": true,
+  "release_acceptance": "pending amendment and independent delta verification",
+  "signed": "Sue"
+}

@@ -1,0 +1,14 @@
+{
+  "status": "BOUNDED_SAVED_PR1194_NUMERIC_SUPPLEMENT",
+  "PR": 1194,
+  "strict_nonself_full_frame_groups": 87,
+  "strict_findings": 0,
+  "all189_historical_original_SHA_bytes_mode_mtime_exact": true,
+  "owneronly_nonsymlink_singlelink_distinctinode_copies": 58,
+  "full12_source_allcall_assertion_census": true,
+  "saved_source_coordinate_projection_and_walked_expected_memories": "UNSAVED_NOT_REPLAYED",
+  "fixture_expected_memory": "UNSAVED_NOT_REPLAYED",
+  "source_API_test_CLI_cache_replays": 0,
+  "all_campaign_result": false,
+  "signed": "Sue"
+}

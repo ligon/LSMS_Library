@@ -1,0 +1,79 @@
+{
+  "status": "ROOT_ACCEPT_BOUNDED_INDEPENDENT_REVIEW",
+  "country": "Uganda",
+  "issue": 849,
+  "recorded_at_UTC": "2026-10-22T06:34:38.669007+00:00",
+  "candidate": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "actual_parent": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "READY_sha256": "4505b86a7b9d5082bd6c7b8845f2ee9ee56a73f9735abe8bf6f833b1a25565cb",
+  "manifest_sha256": "dfef539aa8ffca3ff81acd1ffaba3da390b5f1c5903de47ca3410beb2997778f",
+  "all_manifest_payloads_verified": 2125,
+  "complete_frozen_pathset_verified": true,
+  "safe_exports_verified": 6,
+  "actual_checker_pins_verified": 48,
+  "tracked_source_endpoints_verified": 29805,
+  "source_snapshot_scope": "All Git blobs/modes and own frozen OS receipts; no unrecorded source mtime claim",
+  "physical_copies": {
+    "origins": 74,
+    "copies": 532,
+    "all_receipts_MD5s_and_distinct_inodes_exact": true
+  },
+  "candidate_JUnit": {
+    "pass": 416,
+    "skip": 10
+  },
+  "actual_parent_JUnit": {
+    "fail": 20,
+    "pass": 4
+  },
+  "actual_prebuild_hash_scope": {
+    "country_hashes": {
+      "total": 549,
+      "changed": 28
+    },
+    "framework_fingerprints": {
+      "total": 39,
+      "changed": 0
+    },
+    "wave_hashes": {
+      "total": 1362,
+      "changed": 171
+    },
+    "api_wave_hashes": {
+      "total": 2139,
+      "changed": 224
+    }
+  },
+  "evidence": {
+    "strong_checks": 375,
+    "overlapping_group_counts": [
+      99,
+      246,
+      30
+    ],
+    "existing_string_NA_exceptions": 4,
+    "factor_bindings": 12,
+    "source_records": 133761,
+    "harvest_kg_increase": 12931281.585085638,
+    "warning_literal_pairs": [
+      60,
+      7,
+      3
+    ],
+    "scanner_records": 41,
+    "scanner_statuses": {
+      "warn": 41
+    },
+    "scanner_bytes_exact": true
+  },
+  "root_read_actual_runtime_test_comparator_pair_selection_and_seal_sources": true,
+  "root_verification_only_hashes_reads_JSON_XML_and_static_AST": true,
+  "no_API_pickle_source_decode_or_test_replay": true,
+  "public_PR_or_merge_or_issue_closure": false,
+  "preserved_limits": [
+    "No broad/full-suite/Niger source-cold/Make-pooled claim",
+    "Existing1196/1204/1205 and historical gaps retained",
+    "NullableFloat64 frame-assert gap found and current saved-pair evidence strengthened; no blanket older-review conclusion"
+  ],
+  "signed": "Sue"
+}

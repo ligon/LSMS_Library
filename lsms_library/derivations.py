@@ -61,10 +61,25 @@ without importing anything.  A drift test keeps the two honest in both
 directions.
 
 The ``basis`` vocabulary is this file's OWN (:data:`BASES`): the recall
-ladder's four evidence rungs plus ``modelling-choice``, for an assumption no
-document can supply.  ``recall.BASIS_LADDER`` is deliberately not reused --
-its loader rejects anything outside its ladder, and a modelling choice is not
-evidence and must not be laundered into one.  Naming it is the point.
+ladder's four evidence rungs, ``derived-from-data`` for a regularity measured
+in the distributed file itself that no document states (an exact multiplier
+written into one column, GH #1697), and ``modelling-choice``, for an
+assumption no document can supply.  ``recall.BASIS_LADDER`` is deliberately
+not reused -- its loader rejects anything outside its ladder, and a modelling
+choice is not evidence and must not be laundered into one.  Naming it is the
+point.  ``derived-from-data`` is not documentation either, as in
+``sampling.py``: it says the file shows it, never that a producer says so.
+
+The ORDER of :data:`BASES` is a ladder, strongest first, and it is what
+:attr:`DerivationRecord.bases` reports in (ruling @ligon 2026-11-12, "Above
+filename"): ``questionnaire`` > ``variable-label`` > ``config-comment`` >
+``derived-from-data`` > ``filename`` > ``modelling-choice``.  A regularity
+measured in the file ranks above a guess from a filename and below anything
+a document or a maintainer states; so the recall ladder's four rungs are no
+longer contiguous here.  An assumption carries one ``basis``: where a
+document states part of a claim and the data show the rest (Cote d'Ivoire
+2021-22's ``s07bq03a`` H and L rows), the record carries two assumptions,
+one per basis, and the documentary one says only what the document says.
 
 The loader refuses an entry missing ``rule``, ``function``, ``inputs``,
 ``raw_variables`` or ``assumptions``, or an assumption without a ``basis`` --
@@ -94,9 +109,10 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 import pandas as pd
+import yaml
 
 from .paths import countries_root
-from .yaml_utils import load_yaml
+from .yaml_utils import SchemeLoader
 
 __all__ = [
     "ATTRS_KEY", "COLUMN", "KEY_SEP", "BASES", "REQUIRED_FIELDS",
@@ -114,12 +130,15 @@ COLUMN = "Derivation"
 KEY_SEP = "::"
 MULTI_SEP = "+"
 
-#: The basis vocabulary for an assumption.  This module's OWN -- see the
-#: module docstring for why ``recall.BASIS_LADDER`` is not reused.
+#: The basis vocabulary for an assumption, strongest first: the order is the
+#: ladder ``DerivationRecord.bases`` reports in (ruling 2026-11-12, "Above
+#: filename").  This module's OWN -- see the module docstring for why
+#: ``recall.BASIS_LADDER`` is not reused.
 BASES = (
     "questionnaire",     # the instrument or its manual states it
     "variable-label",    # a Stata variable label states it
     "config-comment",    # a maintainer asserted it in repo config or prose
+    "derived-from-data", # measured in the distributed file itself; no document states it
     "filename",          # inferred from a source filename -- a GUESS
     "modelling-choice",  # no document supplies it; the library chose it
 )
@@ -315,7 +334,8 @@ class DerivationRecord(dict):
 
     @property
     def bases(self) -> tuple[str, ...]:
-        """The distinct assumption bases present, in ladder order."""
+        """The distinct assumption bases present, in ladder order (:data:`BASES`,
+        strongest first)."""
         present = {a.get("basis") for a in (self.get("assumptions") or [])}
         return tuple(b for b in BASES if b in present)
 
@@ -464,10 +484,72 @@ def framework_yml_path() -> Path:
     return Path(str(files("lsms_library") / "derivations.yml"))
 
 
+class _RegistryLoader(SchemeLoader):
+    """Refuse explicit duplicates before merge flattening can hide their origin.
+
+    SchemeLoader still constructs the document, including intentional inherited
+    merge overrides. The raw graph is checked once, so recursive/shared aliases
+    neither loop nor count a reused mapping as a duplicate declaration.
+    """
+
+    def __init__(self, stream):
+        self._key_marks = {}
+        super().__init__(stream)
+
+    def compose_node(self, parent, index):
+        # Alias nodes retain their anchor's mark. Capture the actual occurrence
+        # so a duplicate aliased key points to the repeated use, not its anchor.
+        mark = self.peek_event().start_mark
+        node = super().compose_node(parent, index)
+        if isinstance(parent, yaml.MappingNode) and index is None:
+            self._key_marks[id(parent), len(parent.value)] = mark
+        return node
+
+    def construct_document(self, node):
+        visited = set()
+
+        def check(node):
+            if id(node) in visited:
+                return
+            visited.add(id(node))
+            if isinstance(node, yaml.MappingNode):
+                seen = {}
+                for index, (key_node, value_node) in enumerate(node.value):
+                    mark = self._key_marks.get((id(node), index), key_node.start_mark)
+                    merge = key_node.tag == 'tag:yaml.org,2002:merge'
+                    if merge:
+                        key = '<<'  # SafeLoader handles this by tag, not key shape.
+                    elif key_node.tag == 'tag:yaml.org,2002:value':
+                        key = self.construct_scalar(key_node)
+                    else:
+                        key = self.construct_object(key_node, deep=True)
+                    try:
+                        token = (merge, key)
+                        hash(token)
+                    except TypeError:
+                        raise yaml.constructor.ConstructorError(
+                            'while constructing a mapping', node.start_mark,
+                            'found unhashable key', mark) from None
+                    if token in seen:
+                        raise yaml.constructor.ConstructorError(
+                            'while constructing a derivation registry mapping',
+                            seen[token], f'found duplicate key {key!r}', mark)
+                    seen[token] = mark
+                    check(key_node)
+                    check(value_node)
+            elif isinstance(node, yaml.SequenceNode):
+                for child in node.value:
+                    check(child)
+
+        check(node)
+        return super().construct_document(node)
+
+
 def _load(path: Path, file_country: str | None) -> dict[str, DerivationRecord]:
     if not path.exists():
         return {}
-    data = load_yaml(path) or {}
+    with path.open("r", encoding="utf-8") as handle:
+        data = yaml.load(handle, Loader=_RegistryLoader) or {}
     if not isinstance(data, Mapping):
         raise ValueError(f"{path}: top level must be a mapping of key -> entry")
     out: dict[str, DerivationRecord] = {}
@@ -689,7 +771,8 @@ def derivations_table(country: str | list[str] | None = None) -> pd.DataFrame:
             "key": r.key, "country": r.country, "table": r.table, "name": r.name,
             "waves": "all" if r.waves == "all" else ", ".join(r.waves),
             "columns": ", ".join(r.columns or []),
-            "rows": json.dumps(r.rows) if r.rows else None,
+            # 0 names a deletion, and is falsy: it must not read as "no selector".
+            "rows": json.dumps(r.rows) if r.rows or r.rows == 0 else None,
             "bases": "+".join(r.bases),
             "n_assumptions": len(r.assumptions or []),
             "validated_against": r.validated_against, "since": r.since,

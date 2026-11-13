@@ -1,0 +1,7 @@
+{
+  "status": "ROOT_SOURCE_ONLY_PREPARATION_STOP",
+  "cause": "Whole-base prefix assertion failed before source write; subsequent separate git add staged existing conflict markers, then diff--check stopped commit. No product/documentation file bytes changed, no commit/import/build/test/API.",
+  "conflicted_file_sha256": "0e09b187fbbd1e12cd154a358b62de09b54253650594c65b380d6f5b8ddf59a4",
+  "retained_original": "merge-CONTENTS-original-private.org",
+  "signed": "Sue"
+}

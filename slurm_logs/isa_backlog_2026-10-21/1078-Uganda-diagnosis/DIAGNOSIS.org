@@ -1,0 +1,192 @@
+#+title: GH #1078 Uganda: controlled current-hash nine-cell writer diagnosis
+#+author: Sue (GPT-6)
+#+date: 2026-10-21
+
+* Outcome and limit
+
+A concrete framework producer race reproduces the complete historical bad food frame under both frozen current heads.
+The actual sample-test process applies the legacy Wave food reducer after another normal rebuild removes its just-read script cache, then makes the final ordinary current-hash country write.
+All nine historical NaN-to-zero key/cell identities agree exactly; all other values, row order, keys, null masks, dtypes, axes and full attributes agree with the independent correct cold reference.
+Both actual tests pass despite the corruption.
+
+The original historical full-suite run has no matching writer trace.
+Its original process and exact interleaving remain unidentified.
+This is a demonstrated controlled current-head writer mechanism with the exact historical signature, not retrospective proof of the historical schedule.
+No implementation, tracked edit, Git/ref mutation, GitHub write or cache-gate change was made.
+
+* Frozen identities and preparation
+
+| Role | Frozen HEAD | Checkout |
+|------+-------------+----------|
+| Baseline | f8d236694c26fe9e709c5548f02c70f74ea72c33 | /local/job40255479/worktrees/isa-Uganda-1078 |
+| Reviewed #1062 | 4ef24fb72421e0573841aeb63b8c19b93a4f97d8 | /local/job40255479/worktrees/isa-Uganda-1078-with1062 |
+
+The complete =lsms_library/country.py= bytes are identical between these heads (SHA256 =7a9347537f4d5423dc42c1f9f89cf55ed5abff72d88ced2d7cb6620696b7971c=).
+Each probe starts in its exact checkout with exact package, countries-root and data-root realpath assertions.
+The mounted image Python, numerical/build/Make threads of one, active socket denial and =unshare -rn= apply to every API/test process and its inherited children.
+Pytest uses =-n 0= for each actual named test process; the explicitly coordinated case has exactly two consumers per private root.
+Every other root has one consumer at a time.
+
+Thirty-one declared held raw sources for food/sample/roster/cluster prerequisites passed sidecar MD5 gates before source decodes or API probes.
+There were 341 physical private copies across the held oracle and ten data roots.
+Final SHA/MD5/size/mode/mtime receipts agree with the originals, all copy inodes are distinct, link counts are one and no copy is a symlink.
+Preparation receipts are terminal-success gates, not assumed freshness or manual cache stamps.
+No source acquisition, FDC call, IP attempt, DVC CLI, shared-cache write, in-tree payload, NO_CACHE or assume-fresh route occurred.
+
+* Uganda documentation read and retained caveats
+
+The full current Uganda =_/CONTENTS.org=, including TODO/WAITING/LOGBOOK, was the first country document consulted.
+The relevant country design is mixed cluster identity: 2009-10 has synthetic GPS-bin movers alongside original EA ids; later waves move from EA to parish ids and then district/parish name composites.
+The sample's household-level Region fallback is therefore material to the named market test.
+Cluster identity is not a stable cross-wave key.
+The agriculture instruments cover a subset rather than the entire sampling universe, and distinct agriculture/plot-feature plot identifiers must not be conflated.
+The live WAITING #829 sales-value scale caveat and panel-weight/GPS/null-key TODOs were not retired by this food-cache diagnosis.
+
+Contradictions are preserved as evidence:
+
+- =CONTENTS.org:253= says sample v/Region "is complete for every household".
+  Its explicit caveat at =:270= reports three 2019-20 households with missing Region and says the blanket claim does not hold for every source record.
+- =CONTENTS.org:279= says one-third of the original sample is refreshed "each wave".
+  At =:689= the file itself records the tension: "This same sample was used for the UNPS 2015/16 (Wave 5)" and distinguishes design intent from observed implementation.
+  The 2019-20 panel-only LOGBOOK caveat remains unresolved at =:700=.
+- =CONTENTS.org:1949= describes hashless caches as "trust once, then stamp".
+  The explicit #809 policy correction at =:1952= says current hashless *country* parquets are stale and rebuilt, while script-wave policy differs.
+  The older measurements are historical evidence, not authority to stamp unverified content.
+- The coupled FCT/nutrition discussion at =CONTENTS.org:2027= is relevant prior art.
+  The reviewed #1062 ledger explicitly says not to infer #1078's nine-cell corruption resolved from its sibling correction.
+
+A proposed additive country note is in [[file:PROPOSAL.md][PROPOSAL.md]]; no tracked country documentation was edited.
+
+* Historical signature and independent source grounding
+
+All four copied historical evidence files match the root receipts and their immutable durable originals.
+The three food frames each have 355,571 unique rows, index =(t,i,j,u,s)= and float64 Quantity/Expenditure/Price columns.
+Cold-tip and cold-base are exactly equal in values, keys, order, dtypes, axes and complete attributes, despite their different metadata hashes.
+The suite-written frame differs only in six Quantity and three Expenditure NaNs changed to zero, all in 2011-12.
+Price is unchanged, including its 29,755 missing cells.
+
+| Evidence | Stored hash prefix | Quantity NaNs | Expenditure NaNs |
+|----------+--------------------+---------------+------------------|
+| Historical suite-written | ed5c69e8 | 21 | 31 |
+| Historical cold-tip | ed5c69e8 | 27 | 34 |
+| Historical cold-base | 4672577b | 27 | 34 |
+| Current f8 correct / corrupted | d61dd3d7 | 27 / 21 | 34 / 31 |
+| Current reviewed1062 correct / corrupted | ae9480ac | 27 / 21 | 34 / 31 |
+
+The current hashes are not equated with the historical source state.
+Nevertheless, the complete current cold correct frames exactly match the historical correct frame, and the complete actual controlled bad write inputs/outputs exactly match the historical bad frame.
+Full hashes and schema/coverage proofs are in [[file:historical-summary.json][historical-summary.json]] and [[file:writer-proof.json][writer-proof.json]].
+
+Direct selection from the held 38,743-row 2011-12 =GSEC15B.dta= (MD5 =f4b5885a98654c12d5c9960d1a3586ff=) uniquely identifies one raw row per affected cell.
+All original operands for the six Quantity and three Expenditure measurements are missing.
+The counterpart measure is positive in each case, so these are genuine retained observations.
+The independent source oracle uses source field assignments, metadata labels and the existing missing-unit U_UNKNOWN rule; it does not use the food transformation as the numeric oracle.
+See [[file:source-proof.json][source-proof.json]].
+
+* Actual producer and writer sequence
+
+The vulnerable code is =lsms_library/country.py:2303-2324=.
+After =grab_data('food_acquired')= returns, the method independently tests the current script-parquet path at =:2311=.
+If absent, =:2323= runs the legacy groupby with default numeric =sum=, turning each all-missing singleton measurement into zero.
+The correct canonical script frame was already in memory before that later filesystem test.
+
+Another ordinary missing-country-cache descent calls =_evict_hashless_wave_caches= at =country.py:5268=.
+Its real unlink at =:4733= removes script-written wave outputs so stale sources rebuild; this GH #479 behavior was not bypassed or disabled.
+The observed two-process sequence is:
+
+1. A runs the actual sample/market node and reads the correct 38,983-row 2011-12 wave frame.
+   A pauses immediately before the production existence decision; the real cache exists.
+2. B starts the actual currency node under the same physical data root, with no country food cache yet present.
+   B's normal descent really evicts the hashless wave cache, then pauses before rebuilding it.
+3. A resumes; the real existence result is false and the real legacy groupby executes.
+   A's actual country writer input now contains exactly the nine historical zeros.
+4. B resumes and makes the correct ordinary current-hash country write, completes its actual test and records the correct complete frame.
+5. A resumes its unchanged pyarrow write and atomic replacement, becoming the final writer of the bad complete frame under the same normal current hash and full eight-wave coverage.
+
+| Head | A bad final writer PID | B correct preceding writer PID | Both tests |
+|------+------------------------+--------------------------------+------------|
+| f8 | 1053009 | 1055681 | passed |
+| reviewed1062 | 1055671 | 1058986 | passed |
+
+Only scheduling barriers changed.
+Actual source data, DataFrame/Arrow inputs, Path.exists results, hash computation, write arguments and output bytes were not substituted.
+Private traces retain PID/PPID, actual pytest node, stack locations, exact Arrow inputs, write arguments, output parquet bytes and completion order.
+The final live cache SHA equals A's captured actual output SHA.
+Atomic replacement prevents torn files; it does not prevent this semantically wrong complete frame from replacing a correct one.
+
+A pure historical-frame legacy-groupby counterfactual also reproduces the entire bad frame exactly.
+That counterfactual is kept separate from the actual two-process writer proof.
+
+* Bounded controls and persistence
+
+The actual nodes are:
+
+- =tests/test_sample.py::TestUganda2009MarketFallback::test_food_expenditures_retains_hybrid_v_HH=
+- =tests/test_currency.py::test_country_currency_index_roundtrip=
+
+Each head ran sample->currency and currency->sample on separate initially empty L2 roots.
+All four serial orders retain the complete correct raw frame/full attributes and current hash/coverage after each actual test.
+Each head also ran the explicit two-process schedule above.
+Total: *12 passed, 0 skipped, 0 failed*; this is a bounded cohort, not the full suite.
+No uncoordinated race frequency or historical xdist schedule was inferred from it.
+
+Independent normal cold and fresh-process warm Country food outputs match exactly for both heads, including full public/raw attributes.
+Each warm reference inventory has 18 unchanged parquet files.
+After the controlled corrupt write, another fresh process uses ordinary =Country('Uganda').food_acquired()= and serves the exact corrupt nine cells in both raw and public outputs.
+All other values, keys, axes, dtypes and full attributes remain exact.
+All 57 data files per corrupt root retain bytes/modes/mtimes, proving zero warm writes.
+Thus the defect can persist under a valid current hash; it is not merely a transient return value.
+
+* FCT/nutrition candidate measurement
+
+Each head ran four normal, nonempty calls on another physically private, initially empty L2 root: =fct()=, =nutrition()=, =fct()=, =food_acquired()=.
+Both held tracked FCT CSV operands were successfully parsed before API calls.
+FDC fallback entry and all IP IO were forbidden; neither was attempted.
+
+| Head | Actual country food writes | Hashless legacy food writes | All actual food inputs/outputs |
+|------+----------------------------+-----------------------------+-------------------------------|
+| f8 | 6 | 3 | exact correct frame/full attrs |
+| reviewed1062 | 1 | 0 | exact correct frame/full attrs |
+
+Baseline reproduces the known metadata alternation: FCT builds leave a hashless nutrition sibling; nutrition builds leave a hashless FCT sibling.
+Its legacy Make food prerequisites rewrite the country food frame hashless before the normal food descent rebuilds it current.
+Every captured food input and actual output remains correct, including the nine NaNs.
+Reviewed #1062 builds only the requested sibling and preserves the other table's existing metadata/bytes.
+These measurements establish separate candidate effects; they do not attribute the nine zeros to nutrition arithmetic or FCT sibling writes.
+Observed wall time under tracing was 650.40 seconds on baseline (223.10 / 207.78 / 211.27 / 8.25 seconds by call) and 193.76 seconds on reviewed1062 (140.68 / 43.23 / 1.17 / 8.68 seconds).
+These are bounded instrumented probe durations, not performance benchmarks.
+See [[file:final-proof.json][final-proof.json]] for individual observations and counts.
+
+* Fingerprint membership and proposed repair boundary
+
+Actual registry and import-closure reconstruction matches the production fingerprints under both heads.
+=Wave.food_acquired= is untagged, absent from the actual food build-transform closure and absent from all nine Uganda framework-import closures (country plus eight waves).
+Adjacent =Wave.cluster_features= is explicitly tagged for its table.
+No registry, source callable, tag or schema lever was changed to measure this.
+
+A repair confined to this currently unversioned method would not naturally invalidate already-corrupt current-hash food caches.
+[[file:PROPOSAL.md][PROPOSAL.md]] proposes explicit actual producer provenance, retention of legitimate non-parquet aggregation, food-scoped existing registry machinery and a demonstrated normal-gate healing test on these naturally corrupted roots.
+The private [[file:ledger-draft.md][ledger draft]] cites existing machinery and open decisions.
+Root approval is still required before implementation or tracked-ledger work.
+
+* Freeze, exclusions and release
+
+Full before/after tracked-byte/mode/symlink, HEAD and clean-state receipts cover both source trees: 14,880 and 14,905 tracked files.
+Original historical files, their physical copies, metadata preparation receipts and both permitted private DVC metadata symlinks remain exact.
+Prior immutable global13/global14 evidence remains exact across 169 and 646 files respectively.
+No in-tree parquet exists in either source checkout.
+All traced consumer processes have exited; no writer is left running against these roots.
+
+Detailed frames, exact household keys/cell sets, raw source selections, complete warning logs and trace payloads remain private.
+Only this narrative and aggregate JSON/proofs are safe exports.
+No full-suite bisect, other-country isolation experiment, Feature sweep, source-state census beyond the needed inputs or implementation benchmark was run.
+The original historical writer/interleaving and any other untested mechanism remain residual scope.
+
+Preserved private harness failures include a non-executable shell wrapper invocation, nullable-boolean equality checks in the first corrupt-warm assertions, and an initially incomplete direct-source missing-unit mapper.
+These were corrected only in private orchestration/oracle code; no production function, read gate, source payload or fixture was changed.
+All failed logs remain alongside the successful proof.
+
+Reproduction entry points and exact commands are in [[file:commands.sh][commands.sh]].
+Existing evidence roots are immutable; use a new private root for another replay.
+
+Sue.

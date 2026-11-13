@@ -1,0 +1,27 @@
+{
+  "status": "ROOT_ACCEPTED_QUALIFIED_BASE_CENSUS_SUFFIX_AND_RELEASED_NEVER_RUN_CANDIDATE_CENSUS",
+  "at_ns": 1792707537737782972,
+  "classification_sha256": "859a39a92785a6a4b69d2fbed50f7bef32e3e1b89b546b39b75908c5d4918ed1",
+  "original_base_census_exit": 0,
+  "separate_host_assumption_check_exit": 1,
+  "original_PID": 287131,
+  "saved_guard_rows": 1523,
+  "prior_calibrated_prefix": 64,
+  "census_suffix": {
+    "source_bound_denied_missing_path_open_attempts": 1458,
+    "source_bound_IPv6_probe": 1,
+    "unique_current_absence_endpoints": 561,
+    "stack_class_counts": [
+      704,
+      736,
+      9,
+      9
+    ]
+  },
+  "scope_qualification": "Guard refused before actual payload open; source cached_file_hash catches OSError and returns missing marker. Current561endpoint/sidecar absence is a NEW interval, not historical absence evidence or unguarded execution. No zero-attempt/whole-task/kernel-trace claim.",
+  "continue": "ONLY never-run candidate census under unchanged V3 offline launcher/guard, then exact analogous complete PID/time/source/current-absence attribution and full saved549/39/1362 maps/API/materialization gate before tests. Unexpected stages stop; candidate event counts are measured, not assumed.",
+  "prior_V3_release_and_synthetic_test_conditions_remain": true,
+  "no_completed_census_calibration_controls_replay": true,
+  "genuine_stage": "SEPARATELY_HELD",
+  "signed": "Sue (GPT-6)"
+}

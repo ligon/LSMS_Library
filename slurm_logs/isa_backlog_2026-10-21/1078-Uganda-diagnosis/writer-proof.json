@@ -1,0 +1,44 @@
+{
+  "baseline": {
+    "real_read_then_normal_eviction_then_real_false_then_legacy_groupby": true,
+    "A_writer_input_and_actual_output_exact_entire_historic_bad": true,
+    "B_writer_input_and_output_exact_own_correct_cold": true,
+    "A_final_actual_bytes_equal_served_cache": true,
+    "A_B_normal_current_hash_and_full_coverage": true,
+    "actual_function_data_Path_exists_and_write_arguments_unchanged": true,
+    "writer_A_pid": 1053009,
+    "writer_B_pid": 1055681,
+    "A_null_counts": {
+      "Quantity": 21,
+      "Expenditure": 31,
+      "Price": 29755
+    },
+    "B_null_counts": {
+      "Quantity": 27,
+      "Expenditure": 34,
+      "Price": 29755
+    },
+    "current_hash": "d61dd3d715d7b192c6bf04f92c2ced3378b7d398c11d6edfc5d4eee8f4c51dba"
+  },
+  "with1062": {
+    "real_read_then_normal_eviction_then_real_false_then_legacy_groupby": true,
+    "A_writer_input_and_actual_output_exact_entire_historic_bad": true,
+    "B_writer_input_and_output_exact_own_correct_cold": true,
+    "A_final_actual_bytes_equal_served_cache": true,
+    "A_B_normal_current_hash_and_full_coverage": true,
+    "actual_function_data_Path_exists_and_write_arguments_unchanged": true,
+    "writer_A_pid": 1055671,
+    "writer_B_pid": 1058986,
+    "A_null_counts": {
+      "Quantity": 21,
+      "Expenditure": 31,
+      "Price": 29755
+    },
+    "B_null_counts": {
+      "Quantity": 27,
+      "Expenditure": 34,
+      "Price": 29755
+    },
+    "current_hash": "ae9480ac317d124b6a2461743c745c1e0316954267f00a28b18fe63c202bfdb8"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "status": "OPEN_PR_HUMAN_MERGE_REQUIRED",
+  "issue": 1205,
+  "pr": 1216,
+  "url": "https://github.com/ligon/LSMS_Library/pull/1216",
+  "head": "fix/1205-uganda-parcel-area-20261022",
+  "head_sha": "884775a461d769fd4bb5181005ca3238513b5b01",
+  "base": "fix/849-uganda-reported-factors-20261022",
+  "actual_creation_base_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "state": "open",
+  "merged": false,
+  "mergeable_at_readback": true,
+  "exact_title_body_readback": true,
+  "public_review_commit": "1aa93599a05f75cab2d0fd3d5fe5fe25d8e63efa",
+  "root_acceptance_sha256": "5abc575379ef7366045781c76b52a66b2c8841acc880abb4adda2a158091aa76",
+  "candidate_tests": 65,
+  "actual_parent_new_failures": 6,
+  "actual_parent_new_passes": 27,
+  "yields": 27755,
+  "old_yields": 14520,
+  "added": 13235,
+  "lost": 0,
+  "converted_parcels": 31959,
+  "unserved_reasons": {
+    "both_area_reports_missing": 3918,
+    "nonpositive_chosen_GPS": 276,
+    "parcel_absent": 10
+  },
+  "ci_status": "Exact-head run39836472369 completed success; unit-tests/windows-smoke completed success; six jobs including data-tests skipped. Independent local held-source verification is separate.",
+  "source_publish_qualification": "First GitHub branch push returned remote rejected (failed); exact remote branch absence checked; one ordinary nonforce retry completed0. Original author branch and frozen source unchanged; additive fix branch names the exact accepted head.",
+  "signed": "Sue",
+  "ci_receipt": "1216-ci.json"
+}

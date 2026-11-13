@@ -1,0 +1,251 @@
+{
+ "2014-15": {
+  "urea": {
+   "flag": "s2cq21",
+   "zero_qty_blank_unit": 606,
+   "flag_on_zero_blank": {
+    "Oui": 505,
+    "Manquant": 101
+   },
+   "positive_qty": 2235,
+   "flag_on_positive": {
+    "Oui": 2207,
+    "Manquant": 28
+   }
+  },
+  "dap": {
+   "flag": "s2cq21",
+   "zero_qty_blank_unit": 1828,
+   "flag_on_zero_blank": {
+    "Oui": 1711,
+    "Manquant": 117
+   },
+   "positive_qty": 1013,
+   "flag_on_positive": {
+    "Oui": 1001,
+    "Manquant": 12
+   }
+  },
+  "npk": {
+   "flag": "s2cq21",
+   "zero_qty_blank_unit": 2255,
+   "flag_on_zero_blank": {
+    "Oui": 2140,
+    "Manquant": 115
+   },
+   "positive_qty": 586,
+   "flag_on_positive": {
+    "Oui": 572,
+    "Manquant": 14
+   }
+  },
+  "other_inorganic": {
+   "flag": "s2cq21",
+   "zero_qty_blank_unit": 2237,
+   "flag_on_zero_blank": {
+    "Oui": 2115,
+    "Manquant": 122
+   },
+   "positive_qty": 604,
+   "flag_on_positive": {
+    "Oui": 597,
+    "Manquant": 7
+   }
+  },
+  "manure": {
+   "flag": "s2cq04",
+   "zero_qty_blank_unit": 0,
+   "flag_on_zero_blank": {},
+   "positive_qty": 2877,
+   "flag_on_positive": {
+    "Oui": 2866,
+    "Manquant": 11
+   }
+  },
+  "compost": {
+   "flag": "s2cq09",
+   "zero_qty_blank_unit": 0,
+   "flag_on_zero_blank": {},
+   "positive_qty": 596,
+   "flag_on_positive": {
+    "Oui": 589,
+    "Manquant": 7
+   }
+  },
+  "other_organic": {
+   "flag": "s2cq15",
+   "zero_qty_blank_unit": 0,
+   "flag_on_zero_blank": {},
+   "positive_qty": 305,
+   "flag_on_positive": {
+    "Oui": 287,
+    "Manquant": 18
+   }
+  },
+  "pesticide": {
+   "flag": "s2cq26",
+   "zero_qty_blank_unit": 1353,
+   "flag_on_zero_blank": {
+    "Oui": 1320,
+    "Manquant": 33
+   },
+   "positive_qty": 605,
+   "flag_on_positive": {
+    "Oui": 605
+   }
+  },
+  "fungicide": {
+   "flag": "s2cq26",
+   "zero_qty_blank_unit": 1474,
+   "flag_on_zero_blank": {
+    "Oui": 1441,
+    "Manquant": 33
+   },
+   "positive_qty": 484,
+   "flag_on_positive": {
+    "Oui": 484
+   }
+  },
+  "herbicide": {
+   "flag": "s2cq26",
+   "zero_qty_blank_unit": 603,
+   "flag_on_zero_blank": {
+    "Oui": 570,
+    "Manquant": 33
+   },
+   "positive_qty": 1355,
+   "flag_on_positive": {
+    "Oui": 1355
+   }
+  },
+  "other_phytosanitary": {
+   "flag": "s2cq26",
+   "zero_qty_blank_unit": 1808,
+   "flag_on_zero_blank": {
+    "Oui": 1775,
+    "Manquant": 33
+   },
+   "positive_qty": 150,
+   "flag_on_positive": {
+    "Oui": 150
+   }
+  }
+ },
+ "2017-18": {
+  "urea": {
+   "flag": "s7dq22",
+   "zero_qty_blank_unit": 996,
+   "flag_on_zero_blank": {
+    "Oui": 996
+   },
+   "positive_qty": 5818,
+   "flag_on_positive": {
+    "Oui": 5818
+   }
+  },
+  "dap": {
+   "flag": "s7dq22",
+   "zero_qty_blank_unit": 4110,
+   "flag_on_zero_blank": {
+    "Oui": 4110
+   },
+   "positive_qty": 2704,
+   "flag_on_positive": {
+    "Oui": 2704
+   }
+  },
+  "npk": {
+   "flag": "s7dq22",
+   "zero_qty_blank_unit": 5119,
+   "flag_on_zero_blank": {
+    "Oui": 5119
+   },
+   "positive_qty": 1695,
+   "flag_on_positive": {
+    "Oui": 1695
+   }
+  },
+  "other_inorganic": {
+   "flag": "s7dq22",
+   "zero_qty_blank_unit": 5719,
+   "flag_on_zero_blank": {
+    "Oui": 5719
+   },
+   "positive_qty": 1092,
+   "flag_on_positive": {
+    "Oui": 1092
+   }
+  },
+  "manure": {
+   "flag": "s7dq05",
+   "zero_qty_blank_unit": 0,
+   "flag_on_zero_blank": {},
+   "positive_qty": 8120,
+   "flag_on_positive": {
+    "Oui": 8120
+   }
+  },
+  "compost": {
+   "flag": "s7dq10",
+   "zero_qty_blank_unit": 0,
+   "flag_on_zero_blank": {},
+   "positive_qty": 2061,
+   "flag_on_positive": {
+    "Oui": 2061
+   }
+  },
+  "other_organic": {
+   "flag": "s7dq16",
+   "zero_qty_blank_unit": 0,
+   "flag_on_zero_blank": {},
+   "positive_qty": 809,
+   "flag_on_positive": {
+    "Oui": 809
+   }
+  },
+  "pesticide": {
+   "flag": "s7dq27",
+   "zero_qty_blank_unit": 2552,
+   "flag_on_zero_blank": {
+    "Oui": 2552
+   },
+   "positive_qty": 1958,
+   "flag_on_positive": {
+    "Oui": 1958
+   }
+  },
+  "fungicide": {
+   "flag": "s7dq27",
+   "zero_qty_blank_unit": 3844,
+   "flag_on_zero_blank": {
+    "Oui": 3844
+   },
+   "positive_qty": 664,
+   "flag_on_positive": {
+    "Oui": 664
+   }
+  },
+  "herbicide": {
+   "flag": "s7dq27",
+   "zero_qty_blank_unit": 1202,
+   "flag_on_zero_blank": {
+    "Oui": 1202
+   },
+   "positive_qty": 3307,
+   "flag_on_positive": {
+    "Oui": 3307
+   }
+  },
+  "other_phytosanitary": {
+   "flag": "s7dq27",
+   "zero_qty_blank_unit": 4244,
+   "flag_on_zero_blank": {
+    "Oui": 4244
+   },
+   "positive_qty": 255,
+   "flag_on_positive": {
+    "Oui": 255
+   }
+  }
+ }
+}

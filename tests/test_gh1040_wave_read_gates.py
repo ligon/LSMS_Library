@@ -143,18 +143,19 @@ def test_site1_no_cache_bypasses_a_fresh_parquet(yaml_wave, monkeypatch):
         w.grab_data(YAML_TABLE)
 
 
-def test_site1_no_cache_is_read_by_truthiness(yaml_wave, monkeypatch):
-    """The WAVE gate reads ``LSMS_NO_CACHE`` by truthiness -- ``"0"`` bypasses
-    it -- where the COUNTRY gate accepts only ``{1,true,yes}``.  Pinned as
-    found, so an extraction cannot "harmonise" it silently; changing it is a
-    decision, not a refactor."""
+def test_site1_no_cache_is_on_only_for_1_true_yes(yaml_wave, monkeypatch):
+    """Re-pinned by the GH #1455 ruling (@ligon, 2026-11-04): this gate used to
+    read the flag by truthiness, so ``"0"`` bypassed it; both gates now read it
+    through ``country._no_cache``."""
     w, path, expected, frame = yaml_wave
     _plant(path, frame, cache_hash=expected)
-    monkeypatch.setenv("LSMS_NO_CACHE", "0")
-    with pytest.raises(_Rebuilt):
-        w.grab_data(YAML_TABLE)
-    monkeypatch.setenv("LSMS_NO_CACHE", "")
-    assert list(w.grab_data(YAML_TABLE)["Sex"]) == ["SENTINEL"]
+    for off in ("0", "false", "no", ""):
+        monkeypatch.setenv("LSMS_NO_CACHE", off)
+        assert list(w.grab_data(YAML_TABLE)["Sex"]) == ["SENTINEL"]
+    for on in ("1", "true", "YES"):
+        monkeypatch.setenv("LSMS_NO_CACHE", on)
+        with pytest.raises(_Rebuilt):
+            w.grab_data(YAML_TABLE)
 
 
 def test_site1_stale_rebuilds_and_keeps_its_hash(yaml_wave):
@@ -326,15 +327,14 @@ def test_site2_unverifiable_is_read_without_make(script_wave, monkeypatch):
     assert makes == []
 
 
-def test_site2_read_error_raises_without_make(script_wave):
-    """A file that cannot be parsed grades ``legacy`` and is SELECTED; the read
-    that follows raises (it is not wrapped).  Pinned as found -- unlike site 1,
-    a corrupt script-path wave parquet does not fall through to a rebuild."""
+def test_site2_unreadable_old_cache_runs_make(script_wave):
+    """1071 deliberately supersedes the historical pinned-as-found raise."""
     w, path, _, _, makes = script_wave
     _garbage(path)
-    with pytest.raises(Exception) as info:
-        w.grab_data(SCRIPT_TABLE)
-    assert not isinstance(info.value, _Rebuilt) and makes == []
+    with pytest.warns(UserWarning, match="Unreadable managed cache"):
+        with pytest.raises(_Rebuilt):
+            w.grab_data(SCRIPT_TABLE)
+    assert len(makes) == 1 and not path.exists()
 
 
 def test_site2_does_not_grade_degraded_or_honour_no_cache(script_wave, monkeypatch):
@@ -471,25 +471,20 @@ def test_site3_ignores_the_hash_and_the_degraded_grade(acf, monkeypatch):
     assert probes == []
 
 
-def test_site3_read_error(acf):
-    """A file that cannot be parsed has no readable manifest.  A subset request
-    falls through.  A FULL request RAISES ``ParquetFormatError`` naming the
-    file, and nothing is finalized (GH #1070).
-
-    Until #1070 this pinned the defect as found: ``get_dataframe`` parsed the
-    non-parquet ``.parquet`` as a CSV header and the full request was served
-    an EMPTY frame, with no error.  Raise, not rebuild: ``assume_cache_fresh``
-    is the caller's statement that the parquet is good, and whether a corrupt
-    one should fall through instead is GH #1071's decision."""
+def test_site3_unreadable_old_cache_hands_off_coverage(acf):
+    """1071 changes only the full legacy unreadable-cache pin; a subset with
+    unknown coverage still takes the ordinary path before any payload read.
+    Historical1070/778 raise characterization remains in Git/issue1071.
+    """
     make, path, _, finalized = acf
     c = make()
     _garbage(path)
     with pytest.raises(_FellThrough):
         c._aggregate_wave_data([c.waves[-1]], CF_TABLE)
-    with pytest.raises(LT.ParquetFormatError, match="no Parquet header") as info:
-        c._aggregate_wave_data(list(c.waves), CF_TABLE)
-    assert str(path) in str(info.value)
-    assert finalized == []
+    with pytest.warns(UserWarning, match="Unreadable managed cache"):
+        frame, covered, reason = c._read_assumed_fresh_cache(CF_TABLE, list(c.waves))
+    assert frame is None and covered is None and reason.startswith('read-error:')
+    assert not path.exists() and finalized == []
 
 
 @pytest.mark.parametrize("coverage", ["covered-full", "covered-subset", "legacy-full"])
@@ -502,13 +497,13 @@ def test_site3_disappearing_data_read_falls_through(acf, monkeypatch, coverage):
     waves = [c.waves[-1]] if coverage == "covered-subset" else list(c.waves)
     reads = []
 
-    def disappear(candidate):
+    def disappear(candidate, *args, **kwargs):
         assert candidate == path and candidate.exists()
         reads.append(candidate)
         candidate.unlink()
         raise FileNotFoundError(candidate)
 
-    monkeypatch.setattr(C, "get_dataframe", disappear)
+    monkeypatch.setattr(LT, "open", disappear, raising=False)
     with pytest.raises(_FellThrough):
         c._aggregate_wave_data(waves, CF_TABLE)
     assert reads == [path] and finalized == []
@@ -523,10 +518,11 @@ def test_site3_other_data_read_errors_still_raise(acf, monkeypatch, error, manif
     metadata = {"cache_waves": list(c.waves)} if manifest else {}
     _plant(path, frame, cache_hash="x", **metadata)
 
-    def fail(candidate):
+    def fail(frame, candidate):
         raise error
 
-    monkeypatch.setattr(C, "get_dataframe", fail)
+    # Post-payload audit errors, including colliding OSError types, are fatal.
+    monkeypatch.setattr(LT, "check_read", fail)
     with pytest.raises(type(error)) as caught:
         c._aggregate_wave_data(list(c.waves), CF_TABLE)
     assert caught.value is error and finalized == []
@@ -544,13 +540,13 @@ def test_site3_disappearing_before_footer_falls_through(acf, monkeypatch, subset
         candidate.unlink()
         return read_footer(candidate)
 
-    def read_missing(candidate):
+    def read_missing(candidate, *args, **kwargs):
         assert not candidate.exists()
         reads.append(candidate)
         raise FileNotFoundError(candidate)
 
     monkeypatch.setattr(C, "read_parquet_cache_waves", disappear_before_footer)
-    monkeypatch.setattr(C, "get_dataframe", read_missing)
+    monkeypatch.setattr(LT, "open", read_missing, raising=False)
     waves = [c.waves[-1]] if subset else list(c.waves)
     with pytest.raises(_FellThrough):
         c._aggregate_wave_data(waves, CF_TABLE)
@@ -580,14 +576,14 @@ def test_site3_disappearance_does_not_hide_ordinary_source_error(acf, monkeypatc
     _plant(path, frame, cache_hash="x", cache_waves=list(c.waves))
     source_error = FileNotFoundError("required source is unavailable")
 
-    def disappear(candidate):
+    def disappear(candidate, *args, **kwargs):
         candidate.unlink()
         raise FileNotFoundError(candidate)
 
     def ordinary(self, *args, **kwargs):
         raise source_error
 
-    monkeypatch.setattr(C, "get_dataframe", disappear)
+    monkeypatch.setattr(LT, "open", disappear, raising=False)
     monkeypatch.setattr(C.Country, "_read_l2_country_cache", ordinary)
     with pytest.raises(FileNotFoundError) as caught:
         c._aggregate_wave_data(list(c.waves), CF_TABLE)
@@ -602,7 +598,7 @@ def test_site3_disappearance_can_serve_an_ordinary_cache_hit(acf, monkeypatch):
     replacement = frame.iloc[:1].copy()
     replacement["Sex"] = "ordinary replacement"
 
-    def disappear(candidate):
+    def disappear(candidate, *args, **kwargs):
         candidate.unlink()
         raise FileNotFoundError(candidate)
 
@@ -610,7 +606,7 @@ def test_site3_disappearance_can_serve_an_ordinary_cache_hit(acf, monkeypatch):
         assert method_name == CF_TABLE and candidate == path
         return replacement, list(waves), None
 
-    monkeypatch.setattr(C, "get_dataframe", disappear)
+    monkeypatch.setattr(LT, "open", disappear, raising=False)
     monkeypatch.setattr(C.Country, "_read_l2_country_cache", ordinary)
     got = c._aggregate_wave_data(list(c.waves), CF_TABLE)
     pd.testing.assert_frame_equal(got, replacement)
@@ -627,17 +623,15 @@ def test_country_gate_read_error_is_graded_before_it_is_read(root):
     assert df is None and reason.startswith("STALE"), reason
 
 
-def test_country_gate_unverifiable_read_error_raises(root, monkeypatch):
-    """Only when the expected hash cannot be computed (``unverifiable``) does
-    the country gate read the file.  GH #1070: it now RAISES
-    ``ParquetFormatError`` -- not an ``OSError``/``ArrowInvalid``, so the
-    gate's rebuild handler does not catch it.  Before #1070 the gate served
-    the CSV parse of the garbage, an EMPTY frame, as the table."""
+def test_country_gate_unverifiable_unreadable_cache_is_a_miss(root, monkeypatch):
+    """1071 recovers an unreadable pre-existing owned payload, not CSV data."""
     c = C.Country(CF_COUNTRY, preload_panel_ids=False)
     monkeypatch.setattr(C.Country, "_table_cache_hash", lambda self, *a, **k: None)
     path = _garbage(root / CF_COUNTRY / "var" / f"{CF_TABLE}.parquet")
-    with pytest.raises(LT.ParquetFormatError, match="no Parquet header"):
-        c._read_l2_country_cache(CF_TABLE, path, list(c.waves))
+    with pytest.warns(UserWarning, match="Unreadable managed cache"):
+        frame, covered, reason = c._read_l2_country_cache(CF_TABLE, path, list(c.waves))
+    assert frame is None and covered is None and reason.startswith('read-error:')
+    assert not path.exists()
 
 
 def test_site3_json_methods_never_short_circuit(acf, root):

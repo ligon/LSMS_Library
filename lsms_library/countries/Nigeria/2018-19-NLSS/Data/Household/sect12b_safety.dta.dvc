@@ -1,0 +1,5 @@
+outs:
+- md5: 01ac7913a1624a3a5e0338d3ca7a83cb
+  size: 365734
+  hash: md5
+  path: sect12b_safety.dta

@@ -1,0 +1,61 @@
+{
+  "recorded_at_UTC": "2026-10-22 04:08:01 UTC",
+  "number": 1201,
+  "url": "https://github.com/ligon/LSMS_Library/pull/1201",
+  "state": "open",
+  "merged": false,
+  "head_sha": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+  "head": "fix/1091-tanzania-community-builder-20261022",
+  "base": "fix/1118-tanzania-unknown-units-20261021",
+  "base_sha": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+  "body_independently_refetched_exact": true,
+  "CI_run": 39718698178,
+  "CI_conclusion": "success",
+  "jobs": [
+    {
+      "name": "windows-smoke",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "unit-tests",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "dvc-lock-check",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "dvc-remote-reachability",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "refresh-dvc-locks",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "docs",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "data-tests",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "windows-script-build",
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  ],
+  "credentialed_CI_data_suite_pass_claimed": false,
+  "independent_review": "1091-Tanzania-independent/REVIEW.org",
+  "root_acceptance": "1091-Tanzania-independent/ROOT-ACCEPTANCE.json",
+  "issue1091_kept_open": true,
+  "signed": "Sue"
+}

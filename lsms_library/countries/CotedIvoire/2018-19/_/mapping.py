@@ -8,7 +8,22 @@ from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
+    strata_label,
+    inputs_region_milieu_stratum as _inputs_region_milieu_stratum,
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
 )
+
+
+# GH #1575; reuse GH #812 unchanged (task ledger §§2–5).
+def inputs_strata(wave):
+    """Own cover-page region and milieu labels at (t, i)."""
+    return _inputs_region_milieu_stratum('CotedIvoire', wave)
+
+
+def sample(df):
+    """Disclose the region/milieu construction on rows with a stratum."""
+    return _stamp_region_milieu_stratum(df, 'CotedIvoire')
+
 
 # GH #876.  The wide frame's `Expenditure` used to be `s07bq08`, the value of
 # ONE purchase made up to 30 days ago, sitting beside a 7-day consumption
@@ -117,7 +132,10 @@ def food_acquired(df):
     column / index level.  See ``_decode_mojibake`` for the encoding
     rationale.
     """
-    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    # GH #1224: `decode` -- the served base unit of a sized row is read
+    # through the same repair the sweep below applies to every other row.
+    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION,
+                              decode=_decode_mojibake)
     df = _decode_mojibake_in_df(df)
     return df
 

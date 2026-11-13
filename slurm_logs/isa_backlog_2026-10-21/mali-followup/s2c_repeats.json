@@ -1,0 +1,20 @@
+{
+ "keys_where_s2cq00_differs": 5,
+ "keys_where_s2cq00_same": 0,
+ "repeated_keys": 5,
+ "rows": 9553,
+ "rows_on_repeated_keys": 19,
+ "s2cq21_answer_patterns": {
+  "Non/Non/Oui/Oui/Oui/Oui/Oui/Oui": 1,
+  "Non/Oui": 2,
+  "Oui/Oui": 1,
+  "Oui/Oui/Oui/Oui/Oui": 1
+ },
+ "s2cq26_answer_patterns": {
+  "Non/Non": 1,
+  "Non/Non/Non/Oui/Oui/Oui/Oui/Oui": 1,
+  "Non/Oui": 1,
+  "Non/Oui/Oui/Oui/Oui": 1,
+  "Oui/Oui": 1
+ }
+}

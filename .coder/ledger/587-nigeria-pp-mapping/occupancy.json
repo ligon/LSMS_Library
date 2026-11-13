@@ -1,0 +1,1207 @@
+{
+"W1:unit": [
+{
+"code": 1,
+"rows": 233
+},
+{
+"code": 2,
+"rows": 432
+},
+{
+"code": 3,
+"rows": 818
+},
+{
+"code": 4,
+"rows": 77
+},
+{
+"code": 5,
+"rows": 85
+},
+{
+"code": 6,
+"rows": 1841
+},
+{
+"code": 7,
+"rows": 1285
+},
+{
+"code": 11,
+"rows": 54
+},
+{
+"code": 12,
+"rows": 141
+},
+{
+"code": 13,
+"rows": 242
+},
+{
+"code": 14,
+"rows": 28
+},
+{
+"code": 21,
+"rows": 251
+},
+{
+"code": 22,
+"rows": 160
+},
+{
+"code": 23,
+"rows": 31
+},
+{
+"code": 24,
+"rows": 6
+},
+{
+"code": 31,
+"rows": 309
+},
+{
+"code": 32,
+"rows": 146
+},
+{
+"code": 33,
+"rows": 41
+},
+{
+"code": 34,
+"rows": 6
+},
+{
+"code": 41,
+"rows": 122
+},
+{
+"code": 42,
+"rows": 164
+},
+{
+"code": 43,
+"rows": 40
+},
+{
+"code": 51,
+"rows": 132
+},
+{
+"code": 52,
+"rows": 95
+},
+{
+"code": 53,
+"rows": 42
+},
+{
+"code": 61,
+"rows": 88
+},
+{
+"code": 62,
+"rows": 18
+},
+{
+"code": 63,
+"rows": 11
+},
+{
+"code": 71,
+"rows": 15
+},
+{
+"code": 72,
+"rows": 36
+},
+{
+"code": 73,
+"rows": 9
+},
+{
+"code": 74,
+"rows": 5
+},
+{
+"code": 81,
+"rows": 46
+},
+{
+"code": 82,
+"rows": 29
+},
+{
+"code": 83,
+"rows": 8
+},
+{
+"code": 91,
+"rows": 201
+},
+{
+"code": 92,
+"rows": 105
+},
+{
+"code": 93,
+"rows": 34
+},
+{
+"code": 94,
+"rows": 0
+},
+{
+"code": 95,
+"rows": 0
+},
+{
+"code": 101,
+"rows": 2882
+},
+{
+"code": 102,
+"rows": 3045
+},
+{
+"code": 103,
+"rows": 1735
+},
+{
+"code": 104,
+"rows": 460
+},
+{
+"code": 105,
+"rows": 4235
+},
+{
+"code": 106,
+"rows": 2165
+}
+],
+"W1:availability": [
+{
+"code": 1,
+"rows": 22340
+},
+{
+"code": 2,
+"rows": 0
+}
+],
+"W2:unit": [
+{
+"code": 1,
+"rows": 12783
+},
+{
+"code": 2,
+"rows": 204
+},
+{
+"code": 3,
+"rows": 3793
+},
+{
+"code": 4,
+"rows": 5
+},
+{
+"code": 5,
+"rows": 1319
+},
+{
+"code": 6,
+"rows": 0
+},
+{
+"code": 7,
+"rows": 582
+},
+{
+"code": 8,
+"rows": 326
+},
+{
+"code": 9,
+"rows": 11
+},
+{
+"code": 10,
+"rows": 68
+},
+{
+"code": 11,
+"rows": 90
+},
+{
+"code": 12,
+"rows": 356
+},
+{
+"code": 13,
+"rows": 571
+},
+{
+"code": 14,
+"rows": 1047
+},
+{
+"code": 15,
+"rows": 16
+},
+{
+"code": 16,
+"rows": 234
+}
+],
+"W2:availability": [
+{
+"code": 1,
+"rows": 21405
+}
+],
+"W3-first:unit": [
+{
+"code": 1,
+"rows": 2503
+},
+{
+"code": 2,
+"rows": 6317
+},
+{
+"code": 3,
+"rows": 832
+},
+{
+"code": 4,
+"rows": 3078
+},
+{
+"code": 10,
+"rows": 18
+},
+{
+"code": 11,
+"rows": 390
+},
+{
+"code": 12,
+"rows": 1121
+},
+{
+"code": 13,
+"rows": 917
+},
+{
+"code": 14,
+"rows": 30
+},
+{
+"code": 20,
+"rows": 315
+},
+{
+"code": 21,
+"rows": 531
+},
+{
+"code": 22,
+"rows": 0
+},
+{
+"code": 30,
+"rows": 901
+},
+{
+"code": 32,
+"rows": 0
+},
+{
+"code": 40,
+"rows": 67
+},
+{
+"code": 41,
+"rows": 228
+},
+{
+"code": 43,
+"rows": 0
+},
+{
+"code": 50,
+"rows": 55
+},
+{
+"code": 51,
+"rows": 443
+},
+{
+"code": 52,
+"rows": 698
+},
+{
+"code": 60,
+"rows": 5
+},
+{
+"code": 61,
+"rows": 4
+},
+{
+"code": 62,
+"rows": 5
+},
+{
+"code": 70,
+"rows": 118
+},
+{
+"code": 71,
+"rows": 77
+},
+{
+"code": 72,
+"rows": 9
+},
+{
+"code": 80,
+"rows": 2257
+},
+{
+"code": 81,
+"rows": 1575
+},
+{
+"code": 82,
+"rows": 223
+},
+{
+"code": 90,
+"rows": 1629
+},
+{
+"code": 91,
+"rows": 739
+},
+{
+"code": 92,
+"rows": 103
+},
+{
+"code": 100,
+"rows": 178
+},
+{
+"code": 101,
+"rows": 111
+},
+{
+"code": 102,
+"rows": 21
+},
+{
+"code": 110,
+"rows": 45
+},
+{
+"code": 111,
+"rows": 71
+},
+{
+"code": 112,
+"rows": 23
+},
+{
+"code": 120,
+"rows": 908
+},
+{
+"code": 121,
+"rows": 39
+},
+{
+"code": 122,
+"rows": 6
+},
+{
+"code": 900,
+"rows": 404
+},
+{
+"code": 31,
+"rows": 707,
+"outside_native_card": true
+},
+{
+"code": 42,
+"rows": 66,
+"outside_native_card": true
+}
+],
+"W3-first:availability": [
+{
+"code": 1,
+"rows": 27780
+},
+{
+"code": 2,
+"rows": 0
+}
+],
+"W3-second:unit": [
+{
+"code": 1,
+"rows": 574
+},
+{
+"code": 2,
+"rows": 2130
+},
+{
+"code": 3,
+"rows": 213
+},
+{
+"code": 4,
+"rows": 1412
+},
+{
+"code": 10,
+"rows": 22
+},
+{
+"code": 11,
+"rows": 116
+},
+{
+"code": 12,
+"rows": 228
+},
+{
+"code": 13,
+"rows": 630
+},
+{
+"code": 14,
+"rows": 9
+},
+{
+"code": 20,
+"rows": 51
+},
+{
+"code": 21,
+"rows": 11
+},
+{
+"code": 22,
+"rows": 2
+},
+{
+"code": 30,
+"rows": 191
+},
+{
+"code": 32,
+"rows": 0
+},
+{
+"code": 40,
+"rows": 68
+},
+{
+"code": 41,
+"rows": 55
+},
+{
+"code": 43,
+"rows": 0
+},
+{
+"code": 50,
+"rows": 44
+},
+{
+"code": 51,
+"rows": 25
+},
+{
+"code": 52,
+"rows": 86
+},
+{
+"code": 60,
+"rows": 1
+},
+{
+"code": 61,
+"rows": 0
+},
+{
+"code": 62,
+"rows": 0
+},
+{
+"code": 70,
+"rows": 96
+},
+{
+"code": 71,
+"rows": 75
+},
+{
+"code": 72,
+"rows": 0
+},
+{
+"code": 80,
+"rows": 685
+},
+{
+"code": 81,
+"rows": 271
+},
+{
+"code": 82,
+"rows": 53
+},
+{
+"code": 90,
+"rows": 1632
+},
+{
+"code": 91,
+"rows": 627
+},
+{
+"code": 92,
+"rows": 82
+},
+{
+"code": 100,
+"rows": 225
+},
+{
+"code": 101,
+"rows": 21
+},
+{
+"code": 102,
+"rows": 2
+},
+{
+"code": 110,
+"rows": 17
+},
+{
+"code": 111,
+"rows": 27
+},
+{
+"code": 112,
+"rows": 3
+},
+{
+"code": 120,
+"rows": 269
+},
+{
+"code": 121,
+"rows": 3
+},
+{
+"code": 122,
+"rows": 1
+},
+{
+"code": 900,
+"rows": 159
+},
+{
+"code": 31,
+"rows": 53,
+"outside_native_card": true
+},
+{
+"code": 42,
+"rows": 1,
+"outside_native_card": true
+}
+],
+"W3-second:availability": [
+{
+"code": 1,
+"rows": 10172
+},
+{
+"code": 2,
+"rows": 0
+}
+],
+"W4:unit": [
+{
+"code": 1,
+"rows": 1626
+},
+{
+"code": 3,
+"rows": 717
+},
+{
+"code": 10,
+"rows": 152
+},
+{
+"code": 11,
+"rows": 633
+},
+{
+"code": 12,
+"rows": 1906
+},
+{
+"code": 13,
+"rows": 792
+},
+{
+"code": 14,
+"rows": 131
+},
+{
+"code": 20,
+"rows": 837
+},
+{
+"code": 30,
+"rows": 2305
+},
+{
+"code": 40,
+"rows": 573
+},
+{
+"code": 50,
+"rows": 1263
+},
+{
+"code": 60,
+"rows": 36
+},
+{
+"code": 70,
+"rows": 334
+},
+{
+"code": 80,
+"rows": 6044
+},
+{
+"code": 90,
+"rows": 4885
+},
+{
+"code": 100,
+"rows": 870
+},
+{
+"code": 110,
+"rows": 152
+},
+{
+"code": 120,
+"rows": 2472
+},
+{
+"code": 130,
+"rows": 20
+},
+{
+"code": 140,
+"rows": 1
+},
+{
+"code": 150,
+"rows": 0
+},
+{
+"code": 160,
+"rows": 0
+},
+{
+"code": 170,
+"rows": 0
+},
+{
+"code": 180,
+"rows": 0
+},
+{
+"code": 190,
+"rows": 0
+},
+{
+"code": 200,
+"rows": 504
+},
+{
+"code": 210,
+"rows": 0
+},
+{
+"code": 211,
+"rows": 251
+},
+{
+"code": 240,
+"rows": 3136
+},
+{
+"code": 250,
+"rows": 348
+},
+{
+"code": 251,
+"rows": 103
+},
+{
+"code": 260,
+"rows": 0
+},
+{
+"code": 900,
+"rows": 2155
+}
+],
+"W4:size": [
+{
+"code": 0,
+"rows": 8632
+},
+{
+"code": 1,
+"rows": 8413
+},
+{
+"code": 2,
+"rows": 3894
+},
+{
+"code": 3,
+"rows": 9
+},
+{
+"code": 4,
+"rows": 0
+},
+{
+"code": 5,
+"rows": 0
+},
+{
+"code": 6,
+"rows": 0
+},
+{
+"code": 7,
+"rows": 0
+},
+{
+"code": 10,
+"rows": 1
+},
+{
+"code": 11,
+"rows": 12
+},
+{
+"code": 12,
+"rows": 7
+},
+{
+"code": 20,
+"rows": 454
+},
+{
+"code": 21,
+"rows": 455
+},
+{
+"code": 22,
+"rows": 436
+},
+{
+"code": 23,
+"rows": 477
+},
+{
+"code": 24,
+"rows": 1204
+},
+{
+"code": 25,
+"rows": 84
+},
+{
+"code": 26,
+"rows": 26
+},
+{
+"code": 99,
+"rows": 577
+}
+],
+"W4:availability": [
+{
+"code": 1,
+"rows": 32246
+},
+{
+"code": 2,
+"rows": 24808
+}
+],
+"W5:unit": [
+{
+"code": 1,
+"rows": 1120
+},
+{
+"code": 2,
+"rows": 195
+},
+{
+"code": 3,
+"rows": 590
+},
+{
+"code": 4,
+"rows": 36
+},
+{
+"code": 10,
+"rows": 72
+},
+{
+"code": 11,
+"rows": 591
+},
+{
+"code": 12,
+"rows": 1823
+},
+{
+"code": 13,
+"rows": 780
+},
+{
+"code": 20,
+"rows": 833
+},
+{
+"code": 30,
+"rows": 2225
+},
+{
+"code": 40,
+"rows": 855
+},
+{
+"code": 50,
+"rows": 945
+},
+{
+"code": 60,
+"rows": 38
+},
+{
+"code": 70,
+"rows": 225
+},
+{
+"code": 80,
+"rows": 5599
+},
+{
+"code": 90,
+"rows": 4810
+},
+{
+"code": 100,
+"rows": 753
+},
+{
+"code": 110,
+"rows": 225
+},
+{
+"code": 120,
+"rows": 2887
+},
+{
+"code": 125,
+"rows": 83
+},
+{
+"code": 130,
+"rows": 27
+},
+{
+"code": 140,
+"rows": 0
+},
+{
+"code": 150,
+"rows": 12
+},
+{
+"code": 160,
+"rows": 0
+},
+{
+"code": 170,
+"rows": 0
+},
+{
+"code": 180,
+"rows": 0
+},
+{
+"code": 190,
+"rows": 0
+},
+{
+"code": 200,
+"rows": 498
+},
+{
+"code": 210,
+"rows": 0
+},
+{
+"code": 211,
+"rows": 284
+},
+{
+"code": 240,
+"rows": 3111
+},
+{
+"code": 251,
+"rows": 464
+},
+{
+"code": 260,
+"rows": 0
+},
+{
+"code": 270,
+"rows": 110
+},
+{
+"code": 280,
+"rows": 268
+},
+{
+"code": 290,
+"rows": 349
+},
+{
+"code": 301,
+"rows": 2
+},
+{
+"code": 302,
+"rows": 4
+},
+{
+"code": 310,
+"rows": 8
+},
+{
+"code": 320,
+"rows": 3
+},
+{
+"code": 330,
+"rows": 24
+},
+{
+"code": 900,
+"rows": 172
+}
+],
+"W5:size": [
+{
+"code": 0,
+"rows": 8330
+},
+{
+"code": 1,
+"rows": 6175
+},
+{
+"code": 2,
+"rows": 3627
+},
+{
+"code": 3,
+"rows": 18
+},
+{
+"code": 4,
+"rows": 0
+},
+{
+"code": 5,
+"rows": 0
+},
+{
+"code": 6,
+"rows": 0
+},
+{
+"code": 7,
+"rows": 0
+},
+{
+"code": 10,
+"rows": 2
+},
+{
+"code": 11,
+"rows": 13
+},
+{
+"code": 12,
+"rows": 12
+},
+{
+"code": 13,
+"rows": 0
+},
+{
+"code": 14,
+"rows": 0
+},
+{
+"code": 20,
+"rows": 474
+},
+{
+"code": 21,
+"rows": 223
+},
+{
+"code": 22,
+"rows": 395
+},
+{
+"code": 23,
+"rows": 519
+},
+{
+"code": 24,
+"rows": 1403
+},
+{
+"code": 25,
+"rows": 78
+},
+{
+"code": 26,
+"rows": 14
+},
+{
+"code": 27,
+"rows": 1
+},
+{
+"code": 30,
+"rows": 809
+},
+{
+"code": 31,
+"rows": 4
+},
+{
+"code": 32,
+"rows": 0
+},
+{
+"code": 33,
+"rows": 15
+},
+{
+"code": 34,
+"rows": 373
+},
+{
+"code": 35,
+"rows": 82
+},
+{
+"code": 36,
+"rows": 181
+},
+{
+"code": 37,
+"rows": 3
+},
+{
+"code": 38,
+"rows": 18
+},
+{
+"code": 50,
+"rows": 0
+},
+{
+"code": 51,
+"rows": 0
+},
+{
+"code": 52,
+"rows": 0
+},
+{
+"code": 53,
+"rows": 0
+},
+{
+"code": 54,
+"rows": 0
+},
+{
+"code": 55,
+"rows": 0
+},
+{
+"code": 56,
+"rows": 0
+},
+{
+"code": 99,
+"rows": 33
+}
+],
+"W5:availability": [
+{
+"code": 1,
+"rows": 30021
+},
+{
+"code": 2,
+"rows": 26145
+}
+],
+"_provenance": "Per-code row counts copied from the sealed prior audit /global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/587-nigeria-five-pp-community-docs-20261110/numeric-operands-v1/RESULT.json (operands.<unit|size|availability>.attached_code_rows) and CLOSED-STRATA-v2.json (unit_unlabelled_literal_codes). Counts are all source rows carrying the code (any availability/price); no new data read."
+}

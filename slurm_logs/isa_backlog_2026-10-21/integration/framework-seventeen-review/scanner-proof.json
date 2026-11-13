@@ -1,0 +1,2136 @@
+{
+  "status": "SUCCESS",
+  "raw_occurrences_each": 236,
+  "outcomes": {
+    "warn": 232,
+    "pass": 4
+  },
+  "raw_complete_record_multisets_byte_exact": true,
+  "known_standalone_food_occurrences": 217,
+  "current_food_occurrences": 211,
+  "standalone_exact_unchanged_occurrences": 203,
+  "standalone_removed14_exactly_present_in_earlier_own_cold_warnings": true,
+  "standalone_added8_exactly_present_in_own_warm_cached_warnings": true,
+  "known12_native_cluster_frames_attrs_and_full_grain_footers_exact": [
+    "Uganda/2005-06/_/cluster_features.parquet",
+    "Uganda/2009-10/_/cluster_features.parquet",
+    "Uganda/2010-11/_/cluster_features.parquet",
+    "Uganda/2011-12/_/cluster_features.parquet",
+    "Uganda/2013-14/_/cluster_features.parquet",
+    "Uganda/2015-16/_/cluster_features.parquet",
+    "Uganda/2018-19/_/cluster_features.parquet",
+    "Uganda/2019-20/_/cluster_features.parquet",
+    "Niger/2011-12/_/cluster_features.parquet",
+    "Niger/2014-15/_/cluster_features.parquet",
+    "Niger/2018-19/_/cluster_features.parquet",
+    "Niger/2021-22/_/cluster_features.parquet"
+  ],
+  "new_roster_occurrences": 25,
+  "unchanged_preexisting_data_files_each": 174,
+  "first_scanner_additions": {
+    "baseline": [
+      "Niger/2011-12/_/cluster_features.parquet",
+      "Niger/2014-15/_/cluster_features.parquet",
+      "Niger/2018-19/_/cluster_features.parquet",
+      "Niger/2021-22/_/cluster_features.parquet"
+    ],
+    "candidate": [
+      "Niger/2011-12/_/cluster_features.parquet",
+      "Niger/2014-15/_/cluster_features.parquet",
+      "Niger/2018-19/_/cluster_features.parquet",
+      "Niger/2021-22/_/cluster_features.parquet"
+    ]
+  },
+  "new_cache_fullframes_typedattrs_exact": 4,
+  "all_records": [
+    {
+      "sha256": "51ff854c37db61e7ac5cd4c49b8dbf720faf3c81b1885f1ef1e3cda12d6fef0c",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": "Uganda",
+      "phase": "1a-sanity",
+      "check": "index_levels_match_scheme",
+      "status": "warn"
+    },
+    {
+      "sha256": "c674cb0904e50b5a31a96989fcede3123e8b86bb42668812563efb59a09dd336",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "a92b8f027c8094acdd276959d93b7a735310859c2f0a3f67632332e48c2b47ff",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "2c9e83582aa5a57d59e9a413b5e1a03ec3e949b9ab315c48c55b464008e41b30",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "339157d9d9cdeb5a24dc8fbcb6a190b6f8600721cec82f32ff054f2176473ecb",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "51a44f7d2bbc3339bd2f79d45a0b0f4c7325206cd0d0d3e93c61e16f5621f734",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "5da34b80e60b57ffee337f2566b5406af91e764964d5b3d0f8aed2515375d6e3",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "9f837108999e58f3d3e8589c37f14c719d9b172b819ee768479895baa4a3412d",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "b8c80a2791aaa46e4ca2e6119d0b0314b2982f9561168209c61c507df738703b",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "c5ffc4297bfb70e92c558695ec7a164b3a8163f36bf3070eb2ba5ae7139ed782",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "829a93f58fd533361103de99f5cbd70636fee26177d9f29fd225fb8e567b199d",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "18f68688c4fa8d9db0790aef07ab2aea9be6e63fbfc324269e2f132075eb1d94",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "f1b19d6192bbece03986815a61524710f22f2b38dc8a14693d9b1d64d56b19fb",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "fbba4e90e829eff2afb431cdd8e5d893d86ab125248625ba89bec52a06eef2ba",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "fa2a6bea8814504e2fe4e6cdaa7bfce485de970228320a10980f42a8e6ae6786",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "8dec2204a87cb363cbc76cdb77d7964450a3c0695ecb5b97778e201aefa2d1b3",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "37e3779d25a9cbd57a9466016b5cff3d467bb1312332c9246d0fc8405d3b2899",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "3f869f10116f8717c8c4f11ac2e05d3f4d67f3bf0b3196797e9c264554adeda3",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "bc734b5fbaec2cbf67c220abd4ed7393d5fce619ac0a3447bf0cb368222a84c7",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "83784acf7133771a9ee73eb37da88891c0222df99d769dfde5a7bbdc656b98d3",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "f3d96a450b9ff688dbdb415b8e3e2bfb50e73d5e1c8363c5a864e64812649f1b",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "bc029e2b673181567fa8f7c738bd7d1576b405a81941dadaaea922092bf83b56",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "bab78f6edad9ed1c26dd7020a819d4e407069b20731975e61773640366f578c1",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "b136316536530fb0eb013d0b5ad7f4c12cf33d65472fe448e3213b3dc70d3771",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "137a8f96d8f04c0f9c3123d7ae55b11944e7a9cf6d801dfa3dd8cef0f65cf4e4",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "262bd3e9df469de156d3b3eb35c9fe0ea0e556e509d7f63f1b7d7d8084c11df7",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "9814718d6091ee4bd7a006f0226809f93042719fde1811349be3f8f9693d53c4",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "09ae58f8843c3aeff00a142b96153def4e7e63b65e6ba961117d3cb51b62d614",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "3251e73da03710cde8cc779c8f3a6115e856604e50013e08734bf211ccf3dcdb",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "7bff93b7099b9756053aab49f568f73791578856d23533f07a86fd9950f12a16",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "c0bcf9adf7ed54bd5d9f65d7da1e36dd7a0caa2fc0fd1895301dca8b0cdb33c9",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": "Niger",
+      "phase": "1a-sanity",
+      "check": "index_levels_match_scheme",
+      "status": "warn"
+    },
+    {
+      "sha256": "47b89d8fe64005fceb6105a137b90ea8e5598a7180ebd7e1f1573df13115d2a6",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": "Uganda",
+      "phase": "1a-sanity",
+      "check": "index_levels_match_scheme",
+      "status": "warn"
+    },
+    {
+      "sha256": "b8ba5fd5617e6c80a4432d7e76adf78361f25ebe9e5b14e1713d3a873b2b4636",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "755a22fd735c4d80e4055f9a8af0d4cca3441b7a19a6dad8ec37b6bc37f82509",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "021870b811e79191a357c77bb6f94456ff6ad2c17bb12d418aa757506ae5443c",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "1a-sanity",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "c95fa611dec15cb1fc336f422f1abd85e882b8a99f1e6f5bcd4ddb072e1549a8",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "6ec48a77584dfe3d6968f986d0a27ddf9b284a0c22250220bf53e3445dad0bec",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "0f453465b573f280cd594dc9a225f3a72f79b19d99fdcb42b9c1475b9f9332c5",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "0f2881e322fa134600cf71e5047fba1000166302a190ec07e1beeb54d96b0b3b",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "b0cc758f9f3fcd17535dbcefdef5aa3886d8fd8c35faae17f0a283cb422d4e9c",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "1a58f89947f8809d69a4793d24c654d78317e98058a380dd0e20e1102b406b06",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "57362236e141e642b6504d267ee2215faa12c1e0cec3030c2577c60abddfc455",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "0894ab050639380a82ad89bc3f98f0745ec7f42f07fb51b4117d3033c51cc22e",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "79603efbb6896d61af57a753fba4f7e27db860f7e2457a87490c371572851eec",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "034054fe33312701c8c3e51ff3163598379bf62d68c1fcc6c6a1dfe43d83d1dd",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "d199298c6b8581d0556fb7a21ce9966a7513cb37374fe2b332d00604edb45d43",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "f00a92692653938c5edd6a1c4477e04d75c82a1f49b7d21dd6e1d9159463fec7",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "da295a984316260c1f9cf62f010119cedadb1a21cb01434c11f7e08031ec4a44",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "cf966b0825651e6e4c2f136efb576b6182bcac8a0990b95215cfea976fa56ff1",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "c6267a2d1e0437acbe70ed7f6e293eff6edd88212a4fcfc6a3f813d5ff5a95de",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "64a8fb2678b1f91d0985fa268bb7d8da6970a42197d863ad9517aaaaf0a1e1f6",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "e194a6fb3940a2857629bca1bd5b20fb48c0ed97a43af0f846d734cb3d421bf1",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "4b82cf046947929397300ca2703325d8089f043b9e931bdbac986e55c19fe84d",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "b8926c33952a71de79ff67f2a097494ba263004ad5cd1ad6d68909727b581d95",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "ca40cdc67a3466884ac21f0da52dc13f399352dd0648dd366ed803d4221b404f",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "3f6be33a58094b0e8e9d6e8049291f9f5ba1c20ed35b75727b15d18bba732bb8",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "8ff8d48b0746cebea2ae0e39a0a35b16f3a5df4becaa258185adb52660b9f465",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "15e0b487ae643faa92d62436a58e6f10b86ecea59a8d5507ecb3b48532aa66df",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "c454cbc8ecdc1e0139edaa8d4f2800122e963fe3bac9a028cbd41ef783db300a",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "15116bbfa17a7ddd8dc0a847c0cac46959634038bbe2a7661a2b9d9cbbb535e0",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "d1991a94ab7f5a713b169281c73ff721a770617dc6e093245ef5c972fa15f624",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "041ea71c558dd8072c5289c1fd6478f8766c7d7f56e7b80e883b6fdcf20e0ade",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "78167274cda0a598c974fa30788efa6b31577559ed5a0d9569d6576e8fb87bd4",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "83dbea41ca4d51e9ce41c49649c9cdb022daf0b4f5e4cb1f8524ca2935022806",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "8237231e2b2ee05869426d8f20a41c0099b8ce5f1a6c8db91f591ada38854bda",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "3de7495353010499b2ddc04294887a2ef2e989b1a0f0906476e11d3a06bec894",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "8d5541c8ebde303cfabc97a5ba2fd444c287301bd7bc9cfc832bcf1e070f77ab",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "fbde1f8d0c26f1326f4966ae1bc650666f3f507e201a87d237632bfb5258c33b",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "1b-assembly",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "b938ca6e7f3c19de38b34d75f400a29a788e117abba60f87c4a786f3e9590767",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "64d3c9c917127147f6fbb9b5f799fa09a6990438c1f17bae8d5fb3322ec7a360",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "reaggregate_conservation",
+      "status": "warn"
+    },
+    {
+      "sha256": "ca9b39a00e5bf6609cbbfadf2fc52b790cac0de74704b001fd12921cc06d6eca",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "reaggregate_conservation",
+      "status": "warn"
+    },
+    {
+      "sha256": "a29eb370d1820e9928d7e6ab4ce9ac692e62a65c46d2c6ac5c3029ad7bbb5317",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "e7562e9ebe53946453d2257b87b2f5649cbe84f0d33490b301caf1e49054d540",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "7a1410338a496567415db2bd8e0985e227b11cabbfb59b3bcbd8902351d066b5",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "fb4064cfbdcf824c081aec14c3529e457c78ab730f567bc341bea85ac0879e21",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "636949b016114650191683dc73ecb06f6315a0298b610ad36bbe5775fcf7d12d",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "e0f81b8f2bc7fc62c70296f8f26da5ce2ee2baf87eefecbf94f2ac56251cc35a",
+      "occurrences": 1,
+      "feature": "food_acquired",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "2bd70a03bc19dbc96ee928e5c4bf81f1383a00fdf003cc9edfcac5432de57dea",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "965bf4c5f9c20ff2756844481b23701c72da73bd88a6d075182b98f67012adcd",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "9396ae2eae940753042fb0cf6aa6b203c1916065954be286f20774735c57fd92",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "market_adds_m",
+      "status": "pass"
+    },
+    {
+      "sha256": "e4e226fe107a868cd53b839e64987248f3cb0c6c0cb2b2c96bb560fb4338542f",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "reaggregate_conservation",
+      "status": "warn"
+    },
+    {
+      "sha256": "2a856c76599aa89cd2c9ef81fd335fca1548a029e4176afaee3dc7abff49ea89",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "e5c60651fd95b52bbf27ec5be9a16ebdfe1f10d6eb6140557283aff1eda57a11",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "9cc899f354e696fa88fab4719bef5e536fd46aa04046444761e56bae2de25d7f",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "6ee75a414ab0e5c81b2e0005ee52f63ff9fff1d9d4a81bf7b8c579a9577d3c73",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "2600e7c5f1876a11072c614dd88154bf091cc910d077774bf930d56cc2c47a1a",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "c99af1415b96b3142c13ab17df091775d91d34cdef8773b74c3d42aea934d940",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "6af4c422b9b6e5d21fcf714429e8c2d795102e1fe92f28319537a670f543383f",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "fb498bfcdc892299397df4b67375aa99d68bee7afd93ee234b882d27517860f5",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "a8c2c77cd0ad6534e978691dd5328c5e52eaf3412926334d43bc36b560058199",
+      "occurrences": 2,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "d5d301da2cb8fc0323084f9e5e2dfa03eb52ca267785b22a704483c207a9931b",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "a9a4d0ef4dcf8d11e7eadd1861aab070e0b5ef66faad76032cfdce0fa5d2de1a",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "b8e0ce5ccd2bb2ecd87ad39cf494480df39aebb048f373c524595942ae1634ca",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "bd9b9f82654ac075dae2617174b15653573e0bb5e76b930ea9d9c3ad8edd45c5",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "9572fe30865d6f655415043fa606c427e44cac4e4d86ca305c66252effed21e5",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "84e0e7aa13535f5302666235635913920f413077c4edede494c3ae09190ce49c",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "1f2809e1a9ad1c1a929cd2b76e32a7b0369a8f2f3ed936b599388c029d3a7c77",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "aad4fee1d1d1f11f67b819310ae56f96a7461cfe20683137cff68ddf3698c5ee",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "97581ccbfad5f865dae4e93503af1cbc20a11ced46c16fe7e8dfc24e411d8c93",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "452ac19b4cf803ef5e4b0ebce4b9f26362383528dd17a5ae9fa921974b9a9da0",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "051bcad03904863bb25bd48713c1af5f74ed136315f4d4f069af3e07f19ef8dd",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "e56fe65e344b9d9ae39e886b6bd54d6453cfced8da96d8413bf11165277203c6",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "97b95849f9f233633e7c0c78f8fd0820521135db6aa9b4601273473b19e6f7aa",
+      "occurrences": 1,
+      "feature": "food_expenditures",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "540e3781e171417060691bdd22e921cf3722b7a93ea4c35d728257fc71e48d84",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "df8e6efd1efe4de13803fdce8294f94c69c10130b89dca4799851002e90f3ffd",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "875f4dc86009d174b129de21cc2ab219df1d79cb2da174c72632c841bf2537db",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "a5193c210c2682a832ef12dc5ff0a5616999067b47d21d5cddb36bf31fa8b187",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "aa26ba0a858a8602d70e47837984cd3596c2af26e65b6b3526fa9e9bcd363cf6",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "00b7f07a0e4eb35ca246e95a7e61098d9891739de5f79d33fca8a05e1af1e07c",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "market_adds_m",
+      "status": "pass"
+    },
+    {
+      "sha256": "77e62ac674e7e8b366355101bd44eed11a777e3d834021d51ec905fd830a1c3b",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "edd56b16f7bcb78d4c0e407da75d42fc6aa7b0c620bb193803fcef136b45804f",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "cae713266da7498f29702e6c4b4a10d579d6a8a78dcb270d51fe6d64ac8cb22a",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "b0460b16cc5b737a45caa0c97be46de194c9231b817996ecf7af841f9a3cb164",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "7f91ac3dd066a54d4e142b15f57e1dcb8618089d248517596b0c9e251b3204f1",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "46b39190665f3c0170f53d99e6f0f683a2f73eabc40841806cc11d4e7cced289",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "e174560e9552ff0b8037ebbf2ae8ac986988989978d2bcaabdf7c2ad4b285ae9",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "478b993ce0d6c23241c595efc60ee09960dda48d057a8446b5413e8bfb64fd02",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "76a316053f17ecd889f91429d8f2a4580e9cb5559bca2f84142824b8deb96cd3",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "060ad0287afd595bd0e638fab5cee0f3b42be189984a52744069fa7dab832e03",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "378b16bc3f649e094d0ecea35ddd0e787ce77f79685b0e05d1eed6fa42919cb9",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "41849ff1a92a8b93f461ddd2efac58c6fd42c244dd98eff94eac653360d40107",
+      "occurrences": 2,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "2065d1392fe265b1561d68479929d0c02ca6bfa4e9de77fae999c4aa8941b91f",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "8a2f716047c96addb4b6e0acc77218231ab7a221f5b2c543c54ec20363d8ea2a",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "fc72b79b7f8fe1e6add355bedb4d856fb37312dcd76664f4615305d15fbbdcf2",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "63ea34dab7b719c77da403f05bffd3b8fcacedf2dc1c4f871b17f8088e796570",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "531c123b1e8976789c32adb2a185e1a7939c7fe763c88ab6b2567a8eb20a5c33",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "9750f0e0e5bf8760ff265a8a8c1c1d6f9d0ad23e1de3e2a621f836f7ba0d5e03",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "d93dd89e885bbd6fde43426a56085531bb658011549f824b16577f826666b169",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "0e09fc86863229096baccb0d9158e643cdf6b015a3af7465c7e0a9d0b5aac3b4",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "6f4f412af910567a2aeab30ce8a6fecfa68655360995efd3ce19df9d370fc63a",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "4508dcd0c3bfbb13665ee6e21a8a4ac39cc14b98d844bc624096d508d1b1069c",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "43cfa8d2cf0bf091c25513a3910e1735adb1fe1f62105b1d9f559bf96652cf59",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "ec0b5fde45129cb931cf1e9ead6caa50b5bd3c14f905ea12bad8991dcb4f3969",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "c44eaf0123d5fd73cd918c523fe5df0bd26573e9d7c0352cae2bb330aeded406",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "bd2bf2def627ec3f919703f991ec2842a4c539ea8ee60a3e90940e11b04b8850",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "9eeb5f0b30986418b3190c1d9113b52054069eed2c937f78c3016bd479f121f0",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "ed867e841baed6ba6348ab919f02088d6d0974b3927d72aeace9bca650df2e6b",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "e6923a3c1df5ccd9e3e3357be2ad2b59322f151a217eb7cbaaed9241834eaab6",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "6491928718a191067ffcd5785a726a4c5e130d6a08543c9dfcaadba587a25986",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "4a7c95e7dd830f3f054429149df4390a5404a97e25347ea173050787d24462d4",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "2e880bdf55bed4465c114b67f78da1572967bf8edd84ec6ed95dbbee15e4f820",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "1017327f9cb5d37311a3fe4657afa0c86aeedbe3c5bb08551ae4275f1b1ad97d",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "bfafd30cb7d12c47a214f447980cc5feb745f93647de89c0b4a6a24724c815ce",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "0d172f851580db8def77286841262d593f35792577c519c50bd083575b77c831",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "a4e488fcd2ae524205f8766124ea4d3d68f3b271022a0d93c25d7a06b4e758e5",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "4bf68c406c34dca0d34b24cf3daeaea5cc11730fb59085c59a242028c8fb7757",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "5a3971d70b164754ce1ba13956d4b8381f950f7b934e6e8297aebb8998b5639a",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "2a42c07ece168ffe0fae7b5fec8366a714ad5444da8dd2a1b75f8e527a696250",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "26684d2bcc1f680484cc40ccc4ef89000544ce23d86fdffff10dfc7f6d055a3d",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "265d41d383758338f3bd541120e1951d10a3920bed785a5e15c6ab16bceed9e1",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "27d96a98649269b94624c1063b4611e8b7254a4d6694612825e258309db36cf8",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "dd1656788e0466cf59063a829001c27b1d9de37b103a1e261a85668663d08f93",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "5b71f6974f3f791a07c2456c7bbd452c193c4703b315c6da7587b9e52e7213e0",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "caa450a84e293bf8995f5072144505541a75e04b370f0e2a2d5a09bb261e121e",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "5f68af7b4bb462fa3c551a07e0abc880a674f0ef83a5e3b37f671eea1829125b",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "f18fe5676c710479768f81fe5e3fc17bea969c86976ad874705e68b173515ea6",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "478dc56cede3950b2ca2d7834ad4ac336bd06c24af01d61491bceb6b1d59206b",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "53d9837ec559122302c7fec0487d42019422f67e700bfb4ffeb7e2b15ec735fd",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "3c537735596941f98a327efcea0e41155af25279effce274f1bf9682bc00a47e",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "78a79384fdc3cd1ee1e3a1674098a4f707266e0f26645999accce153ab3d3f41",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "7f62ad0caeae0d9107d8e16883678bece5cb684b1ce9a4b9ec9f766e9d39d416",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "9e766a2490954adea53dfd5ee2812c459fe10482eba8169063d63763798804bb",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "6a6553a442e3c3a927b2cf567d5605f4927f6e338aea681bd7fa1e14f70bbf04",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "e4a01bfbcecc15591968056454215cb863ca1a9db672d6a665dd9012be0198e7",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "32fc6cb53ebba6191a58f2b1f5fe615c15e0c36daa31be6ad3696b995903d02f",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "4e8724b0923805b9dd55dd0d78bff06a6baee34e48033d4a7f43e51e37350eb9",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "39fcbc8b6480233a0ebc6eeddb0a74eb184ac266b8bb9bc0041d136ba436e37d",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "46964c17b08d8037a38af807d935432394c73449641fb7599fb41c46c7f25ebe",
+      "occurrences": 1,
+      "feature": "food_prices",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "941ffe89b905692d5368933f24388411c884ccb611b7f240b77495664a99a36e",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "6dd369750a41ed8adc118a261d1202a0cad0cafadb15e56094f3b1dbf4de922a",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "21f2570a69ca90bf30e6bf45cb107e24daad56493c1c8bf280f0c5d2ef261651",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "38f150216bfea784b61da5692c25bcd19e2623544364c51021839b431ad0f0f4",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "market_adds_m",
+      "status": "pass"
+    },
+    {
+      "sha256": "f7eee8df29873b209fdf64d0d8075ea1595be52e2dc785faf3ee0ef261c957bc",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "reaggregate_conservation",
+      "status": "warn"
+    },
+    {
+      "sha256": "ca63004b9afbf40b2e3a6b347c35fba0c57f21972b073420f54c79d08f54fa9d",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "b6ae75c728bd5ad8fb89b26ee8ef9e6504d181ca6d030e30752ba830fecea8a5",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "a030d2c01d620e41858a69b1e0530658a3cd7a7acade58b71757864d0b83d66d",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "1010117823491b0d7c5a92e7bc81cdb6cf959b1e8cd17180460c459fbbcac83c",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "95055c7ebc40825c31f2d97e36815f543dde3caec6503d64a6d7c1eaaa6a50be",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "c78752c3fd6a33885c10055b261fce30888df2878b607aebb4970f4ed66dcddb",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "ad8896ab2eb945b48517e918eeda563d6777e36e04ceef31ed30c64d33e46477",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "3ad17464ab13a44f42aa2469c63f5fcb912e06b7dc64d14f87744fd7ecdf2f18",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "ab4dfb5645449dcbe47aafc96c0937b5af106dfe2a6ca5671a80ff923c5619a8",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "3e4ad0a3251574e1c1cfddc00e914763d12d7a6ed35a1285afad6b398dffafea",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "a94b5d1ab9ad267b3fc1e5d850d6f9f2003f8fbe752254b6e54206ce774bf24f",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "f7a0b580df9353707899fb6798b3cdd639771bd9aa53af7fdd7f0856b2e3a9fd",
+      "occurrences": 2,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "e2f969a87e5609018a434c99945910e9b79410a13a778c050ba7435e06cd5c4d",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "4f3e8e3a0ecb5578699201e0fefda829b2dedd1c17aeb19632ca0f011061bb46",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "80a7ec1cd9213b8da04979845f516f08af99cc052c5780c7536053fa44e72228",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "5d9c92f39c5dbaf4af43eeb10ac10c11b9922303299abcfeb8277cd2ff3e1502",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "d733d97f749cb5c977915488469b5f8390eae03201cd3f4d3e2739b04c96e0b8",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "773aabc1057bfff842aca25c1577a9fcb84eaaf5fe58964118ff4c90212069de",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "2b8a57a5677c7fa0c00ac70d4ce1e7040cf7bd4318d08a4596b9cb8de5985c9b",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "d17d99dc1c0a2ba91780fc7e129886bf8120b79251504a4c355f38823902392e",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "bc0dc8ce0289adba631916431c4c5026600bd5ecab28f5a60f30b77a7735f345",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "4e71ebb63ececfec38d51aa12f2832fcd2a718c65fa273088079fc1655d5e354",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "1396681524e933a9f5c4e79f13248c2f90585c8d47174634e5e4d1a0fa2572c5",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "665f097d52e36133040d37494e52edfaad7d06c8078c1b99cd4116b42abc1b3a",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "f2df46283253bf0ee3551567d0662720dbcbdd94c87bf379808ba6d48db59c35",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "60962a00c42ff830d66743f7ecb3dc852726a9acbad3152785110f3d056c4491",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "1a119c80d04b5c3afcb07869e61f23c0471ddabecc2dab3980ed4d1c7b11c78f",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "ba4bca1b70b51008f90c4d194d1f20bf844ca3263d03593a025036a80ebd50f6",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "105d8d6c7c07dcda8549dac4416c7460668431f19f549c7aec5382c114f3e12d",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "f6902e851013943091ac375864e080be7e117c202e89e850aa5b2602e1df394d",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "f1b015610bfed03b072ebcac9edb602e751d4c2ceb00fdf3b48bdd43e2050b24",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "e70bfa26a41785de55fafb9191df441be3bed74b39aeb9d13ac93dc745ae2f75",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "d5c54518a1c88f83b58b9f5132008c49276b0772641f57191f107bc08a83b5a2",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "503e90e29b4784a0af794793ada2919d6e9731399b87883f37d74bd3ac668414",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "0b2a2debdadcc9e7bb9190775613951e54335af051c1e0986b7a0aac4c049afd",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "d2f900f459053db656b8a3636a66c138f0482ff1666e4866af61e68d465f9f64",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "ae1d2603b65bc7579502bc6b07a36c5ffb71e4d4d6c250e33b31f42bb82b8ec5",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "db71b911d6b2f9e925ac1073a8541e6227fe429ed2c6cedac9122ecf28a2eea4",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "9374885bfe4bbc2a373422649f9c3c4c068679696854c257b1a3b40c3af13cf3",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "82802a7631e5e624ab758029863ce8026c83fe85328c47036feceb5c446f1ab1",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "546e56aafafb294abb2420fae6352361ec7344f4ba7aa1d4b81c1f4383af9d33",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "37450470e6116b7369b0e022e228c73cf11760861153ceb7d019532bf39ac6a6",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "7cf5dfe8d7a8cb42ce3152c27edf4298ab9846ba3d8991f2386d3e577b4cf834",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "4ba4ac8efd7350dfd77f9a3974f0fccd7b8fb99525b8809001d84474949c4c64",
+      "occurrences": 1,
+      "feature": "food_quantities",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "d92616a8df609df3ebcf002ace49489c504978f524fe9f57388711849889bca0",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "kwarg_changes_rowcount",
+      "status": "warn"
+    },
+    {
+      "sha256": "69005eef7e37d5239681438c62c7820a53b9747b970ed79b2936799aa4ca755a",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "market_adds_m",
+      "status": "pass"
+    },
+    {
+      "sha256": "32040cfb43c2bd8319a3b65fcea746f915124cfc6581c94303fd2696ba60b94d",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "c40c0c057fbad1dcdfde9b6316020ce2f04ad5d0f10b2da765219274eb0da9b1",
+      "occurrences": 2,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "eb8437a01aad253abf233fde1bd436950ffbe9c13074b22c565b8845e41f6d9a",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "84807dab7e36feed295e6883a92b3ff8fc95fc7899a3bf022d7f49544acf4ff3",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "2ae9d8753a9cb1362cdf6e10ab7566f981b0c100d493194d2cffa5f4a0cd5bb3",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "07624422d478da278855fa0aa73565163ccd677b14dcbb39ca413cfbeec3213f",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "4625e2fca153ada878c5b928a38ef5e5bfd61618e57ff7e24b45680d1353a6e4",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "dc69410d20c37292d85f3aafaa8fabc0fb6442613ebfb455eb4aef8374ab0abd",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "8228308ecf3811703721ca11258d380520488ae08072932af61a3713cf981fba",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "4e0020b0788c3d2a838a0e3a2d7fca0872aba7d20bd0b9ad4f0260bc55db93a0",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "a5511f31dbde39c044f3671ffd86cc0f1440726d7c9f5797fc00b28363623e53",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "6064a7ade32eeec368b0aba49ebf0cb6deb97aa7c198eb122293842d499ab387",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    },
+    {
+      "sha256": "fa8891775f0e27feec7bb4794e22e07a2abf75e80b83047af348ee858034b597",
+      "occurrences": 1,
+      "feature": "household_roster",
+      "country": null,
+      "phase": "2-kwargs",
+      "check": "runtime_warning",
+      "status": "warn"
+    }
+  ],
+  "no_finding_normalization": true
+}

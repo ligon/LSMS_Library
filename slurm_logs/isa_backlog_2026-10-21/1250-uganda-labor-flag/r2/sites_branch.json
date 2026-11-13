@@ -1,0 +1,46 @@
+{
+ "shape": [
+  164777,
+  2
+ ],
+ "site_B_null_read": [],
+ "site_Q_quantity": [],
+ "site_I_null_index": [
+  {
+   "site": "built-table-index",
+   "country": "Uganda",
+   "table": "plot_labor",
+   "rows": 164777,
+   "findings": [
+    {
+     "level": "plot_id",
+     "n_nan": 95,
+     "waves": {
+      "2009-10": 85,
+      "2011-12": 5,
+      "2013-14": 5
+     }
+    },
+    {
+     "level": "v",
+     "n_nan": 1218,
+     "waves": {
+      "2009-10": 76,
+      "2011-12": 638,
+      "2015-16": 419,
+      "2018-19": 82,
+      "2019-20": 3
+     }
+    }
+   ]
+  }
+ ],
+ "warning_classes": [
+  "ClusterIdentityWarning",
+  "NullIndexKeyWarning"
+ ],
+ "warnings": [
+  "ClusterIdentityWarning: Uganda/plot_labor: `v` is not a comparable cluster id across 4 wave boundary(ies) in this frame (waves 2009-10 .. 2019-20):\n  2009-10 -> 2010-11: cluster_id_continuity=mixed (household_continuity=panel; derived-from-data: MEASURED, not docu",
+  "NullIndexKeyWarning: Uganda/plot_labor: declared index level(s) carried NaN key(s): level 'plot_id' (wave(s) ['2009-10', '2011-12', '2013-14'] with 95 NaN row(s)); level 'v' (wave(s) ['2009-10', '2011-12', '2015-16', '2018-19', '2019-20'] with 1,218 NaN row(s))"
+ ]
+}

@@ -1,0 +1,56 @@
+{
+  "status": "EXACT_EIGHT_CURRENT_SAFE_AGGREGATE_EXPORTS_V2",
+  "entries": [
+    {
+      "path": "PRIVACY.json",
+      "sha256": "70ccdfb14ad4133b7128dd63111acdc7e4eaf202429763585252d78c25d9ef61",
+      "bytes": 695,
+      "mode": 384
+    },
+    {
+      "path": "QUALIFICATIONS.json",
+      "sha256": "9d47cf83713958b4c4e819edaee2a1f06fa6ba0cd6a39ec6b897060d170c1d3a",
+      "bytes": 2952,
+      "mode": 384
+    },
+    {
+      "path": "REPRODUCE.txt",
+      "sha256": "fd4bc289ecba6d14f3c95336e29cc41266d828183eacf2ebf1f818b9f8a1f6ce",
+      "bytes": 1285,
+      "mode": 384
+    },
+    {
+      "path": "RESULTS.json",
+      "sha256": "f1d39c87904bb60b7c59dac584875ec06b53e7dc1dd0a150a3a38112e4491e82",
+      "bytes": 1067,
+      "mode": 384
+    },
+    {
+      "path": "REVIEW.md",
+      "sha256": "e17638517f5cc370c29fc8775464de99a5e43c174ea82b14018381640bbea33f",
+      "bytes": 2973,
+      "mode": 384
+    },
+    {
+      "path": "SCOPED-SCANNER.json",
+      "sha256": "2d986402a82dd4d766babf9bfd61358002863261500150d6f890ccc175dafdc8",
+      "bytes": 857,
+      "mode": 384
+    },
+    {
+      "path": "SOURCE-PINS.json",
+      "sha256": "fd8a827a8db7c02b105ef2acef3f13c7a8a27872184c238f13b807f9098240c0",
+      "bytes": 672,
+      "mode": 384
+    },
+    {
+      "path": "VALIDATION.json",
+      "sha256": "94fa4b42de86b8765fee78b93529486799f568a0fca3ca24483e26add5432560",
+      "bytes": 1101,
+      "mode": 384
+    }
+  ],
+  "previous_allowlist_preserved_private_sha256": "66075f1121ed463c20d425deb12a33b5328160dc8cdc624e395de57ca99663f7",
+  "previous_directory": "safe-exports is preserved historical v1, not the current export selection",
+  "signed": "Sue (GPT-6)"
+}

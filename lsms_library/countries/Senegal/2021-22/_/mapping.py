@@ -4,7 +4,8 @@ import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
+    inputs_unit_weight as _inputs_unit_weight,
     inputs_last_purchase as _inputs_last_purchase,
 )
 
@@ -15,6 +16,21 @@ from lsms_library.ehcvm import (
 # and stamps the registry key on every purchased row.  See lsms_library/ehcvm.py
 # and Senegal/_/derivations.yml.
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Senegal')
+
+# GH #812.  `strata` is the documented stratum, region x milieu, as a label.  It
+# is a construction, so `sample` carries its registry key: see
+# lsms_library/ehcvm.py and Senegal/_/derivations.yml.
+from lsms_library.ehcvm import (  # noqa: E402
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
+)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Senegal')
+
+# GH #1452: `Quantity_kg` from the survey's own unit-weight table, national median;
+# which file and column, and why: lsms_library.ehcvm.NSU_TABLES.
 
 
 def inputs_food_acquired(wave):
@@ -28,8 +44,164 @@ def inputs_food_acquired(wave):
     return _inputs_last_purchase('Senegal', wave)
 
 
+def inputs_food_acquired_unit_weight(wave):
+    """The registry `inputs` callable of the unit-weight derivation (GH #1452)."""
+    return _inputs_unit_weight('Senegal', wave)
+
+
 def food_acquired(df):
-    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    df = _withhold_salt_per_capita_rows(df)   # marks the withheld records; see below
+    out = _food_acquired_with_unit_weights(
+        df, FOOD_ACQUIRED_DERIVATION, wave='2021-22')
+    return out[out.index.get_level_values('j') != _WITHHELD_J]
+
+
+# ---------------------------------------------------------------------------
+# Salt in kg at a fixed amount per person is not served (ruling @ligon
+# 2026-11-12, "Remove, registered")
+# ---------------------------------------------------------------------------
+#
+# 100 records of s07b_me_sen2021.dta, all product 139 (`Sel`) in kg, size-free,
+# have s07bq03a = 0.0199997 kg x a whole number of persons, and that number is the
+# household's `hhsize` (ehcvm_welfare_sen2021) on every one; 34% of the wave's 294
+# salt-in-kg records.  No other record of any product or unit meets that constant.
+# It reads as "0.02 kg a person" rounded, which is how the 2026-11-12 data check
+# reported it; no record equals 0.02 x hhsize.  No document explains them.  The
+# source records go, every row they become with them; a deletion, disclosed by
+# `Senegal::food_acquired::salt-per-capita-withheld` (`rows: 0`).
+#
+# The selector reads s07b alone (red team of 2026-11-12, F1): "a whole multiple of
+# the constant" picks the same 100 records as "the constant x hhsize" did, so the
+# build does not read the welfare file and cannot fail when it is unavailable.  The
+# welfare `hhsize` is read only by the `inputs` callable, as the evidence that each
+# multiple is the household's size.
+SALT_PER_CAPITA_KEY = 'Senegal::food_acquired::salt-per-capita-withheld'
+#: The fixed amount, kg per household member, as the file holds it.
+SALT_KG_PER_PERSON = 0.0199997
+#: The records' cell in s07b's own codes: product, consumption unit, size.
+_SALT_CELL = {'s07bq01': 139, 's07bq03b': 100, 's07bq03c': 0}
+#: How far ``s07bq03a / SALT_KG_PER_PERSON`` may sit from a whole number.  Measured
+#: on the released file (2026-11-12): the 100 selected records sit at most 3.6e-15
+#: from one, and the nearest of the other 194 positive salt-in-kg records 4.5e-5
+#: away; every tolerance from 1e-12 to 1e-5 selects the same 100.  A value typed on
+#: a 0.01 kg grid cannot come close below 600 kg: a whole multiple of 0.02 kg, j x
+#: 0.02, sits 1.5e-5 x j away (0.02 kg 1.5e-5, 0.1 kg 7.5e-5), and an odd multiple
+#: of 0.01 kg about 0.5 away.
+_SALT_TOLERANCE = 1e-9
+_SALT_SOURCE = 's07b_me_sen2021.dta'
+#: Read by :func:`inputs_salt_per_capita` only (evidence), never by the build.
+_SALT_HOUSEHOLD_SIZE = 'ehcvm_welfare_sen2021.dta'
+#: The withheld rows' `j` while the shared reshape runs; never served.
+_WITHHELD_J = '\x00withheld: salt per capita'
+
+
+class SaltPerCapitaJoinError(Exception):
+    """The wide frame or the household-size file is not what the rule reads.
+
+    Subclasses ``Exception``: a derived food table must not read it as a failed
+    build (GH #1546)."""
+
+
+def _salt_raw(wave='2021-22'):
+    """``s07b_me_sen2021.dta`` in its codes, every record, in file order."""
+    if wave != '2021-22':
+        raise ValueError(f'{SALT_PER_CAPITA_KEY} covers 2021-22 only, not {wave!r}')
+    from lsms_library.paths import countries_root
+    data = countries_root() / 'Senegal' / wave / 'Data'
+    return tools.get_dataframe(str(data / _SALT_SOURCE), convert_categoricals=False)
+
+
+def _household_size(raw, wave='2021-22'):
+    """The welfare file's ``hhsize`` for each record of ``raw``, by (grappe, menage).
+
+    Evidence for :func:`inputs_salt_per_capita`; the build never calls it."""
+    from lsms_library.paths import countries_root
+    data = countries_root() / 'Senegal' / wave / 'Data'
+    welfare = tools.get_dataframe(str(data / _SALT_HOUSEHOLD_SIZE), convert_categoricals=False)
+
+    def key(frame):
+        return pd.MultiIndex.from_arrays(
+            [pd.to_numeric(frame[c], errors='coerce') for c in ('grappe', 'menage')])
+
+    size = pd.Series(pd.to_numeric(welfare['hhsize'], errors='coerce').to_numpy(),
+                     index=key(welfare))
+    if size.index.duplicated().any():
+        raise SaltPerCapitaJoinError(f'{_SALT_HOUSEHOLD_SIZE} repeats a (grappe, menage)')
+    return size.reindex(key(raw)).to_numpy()
+
+
+def salt_per_capita_rows(raw):
+    """Boolean ndarray: salt in kg at a whole multiple of 0.0199997 kg.
+
+    ``raw`` is s07b in its codes (:func:`_salt_raw`).  A record is selected when it
+    is product 139 in kg, size-free, with ``s07bq03a`` positive and within
+    :data:`_SALT_TOLERANCE` of ``n x SALT_KG_PER_PERSON`` for a whole ``n >= 1``.
+    No household size is read: on the released file ``n`` is the welfare
+    ``hhsize`` on all 100 selected records (:func:`inputs_salt_per_capita`).
+    """
+    def col(name):
+        return pd.to_numeric(raw[name], errors='coerce').to_numpy(dtype=float)
+
+    q = col('s07bq03a')
+    with np.errstate(invalid='ignore', divide='ignore'):
+        multiple = q / SALT_KG_PER_PERSON
+        persons = np.round(multiple)
+        hit = (q > 0) & (persons >= 1) & (np.abs(multiple - persons) < _SALT_TOLERANCE)
+        for name, code in _SALT_CELL.items():
+            hit &= col(name) == code
+    return hit
+
+
+def _withhold_salt_per_capita_rows(df):
+    """The wide frame with the withheld records' ``j`` set to :data:`_WITHHELD_J`.
+
+    Marked, not dropped: the shared hook's unit-weight join reads the source by
+    position and refuses a frame that is not the file row for row.  Every row a
+    marked record becomes carries the mark, and :func:`food_acquired` drops them.
+    """
+    raw = _salt_raw()
+    served = pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
+    held = pd.to_numeric(raw['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    if len(raw) != len(df) or not np.array_equal(served, held, equal_nan=True):
+        raise SaltPerCapitaJoinError(
+            f'the wide food_acquired frame is not {_SALT_SOURCE} row for row')
+    hit = salt_per_capita_rows(raw)
+    if not hit.any():
+        return df
+    idx = df.index.to_frame(index=False)
+    j = idx['j'].astype(object).to_numpy(copy=True)
+    j[hit] = _WITHHELD_J
+    try:
+        idx['j'] = pd.array(j, dtype=idx['j'].dtype)
+    except (TypeError, ValueError):
+        idx['j'] = j
+    out = df.copy()
+    out.index = pd.MultiIndex.from_frame(idx)
+    return out
+
+
+def inputs_salt_per_capita(wave='2021-22'):
+    """The registry ``inputs`` callable: the withheld records at ``(t, i, j)``.
+
+    The file's own names and codes, indexed as the served table is
+    (:func:`inputs_food_acquired` supplies the index), with ``hhsize`` from the
+    welfare file beside them: the evidence that each record's whole multiple of
+    the constant is its household's size.  This callable reads the welfare file;
+    the build does not.
+    """
+    raw = _salt_raw(wave)
+    frame = _inputs_last_purchase('Senegal', wave)
+    held = pd.to_numeric(raw['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    keyed = pd.to_numeric(frame['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    if len(raw) != len(frame) or not np.array_equal(held, keyed, equal_nan=True):
+        raise SaltPerCapitaJoinError(f'the input frame is not {_SALT_SOURCE} row for row')
+    hit = salt_per_capita_rows(raw)
+    columns = ['vague', 's07bq01', 's07bq03a', 's07bq03b', 's07bq03c', 's07bq04',
+               's07bq05', 's07bq06', 's07bq07a', 's07bq07b', 's07bq07c', 's07bq08']
+    out = raw.loc[hit, columns].copy()
+    out['hhsize'] = _household_size(raw, wave)[hit]
+    out.index = frame.index[hit]
+    return out
 from collections import defaultdict
 
 def v(value):
@@ -176,6 +348,7 @@ def shocks(df):
         # In 2021-22, cope columns contain rank strings instead of binary indicators.
         # Collect (rank, label) pairs and sort by rank to get ordered coping strategies.
         ranked = []
+        unranked = []
         for c in cope_cols:
             num = int(c.replace('Cope', ''))
             val = row[c]
@@ -184,6 +357,20 @@ def shocks(df):
             rank = _STRATEGY_RANK.get(str(val))
             if rank is not None:
                 ranked.append((rank, COPING_LABELS.get(num, f'Strategy {num}')))
+            elif str(val) == 'Oui':
+                unranked.append(COPING_LABELS.get(num, f'Strategy {num}'))
+
+        # Code 25 (Autre strategie) alone carries the Oui/Non label set, so its
+        # rank is not in the file (GH #1556).  It takes the rank no other
+        # strategy holds: ranks are otherwise gapless, and Burkina, which keeps
+        # the raw rank, shows 25 always filling the next one.  The instrument
+        # allows three strategies, so a fourth falls off the three served slots
+        # below and is dropped (0 held rows).
+        held = {rank for rank, _ in ranked}
+        for label in unranked:
+            rank = min(set(range(1, len(held) + 2)) - held)
+            held.add(rank)
+            ranked.append((rank, label))
 
         ranked.sort(key=lambda x: x[0])
         found = [label for _, label in ranked]

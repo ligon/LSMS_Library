@@ -1,0 +1,96 @@
+{
+  "status": "AUTHOR_AMENDMENT_READY_FOR_INDEPENDENT_DELTA_REVIEW",
+  "source": {
+    "head": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+    "runtime": "21f5cb7f91152c5a86eba8cfd264dd24124b523a",
+    "base": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+    "branch": "fix/1149-staged-reacquisition-v2-20261022",
+    "clean_FS_published": true,
+    "only_ledger_descendant": true
+  },
+  "manifest_path": "/local/job40255479/control/isa-backlog-20261021/framework1149-amendment/final-private-manifest.json",
+  "manifest_entries": 1135,
+  "manifest_sha256": "2827642c84312b7a395b66c2634d0f9b5149e049af749b5a79b155ab881a930c",
+  "safe_exports": {
+    "proof.json": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-amendment/safe-exports/proof.json",
+      "mode": 384,
+      "mtime_ns": 1792656085990585922,
+      "bytes": 2815,
+      "inode": 11677436,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "dccb3779d80add5b742e9fffa661e8b7b522267425de5a487c175664244a9fd3"
+    },
+    "checker-sources.json": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-amendment/safe-exports/checker-sources.json",
+      "mode": 384,
+      "mtime_ns": 1792656085992585933,
+      "bytes": 7023,
+      "inode": 11677441,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "263750df59f5061f5373d1b01dde62651af1b5dd4c053f49e548c6c129c98d30"
+    },
+    "REPRODUCE.md": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-amendment/safe-exports/REPRODUCE.md",
+      "mode": 384,
+      "mtime_ns": 1792656085991585927,
+      "bytes": 1694,
+      "inode": 11677440,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "05f91bfb61614280219c8a02a4cf6f2cdd8edfb8dce133a3c873965c2d0d77a8"
+    },
+    "ALLOWLIST.json": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-amendment/safe-exports/ALLOWLIST.json",
+      "mode": 384,
+      "mtime_ns": 1792656085992585933,
+      "bytes": 247,
+      "inode": 11677442,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "85dc2c4d3e06cf5dabc61a4742e4d27283d7729af3d4d589158e08a529d6b9eb"
+    },
+    "validation.json": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-amendment/safe-exports/validation.json",
+      "mode": 384,
+      "mtime_ns": 1792656085991585927,
+      "bytes": 1284,
+      "inode": 11677437,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "59a0774aa619f82d1cbec1c363647a45cf7f3ab6da31de62e98edb7829921e1a"
+    },
+    "verdict.json": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-amendment/safe-exports/verdict.json",
+      "mode": 384,
+      "mtime_ns": 1792656085991585927,
+      "bytes": 1204,
+      "inode": 11677438,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "662f4d9e9ee7c06b4975b9349e83a324e61663f7e3674f37d49ab18d1927608f"
+    },
+    "REVIEW.org": {
+      "path": "/local/job40255479/control/isa-backlog-20261021/framework1149-amendment/safe-exports/REVIEW.org",
+      "mode": 384,
+      "mtime_ns": 1792656085991585927,
+      "bytes": 4053,
+      "inode": 11677439,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "659f014ee4f827e7a211622a86034eb8bcc55c0a34c249c79a0a508f2556ce32"
+    }
+  },
+  "zero_other_tagged_consumers": true,
+  "no_new_country_data_measurement_or_real_acquisition": true,
+  "old_verdicts_unchanged": true
+}

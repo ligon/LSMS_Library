@@ -46,6 +46,63 @@
 # summed to 0 by `_sale_block`) is served as 0.0 as before and carries NO
 # key: it is the survey's "did not sell", not a sale.
 
+Malawi::food_acquired::borrow-ihs5-factor:
+  waves: ['2024-25']
+  columns: [Quantity_kg]
+  rule: >-
+    Multiply each contributing native quantity by its released IHS5 2019 Factor,
+    joining region, native item code, full size-bearing unit code and informative
+    exact Otherunit text for code 23. Admit only item/unit meanings supported by
+    the two source dictionaries and the current questionnaire. Keep the existing
+    native Quantity, unit and Expenditure; do not borrow for already metric units,
+    except unit code 26 ('5 Litre Bucket(Chigoba)'), a volume container whose
+    label states a capacity rather than a mass and which borrows like any other
+    native unit, as 2019-20 serves it (PR #1604 review F1).
+    Sum via the existing canonical reducer only when every active retained
+    contributor has an observed quantity and supported factor, including
+    expenditure-only rows with unknown quantity. Otherwise Quantity_kg
+    remains missing and the existing conversion ladder handles the residual.
+  function: lsms_library.countries.Malawi.2024-25._.food_borrowing:derive_borrowed_food
+  inputs: lsms_library.countries.Malawi.2024-25._.food_borrowing:inputs_borrowed_food
+  raw_variables:
+    - case_id / y5_hhid, hh_g02
+    - hh_g03a, hh_g03b, hh_g03b_label, hh_g03b_oth
+    - hh_g04a, hh_g04b, hh_g04b_label, hh_g04b_oth, hh_g05
+    - hh_g06a, hh_g06b, hh_g06b_label, hh_g06b_oth
+    - hh_g07a, hh_g07b, hh_g07b_label, hh_g07b_oth
+    - cover.region
+    - ihs_foodconversion_factor_2020.region, item_code, unit_code, Otherunit, factor, source, item_name, unit_name
+  assumptions:
+    - text: >-
+        The applicable IHS5 released factor is transportable to a compatible
+        2024-25 native item/unit/region. This is cross-wave borrowing, not a new
+        measurement. Replace it when an appropriate newer source is available.
+      basis: modelling-choice
+      evidence: 'Maintainer 2026-11-07 item 49: "yes, borrow"; source 2019-20, MD5 dc1bed57a31e20232d04bd1ac5bb0f01.'
+    - text: >-
+        Matching numeric codes must retain their item/unit meanings; only
+        case/whitespace and nonnumeric punctuation differences are ignored.
+        Numeric fractions, decimals, ranges and Unicode numeric fractions retain
+        their literal meaning; no numeric aliases are inferred. Otherunit text is
+        matched without synonym inference. The factor source includes field,
+        imputed, calculated-standard and sparse-field origins, retained in inputs.
+      basis: variable-label
+      evidence: 'IHS5/current Module G dictionaries, current household questionnaire PDF p49 and the complete IHS5 source table. Item119 yellow flour versus Grain Meal, unit74 Tin1Kg versus Bundle, new120 versus835 Popcorn, undocumented size codes and broadened items are refused.'
+  validated_against: >-
+    Invented full-key/ambiguity/metric/completeness controls
+    (tests/test_malawi_food_borrowing.py). Source-backed: private cold build at
+    c964c6c4f (job 41005535) rederived all 169,995 public inputs with native
+    quantity/expenditure/units and older-wave Quantity_kg exact; private cold
+    base-vs-candidate builds on development e5fdd2fa8 (jobs 41232294/41232295,
+    2026-11-12) reproduce 169,995 borrowed rows with every pre-2024 wave
+    unchanged. After unit code 26 was admitted (PR #1604 review F1), a private
+    cold build at 1ca84789a (job 41240388) serves 174,026 borrowed rows;
+    derivation_inputs joins them one-to-one and rederives all 174,026, the
+    4,031 bucket rows included. No external accuracy check of the borrowed
+    factors.
+  contents: 'Malawi/_/CONTENTS.org, 2026-11-07 food follow-ups 49/50'
+  since: '2026-11-07'
+
 Malawi::crop_production::sale-basis-unknown-wildcard:
   waves: ['2010-11', '2013-14', '2016-17', '2019-20']
   columns: [Quantity_sold, Value_sold]
@@ -65,6 +122,7 @@ Malawi::crop_production::sale-basis-unknown-wildcard:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         Module Q asks no shelled/unshelled question before 2016-17, and
@@ -125,6 +183,7 @@ Malawi::crop_production::sale-basis-from-price:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         a shelled unit of a crop sells at a premium over an unshelled unit
@@ -229,6 +288,7 @@ Malawi::crop_production::sale-basis-from-price-overrule:
     - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth'
   assumptions:
     - text: >-
         a recorded S/U answer on the sale side, against a harvest row that
@@ -284,6 +344,7 @@ Malawi::crop_production::sale-basis-not-applicable:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         the instrument scopes shelled/unshelled to "ALL APPLICABLE CROPS"
@@ -346,6 +407,7 @@ Malawi::crop_production::sale-basis-no-reference:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         the instrument scopes shelled/unshelled to "ALL APPLICABLE CROPS"
@@ -408,6 +470,7 @@ Malawi::crop_production::contradiction-price-sale:
     - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth'
   assumptions:
     - text: >-
         where two recorded answers disagree, a price that sits
@@ -448,6 +511,7 @@ Malawi::crop_production::contradiction-price-harvest:
     - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth'
   assumptions:
     - text: as contradiction-price-sale; the two keys exist so that the direction is countable (217 vs 102 in the probe).
       basis: modelling-choice
@@ -462,10 +526,13 @@ Malawi::crop_production::contradiction-price-harvest:
 Malawi::crop_production::sale-basis-unresolved:
   waves: ['2010-11', '2013-14', '2016-17', '2019-20']
   columns: [Quantity_sold, Value_sold]
-  rows: 0
   rule: >-
-    A DELETION.  A sale with a candidate harvest row (single-plot crop, same
-    unit) that no rung admits is attached to nothing, and is COUNTED in
+    A REFUSAL.  Until GH #1457 a deletion; the sale is now served on its own
+    plot_id = 'Farm-level' row with its own unit and state, carrying this key.
+    Farm-level alone does not distinguish refusal from the other causes.
+    A sale with a candidate harvest row
+    (single-plot crop, same unit) that no rung admits is attached to no harvest
+    row, and is COUNTED in
     attrs['sale_basis_mismatch'] and in the SaleAttachmentWarning the build
     emits, on one of three grounds, each counted in
     attrs['sale_basis_ladder'][this key]['grounds']: (1) a contradiction
@@ -481,8 +548,9 @@ Malawi::crop_production::sale-basis-unresolved:
     an exact match already claimed (`claimed_by_tier_a`).  Ambiguous
     pairings (more than one compatible row or sale) are a separate count,
     attrs['sale_suppressed'] (GH #854), not this entry.
-    The dropped rows have nowhere to carry a key; `derivation_inputs`
-    returns them.
+    `derivation_inputs` retains the refused lines and adds the served crop and
+    production_obs where a Farm-level row exists. Refused non-sales remain
+    retrievable without a served observation coordinate.
   function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
   inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_unresolved
   raw_variables:
@@ -490,16 +558,17 @@ Malawi::crop_production::sale-basis-unresolved:
     - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
     - ag_mod_g.ag_g0d / ag_g0b / crop_code, ag_g13a, ag_g13b, ag_g13c
     - ag_mod_p.ag_p0d / ag_p0c / crop_code, ag_p09a, ag_p09b
+    - 'unit specify text, 2016-17+ (GH #856, a 13 OTHER (SPECIFY) unit restating 90 KG BAG / BASKET (DENGU) is served code 3 / 11) -- ag_mod_i.ag_i02b_oth, ag_mod_q.ag_q02b_oth, ag_mod_g.ag_g13b_oth, ag_mod_p.ag_p09b_oth'
   assumptions:
     - text: >-
         a sale that cannot be expressed at the row's declared grain (t, i,
-        plot_id, crop, u, condition) is not attached: attaching it on the
+        plot_id, crop, u, condition) is not attached to it: attaching it on the
         wrong basis makes Value_sold / Quantity_sold a price per the OTHER
         basis, which the condition-keyed kg factors then convert with the
-        wrong factor (GH #833).  Not lost data: the raw modules and
-        `_sale_block` still hold the household-crop total.
+        wrong factor (GH #833).  It has a row of its own since GH #1457, whose
+        Unit_sold and Condition_sold state the sale's basis.
       basis: modelling-choice
-      evidence: GH #833 (CONTENTS.org, "The rule"); README.org section 5.
+      evidence: GH #833 (CONTENTS.org, "The rule"); README.org section 5; GH #1457.
   validated_against: >-
     The build's own suppression predicate: `derivation_inputs` returns
     exactly the Module I/Q lines whose grouped sale has outcome
@@ -513,3 +582,216 @@ Malawi::crop_production::sale-basis-unresolved:
     harvest-side / 550,400 MWK); claimed by tier A 0.  See CONTENTS.org.
   contents: Malawi/_/CONTENTS.org, "the sale-basis LADDER"
   since: '2026-09-24'
+
+# User selected R1 on 2026-11-10; retained implementation cd76e550f (GH #1457).
+Malawi::crop_production::sale-other-unit-single-row:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity_sold, Value_sold, Unit_sold, Condition_sold]
+  rule: >-
+    Module I / Q records a sale per household and crop code in its own unit. A sale with
+    a nonmissing reported unit and no harvest row in that unit goes on the household-crop's
+    ONE harvest row where the row names a plot, its state is compatible (equal, or either unknown) and the row holds no
+    other record, and that row carries this key.  Quantity_sold is in Unit_sold, not u.  What
+    is derived is the ATTACHMENT, not the numbers.  A sale on another basis, or of a crop on
+    two or more rows, or that a second sale competes for the row with, goes to Farm-level.
+    An actual missing sale-unit label stays NA on Farm-level: it is not a reported different
+    unit and moving it would enable the existing harvest-unit fallback. Nonmissing Other,
+    unconvertible and explicit Unknown labels remain eligible; no kg factor is required.
+  function: lsms_library.countries.Malawi._.malawi:derive_other_unit_sale
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_other_unit_single_row
+  raw_variables:
+    - ag_mod_i.ag_i0b / crop_code, ag_i01, ag_i02a, ag_i02b, ag_i02c, ag_i03
+    - ag_mod_q.ag_q0b / crop_code, ag_q01, ag_q02a, ag_q02b, ag_q02c (2016-17+), ag_q03
+    - ag_mod_g.ag_g13b, ag_g13c; ag_mod_p.ag_p09b
+  assumptions:
+    - text: >-
+        Unit_sold is the sale's denominator, so a sale in another unit can sit on the row: the
+        canonical note says both shapes are correct, and #824's "cannot be expressed at the
+        grain" predates Unit_sold.  Historically measured by the #1457 review (not remeasured here): on 2,106 other-unit sales
+        with both units convertible, the sold unit is closer to the same-unit price on 90.4%
+        (median |log| 0.357 against 3.792), so Uganda's 40.5% caveat does not carry over.
+      basis: modelling-choice
+      evidence: >-
+        User approval of R1 on 2026-11-10, following the historical #1457 own-unit review; the
+        ruling of 2026-10-23 on GH #824.
+    - text: >-
+        a sale on another basis stays off the row, per GH #833: 975 records (21,897,879 MWK)
+        contradict shelled against unshelled, and 101 (11,142,265 MWK) are not-applicable against
+        either in that historical review; those counts were not remeasured here,
+        and a price cannot decide across units.
+      basis: modelling-choice
+      evidence: GH #833, Malawi/_/CONTENTS.org, "The rule".
+  validated_against: >-
+    tests/test_gh1457_malawi_farm_level_sales.py; value equals the raw modules in all four waves.
+  contents: 'Malawi/_/CONTENTS.org, "2026-11-04 -- sales no harvest row holds: Farm-level (GH #1457)"'
+  since: '2026-11-10'
+
+# GH #827 (2026-10-23).  community_prices: the Module CK form strikes out the
+# NUMBER OF UNITS and UNIT CODES cells on 17 items whose text names the unit.
+# The unit is supplied by malawi._CK_ITEM_FIXED_UNIT (an index value, so it is
+# visible in the frame and exempt from the registry); the COUNT is invisible
+# -- a 1 that no row records -- so it is registered here.  Ruling (@ligon,
+# 2026-10-23, PR #1239): "on struck-unit items, NumberOfUnits = 1 as a
+# registered derivation, consistent with Niger D2.  The form prices one unit
+# of the named item."  Precedent: Niger::community_prices::one-item-per-price.
+# Round 2 (@ligon, 2026-10-23): EXCLUDE cigarettes (CK33) -- bimodal prices.
+
+Malawi::community_prices::struck-item-one-unit:
+  waves: ['2010-11', '2013-14', '2019-20']
+  columns: [NumberOfUnits]
+  rule: >-
+    NumberOfUnits = 1 on a served community_prices row of one of the 17
+    Module CK items whose NUMBER OF UNITS and UNIT CODES cells the form
+    strikes out -- CK3, CK4, CK30-CK35, CK42, CK44-CK51 (2013-14's list
+    lacks CK51) -- when the row records a price (not NA; a recorded 0
+    counts) and no count.  EXCLUDED: CK33 "Cigarettes, Embassy (packet)"
+    (malawi._CK_ONE_UNIT_EXCLUDED; ruling @ligon 2026-10-23).  Its prices
+    are bimodal -- about 541 of its 1,599 priced rows sit at
+    single-cigarette prices -- so a 1 would assert "one packet" on about a
+    third of the rows the data say were priced per stick; its
+    NumberOfUnits stays NA, with no key, and its `u` stays `Packet` (the
+    printed text).  So 16 items carry the key.  The count is in the row's
+    own `u`, the unit the item text fixes (malawi._CK_ITEM_FIXED_UNIT: 50
+    kg Bag, Bottle, 50 kg per Kilometre, Day, Piece).  A recorded count is never
+    overwritten (none exists on these items in any held file); a row with
+    no price gets no count, because a count says what a price refers to and
+    there is no price for it to qualify; items whose unit IS asked are
+    untouched.  Price is served as recorded; nothing is divided, rescaled
+    or converted.  Stamped after the (t, v, j, u) collapse in
+    malawi.assemble_community_prices.
+  function: lsms_library.countries.Malawi._.malawi:derive_ck_struck_one_unit
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_community_prices_struck_one_unit
+  raw_variables:
+    - 2010-11 Full_Sample/Community/com_ck and 2013-14 COM_MOD_K_13 -- ea_id, com_ck00a (item; 'CK<n>' in 2013-14), com_ck00c (available), com_ck00b1 (price, MK), com_ck00b2 (number of units), com_ck00b3 (unit code)
+    - 2019-20 Cross_Sectional/com_ck and Panel/com_ck_19 -- ea_id, com_ck00a (item), cka (available), ckb (price, MK), ckc (number of units), ckd (unit code)
+  assumptions:
+    - text: >-
+        the price recorded for a struck item is the price of ONE unit of the
+        named item.  The form asks "What is the price for the item?" under
+        MK | NUMBER OF UNITS | UNIT CODES and draws a diagonal line through
+        NUMBER OF UNITS and UNIT CODES on these 17 items, whose printed text
+        names the unit: "Cost to grind 50 kg bag of maize" / "... rice",
+        "Coca-Cola, Fanta (bottle)", "Carlsberg beer (bottle)", "Cigarettes,
+        Embassy (packet)", "Motorized transport of crop output (per 50kg per
+        kilometer)", "Ganyu wage, 1 day, adult male".  The count is not asked
+        because the item fixes it.  (The cigarette item names a unit too,
+        but is excluded by the rule: its recorded prices contradict it.)
+      basis: questionnaire
+      evidence: >-
+        IHS3 Community questionnaire p. 20, "SECTION CK: PRICES"
+        (2010-11/Documentation/IHS3.Community.Qx.FINAL.pdf); IHPS Market
+        questionnaire p. 12, "MODULE E: PRICES"
+        (2013-14/Documentation/IHPS.Market.Questionnaire.FINAL.PRINT.pdf);
+        IHS5 Community questionnaire p. 20, "MODULE CK: PRICES".  Ruling
+        @ligon 2026-10-23 on PR #1239.  0 of the 28,631 served struck-item
+        rows record a count or a unit code.
+    - text: >-
+        for the ten count goods whose text names no unit (CK30 trousers,
+        CK34 battery, CK35 watch, CK44 hand hoe, CK45 panga, CK46 sickle,
+        CK47 axe, CK48 bicycle, CK49 foam mattress, CK50 mosquito net;
+        "single" on CK49 / CK50 is a bed size) the one unit is one item,
+        served in `u = Piece`.  The struck count cell and the singular item
+        name are the only evidence; no printed text says "per piece".
+      basis: modelling-choice
+      evidence: >-
+        Malawi/_/CONTENTS.org, "the 38,506 unit-less rows" (the Piece
+        inference, accepted @ligon 2026-10-23 on PR #1239).
+    - text: >-
+        every recorded price on the 16 keyed items is taken to be per one
+        unit of the item as printed, including six 2019-20 Cross_Sectional
+        mosquito-net rows that record a price of 0 MK: they are served
+        NumberOfUnits = 1 like the rest and are not dropped or reversed.
+        The one item whose data contradict the reading -- CK33 cigarettes,
+        bimodal between packet and single-stick prices -- is EXCLUDED by
+        the rule (ruling @ligon 2026-10-23), not served as recorded.
+      basis: modelling-choice
+      evidence: >-
+        Malawi/_/CONTENTS.org, "the 38,506 unit-less rows" (cigarettes);
+        slurm_logs/isa_backlog_2026-10-21/827-malawi-community-units/results/r3_oracle.json
+        (zero prices, cigarette counts).
+  validated_against: >-
+    the instrument only.  No held file records a count on these items, so
+    the one-unit reading cannot be checked against data; the cigarette
+    price bimodality is the one piece of data that cuts against it, and
+    that item is excluded.  Raw oracle (cold build, 2026-10-23): the struck
+    items' rows with a recorded price and an empty count are 21,641, of
+    which 1,599 are CK33 cigarettes; the other 20,042 (2010-11 9,037;
+    2013-14 2,009; 2019-20 8,996) are exactly the rows that carry the key.
+  contents: 'Malawi/_/CONTENTS.org, "the 38,506 unit-less rows: why, and what is served (GH #827)"'
+  since: '2026-10-23'
+
+# GH #1174 (approved by the maintainer on 2026-11-05).  plot_inputs: a Module G line with no
+# seed answer has no payload, so _finalize_result's dropna(how='all') removes it.  Whether
+# such a line is "seed not used" or "amount unknown" is not settled by the instrument, so
+# nothing is served for it and the loss is registered here.
+Malawi::plot_inputs::seed-line-no-payload:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity, Quantity_purchased, Unit_purchased, Purchased, Improved, Applied, Quantity_received_as_gift, Unit_received_as_gift, Received_as_gift]
+  rows: 0
+  rule: >-
+    A DELETION.  A Module G line with no planted amount (ag_g04a), no Improved answer
+    (ag_g0f, 2016-17 on) and no purchase or free-seed answer attached to it reaches the
+    wave and var/ parquets with no payload, and _finalize_result's dropna(how='all') stops
+    serving it.  No 0 is minted.  A unit alone (ag_g04b, 2 lines in 2010-11) is not a
+    payload, because u is an index level.  The dropped lines have nowhere to carry a key;
+    derivation_inputs returns them.
+  function: lsms_library.countries.Malawi._.malawi:derive_seed_line_no_payload
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_seed_line_no_payload
+  raw_variables:
+    - ag_mod_g.ag_g04a, ag_g04b, ag_g0f (2016-17+) (the seed answers, all blank here but for the 2 units)
+    - ag_mod_g crop and plot keys (blank on 1,018 of the lines)
+    - ag_mod_h.ag_h07a, ag_h16a, ag_h26a, ag_h38a (no attached purchase or free seed)
+  assumptions:
+    - text: >-
+        a line with no seed answer follows the framework's rule for a row with no payload,
+        rather than being served as "seed not used".  The instrument does not settle which
+        it is, and 1,018 of the 1,355 lines name no crop at all, so they are empty roster
+        lines and not seed questions.  Of the 337 that name a crop, 198 report a harvest
+        amount (188 in 2010-11), which reads more like an unrecorded amount.
+      basis: modelling-choice
+      evidence: >-
+        GH #1174; Malawi/_/CONTENTS.org, "The seed half, counted".
+  validated_against: >-
+    An independent read of all six Module G files, matching each served Seed row to its
+    line by position (input_obs), finds the same lines the callable returns: 1,355
+    (459 / 185 / 672 / 39 by wave, cold build of 74e60f713), none with a planted amount.
+  contents: 'Malawi/_/CONTENTS.org, "The seed half, counted"'
+  since: '2026-11-05'
+
+# Issue 1174: the nonseed residual of the same existing all-payload-NA gate.
+Malawi::plot_inputs::nonseed-group-no-payload:
+  waves: ['2010-11']
+  columns: [Quantity, Quantity_purchased, Unit_purchased, Purchased, Improved, Applied, Quantity_received_as_gift, Unit_received_as_gift, Received_as_gift]
+  rows: 0
+  rule: >-
+    A DELETION. A 2010-11 Module D nonseed group whose entire assembled payload
+    is missing is removed by the existing _finalize_result dropna(how='all').
+    The current source has one DAP Fertilizer group with no ag_d38 answer and
+    no enumerator-total quantity. A unit is an index level, not payload.
+    A recorded zero, False, or any other payload prevents this deletion.
+    No use answer is inferred and no native amount replaces a blank total.
+    The dropped group has nowhere to carry a key; derivation_inputs returns
+    every contributing original Module D line, once per source-release row.
+  function: lsms_library.countries.Malawi.2010-11._.mapping:derive_nonseed_group_no_payload
+  inputs: lsms_library.countries.Malawi.2010-11._.mapping:inputs_nonseed_group_no_payload
+  raw_variables:
+    - ag_mod_d.case_id, ag_d00 (household and plot keys)
+    - ag_mod_d.ag_d38, ag_d39a, ag_d39d, ag_d39f, ag_d39i (use, types and selected enumerator-total kg)
+    - ag_mod_d.ag_d39b, ag_d39c, ag_d39g, ag_d39h (separate native amounts/units, retained without substitution)
+    - ag_mod_d.ag_d36, ag_d37a, ag_d37b, ag_d40, ag_d41a, ag_d41b, ag_d41c, ag_d41d, ag_d41e, ag_d41f (other Module D blocks)
+  assumptions:
+    - text: >-
+        Preserve the existing all-payload-NA exclusion without interpreting
+        missing use as No or as an affirmative use. This is disclosure of an
+        existing deletion, not a new source-eligibility or quantity rule.
+      basis: modelling-choice
+      evidence: >-
+        Issue 1174 narrowed 2026-11-05; merged PR 1422; Malawi CONTENTS.org,
+        "Module D use answers; a missing amount is not 0".
+  validated_against: >-
+    Current-base sanctioned Module D census: 19,265 source lines, one deleted
+    DAP group contributed by one raw line, with Quantity and Applied missing.
+    Source MD5 d143b71ea7c7f4efcac3b9afa0d6be48. Full API conservation and raw
+    replay are recorded in the task ledger and source validation receipts.
+  contents: 'Malawi/_/CONTENTS.org, "Nonseed deletion provenance"'
+  since: '2026-11-07'

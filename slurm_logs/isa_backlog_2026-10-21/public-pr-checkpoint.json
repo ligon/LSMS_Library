@@ -1,0 +1,126 @@
+{
+  "checked_at_UTC": "2026-10-21T20:36:00Z",
+  "policy": "Read-only checkpoint; no public merge or PR-base change",
+  "pull_requests": [
+    {
+      "number": 1172,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1172",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1173,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1173",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1175,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1175",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1176,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1176",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1178,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1178",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "base": "fix/1034-nigeria-w3-unit-labels-20261021",
+      "base_sha": "3e658298753db4f2934ea1b703415a1bdfa9f6af"
+    },
+    {
+      "number": 1180,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1180",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1181,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1181",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1182,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1182",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1185,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1185",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1186,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1186",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "6e97eaeb488096459d673486c127043f016c4f8d",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1189,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1189",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    },
+    {
+      "number": 1191,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1191",
+      "state": "open",
+      "merged": false,
+      "mergeable": true,
+      "head_sha": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33"
+    }
+  ]
+}

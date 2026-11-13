@@ -11,18 +11,23 @@ not the H04/H05 months-of-shortage battery introduced in IHS3.
 """
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 
 
-WAVES = ['2010-11', '2013-14', '2016-17', '2019-20']
+country = Country('Malawi')
+assert 'months_food_inadequate' in country.data_scheme, "months_food_inadequate: not declared for Malawi"
 
 pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/months_food_inadequate.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
+# Reuse actual table discovery, including native scripts and YAML declarations.
+# Ledger: malawi-compiler-declarations-20261028.md §§2–5.
+for t in country.waves:
+    wave = country[t]
+    if 'months_food_inadequate' not in wave.data_scheme:
         continue
+    fn = f'../{wave.wave_folder}/_/months_food_inadequate.parquet'
+    # A declared output that cannot be read is a failed build, not absence.
+    df = get_dataframe(fn)
     pieces.append(df)
 
 assert pieces, "months_food_inadequate: no wave-level parquets found"

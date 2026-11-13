@@ -1,0 +1,16 @@
+{
+  "status": "ARCHIVE1_SAVED_MALI_PUBLIC_ASSERTIONS_REASSESSED",
+  "PR": 1186,
+  "authorized_saved_products": 12,
+  "actual_original_public_pairs": 12,
+  "full_strict_passes": 12,
+  "full_strict_failures": 0,
+  "original_rename_projection_authenticated": true,
+  "original_Country_and_Feature_counts_and_Country_keys_and_Mali_totals_pass": true,
+  "native_labor_demographic_cache_test_memory_gaps_preserved": true,
+  "archive_content_SHA_bytes_mode_only_historical_authority": true,
+  "historical_exact_mtime_inode_nlink_continuity_not_claimed": true,
+  "no_original_source_API_Feature_test_Make_cache_replay": true,
+  "old_hold_packets_unchanged": true,
+  "signed": "Sue"
+}

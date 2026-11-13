@@ -104,6 +104,7 @@ Data Scheme:
     AffectedAssets: bool
     AffectedProduction: bool
     AffectedConsumption: bool
+    AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
@@ -113,9 +114,8 @@ Data Scheme:
     # module s16a (GH #167; copied from the Mali EHCVM reference, PR
     # #284).  EHCVM waves only: 2018-19 and 2021-22.  The pre-EHCVM 2014
     # EMC wave uses a different instrument and is out of scope.
-    # plot_id = "{field_no}_{parcel_no}".  Latitude / Longitude are NOT
-    # emitted — EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is
-    # an area, not a coordinate); deferred as in Uganda.
+    # plot_id = "{field_no}_{parcel_no}". 2021-22 records parcel coordinates
+    # in s16aq46; 2018-19 has none. s16aq47 is area, not a coordinate.
     index: (t, i, plot_id)
     Area: float
     AreaUnit: str
@@ -123,6 +123,8 @@ Data Scheme:
     TenureSystem: str
     SoilType: str
     Irrigated: bool
+    Latitude: {type: float, optional: true}
+    Longitude: {type: float, optional: true}
     materialize: make
 
   food_security:
@@ -192,8 +194,8 @@ Data Scheme:
     # self-contained from Niger).  One row per REPORTED (field, parcel,
     # crop) harvest line — REPORTED values only (harvest_kg / yield /
     # main_crop are transformations, never columns).  2018-19 only: s16c
-    # records harvest qty+unit (s16cq12a/b), sold qty (s16cq16a), sale
-    # value (s16cq17) and the intercrop flag (s16cq07) at this plot-crop
+    # records harvest qty+unit (s16cq12a/b), sold qty+unit (s16cq16a/b),
+    # sale value (s16cq17) and the intercrop flag (s16cq07) at this plot-crop
     # grain.  crop joins food via harmonize_food Preferred Labels; u via
     # the u table; unmapped labels pass through unchanged.  u is in the
     # index because one (plot, crop) can be reported in several units.
@@ -202,14 +204,50 @@ Data Scheme:
     # 2-digit menage) reconciling 100% with sample().  harvest_month NA
     # (no planting/harvest-date question in s16c); intercropped from
     # s16cq07.
-    index: (t, i, plot_id, crop, u)
+    #
+    # condition (GH #1436) is "Etat du produit", s16cq12c, the state of the crop
+    # when the harvest Quantity was measured, read by code through
+    # harmonize_crop_condition_ehcvm1 in categorical_mapping.org.  The instrument
+    # asks the form and never the dryness, so the values are the BARE FORM tokens
+    # `shelled` / `unshelled` / `shell_not_applicable`, plus `unknown_condition`
+    # for a blank code.  Five answers fold onto those tokens (ruled @ligon
+    # 2026-11-04); condition_native below keeps what was answered.
+    index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
+    # THE SALE HAS ITS OWN UNIT (GH #824; Niger 2018-19 precedent).  `u` is
+    # the HARVEST unit (s16cq12b); s16cq16b records the unit of the sold
+    # quantity s16cq16a on the same plot-crop line, on the same 7 labels, and
+    # is carried here as the per-row column Unit_sold, canonicalised at build
+    # time through the same `u` table.  It differs from `u` on 546 of the
+    # 5,347 priced rows (Quantity_sold > 0 and Value_sold > 0).  Where the two
+    # disagree the row is a data-quality FLAG, not an identification
+    # (canonical data_info.yml, Unit_sold note): exclude or resolve, and
+    # report the count.  NA-bearing, never sentinel-filled -- NA means "no
+    # sale, or no sold unit recorded".  `optional` because a row with no sale
+    # has no sold unit.
+    Unit_sold:
+      type: str
+      optional: true
     harvest_month:
       type: float
       optional: true
     intercropped: bool
+    # condition_native (GH #1436, ruling @ligon 2026-11-04) is the state label as
+    # recorded (s16cq12c), the answer the `condition` fold cannot show.  `optional`
+    # because a blank state is NA, never a sentinel.
+    condition_native:
+      type: str
+      optional: true
+    # Sold-side own answer, separate from harvest condition (GH1528).
+    Condition_sold:
+      type: str
+      optional: true
+    condition_sold_native:
+      type: str
+      optional: true
+
     materialize: make
 
   plot_inputs:
@@ -218,22 +256,85 @@ Data Scheme:
     # applied: input identity (Seed / Urea / DAP / NPK / Phosphate / Mixed
     # fertilizer / Organic manure / Organic compost / Pesticide / Herbicide
     # / Fungicide / Other phytosanitary), reported quantity used + native
-    # unit, purchased flag + reported purchased quantity, and (seed rows)
+    # unit, purchase/gift flags + quantities with their OWN unit columns,
+    # and (seed rows)
     # the seed's crop on the shared harmonize_food labels.  REPORTED values
-    # only.  Source s16b (2018-19) records inputs at the HOUSEHOLD x input
-    # grain, NOT plot x input (no parcel-level input data); the GAP-2 name
-    # `plot_inputs` is kept but `plot_id` is NOT in the index.  input ->
+    # only. Own s16b in 2018-19 and the newly wired2021-22 records HOUSEHOLD x input
+    # grain, NOT plot x input: s16b has no parcel column.  The separate
+    # s16a parcel module does ask fertilizer quantities and their units
+    # (e.g. s16aq29c1/c2 for NPK); it is not read by this builder.  Its
+    # integration is held in GH #1483; see CONTENTS.org's dated entry.
+    # The GAP-2 name `plot_inputs` is kept but `plot_id` is NOT in the index.  input ->
     # harmonize_input; u -> the u table; the EHCVM roster has no crop
     # column so seed crop is resolved from the seed label via
     # harmonize_seed_crop.  Non-crop-specific rows carry the sentinel
     # '(not crop-specific)' and a missing unit carries 'Manquant' — a NaN
     # index level would be dropped by the framework's canonical NaN-key
-    # de-dup collapse.  i via burkina_faso.ehcvm_i (100% sample reconcile).
+    # de-dup collapse. 2018 i uses burkina_faso.ehcvm_i; own2021 uses
+    # burkina_faso.i before the framework walk; no new sample reconcile is claimed.
     # ENCODING: s16b read default (utf-8) so accented labels match the maps.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    # q08/q09a/b describe purchases; q05/q07a/b describe gifts/donations.
+    # Missing acquisition fields stay missing.  u describes Quantity used;
+    # these optional unit columns do not imply a conversion to that unit.
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
+    # Own2021 retains its numeric codes/answers, including q09c Montant.
+    grappe:
+      type: int
+      optional: true
+    menage:
+      type: int
+      optional: true
+    vague:
+      type: int
+      optional: true
+    s16bq01:
+      type: int
+      optional: true
+    s16bq02:
+      type: int
+      optional: true
+    s16bq03a:
+      type: float
+      optional: true
+    s16bq03b:
+      type: int
+      optional: true
+    s16bq05:
+      type: int
+      optional: true
+    s16bq07a:
+      type: float
+      optional: true
+    s16bq07b:
+      type: int
+      optional: true
+    s16bq08:
+      type: int
+      optional: true
+    s16bq09a:
+      type: float
+      optional: true
+    s16bq09b:
+      type: int
+      optional: true
+    s16bq09c:
+      type: int
+      optional: true
     materialize: make
 
   livestock:
@@ -302,4 +403,19 @@ Data Scheme:
     wage_hrs: {type: float, optional: true}
     Industry: {type: str, optional: true}
     working_age: bool
+    materialize: make
+
+  community_prices:
+    #2018-19 PRICE instrument only; two FCFA quotes per selected native
+    # unit-size. No household i/sample join. variety is the CONSTRUCTED
+    # product+unit-code coordinate, not a reported physical variety.
+    # Quantity1 is a registered quoted-native-unit count, NOT measured
+    # physical quantity/mass; raw seven-field inputs remain retrievable.
+    index: (t, v, j, u, variety, visit, obs)
+    Price: float
+    Quantity: float
+    Description: {type: str, optional: true}
+    SourceProductCode: {type: str, optional: true}
+    SourceUnitCode: {type: str, optional: true}
+    SourceRow: {type: int, optional: true}
     materialize: make

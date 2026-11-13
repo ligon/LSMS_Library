@@ -1,0 +1,30 @@
+{
+  "agreement": true,
+  "all_framework_tracked_blobs_equal": true,
+  "all_other_country_python_blobs_equal": true,
+  "candidate_commit": "47b3c5d76371acc457c5553ebf8adfb1859e115b",
+  "classification": "actual-parent CONFIG control under byte-identical library framework code; not exact-parent pytest package identity",
+  "complete_package_changed_paths": [
+    "lsms_library/countries/Malawi/_/CONTENTS.org",
+    "lsms_library/countries/Malawi/_/Makefile",
+    "lsms_library/countries/Malawi/_/food_acquired.py"
+  ],
+  "config_and_make_checkout": "/local/job40255479/worktrees/isa-review-Malawi-1209-base",
+  "config_mechanism": "LSMS_COUNTRIES_ROOT (AGENTS GH436 config-only lever)",
+  "evidence": [
+    "parent-tests-private.log:37",
+    "parent-tests-private.log:169",
+    "parent-tests-private.log:172",
+    "parent-tests-private.log:187",
+    "parent-tests-start-private.json",
+    "parent-tests-terminal-private.json",
+    "run.sh"
+  ],
+  "framework_tracked_entries_compared": 58,
+  "frozen_report_not_amended": true,
+  "observed_result": "4 failed, 2 passed; pytest child exit 1",
+  "other_country_python_entries_compared": 735,
+  "package_trace_checkout": "/local/job40255479/worktrees/isa-review-Malawi-1209",
+  "parent_commit": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+  "scope": "This qualifies the four-failure/two-pass xdist control only. Candidate clean runtime and the separate non-xdist parent held-source identity remain separate evidence."
+}

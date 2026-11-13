@@ -1,0 +1,84 @@
+{
+  "status": "ROOT_AUTHENTICATED_AUTHOR_PACKET_PENDING_INDEPENDENT_GENUINE_REVIEW",
+  "issue": 1215,
+  "source_head": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "author_pins": {
+    "READY.json": "f9fe07454b338b1793463587d46edb77b2304e066f775b40eb030b96520eee3f",
+    "MANIFEST.private.json": "45c6e8e2f528fa282c59636ca74261d21318520c77a7b7e3ae40c45b5d24efcf",
+    "EXPORT-ALLOWLIST.json": "a57d05d6b8b45b0fb7dd9ad9b67949029d7dc7856b7a8790c071ec03de00495a",
+    "safe-proof.json": "02677e69069394bbad1696859555cb1bcdf18478677a455e4eefdfebe6d5faa2",
+    "postexit-result-private.json": "6f48a3d9ca9ce8570829d12d4cf4ca86b94f6864f3395c0d8bdbf15a3c3ef9a9",
+    "seal-tool-record-private.json": "88ea9f53ff28c35fe79a5dcb82d6ce37e177dee447b04f5550052b22e3e6fca7",
+    "postexit-tool-record-private.json": "a23c44854d2dae2f89428eec15ee68fde61cfd2cac445e9b90c82fe43f95ce4b"
+  },
+  "full_frozen_files": 1498,
+  "frozen_links": 30,
+  "frozen_directories": 1228,
+  "frozen_file_bytes": 508088006,
+  "source_paths": {
+    "candidate": 14914,
+    "base": 14913
+  },
+  "historical_tracked_binary_sources_unopened_metadata_only_each": 3,
+  "providers_fresh_MD5_SHA_magic_physical": 37,
+  "distinct_private_L1_copies": 148,
+  "L1_copy_bytes": 177769212,
+  "candidate_tests": {
+    "new": 13,
+    "supporting": 88
+  },
+  "actual_parent_new": {
+    "pass": 7,
+    "fail": 6
+  },
+  "predata_fingerprint_moves": {
+    "country": 549,
+    "framework": 39,
+    "declared_wave": 1362
+  },
+  "full_strict": {
+    "pass": 38,
+    "fail": 6,
+    "approved_empty_column_order_deltas": 6
+  },
+  "scanners_each": {
+    "WARN": 22,
+    "ordered_full_JSONL_bytes_exact": true
+  },
+  "guard_events": {
+    "total": 172,
+    "seed": 38,
+    "denied_IPv6_import_binds": 90,
+    "existing_directory_mkdir_refusals": 44
+  },
+  "author_comparator": {
+    "total": 30,
+    "positives": 3,
+    "faults": 27
+  },
+  "safe_exports": 4,
+  "privacy_union_literals": 54,
+  "export_identifier_matches": 0,
+  "sealer": {
+    "session_id": 15242,
+    "final_chunk": "80d51d",
+    "exit_code": 0
+  },
+  "postexit": {
+    "session_id": 65267,
+    "final_chunk": "89b801",
+    "exit_code": 0
+  },
+  "root_inspection_output_exception": "Private root-1215-output-scope-268055 retains exact original truncated tool call/return; no output replay or inferred unreturned tail.",
+  "limits": [
+    "Independent genuine-data review still required",
+    "No full-corpus rebuild or full-suite verdict",
+    "Six approved cross-head empty-order comparisons remain FAIL",
+    "All-wave raw country cache operands retained opaque; raw-partial operands not recovered",
+    "Three historical tracked binary files per head remain unopened metadata-only",
+    "Original filesystem method/target stacks were not recorded",
+    "All original stops and exposure qualifications retained"
+  ],
+  "signed": "Sue"
+}

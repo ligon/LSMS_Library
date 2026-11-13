@@ -23,11 +23,24 @@ Many LSMS-ISA countries have waves from **different survey programs** that canno
 |---------|------------|----------------|-----|
 | Malawi | IHS3 2010-11 → IHPS 2013-14 → IHS4 2016-17 → IHS5 2019-20 | IHS2 2004-05 | Different survey instrument |
 | Ethiopia | ESS W1-W3 (2011-12 → 2015-16) | ESS W4 (2018-19) | New sample drawn |
-| Nigeria | GHS W1-W3 (2010-11 → 2015-16) | NLSS 2018-19 | Different survey (cross-sectional) |
+| Nigeria | GHS W1-W5 (2010-11 → 2023-24); W4 partial refresh, continued in W5 | NLSS 2018-19 (separate program) | GHS long-panel and refresh cohorts differ; NLSS is a different, cross-sectional survey |
 | Niger | ECVMA 2011-12 → 2014-15 | EHCVM 2018-19 | Different program |
 | Mali | — | EACI 2014-15, 2017-18 | Not longitudinal |
 | Mali | EHCVM 2018-19 → 2021-22 | — | Only within EHCVM |
 | Burkina Faso | EHCVM 2018-19 → 2021-22 | EMC 2014 | Different program |
+
+Nigeria's repository folder `2018-19/` is **GHS-Panel Wave 4**, not the
+separate same-year NLSS. Its [recorded provenance](../../../../lsms_library/countries/Nigeria/2018-19/Documentation/SOURCE.org)
+identifies [catalog 3557](https://microdata.worldbank.org/index.php/catalog/3557);
+`2023-24/` is [GHS-Panel Wave 5, catalog 6410](https://microdata.worldbank.org/index.php/catalog/6410).
+W4 combines continuing long-panel households with a newly drawn refresh
+cohort; W5 continues both cohorts. Refresh households form a new panel baseline,
+not a non-panel survey. See the country's [sampling and panel-crosswalk notes](../../../../lsms_library/countries/Nigeria/_/CONTENTS.org).
+The committed crosswalk spans all ten rounds and links only households recorded
+as interviewed at both ends, each round from its own cover
+([GH #1264](https://github.com/ligon/LSMS_Library/issues/1264)). `old_new`, not
+survey-program membership or overlapping numeric IDs, is what authorizes a W4/W5
+link: refresh households start their own chain at `2018Q3`.
 
 **Always check the World Bank catalog** for each wave to determine if it's part of a panel.
 
@@ -35,7 +48,7 @@ Many LSMS-ISA countries have waves from **different survey programs** that canno
 
 Three patterns for how household IDs work across waves:
 
-1. **Stable IDs** (simplest): The same `hhid` persists across waves. Nigeria GHS-Panel works this way. Panel_ids is an identity mapping.
+1. **Stable IDs** (simplest): The same recorded household ID persists across waves. Nigeria's `hhid` is stable, so every link and `updated_ids` map is an identity; a stable id alone still does not establish a link, which also needs `old_new` (W4/W5) and an interview at both ends (`countries/Nigeria/_/panel_ids.py`, GH #1264).
 
 2. **New IDs with backward link** (most common): Each wave assigns new IDs but includes a variable linking to the previous wave's ID. Examples:
    - Malawi: `y4_hhid` (current) → `y3_hhid` (previous) in the cover sheet
@@ -155,15 +168,27 @@ That is design **A**, and it is the convention (#894). A panel crosswalk is a
 *harmonization decision*, not a derived measurement: it is small (GhanaLSS is
 714 mappings, 4 ms to recompute), identical for every user, and the input to
 every longitudinal result -- so it belongs where a change to it shows up as a
-reviewable line-level diff. Nine countries do this: Burkina_Faso, Ethiopia,
-EthiopiaRHS, GhanaLSS, Mali, Niger, Senegal, Tanzania, Uganda.
+reviewable line-level diff. All eleven panel countries do this: Burkina_Faso,
+Ethiopia, EthiopiaRHS, GhanaLSS, Malawi, Mali, Niger, Nigeria, Senegal,
+Tanzania, Uganda.
 
-Malawi and Nigeria are design **B** (per-wave `data_info.yml` wiring, cache
-parquet only). `Country._compute_panel_ids` branches on which it got -- A
-returns a `dict`, B a `DataFrame` that `panel_ids(df)` converts -- so both
-arrive at the same API. Converting them to A is #894's remaining work; they are
-named in `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` so a *twelfth*
-country cannot pick a design by accident.
+Malawi and Nigeria were design **B** (per-wave `data_info.yml` wiring, cache
+parquet only) until #894. `Country._compute_panel_ids` still branches on which
+it got -- A returns a `dict`, B a `DataFrame` that `panel_ids(df)` converts --
+and both backends now read the existing JSON/parquet candidates first (GH #1468).
+When every candidate is absent, valid per-wave blocks retain the B fallback;
+runtime fallbacks never execute the offline crosswalk publishers. Malawi's
+`panel_ids.py` reads the same per-wave
+`panel_ids:` blocks (Pattern 1 above), builds the frame exactly as the YAML path
+did (`format_id` on both ids, source-file row order, which decides who keeps the
+bare id in a split), and calls `panel_ids(df)`; the dicts were verified equal to
+design B's. Nigeria's did too until #1264, which needed each round's own cover
+and an interview gate on a second file. A block can express neither, so Nigeria's
+blocks are gone and its script (Pattern 3) holds the wiring; leaving them would
+have made the make backend serve a different crosswalk from the committed one
+before #1468 made both backends use the same source reader.
+`tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` is now empty, so a
+*twelfth* country cannot pick a design by accident.
 
 ### Never make the JSON a Make target
 

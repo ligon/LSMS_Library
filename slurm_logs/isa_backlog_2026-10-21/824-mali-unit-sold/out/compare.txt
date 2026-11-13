@@ -1,0 +1,31 @@
+rows base/branch 35060 35060  index equal True
+columns added ['Unit_sold', 'months_harvested', 'Derivation']  removed []
+  Quantity: 241 rows differ; by t x perennial {('2014-15', True): 241}
+  u: 2 rows differ; by t x perennial {('2017-18', True): 2}
+  Quantity_sold: 1 rows differ; by t x perennial {('2014-15', True): 1}
+  Value_sold: identical
+  planting_month: identical
+  harvest_month: identical
+  intercropped: identical
+  perennial: identical
+  u diffs: base {<NA>: 2} -> branch {'Chargement camion': 2}
+2014-15 tree rows 357  base Quantity all integer<=12: True  base nonnull 351
+  base Quantity == branch months_harvested on 351 of 351 nonnull
+  branch Quantity: nonnull 355 pos 249 zero 106 median pos 6.0
+  rows whose Quantity changed 241
+  base sum 614.0 branch sum 12757.70000076294
+2014-15 months_harvested on tree rows {np.int64(0): 91, np.int64(1): 101, np.int64(2): 68, np.int64(3): 60, np.int64(4): 9, np.int64(5): 6, np.int64(6): 6, np.int64(7): 4, np.int64(9): 1, np.int64(10): 1, np.int64(12): 4, <NA>: 6} ; non-null on field rows 0
+2017-18 months_harvested on tree rows {np.int64(0): 107, np.int64(1): 44, np.int64(2): 45, np.int64(3): 46, np.int64(4): 8, np.int64(5): 6, np.int64(6): 4, np.int64(7): 3, np.int64(10): 1, np.int64(12): 6} ; non-null on field rows 0
+Derivation {<NA>: 34433, 'Mali::crop_production::3b-per-harvest-month': 357, 'Mali::crop_production::11f-per-harvest-month': 270}
+Derivation on non-perennial rows 0
+      t  kind  priced  unit_sold_nonnull  knows_both  agree  differ  sold_in_kg  harvest_u_kg
+2014-15 field     569                568         567    472      95          83            61
+2014-15  tree     198                196         190    148      42          38            17
+2017-18 field     451                451         449    362      87          67            48
+2017-18  tree     127                127         127    109      18          45            33
+disagreeing (u -> Unit_sold) top cells by wave
+  2014-15 {('Sac', 'Kg'): 33, ('Charretée', 'Sac'): 19, ('Panier', 'Sac'): 12, ('Kg', 'Sac'): 9, ('Charretée', 'Kg'): 9, ('Grenier', 'Sac'): 7}
+  2017-18 {('Autre', 'Tonne'): 30, ('Charretée', 'Sac'): 17, ('Sac', 'Kg'): 16, ('Charretée', 'Kg'): 12, ('Sac', 'Calebasse'): 4, ('Bassine', 'Kg'): 3}
+rows with Q_sold==0 & V_sold==0: 19783  Unit_sold non-null there 1
+Unit_sold non-null where Quantity_sold NA 1
+Unit_sold values {<NA>: 33648, 'Sac': 817, 'Kg': 239, 'Charretée': 139, 'Panier': 55, 'Tonne': 41, 'Bassine': 33, 'Autre': 32, 'Casier': 15, 'Chargement camion': 13, 'Grenier': 11, 'Calebasse': 10, 'Gerbe': 4, 'Moude': 3}

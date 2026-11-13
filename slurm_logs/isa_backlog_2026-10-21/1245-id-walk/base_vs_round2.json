@@ -1,0 +1,1107 @@
+{
+ "same": {
+  "assume": 235,
+  "cold": 235,
+  "feature": 235,
+  "warm_fresh": 235,
+  "warm_same": 235
+ },
+ "frame_differs": [],
+ "ti_differs": [
+  [
+   "Burkina_Faso/assets",
+   "assume",
+   {
+    "rows": [
+     112951,
+     112951
+    ],
+    "ti_n": [
+     20509,
+     20509
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/assets",
+   "cold",
+   {
+    "rows": [
+     112951,
+     112951
+    ],
+    "ti_n": [
+     20509,
+     20509
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/assets",
+   "feature",
+   {
+    "rows": [
+     112951,
+     112951
+    ],
+    "ti_n": [
+     20509,
+     20509
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/assets",
+   "warm_fresh",
+   {
+    "rows": [
+     112951,
+     112951
+    ],
+    "ti_n": [
+     20509,
+     20509
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/assets",
+   "warm_same",
+   {
+    "rows": [
+     112951,
+     112951
+    ],
+    "ti_n": [
+     20509,
+     20509
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_acquired",
+   "assume",
+   {
+    "rows": [
+     765816,
+     765816
+    ],
+    "ti_n": [
+     20964,
+     20964
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_acquired",
+   "cold",
+   {
+    "rows": [
+     765816,
+     765816
+    ],
+    "ti_n": [
+     20964,
+     20964
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_acquired",
+   "feature",
+   {
+    "rows": [
+     535478,
+     535478
+    ],
+    "ti_n": [
+     20964,
+     20964
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_acquired",
+   "warm_fresh",
+   {
+    "rows": [
+     765816,
+     765816
+    ],
+    "ti_n": [
+     20964,
+     20964
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_acquired",
+   "warm_same",
+   {
+    "rows": [
+     765816,
+     765816
+    ],
+    "ti_n": [
+     20964,
+     20964
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_expenditures",
+   "assume",
+   {
+    "rows": [
+     377563,
+     377563
+    ],
+    "ti_n": [
+     20838,
+     20838
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_expenditures",
+   "cold",
+   {
+    "rows": [
+     377563,
+     377563
+    ],
+    "ti_n": [
+     20838,
+     20838
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_expenditures",
+   "feature",
+   {
+    "rows": [
+     377563,
+     377563
+    ],
+    "ti_n": [
+     20838,
+     20838
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_expenditures",
+   "warm_fresh",
+   {
+    "rows": [
+     377563,
+     377563
+    ],
+    "ti_n": [
+     20838,
+     20838
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_expenditures",
+   "warm_same",
+   {
+    "rows": [
+     377563,
+     377563
+    ],
+    "ti_n": [
+     20838,
+     20838
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_prices",
+   "assume",
+   {
+    "rows": [
+     234282,
+     234282
+    ],
+    "ti_n": [
+     20774,
+     20774
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_prices",
+   "cold",
+   {
+    "rows": [
+     234282,
+     234282
+    ],
+    "ti_n": [
+     20774,
+     20774
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_prices",
+   "feature",
+   {
+    "rows": [
+     234282,
+     234282
+    ],
+    "ti_n": [
+     20774,
+     20774
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_prices",
+   "warm_fresh",
+   {
+    "rows": [
+     234282,
+     234282
+    ],
+    "ti_n": [
+     20774,
+     20774
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_prices",
+   "warm_same",
+   {
+    "rows": [
+     234282,
+     234282
+    ],
+    "ti_n": [
+     20774,
+     20774
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_quantities",
+   "assume",
+   {
+    "rows": [
+     316441,
+     316441
+    ],
+    "ti_n": [
+     20913,
+     20913
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_quantities",
+   "cold",
+   {
+    "rows": [
+     316441,
+     316441
+    ],
+    "ti_n": [
+     20913,
+     20913
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_quantities",
+   "feature",
+   {
+    "rows": [
+     316441,
+     316441
+    ],
+    "ti_n": [
+     20913,
+     20913
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_quantities",
+   "warm_fresh",
+   {
+    "rows": [
+     316441,
+     316441
+    ],
+    "ti_n": [
+     20913,
+     20913
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_quantities",
+   "warm_same",
+   {
+    "rows": [
+     316441,
+     316441
+    ],
+    "ti_n": [
+     20913,
+     20913
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_security",
+   "assume",
+   {
+    "rows": [
+     10233,
+     10233
+    ],
+    "ti_n": [
+     10233,
+     10233
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_security",
+   "cold",
+   {
+    "rows": [
+     10233,
+     10233
+    ],
+    "ti_n": [
+     10233,
+     10233
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_security",
+   "feature",
+   {
+    "rows": [
+     10233,
+     10233
+    ],
+    "ti_n": [
+     10233,
+     10233
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_security",
+   "warm_fresh",
+   {
+    "rows": [
+     10233,
+     10233
+    ],
+    "ti_n": [
+     10233,
+     10233
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/food_security",
+   "warm_same",
+   {
+    "rows": [
+     10233,
+     10233
+    ],
+    "ti_n": [
+     10233,
+     10233
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/household_characteristics",
+   "assume",
+   {
+    "rows": [
+     20959,
+     20959
+    ],
+    "ti_n": [
+     20959,
+     20959
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/household_characteristics",
+   "cold",
+   {
+    "rows": [
+     20959,
+     20959
+    ],
+    "ti_n": [
+     20959,
+     20959
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/household_characteristics",
+   "feature",
+   {
+    "rows": [
+     20959,
+     20959
+    ],
+    "ti_n": [
+     20959,
+     20959
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/household_characteristics",
+   "warm_fresh",
+   {
+    "rows": [
+     20959,
+     20959
+    ],
+    "ti_n": [
+     20959,
+     20959
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/household_characteristics",
+   "warm_same",
+   {
+    "rows": [
+     20959,
+     20959
+    ],
+    "ti_n": [
+     20959,
+     20959
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/household_roster",
+   "assume",
+   {
+    "rows": [
+     146517,
+     146517
+    ],
+    "ti_n": [
+     21037,
+     21037
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/household_roster",
+   "cold",
+   {
+    "rows": [
+     146517,
+     146517
+    ],
+    "ti_n": [
+     21037,
+     21037
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/household_roster",
+   "feature",
+   {
+    "rows": [
+     146517,
+     146517
+    ],
+    "ti_n": [
+     21037,
+     21037
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/household_roster",
+   "warm_fresh",
+   {
+    "rows": [
+     146517,
+     146517
+    ],
+    "ti_n": [
+     21037,
+     21037
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/household_roster",
+   "warm_same",
+   {
+    "rows": [
+     146517,
+     146517
+    ],
+    "ti_n": [
+     21037,
+     21037
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/housing",
+   "assume",
+   {
+    "rows": [
+     21036,
+     21036
+    ],
+    "ti_n": [
+     21036,
+     21036
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/housing",
+   "cold",
+   {
+    "rows": [
+     21036,
+     21036
+    ],
+    "ti_n": [
+     21036,
+     21036
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/housing",
+   "feature",
+   {
+    "rows": [
+     21036,
+     21036
+    ],
+    "ti_n": [
+     21036,
+     21036
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/housing",
+   "warm_fresh",
+   {
+    "rows": [
+     21036,
+     21036
+    ],
+    "ti_n": [
+     21036,
+     21036
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/housing",
+   "warm_same",
+   {
+    "rows": [
+     21036,
+     21036
+    ],
+    "ti_n": [
+     21036,
+     21036
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/individual_education",
+   "assume",
+   {
+    "rows": [
+     132451,
+     132451
+    ],
+    "ti_n": [
+     21034,
+     21034
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/individual_education",
+   "cold",
+   {
+    "rows": [
+     132451,
+     132451
+    ],
+    "ti_n": [
+     21034,
+     21034
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/individual_education",
+   "feature",
+   {
+    "rows": [
+     132451,
+     132451
+    ],
+    "ti_n": [
+     21034,
+     21034
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/individual_education",
+   "warm_fresh",
+   {
+    "rows": [
+     132451,
+     132451
+    ],
+    "ti_n": [
+     21034,
+     21034
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/individual_education",
+   "warm_same",
+   {
+    "rows": [
+     132451,
+     132451
+    ],
+    "ti_n": [
+     21034,
+     21034
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/interview_date",
+   "assume",
+   {
+    "rows": [
+     30709,
+     30709
+    ],
+    "ti_n": [
+     10237,
+     10237
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/interview_date",
+   "cold",
+   {
+    "rows": [
+     30709,
+     30709
+    ],
+    "ti_n": [
+     10237,
+     10237
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/interview_date",
+   "feature",
+   {
+    "rows": [
+     30709,
+     30709
+    ],
+    "ti_n": [
+     10237,
+     10237
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/interview_date",
+   "warm_fresh",
+   {
+    "rows": [
+     30709,
+     30709
+    ],
+    "ti_n": [
+     10237,
+     10237
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/interview_date",
+   "warm_same",
+   {
+    "rows": [
+     30709,
+     30709
+    ],
+    "ti_n": [
+     10237,
+     10237
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/plot_features",
+   "assume",
+   {
+    "rows": [
+     19784,
+     19784
+    ],
+    "ti_n": [
+     6669,
+     6669
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/plot_features",
+   "cold",
+   {
+    "rows": [
+     19784,
+     19784
+    ],
+    "ti_n": [
+     6669,
+     6669
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/plot_features",
+   "feature",
+   {
+    "rows": [
+     19784,
+     19784
+    ],
+    "ti_n": [
+     6669,
+     6669
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/plot_features",
+   "warm_fresh",
+   {
+    "rows": [
+     19784,
+     19784
+    ],
+    "ti_n": [
+     6669,
+     6669
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/plot_features",
+   "warm_same",
+   {
+    "rows": [
+     19784,
+     19784
+    ],
+    "ti_n": [
+     6669,
+     6669
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/sample",
+   "assume",
+   {
+    "rows": [
+     20648,
+     20648
+    ],
+    "ti_n": [
+     20648,
+     20648
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/sample",
+   "cold",
+   {
+    "rows": [
+     20648,
+     20648
+    ],
+    "ti_n": [
+     20648,
+     20648
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/sample",
+   "feature",
+   {
+    "rows": [
+     20648,
+     20648
+    ],
+    "ti_n": [
+     20648,
+     20648
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/sample",
+   "warm_fresh",
+   {
+    "rows": [
+     20648,
+     20648
+    ],
+    "ti_n": [
+     20648,
+     20648
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/sample",
+   "warm_same",
+   {
+    "rows": [
+     20648,
+     20648
+    ],
+    "ti_n": [
+     20648,
+     20648
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/shocks",
+   "assume",
+   {
+    "rows": [
+     24837,
+     24837
+    ],
+    "ti_n": [
+     13889,
+     13889
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/shocks",
+   "cold",
+   {
+    "rows": [
+     24837,
+     24837
+    ],
+    "ti_n": [
+     13889,
+     13889
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/shocks",
+   "feature",
+   {
+    "rows": [
+     24837,
+     24837
+    ],
+    "ti_n": [
+     13889,
+     13889
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/shocks",
+   "warm_fresh",
+   {
+    "rows": [
+     24837,
+     24837
+    ],
+    "ti_n": [
+     13889,
+     13889
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/shocks",
+   "warm_same",
+   {
+    "rows": [
+     24837,
+     24837
+    ],
+    "ti_n": [
+     13889,
+     13889
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/subjective_well_being",
+   "assume",
+   {
+    "rows": [
+     10174,
+     10174
+    ],
+    "ti_n": [
+     10174,
+     10174
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/subjective_well_being",
+   "cold",
+   {
+    "rows": [
+     10174,
+     10174
+    ],
+    "ti_n": [
+     10174,
+     10174
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/subjective_well_being",
+   "feature",
+   {
+    "rows": [
+     10174,
+     10174
+    ],
+    "ti_n": [
+     10174,
+     10174
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/subjective_well_being",
+   "warm_fresh",
+   {
+    "rows": [
+     10174,
+     10174
+    ],
+    "ti_n": [
+     10174,
+     10174
+    ]
+   }
+  ],
+  [
+   "Burkina_Faso/subjective_well_being",
+   "warm_same",
+   {
+    "rows": [
+     10174,
+     10174
+    ],
+    "ti_n": [
+     10174,
+     10174
+    ]
+   }
+  ]
+ ],
+ "missing": [],
+ "cand_route_disagree": [
+  [
+   "Ethiopia/nutrition",
+   "frame",
+   {
+    "cold": "c9e61250",
+    "warm_same": "c9e61250",
+    "warm_fresh": "c9e61250",
+    "assume": "321042c2"
+   }
+  ],
+  [
+   "Uganda/nutrition",
+   "frame",
+   {
+    "cold": "0036614a",
+    "warm_same": "0036614a",
+    "warm_fresh": "0036614a",
+    "assume": "7afca1a9"
+   }
+  ]
+ ],
+ "base_route_disagree": [
+  [
+   "Ethiopia/nutrition",
+   "frame",
+   {
+    "cold": "c9e61250",
+    "warm_same": "c9e61250",
+    "warm_fresh": "c9e61250",
+    "assume": "321042c2"
+   }
+  ],
+  [
+   "Uganda/nutrition",
+   "frame",
+   {
+    "cold": "0036614a",
+    "warm_same": "0036614a",
+    "warm_fresh": "0036614a",
+    "assume": "7afca1a9"
+   }
+  ]
+ ]
+}

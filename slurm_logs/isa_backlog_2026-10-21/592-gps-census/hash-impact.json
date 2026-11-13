@@ -1,0 +1,23 @@
+{
+ "base_commit": "9a0ed5f3c (working tree before CONTENTS.org appends)",
+ "after": "working tree with the six CONTENTS.org appends",
+ "country": {
+  "total": 549,
+  "moved": 0,
+  "moved_keys": []
+ },
+ "btf": {
+  "total": 40,
+  "moved": 0,
+  "moved_keys": []
+ },
+ "wave": {
+  "total": 2109,
+  "moved": 0,
+  "moved_keys": []
+ },
+ "errors": {
+  "base": 0,
+  "after": 0
+ }
+}

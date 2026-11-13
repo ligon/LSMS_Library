@@ -1,0 +1,64 @@
+{
+  "recorded_at_UTC": "2026-10-22 06:08:14 UTC",
+  "authoritative_states": [
+    {
+      "number": 798,
+      "title": "Mali interview_date: rewrite the stale data_scheme.yml:69-73 comment (state the measured collapse loss) and refresh the coverage matrix",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/798"
+    },
+    {
+      "number": 827,
+      "title": "Malawi community_prices: u and NumberOfUnits jointly blank on 38,506 of 82,635 rows (46%) -- the price basis is unknown for half the yardstick",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/827"
+    },
+    {
+      "number": 856,
+      "title": "Malawi: measure the harvest-side 'other (specify)' free-text residue per wave before deciding on recovery",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/856"
+    },
+    {
+      "number": 1150,
+      "title": "plot_features: serve the WB plot geovariables (elevation, slope, wetness, distance to dwelling) for Ethiopia W1-W5, and declare Nigeria's PlotSlope (#1127 ruling A)",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1150"
+    },
+    {
+      "number": 1127,
+      "title": "Ethiopia 2021-22: acquire ESPS-5 v03_M (replaces the plot geovariables file) and re-stamp SOURCE.org (#1114 ruling)",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1127"
+    },
+    {
+      "number": 1149,
+      "title": "add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1149"
+    },
+    {
+      "number": 978,
+      "title": "Nigeria W5: acquire WB v02 (NGA_2023_GHSP-W5_v02_M) and wire NGA_HouseholdGeovariables_Y5.dta as cluster_features df_geo",
+      "state": "open",
+      "url": "https://github.com/ligon/LSMS_Library/issues/978"
+    }
+  ],
+  "next_code_priority": {
+    "issue": 1149,
+    "status": "SETTLED_OPTION_C_SOURCE_ONLY_PREPARED_UNASSIGNED",
+    "rationale": "Nested Nigeria/Ethiopia refresh path remains flat; current0.16 leftover scan is already recursive but basename-bound. Synthetic-only code repair supports978/1127/1150.",
+    "tests_builds_acquisitions": 0
+  },
+  "other_refreshed": {
+    "issue798": "Main date parsing and comment fixes already merged; remaining final-source coverage promotion must distinguish raw-cache from served API. Read-strict warning policy remains separate.",
+    "issue827": "Read-only source-field/mapping diagnosis first. Current Malawi notes document intentionally unknown unit/basis, nonfood100percentunitless and reduced2013foodlist. Headline joint38506 wording must be remeasured rather than assumed; no fill/imputation authorized.",
+    "issue856": "Read-only harvest other-unit/crop counts by wave before materiality/recovery decision; no copied EPAR strings or Quantity rescaling.",
+    "issue1150": "OptionA settled; do not reask whether raster attributes belong. Depends1127stillOPEN. Current f8 SOURCE recordsv02; case-insensitive geovar sidecar inventory has old household/plot names, no Pub newfile. Claimedv03digest55db absent both checked heldL1layouts; remote presence remains unverified. No new acquisition/raster wiring.",
+    "issue1127": "OPEN; new v03 acquisition/provenance and reviewed sidecar still required. PR keyword searches did not identify a1127PR; absence of a search hit is not proof no differently named PR exists.",
+    "issue978": "OPEN tierD acquisition thenB, current NigeriaW5v01; actual new household geo/totcons/revised harvest files remain outside1149synthetic-onlyrepair."
+  },
+  "actual_WB_or_S3_calls": 0,
+  "actual_country_payload_decode": 0,
+  "signed": "Sue"
+}

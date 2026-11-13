@@ -1,0 +1,251 @@
+{
+  "status": "AUTHOR_VALIDATED_AWAITS_DIFFERENT_INDEPENDENT_REVIEW",
+  "parent": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+  "ledger_first": "0e9f1f696153562b62d3a3d2d389e309b96c9238",
+  "runtime_and_tests": "c5134f57f76bc53e84df6c3398ffc9a3781e9e1c",
+  "scope": "GH1119 Burkina_Faso two seed-crop Preferred Label cells only",
+  "mapping_changes": [
+    {
+      "original": "Semences de ma\u00efs",
+      "before": "Ma\u00efs en grain",
+      "after": "Ma\u00efs",
+      "applied_rows": 2274
+    },
+    {
+      "original": "Semences de haricots/ni\u00e9b\u00e9",
+      "before": "Ni\u00e9b\u00e9/Haricots secs",
+      "after": "Ni\u00e9b\u00e9",
+      "applied_rows": 2156
+    }
+  ],
+  "source_input_records": 22877,
+  "source_input_key_unique_nonnull": true,
+  "unknown_code21_records": 602,
+  "native_crop_records": 15593,
+  "public_crop_records": 15587,
+  "sample_records": 20648,
+  "cluster_records": 2035,
+  "strict_full_frame_comparisons": 52,
+  "changed_crop_label_rows": 4430,
+  "full_values_keys_multiplicities_axes_unused_levels_codes_order_dtypes_masks_typed_attrs_exact_except_intended_labels": true,
+  "source_eligibility_units_values_science_unchanged": true,
+  "unsupported_2014_2021_input_and_crop_subsets": 0,
+  "seed_kg": {
+    "records": 4229,
+    "complete_frame_exact": true,
+    "grain": [
+      "t",
+      "i"
+    ],
+    "no_parcel_allocation": true
+  },
+  "join": {
+    "base": {
+      "Ma\u00efs": {
+        "seed_rows": 2274,
+        "household_crop_matched_rows": 0,
+        "Quantity_on_matched_rows": 0.0,
+        "Quantity_total": 51623.350000000006,
+        "unique_matching_key_count": 0
+      },
+      "Ni\u00e9b\u00e9": {
+        "seed_rows": 2156,
+        "household_crop_matched_rows": 0,
+        "Quantity_on_matched_rows": 0.0,
+        "Quantity_total": 18867.18,
+        "unique_matching_key_count": 0
+      }
+    },
+    "candidate": {
+      "Ma\u00efs": {
+        "seed_rows": 2274,
+        "household_crop_matched_rows": 2251,
+        "Quantity_on_matched_rows": 51375.100000000006,
+        "Quantity_total": 51623.350000000006,
+        "unique_matching_key_count": 2251
+      },
+      "Ni\u00e9b\u00e9": {
+        "seed_rows": 2156,
+        "household_crop_matched_rows": 2097,
+        "Quantity_on_matched_rows": 18438.68,
+        "Quantity_total": 18867.18,
+        "unique_matching_key_count": 2097
+      }
+    }
+  },
+  "join_contract": "Existence at (t,i,crop), not a parcel allocation; input roster is household-grain. seed_kg sums at (t,i), unchanged.",
+  "healthy_comparators": {
+    "Benin": 10605,
+    "Togo": 13730,
+    "current_full_coverage_files_per_root": 12,
+    "all_physical_copy_receipts_gated": true,
+    "full_Country_frames_exact": true,
+    "Feature_expected_global_unused_levels_accounted": true
+  },
+  "Feature": {
+    "rows": 47212,
+    "arguments": [
+      {},
+      {
+        "currency": null
+      }
+    ],
+    "full_frames_typed_attrs_exact_after_only_BF_label_counterfactual": true,
+    "default_existing_currency_axis_preserved": true,
+    "no_additional_row_loss": true
+  },
+  "normal_cold_and_fresh_process_warm": {
+    "both_heads": true,
+    "new_Country_objects": true,
+    "all_data_bytes_modes_nanosecond_mtimes_unchanged_on_warm": true,
+    "genuine_current_hash_and_full_coverage": true
+  },
+  "scanner": {
+    "records_each": 6,
+    "full_normalized_multiset_exact": true,
+    "status_counts": {
+      "warn": 6
+    },
+    "rows_individually_reconciled": 6,
+    "no_phase2_grid": true
+  },
+  "tests": {
+    "candidate_pytest_passed": 131,
+    "skipped": 0,
+    "new_cases": 9,
+    "existing_identity_unit_cases": 7,
+    "existing_unit_reducer_support_cases": 115,
+    "built_data_cases_deselected_in_pytest": 2,
+    "unmodified_existing_built_assertion_bodies_directly_passed_per_head": 2,
+    "parent_new_tests_failed": 5,
+    "parent_new_tests_passed": 4,
+    "parent_fixture_errors": 0
+  },
+  "hash_scope": {
+    "actual_API_hashes_before_builds": 549,
+    "changed_BF": 24,
+    "unchanged_other_countries": 525,
+    "framework_fingerprints_before_builds": 39,
+    "framework_changed": 0,
+    "relevant_wave_hashes": 12,
+    "relevant_wave_hashes_changed": 12,
+    "wave_measurement_timing": "AFTER scoped builds; same runtime/config bytes; not prebuild enumeration",
+    "other_20_BF_outputs_not_claimed": true
+  },
+  "source_receipts": [
+    {
+      "sidecar": "Burkina_Faso/2014/Data/emc2014_p1_logement_27022015.dta.dvc",
+      "md5": "8925253ab9c8c6479fb927b8f6c7130e",
+      "size": 510816,
+      "sha256": "0d41e77616612bda5b05bdf328bc2963d5eaee36641874554f9d6fa7d1ef6445",
+      "mode_mtime_preserved": true,
+      "distinct_inodes_nlink1_nonsymlink": true
+    },
+    {
+      "sidecar": "Burkina_Faso/2014/Data/emc2014_welfare.dta.dvc",
+      "md5": "0b0e21c43e914bb9d6c061a3cf70552b",
+      "size": 923269,
+      "sha256": "656b6876dbe677df0671a6bffc2327fda86fe79d17d117d58b8220e8cae6a761",
+      "mode_mtime_preserved": true,
+      "distinct_inodes_nlink1_nonsymlink": true
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Data/ehcvm_ponderations_bfa2018.dta.dvc",
+      "md5": "c44fd6b15c2ae0a4a29eb9c3e89f32ac",
+      "size": 6192,
+      "sha256": "2f0f954ef3dca1bb733641ff015b56f8cf8de4a2d949ee079a8da79759e4b06f",
+      "mode_mtime_preserved": true,
+      "distinct_inodes_nlink1_nonsymlink": true
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Data/grappe_gps_bfa2018.dta.dvc",
+      "md5": "f80ba40b68a33f6d7b3f1799402f5731",
+      "size": 40793,
+      "sha256": "97702b628f0c9b9b68da45bd930e6806ca4949a87f4002d84c2194a6696684fd",
+      "mode_mtime_preserved": true,
+      "distinct_inodes_nlink1_nonsymlink": true
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Data/s00_me_bfa2018.dta.dvc",
+      "md5": "0adebc92d8366c791dd6fe7151b17951",
+      "size": 1403162,
+      "sha256": "053dfddfc3df3623bbc48fef59738ac9995d93bbc38224678e55d1c65fd70799",
+      "mode_mtime_preserved": true,
+      "distinct_inodes_nlink1_nonsymlink": true
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Data/s16b_me_bfa2018.dta.dvc",
+      "md5": "32eb603ade5ae97b1844c00a2923fd31",
+      "size": 988943,
+      "sha256": "e6fe7f0cc683cf15ad41ceb62669f643f501cf1ea13d2a3eb1e41cc983f1460d",
+      "mode_mtime_preserved": true,
+      "distinct_inodes_nlink1_nonsymlink": true
+    },
+    {
+      "sidecar": "Burkina_Faso/2021-22/Data/ehcvm_panel_ponderations_bfa2021.dta.dvc",
+      "md5": "5f145ca83eb1e06744849ccbee4d80a4",
+      "size": 9075,
+      "sha256": "ad24244e300f45496b952fe7c75b4cd1b1a13d4aa5f7e415562d69d6cf323b26",
+      "mode_mtime_preserved": true,
+      "distinct_inodes_nlink1_nonsymlink": true
+    },
+    {
+      "sidecar": "Burkina_Faso/2021-22/Data/s00_me_bfa2021.dta.dvc",
+      "md5": "38a4d4bf48065fef16f808918e11ae22",
+      "size": 3005184,
+      "sha256": "4091b0419c277114aaa94e81b966964ef10e18e3db7ccafeaef20eb6880f99ec",
+      "mode_mtime_preserved": true,
+      "distinct_inodes_nlink1_nonsymlink": true
+    },
+    {
+      "sidecar": "Burkina_Faso/2018-19/Data/s16c_me_bfa2018.dta.dvc",
+      "md5": "1c34cab76509cf8694d83d8ac71741e9",
+      "size": 3866633,
+      "sha256": "609e73d8a57efbef19d6470099a2caa01df73512213033d8115c7e5cc75e31b2",
+      "mode_mtime_preserved": true,
+      "distinct_inodes_nlink1_nonsymlink": true
+    }
+  ],
+  "physical_preparation": {
+    "source_blobs_per_head": 9,
+    "physical_source_copies": 18,
+    "terminal_success_before_decode_or_build": true,
+    "BF_L2_unseeded": true,
+    "healthy_cache_copies_per_head": 12,
+    "no_acquisition_or_freshness_bypass": true
+  },
+  "retained_harness_stops": [
+    {
+      "stage": "first private Feature expected-construction comparison",
+      "cause": "default Feature already carries currency index, omitted from expected frame",
+      "all_original_operands_and_trace_preserved": true,
+      "correction": "private expected construction uses argument-matched parent currency records; no API replay or attr normalization"
+    },
+    {
+      "stage": "first supplemental wave-hash measurement",
+      "cause": "nonexistent Country.wave accessor; failed before any hash result or build",
+      "correction": "existing Country.__getitem__; distinct v2 script and attempt retained"
+    }
+  ],
+  "limits": [
+    "No independent acceptance verdict yet",
+    "No full suite or whole corpus rebuild",
+    "No claim for unbuilt 20 Burkina API outputs",
+    "No implementation for other countries/shared marker policy/new wave coverage/GH1187/GH1188",
+    "Relevant-wave hashes were enumerated after builds, not before",
+    "Full source frames/IDs/warnings/tracebacks remain private"
+  ],
+  "GitHub_writes": 0,
+  "source_acquisition": false,
+  "shared_cache_mutation": false,
+  "reviewer": "different agent required",
+  "author": "Sue (GPT-6)",
+  "live_parent_scope_receipt": {
+    "path": "/local/job40255479/control/isa-backlog-20261021/BF1119-live-parent-scope-0248.json",
+    "sha256": "3833b7fa64abd62976c65bee9e63d512ca4796908941eb70c3ab091901e9b0a6",
+    "size": 1262,
+    "PR1189_open_unmerged_at_actual_parent": true,
+    "GH1119_open_unchanged_zero_comments": true
+  },
+  "api_audit_exit": 0
+}

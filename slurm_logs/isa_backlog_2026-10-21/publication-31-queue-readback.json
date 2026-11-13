@@ -1,0 +1,41 @@
+{
+  "status": "EXACT_31_PR_QUEUE_AND_ISSUE_BODY_READBACK",
+  "at_UTC": "2026-10-22T21:30:56.418531+00:00",
+  "evidence_commit": "996235beb762e21d614869af83982a65e16d56a9",
+  "items": [
+    {
+      "number": 1170,
+      "state": "open",
+      "head_sha": "996235beb762e21d614869af83982a65e16d56a9",
+      "merged": false,
+      "body_exact": true,
+      "body_bytes": 30701,
+      "body_sha256": "a6a356d09c8ca82d1d487fdbe8b1dc27f7e640034e913c2cb28879d2c4e87fa0"
+    },
+    {
+      "number": 1188,
+      "state": "open",
+      "head_sha": null,
+      "merged": null,
+      "body_exact": true,
+      "body_bytes": 4347,
+      "body_sha256": "98257f25f4046e5aeee32da13ab1bbde3a0cd4f812163ecfc713e675541906b3"
+    },
+    {
+      "number": 1218,
+      "state": "open",
+      "head_sha": null,
+      "merged": null,
+      "body_exact": true,
+      "body_bytes": 4913,
+      "body_sha256": "cde40f8582ec906aea08e955718990930ee512161cb5b5a0da002ad5f4fe3c2e"
+    }
+  ],
+  "implementation_PRs": 31,
+  "ISA_open_records": 114,
+  "PR_linked": 28,
+  "active": 2,
+  "other": 84,
+  "full_campaign_verdict": false,
+  "signed": "Sue"
+}

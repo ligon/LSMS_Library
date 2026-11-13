@@ -1,0 +1,289 @@
+{
+  "status": "INDEPENDENT_BOUNDED_REVIEW_PASS_WITH_DISCLOSED_HISTORY",
+  "signed": "Sue",
+  "candidate": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+  "parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "tests": {
+    "candidate-v2": {
+      "tests": 28,
+      "failed": 0,
+      "passed": 28
+    },
+    "base-v2": {
+      "tests": 28,
+      "failed": 17,
+      "passed": 11
+    },
+    "existing": {
+      "tests": 21,
+      "failed": 0,
+      "passed": 21
+    }
+  },
+  "strict_pairs": 50,
+  "public_api_pairs": 40,
+  "native_pairs": 10,
+  "calibration_rejected": 14,
+  "scanner": {
+    "literal_ordered_equal": true,
+    "records": 163,
+    "status_counts": {
+      "warn": 158,
+      "pass": 3,
+      "fail": 2
+    }
+  },
+  "invalid": [
+    {
+      "case": "base-bad",
+      "error_class_args_exact": true,
+      "chain_types": [
+        "builtins.KeyError"
+      ],
+      "whole_tree_exact": false,
+      "removed_native": 5,
+      "changed_dirs": 5,
+      "before_paths": 105,
+      "after_paths": 100,
+      "L1_country_exact": true
+    },
+    {
+      "case": "candidate-bad",
+      "error_class_args_exact": true,
+      "chain_types": [
+        "builtins.KeyError"
+      ],
+      "whole_tree_exact": true,
+      "removed_native": 0,
+      "changed_dirs": 0,
+      "before_paths": 105,
+      "after_paths": 105,
+      "L1_country_exact": true
+    },
+    {
+      "case": "base-mixed",
+      "error_class_args_exact": true,
+      "chain_types": [
+        "builtins.KeyError"
+      ],
+      "whole_tree_exact": false,
+      "removed_native": 5,
+      "changed_dirs": 5,
+      "before_paths": 105,
+      "after_paths": 100,
+      "L1_country_exact": true
+    },
+    {
+      "case": "candidate-mixed",
+      "error_class_args_exact": true,
+      "chain_types": [
+        "builtins.KeyError"
+      ],
+      "whole_tree_exact": true,
+      "removed_native": 0,
+      "changed_dirs": 0,
+      "before_paths": 105,
+      "after_paths": 105,
+      "L1_country_exact": true
+    }
+  ],
+  "known_scanner_failures": {
+    "unchanged_literal_records": 163,
+    "failures": [
+      {
+        "feature": "food_prices",
+        "country": null,
+        "kwargs": {
+          "units": "kgprice"
+        },
+        "check": "assembly_nonempty",
+        "status": "fail"
+      },
+      {
+        "feature": "food_prices",
+        "country": null,
+        "kwargs": {
+          "units": "unitprice"
+        },
+        "check": "assembly_nonempty",
+        "status": "fail"
+      }
+    ],
+    "literal_sha256": "9e19e6a16ec37b0ecf7c5f1823db372fc30fd48b6b850a1668c195691cd46cd1"
+  },
+  "warning_equality": [
+    {
+      "kind": "bad",
+      "stage": "cold-food_acquired",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "cold-food_expenditures",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "cold-food_prices",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "cold-food_quantities",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "warm-food_acquired",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "warm-food_expenditures",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "warm-food_prices",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "warm-food_quantities",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "warm-singleton",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "feature-expenditures",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "feature-native-quantities",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "bad",
+      "stage": "feature-singleton",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "cold-food_acquired",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "cold-food_expenditures",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "cold-food_prices",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "cold-food_quantities",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "warm-food_acquired",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "warm-food_expenditures",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "warm-food_prices",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "warm-food_quantities",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "warm-singleton",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "feature-expenditures",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "feature-native-quantities",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    },
+    {
+      "kind": "mixed",
+      "stage": "feature-singleton",
+      "categories_and_order_exact": true,
+      "full_messages_exact": true
+    }
+  ],
+  "fingerprint_scope": {
+    "status": "MEASURED_BEFORE_DATA",
+    "counts": {
+      "country": {
+        "total": 549,
+        "moved": 549
+      },
+      "framework": {
+        "total": 39,
+        "moved": 39
+      },
+      "wave": {
+        "total": 1362,
+        "moved": 1362
+      }
+    },
+    "complete_declaration_and_exclusions_exact": true,
+    "outputs_not_assessed_by_fingerprints": true
+  },
+  "qualifications": [
+    "Iterator materialization changes the exhausted-iterator result; ordinary None/empty/order/duplicate/tuple/string controls remain as tested.",
+    "The guard deliberately changes derived error timing before lookup/fallback. Parent Make sentinel tests establish reachability only, not the underlying wrapped backend exception.",
+    "All build fingerprints move. Four Malawi roots and50 strict saved-result pairs do not establish whole-corpus output equality.",
+    "Author protection4319 retained six relative cleanup denials lacking historical dir_fd endpoints; source/provider/frozen evidence assertions and root-authorized chain are separately bound.",
+    "Two independent initial controllers stopped precollection when guard-v1 refused execnet fdopen; full streams and v1 guard remain, historical kernel pipe IDs were not captured. Corrected v2 has exact dir_fd handling and kernel IPC allowance.",
+    "Root preparation binds pre-import tmp symlink logical targets; reviewer full symlink physical receipts are an explicitly NEW during-run baseline, without invented initial timestamps.",
+    "Inherited Malawi conversion-factor and tracked-mover documentation tensions are quoted in phase0; no science, string-policy, Make1209 or country-alias repair was made."
+  ],
+  "acceptance_and_publication": "Root-owned; no Git/GitHub/source mutation by reviewer."
+}

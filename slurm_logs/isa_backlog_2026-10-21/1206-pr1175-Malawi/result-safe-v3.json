@@ -1,0 +1,12 @@
+{
+  "PR": 1175,
+  "status": "DOMAIN_CHANGE_BOUND_TO_REVIEWED_ORGANIC_PATCH",
+  "groups": 3,
+  "all_added_domains_explained_by_actual_candidate_organic_units": true,
+  "dtype_storage_NA_names_order_used_codes_verified": true,
+  "new_numeric_supplement_from_v2_unchanged": true,
+  "full_axis_invariance_failures_retained": 3,
+  "claims_full_frame_equality_for_qualified_groups": false,
+  "unexplained_domain_differences": 0,
+  "signed": "Sue"
+}

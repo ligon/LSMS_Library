@@ -1,0 +1,82 @@
+#+title: Six-fix ISA integration regression check
+#+author: Sue
+#+date: 2026-10-21
+
+* Source and result
+
+The validation-only branch =isa/integration-20261021= at =5906e87155e03e27cb493daaa2b8ec989516f3e2= combines reviewed PRs #1172, #1173, #1175, #1176, #1178 and #1180.
+It does not merge those public PRs or change development.
+The exact selection below passed 266 tests with zero skips, failures or errors in 126.48 seconds under eight loadfile workers.
+No full-suite or full-corpus result is implied.
+
+The source root was a physical copy of all 1,519 manifest-pinned release L2 files, with 2,733 physically copied held ISA L1 blobs.
+All copied bytes were checked; absent blobs were not fetched.
+Sixteen raw seed files outside the old L2 manifest were recorded and excluded from staging.
+The 1,519 manifest-pinned source-seed files remain byte-for-byte unchanged after the test selection.
+See =preparation-summary.json=, =cohort-summary.json= and =source-seed-postcheck.json=.
+Raw inputs, manifests, logs and JUnit XML remain private.
+
+* Environment and command
+
+Use a separate checkout at the pinned source and a physically private seeded data root, never a shared writable cache.
+Set =ISA_CHECKOUT= and =ISA_DATA= to those paths, =ISA_PYTHON= to the mounted project image interpreter, and =ISA_OFFLINE= to a directory containing the offline =sitecustomize.py= below.
+The original interpreter was =/local/job40255479/venv_img/bin/python=, image generation =20261019T221223Z=.
+Run from the selected checkout; assert package/config/data realpaths before pytest.
+Pin numerical and build threads to one and budget workers against the allocation.
+
+#+begin_src sh :eval no :tangle no :results output
+cd "$ISA_CHECKOUT"
+export PYTHONPATH="$ISA_CHECKOUT:$ISA_OFFLINE"
+export LSMS_COUNTRIES_ROOT="$ISA_CHECKOUT/lsms_library/countries"
+export LSMS_DATA_DIR="$ISA_DATA"
+export LSMS_ISSUES_LOG="$ISA_DATA/issues-private.log"
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+export LSMS_BUILD_WORKERS=1 LSMS_MAKE_JOBS=1 PYTHONDONTWRITEBYTECODE=1
+export PATH="$(dirname "$ISA_PYTHON"):$PATH"
+"$ISA_PYTHON" -m pytest -n 8 --dist=loadfile \
+  --timeout=600 --timeout-method=thread --maxfail=1 --tb=short -ra \
+  -o cache_dir="$ISA_DATA/pytest-cache" \
+  --basetemp="$ISA_DATA/pytest-temp" \
+  --junitxml="$ISA_DATA/cohort-tests-private.xml" \
+  tests/test_nigeria_food_item_decode.py \
+  tests/test_nigeria_food_unit_decode.py \
+  tests/test_nigeria_food_acquired_sources.py \
+  tests/test_gh1035_nigeria_w1_stated_weights.py \
+  tests/test_gh1041_nigeria_missing_unit.py \
+  tests/test_gh1047_nigeria_unit_codes.py \
+  tests/test_gh1062_uganda_sibling_writes.py \
+  tests/test_gh772_uganda_earnings_shape.py \
+  tests/test_1109_malawi_input_quantity.py \
+  tests/test_community_prices_variety.py \
+  tests/test_mali_community_price_readings.py \
+  > "$ISA_DATA/cohort-tests-private.log" 2>&1
+#+end_src
+
+The inherited offline guard permits local IPC and refuses IPv4/IPv6 connections in pytest and child builds.
+Verify =socket.socket.connect.__module__= and =connect_ex.__module__= are =sitecustomize=, and actively test refusal before starting.
+The first launch incorrectly checked the socket class's module and stopped before any test; =launch1.json= preserves that terminal result.
+
+#+begin_src python :eval no :tangle no :results output
+import socket
+
+_old_connect = socket.socket.connect
+_old_connect_ex = socket.socket.connect_ex
+
+def _connect(self, address):
+    if self.family in (socket.AF_INET, socket.AF_INET6):
+        raise OSError('ISA integration verification forbids network IO')
+    return _old_connect(self, address)
+
+def _connect_ex(self, address):
+    if self.family in (socket.AF_INET, socket.AF_INET6):
+        raise OSError('ISA integration verification forbids network IO')
+    return _old_connect_ex(self, address)
+
+socket.socket.connect = _connect
+socket.socket.connect_ex = _connect_ex
+#+end_src
+
+Detailed pytest output can contain household identifiers and observed values.
+Keep it private; export aggregate outcomes and named regression results only.
+
+Sue

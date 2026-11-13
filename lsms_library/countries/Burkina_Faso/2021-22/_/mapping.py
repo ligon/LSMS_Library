@@ -8,7 +8,8 @@ from lsms_library.transformations import (
 
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
+    inputs_unit_weight as _inputs_unit_weight,
     inputs_last_purchase as _inputs_last_purchase,
 )
 
@@ -20,6 +21,21 @@ from lsms_library.ehcvm import (
 # and Burkina_Faso/_/derivations.yml.
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Burkina_Faso')
 
+# GH #812.  `strata` is the documented stratum, region x milieu, as a label.  It
+# is a construction, so `sample` carries its registry key: see
+# lsms_library/ehcvm.py and Burkina_Faso/_/derivations.yml.
+from lsms_library.ehcvm import (  # noqa: E402
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
+)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Burkina_Faso')
+
+# GH #1452: `Quantity_kg` from the survey's own unit-weight table, national median;
+# which file and column, and why: lsms_library.ehcvm.NSU_TABLES.
+
 
 def inputs_food_acquired(wave):
     """The registry `inputs` callable: raw section-7B answers at (t, i, j).
@@ -30,6 +46,11 @@ def inputs_food_acquired(wave):
     fingerprint.
     """
     return _inputs_last_purchase('Burkina_Faso', wave)
+
+
+def inputs_food_acquired_unit_weight(wave):
+    """The registry `inputs` callable of the unit-weight derivation (GH #1452)."""
+    return _inputs_unit_weight('Burkina_Faso', wave)
 
 
 def food_acquired(df):
@@ -46,7 +67,93 @@ def food_acquired(df):
     No number changes here: one constant level is appended, nothing is summed,
     reduced or dropped.
     """
-    return add_visit_level(_food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION), visit=1)
+    return add_visit_level(_food_acquired_with_unit_weights(
+        df, FOOD_ACQUIRED_DERIVATION, wave='2021-22'), visit=1)
+
+# ---------------------------------------------------------------------------
+# cluster_features: a panel grappe's 2018-19 fix (GH #1057)
+# ---------------------------------------------------------------------------
+#
+# 2021-22 ships no cluster GPS: no grappe file in either catalog entry, and the
+# panel cover's GPS__* are 0 of 3,227 populated.  The panel re-interviews
+# households "tracked within the EA" (bid_bfa_ehcvm2.pdf p. 4) and grappe ==
+# grappe_EHCVM1 for all 3,227, so a panel grappe IS a 2018-19 EA and the fix
+# carries.  Three grappes name a different province in the two waves, which puts
+# that identity in doubt for them (GH #1059), six carry a fix far from their own
+# parcels, and three carry a copy of another grappe's reading, so all twelve stay NA
+# by ruling.  The cross-section has no 2018-19 antecedent; its household GPS is not a
+# cluster fix.
+PANEL_GPS_DERIVATION = 'Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19'
+
+# Seno/Yagha, Poni/Noumbiel, Kompienga/Gourma.  The first two have a 2018-19 fix;
+# the third has none, so its exclusion changes nothing served.
+_GPS_PROVINCE_CHANGED_GRAPPES = ('19', '365', '549')
+
+# The fix lies more than 25 km from the median of the grappe's own 2021-22 parcels
+# (s16aq46; km 104.7, 103.7, 51.4, 44.5, 29.3, 28.8), where the median carried grappe
+# is 1.6 km away.  Ruling of 2026-11-04.  The list is literal so that a build never
+# reads s16a; tests/test_gh1060_1057_burkina_cluster_features.py recomputes it from
+# the parcels.
+_GPS_FAR_FROM_PARCELS_GRAPPES = ('103', '104', '240', '237', '229', '226')
+
+# Rounded copies of another grappe's reading, so not a reading of this grappe in either
+# wave: 2018-19/_/mapping.py withholds them there.  Ruling of 2026-11-05.  226, 237, 240
+# and 365 are copies too, and are listed above.
+_GPS_COPIED_READING_GRAPPES = ('216', '218', '350')
+
+_GPS_NOT_CARRIED_GRAPPES = (_GPS_PROVINCE_CHANGED_GRAPPES + _GPS_FAR_FROM_PARCELS_GRAPPES
+                            + _GPS_COPIED_READING_GRAPPES)
+
+_GPS_COLUMNS = {'Latitude': 'coordonnes_gps__Latitude',
+                'Longitude': 'coordonnes_gps__Longitude'}
+
+
+def derive_panel_grappe_gps(df):
+    """Keep a panel grappe's 2018-19 fix, and stamp the rows that carry one.
+
+    Takes the merged frame: the ``v`` index level, and ``Latitude`` / ``Longitude``
+    from ``df_geo``.  Blanks the excluded grappes, then stamps ``Derivation`` on
+    every row still carrying a coordinate.  Row order is preserved.  With neither
+    column present (``df_geo`` could not be fetched, which the GH #675 drop stamp
+    reports) there is nothing carried and nothing to stamp.
+    """
+    out = df.copy()
+    present = [c for c in _GPS_COLUMNS if c in out.columns]
+    if not present:
+        return out
+    excluded = out.index.get_level_values('v').isin(_GPS_NOT_CARRIED_GRAPPES)
+    out.loc[excluded, present] = np.nan
+    carried = out[present].notna().any(axis=1).to_numpy()
+    out['Derivation'] = pd.Series(pd.NA, index=out.index, dtype='string')
+    out.loc[carried, 'Derivation'] = PANEL_GPS_DERIVATION
+    return out
+
+
+def cluster_features(df):
+    """``cluster_features`` post-processor: see :func:`derive_panel_grappe_gps`."""
+    return derive_panel_grappe_gps(df)
+
+
+def inputs_cluster_features(wave='2021-22'):
+    """The registry `inputs` callable: the 2018-19 fix behind each row that carries
+    one, one row per grappe, at ``(t, v)`` with ``t`` the wave it is served in.
+
+    ``grappe_EHCVM1`` is the panel cover's own pointer to the 2018-19 grappe, the
+    link the construction rests on.  An excluded grappe's fix is not returned,
+    because no served row was computed from it.
+    """
+    if wave != '2021-22':
+        raise ValueError(f'{PANEL_GPS_DERIVATION} covers 2021-22 only, not {wave!r}')
+    from lsms_library.paths import countries_root
+    root = countries_root() / 'Burkina_Faso'
+    gps = tools.get_dataframe(root / '2018-19' / 'Data' / 'grappe_gps_bfa2018.dta')
+    cover = tools.get_dataframe(root / wave / 'Data' / 's00_me_bfa2021.dta')
+    out = gps[['grappe', *_GPS_COLUMNS.values()]].merge(
+        cover[['grappe', 'grappe_EHCVM1']].drop_duplicates(), on='grappe')
+    v = out['grappe'].map(tools.format_id)
+    keep = out[list(_GPS_COLUMNS.values())].notna().any(axis=1) & ~v.isin(_GPS_NOT_CARRIED_GRAPPES)
+    return out[keep].assign(t=wave, v=v[keep]).set_index(['t', 'v'])
+
 
 FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
               'AteLess', 'RanOut', 'Hungry', 'WholeDay']
@@ -161,7 +268,9 @@ def shocks(df):
 
     how_coped = {0: [], 1: [], 2: []}
     for _, row in df[cope_cols].iterrows():
-        found = []
+        # Unlabelled in this file, but the values are the instrument's ranks:
+        # every row holds 1, 1-2 or 1-2-3, and code 25 keeps its rank (GH #1556).
+        ranked = []
         for c in cope_cols:
             num = int(c.replace('Cope', ''))
             val = row[c]
@@ -170,9 +279,9 @@ def shocks(df):
             except (ValueError, TypeError):
                 continue
             if val >= 1:
-                found.append(COPING_LABELS.get(num, f'Strategy {num}'))
-            if len(found) == 3:
-                break
+                ranked.append((val, COPING_LABELS.get(num, f'Strategy {num}')))
+        ranked.sort(key=lambda x: x[0])
+        found = [label for _, label in ranked]
         for k in range(3):
             how_coped[k].append(found[k] if k < len(found) else np.nan)
 

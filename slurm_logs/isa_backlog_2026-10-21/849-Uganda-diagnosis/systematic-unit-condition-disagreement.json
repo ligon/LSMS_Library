@@ -1,0 +1,3701 @@
+[
+  {
+    "wave": "2010-11",
+    "unit": "Basket (10 kg)",
+    "condition": "fresh_with_shell",
+    "rows": 45,
+    "screened_report_count": 45,
+    "agreement": {
+      "both_finite_positive": 45,
+      "within10_count": 7,
+      "within20_count": 8,
+      "within10_share": 0.15555555555555556,
+      "within20_share": 0.17777777777777778,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        2.0,
+        5.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      2.0,
+      3.0,
+      5.0,
+      6.0,
+      10.0
+    ],
+    "reported_cv": 0.5088621592809105
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dried_grain",
+    "rows": 1670,
+    "screened_report_count": 1669,
+    "agreement": {
+      "both_finite_positive": 1669,
+      "within10_count": 633,
+      "within20_count": 1038,
+      "within10_share": 0.3792690233672858,
+      "within20_share": 0.621929298981426,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        0.8333333333333334,
+        1.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      15.0,
+      15.0,
+      18.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.41046440879931184
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dried_with_shell",
+    "rows": 180,
+    "screened_report_count": 180,
+    "agreement": {
+      "both_finite_positive": 180,
+      "within10_count": 34,
+      "within20_count": 46,
+      "within10_share": 0.18888888888888888,
+      "within20_share": 0.25555555555555554,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.5,
+        3.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      5.0,
+      10.0,
+      15.0,
+      20.0
+    ],
+    "reported_cv": 1.0180486281169103
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dry_at_harvest_with_shell",
+    "rows": 53,
+    "screened_report_count": 52,
+    "agreement": {
+      "both_finite_positive": 52,
+      "within10_count": 4,
+      "within20_count": 4,
+      "within10_share": 0.07692307692307693,
+      "within20_share": 0.07692307692307693,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.5,
+        1.875
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      8.0,
+      8.75,
+      10.0,
+      12.0,
+      20.0
+    ],
+    "reported_cv": 0.4203126323685197
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "fresh",
+    "rows": 861,
+    "screened_report_count": 861,
+    "agreement": {
+      "both_finite_positive": 861,
+      "within10_count": 279,
+      "within20_count": 331,
+      "within10_share": 0.3240418118466899,
+      "within20_share": 0.38443670150987225,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.6,
+        0.8333333333333334,
+        1.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      15.0,
+      18.0,
+      24.0,
+      25.0
+    ],
+    "reported_cv": 0.4990861999235452
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "fresh_in_pods",
+    "rows": 588,
+    "screened_report_count": 588,
+    "agreement": {
+      "both_finite_positive": 588,
+      "within10_count": 117,
+      "within20_count": 228,
+      "within10_share": 0.1989795918367347,
+      "within20_share": 0.3877551020408163,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.5,
+        1.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      10.0,
+      10.0,
+      17.0,
+      18.0
+    ],
+    "reported_cv": 0.31980227437492315
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "fresh_with_shell",
+    "rows": 175,
+    "screened_report_count": 175,
+    "agreement": {
+      "both_finite_positive": 175,
+      "within10_count": 20,
+      "within20_count": 25,
+      "within10_share": 0.11428571428571428,
+      "within20_share": 0.14285714285714285,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.625,
+        0.75,
+        1.25
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      12.0,
+      19.0,
+      20.0,
+      22.0,
+      24.0
+    ],
+    "reported_cv": 0.5233883802216189
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "unknown_condition",
+    "rows": 20,
+    "screened_report_count": 20,
+    "agreement": {
+      "both_finite_positive": 20,
+      "within10_count": 4,
+      "within20_count": 6,
+      "within10_share": 0.2,
+      "within20_share": 0.3,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7431818181818182,
+        0.8333333333333334,
+        1.9500000000000064
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      9.250000000000002,
+      13.75,
+      18.0,
+      20.0,
+      20.200000000000003
+    ],
+    "reported_cv": 0.3870140818624035
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_in_cob",
+    "rows": 81,
+    "screened_report_count": 81,
+    "agreement": {
+      "both_finite_positive": 81,
+      "within10_count": 13,
+      "within20_count": 16,
+      "within10_share": 0.16049382716049382,
+      "within20_share": 0.19753086419753085,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.6666666666666667,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      40.0,
+      60.0,
+      60.0,
+      80.0,
+      100.0
+    ],
+    "reported_cv": 0.3234931751173168
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 209,
+    "screened_report_count": 208,
+    "agreement": {
+      "both_finite_positive": 208,
+      "within10_count": 100,
+      "within20_count": 105,
+      "within10_share": 0.4807692307692308,
+      "within20_share": 0.5048076923076923,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      60.0,
+      90.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.2688840834527048
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried",
+    "rows": 25,
+    "screened_report_count": 25,
+    "agreement": {
+      "both_finite_positive": 25,
+      "within10_count": 6,
+      "within20_count": 12,
+      "within10_share": 0.24,
+      "within20_share": 0.48,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3333333333333333,
+        3.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      40.0,
+      60.0,
+      90.0,
+      100.0,
+      120.0
+    ],
+    "reported_cv": 0.4086542728904585
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 81,
+    "screened_report_count": 81,
+    "agreement": {
+      "both_finite_positive": 81,
+      "within10_count": 12,
+      "within20_count": 18,
+      "within10_share": 0.14814814814814814,
+      "within20_share": 0.2222222222222222,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.7142857142857142,
+        2.6666666666666665
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      45.0,
+      50.0,
+      70.0,
+      80.0,
+      120.0
+    ],
+    "reported_cv": 0.36122692121103184
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "dried_with_shell",
+    "rows": 23,
+    "screened_report_count": 23,
+    "agreement": {
+      "both_finite_positive": 23,
+      "within10_count": 8,
+      "within20_count": 13,
+      "within10_share": 0.34782608695652173,
+      "within20_share": 0.5652173913043478,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        1.6000000000000003
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      12.600000000000001,
+      15.0,
+      18.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.16450271725482504
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_in_cob",
+    "rows": 43,
+    "screened_report_count": 43,
+    "agreement": {
+      "both_finite_positive": 43,
+      "within10_count": 12,
+      "within20_count": 19,
+      "within10_share": 0.27906976744186046,
+      "within20_share": 0.4418604651162791,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3333333333333333,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      15.0,
+      15.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.3234167729591765
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_with_shell",
+    "rows": 28,
+    "screened_report_count": 28,
+    "agreement": {
+      "both_finite_positive": 28,
+      "within10_count": 6,
+      "within20_count": 10,
+      "within10_share": 0.21428571428571427,
+      "within20_share": 0.35714285714285715,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.8333333333333335,
+        4.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      6.0,
+      11.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.6953365609129623
+  },
+  {
+    "wave": "2010-11",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "unknown_condition",
+    "rows": 26,
+    "screened_report_count": 26,
+    "agreement": {
+      "both_finite_positive": 26,
+      "within10_count": 7,
+      "within20_count": 11,
+      "within10_share": 0.2692307692307692,
+      "within20_share": 0.4230769230769231,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8545454545454545,
+        1.3333333333333333,
+        12.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      3.0,
+      9.25,
+      15.0,
+      20.0,
+      23.5
+    ],
+    "reported_cv": 0.7886093848698238
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Basket (20 kg)",
+    "condition": "dried_with_shell",
+    "rows": 32,
+    "screened_report_count": 32,
+    "agreement": {
+      "both_finite_positive": 32,
+      "within10_count": 4,
+      "within20_count": 4,
+      "within10_share": 0.125,
+      "within20_share": 0.125,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.025,
+        2.0,
+        4.444444444444445
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      4.5,
+      5.75,
+      10.0,
+      13.25,
+      19.60000000000001
+    ],
+    "reported_cv": 0.4852611753640014
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Basket (20 kg)",
+    "condition": "fresh_in_cob",
+    "rows": 65,
+    "screened_report_count": 65,
+    "agreement": {
+      "both_finite_positive": 65,
+      "within10_count": 15,
+      "within20_count": 39,
+      "within10_share": 0.23076923076923078,
+      "within20_share": 0.6,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8,
+        1.1111111111111112,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      12.0,
+      15.0,
+      18.0,
+      20.0,
+      25.0
+    ],
+    "reported_cv": 0.23877238410210697
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Basket (20 kg)",
+    "condition": "fresh_in_pods",
+    "rows": 136,
+    "screened_report_count": 136,
+    "agreement": {
+      "both_finite_positive": 136,
+      "within10_count": 37,
+      "within20_count": 61,
+      "within10_share": 0.27205882352941174,
+      "within20_share": 0.4485294117647059,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      14.0,
+      16.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.22543438916219202
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Basket (20 kg)",
+    "condition": "green_in_cob",
+    "rows": 24,
+    "screened_report_count": 24,
+    "agreement": {
+      "both_finite_positive": 24,
+      "within10_count": 5,
+      "within20_count": 22,
+      "within10_share": 0.20833333333333334,
+      "within20_share": 0.9166666666666666,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1764705882352942,
+        1.1764705882352942
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      17.0,
+      17.0,
+      17.0,
+      18.0,
+      20.0
+    ],
+    "reported_cv": 0.07992501893322443
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Basket (20 kg)",
+    "condition": "green_in_pods",
+    "rows": 57,
+    "screened_report_count": 57,
+    "agreement": {
+      "both_finite_positive": 57,
+      "within10_count": 5,
+      "within20_count": 8,
+      "within10_share": 0.08771929824561403,
+      "within20_share": 0.14035087719298245,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.1764705882352942,
+        1.4285714285714286,
+        1.5897435897435896
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      12.600000000000001,
+      13.0,
+      14.0,
+      16.0,
+      17.0
+    ],
+    "reported_cv": 0.1692109636574814
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Basket (20 kg)",
+    "condition": "green_with_shell",
+    "rows": 76,
+    "screened_report_count": 76,
+    "agreement": {
+      "both_finite_positive": 76,
+      "within10_count": 12,
+      "within20_count": 31,
+      "within10_share": 0.15789473684210525,
+      "within20_share": 0.40789473684210525,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.4285714285714286
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      14.0,
+      15.0,
+      16.0,
+      17.0,
+      20.0
+    ],
+    "reported_cv": 0.12256763242730125
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dried_grain",
+    "rows": 1115,
+    "screened_report_count": 1115,
+    "agreement": {
+      "both_finite_positive": 1115,
+      "within10_count": 377,
+      "within20_count": 730,
+      "within10_share": 0.3381165919282511,
+      "within20_share": 0.6547085201793722,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        0.8823529411764706,
+        1.1538461538461537
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      13.0,
+      15.0,
+      17.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.5902115633391332
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dried_with_shell",
+    "rows": 156,
+    "screened_report_count": 156,
+    "agreement": {
+      "both_finite_positive": 156,
+      "within10_count": 22,
+      "within20_count": 32,
+      "within10_share": 0.14102564102564102,
+      "within20_share": 0.20512820512820512,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.5,
+        3.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      7.0,
+      10.0,
+      15.0,
+      20.0
+    ],
+    "reported_cv": 1.018508432717899
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dry_at_harvest_with_shell",
+    "rows": 34,
+    "screened_report_count": 34,
+    "agreement": {
+      "both_finite_positive": 34,
+      "within10_count": 2,
+      "within20_count": 2,
+      "within10_share": 0.058823529411764705,
+      "within20_share": 0.058823529411764705,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.6,
+        1.25,
+        2.0624999999999996
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      7.300000000000001,
+      10.0,
+      12.0,
+      20.0,
+      25.0
+    ],
+    "reported_cv": 1.3186843599223947
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "fresh_with_shell",
+    "rows": 98,
+    "screened_report_count": 98,
+    "agreement": {
+      "both_finite_positive": 98,
+      "within10_count": 12,
+      "within20_count": 16,
+      "within10_share": 0.12244897959183673,
+      "within20_share": 0.16326530612244897,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.6818181818181818,
+        0.75,
+        1.875
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      8.0,
+      12.75,
+      20.0,
+      22.0,
+      22.0
+    ],
+    "reported_cv": 1.141225415703315
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried",
+    "rows": 130,
+    "screened_report_count": 130,
+    "agreement": {
+      "both_finite_positive": 130,
+      "within10_count": 54,
+      "within20_count": 66,
+      "within10_share": 0.4153846153846154,
+      "within20_share": 0.5076923076923077,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        1.4523809523809545
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      69.0,
+      70.0,
+      90.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.26241543428961356
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 302,
+    "screened_report_count": 300,
+    "agreement": {
+      "both_finite_positive": 300,
+      "within10_count": 41,
+      "within20_count": 47,
+      "within10_share": 0.13666666666666666,
+      "within20_share": 0.15666666666666668,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.6666666666666667,
+        3.3333333333333335
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      40.0,
+      60.0,
+      80.0,
+      100.0
+    ],
+    "reported_cv": 0.43154676367722955
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Sack (100 kgs)",
+    "condition": "fresh",
+    "rows": 995,
+    "screened_report_count": 991,
+    "agreement": {
+      "both_finite_positive": 991,
+      "within10_count": 381,
+      "within20_count": 760,
+      "within10_share": 0.384460141271443,
+      "within20_share": 0.7669021190716448,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7692307692307693,
+        0.8333333333333334,
+        1.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      100.0,
+      100.0,
+      120.0,
+      120.0,
+      130.0
+    ],
+    "reported_cv": 0.15767249300747904
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Sack (100 kgs)",
+    "condition": "fresh_with_shell",
+    "rows": 58,
+    "screened_report_count": 58,
+    "agreement": {
+      "both_finite_positive": 58,
+      "within10_count": 8,
+      "within20_count": 10,
+      "within10_share": 0.13793103448275862,
+      "within20_share": 0.1724137931034483,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.4285714285714286,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      60.0,
+      60.0,
+      70.0,
+      75.0,
+      100.0
+    ],
+    "reported_cv": 0.35114239743636644
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried",
+    "rows": 62,
+    "screened_report_count": 61,
+    "agreement": {
+      "both_finite_positive": 61,
+      "within10_count": 19,
+      "within20_count": 43,
+      "within10_share": 0.3114754098360656,
+      "within20_share": 0.7049180327868853,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9230769230769231,
+        1.2,
+        1.6
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      75.0,
+      90.0,
+      100.0,
+      120.0,
+      130.0
+    ],
+    "reported_cv": 0.29776466165919263
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 119,
+    "screened_report_count": 119,
+    "agreement": {
+      "both_finite_positive": 119,
+      "within10_count": 6,
+      "within20_count": 9,
+      "within10_share": 0.05042016806722689,
+      "within20_share": 0.07563025210084033,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.3066666666666666,
+        1.8461538461538463,
+        2.6666666666666665
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      45.0,
+      60.0,
+      65.0,
+      70.0,
+      92.00000000000003
+    ],
+    "reported_cv": 0.4405998590434759
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Sack (120 kgs)",
+    "condition": "green_in_cob",
+    "rows": 20,
+    "screened_report_count": 20,
+    "agreement": {
+      "both_finite_positive": 20,
+      "within10_count": 4,
+      "within20_count": 11,
+      "within10_share": 0.2,
+      "within20_share": 0.55,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9923076923076923,
+        1.2,
+        1.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      80.0,
+      83.75,
+      100.0,
+      100.0,
+      121.00000000000001
+    ],
+    "reported_cv": 0.16118315425065316
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Sack (50 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 59,
+    "screened_report_count": 59,
+    "agreement": {
+      "both_finite_positive": 59,
+      "within10_count": 13,
+      "within20_count": 15,
+      "within10_share": 0.22033898305084745,
+      "within20_share": 0.2542372881355932,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.25
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      40.0,
+      40.0,
+      40.0,
+      45.0,
+      50.0
+    ],
+    "reported_cv": 0.6423697465389594
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh",
+    "rows": 127,
+    "screened_report_count": 127,
+    "agreement": {
+      "both_finite_positive": 127,
+      "within10_count": 51,
+      "within20_count": 81,
+      "within10_share": 0.4015748031496063,
+      "within20_share": 0.6377952755905512,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7142857142857143,
+        0.8333333333333334,
+        1.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      50.0,
+      60.0,
+      70.0,
+      70.0
+    ],
+    "reported_cv": 0.16864546946536121
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "dried_with_shell",
+    "rows": 37,
+    "screened_report_count": 37,
+    "agreement": {
+      "both_finite_positive": 37,
+      "within10_count": 2,
+      "within20_count": 8,
+      "within10_share": 0.05405405405405406,
+      "within20_share": 0.21621621621621623,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0666666666666667,
+        1.4285714285714286,
+        4.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      7.0,
+      14.0,
+      16.0,
+      18.799999999999997
+    ],
+    "reported_cv": 0.46698986246228114
+  },
+  {
+    "wave": "2011-12",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_in_cob",
+    "rows": 72,
+    "screened_report_count": 72,
+    "agreement": {
+      "both_finite_positive": 72,
+      "within10_count": 25,
+      "within20_count": 44,
+      "within10_share": 0.3472222222222222,
+      "within20_share": 0.6111111111111112,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        1.3333333333333333
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      15.0,
+      16.0,
+      18.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.23478296029309598
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Basket (10 kg)",
+    "condition": "fresh_in_cob",
+    "rows": 48,
+    "screened_report_count": 48,
+    "agreement": {
+      "both_finite_positive": 48,
+      "within10_count": 15,
+      "within20_count": 20,
+      "within10_share": 0.3125,
+      "within20_share": 0.4166666666666667,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      6.75,
+      8.0,
+      10.0,
+      10.0
+    ],
+    "reported_cv": 0.34683070866850096
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Basket (10 kg)",
+    "condition": "fresh_in_pods",
+    "rows": 106,
+    "screened_report_count": 106,
+    "agreement": {
+      "both_finite_positive": 106,
+      "within10_count": 32,
+      "within20_count": 36,
+      "within10_share": 0.3018867924528302,
+      "within20_share": 0.33962264150943394,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.4285714285714286,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      4.0,
+      5.0,
+      7.0,
+      10.0,
+      10.0
+    ],
+    "reported_cv": 0.3596415096080089
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Basket (10 kg)",
+    "condition": "fresh_with_shell",
+    "rows": 72,
+    "screened_report_count": 72,
+    "agreement": {
+      "both_finite_positive": 72,
+      "within10_count": 17,
+      "within20_count": 17,
+      "within10_share": 0.2361111111111111,
+      "within20_share": 0.2361111111111111,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.4285714285714286,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      5.0,
+      7.0,
+      10.0,
+      10.0
+    ],
+    "reported_cv": 0.37717602786895177
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Basket (5 kg)",
+    "condition": "fresh",
+    "rows": 79,
+    "screened_report_count": 79,
+    "agreement": {
+      "both_finite_positive": 79,
+      "within10_count": 20,
+      "within20_count": 28,
+      "within10_share": 0.25316455696202533,
+      "within20_share": 0.35443037974683544,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.5,
+        0.7142857142857143,
+        1.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      5.0,
+      7.0,
+      8.5,
+      10.0
+    ],
+    "reported_cv": 0.7013648696705569
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Basket (5 kg)",
+    "condition": "fresh_in_cob",
+    "rows": 62,
+    "screened_report_count": 62,
+    "agreement": {
+      "both_finite_positive": 62,
+      "within10_count": 11,
+      "within20_count": 24,
+      "within10_share": 0.1774193548387097,
+      "within20_share": 0.3870967741935484,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.625,
+        0.8333333333333334,
+        1.25
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      4.0,
+      5.0,
+      6.0,
+      7.0,
+      8.0
+    ],
+    "reported_cv": 0.3067078267549883
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Basket (5 kg)",
+    "condition": "fresh_with_shell",
+    "rows": 41,
+    "screened_report_count": 41,
+    "agreement": {
+      "both_finite_positive": 41,
+      "within10_count": 13,
+      "within20_count": 14,
+      "within10_share": 0.3170731707317073,
+      "within20_share": 0.34146341463414637,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.6666666666666667,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      3.0,
+      3.0,
+      3.0,
+      5.0,
+      5.0
+    ],
+    "reported_cv": 0.31141255237671095
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Jerrican (20 lts)",
+    "condition": "fresh",
+    "rows": 25,
+    "screened_report_count": 25,
+    "agreement": {
+      "both_finite_positive": 25,
+      "within10_count": 4,
+      "within20_count": 4,
+      "within10_share": 0.16,
+      "within20_share": 0.16,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.6666666666666667,
+        3.1428571428571437
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      6.4,
+      9.0,
+      12.0,
+      15.0,
+      20.0
+    ],
+    "reported_cv": 0.37634338002187273
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dried_with_shell",
+    "rows": 161,
+    "screened_report_count": 161,
+    "agreement": {
+      "both_finite_positive": 161,
+      "within10_count": 27,
+      "within20_count": 28,
+      "within10_share": 0.16770186335403728,
+      "within20_share": 0.17391304347826086,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        3.0,
+        3.75
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      4.0,
+      5.0,
+      5.0,
+      15.0,
+      18.0
+    ],
+    "reported_cv": 1.590537502568113
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "fresh_with_shell",
+    "rows": 148,
+    "screened_report_count": 148,
+    "agreement": {
+      "both_finite_positive": 148,
+      "within10_count": 47,
+      "within20_count": 57,
+      "within10_share": 0.31756756756756754,
+      "within20_share": 0.38513513513513514,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        1.125,
+        3.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      8.0,
+      13.5,
+      15.0,
+      20.0
+    ],
+    "reported_cv": 0.6206098659419614
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "green_in_cob",
+    "rows": 33,
+    "screened_report_count": 33,
+    "agreement": {
+      "both_finite_positive": 33,
+      "within10_count": 11,
+      "within20_count": 11,
+      "within10_share": 0.3333333333333333,
+      "within20_share": 0.3333333333333333,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.5,
+        1.875
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      8.0,
+      8.0,
+      10.0,
+      15.0,
+      15.0
+    ],
+    "reported_cv": 0.3077237032648288
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_in_pods",
+    "rows": 157,
+    "screened_report_count": 157,
+    "agreement": {
+      "both_finite_positive": 157,
+      "within10_count": 38,
+      "within20_count": 49,
+      "within10_share": 0.24203821656050956,
+      "within20_share": 0.31210191082802546,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      60.0,
+      70.0,
+      80.0,
+      90.0,
+      100.0
+    ],
+    "reported_cv": 0.16609595237522642
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 195,
+    "screened_report_count": 191,
+    "agreement": {
+      "both_finite_positive": 191,
+      "within10_count": 80,
+      "within20_count": 81,
+      "within10_share": 0.418848167539267,
+      "within20_share": 0.42408376963350786,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      40.0,
+      50.0,
+      80.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.4012699827750801
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (100 kgs)",
+    "condition": "dry_at_harvest_in_cob",
+    "rows": 32,
+    "screened_report_count": 32,
+    "agreement": {
+      "both_finite_positive": 32,
+      "within10_count": 13,
+      "within20_count": 18,
+      "within10_share": 0.40625,
+      "within20_share": 0.5625,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        1.9666666666666675
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      51.0,
+      70.0,
+      90.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.39335887447236456
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (100 kgs)",
+    "condition": "fresh_in_pods",
+    "rows": 179,
+    "screened_report_count": 178,
+    "agreement": {
+      "both_finite_positive": 178,
+      "within10_count": 84,
+      "within20_count": 97,
+      "within10_share": 0.47191011235955055,
+      "within20_share": 0.5449438202247191,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        1.7222222222222243
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      58.199999999999996,
+      70.0,
+      90.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.2274993878036747
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (100 kgs)",
+    "condition": "fresh_with_shell",
+    "rows": 119,
+    "screened_report_count": 119,
+    "agreement": {
+      "both_finite_positive": 119,
+      "within10_count": 53,
+      "within20_count": 58,
+      "within10_share": 0.44537815126050423,
+      "within20_share": 0.48739495798319327,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      65.0,
+      80.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.2873383751976683
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (100 kgs)",
+    "condition": "green_in_cob",
+    "rows": 39,
+    "screened_report_count": 39,
+    "agreement": {
+      "both_finite_positive": 39,
+      "within10_count": 12,
+      "within20_count": 13,
+      "within10_share": 0.3076923076923077,
+      "within20_share": 0.3333333333333333,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      50.0,
+      80.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.2968718666597167
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (100 kgs)",
+    "condition": "green_in_pods",
+    "rows": 33,
+    "screened_report_count": 33,
+    "agreement": {
+      "both_finite_positive": 33,
+      "within10_count": 13,
+      "within20_count": 13,
+      "within10_share": 0.3939393939393939,
+      "within20_share": 0.3939393939393939,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.6666666666666667,
+        3.866666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      26.0,
+      40.0,
+      60.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.48279925358520615
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (100 kgs)",
+    "condition": "green_with_shell",
+    "rows": 77,
+    "screened_report_count": 77,
+    "agreement": {
+      "both_finite_positive": 77,
+      "within10_count": 34,
+      "within20_count": 48,
+      "within10_share": 0.44155844155844154,
+      "within20_share": 0.6233766233766234,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        1.800000000000002
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      56.00000000000001,
+      75.0,
+      90.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.2275782198587054
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 46,
+    "screened_report_count": 43,
+    "agreement": {
+      "both_finite_positive": 43,
+      "within10_count": 5,
+      "within20_count": 8,
+      "within10_share": 0.11627906976744186,
+      "within20_share": 0.18604651162790697,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8530612244897959,
+        2.0,
+        2.4
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      52.5,
+      60.0,
+      100.0,
+      141.6000000000001
+    ],
+    "reported_cv": 0.6311835832372928
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (50 kgs)",
+    "condition": "dried_in_pods",
+    "rows": 20,
+    "screened_report_count": 20,
+    "agreement": {
+      "both_finite_positive": 20,
+      "within10_count": 1,
+      "within20_count": 7,
+      "within10_share": 0.05,
+      "within20_share": 0.35,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7142857142857143,
+        0.8333333333333334,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      57.5,
+      60.0,
+      70.0,
+      70.0
+    ],
+    "reported_cv": 0.3106303720986978
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (50 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 60,
+    "screened_report_count": 60,
+    "agreement": {
+      "both_finite_positive": 60,
+      "within10_count": 15,
+      "within20_count": 17,
+      "within10_share": 0.25,
+      "within20_share": 0.2833333333333333,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7123015873015873,
+        1.25,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      40.0,
+      40.0,
+      50.0,
+      70.2
+    ],
+    "reported_cv": 0.4572131745122875
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh_with_shell",
+    "rows": 24,
+    "screened_report_count": 24,
+    "agreement": {
+      "both_finite_positive": 24,
+      "within10_count": 8,
+      "within20_count": 11,
+      "within10_share": 0.3333333333333333,
+      "within20_share": 0.4583333333333333,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      38.0,
+      40.0,
+      50.0,
+      50.0
+    ],
+    "reported_cv": 0.23609539689476414
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Sack (50 kgs)",
+    "condition": "green_with_shell",
+    "rows": 20,
+    "screened_report_count": 20,
+    "agreement": {
+      "both_finite_positive": 20,
+      "within10_count": 7,
+      "within20_count": 9,
+      "within10_share": 0.35,
+      "within20_share": 0.45,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1805555555555556,
+        1.7857142857142858
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      28.0,
+      40.0,
+      42.5,
+      50.0,
+      50.0
+    ],
+    "reported_cv": 0.3274779372820477
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "dried_in_pods",
+    "rows": 43,
+    "screened_report_count": 43,
+    "agreement": {
+      "both_finite_positive": 43,
+      "within10_count": 10,
+      "within20_count": 11,
+      "within10_share": 0.23255813953488372,
+      "within20_share": 0.2558139534883721,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3333333333333333,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      11.5,
+      15.0,
+      16.5,
+      20.0
+    ],
+    "reported_cv": 0.25833557515993133
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "dried_with_shell",
+    "rows": 28,
+    "screened_report_count": 28,
+    "agreement": {
+      "both_finite_positive": 28,
+      "within10_count": 3,
+      "within20_count": 7,
+      "within10_share": 0.10714285714285714,
+      "within20_share": 0.25,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.077777777777778,
+        2.0,
+        3.3333333333333335
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      6.0,
+      8.0,
+      10.0,
+      15.5,
+      18.6
+    ],
+    "reported_cv": 0.41928964481832887
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_in_cob",
+    "rows": 64,
+    "screened_report_count": 64,
+    "agreement": {
+      "both_finite_positive": 64,
+      "within10_count": 7,
+      "within20_count": 11,
+      "within10_share": 0.109375,
+      "within20_share": 0.171875,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0333333333333334,
+        2.0,
+        2.857142857142857
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      7.0,
+      8.0,
+      10.0,
+      15.0,
+      19.400000000000006
+    ],
+    "reported_cv": 0.40788472778103174
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_in_pods",
+    "rows": 332,
+    "screened_report_count": 332,
+    "agreement": {
+      "both_finite_positive": 332,
+      "within10_count": 90,
+      "within20_count": 134,
+      "within10_share": 0.2710843373493976,
+      "within20_share": 0.4036144578313253,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3333333333333333,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      8.0,
+      10.0,
+      15.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.5265977933104219
+  },
+  {
+    "wave": "2013-14",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_with_shell",
+    "rows": 28,
+    "screened_report_count": 28,
+    "agreement": {
+      "both_finite_positive": 28,
+      "within10_count": 11,
+      "within20_count": 15,
+      "within10_share": 0.39285714285714285,
+      "within20_share": 0.5357142857142857,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1437908496732025,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      13.5,
+      17.5,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.2881634500544177
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Basket (10 kg)",
+    "condition": "fresh_in_pods",
+    "rows": 50,
+    "screened_report_count": 50,
+    "agreement": {
+      "both_finite_positive": 50,
+      "within10_count": 13,
+      "within20_count": 15,
+      "within10_share": 0.26,
+      "within20_share": 0.3,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      4.0,
+      6.25,
+      8.0,
+      10.0,
+      10.0
+    ],
+    "reported_cv": 0.31706335289087584
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Basket (20 kg)",
+    "condition": "fresh",
+    "rows": 68,
+    "screened_report_count": 68,
+    "agreement": {
+      "both_finite_positive": 68,
+      "within10_count": 33,
+      "within20_count": 39,
+      "within10_share": 0.4852941176470588,
+      "within20_share": 0.5735294117647058,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.5,
+        0.8,
+        1.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      20.0,
+      20.0,
+      25.0,
+      40.0,
+      40.0
+    ],
+    "reported_cv": 0.32515741771063295
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Basket (20 kg)",
+    "condition": "fresh_in_pods",
+    "rows": 25,
+    "screened_report_count": 25,
+    "agreement": {
+      "both_finite_positive": 25,
+      "within10_count": 9,
+      "within20_count": 10,
+      "within10_share": 0.36,
+      "within20_share": 0.4,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3333333333333333,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      10.0,
+      15.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.2905961529832489
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Basket (5 kg)",
+    "condition": "fresh_in_cob",
+    "rows": 33,
+    "screened_report_count": 33,
+    "agreement": {
+      "both_finite_positive": 33,
+      "within10_count": 5,
+      "within20_count": 9,
+      "within10_share": 0.15151515151515152,
+      "within20_share": 0.2727272727272727,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.5555555555555556,
+        0.625,
+        1.25
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      4.0,
+      5.0,
+      8.0,
+      8.0,
+      9.0
+    ],
+    "reported_cv": 0.35030504596415213
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Basket (5 kg)",
+    "condition": "fresh_in_pods",
+    "rows": 69,
+    "screened_report_count": 69,
+    "agreement": {
+      "both_finite_positive": 69,
+      "within10_count": 10,
+      "within20_count": 12,
+      "within10_share": 0.14492753623188406,
+      "within20_share": 0.17391304347826086,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.6964285714285715,
+        1.6666666666666667,
+        5.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      1.0,
+      2.0,
+      3.0,
+      5.0,
+      7.200000000000003
+    ],
+    "reported_cv": 0.6409554454308781
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dried_with_shell",
+    "rows": 191,
+    "screened_report_count": 191,
+    "agreement": {
+      "both_finite_positive": 191,
+      "within10_count": 39,
+      "within20_count": 42,
+      "within10_share": 0.20418848167539266,
+      "within20_share": 0.2198952879581152,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        2.142857142857143,
+        3.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      5.0,
+      7.0,
+      12.0,
+      15.0
+    ],
+    "reported_cv": 1.1561836639651784
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dry_at_harvest_with_shell",
+    "rows": 26,
+    "screened_report_count": 26,
+    "agreement": {
+      "both_finite_positive": 26,
+      "within10_count": 6,
+      "within20_count": 6,
+      "within10_share": 0.23076923076923078,
+      "within20_share": 0.23076923076923078,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        2.142857142857143,
+        3.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      6.0,
+      7.0,
+      13.0,
+      15.0
+    ],
+    "reported_cv": 0.4779389583632098
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "fresh_in_cob",
+    "rows": 157,
+    "screened_report_count": 157,
+    "agreement": {
+      "both_finite_positive": 157,
+      "within10_count": 50,
+      "within20_count": 56,
+      "within10_share": 0.3184713375796178,
+      "within20_share": 0.35668789808917195,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.8333333333333334,
+        1.25,
+        1.875
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      8.0,
+      10.0,
+      12.0,
+      15.0,
+      18.0
+    ],
+    "reported_cv": 0.31711763246708397
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "fresh_in_pods",
+    "rows": 481,
+    "screened_report_count": 481,
+    "agreement": {
+      "both_finite_positive": 481,
+      "within10_count": 183,
+      "within20_count": 198,
+      "within10_share": 0.3804573804573805,
+      "within20_share": 0.41164241164241167,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9375,
+        1.25,
+        3.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      8.0,
+      12.0,
+      15.0,
+      16.0
+    ],
+    "reported_cv": 0.37576371120464624
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_in_cob",
+    "rows": 39,
+    "screened_report_count": 39,
+    "agreement": {
+      "both_finite_positive": 39,
+      "within10_count": 13,
+      "within20_count": 15,
+      "within10_share": 0.3333333333333333,
+      "within20_share": 0.38461538461538464,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.4285714285714286,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      60.0,
+      70.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.28834501570786597
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_in_pods",
+    "rows": 162,
+    "screened_report_count": 162,
+    "agreement": {
+      "both_finite_positive": 162,
+      "within10_count": 62,
+      "within20_count": 69,
+      "within10_share": 0.38271604938271603,
+      "within20_share": 0.42592592592592593,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.4285714285714286
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      70.0,
+      70.75,
+      80.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.16850215866597662
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 366,
+    "screened_report_count": 365,
+    "agreement": {
+      "both_finite_positive": 365,
+      "within10_count": 136,
+      "within20_count": 146,
+      "within10_share": 0.3726027397260274,
+      "within20_share": 0.4,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.4285714285714286,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      40.0,
+      50.0,
+      70.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.3675400479998404
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (100 kgs)",
+    "condition": "dry_at_harvest_with_shell",
+    "rows": 50,
+    "screened_report_count": 50,
+    "agreement": {
+      "both_finite_positive": 50,
+      "within10_count": 15,
+      "within20_count": 17,
+      "within10_share": 0.3,
+      "within20_share": 0.34,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.4285714285714286,
+        2.5833333333333344
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      39.0,
+      40.0,
+      70.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.41078869898560166
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (100 kgs)",
+    "condition": "green_in_cob",
+    "rows": 39,
+    "screened_report_count": 39,
+    "agreement": {
+      "both_finite_positive": 39,
+      "within10_count": 7,
+      "within20_count": 9,
+      "within10_share": 0.1794871794871795,
+      "within20_share": 0.23076923076923078,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.6666666666666667,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      40.0,
+      50.0,
+      60.0,
+      80.0,
+      100.0
+    ],
+    "reported_cv": 0.3899210396693483
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried",
+    "rows": 24,
+    "screened_report_count": 24,
+    "agreement": {
+      "both_finite_positive": 24,
+      "within10_count": 7,
+      "within20_count": 17,
+      "within10_share": 0.2916666666666667,
+      "within20_share": 0.7083333333333334,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9341538461538462,
+        1.2,
+        1.45
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      83.0,
+      90.0,
+      100.0,
+      120.0,
+      128.5
+    ],
+    "reported_cv": 0.1760683446850228
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 91,
+    "screened_report_count": 89,
+    "agreement": {
+      "both_finite_positive": 89,
+      "within10_count": 3,
+      "within20_count": 8,
+      "within10_share": 0.033707865168539325,
+      "within20_share": 0.0898876404494382,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.2,
+        2.0,
+        2.6666666666666665
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      45.0,
+      50.0,
+      60.0,
+      65.0,
+      100.0
+    ],
+    "reported_cv": 0.4542537670018081
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (120 kgs)",
+    "condition": "dry_at_harvest_with_shell",
+    "rows": 25,
+    "screened_report_count": 25,
+    "agreement": {
+      "both_finite_positive": 25,
+      "within10_count": 0,
+      "within20_count": 1,
+      "within10_share": 0.0,
+      "within20_share": 0.04,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.8285714285714285,
+        2.5531914893617023,
+        2.970731707317073
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      40.4,
+      45.0,
+      47.0,
+      60.0,
+      66.00000000000001
+    ],
+    "reported_cv": 0.29293711050684007
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (50 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 52,
+    "screened_report_count": 52,
+    "agreement": {
+      "both_finite_positive": 52,
+      "within10_count": 11,
+      "within20_count": 14,
+      "within10_share": 0.21153846153846154,
+      "within20_share": 0.2692307692307692,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      20.0,
+      30.0,
+      40.0,
+      50.0,
+      50.0
+    ],
+    "reported_cv": 0.39845006823616297
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh_in_cob",
+    "rows": 49,
+    "screened_report_count": 49,
+    "agreement": {
+      "both_finite_positive": 49,
+      "within10_count": 12,
+      "within20_count": 15,
+      "within10_share": 0.24489795918367346,
+      "within20_share": 0.30612244897959184,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        2.1000000000000014
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      24.000000000000004,
+      30.0,
+      40.0,
+      45.0,
+      50.0
+    ],
+    "reported_cv": 0.26515404553030814
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh_in_pods",
+    "rows": 44,
+    "screened_report_count": 44,
+    "agreement": {
+      "both_finite_positive": 44,
+      "within10_count": 15,
+      "within20_count": 19,
+      "within10_share": 0.3409090909090909,
+      "within20_share": 0.4318181818181818,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      20.0,
+      30.0,
+      40.0,
+      50.0,
+      50.0
+    ],
+    "reported_cv": 0.3905216438047228
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh_with_shell",
+    "rows": 83,
+    "screened_report_count": 83,
+    "agreement": {
+      "both_finite_positive": 83,
+      "within10_count": 28,
+      "within20_count": 35,
+      "within10_share": 0.3373493975903614,
+      "within20_share": 0.42168674698795183,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9090909090909091,
+        1.25,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      30.0,
+      40.0,
+      50.0,
+      55.0
+    ],
+    "reported_cv": 0.3354811176686431
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Sack (50 kgs)",
+    "condition": "green_with_shell",
+    "rows": 57,
+    "screened_report_count": 57,
+    "agreement": {
+      "both_finite_positive": 57,
+      "within10_count": 24,
+      "within20_count": 28,
+      "within10_share": 0.42105263157894735,
+      "within20_share": 0.49122807017543857,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      40.0,
+      40.0,
+      50.0,
+      50.0
+    ],
+    "reported_cv": 0.1978182902091744
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "dried_in_pods",
+    "rows": 37,
+    "screened_report_count": 37,
+    "agreement": {
+      "both_finite_positive": 37,
+      "within10_count": 14,
+      "within20_count": 22,
+      "within10_share": 0.3783783783783784,
+      "within20_share": 0.5945945945945946,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        1.3333333333333333
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      15.0,
+      15.0,
+      18.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.5169232841917611
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "dried_with_shell",
+    "rows": 51,
+    "screened_report_count": 51,
+    "agreement": {
+      "both_finite_positive": 51,
+      "within10_count": 7,
+      "within20_count": 9,
+      "within10_share": 0.13725490196078433,
+      "within20_share": 0.17647058823529413,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        2.5,
+        5.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      4.0,
+      6.0,
+      8.0,
+      15.0,
+      20.0
+    ],
+    "reported_cv": 0.5219216307019509
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_in_cob",
+    "rows": 97,
+    "screened_report_count": 97,
+    "agreement": {
+      "both_finite_positive": 97,
+      "within10_count": 12,
+      "within20_count": 16,
+      "within10_share": 0.12371134020618557,
+      "within20_share": 0.16494845360824742,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3333333333333333,
+        3.3333333333333335
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      6.0,
+      8.0,
+      15.0,
+      15.0,
+      20.0
+    ],
+    "reported_cv": 0.3748868691960416
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_in_pods",
+    "rows": 545,
+    "screened_report_count": 545,
+    "agreement": {
+      "both_finite_positive": 545,
+      "within10_count": 198,
+      "within20_count": 253,
+      "within10_share": 0.363302752293578,
+      "within20_share": 0.46422018348623856,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        3.3333333333333335
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      6.0,
+      10.0,
+      16.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.36652764820096284
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_with_shell",
+    "rows": 36,
+    "screened_report_count": 36,
+    "agreement": {
+      "both_finite_positive": 36,
+      "within10_count": 11,
+      "within20_count": 13,
+      "within10_share": 0.3055555555555556,
+      "within20_share": 0.3611111111111111,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3333333333333333,
+        2.25
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      9.0,
+      10.0,
+      15.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.30233457356912147
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "green_in_cob",
+    "rows": 36,
+    "screened_report_count": 35,
+    "agreement": {
+      "both_finite_positive": 35,
+      "within10_count": 5,
+      "within20_count": 7,
+      "within10_share": 0.14285714285714285,
+      "within20_share": 0.2,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        2.0,
+        4.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      6.0,
+      10.0,
+      15.0,
+      20.0
+    ],
+    "reported_cv": 0.5082949627672696
+  },
+  {
+    "wave": "2015-16",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "green_in_pods",
+    "rows": 47,
+    "screened_report_count": 47,
+    "agreement": {
+      "both_finite_positive": 47,
+      "within10_count": 22,
+      "within20_count": 24,
+      "within10_share": 0.46808510638297873,
+      "within20_share": 0.5106382978723404,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1764705882352942,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      15.0,
+      17.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.21986091497323443
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Basket (20 kg)",
+    "condition": "fresh_in_pods",
+    "rows": 35,
+    "screened_report_count": 35,
+    "agreement": {
+      "both_finite_positive": 35,
+      "within10_count": 17,
+      "within20_count": 28,
+      "within10_share": 0.4857142857142857,
+      "within20_share": 0.8,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1764705882352942,
+        1.5384615384615385
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      13.0,
+      17.0,
+      17.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.16478672130453922
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dried_in_pods",
+    "rows": 52,
+    "screened_report_count": 52,
+    "agreement": {
+      "both_finite_positive": 52,
+      "within10_count": 18,
+      "within20_count": 25,
+      "within10_share": 0.34615384615384615,
+      "within20_share": 0.4807692307692308,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.2019230769230769,
+        2.464285714285714
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      6.1000000000000005,
+      9.75,
+      12.5,
+      15.0,
+      15.0
+    ],
+    "reported_cv": 0.3412710483244677
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dried_with_shell",
+    "rows": 55,
+    "screened_report_count": 55,
+    "agreement": {
+      "both_finite_positive": 55,
+      "within10_count": 10,
+      "within20_count": 11,
+      "within10_share": 0.18181818181818182,
+      "within20_share": 0.2,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.875,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      6.0,
+      7.0,
+      8.0,
+      10.0,
+      15.0
+    ],
+    "reported_cv": 0.4613562084667949
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dry_at_harvest_grain",
+    "rows": 33,
+    "screened_report_count": 33,
+    "agreement": {
+      "both_finite_positive": 33,
+      "within10_count": 8,
+      "within20_count": 16,
+      "within10_share": 0.24242424242424243,
+      "within20_share": 0.48484848484848486,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.75,
+        0.8333333333333334,
+        1.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      15.0,
+      18.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.2805108756390972
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dry_at_harvest_with_shell",
+    "rows": 28,
+    "screened_report_count": 28,
+    "agreement": {
+      "both_finite_positive": 28,
+      "within10_count": 2,
+      "within20_count": 3,
+      "within10_share": 0.07142857142857142,
+      "within20_share": 0.10714285714285714,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.221153846153846,
+        1.875,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      6.0,
+      8.0,
+      8.0,
+      10.5,
+      12.3
+    ],
+    "reported_cv": 0.3054547035688494
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "green_in_pods",
+    "rows": 57,
+    "screened_report_count": 57,
+    "agreement": {
+      "both_finite_positive": 57,
+      "within10_count": 19,
+      "within20_count": 27,
+      "within10_share": 0.3333333333333333,
+      "within20_share": 0.47368421052631576,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      10.0,
+      12.0,
+      15.0,
+      15.0
+    ],
+    "reported_cv": 0.25112981588017974
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried",
+    "rows": 122,
+    "screened_report_count": 120,
+    "agreement": {
+      "both_finite_positive": 120,
+      "within10_count": 44,
+      "within20_count": 77,
+      "within10_share": 0.36666666666666664,
+      "within20_share": 0.6416666666666667,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1437908496732025,
+        1.3333333333333333
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      75.0,
+      80.0,
+      87.5,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.12823272146644188
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_in_pods",
+    "rows": 152,
+    "screened_report_count": 150,
+    "agreement": {
+      "both_finite_positive": 150,
+      "within10_count": 55,
+      "within20_count": 70,
+      "within10_share": 0.36666666666666664,
+      "within20_share": 0.4666666666666667,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9090909090909091,
+        1.25,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      70.0,
+      80.0,
+      100.0,
+      110.0
+    ],
+    "reported_cv": 0.2905235351168498
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 70,
+    "screened_report_count": 70,
+    "agreement": {
+      "both_finite_positive": 70,
+      "within10_count": 11,
+      "within20_count": 11,
+      "within10_share": 0.15714285714285714,
+      "within20_share": 0.15714285714285714,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.6666666666666667,
+        3.3333333333333335
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      40.0,
+      60.0,
+      78.75,
+      100.0
+    ],
+    "reported_cv": 0.3674536353721217
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_with_shell_and_stalk",
+    "rows": 22,
+    "screened_report_count": 22,
+    "agreement": {
+      "both_finite_positive": 22,
+      "within10_count": 0,
+      "within20_count": 0,
+      "within10_share": 0.0,
+      "within20_share": 0.0,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.4285714285714286,
+        1.6666666666666667,
+        2.821428571428572
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      35.5,
+      50.5,
+      60.0,
+      65.0,
+      70.0
+    ],
+    "reported_cv": 0.25811411176789234
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (100 kgs)",
+    "condition": "dry_at_harvest_with_shell",
+    "rows": 23,
+    "screened_report_count": 23,
+    "agreement": {
+      "both_finite_positive": 23,
+      "within10_count": 2,
+      "within20_count": 2,
+      "within10_share": 0.08695652173913043,
+      "within20_share": 0.08695652173913043,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.2857142857142858,
+        2.2222222222222223,
+        3.1666666666666674
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      32.0,
+      42.5,
+      45.0,
+      65.0,
+      78.0
+    ],
+    "reported_cv": 0.37767268040813484
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (100 kgs)",
+    "condition": "fresh_in_cob",
+    "rows": 58,
+    "screened_report_count": 58,
+    "agreement": {
+      "both_finite_positive": 58,
+      "within10_count": 26,
+      "within20_count": 30,
+      "within10_share": 0.4482758620689655,
+      "within20_share": 0.5172413793103449,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        1.500000000000001
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      67.0,
+      72.5,
+      90.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.20598499266837855
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (100 kgs)",
+    "condition": "fresh_in_pods",
+    "rows": 45,
+    "screened_report_count": 45,
+    "agreement": {
+      "both_finite_positive": 45,
+      "within10_count": 16,
+      "within20_count": 20,
+      "within10_share": 0.35555555555555557,
+      "within20_share": 0.4444444444444444,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9454545454545454,
+        1.25,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      70.0,
+      80.0,
+      100.0,
+      106.00000000000001
+    ],
+    "reported_cv": 0.26482405913415086
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried_in_pods",
+    "rows": 29,
+    "screened_report_count": 29,
+    "agreement": {
+      "both_finite_positive": 29,
+      "within10_count": 1,
+      "within20_count": 4,
+      "within10_share": 0.034482758620689655,
+      "within20_share": 0.13793103448275862,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0327272727272727,
+        2.4,
+        3.5428571428571423
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      34.0,
+      35.0,
+      50.0,
+      80.0,
+      117.99999999999997
+    ],
+    "reported_cv": 0.6213047203712164
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 24,
+    "screened_report_count": 24,
+    "agreement": {
+      "both_finite_positive": 24,
+      "within10_count": 2,
+      "within20_count": 2,
+      "within10_share": 0.08333333333333333,
+      "within20_share": 0.08333333333333333,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.438235294117647,
+        2.332075471698113,
+        2.8
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      42.9,
+      45.0,
+      51.5,
+      60.0,
+      83.5
+    ],
+    "reported_cv": 0.41416483777864527
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh",
+    "rows": 51,
+    "screened_report_count": 51,
+    "agreement": {
+      "both_finite_positive": 51,
+      "within10_count": 8,
+      "within20_count": 26,
+      "within10_share": 0.1568627450980392,
+      "within20_share": 0.5098039215686274,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7142857142857143,
+        0.8333333333333334,
+        1.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      60.0,
+      60.0,
+      70.0,
+      70.0
+    ],
+    "reported_cv": 0.2216062089571909
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh_in_cob",
+    "rows": 50,
+    "screened_report_count": 50,
+    "agreement": {
+      "both_finite_positive": 50,
+      "within10_count": 14,
+      "within20_count": 19,
+      "within10_share": 0.28,
+      "within20_share": 0.38,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9015151515151515,
+        1.25,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      40.0,
+      40.0,
+      50.0,
+      55.50000000000001
+    ],
+    "reported_cv": 0.2754887695277415
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh_in_pods",
+    "rows": 36,
+    "screened_report_count": 36,
+    "agreement": {
+      "both_finite_positive": 36,
+      "within10_count": 3,
+      "within20_count": 5,
+      "within10_share": 0.08333333333333333,
+      "within20_share": 0.1388888888888889,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      30.0,
+      40.0,
+      40.0,
+      50.0
+    ],
+    "reported_cv": 0.28767186522288957
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "dried_in_pods",
+    "rows": 24,
+    "screened_report_count": 24,
+    "agreement": {
+      "both_finite_positive": 24,
+      "within10_count": 7,
+      "within20_count": 10,
+      "within10_share": 0.2916666666666667,
+      "within20_share": 0.4166666666666667,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3333333333333333,
+        2.4166666666666665
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      8.3,
+      11.5,
+      15.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.39392376384777444
+  },
+  {
+    "wave": "2018-19",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_in_pods",
+    "rows": 58,
+    "screened_report_count": 58,
+    "agreement": {
+      "both_finite_positive": 58,
+      "within10_count": 23,
+      "within20_count": 33,
+      "within10_share": 0.39655172413793105,
+      "within20_share": 0.5689655172413793,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9727272727272728,
+        1.1111111111111112,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      15.0,
+      18.0,
+      20.0,
+      20.60000000000001
+    ],
+    "reported_cv": 0.27316604109643167
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Basket (5 kg)",
+    "condition": "fresh_in_cob",
+    "rows": 24,
+    "screened_report_count": 24,
+    "agreement": {
+      "both_finite_positive": 24,
+      "within10_count": 8,
+      "within20_count": 17,
+      "within10_share": 0.3333333333333333,
+      "within20_share": 0.7083333333333334,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.47916666666666674,
+        0.8333333333333334,
+        1.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      5.0,
+      6.0,
+      6.25,
+      10.799999999999997
+    ],
+    "reported_cv": 0.4129446910988545
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Basket (5 kg)",
+    "condition": "fresh_in_pods",
+    "rows": 37,
+    "screened_report_count": 37,
+    "agreement": {
+      "both_finite_positive": 37,
+      "within10_count": 13,
+      "within20_count": 13,
+      "within10_share": 0.35135135135135137,
+      "within20_share": 0.35135135135135137,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.6666666666666667,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      2.5,
+      2.5,
+      3.0,
+      5.0,
+      5.0
+    ],
+    "reported_cv": 0.30883513155637926
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dried_with_shell",
+    "rows": 85,
+    "screened_report_count": 85,
+    "agreement": {
+      "both_finite_positive": 85,
+      "within10_count": 18,
+      "within20_count": 20,
+      "within10_share": 0.21176470588235294,
+      "within20_share": 0.23529411764705882,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.6666666666666667,
+        3.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      7.0,
+      9.0,
+      12.0,
+      15.0
+    ],
+    "reported_cv": 0.35376996236892383
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "dry_at_harvest_with_shell",
+    "rows": 38,
+    "screened_report_count": 38,
+    "agreement": {
+      "both_finite_positive": 38,
+      "within10_count": 5,
+      "within20_count": 9,
+      "within10_share": 0.13157894736842105,
+      "within20_share": 0.23684210526315788,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.7708333333333335,
+        3.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      5.0,
+      6.25,
+      8.5,
+      12.0,
+      15.0
+    ],
+    "reported_cv": 0.38420305304729024
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "green_in_pods",
+    "rows": 143,
+    "screened_report_count": 143,
+    "agreement": {
+      "both_finite_positive": 143,
+      "within10_count": 30,
+      "within20_count": 60,
+      "within10_share": 0.2097902097902098,
+      "within20_share": 0.4195804195804196,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      10.0,
+      12.0,
+      13.0,
+      15.0
+    ],
+    "reported_cv": 0.1609777701526749
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Plastic Basin (15 lts)",
+    "condition": "green_with_shell",
+    "rows": 22,
+    "screened_report_count": 22,
+    "agreement": {
+      "both_finite_positive": 22,
+      "within10_count": 4,
+      "within20_count": 4,
+      "within10_share": 0.18181818181818182,
+      "within20_share": 0.18181818181818182,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.5,
+        1.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      10.0,
+      10.0,
+      12.0,
+      15.0
+    ],
+    "reported_cv": 0.19562942139050354
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried",
+    "rows": 288,
+    "screened_report_count": 287,
+    "agreement": {
+      "both_finite_positive": 287,
+      "within10_count": 131,
+      "within20_count": 162,
+      "within10_share": 0.4564459930313589,
+      "within20_share": 0.5644599303135889,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        1.5384615384615385
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      65.0,
+      75.0,
+      90.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.20065736641743795
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_in_cob",
+    "rows": 23,
+    "screened_report_count": 23,
+    "agreement": {
+      "both_finite_positive": 23,
+      "within10_count": 7,
+      "within20_count": 12,
+      "within10_share": 0.30434782608695654,
+      "within20_share": 0.5217391304347826,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9272727272727272,
+        1.1764705882352942,
+        1.4285714285714286
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      70.0,
+      77.5,
+      85.0,
+      100.0,
+      108.0
+    ],
+    "reported_cv": 0.23729313052188908
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_in_pods",
+    "rows": 372,
+    "screened_report_count": 369,
+    "agreement": {
+      "both_finite_positive": 369,
+      "within10_count": 92,
+      "within20_count": 100,
+      "within10_share": 0.24932249322493225,
+      "within20_share": 0.27100271002710025,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      60.0,
+      80.0,
+      98.0,
+      100.0
+    ],
+    "reported_cv": 0.2719709684746124
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (100 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 66,
+    "screened_report_count": 66,
+    "agreement": {
+      "both_finite_positive": 66,
+      "within10_count": 20,
+      "within20_count": 21,
+      "within10_share": 0.30303030303030304,
+      "within20_share": 0.3181818181818182,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.4285714285714286,
+        2.5
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      40.0,
+      56.25,
+      70.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.32642584936194347
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (100 kgs)",
+    "condition": "dry_at_harvest_in_cob",
+    "rows": 22,
+    "screened_report_count": 22,
+    "agreement": {
+      "both_finite_positive": 22,
+      "within10_count": 8,
+      "within20_count": 8,
+      "within10_share": 0.36363636363636365,
+      "within20_share": 0.36363636363636365,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3392857142857144,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      50.0,
+      50.0,
+      75.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.3277898013150407
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (100 kgs)",
+    "condition": "dry_at_harvest_with_shell",
+    "rows": 27,
+    "screened_report_count": 27,
+    "agreement": {
+      "both_finite_positive": 27,
+      "within10_count": 0,
+      "within20_count": 1,
+      "within10_share": 0.0,
+      "within20_share": 0.037037037037037035,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.3,
+        1.6666666666666667,
+        2.8333333333333353
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      36.0,
+      50.0,
+      60.0,
+      67.5,
+      77.00000000000001
+    ],
+    "reported_cv": 0.27606156602253934
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (100 kgs)",
+    "condition": "fresh_in_pods",
+    "rows": 197,
+    "screened_report_count": 197,
+    "agreement": {
+      "both_finite_positive": 197,
+      "within10_count": 74,
+      "within20_count": 96,
+      "within10_share": 0.3756345177664975,
+      "within20_share": 0.4873096446700508,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.5384615384615385
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      65.0,
+      70.0,
+      80.0,
+      100.0,
+      100.0
+    ],
+    "reported_cv": 0.2224606154772543
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried_in_pods",
+    "rows": 53,
+    "screened_report_count": 52,
+    "agreement": {
+      "both_finite_positive": 52,
+      "within10_count": 15,
+      "within20_count": 18,
+      "within10_share": 0.28846153846153844,
+      "within20_share": 0.34615384615384615,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.5,
+        3.385714285714285
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      35.5,
+      40.0,
+      80.0,
+      120.0,
+      120.0
+    ],
+    "reported_cv": 0.4359947870399838
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (120 kgs)",
+    "condition": "dried_with_shell",
+    "rows": 22,
+    "screened_report_count": 22,
+    "agreement": {
+      "both_finite_positive": 22,
+      "within10_count": 1,
+      "within20_count": 1,
+      "within10_share": 0.045454545454545456,
+      "within20_share": 0.045454545454545456,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.5,
+        1.8185993111366248,
+        2.955319148936171
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      40.7,
+      60.5,
+      66.0,
+      80.0,
+      80.0
+    ],
+    "reported_cv": 0.28499902540548794
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (50 kgs)",
+    "condition": "dry_at_harvest_grain",
+    "rows": 35,
+    "screened_report_count": 35,
+    "agreement": {
+      "both_finite_positive": 35,
+      "within10_count": 12,
+      "within20_count": 26,
+      "within10_share": 0.34285714285714286,
+      "within20_share": 0.7428571428571429,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7142857142857143,
+        0.8333333333333334,
+        1.0666666666666669
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      47.0,
+      50.0,
+      60.0,
+      60.0,
+      70.0
+    ],
+    "reported_cv": 0.20524794734975033
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh",
+    "rows": 145,
+    "screened_report_count": 144,
+    "agreement": {
+      "both_finite_positive": 144,
+      "within10_count": 44,
+      "within20_count": 90,
+      "within10_share": 0.3055555555555556,
+      "within20_share": 0.625,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.7142857142857143,
+        0.8333333333333334,
+        1.1111111111111112
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      45.0,
+      50.0,
+      60.0,
+      65.0,
+      70.0
+    ],
+    "reported_cv": 0.2846052511304262
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh_in_cob",
+    "rows": 106,
+    "screened_report_count": 106,
+    "agreement": {
+      "both_finite_positive": 106,
+      "within10_count": 25,
+      "within20_count": 57,
+      "within10_share": 0.2358490566037736,
+      "within20_share": 0.5377358490566038,
+      "ratio_other_over_reported_p10_p50_p90": [
+        0.9090909090909091,
+        1.1111111111111112,
+        1.3392857142857144
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      37.5,
+      40.0,
+      45.0,
+      50.0,
+      55.0
+    ],
+    "reported_cv": 0.21829649924383052
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (50 kgs)",
+    "condition": "fresh_in_pods",
+    "rows": 71,
+    "screened_report_count": 71,
+    "agreement": {
+      "both_finite_positive": 71,
+      "within10_count": 9,
+      "within20_count": 29,
+      "within10_share": 0.1267605633802817,
+      "within20_share": 0.4084507042253521,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      40.0,
+      40.0,
+      45.0,
+      50.0
+    ],
+    "reported_cv": 0.2078230194670658
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Sack (50 kgs)",
+    "condition": "green_with_shell",
+    "rows": 42,
+    "screened_report_count": 42,
+    "agreement": {
+      "both_finite_positive": 42,
+      "within10_count": 9,
+      "within20_count": 11,
+      "within10_share": 0.21428571428571427,
+      "within20_share": 0.2619047619047619,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.25,
+        1.6666666666666667
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      30.0,
+      30.0,
+      40.0,
+      43.75,
+      50.0
+    ],
+    "reported_cv": 0.1887682377534862
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "dried_in_pods",
+    "rows": 37,
+    "screened_report_count": 37,
+    "agreement": {
+      "both_finite_positive": 37,
+      "within10_count": 7,
+      "within20_count": 12,
+      "within10_share": 0.1891891891891892,
+      "within20_share": 0.32432432432432434,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3333333333333333,
+        2.857142857142857
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      7.0,
+      8.0,
+      15.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 0.48382153414591234
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_in_pods",
+    "rows": 186,
+    "screened_report_count": 186,
+    "agreement": {
+      "both_finite_positive": 186,
+      "within10_count": 37,
+      "within20_count": 102,
+      "within10_share": 0.1989247311827957,
+      "within20_share": 0.5483870967741935,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.1111111111111112,
+        2.0
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      10.0,
+      15.0,
+      18.0,
+      18.0,
+      20.0
+    ],
+    "reported_cv": 0.24494838354635057
+  },
+  {
+    "wave": "2019-20",
+    "unit": "Tin (Debe) (20 lts)",
+    "condition": "fresh_with_shell",
+    "rows": 22,
+    "screened_report_count": 22,
+    "agreement": {
+      "both_finite_positive": 22,
+      "within10_count": 6,
+      "within20_count": 6,
+      "within10_share": 0.2727272727272727,
+      "within20_share": 0.2727272727272727,
+      "ratio_other_over_reported_p10_p50_p90": [
+        1.0,
+        1.3333333333333333,
+        2.7142857142857175
+      ]
+    },
+    "reported_p10_p25_median_p75_p90": [
+      7.700000000000001,
+      15.0,
+      15.0,
+      20.0,
+      20.0
+    ],
+    "reported_cv": 1.3431488012559836
+  }
+]

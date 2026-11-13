@@ -1,0 +1,513 @@
+{
+  "paired": {
+    "all_rows_keys_nonquantity_equal": true,
+    "changed_quantity_only_to_na": 76,
+    "total_rows": 46043,
+    "rows_by_wave": {
+      "2011-12": 32352,
+      "2014-15": 13691
+    },
+    "cells_by_wave": {
+      "2011-12": 8923,
+      "2014-15": 6500
+    },
+    "unchanged_quantity_rows": 45967
+  },
+  "hash_impact": {
+    "Niger": {
+      "changed": 23,
+      "tables": 23
+    },
+    "Mali": {
+      "changed": 0,
+      "tables": 24
+    },
+    "Tanzania": {
+      "changed": 0,
+      "tables": 25
+    }
+  },
+  "forms": [
+    {
+      "source": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p1.dta",
+      "fields": [
+        {
+          "price_column": "cs07q03",
+          "quantity_column": "cs07q04",
+          "exact_price_counts": {
+            "9999.0": 0,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          },
+          "exact_quantity_counts": {
+            "9999.0": 1768,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          }
+        },
+        {
+          "price_column": "cs07q06",
+          "quantity_column": "cs07q07",
+          "exact_price_counts": {
+            "9999.0": 0,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          },
+          "exact_quantity_counts": {
+            "9999.0": 2045,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          }
+        },
+        {
+          "price_column": "cs07q09",
+          "quantity_column": "cs07q10",
+          "exact_price_counts": {
+            "9999.0": 0,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          },
+          "exact_quantity_counts": {
+            "9999.0": 2168,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          }
+        }
+      ]
+    },
+    {
+      "source": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p2.dta",
+      "fields": [
+        {
+          "price_column": "cs07q03",
+          "quantity_column": "cs07q04",
+          "exact_price_counts": {
+            "9999.0": 0,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 2156,
+            "99999.9": 0,
+            "99999.8984375": 0
+          },
+          "exact_quantity_counts": {
+            "9999.0": 2183,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          }
+        },
+        {
+          "price_column": "cs07q06",
+          "quantity_column": "cs07q07",
+          "exact_price_counts": {
+            "9999.0": 0,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 2495,
+            "99999.9": 0,
+            "99999.8984375": 0
+          },
+          "exact_quantity_counts": {
+            "9999.0": 2495,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          }
+        },
+        {
+          "price_column": "cs07q09",
+          "quantity_column": "cs07q10",
+          "exact_price_counts": {
+            "9999.0": 0,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 2710,
+            "99999.9": 0,
+            "99999.8984375": 0
+          },
+          "exact_quantity_counts": {
+            "9999.0": 2699,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          }
+        }
+      ]
+    },
+    {
+      "source": "Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/comprixcs07.dta",
+      "fields": [
+        {
+          "price_column": "cs07q04",
+          "quantity_column": "cs07q05",
+          "exact_price_counts": {
+            "9999.0": 0,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          },
+          "exact_quantity_counts": {
+            "9999.0": 0,
+            "9999.9": 0,
+            "9999.900390625": 43,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          }
+        },
+        {
+          "price_column": "cs07q06",
+          "quantity_column": "cs07q07",
+          "exact_price_counts": {
+            "9999.0": 0,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 2,
+            "99999.9": 0,
+            "99999.8984375": 0
+          },
+          "exact_quantity_counts": {
+            "9999.0": 2,
+            "9999.9": 0,
+            "9999.900390625": 32,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          }
+        },
+        {
+          "price_column": "cs07q08",
+          "quantity_column": "cs07q09",
+          "exact_price_counts": {
+            "9999.0": 0,
+            "9999.9": 0,
+            "9999.900390625": 0,
+            "99999.0": 3,
+            "99999.9": 0,
+            "99999.8984375": 0
+          },
+          "exact_quantity_counts": {
+            "9999.0": 3,
+            "9999.9": 0,
+            "9999.900390625": 1,
+            "99999.0": 0,
+            "99999.9": 0,
+            "99999.8984375": 0
+          }
+        }
+      ]
+    }
+  ],
+  "dedup": [
+    {
+      "source": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p1.dta",
+      "baseline": [
+        {
+          "before": 13291,
+          "after": 13291,
+          "removed": 0
+        }
+      ],
+      "proposed": [
+        {
+          "before": 13291,
+          "after": 13291,
+          "removed": 0
+        }
+      ]
+    },
+    {
+      "source": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p2.dta",
+      "baseline": [
+        {
+          "before": 19667,
+          "after": 19650,
+          "removed": 17
+        }
+      ],
+      "proposed": [
+        {
+          "before": 19667,
+          "after": 19650,
+          "removed": 17
+        }
+      ]
+    },
+    {
+      "source": "Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/comprixcs07.dta",
+      "baseline": [
+        {
+          "before": 13808,
+          "after": 13691,
+          "removed": 117
+        }
+      ],
+      "proposed": [
+        {
+          "before": 13808,
+          "after": 13691,
+          "removed": 117
+        }
+      ]
+    }
+  ],
+  "comparator": {
+    "country": "Mali",
+    "source": "/local/job40255479/release-v016-seed-data/Mali/var/community_prices.parquet",
+    "destination": "/local/job40255479/control/isa-backlog-20261021/Niger/1088/cold-proposed/Mali/var/community_prices.parquet",
+    "rows": 40218,
+    "hash_verified": true,
+    "coverage_verified": true,
+    "sha256": "8fa6200325365de6e25e2b1966e8f123e247374b65130f5567b58caaa5520172"
+  },
+  "feature_direct": {
+    "rows": 86261,
+    "by_country": {
+      "Mali": 40218,
+      "Niger": 46043
+    },
+    "index_unique": true,
+    "index_names": [
+      "country",
+      "t",
+      "v",
+      "j",
+      "u",
+      "variety",
+      "visit",
+      "obs",
+      "currency"
+    ],
+    "warning_classes": [
+      "UserWarning"
+    ]
+  },
+  "baseline_api": {
+    "cold": {
+      "phase": "baseline",
+      "mode": "cold",
+      "head": "1e8aeaf88291c14b01c672671fbe465ea0f84ce3",
+      "package": "/local/job40255479/worktrees/isa-Niger/lsms_library/__init__.py",
+      "countries_root": "/local/job40255479/worktrees/isa-Niger/lsms_library/countries",
+      "data_root": "/local/job40255479/control/isa-backlog-20261021/Niger/1088/cold-baseline",
+      "country_module_sha256": "4e9bfeb2ae3dd3655f0acc741572e0b3504b0c8d8043f8465ec814fe44e4da3a",
+      "elapsed_s": 7.765,
+      "rows": 46043,
+      "rows_by_wave": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cells_by_wave": {
+        "2011-12": 8923,
+        "2014-15": 6500
+      },
+      "quantity_candidate_count": 76,
+      "later_records": {
+        "2011-12": 15,
+        "2014-15": 15
+      },
+      "warning_classes": [],
+      "index_unique": true,
+      "index_names": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ]
+    },
+    "warm": {
+      "phase": "baseline",
+      "mode": "warm",
+      "head": "1e8aeaf88291c14b01c672671fbe465ea0f84ce3",
+      "package": "/local/job40255479/worktrees/isa-Niger/lsms_library/__init__.py",
+      "countries_root": "/local/job40255479/worktrees/isa-Niger/lsms_library/countries",
+      "data_root": "/local/job40255479/control/isa-backlog-20261021/Niger/1088/cold-baseline",
+      "country_module_sha256": "4e9bfeb2ae3dd3655f0acc741572e0b3504b0c8d8043f8465ec814fe44e4da3a",
+      "elapsed_s": 1.247,
+      "rows": 46043,
+      "rows_by_wave": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cells_by_wave": {
+        "2011-12": 8923,
+        "2014-15": 6500
+      },
+      "quantity_candidate_count": 76,
+      "later_records": {
+        "2011-12": 15,
+        "2014-15": 15
+      },
+      "warning_classes": [],
+      "index_unique": true,
+      "index_names": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "cold_warm_equal": true
+    }
+  },
+  "proposed_api": {
+    "cold": {
+      "phase": "proposed",
+      "mode": "cold",
+      "head": "1e8aeaf88291c14b01c672671fbe465ea0f84ce3",
+      "package": "/local/job40255479/worktrees/isa-Niger/lsms_library/__init__.py",
+      "countries_root": "/local/job40255479/worktrees/isa-Niger/lsms_library/countries",
+      "data_root": "/local/job40255479/control/isa-backlog-20261021/Niger/1088/cold-proposed",
+      "country_module_sha256": "5b860d8813eec74079dd037b0412c916fb28ec37f334cff1b675abc830f91ec4",
+      "elapsed_s": 7.238,
+      "rows": 46043,
+      "rows_by_wave": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cells_by_wave": {
+        "2011-12": 8923,
+        "2014-15": 6500
+      },
+      "quantity_candidate_count": 0,
+      "later_records": {
+        "2011-12": 15,
+        "2014-15": 15
+      },
+      "warning_classes": [],
+      "index_unique": true,
+      "index_names": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ]
+    },
+    "warm": {
+      "phase": "proposed",
+      "mode": "warm",
+      "head": "1e8aeaf88291c14b01c672671fbe465ea0f84ce3",
+      "package": "/local/job40255479/worktrees/isa-Niger/lsms_library/__init__.py",
+      "countries_root": "/local/job40255479/worktrees/isa-Niger/lsms_library/countries",
+      "data_root": "/local/job40255479/control/isa-backlog-20261021/Niger/1088/cold-proposed",
+      "country_module_sha256": "5b860d8813eec74079dd037b0412c916fb28ec37f334cff1b675abc830f91ec4",
+      "elapsed_s": 1.17,
+      "rows": 46043,
+      "rows_by_wave": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cells_by_wave": {
+        "2011-12": 8923,
+        "2014-15": 6500
+      },
+      "quantity_candidate_count": 0,
+      "later_records": {
+        "2011-12": 15,
+        "2014-15": 15
+      },
+      "warning_classes": [],
+      "index_unique": true,
+      "index_names": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "cold_warm_equal": true
+    }
+  },
+  "source_md5_and_hold_status": [
+    {
+      "relative_source": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p1.dta",
+      "md5": "d50b9da7f5ee6c3f4445995fa3043915",
+      "declared_size": 1623287,
+      "held": true,
+      "copied_bytes": 1623287
+    },
+    {
+      "relative_source": "Niger/2011-12/Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p2.dta",
+      "md5": "12c9782e778e47ef1aad93ba9b3c658e",
+      "declared_size": 2621108,
+      "held": true,
+      "copied_bytes": 2621108
+    },
+    {
+      "relative_source": "Niger/2014-15/Data/NER_2014_ECVMA-II_v02_M_STATA8/comprixcs07.dta",
+      "md5": "12277d0e690973d0e1aaa2ddfeeed5c7",
+      "declared_size": 1983346,
+      "held": true,
+      "copied_bytes": 1983346
+    },
+    {
+      "relative_source": "Niger/2011-12/Documentation/ECVMA_Quest_COM_P1_V10_Eng.pdf",
+      "md5": "570056b5bd39b2fd5953121a8ffbde63",
+      "declared_size": 396363,
+      "held": false
+    },
+    {
+      "relative_source": "Niger/2011-12/Documentation/ECVMA_Quest_COM_P2_V10_ENG.pdf",
+      "md5": "739c2f282c5b921b7c46e49c79d8ffda",
+      "declared_size": 139194,
+      "held": false
+    },
+    {
+      "relative_source": "Niger/2014-15/Documentation/ecvma2014_quest_com_p1.pdf",
+      "md5": "2bd9db8bfbacef1f233f90fff970f739",
+      "declared_size": 302042,
+      "held": false
+    },
+    {
+      "relative_source": "Niger/2014-15/Documentation/ECVMA2_P2_Quest_COM.pdf",
+      "md5": "9f7c2cd67329d83ca70ab176abcbde0c",
+      "declared_size": 164997,
+      "held": false
+    }
+  ],
+  "source_metadata_note": "The 2014 quantity columns declare Stata double; observed value 9999.900390625 equals promoted float32(9999.9). No quantity/Price missing-code value labels; no held questionnaire PDFs.",
+  "tests": {
+    "unit_and_assembly_passed": 55,
+    "built_niger_mali_passed": 12,
+    "skips_in_selections": 0,
+    "baseline_regression_failed": 8,
+    "baseline_regression_passed": 27,
+    "private_initial_negative_failed": 1
+  }
+}

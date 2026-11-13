@@ -1,0 +1,12 @@
+{
+  "safe_names": [
+    "REVIEW.org",
+    "verdict.json",
+    "proof.json",
+    "validation.json",
+    "REPRODUCE.md",
+    "checker-sources.json",
+    "ALLOWLIST.json"
+  ],
+  "raw_frames_full_warnings_tracebacks_and_failed_operands_exported": false
+}

@@ -1,0 +1,133 @@
+#+TITLE: Independent Uganda GH849 review
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-22
+
+* Verdict and pins
+
+PASS for the bounded twelve-mapping change at491daf5654b9ee45332bec97e1296ae821ff46d5 against actual parent0854303bc5f60daa698b2927fc3b193822a4c090.
+No blocking production finding remains.
+Final runtime differs from7a8fd22492255cc2c4d020b7a16f99249f588977 only in excluded Uganda CONTENTS documentation; final tests tree/modes equal66bfa1eb16442ceb6d455dfaa5726f181d713abd.
+The task849 ledger and standing definitions, code-reviewer/backlog/cross-country/Feature audit guidance and accepted parent1198 runtime/docs evidence ground this review.
+No production/test/config/schema/fixture/dependency/source/Git/ref/GitHub mutation, acquisition or shared-cache operation occurred.
+Root owns acceptance and publication; final release requires the separate terminal seal/FINAL-READY.
+
+* Country grounding
+
+The complete3741-line current Uganda CONTENTS, including TODO/WAITING/LOGBOOK/history and the new849 note, was read before analysis.
+Current Niger's1557-line blob was explicitly proven byte-identical to f8's previously fully read document; the earlier complete reading is corroborated in the independent1198 review.
+Uganda A/B are source modules rather than universal calendar seasons:2015A covers second2014, B first2015.
+The2013 variable labels are swapped;2018A lacks a distributed harvest-unit field and B mixes naming styles, while2019 actual condition slots are distinct observations.
+Reported production IDs, actual slots and truthful release-row coordinates retain their1198 meanings; source fingerprints are basename plus sidecar SHA, not raw-DTA MD5.
+Season-specific crop stands, independent sold units/conditions, the2015 sales-value x100 WAITING caveat,403 conditional old-null exclusions and928 public null-v records remain unchanged.
+Niger's ECVMA/EHCVM split, grappe/menage/EXTENSION identities, Original Label versus Code distinction and native community variety/visit/obs caveats remain separate from this held-warm CROP comparison.
+
+CONTENTS:2433 says the others are deliberately left out and2436 says the move "would be small and in the right direction";2438 immediately cautions that "small" is a measurement to make, not assume.
+The measured12.931Mkg effect is substantial; neither source-report precedence nor the unchanged screen is new scientific validation.
+The old instruction "Before wiring any of them, filter the raw factor" is reconciled with the existing normalization and downstream filters, not used as permission to invent a new screen.
+The dated old sum/first, unregistered-feature, null-collapse and complete-area-match statements coexist with1198/849 notes and measured residuals; they are quoted as historical tensions, not silently discarded.
+The settled2018 B misleading season-label/date/vocabulary ruling is preserved; no calendar reinterpretation is made.
+The new849 note accurately distinguishes its author's mode observation from a universal guarantee; this independent root supplies another bounded datum below.
+
+* Exact production boundary and prebuild census
+
+AST comparison independently removes exactly12 new kg_factor keys and proves every other map and helper/function AST identical.
+The eight long-form keys bind a5aq6d/a5bq6d in2010/2011/2013/2015; four2019 keys bind actual s5aq06d_1/2 and s5bq06d_1/2 slots.
+Existing2018 three maps and2009 map remain exact;2019 loader changes only its superseded module docstring.
+No scientific transform, reducer, identity, quantity, source, unit, condition, schema, global flag or threshold changes.
+The existing numeric coerce and nonpositive-to-missing normalization remain exact, followed by existing finite-positive/Kg1percent/cap250/calendar-year screens.
+Positive suspects remain in the reported column; no clipping, averaging, relabelling or blanket exception is added.
+
+BEFORE source preparation/builds, separate source processes measured549API/39framework/1362declared-wave/2139API-wave fingerprints.
+28Uganda API hashes move,521other-country hashes and39framework fingerprints stay exact;171declared-wave and224API-wave hashes change, all Uganda.
+This measures invalidation, not rebuild coverage for all28 APIs or other countries.
+
+* Source gate and complete native observation oracle
+
+Terminal physical preparation preceded every decode/pickle/API:59 held modules/59 sidecars,472 distinct single-link nonsymlink raw copies in two DVC layouts/four independent roots, MD5/SHA/actualsize/mode/mtime/inode receipts.
+41 sidecars omit declared size; that omission is retained rather than invented.
+The healthy Niger CROP comparator comprises15 physically copied companions/root with genuinely current country hashes/full coverage and46376 rows.
+It is DEFAULT held-warm evidence, not Niger source-cold or Make-pooled evidence; no GLOBAL20 community cache was substituted.
+Mounted image Python, exact cwd/import/PYTHONPATH/countries/config/data identities, active socket/write guards and unshare-rn were asserted before data operations.
+All numerical/build/Make threads were1; pytest cohorts ran sequentially with2 explicit loadfile workers.
+Only exact prepared ignored DVCtmp paths resolving into this review root were checkout metadata exceptions.
+
+The independent oracle binds literal raw factors to physical retained rows/actual slots, using the unchanged actual-parent decoder only for eligibility/identity.
+It does not generate expected factors through the candidate map.
+All133761 observations, production coordinates and complete nonfactor values/order/axes/dtypes/masks/full typed attrs are exact through helper, serialized native, ID-walked/raw-country and public stages under both backends.
+Retained wave counts are22549/21051/20200/17646/19639/15630/17046.
+New nonmissing factors are82103; full2009/2018 controls are unchanged, including every other payload.
+The403 old conditional null exclusions remain360/43; all928 public null-v rows survive.
+Raw new fields contain24 zeros,22 retained; no negative or positive-infinite held reports were found. Synthetic cases cover nonnumeric/nonpositive/nonfinite and positive suspects independently.
+Source metadata retains actual truncated/misleading labels; the accepted2018 interpretation is not inferred anew from a label.
+
+* Strengthened value verification and preserved stops
+
+A meaningful tiny-float control exposed a mounted-pandas verification gap: assert_frame_equal(check_exact=True,rtol=atol=0) accepted a real nullable-Float64 difference1.000088900582341e-12.
+Explicit ExtensionArray equality and NumPy strict equality rejected the same saved synthetic pair.
+The original comparator/diagnostic sources, accepted-bad-return result and operands remain immutable; no product mismatch or blanket invalidation of prior reviews is inferred.
+NEW exact_strict_v2.py adds explicit per-column ExtensionArray equality, matching masks, strict nonmissing numeric NumPy values and nested Series-array checks, retaining all axis classes/unusedlevels/codes/dtypes/order and recursively typed attrs/_FIELDS presence/values.
+Tiny and nextafter mutations plus dtype/null/attrs-type/attrs-presence/order/unused-level controls all reject.
+Artifact-only reassessment passes99matched-head/subset/CLI checks,246distinct saved source/native/raw/public/warm/direct-product/yield comparisons and30currency/Feature assembly checks.
+An earlier264 sweep included18 initial-versus-itself sanity comparisons; the final246 count excludes those without changing any operand or result.
+No source/API/test prefix was replayed to erase a stop; expected assembly and own-row product controls were recomputed only from saved artifacts.
+
+Own artifact qualifications remain explicit: two literal-skip assertions stopped, the first qualified-v check still invoked full pandas equality and stopped at the known dtype, the tiny-float negative stopped, and a warning finalizer TypeError came from reusing a local counter variable while packaging.
+Their exact sources/operands/failure locations/logs remain private; separately named corrected artifact checkers preserve them.
+Two early read-only safe-report path lookups missed their intended files; they did not read raw failure logs or perform data calls.
+All diagnostics expose only class/source locations/counts/dtype names; full exception text stays private.
+
+* Runtime, arguments, cache and CLI stages
+
+Normal empty-Uganda-L2 cold DEFAULT and MAKE builds completed on both heads, followed by fresh-process/new-Country warm calls.
+Public crop133761, sample24362, area42841 and cluster4805 sizes match; complete nonfactor frames and typed attrs match the actual parent at matching stages.
+Niger crop46376/support frames remain exact, and actual matched bare/None/index Features have180137 rows.
+Country bare defaults to currency=None while Feature bare defaults to index; actual argument provenance and separate source-assembly/currency oracles are retained.
+
+DEFAULT warm/Feature/CLI/scanner/subset cache bytes/modes/mtimes are exact with zero writes.
+This independent Make warm changes the same17 paths on both heads: identical bytes/sizes/modes0600->0600, mtimes changed, no additions/deletions.
+Author8490600->0644 and prior1198 reviewer0644->0600 remain separately pinned observations; no universal mode/provenance claim is made.
+The4805-row cluster support frame has0null-v; both full MultiIndex v level and extracted v change StringDtype na_value pd.NA->np.nan on both heads/backends (#1196).
+The four explicitly qualified comparisons check every other payload/column dtype/mask/axis/codes/order/typed attr exactly, without normalizing stored/returned frames.
+Crop/native/raw frames and all other checked cross-stage frames are exact.
+
+Populated DEFAULT supported2018/unsupported2005/combined requests return15630/0/15630 with matched-parent full typed attrs, not a filtered finalized full-frame oracle.
+MAKE returns133761/all seven supported waves for each subset, preserving #1204; ordinary byte-identical native rewrites are accounted rather than described as zero writes.
+Actual CLI prewrite API returns match matched arguments; postread artifacts match independent unchanged-writer controls including complete Arrow schema/footer and bytes.
+API-to-artifact identity is intentionally not claimed: v NA metadata and sampling/population/recall Record-to-dict JSON serialization differ on both heads.
+
+* Measured transformation effects and source quality
+
+Independent own-row products and fine/coarse median support/threshold logic reproduce full harvest frames, with explicit array equality closing the nullable-float gap.
+Harvest changes78571->88980 keys and29095413.407893993->42026694.99297963kg (+12931281.585085638).
+Reported/survey_median/metric/none counts change14981/560/88443/29777 to96747/4840/23406/8768; implausible102->439; shipped/inferred0.
+Fine pools have1287count/median changes and692 support-threshold crossings; coarse166changes/133crossings.
+727 resolved factors change on records whose own report payload is unchanged, because same-wave median pools change.
+Severe report-versus-label disagreement, Quantity-equality, overcap/year/Kg-not-one overlaps and unit/condition dispersion remain visible in the private measured artifacts; no new scientific rejection rule is introduced.
+Agreement denominators require finite-positive factors on both sides, no Quantity filter; existing nominal-label parsing uses volume_as_mass=True, without price inference or declared-table substitution.
+The full42841-row area frame stays exact; parcel yield14022->14520 adds498keys and changes7335shared values, while literal plot yields remain empty (#1205).
+This is per-observation conversion followed by the existing analyst reduction, not the rejected42.035M scalar-carrier projection.
+
+* Tests, warnings and scanner
+
+The exact authorized cohort has416PASS/10genuineSKIP/0FAIL/ERROR (426total),2loadfile workers.
+All426 full node identities match the author. Ten skipped nodes match: seven unavailable Malawi cases and three unrelated global-corpus cases.
+3/10 skip message strings and0/10 complete XML text strings are literal across roots; all10 match after ONLY explicit source-checkout/private-cache prefixes are compared separately.
+Raw reasons/XML remain immutable; no byte-identical skip-reason claim or skipped-to-pass conversion is made.
+The exact physical24case new file on the actual parent yields20functional FAIL/4PASS/0ERROR/SKIP:12missing source-pair cases,2wide equal/partial controls,3positive-suspect controls,1Kg control and2missing-declared-column contracts.
+Existing test edits are limited to directly superseded harvest/layer pins and the old unwired assertion, retaining nonempty new-wave/2018positive/2009negative controls.
+
+All60main-call class/full-message warning multisets,7helper source-oracle multisets and3derived warning lists match literally with full multiplicity and no path normalization.
+Every one of41scoped unmodified scanner records matches literally; allWARN,0FAIL/ERROR, and crop_production has no phase2kwargs grid.
+Source/child logs use unique launch/cohort filenames and retain full bytes; structured per-call warnings/endpoints precede assertions. Subprocess text is not claimed to be a WarningMessage object list.
+
+* Protection, limits and release
+
+Final protection rehashes10517 frozen author/parent1198/GLOBAL20 manifest entries,606 source/copy endpoints and every tracked review checkout byte/mode/mtime/inode/link/HEAD/clean endpoint.
+The final seal repeats source/copy checks and verifies zero other consumers, complete manifest/pathset/checker pins and the dedicated six-file safe allowlist.
+No in-tree parquet, unexpected denied write or network attempt occurred.
+Full source rows/IDs/frames/warnings/tracebacks and all raw receipts remain private.
+No broad Uganda corpus, other28invalidated-output rebuild, full suite, Niger source-cold or Make-pooled claim is made.
+Original1198 overwritten XML/first-failed-Make warning-list gaps, historical GLOBAL17full13FAIL/doc-child guard+mtime/stale8 qualifications and author historical stops remain unrepaired at their original pins.
+No frozen GLOBAL20/1198/old849/Mali evidence was modified.
+
+Sue

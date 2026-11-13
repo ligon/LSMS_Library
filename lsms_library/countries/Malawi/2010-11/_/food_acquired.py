@@ -32,6 +32,14 @@ wave = "2010-11"
 #: table keys it '03').
 _IHS3_CONTRADICTED_CODES = ['3']
 
+#: Suffixed unit codes on NO instrument list, conversion-factor report or `u`
+#: table entry (GH #1075 ruling, @ligon 2026-11-03): served as no unit
+#: recorded under the standing "code on no instrument list -> Unknown" rule,
+#: NOT decoded by analogy with the base code (16 Cup, 12 Basket, ...).  13
+#: served rows (16B 5, 12A 2, 21B 2, 16A 2, 12B 1, 3A 1), none with specify
+#: text.  Compared without leading zeros, upper case.
+_IHS3_UNLISTED_CODES = ['16A', '16B', '12A', '12B', '21B', '3A']
+
 df = get_dataframe('../Data/Full_Sample/Household/hh_mod_g1.dta',
                    convert_categoricals=True)
 
@@ -128,6 +136,11 @@ for src in ('consumed', 'bought', 'produced', 'gifted'):
         df[u_col], df[code_col].astype('string').str.strip()
         .str.replace(r'\.0$', '', regex=True).str.lstrip('0')
         .isin(_IHS3_CONTRADICTED_CODES).fillna(False).values)
+    # GH #1075 ruling: suffixed codes on no list record no unit either.
+    df[u_col] = other_specify_to_unknown(
+        df[u_col], df[code_col].astype('string').str.strip().str.upper()
+        .str.replace(r'\.0$', '', regex=True).str.lstrip('0')
+        .isin(_IHS3_UNLISTED_CODES).fillna(False).values)
 
 df['t'] = wave
 df = df.reset_index()

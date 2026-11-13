@@ -1,0 +1,11 @@
+{
+  "status": "ROOT_METADATA_VERIFICATION_STOP_PRESERVED",
+  "session": 46442,
+  "actual_terminal_exit": 1,
+  "terminal_chunk": "0bf798",
+  "source_sha256": "8519166e1a3b37506b64004026f9da3fe95bd0276e37f56105db88eb355391f9",
+  "stderr_sha256": "c3c61926793f67c3a90a177f33654be696612010bdeac55a67fef5d4a9c7e3a5",
+  "cause": "Root incorrectly equated empty redirected tool stdout with the separately retained sealer/postexit stdout file. All474frozen entries and exact terminal return/status checks preceded this assertion.",
+  "correction": "Verify exact launch redirection, empty tool stdout and separately retained literal stream text/source receipts; no product/data/API/test replay.",
+  "signed": "Sue"
+}

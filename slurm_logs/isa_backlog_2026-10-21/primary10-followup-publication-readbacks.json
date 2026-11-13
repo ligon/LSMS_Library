@@ -1,0 +1,47 @@
+{
+  "source_commit": "709bd75e96d3df4ef91b3fa4b935a12726a73ac4",
+  "readbacks": [
+    {
+      "number": 1170,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1170",
+      "state": "open",
+      "head": "709bd75e96d3df4ef91b3fa4b935a12726a73ac4",
+      "base": "development",
+      "body_exact": true
+    },
+    {
+      "number": 1206,
+      "url": "https://github.com/ligon/LSMS_Library/issues/1206",
+      "state": "open",
+      "head": null,
+      "base": null,
+      "body_exact": true
+    },
+    {
+      "number": 1193,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1193",
+      "state": "open",
+      "head": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "base": "fix/1109-malawi-organic-quantity-v2-20261021",
+      "body_exact": true
+    },
+    {
+      "number": 1197,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1197",
+      "state": "open",
+      "head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "base": "development",
+      "body_exact": true
+    },
+    {
+      "number": 1202,
+      "url": "https://github.com/ligon/LSMS_Library/pull/1202",
+      "state": "open",
+      "head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "base": "development",
+      "body_exact": true
+    }
+  ],
+  "implementation_merges": 0,
+  "signed": "Sue"
+}

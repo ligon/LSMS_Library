@@ -58,50 +58,92 @@ CS = 'Malawi::crop_production::contradiction-price-sale'
 CH = 'Malawi::crop_production::contradiction-price-harvest'
 DEL = 'Malawi::crop_production::sale-basis-unresolved'
 KEYS = (W, P, OV, N, NR, CS, CH)
+#: crop_production keys that are not rungs of the basis ladder: a sale the ladder had no
+#: row for, in the rulings queued on the #1457 review.
+OFF_LADDER = {'Malawi::crop_production::sale-other-unit-single-row',
+              'Malawi::crop_production::sale-one-row-states-harvest'}
 SINCE = {OV: '2026-09-25', NR: '2026-09-25'}
 
-#: Delivered ROWS carrying each key, per wave -- measured on the cold build
-#: of 2026-09-25 (fix/malawi-derivations @ 95449ffb9 -> this branch).  Rows
-#: are BELOW the attached sales on the wildcard (949 / 357 / 450 / 1,046
-#: sales) for TWO reasons, neither of them this ladder: the GH #869
-#: unmapped-crop drop (13 rows, all 2013-14) and the defensive collapse at
-#: the declared grain in `assemble_crop_production` (`_grain`, `Value_sold:
-#: 'first'`), which merges two same-label VARIETIES of one plot-crop
-#: (Citrus 1005/1010/1011, Groundnut 11/12/16, Maize 1/3) into one row and
-#: keeps one variety's sale -- 2 / 3 / 1 / 5 keyed wildcard sales, and 27
-#: sales / 373,600 MWK in all (6 / 3 / 1 / 17 per wave), a pre-existing
-#: composition the ladder does not touch (issue text in
-#: slurm_logs/backlog_fix_2026-09-24/issues_to_file.org).  Unsold Module I/Q
+#: Delivered ROWS carrying each key, per wave -- first measured on the cold
+#: build of 2026-09-25 (fix/malawi-derivations @ 95449ffb9 -> this branch).
+#: Re-pinned 2026-11-03 (GH #1432, cold development 98c6069d2): #1373
+#: (0377b733b) removed the defensive collapse at the declared grain in
+#: `assemble_crop_production`, which merged two same-label VARIETIES of one
+#: plot-crop (Citrus 1005/1010/1011, Groundnut 11/12/16, Maize 1/3) into one
+#: row and kept one variety's sale.  This comment had counted what that cost,
+#: and exactly that came back: 2 / 3 / 1 / 5 keyed wildcard sales (W was 947 /
+#: 341 / 520 / 1,137; no other key moved), and 373,600 MWK in all (the
+#: VALUE_SOLD_AFTER move below).  Rows now fall below the attached sales only
+#: through the GH #869 unmapped-crop drop (13 rows, all 2013-14), which
+#: `test_every_attached_sale_reaches_a_served_row` accounts for.  Unsold Module I/Q
 #: lines summed to 0/0 by `_sale_block` (901 / 225 / 2,433 / 2,185) attach on
 #: the wildcard as 0.0, as they always did, and carry NO key.
 #: Before 2026-09-25 the not-applicable key carried N + NR (122 / 11 / 79 /
 #: 198) and the from-price key's harvest side refused what OV now carries.
 ROWS = {
-    '2010-11': {W: 947, P: 1, OV: 0, N: 5, NR: 117, CS: 67, CH: 19},
-    '2013-14': {W: 341, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
-    '2016-17': {W: 449, P: 8, OV: 2, N: 42, NR: 37, CS: 47, CH: 23},
-    '2019-20': {W: 1041, P: 29, OV: 2, N: 67, NR: 131, CS: 85, CH: 51},
+    '2010-11': {W: 949, P: 1, OV: 0, N: 5, NR: 117, CS: 67, CH: 19},
+    # W 344 before GH #1457: sugar cane's 13 Module Q sales now reach their Module P rows.
+    '2013-14': {W: 357, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
+    '2016-17': {W: 521, P: 8, OV: 2, N: 42, NR: 37, CS: 46, CH: 23},
+    '2019-20': {W: 1142, P: 29, OV: 2, N: 67, NR: 131, CS: 84, CH: 51},
 }
+#: GH #856 (2026-10-22) moved the two IHS4/IHS5 waves: recovering 90 KG BAG /
+#: BASKET (DENGU) from the unit specify text on BOTH sides attached 71 / 97
+#: wildcard sales (perennial harvest rows coded 3 / 11 meeting a Module Q
+#: sale written 13 + text; 53 of the 2016-17 ones are Q's 'BASKET
+#: (UNSPECIFIED SIZE)', Sue's decision of 2026-10-22) and lost one wildcard
+#: sale in 2019-20 (OX-CART harvest vs 'BUSKET' sale -- different units).
+#: CS lost one sale per wave: in 2016-17 it became unresolved (its (crop,
+#: 'Other (Specify)') price cell lost the recovered rows); in 2019-20 it left
+#: the ladder altogether (the sale's '90KG BAY' is now a 90 kg bag, its
+#: harvest row's '09KG BAG' is left, so no row of its unit exists).  Was
+#: W 449 / 1041, CS 47 / 85.
 #: Total Value_sold per wave, before (the GH #833 bundle) -> after.  The
 #: overrule rung of 2026-09-25 moved 2016-17 by +37,000 (409,053,925 ->
 #: 409,090,925) and 2019-20 by +120,000 (527,653,548 -> 527,773,548).
 VALUE_SOLD_BEFORE = {'2010-11': 126_816_048.0, '2013-14': 94_338_845.0,
                      '2016-17': 394_826_755.0, '2019-20': 496_063_698.0}
-VALUE_SOLD_AFTER = {'2010-11': 130_650_105.0, '2013-14': 94_992_745.0,
-                    '2016-17': 409_090_925.0, '2019-20': 527_773_548.0}
+#: GH #1457: 2013-14 + 329,000, sugar cane's 13 Module Q sales on their Module P rows.
+VALUE_SOLD_AFTER = {'2010-11': 130_679_005.0, '2013-14': 95_339_945.0,
+                    '2016-17': 410_017_725.0, '2019-20': 529_712_448.0}
+#: #1373 (see ROWS) moved these by +28,900 / +18,200 / +50,000 / +276,500 =
+#: +373,600 MWK from 130,650,105 / 94,992,745 / 409,967,725 / 529,435,948.
+#: GH #856 moved 2016-17 by +876,800 (409,090,925 -> 409,967,725) and 2019-20
+#: by +1,662,400 (527,773,548 -> 529,435,948): 3,601,200 MWK newly attached,
+#: 1,062,000 detached (see the ROWS comment above and CONTENTS.org, GH #856).
+#: Of that, the 'BASKET (BAMBOO)' ruling (@ligon 2026-10-22) re-attached 9
+#: exact-match sales (+150,000) and detached 3 tomato sales (-875,000) whose
+#: harvest row says 'BASKET (SMALL)' or nothing; 'BASKET (UNSPECIFIED SIZE)'
+#: (Sue, 2026-10-22) attached 53 wildcard sales (+833,200); the bag typo
+#: '90 KG BAD' re-attached one exact-match sale (+10,000).
 #: Sales the ladder still suppresses (attrs['sale_basis_mismatch']), per
 #: wave: before 303 / 59 / 247 / 503 (64,110,157 MWK); after the ladder of
 #: 2026-09-24, 94 / 21 / 90 / 140 (13,805,180 MWK); the overrule rung took 2
 #: / 2 sales (37,000 / 120,000 MWK) out of 2016-17 / 2019-20.
 UNRESOLVED = {'2010-11': (94, 1_088_250.0), '2013-14': (21, 315_300.0),
-              '2016-17': (88, 5_972_600.0), '2019-20': (138, 6_272_030.0)}
+              '2016-17': (89, 6_009_600.0), '2019-20': (137, 6_244_030.0)}
+#: (GH #856: was 88 / 5,972,600 and 138 / 6,272,030.  2016-17: one groundnut
+#: sale moved from contradiction-price-sale to unresolved (+37,000).  2019-20:
+#: one unresolved sale (28,000) left the set -- its own text is not
+#: recovered but its candidate harvest row's is, so no row of its unit is
+#: left to contradict.)
 #: attrs['sale_basis_ladder'][DEL]['grounds'], summed over the four waves.
+#: GH #856 left the SUM unchanged, by coincidence, and it was checked rather
+#: than assumed (slurm_logs/isa_backlog_2026-10-21/856-harvest-unit-text/
+#: ladder_tallies_*.json, a per-wave replay): contradiction_no_separation
+#: moves 70 -> 71 in 2016-17 and 105 -> 104 in 2019-20 (the two sales in the
+#: UNRESOLVED comment above), so 271 stays 271.  At bf29f212a, before the bag
+#: typos mapped, it was 272: the 2019-20 '90KG BAY' groundnut sale was
+#: unresolved there, and now leaves the ladder instead.
 UNRESOLVED_GROUNDS = {'contradiction_no_separation': 271,
                       'contradiction_price_undecided': 57,
                       'na_sale_price_undecided': 6,
                       'na_harvest_price_undecided': 7,
                       'claimed_by_tier_a': 0}
-TOTAL_ROWS = {'2010-11': 33_420, '2013-14': 12_616, '2016-17': 37_170, '2019-20': 51_872}
+#: One row per native crop code since #1373 (0377b733b); was 33,420 / 12,616 /
+#: 37,170 / 51,872.  `test_gh637_malawi_tail.py`'s raw oracle derives these.
+#: + 1 / + 23 for GH #1457: Module P rows of sugar cane, 1039 -> 39.
+TOTAL_ROWS = {'2010-11': 33_550, '2013-14': 12_694, '2016-17': 37_177, '2019-20': 51_973}
 
 
 @pytest.fixture(scope='module')
@@ -128,9 +170,31 @@ def _source():
 # static: the registry
 # ---------------------------------------------------------------------------
 
+def _ladder():
+    """Malawi's crop_production registry entries -- the sale-basis ladder.
+    Scoped to the table: the country file also registers other tables'
+    derivations (community_prices, GH #827), which are not rungs."""
+    return {k: r for k, r in derivation_records(COUNTRY).items()
+            if r.table == 'crop_production' and k not in OFF_LADDER}
+
+
+def _keys_of(frame):
+    """Rows per key.  A row can carry two (`Derivation` is MULTI_SEP-joined)."""
+    return frame['Derivation'].astype('string').str.split('+').explode().value_counts().to_dict()
+
+
+def _without(frame, keys):
+    """The rows carrying none of ``keys``."""
+    out = frame
+    for key in keys:
+        carries = out['Derivation'].astype('string').str.contains(key, regex=False).fillna(False)
+        out = out[~carries.to_numpy(dtype=bool)]
+    return out
+
+
 class TestRegistry:
     def test_eight_entries_one_per_rung(self):
-        r = derivation_records(COUNTRY)
+        r = _ladder()
         assert set(r) == set(KEYS) | {DEL}
         for key in KEYS:
             rec = r[key]
@@ -144,7 +208,7 @@ class TestRegistry:
 
     def test_the_deletion_entry(self):
         rec = derivation_records(COUNTRY)[DEL]
-        assert rec.rows == 0
+        assert rec.rows is None
         assert rec.inputs.endswith(':inputs_sale_basis_unresolved')
         assert 'sale_basis_mismatch' in rec.rule
 
@@ -178,7 +242,7 @@ class TestRegistry:
         assert 'sits between' not in r[P].rule.lower().replace('sits between the medians resolves', 'X')
 
     def test_every_callable_resolves(self):
-        r = derivation_records(COUNTRY)
+        r = _ladder()
         fns = set()
         for key, rec in r.items():
             assert callable(resolve_callable(rec.function)), key
@@ -204,21 +268,20 @@ class TestScripts:
         for key in (*KEYS, DEL):
             assert f"'{key}'" in src, key
 
-    def test_label_is_stamped_after_the_collapse(self):
-        """The registry key is written AFTER the declared-grain groupby."""
+    def test_label_is_stamped_after_native_coordinate_validation(self):
+        """The unchanged branch is stamped only after full-grain refusal."""
         src = _source()
-        i_collapse = src.index("harv.groupby(_grain, as_index=False, dropna=False)")
+        i_guard = src.index("if harv.duplicated(_grain).any():")
         i_stamp = src.index("harv['Derivation'] = pd.array(")
-        assert i_stamp > i_collapse
-        # and the collapse carries the branch through, so the stamp cannot
-        # land on a row the collapse assembled from two
-        assert "'_branch':        'first'" in src
+        assert i_stamp > i_guard
+        assert "harv.groupby(_grain, as_index=False, dropna=False)" not in src
 
     def test_the_unresolved_warning_names_the_three_grounds(self):
         """Review item 6: the deletion's warning used to say the sale
         CONTRADICTS every row; the class holds three grounds."""
         src = _source()
-        i = src.index('registered as the deletion "')      # the f-string, not the docstring
+        # Re-pinned for GH #1457: no longer a deletion; the sale has a Farm-level row.
+        i = src.index('names the refusal')      # the f-string, not the docstring
         head = src[i - 1500:i]
         assert 'three' in head and 'grounds' in head
         assert 'CONTRADICTS' in head and 'SEPARATING' in head and 'claimed' in head
@@ -226,7 +289,7 @@ class TestScripts:
     @pytest.mark.parametrize('wave', WAVES)
     def test_wave_script_asserts_uniqueness_on_the_declared_grain(self, wave):
         src = (ROOT / wave / '_' / 'crop_production.py').read_text()
-        assert "_GRAIN = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']" in src
+        assert "_GRAIN = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs']" in src
         assert 'assert not df.reset_index().duplicated(_GRAIN).any()' in src
 
     @pytest.mark.parametrize('wave', ['2010-11', '2013-14'])
@@ -246,6 +309,10 @@ class TestScripts:
             assert half['hhid'] in src, (wave, half['hhid'])
             for k in ('gplot', 'gcrop', 'pplot', 'icrop', 'qcrop'):
                 assert half[k] in src, (wave, k, half[k])
+            # GH #856: the unit specify-text columns, where a wave passes them.
+            for k in ('gtext', 'ptext', 'itext', 'qtext', 'gcrop_text'):
+                if half.get(k):
+                    assert f"'{half[k]}'" in src, (wave, k, half[k])
 
 
 # ---------------------------------------------------------------------------
@@ -375,6 +442,7 @@ def _harv(rows):
         'i': [r[0] for r in rows], 'plot_id': [r[1] for r in rows],
         'crop': [r[2] for r in rows],
         '_crop_code': pd.array([r[3] for r in rows], dtype='Int64'),
+        'production_obs': pd.array([f'reported:G:{r[3]}' for r in rows], dtype='string'),
         'u': pd.array([r[4] for r in rows], dtype='string'),
         'condition': pd.array([r[5] for r in rows], dtype='string'),
         'crop_variety': pd.array(['x'] * n, dtype='string'),
@@ -497,7 +565,12 @@ class TestAssemble:
             out = malawi_mod.assemble_crop_production(
                 '2010-11', [_harv([('h1', 'R1', 'Groundnut', 11, KG, S, 10)])],
                 [_sale([('h1', 11, KG, U, 4, 2500)])])
-        assert out['Value_sold'].isna().all() and out['Derivation'].isna().all()
+        # Re-pinned for GH #1457: refused from its harvest row, and on a Farm-level row.
+        harvest_row = out[out.index.get_level_values('plot_id') != 'Farm-level']
+        assert harvest_row['Value_sold'].isna().all() and harvest_row['Derivation'].isna().all()
+        assert out.xs('Farm-level', level='plot_id')['Derivation'].tolist() == [DEL]
+        farm = out.xs('Farm-level', level='plot_id')
+        assert farm['Value_sold'].tolist() == [2500.0] and farm['Condition_sold'].tolist() == [U]
         assert out.attrs['sale_basis_mismatch'] == {
             'wave': '2010-11', 'sales': 1, 'rows': 1, 'value': 2500.0}
         assert out.attrs['sale_basis_ladder'][DEL]['sales'] == 1
@@ -605,7 +678,9 @@ def delivered(country):
         cp = country.crop_production()
     except Exception as e:                    # pragma: no cover - no microdata
         pytest.skip(f'{COUNTRY} crop_production not buildable here: {e}')
-    return cp
+    # GH #1457: the ladder's rows.  What it did not attach is on Farm-level, with its
+    # own oracle in tests/test_gh1457_malawi_farm_level_sales.py.
+    return cp[cp.index.get_level_values('plot_id') != 'Farm-level']
 
 
 @pytest.mark.requires_s3
@@ -615,15 +690,47 @@ class TestDelivered:
     def test_rows_per_key_per_wave(self, delivered, wave):
         x = delivered.xs(wave, level='t', drop_level=False)
         assert len(x) == TOTAL_ROWS[wave]
-        got = x['Derivation'].value_counts().to_dict()
+        got = _keys_of(_without(x, OFF_LADDER))
         assert {k: got.get(k, 0) for k in KEYS} == ROWS[wave]
         assert set(got) <= set(KEYS)
 
     @pytest.mark.parametrize('wave', WAVES)
     def test_value_sold_moved_by_the_re_attached_sales(self, delivered, wave):
-        x = delivered.xs(wave, level='t', drop_level=False)
+        x = _without(delivered.xs(wave, level='t', drop_level=False), OFF_LADDER)
         assert x['Value_sold'].sum() == pytest.approx(VALUE_SOLD_AFTER[wave], rel=1e-9)
         assert VALUE_SOLD_AFTER[wave] > VALUE_SOLD_BEFORE[wave]
+
+    @pytest.mark.parametrize('wave', WAVES)
+    def test_every_attached_sale_reaches_a_served_row(self, malawi_mod, delivered, wave):
+        """The rule #1373 restored: nothing after the ladder loses a sale.
+
+        Replayed from sources: each rung's positive sales are its served
+        rows, and the ladder's attached value is the served value, up to the
+        rows the GH #869 unmapped-crop filter drops (reported loudly there).
+        The collapse this replaces lost 19 sales worth 373,600 MWK and 8
+        zero-value "did not sell" lines.
+        """
+        try:
+            harvest, sale, _ = malawi_mod._crop_pieces(wave)
+        except Exception as e:                # pragma: no cover - no microdata
+            pytest.skip(f'{COUNTRY} {wave} sources not available here: {e}')
+        harv = malawi_mod._consolidate_harvest(harvest)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            attached, _, tallies = malawi_mod._attach_sales(
+                wave, harv, pd.concat(sale, ignore_index=True))
+        ladder = tallies['sale_basis_ladder']
+        dropped = attached[attached['crop'].isna()]
+        served = delivered.xs(wave, level='t', drop_level=False)
+        got = _keys_of(served)
+        for key in KEYS:
+            positive = ladder[key]['sales'] - ladder[key]['zero_quantity']
+            lost = dropped['_branch'].astype('string').str.contains(key, regex=False).fillna(False)
+            assert int(got.get(key, 0)) == positive - int(lost.sum()), key
+        value = sum(ladder[name]['value'] for name in (malawi_mod.SALE_EXACT, *KEYS))
+        # A sale in another unit is outside the ladder (R1 on the #1457 review).
+        assert _without(served, [k for k in OFF_LADDER if 'other-unit' in k])['Value_sold'].sum() == pytest.approx(
+            value - dropped['Value_sold'].sum(), rel=1e-9)
 
     def test_a_key_marks_a_sale_and_only_a_sale(self, delivered):
         keyed = delivered[delivered['Derivation'].notna()]
@@ -634,13 +741,15 @@ class TestDelivered:
         assert (unkeyed['Value_sold'] > 0).sum() > 10_000
         assert (unkeyed['Value_sold'] == 0).sum() > 1_000
 
-    def test_attrs_summary_counts_the_labelled_rows_and_lists_the_deletion(self, delivered):
-        summ = delivered.attrs['derivations'][COUNTRY]
-        assert set(summ) == set(KEYS) | {DEL}
+    def test_attrs_summary_counts_the_labelled_rows_and_lists_the_deletion(self, delivered, country):
+        full = country.crop_production()
+        summ = full.attrs['derivations'][COUNTRY]
+        assert set(summ) - OFF_LADDER == set(KEYS) | {DEL}
         for key in KEYS:
-            assert summ[key]['rows'] == int((delivered['Derivation'] == key).sum())
+            assert summ[key]['rows'] == _keys_of(delivered).get(key, 0)
             assert summ[key]['in'] == 'crop_production'
-        assert summ[DEL]['rows'] == 0
+        assert summ[DEL]['rows'] == _keys_of(full).get(DEL, 0)
+        assert summ[DEL]['rows'] == sum(n for n, _ in UNRESOLVED.values())
 
     def test_the_two_new_keys_stamp_exactly_their_rows(self, delivered):
         """The overrule rung is Groundnut on a not-applicable harvest row
@@ -666,7 +775,7 @@ class TestDelivered:
 
     def test_registry_lists_every_key(self, country):
         import lsms_library as ll
-        assert set(country.derivations('crop_production')) == set(KEYS) | {DEL}
+        assert set(country.derivations('crop_production')) - OFF_LADDER == set(KEYS) | {DEL}
         tbl = ll.derivations()
         assert set(KEYS) | {DEL} <= set(tbl.index)
 

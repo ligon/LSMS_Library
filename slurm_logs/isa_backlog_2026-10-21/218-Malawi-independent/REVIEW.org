@@ -1,0 +1,89 @@
+#+TITLE: Independent Malawi GH218 review
+
+* Verdict and boundary
+PASS for the two-key Malawi cleanup at d29a56783d08a8a647e2622150a4ee5fbdd7246a against actual f8d236694c26fe9e709c5548f02c70f74ea72c33.
+Runtime/tests equal tested299fb8675e785fd392b1259ab1f4fb535eb69c34 except the documented CONTENTS descendant.
+Only the null food_expenditures/food_prices raw Data Scheme registrations are removed.
+Public derived methods/order/materialization{} remain exact; framework/helpers/Make/science and source eligibility are untouched.
+No new product defect found; broader GH218 and the inherited residuals remain open.
+
+* Grounding
+Complete current3090-line Malawi CONTENTS was read, including TODO/WAITING/LOGBOOK/history.
+2013-14 is panel-only;2016/2019 mix CS/tracking populations.
+Preserve cs-17 identifiers, sample joins, tracking-defined universes, baseline EA versus current-location distinctions and the fully qualified EA key.
+IHS2 has no survey factor table but explicit metric labels carry magnitudes; IHS3+ conversions are region-keyed.
+The older "lacks any unit-to-kg conversion factors entirely" (CONTENTS1598) coexists with the metric-label explanation at2546-2588.
+The retired-family entry says products "now derive from food_acquired" (CONTENTS1656), while the two raw null registrations still existed.
+These are reported tensions, not permission to change science or erase history.
+Niger's prior complete1557-line reading was carried only after exact current blob f4e280252f00640d265fbf63cfcf82072c2e47c8 equality: ECVMA/EHCVM/grappe/menage, EXTENSION tracking, seasonal and Original Label dictionary caveats stay in force.
+Standing/task ledger, applicable food/Aggregate/cross-country/backlog skills and actual author checkers/stops were reviewed.
+
+* Independent evidence
+Actual prebuild549 census:26 Malawi hashes move,523 other-country cells exact;39 framework and97 Malawi-wave hashes exact.
+This invalidates all26 enumerated Malawi API table hashes; only scoped food/sample/lazy panel companions were source-built.
+Ledger61f2236e precedes production299fb867; the complete actual loader census independently found only Malawi's two offending raw-derived registrations.
+Candidate focused51PASS/0SKIP; identical actual-parent tests1 expected registry FAIL/1 public-discovery PASS, no fixture/error failure.
+Strict API surface audit passed.
+Nineteen held DTA sidecars passed MD5/SHA/declared-size/mode/mtime gates;152 physical raw copies across four roots/two layouts, plus52 current full-coverage Niger warm copies, had distinct inodes/nlink1/no symlinks before decode/API/unpickle.
+All204 copies and32 origins remain exact; both protected author815 and Uganda8491858-entry manifests were rehashed unchanged.
+
+| Product | Malawi all | Malawi2013 | Joint Feature default and None |
+|---------+------------+------------+--------------------------------|
+| food_acquired |971531|81680|1211408|
+| food_expenditures |681980|59264|846994|
+| food_prices |680400|59180|845427|
+| food_quantities |971028|81675|1210883|
+
+Native/raw/writer/public/Feature/API-before-write and artifact-after-read operands were saved at matching stages.
+Explicit unit/currency/default-family controls and the unavailable kgprice/unitprice exceptions remain classified by actual arguments.
+Five native food waves preserve all rows and fields; own pre-invalid native copies bind byte-for-byte to Make natives.
+Twenty-four cache-frame/footer pairs match; the two country footers differ only in measured current hash plus exact nested ARROW:schema copies.
+Replacing only that hash reconstructs complete nested schema bytes; no metadata stripping.
+Default/Make fresh processes/new objects and first/fresh Feature calls preserve complete DATA byte/size/OS-mode/nanosecond-mtime receipts.
+Six actual CLI calls exit0; their real load-return/prewrite frames match saved API controls, and independent serialization artifacts match complete Arrow/footer/schema/parquet bytes.
+API versus generic postread is deliberately not declared equal: v changes pyarrow StringDtype na_value=pd.NA to nan, with zero nulls; numeric cells/index codes/values/order survive; population/recall attrs differ recursively by type.
+Both heads and the independent serialization oracles match at their proper stages without normalization.
+
+* Numerical exactness qualification and reassessment
+Mounted pandas assert_frame_equal(check_exact=True,rtol=atol=0) accepts a nullable Float64 difference of1.000088900582341e-12; initial author/review pandas calls alone were insufficient precision proof.
+Old common.py/checks remain untouched as historical observations.
+NEW common_strict.py explicitly checks every column/axis EA with exact-zero arguments, dtype/storage/na_value, null masks, NumPy strict numeric values and typed object cells, alongside full axes/unused levels/codes and recursively typed full attrs/_FIELDS.
+Fifteen comparator calibration cases pass, including tiny/nextafter nullable mutants rejected by the new checker but accepted by the legacy one.
+Artifact-only reassessment:209 checks over177 unique ordered pairs,101256963 rows including repeated controls, all exact.
+This includes all saved native/raw/writer/public/cold-warm/Feature/CLI/serialization/default-None/corrected assembly pairs.
+No API, source or pytest cohort was replayed for the reassessment.
+
+* Scanner and warning accounting
+Unmodified phases1/2:205 records/head, full ordered sequence and full occurrence multiset exact;200warn/3pass/2fail/0error.
+Both FAILs remain food_prices assembly_nonempty for kgprice/unitprice; neither input country records Price.
+All occurrence digests/multiplicities are exported; full messages stay private.
+Sixty-seven endpoint pairs contain353 parent warning occurrences/head;60 raw category/message multisets match, seven Make messages retain literal path differences.
+Full category/message/file/line arrays match after only declared checkout/data-root prefix substitution; raw four-field equality holds in4 pairs, qualified occurrence and order equality in67.
+Per-call child records retain returns; stdout/stderr fields are empty because actual child FDs were inherited.
+Complete original outer FD logs remain (30 units-error occurrences/cold head,12/warm head); no structured per-call child-warning equality is claimed.
+Scanner and CLI DATA receipts have zero changes.
+
+* Residuals and evidence lineage
+The country Make builder still fails at food_acquired.py18-22 on both heads for all/supported2013 and all three derived callers; RuntimeError is not an empty result.
+Invalid1900-00 raises KeyError after five native evictions while preserving country cache; all five declared survey waves are supported.
+These and remaining GH218 work are separated in RESIDUALS.md; no unrelated repair, ownership invention or closure.
+The original independent assembly oracle appended currency to an EMPTY canonical list, contrary to Feature.py1014; its initial in-memory expectation is absent.
+Newly reconstructed diagnostic/corrected expected artifacts are separately named;16 corrected argument-matched full assemblies pass, including typed attrs, without replaying APIs.
+Original author gaps/stops remain untouched, including absent wrong-owner stderr; own metadata/schema, syntax, child-stderr binding and cross-checkout permission stops also remain.
+Seven report OS-mode differences across author/review roots are separately measured; each root matches its own frozen receipt, Git blobs/modes match and no chmod was performed.
+The prospective warm-driver preparation changed the private cold checker's mtime before its original bytes were restored; loaded cold execution/output and immutable product source were not replaced.
+No newly reconstructed aggregate/operand is called original or recovered; no missing original evidence is invented.
+
+* Limits and release
+No full suite, whole corpus, other Malawi table rebuild, Niger source-cold/Make pooled descent, source acquisition, DVC CLI, shared cache mutation, bypass/stamp, product/test/Git/GitHub edit, FDC/nutrition call or issue closure.
+Source snapshots use literal symlink bytes and full tracked modes/head/clean checks; protected copy/source/reference receipts and zero consumers are required by final READY/seal.
+Safe export allowlist is complete; records/IDs/full warnings/tracebacks stay private.
+
+Sue.
+
+* Final artifact-only diagnostic coverage supplement
+After the209 accepted matched-stage comparisons, the new strict checker also revisited all16 saved historical diagnostic reconstructions:14 exact and the two deliberately wrong expenditure-grain constructions rejected as expected.
+All six intentional actual API-before-write versus generic postread comparisons were rejected as expected for the recorded v/attrs stage distinctions.
+Thus22 additional historical/stage-negative comparisons retain their classifications; none is relabelled as a product regression or a recovered original operand.
+The ORIGINAL first in-memory assembly expectation remains absent and cannot be rechecked; its later explicitly new reconstructions are separate evidence.
+All of this uses saved artifacts only; no source/API/pytest replay.

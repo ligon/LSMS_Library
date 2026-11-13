@@ -2,15 +2,44 @@ Country: Nigeria
 
 Data Scheme:
   sample:
+    # ONE COVER PAGE PER ROUND (GH #1120 D1, ruling @ligon 2026-10-23): the
+    # post-planting quarter's rows come from the post-planting household cover
+    # (secta_planting{wN}), the post-harvest quarter's from the post-harvest
+    # cover (secta_harvest{wN}), each with that cover's weights.  Until
+    # 2026-10-23 one YAML block read the PP cover for BOTH rounds.  So a
+    # household's `v` is a per-ROUND fact: a household that moved between the
+    # two visits can have a different PH key. Labelled W4/W5 same-location
+    # answers reuse a complete known own-PP identity only for PH ea=0;
+    # and the round's household set is the cover's (W2's PH cover adds 44
+    # households the PP cover lacks; every wave's PH cover drops PP households
+    # it did not revisit).  W2's PP round also takes the 21 households the PP
+    # AGRICULTURE cover lists and the PP household cover does not (weights
+    # NA), and any round takes a household its own ROSTER records with a
+    # location and no cover lists (2016Q1: 2; weights NA) -- both GH #1120 D1.
+    # A household no file locates would get the D2 singleton
+    # `unlocated-{hhid}` (fires on none today).  Built by <wave>/_/sample.py
+    # -> nigeria.sample_for_wave: two
+    # source files per folder, each with its own `t` -> materialize: make.
+    # See CONTENTS.org, "Sampling Design".
+    #
+    # InterviewResult is what the round's own household cover records, so a user
+    # can filter (GH #1444).  It gates nothing: the rule above decides who is here.
+    # NA for a household only the supplement cover or a roster lists (23 rows).
     index: (i, t)
     v: str
     weight: float
     panel_weight: float
     strata: str
     Rural: str
+    InterviewResult: str
+    materialize: make
 
   cluster_features:
-    # Built from the HOUSEHOLD cover page (one row per household), so the frame
+    # Built from each ROUND's household cover page (GH #1120 D1, the same
+    # covers as `sample`, so the two share one keyspace in every round) by
+    # <wave>/_/cluster_features.py -> nigeria.cluster_features_for_wave, with
+    # the household geovariables joined LEFT onto the cover (GH #1261).  One
+    # row per household, so the frame
     # arrives at household grain and Wave.cluster_features() collapses it to
     # the (t, v) cluster grain.  What makes that collapse SOUND is the key:
     # `v` is the composite cluster id (state/lga/ea -- see the GH #323 note in
@@ -20,23 +49,29 @@ Data Scheme:
     # (890/5000 W1 households got the wrong District).  With the composite key,
     # Region/District/Rural are constant within the group BY CONSTRUCTION
     # (state and lga are IN the key; zone and sector are functions of them), so
-    # the collapse is provably lossless for them.
+    # ordinary raw-composite groups agree on these attributes. The explicit
+    # PH same-location repair keeps PH payload with a PP identity; Site 2
+    # still audits any resulting disagreement rather than assuming agreement.
     #
     # Latitude/Longitude are the exception and are NOT invariant from W2 on:
     # the panel follows households that move while keeping their ORIGINAL ea in
     # the sampling frame, so a mover's current coordinates differ from its
-    # cluster's.  Core reduces these with .mean() (the cluster centroid).  That
-    # is the historical behaviour and it is retained here deliberately: core
-    # does not aggregate on declaration (GH #323 D1), and auditing this
-    # household->cluster collapse is Site 2, owned centrally rather than
-    # per-country.  Measured spread: 5 / 24 / 50 clusters in W2 / W3 / W4 span
-    # more than one coordinate.  W1 is clean (0 of 500 groups disagree).
+    # cluster's.  Core does not aggregate them: the audited Site 2 collapse
+    # SELECTS the group's most complete household row (GH #871; the .mean()
+    # centroid this comment used to describe was retired 2026-07-13) and
+    # reports the conflict as a GrainCollapseWarning.  Measured spread: 5 / 24
+    # / 50 clusters in W2 / W3 / W4 span more than one coordinate.  W1 is
+    # clean (0 of 500 groups disagree). Acquired W5 v02 household reference
+    # coordinates are anonymized:34PP /31refinedPH real clusters have multiple
+    # pairs (#978, CONTENTS.org). Keep the same audited observed-row selector;
+    # neither a centroid nor a physical-movement inference follows.
     index: (t, v)
     Region: str
     District: str
     Rural: str
     Latitude: float
     Longitude: float
+    materialize: make
 
   shocks:
     index: (t, i, Shock)
@@ -94,18 +129,21 @@ Data Scheme:
   individual_education:
     # Highest education level completed per household member (GH #171).
     # Wired on the YAML path (per-wave _/data_info.yml block), mirroring
-    # Uganda -- one post-harvest section-2 file per wave, no script.  Like
-    # the other Nigeria YAML-path tables (shocks, assets), each wave is
-    # tagged on BOTH of its quarter t values (PP + PH), so the section-2
-    # rows appear under both 2010Q3/2011Q1, 2012Q3/2013Q1, etc.
+    # Uganda -- the selected post-harvest section-2 series is dated only
+    # to each wave's PH visit, not duplicated at PP. Earlier W1/W2 PP
+    # attainment questions are separate sources and remain unwired here.
+    # Quarter t values label logical visits; PH fieldwork can extend
+    # beyond calendar Q1.
     # Educational Attainment = highest level completed: s2aq9 in W1-W4
     # post-harvest (sect2a_harvestw1/w2, sect2_harvestw3/w4), s2q9 in W5
     # (sect2_harvestw5).  Raw "NN. LEVEL" / cased labels are harmonized
     # onto the canonical ordinal vocabulary via the row-additive
     # harmonize_education table (global base + Nigeria delta in
-    # _/categorical_mapping.org).  W1/W2 coverage is low (~640/310 rows):
-    # those post-harvest sections recorded the level only for members
-    # who had left school.
+    # _/categorical_mapping.org). W1 coverage is low (~640 rows); the
+    # held W2 file has 313 answers from new members aged 5+ who ever
+    # attended school, including 175 current students (CONTENTS.org, #1292).
+    # This contradicts the W2 left-school-only explanation. W1 and the
+    # exact printed W2 skip sequence remain unverified.
     index: (t, i, pid)
     Educational Attainment: str
 
@@ -196,8 +234,12 @@ Data Scheme:
     Age: float
     Value: float
   interview_date:
+    # Int_t dates the VISIT: every cover records one whether or not anyone was
+    # interviewed.  InterviewResult is what the cover says it produced (GH #1096,
+    # #1444).  Rows with no date are not served.  See CONTENTS.org.
     index: (t, i)
     Int_t: datetime
+    InterviewResult: str
     materialize: make
 
   housing:
@@ -209,8 +251,9 @@ Data Scheme:
   plot_features:
     # Lasting plot characteristics from the post-planting Agriculture
     # module (GH #167).  Nigeria is post-planting/post-harvest; lasting
-    # attributes are recorded only in the PP round, so each wave maps to
-    # a single t = PP quarter (2010Q3, 2012Q3, 2015Q3, 2018Q3, 2023Q3).
+    # historical PP blocks map to their PP quarters. GH587 additionally
+    # binds W1–W3 PH A1 source records to2011Q1/2013Q1/2016Q1.
+    # W4 unknown-unit current area and W5 prior GPS remain separate holds.
     # Area (sect11a1) is joined onto plot detail (sect11b/sect11b1) on
     # (hhid, plotid) -- two files per wave -> materialize: make.
     # Latitude / Longitude deferred (no decimal-degree parcel coords;
@@ -223,11 +266,131 @@ Data Scheme:
     TenureSystem: str
     SoilType: str
     Irrigated: bool
+    # WB srtmslp_nga is percent (GH #1150 source-label reconciliation).
+    PlotSlope:
+      type: float
+      optional: true
+    # Own PH raw/routing operands; source-qualified to avoid W1 text/GPS collisions.
+    PHReportedAreaUnit:
+      type: str
+      optional: true
+    PHReportedAcquisition:
+      type: str
+      optional: true
+    NativePH_W1_hhid:
+      type: int
+      optional: true
+    NativePH_W1_plotid:
+      type: int
+      optional: true
+    NativePH_W1_sa1q3:
+      type: int
+      optional: true
+    NativePH_W1_sa1q4:
+      type: int
+      optional: true
+    NativePH_W1_sa1q5a:
+      type: int
+      optional: true
+    NativePH_W1_sa1q7a:
+      type: int
+      optional: true
+    NativePH_W1_sa1q9a:
+      type: float
+      optional: true
+    NativePH_W1_sa1q9b:
+      type: int
+      optional: true
+    NativePH_W1_sa1q9c:
+      type: str
+      optional: true
+    NativePH_W1_sa1q9d:
+      type: float
+      optional: true
+    NativePH_W1_sa1q12:
+      type: int
+      optional: true
+    NativePH_W2_hhid:
+      type: int
+      optional: true
+    NativePH_W2_plotid:
+      type: int
+      optional: true
+    NativePH_W2_sa1q3:
+      type: int
+      optional: true
+    NativePH_W2_sa1q4:
+      type: int
+      optional: true
+    NativePH_W2_sa1q5:
+      type: int
+      optional: true
+    NativePH_W2_sa1q7:
+      type: int
+      optional: true
+    NativePH_W2_sa1q9a:
+      type: float
+      optional: true
+    NativePH_W2_sa1q9b:
+      type: int
+      optional: true
+    NativePH_W2_sa1q9c:
+      type: float
+      optional: true
+    NativePH_W2_sa1q12:
+      type: int
+      optional: true
+    NativePH_W3_hhid:
+      type: int
+      optional: true
+    NativePH_W3_plotid:
+      type: int
+      optional: true
+    NativePH_W3_sa1q1a:
+      type: int
+      optional: true
+    NativePH_W3_sa1q3:
+      type: int
+      optional: true
+    NativePH_W3_sa1q4:
+      type: int
+      optional: true
+    NativePH_W3_sa1q4b:
+      type: int
+      optional: true
+    NativePH_W3_sa1q5:
+      type: int
+      optional: true
+    NativePH_W3_sa1q7:
+      type: int
+      optional: true
+    NativePH_W3_sa1q9a:
+      type: float
+      optional: true
+    NativePH_W3_sa1q9b:
+      type: int
+      optional: true
+    NativePH_W3_sa1q9c:
+      type: float
+      optional: true
+    NativePH_W3_sa1q10a:
+      type: int
+      optional: true
+    NativePH_W3_sa1q10b:
+      type: int
+      optional: true
+    NativePH_W3_sa1q10c:
+      type: int
+      optional: true
+    NativePH_W3_sa1q12:
+      type: int
+      optional: true
     materialize: make
 
   crop_production:
     # Item-level reported crop harvest (GAP 1) at natural grain
-    # (t, i, plot_id, crop).  Source: post-harvest crop module secta3*.
+    # (t, i, plot_id, crop, production_obs).  Source: post-harvest crop module
+    # secta3*.
     # Crop-level harvest is recorded only in the post-harvest round, so
     # each wave maps to a single t = PH quarter (2011Q1 / 2013Q1 /
     # 2016Q1 / 2019Q1 / 2024Q1), distinct from plot_features' PP quarter
@@ -238,12 +401,35 @@ Data Scheme:
     # conversion, yield, main_crop, or value shares (transformations).
     # crop (j) on the shared harmonize_food Preferred Label so it joins
     # food_acquired.j; u normalized to the shared `u` table base labels.
-    # Quantity_sold / Value_sold populated only where the survey records
-    # sales at the plot-crop grain (W1/W2); W3-W5 record sales at
-    # hh-crop grain (no plot linkage) -> NaN.  intercropped derived from
+    # Quantity_sold / Value_sold: W1/W2 record them on the plot-crop row.
+    # W3-W5 record them at hh-crop grain (secta3ii, no plot), so the sale goes
+    # on the household's one row for that crop that states a harvest (positive
+    # Quantity; a registered derivation, _/derivations.yml) and otherwise on ONE
+    # row with plot_id='Farm-level' and no harvest Quantity (GH #843, @ligon
+    # 2026-11-03, 2026-11-04).
+    # No split, no double count, nothing dropped.  `Farm-level` is the canonical
+    # structural sentinel: NOT a plot, so filter `plot_id != 'Farm-level'` before
+    # counting plots; a count of crop occurrences drops it only where the household
+    # has a plot row of that crop (GH #1469).  On such a row `u` is 'Unknown' beside a real Unit_sold, which
+    # is correct (GH #1047): `u` describes the harvest Quantity the row does not
+    # have, so do not read it as a Unit_sold != u flag.  See _/CONTENTS.org.
+    # W5's value column prints "ESTIMATE THE VALUE OF IN-KIND PAYMENTS", so a W5
+    # Value_sold can include an estimated in-kind part; no column flags it.
+    # intercropped derived from
     # the PP planting roster (sect11f s11fq2) where present (W1-W3);
-    # perennial = True for tree/permanent-crop rows (W4/W5 secta3iii).
-    index: (t, i, plot_id, crop)
+    # perennial = True for tree/permanent-crop rows (W4/W5 secta3iii), NA on a
+    # Farm-level row.
+    #
+    # production_obs (GH #1433) is the canonical native crop-observation
+    # coordinate (data_info.yml, GH #1198): one (plot, crop) can carry several
+    # harvest lines, because harmonize_food folds several codes onto one label
+    # (Yam--roots is 1120-1124) and the W1-W3 rosters can repeat a code on a plot.
+    # W1-W3 serve the roster's own line id, reported:crop_id:<cropid> (W1 has 6
+    # labelled lines with none: CONSTRUCTED missing-id:row:<source_fingerprint>:<n>);
+    # W4/W5 ship no line id and the code names the line, reported:crop_code:<code>;
+    # a Farm-level sale row answers no line and carries unresolved_observation.
+    # Not a persistent id across waves.
+    index: (t, i, plot_id, crop, production_obs)
     Quantity: float
     u: str
     Quantity_sold: float
@@ -265,15 +451,26 @@ Data Scheme:
     # the column was worse: Value_sold / Quantity_sold was filed under the
     # harvest unit by assumption on every row.
     #
+    # W3 asks the sale its own unit (sa3iiq5b).  W4/W5 ask only a quantity, "Of
+    # the [QTY] [UNIT] [CONDITION] of [CROP] harvested, how much of it did your
+    # household sell?", so the sale is in the unit of the household's total
+    # harvest (sa3iiq1c / sa3iiq3b); its size and condition are not carried.
+    #
     # A plain NA-bearing string column, never an index level and never
-    # sentinel-filled.  `optional` for two reasons: only W1/W2 record a
-    # plot-grain sale at all (W3-W5's sale block is secta3ii at hh-crop
-    # grain with no plot linkage, GH #843, so Quantity_sold / Value_sold /
-    # Unit_sold are all legitimately NaN there); and a row with no sale has
-    # no sold unit, so the column is never fully populated.  No sold
-    # CONDITION column exists in the W1/W2 A3 files.
+    # sentinel-filled.  `optional` because a row with no sale has no sold unit,
+    # so the column is never fully populated, and a household-crop sold in two
+    # units has no single unit to serve (GH #843).  No sold CONDITION column
+    # exists in the W1/W2 A3 files.
     Unit_sold:
       type: str
+      optional: true
+    # Survey-reported kg per ONE sold unit (GH #843): W4/W5 `sa3iiq1_conv`, the
+    # form's Kg/L factor for the total-harvest unit the sale is stated in.  W1-W3
+    # ship none, so `optional`.  A column apart from KgFactor, which rates the
+    # harvest `u`.  A summed row carries it only where every record reports the
+    # same factor, missingness included; a two-unit row's is NA.
+    KgFactor_sold:
+      type: float
       optional: true
     planting_month: str
     harvest_month: str
@@ -297,10 +494,27 @@ Data Scheme:
     # sa3iiiq23_conv.  The other `*_conv` columns are NOT wired and must not
     # be: sa3iq6d_conv (W4) / sa3iq15_conv (W5) belong to the "expect to
     # harvest MORE" block with its own unit columns, and sa3iiq1_conv
-    # (secta3ii) is hh-crop grain with no plot linkage.  See _/CONTENTS.org.
+    # (secta3ii) rates the household total, so it is the sale's KgFactor_sold
+    # above and never a plot row's KgFactor.  See _/CONTENTS.org.
     KgFactor:
       type: float
       optional: true
+    # The household's own Naira VALUATION of the harvest this row's
+    # `Quantity` measures (GH #844).  A hypothetical value, NEVER a
+    # transaction: what the household says the harvest is worth, not what it
+    # received -- so it is a column distinct from `Value_sold` and the two
+    # must not be pooled.  Asked on the same plot-crop row in every wave
+    # (populated on 73-86% of source rows), read positionally, stored as
+    # recorded.  The wording differs by wave:
+    #   W1/W2  sa3q18    "If you had sold all [CROP] harvested since the
+    #                    last visit, what would be the total value?"
+    #   W3     sa3iq6a   "What is the estimated value of the [CROP]
+    #                    harvested during this agricultural (rainy) season?"
+    #   W4/W5  sa3iq6a / sa3iq10 (annual), sa3iiiq14 / sa3iiiq24 (tree /
+    #          permanent): "What is the estimated value of the [CROP]
+    #          harvested from [PLOT] during ...?"
+    # Required (not optional): every wave carries it.  See _/CONTENTS.org.
+    Value_harvested: float
     materialize: make
 
   plot_inputs:
@@ -351,10 +565,11 @@ Data Scheme:
     # Family B (coping-strategies / rCSI), #332.  GHS section 9 ("Food
     # Security") is a coping day-count battery (items s9q1a..s9q1i: "how
     # many days in the last 7 had to [strategy]", coded 0-7), NOT an
-    # HFIAS occurrence/frequency scale.  Collected in the post-planting
-    # round only, so each wave maps to a single t = PP quarter
-    # (2010Q3 / 2012Q3 / 2015Q3 for W1-W3) -> materialize: make.  W4+
-    # section 9 switched to FIES (sect9b), wired separately.
+    # HFIAS occurrence/frequency scale.  W1-W3 post-planting section 9
+    # maps to PP quarters 2010Q3 / 2012Q3 / 2015Q3.  W3 additionally
+    # supplies its own PH section 12 Q1 battery (s12q1a..i) under the
+    # separate visit label 2016Q1 (GH #587), never a PP carry-forward.
+    # W4+ section 9 switched to FIES (sect9b), wired separately.
     index: (t, i, Strategy)
     Days: int
     materialize: make
@@ -518,9 +733,14 @@ Data Scheme:
   community_prices:
     # Item-level reported community food prices (GAP C) at natural grain
     # (t, v, j, u).  CLUSTER-level: one row per (cluster/EA x food-item x
-    # unit) from the post-harvest COMMUNITY questionnaire's food-price
-    # module (Section C8 "Food Prices", file sectc8_harvest{wN}; W3 splits
-    # it across sectc8a / sectc8b; W5 under Post Harvest Wave 5/Community/).
+    # unit) from the COMMUNITY questionnaire's food-price module, in BOTH
+    # rounds (GH #587, rulings 2026-11-12): post-harvest Section C8 "Food
+    # Prices" (file sectc8_harvest{wN}; W3 splits it across sectc8a /
+    # sectc8b; W5 under Post Harvest Wave 5/Community/) at the PH quarter,
+    # and post-planting Section C2 "Food Prices" (sectc2_planting{wN}; W3
+    # sectc2a / sectc2b) at the PP quarter -- distinct t per round.  The PP
+    # rows are built by _/pp_community_prices.py (its own item/unit
+    # crosswalk; see CONTENTS.org "Post-planting community prices").
     # There is NO household i, so _join_v_from_sample does NOT apply -- `v`
     # is declared in the index here and carried NATIVELY: it is the
     # community questionnaire's EA id (v = cluster_id(state, lga, ea) -- the
@@ -531,8 +751,17 @@ Data Scheme:
     #
     # Stores the REPORTED surveyed field ONLY:
     #   Price   prevailing price of one unit `u` of item `j` in cluster `v`
-    #           at the present time (Naira).  W1/W2 sc8q2 / c8q2; W3-W5
-    #           c8q3 / c8aq3.
+    #           at the present time (Naira).  PH W1/W2 sc8q2 / c8q2; W3-W5
+    #           c8q3 / c8aq3.  PP c2q3 (W1 sc2q3a, divided by the Number of
+    #           Units sc2q3b where it exceeds 1 -- the registered
+    #           pp-w1-number-of-units on the bands the evidence supports,
+    #           pp-w1-number-of-units-unvalidated on those it does not; W5
+    #           g / cl with no size divided by the c2q2a gram / cl count --
+    #           pp-w5-metric-unit-quantity).
+    #   Size    the native size the base `u` folds away (GH #587 unit-axis
+    #           ruling): PP W4/W5 the recorded SIZE label verbatim ('0. SMALL',
+    #           '34. 250 GRAMS'); PP W1-W3 the size their unit code carries
+    #           ('small', 'LARGE').  NA on PH rows (not carried there yet).
     # NOT an index, NOT a cross-cluster median/mean, NOT an HH-median
     # imputation -- those are transformations over these rows.  (The WB
     # panel surveys NO community prices: their crop_price_EA is an HH-median
@@ -546,12 +775,16 @@ Data Scheme:
     #        scheme, mapped by NAME in nigeria.py (_W1W2_PRICE_ITEM), reusing
     #        existing food labels; the 16 genuinely-new prepared-food/drink
     #        price items are registered in harmonize_food (codes 4001-4016).
-    #   u -> the SHARED `u` table base Preferred Label via _canon_unit (all
-    #        30 units used already exist in `u` -- no extension needed).  W3-W5
+    #   u -> the SHARED `u` table base Preferred Label via _canon_unit.  W3-W5
     #        record the unit per row; W1/W2 carry no unit column, so the unit
     #        is the questionnaire's per-item fixed unit (_W1W2_PRICE_UNIT).
-    # t = PH_QUARTER[wave] (the price module sits in the post-harvest round,
-    # matching crop_production / anthropometry).
+    #        The PP rows add 'Tomatoes cup', 'Congo/Mudu' and 'ml' (W1),
+    #        registered in `u` as codes 1020-1022 (ruling 2026-11-12), and
+    #        'Unknown' (a PP row with no unit recorded, the data_info.yml
+    #        sentinel); '210. STEMS' / '260. SEEDLING/PLANT' would stay
+    #        verbatim (GH #1095; 0 rows).  j adds W1/W2's native 'Pepper'
+    #        (GH #1144) and W2's 'Semovita' (a harmonize_food row).
+    # t = PH_QUARTER[wave] for C8 rows, PP_QUARTER[wave] for C2 rows.
     #
     # GH #834 (C8 SIZE field, W3-W5): where the coded size states a metric
     # quantity (W4 c8q2c / W5 c8aq2_c; W3's c8q2b is free text and blank on
@@ -561,6 +794,7 @@ Data Scheme:
     # Nigeria::community_prices::c8-metric-size` (see _/derivations.yml).
     # A metric-unit row with an UNRECORDED package size (all of W3's g/cl
     # rows but one, and all 3,433 of W3's Kg/l rows; W5's 133 'GRAMS (G)'
+    # and 49 'CENTLITRES (CL)'
     # rows) is DROPPED, not served mis-scaled by ~189x/~42x -- registered
     # as the deletion entry
     # Nigeria::community_prices::c8-unrecorded-size-drop.  W4 drops nothing
@@ -568,8 +802,26 @@ Data Scheme:
     # 'KILOGRAMS (KG)' (the earlier 'Grams(g)' description was wrong), and
     # a blank size beside KILOGRAMS reads as one kilogram -- they are
     # served under `Kg`.
-    index: (t, v, j, u)
+    #
+    # obs (GH #637 defect C; the GH #840 contract in lsms_library/data_info.yml)
+    # -- the C8 READING SLOT.  W3 fields C8 at two locations per community:
+    # sectc8a "C8a: FOOD PRICES - 1ST LOCATION" is obs 1, sectc8b "C8b: FOOD
+    # PRICES - 2ND LOCATION" is obs 2 (PH_W3_Community_Quest.pdf).  Until
+    # 2026-10-23 the two were collapsed on (t, v, j, u) and location 1 kept:
+    # 2,591 location-2 prices dropped (983 of them different), and 3,218
+    # location-2-only rows served as if from location 1.  Every other wave
+    # prices one location: obs = 1, native (not the Feature sentinel).  No
+    # `visit` level: Feature supplies its canonical single-visit sentinel.
+    # W1/W2 variety is the FULL source item/size code, per GH #637 ruling
+    # 2026-10-23; W3-W5 carry their existing unknown_variety sentinel.
+    # Every complete native key is asserted unique; no first-kept price.
+    # PP W1/W2 variety is the native item code, W3-W5 unknown_variety; W3's
+    # PP 1st / 2nd location (sectc2a / sectc2b) is obs 1 / 2 (GH #587).
+    index: (t, v, j, u, variety, obs)
     Price: float
+    Size:
+      type: str
+      optional: true
     materialize: make
 
   nonfood_expenditures:

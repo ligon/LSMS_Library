@@ -5,7 +5,8 @@
 
 Togo EHCVM (Enquete Harmonisee sur les Conditions de Vie des
 Menages), the harmonized West African household-conditions survey
-template.  One wave configured: =2018=.
+template.  Two waves: =2018= and =2021-22= (EHCVM-2, wired 2026-11-04, see "2021-22
+wired" below, and its 2026-11-12 sequel at the end of this file).
 
 * Sampling Design
 
@@ -466,13 +467,27 @@ see =slurm_logs/ehcvm_unit_codebook_2026-06-07.org=) is applied to =u= via
 Residual codes (=114, 659, 660, 662=) are *item-specific local units* --
 659 banana/plantain, 660 meat, 662 yam/cassava/plantain portions, 114
 tomato -- with the size in =s07bq03c= (Petit/Moyen/Grand).  They have no
-label in *any* EHCVM source =.dta=, and the household-questionnaire =Unites=
+label in any *2018-19* EHCVM source =.dta=, and the household-questionnaire =Unites=
 sheet is the generic 1--57 scheme, NOT the data's 100--700 coding (whose
-neighbours -- 663=Agoua, 664=Kpogban -- are specific local names).  No
-available source decodes them, so they are *accepted as undecodable* and
-left as codes (consistent with Malawi's residuals, #383).  They still
-contribute valid food_expenditures and per-native-unit =unitvalue= prices;
-only the kg aggregate excludes them.
+neighbours -- 663=Agoua, 664=Kpogban -- are specific local names).
+[2026-11-12, CORRECTED (ruling @ligon, "Decode 2018 with 2021 labels (Recommended)", GH
+#1557): 659, 660 and 662 are no longer undecodable, and 2018 now serves them as =Main=,
+=Quartier= and =Tête=.  The evidence is Togo's own 2021-22 files: =s07b_me_tgo2021.dta=
+labels =s07bq03b= 659 =Main= (on Plantain, 60 rows), 660 =Quartier= (other meat, 5), 662
+=Tête= (Igname 1,215, Manioc 91, Taro 17), and the unit-weight file =ehcvm_nsu_tgo2021.dta=
+uses the same codes for the same goods (=uniteID= 659 =Main= on Banane douce 145 and
+Plantain 32; 660 =Quartier= on mutton 27, beef 18, goat 13, pork 12, chicken 3, game 3; 662
+=Tête= on Igname 111, Manioc 16, Taro 3).  2018 records them on those goods: 659 on Banane
+douce 437 and Plantain 77 source rows, 660 on goat 14, mutton 7, other meat 2, beef 1, 662
+on Igname 1,317, Manioc 148, Plantain 21.  So the code book is read as one across the waves.
+The decode is =2018/_/mapping.py:UNIT_CODES_DECODED_FROM_2021=, applied to the =u= level
+only, so =unit_match= still compares codes and no =Expenditure= moves; the served =u= is
+=Main (Moyen)= where it was =659 (Moyen)=.  Rows served: "2026-11-12 -- s07bq03a: the
+regional factor is divided out (GH #1697)" below.  Code 114 (one row, tomato) has no label in
+either wave and stays a code (consistent with Malawi's residuals, #383).]  They still
+contribute valid food_expenditures and per-native-unit =unitvalue= prices.  (The old
+clause "only the kg aggregate excludes them" was never true: an accepted residual takes
+the u-pooled =unit= rung, =tests/test_962_unit_sentinel.py=.)
 
 * Household Presence / MonthsSpent
 
@@ -744,8 +759,872 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - The served =u= index still carries only =s07bq03b=, not the unit SIZE
   =s07bq03c=, so two rows differing only in container size collapse onto one
   =u=.  The derivation does distinguish them; the index does not.
+- [2026-11-03, GH #1224: no longer true.  =u= is now =<unit> (<Size>)= where =s07bq03c= names a size, base as the =ehcvm_units= decode and =u= table serve it.  *Accepted residual:* size code 98 has no label anywhere Togo holds (208 source rows, 8 served labels: =Bol=, =Bouquet=, =Calebasse=, =Paquet=, =Sachet=, =Tas=, =Unité=, =662=), so it is served as the code, =Bouquet (98)=, not folded into the bare unit and not given a label.  Checked 2026-11-03: the =s07bq03c= and =s07bq07c= value labels in =s07b_me_tgo2018.dta= run 0-9 with no 98, and none of the five =Documentation/= spreadsheets prints a size list at all: 7B.03 is a quantity with the =Unites= sheet's 1-57 codes, which build size into the unit (=Petit tas=).  Elsewhere the instrument uses 98 for =Ne Sait pas= (S8A, S13), so the code's meaning here is not assumed.  Benin's file calls its code 98 =Autre taille=; that is not Togo's evidence.  A residual unit code stays a code too (=662 (Moyen)=).  Cold 2018: rows 112,445 -> 112,596 (151 keys of the residual buckets stop summing across sizes), =u= 38 -> 107, (j, u) 441 -> 1,009; =lsms_library/ehcvm.py=.]
 - The price still comes from a purchase up to 30 days old.  That is what the
   instrument asked; the assumption is recorded rather than hidden.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* 2026-11-04 -- the NPK slot states no grade (GH #1445)
+
+Measured, nothing changed.  Code 5 of =s16bq01= is =Engrais inorganiques -
+NPK/Formule unique= in the file and the questionnaire (2,041 applied rows); no grade.
+It maps to =NPK= (0.17 N) and is 44.4% of =nitrogen_kg=; 3 =Tonne= rows are 23.8% of the slot's
+kilograms.  The =npk 15/15= rows of =harmonize_input= came with the Niger template and
+match no label here.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 3,420 positive), which the
+=data_scheme.yml= grain note says it does not.
+
+* 2026-11-04 -- 2021-22 held and registered (GH #552)
+
+Wired the same day: see "2021-22 wired" below, which settles what this one left open.
+
+Acquired whole by =add_wave=: EHCVM-2 (6279, =TGO_2021_EHCVM-2_v01_M=) in =2021-22/Data/=, 57
+files, 105 MB, with the BIDs and both household questionnaires in
+=Documentation/=.  No table of this wave is served: =_/data_info.yml= declares
+nothing.  Each new table is its own piece of work; the 2021-22 waves of Niger,
+Mali and Senegal are the template.  For the wiring:
+
+- *A panel by cluster.*  The BID's strategy is to revisit the same clusters.
+  Measured: all 540 grappes recur from =2018=, and 5,441 of 6,462
+  =(grappe, menage)= keys do.  Whether a recurring key is the same household is
+  not checked here: =s00_me= has a =PanelHH= column, and Burkina renumbers its
+  households (GH #1245).
+- *Layout.*  The wave is flat with =tgo2021= names; =2018/Data/= is =Data1/= plus
+  the =_forEthan= extracts.  The wave label =2021-22= is the catalog's, beside
+  the older =2018=.
+- *Documents.*  The catalog lists =tgo_ehcvm2_qnr_men_excel_vague2.pdf= as "Wave 1"
+  and =..._vague1.pdf= as "Wave 2".  Read the wave from the file name, and check
+  it against the PDF before citing.
+- *GPS.*  =s00_me= carries =GPS__Latitude= / =GPS__Longitude= on all 6,462
+  households, and =ehcvm_prix= has =latitude= / =longitude= for points of sale.
+  Whether they are displaced is not known; read GH #791 first.
+- *Prices.*  =ehcvm_prix= comes from a separate sample of markets (BID section
+  3.3), and the community files are =s00_co= to =s04_co= only, with no =s05_co=.
+  =s02_co= and =s04_co= are wide here (540 rows, 331 and 569 columns), unlike
+  the long files of the other EHCVM-2 countries.
+- *Size.*  Of the 18 source files the =2018= config names that have a 2021
+  analogue, 87% of columns keep their name; =s11= and =s16c= move most.
+
+Registration moves every Togo =Country._table_cache_hash=, because the wave set
+is folded into the hash, and no existing wave's =Wave._input_hash=.  When
+=food_acquired= is wired for 2021-22, pooled kg factors change for every
+Togo wave at read time (GH #1487).
+
+* 2026-11-04 -- =crop_production= serves =condition= and the recorded answer (GH #1436)
+
+Ruling @ligon 2026-11-04, option (D), set on Niger in #1471: the fold stays on the
+=condition= level and the survey's own answer rides in the optional column
+=condition_native=.  =2018/Data1/s16c_me_tgo2018.dta= records "Etat du produit" in =s16cq12c=, read by code
+through =harmonize_crop_condition_ehcvm1=.
+
+| code | =.dta= label | rows | =condition= |
+|------+--------------+------+-------------|
+| 1 | Epis | 63 | =unshelled= |
+| 2 | Grain | 7,845 | =shelled= |
+| 3 | Décortiqué | 326 | =shelled= |
+| 4 | Non-décortiqué | 705 | =unshelled= |
+| 5 | Non concerné | 2,020 | =shell_not_applicable= |
+| blank | | 606 | =unknown_condition=, column NA |
+
+11,565 lines, unique on (household, field, parcel, crop code, unit), so the level separates nothing and adds no row.  A blank state is a
+blank unit on all 606.  The answer describes the harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).
+2021-22 has its own list: see "2021-22 wired".
+
+*The printed forms are not what was fielded.*  All three held Excel forms
+(=tgo_ehcvm1_qnr_household_excel_vague1.xls=, =..._vague2.xls=, =EHCVM_UEMOA_MEN_TOGO_V2.xls=, sheet
+=S16c_Agri=) print eight answers: 1 épis, 2 grain, 3 Tubercule, 4 Gousse, 5 Régime, 6 décortiqué,
+7 non-décortiqué, 8 non-concerné.  The file holds codes 1-5 in both vagues under the shared five labels,
+and its crops fit the labels and not the form: code 3 falls on cotton (82), maize (64) and groundnut (54),
+none of them a tuber, and code 5 on yam (587), cotton (575) and cassava (362), none of them a bunch.  So the
+=.dta= list is what was fielded, and it is the one this table reads.
+
+*Cost:* one Togo re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
+
+* 2026-11-04 -- 2021-22 wired (GH #552)
+
+Every table 2018 serves.  The pilot for Benin, Cote d'Ivoire and Guinea-Bissau: the last
+heading below says what they should reuse.
+
+** Ids: no link is served, and the ids cannot meet
+
+=i= is =E2_<grappe>0<menage>=, by =2021-22/_/mapping.py:i=, which the wave's scripts
+import.  =pid= is the file's member number, one number in every table of the wave.
+=v= is the bare =grappe=: the clusters are the same (below), the households are not
+known to be.
+
+Measured, 2026-11-04, against each household's 2018 roster on (sex, birth year +-1), and
+against its 2018 head (=ehcvm_individu=: same sex; age 1 to 6 years older):
+| group                                              | n     | median share of roster | roster >= half | head sex | head sex and age |
+|----------------------------------------------------+-------+------------------------+----------------+----------+------------------|
+| recurring key, =panel= = 1 (=ehcvm_ponderations=)  | 4,044 |                   0.50 |          51.3% |    96.1% |            61.3% |
+| recurring key, =PanelHH= = 1, =panel= = 2          |   431 |                   0.14 |          24.4% |    55.7% |            11.1% |
+| recurring key, =PanelHH= = 0, =panel= = 1          |   109 |                   0.43 |          49.5% |    93.6% |            56.0% |
+| recurring key, =PanelHH= = 0, =panel= = 2          |   966 |                   0.00 |           6.3% |    57.9% |             7.5% |
+| baseline: another household in the grappe          |       |                   0.00 |             5% |    62.2% |             7.9% |
+5,441 of the 6,462 keys occur in 2018, so a link by identity would join 1,397 households
+(=panel= = 2) that sit at the baseline: different households under a recurring number (the
+Mali #1494 trap).  The file carries three flags that disagree: =PanelHH= (4,377), the
+weights file's =panel= (4,044), =s00q07d= "interviewed in 2018/19" (3,938).  =panel= is
+the one that separates; =PanelHH= alone would admit the 431.  Its 96.1% is at real-link
+level (the =s00q07f= links of Mali and Niger give 94.5% and 89.5%); the 61% on sex and age
+is noise in reported age, not a weak link.  The BID's merge variables =s00q07f1=/=f2= are filled in vague 2 only, on 1,941 households
+(0 of 3,236 in vague 1),
+and on the 55 where they differ from the current key their overlap sits at the baseline
+while the current key's does not, so they do not rescue a link.  Linking is a decision:
+memo in the PR of this change.  It would make Togo a panel country, with committed
+crosswalks under =test_panel_ids_persistence=.  [2026-11-12: the day's link ruling covers
+Benin only ("Make Benin a panel country", GH #1705); Togo's link is not ruled, and none is
+served (GH #1697).  Note that GH #1705's text says Togo's flagged keys sit at the baseline:
+that is true of =panel= = 2 (1,397) and not of =panel= = 1, measured above at real-link level.]
+
+*Clusters are the same.*  All 540 grappes recur; region, prefecture and milieu agree on
+540 of 540 and the point agrees on all 535 2018 fixes.  Region code 6 is =Lomé commune=
+in 2018 and =Grand Lomé= here, on the same 98 grappes; =strata= and =Region= serve each
+wave's label, so a cross-wave group on them splits that region.  =strata= is region only
+(#812).  [2026-11-12: 2018's =strata= is now region x milieu (GH #1575, ruled for 2018 only),
+so the two waves' =strata= no longer share a construction.  See "2026-11-12 -- 2021-22 restored
+onto development".]  [Later 2026-11-12: they share it again.  2021-22's =strata= is region x
+milieu by the same rule (ruled "Same rule as #1575"), with =Grand Lomé= kept as this wave's
+label: see "2026-11-12 -- 2021-22 strata on the #1575 rule, and the day's other rulings (GH #1697)".]  The record is =_/sampling.yml=.
+
+*Weights.*  =poids= takes two values in most grappes, by =panel= (one value in each of the
+1,054 (grappe, panel) pairs), and no longitudinal weight is shipped, so =panel_weight= is
+=poids=, as 2018's is =hhweight=.  Do not read it as a panel weight.
+
+** GPS: a cluster point, not stated to be displaced or not
+
+The BID says the cover records "the GPS coordinates of the household".  The data say
+otherwise: one distinct point per grappe on all 6,462 households, and on the 535 grappes
+with a 2018 fix it is that fix to the last digit (=grappe_gps_tgo2018.dta=, 0.0 km).  The
+5 grappes without one in 2018 have one here.  No document held says whether it is
+displaced.  So =cluster_features= reads it as a cluster attribute, through the same
+projection as 2018.
+
+** The documents
+
+The catalog lists =tgo_ehcvm2_qnr_men_excel_vague2.pdf= as "Wave 1" and =..._vague1.pdf=
+as "Wave 2".  Checked against the PDFs: each title page prints its own number under
+VAGUE (1 in =_vague1=, 2 in =_vague2=).  The file names are right and the catalog's
+titles are swapped.  Section 7B is on PDF p. 37 of each.
+
+** Names survive where meanings do not
+
+87% of the names survive, and that number hides these.  Compare labels, never names.
+- =s11=: roof and floor are =s11q19=, =s11q20= here, =s11q20=, =s11q21= in 2018.
+- =s20aq05= replaces =s20q05=, on the same code list (1 = Riche).  The mapping is keyed on
+  the labels, and the served step runs the other way from the codes.
+- =s14= is two files: =s14a= the COVID-19 module, =s14b= what 2018 called =s14=.
+  =s14bq05__N= holds a rank label or =Non=, where =s14q05__N= held an indicator, except
+  column 25, =Autre stratégie=, whose label set is Oui/Non: its 26 rows name no other
+  strategy and it takes the first slot.  =s14bq04d= is the herd here, so
+  =AffectedConsumption= reads =s14bq04e=, the food stock, 2018's =s14q04d=.  [2026-11-12:
+  superseded by the ruling of GH #1556 / #1561: =AffectedConsumption= reads =s14bq04f=, the
+  food purchases, and =AffectedFoodStock= =s14bq04e=.  See the 2026-11-12 section.]
+- =shocks= serves 2,666 of 7,229 reported shocks.  The instrument asks follow-ups only for
+  the last 12 months, and the framework drops the rows with none; 2018 serves all 7,230.
+  So a cross-wave incidence on this table reads as a false 63% fall.  With the maintainer.
+- =s12= ships owned items only (33,619 rows, all =Oui=); 2018 ships the grid (277,695).
+- =s17q01= is the species; 2018's =s17q02= is gone.
+- =s04a= has one row per member, 3,939 of them with no answer, where 2018's =s04= has
+  members 5 and over.  =pid= is =membres__id=; the BID's =s01q00a= is not in the file.
+- =s16bq05= is the GIFT question in both waves; the purchase is =s16bq08=.  See below.
+
+*=nonfood_expenditures=: the item codes moved.*  53 of the 131 codes of section 9 name
+another item than in 2018 (=415= was Parfums and is a washable face mask here; =618= was
+Vaisselle and is a solar panel), and 2018's =nonfood_items= is keyed on code.  So this wave
+has its own table, =2021-22/_/categorical_mapping.org=, which wins by the level rule; each
+label is the one 2018 serves for that item, matched on the two files' value labels, and
+nine new items take new labels (two COVID-19 masks, sanitiser, pharmacy medicines, tolls,
+wells, two solar items, medical evacuation).
+
+*=food_acquired=: two label sets for one code book.*  =s07bq03b= and =s07bq07b= label the
+same codes differently, the labels carry no code prefix to settle it, and =unit_match=
+reads labels.  Case and accents fold; =139= (=sachet= / =sachet (industrielle)=) and =141=
+(=Sans os au tas= / =Sans os en tas=) do not.  On the raw labels 55,169 rows match; on the
+codes 70,581; the wave's =LastPurchaseUnitCode= formatter restores 70,581 row for row.
+Without it those 15,412 rows read as another unit, and each with a purchased quantity
+serves =Expenditure= NA, silently.
+
+*=u=.*  This file labels its codes, unlike 2018's, in lower case for several.  The YAML
+maps nine labels onto what =ehcvm_units= calls the code, so =u= agrees across the waves.
+Three of the codes 2018 leaves undecoded have labels here (659 =Main=, 660 =Quartier=,
+662 =Tête=).  They are served as labels here and 2018 is not re-decoded.  [2026-11-12:
+superseded by the ruling of GH #1557, "Decode 2018 with 2021 labels": 2018 serves them
+under these labels too; see "food_acquired units" above.]
+
+*=j=.*  This file's labels are clean UTF-8 and 2018's keys are mojibake, so 87 labels
+needed rows.  Niger's rule (#833): a respelling of a good 2018 names takes 2018's Preferred
+Label, and two goods 2018 bundles and this wave splits stay split.  Folded: =Sucre poudre=
+and =Sucre morceaux=, as 2018's own label says.  NOT folded, each under its own label:
+=Crabes= / =Crevettes fraiches= / =Crevettes séchées= / =Autres fruits de mer=; =Pastèque= /
+=Melon=; =Aubergine,= / =Courge/Courgette=; =Piment séché= / =Piment frais=; =Gingembre
+frais= / =moulu=; =Café en poudre= / =soluble=; =Vinaigre de citron= / =Moutarde=; =Huile
+d'arachide raffinée= / ="Segal"=; =Arachides décortiquées= / =pilées=; =Pommes=, =Papaye=,
+=Néré=, =Fruit de baobab= (2018's =Autres fruits=).  Under the same rule =Fromage= serves as
+=Fromage (hors soja)= and =Arachides décortiquées= as =Arachides décortiquées (hors pilées)=:
+2018's =Fromage local= is 25 FCFA per =Unité (Petit)=, this wave's =Fromage= 500 and its =Fromage
+à base de soja= 25; 2018's =décortiquées ou pilées= has 233 purchased rows against 105 + 85
+here.  =Piment frais= is a recorded exception: 2018's =Piment= prices as this wave's fresh
+chilli (1.00 on the five largest cells, weighted 0.996; 3,564 purchased rows against 3,280),
+while dried chilli adds 2,582 and departs in two cells.  New goods: three =semoule= rows,
+=Noix de palme=, =Huile de soja=, =Fromage à base de soja=, =Viande séchée=, =Poivre=.  A
+cross-wave demand system on =j= must bundle these itself.
+
+*=Expenditure=* is NA on 35.3% of purchased rows, against 19.0% in 2018 and 11-16% in the
+siblings.  An earlier version of this file blamed the last purchase being filled only
+within 30 days.  That is wrong: 2018 fills the same way (0 fills on =Jamais= or =Plus de 30
+jours=).  The difference is the rescaling below.
+
+** =s07bq03a= is rescaled by region (ANSWERED 2026-11-12: "Invert, registered"; see "s07bq03a: the regional factor is divided out (GH #1697)" below)
+
+[2026-11-12: this section records the finding as it stood before the ruling, and two of its
+statements are wrong, corrected by the doc search (=burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md=
+§2b) and re-measured: =unité= rows ARE scaled, then floored to an integer, which is why they sit
+on the grid; and Grand Lomé purchase-only =unité= rows are floored at 0.9143, not unscaled.  The
+served table no longer carries the factor.]
+
+The consumption quantity carries an undocumented factor, and only that column does.  The
+values are the file's: no document held explains them, and a direct read agrees.  On the
+quarter grid, positive values: =s07bq03a= 14.7% here and 98.7% in 2018; =s07bq04= 98.9%,
+=s07bq05= 96.4%, =s07bq07a= 98.4%.
+
+| region     | factor | =q3/q4= at the mode, never-purchased own-production rows | 2021/2018 median =q3=, same unit and size |
+|------------+--------+----------------------------------------------------------+-------------------------------------------|
+| Centrale   | 1.6725 | 1,435 of 1,556                                           |                                     1.672 |
+| Savanes    |  1.338 | 2,341 of 2,494                                           |                                     1.338 |
+| Plateaux   | 1.2265 | 1,946 of 2,235                                           |                                     1.227 |
+| Kara       | 1.0035 | 1,400 of 1,594                                           |                                     1.004 |
+| Maritime   | 1.0035 | 983 of 1,292                                             |                                     1.004 |
+| Grand Lomé | 0.9143 and 1.2, by row (below) | 1.2 on 64 of 69                | 0.914 |
+
+=unité= rows are not scaled (99.99% on the grid outside Grand Lomé); =Kg= and =Litre= rows
+are.  After dividing, 93-99% of a region's non-=unité= rows are on the quarter grid and
+98-99.9% on the 0.01 grid, so the rows off the quarter grid are scaled too (0.12, 0.15).
+
+*Grand Lomé is two factors, split by row.*  A row reporting no own production and no gift
+carries 0.9143 (92.2% on the quarter grid, 98.8% on the 0.01 grid, 17,425 non-=unité= rows;
+its =unité= rows are unscaled).  A row reporting either carries 1.2 (84.8% and 92.8% of
+1,830 rows, and 88.1% of 564 =unité= rows).  No household or cluster splits them, and
+1.2 is why the =q3/q4= mode there differs from the purchased rows' median.  =Jamais=
+rows with a residual go 438 -> 60 under this reading.
+
+*What it does.*  The purchased quantity is a residual, =q3 - q4 - q5=, so a scaled =q3=
+leaves a phantom purchase where none occurred: 11,952 of 12,963 =Jamais= rows have a
+positive residual here, 166 in 2018.  =Expenditure= is that quantity at a unit value, so it
+carries the factor too, and a phantom row with no last purchase serves NA, which is the
+35.3%.  Pooled kg factors read =s07bq08/s07bq07a= and are not contaminated.
+=food_quantities(units='kgs')= and =food_expenditures= of this wave are, by region.
+
+*The UEMOA check proves nothing here, and the claim is withdrawn.*  =ehcvm_conso= carries
+the same scaling: =Achat= appears on 91.6% of =Jamais= rows and its =Achat/Autoconso= equals
+=residual/q4=.  So the 90.8% agreement recorded in =_/derivations.yml= shows the arithmetic
+was carried out, not that the column is what the household said.  Do not cite a =depan= match
+as proof that a quantity is raw.
+
+*As served, the wave is as filed*, so purchased =Quantity= and =Expenditure= of 2021-22 are
+not comparable across regions or waves.  Options with measured patches: in the PR.  [2026-11-12:
+superseded; the factor is divided out, below.]
+
+*Kilograms.*  =ehcvm_nsu_tgo2021.dta= exists and is not wired: GH #1598 is *deferred, not
+unruled* [2026-11-12: corrected from "not ruled for single-wave countries", red team F4].  The
+2026-11-12 GO ruling names #1598's own-country NSU weights inside the food step; #1598 itself
+says to sequence it after the wave wiring, so it follows in its own PR and stays open.  So this wave's kilograms come from the price-ratio ladder, as 2018's do, on the
+scaled quantity above:
+=metric= 11,559 rows, =item_unit= 16,474, =unit= 108,174, =none= 7.  Because #1487 pools
+factors across a country's waves, wiring this table moved 2018's inferred kilograms at
+read time, measured cold on the same code: =food_quantities(units='kgs')= 2018 63,624 ->
+66,987, 91,261 of 110,740 rows move, median ratio 1.15; =food_prices= median ratio 0.87.
+The rungs barely move (=item_unit= 14,087 -> 14,450, =unit= 88,132 -> 87,771, =none= 33 ->
+31, =metric= unchanged at 10,344), so the move is the pooled =unit= factor itself.  2018's
+native =Quantity= and =Expenditure= do not move, and neither does =harvest_kg= (2,580,521).
+
+** =crop_production=
+
+=s16c= holds the harvest, =s16d= with no plot the dispositions.  =s16cq16a= is filled on
+10,325 of 10,877 crop rows, so Togo is like Niger and not like Mali (#1437): no total is
+derived.  =s16c= has 2,690 more rows, households with no field.  =(household, field,
+parcel, crop)= is unique, so no observation level is needed.  =s16d= repeats a crop's record
+once per harvest line (1,111 exact repeats, 782 of them sales), and no pair has two
+different records.  Sales: 5,304 on their single row, keyed =hh-crop-sale-single-row=; 672
+on one =Farm-level= row each, =u= = =Unknown= (option (d), as ruled for Mali).  111 rows of
+unfinished crops record a quantity and are keyed =harvest-to-date=.
+
+- =u= is =s16cq16b=, the vocabulary of the sold unit =s16dq05b=.  Its =Autre à préciser= is
+  670 rows; =s16cq16b_bis= ("Unité NSU Agricole") decodes them (=Petite Calebasse= 175,
+  =Moyenne Bassine= 142, =Moyen Panier= 76, ...) and relabels the rest one for one.  Not
+  served: it has no twin on the sale side.  A decision for the survey-kg lane.
+- =s16cq16c= and =s16dq05c= are totals in kg, as in Mali.  Not served.
+- =condition= is =s16cq16d=, read by code through this wave's own table,
+  =harmonize_crop_condition_ehcvm2= in =2021-22/_/categorical_mapping.org=, with the answer in
+  =condition_native=.  Eight codes, where 2018's =s16cq12c= has five in the file and Niger
+  2021-22 three, and code 3 means something else in each.  Unlike 2018's, this file's crops
+  fit its labels: =Tubercule= falls on yam (540) and cassava (432), =Régime= on bananas.
+  | code | label | rows | =condition= |
+  |------+-------+------+-------------|
+  | 1 | Epis | 45 | =unshelled= |
+  | 2 | Grain | 7,790 | =shelled= |
+  | 3 | Tubercule | 1,008 | =other_condition= |
+  | 4 | Gousse | 0 | =other_condition= |
+  | 5 | Régime | 24 | =other_condition= |
+  | 6 | Décortiqué | 11 | =shelled= |
+  | 7 | Non-décortiqué | 791 | =unshelled= |
+  | 8 | Non concerné | 649 | =shell_not_applicable= |
+  | blank | | 559 | =unknown_condition=, column NA |
+  WAITING: =Tubercule=, =Gousse= and =Régime= are outside the ruled fold of #1436, and a ruling
+  is asked for.  =Farm-level= rows carry =unknown_condition=: their state is the sale's, GH #1462.
+- =Récolte nulle= (258 rows) stays NA with =u= = =Unknown=, as the maintainer ruled for Mali:
+  =s16cq16a= and =s16cq16b= are blank there, and the answer is in the file for anyone who wants
+  a zero.  So a reported nil harvest reads the same as a question not asked; disclosed, not
+  resolved.
+- =Unit_sold= is NA on 2018, whose sold unit =s16cq16b= is not read.
+- 2018's code 56 (356 rows) has no label there and =Ananas= here, with 17 rows; 2018's
+  list stops at 55, so it is not assumed to be the same crop.  Left as it is.
+
+** =plot_inputs=
+
+This wave reads the purchase (=s16bq08=, =s16bq09a=, =s16bq09b=) and the gift (=s16bq05=,
+=s16bq07a=, =s16bq07b=), each with its own unit, as Burkina (#1188).  WAITING: 2018's script
+serves =s16bq05= and =s16bq07a= under =Purchased= and =Quantity_purchased=, the same defect,
+recorded and not changed here, so those two columns mean different things across this
+country's waves until it is corrected.  =s16bq01= has two slots 2018's tables did not name,
+=Semences d'arichide= (sic) and =Plants d'hévéa, de teck=; each takes its own crop label.
+
+** Not wired
+
+=ehcvm_nsu=, =ehcvm_prix=, =s00_co=..=s04_co=, as 2018 declares no community table.
+
+** What Benin, Cote d'Ivoire and Guinea-Bissau should reuse
+
+- =lsms_library/ehcvm.py= gained =hh_crop_records=, =is_crop_sale=,
+  =derive_hh_crop_sale_attachment=, =derive_harvest_to_date=, =stamp_harvest_to_date=.
+  Nothing existing imports them, so they move no other country's hash.
+- Run these checks first, because each can pass silently: value labels of =s07bq03b= against
+  =s07bq07b= by code; =s09?q01= codes against the country's =nonfood_items= by label;
+  =s16bq05= and =s16bq08= labels; =s16cq16a= fill (Togo's shape or Mali's); exact repeats in
+  =s16d=; roster agreement by each of the three panel flags, against a real-link benchmark;
+  =Jamais= rows with a positive residual (Togo 11,952; siblings 6 to about 400); the quarter-grid
+  share of =s07bq03a= against =s07bq04= and =s07bq05=, and the =q3/q4= mode by region and by
+  whether the row reports own production or a gift.
+- Wire =AffectedConsumption= to =s14bq04e=, not =s14bq04d=; do not copy the YAML line from a
+  2021-22 sibling.  Read all 26 =s14bq05__N= label sets: code 25 may be Oui/Non.  [2026-11-12:
+  the first half is superseded.  The ruling (GH #1556 / #1561) is =AffectedConsumption= =
+  =s14bq04f= (purchases) and =AffectedFoodStock= = =s14bq04e= (stock), which is also what the
+  core 2021-22 waves now declare; still check the labels of d, e and f in each file.]
+- Do not cite a =depan= match as proof a quantity is raw.  Disclose the shock rows with no
+  follow-up.  Read =s16cq16d= off the file before reusing a condition table.
+
+* Shocks: food purchases and food stocks (2026-11-06, GH #1561)
+
+The maintainer ruling is =AffectedConsumption= for food *purchases* and
+=AffectedFoodStock= for food stocks, following Ethiopia. Neither field
+measures food eaten. Both are nullable booleans using the existing answer
+map: increases and decreases are True, unchanged and ordinary
+not-concerned answers False, and missing answers stay missing.
+
+Vague 1 has five consequences: =s14q04d= is food stock, =e= food
+purchases, =f= blank. Vague 2 has six: =d= livestock, =e= food stock,
+=f= food purchases. Select by each row's =vague=, not by household or
+cluster. The hook refuses a release with a different f/vague layout.
+
+The source variable label still calls d "Stock Produit Alimentaire" and e
+"Achat de Produit Alimentaire"; these labels conflict with the fielded
+six-column layout. The independent 2026-11-05 EHCVM shocks review
+(=reports/review-ehcvm-shocks/VERDICT.md= in the isa-sm-20261103 burst)
+identifies the layouts using source structure, animal disease/ownership
+contrasts and purchase responses, not the misleading labels. The source
+controls in =tests/test_shocks_extension_food_effects.py= independently
+select the expected columns and check the livestock-specific behaviour
+of d. No contradictory shocks-layout statement was found in this file.
+
+The wave remains =2018= and uses =Data1/s14_me_tgo2018.dta=; do not
+substitute the older =Data/= extracts or rename the wave.
+
+Only the existing 2018 declaration is changed. Registered but unfinished
+2021-22 wiring is outside this change. Other effects, coping strategies,
+row/index identity and timing are preserved.
+
+* 2026-11-08 — documented planned strata and capital-domain caveat (GH #1575)
+
+The own second-edition BID (September 2023),
+=2021-22/Documentation/tgo_ehcvm2_information_de_base.pdf=, section 4.1,
+PDF p. 12 / printed p. 11 (English edition p. 11), explicitly describes
+the *original 2018/19* design: "La strate est la combinaison région/milieu
+de résidence." Source: https://microdata.worldbank.org/index.php/catalog/6279/related-materials .
+Clusters were selected PPS within strata, then 12 households with equal
+probability within each cluster. The 2021/22 strategy revisits the same
+clusters and completes households to 12 where needed, rather than making
+a new independent first-stage draw. This is direct design evidence, not
+an inference from the weight shares behind the earlier region-only
+recommendation, which remains recorded above.
+
+The earlier own June 2021 BID p. 10 says "except Lome Commune where all
+respondents are from rural areas"
+(https://microdata.worldbank.org/catalog/4298/download/52590). The 2023
+retrospective Table 1a (French p. 12, English p. 12) labels *Grand Lomé*
+and allocates 98 urban / 0 rural clusters. Preserve both accounts: no
+equivalence between these geographic names, translation typo or formal
+planned-cell exclusion is established here. Eleven nonzero allocation
+cells in that table is a count, not a separately stated stratum count.
+
+No =strata=, native labels, weights or defaults change. The native wave
+remains =2018= with =Data1/= sources; 2021-22 is registered but unwired
+at this source pin. Household strata are separate from the price/NSU
+market samples. Geographic reconciliation and wiring require their own
+scope; exact document identities are in the GH #1575 evidence packet.
+
+* 2026-11-08 — original EHCVM2018 BID managed holding (GH #1575)
+
+The own original2018/19 Basic Information Document, a separate source from
+the second-edition BID discussed above, is now held at =2018/Documentation/basicinformationdocument_tgo.pdf=
+through its normal managed DVC sidecar. A fresh same-source reader tree,
+empty private L1 and read-only profile retrieved the exact public original
+via normal =get_data_file=; verified 2026-11-08T20:42:29.183666+00:00.
+MD5 =42ff0272d615674fde2f748e0639077e=; 344466 bytes. Exact public source and
+SHA256 provenance are appended to =2018/Documentation/SOURCE.org=.
+
+This adds document availability only. Existing planned2018-design versus
+2021-cluster-revisit distinctions and all prior notes remain intact.
+The Lomé Commune versus Grand Lomé domain/version discrepancy remains unresolved.
+No sample, strata, native labels, weights, schema or defaults change.
+No new download, PDF parse, microdata read or source/table campaign was
+needed for this holding; the earlier document-check evidence is reused.
+See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
+
+* 2026-11-10 — 2018 strata wiring selected (GH #1575)
+
+The user selected the documented combination on 2026-11-10. Only =2018=
+=sample.strata= now combines the own cover-page region label =s00q01= with
+the residence-milieu label =s00q04=, through the existing GH #812 helpers.
+This supersedes the earlier region-only recommendation for this construction;
+the historical weight measurements and all previous notes remain above.
+The own September 2023 BID's retrospective original-design definition,
+"La strate est la combinaison région/milieu de résidence", is the basis,
+not the variance of weights or a count of occupied cells.
+
+The native layout remains =2018/Data1/=: cover =s00_me_tgo2018.dta=,
+weights =ehcvm_ponderations_tgo2018.dta=. Existing household and cluster IDs,
+the =v= join, both raw =hhweight= columns and =Rural= extraction are retained.
+The labels are stripped and joined in region/milieu order; missing or blank
+either operand gives NA, and undecoded nonstring coding retains the existing
+dedicated refusal. No native geographic spelling table or crosswalk is added.
+Nonmissing strata carry =Togo::sample::region-milieu-stratum= in the existing
+optional =Derivation= column; raw inputs remain available by original name.
+
+The June 2021 BID p.10 wording "except Lome Commune where all respondents
+are from rural areas" remains beside the September 2023 retrospective
+Table 1a's *Grand Lomé*, 98 urban / 0 rural clusters. No equivalence between
+the names, typo correction or formal planned-cell exclusion is established.
+Neither that table's nonzero-cell arithmetic nor a future observed count is
+an enforced stratum count. Registered 2021-22 remains outside this wiring.
+
+Validation at construction: documentary definition and source wiring only;
+native cards/rows, missingness, cluster consistency, actual original/candidate
+Country/Feature and cold/fresh-warm acceptance are UNRUN. Focused invented-frame
+checks and their exact source/runtime receipts accompany the task delivery;
+they do not establish native coding, geography or production readiness.
+* 2026-11-10 — own printed GPS question47 and calendar/export caveats (GH #1531)
+
+All three declared own2018 household forms,
+=tgo_ehcvm1_qnr_household_excel_vague1.xls= (MD5
+=1b7b18d25fa7083ec894688339aeaab6=), =..._vague2.xls= (MD5
+=5a7cbeb59add0bdf74e9379621388603=), and =EHCVM_UEMOA_MEN_TOGO_V2.xls=
+(MD5 =7acdf05c8091675af9e9f2b23fd4da5c=), explicitly identify GPS question47
+at =S16a_Agri!EO5/EO6=: “superficie de la parcelle (en hectare) selon les
+mesures GPS”. These question45–48 blocks and farmer question9 =K5/K6= agree
+across the distinct objects. The farmer's ha/m² codebook and measured flag
+are separate questions and supply no GPS-export unit classifier.
+
+All three =couvert!A16= covers print2017/2018, while the own catalog/BID
+describe2018/19. Agriculture entry =S16a_Agri!B2= names campaign2017/2018
+in vague1 and2018/2019 in vague2/V2. These are actual wording/version
+differences, not silently corrected calendar labels or proof of which form
+was fielded with the held v02 export. The existing printed-versus-fielded
+crop-condition warning likewise remains intact.
+
+No q47a/export/cleaning relation was found in inspected S16a cells, covers,
+Observations, selected-sheet comments or defined names; no global absence is
+claimed. Actual released-field existence/labels were not read for this
+document result. The current source's q47-hectares assumption is not an
+export bridge. Do not transfer Guinea-Bissau, Benin or farmer-unit authority.
+The native wave remains2018 and its agriculture source is Data1;2021-22
+remains a registered unwired holding.
+
+Exact DOCUMENT MD5/SHA/custody, cells and limits are retained in
+=reports/review-1531-benin-togo-own-documents-20261110/=. Held private copies
+required no network retrieval or microdata/header/row/API. No area conversion,
+substitution, fallback, clamp, yield route, held-list, unit or default changes.
+
+* 2026-11-10 — separate released S16a header result (GH #1531)
+
+After the document-only note above, exactly one metadata-only context read
+the declared own =2018/Data1/s16a_me_tgo2018.dta= header, MD5
+=6292af8f5a1a30fce364a2994775b0c4=, with zero records returned. The complete
+237-name variable inventory contains =s16aq47= and no =s16aq47a=, =s16aq47b=,
+=s16aq47_1= or =s16aq47_2=. The bound q47 is double, format =%12.0g=; its own
+French GPS-area label states no unit and has no value-label link. This is
+explicit absence in this exact release, not evidence about another version.
+
+The own GPS-measured field45 links to =S16AQ45=:1 Oui/2 Non. Farmer-unit
+field09b links separately to =S16AQ09B=:1 Hectare (Ha)/2 Mètre Carré (m^2).
+Neither card assigns a unit to GPS47. No numeric records, magnitudes, ratios,
+presence counts or corrections were inspected. Own printed question47
+hectares wording and the calendar/version caveats remain separate from the
+unitless released label. Guinea-Bissau's distinct47a m² operand does not exist
+in this inventory and supplies no substitute or conversion here.
+
+Frozen scope, exact input/private custody, two total contexts and0records
+across both countries are retained in
+=reports/1531-benin-togo-own-header-20261110/=. Source and private copies sealed
+exact before/after. No2021 header, table/API or policy/held-list change. The
+remaining documentary question is this release's own q47 export/cleaning and
+fielded-version definition, not a presumed own47a relation.
+
+* 2026-11-10 — GH #1575 normal sample validation completed
+
+The construction-stage pending/UNRUN wording above records the state at
+that stage. For =2018 sample=, the own native cover and weights, cold
+baseline/candidate whole frames, unchanged IDs/weights/Rural, documented
+region or department × milieu strata and derivation inputs passed the
+finite normal validation. Four warm Country.sample returns and two scoped
+Feature.sample returns passed full typed frame/axes/attrs comparison from
+eight authenticated L2 parquets, with zero warm raw getters or writers.
+The cross-run cold and warm capture comparisons, source seals and prior
+failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
+=5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
+earlier job-local caches were reaped; source and survey values did not change.
+
+* 2026-11-12 -- 2021-22 restored onto development (GH #552)
+
+The 2026-11-04 wiring above was held on =refs/archive/2026-11-11/isa/wire-togo-2021-20261104=
+and is merged here onto development =e5fdd2fa8= (ruling @ligon 2026-11-12, "Go: restore and
+wire").  What changed in the 2021-22 wiring because development moved underneath it:
+
+- *Shocks, on the ruling (GH #1556 / #1561).*  =AffectedConsumption= is food PURCHASES and
+  =AffectedFoodStock= food STOCKS.  This file labels =s14bq04d= "l'Effectif du cheptel",
+  =s14bq04e= "le Stock produits alimentaires" and =s14bq04f= "les Achats produits alimentaires",
+  each on the same 2,666 answered rows, and, unlike 2018, both vagues ask all six (no per-vague
+  layout).  So 2021-22 reads =f= and =e=, as Niger, Mali, Senegal and Burkina 2021-22 do.
+  Measured on the file: =f= is affected on 1,858 rows, =e= on 1,811, =d= on 870.  The served
+  =AffectedConsumption= of 2021-22 therefore changes from the stock to the purchases; no 2018
+  value changes.  The coping hook is unchanged: no row has a non-contiguous rank, and
+  =Autre stratégie= (26 rows) never sits beside another strategy, so its first-empty-slot rule
+  and the core waves' "rank no other strategy holds" give the same slots.
+- [Superseded the same day: ruled "Same rule as #1575", and 2021-22 now has 2018's construction;
+  see the next section.]  *Strata are NOT aligned with 2018, and this is a question for the maintainer.*  GH #1575
+  rewired 2018's =strata= to the documented region x milieu label and scoped the registry
+  entry =Togo::sample::region-milieu-stratum= to =2018= alone ("no 2021 integration";
+  =tests/test_gh1575_togo1575-stratawiring_strata.py= pins =waves == ['2018']=).  2021-22 keeps
+  the archived region-only =s00q01=, so =strata= now means region x milieu in 2018 and region in
+  2021-22, on the same 540 grappes.  The patch to align them is small (the same three-element
+  =strata= spec, the =sample= stamp hook and =inputs_strata= in =2021-22/_/mapping.py=, and
+  ='2021-22'= in the entry's =waves=), but it is a scope the ruling did not grant.  Grand Lomé /
+  Lomé commune stays as each wave records it either way.  Measured: 2021-22 serves 6 =strata= labels and 2018
+  11, and none is shared, so a cross-wave group on =strata= splits every stratum.
+- *Re-measured on this merge (cold, private roots, base =e5fdd2fa8=; burst job 41235873).*  Every
+  non-derived table's 2018 rows are frame-equal to base on base's columns, with the same household ids;
+  the new optional columns (=Unit_sold=, =Derivation= on =crop_production=, four gift/purchase columns on
+  =plot_inputs=) are NA on 2018.  The kilogram movement recorded under "2021-22 wired" reproduces: 91,261 of
+  110,740 2018 =food_quantities(units='kgs')= rows move, median ratio 1.152; =food_prices= median 0.868; 2018's
+  rungs =item_unit= 14,087 -> 14,450, =unit= 88,132 -> 87,771, =none= 33 -> 31, =metric= 10,344.  Summed over rows
+  served with =u= = =kg=, 2018 is 63,577 -> 66,944 kg (the text above gives 63,624 -> 66,987; its sum's definition
+  is not recorded, and the row counts and rungs agree exactly).
+- *=s12q09= (GH #1566), measured, nothing changed.*  =assets.Value= is =s12q09=.  1,245 of 33,354 positive
+  values (3.7%) are off the 25 grid, 1,239 of them non-integers (=1000.0000298=, =1071.4286=, =1166.6667=);
+  the share is the same in both vagues (3.74%, 3.72%).  =Radio simple/Radiocassette= holds 1,054 of them
+  (46% of its 2,270 rows).  It is not a per-unit value: only 94 of the 1,245 rows have =s12q03= above 1, and
+  =s12q09= x =s12q03= is on the grid for 673.  2018: 4 of 30,337.  Cote d'Ivoire 2021-22 has its own
+  off-grid block (4.1%, integers); Benin 2021-22 has 25 of 40,220.  Unexplained.
+- *Evidence for GH #1557, nothing changed.*  This wave's =ehcvm_nsu_tgo2021.dta= labels =uniteID= 659
+  =Main= on =Banane douce= and =Plantain= (177 rows), 660 =Quartier= on six meats (76), 662 =Tête= on
+  =Manioc=, =Igname=, =Taro, macabo= (130): the goods the 2018 notes above give for the same bare codes.  That
+  supports one code book across the waves; the decode of 2018 is still the maintainer's decision.
+- [Moot for Togo since the next section: 2021-22 is inside the entry's =waves=.  The framework
+  behaviour, =call_inputs= not checking =waves= on a named wave, is unchanged.]
+  *An explicit out-of-scope =derivation_inputs= call is not refused.*
+  =Country('Togo').derivation_inputs('Togo::sample::region-milieu-stratum', wave='2021-22')= returns that wave's
+  6,462 cover answers, though no 2021-22 row carries the key: =derivations.call_inputs= does not check the
+  entry's =waves= when a wave is named.  Before this wiring the same call raised =KeyError= (no =sample=
+  block).  The default call reads =2018= only.  A framework residual, not patched here.
+- *Not wired, residuals:* the own-country =ehcvm_nsu_tgo2021.dta= weights (GH #1598); the
+  decode of 2018's bare codes 659, 660, 662 (GH #1557); the =s12q09= grid (GH #1566, recorded in
+  the PR report, nothing changed).
+
+* 2026-11-12 -- 2021-22 strata on the #1575 rule, and the day's other rulings (GH #1697)
+
+The wiring of 2021-22 is tracked in GH #1697, split from GH #552 on 2026-11-12; #552 is now about
+acquisition only.  The "GH #552" in the 2026-11-04 sections above is the issue as it stood then.
+
+*Ruling (@ligon, 2026-11-12): "Same rule as #1575".*  2021-22's =sample.strata= is now the documented
+region x milieu label, =<s00q01 label> <s00q04 label>=, by the same shared helper, cell formatter and
+=sample= stamp hook as 2018 (=ehcvm.strata_label=, =ehcvm.stamp_region_milieu_stratum=), and
+=Togo::sample::region-milieu-stratum= now has =waves: ['2018', '2021-22']=.  Its =inputs= callable is
+still 2018's =mapping:inputs_strata=, which reads each wave's own cover.  A missing or blank label gives
+NA; a code is refused.  This supersedes the region-only 2021-22 =strata= of the section above.
+
+*Lomé commune / Grand Lomé, preserved literally.*  Each wave serves its own label for region code 6, on
+the same 98 grappes: =Lomé commune Urbain= in 2018, =Grand Lomé Urbain= in 2021-22.  Nothing renames
+either, and no Lomé =Rural= cell exists in either cover (both quoted accounts above stand).  So the two
+waves share 10 of their 11 labels, and a cross-wave group on =strata= splits that one stratum and no
+other.  Measured, cold =sample()= (burst job 41240821), households per label:
+| =strata=            |  2018 | 2021-22 |
+|---------------------+-------+---------|
+| Centrale Rural      |   609 |     633 |
+| Centrale Urbain     |   210 |     228 |
+| Grand Lomé Urbain   |     0 |   1,169 |
+| Kara Rural          |   788 |     804 |
+| Kara Urbain         |   339 |     348 |
+| Lomé commune Urbain | 1,034 |       0 |
+| Maritime Rural      |   719 |     744 |
+| Maritime Urbain     |   227 |     240 |
+| Plateaux Rural      |   855 |     887 |
+| Plateaux Urbain     |   246 |     259 |
+| Savanes Rural       |   930 |     935 |
+| Savanes Urbain      |   214 |     215 |
+No label is NA, every row with a stratum carries the key and only those, and no grappe holds two
+strata in either wave.  The region part equals =cluster_features.Region= and the milieu part =Rural=
+on every grappe of both waves.  2018 is frame-equal to base =e5fdd2fa8= on every column, =strata= and
+=Derivation= included; 2021-22's =v=, =Rural=, =weight= and =panel_weight= are frame-equal to the
+wiring before this change (=df1df60ed=), on the same household ids.
+
+*The link.*  The day's link ruling covers Benin only ("Make Benin a panel country", GH #1705).  Togo's
+is not ruled; none is served.  See the note under "2021-22 wired": =panel= = 1 sits at real-link level
+here, =panel= = 2 at the baseline.
+
+*Issue numbers.*  GH #1697 is the wiring (this branch "Addresses #1697"); GH #552 acquisition only;
+GH #1556's shock ruling is applied (purchases =s14bq04f=, stock =s14bq04e=, above); GH #791 is the UEMOA
+source, untouched (this wave is a World Bank release); GH #1598 the own-country NSU weights, still not
+wired; GH #1557 and #1566 as recorded above.
+
+*Cost.*  Config-only, base =e5fdd2fa8= against this change: =Country._table_cache_hash= Togo 22 of 22,
+=Wave._input_hash= 44 of 44, =build_transforms_fingerprint= 0 of 40; the only other countries that move
+are Benin, Cote d'Ivoire and GhanaLSS (=Très grand=), as before this change.  [2026-11-12, red team F3:
+GhanaLSS moves at BOTH tiers, 21 of 21 =_table_cache_hash= and 147 of 147 =Wave._input_hash=, a full cold
+re-warm of GhanaLSS through =nutrition.py='s import of =transformations=; no GhanaLSS served value changes
+(measured, burst job 41240822).]
+
+* 2026-11-12 -- s07bq03a: the regional factor is divided out (GH #1697)
+
+*Ruling (@ligon, 2026-11-12): "Invert, registered (Recommended)".*  It answers the WAITING entry
+"=s07bq03a= is rescaled by region" above, on the doc search
+=burst/isa-sm-20261112/reports/ehcvm2-s07bq03a-docsearch/REPORT.md= §2, under the principle "Without a very
+good reason we don't want to serve up someone else's undocumented imputations."  The ruled text: "Divide
+out the exact factor as a registered derivation to recover the household's answers; Lome count rows that
+were rounded cannot be inverted and are served NA under a registered omission."
+
+*The mechanics, re-measured on the file before wiring them* (burst job 41248473, =probe.py=):
+- The factor is 1.115 x {Centrale 1.5, Savanes 1.2, Plateaux 1.1, Kara 0.9, Maritime 0.9, Grand Lomé 0.82} =
+  1.6725, 1.338, 1.2265, 1.0035, 1.0035, 0.9143, by the cover's region =s00q01= (one region per grappe on
+  all 540).  A Grand Lomé row reporting own production or a gift carries 1.2.  =s07b= carries no region, so
+  the hook reads it from =s00_me_tgo2021.dta=.
+- Every unit is exact, =s07bq03a= = answer x f, except =unité= (code 147): on own-production-only rows of
+  Centrale, Savanes and Plateaux, 730 of its 767 are floor(=s07bq04= x f) and none is =s07bq04= x f; every
+  other unit is exact (Tête 247 of 252, Bol 3,356 of 3,417).  This corrects "=unité= rows are not scaled"
+  above.  A Grand Lomé =unité= with own production or a gift is x 1.2, not floored.
+- After dividing, 84.8-99.7% of each region and class's non-=unité= rows sit on the quarter grid, against
+  0.0-3.5% as filed.
+
+*What is served* (=2021-22/_/mapping.py=; three keys in =_/derivations.yml=, each beside the 7-day key on
+the purchased row, joined with =+=):
+| source rows (110,686)                         | rule                                         | key                                     |
+|-----------------------------------------------+----------------------------------------------+-----------------------------------------|
+| 93,986, every unit but =unité=, and 497 Grand Lomé =unité= with own production or a gift | =s07bq03a= / f | =s07bq03a-regional-factor-divided-out= |
+| 12,644 =unité= outside Grand Lomé              | the one positive integer k with floor(k x f) = =s07bq03a= | =s07bq03a-floored-count-recovered=       |
+| 4,056 =unité= that cannot be recovered         | Quantity and Expenditure NA                   | =s07bq03a-floored-count-withheld=        |
+[Counts as of the recovered-0 ruling at the end of this file: 12,665 and 4,035 before it.]  The withheld
+rows are the 3,848 Grand Lomé purchase-only =unité= rows (floor(k x 0.9143) sends 1 to 0, 607 of them
+filed as 0 though the household reported consuming the item, and 11 and 12 both to 10), 182 Grand Lomé
+own-production or gift =unité= rows filed at 0 or with =s07bq03a= / 1.2 off the quarter grid, 5 =unité=
+elsewhere that no integer reproduces (Plateaux 3, Centrale 1, Kara 1), and 21 =unité= elsewhere filed as 0,
+which recover to 0.  A withheld row keeps its produced and in-kind rows, which read =s07bq04= and =s07bq05=
+as filed; it is served one purchased row with Quantity and Expenditure NA where a purchase is implied (no
+own production and no gift, or a positive filed residual): 3,906 rows (3,895 before the recovered-0 ruling;
+the 11 recovered-0 counts with no own production or gift are the difference).  A recovered value within a millionth (relative) of =s07bq04= + =s07bq05= is
+that sum, so a row with no purchase leaves no single-precision residue (the file's residual otherwise runs to
+5e-8).  4,508 recovered counts differ from the filed count.  For a filed Grand Lomé count of 0 to 9 the floor
+sends k to k - 1 (k up to 11), so those could be read as filed + 1 on the integer assumption; the ruling
+withholds them all, and this is recorded as an option, not served.  [2026-11-12, re-review ruling at the
+end of this file: the integer recovery is kept outside Grand Lomé and Grand Lomé's floored counts stay
+withheld, which settles the red team's N3b.]
+
+*Measured effect* (cold, private roots, base =e5fdd2fa8=, previous head =6538bc8b8=; burst jobs 41248474,
+41249059; candidate =81ea0576e= re-measured in 41249521):
+- *Phantom purchases on =Jamais= rows*: 11,952 of 12,963 -> 305 (2018: 166).  The smallest residual left is
+  0.03, so these are answers, not residue.  By region, before -> after: Centrale 2,121 -> 33, Grand Lomé 438
+  -> 5, Kara 1,829 -> 73, Maritime 1,817 -> 83, Plateaux 2,803 -> 53, Savanes 2,944 -> 58.
+- *Purchased rows* 107,841 -> 83,264; produced 17,794 and in-kind 10,579 unchanged.  *=Expenditure= NA*
+  on 38,092 of 107,841 purchased rows (35.3%) -> 17,525 of 83,264 (21.0%), of which 3,895 are the withheld
+  counts; on the other 79,369 it is 13,630 (17.2%), against 19.0% in 2018.  [After the recovered-0 ruling
+  at the end of this file: 83,275 purchased rows, 17,536 with =Expenditure= NA (21.1%), 3,906 of them
+  withheld; the other 79,369 and their 13,630 are unchanged.]
+- *Purchased =Expenditure=* 34,464,072 -> 29,435,020 FCFA (=food_expenditures= the same).  By region, before
+  -> after: Centrale 4,999,457 -> 3,002,467; Savanes 5,633,891 -> 4,212,402; Plateaux 7,166,796 -> 5,922,533;
+  Kara 4,274,783 -> 4,260,494; Maritime 5,836,244 -> 5,818,926; Grand Lomé 6,552,901 -> 6,218,198 (its
+  withheld counts carry no value).
+- *=food_quantities(units='kgs')=* 2021-22, summed: 70,309 -> 58,744; =food_quantities(units='units')=
+  rows 136,214 -> 107,742 (the withheld rows are absent, never a zero: every derived table drops an NA
+  before it sums).  =sample= is unchanged.
+- *Grand Lomé's split is by the predicate, not by fit.*  Of the 2,394 positive Grand Lomé rows with own
+  production or a gift, 122 land on the 0.01 grid at 0.9143 and not at 1.2, and 22 at neither; all are
+  divided by 1.2, as the predicate says.  21 recovered rows fall below =s07bq04= + =s07bq05= (13 counts, 8
+  others); their residual clips to 0, as a filed one would.
+
+*Disclosure, to read before comparing waves* (coordinator, 2026-11-12).  The doc search's best reading of
+the factor is an under-reporting correction by the producer: its regional multipliers follow, in rank
+order, each region's fall since 2018 in the number of foods a household reports (Spearman 0.93 over six
+regions; REPORT.md §2c, T-TGO-15).  Its approximate estimate (T-TGO-12, holding the 2021 poverty line fixed;
+not measured here) is that without the factor poverty in Centrale would rise about 20 points from 2018,
+where the official published change is +2.9.  So a 2018 against 2021-22 comparison through the library
+shows a much steeper fall in consumption, in Centrale above all, than the official statistics: the library
+serves what households reported, before the producer's adjustment.  The producer's filed values stay
+recoverable: =Country('Togo').derivation_inputs('Togo::food_acquired::s07bq03a-regional-factor-divided-out')=
+(and the two count keys) returns each keyed row's =s07bq03a= as the file holds it, with =s00q01=,
+=s07bq04= and =s07bq05=; =s07bq03a= / =recover_s07bq03a(...)= is the factor, and the 7-day key's inputs
+return every source row as filed.
+
+*derivation_inputs joins* at =(t, i, j)=: the withheld key 3,895 to 3,895, one to one (3,906 to 3,906
+after the recovered-0 rulings).  The divided-out key
+joins 67,992 of its 69,330 served rows to exactly one input row, and the count key 10,035 of 10,039.  The
+rest come from the =harmonize_food= folds (two file items under one served =j=, e.g. the two sugars): of
+the divided-out key's 1,338, 1,172 are pairs of served rows told apart by =u=, and 166 are each the SUM of
+two source rows in one unit (332 input rows, each matching one served row), which the core collapse adds;
+the count key's 4 are two pairs.  So the join is one to one except on those folds.  On the one-to-one rows
+the registered function re-derives the served purchased quantity exactly (max |diff| 0.0).
+
+*Kilograms: the pooled factors move* (GH #1487 pools them across the waves).  A row's unit value
+=Expenditure= / =Quantity= does not move under the division, but the evidence row set does: phantom
+purchases that carried a value leave, the withheld counts leave, and 2018's decoded =Main= / =Quartier= /
+=Tête= rows now pool with 2021-22's.  Measured against the previous head (burst job 41249521): 2018
+=food_quantities(units='kgs')= on =u= = =kg= 66,944 -> 68,062 (+1.7%; base =e5fdd2fa8= 63,577), 27,478 of
+110,742 rows move, at a median ratio of 1.036 (p10 0.992, p90 1.167), most in =Unité= (8,599 rows) and =Bol
+(Grand)= (7,105); 2018 =food_prices= 14,266 of 67,434 rows move, median 0.966.  2018's native =Quantity= and
+=Expenditure= do not move.  #1598 is deferred, not unruled.  [The second red team split the +1,118 kg: the
+2018 decode alone +624, the 2021-22 changes +492; see the last section of this file.]
+
+*Togo 2018 =u=, GH #1557* (ruling "Decode 2018 with 2021 labels (Recommended)"): =food_acquired= 2018 is
+frame-equal to base =e5fdd2fa8= once base's =659=, =660= and =662= are read as =Main=, =Quartier= and
+=Tête=; that is 2,059 served rows (=Tête= 1,512, =Main= 518, =Quartier= 25, =Tête (98)= 4), by item
+Igname 1,342, Banane douce 441, Manioc 153, Plantain 98, goat 14, mutton 8, other meat 2, beef 1.  No
+=Expenditure= moves.  The evidence is in "food_acquired units" above.
+
+*Still WAITING (not ruled):* =crop_production= =condition= codes 3-5 (=Tubercule=, =Gousse=, =Régime=;
+1,032 served rows) map to =other_condition=, outside the ruled fold of #1436, with the answer kept in
+=condition_native= (red team F6).
+
+*Cost.*  Config-only for every country but Togo and Cote d'Ivoire: against the previous head, Togo 22 of 22
+=_table_cache_hash= and 44 of 44 =Wave._input_hash=, Cote d'Ivoire 21 of 21 and 21 of 126, every other
+country 0, =build_transforms_fingerprint= 0 of 40 (burst job 41249059).  =derived-from-data= in
+=derivations.BASES= moves no hash.
+
+* 2026-11-12 -- counts that recover to 0, the deleted purchases, and the second red team's sizings (GH #1697)
+
+*Ruling (@ligon, 2026-11-12, on =burst/isa-sm-20261112/reports/ehcvm2-2021-redteam2/VERDICT.md=):
+"Recover; a 0 becomes NA (Recommended)".*  Keep the exact integer recovery outside Grand Lomé; any count
+that recovers to 0 is served NA under the withheld key, so no reported item disappears; disclose the ~54
+(0.43%) recovered rows that were probably fractional counts.  It settles the red team's N3 and N3b as one
+decision: the integer reading stands outside Grand Lomé, and Grand Lomé's floored counts stay withheld as
+first ruled.
+
+*Second ruling (@ligon, 2026-11-12): "NA row only for the 11 (Recommended)".*  Of the 21 counts outside
+Grand Lomé that recover to 0, only the 11 with no other served row get an NA purchased row under the
+withheld key; the 10 that report small own production or a gift stay represented by those rows, and no
+purchase is invented for them.
+
+*What changed* (=2021-22/_/mapping.py=, =_recover=).  A count outside Grand Lomé filed as 0 recovers to
+k = 0, the floor of a count below 1 / f, so a fraction; it now takes the withheld branch, and its purchased
+row follows the ordinary withheld test (=_purchase_implied=: no own production and no gift, or a positive
+filed residual).  Measured on the file (burst job 41252164): *21 source rows*, every one with =s07bq02= =
+=Oui=, in Kara 9, Centrale 4, Plateaux 4, Savanes 3 and Maritime 1.
+- *The eleven* report neither own production nor a gift.  At =9b5585cf2= they were served no row at all, so
+  the item vanished; each is now served one purchased row with Quantity NA, Expenditure NA and
+  =s07bq03a-floored-count-withheld=.  =s07bq06=, the last purchase: =7 dernier jours= 6, =30 derniers
+  jours= 1, =Plus de 30 jours= 4.
+- *The ten* report own production or a gift below 1 / f: 0.5 (6 rows), 0.25 (3) or 0.16 (1).  Their filed
+  residual 0 - =s07bq04= - =s07bq05= is negative, so no purchase is implied; they are served their produced
+  and in-kind rows as filed and no purchased row, as every other withheld row with own production or a
+  gift and no positive filed residual is.  =s07bq06= puts none of their last purchases within 30 days
+  (=Jamais= 4, =Plus de 30 jours= 6).
+[History: =84722db39= served all 21 an NA purchased row, reading the first ruling's "any count that
+recovers to 0" literally (3,916 such rows, burst job 41252164); the second ruling reverses that for the
+ten, back to =51ef26e5a='s rule.]  The derived food tables drop an NA before they sum, so no served total
+moves either way.
+
+Counts, against =9b5585cf2=: source rows divided 93,986 (unchanged), count-recovered 12,665 -> 12,644,
+withheld 4,035 -> 4,056 (Grand Lomé 4,030, Kara 10, Plateaux 7, Centrale 5, Savanes 3, Maritime 1).
+Served: purchased rows 83,264 -> 83,275, withheld-keyed NA purchased rows 3,895 -> 3,906, =Expenditure= NA
+17,525 -> 17,536 (21.1%); the count key still serves 10,039 rows (the 21 never had a purchased row).
+Purchased =Expenditure= is unchanged at 29,435,020.05 FCFA, the derived food tables of both waves are
+frame-equal, every 2018 table is frame-equal, and no served row other than the 11 changes (burst job
+41252020, at =51ef26e5a=, whose rule this restores; against =ee65db577= the only difference is the ten NA
+purchased rows removed).
+
+*Probable fractional counts, disclosed as ruled* (the red team's simulation, Q1b and N3, not re-run here).
+The inversion is exact only for an integer count.  2018, the same instrument with no factor, has 79
+fractional counts among its 16,410 positive =Unité= =s07bq03a= (0.48%), and 65 of the 79 are half Maggi
+cubes (=Cube alimentaire=), so the rate is concentrated in one item and that item's 2021-22 rate is not
+measured.  Pushing 2018's counts through the floor and this recovery: integer counts come back exactly
+(0 wrong); a fractional one comes back as an integer, typically 0.5 below it and never beyond 0.75 either
+way, or is withheld.  Scaled to 2021-22, about 54 of the 12,670 =unité= rows outside Grand Lomé (0.43%)
+hold a probable fractional count, about one in five of them filed as 0.  The 21 filed as 0 are measured
+(above), and are all withheld now; the rest of the ~54 are served as an integer within one unit.  The two
+numbers come from different sources and are not reconciled here.
+
+*The deleted purchases are registered* (red team N4): =Togo::food_acquired::s07bq03a-purchase-removed-by-division=,
+=rows: 0=, inputs =2021-22/_/mapping.py:inputs_purchase_removed_by_division=.  A source row whose filed
+residual =s07bq03a - s07bq04 - s07bq05= is above 0 (the shared reshape's own test for serving a purchased
+row; 0 rows lie at or below 1e-6) and whose recovered residual is 0 or below is served no purchased row.
+Measured (burst job 41252164): *25,234 rows*, 24,489 divided and 745 count-recovered.  By =s07bq06=:
+=Jamais= 11,645, =Plus de 30 jours= 11,871, within 30 days 1,718 (=7 dernier jours= 1,108, =30 derniers
+jours= 462, =Hier= 148).  Every one reports own production or a gift; its produced and in-kind rows are
+served as filed.  By region: Kara 6,540, Plateaux 5,139, Savanes 4,837, Centrale 4,342, Grand Lomé 2,199,
+Maritime 2,177.  The recovered residual is exactly 0 on 25,224 and below 0 on 10.  The 108,057 source
+rows with a positive filed residual partition as 79,535 served a purchased row from the recovered value,
+25,234 deleted, and 3,288 withheld and served NA.  The inputs equal the raw predicate's rows household for
+household; no served row carries the key, and the =attrs= summary lists it at 0.  155 of the 25,234 share
+=(t, i, j)= with a served purchased row (a =harmonize_food= fold partner), so read the deletion at the
+source-row grain.  At the last purchase's unit value, where the purchase was in the consumption unit, the
+deleted filed residual was worth roughly 127k FCFA on 1,599 rows (approximate: units compared on the
+labels as filed, not the hook's folded codes).
+
+*Kilograms: the 2018 movement, split* (red team N1, its jobs 41251020 and 41251201; not re-spliced here).
+The +1,118 kg on =u= = =kg= in 2018 =food_quantities(units='kgs')= (66,944 -> 68,062 against
+=6538bc8b8=) is the sum of two effects with an interaction of about 1 kg:
+- *the 2018 decode alone*, +624 kg (+0.9%), on 1,875 rows, every one a decoded row (=Tête
+  (Moyen/Petit/Grand)= 1,512, =Main= 363), all on the u-pooled =unit= rung and now pooled with 2021-22's
+  =Tête= / =Main=;
+- *the 2021-22 changes alone*, +492 kg (+0.7%), on 25,607 other rows, none decoded (=Unité= 8,599, =Bol
+  (Grand)= 7,105, =Unité (Moyen)= 2,136, ...; by kilograms =Unité (Moyen)= +315, =Unité= +129).
+So by rows the 2021-22 effect is larger, and by kilograms the decode is.  The decode changes no native
+=Quantity= or =Expenditure=.  This head serves 2018 68,062.04 kg, the same as =9b5585cf2=, with every 2018
+table frame-equal and 0 kg factors changed (burst job 41252164), so the split carries over.  Cote
+d'Ivoire's +0.6% is entirely its own 2021-22 slice.
+
+*Grand Lomé's own/gift misfit, disclosed and not fixed* (red team N2).  Of the 1,830 positive non-=unité=
+Grand Lomé rows with own production or a gift, 1,686 land on the 0.01 grid at 1.2, 122 only at 0.9143 and
+22 at neither; the predicate divides all of them by 1.2.  On the 122 the served purchased quantity is 122.5
+units against 216.9 at 0.9143; at each row's own last-purchase unit value that is about 18.5k against
+36.9k FCFA, so about 18k FCFA understated, 0.3% of Grand Lomé's 6.22M purchased =Expenditure=.  Not
+applied, offered as an alternative: divide by whichever factor lands on the grid.  (The 2,394 above counts
+every positive Grand Lomé own/gift row, =unité= included.)
+
+*The cover is not hashed* (red team N5).  The hook and the =inputs= callables read =s00_me_tgo2021.dta= by a
+constructed path.  =food_acquired= is a YAML-path table and =Wave._input_hash= folds only the sidecars of
+the sources the YAML declares, so a re-released cover alone would not invalidate =food_acquired= (CLAUDE.md,
+cache limitation (a)).  Clear the Togo cache by hand if the cover is ever re-released.
+
+*Still unexplained* (red team r2, open):
+- 76 of the 305 =Jamais= rows that keep a residual sit at exactly =s07bq03a= / (=s07bq04= + =s07bq05=) =
+  5.0175 = 5 x 1.0035, so in Kara and Maritime: a reported 5x own production, or a unit slip.  No 2018
+  control was run.
+- After the division about 2,200 purchase-only rows sit off the quarter grid beyond 2018's share (Grand
+  Lomé about 770, Kara about 470, Maritime about 450); Litre and Bouteille are the low units.  The cause is
+  not established.
+
+*=assets= index (red team F7, GH #1710).*  The served =assets= index =(t, i, j)= is not unique in old and
+new waves alike (2021-22: 958 duplicated entries) because the =harmonize_assets= relabel of =j= runs in
+=_finalize_result= after the index collapse; no =GrainCollapseWarning= fires.  Pre-existing, extended to
+2021-22 by this wiring; filed as GH #1710.
+
+*Cost.*  =2021-22/_/mapping.py= only: against =9b5585cf2=, Togo 22 of 22 =_table_cache_hash= and 22 of 44
+=Wave._input_hash= (the 2021-22 wave), every other country 0, =build_transforms_fingerprint= 0 of 40
+(burst job 41252164).  =_/derivations.yml= and this file move no hash.

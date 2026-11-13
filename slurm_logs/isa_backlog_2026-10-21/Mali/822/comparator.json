@@ -1,0 +1,13 @@
+{
+  "country": "Niger",
+  "cache_hash": "17fd54ea7da1144c69db369eba111e53b8a39957f5a27a39841ac0e947b04eda",
+  "freshness": "fresh",
+  "coverage": [
+    "2011-12",
+    "2014-15",
+    "2018-19",
+    "2021-22"
+  ],
+  "sha256": "bf47a8949709044659b3f914813e55324b457fc210280c64bf7660589248f284",
+  "rows": 46043
+}

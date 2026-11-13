@@ -8,15 +8,33 @@ The 2014 EMC is a different survey program with no panel linkage.
 The 2021-22 cover sheet (s00_me_bfa2021.dta) contains 3,227 panel households
 with linkage variables:
   - hhid       : 2021-22 household ID (current wave)
-  - hhid_EHCVM1: 2018-19 household ID (previous wave)
+  - hhid_EHCVM1: 2018-19 household ID (previous wave), in the SURVEY's format
   - grappe_EHCVM1, menage_EHCVM1: cluster/household from 2018-19
 
-ID construction differs across waves:
-  - 2018-19: j = str(grappe) + str(menage).zfill(3)
-  - 2021-22: j = str(hhid)
+THE LIBRARY'S HOUSEHOLD ID DIFFERS BY WAVE (GH #460, #1240).  Each wave's
+tables build ``i`` from ``(grappe, menage)`` with a different formatter:
 
-Since hhid_EHCVM1 == str(grappe_EHCVM1) + str(menage_EHCVM1).zfill(3),
-we use hhid_EHCVM1 directly as previous_i.
+  - 2018-19: ``2018-19/_/mapping.py:i`` == ``burkina_faso.ehcvm_i``
+             = format_id(grappe) + '0' + format_id(menage, zeropadding=2)
+  - 2021-22: no wave override, so the country-level ``burkina_faso.i``
+             = format_id(grappe) + format_id(menage, zeropadding=3)
+
+The two agree for menage <= 99 and diverge for a three-digit menage
+(grappe=2, menage=126: ``'20126'`` in 2018-19, ``'2126'`` in 2021-22).
+
+The survey's own ``hhid_EHCVM1`` (and ``hhid``) are in the 2021-22 form,
+``grappe + menage.zfill(3)``, for all 3,227 rows.  So ``hhid_EHCVM1`` is NOT
+the id the 2018-19 tables serve, and neither is any 2018-19 id built with
+``zfill(3)``.  Until GH #1240 this script did exactly that: 1,108 of the 3,227
+households have a three-digit 2018-19 menage, and their targets were ids that
+exist in no 2018-19 table (1,088) or, worse, the id of a DIFFERENT 2018-19
+household (3: target ``'90102'`` for 2018-19 household (90, 102), which is the
+served id of (9, 102)); the other 17 were chain-skipped.
+
+Both ids are therefore built here with the country's own formatters -- the
+target with ``ehcvm_i``, the source with ``i`` (byte-identical to ``hhid`` for
+all 3,227 rows) -- and every target is checked against the 2018-19 cover's
+``ehcvm_i`` ids, as Mali's and Senegal's ``panel_ids.py`` check theirs.
 """
 
 import json
@@ -27,25 +45,59 @@ import pandas as pd
 
 sys.path.append('../../_')
 from lsms_library.local_tools import panel_ids, get_dataframe
+# The script's own directory (``_/``) is sys.path[0] when run as
+# ``python panel_ids.py``; Mali's script imports ``from mali import i`` the
+# same way.  Reuse the country's formatters rather than re-implementing them.
+from burkina_faso import ehcvm_i, i as country_i  # noqa: E402
+
+
+def _id_2018_19(grappe, menage):
+    """2018-19 household id, as ``2018-19/_/mapping.py:i`` builds it."""
+    if pd.isna(grappe) or pd.isna(menage):
+        return None
+    return ehcvm_i(int(grappe), int(menage))
+
+
+def _id_2021_22(grappe, menage):
+    """2021-22 household id, as the country-level ``i`` builds it."""
+    if pd.isna(grappe) or pd.isna(menage):
+        return None
+    return country_i(pd.Series([int(grappe), int(menage)]))
+
+
+# 2018-19 baseline ids, in the 2018-19 tables' format.  A target outside this
+# set would be a phantom (Mali / Senegal precedent); dropped and counted.
+cover_18 = get_dataframe('../2018-19/Data/s00_me_bfa2018.dta')
+baseline_ids = {
+    _id_2018_19(g, m)
+    for g, m in cover_18[['grappe', 'menage']].dropna().drop_duplicates()
+    .itertuples(index=False)
+}
 
 # Read the 2021-22 cover sheet.  Today every row is a panel household
 # (3,227 rows, all with a non-null grappe_EHCVM1), but do not *assume* that:
 # see the full-cover cur_set below (GH #548).
 df = get_dataframe('../2021-22/Data/s00_me_bfa2021.dta', convert_categoricals=True)
 
-# Build current wave ID (2021-22 style)
-df['i'] = df['hhid'].astype(int).astype(str)
+# Current wave ID, in the 2021-22 tables' format.  The survey's hhid carries
+# the same digits; assert it so a future release that changes either fails
+# here rather than producing sources no 2021-22 table serves.
+df['i'] = [_id_2021_22(g, m) for g, m in
+           df[['grappe', 'menage']].itertuples(index=False)]
+_hhid = df['hhid'].astype(int).astype(str)
+assert (df['i'] == _hhid).all(), (
+    "2021-22 country i(grappe, menage) no longer equals hhid for "
+    f"{int((df['i'] != _hhid).sum())} rows")
 
-# Build previous wave ID (2018-19 style: grappe + menage zero-padded to 3),
-# leaving it null for any household without a 2018-19 antecedent.  Such rows
-# are dropped inside panel_ids(); they still count as *occupied* 2021-22
-# slots for the collision guard below.
-_panel = df['grappe_EHCVM1'].notna() & df['menage_EHCVM1'].notna()
-df['previous_i'] = pd.NA
-df.loc[_panel, 'previous_i'] = (
-    df.loc[_panel, 'grappe_EHCVM1'].astype(int).astype(str)
-    + df.loc[_panel, 'menage_EHCVM1'].astype(int).astype(str).str.rjust(3, '0')
-)
+# Previous wave ID, in the 2018-19 tables' format, left null for any household
+# without a 2018-19 antecedent.  Such rows are dropped inside panel_ids(); they
+# still count as *occupied* 2021-22 slots for the collision guard below.
+_prev = [_id_2018_19(g, m) for g, m in
+         df[['grappe_EHCVM1', 'menage_EHCVM1']].itertuples(index=False)]
+orphans = sum(p is not None and p not in baseline_ids for p in _prev)
+df['previous_i'] = pd.Series(
+    [p if p in baseline_ids else pd.NA for p in _prev],
+    index=df.index, dtype=object)
 
 df['t'] = '2021-22'
 
@@ -61,47 +113,32 @@ panel_df = pd.concat([dummy, panel_df])
 
 D, updated_ids = panel_ids(panel_df)
 
-# Skip transitive-chain collisions. Burkina's 2021-22 cur_i is an
-# integer hhid, while the 2018-19 prev_i is a composite
-# grappe+menage.zfill(3). Because both live in the same numeric-
-# string namespace, 95 of 3227 entries end up with prev_i values
-# that coincide with other households' cur_i values (e.g.
-# 4021->4065 where 4065 is also a cur_i). If left in, id_walk
-# applied twice collapses the chain and 91 post-walk (i,t) tuples
-# disappear due to collision. Drop the non-endpoint entries so
-# id_walk stays idempotent. Caught by
-# check_panel_consistency's id_walk_idempotent check
-# (diagnostics.py).
+# No chain guard (GH #1245).  The 2021-22 ids and the 2018-19 ids are built
+# from (grappe, menage) in one numeric-string namespace, and 2021-22 renumbered
+# menage within the grappe (only 477 of 3,227 keep their 2018-19 menage), so a
+# household's 2018-19 id can be ANOTHER 2021-22 household's current id: 4021
+# -> 4065, where 4065 is itself a 2021-22 household that moves on.  80 of the
+# 3,227 entries are such links.  While id_walk closure-resolved a wave's map,
+# {A: B, B: C} served both A and B as C, so this script dropped all 80 (and 8
+# of those households were then served under a DIFFERENT 2018-19 household's
+# id, GH #1240).  id_walk is now a single-pass rename -- every id to its own
+# target -- and refuses to walk a wave twice, so every entry is kept.
 #
-# GH #548 (hardening; byte-identical today): the "occupied" set must be
-# EVERY 2021-22 household id, not just the panel-linked candidates.  Built
-# from updated_ids.keys() it saw only panel households -- the exact
-# panel-only pattern GH #536 had to fix in Mali, where a household renaming
-# onto a slot held by a NON-panel current household collided under id_walk
-# and groupby().first() silently dropped one of each pair.  Burkina's
-# 2021-22 cover happens to be 100% panel (3,227/3,227), so panel-only and
-# full-cover coincide *today* and this edit changes nothing; a future cover
-# with refreshment households would otherwise resurface the Mali bug
-# silently.  Build cur_set from the full cover.
+# What a single pass CANNOT survive is a target held by a 2021-22 household
+# that keeps its id: renaming onto it would merge two households.  That is
+# impossible today (every 2021-22 household is a panel household, and every
+# occupied target's occupant moves on), so assert it rather than drop links
+# silently: a future cover with refreshment households fails here, at
+# regeneration, instead of colliding at read time.  The "occupied" set is the
+# FULL cover, not just panel-linked rows (GH #548 / #536).
 cur_set = set(df['i'].dropna())
-filtered_21 = {}
-skipped_chains = 0
-for cur, prev in updated_ids.get('2021-22', {}).items():
-    if prev in cur_set and cur != prev:
-        skipped_chains += 1
-        continue
-    filtered_21[cur] = prev
-updated_ids['2021-22'] = filtered_21
-
-# Rebuild the RecursiveDict with the skipped entries removed.
-from lsms_library.local_tools import RecursiveDict  # noqa: E402
-D_filtered = RecursiveDict()
-for k, v in D.data.items():
-    # k = (wave, cur_id), v = (prev_wave, prev_id)
-    if k[0] == '2021-22' and k[1] not in filtered_21:
-        continue
-    D_filtered[k] = v
-D = D_filtered
+_w21 = updated_ids.get('2021-22', {})
+_held = sorted(prev for cur, prev in _w21.items()
+               if prev != cur and prev in cur_set and _w21.get(prev, prev) == prev)
+assert not _held, (
+    f"{len(_held)} 2021-22 crosswalk target(s) are held by a 2021-22 household "
+    f"that keeps its id; a single-pass rename would merge them: {_held[:5]}")
+chained = sum(1 for cur, prev in _w21.items() if prev != cur and prev in cur_set)
 
 # GH #914: write beside THIS script, never into the process's cwd.  These two
 # files are committed sources; `make panel-ids` regenerates them in place for a
@@ -117,5 +154,6 @@ with open(_HERE / 'panel_ids.json', 'w') as f:
 with open(_HERE / 'updated_ids.json', 'w') as f:
     json.dump(updated_ids, f)
 
-print(f"Burkina Faso 2021-22 -> 2018-19: {len(filtered_21)} linked "
-      f"({skipped_chains} transitive-chain entries skipped)")
+print(f"Burkina Faso 2021-22 -> 2018-19: {len(_w21)} linked "
+      f"({chained} onto an id another 2021-22 household moves off, "
+      f"{orphans} targets absent from the 2018-19 cover)")

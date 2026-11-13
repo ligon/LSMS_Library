@@ -1,0 +1,27 @@
+{
+  "recorded_at": "2026-10-22T02:22:30.452972+00:00",
+  "rows": [
+    {
+      "label": "candidate",
+      "checkout": "/local/job40255479/worktrees/isa-integration-nineteen-docs",
+      "head": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+      "ignored_link": "/local/job40255479/worktrees/isa-integration-nineteen-docs/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/integration/niger-nineteen-docs-review/candidate-dvc-tmp",
+      "clean": true
+    },
+    {
+      "label": "base",
+      "checkout": "/local/job40255479/worktrees/isa-integration-nineteen-docs-base",
+      "head": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+      "ignored_link": "/local/job40255479/worktrees/isa-integration-nineteen-docs-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/integration/niger-nineteen-docs-review/base-dvc-tmp",
+      "clean": true
+    }
+  ],
+  "source_proof": "Exact twelve Niger changed blobs/modes equal670vsd602; only Mali documentation differs from old60; complete Mali documentation equals471",
+  "old_source_preparation_preserved": true,
+  "review_assigned": false,
+  "tests_builds": 0,
+  "verdict": null,
+  "GitHub_publication": false
+}

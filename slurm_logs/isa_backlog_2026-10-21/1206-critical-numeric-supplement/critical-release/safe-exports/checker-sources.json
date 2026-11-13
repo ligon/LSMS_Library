@@ -1,0 +1,112 @@
+{
+  "prepare-critical.py": {
+    "sha256": "aa61add0073b0feb71a001630e675f0598882480862f79286d91d638fef9b83e",
+    "bytes": 10706,
+    "mode": 384,
+    "mtime_ns": 1792650616445685339,
+    "inode": 59385841,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "twenty-original-exact.py": {
+    "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2",
+    "bytes": 4376,
+    "mode": 384,
+    "mtime_ns": 1792650620812709018,
+    "inode": 59385846,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "1196-original-exact.py": {
+    "sha256": "b20c96a10e0330bda3dcd23b354835b810b0ae2bf186959f1f43a997c76c4be2",
+    "bytes": 4376,
+    "mode": 384,
+    "mtime_ns": 1792650621807714413,
+    "inode": 59385847,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "bootstrap.py": {
+    "sha256": "3a3aca0d72e4d3b919bc1708947f8edc413e712cab125d2badb74e104199b522",
+    "bytes": 2560,
+    "mode": 384,
+    "mtime_ns": 1792650727641300176,
+    "inode": 59385848,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "exact_strict.py": {
+    "sha256": "c42164e9d7e01027ac264b1442e5157d44aa0207655ab8c53d080659084f812d",
+    "bytes": 5155,
+    "mode": 384,
+    "mtime_ns": 1792650727680300392,
+    "inode": 59385849,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "run-critical.sh": {
+    "sha256": "b7fb54cd9a04e6f4561bd0e12aba4b09f1a30a00eb0f41dd7f1264284373b26c",
+    "bytes": 674,
+    "mode": 384,
+    "mtime_ns": 1792650727686300425,
+    "inode": 59385850,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "check-critical.py": {
+    "sha256": "947bc88204df04cdc9d23b70624f697fcd279fe20cfb01c2f5f7a3ed4658f808",
+    "bytes": 9585,
+    "mode": 384,
+    "mtime_ns": 1792650827403867387,
+    "inode": 59385851,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "check-critical-cache-pairs.py": {
+    "sha256": "e481fd57b794fedbc167dc80b169bdf7cb65dea8243508578587b3e2c413c10f",
+    "bytes": 1728,
+    "mode": 384,
+    "mtime_ns": 1792651083929371838,
+    "inode": 59385858,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "inventory-and-cli-metadata.py": {
+    "sha256": "ae176a1bf697ce6885834f6e354975f6355cac23aca4affb239b4f2286c505df",
+    "bytes": 4143,
+    "mode": 384,
+    "mtime_ns": 1792651051644186584,
+    "inode": 59385862,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "prepare-1196-extra.py": {
+    "sha256": "1ab7d8f670d08b5b37fbff3f2473b4ec83a75ed5646547cdbb316d1396dbcd2b",
+    "bytes": 2596,
+    "mode": 384,
+    "mtime_ns": 1792651210474100797,
+    "inode": 59385866,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  },
+  "check-1196-extra.py": {
+    "sha256": "ee572ee02c071e0a499e0a1be22f3c0a6c0c8448ecbe6c6584959269506c0541",
+    "bytes": 2522,
+    "mode": 384,
+    "mtime_ns": 1792651241441277871,
+    "inode": 59385868,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file"
+  }
+}

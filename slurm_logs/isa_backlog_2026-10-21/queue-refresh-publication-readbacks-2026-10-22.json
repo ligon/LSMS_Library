@@ -1,0 +1,74 @@
+{
+  "verified_at": "2026-10-22T16:49:44.496Z",
+  "source_publication_commit": "c5e77e10b7404b08c60684deddc57f580a5f50ea",
+  "local_commit_and_GitHub_push": "actual terminal0; normal hook SUCODER published",
+  "records": [
+    {
+      "number": 1170,
+      "state": "open",
+      "merged": false,
+      "head_sha": "c5e77e10b7404b08c60684deddc57f580a5f50ea",
+      "body_readback_exact": true
+    },
+    {
+      "number": 1209,
+      "state": "open",
+      "merged": null,
+      "head_sha": null,
+      "body_readback_exact": true
+    },
+    {
+      "number": 1213,
+      "state": "open",
+      "merged": false,
+      "head_sha": "47b3c5d76371acc457c5553ebf8adfb1859e115b",
+      "body_readback_exact": true
+    }
+  ],
+  "pr1213_ci": {
+    "run_id": 39815466875,
+    "workflow": "completed/success",
+    "jobs": [
+      {
+        "name": "unit-tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "windows-smoke",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "dvc-remote-reachability",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "data-tests",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "dvc-lock-check",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "docs",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "refresh-dvc-locks",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "windows-script-build",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ]
+  }
+}

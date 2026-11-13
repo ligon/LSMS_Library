@@ -1,0 +1,1758 @@
+{
+  "actors": [
+    {
+      "tag": "api-audit",
+      "role": "candidate",
+      "script": "api-audit.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "api-audit.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 4.697650909423828
+    },
+    {
+      "tag": "base-dvc-a-cold-all",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-a",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-a",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 37.94649839401245
+    },
+    {
+      "tag": "base-dvc-a-feature-all",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-a",
+        "dvc",
+        "all",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-a",
+        "dvc",
+        "all",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 8.333240747451782
+    },
+    {
+      "tag": "base-dvc-a-feature-barren",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-a",
+        "dvc",
+        "barren",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-a",
+        "dvc",
+        "barren",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.656790494918823
+    },
+    {
+      "tag": "base-dvc-a-feature-supported",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-a",
+        "dvc",
+        "supported",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-a",
+        "dvc",
+        "supported",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.694455623626709
+    },
+    {
+      "tag": "base-dvc-a-fresh-all",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-a",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-a",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 8.430753231048584
+    },
+    {
+      "tag": "base-dvc-a-fresh-barren",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-a",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-a",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.449498653411865
+    },
+    {
+      "tag": "base-dvc-a-populated-supported",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-a",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-a",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.538275718688965
+    },
+    {
+      "tag": "base-dvc-a-scanner",
+      "role": "base",
+      "script": "scanner.py",
+      "arguments": [
+        "base-dvc-a",
+        "dvc"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "scanner.py",
+        "base-dvc-a",
+        "dvc"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 9.886896848678589
+    },
+    {
+      "tag": "base-dvc-b-after-all-barren",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-b",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-b",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.36446475982666
+    },
+    {
+      "tag": "base-dvc-b-after-barren-supported",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-b",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-b",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 11.253705024719238
+    },
+    {
+      "tag": "base-dvc-b-cold-barren",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-b",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-b",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 91.33785390853882
+    },
+    {
+      "tag": "base-dvc-b-union-all",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-b",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-b",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 34.86872458457947
+    },
+    {
+      "tag": "base-dvc-s-cold-supported",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-s",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-s",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 13.472413301467896
+    },
+    {
+      "tag": "base-dvc-s-fresh-supported",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-s",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-s",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 6.933734178543091
+    },
+    {
+      "tag": "base-dvc-s-populated-barren",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-dvc-s",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-dvc-s",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 11.169787406921387
+    },
+    {
+      "tag": "base-inventory",
+      "role": "base",
+      "script": "inventory.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "inventory.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 49.11278009414673
+    },
+    {
+      "tag": "base-make-a-cold-all",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-a",
+        "make",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-a",
+        "make",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 81.3848991394043
+    },
+    {
+      "tag": "base-make-a-feature-all",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-a",
+        "make",
+        "all",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-a",
+        "make",
+        "all",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 80.16939997673035
+    },
+    {
+      "tag": "base-make-a-feature-barren",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-a",
+        "make",
+        "barren",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-a",
+        "make",
+        "barren",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 80.0134105682373
+    },
+    {
+      "tag": "base-make-a-feature-supported",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-a",
+        "make",
+        "supported",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-a",
+        "make",
+        "supported",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 79.48366713523865
+    },
+    {
+      "tag": "base-make-a-fresh-all",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-a",
+        "make",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-a",
+        "make",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 79.53599691390991
+    },
+    {
+      "tag": "base-make-a-fresh-barren",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-a",
+        "make",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-a",
+        "make",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 79.17567753791809
+    },
+    {
+      "tag": "base-make-a-populated-supported",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-a",
+        "make",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-a",
+        "make",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 78.69202136993408
+    },
+    {
+      "tag": "base-make-b-after-all-barren",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-b",
+        "make",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-b",
+        "make",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 78.67877554893494
+    },
+    {
+      "tag": "base-make-b-after-barren-supported",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-b",
+        "make",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-b",
+        "make",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 79.51927947998047
+    },
+    {
+      "tag": "base-make-b-cold-barren",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-b",
+        "make",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-b",
+        "make",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 79.97022438049316
+    },
+    {
+      "tag": "base-make-b-union-all",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-b",
+        "make",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-b",
+        "make",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 80.58212780952454
+    },
+    {
+      "tag": "base-make-s-cold-supported",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-s",
+        "make",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-s",
+        "make",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 82.88899683952332
+    },
+    {
+      "tag": "base-make-s-fresh-supported",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-s",
+        "make",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-s",
+        "make",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 80.78154015541077
+    },
+    {
+      "tag": "base-make-s-populated-barren",
+      "role": "base",
+      "script": "probe.py",
+      "arguments": [
+        "base-make-s",
+        "make",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "base-make-s",
+        "make",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 80.66457200050354
+    },
+    {
+      "tag": "cache-artifacts",
+      "role": "candidate",
+      "script": "artifacts-held.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "artifacts-held.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 8.38610029220581
+    },
+    {
+      "tag": "calibration",
+      "role": "candidate",
+      "script": "calibrate.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "calibrate.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 3.4151172637939453
+    },
+    {
+      "tag": "candidate-dvc-a-cold-all",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-a",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-a",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 37.74846816062927
+    },
+    {
+      "tag": "candidate-dvc-a-feature-all",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-a",
+        "dvc",
+        "all",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-a",
+        "dvc",
+        "all",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 8.63129734992981
+    },
+    {
+      "tag": "candidate-dvc-a-feature-barren",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-a",
+        "dvc",
+        "barren",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-a",
+        "dvc",
+        "barren",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.970260858535767
+    },
+    {
+      "tag": "candidate-dvc-a-feature-supported",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-a",
+        "dvc",
+        "supported",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-a",
+        "dvc",
+        "supported",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.886131286621094
+    },
+    {
+      "tag": "candidate-dvc-a-fresh-all",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-a",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-a",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 8.196134328842163
+    },
+    {
+      "tag": "candidate-dvc-a-fresh-barren",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-a",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-a",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.223818302154541
+    },
+    {
+      "tag": "candidate-dvc-a-populated-supported",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-a",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-a",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.43653416633606
+    },
+    {
+      "tag": "candidate-dvc-a-scanner",
+      "role": "candidate",
+      "script": "scanner.py",
+      "arguments": [
+        "candidate-dvc-a",
+        "dvc"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "scanner.py",
+        "candidate-dvc-a",
+        "dvc"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 10.076355934143066
+    },
+    {
+      "tag": "candidate-dvc-b-after-all-barren",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-b",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-b",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.228708505630493
+    },
+    {
+      "tag": "candidate-dvc-b-after-barren-supported",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-b",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-b",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 10.411815166473389
+    },
+    {
+      "tag": "candidate-dvc-b-cold-barren",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-b",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-b",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 8.642093420028687
+    },
+    {
+      "tag": "candidate-dvc-b-union-all",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-b",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-b",
+        "dvc",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 33.88526153564453
+    },
+    {
+      "tag": "candidate-dvc-s-cold-supported",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-s",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-s",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 14.14389157295227
+    },
+    {
+      "tag": "candidate-dvc-s-fresh-supported",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-s",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-s",
+        "dvc",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 6.8428566455841064
+    },
+    {
+      "tag": "candidate-dvc-s-populated-barren",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-dvc-s",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-dvc-s",
+        "dvc",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 6.452763795852661
+    },
+    {
+      "tag": "candidate-inventory",
+      "role": "candidate",
+      "script": "inventory.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "inventory.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 47.460120677948
+    },
+    {
+      "tag": "candidate-make-a-cold-all",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-a",
+        "make",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-a",
+        "make",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 36.12543177604675
+    },
+    {
+      "tag": "candidate-make-a-feature-all",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-a",
+        "make",
+        "all",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-a",
+        "make",
+        "all",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 33.80508351325989
+    },
+    {
+      "tag": "candidate-make-a-feature-barren",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-a",
+        "make",
+        "barren",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-a",
+        "make",
+        "barren",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.664064407348633
+    },
+    {
+      "tag": "candidate-make-a-feature-supported",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-a",
+        "make",
+        "supported",
+        "feature"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-a",
+        "make",
+        "supported",
+        "feature"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 11.341609239578247
+    },
+    {
+      "tag": "candidate-make-a-fresh-all",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-a",
+        "make",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-a",
+        "make",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 34.04542303085327
+    },
+    {
+      "tag": "candidate-make-a-fresh-barren",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-a",
+        "make",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-a",
+        "make",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.2056884765625
+    },
+    {
+      "tag": "candidate-make-a-populated-supported",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-a",
+        "make",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-a",
+        "make",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 10.748685598373413
+    },
+    {
+      "tag": "candidate-make-b-after-all-barren",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-b",
+        "make",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-b",
+        "make",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.530341625213623
+    },
+    {
+      "tag": "candidate-make-b-after-barren-supported",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-b",
+        "make",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-b",
+        "make",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 11.069512367248535
+    },
+    {
+      "tag": "candidate-make-b-cold-barren",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-b",
+        "make",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-b",
+        "make",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 8.60740327835083
+    },
+    {
+      "tag": "candidate-make-b-union-all",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-b",
+        "make",
+        "all",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-b",
+        "make",
+        "all",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 34.09342312812805
+    },
+    {
+      "tag": "candidate-make-s-cold-supported",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-s",
+        "make",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-s",
+        "make",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 12.223117351531982
+    },
+    {
+      "tag": "candidate-make-s-direct-make",
+      "role": "candidate",
+      "script": "direct-make.py",
+      "arguments": [
+        "candidate-make-s",
+        "make"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "direct-make.py",
+        "candidate-make-s",
+        "make"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 29.67744779586792
+    },
+    {
+      "tag": "candidate-make-s-fresh-supported",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-s",
+        "make",
+        "supported",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-s",
+        "make",
+        "supported",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 11.001649856567383
+    },
+    {
+      "tag": "candidate-make-s-populated-barren",
+      "role": "candidate",
+      "script": "probe.py",
+      "arguments": [
+        "candidate-make-s",
+        "make",
+        "barren",
+        "country"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "probe.py",
+        "candidate-make-s",
+        "make",
+        "barren",
+        "country"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 7.085847854614258
+    },
+    {
+      "tag": "candidate-tests",
+      "role": "candidate",
+      "script": "test-runner.py",
+      "arguments": [
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate.xml",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh1204_uganda_crop_wave_coverage.py"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "test-runner.py",
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate.xml",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh1204_uganda_crop_wave_coverage.py"
+      ],
+      "exit_code": 3,
+      "elapsed_s": 5.783959865570068
+    },
+    {
+      "tag": "candidate-tests-v2",
+      "role": "candidate",
+      "script": "test-runner.py",
+      "arguments": [
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate-v2",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate-v2.xml",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh1204_uganda_crop_wave_coverage.py"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "test-runner.py",
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate-v2",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate-v2.xml",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh1204_uganda_crop_wave_coverage.py"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 14.201837301254272
+    },
+    {
+      "tag": "candidate-tests-v3",
+      "role": "candidate",
+      "script": "test-runner.py",
+      "arguments": [
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate-v3",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate-v3.xml",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh1204_uganda_crop_wave_coverage.py"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "test-runner.py",
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate-v3",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-candidate-v3.xml",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh1204_uganda_crop_wave_coverage.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 19.88035559654236
+    },
+    {
+      "tag": "existing-tests",
+      "role": "candidate",
+      "script": "test-runner.py",
+      "arguments": [
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-existing",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-existing.xml",
+        "-k",
+        "not TestEndToEnd and not test_a_poisoned_country_parquet_is_REBUILT_not_served and not test_a_wave_produced_table_is_never_evicted",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_id_walk.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh891_wave_subset_cache.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh1039_make_backend_no_country_rule.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh866_stale_country_parquet_not_laundered.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh868_reduce_to_agreed_ledger.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh1198_uganda_production_observations.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh849_uganda_reported_factors.py"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "test-runner.py",
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-existing",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-existing.xml",
+        "-k",
+        "not TestEndToEnd and not test_a_poisoned_country_parquet_is_REBUILT_not_served and not test_a_wave_produced_table_is_never_evicted",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_id_walk.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh891_wave_subset_cache.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh1039_make_backend_no_country_rule.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh866_stale_country_parquet_not_laundered.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh868_reduce_to_agreed_ledger.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh1198_uganda_production_observations.py",
+        "/local/job40255479/worktrees/isa-Uganda-1204/tests/test_gh849_uganda_reported_factors.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 22.029351949691772
+    },
+    {
+      "tag": "guard-calibration-v2",
+      "role": "candidate",
+      "script": "guard-calibration-v2.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "guard-calibration-v2.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.5928356647491455
+    },
+    {
+      "tag": "operand-comparisons",
+      "role": "candidate",
+      "script": "compare-held.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "compare-held.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 12.64879059791565
+    },
+    {
+      "tag": "parent-tests",
+      "role": "base",
+      "script": "test-runner.py",
+      "arguments": [
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent.xml",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/test_gh1204_parent.py"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "test-runner.py",
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent.xml",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/test_gh1204_parent.py"
+      ],
+      "exit_code": 3,
+      "elapsed_s": 5.783718585968018
+    },
+    {
+      "tag": "parent-tests-v2",
+      "role": "base",
+      "script": "test-runner.py",
+      "arguments": [
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent-v2",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent-v2.xml",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/test_gh1204_parent.py"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "test-runner.py",
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent-v2",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent-v2.xml",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/test_gh1204_parent.py"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 14.523735523223877
+    },
+    {
+      "tag": "parent-tests-v3",
+      "role": "base",
+      "script": "test-runner.py",
+      "arguments": [
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent-v3",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent-v3.xml",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/test_gh1204_parent_v3.py"
+      ],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "test-runner.py",
+        "-q",
+        "-n",
+        "1",
+        "--dist=loadfile",
+        "--import-mode=importlib",
+        "--rootdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "--confcutdir=/local/job40255479/worktrees/isa-Uganda-1204-base",
+        "-p",
+        "identity_plugin",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent-v3",
+        "--junitxml=/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/pytest-parent-v3.xml",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/test_gh1204_parent_v3.py"
+      ],
+      "exit_code": 1,
+      "elapsed_s": 17.78899884223938
+    },
+    {
+      "tag": "prepare",
+      "role": "candidate",
+      "script": "prepare.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "prepare.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 32.231467485427856
+    },
+    {
+      "tag": "provider-census",
+      "role": "candidate",
+      "script": "provider-census.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "provider-census.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 3.5772018432617188
+    },
+    {
+      "tag": "runtime",
+      "role": "candidate",
+      "script": "runtime.py",
+      "arguments": [],
+      "command": [
+        "bash",
+        "/local/job40255479/control/isa-backlog-20261021/uganda1204-fix/run.sh",
+        "runtime.py"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 3.740769147872925
+    }
+  ],
+  "warning": "Exclusive-create evidence paths must not be replayed. Reproduction requires fresh prefixes and separately authenticated physical L1 roots.",
+  "actual_tool_terminal_zero_handles": {
+    "candidate_grid": 99963,
+    "parent_grid": 60492,
+    "operand_reader": 5321,
+    "artifact_reader": 63519,
+    "final_ledger_commit_normal_hooks": 44438,
+    "additive_final_protection": 71191
+  },
+  "retained_stops": {
+    "phase0_AST_full_dict_literal_eval_before_output": true,
+    "precollection_IPC_setup_stops": 2,
+    "original_guard_and_streams_retained": true,
+    "v2_fixture_required_fields_failure_retained": true,
+    "v2_parent_fixture_control_confounded_not_final": true,
+    "v3_fresh_prefixes_have_actual_parent_controller_and_worker_identity": true,
+    "metadata_cat_absent_test_existing_file_exit1_recorded": true
+  },
+  "protection_metadata_stop": {
+    "original_tool_handle": 74572,
+    "observed_exit_code": 1,
+    "rich_receipt_schema_mismatch_not_provider_change": true,
+    "original_script_and_stream_retained": true,
+    "unsaved_source_snapshot_memory_disclosed": true,
+    "additive_protection_continuation_only": true,
+    "API_test_or_grid_replay": false
+  },
+  "network_note": "Denied IPv6 loopback bind events are retained with original unattributed context. The installed urllib3 probe is static context only; no original caller attribution or whole-task zero-network-attempt claim."
+}

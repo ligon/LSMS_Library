@@ -1,0 +1,18 @@
+{
+  "PR": 1180,
+  "scope": "author822_saved_results_only",
+  "status": "FINDINGS_REQUIRE_CLASSIFICATION",
+  "saved_operands": 4,
+  "positive_groups": 4,
+  "complete_strict_passes": 2,
+  "array_checks": {
+    "str": 14,
+    "int64": 3,
+    "numeric_nonmissing_arrays": 7,
+    "Float64": 4,
+    "string": 2
+  },
+  "independent_review822_authority_and_unsaved_expected_objects_remain_gaps": true,
+  "raw_or_source_API_Feature_finalizer_or_pytest_replays": 0,
+  "signed": "Sue"
+}

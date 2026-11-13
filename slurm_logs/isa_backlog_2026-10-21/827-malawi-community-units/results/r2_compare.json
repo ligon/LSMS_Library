@@ -1,0 +1,85 @@
+{
+ "rows_base": 82635,
+ "rows_new": 82635,
+ "columns_base": [
+  "t",
+  "v",
+  "j",
+  "u",
+  "Price",
+  "NumberOfUnits",
+  "Available"
+ ],
+ "columns_new": [
+  "t",
+  "v",
+  "j",
+  "u",
+  "Price",
+  "NumberOfUnits",
+  "Available",
+  "Derivation"
+ ],
+ "join": {
+  "both": 82635,
+  "left_only": 0,
+  "right_only": 0
+ },
+ "u_differ": 0,
+ "Price_differ": 0,
+ "Available_differ": 0,
+ "NumberOfUnits_differ": 21641,
+ "nunits_changed_from_na": true,
+ "nunits_changed_to": {
+  "1.0": 21641
+ },
+ "nunits_changed_by_t": {
+  "2010-11": 9784,
+  "2013-14": 2201,
+  "2019-20": 9656
+ },
+ "oracle_rows": 21641,
+ "changed_eq_oracle": true,
+ "changed_minus_oracle": 0,
+ "oracle_minus_changed": 0,
+ "derivation_values": {
+  "<NA>": 60994,
+  "Malawi::community_prices::struck-item-one-unit": 21641
+ },
+ "derivation_by_t": {
+  "2010-11": 9784,
+  "2013-14": 2201,
+  "2019-20": 9656
+ },
+ "keyed_eq_oracle": true,
+ "derivation_dtype": "string",
+ "nunits_eq1_new": 53815,
+ "nunits_eq1_base": 32174,
+ "keyed_by_u": {
+  "Piece": 13083,
+  "Bottle": 3003,
+  "50 kg Bag": 2158,
+  "Packet": 1599,
+  "Day": 1001,
+  "50 kg per Kilometre": 797
+ },
+ "keyed_price_zero": 6,
+ "keyed_available": {
+  "True": 21627,
+  "<NA>": 12,
+  "False": 2
+ },
+ "price_sum_base": 132618171.0,
+ "price_sum_new": 132618171.0,
+ "attrs_derivations": {
+  "Malawi": {
+   "Malawi::community_prices::struck-item-one-unit": {
+    "rows": 21641,
+    "columns": [
+     "NumberOfUnits"
+    ],
+    "in": "community_prices"
+   }
+  }
+ }
+}

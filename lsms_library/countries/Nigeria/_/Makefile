@@ -14,6 +14,23 @@ var = $(VAR_DIR)/food_acquired.parquet $(VAR_DIR)/food_expenditures.parquet $(VA
 
 all: $(var)
 
+# panel_ids.json / updated_ids.json are REVIEWED SOURCES, committed to the
+# config tree -- NOT build products (GH #914, #894).  They deliberately carry
+# no rule.  A rule here fires whenever panel_ids.py happens to be the newer
+# file, and on a pip install which of the two is newer is decided by the
+# millisecond the wheel was unpacked (measured on the real 0.13.0 wheel).  The
+# recipe then writes into site-packages, which on any shared install is not
+# writable by the user running the code -- PermissionError from three layers
+# inside a `make` subprocess.  Regenerating the crosswalk is a deliberate
+# maintainer action, reviewed as a diff to the committed JSON:
+#
+#     make panel-ids
+#
+# panel_ids.py reads each round's own cover and interview status (GH #1264).
+.PHONY: panel-ids
+panel-ids:
+	python panel_ids.py
+
 food_acquired = $(shell find $(rounds) -name food_acquired.py)
 food_acquired_parquet := $(food_acquired:.py=.parquet)
 
@@ -76,19 +93,19 @@ $(VAR_DIR)/household_roster.parquet: household_roster.py $(household_roster_parq
 	python household_roster.py
 
 ../2010-11/_/household_roster.parquet: ../2010-11/_/household_roster.py
-	(cd ../2010-11/_; python household_roster.py)
+	(cd ../2010-11/_ && python household_roster.py)
 
 ../2012-13/_/household_roster.parquet: ../2012-13/_/household_roster.py
-	(cd ../2012-13/_; python household_roster.py)
+	(cd ../2012-13/_ && python household_roster.py)
 
 ../2015-16/_/household_roster.parquet: ../2015-16/_/household_roster.py
-	(cd ../2015-16/_; python household_roster.py)
+	(cd ../2015-16/_ && python household_roster.py)
 
 ../2018-19/_/household_roster.parquet: ../2018-19/_/household_roster.py
-	(cd ../2018-19/_; python household_roster.py)
+	(cd ../2018-19/_ && python household_roster.py)
 
 ../2023-24/_/household_roster.parquet: ../2023-24/_/household_roster.py
-	(cd ../2023-24/_; python household_roster.py)
+	(cd ../2023-24/_ && python household_roster.py)
 
 food_quantities = $(shell find $(rounds) -name food_expenditures.py)
 food_quantities_parquet := $(food_quantities:.py=.parquet)
@@ -137,13 +154,30 @@ $(VAR_DIR)/housing.parquet: housing.py $(housing_parquet)
 # pattern rule runs the wave script.  The VAR_DIR rule mirrors the
 # household_roster country-level convention above.
 plot_features = $(shell find $(rounds) -name plot_features.py)
-plot_features_parquet := $(plot_features:.py=.parquet)
+# PP/PH share physical scripts. Make must name the actual redirected outputs,
+# so country assembly reuses the strictly prepared managed wave prerequisites.
+plot_features_parquet := $(patsubst ../%/_/plot_features.py,$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_features.parquet,$(plot_features))
 
-../%/_/plot_features.parquet: ../%/_/plot_features.py
-	(cd $(@D) && python plot_features.py)
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_features.parquet: ../%/_/plot_features.py
+	(cd $(<D) && python $(<F))
+
+# Preserve the legacy target spelling as an alias, with one managed producer.
+../%/_/plot_features.parquet: $(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_features.parquet
+	@:
 
 $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 	python plot_features.py
+
+# sample / cluster_features (GH #1120 D1).  Each wave script reads BOTH of its
+# folder's cover pages -- the post-planting cover for the PP quarter, the
+# post-harvest cover for the PH quarter -- and writes one wave parquet holding
+# both rounds; the framework keeps the requested round.  No country-level
+# rule: the framework concatenates the waves.
+../%/_/sample.parquet: ../%/_/sample.py
+	(cd $(@D) && python sample.py)
+
+../%/_/cluster_features.parquet: ../%/_/cluster_features.py
+	(cd $(@D) && python cluster_features.py)
 
 # food_coping (#332, Family B).  Post-planting GHS section-9 coping
 # day-count battery (W1-W3).  The framework's grab_data calls
@@ -172,8 +206,10 @@ $(VAR_DIR)/anthropometry.parquet: anthropometry.py
 	python anthropometry.py
 
 # community_prices (GAP C).  Wave-level scripts read each year folder's
-# post-harvest community price module (Section C8, sectc8_harvest*) and
-# write a wave parquet at the PH quarter; the country-level concatenator
+# post-harvest community price module (Section C8, sectc8_harvest*) and,
+# through pp_community_prices.py, its post-planting one (Section C2,
+# sectc2_planting*; GH #587), and write a wave parquet holding both rounds
+# at their own quarters (PH and PP); the country-level concatenator
 # joins them to var/community_prices.parquet.  The wave-level split routes
 # the build through the framework's wave path, preserving the (t, v, j, u)
 # grain (the country-only fallback applies map_index(), which swaps a
@@ -188,16 +224,16 @@ $(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parq
 	python community_prices.py
 
 ../2010-11/_/housing.parquet: ../2010-11/_/housing.py
-	(cd ../2010-11/_; python housing.py)
+	(cd ../2010-11/_ && python housing.py)
 
 ../2012-13/_/housing.parquet: ../2012-13/_/housing.py
-	(cd ../2012-13/_; python housing.py)
+	(cd ../2012-13/_ && python housing.py)
 
 ../2015-16/_/housing.parquet: ../2015-16/_/housing.py
-	(cd ../2015-16/_; python housing.py)
+	(cd ../2015-16/_ && python housing.py)
 
 ../2018-19/_/housing.parquet: ../2018-19/_/housing.py
-	(cd ../2018-19/_; python housing.py)
+	(cd ../2018-19/_ && python housing.py)
 
 ../2023-24/_/housing.parquet: ../2023-24/_/housing.py
-	(cd ../2023-24/_; python housing.py)
+	(cd ../2023-24/_ && python housing.py)

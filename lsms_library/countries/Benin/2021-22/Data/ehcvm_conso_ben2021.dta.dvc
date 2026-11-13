@@ -1,0 +1,5 @@
+outs:
+- md5: 204ae8bdb05c05ece336b1c083dc79fa
+  size: 19672881
+  hash: md5
+  path: ehcvm_conso_ben2021.dta

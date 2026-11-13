@@ -1,0 +1,20 @@
+{
+  "timestamp_utc": "2026-10-21T13:03:42.811539+00:00",
+  "author": "Sue",
+  "state": "Final release gates running; no tag/publication yet",
+  "preparation_pr": 1167,
+  "preparation_merge": "ee97d80aab8874e71e89dcdd5f93f18715fab935",
+  "release_pr": 1168,
+  "release_master_merge": "097283459f80016b0f00a51b814a0cb964a42789",
+  "release_merge_method": "merge commit",
+  "parsed_closures": 48,
+  "master_ci_run": 39604418333,
+  "master_ci_url": "https://github.com/ligon/LSMS_Library/actions/runs/39604418333",
+  "make_release_session": 41992,
+  "local_collected": 9137,
+  "worker_identity_count": 16,
+  "tag_created": false,
+  "published": false,
+  "source_worktree_frozen": "/local/job40255479/worktrees/release-v016-master",
+  "private_control_root": "/local/job40255479/control/release-v016"
+}

@@ -1,0 +1,16 @@
+{
+  "PR": 1175,
+  "status": "READY_NEW_NUMERIC_SUPPLEMENT_WITH_AXIS_QUALIFICATIONS_AND_GAPS",
+  "pins": {
+    "pr1175-full-manifest-private.json": "eb487511265173e6007bf1b4bc5a6d198b266ced5b6052d176e8293bdd9b9ae3",
+    "pr1175-postexit-private.json": "e6d01a94d5e6d9fc6caade77560f219418c6bb18024edeeb9ff4d3cbbff46ea8",
+    "pr1175-safe-allowlist.json": "7ba16edb7d2e292bde6b5023eeebc3c34cf33bfad386c4f07867d0d1fba2f66e"
+  },
+  "final_safe_sha256": "0b32d3b7716d70592c64c87743915fa737b6343baf1a993f5abef00cec2358e7",
+  "packager_terminal_exit": 0,
+  "postexit_checker_terminal_exit": 0,
+  "remaining_consumers": 0,
+  "guard_denials": 0,
+  "signed": "Sue",
+  "original_private_READY_sha256": "cd18f06411b6ec6187d14ecd8bf879fcf453c8ba907745d41d8b7954b1d86d31"
+}

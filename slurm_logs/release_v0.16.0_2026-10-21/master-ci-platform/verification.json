@@ -1,0 +1,489 @@
+{
+  "author": "Sue",
+  "branch": "master",
+  "credential_count_limit": "Zero literal error-marker witnesses is not individual adjudication of every skipped test. Unit and Windows smoke are intentionally data-free; native Windows builds and the separate data gate have their own credential evidence.",
+  "data_auth_gate_metadata": [
+    {
+      "completed_at": "2026-10-21T13:02:23Z",
+      "conclusion": "success",
+      "name": "Assert the requires_s3 gate is open",
+      "number": 7,
+      "started_at": "2026-10-21T13:02:22Z",
+      "status": "completed"
+    }
+  ],
+  "data_suite_conclusion": null,
+  "data_suite_status": "in_progress",
+  "event": "push",
+  "github_mutations": false,
+  "jobs": {
+    "docs": {
+      "actual_checkout_shas": [
+        "097283459f80016b0f00a51b814a0cb964a42789"
+      ],
+      "conclusion": "success",
+      "credential_count_limit": "Literal line witnesses, not automatic adjudication. Unit/smoke jobs intentionally skip authentication; their credential-related skips are expected and not classified as platform failures.",
+      "credential_indicator_line_counts": {
+        "NoCredentialsError": 0,
+        "PartialCredentialsError": 0,
+        "Skipped: no S3 credentials": 0,
+        "UnmarkedS3TestWarning": 0,
+        "needs S3 credentials to build country data": 0,
+        "reached a credential-less skip at RUN time": 0
+      },
+      "job_id": 119236827625,
+      "pytest_summaries": [],
+      "raw_log_bytes": 44414,
+      "raw_log_sha256": "9fa7c1429aae37ea3c91cf5cede6f390c3ee3fb5563e40915ff54ff7015c8820",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Build docs",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/upload-pages-artifact@v3",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Deploy to GitHub Pages",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    },
+    "dvc-lock-check": {
+      "actual_checkout_shas": [
+        "097283459f80016b0f00a51b814a0cb964a42789"
+      ],
+      "conclusion": "success",
+      "credential_count_limit": "Literal line witnesses, not automatic adjudication. Unit/smoke jobs intentionally skip authentication; their credential-related skips are expected and not classified as platform failures.",
+      "credential_indicator_line_counts": {
+        "NoCredentialsError": 0,
+        "PartialCredentialsError": 0,
+        "Skipped: no S3 credentials": 0,
+        "UnmarkedS3TestWarning": 0,
+        "needs S3 credentials to build country data": 0,
+        "reached a credential-less skip at RUN time": 0
+      },
+      "job_id": 119236827620,
+      "lock_check_limit": "The check uses continue-on-error. Individual step outcomes are preserved; refresh-dvc-locks was skipped, so no automatic refresh was scheduled in this run.",
+      "pytest_summaries": [],
+      "raw_log_bytes": 44993,
+      "raw_log_sha256": "0e019b4c094007450e5a49170e13f49b33d1620595849c4911f08d6becb41d85",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install Poetry",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Verify DVC lockfiles",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    },
+    "dvc-remote-reachability": {
+      "actual_checkout_shas": [
+        "097283459f80016b0f00a51b814a0cb964a42789"
+      ],
+      "conclusion": "success",
+      "credential_count_limit": "Literal line witnesses, not automatic adjudication. Unit/smoke jobs intentionally skip authentication; their credential-related skips are expected and not classified as platform failures.",
+      "credential_indicator_line_counts": {
+        "NoCredentialsError": 0,
+        "PartialCredentialsError": 0,
+        "Skipped: no S3 credentials": 0,
+        "UnmarkedS3TestWarning": 0,
+        "needs S3 credentials to build country data": 0,
+        "reached a credential-less skip at RUN time": 0
+      },
+      "job_id": 119236827507,
+      "pytest_summaries": [],
+      "raw_log_bytes": 21707,
+      "raw_log_sha256": "1bb1922a2954fc2b79e609876be1e0191e25e6e01bd383dc335eabce45bcce3a",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install boto3 + pyyaml (the script needs nothing else)",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Configure S3 read credentials",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Sweep the remote",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Upload the missing-blob report",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    },
+    "refresh-dvc-locks": {
+      "conclusion": "skipped",
+      "job_id": 119238500474,
+      "status": "completed",
+      "steps": []
+    },
+    "unit-tests": {
+      "actual_checkout_shas": [
+        "097283459f80016b0f00a51b814a0cb964a42789"
+      ],
+      "conclusion": "success",
+      "credential_count_limit": "Literal line witnesses, not automatic adjudication. Unit/smoke jobs intentionally skip authentication; their credential-related skips are expected and not classified as platform failures.",
+      "credential_indicator_line_counts": {
+        "NoCredentialsError": 0,
+        "PartialCredentialsError": 0,
+        "Skipped: no S3 credentials": 0,
+        "UnmarkedS3TestWarning": 0,
+        "needs S3 credentials to build country data": 0,
+        "reached a credential-less skip at RUN time": 0
+      },
+      "job_id": 119236827736,
+      "pytest_summaries": [
+        "========= 4685 passed, 4452 skipped, 70 warnings in 266.86s (0:04:26) =========="
+      ],
+      "raw_log_bytes": 97734,
+      "raw_log_sha256": "8562a1176ce8cecad4193e1ebff4921742f8a65ea5bfc8284d9df42487ff0e4b",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install Poetry",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run tests",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "State what this check did not verify",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    },
+    "windows-script-build": {
+      "actual_checkout_shas": [
+        "097283459f80016b0f00a51b814a0cb964a42789"
+      ],
+      "conclusion": "success",
+      "credential_count_limit": "Literal line witnesses, not automatic adjudication. Unit/smoke jobs intentionally skip authentication; their credential-related skips are expected and not classified as platform failures.",
+      "credential_indicator_line_counts": {
+        "NoCredentialsError": 0,
+        "PartialCredentialsError": 0,
+        "Skipped: no S3 credentials": 0,
+        "UnmarkedS3TestWarning": 0,
+        "needs S3 credentials to build country data": 0,
+        "reached a credential-less skip at RUN time": 0
+      },
+      "credential_scope": "S3 configuration step and actual cold builds succeed; no separate requires_s3 gate is defined in this native job",
+      "installed_code_and_packaged_config_assertions_passed": true,
+      "job_id": 119236827619,
+      "makevars": [
+        {
+          "find_errors": 0,
+          "parquet_list": 126
+        }
+      ],
+      "native_results": [
+        {
+          "columns": 10,
+          "digest": "0ab2ea4c79dd",
+          "rows": 14457,
+          "table": "Uganda:shocks",
+          "waves": 8
+        },
+        {
+          "columns": 1,
+          "digest": "9202ed542a14",
+          "rows": 116808,
+          "table": "Uganda:assets",
+          "waves": 8
+        }
+      ],
+      "pytest_summaries": [],
+      "raw_log_bytes": 138717,
+      "raw_log_sha256": "9aeda5a9d9f404ca99ca1b95b1665b3813dba80019824eb7595df2d5185a45a8",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run conda-incubator/setup-miniconda@v3",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install the library",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Configure S3 read credentials",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Cold-build and compare with Linux",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run conda-incubator/setup-miniconda@v3",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    },
+    "windows-smoke": {
+      "actual_checkout_shas": [
+        "097283459f80016b0f00a51b814a0cb964a42789"
+      ],
+      "conclusion": "success",
+      "credential_count_limit": "Literal line witnesses, not automatic adjudication. Unit/smoke jobs intentionally skip authentication; their credential-related skips are expected and not classified as platform failures.",
+      "credential_indicator_line_counts": {
+        "NoCredentialsError": 0,
+        "PartialCredentialsError": 0,
+        "Skipped: no S3 credentials": 0,
+        "UnmarkedS3TestWarning": 0,
+        "needs S3 credentials to build country data": 0,
+        "reached a credential-less skip at RUN time": 0
+      },
+      "job_id": 119236827645,
+      "pytest_summaries": [
+        "======================= 327 passed, 1 skipped in 9.03s ========================"
+      ],
+      "raw_log_bytes": 95842,
+      "raw_log_sha256": "649ef661468b554936c0bdf90eca0170e339b9e715672a00fcd2061d5e66a31b",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/setup-python@v5",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install Poetry",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install dependencies",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Import + config smoke",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Collect tests",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run portability + config tests",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "status": "completed"
+        }
+      ]
+    }
+  },
+  "no_project_import_or_tests_executed_locally": true,
+  "raw_logs_private": true,
+  "run": 39604418333,
+  "sha": "097283459f80016b0f00a51b814a0cb964a42789",
+  "state": "platform jobs passed; Linux data suite reported separately",
+  "workflow_status_at_platform_completion": "in_progress"
+}

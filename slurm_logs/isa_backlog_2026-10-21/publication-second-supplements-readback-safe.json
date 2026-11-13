@@ -1,0 +1,53 @@
+{
+  "at_UTC": "2026-10-22T14:52:19.587362+00:00",
+  "source_evidence_commit": "6810683dd16f1a2e04ed34e9ba220fb51a719f4f",
+  "PRs": [
+    {
+      "PR": 1170,
+      "head": "6810683dd16f1a2e04ed34e9ba220fb51a719f4f",
+      "state": "open",
+      "merged": false,
+      "body_exact": true,
+      "body_sha256": "80c2cc72119ce0ca69aac4f07b3e3a7fdc9a37739ac6b579425c4566f5fcf760"
+    },
+    {
+      "PR": 1175,
+      "head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "state": "open",
+      "merged": false,
+      "body_exact": true,
+      "body_sha256": "5778b471d7c9c1bc67895b7e0be454583293991206b5fcb8ec3efad25bf870cb"
+    },
+    {
+      "PR": 1180,
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "state": "open",
+      "merged": false,
+      "body_exact": true,
+      "body_sha256": "593bc2e1ea1ab34d708a2ae6a7f9f1eefa5927b16a54a5f1b2f956b693ad23af"
+    },
+    {
+      "PR": 1189,
+      "head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "state": "open",
+      "merged": false,
+      "body_exact": true,
+      "body_sha256": "91fd37914a8afcf550f7c3d543958da740ccc682e4df4c1434ccbe916dfee796"
+    },
+    {
+      "PR": 1191,
+      "head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "state": "open",
+      "merged": false,
+      "body_exact": true,
+      "body_sha256": "5de2126370fad108d06a9b0214c659039ca797169d52acde7505eb61d4c6fdc6"
+    }
+  ],
+  "signed": "Sue",
+  "issue": {
+    "number": 1206,
+    "state": "open",
+    "body_exact": true,
+    "body_sha256": "860c3d4ef01e839f585d215b5d759dca5de639c8f9b0c7eb800bf83112a80625"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "frozen_at_time_ns": 1792621709986826235,
+  "author": "Sue (GPT-6)",
+  "quiescent_release": true,
+  "safe_export_allowlist": {
+    "DIAGNOSIS.org": {
+      "sha256": "1319dd9f47e0422b24a1caefab35f45239124e2246cc52de9851647bc401ff77",
+      "bytes": 14752
+    },
+    "PROPOSAL.md": {
+      "sha256": "a622f25c704f924cf4dafdc21475d5d0fd8cfe286b26d8c7802a12047e1758e5",
+      "bytes": 5531
+    },
+    "ledger-draft.md": {
+      "sha256": "c690b5720a2833d419e18d1410954a0a7199adff88ab64d8eed5a78e97a238c6",
+      "bytes": 5550
+    },
+    "verdict.json": {
+      "sha256": "fe7ed228f8fec94db0abbdf273bf155bfcb0f1d568f8663e7f377ddf59ba5ec4",
+      "bytes": 943
+    },
+    "proof.json": {
+      "sha256": "bc1b7da4ebfde5f539ce93134d1a148c8806573111702b52ea487bd345b31508",
+      "bytes": 4987
+    },
+    "commands.sh": {
+      "sha256": "17e1b6ac06254bde16fc1e78e41e3ae43f756a39c85cf7dc2be05bb79ada6555",
+      "bytes": 3016
+    },
+    "writer-proof.json": {
+      "sha256": "0065f6b25bee083fb1de329c938bd083608eb7efd1b7f9c4e569a86d35b052ef",
+      "bytes": 1523
+    },
+    "source-proof.json": {
+      "sha256": "14e17b96efdd8c03c0bad0471ee5c1229a4ce536b19acfe7a97c178b9a3c7075",
+      "bytes": 471
+    },
+    "historical-summary.json": {
+      "sha256": "7f250143302543266ce9b4f7de27412477a2315f0faa5c2b82b10acec6a48025",
+      "bytes": 5048
+    },
+    "historical-counterfactual.json": {
+      "sha256": "08bf90f58c6c70659ae2b677c37442fb2e88b8664f29c1874e34afc149241ec7",
+      "bytes": 271
+    },
+    "final-proof.json": {
+      "sha256": "49864febc1ab39f27a8968fd2ce8a9c230d5cd13cd9f0eb4f4d1304b3f3b9489",
+      "bytes": 7685
+    },
+    "snapshot-after-summary.json": {
+      "sha256": "a978a0327bd440e474b92f7fdcd2744cf5cab71b73005c27450432cf7e974a1d",
+      "bytes": 537
+    }
+  },
+  "remaining_files": "PRIVATE: source frames, IDs, nine-cell keys, write inputs/outputs/arguments, logs and detailed receipts; do not export wholesale."
+}

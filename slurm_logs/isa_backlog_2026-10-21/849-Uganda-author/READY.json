@@ -1,0 +1,141 @@
+{
+  "status": "FROZEN_AUTHOR_READY_FOR_INDEPENDENT_REVIEW",
+  "verdict": "PENDING_DIFFERENT_REVIEWER",
+  "candidate_root": "/local/job40255479/worktrees/isa-Uganda-849-fix",
+  "base_root": "/local/job40255479/worktrees/isa-Uganda-849-fix-base",
+  "candidate_head": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "base_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "runtime_pin": "7a8fd22492255cc2c4d020b7a16f99249f588977",
+  "tested_tests_pin": "66bfa1eb16442ceb6d455dfaa5726f181d713abd",
+  "clean_sources_runtime_tests_modes_exact": true,
+  "literal_os_readlink_Git_bytes": true,
+  "tested_cohort": {
+    "pass": 416,
+    "skip": 10,
+    "fail": 0,
+    "error": 0
+  },
+  "new_cases_candidate": {
+    "pass": 24,
+    "skip": 0,
+    "fail": 0,
+    "error": 0
+  },
+  "actual_parent_new_cases": {
+    "pass": 4,
+    "fail": 20,
+    "skip": 0,
+    "error": 0
+  },
+  "observations": 133761,
+  "new_nonmissing_factor_payloads": 82103,
+  "old_null_exclusions": 403,
+  "retained_null_v": 928,
+  "Feature_rows": 180137,
+  "healthy_Niger_rows": 46376,
+  "harvest_before_kg": 29095413.407893993,
+  "harvest_after_kg": 42026694.99297963,
+  "manifest": "final-private-manifest.json",
+  "manifest_entries": 1858,
+  "manifest_sha256": "eb0e0d07305d820b05f6d34a4ef313f4ef5c18130150a95d8d66bd54655beb84",
+  "safe_exports_allowlist": {
+    "Feature-CLI.json": {
+      "sha256": "194b6fcbce8b7d1e533d94564727823a48fa8a6590da6d815cb52c2e37035f08",
+      "bytes": 2645
+    },
+    "REPORT.org": {
+      "sha256": "0da648a6d153ab1a1446f24627281ee80599748f65aff6894ef423f5a582cf1b",
+      "bytes": 15005
+    },
+    "REPRODUCE.sh": {
+      "sha256": "b1152b37951f043d075fc2491d09e9ffe06d18b9b449868e666778753726cfed",
+      "bytes": 2677
+    },
+    "RESIDUAL.org": {
+      "sha256": "e72bae9d11716e0183dcef88cb279ad147ea581a1a707ee923d30112339c6550",
+      "bytes": 3431
+    },
+    "artifact-checks.json": {
+      "sha256": "f56243c190f2c626ad587d64fa694f277fdf975be3475cbcce632a27e7f8e101",
+      "bytes": 8677
+    },
+    "checkers.json": {
+      "sha256": "2fedf69c2096a8c0b7314703e44dbf4cc666850b68d87a559d770a0cf50b2a22",
+      "bytes": 3434
+    },
+    "derived.json": {
+      "sha256": "3cd48d27285e77af438df5e9688d532d004f3c9eb26afbdbca371def0d6a134b",
+      "bytes": 2748
+    },
+    "hash-scope.json": {
+      "sha256": "b944aaf0a844f0cc2859cd88d56726ad0f0bda555d62030f4fd64deade950dd9",
+      "bytes": 17974
+    },
+    "protected-references.json": {
+      "sha256": "15be36102557cea06cc34a6fcca98f52cf102b89d7300fd0017df8e402933649",
+      "bytes": 1647
+    },
+    "source-and-cache-proof.json": {
+      "sha256": "33a7b88a01124ae139e37edca884cef165f321da30dff3c5a3049d9d6728a3e1",
+      "bytes": 4652
+    },
+    "source-fields.json": {
+      "sha256": "cd0d6b01c769ef5185c1d61754414fb448be3a718bd9857f8e6ff9f960dd16bf",
+      "bytes": 9099
+    },
+    "source-oracle.json": {
+      "sha256": "293c28e8f16412f09fb3e8d99f18d6991e60831c7fe00ccdd26eb8c359adbb4b",
+      "bytes": 2851
+    },
+    "stage-comparison.json": {
+      "sha256": "22e8bd0fb42baed58d21d09bdcfc7aa5f5ba39d3d346c09e710bdfcf25587108",
+      "bytes": 13879
+    },
+    "stops.json": {
+      "sha256": "3ae2c7b6242b3c5c82d7fe9a4eabc9ce2a61f5f3de6af334c313de63cfa144ba",
+      "bytes": 8761
+    },
+    "tests.json": {
+      "sha256": "93b20cd48233dc629d5f6c677623dff0bbb5d35ddef26c9771b96cbfc9803db7",
+      "bytes": 4016
+    },
+    "unit-condition-dispersion.json": {
+      "sha256": "8b986d0e37ef2e1aaced699f10f6aecb9e037c5101cc53b9232004f3a534b0a5",
+      "bytes": 802557
+    },
+    "validation.json": {
+      "sha256": "72ee9a405d0d4c9d43f415e5977f25642c0b29f95be809088c7a52f1bb07f14d",
+      "bytes": 4819
+    },
+    "warning-and-scanner.json": {
+      "sha256": "2b867607556c1fc9a2d3342ce9799500549c5184d43d9712bacfdd61f434ca2a",
+      "bytes": 46659
+    },
+    "wave-measurements.json": {
+      "sha256": "3ad5f482ecf0d57209e506364d93e531b75cef34af788a76d296d847999b52f0",
+      "bytes": 22251
+    }
+  },
+  "other_consumers": [],
+  "network_attempts": 0,
+  "guard_events": {
+    "mkdir-existing": 20
+  },
+  "explicit_limits": [
+    "#1204 subset routing unchanged; actual parent/candidate subset returns/full attrs exact",
+    "#1205 area coverage unchanged; real area oracle measured changed harvest/yield effects",
+    "#1196 distinct Uganda v StringDtype NA-representation, shared cause unproved",
+    "This run17 byte-identical Make paths0600-to0644+mtime, separate from prior opposite direction; no provenance/universal mode claim",
+    "CLI matched stages exact with existing v dtype and typed JSON attrs differences",
+    "First stopped subset expected filter not serialized; separately named saved-artifact reconstruction only",
+    "Initial toy four-worker overlap and original hash/cwd/launch/summary/empty-safe-directory stops preserved",
+    "Original1198 XML and first-failed-Make warning-list gaps remain historical and unrecovered",
+    "No2009mapping, other-Uganda-output corpus/full suite/nutrition/FDC or global composition proof",
+    "New source snapshots have content/mode/HEAD/clean checks; no invented initial mtime baseline"
+  ],
+  "independent_acceptance": false,
+  "no_GitHub_write_merge_closure": true,
+  "writer_exits_after_READY": true,
+  "created_UTC": "2026-10-22T04:59:10.238163+00:00",
+  "signed": "Sue"
+}

@@ -1,0 +1,5 @@
+outs:
+- md5: b0ddc75497939d68cddaec00feee0027
+  size: 25503997
+  hash: md5
+  path: sect_result.dta

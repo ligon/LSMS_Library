@@ -1,0 +1,20 @@
+{
+ "country": {
+  "moved": 549,
+  "total": 549
+ },
+ "btf": {
+  "moved": 40,
+  "total": 40
+ },
+ "wave": {
+  "moved": 2109,
+  "total": 2109
+ },
+ "errors": [
+  0,
+  0
+ ],
+ "base": "d353b7ea7",
+ "cand": "worktree after a7b0e703b + 7058b8d92"
+}

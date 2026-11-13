@@ -22,6 +22,7 @@ lsms_library/countries/Malawi/_/malawi.py:_plot_labor_block.
 """
 import os
 import sys
+import numpy as np
 import tempfile
 
 sys.path.append('../../_/')
@@ -29,8 +30,10 @@ import pyreadstat
 
 from lsms_library.local_tools import (get_dataframe, to_parquet, format_id,
                                        DVCFS, _ensure_dvc_pulled,
-                                       _dvc_working_directory, _COUNTRIES_DIR)
-from malawi import _plot_labor_block, assemble_plot_labor
+                                       _dvc_working_directory, _COUNTRIES_DIR,
+                                       _dvc_cache_path)
+from malawi import (_plot_labor_block, assemble_plot_labor,
+                    _labor_source_reference)
 
 
 WAVE = '2016-17'
@@ -54,9 +57,16 @@ def _read_usecols(countries_rel, usecols):
     decode (latin-1 bad byte in an unused column).  Absent columns are
     silently skipped by pyreadstat."""
     _ensure_dvc_pulled(countries_rel)
-    with _dvc_working_directory(_COUNTRIES_DIR):
-        with DVCFS.open(countries_rel) as f:
+    # Reuse the accepted plot_inputs/plot_features cached-byte route; keep
+    # labor's metadata-only column discovery below, including absent columns.
+    cache_path = _dvc_cache_path(countries_rel)
+    if cache_path is not None:
+        with open(cache_path, 'rb') as f:
             data = f.read()
+    else:
+        with _dvc_working_directory(_COUNTRIES_DIR):
+            with DVCFS.open(countries_rel) as f:
+                data = f.read()
     with tempfile.NamedTemporaryFile(suffix='.dta', delete=False) as tmp:
         tmp.write(data)
         tmp_path = tmp.name
@@ -81,21 +91,29 @@ pieces = []
 # --- Cross_Sectional half (cs-17 prefix; no "other" labor columns) ---
 d_xs = _read_usecols('Malawi/2016-17/Data/Cross_Sectional/ag_mod_d.dta',
                      _D_LABOR_COLS)
+d_xs_labor_positions = np.arange(len(d_xs), dtype=np.int64)
 d_xs['hhid'] = 'cs-17-' + d_xs['case_id'].apply(format_id)
 d_xs['plotkey'] = _plotkey(d_xs)
 pieces.append(_plot_labor_block(d_xs, hhid='hhid', plotkey='plotkey', t=WAVE,
-                                hired_suffix='1/2/3', include_other=False))
+                                hired_suffix='1/2/3', include_other=False,
+                                source_ref=_labor_source_reference(
+                                    'Malawi/2016-17/Data/Cross_Sectional/ag_mod_d.dta', script_path=__file__),
+                                row_positions=d_xs_labor_positions))
 
 # --- Panel half (bare y3_hhid; has "other" labor) ---
 d_pn = get_dataframe('../Data/Panel/ag_mod_d_16.dta', convert_categoricals=False)
+d_pn_labor_positions = np.arange(len(d_pn), dtype=np.int64)
 d_pn['hhid'] = d_pn['y3_hhid'].apply(format_id)
 d_pn['plotkey'] = _plotkey(d_pn)
 pieces.append(_plot_labor_block(d_pn, hhid='hhid', plotkey='plotkey', t=WAVE,
-                                hired_suffix='1/2/3', include_other=True))
+                                hired_suffix='1/2/3', include_other=True,
+                                source_ref=_labor_source_reference(
+                                    '../Data/Panel/ag_mod_d_16.dta', script_path=__file__),
+                                row_positions=d_pn_labor_positions))
 
 df = assemble_plot_labor(WAVE, pieces)
 
-assert df.index.is_unique, f"Non-unique (t,i,plot,source) in plot_labor {WAVE}"
+assert df.index.is_unique, f"Non-unique (t,i,plot,source,labor_obs) in plot_labor {WAVE}"
 assert len(df) > 0, f"plot_labor {WAVE} produced no rows"
 
 to_parquet(df, 'plot_labor.parquet')

@@ -110,11 +110,18 @@ def test_exactly_the_country_tier_call_sites_pass_the_flag():
     calls = [ln for ln in SOURCE.splitlines() if "load_from_waves(" in ln
              and "def load_from_waves(" not in ln]
     passing = [ln for ln in calls if "evict_country_cache=" in ln]
-    assert len(calls) == 6, f"call sites moved: {calls}"
+    # GH1468 routes the non-DVC JSON backend through load_json_cache too.
+    # Its missing-candidate wave fallback is shared, so one duplicate call
+    # disappears; the three country-tier eviction forwarders do not move.
+    assert len(calls) == 5, f"call sites moved: {calls}"
     assert len(passing) == 3, (
         f"expected exactly the 3 load_dataframe_with_dvc sites to evict, got "
         f"{len(passing)}:\n" + "\n".join(passing)
     )
+    json_backend = SOURCE.split(
+        "if not use_dvc and method_name in JSON_CACHE_METHODS:", 1)[1].split("else:", 1)[0]
+    assert "df = load_json_cache(method_name)" in json_backend
+    assert "load_from_waves(" not in json_backend
 
 
 def test_the_rebuild_failure_is_still_raised_not_swallowed():

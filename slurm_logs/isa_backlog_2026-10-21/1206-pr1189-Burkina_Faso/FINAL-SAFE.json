@@ -1,0 +1,27 @@
+{
+  "PR": 1189,
+  "status": "PASS_NEW_NUMERIC_SUPPLEMENT_WITH_EXPLICIT_COMPLETE_AXIS_QUALIFICATIONS",
+  "same_stage_full_strict_pairs": 16,
+  "original_intended_crop_exclusion_projection": 1,
+  "NEW_source_pinned_native_rekey_reconstruction": 1,
+  "Feature_views_numeric_typed_attrs_used_tuples_with_explicit_unused_domain_qualification": 2,
+  "complete_axis_failures_retained": 2,
+  "numeric_mismatches_observed": 0,
+  "unexplained_domain_differences": 0,
+  "all_v1_original_unsaved_object_gaps_retained": true,
+  "signed": "Sue",
+  "source_records": 16,
+  "overlapping_static_locator_sites": 406,
+  "locator_counts_not_independent_proof_counts": true,
+  "toy_faults_rejected": 42,
+  "positive_calibrations": 6,
+  "original_unsaved_and_authority_gaps_explicit": true,
+  "claim_all_original_assertions_replayed": false,
+  "source_API_CLI_Feature_pytest_raw_or_cache_replays": 0,
+  "gaps": [
+    "Original independent raw expected/native/public oracle objects were not serialized. Saved native reconstruction is explicitly NEW.",
+    "Original actual-script controlled writes and adversarial fixture objects are unsaved. No script/pytest replay.",
+    "Original warm Country/comparator objects were not serialized separately; saved cold objects do not recover original warm objects.",
+    "Country-to-Feature expected assembly objects and original retained-public selected_keys derived from raw source are unsaved; no API or raw prefix replay."
+  ]
+}

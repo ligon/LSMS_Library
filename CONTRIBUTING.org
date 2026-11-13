@@ -206,6 +206,23 @@
    take the lock, but retries contention with exponential backoff and
    jitter, so concurrent writers queue rather than fail.
 
+   A second WB catalog entry of a wave we already hold (the #600
+   pattern, =Malawi/2016-17='s =Cross_Sectional/= + =Panel/=) is acquired
+   into its own subdirectory with
+   =add_wave(country, id, wave=..., subdir='Cross_Section')=, which
+   confines extraction, sidecar matching and the push to
+   =Data/Cross_Section/= (GH #1276); into a subdirectory that already
+   holds files it refreshes only those files (=add_members=True= adds the
+   rest, for a complete holding only).  =SOURCE.org= records which
+   subdirectory holds which entry (=#+CATALOG_SUBDIR: <id> <subdir>=), and
+   an acquisition that contradicts it is refused before any download.  The
+   procedure, including moving the first entry into its own subdirectory
+   and its =#+CATALOG_SUBDIR:= line, is Step 2b of
+   =.claude/skills/add-wave/SKILL.md=.  The secondary entry's held release
+   is its own =#+CATALOG_HELD: <id> <idno> [<doi>]= line, written by the
+   acquisition (GH #1283); the primary keeps =#+CATALOG_IDNO:= /
+   =#+CATALOG_DOI:=.
+
    #+begin_quote
    Never =rm= a DVC lock file to "clear a stale lock" --- it may belong
    to a live sibling process, and removing it corrupts that writer.
@@ -381,11 +398,31 @@ Write access to the remote s3 repository requires additional credentials; contac
   4. Add other documentation useful for understanding the data to the
      =Documentation= sub-directory.
 
-  5. Add all the contents of the =Documentation= folder to the =git= repo;
-     e.g., 
+     Minimum holdings are =SOURCE.org= (catalog/release/citation), the
+     actual licence/terms or a cited terms location, and the questionnaires,
+     manuals/technical reports/BID and DDI published for that catalog entry.
+     A stub alone is not substantive documentation. Record documents not
+     listed by an inspected catalog separately from failed retrieval; neither
+     proves that no official document exists elsewhere. Public forms do not
+     alone establish fielded CAPI or released-column correspondence.
+
+     =data_access.add_wave()= fetches catalog documentation by default after
+     its existing raw acquisition. =documentation=False= explicitly retains
+     a data-only acquisition. For documentation-only backfill use
+     =data_access.fetch_documentation(country, wave, catalog_id, push=True)=;
+     it uses the same managed =push_to_cache_batch()= publisher. Inspect its
+     return and =Documentation/DOCUMENTS-<catalog_id>.json=: document failures
+     are explicit and do not change the raw release's held identity or the
+     raw-file list returned by =add_wave=. =push=False= records local-only
+     document bytes, not remote publication. Held receipt identity is not a
+     guarantee of current remote freshness.
+
+  5. Add textual provenance/terms/receipts and binary document =.dvc= pointers
+     to =git=; publish binary documents with =push_to_cache_batch()=, not as
+     Git blobs or hand-run DVC commands. Review the staged file list; e.g.,
      #+begin_src sh
      cd ./Uganda/2015-16/Documentation
-     git add .
+     git add SOURCE.org LICENSE DOCUMENTS-*.json *.dvc .gitignore
      git commit -m"Add Uganda 2015-16 documentation to repo."
      git push
      #+end_src

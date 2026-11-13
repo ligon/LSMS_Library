@@ -1,0 +1,12 @@
+{
+  "status": "ROOT_SCANNER_DIGEST_OBJECT_MISMATCH_STOP",
+  "original_session_id": 58659,
+  "initial_chunk": "7e835c",
+  "terminal_chunk": "6fe708",
+  "exit_code": 1,
+  "scope": "Full1045packet/29788source/6provider+24copy hashes and exact151/four-empty matrices passed; scanner actual bytes were equal. Root used peer summary digest for JSONL without binding the object; frozen manifest binds both JSONLs to3e395b68d67db3da11b295c81cecba7a5aa61024d83c91236dab74ac1f087f29.",
+  "comparison_document_sha256": "2effd253ec2573b96702e6b79ad37efd9b4c167701483dbaf58c93eea97a51e7",
+  "JSONL_sha256": "3e395b68d67db3da11b295c81cecba7a5aa61024d83c91236dab74ac1f087f29",
+  "v3": "Binds exact JSONL bytes to each independently pinned manifest entry. No source/API/test/data decode replay.",
+  "signed": "Sue"
+}

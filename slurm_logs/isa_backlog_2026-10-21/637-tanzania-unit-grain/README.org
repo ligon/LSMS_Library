@@ -1,0 +1,164 @@
+#+title: GH #637 -- Tanzania plot_inputs / crop_production reducers
+
+Branch =fix/637-tanzania-unit-grain-20261023= on development =9a0ed5f3c=.
+Aggregates only: no household ids, no raw records.  Row-level frames and the
+provenance long frames live in the private task root
+(=/local/job40390255/data-private/637-tz/=), never in the tree.
+
+* Scripts (run with cwd and =PYTHONPATH= = the checkout under test, a fresh
+  =LSMS_DATA_DIR= per checkout, BLAS / build workers pinned to one)
+
+| script              | what it does                                                                                       | output here                          |
+|---------------------+----------------------------------------------------------------------------------------------------+--------------------------------------|
+| =diagnose.py=       | runs both helpers in-process on frames from =get_dataframe=, captures the frame each hands its groupby, and classifies every duplicate group against an independent provenance long frame | =diagnosis-development.json=         |
+| =source_oracle.py=  | independent field bindings from the held =AG_SEC_3A= / =4A= keyed on the 6-level key; asserts helper == oracle row-for-row and quantity conserved per (key, unit) | =source-oracle-branch.json=          |
+| =api_snapshot.py=   | cold =Country('Tanzania')= build of =plot_inputs=, =crop_production=, =plot_features=, plus =seed_kg= / =nitrogen_kg= / =harvest_kg= / =yield_kg=, warnings and Site I / Q reports | =api-development.json=, =api-branch.json= |
+| =compare.py=        | cell-by-cell development vs branch from the private pickles                                        | =compare.json=                       |
+| =round2_measure.py= | round 2: residual groups, =seed_kg= decomposition, Site Q full vs positive-only reference, recorded zeros | =round2-measure.json=          |
+| =feature_check.py=  | warm read == cold read; =Feature(t)(['Tanzania'])= rows and canonical alignment                    | =feature-development.json=, =feature-branch.json= |
+| hash census         | =worktrees/1218/.../1218-current-validation/hash_census.py= on both checkouts                      | =hash-impact.json=                   |
+
+* Diagnosis (development, held sources)
+
+Source grain: =AG_SEC_4A/6A/6B= unique on =(hhid, plot, cropid)=, =AG_SEC_3A= on
+=(hhid, plot)=, each sale module on =(hhid, cropid)=; no null id in either wave
+(2019-20 =sdd_hhid= / =plotnum=, 2020-21 =y5_hhid= / =plot_id=).  No group is
+replication of one source record.
+
+** plot_inputs, duplicate =(t, i, plot_id, input, crop)= groups
+
+| wave    | source rows | groups | two recorded units | OTHER + recorded unit | both OTHER (residual) | same recorded unit (commensurable) |
+|---------+-------------+--------+--------------------+-----------------------+-----------------------+------------------------------------|
+| 2019-20 |       1,787 |     13 |                  0 |                     1 |                     2 |                                 10 |
+| 2020-21 |       8,035 |    101 |                  6 |                     4 |                     2 |                                 89 |
+
+(Round 2 correction: the first version counted the four both-OTHER groups as
+"same unit (commensurable)".  They are summed into one =Unknown= row by the
+branch too -- 2 + 50 and 60 + 100 Vegetables in 2019-20, 250 + 250 Vegetables
+and 2 + 3.5 Pulses in 2020-21 -- and are disclosed as a residual: two OTHER
+units are not known to be one unit, =u= cannot separate them, and splitting
+them needs a row ordinal.  Nil downstream: =Unknown= gets no kg factor.)
+
+All 11 groups mixing units are =Seed= with 2-4 lumped raw crop codes.  The
+same-unit groups include 7 fertilizer type-1/type-2 slot pairs naming one
+product (5 with identical quantities).
+
+** crop_production, duplicate =(t, i, plot_id, j)= groups
+
+| wave    | groups (rows) | lumped codes | same code, two modules | unit conflicts | sale dropped by 'first'      |
+|---------+---------------+--------------+------------------------+----------------+------------------------------|
+| 2019-20 | 260 (652)     |          260 |                      0 |              0 | 14 groups, 1,813 kg, 2,136,000 TSh |
+| 2020-21 | 958 (2,509)   |          956 |                      2 |              0 | 52 groups, 10,062 kg, 10,762,200 TSh |
+
+The collapse runs over every group once the index is non-unique, so its plain
+='sum'= served all 2,395 NA quantities (527 / 1,868) as 0.0: 2,376 are perennial
+"not harvested in the past 12 months" (=ag6?_06a= = 2; correct by accident),
+19 (14 / 5) seasonal rows with no quantity and no =ag4a_19= answer (fabricated).
+
+* Fix
+
+- =plot_inputs=: =u= joins the declared index =(t, i, plot_id, input, crop, u)=;
+  a missing unit is =Unknown= before grouping.
+- =crop_production=: perennial colmaps name =ag6a_06a= / =ag6b_06a= as their
+  =harvested= question; the collapse sums with =min_count=1=.  Grain unchanged.
+
+* Result (cold, fresh data roots; development vs branch)
+
+See =compare.json=.  plot_inputs 9,698 -> 9,709 (+1 2019-20, +10 2020-21 =
+exactly the 11 split groups, 11 -> 22 rows, 415.5 total quantity unchanged);
+the other 9,687 rows identical including =u=; per-wave Quantity totals
+unchanged.  crop_production 14,126 rows, index identical; Quantity 0.0 -> NA on
+14 / 5 rows; =u= NA -> Kg on 513 / 1,863 perennial reported zeros; no other
+cell.  =nitrogen_kg=, =harvest_kg=, =yield_kg= frame-identical.  Grain reports
+0 -> 0; Site I 1 -> 1 (the existing =plot_inputs= =crop= NaN level, by
+construction).
+
+=seed_kg= -629 kg (-50 / -579), corrected in round 2 (=round2-measure.json=):
+the old error ran both ways.  -324 kg (52%) from 3 groups whose first unit was
+=20l Bucket= (factor 20), serving kg / small-cup quantities as buckets
+(13 buckets -> 1 bucket + 12 kg; 6 -> 2 + 4 kg; 9 -> 8 + 1 small cup);
+-306 kg from 6 groups whose first unit was kg, counting Unknown / large-cup
+quantities as kg; +1 kg from one (2 small cups -> 1 kg + 1 small cup); 0 from
+one (large cup + Unknown).  11 plots carry a split group; 10 move.
+
+Site Q (=round2-measure.json=, GH #1259): 14 -> 30 offenders.  The 16 new ones
+are 13 Timber (3 in 2019-20, 10 in 2020-21) and one each of Citrus Fruits,
+Coconuts, Ripe Bananas.  Timber kg cells are 104 / 117 and 309 / 346 zeros, so
+the p90 reference falls from 34,100 to 56 kg and from 23,088 to 17 kg.  With a
+positive-only reference none of the 16 survives and the set equals
+development's 14; development's own seasonal zeros have no measured effect
+(its positive-only set is its full set).  The first version's "11 of the new
+ones Timber" and "the seasonal zeros were already doing this" were wrong.
+6 source rows record 0 kg with harvested = YES, so not every served zero is a
+"did not harvest".
+Warm read == cold read on both checkouts.  =Feature('plot_inputs')(['Tanzania'])=
+9,698 -> 9,709, Tanzania no longer in =promoted=.
+
+* Scope notes
+
+- Beyond adding =u= to =plot_inputs='s key, three =crop_production= edits:
+  =min_count=1= on the Quantity collapse; =harvested='ag6a_06a'= /
+  ='ag6b_06a'= in both wave scripts' perennial colmaps (without it,
+  =min_count=1= alone would turn 2,376 correct reported zeros into NA); and
+  =_block='s zeroing now fires only on an explicit 2
+  (=harvested.eq(2).fillna(False)=) -- no effect on these sources (numpy
+  float codes), a guard against a nullable dtype zeroing unanswered rows.
+  The served cost of making the zero explicit: =u= NA -> Kg on those 2,376 rows.
+- Script path: the helpers were run in-process on frames loaded with
+  =get_dataframe= (=diagnose.py=, =source_oracle.py=, the held-source tests),
+  and end to end through =make= by the cold =Country('Tanzania')= builds; no
+  =runpy=.
+- Diagnosis classes in =diagnosis-development.json=: its
+  ="all_Quantity_NA(sum->0.0)"= flag counts duplicate GROUPS (42 / 150); the
+  served zeros were 2,395 ROWS because the collapse also reduces singletons
+  (=compare.json=).
+- Cross-country: =Feature('plot_inputs')(['Tanzania', 'Malawi'])= stacks with
+  no =GrainCollapseWarning= on either checkout; Malawi 179,949 rows on both,
+  Tanzania 9,698 -> 9,709 (=feature-tanzania-malawi.json=).
+
+* Round 3 -- the maintainer's rulings (@ligon, 2026-10-23)
+
+Files in =round3/=.  Three cold builds, each in its own private
+=LSMS_DATA_DIR= (=/local/job40390255/data-private/637-tz-r3/{dev,old,new}=):
+development =9a0ed5f3c= (=dev=), the PR head before the rulings =5239daecd=
+(=old=) and the round-3 code (=new=; built from the working tree that was then
+committed unchanged, so =snapshot-new.json= still records =5239daecd= as
+=HEAD=).
+
+| script              | what it does                                                                                       | output                                   |
+|---------------------+----------------------------------------------------------------------------------------------------+------------------------------------------|
+| =snapshot.py=       | cold =Country('Tanzania')= =plot_inputs= / =crop_production= / =plot_features=; =seed_kg=, =nitrogen_kg=, =harvest_kg=, =yield_kg=, =gross_crop_revenue=; grain, Site I and Site Q reports | =snapshot-{dev,old,new}.json=            |
+| =compare.py=        | public-API frames, dev and old vs new: rows added, split keys, sales recovered, downstream equality | =compare.json=                           |
+| =oracle.py=         | independent bindings from the held =AG_SEC_3A/4A/5A/6A/6B/7A/7B=; asserts the new wave parquets == oracle row for row and per-household sales == raw attachable sums; =Unit_purchased= coverage and mismatches | =oracle-new.json=                        |
+| =feature_check.py=  | warm == cold; =Feature(t)(['Tanzania', 'Malawi'])= for =plot_inputs= and =crop_production=      | =feature-new.json=                       |
+| =hash_census.py=    | copy of =1218-current-validation/hash_census.py=, run on the dev and new checkouts                 | (=hash_compare.py=) =hash-impact.json=   |
+
+| ruling                      | result (2019-20 / 2020-21)                                                                                     |
+|-----------------------------+----------------------------------------------------------------------------------------------------------------|
+| 1 lumped codes              | =crop_production= 3,001 -> 3,393 / 11,125 -> 12,676 rows; 14 / 52 sales recovered, 1,813 kg + 2,136,000 TSh / 10,062 kg + 10,762,200 TSh |
+| 5 module pairs              | 0 / 3 pairs (Pulses 860 + 860, Pulses 60 + 60, Other Crop 20 + recorded 0), all 4A + 6B; sales module-matched; one 7B sale (130 kg / 120,000 TSh) newly attachable |
+| 3 =Unit_purchased=          | seed 494 / 2,141 records carry it (exactly the positive purchases); != served =u= on 1 / 11 rows; organic =Kg= on 14 / 96 rows |
+| 4 fertilizer pairs          | documentation only: 1 / 6 pairs, 5 identical quantities (CONTENTS.org table)                                    |
+
+- Split old keys conserve =Quantity=; every other old key's row is identical
+  to =5239daecd= in every column except the one 7B sale above.
+- =harvest_kg=, =yield_kg=, =seed_kg=, =nitrogen_kg=: frame-equal to
+  =5239daecd=.  =gross_crop_revenue=: 189,955,250 -> 192,091,250 and
+  856,481,400 -> 867,363,600 TSh; 66 household-wave totals change, one of them
+  new, none falls.
+- =plot_inputs=: index identical to =5239daecd=, other columns frame-equal.
+- No grain or Site I warning on =crop_production=.  Site Q (old rule):
+  4 / 30 offenders; positive-only reference 1 / 14 (13 before, see
+  CONTENTS.org).
+- =Feature('crop_production')(['Tanzania', 'Malawi'])=: 151,147 rows, unique
+  index; Tanzania 16,069 rows with =reported:= tokens, Malawi 135,078 with
+  =unresolved_observation=.  =Feature('plot_inputs')(['Tanzania', 'Malawi'])=:
+  189,658 rows, unique index.
+- Hash census vs development: Tanzania only (25/25 country, 150/150 wave),
+  0/40 build fingerprints.
+- Tests (=tests.txt=): targeted 258 passed / 3 skipped; with three warm
+  countries =test_feature_canonical_index.py= 82 passed, 0 skipped; all 36
+  Tanzania test files 2,023 passed, 109 skipped, 4 xfailed, 0 failed.  The new
+  #637 test file on =5239daecd=: 27 failed, 18 passed.
+- PR #1266 scratch merge: no conflict, =test_quantity_screen.py= 43 passed
+  (=merge-1266.txt=).

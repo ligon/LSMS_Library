@@ -1,0 +1,26 @@
+{
+  "status": "ROOT_ACCEPTED_BOUNDED_REVIEW",
+  "frozen_supplement_pending_root_flags_are_historical": true,
+  "root_checker_observed_session": 78135,
+  "root_checker_observed_exit": 0,
+  "runtime_sealer_postexit_sessions": [
+    48820,
+    30150
+  ],
+  "runtime_sealer_postexit_actual_exits": [
+    0,
+    0
+  ],
+  "supplement_inline_exec_chunks": [
+    "3422cc",
+    "d89728"
+  ],
+  "supplement_actual_exits": [
+    0,
+    0
+  ],
+  "private_independent_runtime_and_supplement_archive_pending": true,
+  "author_packet_durable_in_archive28": true,
+  "human_merge_required": true,
+  "signed": "Sue"
+}

@@ -1,0 +1,97 @@
+{
+  "status": "PASS_ALL_FROZEN_SOURCE_REFERENCE_RECEIPTS",
+  "sources": [
+    {
+      "root": "/local/job40255479/worktrees/isa-review-Uganda-1198",
+      "head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+      "tracked_paths": 14893,
+      "exact_initial_bytes_modes_HEAD_status": true,
+      "literal_symlinks": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-review-Uganda-1198-base",
+      "head": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+      "tracked_paths": 14885,
+      "exact_initial_bytes_modes_HEAD_status": true,
+      "literal_symlinks": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-Uganda-1198-fix",
+      "head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+      "tracked_paths": 14893,
+      "Git_blob_bytes_modes_clean": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-Uganda-849",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_paths": 14880,
+      "Git_blob_bytes_modes_clean": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-Mali-1091-fix",
+      "head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "tracked_paths": 14897,
+      "Git_blob_bytes_modes_clean": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-integration-seventeen",
+      "head": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+      "tracked_paths": 15026,
+      "Git_blob_bytes_modes_clean": true
+    },
+    {
+      "root": "/local/job40255479/worktrees/isa-Burkina_Faso-1119",
+      "head": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "tracked_paths": 14893,
+      "Git_blob_bytes_modes_clean": true
+    }
+  ],
+  "references": {
+    "author": {
+      "entries": 4122,
+      "manifest_sha256": "e1a7d64677dbc9b11f6159512e890d8372ba330acfa471dfdd9ed6cae5734472",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "original_1198_849_addendum_Mali_references": {
+      "entries": 1960,
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "GLOBAL17": {
+      "entries": 6468,
+      "manifest_sha256": "f559b1677e5ccbf237caf0b4a96a050c4d69bd0fec91f27a9d62ce8fc05e30cd",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "BF1119": {
+      "entries": 594,
+      "manifest_sha256": "62cadf6a6080969f3aebe056fd4bfcfe54d0a6fde1604306019a62a93a1cbe57",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "Tanzania1091": {
+      "entries": 2894,
+      "manifest_sha256": "2a09f454e5a9622b9493a3cc73673fb897d22c5b412535b41b9018f3644e641f",
+      "all_recorded_content_modes_mtimes_exact": true
+    },
+    "author_actual_parent_tracked": {
+      "paths": 14839,
+      "all_recorded_content_modes_mtimes_exact": true,
+      "legacy_receipt_follows_file_symlink_targets": true
+    },
+    "source_and_healthy_copies": {
+      "exact_receipts": 606,
+      "source_modules": 59,
+      "source_copies": 472,
+      "Niger_files_per_root": 15
+    }
+  },
+  "runtime_tests_pin": "929149222e43a8fe500cc08420cdc68357170af3",
+  "after_runtime_only_changed_library_path": [
+    "lsms_library/countries/Uganda/_/CONTENTS.org"
+  ],
+  "review_parent_release_f8_library_tests_exact": true,
+  "source_mtime_limit": "New review checkouts have initial/final full content/mode/HEAD/status checks, not an invented initial mtime baseline. Protected original parent and private references retain their recorded timestamp checks.",
+  "network_attempts": 0,
+  "guard_events": {
+    "mkdir-existing": 16
+  },
+  "no_intree_parquets": true
+}

@@ -1,0 +1,149 @@
+#+title: GH #1259 -- Site Q's reference from strictly positive values: raw records
+#+date: 2026-10-23
+
+Measurements behind the #1259 change to =lsms_library/quantity_audit.py= (the
+reference quantile and the 30-row cell floor now count strictly positive values
+only). Everything here is aggregated. Per-row offender lists carry household
+ids, so they stayed in scratch and are not committed.
+
+* Data under test
+
+| root | what | vintage |
+|------+------+---------|
+| cold | all 16 =crop_production= countries, cold-built at development =9a0ed5f3c= (=build_cold.py=) into a private =LSMS_DATA_DIR= | 2026-10-23 |
+| cache20261019 | the shared warm cache (=~/.local/share/lsms_library=), read-only: =crop_production=, =food_acquired=, =plot_features= | built 2026-10-19; grades =stale= against =9a0ed5f3c= for *every* screened parquet |
+| pr1263-tanzania | Tanzania =crop_production= built from PR #1263's head =5239daecd= into a private root | 2026-10-23 |
+
+The rule comparison is always *the same frames under both rules*, so the
+staleness of cache20261019 does not confound the deltas. It only means those
+absolute counts describe the 2026-10-19 builds.
+
+* Scripts
+
+All of them are read-only against their data root and assert which
+=lsms_library= they imported.
+
+| file | what |
+|------+------|
+| =dump_rows.py= | Per-row reference, rung and verdict under whichever rule the imported checkout ships. It calls the module's own =_cell_reference=, cross-checks the count against =audit_quantities=, and writes per-row output to scratch and a count summary (=firing-*.json=). |
+| =diff_rows.py= | Joins a development dump and a branch dump. Classifies every row that leaves or arrives, and counts every rung transition (=diff-*.json=, counts only). |
+| =variants.py= | The three "which values count" readings plus a floor=0 control (=variants-*.txt=). |
+| =ab_timing.py= | Base vs branch =audit_quantities= timed interleaved in one process. |
+| =read_cost.py= | A spy on =country.check_quantities= inside warm =Country(...).crop_production()= reads. It also asserts =check_quantities= returns its input object. |
+| =build_cold.py= | The cold build. |
+| =hash_census.py= | A copy of the 1218 census: every L2-country hash, build fingerprint and L2-wave input hash. |
+
+=slurm_logs/gh857_quantity_screen/sensitivity_sweep.py= was re-run unchanged
+from each checkout (=sensitivity-*.txt=). Only its count lines and its ratio
+quantiles are kept; its top-40 table names households.
+
+* Results
+
+** Firing, development rule -> branch rule
+
+| table | root | before | after | left | arrived | rows changing rung |
+|-------+------+--------+-------+------+---------+--------------------|
+| crop_production | cold (16 countries, 672,461 rows) | 129 | 120 | 9 | 0 | 3,394 |
+| crop_production | cache20261019 | 129 | 120 | 9 | 0 | 3,394 |
+| food_acquired | cache20261019 (20 countries, 11.93M rows) | 2,004 | 1,998 | 6 | 0 | 36 |
+| plot_features.Area | cache20261019 (23 countries) | 348 | 347 | 1 | 0 | 0 |
+| crop_production | pr1263-tanzania | 30 | 14 | 16 | 0 | 288 |
+
+No row arrives anywhere.
+
+Who leaves, by cell (zero share of the row's own =(t,u,j)= cell; reference
+before -> after):
+- Uganda =crop_production= 2010-11, =Others specify=, 4 rows (Rice 300, Ground
+  Nuts 150, Sugarcane 150, Pumpkins 105).
+  - The =(t,u)= cell is 697 zeros of 775 rows.
+  - Reference 1.0 (the floor; the raw p90 was 0.6) -> 92.7.
+- Nigeria =crop_production= 2011Q1, Maize/=Unknown=, 4 rows (1,800, 500, 200,
+  200).
+  - The crop cell is 60 zeros + 7 harvests.
+  - Reference 1.2 at =(t,u,j)= -> 890 at =(t,u)=.
+- Malawi =crop_production= 2016-17, Pigeon Pea, =Other (Specify)=, 500.
+  - The cell has 5 zeros of 74 rows.
+  - 106.4x -> 100.0x.
+- Ethiopia =food_acquired= 2011-12, =u='Unknown'=, 6 rows (500,000 to
+  8,120,000; Chick Pea, Chat/Kat x2, Barley, Maize, Sorghum).
+  - The =(t,u)= cell is 220 zeros + 32 positives; 6 of those 32 are these
+    slips.
+  - Reference 1,000 -> 698,000. **A real cost** (see the module docstring and
+    the ledger §6).
+- Uganda =plot_features= 2005-06, one plot.
+  - The wave cell has 22 zero areas of 5,451.
+  - 100.05x -> 99.75x.
+- PR #1263 Tanzania, 16 rows: 2020-21 Timber 10, Citrus 1, Coconuts 1, Ripe
+  Bananas 1, and 2019-20 Timber 3.
+  - Timber/kg 2020-21 is 309 zeros of 346 rows. Reference 17 -> 23,088.
+  - Timber/kg 2019-20 is 104 of 117. Reference 56 -> 864, at =(t,kg)=,
+    because its 13 harvests are under the floor.
+  - The branch-rule offender set on #1263's build equals the development-rule
+    offender set on development's build (14 rows; 13 of them in 2020-21).
+
+** Which values count (=variants-*.txt=)
+
+| reading | crop cold | food | plot | #1263 Tanzania |
+|---------+-----------+------+------+----------------|
+| A development | 129 | 2,004 | 348 | 30 |
+| B quantile positive, floor counts all | 120 | 1,997 | 347 | 14 |
+| C both positive (shipped) | 120 | 1,998 | 347 | 14 |
+| C, floor = 0 | 120 | 2,000 | 355 | 14 |
+
+B and C differ on one row: Malawi =food_acquired= 2016-17, Maize Ufa Mgaiwa,
+missing unit. Its cell is 45 zeros + one 3,200.
+- B makes the row its own reference (silent).
+- C drops it to the wave rung (reference 10, 320x).
+That row is why the floor counts positives. The one-unit floor no longer
+changes any =crop_production= verdict, but it still binds on =food_acquired=
+and =plot_features=.
+
+** Sensitivity (cold =crop_production=)
+
+The K grid at p90, floor 1:
+
+| K | 30 | 50 | 100 | 150 | 300 |
+|---+----+----+-----+-----+-----|
+| development rule | 401 | 240 | 129 | 81 | 39 |
+| branch rule | 380 | 228 | 120 | 75 | 37 |
+
+- The ratio quantiles under the branch rule are p90 1.0, p99 3.57, p99.9 20.0,
+  p99.99 188.5 and max 11,029. There is still no gap.
+- Timber 4,000,000 kg still sits at 173.3x and is still the binding row from
+  above.
+- p95 / p99 at K=100: development 74 / 23, branch 66 / 23.
+- The argument for p90 is unchanged: the Timber cell's 37 positive values are
+  identical under both data versions.
+- On #1263's build, positive-only is what keeps the argument true. Counting
+  zeros puts p90 at 17 there.
+
+** Cost
+
+- Hashes (=hash-impact.json=):
+  - Full census, development vs branch: 0/549 L2-country, 0/40 fingerprints,
+    0/2,109 L2-wave.
+  - Stash probe: 0/17.
+- Read spy (=read_cost.txt=, alternating base/branch/base/branch, best of 5
+  warm reads):
+  - Uganda: Site Q 72-77 ms of a 1,033-1,046 ms read.
+  - Tanzania: 9-13 ms of 123-164 ms.
+  - The same under both rules. The served =Quantity= checksums are identical,
+    and =check_quantities= returned its input object on every call.
+- Isolated, interleaved (=ab_timing.txt=), base vs branch:
+  - Uganda crop: 72.9 vs 67.9 ms.
+  - Malawi crop: 96.0 vs 92.9 ms.
+  - GhanaLSS food: 2,886 vs 2,894 ms.
+
+** Tests (=tests-*.txt=)
+
+- =tests/test_quantity_screen.py= has four new tests:
+  - =test_recorded_zeros_do_not_collapse_the_reference=
+  - =test_zeros_cannot_pad_a_thin_cell_over_the_floor=
+  - =test_a_zero_padded_crop_falls_to_its_wave_unit_cell=
+  - =test_the_audit_ignores_zero_rows_entirely=
+- On development code, all four fail and the other 40 pass, including the
+  real-data Tanzania pin.
+- On the branch, all 44 pass.
+- With =test_null_read_guard.py= and =test_build_transform_hash.py=: 134
+  passed.
+- The PR #1263 interaction is recorded in =merge-1263.txt=.

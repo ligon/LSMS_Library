@@ -1,0 +1,51 @@
+LICENSE (TZA_1991_KHDS_v01_M)
+
+https://microdata.worldbank.org/index.php/catalog/359/study-description#metadata-data_access
+
+1. Access policy
+CONTACTS
+
+World Bank LSMS		lsms@worldbank.org	
+
+ACCESS CONDITIONS
+In receiving these data it is recognized that the data are supplied for use within your organization, and you agree to the following stipulations as conditions for the use of the data:
+
+1.  The data are supplied solely for the use described in this form and will not be made available to other organizations or individuals. Other organizations or individuals may request the data directly.
+
+2.  Three copies of all publications, conference papers, or other research reports based entirely or in part upon the requested data will be supplied to:
+
+ The World Bank
+ Development Economics Research Group
+ LSMS Database Administrator
+ MSN MC3-306
+ 1818 H Street, NW
+ Washington, DC  20433, USA
+ tel: (202) 473-9041
+ fax: (202) 522-1153
+ e-mail: lsms@worldbank.org
+
+3.  The researcher will refer to the 1991-94 Tanzania, Kagera Health and Development Survey as the source of the information in all publications, conference papers, and manuscripts.  At the same time, the World Bank is not responsable for the estimations reported by the analyst(s).
+
+4.  Users who download the data may not pass the data to third parties.
+
+5.  The database cannot be used for commercial ends, nor can it be sold.
+
+
+CITATION REQUIREMENT
+Use of the dataset must be acknowledged by including a citation which would include:
+- Identification of the Primary Investigator
+- Title of the survey (including the country name and year of implementation)
+- Survey reference number
+- Source and date of download
+
+Example:
+
+World Bank and University of Dar es Salaam.Tanzania, Kagera Health and Development Survey 1991-1994 (Wave 1 to 4 Panel). Ref. TZA_1991_KHDS_v01_M. Dataset downloaded from the World Bank Microdata Library (www.microdata.worldbank.org) on [date]
+
+
+DISCLAIMER
+The user of the data acknowledges that the original collector of the data, the authorized distributor of the data, and the relevant funding agency bear no responsibility for use of the data or for interpretations or inferences based upon such uses.
+
+
+(Text copied from the World Bank catalog DDI export, https://microdata.worldbank.org/metadata/export/359/json, 2026-11-04.)
+

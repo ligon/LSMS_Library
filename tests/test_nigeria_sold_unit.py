@@ -19,9 +19,10 @@ Four things are pinned, and they fail differently:
    concat hazard ``KgFactor`` guards against.
 2. **Which waves name it** (data-free, config): the country script is read
    with ``ast`` -- never imported, it runs data reads -- and only the W1/W2
-   frame dicts may carry ``unit_sold``.  W3-W5 record sales in ``secta3ii``
-   at hh-crop grain with no plot linkage (GH #843), so a sold unit there
-   would be attached to a plot the survey never tied it to.
+   HARVEST frame dicts may carry ``unit_sold``.  W3-W5 record sales in
+   ``secta3ii`` at hh-crop grain with no plot, placed separately by
+   ``hh_sales`` under the GH #843 ruling
+   (``tests/test_gh843_nigeria_household_crop_sales.py``).
 3. **The identification** (data-gated): the column is a UNIT column by the
    survey's own VALUE-LABEL vocabulary -- ``sa3q11b``'s code->label dict is
    IDENTICAL to the harvest unit's in both waves -- not by its variable
@@ -68,7 +69,7 @@ TABLE = "crop_production"
 UNIT_SOLD = "Unit_sold"
 
 #: The sold-unit column, per wave dir, and the harvest-unit column it must
-#: share a value-label set with.  W3-W5: none, by design (GH #843).
+#: share a value-label set with.  W3-W5's sale is not on the harvest frame (GH #843).
 SOLD_UNIT_COLUMNS = {
     "2010-11": dict(
         file="Data/Post Harvest Wave 1/Agriculture/secta3_harvestw1.dta",
@@ -94,6 +95,21 @@ EXPECTED_CANON_AGREEMENT = {
     "2011Q1": dict(both=3548, same=3466),   # 97.7%
     "2013Q1": dict(both=3478, same=3349),   # 96.3%
 }
+
+
+def _skip_partial_sold_unit_cache(path):
+    """The two pinned PH-wave counts require recorded coverage (GH #1146)."""
+    from lsms_library.local_tools import read_parquet_cache_waves
+
+    coverage = read_parquet_cache_waves(path)
+    if coverage is None:  # GH #1113: legacy/Make coverage remains unknown.
+        return
+    missing = sorted(set(EXPECTED_RAW_AGREEMENT) - set(coverage))
+    if missing:
+        pytest.skip(
+            f"partial warm Nigeria {TABLE} cache: lsms_cache_waves lacks "
+            f"required sold-unit waves {missing}; no cold rebuild (GH #1146)"
+        )
 
 
 # --------------------------------------------------------------------------
@@ -204,7 +220,7 @@ class TestWiring:
         assert str(out[UNIT_SOLD].dtype).startswith("string"), out[UNIT_SOLD].dtype
 
     def test_frame_without_plot_grain_sale_delivers_all_na_string_column(self):
-        """W3-W5 shape: no ``sold_on`` at all."""
+        """A harvest frame with no ``sold_on`` and no ``hh_sales`` argument."""
         ng = _load_nigeria_module()
         fr = _synthetic_frame(["1. KILOGRAMS"] * 2, ["1. KILOGRAMS"] * 2, name_unit_sold=True)
         fr.pop("sold_on")
@@ -241,8 +257,9 @@ class TestConfig:
             assert wave in frames, f"no frame dict found for {wave}"
             for keys in frames[wave]:
                 assert "unit_sold" not in keys, (
-                    f"{wave} names a sold unit, but its sale sits in secta3ii "
-                    "at hh-crop grain with no plot linkage (GH #843)")
+                    f"{wave} names a sold unit on a harvest frame, but its sale "
+                    "sits in secta3ii at hh-crop grain and arrives as hh_sales "
+                    "(GH #843)")
                 assert "sold_on" not in keys
 
     def test_w1_w2_name_sa3q11b_literally(self):
@@ -315,23 +332,24 @@ class TestRawFiles:
 # --------------------------------------------------------------------------
 
 class TestBuiltTable:
-    def test_unit_sold_populated_only_in_w1_w2(self):
+    def test_unit_sold_populated_in_every_wave(self):
+        # Re-pinned by GH #843: W3-W5 sales are now served, in their own unit.
         from lsms_library.local_tools import data_root
         path = data_root() / "Nigeria" / "var" / f"{TABLE}.parquet"
         # The read is the check, not a prior exists(): since GH #866 a rebuild
         # deletes var/ first, so the file can vanish in between (GH #778).
+        _skip_partial_sold_unit_cache(path)
         try:
             df = pd.read_parquet(path)
         except FileNotFoundError:
             pytest.skip("no warm Nigeria crop_production parquet (absent, or mid-rebuild)")
+        _skip_partial_sold_unit_cache(path)
         if UNIT_SOLD not in df.columns:
             pytest.skip("warm Nigeria crop_production parquet predates Unit_sold (re-warm needed)")
         t = df.index.get_level_values("t") if "t" in df.index.names else df["t"]
         nonnull = df[UNIT_SOLD].notna().groupby(np.asarray(t)).sum()
-        assert nonnull.get("2011Q1", 0) > 3000
-        assert nonnull.get("2013Q1", 0) > 3000
-        for w in ("2016Q1", "2019Q1", "2024Q1"):
-            assert nonnull.get(w, 0) == 0, (w, nonnull.get(w))
+        for w in ("2011Q1", "2013Q1", "2016Q1", "2019Q1", "2024Q1"):
+            assert nonnull.get(w, 0) > 3000, (w, nonnull.get(w))
         assert str(df[UNIT_SOLD].dtype).startswith("string"), df[UNIT_SOLD].dtype
 
     def test_api_frame_serves_unit_sold_through_finalize(self):
@@ -342,10 +360,12 @@ class TestBuiltTable:
         from lsms_library.local_tools import data_root
         path = data_root() / "Nigeria" / "var" / f"{TABLE}.parquet"
         # The read is the check (GH #778); see the test above.
+        _skip_partial_sold_unit_cache(path)
         try:
             cols = pd.read_parquet(path, columns=None).columns
         except FileNotFoundError:
             pytest.skip("no warm Nigeria crop_production parquet (absent, or mid-rebuild)")
+        _skip_partial_sold_unit_cache(path)
         if UNIT_SOLD not in cols:
             pytest.skip("warm Nigeria crop_production parquet predates Unit_sold (re-warm needed)")
         import lsms_library as ll
@@ -355,15 +375,15 @@ class TestBuiltTable:
                 df = ll.Country("Nigeria", assume_cache_fresh=True).crop_production()
             except FileNotFoundError:
                 pytest.skip("warm Nigeria crop_production parquet vanished mid-read (rebuild in progress)")
+        _skip_partial_sold_unit_cache(path)
         assert UNIT_SOLD in df.columns
         assert str(df[UNIT_SOLD].dtype).startswith("string"), df[UNIT_SOLD].dtype
         assert UNIT_SOLD not in df.index.names
         t = df.index.get_level_values("t")
         nonnull = df[UNIT_SOLD].notna().groupby(np.asarray(t)).sum()
-        assert nonnull.get("2011Q1", 0) > 3000
-        assert nonnull.get("2013Q1", 0) > 3000
-        for w in ("2016Q1", "2019Q1", "2024Q1"):
-            assert nonnull.get(w, 0) == 0, (w, nonnull.get(w))
+        # Re-pinned by GH #843: W3-W5 sales are now served, in their own unit.
+        for w in ("2011Q1", "2013Q1", "2016Q1", "2019Q1", "2024Q1"):
+            assert nonnull.get(w, 0) > 3000, (w, nonnull.get(w))
         # The only sold label absent from the harvest vocabulary is Olodo
         # (CONTENTS.org): the read-path passes do not move u and Unit_sold apart.
         # (`u` is a column on the Country frame; Feature() moves it to the index.)

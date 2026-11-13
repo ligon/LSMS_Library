@@ -1,0 +1,113 @@
+{
+  "status": "FROZEN_PASS_NARROW_AMENDMENT",
+  "head": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+  "base": "fb1571035eac6f0f67e4496fd58d4b101b164ce9",
+  "manifest": {
+    "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/final-private-manifest.json",
+    "mode": 384,
+    "mtime_ns": 1792673473865444082,
+    "bytes": 637410,
+    "inode": 56625366,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file",
+    "sha256": "00b54088f4212f620c99af0dac9b8c9a2ed97521207712739ab13d090b7cb872"
+  },
+  "entries": 1151,
+  "safe_exports": [
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/safe-exports/ALLOWLIST.json",
+      "mode": 384,
+      "mtime_ns": 1792673456160353046,
+      "bytes": 243,
+      "inode": 10231564,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "8077f652eb7d61db76bc965a6c3fd4aa40e2b74e2450446a424a674be1f6773e"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/safe-exports/REPRODUCE.md",
+      "mode": 384,
+      "mtime_ns": 1792673456158353036,
+      "bytes": 2577,
+      "inode": 10231562,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "4070a52bf638d437fe225bec86bf136626de0f7c50b76ef223b3d66e385a11ee"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/safe-exports/REVIEW.org",
+      "mode": 384,
+      "mtime_ns": 1792673456158353036,
+      "bytes": 6825,
+      "inode": 10231561,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "f24457cc1838863433698bb06eb6ec458d6ad0a2e80c060d435b2f17fa7ff2d5"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/safe-exports/checker-sources.json",
+      "mode": 384,
+      "mtime_ns": 1792673456160353046,
+      "bytes": 5429,
+      "inode": 10231563,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "c365d9e60358e1ca2a3c336c4340a787b8fd31cbe515106610edc0685f366dc2"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/safe-exports/proof.json",
+      "mode": 384,
+      "mtime_ns": 1792673456158353036,
+      "bytes": 2841,
+      "inode": 10231559,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "9762155a087b646ec48b2edb831cff87353940ef5748c04ef0759f7ba12de34e"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/safe-exports/validation.json",
+      "mode": 384,
+      "mtime_ns": 1792673456158353036,
+      "bytes": 2413,
+      "inode": 10231560,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "ce2b4cfe4543887ee61120bbab9f6f6272c0194b0ca60a8d69b64d7a371c60b2"
+    },
+    {
+      "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/safe-exports/verdict.json",
+      "mode": 384,
+      "mtime_ns": 1792673456157353031,
+      "bytes": 1142,
+      "inode": 10231558,
+      "device": 64770,
+      "nlink": 1,
+      "type": "file",
+      "sha256": "c776ca18faea0640c0c7d2c5334738b0e397828ffedc4ed3d747fe3049f9fd49"
+    }
+  ],
+  "source_protection": {
+    "path": "/local/job40255479/control/isa-backlog-20261021/review-1149-amendment/protection-after-safe.json",
+    "mode": 384,
+    "mtime_ns": 1792673311552613637,
+    "bytes": 247,
+    "inode": 56625358,
+    "device": 64770,
+    "nlink": 1,
+    "type": "file",
+    "sha256": "483c441c5bef2a72df88f4f3e83b2c559bbffdbe10de8587cd695173f492a574"
+  },
+  "zero_external_consumers_at_seal": true,
+  "scope": "Narrow cleanup delta independently passes; original human six-contract findings carry through unchanged code and current affected tests; old fb warm remains separately pinned; root acceptance pending",
+  "immutable_exclusions": [
+    "final-private-manifest.json",
+    "FINAL-READY.json"
+  ]
+}

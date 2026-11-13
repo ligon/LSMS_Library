@@ -1,0 +1,190 @@
+Uganda::sample::agriculture-cover: &agriculture_cover
+  waves: ['2015-16']
+  columns: [v, ea]
+  rows: {}
+  rule: >-
+    A household recorded in AGSEC1 and absent from gsec1 takes its recorded
+    AGSEC1 parish_code, formatted by the existing country format_id rule, and
+    on sample its recorded AGSEC1 ea, the design PSU of origin, as recorded (the
+    function is the parish rule; ea needs only the same format_id).
+    HH-covered households retain every HH-cover answer, including nulls.
+    AGSEC1 hwgt_W5 supplies panel_weight only; cross-sectional weight is absent.
+    No geographic component is inferred or carried from another wave.
+  function: lsms_library.countries.Uganda._.uganda:derive_agriculture_cover_v
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_agriculture_cover
+  raw_variables: [HHID, parish_code, ea, hwgt_W5, sregion, urban, region, district]
+  assumptions:
+    - text: The agriculture cover records eligible households even without a completed household questionnaire.
+      basis: modelling-choice
+      evidence: Owner rulings GH1120 comments 6367256988 and 6380186741 (2026-10-23/24).
+    - text: AGSEC1.ea and gsec1.ea are one variable, so a household only AGSEC1 records can take AGSEC1.ea.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon, 2026-11-04.  The two are equal on all 2,622 households both
+        covers hold, and the build raises if a release breaks that.
+  validated_against: Focused helper tests; bounded source verification recorded in dispatch evidence. Independent root acceptance pending.
+  contents: Uganda/_/CONTENTS.org, GH1120 locating covers and singletons
+  since: '2026-10-30'
+Uganda::cluster_features::agriculture-cover:
+  <<: *agriculture_cover
+  columns: [v]
+
+Uganda::sample::unlocated-identity: &unlocated_identity
+  waves: all
+  columns: [v]
+  rows: {}
+  rule: >-
+    A household in the declared own-wave membership sources without a usable
+    cover location (or the already-declared 2009-10 GPS bin) receives
+    unlocated-{formatted household id}. This is an identity marker, not a
+    measured cluster or a geographic inference. Preserve existing real and
+    moved identifiers. Unrelated households never share this singleton.
+  function: lsms_library.countries.Uganda._.uganda:derive_unlocated_identity
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_unlocated_identity
+  raw_variables: [HHID, hhid, comm, h1aq4a, parish_code, distirct_name, parish_name, district, s1aq04a, lat_mod, lon_mod]
+  assumptions:
+    - text: The declared membership sources establish a household observation despite missing geography.
+      basis: modelling-choice
+      evidence: Owner ruling GH1120 comment6380186741, D2 spelling (2026-10-24).
+  validated_against: Helper tests and bounded source union; independent root review pending.
+  contents: Uganda/_/CONTENTS.org, GH1120 locating covers and singletons
+  since: '2026-10-30'
+Uganda::cluster_features::unlocated-identity: *unlocated_identity
+
+Uganda::sample::ea-tracking-key:
+  waves: ['2018-19', '2019-20']
+  columns: [ea]
+  rows: {}
+  rule: >-
+    A household with no ea of its own takes the 2015-16 ea of the household
+    its tracking key names, from gsec1 or, for a household only AGSEC1 records,
+    from AGSEC1. 2018-19: GSEC1.t0_hhid -> 2015-16 HHID. 2019-20: gsec1.hhidold
+    -> 2018-19 GSEC1.hhid -> t0_hhid -> 2015-16 HHID. Raw source ids through
+    format_id, never the walked household id. A household the chain does not
+    reach stays NA: a blank hhidold is not a link, AGSEC1.t0_hhid is not
+    followed, and nothing is read from the parish or parsed out of an id. v is
+    not involved and does not change.
+  function: lsms_library.countries.Uganda._.uganda:derive_inherited_ea
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_inherited_ea
+  raw_variables: [hhid, t0_hhid, hhidold, HHID, ea]
+  assumptions:
+    - text: t0_hhid names the 2015-16 household this household descends from, and hhidold names its 2018-19 record.
+      basis: variable-label
+      evidence: >-
+        2018-19 GSEC1.t0_hhid, "Full wave5 UNPS household ID or wave6 split-off
+        Parent Household ID"; 2019-20 gsec1.hhidold, "Unique hh indentifier for
+        wave7 :SUSO". The library's panel crosswalk reads the same two keys
+        (Waves in uganda.py).
+    - text: ea is a label of origin, so a tracked household's EA is the EA of the 2015-16 household it descends from, wherever it now lives.
+      basis: modelling-choice
+      evidence: >-
+        No document states it, and ea being unchanged 2013-14 -> 2015-16 is not
+        evidence: characters 2-4 of the household id are ea and the link is string
+        identity between ids, so that result pins UBOS's encoding. Independent of
+        the id's digits: ea pairs one-to-one with 2011-12 comm (212 pairs over 1,717
+        households linked by HHID_old); t0_hhid child and parent share a district
+        for 2,729 of 2,978 and hhidold for 2,977 of 2,986; for persons linked by
+        pid_unps, sex agrees for 11,203 of 11,296 and the age gap is 1-5 years for
+        99.8%, and the person's 2015-16 household is the one t0_hhid names for 13,166
+        of 13,298. A split-off inherits its parent's EA, so the value is the PSU
+        through which the lineage entered the sample.
+  validated_against: >-
+    tests/test_gh689_uganda_ea_psu.py recomputes the chain from the raw covers
+    without importing this module; CONTENTS.org records the before/after.
+  contents: Uganda/_/CONTENTS.org, "The design PSU ea (GH #689)"
+  since: '2026-11-03'
+
+Uganda::sample::ea-comm-link:
+  waves: ['2005-06', '2009-10', '2010-11', '2011-12']
+  columns: [ea]
+  rows: {}
+  rule: >-
+    An early-wave household whose frame EA is one of the 212 the survey numbers
+    from 2013-14 takes that number, through the reviewed comm_ea table. comm is
+    first served as its 8-digit frame code (comm_frame_ea). A blank comm or a
+    code that is not 8 digits stays NA. v is not involved and does not change.
+  function: lsms_library.countries.Uganda._.uganda:derive_comm_ea
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_ea_comm_link
+  raw_variables: [HHID, comm, HHID_old, ea]
+  assumptions:
+    - text: comm and ea are two labels of one frame EA, so a household on a comm in an early wave is on the paired ea.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon, 2026-11-04 (GH #1459).  No document states it.  On the 1,717
+        households linked 2011-12 -> 2013-14 by HHID_old, 212 comm and 212 ea pair
+        one-to-one (shuffled, 1,684 pairs).  ea is also the rank of comm among the 322
+        frame EAs of 2005-06, sorted, on all 212, which does not read a household.
+  validated_against: >-
+    tests/test_gh1459_uganda_early_ea.py re-derives the table from the raw covers
+    without importing this module.
+  contents: Uganda/_/CONTENTS.org, "One label across all eight waves (GH #1459)"
+  since: '2026-11-04'
+
+Uganda::sample::ea-own-comm:
+  waves: ['2005-06', '2009-10', '2010-11', '2011-12']
+  columns: [ea]
+  rows: {}
+  rule: >-
+    An early-wave household whose frame EA is one of the 110 rotated out before
+    2013-14 takes its own 8-digit comm as ea, since no household links it to a
+    number. It cannot collide with the labels 1-430. comm is first served as its
+    8-digit frame code (comm_frame_ea). v is not involved and does not change.
+  function: lsms_library.countries.Uganda._.uganda:derive_comm_ea
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_ea_own_comm
+  raw_variables: [HHID, comm]
+  assumptions:
+    - text: A label of a different form is an acceptable way to name these 110 PSUs in one column.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon, 2026-11-04 (GH #1459).  A standard error clustered on ea needs
+        only that a label names one PSU; it reads neither the label's form nor its order.
+  validated_against: tests/test_gh1459_uganda_early_ea.py
+  contents: Uganda/_/CONTENTS.org, "One label across all eight waves (GH #1459)"
+  since: '2026-11-04'
+
+Uganda::sample::ea-same-household:
+  waves: ['2009-10']
+  columns: [ea]
+  rows: {}
+  rule: >-
+    A 2009-10 cover household whose own comm gives no ea (blank: movers, split-offs
+    and five originals) takes the same household's ea in another wave: its comm in
+    2005-06, 2010-11 or 2011-12 by HHID, which the survey keeps unchanged across
+    those waves, through the comm_ea table; else its 2013-14 GSEC1.ea, by HHID_old
+    (the 2011-12 HHID).  The labels a household holds must agree, or the build
+    raises OriginEaError.  Raw source ids through format_id, never the walked
+    household id.  A household with no label in those waves stays NA, and no ea
+    that is already served changes.  v is not involved and does not change.
+  function: lsms_library.countries.Uganda._.uganda:derive_ea_same_household
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_ea_same_household
+  raw_variables: [HHID, comm, HHID_old, ea]
+  assumptions:
+    - text: >-
+        ea is a label of origin, carried with a household when it moves, so a 2009-10
+        mover or split-off takes the label its own record carries in another wave.
+        That is the definition the column already serves under (ea-tracking-key,
+        ea-comm-link), and 2010-11 GSEC1 itself records the movers and split-offs
+        under their original-sample EA.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-12, "Fill, registered" (GH #1536).  Of 2009-10's 569
+        households with no ea, 514 hold a label in another wave and none holds two:
+        2005-06 197, 2010-11 440, 2011-12 420, 2013-14 246, 2015-16 229, 2018-19 207,
+        2019-20 197 (measured on the served sample by walked household id, 2026-11-12).
+        The comm waves and 2013-14 reach all 514 by raw id: 492 through comm, 22 only
+        through HHID_old.
+    - text: >-
+        when several waves hold a label, the comm waves' is used, and 2013-14's only
+        for a household they do not record: the comm waves name the frame EA of the
+        same HHID directly, and 2005-06 is the wave the panel was sampled in.  The
+        rule raises rather than choose, so the order cannot decide a served value.
+      basis: modelling-choice
+      evidence: >-
+        On all 514 every label the household holds, in all seven other waves, is the
+        same, so the order changes nothing today.
+  validated_against: >-
+    the base build: 514 of 2009-10's 569 NA ea are filled, every non-missing ea in
+    every wave is unchanged, and derivation_inputs returns rows for every stamped
+    household (Uganda/_/CONTENTS.org).
+  contents: 'Uganda/_/CONTENTS.org, "2009-10 ea from the same household in another wave (GH #1536)"'
+  since: '2026-11-12'

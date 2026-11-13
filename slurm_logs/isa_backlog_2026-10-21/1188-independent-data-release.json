@@ -1,0 +1,16 @@
+{
+  "status": "ROOT_CONDITIONALLY_RELEASED_EXACT_BF1188_INDEPENDENT_DATA",
+  "release_path": "/local/job40255479/control/isa-backlog-20261021/review-Burkina_Faso-1188/ROOT-DATA-READ-RELEASE.json",
+  "release_sha256": "757ffa868fa6827d3a6f9f784cecf83af9b79bd041eb39046a35f51eeb6348b9",
+  "plan_sha256": "8c8469cfad6adef88239df3926b99f07c141f6a704e1aa3217a5ab765eb96f00",
+  "guard_sha256": "377e85fc5311f1b3705bc5c5a484b4fac9b75cf76365a3fdb4528e4f3be2646a",
+  "providers": 6,
+  "normal_roots": 4,
+  "binary_copies": 24,
+  "binary_copy_bytes": 25343300,
+  "bootstrap_gate_required_before_any_genuine_payload_read": true,
+  "root_author_authentication_sha256": "dfca2e265cfdd0c3ff9b74c88729643d39dc38c1b13b7f181e6c793349679927",
+  "write_fstat_IPC_network_DNS_AST_unchanged": true,
+  "root_no_provider_payload_access": true,
+  "signed": "Sue"
+}

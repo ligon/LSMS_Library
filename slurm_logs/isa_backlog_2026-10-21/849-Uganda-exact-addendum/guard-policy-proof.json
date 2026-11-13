@@ -1,0 +1,7 @@
+{
+  "original_sha256": "bc1ed87672ab7d5138dc910fad5c6f8f2685ee1158b66a2676165c1b34e65d49",
+  "new_sha256": "c097c9a3b38c27ccbcfc73d75363fd4ec7fd64ff2dd28f0911211d63bde50211",
+  "root_substitution_only_AST_exact": true,
+  "metadata_link_confined_inside_new_private_root": true,
+  "old_source_metadata_writes_allowed": false
+}

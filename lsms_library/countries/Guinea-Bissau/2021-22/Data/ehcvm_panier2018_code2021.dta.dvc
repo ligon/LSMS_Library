@@ -1,0 +1,5 @@
+outs:
+- md5: 57a5bfd17ee691dc3ed4c2766f440866
+  size: 9005
+  hash: md5
+  path: ehcvm_panier2018_code2021.dta

@@ -1,0 +1,43 @@
+GH #637 round 3 -- test runs (cwd and PYTHONPATH = the checkout under test, identity asserted by
+real path; OPENBLAS/OMP/MKL threads 1, LSMS_BUILD_WORKERS=1, nice 19, pytest -n <= 3 --dist=loadfile;
+LSMS_DATA_DIR = the private cold-build root of the same code).
+
+New head (3fe6a1996), data root 637-tz-r3/new:
+  tests/test_gh637_tanzania_unit_grain.py + test_1118_tanzania_plot_input_units.py
+  + test_quantity_screen.py + test_feature_canonical_index.py + test_962_unit_sentinel.py
+      258 passed, 3 skipped   (the 3: test_feature_canonical_index warm-corpus checks, < 3 warm countries)
+  tests/test_feature_canonical_index.py, after warming Benin + Malawi + Tanzania
+  crop_production / plot_inputs / plot_labor in the same root
+      82 passed, 0 skipped
+  all 36 test files mentioning Tanzania
+      2023 passed, 109 skipped, 4 xfailed, 0 failed (398.8 s)
+
+The new tests/test_gh637_tanzania_unit_grain.py against 5239daecd code (copied into a detached
+5239daecd worktree, run there, then reverted), data root 637-tz-r3/old:
+      27 failed, 18 passed
+  failing, by ruling:
+    1 / 5 (production_obs, module separation, sales):
+      test_declared_index_carries_u
+      test_lumped_codes_keep_their_own_rows                     (reversal of the round-1/2 sum pin)
+      test_production_obs_is_the_module_qualified_native_crop_code
+      test_one_code_in_seasonal_and_perennial_module_is_two_rows
+      test_each_lumped_code_keeps_its_own_sale
+      test_a_sale_attaches_only_to_its_own_harvest_modules_row
+      test_a_sale_is_never_duplicated_or_split_across_plots
+      test_a_repeated_native_record_raises_rather_than_sums
+      TestHeldSources::test_crop_production_zeros_are_reported_and_nothing_else[2019-20, 2020-21]
+      TestHeldSources::test_crop_production_native_rows_and_module_pairs[2019-20, 2020-21]
+      TestHeldSources::test_no_sale_is_dropped_per_household[2019-20, 2020-21]
+    3 (Unit_purchased):
+      test_declared_unit_purchased_is_an_optional_string_column
+      test_unit_purchased_is_the_purchase_units_own_served_label[x5]
+      test_unit_purchased_is_missing_where_nothing_was_purchased
+      test_unit_purchased_labels_are_the_labels_u_is_served_with
+      test_organic_fertilizer_purchase_is_in_kg_where_recorded
+      test_purchases_in_two_units_under_one_key_raise_rather_than_sum
+      test_agreeing_purchase_units_under_one_key_are_summed
+      TestHeldSources::test_unit_purchased_differs_from_u_on_the_measured_seed_records[2019-20, 2020-21]
+    4 (documentation only): test_same_fertilizer_in_both_inorganic_slots_is_still_summed is the
+      control and passes on both.
+
+PR #1266 scratch merge: tests/test_quantity_screen.py 43 passed (merge-1266.txt).

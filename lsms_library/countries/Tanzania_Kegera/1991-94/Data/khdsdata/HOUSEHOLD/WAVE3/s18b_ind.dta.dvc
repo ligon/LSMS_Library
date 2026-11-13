@@ -1,0 +1,5 @@
+outs:
+- md5: 5eb60999cc612bd033d64b35f12f8754
+  size: 108635
+  hash: md5
+  path: s18b_ind.dta

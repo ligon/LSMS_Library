@@ -1,0 +1,701 @@
+{
+  "verdict": "PASS",
+  "blockers": [],
+  "reviewed_head": "3f520e09ff2d21501e30d8ac657f7f8ea571152d",
+  "baseline_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "scope": "Independent review of frozen 1077; no tracked changes or GitHub writes",
+  "tests": {
+    "focused": {
+      "passed": 230,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 1
+    },
+    "baseline_counterfactual": {
+      "failed": 118,
+      "passed": 1
+    },
+    "guard_only_counterfactual": {
+      "failed": 52,
+      "passed": 67
+    }
+  },
+  "evidence": {
+    "metadata": {
+      "cells": [
+        {
+          "country": "Ethiopia",
+          "table": "harmonize_food",
+          "target": "Preferred Label",
+          "source": "2011-12"
+        },
+        {
+          "country": "Ethiopia",
+          "table": "harmonize_food",
+          "target": "2011-12",
+          "source": "2013-14"
+        },
+        {
+          "country": "Ethiopia",
+          "table": "harmonize_food",
+          "target": "2013-14",
+          "source": "2011-12"
+        },
+        {
+          "country": "Ethiopia",
+          "table": "harmonize_food",
+          "target": "2015-16",
+          "source": "2011-12"
+        },
+        {
+          "country": "Ethiopia",
+          "table": "harmonize_food",
+          "target": "2018-19",
+          "source": "2011-12"
+        },
+        {
+          "country": "Ethiopia",
+          "table": "harmonize_food",
+          "target": "2021-22",
+          "source": "2011-12"
+        },
+        {
+          "country": "Ethiopia",
+          "table": "harmonize_food",
+          "target": "FTC Code",
+          "source": "2011-12"
+        },
+        {
+          "country": "Ethiopia",
+          "table": "harmonize_food",
+          "target": "FDC ID",
+          "source": "2011-12"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items",
+          "target": "Preferred Label",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items",
+          "target": "Code_2005-06",
+          "source": "Code_2012-13"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items",
+          "target": "Code_2012-13",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items",
+          "target": "Code_2016-17",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items",
+          "target": "Label_2005-06",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items",
+          "target": "Label_2012-13",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items",
+          "target": "Label_2016-17",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items_9b",
+          "target": "Preferred Label",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items_9b",
+          "target": "Code_2005-06",
+          "source": "Code_2012-13"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items_9b",
+          "target": "Code_2012-13",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items_9b",
+          "target": "Code_2016-17",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items_9b",
+          "target": "Label_2005-06",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items_9b",
+          "target": "Label_2012-13",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "GhanaLSS",
+          "table": "nonfood_items_9b",
+          "target": "Label_2016-17",
+          "source": "Code_2005-06"
+        },
+        {
+          "country": "Guatemala",
+          "table": "harmonize_food",
+          "target": "2000",
+          "source": "FCT code"
+        },
+        {
+          "country": "Mali",
+          "table": "u",
+          "target": "Code",
+          "source": "2014-15"
+        },
+        {
+          "country": "Mali",
+          "table": "harmonize_food",
+          "target": "Code",
+          "source": "2014-15"
+        },
+        {
+          "country": "Nigeria",
+          "table": "u",
+          "target": "Code",
+          "source": "2010-11"
+        },
+        {
+          "country": "Nigeria",
+          "table": "harmonize_industry",
+          "target": "Code",
+          "source": "s3q14 (W1-W4)"
+        },
+        {
+          "country": "Tanzania",
+          "table": "u",
+          "target": "Original Label",
+          "source": "2008-15"
+        },
+        {
+          "country": "Tanzania",
+          "table": "harmonize_input",
+          "target": "Code",
+          "source": "2019-20"
+        },
+        {
+          "country": "Tanzania",
+          "table": "harmonize_input",
+          "target": "Preferred Label",
+          "source": "Code"
+        },
+        {
+          "country": "Tanzania",
+          "table": "harmonize_input",
+          "target": "2019-20",
+          "source": "Code"
+        },
+        {
+          "country": "Tanzania",
+          "table": "harmonize_input",
+          "target": "2020-21",
+          "source": "Code"
+        },
+        {
+          "country": "Tanzania",
+          "table": "harmonize_species",
+          "target": "Code",
+          "source": "2019-20"
+        },
+        {
+          "country": "Uganda",
+          "table": "u",
+          "target": "Code",
+          "source": "2005-06"
+        }
+      ],
+      "counts": {
+        "cells": 34,
+        "tables": 12,
+        "countries": 7,
+        "by_country": {
+          "Ethiopia": 8,
+          "GhanaLSS": 14,
+          "Guatemala": 1,
+          "Mali": 2,
+          "Nigeria": 2,
+          "Tanzania": 6,
+          "Uganda": 1
+        }
+      },
+      "guard_only_fabricated": {
+        "column": 21,
+        "index": 8
+      },
+      "candidate_fabricated": {
+        "column": 0,
+        "index": 0
+      },
+      "preservation": {
+        "independent_controls_column_and_index": true,
+        "Niger_explicit_self_key_rejection_and_four_valid_targets": true
+      }
+    },
+    "cross_checks": {
+      "exact_frames": {
+        "default": {
+          "rows": 355571,
+          "dtypes_exact": true,
+          "values_and_index_exact": true,
+          "full_logical_attrs_exact": true,
+          "attrs_keys": [
+            "country",
+            "id_converted",
+            "population",
+            "population_resolution",
+            "recall",
+            "sampling",
+            "sampling_resolution"
+          ]
+        },
+        "raw": {
+          "rows": 355571,
+          "dtypes_exact": true,
+          "values_and_index_exact": true,
+          "full_logical_attrs_exact": true,
+          "attrs_keys": [
+            "id_converted"
+          ]
+        },
+        "wave-2005-06": {
+          "rows": 40749,
+          "dtypes_exact": true,
+          "values_and_index_exact": true,
+          "full_logical_attrs_exact": true,
+          "attrs_keys": []
+        },
+        "wave-2009-10": {
+          "rows": 38107,
+          "dtypes_exact": true,
+          "values_and_index_exact": true,
+          "full_logical_attrs_exact": true,
+          "attrs_keys": []
+        },
+        "wave-2010-11": {
+          "rows": 35489,
+          "dtypes_exact": true,
+          "values_and_index_exact": true,
+          "full_logical_attrs_exact": true,
+          "attrs_keys": []
+        },
+        "wave-2011-12": {
+          "rows": 38983,
+          "dtypes_exact": true,
+          "values_and_index_exact": true,
+          "full_logical_attrs_exact": true,
+          "attrs_keys": []
+        },
+        "wave-2013-14": {
+          "rows": 50703,
+          "dtypes_exact": true,
+          "values_and_index_exact": true,
+          "full_logical_attrs_exact": true,
+          "attrs_keys": []
+        },
+        "wave-2015-16": {
+          "rows": 50108,
+          "dtypes_exact": true,
+          "values_and_index_exact": true,
+          "full_logical_attrs_exact": true,
+          "attrs_keys": []
+        },
+        "wave-2018-19": {
+          "rows": 53288,
+          "dtypes_exact": true,
+          "values_and_index_exact": true,
+          "full_logical_attrs_exact": true,
+          "attrs_keys": []
+        },
+        "wave-2019-20": {
+          "rows": 48144,
+          "dtypes_exact": true,
+          "values_and_index_exact": true,
+          "full_logical_attrs_exact": true,
+          "attrs_keys": []
+        }
+      },
+      "full_logical_attrs_compared": true,
+      "Code_only_u_values_change": true,
+      "hash_inventory": {
+        "cells": 549,
+        "changed": [
+          "Uganda/people_last7days",
+          "Uganda/sample",
+          "Uganda/cluster_features",
+          "Uganda/household_roster",
+          "Uganda/individual_education",
+          "Uganda/shocks",
+          "Uganda/earnings",
+          "Uganda/food_acquired",
+          "Uganda/fct",
+          "Uganda/nutrition",
+          "Uganda/interview_date",
+          "Uganda/panel_ids",
+          "Uganda/income",
+          "Uganda/enterprise_income",
+          "Uganda/assets",
+          "Uganda/months_food_inadequate",
+          "Uganda/housing",
+          "Uganda/plot_features",
+          "Uganda/crop_production",
+          "Uganda/plot_inputs",
+          "Uganda/livestock",
+          "Uganda/anthropometry",
+          "Uganda/plot_labor",
+          "Uganda/nonfood_expenditures",
+          "Uganda/food_expenditures",
+          "Uganda/food_prices",
+          "Uganda/food_quantities",
+          "Uganda/household_characteristics"
+        ],
+        "other_country_exact": 521,
+        "framework_tags_exact": 39
+      }
+    },
+    "audit": {
+      "baseline": {
+        "warn": 22,
+        "fail": 1
+      },
+      "candidate": {
+        "warn": 26
+      },
+      "baseline_records": 23,
+      "candidate_records": 26,
+      "nonCode_full_normalized_record_multiset_exact": true,
+      "unchanged_records": 21,
+      "Code_removed": [
+        {
+          "check": "runtime_warning",
+          "status": "warn",
+          "severity": "A"
+        },
+        {
+          "check": "assembly_nonempty",
+          "status": "fail",
+          "severity": "B"
+        }
+      ],
+      "Code_added_classes": {
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "Code_added_bodies_exact_to_public_Code_warning_capture": true,
+      "existing_warning_bodies_exact": 4,
+      "existing_warning_body_exact_after_measured_u_label_substitution": 1,
+      "all_records_accounted": true,
+      "paths_only_normalized": true
+    },
+    "public_Feature": {
+      "rows": 355571,
+      "native_Country_frame_exact": true,
+      "index_names": [
+        "country",
+        "t",
+        "v",
+        "i",
+        "j",
+        "u",
+        "s"
+      ],
+      "warning_classes": {
+        "QuantityImplausibleWarning": 3,
+        "NullIndexKeyWarning": 1,
+        "ClusterIdentityWarning": 1
+      },
+      "no_parquet_writes": true
+    },
+    "baseline_cold": {
+      "mode": "cold",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "package": "/local/job40255479/worktrees/isa-baseline/lsms_library/__init__.py",
+      "calls": {
+        "default": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning",
+            "ResourceWarning",
+            "RuntimeWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        },
+        "Preferred": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        },
+        "Code": {
+          "error": "ValueError",
+          "message": "cannot convert float NaN to integer"
+        },
+        "Code_repeat": {
+          "error": "ValueError",
+          "message": "cannot convert float NaN to integer"
+        },
+        "default_after_Code": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        }
+      },
+      "waves": {
+        "2005-06": 40749,
+        "2009-10": 38107,
+        "2010-11": 35489,
+        "2011-12": 38983,
+        "2013-14": 50703,
+        "2015-16": 50108,
+        "2018-19": 53288,
+        "2019-20": 48144
+      },
+      "warm_no_parquet_writes": true,
+      "raw_rows": 355571,
+      "seconds": 39.11137657240033
+    },
+    "candidate_cold": {
+      "mode": "cold",
+      "head": "3f520e09ff2d21501e30d8ac657f7f8ea571152d",
+      "package": "/local/job40255479/worktrees/isa-review-1077/lsms_library/__init__.py",
+      "calls": {
+        "default": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning",
+            "ResourceWarning",
+            "RuntimeWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        },
+        "Preferred": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        },
+        "Code": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 74603
+        },
+        "Code_repeat": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 74603
+        },
+        "default_after_Code": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        }
+      },
+      "waves": {
+        "2005-06": 40749,
+        "2009-10": 38107,
+        "2010-11": 35489,
+        "2011-12": 38983,
+        "2013-14": 50703,
+        "2015-16": 50108,
+        "2018-19": 53288,
+        "2019-20": 48144
+      },
+      "warm_no_parquet_writes": true,
+      "raw_rows": 355571,
+      "seconds": 43.78610007185489
+    },
+    "baseline_warm": {
+      "mode": "warm",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "package": "/local/job40255479/worktrees/isa-baseline/lsms_library/__init__.py",
+      "calls": {
+        "default": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        },
+        "Code": {
+          "error": "ValueError",
+          "message": "cannot convert float NaN to integer"
+        },
+        "default_after_Code": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        },
+        "Preferred": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        },
+        "newCountry_Code": {
+          "error": "ValueError",
+          "message": "cannot convert float NaN to integer"
+        }
+      },
+      "warm_no_parquet_writes": true,
+      "seconds": 10.402601518668234
+    },
+    "candidate_warm": {
+      "mode": "warm",
+      "head": "3f520e09ff2d21501e30d8ac657f7f8ea571152d",
+      "package": "/local/job40255479/worktrees/isa-review-1077/lsms_library/__init__.py",
+      "calls": {
+        "default": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        },
+        "Code": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 74603
+        },
+        "default_after_Code": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        },
+        "Preferred": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 24
+        },
+        "newCountry_Code": {
+          "rows": 355571,
+          "warning_classes": [
+            "ClusterIdentityWarning",
+            "NullIndexKeyWarning",
+            "QuantityImplausibleWarning"
+          ],
+          "null_u": 0,
+          "numeric_u": 74603
+        }
+      },
+      "warm_no_parquet_writes": true,
+      "seconds": 13.11440173536539
+    }
+  },
+  "immutable_proof": {
+    "baseline": {
+      "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "clean": true,
+      "all_tracked_sha256_unchanged": true,
+      "tracked_files": 14880,
+      "held_L1_unchanged": true,
+      "private_blob_count": 23,
+      "no_new_in_tree_sources_or_parquets": true
+    },
+    "candidate": {
+      "HEAD": "3f520e09ff2d21501e30d8ac657f7f8ea571152d",
+      "clean": true,
+      "all_tracked_sha256_unchanged": true,
+      "tracked_files": 14884,
+      "held_L1_unchanged": true,
+      "private_blob_count": 23,
+      "no_new_in_tree_sources_or_parquets": true
+    },
+    "no_other_task_processes": true
+  },
+  "limitations": [
+    "34 metadata cells use real tables and mapping methods with synthetic observations, not 34 raw-survey builds",
+    "Actual held-source rebuild is Uganda only; the complete hash inventory covers all countries",
+    "Historical 36-cell issue total is not the current reproduced 34",
+    "Niger Original Label request retains its intentional source-equals-target KeyError; four other variants succeed",
+    "Existing Uganda CONTENTS blanket unused-at-runtime wording needs a small documentation qualification; frozen tree left unchanged"
+  ],
+  "author": "Sue"
+}

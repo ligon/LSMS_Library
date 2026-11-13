@@ -1,0 +1,5 @@
+outs:
+- md5: 835b8bbcee6ec5d8afce69869eff9be1
+  size: 2244989
+  hash: md5
+  path: totcons_final.dta

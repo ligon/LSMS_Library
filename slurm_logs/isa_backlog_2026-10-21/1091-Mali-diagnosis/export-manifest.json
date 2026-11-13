@@ -1,0 +1,42 @@
+{
+  "source": "/local/job40255479/control/isa-backlog-20261021/Mali/1091",
+  "files": [
+    {
+      "name": "DIAGNOSIS.org",
+      "bytes": 13958,
+      "sha256": "bd88fea5c68e1eb92be0ced09da1a080e56f0d9518ae7d4f55ea289ee9431b32"
+    },
+    {
+      "name": "PROPOSAL.md",
+      "bytes": 6393,
+      "sha256": "2fad4b89ca7209fcd2a1b88eb25d1cf6784d9a019c7530118eb4a6ed64d93a88"
+    },
+    {
+      "name": "TARGETED-TEST-PLAN.md",
+      "bytes": 5272,
+      "sha256": "7444f993dab9df20a2de786f46784c0898337a976dd5989d42bb0e5a7d96026d"
+    },
+    {
+      "name": "validation.json",
+      "bytes": 3981,
+      "sha256": "bd855de6d77bd657ce0a21593077c3638d735d1668d9890d187949bb387a3269"
+    },
+    {
+      "name": "proof.json",
+      "bytes": 8874,
+      "sha256": "ede501e57686beac40809da2008de51d7eeb6f9257979aad05f68a6f75efa5b2"
+    },
+    {
+      "name": "REPRODUCE.sh",
+      "bytes": 2346,
+      "sha256": "056d2d26efb8b99adb632a23f1fbf0e157c973e671beb685470387c04eef93be"
+    },
+    {
+      "name": "LEDGER-DRAFT.md",
+      "bytes": 6719,
+      "sha256": "3a4b75f82798412db3f7fafb9a172becf7b45aa75d433e8165f6381c08a7b821"
+    }
+  ],
+  "source_exact": true,
+  "private_source_rows_IDs_frames_logs_excluded": true
+}

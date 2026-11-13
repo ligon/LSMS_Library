@@ -1,0 +1,43 @@
+{
+  "status": "ROOT_RELEASE_EXACT_BOUNDED_INDEPENDENT_1215_GENUINE_GRID",
+  "plan_sha256": "e5b26fa449da9ae8e59080cbf95a65c5d10c128d55916237b72e67ced4e8fa61",
+  "provider_source_authority_sha256": "cfd5473ccda94887fd58ff5e060671d2dadbe1eb68d35a57d952fe83f77dbbd8",
+  "root_author_authentication_sha256": "bbc76ab1a0f0478255cd8871cdee95be1458b5309460e8c878d90b292fa8468e",
+  "guard_sha256": "993fc4077a95e5b7da11eae757b68b07093b0b25a43d948c15f93c7b5762b3b4",
+  "candidate": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+  "actual_parent": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "providers": 37,
+  "provider_bytes": 44442303,
+  "normal_roots": {
+    "candidate-default": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1215/data/genuine-candidate-default",
+    "candidate-make": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1215/data/genuine-candidate-make",
+    "parent-default": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1215/data/genuine-parent-default",
+    "parent-make": "/local/job40255479/control/isa-backlog-20261021/review-Uganda-1215/data/genuine-parent-make"
+  },
+  "distinct_private_copies": 148,
+  "copy_bytes": 177769212,
+  "distinct_provider_and_copy_inodes": 185,
+  "normal_grid_actors": 8,
+  "normal_top_level_calls": 48,
+  "scanner_actors": 2,
+  "planned_public_strict_pairs": 64,
+  "planned_native_strict_pairs": 28,
+  "required_gates": [
+    "Root approves this exact plan and source authority; independently authenticate frozen author READY/fullmanifest/allowlist/sealer/postexit tool chain and tested f7 source mapping, metadata/source only.",
+    "Own original guarded source/time/Popen/boot/ns/UID/runtime/private-DVC identity protocol before any provider gate. No recalibration/census/test replay.",
+    "Fresh current lstat+nonsymlink/nlink1/mode/mtime_ns/dev/inode/size MD5 SHA genuineStata magic on every37 historical external endpoints, before copies or decodes; current candidate+parent sidecar/SOURCE hashes must still match. Save whole pre-copy receipt; stop on any change/absence/mismatch, no alternate providers/acquisition.",
+    "Report actual37/count44442303 aggregate before staging. Four absent roots only, one DVC3 files/md5 layout. Exclusive0600 full byte copies; no links/reflinks. Check each copy full MD5/SHA/magic/physical and all185 inode distinctions before decode. All148 copies177769212 bytes exact; zero extra native-source preflight copies.",
+    "Read-only actual _dvc_cache_path resolution/physical preflight for all37 eachroot, no get_data_file, CLI, stamp, promotion or bypass. Assert L1-only/no parquet/native source copies before first normal API.",
+    "Run eight sequential original grid actors (cold and freshwarm perroot), all BLAS/build/Make1. Save every returned complete frame and before/after exact physical/cache/footer snapshots. No fifthroot, sourceonly expected materialization, API replay or extra calls.",
+    "Read-only artifact proof and listed64 full strict public pairs plus28 full strict native-wave pairs. Every failed comparison retained as FAIL; no casts/reorder/normalization/attrs transplantation. Source-known facts checked separately, not substituted for full equality.",
+    "Two unmodified scoped scanner actors, candidate-default and parent-default same normal roots, crop_production/Uganda/phases1,2/jobs1 only; retain full ordered JSONL and every finding.",
+    "Full final source/provider/copy/cache/private proof protection, exact manifest/allowlist, original sealer0 and separate readonly postexit0 with exact tool records; root owns acceptance/publication."
+  ],
+  "synthetic_controls": "Independent complete two-file catalog63PASS versus57PASS6FAIL; original30fault/2positive controls plus two additive isolated axis controls. Original two confounded seed qualification retained.",
+  "root_metadata_inspection_stop": "One read-only plan-shape print called len on the integer legacy-sidecar count; original afc63a actual1 retained in root session. No provider lstat/open/copy/decode or actor was performed by that inspection.",
+  "scope": "Fresh source-provider gates before copies/decodes; four new absent L1-only roots, one DVC3 layout, readonly path preflight; literal package/config/cwd/child/worker/runtime/privateDVC identities and original-Popen terminals; no flags/acquisition/shared writes/extra copies/fifthroot. Preserve all strict failures and exact whole footers/partial raw operands.",
+  "already_completed_actors_released_for_replay": false,
+  "root_release_checker_genuine_provider_lstats_opens_hashes_copies_decodes": 0,
+  "independent_acceptance": false,
+  "signed": "Sue"
+}

@@ -1,0 +1,24 @@
+{
+ "country": {
+  "total": 549,
+  "moved": 28,
+  "moved_by_country": {
+   "Uganda": 28
+  },
+  "uganda_total": 28
+ },
+ "btf": {
+  "total": 40,
+  "moved": 0,
+  "moved_by_country": {},
+  "uganda_total": null
+ },
+ "wave": {
+  "total": 2109,
+  "moved": 224,
+  "moved_by_country": {
+   "Uganda": 224
+  },
+  "uganda_total": 224
+ }
+}

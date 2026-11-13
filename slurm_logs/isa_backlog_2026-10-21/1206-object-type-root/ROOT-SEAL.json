@@ -1,0 +1,56 @@
+{
+  "status": "FROZEN_ROOT_SYNTHETIC_OBJECT_COMPARATOR_DIAGNOSIS",
+  "at_UTC": "2026-10-22T12:45:08.401839+00:00",
+  "entries": {
+    "ROOT-SYNTHETIC-PROOF.json": {
+      "sha256": "0951a648af9b106998e958f5bfae971459bdbb028bbbd593f26a14ce9d377e9b",
+      "bytes": 2124,
+      "mode": 384,
+      "mtime_ns": 1792654882705111771,
+      "inode": 10362147,
+      "device": 64770,
+      "nlink": 1
+    },
+    "stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "mtime_ns": 1792654882270109322,
+      "inode": 10362146,
+      "device": 64770,
+      "nlink": 1
+    },
+    "initial-launch-stop.json": {
+      "sha256": "2fb86cbb48e5a2416dbd6750173c5ea3062b49d93fbadea406a28546fe6e6aea",
+      "bytes": 179,
+      "mode": 384,
+      "mtime_ns": 1792654875247069784,
+      "inode": 10362143,
+      "device": 64770,
+      "nlink": 1
+    },
+    "stdout.log": {
+      "sha256": "cc5c98623e8da08d7060d843c28a73e9d4bea72488e9c97df165a3f49d9d3f80",
+      "bytes": 1598,
+      "mode": 384,
+      "mtime_ns": 1792654882705111771,
+      "inode": 10362145,
+      "device": 64770,
+      "nlink": 1
+    },
+    "independent-synthetic.py": {
+      "sha256": "2a25f1d86d9889c64420f121fe649ff45bf488e1d3880330dfacc5d2b06b9abe",
+      "bytes": 3193,
+      "mode": 384,
+      "mtime_ns": 1792654875247069784,
+      "inode": 10362144,
+      "device": 64770,
+      "nlink": 1
+    }
+  },
+  "terminal_exit": 0,
+  "synthetic_only": true,
+  "no_country_mismatch_claim": true,
+  "initial_python_alias_launch_stop_preserved": true,
+  "signed": "Sue"
+}

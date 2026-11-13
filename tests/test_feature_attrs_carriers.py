@@ -60,10 +60,10 @@ class TestTheRegistry:
 
     def test_every_carrier_is_registered(self):
         # `labels_unmatched` added for GH #787 item 3; `unit_kg` for GH #931;
-        # `sampling` for GH #793.
+        # `sampling` for GH #793; `period` for GH #851 Phase II.
         assert [c.name for c in F._ATTRS_CARRIERS] == \
             ["population", "recall", "derivations", "labels_unmatched",
-             "unit_kg", "sampling"]
+             "unit_kg", "sampling", "period"]
 
     def test_feature_did_not_import_the_SHADOWING_callables(self):
         """`lsms_library` binds public callables over two of its own submodule
@@ -81,6 +81,7 @@ class TestTheRegistry:
         assert F._ATTRS_CARRIERS[1].keys == (R.ATTRS_KEY,)
         assert F._ATTRS_CARRIERS[2].keys == (D.ATTRS_KEY,)
         assert F._ATTRS_CARRIERS[4].keys == (T.UNIT_KG_ATTRS_KEY,)
+        assert F._ATTRS_CARRIERS[6].keys == (R.PERIOD_ATTRS_KEY,)
 
     def test_the_captured_keys_are_exactly_the_carriers_keys(self):
         """The capture at the top of the country loop and the re-attach after
@@ -91,7 +92,7 @@ class TestTheRegistry:
         assert set(F._CARRIED_ATTRS_KEYS) == {
             P.ATTRS_KEY, P.ATTRS_RESOLUTION_KEY, R.ATTRS_KEY, D.ATTRS_KEY,
             "labels_unmatched", T.UNIT_KG_ATTRS_KEY, S.ATTRS_KEY,
-            S.ATTRS_RESOLUTION_KEY}
+            S.ATTRS_RESOLUTION_KEY, R.PERIOD_ATTRS_KEY}
 
     def test_each_carrier_delegates_to_its_own_modules_merge(self):
         """The union rule belongs to the module that defines the record.
@@ -105,7 +106,8 @@ class TestTheRegistry:
                                (F._ATTRS_CARRIERS[2], D.merge_attrs),
                                (F._ATTRS_CARRIERS[3],
                                 merge_label_pass_through_reports),
-                               (F._ATTRS_CARRIERS[4], T.merge_unit_kg_attrs)):
+                               (F._ATTRS_CARRIERS[4], T.merge_unit_kg_attrs),
+                               (F._ATTRS_CARRIERS[6], R.merge_period_attrs)):
             closed_over = {c.cell_contents for c in carrier.attach.__closure__}
             assert merge in closed_over, \
                 f"{carrier.name} does not call its module's merge_attrs"
@@ -414,6 +416,28 @@ class TestLabelsUnmatchedSurvivesAssembly:
             out = food_feature(["Liberia"], labels="Aggregate", currency=None)
         assert out.attrs["labels_unmatched"] == {"Liberia": _report(3)}
 
+    def test_every_country_dropped_is_shaped_not_bare(self, food_feature):
+        """GH #1456: the all-degraded result used to be a bare `pd.DataFrame()`
+        on a `RangeIndex`, so a caller's `groupby('country')` raised KeyError."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Togo"], labels="Aggregate", currency=None)
+        assert out.empty and out.shape == (0, 0)
+        assert out.attrs["labels_unavailable"] == ["Togo"]
+        assert list(out.index.names) == [
+            "country", *F._canonical_index_levels("food_prices")]
+        assert out.groupby("country").size().empty
+        assert list(out.index.get_level_values("country")) == []
+
+    def test_every_country_dropped_keeps_the_currency_level(self, food_feature):
+        """The default `currency='index'` widens a monetary table's index, and
+        the empty frame is that same shape."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Togo"], labels="Aggregate")
+        assert list(out.index.names) == [
+            "country", *F._canonical_index_levels("food_prices"), "currency"]
+
     def test_no_labels_no_key(self, food_feature):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -451,6 +475,14 @@ class TestUnitsUnavailableDegrades:
             out = food_feature(["Togo"], units="unitprice", currency=None)
         assert out.empty
         assert out.attrs["units_unavailable"] == ["Togo"]
+
+    def test_every_country_dropped_is_still_indexed_by_country(
+            self, food_feature):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Togo"], units="unitprice", currency=None)
+        assert out.index.names[0] == "country"
+        assert out.groupby("country").size().empty
 
     def test_a_mode_whose_inputs_exist_drops_nobody(self, food_feature):
         with warnings.catch_warnings():
@@ -573,3 +605,30 @@ class TestDelivered:
         """The control: generalising the hook must not have cost the carrier it
         was generalised from."""
         assert set(assembled.attrs[P.ATTRS_KEY]) == set(self.PAIR)
+
+
+# ---------------------------------------------------------------------------
+# GH #1456: the shape of an assembly no country survived
+# ---------------------------------------------------------------------------
+
+class TestEmptyAssemblyShape:
+    def test_an_unregistered_table_is_indexed_by_country_alone(self):
+        out = F._empty_assembly([])
+        assert list(out.index.names) == ["country"]
+        assert out.groupby("country").size().empty
+
+    def test_a_registered_table_carries_its_canonical_levels(self):
+        out = F._empty_assembly(["t", "i"])
+        assert list(out.index.names) == ["country", "t", "i"]
+        assert out.shape == (0, 0)
+
+    def test_it_concatenates_onto_a_real_assembly_without_collapsing_it(self):
+        """A caller pooling several `Feature` calls must not lose the level
+        names to an empty member."""
+        real = pd.DataFrame({"x": [1.0]}, index=pd.MultiIndex.from_tuples(
+            [("Niger", "w1", "h1")], names=["country", "t", "i"]))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = pd.concat([F._empty_assembly(["t", "i"]), real])
+        assert list(out.index.names) == ["country", "t", "i"]
+        assert len(out) == 1

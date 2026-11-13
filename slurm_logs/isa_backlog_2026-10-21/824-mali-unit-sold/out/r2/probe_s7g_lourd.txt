@@ -1,0 +1,99 @@
+s7g rows 16054 cover rows 8390 cover dup keys 0
+
+s7gq20 by typequest (rows):
+tq    Questionnaire Leger  Questionnaire Lourd    All
+flag                                                 
+<NA>                  516                  257    773
+Non                  8346                 4666  13012
+Oui                  1607                  662   2269
+All                 10469                 5585  16054
+
+Oui rows: has quantity / unit / value, by typequest
+                    has_q       has_u       has_v      
+                      sum count   sum count   sum count
+tq                                                     
+Questionnaire Leger     0  1607     0  1607     0  1607
+Questionnaire Lourd   662   662   662   662   647   662
+
+Oui rows with NO quantity AND NO unit: 1607  by typequest: {'Questionnaire Leger': 1607}
+  ...of which a value is recorded: 0  value > 0: 0
+  ...by milieu: {'Rural': 1607}
+
+households: Oui 1696  Oui-without-qty-and-unit 1190  of which Leger 1190  Lourd 0
+Oui households with no quantity on ANY sold crop: 1190  by tq: {'Questionnaire Leger': 1190}
+Oui households with a quantity on some crop: 506  by tq: {'Questionnaire Lourd': 506}
+
+unanswered s7gq20 rows 773  by tq {'Questionnaire Leger': 516, 'Questionnaire Lourd': 257}  with qty 0  with val 0
+Non rows 13012  with qty 0  with val 0
+
+share non-null per column by typequest (s7g):
+tq       Questionnaire Leger  Questionnaire Lourd
+s7gq01                 1.000                1.000
+s7gq02                 0.951                0.955
+s7gq03a                0.000                0.955
+s7gq03b                0.000                0.669
+s7gq03c                0.000                0.648
+s7gq03d                0.000                0.668
+s7gq04a                0.000                0.954
+s7gq04b                0.000                0.403
+s7gq04c                0.000                0.397
+s7gq04d                0.000                0.404
+s7gq05a                0.000                0.955
+s7gq05b                0.000                0.572
+s7gq05c                0.000                0.563
+s7gq05d                0.000                0.572
+s7gq06a                0.000                0.954
+s7gq06b                0.000                0.063
+s7gq06c                0.000                0.050
+s7gq06d                0.000                0.064
+s7gq07a                0.000                0.954
+s7gq07b                0.000                0.038
+s7gq07c                0.000                0.037
+s7gq07d                0.000                0.037
+s7gq08                 0.000                0.954
+s7gq09a                0.000                0.750
+s7gq09b                0.000                0.742
+s7gq079                0.000                0.725
+s7gq09d                0.000                0.742
+s7gq10                 0.000                0.743
+s7gq11                 0.000                0.742
+s7gq12                 0.000                0.954
+s7gq13                 0.000                0.383
+s7gq14a                0.000                0.383
+s7gq14b                0.000                0.383
+s7gq15                 0.000                0.383
+s7gq16                 0.000                0.954
+s7gq17a                0.000                0.006
+s7gq17b                0.000                0.006
+s7gq17c                0.000                0.005
+s7gq17d                0.000                0.006
+s7gq18                 0.000                0.006
+s7gq19                 0.000                0.954
+s7gq20                 0.951                0.954
+s7gq21a                0.000                0.119
+s7gq21b                0.000                0.119
+s7gq21c                0.000                0.075
+s7gq21d                0.000                0.119
+s7gq22                 0.000                0.116
+s7gq23a                0.000                0.118
+s7gq23b                0.000                0.118
+s7gq24                 0.154                0.119
+s7gq25                 0.154                0.119
+s7gq26                 0.154                0.119
+s7gq27                 0.000                0.119
+s7gq28                 0.000                0.119
+s7gq29                 0.000                0.119
+s7gq30a                0.000                0.000
+s7gq30b                0.000                0.000
+s7gq30c                0.000                0.000
+s7gq30d                0.000                0.000
+s7gq31                 0.000                0.119
+s7gq32                 0.000                0.878
+s7gq33a                0.000                0.019
+s7gq33b                0.000                0.019
+s7gq33c                0.000                0.013
+s7gq33d                0.000                0.019
+s7gq34                 0.000                0.018
+s7gq35                 0.154                0.076
+s7gq36a                0.019                0.008
+s7gq36b                0.019                0.008

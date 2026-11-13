@@ -1,0 +1,13 @@
+{
+  "status": "SUCCESS",
+  "actual_f8_counterfactual_Arrow_inputs_outputs_and_final_cache_exact_historical_nine_zero_frame": true,
+  "A_changed_cells": 9,
+  "Quantity_NaN_to_zero": 6,
+  "Expenditure_NaN_to_zero": 3,
+  "B_correct_complete_frame": true,
+  "both_actual_original_tests_passed_despite_corruption": true,
+  "real_eviction_and_false_exists_observed": true,
+  "legacy_reducer_reached_once": true,
+  "all_other_values_keys_dtypes_order_axes_fullattrs_exact": true,
+  "normal_f8_hash_full_coverage": true
+}

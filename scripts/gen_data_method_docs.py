@@ -34,7 +34,7 @@ OUT = REPO / "docs" / "guide" / "data-methods.md"
 #: single method can never document the whole surface.
 SPECIMENS = [
     ("GhanaLSS", "food_prices", "units, volume_as_mass, currency, numeraire"),
-    ("GhanaLSS", "food_expenditures", "basis, valuation"),
+    ("GhanaLSS", "food_expenditures", "basis, valuation, period"),
     ("GhanaLSS", "household_characteristics", "age_cuts"),
     ("GhanaLSS", "household_roster", "the common kwargs alone"),
 ]
@@ -75,6 +75,7 @@ methods that do accept it, rather than being silently ignored.
 | `numeraire=` | monetary tables | convert monetary columns to a common numeraire |
 | `basis=` | `food_expenditures` | `'purchased'` or `'total'` |
 | `valuation=` | `food_expenditures` (with `basis='total'`) | value produced / in-kind rows: `'own_price'`, `'median_price'`, or a tuple applied in order; off by default |
+| `period=` | `food_expenditures`, `food_quantities` | rescale by declared wave exposure; `None` preserves the recorded window; see [recall](recall.md) |
 | `age_cuts=` | `household_characteristics` | age-bracket boundaries |
 
 `currency=` and `numeraire=` are mutually exclusive. Available numeraires come

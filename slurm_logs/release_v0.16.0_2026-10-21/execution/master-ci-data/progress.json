@@ -1,0 +1,37 @@
+{
+  "duplicate_run_is_release_gate": false,
+  "elapsed_job_seconds": 3593,
+  "failure_observed": false,
+  "job_conclusion": null,
+  "job_id": 119236827295,
+  "job_status": "in_progress",
+  "last_remote_observation_utc": "2026-10-21T14:01:49.310313+00:00",
+  "observer_stopped": true,
+  "observer_stopped_utc": "2026-10-21T14:04:00.363461+00:00",
+  "run_id": 39604418333,
+  "source_sha": "097283459f80016b0f00a51b814a0cb964a42789",
+  "steps": {
+    "Assert the requires_s3 gate is open": {
+      "conclusion": "success",
+      "status": "completed"
+    },
+    "Build Uganda tables": {
+      "conclusion": "success",
+      "status": "completed"
+    },
+    "Configure S3 read credentials": {
+      "conclusion": "success",
+      "status": "completed"
+    },
+    "Run actions/checkout@v4": {
+      "conclusion": "success",
+      "status": "completed"
+    },
+    "Run full test suite": {
+      "conclusion": null,
+      "status": "in_progress"
+    }
+  },
+  "terminal_proof_ready": false,
+  "updated_utc": "2026-10-21T14:04:00.363461+00:00"
+}

@@ -336,6 +336,21 @@ via =categorical_mapping.org= =harmonize_food= (GH #783; was =food_items.org=), 
 hh_sec_5 reports ONE total quantity but splits VALUE (=s05q05= purchased /
 =s05q06= obtained-otherwise), so the quantity is apportioned by value share
 (#108 decision 2026-06-20); =s=produced= lumps own-production + in-kind.
+
+*Caveat: allocated quantity (GH #1509, ruling @ligon 2026-11-12).*  Since
+#1509 the kg price-ratio inference (=transformations.food_kg_factors=) reads
+only =s=purchased= rows as evidence.  Cambodia's purchased =Quantity= is not
+an independent measurement: it is =total_quantity * spent / (spent +
+obtained)=, so its purchased unit value is =(spent + obtained) /
+total_quantity= and still depends on the self-valued =s05q06= amount.  The
+ruling ("all purchase rows") admits it anyway: a row the country LABELS a
+purchase is evidence, whatever its quantity's construction.  Measured on the
+2026-11-07 comparison (development =c964c6c4f=): all 325 positive paired
+source rows have equal purchased and obtained unit values to 1e-12, and
+doubling only the raw obtained value moves 325 purchased quantities and 2,574
+=Piece= factors (0.1154 -> 0.1143 kg) even under the purchase-only filter.
+The alternative, independently observed purchase prices only, was not
+selected.  Do not read Cambodia's inferred kg factors as purchase-only prices.
 Country-level =_/food_acquired.py= concatenates the wave parquet(s) to
 =var/food_acquired.parquet=; registered in =data_scheme.yml= with
 =materialize: make=.  Price is api-derived.

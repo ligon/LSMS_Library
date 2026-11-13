@@ -1,0 +1,6 @@
+REPORT.md
+verification.json
+monitor.py
+finalize.py
+COPYLIST.txt
+MANIFEST.json

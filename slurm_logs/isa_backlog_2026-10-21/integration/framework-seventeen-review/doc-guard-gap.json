@@ -1,0 +1,23 @@
+{
+  "tests/test_api_discoverability.py": {
+    "actual16_17_blobs_exact": true,
+    "sha256": "06775d2724929e6b45e07c2b557d6062e2e520acc915ebe15cdea4f6d15f1338"
+  },
+  "scripts/gen_data_method_docs.py": {
+    "actual16_17_blobs_exact": true,
+    "sha256": "728e12e7d0e19e1929c15affd5fc4078d0f4cd51544cc94874b90ec3ea171cb6"
+  },
+  "qualification": {
+    "existing_test_source": "tests/test_api_discoverability.py:55-59",
+    "child_command": "[sys.executable, REPO/scripts/gen_data_method_docs.py]",
+    "child_cwd": "REPO",
+    "child_environment_replaces_PYTHONPATH_with_REPO_only": true,
+    "private_sitecustomize_path_lost_in_child": true,
+    "network_namespace_inherited_by_normal_exec": true,
+    "no_child_write_audit_record_was_captured": true,
+    "source_write_path": "scripts/gen_data_method_docs.py:116 OUT.write_text",
+    "testcase_passed_in_original_full_selection": true,
+    "actual_write_PID_not_individually_traced": true,
+    "observed_delta": "one tracked doc mtime only; full before/after receipts retained; no restore or rerun"
+  }
+}

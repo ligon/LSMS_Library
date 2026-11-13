@@ -4,29 +4,31 @@ Each buildable wave's ``Malawi/<wave>/_/plot_features.py`` produces a
 parquet indexed (t, i, plot_id) with the canonical columns.  This script
 concatenates them.  Cross-wave id_walk (panel-id chaining) and the join
 of the cluster id ``v`` are applied by the framework at API time in
-_finalize_result, so -- unlike Uganda -- no id_walk is run here (Malawi
-has no country-level updated_ids.json; panel linkage flows from the
-``panel_ids`` table).
+_finalize_result; no id_walk is run in this compiler. Malawi's committed
+country-level updated_ids.json is the existing framework input (GH #894);
+this concatenator preserves the wave-native household IDs.
 
 2004-05 (IHS2) is DEFERRED: it has no standard plot roster.
 """
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 
 
-# Only the four buildable IHS3+ waves; 2004-05 deferred.
-WAVES = ['2010-11', '2013-14', '2016-17', '2019-20']
+country = Country('Malawi')
+assert 'plot_features' in country.data_scheme, "plot_features: not declared for Malawi"
 
 pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/plot_features.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not yet wired / parquet not built.  DVC raises
-        # PathMissingError here, not FileNotFoundError.
+# Reuse actual table discovery, including native scripts and YAML declarations.
+# Ledger: malawi-compiler-declarations-20261028.md §§2–5.
+for t in country.waves:
+    wave = country[t]
+    if 'plot_features' not in wave.data_scheme:
         continue
+    fn = f'../{wave.wave_folder}/_/plot_features.parquet'
+    # A declared output that cannot be read is a failed build, not absence.
+    df = get_dataframe(fn)
     pieces.append(df)
 
 assert pieces, "plot_features: no wave-level parquets found"

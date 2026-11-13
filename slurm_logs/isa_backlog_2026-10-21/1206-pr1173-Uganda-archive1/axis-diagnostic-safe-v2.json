@@ -1,0 +1,19 @@
+{
+  "status": "UGANDA_NEW_SUBSET_AXIS_FINDING_CHARACTERIZED_SEPARATELY",
+  "PR": 1173,
+  "original_full_axis_failure_preserved": true,
+  "exact_numeric_nullable_values_masks_dtypes": true,
+  "exact_used_tuples_names_order": true,
+  "exact_typed_attrs_records_and_field_keys": false,
+  "typed_attrs_strict_failure_preserved": true,
+  "typed_attr_differences": 21,
+  "complete_domains_differ_only_by_unused_labels_from_outside_saved_subset": true,
+  "complete_code_storage_and_mapped_codes_checked": true,
+  "code_width_changes": 0,
+  "actual_original_producer_and_current_decoder_operations_bound": true,
+  "original_oracles_still_missing": true,
+  "not_full_frame_equality": true,
+  "no_product_defect_inferred": true,
+  "no_original_API_source_test_or_cache_replay": true,
+  "signed": "Sue"
+}

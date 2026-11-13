@@ -1,0 +1,23 @@
+{
+  "verified_at_UTC": "2026-10-22T00:33:41.224859+00:00",
+  "archive_name": "quiescent-followup-00h25.tar.gz",
+  "archive_sha256": "cbe66610d13e12d840e27563f4f236e6cf73994b3ff33de177e10fe8f6b5cec8",
+  "archive_bytes": 89770166,
+  "included_files": 898,
+  "included_source_bytes": 1138953520,
+  "roots": [
+    "review-Mali-1091"
+  ],
+  "excluded_entries": 92,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "c5249b7d7b76a8777bd840f8972166a26f82934caae12d0c8dfdaf49d267bfd6",
+  "private_full_manifest_sha256": "4c7fa9a20d43e9954d6652ac591ff306550d48bf6d8395976224738bcf9f57aa",
+  "private_evidence_not_exported_to_Git": true
+}

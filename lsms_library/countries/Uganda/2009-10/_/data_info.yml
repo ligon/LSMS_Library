@@ -50,25 +50,39 @@ housing:
         Floor: H9q06
 
 sample:
-    # 2009-10 is a panel-refresh wave: `comm` in GSEC1 is the 2005-06 EA
-    # (the original sampling frame).  565 HH (movers + split-offs) have
-    # blank `comm` because they fall outside that frame.  Fall back to a
-    # synthetic `@lat,lon` cluster label built from the modified GPS
-    # coordinates in the geovars file.  See Uganda/_/CONTENTS.org for
-    # the full rationale.
+    # GH #1120 D2: retain the existing comm/GPS-bin rule. AGSEC3B and
+    # GSEC12 contribute membership only; no file locates their cover-absent
+    # households. Each missing location receives unlocated-{hhid}.
     dfs:
-        - df_main
+        - locating_cover
         - df_geo
-    df_main:
+        - locating_frame
+        - ea_comm_waves
+        - ea_2013_14
+    locating_cover:
         file: ../Data/GSEC1.dta
         idxvars:
             i: HHID
         myvars:
-            v: comm
+            _cover: HHID
+            # GH #1133: the 7-character comm is served as the 8-digit frame EA
+            # (as 2005-06 / 2011-12 write it) through the reviewed
+            # `comm_frame_ea` table; blank comm stays None for the bin below.
+            v:
+                - comm
+                - mappings: comm_frame_ea
+            # The design PSU, on one label across all eight waves (GH #1459).  NA
+            # for a blank comm: a GPS bin is not an EA.
+            ea:
+                - comm
+                - mappings: comm_ea
             weight: wgt09
             panel_weight: wgt09  # pre-refreshment — same as cross-sectional
             strata: stratum
             Rural: urban
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: h1aq1  # numeric codes in this wave; a blank stays NA
             # HH-level Region — populated in GSEC1 for every household
             # (including the 565 movers/split-offs whose comm is blank),
             # so Region is always available regardless of whether v ended
@@ -85,6 +99,41 @@ sample:
         myvars:
             _lat: lat_mod
             _lon: lon_mod
+    locating_frame:
+        # One sub-df, two files concatenated: two plot/enterprise-grain
+        # sub-dfs merged in turn would both repeat `i`, which the `dfs:` merge
+        # rightly refuses as a cartesian (GH #323 site 4).
+        file:
+            - ../Data/AGSEC3B.dta
+            - ../Data/GSEC12.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _frame: HHID
+    # GH #1536 (ruling @ligon 2026-11-12, "Fill, registered").  A household whose
+    # own comm is blank (movers, split-offs) takes `ea` from its label in another
+    # wave: the comm waves first, by HHID, which is unchanged 2005-06 .. 2011-12,
+    # then 2013-14's GSEC1.ea by HHID_old.  The hooks (uganda.ea_comm_waves,
+    # uganda.ea_2013_14) keep only this wave's cover households with a blank comm,
+    # so the outer merge adds no row; uganda.sample fills and stamps
+    # `Uganda::sample::ea-same-household`.  A lost cover costs the fill, not `v`.
+    ea_comm_waves:
+        file:
+            - ../../2005-06/Data/GSEC1.dta
+            - ../../2010-11/Data/GSEC1.dta
+            - ../../2011-12/Data/GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _ea_comm_waves:
+                - comm
+                - mappings: comm_ea
+    ea_2013_14:
+        file: ../../2013-14/Data/GSEC1.dta
+        idxvars:
+            i: HHID_old
+        myvars:
+            _ea_2013_14: ea
     merge_on:
         - i
     final_index:
@@ -122,14 +171,19 @@ cluster_features:
     # sees it.  The country-level hook uganda.cluster_features() then projects
     # onto the declared (t, v) grain.
     dfs:
-        - df_main
+        - locating_cover
         - df_geo
-    df_main:
+        - locating_frame
+    locating_cover:
         file: ../Data/GSEC1.dta
         idxvars:
             i: HHID
         myvars:
-            v: comm
+            _cover: HHID
+            # GH #1133: same function as `sample` above, so the two `v` agree.
+            v:
+                - comm
+                - mappings: comm_frame_ea
             Rural: urban
             District: h1aq1  # TODO: This is numeric codes; needs mapping to names.
             Region:
@@ -144,6 +198,17 @@ cluster_features:
         myvars:
             Latitude: lat_mod
             Longitude: lon_mod
+    locating_frame:
+        # One sub-df, two files concatenated: two plot/enterprise-grain
+        # sub-dfs merged in turn would both repeat `i`, which the `dfs:` merge
+        # rightly refuses as a cartesian (GH #323 site 4).
+        file:
+            - ../Data/AGSEC3B.dta
+            - ../Data/GSEC12.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _frame: HHID
     merge_on:
         - i
     final_index:
