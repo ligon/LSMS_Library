@@ -971,7 +971,8 @@ served AS RELEASED under a registered key, because its quantities are rounded (b
 
 5,351 households, =v= = =grappe=.  =weight= = =panel_weight= = =hhweight= of
 =ehcvm_ponderations_gnb2021.dta=, one row per household.  *It is the CROSS-SECTIONAL household
-weight, whatever its source label (" Ponderation panel") says*: positive on all 5,351 households,
+weight, whatever its source label (" Ponderation panel"; the BID: "Weights are calculated for each
+household, taking into account the panel dimension") says*: positive on all 5,351 households,
 the 454 non-panel ones included; equal to =ehcvm_welfare.hhweight= ("Ponderation menage") on 5,351 of
 5,351; within a grappe it varies only with =panelHH= (two values in 240 grappes).  No other weight
 variable is in the wave's 60 files, so =panel_weight= is the same column, as in Mali 2021-22
@@ -1055,9 +1056,10 @@ quantities are rounded:
   even but for 23 rows each, the same 23, where q3 = q4 + q5.  No =Kg= or =Litro= row equals 1 or is
   below 1.  The value =s07bq08= carries no such signature (6.5% odd against 7.3% in 2018-19).
 - 2018-19: 70,949 odd and 6,119 fractional values of 125,483, =Kg= mode 1; Benin, Togo, Cote
-  d'Ivoire, Senegal, Niger and Mali 2021-22 have odd and fractional values everywhere (red team).  The
-  same 2021-22 GNB release holds halves in s16b and s16c, so the CAPI took decimals.  The quantities
-  are stored as Stata byte (=int8=; 2018-19 double).
+  d'Ivoire, Senegal, Niger and Mali 2021-22 have odd and fractional values everywhere (red team);
+  Senegal 2021-22, measured the same way, has 6.66% halves.  The same 2021-22 GNB release holds halves
+  elsewhere (s16b q03a 159, s16c q16a 92), so the CAPI took decimals.  The quantities are stored as
+  Stata byte (=int8=, =%8.0g=; 2018-19 double), and a second reader (pyreadstat, the same blob) agrees.
 - It is a rounding, not a doubling: per item x unit x size cell (95 cells shared with 2018-19) the
   median q3 ratio 2021/2018 is 1.00, the mean ratio 1.20 (Litro 1.93, Kg 1.25, Unidade 1.13).
 - *3,945 consumed-yes rows carry q3 = 0* (2018-19: 0), 1,881 Kg and 1,682 Litro (palm oil, lemon
@@ -1072,7 +1074,11 @@ quantities are rounded:
   0.064 against 0.063, 0.098 against 0.099), and only the Kg and Litro zeros tell the two apart (half-up
   0.036 / 0.075, ceiling 0.186 / 0.260; red team F3).  It maps 1, 2 and 2.5 all to 2 and 0.5 to 0, so
   it CANNOT be inverted.  Unverified hypothesis: Stata's =round(x, 2)= rounds to a multiple of 2, so a
-  =round(q, 2)= written for "2 decimals" would produce exactly this, a processing slip.
+  =round(q, 2)= written for "2 decimals" would produce exactly this, a processing slip.  2 x
+  round-half-even and 2 x floor fit worse.  q4 and q5 keep 23 odd values each, which one rounding of
+  all three would not leave.
+- The #876 rule reproduces =depan(Compra)= within 1% on 91.3% of rows; that is arithmetic, since the
+  rule is scale-invariant in q3 and q7a TOGETHER, and says nothing about the quantities.
 - Documented nowhere found: the English BID (7B description, section 7 processing), the EHCVM-2
   enumerator manual (Q7B.03-Q7B.08 ask the quantity actually consumed, in its unit), and the World
   Bank DDI (=dataProcessing= empty, isa-sm-20261112 docsearch).
@@ -1102,12 +1108,12 @@ inside code 107, =Outros legumes frescos, n.e.s (Djagatu, nabo, beterraba)=.
 107 (=Lata=), 122 (=Rede de cebola, alho=) and 126 (=Pedaço (25 F)=) otherwise than =s07bq03b=;
 =mapping.LastPurchaseUnitCode= puts them on =s07bq03b='s spelling, as Togo 2021-22 does.  *Size
 =Inteiro= is not in =transformations._UNIT_SIZE_WORDS=*: adding it re-warms GhanaLSS, Uganda and
-Ethiopia, which the ruling forbids here, so an =X (Inteiro)= label (=Carcaça (Inteiro)= is the only one served) is read as a unit
+Ethiopia, which the ruling forbids here, so an =X (Inteiro)= label (26 raw rows; =Carcaça (Inteiro)= is the only served label) is read as a unit
 of its own: it neither pools with bare =X= nor is size-pooled.  The test pins name it
-(=SIZES_NOT_YET_IN_THE_VOCABULARY=); a residual is drafted.
+(=SIZES_NOT_YET_IN_THE_VOCABULARY=); a residual is drafted, on the precedent of Benin's =Très grand=.
 
 *Kilograms.*  No own-country NSU weights (#1598): wiring =ehcvm_nsu_gnb2021.dta= (4,419 rows, region x
-milieu x product x unit x size -> =poids=) needs =ehcvm.NSU_COUNTRIES= / =NSU_TABLES=, and that edit,
+milieu x product x unit x size -> =poids=; the BID: "collected in 2018 and updated in 2021") needs =ehcvm.NSU_COUNTRIES= / =NSU_TABLES=, and that edit,
 measured in a job-local clone, moves 97 of 555 =_table_cache_hash= and 194 of 2,321 =Wave._input_hash=
 values in Burkina Faso, Mali, Niger and Senegal (0 in Guinea-Bissau).  Mali and Niger are outside
 this batch's re-warm set, so it is not done.  The kilograms come from the price-ratio ladder, which
