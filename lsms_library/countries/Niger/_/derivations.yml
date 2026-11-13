@@ -665,14 +665,20 @@ Niger::food_acquired::flagged-purchase-local-median:
     - text: >-
         a cluster median needs 3 genuine reports and a region median 1.  Each genuine
         report scored against the median of the OTHER genuine reports in its cell
-        (2026-11-12): within 25% of the held-out price, a cluster median of 2 others
-        63.6% against the region median's 67.4%, of 3 others 71.7% against 69.1%, of 5
-        others 73.5% against 70.8%, of 10 or more 87.2% against 84.9%.  From 3 the
-        cluster median is about as good as the region's or better, and 3 is the smallest
-        median one stray report cannot move.  The region is the last level the ruling
+        (2026-11-12): within 25% of the held-out price, a cluster median of 1 other
+        67.1% against the region median's 64.6%, of 2 others 63.6% against 67.4%, of 3
+        71.7% against 69.1%, of 4 69.7% against 70.7%, of 5 73.5% against 70.8%, of 10
+        or more 87.2% against 84.9%.  The comparison is noisy below 5 and does not single
+        out 3; it permits it: from 3 the cluster median is within a point of the
+        region's or better, and 3 is the smallest median one stray report cannot move.
+        The region is the last level the ruling
         names and it withholds only where there is no genuine local price, so a region
         cell with a single report is used; a floor of 3 there too would serve 3,787 rows
-        NA instead of 1,992.  Each value's report counts are in the function's output.
+        NA instead of 1,992.  That has a cost: 831 region-level rows rest on 1 report and
+        964 on 2, and for reports whose cluster has fewer than 3 others a region median
+        of 1 or 2 other reports is within 25% of the held-out price only 48.5% / 43.1% of
+        the time (64.5% with 10 or more).  Each value's report counts are in the
+        function's output.
       basis: modelling-choice
       evidence: >-
         Held-out checks on s07b_me_ner2018.dta, 2026-11-12 (reports/

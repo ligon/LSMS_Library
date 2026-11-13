@@ -3766,9 +3766,9 @@ answered =Plus de 30 jours=).  That is the ruling's "for the flagged rows"; one 
 *The floors.*  Each genuine report was scored against the median of the OTHER genuine reports in its
 cell.  Within 25% of the held-out price, a cluster median of 1 other report scores 67.1% against the
 region median's 64.6%, of 2 others 63.6% against 67.4%, of 3 others 71.7% against 69.1%, of 4 69.7%
-against 70.7%, of 5 73.5% against 70.8%, and of 10 or more 87.2% against 84.9%.  So from 3 the
-cluster median is about as good as the region's or better, and 3 is also the smallest median one
-stray report cannot move.  The region floor is 1, because the ruling withholds only where there is
+against 70.7%, of 5 73.5% against 70.8%, and of 10 or more 87.2% against 84.9%.  The comparison
+is noisy below 5 and does not single out 3; it permits it: from 3 the cluster median is within a
+point of the region's or better, and 3 is also the smallest median one stray report cannot move.  The region floor is 1, because the ruling withholds only where there is
 "no genuine local price" and the region is its last level.  That has a cost: 831 region-level rows
 rest on 1 report and 964 on 2.  For reports whose cluster has fewer than 3 others, a region median of
 1 other report is within 25% of the held-out price 48.5% of the time, of 2 others 43.1%, of 3-4
@@ -3807,7 +3807,9 @@ of 1,992.  The report counts behind every value are in the registered function's
 - *A new build input.*  The cover =s00_me_ner2018.dta= supplies the region (each of the 504 grappes
   in one region; every s07b record on the cover), declared under =household_region:= in the wave's
   =food_acquired= block.  With it unfetchable, =food_acquired(waves=['2018-19'])= raises
-  =FileNotFoundError= naming the file; 2021-22 still serves.
+  =FileNotFoundError= naming the file, and =food_acquired(waves=['2021-22'])= still serves.  Not
+  measured: an all-waves call, and the kilogram modes of a 2021-22 subset, which read every wave
+  (GH #1487) and so should raise too.
 - *Residual for the maintainer.*  167 genuine reports carry a non-integer =s07bq08=, the same "cannot
   have been entered" signal as the flagged class (the red team counted 162 under its definition).
   They are unflagged, so the ruling counts them as genuine and they price their cells; between 255
