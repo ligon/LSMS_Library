@@ -76,7 +76,7 @@ quantity/conversion basis, a default quantity of one, a PH size rule, or an infe
 ---
 ### Phase 3 — verification
 
-- `MAPPING.org` / builder — OK (§2): every `j` comes from an existing resolver or a listed override; every proposed `j` is a `harmonize_food` Preferred Label except native "Pepper" (§3, #1144) and every proposed `u` is a `u` Preferred Label except `ml` and `Congo/Mudu` (flagged).
+- `MAPPING.org` / builder — OK (§2): every `j` comes from an existing resolver or a listed override; every proposed `j` is a `harmonize_food` Preferred Label except native "Pepper" (§3, #1144) and every proposed `u` is a `u` Preferred Label except `ml` and `Congo/Mudu` (flagged).  *(Superseded: the wiring also served W1 code 1 as `Tomatoes cup`, which this sentence predates (red team F3); since the 2026-11-12 ruling "Register tokens, keep Unknown" all three are `u` Preferred Labels, codes 1020-1022.)*
 - Builder — OK (§4): no PP code is decoded through a `u` Code join; overrides cover exactly the six verified rule errors.
 - No REINVENTION: the projection's explicit-map contract (`pp_community_prices.py:137`) is the consumer; no parser or factor added.
 - CONTRADICTION recorded, not resolved: CONTENTS.org L2140-2152 ("C8 is POST-HARVEST ONLY … PP carries C1-C4 only … correctly empty") is contradicted by all five PP forms (Section 2 / C2 Food Prices).

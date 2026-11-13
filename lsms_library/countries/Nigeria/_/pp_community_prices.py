@@ -191,25 +191,35 @@ def pp_community_price_projection(report, *, item_map, unit_map):
 # GH #587 SERVING: PP C2 rows on Nigeria's shared labels (rulings 2026-11-12)
 # ===========================================================================
 #
-# The rulings (``.sucoder/isa-decisions.org``, three 2026-11-12 GH587 entries):
+# The rulings (``.sucoder/isa-decisions.org``, the 2026-11-12 GH587 entries):
 #   * labels: j = Nigeria's shared harmonize_food Preferred Label, u = the
 #     shared base unit label (the data_scheme.yml j/u promise);
 #   * unit axis: the PH size-agnostic base u, the native size in its own
 #     column (``Size``);
 #   * W1: Price of one unit = sc2q3a / sc2q3b where Number of Units > 1, a
 #     registered derivation; N = 1 as recorded; no count -> unserved,
-#     registered.  Two W1 metric groups are held, each registered on its
-#     own ("Hold both groups", 2026-11-12): g / ml with N = 1 (package
-#     prices, ~144x the household unit value) and Kg / l with N > 50 (the
-#     count reads as a size; divided they sit 50-1000x below it);
+#     registered.  W1 groups held, each registered on its own: g / ml with
+#     N = 1 (package prices, ~144x the household unit value) and Kg / l with
+#     N > 50 (the count reads as a size) ("Hold both groups"); then, after
+#     the red team's N-band test ("GH587 W1 division after red team"), Kg
+#     with N 6-50 (divided 0.16-0.33x on three references), non-metric units
+#     with N > 50 (divided 0.015x, undivided 1.0x: N reads as a size) and
+#     g / ml with N 2-5 (~9x household).  The division is kept, under its
+#     OWN key marking it unvalidated, on non-metric N 2-50, Kg N 2-5 and
+#     every Unknown-unit row; g / ml N >= 6 and l N 2-50 keep the original
+#     division key;
 #   * W2-W4: the printed "PLEASE USE A QUANTITY OF ONE (1)" -- as recorded;
 #   * W5: "accept quantity of one"; the c2q2a Quantity is disclosed (below);
-#   * W4/W5 coded metric SIZE: the PH c8-metric-size division, for PP;
+#   * W4/W5 coded metric SIZE: the PH c8-metric-size division, for PP --
+#     including W5's Bottle/Can rows whose c2q2a is not 1 ("Serve the 63
+#     via c8", "GH587 label judgements and two follow-ups");
 #   * metric UNITS with no recorded package size ("Serve W3 kg/l and W5
 #     g/cl", 2026-11-12): W3 Kg / l served as recorded (per-kg / per-litre
 #     prices, 1.07x / 1.00x the household unit value); W5 g / cl that record
 #     c2q2a served as c2q3 / c2q2a, a registered derivation; W2 g / cl, W3
-#     g / cl and W5 g / cl with no c2q2a stay held, registered.
+#     g / cl and W5 g / cl with no c2q2a stay held, registered;
+#   * items ("Add a Semovita row"): W2 code 15 is served as harmonize_food's
+#     'Semovita'; W2 code 0 (the "No more option" sentinel) is not served.
 #
 # Every unserved, priced row is in exactly one registered omission (a
 # ``rows: 0`` entry in ``_/derivations.yml``) whose ``inputs`` callable below
@@ -233,26 +243,44 @@ PP_W5_QUANTITY_KEY = 'Nigeria::community_prices::pp-w5-quantity-not-one-hold'
 PP_W1_METRIC_PACKAGE_KEY = 'Nigeria::community_prices::pp-w1-metric-package-hold'
 PP_W1_COUNT_AS_SIZE_KEY = 'Nigeria::community_prices::pp-w1-count-as-size-hold'
 PP_W5_METRIC_QUANTITY_KEY = 'Nigeria::community_prices::pp-w5-metric-unit-quantity'
+PP_W1_UNITS_UNVALIDATED_KEY = 'Nigeria::community_prices::pp-w1-number-of-units-unvalidated'
+PP_W1_METRIC_SMALL_COUNT_KEY = 'Nigeria::community_prices::pp-w1-metric-small-count-hold'
+PP_W1_KG_MID_COUNT_KEY = 'Nigeria::community_prices::pp-w1-kg-mid-count-hold'
+PP_W1_NONMETRIC_COUNT_AS_SIZE_KEY = 'Nigeria::community_prices::pp-w1-nonmetric-count-as-size-hold'
 
-#: W1 Number of Units above which a Kg / l count reads as a size, not a
-#: count (ruling 2026-11-12, "Hold both groups").  N = 50 is still divided.
+#: W1's metric units, decoded from its own card (101-104).  Every other
+#: placed unit is "non-metric"; ``Unknown`` (no unit recorded) is neither.
+PP_W1_METRIC_UNITS = ('Kg', 'g', 'l', 'ml')
+
+#: The W1 Number-of-Units bands the red team measured and the maintainer
+#: ruled on ("GH587 W1 division after red team"): 2-5 (N <= 5), 6-50
+#: (5 < N <= 50) and above 50.  Above 50 a Kg / l or non-metric count reads
+#: as a size ("Hold both groups"; red team F1).
+PP_W1_SMALL_COUNT_MAX = 5
 PP_W1_COUNT_AS_SIZE_ABOVE = 50
 
 #: The disposition of every native PP row, in the order they are decided.
-#: ``served`` / ``w1-divided`` / ``metric-size`` / ``w5-metric-quantity``
-#: are served; ``unpriced`` (no positive Naira -- not available, or not
-#: priced) is excluded exactly as PH excludes it; every other one is a
-#: registered omission.
+#: ``served`` / ``w1-divided`` / ``w1-divided-unvalidated`` / ``metric-size``
+#: / ``w5-metric-quantity`` are served; ``unpriced`` (no positive Naira --
+#: not available, or not priced) is excluded exactly as PH excludes it;
+#: every other one is a registered omission.
 PP_DISPOSITIONS = ('unpriced', 'item-hold', 'unit-unplaced', 'w1-no-count',
                    'w1-metric-package-hold', 'w1-count-as-size-hold',
+                   'w1-metric-small-count-hold', 'w1-kg-mid-count-hold',
+                   'w1-nonmetric-count-as-size-hold',
                    'w5-metric-quantity', 'unrecorded-size-hold',
-                   'w5-quantity-hold', 'metric-size', 'w1-divided', 'served')
-PP_SERVED_DISPOSITIONS = ('served', 'w1-divided', 'metric-size', 'w5-metric-quantity')
+                   'w5-quantity-hold', 'metric-size', 'w1-divided-unvalidated',
+                   'w1-divided', 'served')
+PP_SERVED_DISPOSITIONS = ('served', 'w1-divided', 'w1-divided-unvalidated',
+                          'metric-size', 'w5-metric-quantity')
 PP_OMISSION_KEYS = {
     'item-hold': PP_ITEM_HOLD_KEY,
     'w1-no-count': PP_W1_NO_COUNT_KEY,
     'w1-metric-package-hold': PP_W1_METRIC_PACKAGE_KEY,
     'w1-count-as-size-hold': PP_W1_COUNT_AS_SIZE_KEY,
+    'w1-metric-small-count-hold': PP_W1_METRIC_SMALL_COUNT_KEY,
+    'w1-kg-mid-count-hold': PP_W1_KG_MID_COUNT_KEY,
+    'w1-nonmetric-count-as-size-hold': PP_W1_NONMETRIC_COUNT_AS_SIZE_KEY,
     'unrecorded-size-hold': PP_UNRECORDED_SIZE_KEY,
     'w5-quantity-hold': PP_W5_QUANTITY_KEY,
 }
@@ -270,13 +298,14 @@ PP_ITEM_QUARTER = {'W1': '2010Q3', 'W2': '2012Q3', 'W3-first': '2015Q3',
                    'W3-second': '2015Q3', 'W4': '2018Q3', 'W5': '2018Q3'}
 
 #: Carded PP item codes with NO harmonize_food Preferred Label -- held, not
-#: guessed (FOR MAINTAINER REVIEW).  Any other carded code the quarter
-#: resolver cannot place is a defect, and the map refuses it.
+#: guessed.  Any other carded code the quarter resolver cannot place is a
+#: defect, and the map refuses it.  W2 code 15 (Semovita) used to be held
+#: here; since the 2026-11-12 ruling "Add a Semovita row" harmonize_food's
+#: 2012Q3 column names it and a label-only 'Semovita' row carries its
+#: Preferred and Aggregate Labels, so the quarter resolver serves it (the
+#: wave-blind Code contract would still say "Bread", W1's code 15).
 PP_ITEM_HELD = {
     ('W2', 0): 'questionnaire sentinel "No more option", not a food item',
-    ('W2', 15): ('Semovita: on the W2 PP card, but harmonize_food has no row '
-                 'meaning Semovita (its 2012Q3 cell for code 15 is blank); the '
-                 'wave-blind Code contract would serve "Bread" (W1\'s code 15)'),
 }
 
 
@@ -326,17 +355,20 @@ def _card_item(spec):
 
 # --------------------------------------------------------------------- u ---
 #: Where the community decoder (``nigeria._canon_community_unit``, the one PH
-#: C8 uses) is wrong or silent on a PP label.  Every entry is FOR MAINTAINER
-#: REVIEW (MAPPING.org proposals).  Keyed ``(source group, native code)``.
+#: C8 uses) is wrong or silent on a PP label.  Accepted as proposed in
+#: MAPPING.org (ruling 2026-11-12, "Accept all").  The three W1 spellings
+#: are ``u`` Preferred Labels (codes 1020-1022, "Register tokens, keep
+#: Unknown").  Keyed ``(source group, native code)``.
 PP_UNIT_OVERRIDES = {
-    # W1's own card: no u row means a tomato cup.  A new weightless spelling;
-    # the label's stated 0.087 kg stays out of u (GH #1035).
+    # W1's own card: no u row means a tomato cup.  A weightless spelling
+    # (u code 1022); the label's stated 0.087 kg stays out of u (GH #1035).
     ('W1', 1): 'Tomatoes cup',
     # One W1 code names TWO units, 'congo/mudu (1.5 kg)'; W2-W5 code congo
     # and mudu apart.  The decoder returns 'Congo' (first substring hit).
+    # A combined spelling, u code 1020.
     ('W1', 6): 'Congo/Mudu',
-    # 'millilitre' hits 'litre' -> 'l', a 1000x error.  'ml' is the spelling
-    # food_acquired W1 serves (u table 2010-11, code 4).
+    # 'millilitre' hits 'litre' -> 'l', a 1000x error.  'ml' (u code 1021)
+    # is also the spelling food_acquired W1 serves (u table 2010-11, code 4).
     ('W1', 104): 'ml',
     # 'MEDIUM DERCA' (typo): the decoder returns nothing.
     ('W2', 10): 'Derica',
@@ -522,28 +554,50 @@ def pp_dispositions(raw, source_key):
     # rows), so the price of one is c2q3 / c2q2a -- a registered derivation.
     # Elsewhere the ruled basis is a quantity of one, so a row recording
     # another quantity is contradicted by its own export -- not served
-    # (measured: on CUBE rows the price scales with c2q2a), and registered.
+    # (measured: on CUBE rows the price scales with c2q2a), and registered --
+    # except a Bottle/Can row with a coded metric size, which the PH size
+    # division serves whatever its c2q2a ("Serve the 63 via c8", 2026-11-12).
     if source_key == 'W5':
         q = pd.to_numeric(frame['ReportedQuantity'], errors='coerce')
-        w5_quantity = q.notna() & q.ne(1)
+        w5_quantity = q.notna() & q.ne(1) & ~(u.eq('Bottle/Can') & metric_size)
         w5_metric_quantity = no_size & q.gt(0)
     else:
         q = None
         w5_quantity = w5_metric_quantity = pd.Series(False, index=index)
 
+    false = pd.Series(False, index=index)
     if source_key == 'W1':
         n = pd.to_numeric(frame['ReportedNumberOfUnits'], errors='coerce')
         no_count = n.isna() | n.lt(1)
+        several = n.gt(1)
+        small = several & n.le(PP_W1_SMALL_COUNT_MAX)
+        mid = n.gt(PP_W1_SMALL_COUNT_MAX) & n.le(PP_W1_COUNT_AS_SIZE_ABOVE)
+        large = n.gt(PP_W1_COUNT_AS_SIZE_ABOVE)
+        unknown = u.eq('Unknown')
+        nonmetric = ~u.isin(PP_W1_METRIC_UNITS) & ~unknown
         # "Hold both groups" (2026-11-12): a single g / ml is a package
         # price (144x the household per-gram price), and a Kg / l count
         # above 50 reads as a size (divided: 50-1000x below household).
         w1_metric_package = u.isin(('g', 'ml')) & n.eq(1)
-        w1_count_as_size = u.isin(('Kg', 'l')) & n.gt(PP_W1_COUNT_AS_SIZE_ABOVE)
-        divide = n.gt(1)
+        w1_count_as_size = u.isin(('Kg', 'l')) & large
+        # "GH587 W1 division after red team" (2026-11-12): held -- g / ml
+        # with N 2-5 (divided ~9x household), Kg with N 6-50 (divided
+        # 0.16-0.33x on three references) and non-metric units with N > 50
+        # (divided 0.015x, undivided 1.0x their own N = 1 price).
+        w1_metric_small_count = u.isin(('g', 'ml')) & small
+        w1_kg_mid_count = u.eq('Kg') & mid
+        w1_nonmetric_count_as_size = nonmetric & large
+        # ... and still divided, under a separate key marking the division
+        # unvalidated: non-metric N 2-50, Kg N 2-5, every Unknown-unit row
+        # (the held bands above are decided first).  What is left of N > 1
+        # -- g / ml N >= 6 and l N 2-50 -- keeps the original key.
+        divide_unvalidated = several & (nonmetric | unknown | u.eq('Kg'))
+        divide = several
     else:
         n = None
-        no_count = divide = pd.Series(False, index=index)
-        w1_metric_package = w1_count_as_size = pd.Series(False, index=index)
+        no_count = divide = divide_unvalidated = false
+        w1_metric_package = w1_count_as_size = false
+        w1_metric_small_count = w1_kg_mid_count = w1_nonmetric_count_as_size = false
 
     decided = pd.Series(False, index=index)
     for name, mask in (('unpriced', ~priced),
@@ -552,10 +606,14 @@ def pp_dispositions(raw, source_key):
                        ('w1-no-count', no_count),
                        ('w1-metric-package-hold', w1_metric_package),
                        ('w1-count-as-size-hold', w1_count_as_size),
+                       ('w1-metric-small-count-hold', w1_metric_small_count),
+                       ('w1-kg-mid-count-hold', w1_kg_mid_count),
+                       ('w1-nonmetric-count-as-size-hold', w1_nonmetric_count_as_size),
                        ('w5-metric-quantity', w5_metric_quantity),
                        ('unrecorded-size-hold', no_size),
                        ('w5-quantity-hold', w5_quantity),
                        ('metric-size', metric_size),
+                       ('w1-divided-unvalidated', divide_unvalidated),
                        ('w1-divided', divide)):
         take = mask.fillna(False).astype(bool) & ~decided
         disp[take] = name
@@ -570,10 +628,12 @@ def pp_dispositions(raw, source_key):
     if take.any():
         price[take] = derive_pp_w5_metric_unit_price(reported[take], q[take])
         derivation[take] = PP_W5_METRIC_QUANTITY_KEY
-    take = disp.eq('w1-divided')
-    if take.any():
-        price[take] = derive_pp_w1_unit_price(reported[take], n[take])
-        derivation[take] = PP_W1_UNITS_KEY
+    for name, key in (('w1-divided', PP_W1_UNITS_KEY),
+                      ('w1-divided-unvalidated', PP_W1_UNITS_UNVALIDATED_KEY)):
+        take = disp.eq(name)
+        if take.any():
+            price[take] = derive_pp_w1_unit_price(reported[take], n[take])
+            derivation[take] = key
 
     unplaced = set(pp_unplaced_unit_codes(source_key))
     verbatim = disp.isin(PP_SERVED_DISPOSITIONS) & unit_code.isin(unplaced)
@@ -718,8 +778,15 @@ def pp_inputs(wave, dispositions):
 
 
 def inputs_pp_w1_number_of_units(wave='2010-11'):
-    """Registry inputs: W1 PP rows whose Price is sc2q3a / sc2q3b (N > 1)."""
+    """Registry inputs: W1 PP rows whose Price is sc2q3a / sc2q3b, on the
+    bands the evidence supports (g / ml N >= 6, l N 2-50)."""
     return pp_inputs(wave, ('w1-divided',))
+
+
+def inputs_pp_w1_number_of_units_unvalidated(wave='2010-11'):
+    """Registry inputs: W1 PP rows whose Price is sc2q3a / sc2q3b, on the
+    bands no comparator validates (non-metric N 2-50, Kg N 2-5, Unknown)."""
+    return pp_inputs(wave, ('w1-divided-unvalidated',))
 
 
 def inputs_pp_c2_metric_size(wave):
@@ -745,6 +812,21 @@ def inputs_pp_w1_metric_package_hold(wave='2010-11'):
 def inputs_pp_w1_count_as_size_hold(wave='2010-11'):
     """Registry inputs (deletion): W1 PP Kg / l rows with Number of Units > 50."""
     return pp_inputs(wave, ('w1-count-as-size-hold',))
+
+
+def inputs_pp_w1_metric_small_count_hold(wave='2010-11'):
+    """Registry inputs (deletion): W1 PP g / ml rows with Number of Units 2-5."""
+    return pp_inputs(wave, ('w1-metric-small-count-hold',))
+
+
+def inputs_pp_w1_kg_mid_count_hold(wave='2010-11'):
+    """Registry inputs (deletion): W1 PP Kg rows with Number of Units 6-50."""
+    return pp_inputs(wave, ('w1-kg-mid-count-hold',))
+
+
+def inputs_pp_w1_nonmetric_count_as_size_hold(wave='2010-11'):
+    """Registry inputs (deletion): W1 PP non-metric rows with Number of Units > 50."""
+    return pp_inputs(wave, ('w1-nonmetric-count-as-size-hold',))
 
 
 def inputs_pp_unrecorded_size_hold(wave):

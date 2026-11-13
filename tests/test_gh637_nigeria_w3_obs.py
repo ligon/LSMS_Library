@@ -155,12 +155,17 @@ def _aws_creds_available() -> bool:
 # 1,043 g / ml rows with N = 1 and 332 Kg / l rows with N > 50; 2015Q3
 # serves W3's 4,120 Kg / l rows (obs 1: 3,333, obs 2: 787); 2023Q3 serves
 # W5's 208 g / cl rows divided by c2q2a.
+# Then the red-team rulings (2026-11-12, "GH587 W1 division after red team"
+# and "GH587 label judgements and two follow-ups"): 2010Q3 holds 513 more W1
+# rows (Kg N 6-50: 208, non-metric N > 50: 241, g / ml N 2-5: 61 + 3);
+# 2012Q3 serves W2's 72 Semovita rows (code 15); 2023Q3 serves W5's 63
+# Bottle/Can rows with a coded metric size whose c2q2a is not 1.
 EXPECTED = {'2011Q1': {1: 30628}, '2013Q1': {1: 31239},
             '2016Q1': {1: 17344, 2: 5809},
             '2019Q1': {1: 31757}, '2024Q1': {1: 30015},
-            '2010Q3': {1: 20839}, '2012Q3': {1: 21124},
+            '2010Q3': {1: 20326}, '2012Q3': {1: 21196},
             '2015Q3': {1: 18365, 2: 6630},
-            '2018Q3': {1: 32246}, '2023Q3': {1: 29875}}
+            '2018Q3': {1: 32246}, '2023Q3': {1: 29938}}
 
 
 @pytest.mark.slow

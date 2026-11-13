@@ -300,6 +300,7 @@ def test_community_prices_serves_each_round_at_its_own_quarter(nigeria):
     is_pp = r['t'].isin(PP_QUARTERS)
     pp_keys = set(r.loc[is_pp, 'Derivation'].dropna())
     assert pp_keys == {'Nigeria::community_prices::pp-w1-number-of-units',
+                       'Nigeria::community_prices::pp-w1-number-of-units-unvalidated',
                        'Nigeria::community_prices::pp-c2-metric-size',
                        'Nigeria::community_prices::pp-w5-metric-unit-quantity'}, pp_keys
     assert not set(r.loc[~is_pp, 'Derivation'].dropna()) & pp_keys
@@ -322,6 +323,7 @@ def test_community_prices_serves_each_round_at_its_own_quarter(nigeria):
 
 @pytest.mark.parametrize('key', [
     'Nigeria::community_prices::pp-w1-number-of-units',
+    'Nigeria::community_prices::pp-w1-number-of-units-unvalidated',
     'Nigeria::community_prices::pp-c2-metric-size',
     'Nigeria::community_prices::pp-w5-metric-unit-quantity',
 ])
@@ -338,8 +340,10 @@ def test_pp_derivation_inputs_join_and_reproduce_the_served_rows(nigeria, key):
     assert len(inp) == len(served) > 0
     assert set(inp.index) == set(served.index)
     fn = D.resolve_callable(nigeria.derivations()[key].function)
-    if key.endswith('number-of-units'):
+    if 'number-of-units' in key:        # both W1 division keys
         again = fn(inp['sc2q3a'], inp['sc2q3b'])
+        assert set(inp.index.get_level_values('t')) == {'2010Q3'}
+        assert (pd.to_numeric(inp['sc2q3b']) > 1).all()
     elif key.endswith('metric-unit-quantity'):
         again = fn(inp['c2q3'], inp['c2q2a'])
         assert set(inp.index.get_level_values('u')) == {'g', 'cl'}
@@ -357,20 +361,26 @@ def test_pp_derivation_inputs_join_and_reproduce_the_served_rows(nigeria, key):
                                    check_names=False, check_index=False, rtol=1e-12)
 
 
-@pytest.mark.parametrize('key', [
-    'Nigeria::community_prices::pp-w1-no-count-hold',
-    'Nigeria::community_prices::pp-w1-metric-package-hold',
-    'Nigeria::community_prices::pp-w1-count-as-size-hold',
-    'Nigeria::community_prices::pp-unrecorded-size-hold',
-    'Nigeria::community_prices::pp-unharmonized-item-hold',
-    'Nigeria::community_prices::pp-w5-quantity-not-one-hold',
+@pytest.mark.parametrize('key,held', [
+    ('Nigeria::community_prices::pp-w1-no-count-hold', 105),
+    ('Nigeria::community_prices::pp-w1-metric-package-hold', 1043),
+    ('Nigeria::community_prices::pp-w1-count-as-size-hold', 332),
+    ('Nigeria::community_prices::pp-w1-metric-small-count-hold', 64),
+    ('Nigeria::community_prices::pp-w1-kg-mid-count-hold', 208),
+    ('Nigeria::community_prices::pp-w1-nonmetric-count-as-size-hold', 241),
+    ('Nigeria::community_prices::pp-unrecorded-size-hold', 13166),
+    # W2 code 0, the "No more option" sentinel, has no priced row; code 15
+    # (Semovita) is served since the 2026-11-12 "Add a Semovita row" ruling.
+    ('Nigeria::community_prices::pp-unharmonized-item-hold', 0),
+    ('Nigeria::community_prices::pp-w5-quantity-not-one-hold', 60),
 ])
-def test_pp_omissions_return_rows_the_table_does_not_serve(nigeria, key):
+def test_pp_omissions_return_rows_the_table_does_not_serve(nigeria, key, held):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         cp = nigeria.community_prices()
         inp = nigeria.derivation_inputs(key)
-    assert len(inp) > 0
+    assert len(inp) == held
+    assert inp.index.is_unique
     assert not set(inp.index) & set(cp.index)
     summary = cp.attrs['derivations']['Nigeria']
     assert summary[key]['rows'] == 0

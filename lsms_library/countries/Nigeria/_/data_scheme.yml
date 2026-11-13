@@ -754,8 +754,10 @@ Data Scheme:
     #           at the present time (Naira).  PH W1/W2 sc8q2 / c8q2; W3-W5
     #           c8q3 / c8aq3.  PP c2q3 (W1 sc2q3a, divided by the Number of
     #           Units sc2q3b where it exceeds 1 -- the registered
-    #           pp-w1-number-of-units; W5 g / cl with no size divided by
-    #           the c2q2a gram / cl count -- pp-w5-metric-unit-quantity).
+    #           pp-w1-number-of-units on the bands the evidence supports,
+    #           pp-w1-number-of-units-unvalidated on those it does not; W5
+    #           g / cl with no size divided by the c2q2a gram / cl count --
+    #           pp-w5-metric-unit-quantity).
     #   Size    the native size the base `u` folds away (GH #587 unit-axis
     #           ruling): PP W4/W5 the recorded SIZE label verbatim ('0. SMALL',
     #           '34. 250 GRAMS'); PP W1-W3 the size their unit code carries
@@ -776,11 +778,12 @@ Data Scheme:
     #   u -> the SHARED `u` table base Preferred Label via _canon_unit.  W3-W5
     #        record the unit per row; W1/W2 carry no unit column, so the unit
     #        is the questionnaire's per-item fixed unit (_W1W2_PRICE_UNIT).
-    #        "All units used already exist in `u`" is no longer true: the PP
-    #        rows add 'Tomatoes cup', 'Congo/Mudu' and 'ml' (W1, for
-    #        maintainer review), 'Unknown' (a PP row with no unit recorded),
-    #        and '210. STEMS' / '260. SEEDLING/PLANT' would stay verbatim
-    #        (GH #1095; 0 rows).  j adds W1/W2's native 'Pepper' (GH #1144).
+    #        The PP rows add 'Tomatoes cup', 'Congo/Mudu' and 'ml' (W1),
+    #        registered in `u` as codes 1020-1022 (ruling 2026-11-12), and
+    #        'Unknown' (a PP row with no unit recorded, the data_info.yml
+    #        sentinel); '210. STEMS' / '260. SEEDLING/PLANT' would stay
+    #        verbatim (GH #1095; 0 rows).  j adds W1/W2's native 'Pepper'
+    #        (GH #1144) and W2's 'Semovita' (a harmonize_food row).
     # t = PH_QUARTER[wave] for C8 rows, PP_QUARTER[wave] for C2 rows.
     #
     # GH #834 (C8 SIZE field, W3-W5): where the coded size states a metric

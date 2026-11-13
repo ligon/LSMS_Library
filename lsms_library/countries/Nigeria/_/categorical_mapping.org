@@ -34,6 +34,22 @@
   label in the PH harvest quarters (2011Q1/2013Q1/2016Q1/2019Q1); 2023-24
   (PH quarter 2024Q1) has no column but resolves via Code.
 
+  Semovita (GH #587; ruling 2026-11-12 "Add a Semovita row").  The W2
+  post-planting COMMUNITY price card (sectc2_plantingw2, 2012Q3) numbers
+  its items as the 2012Q3 household card does, except code 15, Semovita,
+  which the household card does not use (0 rows of code 15 in
+  sect7b_plantingw2 / sect10b_harvestw2 or any later household food file).
+  So the 2012Q3 cell of code 15 names Semovita, and a label-only row (the
+  GH #1144 convention of the Groundnuts / Maize (shelled) rows) carries its
+  Preferred and Aggregate Labels; the wave-blind Code contract still reads
+  code 15 as W1's Bread.  Aggregate 'Other grains and flour': where the
+  household files record Semovita -- the other-specify recode
+  '231. Semovita/semolina' (item_os_cd) of W4 PP/PH, W5 PP and NLSS
+  2018-19 -- it sits under item_cd 23 "Other grains and flour (specify)" on
+  189 of 190 rows (one under 38, other roots and tuber), and food_acquired
+  serves W4's under that label.  (GhanaLSS 2016-17 folds "Wheat semolina,
+  suji" into Wheat Flour instead.)
+
 #+NAME: harmonize_food
 | Code | Preferred Label                         | Aggregate Label              | 2010Q3                                        | 2011Q1                                        | 2012Q3                                        | 2013Q1                                        | 2015Q3                                        | 2016Q1                                        | 2018Q3                                        | 2019Q1                                        |
 |------+-----------------------------------------+------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|
@@ -51,7 +67,7 @@
 |   12 | Maize                                   | Maize                        | Maize                                         | Maize                                         | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           |
 |   13 | Rice--local                             | Rice                         | Rice--local                                   | Rice--local                                   | Rice--local                                   | Rice--local                                   | Rice--local                                   | Rice--local                                   | Rice--local                                   | Rice--local                                   |
 |   14 | Rice--imported                          | Rice                         | Rice--imported                                | Rice--imported                                | Rice--imported                                | Rice--imported                                | Rice--imported                                | Rice--imported                                | Rice--imported                                | Rice--imported                                |
-|   15 | Bread                                   | Bread                        | Bread                                         | Bread                                         | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           |
+|   15 | Bread                                   | Bread                        | Bread                                         | Bread                                         | Semovita                                      | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           |
 |   16 | Maize flour                             | Maize flour                  | Maize flour                                   | Maize flour                                   | Maize flour                                   | Maize flour                                   | Maize flour                                   | Maize flour                                   | Maize flour                                   | Maize flour                                   |
 |   17 | Yam flour                               | Yam flour                    | Yam flour                                     | Yam flour                                     | Yam flour                                     | Yam flour                                     | Yam flour                                     | Yam flour                                     | Yam flour                                     | Yam flour                                     |
 |   18 | Cassava flour                           | Cassava flour                | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 |
@@ -297,6 +313,7 @@
 | 4016 | Kunu | Kunu | --- | Kunu | --- | Kunu | --- | --- | --- | --- |
 |  | Groundnuts | Groundnuts |  |  |  |  |  |  |  |  |
 |  | Maize (shelled) | Maize |  |  |  |  |  |  |  |  |
+|  | Semovita | Other grains and flour |  |  |  |  |  |  |  |  |
 
 * Units
 
@@ -328,6 +345,16 @@
   already cover; the rest reuse existing food-unit Preferred Labels (Kg, g,
   l, cl, Sack/Bag, Basket, Basin, Tuber, Wheelbarrow, ...).  kg-conversion
   factors are NOT stored here (that is a transformation).
+
+  Codes 1020-1022 register three post-planting community-price units (GH
+  #587; ruling 2026-11-12 "Register tokens, keep Unknown"), served by
+  _/pp_community_prices.py from W1's own PP C2 card, never by joining a PP
+  unit code to this table: 'Congo/Mudu' (W1 PP code 6 names both units),
+  'ml' (W1 PP code 104 "millilitre"; also the spelling food_acquired W1
+  decodes from the 2010-11 column's code 4) and 'Tomatoes cup' (W1 PP
+  code 1; weightless -- the card's stated 0.087 kg stays out of u, GH
+  #1035).  Like 1001-1019 they carry no per-wave column, so no food or
+  harvest decode reads them.
 
 #+NAME: u
 | Code | Preferred Label              | 2010-11                      | 2012-13                      | 2015-16                      | 2018Q3                       | 2019Q1                       |
@@ -438,6 +465,9 @@
 | 1017 | Stalk | --- | --- | --- | --- | --- |
 | 1018 | Tiya | --- | --- | --- | --- | --- |
 | 1019 | days | --- | --- | --- | --- | --- |
+| 1020 | Congo/Mudu | --- | --- | --- | --- | --- |
+| 1021 | ml | --- | --- | --- | --- | --- |
+| 1022 | Tomatoes cup | --- | --- | --- | --- | --- |
 
 * Geopolitical Zones
 
