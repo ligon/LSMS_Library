@@ -19,15 +19,20 @@ WRAPPER = ROOT / "scripts" / "private_ci_check.py"
 SECRET = "FAKE_PRIVATE_ROW_42_COORD_12_345"
 
 
-def _invoke(tmp_path, command, *, junit=None, stage="data-tests"):
+def _invoke(tmp_path, command, *, junit=None, stage="data-tests", pins=False, expect=None):
     temporary = tmp_path / "user temp with spaces"
     temporary.mkdir(exist_ok=True)
     env = os.environ.copy()
     env.update(TMPDIR=str(temporary), TMP=str(temporary), TEMP=str(temporary),
                PYTEST_DISABLE_PLUGIN_AUTOLOAD="1")
+    env.pop("EXPECT", None)
+    if expect is not None:
+        env["EXPECT"] = expect
     argv = [sys.executable, str(WRAPPER), "--stage", stage]
     if junit is not None:
         argv += ["--junit", junit]
+    if pins:
+        argv += ["--public-pins"]
     result = subprocess.run(argv + ["--"] + command, cwd=tmp_path,
                             env=env, capture_output=True, text=True, timeout=60)
     assert SECRET not in result.stdout
@@ -260,7 +265,131 @@ def test_workflow_wraps_each_credentialed_data_command_without_changing_coverage
                    if step.get("name") == "Cold-build and compare with Linux")
     assert windows["shell"] == "cmd /C CALL {0}"
     assert 'python "%GITHUB_WORKSPACE%\\scripts\\private_ci_check.py"' in windows["run"]
-    assert '--stage windows-script-build -- python "%GITHUB_WORKSPACE%\\scripts\\windows_build_check.py" Uganda:shocks Uganda:assets' in windows["run"]
+    assert '--stage windows-script-build --public-pins -- python "%GITHUB_WORKSPACE%\\scripts\\windows_build_check.py" Uganda:shocks Uganda:assets' in windows["run"]
+    # Every pinned table is built, and every built table is pinned.
+    expect = windows["env"]["EXPECT"]
+    assert _expected_pins(expect) is not None
+    assert sorted(_expected_pins(expect)) == sorted(windows["run"].split()[-2:])
+
+
+# GH #1716: a stale pin must be diagnosable from the public log, which before
+# showed only `exit=1`.  The pin line adds nothing the child chooses beyond a
+# decimal row count and a 12-hex digest read from a fully matching RESULT line.
+def _wrapper_module():
+    spec = importlib.util.spec_from_file_location("private_ci_check_under_test", WRAPPER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _expected_pins(text):
+    return _wrapper_module()._expected_pins(text)
+
+
+PIN_EXPECT = "Uganda:shocks=14459:aac42079f006,Uganda:assets=116808:9202ed542a14"
+
+
+def _result_child(lines, status=0):
+    """A child that writes SECRET noise around the given stdout lines."""
+    code = ("import sys, warnings; "
+            f"print({SECRET!r}); warnings.warn({SECRET!r}); "
+            f"sys.stdout.write({''.join(lines)!r}); print({SECRET!r}, file=sys.stderr); "
+            f"sys.exit({status})")
+    return [sys.executable, "-c", code]
+
+
+def _result_line(spec, rows, digest, end="\n"):
+    return f"RESULT {spec} rows={rows} cols=10 waves=8 digest={digest} (51s){end}"
+
+
+@pytest.mark.parametrize("end", ["\n", "\r\n"])
+def test_pins_publish_expected_and_actual_rows_and_digest(tmp_path, end):
+    lines = [_result_line("Uganda:shocks", 14459, "aac42079f006", end),
+             _result_line("Uganda:assets", 116808, "0123456789ab", end)]
+    result = _invoke(tmp_path, _result_child(lines, 1), stage="windows-script-build",
+                     pins=True, expect=PIN_EXPECT)
+    assert result.returncode == 1
+    assert result.stdout == (
+        "private-ci-check stage=windows-script-build exit=1\n"
+        "pin Uganda:shocks expected rows=14459 digest=aac42079f006 "
+        "actual rows=14459 digest=aac42079f006 match\n"
+        "pin Uganda:assets expected rows=116808 digest=9202ed542a14 "
+        "actual rows=116808 digest=0123456789ab mismatch\n")
+
+
+@pytest.mark.parametrize("lines", [
+    [],  # the build raised before printing RESULT
+    [_result_line("Uganda:shocks", 14459, "aac42079f006")] * 2,  # ambiguous
+    [_result_line("Uganda:shocks", 14459, "aac42079f006").rstrip("\n")],  # unterminated
+    [_result_line("Uganda:shocks", 14459, SECRET)],
+    [_result_line("Uganda:shocks", SECRET, "aac42079f006")],
+    [_result_line("Uganda:shocks", 14459, "aac42079f006").replace("(51s)", SECRET)],
+    [SECRET + _result_line("Uganda:shocks", 14459, "aac42079f006")],
+    ["RESULT Uganda:shocks rows=14459 digest=aac42079f006\n"],
+    [_result_line("Uganda:shocks", 14459, "AAC42079F006")],
+    [_result_line("Uganda:shocks", "1" * 10, "aac42079f006")],
+    ["x" * 5000 + _result_line("Uganda:shocks", 14459, "aac42079f006")],
+    [_result_line("Uganda:shocksé", 14459, "aac42079f006")],
+])
+def test_pins_without_one_well_formed_result_are_unavailable(tmp_path, lines):
+    result = _invoke(tmp_path, _result_child(lines, 1), stage="windows-script-build",
+                     pins=True, expect="Uganda:shocks=14459:aac42079f006")
+    assert result.returncode == 1
+    assert result.stdout == (
+        "private-ci-check stage=windows-script-build exit=1\n"
+        "pin Uganda:shocks expected rows=14459 digest=aac42079f006 actual unavailable\n")
+
+
+def test_pins_report_only_tables_named_in_expect(tmp_path):
+    lines = [_result_line("Uganda:secret_table", 1, "aac42079f006"),
+             _result_line("Uganda:shocks", 14459, "aac42079f006")]
+    result = _invoke(tmp_path, _result_child(lines), stage="windows-script-build",
+                     pins=True, expect="Uganda:shocks=14459:aac42079f006")
+    assert result.returncode == 0
+    assert "secret_table" not in result.stdout
+    assert result.stdout.endswith("actual rows=14459 digest=aac42079f006 match\n")
+
+
+@pytest.mark.parametrize("expect", [
+    None, "", SECRET, "Uganda:shocks=14459", "Uganda:shocks=14459:aac42079f00",
+    "Uganda:shocks=14459:aac42079f006,", "Uganda:shocks=x:aac42079f006",
+    "Uganda shocks=14459:aac42079f006", "Uganda:shocks=14459:aac42079f006\n" + SECRET,
+    "Uganda:shocks=14459:aac42079f006,Uganda:shocks=14459:aac42079f006",
+    ",".join(f"Uganda:t{chr(97 + k)}=1:aac42079f006" for k in range(17)),
+])
+def test_unusable_expect_publishes_no_pin_values(tmp_path, expect):
+    lines = [_result_line("Uganda:shocks", 14459, "aac42079f006")]
+    result = _invoke(tmp_path, _result_child(lines, 3), stage="windows-script-build",
+                     pins=True, expect=expect)
+    assert result.returncode == 3
+    assert result.stdout == ("private-ci-check stage=windows-script-build exit=3\n"
+                             "pin unavailable\n")
+
+
+def test_pins_are_refused_outside_the_windows_script_build(tmp_path):
+    result = _invoke(tmp_path, _result_child([]), stage="data-tests", pins=True,
+                     expect=PIN_EXPECT)
+    assert result.returncode == 125
+    assert result.stdout == "private-ci-check stage=data-tests exit=125\n"
+
+
+def test_pins_follow_a_startup_failure_without_values(tmp_path):
+    result = _invoke(tmp_path, [str(tmp_path / SECRET)], stage="windows-script-build",
+                     pins=True, expect=PIN_EXPECT)
+    assert result.returncode == 125
+    assert result.stdout == ("private-ci-check stage=windows-script-build exit=125\n"
+                             "pin unavailable\n")
+
+
+def test_pin_parser_matches_the_build_check_result_format():
+    """The wrapper parses exactly what windows_build_check.py prints."""
+    source = (ROOT / "scripts" / "windows_build_check.py").read_text(encoding="utf-8")
+    assert ('print(f"RESULT {spec} rows={len(df)} cols={df.shape[1]} waves={len(waves)} '
+            'digest={digest:012x} ({time.time()-t0:.0f}s)")') in source
+    assert 'rows, digest = want.split(":")' in source
+    pattern = _wrapper_module()._PIN_RESULT
+    assert pattern.fullmatch("RESULT Uganda:shocks rows=14459 cols=10 waves=8 "
+                             "digest=aac42079f006 (51s)")
 
 
 def test_windows_smoke_executes_private_wrapper_tests():
