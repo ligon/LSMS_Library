@@ -10,5 +10,7 @@ $PY $BATCH/tools/hashdiff.py $O/census-base.json $O/census-cand.json $O/hashdiff
 (cd $SRC_1/lsms_library/countries/Benin/_ && PYTHONPATH=$SRC_1 LSMS_DATA_DIR=$DATA_1 PATH=$(dirname $PY):$PATH make panel-ids > $O/make_panel_ids.txt 2>&1; echo "exit $?" >> $O/make_panel_ids.txt; git -C $SRC_1 status --short >> $O/make_panel_ids.txt; echo status-end >> $O/make_panel_ids.txt)
 (cd $SRC_1 && PYTHONPATH=$SRC_1 LSMS_DATA_DIR=$DATA_1 "$PY" $S/feature_parity.py $O/feature_parity.json > $O/feature_parity.txt 2>&1; echo "exit $?" >> $O/feature_parity.txt)
 cd $SRC_1; export PYTHONPATH=$SRC_1 LSMS_DATA_DIR=$DATA_1
-"$PY" -m pytest -n 4 --dist=loadfile -p no:cacheprovider -q -rfEs tests/test_benin_panel_ids.py tests/test_benin_2018_plot_inputs.py tests/test_panel_ids_persistence.py tests/test_derivations.py > $O/pytest.txt 2>&1; echo "exit $?" >> $O/pytest.txt
+"$PY" -m pytest -n 8 --dist=loadfile -p no:cacheprovider -q -rfEs tests/test_benin_panel_ids.py tests/test_benin_2018_plot_inputs.py tests/test_panel_ids_persistence.py tests/test_derivations.py tests/test_gh1575_benin1575-stratawiring_strata.py tests/test_benin_2021_wave.py tests/test_id_walk.py tests/test_schema_consistency.py tests/test_build_transform_hash.py > $O/pytest.txt 2>&1; echo "exit $?" >> $O/pytest.txt
+"$PY" -m pytest -n 4 --dist=loadfile -p no:cacheprovider -q -rfEs -k Benin tests/test_sample.py tests/test_sampling.py > $O/pytest-kBenin.txt 2>&1; echo "exit $?" >> $O/pytest-kBenin.txt
+"$PY" -m pytest -n $SLURM_CPUS_ON_NODE --dist=loadfile -p no:cacheprovider -q -rfE -m "not requires_s3" tests/ > $O/pytest-datafree.txt 2>&1; echo "exit $?" >> $O/pytest-datafree.txt
 find lsms_library/countries -name '*.parquet' > $O/intree_parquets.txt; git status --short > $O/git_status.txt
