@@ -1,5 +1,26 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: GH1519 Expenditure on the NA rows -- ANSWERED
+The user explicitly selected: "Yes, NA Expenditure too (Recommended)".  On the
+2 Senegal 2018-19 product-132 rows whose Expenditure the registered #876 rule
+computes from the withheld near-zero quantity, Expenditure is NA as well
+(6,000 FCFA).  A value computed from a withheld quantity is withheld with it.
+
+* 2026-11-12: GH1708 Niger 2018-19 purchase valuation -- ANSWERED
+Diagnosis (reports/served-corrections/REPORT.md): on 90% of the 15,264 flagged
+records the unit value s07bq08/s07bq07a is one producer reference value per
+product x unit x size x region; quantity backed out of value on 12,250, both
+rebuilt on 3,013; reference matches nothing documented; originals unrecoverable.
+The user asked whether food_expenditures reconstructs values from reported
+quantities and local prices (answer: no -- EHCVM Expenditure = purchased
+quantity x the household's OWN last-purchase unit value, #876).  Then
+explicitly selected: "Revalue at local median (Recommended)".  For the flagged
+rows, Expenditure = purchased quantity x the median GENUINE (unflagged)
+last-purchase unit value for the same product x unit x size in the same
+cluster, falling back to region; rows with no genuine local price get NA.  A
+registered derivation; the producer's values stay recoverable via
+derivation_inputs.  Consumed quantities are unchanged.
+
 * 2026-11-12: GH1509 ladder order and build-time Country-API dependencies -- ANSWERED
 Evidence: reports/framework-1509-redteam/VERDICT.md.
 - "Item self-valued first (Recommended)": for a (j,u) cell with NO purchase
