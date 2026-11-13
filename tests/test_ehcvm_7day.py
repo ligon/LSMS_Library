@@ -308,8 +308,9 @@ class TestDelivered:
         assert (got == (s == 'purchased')).all()
         keys = set(x['Derivation'].dropna().str.split('+').explode())
         # GH #1708: Niger 2018-19's purchased rows built from a computed s07bq07a also
-        # carry that flag.
-        flags = {'Niger::food_acquired::computed-last-purchase-quantity'} \
+        # carry that flag, and the key of their revaluation at a local median.
+        flags = {'Niger::food_acquired::computed-last-purchase-quantity',
+                 'Niger::food_acquired::flagged-purchase-local-median'} \
             if (country, wave) == ('Niger', '2018-19') else set()
         assert keys - {derivation_key(country)} <= {
             f'{country}::food_acquired::nsu-national-unit-weight'} | flags

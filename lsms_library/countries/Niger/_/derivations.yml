@@ -26,7 +26,12 @@ Niger::food_acquired::7day-purchase-at-last-purchase-unit-value:
     case, accents, padding and punctuation folded -- the two variables carry
     DIFFERENT value-label sets inside the same .dta.  Before GH #876 the served
     Expenditure was s07bq08 itself: the value of one purchase of unrecorded
-    size made up to 30 days earlier, beside a 7-day quantity.
+    size made up to 30 days earlier, beside a 7-day quantity.  Since 2026-11-12
+    (GH #1708, "Revalue at local median"), on the 15,014 2018-19 purchased rows
+    built from a record whose s07bq07a was computed by the producers, the unit
+    value is a local median of genuine last purchases instead of the
+    household's own, under flagged-purchase-local-median; those rows carry
+    both keys, and the counts and totals below are as measured before it.
   function: lsms_library.ehcvm:derive_ehcvm_purchase_value
   inputs: lsms_library.countries.Niger.2018-19._.mapping:inputs_food_acquired
   raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s07bq07a,
@@ -551,7 +556,8 @@ Niger::food_acquired::nsu-national-unit-weight:
   since: '2026-11-04'
 
 # A FLAG, not our construction (GH #1708): the producers' file carries a computed
-# s07bq07a on these records.  The rows are served unchanged and say so.
+# s07bq07a on these records.  The rows say so; since the second ruling their
+# Expenditure is revalued, under flagged-purchase-local-median (below).
 Niger::food_acquired::computed-last-purchase-quantity:
   waves: ['2018-19']
   columns: [Expenditure]
@@ -560,9 +566,11 @@ Niger::food_acquired::computed-last-purchase-quantity:
     A purchased row built from a record of s07b_me_ner2018.dta whose s07bq07a (the
     quantity of the last purchase) is positive and off the quarter grid, i.e. not a
     multiple of 0.25, carries this key beside its 7day-purchase-at-last-purchase-unit-value
-    key.  Nothing is changed: the row's Expenditure is still Quantity x s07bq08 /
-    s07bq07a, and it passes through that s07bq07a.  A purchased row that shares its
-    key with an unflagged record's (core sums the two) carries it too.  15,264 of the
+    key.  This key changes no value itself.  Under the first ruling the row's
+    Expenditure stayed Quantity x s07bq08 / s07bq07a, passing through that s07bq07a;
+    under the second (2026-11-12, "Revalue at local median") it is revalued, and the row
+    carries flagged-purchase-local-median too.  A purchased row that shares its key with
+    an unflagged record's (core sums the two) carries it too; none does.  15,264 of the
     107,263 positive s07bq07a are flagged (14.2%); 15,014 of those records become a
     served purchased row.
   function: lsms_library.countries.Niger.2018-19._.mapping:computed_last_purchase_rows
@@ -591,13 +599,100 @@ Niger::food_acquired::computed-last-purchase-quantity:
         48, download 191 / 192): s07Bq07a "NUMERIQUE: DECIMAL", s07Bq08 "NUMERIQUE:
         ENTIER", both enabled under s07Bq06.InList(1,2,3).
     - text: >-
-        the rows are flagged and served, not dropped or set NA: the drop decision is
-        the maintainer's, and comes after the diagnosis.  How the values were built is
-        not documented anywhere found; Niger/_/CONTENTS.org has the diagnosis.
+        the rows are flagged and served, not dropped: the first ruling flagged them and
+        returned the decision to the maintainer after the diagnosis, and the second
+        revalues their Expenditure at a local median of genuine prices
+        (flagged-purchase-local-median).  How the producer's values were built is not
+        documented anywhere found; Niger/_/CONTENTS.org has the diagnosis.
       basis: modelling-choice
-      evidence: Ruling @ligon 2026-11-12, "Flag now, diagnose".
+      evidence: >-
+        Rulings @ligon 2026-11-12, "Flag now, diagnose" and then "Revalue at local
+        median".
   validated_against: >-
-    the served table: the candidate build equals the base build in every row and every
-    column but Derivation, and derivation_inputs joins every flagged row.
+    the served table under the first ruling: that build equalled development in every
+    row and every column but Derivation, and derivation_inputs joins every flagged row.
+    The second ruling's revaluation is validated under its own key.
   contents: 'Niger/_/CONTENTS.org, "2018-19 s07bq07a computed on 14.2% of records (GH #1708)"'
+  since: '2026-11-12'
+
+# OUR construction (GH #1708, second ruling): the Expenditure of a flagged purchase
+# is the purchased quantity at a local median of the genuine prices.
+Niger::food_acquired::flagged-purchase-local-median:
+  waves: ['2018-19']
+  columns: [Expenditure]
+  rows: {s: purchased}
+  rule: >-
+    On a purchased row built from a record that computed-last-purchase-quantity flags,
+    Expenditure = the served purchased Quantity, (s07bq03a - s07bq04 - s07bq05).clip(0),
+    times the median GENUINE last-purchase unit value s07bq08 / s07bq07a for the same
+    product (s07bq01) x unit (s07bq03b) x size (s07bq03c): in the record's cluster
+    (grappe) when that cell has at least 3 genuine reports, else in its region
+    (s00q01 of the cover, s00_me_ner2018.dta) when it has at least 1, else NA.  A
+    genuine report is a record that is NOT flagged, with s07bq07a and s07bq08 positive
+    and its last-purchase unit and size recorded (70,933 records); it prices the cell
+    of its OWN last-purchase unit and size (s07bq07b, s07bq07c), and the units are
+    compared through the identity of the #876 unit match, so nothing is converted
+    between units.  Every flagged purchased row is revalued, including the 2,787 that
+    #876 leaves NA (2,786 whose own last purchase used another unit or size, 1 with no
+    s07bq08): 15,014 rows, 1,361 at a cluster median, 11,661 at a region median and
+    1,992 NA.  The row
+    keeps its 7day-purchase-at-last-purchase-unit-value and
+    computed-last-purchase-quantity keys; its Quantity, Quantity_kg and every
+    consumed quantity are unchanged.
+  function: lsms_library.countries.Niger.2018-19._.mapping:derive_flagged_purchase_local_median
+  inputs: lsms_library.countries.Niger.2018-19._.mapping:inputs_flagged_purchase_local_median
+  raw_variables: [grappe, s00q01, s07bq01, s07bq03a, s07bq03b, s07bq03c, s07bq04,
+                  s07bq05, s07bq06, s07bq07a, s07bq07b, s07bq07c, s07bq08]
+  assumptions:
+    - text: >-
+        the household's own unit value s07bq08 / s07bq07a on a flagged record is not
+        the household's: on 90% of the 15,264 it is one producer reference value per
+        product x unit x size x region, with the quantity backed out of the value
+        (12,250) or both rebuilt (3,013), and the originals are not recoverable.  A
+        genuine purchase in the same cluster, else the same region, is the local price
+        the purchase is valued at instead.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-12, "Revalue at local median", on the diagnosis in
+        Niger/_/CONTENTS.org (reports/served-corrections of 2026-11-12).
+    - text: >-
+        a cluster median needs 3 genuine reports and a region median 1.  Each genuine
+        report scored against the median of the OTHER genuine reports in its cell
+        (2026-11-12): within 25% of the held-out price, a cluster median of 2 others
+        63.6% against the region median's 67.4%, of 3 others 71.7% against 69.1%, of 5
+        others 73.5% against 70.8%, of 10 or more 87.2% against 84.9%.  From 3 the
+        cluster median is about as good as the region's or better, and 3 is the smallest
+        median one stray report cannot move.  The region is the last level the ruling
+        names and it withholds only where there is no genuine local price, so a region
+        cell with a single report is used; a floor of 3 there too would serve 3,787 rows
+        NA instead of 1,992.  Each value's report counts are in the function's output.
+      basis: modelling-choice
+      evidence: >-
+        Held-out checks on s07b_me_ner2018.dta, 2026-11-12 (reports/
+        served-corrections-final).
+    - text: >-
+        every flagged purchased row is revalued, including the 2,787 that #876 serves
+        NA (2,786 whose own last purchase used another unit or size, 1 with no
+        s07bq08): the ruling says "for the flagged rows", and a genuine local price in
+        the row's own consumption unit converts nothing.  The constant
+        LOCAL_MEDIAN_REVALUES_EVERY_FLAGGED_PURCHASE is the one gate; set False it
+        would revalue only the 12,227 rows #876 values.
+      basis: modelling-choice
+      evidence: Ruling @ligon 2026-11-12, "Revalue at local median".
+    - text: >-
+        the region is the cover's s00q01: each of the 504 grappes lies in one region,
+        and every s07b record finds its household on the cover.  The cover is therefore
+        a build input of this table, declared in the wave's food_acquired block
+        (household_region:); if it cannot be fetched the table raises.
+      basis: config-comment
+      evidence: >-
+        lsms_library/ehcvm.py STRATUM_RAW_VARIABLES, "region, then milieu" (s00q01,
+        s00q04; GH #812, whose BIDs define the stratum as region x milieu); measured
+        2026-11-12, 0 of 504 grappes in two regions, 0 of 107,269 s07b records without
+        a cover row.
+  validated_against: >-
+    the cold build of 2026-11-12 against development, and the registered function run
+    on derivation_inputs, which reproduces the served Expenditure of every revalued
+    row (tests/test_gh1707_served_corrections.py); measured in Niger/_/CONTENTS.org.
+  contents: 'Niger/_/CONTENTS.org, "2018-19 flagged purchases revalued at a local median (GH #1708)"'
   since: '2026-11-12'

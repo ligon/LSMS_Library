@@ -3,7 +3,8 @@
 - Mali 2018-19: the rice-ration block is withheld (GH #1707, "Remove, registered").
 - Senegal 2021-22: salt at 0.0199997 kg x hhsize is withheld ("Remove, registered").
 - Senegal 2018-19: two quantities below 1e-3 are served NA (GH #1519, "Exact-value NA rule").
-- Niger 2018-19: an off-grid s07bq07a is flagged and served (GH #1708, "Flag now, diagnose").
+- Niger 2018-19: an off-grid s07bq07a is flagged and served (GH #1708, "Flag now, diagnose"),
+  and the purchase it values is revalued at a local median ("Revalue at local median").
 - Uganda 2009-10: a missing ea is filled from the same household (GH #1536, "Fill, registered").
 
 Three tiers: synthetic frames through the real wave modules (no microdata);
@@ -30,7 +31,8 @@ KEYS = {
     "Mali": ["Mali::food_acquired::rice-ration-block-withheld"],
     "Senegal": ["Senegal::food_acquired::salt-per-capita-withheld",
                 "Senegal::food_acquired::near-zero-quantity-withheld"],
-    "Niger": ["Niger::food_acquired::computed-last-purchase-quantity"],
+    "Niger": ["Niger::food_acquired::computed-last-purchase-quantity",
+              "Niger::food_acquired::flagged-purchase-local-median"],
     "Uganda": ["Uganda::sample::ea-same-household"],
 }
 
@@ -176,11 +178,117 @@ class TestSenegalRules:
         assert senegal18.near_zero_quantity_rows([1e-3], [1e-4]).tolist() == [False]
 
 
+#: Synthetic s07b records for the GH #1708 revaluation: (grappe, region, product,
+#: s07bq03a, s07bq04, s07bq05, s07bq07a, consumption unit, last-purchase unit, s07bq08).
+#: Sizes are all "Taille unique", so no unit-size label (and no config) is involved.
+#: A flagged record has an off-grid s07bq07a (1/3).
+_NIGER_RECORDS = [
+    (1, 1, 1, 2.0, 0.0, 0.0, 1.0, "Kg", "Kg", 100.0),        # 0 genuine, cluster 1
+    (1, 1, 1, 2.0, 0.0, 0.0, 1.0, "Kg", "Kg", 110.0),        # 1 genuine, cluster 1
+    (1, 1, 1, 2.0, 0.0, 0.0, 1.0, "Kg", "Kg", 120.0),        # 2 genuine, cluster 1
+    (2, 1, 1, 2.0, 0.0, 0.0, 1.0, "Kg", "Kg", 200.0),        # 3 genuine, cluster 2
+    (1, 1, 1, 2.0, 0.0, 0.0, 1 / 3, "Kg", "Kg", 50.0),       # 4 flagged: cluster median 110
+    (2, 1, 1, 3.0, 0.0, 0.0, 1 / 3, "Kg", "Kg", 50.0),       # 5 flagged: 1 cluster report -> region 115
+    (3, 2, 1, 1.0, 0.0, 0.0, 1 / 3, "Kg", "Kg", 50.0),       # 6 flagged: no genuine price in region 2
+    (1, 1, 1, 4.0, 0.0, 0.0, 1 / 3, "Bol", "Kg", 50.0),      # 7 flagged, consumed in Bol: Bol cell 30
+    (1, 1, 1, 1.0, 0.0, 0.0, 2.0, "Kg", "Bol", 50.0),        # 8 genuine Bol price 25
+    (1, 1, 1, 1.0, 0.0, 0.0, 2.0, "Kg", "Bol", 60.0),        # 9 genuine Bol price 30
+    (1, 1, 1, 1.0, 0.0, 0.0, 2.0, "Kg", "Bol", 70.0),        # 10 genuine Bol price 35
+    (1, 1, 1, 2.0, 2.0, 0.0, 1 / 3, "Kg", "Kg", 50.0),       # 11 flagged, all own-produced
+    (1, 1, 1, 3.0, 0.0, 1.0, 1 / 3, "Kg", "Kg", 50.0),       # 12 flagged, one unit a gift
+]
+#: The served Expenditure of each record's purchased row after the revaluation.
+_NIGER_EXPECTED = {"h4": 220.0, "h5": 345.0, "h6": np.nan, "h7": 120.0, "h12": 220.0}
+
+
+def _niger_frames(niger):
+    """(raw, wide, region) for _NIGER_RECORDS, as the hook receives them."""
+    cols = ["grappe", "s00q01", "s07bq01", "s07bq03a", "s07bq04", "s07bq05", "s07bq07a",
+            "unit3", "unit7", "s07bq08"]
+    rec = pd.DataFrame(_NIGER_RECORDS, columns=cols)
+    raw = rec[["grappe", "s07bq01", "s07bq03a", "s07bq04", "s07bq05", "s07bq07a", "s07bq08"]].copy()
+    raw["s07bq06"] = 2.0
+    ids = [f"h{n}" for n in range(len(rec))]
+    index = pd.MultiIndex.from_arrays(
+        [["2018-19"] * len(rec), rec["grappe"].astype(int).astype(str), [1] * len(rec), ids,
+         ["Mil"] * len(rec), rec["unit3"]], names=["t", "v", "visit", "i", "j", "u"])
+    wide = pd.DataFrame({
+        "Quantity": rec["s07bq03a"].to_numpy(), "Produced": rec["s07bq04"].to_numpy(),
+        "GiftQuantity": rec["s07bq05"].to_numpy(), "ConsumptionUnitCode": rec["unit3"].to_numpy(),
+        "ConsumptionUnitSize": ["Taille unique"] * len(rec),
+        "LastPurchaseQuantity": rec["s07bq07a"].to_numpy(), "LastPurchaseUnitCode": rec["unit7"].to_numpy(),
+        "LastPurchaseUnitSize": ["Taille unique"] * len(rec), "LastPurchaseValue": rec["s07bq08"].to_numpy(),
+    }, index=index)
+    return raw, wide, rec["s00q01"].to_numpy(dtype=float)
+
+
 class TestNigerRule:
     def test_off_the_quarter_grid(self, niger):
         x = [0.25, 1.0, 0.125, 0.5516, 0.1, 0.0, np.nan, 2.75, 1 / 3]
         assert niger.computed_last_purchase_rows(x).tolist() == [
             False, False, True, True, True, False, False, False, True]
+
+    def test_the_floors_and_the_gate(self, niger):
+        assert niger.LOCAL_MEDIAN_MIN_CLUSTER_REPORTS == 3
+        assert niger.LOCAL_MEDIAN_MIN_REGION_REPORTS == 1
+        assert niger.LOCAL_MEDIAN_REVALUES_EVERY_FLAGGED_PURCHASE is True
+
+    def test_the_registered_function_on_synthetic_inputs(self, niger):
+        raw, wide, region = _niger_frames(niger)
+        frame = niger._valuation_frame(raw, wide, region)
+        frame.index = pd.MultiIndex.from_arrays(
+            [["2018-19"] * len(frame), [f"h{n}" for n in range(len(frame))], ["Mil"] * len(frame)],
+            names=["t", "i", "j"])
+        got = niger.derive_flagged_purchase_local_median(frame)
+        assert got.index.get_level_values("i").tolist() == list(_NIGER_EXPECTED)
+        np.testing.assert_allclose(got["Expenditure"].to_numpy(dtype=float),
+                                   list(_NIGER_EXPECTED.values()), equal_nan=True)
+        assert got["level"].astype(object).where(got["level"].notna(), None).tolist() == [
+            "cluster", "region", None, "cluster", "cluster"]
+        assert got["cluster_reports"].tolist() == [3, 1, 0, 3, 3]
+        assert got["region_reports"].tolist() == [4, 4, 0, 3, 4]
+
+    def test_a_flagged_record_never_prices_another(self, niger):
+        """The flagged records' own s07bq08 / s07bq07a (150 here) is the producer's
+        value: it must not enter any median."""
+        raw, wide, region = _niger_frames(niger)
+        local = niger.local_median_unit_values(niger._valuation_frame(raw, wide, region))
+        assert local.loc[4, "unit_value"] == 110.0
+
+    def test_the_hook_writes_by_position(self, niger):
+        from lsms_library.ehcvm import food_acquired_ehcvm
+        raw, wide, region = _niger_frames(niger)
+        frame = niger._valuation_frame(raw, wide, region)
+        out = food_acquired_ehcvm(wide, niger.FOOD_ACQUIRED_DERIVATION)
+        got = niger._revalue_flagged_purchases(out, wide, frame)
+        s = got.index.get_level_values("s")
+        i = got.index.get_level_values("i")
+        key = niger.LOCAL_MEDIAN_KEY
+        stamped = _carries(got, key)
+        assert set(i[stamped]) == set(_NIGER_EXPECTED) and set(s[stamped]) == {"purchased"}
+        purchased = got[s == "purchased"].droplevel(["t", "v", "j", "u", "s"])
+        for hh, value in _NIGER_EXPECTED.items():
+            assert (np.isnan(value) and np.isnan(purchased.loc[hh, "Expenditure"])) \
+                or purchased.loc[hh, "Expenditure"] == pytest.approx(value)
+        # Every other row is untouched, and every revalued row keeps its #876 key.
+        base = out[~stamped]
+        pd.testing.assert_frame_equal(got[~stamped], base)
+        assert _carries(got[stamped], niger.FOOD_ACQUIRED_DERIVATION).all()
+        assert purchased.loc["h0", "Expenditure"] == 200.0
+        assert np.isnan(purchased.loc["h8", "Expenditure"])   # #876: Kg against a Bol price
+
+    def test_the_hook_refuses_rows_out_of_order(self, niger):
+        from lsms_library.ehcvm import food_acquired_ehcvm
+        raw, wide, region = _niger_frames(niger)
+        frame = niger._valuation_frame(raw, wide, region)
+        out = food_acquired_ehcvm(wide, niger.FOOD_ACQUIRED_DERIVATION)
+        with pytest.raises(niger.LocalMedianJoinError):
+            niger._revalue_flagged_purchases(out.iloc[::-1], wide, frame)
+        with pytest.raises(niger.LocalMedianJoinError):
+            niger._valuation_frame(raw.iloc[::-1].reset_index(drop=True), wide, region)
+
+    def test_the_error_is_not_a_generic_build_failure(self, niger):
+        assert not issubclass(niger.LocalMedianJoinError, (ValueError, RuntimeError, KeyError))
 
 
 class TestUgandaRule:
@@ -282,6 +390,37 @@ class TestServed:
         assert int(has.sum()) == 15_014
         assert set(fa.index.get_level_values("t")[has].astype(str)) == {"2018-19"}
         assert set(fa.index.get_level_values("s")[has].astype(str)) == {"purchased"}
+
+    def test_niger_revalues_exactly_the_flagged_purchases(self, served):
+        """Ruling "Revalue at local median": every flagged purchased row, and no other."""
+        fa = served("Niger")
+        flagged = _carries(fa, "Niger::food_acquired::computed-last-purchase-quantity")
+        revalued = _carries(fa, "Niger::food_acquired::flagged-purchase-local-median")
+        assert int(revalued.sum()) == 15_014
+        assert (flagged == revalued).all()
+
+    def test_niger_the_registered_function_reproduces_the_served_value(self, served):
+        """`derivation_inputs` returns every record (the genuine ones are the prices),
+        and the registered function, run on them, gives the served Expenditure of every
+        revalued row, NA where it is NA."""
+        import warnings
+        import lsms_library as ll
+        key = "Niger::food_acquired::flagged-purchase-local-median"
+        c = ll.Country("Niger")
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            inputs = c.derivation_inputs(key, wave="2018-19")
+        assert len(inputs) == 107_269 and int(inputs["flagged"].sum()) == 15_264
+        derived = c.derivations()[key].resolve()(inputs)
+        assert len(derived) == 15_014
+        fa = served("Niger")
+        x = fa[_carries(fa, key)]
+        got = x["Expenditure"].groupby(level=["t", "i", "j"]).sum(min_count=1).sort_index()
+        want = derived["Expenditure"].groupby(level=["t", "i", "j"]).sum(min_count=1)
+        assert set(got.index) == set(want.index)
+        np.testing.assert_allclose(got.to_numpy(dtype=float),
+                                   want.reindex(got.index).to_numpy(dtype=float),
+                                   rtol=1e-9, equal_nan=True)
 
 
 @pytest.mark.requires_s3
