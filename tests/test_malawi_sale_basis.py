@@ -304,7 +304,10 @@ class TestScripts:
         """`_CROP_SALE_SOURCES` transcribes the scripts; a drift fails here."""
         src = (ROOT / wave / '_' / 'crop_production.py').read_text()
         for half in malawi_mod._CROP_SALE_SOURCES[wave]:
-            for k in ('g', 'p', 'i', 'q'):
+            # `d`: the Module D file whose question-20 text names a code-48 line (GH #1228).
+            for k in ('g', 'p', 'i', 'q', 'd'):
+                if k == 'd' and k not in half:
+                    continue
                 assert half[k] in src, (wave, half[k])
             assert half['hhid'] in src, (wave, half['hhid'])
             for k in ('gplot', 'gcrop', 'pplot', 'icrop', 'qcrop'):

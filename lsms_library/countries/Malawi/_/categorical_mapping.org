@@ -617,9 +617,11 @@
 # Macadamia, the citrus/stone-tree perennials).
 #
 # GH #1228: one served crop label is not in this table, because no code carries
-# it.  The instrument has no cowpea code, so 2010-11 code 48 lines whose own
-# specify text says COWPEAS are served harmonize_food's `Cowpea (Khobwe)` by
-# `malawi._CROP_TEXT_RECODE`.
+# it.  The instrument has no cowpea code (until IHS6's code 50, a wave not built
+# here), so a code 48 line whose crop text says cowpea is served harmonize_food's
+# `Cowpea (Khobwe)` by `malawi._CROP_TEXT_RECODE`: in 2010-11 its own Module G
+# text, in 2016-17 / 2019-20 its plot's single Module D question-20 "Other Crop"
+# text (ruling 2026-11-12, "Join D, single-text only").  The code stays 48.
 #+name: harmonize_crop
 | Code | Preferred Label      |
 |------+----------------------|

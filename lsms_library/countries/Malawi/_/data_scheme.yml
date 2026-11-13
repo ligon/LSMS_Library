@@ -221,8 +221,10 @@ Data Scheme:
     # seasonal Module G + perennial Module P (plot-crop harvest), seasonal
     # Module I + perennial Module Q (household-crop sale).  crop on the
     # shared harmonize_crop -> harmonize_food Preferred Label axis (GH #1228:
-    # 2010-11 code 48 lines whose own text says COWPEAS are `Cowpea (Khobwe)`,
-    # with production_obs and crop_variety still the recorded code).  THAT
+    # code 48 lines whose crop text says cowpea are `Cowpea (Khobwe)` -- 2010-11
+    # from the line's own G text, 2016-17 / 2019-20 from the plot's single
+    # Module D "Other Crop" text -- with production_obs and crop_variety still
+    # the recorded code; a code-48 sale follows its household's lines).  THAT
     # IS A SHARED AXIS, NOT A JOIN (GH #839; this comment used to claim
     # the crop labels "JOIN food_acquired.j", and 20 of 44 do not).
     # Measured on the 2026-09-24 build: 24 of the 44 crop labels also occur

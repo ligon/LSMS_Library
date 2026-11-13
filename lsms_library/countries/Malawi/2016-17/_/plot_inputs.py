@@ -24,6 +24,10 @@ free-text column that breaks a full read; we read only the columns we
 need via the _read_usecols helper (same recipe as plot_features 2016-17).
 H quantity components also have acquisition-only Farm-level rows (GH #1190);
 planted Quantity/Applied and all legacy attached fields remain NA on those rows.
+A Module G seed line coded 48 OTHER (SPECIFY) carries the label its
+crop_production harvest line carries: the plot's single Module D question-20
+"Other Crop" text, joined by ``malawi.attach_module_d_text`` (GH #1228), so
+COWPEAS is served ``Cowpea (Khobwe)``; the D20 columns join the restricted read.
 See lsms_library/countries/Malawi/_/malawi.py.
 """
 import os
@@ -42,7 +46,8 @@ from lsms_library.local_tools import (get_dataframe, to_parquet, format_id,
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
                     _seed_block, _seed_purchase_block, _seed_gift_block,
                     assemble_plot_inputs, _seed_source_reference,
-                    _seed_acquisition_block, _append_seed_acquisitions)
+                    _seed_acquisition_block, _append_seed_acquisitions,
+                    attach_module_d_text, D20_COLUMNS, D20_TEXT_COL)
 
 
 WAVE = '2016-17'
@@ -58,7 +63,9 @@ _D_USECOLS = ['case_id', 'y3_hhid', 'gardenid', 'plotid',
               'ag_d39a', 'ag_d39d', 'ag_d39e',
               'ag_d39g', 'ag_d39j', 'ag_d40',
               'ag_d41a', 'ag_d41b', 'ag_d41c',
-              'ag_d41d', 'ag_d41e', 'ag_d41f']
+              'ag_d41d', 'ag_d41e', 'ag_d41f',
+              # GH #1228: question 20's crop slots and "Other Crop" text.
+              *[c for c in D20_COLUMNS if c not in ('gardenid', 'plotid')]]
 
 
 def _read_usecols(countries_rel, usecols):
@@ -96,6 +103,7 @@ def _half(d, g, h, hh_of, seed_qty, seed_unit, seed_value, source_ref, source_ha
     g_rows = np.arange(len(g))
     for df in (d, g, h):
         df['hhid'] = hh_of(df)
+    attach_module_d_text(g, d, cropcode='crop_code')
     d['plotkey'] = _plotkey(d)
     g['plotkey'] = _plotkey(g)
     # Q39 (IHS4 agriculture questionnaire, PDF/printed p.12) labels d/j
@@ -118,7 +126,7 @@ def _half(d, g, h, hh_of, seed_qty, seed_unit, seed_value, source_ref, source_ha
         _seed_block(g, hhid='hhid', plotkey='plotkey', cropcode='crop_code',
                     qty='ag_g04a', unit='ag_g04b', improved='ag_g0f', t=WAVE,
                     source_ref=source_ref, source_half=source_half,
-                    row_positions=g_rows),
+                    row_positions=g_rows, crop_text=D20_TEXT_COL),
     ]
     # Seed purchase column naming differs by half (GH #1190): the
     # Cross_Sectional file keeps the original IHS4 names (ag_h07a/b, value

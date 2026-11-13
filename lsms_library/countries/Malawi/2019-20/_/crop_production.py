@@ -14,6 +14,15 @@ Unit specify text (GH #856): this wave's G/I/Q unit code lists have no
 3 (90 KG BAG) or 11 (BASKET (DENGU)), so those units arrive as 13 OTHER
 (SPECIFY) + text; ``unit_text=`` hands the blocks the module's own specify
 column so a plain restatement is served the coded unit's label.
+
+Crop specify text (GH #1228, ruling 2026-11-12 "Join D, single-text only"):
+Module G carries no crop name for code 48 OTHER (SPECIFY); Module D question
+20's "Other Crop" text does (``ag_d20_oth``, and in the cross-section also
+``ag_d20b_oth`` "Other Crop 2").  ``malawi.attach_module_d_text`` joins the
+plot's text onto G on (household, gardenid, plotid) where the plot has
+exactly one, and ``crop_text=`` hands it to the harvest block, so a line whose
+text says COW PEAS is served ``Cowpea (Khobwe)`` (code 48 stays the recorded
+code).  A plot with two texts keeps 'Other'.
 """
 import sys
 
@@ -21,7 +30,8 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
-from malawi import (_harvest_block, _sale_block, assemble_crop_production)
+from malawi import (_harvest_block, _sale_block, assemble_crop_production,
+                    attach_module_d_text, D20_TEXT_COL, D20_REASON_COL)
 
 
 WAVE = '2019-20'
@@ -32,9 +42,10 @@ def _plotkey(df):
             + df['plotid'].apply(format_id))
 
 
-def _half(g, p, i_mod, q, hh_of):
-    for df in (g, p, i_mod, q):
+def _half(d, g, p, i_mod, q, hh_of):
+    for df in (d, g, p, i_mod, q):
         df['hhid'] = hh_of(df)
+    attach_module_d_text(g, d, cropcode='crop_code')
     g['plotkey'] = _plotkey(g)
     p['plotkey'] = _plotkey(p)
     # Perennial crop code lives in ag_p0c (Cross_Sectional) or crop_code
@@ -45,7 +56,8 @@ def _half(g, p, i_mod, q, hh_of):
                        qty='ag_g13a', unit='ag_g13b', condition='ag_g13c',
                        plant_m='ag_g05a', plant_y='ag_g05b', harv_m='ag_g12b',
                        intercrop='ag_g01', perennial=False, t=WAVE,
-                       unit_text='ag_g13b_oth'),
+                       unit_text='ag_g13b_oth', crop_text=D20_TEXT_COL,
+                       crop_text_reason=D20_REASON_COL),
         _harvest_block(p, hhid='hhid', plotkey='plotkey', cropcode=p_crop,
                        qty='ag_p09a', unit='ag_p09b', plant_y='ag_p04',
                        harv_m='ag_p06c', perennial=True, t=WAVE,
@@ -67,21 +79,23 @@ def _half(g, p, i_mod, q, hh_of):
 harvest_all, sale_all = [], []
 
 # --- Cross-sectional half (cs-19 prefix) ---
+d_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_d.dta', convert_categoricals=False)
 g_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_g.dta', convert_categoricals=False)
 p_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_p.dta', convert_categoricals=False)
 i_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_i.dta', convert_categoricals=False)
 q_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_q.dta', convert_categoricals=False)
-h, s = _half(g_xs, p_xs, i_xs, q_xs,
+h, s = _half(d_xs, g_xs, p_xs, i_xs, q_xs,
              lambda df: 'cs-19-' + df['case_id'].apply(format_id))
 harvest_all += h
 sale_all += s
 
 # --- Panel half (y4_hhid) ---
+d_pn = get_dataframe('../Data/Panel/ag_mod_d_19.dta', convert_categoricals=False)
 g_pn = get_dataframe('../Data/Panel/ag_mod_g_19.dta', convert_categoricals=False)
 p_pn = get_dataframe('../Data/Panel/ag_mod_p_19.dta', convert_categoricals=False)
 i_pn = get_dataframe('../Data/Panel/ag_mod_i_19.dta', convert_categoricals=False)
 q_pn = get_dataframe('../Data/Panel/ag_mod_q_19.dta', convert_categoricals=False)
-h, s = _half(g_pn, p_pn, i_pn, q_pn,
+h, s = _half(d_pn, g_pn, p_pn, i_pn, q_pn,
              lambda df: df['y4_hhid'].apply(format_id))
 harvest_all += h
 sale_all += s

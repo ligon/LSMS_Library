@@ -1306,15 +1306,21 @@ def _normalise_unit_text(series):
 #: none, so `_crop_code` and `production_obs` stay the recorded 48 and the sale
 #: attach, which keys on the code, does not move.
 _CROP_OTHER_SPECIFY = 48
-_CROP_TEXT_RECODE = {'COWPEAS': 'Cowpea (Khobwe)'}
+#: Measured spellings (CONTENTS.org, 2026-11-13): 2010-11's own G text and 2016-17's
+#: Module D text write COWPEAS; 2019-20's Module D text writes COW PEAS.  No other
+#: spelling occurs on a single-text plot.  'COWPEAS(NSEULA)' (one 2016-17 line) is
+#: deliberately absent: it carries a local name the ruling leaves unmapped.
+_CROP_TEXT_RECODE = {'COWPEAS': 'Cowpea (Khobwe)', 'COW PEAS': 'Cowpea (Khobwe)'}
 
 
 def _crop_text_labels(label, df, cropcode, crop_text):
-    """Relabel the code-48 lines whose own specify text is in `_CROP_TEXT_RECODE`.
+    """Relabel the code-48 lines whose crop specify text is in `_CROP_TEXT_RECODE`.
 
     Returns ``(label, named)``: the labels, and a boolean array of the lines
-    relabelled.  ``crop_text`` is None for a wave whose G file holds no crop
-    specify text on the row (every wave but 2010-11, CONTENTS.org, GH #856).
+    relabelled.  ``crop_text`` names the line's crop text: its own Module G
+    specify column in 2010-11 (``ag_g0d_os``), the plot's single Module D
+    "Other Crop" text in 2016-17 / 2019-20 (`module_d_other_crop_text`), or
+    None for a wave with neither (2013-14, CONTENTS.org, GH #856 / #1228).
     """
     if crop_text is None:
         return label, np.zeros(len(df), dtype=bool)
@@ -1325,6 +1331,148 @@ def _crop_text_labels(label, df, cropcode, crop_text):
     out = label.astype('string').copy()
     out[named] = text[named].map(_CROP_TEXT_RECODE).astype('string').array
     return out, named
+
+
+# --- GH #1228, 2016-17 / 2019-20: the crop name is in Module D -------------
+#
+# Ruling (@ligon, 2026-11-12, "Join D, single-text only"): after a read-only
+# check that Modules D and G share the season reference, relabel the later
+# waves' 'Other' G lines from Module D's text, only where the plot has exactly
+# one 'Other Crop' text; Module I code-48 sales move by the same rule; local
+# names stay unmapped.  The check passed by inference (the season answer is not
+# exported; one season per interview, a step by interview date, D and G started
+# the same day for 96-97.5% of households): CONTENTS.org, 2026-11-13.
+#
+# After 2013-14 Module G carries no crop-name text.  Module D question 20 lists
+# the plot's crops in five code slots and names an OTHER (SPECIFY) crop in its
+# "Other Crop" text: ag_d20_oth (2016-17 both halves, 2019-20 Panel), plus
+# ag_d20b_oth "Other Crop 2" (2019-20 Cross_Sectional).  G's crop roster is
+# pre-populated from D20, so a G line coded 48 is the plot's D20 code-48 entry
+# and D's text names it.  A line is named only where the join is unambiguous:
+# exactly one D row for the plot, exactly one text, and exactly one code-48
+# slot in D and one code-48 line in G.  Everything else keeps 'Other', counted
+# by reason on `attrs['crop_text_left_other']`.
+_D20_SLOTS = ('ag_d20a', 'ag_d20b', 'ag_d20c', 'ag_d20d', 'ag_d20e')
+_D20_TEXTS = ('ag_d20_oth', 'ag_d20b_oth')
+#: The columns `module_d_other_crop_text` reads, beside the household id.
+D20_COLUMNS = ('gardenid', 'plotid', *_D20_SLOTS, *_D20_TEXTS)
+#: Why a G line got no single Module D text (`module_d_other_crop_text`).
+D20_SINGLE = 'single'
+_D20_REASONS = ('key_incomplete', 'no_d_row', 'd_not_unique', 'no_text', 'multi_text',
+                'text_no_other_slot', 'text_multi_other_slot', 'g_multi_other_on_plot')
+
+
+def module_d_other_crop_text(g, d, *, cropcode, hhid='hhid'):
+    """The one Module D "Other Crop" text of each Module G line's plot (GH #1228).
+
+    ``g`` and ``d`` are one source half's Modules G and D, each already carrying
+    the ``hhid`` string column the wave script builds (prefix included), and
+    their own ``gardenid`` / ``plotid``.  ``cropcode`` is G's crop code column.
+    Returns ``(text, reason)``, two string Series aligned to ``g.index``: the
+    plot's normalised text where ``reason == 'single'``, NA otherwise, and the
+    reason (``D20_SINGLE`` or one of ``_D20_REASONS``).  The text is handed to
+    `_harvest_block` / `_seed_block` as ``crop_text``; only a line coded 48 whose
+    text is in `_CROP_TEXT_RECODE` is relabelled there.
+    """
+    texts = [c for c in _D20_TEXTS if c in d.columns]
+    slots = [c for c in _D20_SLOTS if c in d.columns]
+    if not texts or len(slots) != len(_D20_SLOTS):
+        raise KeyError(f'Module D question 20 columns missing: texts {texts}, slots {slots}')
+    keys = ['_k_h', '_k_g', '_k_p']
+
+    def _keys(df):
+        return pd.DataFrame({'_k_h': df[hhid].astype('string').values,
+                             '_k_g': df['gardenid'].apply(format_id).astype('string').values,
+                             '_k_p': df['plotid'].apply(format_id).astype('string').values})
+
+    dk = _keys(d)
+    codes = pd.DataFrame({c: pd.to_numeric(d[c], errors='coerce').values for c in slots})
+    words = pd.DataFrame({c: _normalise_unit_text(d[c]).values for c in texts})
+    dk['_n_other'] = codes.eq(_CROP_OTHER_SPECIFY).sum(axis=1).values
+    dk['_n_text'] = words.notna().sum(axis=1).values
+    dk['_text'] = words.bfill(axis=1).iloc[:, 0].astype('string').values
+    dk = dk[dk[keys].notna().all(axis=1).to_numpy()]
+    dk['_n_rows'] = dk.groupby(keys)['_k_h'].transform('size')
+    dk = dk.drop_duplicates(keys)
+    gk = _keys(g)
+    gk['_pos'] = np.arange(len(g))
+    complete = gk[keys].notna().all(axis=1).to_numpy()
+    g48 = pd.to_numeric(g[cropcode], errors='coerce').eq(_CROP_OTHER_SPECIFY).fillna(False).to_numpy()
+    gk['_g48'] = g48 & complete
+    gk['_n_g48'] = gk.groupby(keys, dropna=False)['_g48'].transform('sum')
+    m = gk.merge(dk, on=keys, how='left', validate='m:1').sort_values('_pos')
+    m.loc[~complete[m['_pos'].to_numpy()], ['_n_rows', '_n_text', '_n_other']] = np.nan
+    reason = np.select(
+        [~complete[m['_pos'].to_numpy()], m['_n_rows'].isna().to_numpy(), (m['_n_rows'] > 1).to_numpy(),
+         (m['_n_text'] == 0).to_numpy(), (m['_n_text'] >= 2).to_numpy(),
+         (m['_n_other'] == 0).to_numpy(), (m['_n_other'] >= 2).to_numpy(), (m['_n_g48'] > 1).to_numpy()],
+        list(_D20_REASONS), default=D20_SINGLE)
+    reason = pd.Series(reason, index=g.index, dtype='string')
+    text = pd.Series(m['_text'].to_numpy(), index=g.index, dtype='string').where(reason.eq(D20_SINGLE))
+    return text, reason
+
+
+def read_module_d_columns(path, usecols):
+    """Read only ``usecols`` of a Module D file through its held DVC blob.
+
+    For 2016-17 ``Cross_Sectional/ag_mod_d.dta``, which a full read cannot decode
+    (a latin-1 byte in ``ag_d55_2oth``).  The same route as the 2016-17
+    ``plot_inputs`` / ``plot_features`` / ``plot_labor`` ``_read_usecols``: the
+    sidecar-resolved L1 blob, else ``DVCFS.open``, decoded with
+    ``apply_value_formats=False`` from a temporary copy.  ``path`` is absolute or
+    relative to the caller's cwd (a wave script's ``'../Data/...'``).  Columns of
+    ``usecols`` the file does not carry are skipped (its metadata is read first,
+    as the 2016-17 ``plot_labor`` reader does).
+    """
+    import os
+    import tempfile
+    from pathlib import Path
+    import pyreadstat
+    from lsms_library.local_tools import (DVCFS, _COUNTRIES_DIR, _dvc_cache_path,
+                                          _dvc_working_directory, _ensure_dvc_pulled)
+    p = Path(path)
+    p = p if p.is_absolute() else (Path.cwd() / p)
+    p = Path(os.path.normpath(p))
+    _ensure_dvc_pulled(str(p))
+    cache_path = _dvc_cache_path(str(p))
+    if cache_path is not None:
+        with open(cache_path, 'rb') as f:
+            data = f.read()
+    else:
+        rel = p.relative_to(Path(_COUNTRIES_DIR)).as_posix()
+        with _dvc_working_directory(_COUNTRIES_DIR):
+            with DVCFS.open(rel) as f:
+                data = f.read()
+    with tempfile.NamedTemporaryFile(suffix='.dta', delete=False) as tmp:
+        tmp.write(data)
+        tmp_path = tmp.name
+    try:
+        _, meta = pyreadstat.read_dta(tmp_path, metadataonly=True)
+        cols = [c for c in usecols if c in set(meta.column_names)]
+        df, _ = pyreadstat.read_dta(tmp_path, usecols=cols, apply_value_formats=False)
+        return df
+    finally:
+        os.unlink(tmp_path)
+
+
+def household_crop_labels(lines, harv):
+    """Give code-48 raw sale lines the label their household's harvest rows agree on.
+
+    The rule `_farm_level_sales` serves (GH #1228): a household's own harvest rows
+    name a crop code where they all carry one label, so a Module I line of code 48
+    beside lines named ``Cowpea (Khobwe)`` is that crop, and the raw lines that
+    `derivation_inputs` hands back join the served rows on ``crop``.  Only code 48
+    moves; ``lines`` needs ``i``, ``_crop_code`` and ``crop``.
+    """
+    named = harv.loc[pd.to_numeric(harv['_crop_code'], errors='coerce').eq(_CROP_OTHER_SPECIFY).fillna(False),
+                     ['i', 'crop']].dropna(subset=['crop']).drop_duplicates()
+    named = named[~named.duplicated('i', keep=False)].astype({'i': 'string', 'crop': 'string'})
+    own = pd.DataFrame({'i': lines['i'].astype('string').values}).merge(named, on='i', how='left')['crop']
+    is48 = pd.to_numeric(lines['_crop_code'], errors='coerce').eq(_CROP_OTHER_SPECIFY).fillna(False).to_numpy()
+    out = lines['crop'].astype('string').copy()
+    take = is48 & own.notna().to_numpy()
+    out[take] = own.to_numpy()[take]
+    return out
 
 
 def _recover_unit_code(code, text):
@@ -1375,7 +1523,8 @@ def _recovered_counts(recovered_to):
 
 def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
                    plant_m=None, plant_y=None, harv_m=None, intercrop=None,
-                   perennial=False, t=None, unit_text=None, crop_text=None):
+                   perennial=False, t=None, unit_text=None, crop_text=None,
+                   crop_text_reason=None):
     """Reshape one harvest module (G or P) to canonical long rows.
 
     All keyword args are RAW column names in ``df`` (or None when the
@@ -1401,10 +1550,15 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     served that code's label (GH #856, ``_UNIT_TEXT_RECODE``); the count
     rides on ``attrs['unit_text_recovered']``.  ``Quantity`` never moves.
 
-    ``crop_text`` is the row's own crop specify-text column (2010-11 Module G:
-    ``ag_g0d_os``).  A code-48 line whose text is in ``_CROP_TEXT_RECODE`` is
-    served that label (GH #1228); its code, variety and ``production_obs`` stay
-    what was recorded.  The count rides on ``attrs['crop_text_recovered']``.
+    ``crop_text`` is the row's crop specify-text column: 2010-11 Module G's own
+    ``ag_g0d_os``, or in 2016-17 / 2019-20 the plot's single Module D "Other
+    Crop" text (`module_d_other_crop_text`).  A code-48 line whose text is in
+    ``_CROP_TEXT_RECODE`` is served that label (GH #1228); its code, variety and
+    ``production_obs`` stay what was recorded.  The count rides on
+    ``attrs['crop_text_recovered']``; the code-48 lines left 'Other' are counted
+    by reason on ``attrs['crop_text_left_other']`` (``crop_text_reason`` names a
+    column of `module_d_other_crop_text` reasons; without it a line with no text
+    is ``no_text``, one whose text is not on the list ``text_not_recoded``).
     """
     unit_map = _malawi_code_map('harmonize_crop_unit')
 
@@ -1489,6 +1643,15 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     out.attrs['unit_text_recovered'] = _recovered_counts(
         recovered_to[keep])
     out.attrs['crop_text_recovered'] = int(crop_named[keep].sum())
+    if crop_text is not None:
+        is48 = pd.to_numeric(df[cropcode], errors='coerce').eq(_CROP_OTHER_SPECIFY).fillna(False).to_numpy()
+        left = keep & is48 & ~crop_named
+        has_text = _normalise_unit_text(df[crop_text]).notna().to_numpy()
+        why = (df[crop_text_reason].astype('string').to_numpy(dtype=object) if crop_text_reason is not None
+               else np.full(len(df), 'no_text', dtype=object))
+        why = np.where(has_text, 'text_not_recoded', why)
+        out.attrs['crop_text_left_other'] = {str(k): int(v) for k, v in
+                                             pd.Series(why[left]).value_counts().sort_index().items()}
     return out
 
 
@@ -2525,6 +2688,11 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     out.attrs['unit_text_recovered'] = recovered
     out.attrs['crop_text_recovered'] = sum(
         piece.attrs.get('crop_text_recovered', 0) for piece in harvest_pieces)
+    left = {}
+    for piece in harvest_pieces:
+        for k, n in piece.attrs.get('crop_text_left_other', {}).items():
+            left[k] = left.get(k, 0) + int(n)
+    out.attrs['crop_text_left_other'] = dict(sorted(left.items()))
     return out
 
 
@@ -2555,27 +2723,46 @@ _CROP_SALE_SOURCES = {
                      hhid='y2_hhid', prefix='', plot='named',
                      gplot='ag_g00', gcrop='ag_g0b', pplot='ag_p00', pcrop='ag_p0c',
                      icrop='ag_i0b', qcrop='ag_q0b')],
+    # `d`: the Module D file whose question-20 text names a code-48 G line (GH #1228);
+    # `d_restricted`: read through `read_module_d_columns` (2016-17 XS, latin-1 byte).
     '2016-17': [dict(half='xs', dir='Data/Cross_Sectional',
                      g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
+                     d='ag_mod_d.dta', d_restricted=True,
                      hhid='case_id', prefix='cs-17-', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
                      icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS),
                 dict(half='panel', dir='Data/Panel',
                      g='ag_mod_g_16.dta', p='ag_mod_p_16.dta', i='ag_mod_i_16.dta', q='ag_mod_q_16.dta',
+                     d='ag_mod_d_16.dta',
                      hhid='y3_hhid', prefix='', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
                      icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS)],
     '2019-20': [dict(half='xs', dir='Data/Cross_Sectional',
                      g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
+                     d='ag_mod_d.dta',
                      hhid='case_id', prefix='cs-19-', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
                      icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS),
                 dict(half='panel', dir='Data/Panel',
                      g='ag_mod_g_19.dta', p='ag_mod_p_19.dta', i='ag_mod_i_19.dta', q='ag_mod_q_19.dta',
+                     d='ag_mod_d_19.dta',
                      hhid='y4_hhid', prefix='', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
                      icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS)],
 }
+
+#: The column the 2016-17 / 2019-20 scripts write the plot's single Module D text
+#: into (and its reason), and hand `_harvest_block` / `_seed_block` as ``crop_text``.
+D20_TEXT_COL = '_d20_other_crop'
+D20_REASON_COL = '_d20_other_crop_reason'
+
+
+def attach_module_d_text(g, d, *, cropcode, hhid='hhid'):
+    """Write `module_d_other_crop_text` into ``g`` as `D20_TEXT_COL` / `D20_REASON_COL`."""
+    text, reason = module_d_other_crop_text(g, d, cropcode=cropcode, hhid=hhid)
+    g[D20_TEXT_COL] = text
+    g[D20_REASON_COL] = reason
+    return g
 
 #: The sale modules' variables, in questionnaire order, per module.
 _SALE_RAW_VARS = {'I': ['ag_i01', 'ag_i02a', 'ag_i02b', 'ag_i02c', 'ag_i03'],
@@ -2611,13 +2798,24 @@ def _crop_pieces(wave):
             for df in (g, p):
                 df['plotkey'] = (df['gardenid'].apply(format_id) + '_'
                                  + df['plotid'].apply(format_id))
+        crop_text, crop_reason = h.get('gcrop_text'), None
+        if h.get('d'):
+            # GH #1228: the plot's single Module D "Other Crop" text, as the script reads it.
+            if h.get('d_restricted'):
+                dmod = read_module_d_columns(d / h['d'], [h['hhid'], *D20_COLUMNS])
+            else:
+                dmod = get_dataframe(str(d / h['d']), convert_categoricals=False)
+            dmod['hhid'] = h['prefix'] + dmod[h['hhid']].apply(format_id)
+            attach_module_d_text(g, dmod, cropcode=h['gcrop'])
+            crop_text, crop_reason = D20_TEXT_COL, D20_REASON_COL
         pcrop = h['pcrop'] or ('ag_p0c' if 'ag_p0c' in p.columns else 'crop_code')
         harvest += [
             _harvest_block(g, hhid='hhid', plotkey=h['gplot'], cropcode=h['gcrop'],
                            qty='ag_g13a', unit='ag_g13b', condition='ag_g13c',
                            plant_m='ag_g05a', plant_y='ag_g05b', harv_m='ag_g12b',
                            intercrop='ag_g01', perennial=False, t=wave,
-                           unit_text=h.get('gtext'), crop_text=h.get('gcrop_text')),
+                           unit_text=h.get('gtext'), crop_text=crop_text,
+                           crop_text_reason=crop_reason),
             _harvest_block(p, hhid='hhid', plotkey=h['pplot'], cropcode=pcrop,
                            qty='ag_p09a', unit='ag_p09b', plant_y='ag_p04',
                            harv_m='ag_p06c', perennial=True, t=wave,
@@ -2649,7 +2847,12 @@ def _crop_pieces(wave):
                 if n in df.columns:
                     line[n] = df[n].values
             raw.append(line[line['_crop_code'].notna()])
-    return harvest, sale, pd.concat(raw, ignore_index=True)
+    raw = pd.concat(raw, ignore_index=True)
+    # GH #1228: a code-48 line takes the label its household's harvest rows agree on,
+    # as the served row it attaches to (or its Farm-level row) does, so the lines
+    # join the served rows on `crop`.
+    raw['crop'] = household_crop_labels(raw, _consolidate_harvest(harvest))
+    return harvest, sale, raw
 
 
 def sale_basis_decisions(wave):
