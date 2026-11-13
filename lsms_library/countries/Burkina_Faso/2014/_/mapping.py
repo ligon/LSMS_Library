@@ -218,8 +218,9 @@ def visit_p4(_row):
 #
 # CONSUMER RULE: `u == 'Unknown'` is NOT a unit.  Almost all of these rows
 # carry an Expenditure and no physical quantity (the money-only passages and
-# items).  The exceptions are 56 passage-1 produced / inkind rows (41 + 15)
-# whose quantity was recorded without its unit (GH #864); several of those
+# items, on all three `s` since GH #1442).  The exceptions are 56 passage-1
+# produced / inkind rows (41 + 15) whose quantity was recorded without its unit
+# (GH #864); several of those
 # quantities look like CFA amounts keyed into the quantity box.  Exclude
 # `Unknown` rows before any per-unit price or kg conversion, and report how
 # many you excluded.
@@ -263,22 +264,25 @@ def _fill_missing_u(df):
 # * the C06 gift quantity ``qcadeau`` (1,468 rows > 0) is served as
 #   ``s = 'inkind'`` in ``ucadeau``.
 #
-# @ligon's ruling, 2026-11-03.  Every served number is a direct survey answer
-# (C04 quantity and value, C05 quantity, C06 quantity), so nothing here is a
-# registered derivation.  ``Expenditure`` is C04's ``achat`` and is NaN on the
-# produced / inkind rows, as in the EHCVM waves; the C05 / C06 VALUES
-# (``autocons`` / ``cadeau``) and C02 ``mtt_dep`` stay unread.
+# @ligon's rulings, 2026-11-03 and (GH #1442) 2026-11-04.  Every served number is a
+# direct survey answer (each block's quantity and value), so nothing here is a
+# registered derivation.  ``Expenditure`` is the block's own "Montant en fcfa":
+# ``achat`` on purchased rows, ``autocons`` on produced rows, ``cadeau`` on inkind
+# rows, as Uganda serves ``value_own`` and ``value_inkind``.  The EHCVM waves leave it
+# NA on those rows only because EHCVM asks no value.  C02 ``mtt_dep`` stays unread:
+# it is outlay, a different question.
 #
 # A quantity the survey did not ask for stays NaN: passages 2-4 have no
 # quantity grid, and the printed passage-1 grid has no quantity boxes for nine
 # items (Sel, Oignons, Soumbala, Feuilles, Gombo, Pate d'arachide, Haricot,
 # Beurre de Karite, Fruits).  Nothing is filled with 0, so no NaN has to be
-# restored afterwards.
+# restored afterwards.  So a block with money and no quantity is served as a
+# money-only row, ``Quantity`` NaN and, with no unit recorded, ``u = 'Unknown'``.
 _BLOCKS = (
     # s,           quantity column, unit column (None = the index's `u`), value
     ('purchased', 'Quantity',      None,           'Expenditure'),
-    ('produced',  'Produced',      'ProducedUnit', None),
-    ('inkind',    'GiftQuantity',  'GiftUnit',     None),
+    ('produced',  'Produced',      'ProducedUnit', 'ProducedValue'),
+    ('inkind',    'GiftQuantity',  'GiftUnit',     'GiftValue'),
 )
 
 
@@ -295,15 +299,12 @@ def _section_c_to_canonical(part):
 
     ``part`` is indexed ``(t, v, i, j, u[, visit])`` with ``u`` = ``uachat``
     and columns ``Quantity`` / ``Expenditure`` (C04), ``Produced`` /
-    ``ProducedUnit`` (C05), ``GiftQuantity`` / ``GiftUnit`` (C06).  A block's
-    columns may be absent (a test frame, or a passage file that lacks them);
-    they are then treated as all-NaN.  Returns a frame indexed
-    ``(t, v, i, j, u, s)`` with ``Quantity`` / ``Expenditure``:
-
-    * ``purchased`` -- kept where ``Quantity > 0`` or ``Expenditure > 0``,
-      ``Quantity`` exactly as reported (NaN where not asked);
-    * ``produced`` / ``inkind`` -- kept where their quantity is ``> 0``, in
-      their own unit, ``Expenditure`` NaN.
+    ``ProducedUnit`` / ``ProducedValue`` (C05), ``GiftQuantity`` / ``GiftUnit`` /
+    ``GiftValue`` (C06).  A block's columns may be absent (a test frame, or a
+    passage file that lacks them); they are then treated as all-NaN.  Returns a
+    frame indexed ``(t, v, i, j, u, s)`` with ``Quantity`` / ``Expenditure``, each
+    block kept where its quantity or its value is ``> 0``, in its own unit, with
+    both exactly as reported (NaN where not asked).
 
     A missing unit is left NaN here; the caller's :func:`_fill_missing_u`
     turns it into the ``Unknown`` sentinel.

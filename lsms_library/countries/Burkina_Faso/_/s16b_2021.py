@@ -20,6 +20,10 @@ RAW_FIELDS = ('grappe', 'menage', 'vague', 's16bq01', 's16bq02',
               's16bq08', 's16bq09a', 's16bq09b', 's16bq09c')
 INDEX = ['t', 'i', 'input', 'crop', 'u']
 CROP_NA = '(not crop-specific)'
+# A blank used-quantity unit is the corpus missing-unit sentinel (GH #1041 / #1118),
+# never a minted label.  Literal here: this adapter imports no package module.
+# A coded unit the own card does not label keeps its source-qualified identity.
+UNIT_NA = 'Unknown'
 
 
 class S16b2021Error(Exception):
@@ -130,7 +134,7 @@ def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
     out = pd.DataFrame({
         't': pd.Series('2021-22', index=raw.index, dtype='string'),
         'i': hh, 'input': inputs, 'crop': crops.fillna(CROP_NA),
-        'u': units['s16bq03b'].fillna('Manquant'),
+        'u': units['s16bq03b'].fillna(UNIT_NA),
         'Quantity': _amount(raw['s16bq03a'], 's16bq03a'),
         'Purchased': _flag(raw['s16bq08'], 's16bq08'),
         'Quantity_purchased': _amount(raw['s16bq09a'], 's16bq09a'),

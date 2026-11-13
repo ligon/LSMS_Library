@@ -48,12 +48,20 @@ from lsms_library.yaml_utils import load_yaml
 # (qachat - qautocons).clip(0) had zeroed and then dropped (no achat); one
 # produced pair that collided on u='Unknown' now has distinct units, so the
 # additive de-dup merges 129 groups, not 130.  Expenditure is unchanged.
-N_WAVE_ROWS = 559_309                 # canonical rows extracted from the 4 files
-N_DELIVERED_ROWS = 559_180            # after the lossless additive de-dup
-PASSAGE_ROWS = {1: 154_076, 2: 139_834, 3: 136_948, 4: 128_451}
-PASSAGE_EXPENDITURE = {1: 93_383_167.0, 2: 82_473_394.0,
+# Re-pinned 2026-11-04 (GH #1442 ruling): C05 / C06 values are served as Expenditure
+# on produced / inkind rows, which adds their money-only rows in every passage.
+# Purchased rows and purchased Expenditure do not move (PASSAGE_EXPENDITURE).
+N_WAVE_ROWS = 672_849                 # canonical rows extracted from the 4 files
+N_DELIVERED_ROWS = 672_718            # after the lossless additive de-dup
+PASSAGE_ROWS = {1: 171_810, 2: 167_137, 3: 165_373, 4: 168_529}
+PASSAGE_EXPENDITURE = {1: 93_383_167.0, 2: 82_473_394.0,      # s='purchased', achat
                        3: 93_328_730.0, 4: 72_925_224.0}
-WAVE_EXPENDITURE = 342_110_515.0
+PASSAGE_PRODUCED_VALUE = {1: 43_472_367.0, 2: 32_132_465.0,   # s='produced', autocons
+                          3: 32_250_801.0, 4: 43_364_488.0}
+PASSAGE_INKIND_VALUE = {1: 2_505_140.0, 2: 2_613_985.0,       # s='inkind', cadeau
+                        3: 2_794_504.0, 4: 1_809_695.0}
+PURCHASED_EXPENDITURE = 342_110_515.0
+WAVE_EXPENDITURE = 503_053_960.0      # all three blocks
 # Sum over all three blocks (mixed units; a conservation check, not a total).
 WAVE_QUANTITY = 4_221_285.6
 
@@ -226,18 +234,23 @@ def test_per_passage_expenditure_is_recoverable(delivered):
     """The point of the level.  Each passage's own 7-day total must be readable
     off the delivered table -- not merged into an unmarked 28-day figure."""
     wave = delivered.xs('2014', level='t')
-    per_passage = wave.groupby(level='visit')['Expenditure'].sum()
-    for passage, expected in PASSAGE_EXPENDITURE.items():
-        assert per_passage[passage] == pytest.approx(expected, rel=1e-9)
-    # ... and the sum over passages is the wave's reported total.
-    assert per_passage.sum() == pytest.approx(WAVE_EXPENDITURE, rel=1e-9)
+    for source, by_passage in (('purchased', PASSAGE_EXPENDITURE),
+                               ('produced', PASSAGE_PRODUCED_VALUE),
+                               ('inkind', PASSAGE_INKIND_VALUE)):
+        per_passage = wave.xs(source, level='s').groupby(level='visit')['Expenditure'].sum()
+        for passage, expected in by_passage.items():
+            assert per_passage[passage] == pytest.approx(expected, rel=1e-9)
+    # ... and the sum over passages and sources is the wave's reported total.
+    assert wave['Expenditure'].sum() == pytest.approx(WAVE_EXPENDITURE, rel=1e-9)
+    purchased = wave.xs('purchased', level='s')['Expenditure'].sum()
+    assert purchased == pytest.approx(PURCHASED_EXPENDITURE, rel=1e-9)
 
 
 @_data
 def test_nothing_is_lost_and_nothing_is_manufactured(wave_frame, delivered):
     """Conservation between the extracted frame and the served table.
 
-    The 129-row difference is the framework's ADDITIVE de-dup of genuine
+    The 131-row difference is the framework's ADDITIVE de-dup of genuine
     within-passage duplicate groups (the same household reporting the same item
     twice inside one passage) -- lossless by construction, which is exactly what
     the equality of the two totals proves."""
@@ -320,8 +333,18 @@ def test_feature_still_sums_the_passages_for_cross_country_work(burkina):
 # ruling (2026-11-03) C04 is served as reported and none remains.
 P1_PURCHASED_NULL_QUANTITY = 43_906
 P1_PURCHASED_ZERO_QUANTITY = 0
-P1_INKIND_ROWS = 1_468                # C06 qcadeau > 0
+P1_INKIND_ROWS = 3_280                # C06 qcadeau > 0 or cadeau > 0 (GH #1442)
 P1_PRODUCED_UNKNOWN_UNIT = 41         # C05 quantity with no uautocons
+P1_INKIND_UNKNOWN_UNIT = 15           # C06 quantity with no ucadeau
+# food_prices(units='unitvalue') tally (GH #864 money_only, GH #1068 unknown), re-measured
+# cold for GH #1442 on the 2026-11-13 branch: the money-only groups now include passages
+# 2-4 of the produced and inkind blocks.
+MONEY_ONLY = (139_798 + 136_913 + 128_416        # purchased, passages 2-4
+              + 23_527 + 24_934 + 37_029         # produced, passages 2-4
+              + 3_775 + 3_490 + 3_049)           # inkind, passages 2-4: 500,931
+# 178 purchased rows before GH #1442; +30 passage-1 produced / inkind rows that record a
+# value and a quantity but no unit (measured cold, job 41271920).
+UNKNOWN_PRICED = 208
 
 
 def test_the_hook_serves_each_section_c_block_in_its_own_unit():
@@ -347,8 +370,10 @@ def test_the_hook_serves_each_section_c_block_in_its_own_unit():
     df = pd.DataFrame({'Quantity': [2.0, None, None, None, 1.0],
                        'Produced': [0.5, None, None, 3.0, 3.0],
                        'ProducedUnit': ['tas', None, None, 'unité', 'kg'],
+                       'ProducedValue': [20.0, None, 30.0, 90.0, None],
                        'GiftQuantity': [None, None, None, 2.0, None],
                        'GiftUnit': [None, None, None, None, None],
+                       'GiftValue': [None, 15.0, None, 60.0, None],
                        'Expenditure': [100.0, 50.0, 70.0, None, 40.0],
                        'visit': [1, 1, 2, 1, 1]}, index=idx)
     out = mod.food_acquired(df)
@@ -365,11 +390,21 @@ def test_the_hook_serves_each_section_c_block_in_its_own_unit():
     # Not asked -> NaN, never 0.
     assert pd.isna(q.xs(('h1', 'Sel', 'Unknown', 'purchased', 1), level=lv).iloc[0])
     assert pd.isna(q.xs(('h1', 'Maize', 'Unknown', 'purchased', 2), level=lv).iloc[0])
-    # Expenditure is C04's achat only; produced / inkind rows carry none.
-    assert out['Expenditure'].sum() == 260.0
-    s = out.index.get_level_values('s')
-    assert out.loc[s != 'purchased', 'Expenditure'].isna().all()
-    assert len(out) == 8
+    # Each block's Expenditure is its own value (GH #1442): achat, autocons, cadeau.
+    x = out['Expenditure']
+    assert x.xs(('h1', 'Maize', 'kg', 'purchased', 1), level=lv).iloc[0] == 100.0
+    assert x.xs(('h1', 'Maize', 'tas', 'produced', 1), level=lv).iloc[0] == 20.0
+    assert x.xs(('h1', 'Oeufs', 'unité', 'produced', 1), level=lv).iloc[0] == 90.0
+    assert x.xs(('h1', 'Oeufs', 'Unknown', 'inkind', 1), level=lv).iloc[0] == 60.0
+    # A value with no quantity is a money-only row, Quantity NaN, u Unknown.
+    assert x.xs(('h1', 'Maize', 'Unknown', 'produced', 2), level=lv).iloc[0] == 30.0
+    assert pd.isna(q.xs(('h1', 'Maize', 'Unknown', 'produced', 2), level=lv).iloc[0])
+    assert x.xs(('h1', 'Sel', 'Unknown', 'inkind', 1), level=lv).iloc[0] == 15.0
+    assert pd.isna(q.xs(('h1', 'Sel', 'Unknown', 'inkind', 1), level=lv).iloc[0])
+    # A quantity with no value keeps Expenditure NaN.
+    assert pd.isna(x.xs(('h2', 'Mil', 'kg', 'produced', 1), level=lv).iloc[0])
+    assert out['Expenditure'].sum() == 260.0 + 215.0
+    assert len(out) == 10
     assert sorted(out.columns) == ['Expenditure', 'Quantity']
 
 
@@ -390,15 +425,18 @@ def test_money_only_passages_carry_nan_not_zero(delivered):
     p1 = q[(s == 'purchased') & (visit == 1)]
     assert int(p1.isna().sum()) == P1_PURCHASED_NULL_QUANTITY
     assert int((p1 == 0).sum()) == P1_PURCHASED_ZERO_QUANTITY
-    assert (q[s == 'produced'] > 0).all()
+    assert (q[s == 'produced'].dropna() > 0).all()
     s_ = np.asarray(s, dtype=object)
     v_ = np.asarray(visit)
     u_ = np.asarray(wave.index.get_level_values('u'), dtype=object)
     assert int(((s_ == 'inkind') & (v_ == 1)).sum()) == P1_INKIND_ROWS
-    assert not ((s_ == 'inkind') & (v_ > 1)).any()
-    assert wave.loc[s_ != 'purchased', 'Expenditure'].isna().all()
-    assert int(((s_ == 'produced') & (u_ == 'Unknown')).sum()) == \
+    # Passages 2-4 field no quantity for any block, money-only rows included.
+    assert q[v_ > 1].isna().all()
+    has_q = q.notna().to_numpy()
+    assert int(((s_ == 'produced') & (u_ == 'Unknown') & (v_ == 1) & has_q).sum()) == \
         P1_PRODUCED_UNKNOWN_UNIT
+    assert int(((s_ == 'inkind') & (u_ == 'Unknown') & (v_ == 1) & has_q).sum()) == \
+        P1_INKIND_UNKNOWN_UNIT
 
 
 @_data
@@ -409,12 +447,17 @@ def test_food_prices_tallies_the_money_only_passages_by_design(burkina):
         warnings.simplefilter('ignore')
         fp = burkina.food_prices(units='unitvalue')
     tally = fp.attrs['price_rows_dropped']
-    assert tally['money_only'] == 139_798 + 136_913 + 128_416     # 405,127
+    # Passages 2-4, purchased (405,127), and since GH #1442 produced and inkind too.
+    assert tally['money_only'] == MONEY_ONLY
     # GH #1068 (ruling @ligon 2026-11-12) adds the `unknown` bucket beside it:
-    # 178 priced passage-1 rows on u='Unknown', outside the money-only groups.
+    # priced passage-1 rows on u='Unknown', outside the money-only groups.
     assert tally['expected_gross'] - tally['expected'] == (
         tally['money_only'] + tally['unknown'] + tally['currency'])
-    assert tally['unknown'] == 178
-    assert tally['lost_fraction'] < 0.2
+    assert tally['unknown'] == UNKNOWN_PRICED
+    # Pinned, not bounded (red team F6: `< 0.2` held by 0.0005).  Measured cold, job
+    # 41271920: 0.15769 before GH #1442, 0.19950 after.  The rise is the 17,734 passage-1
+    # money-only produced / inkind rows whose (t, visit, s) group also carries quantities,
+    # so they count as lost rather than money_only (#864's by-design bucket is per group).
+    assert tally['lost_fraction'] == pytest.approx(0.19950, abs=5e-5)
     # The GH #591 class: the clipped zeros were the last of it (GH #864).
     assert tally['inf'] == P1_PURCHASED_ZERO_QUANTITY

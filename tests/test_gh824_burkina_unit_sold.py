@@ -181,7 +181,9 @@ class TestServed:
         import lsms_library as ll
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            df = ll.Country(COUNTRY).crop_production()
+            # The 2018-19 wave this fix is about; 2021-22 has its own builder and
+            # test since the 2026-11-13 batch (test_burkina_faso_2021_crop_production.py).
+            df = ll.Country(COUNTRY).crop_production(waves=[WAVE])
         return df.reset_index()
 
     @pytest.fixture(scope="class")

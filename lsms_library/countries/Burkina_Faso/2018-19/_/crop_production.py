@@ -14,10 +14,12 @@ needed and no row is added, removed or re-keyed by the sold unit.
 ENCODING: loaded with the DEFAULT (utf-8) encoding so the French crop / unit
 labels keep their accents and match the harmonize_food / u table keys.
 
-Index = (t, i, plot_id, crop, u, condition); plot_id = "{s16cq02}_{s16cq03}" aligns with
-plot_features' plot_id.  i = EHCVM composite via burkina_faso.ehcvm_i
-(reconciles 100% with sample()).  Unmapped crop / unit labels pass through
-unchanged (kept visible; the GAP-1 reported-only rule).
+Index = (t, i, plot_id, crop, u, condition, production_obs); plot_id = "{s16cq02}_{s16cq03}"
+aligns with plot_features' plot_id.  production_obs (GH #1436, the Niger #1360 level) is
+`unresolved_observation` on every row: this wave is unique without it; 2021-22 needs
+it.  i = EHCVM composite via burkina_faso.ehcvm_i (reconciles 100% with sample()).
+Unmapped crop / unit labels pass through unchanged (kept visible; the GAP-1
+reported-only rule).
 
 ``condition`` is the harvest's own "Etat du produit" (s16cq12c, GH #1436), read
 by code and folded from five answers to three tokens; the column
@@ -89,8 +91,8 @@ def _crop_sold_conditions(codes):
 
 
 def _finish_crop_production(df, t):
-    """Tag t, build the (t, i, plot_id, crop, u, condition) index, coerce numerics, drop
-    rows with no crop recorded."""
+    """Tag t, build the (t, i, plot_id, crop, u, condition, production_obs) index,
+    coerce numerics, drop rows with no crop recorded."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     if 'harvest_month' not in df.columns:
@@ -126,7 +128,10 @@ def _finish_crop_production(df, t):
     df = df[[c for c in keep if c in df.columns]]
     df['condition'] = df['condition'].astype('string')
     df['condition_native'] = df['condition_native'].astype('string')
-    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition'])
+    # The canonical sentinel, spelled here: this wave is unique without the level
+    # (GH #1436; Niger's 2018-19 carries the same).  2021-22 serves line tokens.
+    df['production_obs'] = pd.Series('unresolved_observation', index=df.index, dtype='string')
+    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
     return df
 
 

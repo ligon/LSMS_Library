@@ -36,6 +36,10 @@ from burkina_faso import ehcvm_i
 # crop-specific.  A non-null token keeps every reported row through the
 # framework's groupby(level=...).first() de-dup (which drops NaN keys).
 CROP_NA = '(not crop-specific)'
+# A blank used-quantity unit is the corpus missing-unit sentinel `Unknown`
+# (GH #1041 / #1118), never a minted label.  This used to write 'Manquant',
+# which no table maps.
+UNIT_NA = 'Unknown'
 
 
 def _input_maps():
@@ -69,7 +73,7 @@ def _unit_labels(unit_series, unit_map):
 
 
 def _finish_plot_inputs(df, t):
-    """Coerce numerics, fill the CROP_NA / 'Manquant' sentinels so the index
+    """Coerce numerics, fill the CROP_NA / UNIT_NA sentinels so the index
     is fully non-null, drop rows with no input identity, build
     (t, i, input, crop, u)."""
     for col in ['Quantity', 'Quantity_purchased', 'Quantity_received_as_gift']:
@@ -89,7 +93,7 @@ def _finish_plot_inputs(df, t):
     if 'crop' not in df.columns:
         df['crop'] = pd.NA
     df['crop'] = df['crop'].astype('string').fillna(CROP_NA)
-    df['u'] = df['u'].astype('string').fillna('Manquant')
+    df['u'] = df['u'].astype('string').fillna(UNIT_NA)
     df = df[df['input'].notna()]
     keep = ['t', 'i', 'input', 'crop', 'u',
             'Quantity', 'Purchased', 'Quantity_purchased', 'Unit_purchased',
