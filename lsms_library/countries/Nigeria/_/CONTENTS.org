@@ -740,7 +740,8 @@ served =u=:
   =Nigeria::food_acquired::w2-cl-class-read-as-grams= (884 served rows in
   2012Q3, 637 in 2013Q1).  The list was decided item by item on what the item
   is, with this evidence (burst job 41275442, =reports/nigeria/out/m8/=;
-  table / reference, median over served rows, cl reading / grams reading):
+  table / reference, median over served rows, cl reading / grams reading;
+  "a; b" is 2012Q3; 2013Q1 where the rounds differ):
 
   | item (code) | rows 2012Q3 / 2013Q1 | inference | W3 table | price-implied | read as |
   |-+-+-+-+-+-|
@@ -775,10 +776,11 @@ served =u=:
   decided here.  Across the class the price-implied reference disagrees with
   the re-read (=reports/nigeria/out/m10/=, burst job 41276128): on its 573 /
   338 purchased rows, table over implied is 0.31 / 0.175 under grams (within
-  2x on 30% / 17%) and 3.08 / 1.75 under cl (34% / 53%); the inference (0.67,
-  within 2x on 93% / 92% of the 884 / 637 rows; read as inference over the
-  re-read table, 15x lower under cl) and W4's =*_cvn= (table over W4 0.76 /
-  0.83 on 6 / 12 same-label cells; about 8x under cl) agree with it.  The
+  2x on 30% / 17%) and 3.08 / 1.75 under cl (34% / 53%).  The inference (the
+  median row's inferred factor is 0.67 of the re-read table, within 2x on 93%
+  / 92% of the 884 / 637 rows; the cl reading sat 15x above it) and W4's
+  =*_cvn= (table over W4 0.76 / 0.83 on 6 / 12 same-label cells; about 8x
+  under cl) agree with the re-read.  The
   price-implied reference is weakest exactly here: an item's Kg-labelled
   purchases need not be the same product (groundnuts carry most of these
   rows).  Kilograms on the class: 64,666 / 12,593 under cl, 6,467 / 1,259
