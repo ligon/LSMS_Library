@@ -256,12 +256,23 @@ def test_old_helper_and_r1_r3_source_inverse_exact():
     # addition after this fixture's baseline.  Named exactly, so any other
     # change to malawi.py still fails the inverse.
     added|={'CS_24','ihps24_refreshed','_ihps24_refreshed','drop_ihps24_refreshed'}
+    # GH #1228 later waves (ruling 2026-11-12): the Module D join helpers, added ...
+    added|={'_D20_SLOTS','_D20_TEXTS','D20_COLUMNS','D20_SINGLE','_D20_REASONS',
+            'module_d_other_crop_text','read_module_d_columns','household_crop_labels',
+            'D20_TEXT_COL','D20_REASON_COL','attach_module_d_text'}
+    # ... and the six definitions it changed, named exactly and dropped from BOTH
+    # sides, so every other definition of malawi.py is still compared byte for byte.
+    changed={'_CROP_TEXT_RECODE','_crop_text_labels','_harvest_block',
+             'assemble_crop_production','_CROP_SALE_SOURCES','_crop_pieces'}
     added_imports={'functools'}
+    def named(n,names):
+        return getattr(n,'name',None) in names or isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id in names for t in n.targets)
     def owned(n):
         if isinstance(n,ast.Import) and {a.name for a in n.names}<=added_imports and not any(a.asname for a in n.names):
             return True
-        return getattr(n,'name',None) in added or isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id in added for t in n.targets)
+        return named(n,added|changed)
     new.body=[n for n in new.body if not owned(n)]
+    old.body=[n for n in old.body if not named(n,changed)]
     assert ast.dump(new,include_attributes=False)==ast.dump(old,include_attributes=False)
 
 
@@ -269,7 +280,10 @@ def driver_inputs(wave,half):
     hh='case_id' if half in ('Full_Sample','Cross_Sectional') else 'y2_hhid' if wave=='2013-14' else 'y3_hhid' if wave=='2016-17' else 'y4_hhid'
     d=pd.DataFrame({hh:['h'], 'ag_d00':['p'], 'gardenid':['g'], 'plotid':['p'],
                     'ag_d39a':[4], 'ag_d39d':[4.], 'ag_d39f':[4], 'ag_d39i':[5.],
-                    'ag_d39g':[4], 'ag_d39j':[5.], 'ag_d36':[2], 'ag_d38':[1], 'ag_d40':[2]})
+                    'ag_d39g':[4], 'ag_d39j':[5.], 'ag_d36':[2], 'ag_d38':[1], 'ag_d40':[2],
+                    # GH #1228: question 20, joined onto G by the 2016-17 / 2019-20 drivers.
+                    **{c:[np.nan] for c in ('ag_d20a','ag_d20b','ag_d20c','ag_d20d','ag_d20e',
+                                            'ag_d20_oth','ag_d20b_oth')}})
     g=pd.DataFrame({hh:['h','h','h','z'], 'ag_g0b':['p','p','p2',None] if wave=='2010-11' else [1,1,1,1],
         'ag_g0d':[1,1,1,1], 'ag_g00':['p','p','p2',None], 'gardenid':['g']*4,
         'plotid':['p','p','p2',None], 'crop_code':[1]*4, 'ag_g04a':[3.,3.,np.nan,np.nan],

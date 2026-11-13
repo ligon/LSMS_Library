@@ -77,6 +77,10 @@ def drive(monkeypatch):
                     'ag_d41e': [pd.NA, pd.NA],
                     'ag_d41f': [pd.NA, pd.NA],
                     'ag_d41g': [pd.NA, pd.NA],
+                    # GH #1228: the 2016-17 / 2019-20 drivers join question 20's
+                    # crop slots and "Other Crop" text onto Module G.
+                    **{c: [pd.NA, pd.NA] for c in ('ag_d20a', 'ag_d20b', 'ag_d20c', 'ag_d20d',
+                                                   'ag_d20e', 'ag_d20_oth', 'ag_d20b_oth')},
                 })
                 return d
             if 'ag_mod_g' in name:

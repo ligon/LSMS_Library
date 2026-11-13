@@ -78,6 +78,61 @@ of those, the household's every G code-48 line resolves to cowpea for 16 / 14 / 
 some but not all for 1 / 2 / 6 / 0, none for 28 / 9 / 114 / 39, and 5 / 0 / 9 / 3
 households have no G code-48 line.
 
+** The relabel, as built (merge only if the season inference above is accepted)
+
+=malawi.module_d_other_crop_text= / =attach_module_d_text= implement the join above
+in all four later halves (2016-17 XS D through the restricted =read_module_d_columns=
+route, the latin-1 file), and the line's text reaches =_harvest_block= / =_seed_block= as
+=crop_text=, the 2010-11 mechanism.  =_CROP_TEXT_RECODE= gains =COW PEAS=.  The code
+stays 48, so =production_obs= (=reported:G:48=) and =crop_variety= still say what was
+recorded, and a sale attaches exactly as before.  "Module I code-48 sales move by the
+same rule" is read at household grain: a sale on its single-plot line moves with it,
+and a Farm-level code-48 sale takes the label only where ALL its household's code-48
+lines carry it (the =_farm_level_sales= rule GH #1457 already applied for 2010-11).
+=_crop_pieces= now labels the raw I / Q lines by the same rule, so =derivation_inputs=
+joins the relabelled rows.
+
+Measured, cold builds in private roots, development =f138a3d61= against =e857a9c0f=
+(burst job 41271926):
+
+- =crop_production= 141,661 rows either way, rows by wave unchanged.  =crop= moves on
+  310 rows in 2016-17 (302 harvest rows, 8 Farm-level sales) and 716 in 2019-20 (697,
+  19), all =Other= -> =Cowpea (Khobwe)=; 2010-11 and 2013-14 do not move.  No other cell
+  of any row moves (=Quantity=, the sale columns, =Derivation=, units, conditions), and
+  every ladder tally replays identically per wave: splitting =Other= moved no
+  reference cell's rung.
+- Sales now on a cowpea row: 2016-17 30 (733,110 MWK), 2019-20 78 (2,185,350 MWK); the
+  waves' sale totals are unchanged.
+- Code-48 G lines left =Other= (=attrs['crop_text_left_other']=): 2016-17 no text 2, a
+  text with no D code-48 slot 1, a text not on the list 177; 2019-20 two texts 27, no
+  slot 3, not on the list 497.  2010-11 (the new key only): no text 2, not on the
+  list 169.
+- =plot_inputs= 222,662 rows either way; =crop= moves on the seed rows of the same lines,
+  301 (2016-17) and 697 (2019-20), and nothing else.  Module H's acquisition-only
+  Farm-level rows keep the code's label =Other= (household grain, no plot text).
+- =harvest_kg= (default and with the shipped IHS5 tables): rows and wave kilograms
+  unchanged; on =j=, 2016-17 =Other= 244 -> 104 + 140 cowpea, 2019-20 821 -> 354 + 467.
+  =seed_kg=, =nitrogen_kg=, =gross_crop_revenue= frame-equal.  =crop_diversity= rises on 7
+  / 52 households that grow cowpea beside another =Other= crop.  Site Q's warnings read
+  the same.
+- =derivation_inputs=: every keyed row of every wave joins its inputs in both arms;
+  raw I / Q lines labelled cowpea 132 (2010-11: the latent residual recorded under the
+  2010-11 entry, now joined), 256, 560.
+- Sensitivity: of the relabelled harvest rows, 294 of 302 / 665 of 697 are in
+  households whose Modules D and G started the same day, 271 / 618 in households whose
+  dated G lines fall in one season, 265 / 587 both.
+
+*Cache*: every Malawi L2-country (26 of 26) and L2-wave (156 of 156) hash moves, no
+other country's (555 / 2,321 probed), no =build_transforms_fingerprint= (0 of 42).
+Malawi's =framework_imports_fingerprint= moves too: =read_module_d_columns= imports five
+=local_tools= DVC helpers (=_ensure_dvc_pulled=, =_dvc_cache_path=, =DVCFS=, ...), which
+the 2016-17 wave readers already import, so a later edit to those helpers re-warms every
+Malawi table, not only 2016-17's.
+
+*Left as they are, for a decision* (none is in the ruling): the 25 two-text 2019-20 XS
+plots with cowpea in one text (2 say it twice), the one =COWPEAS(NSEULA)=, the one
+=COWPEAS= on a D row without a code-48 slot, and 2013-14 (no text held).
+
 *2024-25 (IHS6 / IHPS 2024), measured and NOT relabelled* (outside the ruling;
 =crop_production= is not wired for this wave).  *Idiosyncrasy: IHS6 has a cowpea code.*
 Module G lists =48 OTHER (SPECIFY) 1=, =49 OTHER (SPECIFY) 2= and =50 COW PEAS (KHOBWE)=
@@ -1119,7 +1174,8 @@ now grow one more named crop.
 
 *A wave break on =crop=.*  The label exists only in 2010-11, while later waves' =Other= is
 still mostly cowpea (above), so a cowpea series cannot be read across waves until the
-Module D halves land.
+Module D halves land.  /2026-11-13: they have, on a branch awaiting the season decision;
+see the entry of that date at the top of this file.  2013-14 still has no text./
 
 *Lines left out.*  6 more 2010-11 G lines say exactly =COWPEAS= on codes 1, 5, 11, 21 and 42
 (42 twice).  They keep their code's label: a text on a coded crop is a different decision
