@@ -2138,6 +2138,27 @@ class TestServedStrataRefusals:
             SamplingRecord.from_config("A", "1", {"served_strata": strata(
                 **{**CONSTRUCTED, "derivation": key})})
 
+    @pytest.mark.parametrize("key", [
+        " A::sample::region-milieu-stratum ",     # padded (red team F2)
+        "A::sample::region-milieu-stratum ",
+        "A:: sample ::region-milieu-stratum",       # re-spaced slot
+        "A::sample:: region-milieu-stratum",
+    ])
+    def test_constructed_key_must_be_written_canonically(self, key):
+        """`parse_key` strips its slots, so a padded key used to pass the
+        country/table check while matching no registry key and no stamp."""
+        with pytest.raises(ValueError, match="not written as a registry key"):
+            SamplingRecord.from_config("A", "1", {"served_strata": strata(
+                **{**CONSTRUCTED, "derivation": key})})
+
+    def test_the_holds_refusal_names_its_own_origin(self):
+        """`holds` is not the Uganda exemplar's vocabulary (red team F8)."""
+        with pytest.raises(ValueError) as exc:
+            SamplingRecord.from_config(
+                "A", "1", {"served_strata": strata(holds="label")})
+        assert "GH #1577" in str(exc.value)
+        assert "Uganda exemplar" not in str(exc.value)
+
     @pytest.mark.parametrize("extra", [{"variable": "strate"},
                                        {"derivation": "A::sample::x"}])
     def test_absent_names_nothing(self, extra):
@@ -2261,9 +2282,13 @@ class TestServedStrataAgreesWithTheRegistry:
         cells = [w for (c, w) in _registered_strata_constructions() if c == country]
         tagged = [w for w in cells
                   if (sampling_records(country).get(w) is not None
-                      and sampling_records(country)[w].strata_holds == "constructed")]
-        assert cells and tagged != cells, (
-            f"{country} is now tagged; remove it from SERVED_STRATA_PENDING")
+                      and sampling_records(country)[w].strata_holds is not None)]
+        # NOTHING tagged (red team F5): a half-tagged pending country -- one
+        # wave pasted, another registered later -- must fail here, not pass
+        # silently until someone notices.
+        assert cells and not tagged, (
+            f"{country} is (partly) tagged: {tagged} of {cells}.  Tag every "
+            "registered wave and remove it from SERVED_STRATA_PENDING.")
 
     def test_a_native_or_absent_tag_has_no_registered_construction(self):
         """A registered construction of a wave's strata contradicts a tag that
@@ -2274,6 +2299,186 @@ class TestServedStrataAgreesWithTheRegistry:
             for wave, r in sampling_records(name).items():
                 if r.strata_holds in S.NATIVE_STRATA | {"absent"}:
                     assert (name, wave) not in registered, (name, wave)
+
+
+# -- static: a native record is what the wave's config serves (red team F4) --
+#
+# Read from config and source text only (no data, no import of a country
+# module): the record's `variable` must be the variable and file the wave's
+# data_info.yml maps to `strata`, declared bare (no `mapping:` / `mappings:`),
+# and nothing in the wave may relabel it -- the effective `strata` formatter is
+# absent or `format_id`, and no `sample` / sub-df hook touches `strata`.  A
+# spelling fold by the country's `strata` categorical table is allowed, as the
+# `native-label` definition says.
+
+_VARIABLE = re.compile(r"^(\S+) \((.+)\)$")
+
+
+def _strata_declarations(block):
+    """``[(sub-df name or None, file, value)]`` for each `strata` myvar."""
+    out = []
+    if "dfs" in block:
+        for name in block["dfs"]:
+            sub = block.get(name) or {}
+            if "strata" in (sub.get("myvars") or {}):
+                out.append((name, sub.get("file"), sub["myvars"]["strata"]))
+    elif "strata" in (block.get("myvars") or {}):
+        out.append((None, block.get("file"), block["myvars"]["strata"]))
+    return out
+
+
+def _module_names(paths):
+    """``{name: (path, node, names-of-that-module)}``, later paths overriding
+    earlier ones (as ``Wave.formatting_functions`` does)."""
+    import ast
+    out = {}
+    for p in paths:
+        if not p.exists():
+            continue
+        tree = ast.parse(p.read_text(encoding="utf-8"))
+        local = {}
+        for node in tree.body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                local[node.name] = node
+            elif isinstance(node, ast.Assign):
+                for t in node.targets:
+                    if isinstance(t, ast.Name):
+                        local[t.id] = node.value
+            elif isinstance(node, (ast.Import, ast.ImportFrom)):
+                for a in node.names:
+                    local[a.asname or a.name.split(".")[0]] = node
+        for name, node in local.items():
+            out[name] = (p, node, local)
+    return out
+
+
+def _resolve(entry, depth=0):
+    """Follow ``alias = other_function`` inside one module."""
+    import ast
+    p, node, local = entry
+    if isinstance(node, ast.Name) and depth < 5 and node.id in local:
+        return _resolve((p, local[node.id], local), depth + 1)
+    return entry
+
+
+def _body_without_docstring(fn):
+    import ast
+    body = list(fn.body)
+    if body and isinstance(body[0], ast.Expr) and isinstance(
+            getattr(body[0], "value", None), ast.Constant) and isinstance(
+            body[0].value.value, str):
+        body = body[1:]
+    return body
+
+
+def _touches_strata(fn):
+    import ast
+    for stmt in _body_without_docstring(fn):
+        for n in ast.walk(stmt):
+            if isinstance(n, ast.Constant) and n.value == "strata":
+                return True
+            if isinstance(n, ast.Attribute) and n.attr == "strata":
+                return True
+    return False
+
+
+def _is_format_id_passthrough(fn):
+    import ast
+    body = _body_without_docstring(fn)
+    args = [a.arg for a in fn.args.args]
+    if len(args) != 1 or len(body) != 1 or not isinstance(body[0], ast.Return):
+        return False
+    call = body[0].value
+    return (isinstance(call, ast.Call) and isinstance(call.func, ast.Name)
+            and call.func.id == "format_id" and len(call.args) == 1
+            and not call.keywords and isinstance(call.args[0], ast.Name)
+            and call.args[0].id == args[0])
+
+
+def _native_config_problems(country, wave, variable=None):
+    """Why the wave's `strata` is not a bare, un-relabelled recorded variable
+    (and, given `variable`, not the one the record names).  [] if none."""
+    import ast
+    import lsms_library as ll
+    from pathlib import PurePosixPath
+    from lsms_library.yaml_utils import load_yaml
+    c = ll.Country(country)
+    w = c[wave]
+    with open(w.file_path / "_" / "data_info.yml", encoding="utf-8") as fh:
+        block = (load_yaml(fh) or {}).get("sample") or {}
+    problems = []
+    decls = _strata_declarations(block)
+    if len(decls) != 1:
+        return [f"{len(decls)} `strata` declarations in the sample block"]
+    sub, file, value = decls[0]
+    if not isinstance(value, str):
+        problems.append(f"`strata` is not declared bare: {value!r}")
+    if not isinstance(file, str):
+        problems.append(f"`strata` comes from more than one file: {file!r}")
+    if variable is not None:
+        m = _VARIABLE.match(variable)
+        if not m:
+            problems.append(f"variable {variable!r} is not 'name (file)'")
+        else:
+            name, rec_file = m.group(1), PurePosixPath(m.group(2)).parts
+            if value != name:
+                problems.append(f"config serves {value!r}, record names {name!r}")
+            if not isinstance(file, str) or \
+                    PurePosixPath(file).parts[-len(rec_file):] != rec_file:
+                problems.append(f"config reads {file!r}, record names {m.group(2)!r}")
+    names = _module_names([
+        c.file_path / "_" / f"{country.lower()}.py", c.file_path / "_" / "mapping.py",
+        w.file_path / "_" / f"{w.wave_folder}.py", w.file_path / "_" / "mapping.py"])
+    if "strata" in names:
+        p, node, _ = _resolve(names["strata"])
+        if not (isinstance(node, ast.FunctionDef) and _is_format_id_passthrough(node)):
+            problems.append(f"`strata` formatter in {p.name} is not format_id")
+    for hook in ["sample"] + ([sub] if sub else []):
+        if hook not in names:
+            continue
+        p, node, _ = _resolve(names[hook])
+        if not isinstance(node, ast.FunctionDef):
+            problems.append(f"`{hook}` hook in {p.name} cannot be read")
+        elif _touches_strata(node):
+            problems.append(f"`{hook}` hook in {p.name} writes or reads `strata`")
+    return problems
+
+
+def _native_records():
+    try:
+        return sorted((r.country, r.wave) for r in _shipped()
+                      if r.strata_holds in S.NATIVE_STRATA)
+    except Exception:                                  # pragma: no cover
+        return []
+
+
+class TestANativeRecordIsWhatTheConfigServes:
+
+    @pytest.mark.parametrize("country,wave", _native_records())
+    def test_the_variable_is_the_configs_and_nothing_relabels_it(self, country,
+                                                                wave):
+        rec = sampling_records(country)[wave]
+        assert _native_config_problems(
+            country, wave, rec.served_strata["variable"]) == []
+
+    def test_there_are_native_records_to_check(self):
+        assert len(_native_records()) >= 2
+
+    @pytest.mark.parametrize("country,wave,why", [
+        # The #1573 decode: its `sample` hook relabels the code.
+        ("Burkina_Faso", "2014", "hook"),
+        # A district mapping on the declaration itself.
+        ("Malawi", "2010-11", "not declared bare"),
+    ])
+    def test_the_check_bites_on_a_relabelled_wave(self, country, wave, why):
+        problems = _native_config_problems(country, wave)
+        assert any(why in p for p in problems), problems
+
+    def test_the_check_bites_on_a_wrong_variable_or_file(self):
+        assert _native_config_problems("Mali", "2017-18",
+                                       "strate (EACIPOIDS.dta)")
+        assert _native_config_problems("Mali", "2017-18",
+                                       "poids_leger (EACI17_ECHANTILLON.dta)")
 
 
 # -- delivered: the tag agrees with the served column ----------------------
@@ -2303,8 +2508,10 @@ def test_the_tag_agrees_with_the_served_strata(country, wave):
     assert len(s), (country, wave)
     blk = sampling_records(country)[wave].served_strata
     if blk["holds"] == "absent":
-        # A frame of that wave alone has no `strata` column at all (measured,
-        # Mali 2014-15); in a frame with other waves the column is NA there.
+        # Whether a one-wave frame carries the column depends on cache state,
+        # identically on base (red team F1): Mali 2014-15 has no `strata` on a
+        # cold one-wave call and an all-NA one after an all-wave call.  Both
+        # shapes serve no stratum, so both pass.
         assert "strata" not in s or s["strata"].isna().all(), \
             s["strata"].dropna().unique()[:5]
         return

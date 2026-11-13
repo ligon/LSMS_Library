@@ -114,6 +114,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
+from .derivations import format_key as _format_derivation_key
 from .derivations import parse_key as _parse_derivation_key
 from .paths import countries_root
 from .yaml_utils import SchemeLoader
@@ -330,13 +331,23 @@ STRATA_HOLDS: frozenset[str] = frozenset({
     # First record: Mali 2018-19, region x milieu from the cover's labels
     # (`Mali::sample::region-milieu-stratum`, GH #812).
     "constructed",
-    # No stratum is served: `strata` is NA on every row of the wave (and a
-    # frame of that wave alone has no `strata` column).  The locator says what
-    # was searched, because silence in config is not evidence of absence.
-    # First record: Mali 2014-15 (no variable in its 55 files is named or
-    # labelled a stratum; GH #812 ruling).
+    # No stratum is served: no row of the wave has a non-NA `strata`.
+    # Whether a frame of that wave ALONE carries a `strata` column (all NA)
+    # or none at all depends on cache state, identically on base -- Mali
+    # 2014-15: none on a cold one-wave call, present after an all-wave call
+    # (red team F1; a pre-existing build/read-composition defect) -- so
+    # read it with `.get('strata')`.  The locator says what was searched,
+    # because silence in config is not evidence of absence.  First record:
+    # Mali 2014-15 (no variable in its 55 files is named or labelled a
+    # stratum, except `deflator`; GH #812 ruling).
     "absent",
 })
+
+# `confidence` on a `served_strata` block grades the claim about the SERVED
+# column (what `sample().strata` holds, read off the served frame and the
+# source file), not a design statement: the CONFIDENCE_LEVELS legend above is
+# written for design statements and is reused here with that meaning, as
+# `panel` reuses it for a continuity reading.
 
 #: The ``holds`` values that serve a recorded variable, and so name it.
 NATIVE_STRATA: frozenset[str] = frozenset({"native-code", "native-label"})
@@ -746,13 +757,22 @@ class SamplingRecord(dict):
         return dict(self)
 
 
+#: Where a vocabulary came from, for the refusal message.  The default is the
+#: module's original wording; `served_strata.holds` (GH #1577) is not the
+#: Uganda exemplar's and names its own origin (red team F8).
+_VOCAB_ORIGIN_DEFAULT = "frozen from the Uganda exemplar, GH #793"
+_STRATA_HOLDS_ORIGIN = ("added by GH #1577, each value with its first record, "
+                        "under GH #1134's rule")
+
+
 def _check_vocab(where: str, field: str, value: Any,
-                 allowed: frozenset[str]) -> None:
+                 allowed: frozenset[str], *,
+                 origin: str = _VOCAB_ORIGIN_DEFAULT) -> None:
     if str(value) not in allowed:
         raise ValueError(
             f"{where}: {field}={value!r} is not in the controlled vocabulary "
-            f"{sorted(allowed)} (frozen from the Uganda exemplar, GH #793; "
-            "widening it is a decision, made in lsms_library/sampling.py)"
+            f"{sorted(allowed)} ({origin}; widening it is a decision, made in "
+            "lsms_library/sampling.py)"
         )
 
 
@@ -984,7 +1004,8 @@ def _check_served_strata(where: str, country: str, block: Any) -> None:
             "column holds is a reading, and it travels with its own "
             "provenance (GH #1577).")
     holds = block["holds"]
-    _check_vocab(where, f"{name}.holds", holds, STRATA_HOLDS)
+    _check_vocab(where, f"{name}.holds", holds, STRATA_HOLDS,
+                 origin=_STRATA_HOLDS_ORIGIN)
     _check_vocab(where, f"{name}.source_type", block["source_type"],
                  SOURCE_TYPES)
     _check_vocab(where, f"{name}.confidence", block["confidence"],
@@ -1019,6 +1040,13 @@ def _check_served_strata(where: str, country: str, block: Any) -> None:
             k_country, k_table, _name = _parse_derivation_key(key)
         except ValueError as exc:
             raise ValueError(f"{where}: {name}.derivation: {exc}") from None
+        canonical = _format_derivation_key(k_country, k_table, _name)
+        if key != canonical:
+            raise ValueError(
+                f"{where}: {name}.derivation={key!r} is not written as a "
+                f"registry key; write it exactly as {canonical!r}.  A padded "
+                "or re-spaced key matches no registry entry and no "
+                "`Derivation` stamp (red team F2).")
         if k_country != country or k_table != "sample":
             raise ValueError(
                 f"{where}: {name}.derivation={key!r} must be a key of "

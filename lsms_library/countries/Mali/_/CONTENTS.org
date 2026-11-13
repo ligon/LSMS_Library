@@ -4094,7 +4094,14 @@ four values, so 2014-15 now has an entry; it carries no =panel:= block, because 
 boundary.  No served value, weight or default changed; the hash census (base =f138a3d61=) is in the
 #1577 report.
 
-*An idiosyncrasy of the absent wave, measured.*  =Country('Mali').sample(waves=['2014-15'])= has no
-=strata= column at all, where an all-wave frame has the column, NA on 2014-15's rows.  A consumer
-indexing =s['strata']= on a 2014-15-only frame gets =KeyError=, not a column of NA (burst job 41275776,
-cold, private root; =tests/test_sampling.py::test_the_tag_agrees_with_the_served_strata= takes both shapes).
+*An idiosyncrasy of the absent wave: its one-wave shape depends on cache state.*  Whether
+=Country('Mali').sample(waves=['2014-15'])= carries a =strata= column at all depends on what was built
+before it, and it does so identically on base =f138a3d61=: a cold one-wave call (the first call in an
+empty data root) has no =strata= and no =Derivation= column, while the same call after
+=sample()= for all waves has both, =strata= NA on all 3,804 rows (red team on GH #1577, burst job
+41276936, =reports/strata-redteam/out/j4/mali-order-{cand,base}.txt=; this branch's job 41275776 saw
+the cold shape).  So =s['strata']= on a 2014-15-only frame can raise =KeyError=; read it with
+=s.get('strata')=.  This is a pre-existing build/read-composition defect, not something the record
+introduces, and CLAUDE.md's rule applies: "a served value that depends on cache state is a defect to
+fix".  Filed as a residual in the #1577 report.  =tests/test_sampling.py::test_the_tag_agrees_with_the_served_strata=
+accepts both shapes, since neither serves a stratum.

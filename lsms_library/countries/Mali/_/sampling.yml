@@ -38,7 +38,7 @@ Sampling:
       holds: absent
       source_type: derived-from-data
       confidence: high
-      locator: 'CONTENTS.org, "2026-11-04 -- the NPK slot, the EHCVM input files, and strata by wave (GH #1445, #812)", "Strata, measured": no variable in the 55 files of 2014-15 is named or labelled a stratum; and "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)", where 2014-15 `strata` is "empty, by the ruling"; 2014-15/_/data_info.yml `sample` declares no `strata`'
+      locator: 'CONTENTS.org, "2026-11-04 -- the NPK slot, the EHCVM input files, and strata by wave (GH #1445, #812)", "Strata, measured", verbatim: "2014-15: no variable in its 55 files is named or labelled a stratum, except =deflator= in =eaci2014_agregatconso.dta= ("Strata deflator"), which is one-to-one with region x milieu, 15 cells, not the design''s 51."; and "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)", where 2014-15 `strata` is "empty, by the ruling"; 2014-15/_/data_info.yml `sample` declares no `strata`'
       note: |-
         The EAC-I 2014 BID (catalog 2583) states "51 explicit sample strata", so
         the design was stratified; what is absent is a stratum variable in the
@@ -132,8 +132,14 @@ Sampling:
       locator: '_/derivations.yml, Mali::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2021-22/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2021-22/_/mapping.py; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)": 17 region x milieu labels, equal to BID Table 1'
       note: |-
         Each wave's label is its own cover's: 2021-22 writes Menaka and Taoudenit
-        under Gao and Tombouctou, so 429 households in both waves change stratum
-        on the label alone (CONTENTS.org, "Why 20 then 17").
+        under Gao and Tombouctou, so households change stratum on the label
+        alone.  CONTENTS.org ("Why 20 then 17", 2026-11-04) counts 429 of the
+        6,133 households it found in both waves, in 36 clusters.  On the
+        households the served panel links today (after the GH #1494 id
+        namespace) the red team on GH #1577 counts 415 of 5,011, in 36 clusters,
+        all three pairs relabels (Menaka Rural to Gao Rural 195, Taoudénit Rural
+        to Tombouctou Rural 154, Menaka Urbain to Gao Urbain 66; burst job
+        41277169).
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: stable
