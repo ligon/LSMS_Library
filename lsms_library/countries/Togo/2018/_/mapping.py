@@ -216,7 +216,7 @@ def _food_effects_by_vague(df):
 
 
 def shocks(df):
-    """The coping SET from the s14q05__N grid; no HowCoped<n> position (GH #1562).
+    """The coping SET from the s14q05__N grid; HowCoped0..2 NA (GH #1562).
 
     The grid records which strategies were chosen, not their order (ruling
     2026-11-12), so the set only: ehcvm.coping_set_from_grid, which says which

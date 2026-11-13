@@ -1629,6 +1629,8 @@ COPING_SET_COLUMN = "HowCopedSet"
 COPING_GRID_NOT_CHOSEN = 0
 #: The cell values that mark an option CHOSEN.  See coping_set_from_grid.
 COPING_GRID_CHOSEN = (1, 2, 3)
+#: The positions a set-only hook writes, all NA (the paper form asks for up to 3).
+COPING_GRID_POSITIONS = 3
 #: The release's rank labels of ``s14bq05__N`` (EHCVM 2021-22), and the rank.
 COPING_RANK_LABELS = {"Première stratégie": 1, "Deuxième strategie": 2,
                       "Troisième stratégie": 3}
@@ -1670,8 +1672,11 @@ def coping_set_from_grid(df: pd.DataFrame, labels: dict, *, country: str,
     set only (not positions) until its order is proven".  So this returns
     ``df`` with the grid columns dropped and ``HowCopedSet`` added -- the
     labels of the CHOSEN options, distinct, sorted, joined with
-    ``derivations.MULTI_SEP`` -- and writes no ``HowCoped<n>``.  NA where the
-    row chose nothing (no follow-up asked).
+    ``derivations.MULTI_SEP`` -- and ``HowCoped0..2`` all NA: the positions are
+    present, so the served schema does not depend on which waves are asked for
+    (an EMPTY answer must carry its required columns, GH #1292), and empty,
+    because the grid records no order.  ``HowCopedSet`` is NA where the row
+    chose nothing (no follow-up asked).
 
     Which cell values count as chosen (GH #1562; counts are the audit's, per
     country, ``burst/isa-sm-20261113/reports/1562-coping-audit/out/raw``):
@@ -1725,6 +1730,8 @@ def coping_set_from_grid(df: pd.DataFrame, labels: dict, *, country: str,
     sets = [_join_coping_labels(names[k] for k in range(len(codes)) if row[k])
             for row in chosen]
     out = df.drop(columns=cols)
+    for k in range(COPING_GRID_POSITIONS):
+        out[f"HowCoped{k}"] = pd.array([pd.NA] * len(out), dtype="string")
     out[COPING_SET_COLUMN] = pd.array(sets, dtype="string")
     return out
 

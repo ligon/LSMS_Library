@@ -236,7 +236,7 @@ def shocks(df):
     """Food effects per vague, then the coping SET from the s14q05__N grid (GH #1562).
 
     The grid records which strategies were chosen, not their order (ruling
-    2026-11-12), so no HowCoped<n> position is written: the set only, read by
+    2026-11-12), so HowCoped0..2 are written NA: the set only, read by
     ehcvm.coping_set_from_grid, which says which cell values count as chosen.
     Benin never marks more than two options per shock.
     """

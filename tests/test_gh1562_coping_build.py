@@ -61,7 +61,8 @@ def test_positive_values_are_chosen_zero_is_not_na_is_not_asked():
     df['Other'] = 7
     out = coping_set_from_grid(df, LABELS, country='X')
     assert out[COPING_SET_COLUMN].tolist() == ['a+b', 'Aucune stratégie', 'a+b', pd.NA, 'b']
-    assert list(out.columns) == ['Other', COPING_SET_COLUMN]
+    assert list(out.columns) == ['Other', 'HowCoped0', 'HowCoped1', 'HowCoped2', COPING_SET_COLUMN]
+    assert out[['HowCoped0', 'HowCoped1', 'HowCoped2']].isna().all().all()
     assert str(out[COPING_SET_COLUMN].dtype) == 'string'
 
 
@@ -89,7 +90,7 @@ def test_a_label_with_the_separator_is_refused():
 
 
 @pytest.mark.parametrize('country', EHCVM_2018)
-def test_every_2018_hook_writes_the_set_and_no_position(country):
+def test_every_2018_hook_writes_the_set_and_na_positions(country):
     module = _module(country, EHCVM_2018[country])
     n = max(module.COPING_LABELS)
     frame = pd.DataFrame({f'Cope{k}': [0, 0] for k in range(1, n + 1)})
@@ -101,7 +102,9 @@ def test_every_2018_hook_writes_the_set_and_no_position(country):
                              StockVague2=[np.nan, np.nan], PurchasesVague2=[np.nan, np.nan],
                              AffectedConsumption=[np.nan, np.nan])
     out = module.shocks(frame)
-    assert not [c for c in out if str(c).startswith('HowCoped') and c != COPING_SET_COLUMN]
+    positions = [c for c in out if str(c).startswith('HowCoped') and c != COPING_SET_COLUMN]
+    assert positions == ['HowCoped0', 'HowCoped1', 'HowCoped2']
+    assert out[positions].isna().all().all()
     assert not [c for c in out if str(c).startswith('Cope')]
     lab = module.COPING_LABELS
     assert out[COPING_SET_COLUMN].iloc[0] == '+'.join(sorted({lab[1], lab[2]}))
@@ -239,7 +242,8 @@ def test_nigeria_w4_fills_the_set_only():
                           'Cope3': [np.nan, '16. RELIED ON SAVINGS', np.nan],
                           'Cope4': [np.nan, '12. DELAYED PAYMENT OBLIGATIONS', np.nan]})
     out = module.shocks(frame)
-    assert list(out.columns) == [COPING_SET_COLUMN]
+    assert list(out.columns) == ['HowCoped0', 'HowCoped1', 'HowCoped2', COPING_SET_COLUMN]
+    assert out[['HowCoped0', 'HowCoped1', 'HowCoped2']].isna().all().all()
     assert out[COPING_SET_COLUMN].tolist() == [
         '21. DID NOTHING',
         '1. SALE OF LIVESTOCK+12. DELAYED PAYMENT OBLIGATIONS+16. RELIED ON SAVINGS',

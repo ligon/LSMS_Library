@@ -249,7 +249,7 @@ COPING_LABELS = {
 
 
 def shocks(df):
-    """The coping SET from the s14q05__N grid; no HowCoped<n> position (GH #1562).
+    """The coping SET from the s14q05__N grid; HowCoped0..2 NA (GH #1562).
 
     The CAPI form calls 14.05 "CHOIX MULTIPLE: ORDONNE", but the release holds
     {0, 1, 3} per option and never a 2, so the order is not established (ruling

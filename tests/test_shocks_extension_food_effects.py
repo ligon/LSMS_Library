@@ -89,8 +89,9 @@ def test_split_effects_are_selected_per_row_and_preserve_missingness(country):
     }, index=frame.index)
     pd.testing.assert_frame_equal(out[FOOD], expected)
     assert not {'StockVague2', 'PurchasesVague2', 'vague', 'Cope1'} & set(out)
-    # GH #1562: the 2018-19 grid fills the set only, never a position.
-    assert not [c for c in out if str(c).startswith('HowCoped') and c != 'HowCopedSet']
+    # GH #1562: the 2018-19 grid fills the set only; the positions are present and NA.
+    positions = [c for c in out if str(c).startswith('HowCoped') and c != 'HowCopedSet']
+    assert positions == ['HowCoped0', 'HowCoped1', 'HowCoped2'] and out[positions].isna().all().all()
     label = _module(country).COPING_LABELS[1]
     assert out['HowCopedSet'].tolist() == [label, pd.NA, label, label, pd.NA, pd.NA]
 

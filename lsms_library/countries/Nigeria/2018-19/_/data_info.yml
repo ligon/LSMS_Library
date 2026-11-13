@@ -28,7 +28,7 @@ shocks:
     # GH #1562 (ruling 2026-11-13, "W4 fills the set only").  The W4 question is
     # "How did your household cope with the most recent [SHOCK]? ... SELECT ALL
     # THAT APPLY" (ph_w4_household_quest.pdf p62): s15aq7_1..4 record WHICH
-    # strategies, in entry order, not a rank.  So no HowCoped<n> position: the
+    # strategies, in entry order, not a rank.  So HowCoped0..2 are NA: the
     # mapping.py shocks hook writes HowCopedSet from all four.  Once, under the
     # post-harvest quarter.  See 2010-11/_/data_info.yml.
     file:

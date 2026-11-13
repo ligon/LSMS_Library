@@ -209,7 +209,7 @@ class ShocksCopingError(Exception):
 
 
 def shocks(df):
-    """HowCopedSet from s15aq7_1..4 (``Cope1..4``); no HowCoped<n> position.
+    """HowCopedSet from s15aq7_1..4 (``Cope1..4``); HowCoped0..2 present and NA.
 
     W4 asks "How did your household cope with the most recent [SHOCK]? SEE
     CODES. SELECT ALL THAT APPLY" (ph_w4_household_quest.pdf p62), so its four
@@ -232,5 +232,10 @@ def shocks(df):
             raise ShocksCopingError(f'Nigeria 2018-19 coping labels contain {_SET_SEP!r}: {bad}')
         sets.append(_SET_SEP.join(picked) if picked else pd.NA)
     out = df.drop(columns=cols)
+    # Positions present and NA: no order was asked, and an EMPTY answer (a cold
+    # request for 2018Q3 alone) must still carry the required HowCoped0..2
+    # (GH #1292's empty-answer check).
+    for k in range(3):
+        out[f'HowCoped{k}'] = pd.array([pd.NA] * len(out), dtype='string')
     out['HowCopedSet'] = pd.array(sets, dtype='string')
     return out

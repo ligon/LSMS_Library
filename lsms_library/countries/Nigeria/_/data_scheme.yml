@@ -77,8 +77,8 @@ Data Scheme:
     # GH #1562 (ruling 2026-11-13).  Served ONCE per wave, under the post-harvest
     # quarter (2011Q1, 2013Q1, 2016Q1, 2019Q1) whose file it is; it used to be
     # served under both quarters.  W1-W3 rank four strategies (HowCoped0..3);
-    # W4 is "select all that apply", so it serves HowCopedSet only and no
-    # position.  See CONTENTS.org, "shocks".
+    # W4 is "select all that apply", so it serves HowCopedSet and NA positions.
+    # See CONTENTS.org, "shocks".
     index: (t, i, Shock)
     HowCoped0: str
     HowCoped1: str
