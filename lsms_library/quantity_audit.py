@@ -375,7 +375,12 @@ of its own that subclasses :class:`QuantityImplausibleWarning`.  It is the item
 #1559's body names as missing ("not on Site Q's channels").  A flag and not a
 verdict: the reference has measured biases (survey kilograms 1.1-1.4x it at the
 median; state; sacks at their stated mass; sellers' prices), set out in the #1559
-rung design memo.
+rung design memo.  Measured cold (2026-11-13, burst jobs 41275992 / 41276357): only
+Niger and Mali serve ``Quantity_kg``.  Niger judges 1,932 / 6,394 / 9,020 rows in
+2011-12 / 2014-15 / 2021-22 and names 12 / 115 / 30 (low 6 / 26 / 2, high 6 / 89 /
+28), median survey / implied 1.14 / 1.13 / 1.25; 2018-19 asks no kilograms.  Mali
+judges 1 row and names none.  Cost 47 ms of a 659 ms warm Niger read, 41 of 658 on
+Mali (a first cut on row text cost 314 ms and was rewritten on integer codes).
 
 CACHE.  Like ``null_read_audit`` this is pure reporting -- it provably returns
 its input unchanged -- so its entry points are listed in
