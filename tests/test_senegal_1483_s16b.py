@@ -607,7 +607,11 @@ def test_full_catchall_cannot_normalize_to_pure_dap(adapter):
     assert got.index.get_level_values('input')[-2] == 'NPK'  # existing identity only; no grade chosen
 
 
-def test_2018_production_functions_still_bind_gift_under_old_purchase_names(adapter):
+def test_2018_production_functions_bind_the_purchase_and_keep_the_gift(adapter):
+    # Re-pinned 2026-11-13 under the ruling "Extend to all four now (Recommended)":
+    # Senegal 2018-19 reads the purchase s16bq08 / s16bq09a(/b) and serves the gift
+    # s16bq05 / s16bq07a(/b) in its own columns (Togo template 408d02a24).  Until
+    # then this test pinned the gift-as-purchase binding.
     _, kwargs = adapter
     old = COUNTRY / '2018-19/_/plot_inputs.py'
     fmt = extract(ROOT / 'lsms_library/local_tools.py', ['format_id'], {'pd': pd, 'Any': Any})['format_id']
@@ -622,9 +626,15 @@ def test_2018_production_functions_still_bind_gift_under_old_purchase_names(adap
     got = helpers['_finish_plot_inputs'](frame, '2018-19')
     assert got.index.tolist() == [('2018-19', '1023', 'Seed', 'Arachide', kwargs['unit_map'].get('Gramme', 'Gramme')),
         ('2018-19', '12003', 'Seed', 'Autre tubercule', kwargs['unit_map'].get('Sac', 'Sac'))]
-    assert got['Quantity'].tolist() == [0, -7] and list(got) == ['Quantity', 'Purchased', 'Quantity_purchased']
+    assert got['Quantity'].tolist() == [0, -7]
+    assert list(got) == ['Quantity', 'Purchased', 'Quantity_purchased', 'Unit_purchased',
+                         'Received_as_gift', 'Quantity_received_as_gift', 'Unit_received_as_gift']
     assert got['Quantity'].dtype == pd.Float64Dtype() and got['Purchased'].dtype == pd.BooleanDtype()
+    assert got['Received_as_gift'].dtype == pd.BooleanDtype()
+    assert got['Quantity_received_as_gift'].dtype == pd.Float64Dtype()
     assert helpers['i'](pd.Series([1, 23])) == '1023'
     text = old.read_text()
-    assert "src['s16bq05']" in text and "srcn['s16bq07a']" in text
-    assert "srcn['s16bq09a']" not in text
+    assert "purchased = src['s16bq08']" in text and "srcn['s16bq09a']" in text
+    assert "src['s16bq09b']" in text
+    assert "received_as_gift = src['s16bq05']" in text and "srcn['s16bq07a']" in text
+    assert "src['s16bq07b']" in text

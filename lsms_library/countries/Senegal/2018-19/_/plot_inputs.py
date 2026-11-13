@@ -6,16 +6,22 @@ roster, one row per input-type the household was asked about.  Columns:
   s16bq01   input type (organic / inorganic fert / phyto / seeds-by-crop)
   s16bq02   USED this input? (1=Oui) — application gate (all 1 in 2018)
   s16bq03a / s16bq03b   quantity used + native unit
-  s16bq05   received as a GIFT or donation? (Oui / Non) -- the file's label is
-            "16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de
-            don?"; the purchase question is s16bq08
-  s16bq07a  quantity received as a gift (native unit); the purchased
-            quantity is s16bq09a
+  s16bq05 / s16bq07a / s16bq07b   GIFT: received as a gift or donation?
+            (Oui / Non), the quantity received, and its own unit -- the file's
+            label is "16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou
+            de don?"
+  s16bq08 / s16bq09a / s16bq09b   PURCHASE: "16B.08. Avez-vous acheté
+            [INTRANT]?", the quantity bought, and its own unit
 
-KNOWN DEFECT, NOT YET RULED FOR SENEGAL: `Purchased` / `Quantity_purchased`
-below are read from s16bq05 / s16bq07a, i.e. they serve the GIFT answers
-under purchase names (the defect the 2026-11-13 ruling "Fix all three now"
-corrected for Guinea-Bissau, Togo and Benin).  See _/CONTENTS.org.
+THE PURCHASE IS s16bq08 (ruling @ligon 2026-11-13, "Extend to all four now
+(Recommended)", which extends "Fix all three now" to Senegal 2018-19; Togo's
+408d02a24 is the template).  Until 2026-11-13 this script served the GIFT
+answers under Purchased / Quantity_purchased; they now ride in
+Received_as_gift / Quantity_received_as_gift, as Senegal 2021-22 (GH #1483)
+serves them.  Each acquisition unit is decoded from its OWN value labels and
+served in the vocabulary the API serves `u` in (ehcvm.served_unit_labels).
+`u` still describes the quantity USED.  s16bq09c (purchase value) is not
+read.  See _/CONTENTS.org.
 
 We keep s16bq02==1 (applied) rows.  The EHCVM roster has NO crop column —
 the seed's crop is embedded in the input-type label ('Semences de petit
@@ -35,6 +41,7 @@ Senegal-specific 'Semences d'arachide' -> Arachide seed slot added).
 import pandas as pd
 
 import lsms_library.local_tools as tools
+from lsms_library.ehcvm import served_unit_labels
 from lsms_library.local_tools import get_dataframe, to_parquet
 
 
@@ -92,6 +99,15 @@ def _seed_crop_labels(source_labels, seed_crop_map):
     return lab.map(lambda x: seed_crop_map.get(x, pd.NA) if pd.notna(x) else pd.NA).astype('string')
 
 
+def _served_units(series):
+    """Each acquisition-unit label as the API serves `u` (Kilogramme -> Kg via
+    the global u table); NA stays NA.  Same helper as Togo 2018 / 2021-22."""
+    raw = series.astype('string').str.strip()
+    known = raw.dropna().unique()
+    served = dict(zip(known, served_unit_labels('Senegal', known)))
+    return raw.map(served).astype('string')
+
+
 def _finish_plot_inputs(df, t):
     """Common tail: coerce numeric columns, guarantee the full schema column
     set, build the (t, i, input, crop, u) index.  Drops rows with no input
@@ -101,13 +117,18 @@ def _finish_plot_inputs(df, t):
     2018-19 line lacks a unit, so the fill serves 0 rows today) — so neither
     index level is null and no row is lost to the framework's NaN-key
     duplicate collapse."""
-    for col in ['Quantity', 'Quantity_purchased']:
+    for col in ['Quantity', 'Quantity_purchased', 'Quantity_received_as_gift']:
         if col not in df.columns:
             df[col] = pd.NA
         df[col] = pd.to_numeric(df[col], errors='coerce').astype('Float64')
-    if 'Purchased' not in df.columns:
-        df['Purchased'] = pd.NA
-    df['Purchased'] = df['Purchased'].astype('boolean')
+    for col in ['Purchased', 'Received_as_gift']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = df[col].astype('boolean')
+    for col in ['Unit_purchased', 'Unit_received_as_gift']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = df[col].astype('string')
     df['t'] = t
     df['input'] = df['input'].astype('string')
     if 'crop' not in df.columns:
@@ -116,7 +137,9 @@ def _finish_plot_inputs(df, t):
     df['u'] = df['u'].astype('string').fillna('Unknown')
     df = df[df['input'].notna()]
     keep = ['t', 'i', 'input', 'crop', 'u',
-            'Quantity', 'Purchased', 'Quantity_purchased']
+            'Quantity', 'Purchased', 'Quantity_purchased', 'Unit_purchased',
+            'Received_as_gift', 'Quantity_received_as_gift',
+            'Unit_received_as_gift']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'input', 'crop', 'u'])
     return df
@@ -134,9 +157,11 @@ srcn = srcn[applied.values]
 
 hh = srcn.apply(lambda r: i(pd.Series([r['grappe'], r['menage']])), axis=1)
 
-# Served as `Purchased`, but s16bq05 is the GIFT flag (Oui/Non, loaded as
-# labels with convert_categoricals): the known defect in the docstring.
-purchased = src['s16bq05'].astype('string').map({'Oui': True, 'Non': False})
+# The purchase is s16bq08 / s16bq09a / s16bq09b; the gift is s16bq05 /
+# s16bq07a / s16bq07b (labels via convert_categoricals; see the docstring).
+yes_no = {'Oui': True, 'Non': False}
+purchased = src['s16bq08'].astype('string').map(yes_no)
+received_as_gift = src['s16bq05'].astype('string').map(yes_no)
 
 df = pd.DataFrame({
     'i':                  hh.values,
@@ -145,7 +170,11 @@ df = pd.DataFrame({
     'u':                  _unit_labels(src['s16bq03b'], unit_map).values,
     'Quantity':           pd.to_numeric(srcn['s16bq03a'], errors='coerce').values,
     'Purchased':          purchased.values,
-    'Quantity_purchased': pd.to_numeric(srcn['s16bq07a'], errors='coerce').values,
+    'Quantity_purchased': pd.to_numeric(srcn['s16bq09a'], errors='coerce').values,
+    'Unit_purchased':     _served_units(src['s16bq09b']).values,
+    'Received_as_gift':   received_as_gift.values,
+    'Quantity_received_as_gift': pd.to_numeric(srcn['s16bq07a'], errors='coerce').values,
+    'Unit_received_as_gift': _served_units(src['s16bq07b']).values,
 })
 
 df = _finish_plot_inputs(df, '2018-19')

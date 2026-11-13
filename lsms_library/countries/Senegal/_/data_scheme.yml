@@ -196,10 +196,12 @@ Data Scheme:
     # Item-level agricultural inputs (GAP 2), cloned from the Niger EHCVM
     # template.  One row per REPORTED input applied by a household from the
     # EHCVM s16b roster (s16b_me_sen2018.dta): input identity, reported
-    # quantity used + native unit, a purchased flag + quantity (in 2018-19 the
-    # GIFT answers s16bq05 / s16bq07a, a known defect not yet ruled for
-    # Senegal: _/CONTENTS.org), and (seed rows) the seed's crop, on the labels
-    # crop_production serves (GH #1119).  REPORTED values only: seed_kg /
+    # quantity used + native unit, the purchase (s16bq08 / s16bq09a / s16bq09b)
+    # and the gift (s16bq05 / s16bq07a / s16bq07b) each with its own unit (both
+    # waves since 2026-11-13, ruling "Extend to all four now"; until then
+    # 2018-19 served the gift under the purchase names: _/CONTENTS.org), and
+    # (seed rows) the seed's crop, on the labels crop_production serves
+    # (GH #1119).  REPORTED values only: seed_kg /
     # nitrogen_kg / fertilizer totals are transformations, never columns.
     # 2018-19 here; 2021-22 through _/s16b_2021.py (GH #1483).
     #
@@ -219,8 +221,8 @@ Data Scheme:
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
-    # Own2021 only (GH #1483): separate acquisition roles, not used-unit amounts.
-    # The 2018 driver and its historical gift-as-purchase binding are unchanged.
+    # Separate acquisition roles, not used-unit amounts: Own2021 since GH #1483,
+    # 2018-19 since 2026-11-13 (ruling "Extend to all four now").
     Unit_purchased: {type: str, optional: true}
     Received_as_gift: {type: bool, optional: true}
     Quantity_received_as_gift: {type: float, optional: true}

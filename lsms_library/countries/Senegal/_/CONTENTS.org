@@ -780,7 +780,9 @@ First entry for this table.  =plot_inputs= is a script-path table
   file labels as the GIFT flag and gift quantity (the Burkina finding of
   #1188 applies by inspection).  Not changed here.  [2026-11-13: still not
   changed.  The ruling "Fix all three now" names Guinea-Bissau, Togo and Benin,
-  not Senegal; measured on the file, see the 2026-11-13 section.]
+  not Senegal; measured on the file, see the 2026-11-13 section.]  [Later
+  2026-11-13: changed, under the ruling "Extend to all four now"; see "2018-19
+  =plot_inputs= reads the purchase" at the end of this file.]
 
 *The collapse, and the fix.*  The three catch-all seed slots -- 15 ="Semences
 d'autres céréales"= (27 lines), 19 =Plants/boutures= (98), 20 =Autres
@@ -1358,7 +1360,8 @@ the candidate)./  With =2021-22/_/plot_features.py= replaced by a failing script
 A healthy cold build serves 7,712 + 6,112 rows on both sides, frame-equal.  Synthetic tests:
 =tests/test_senegal_plot_concatenator_refusal.py= (the Burkina test's twin).
 
-*Not changed: the gift/purchase binding of 2018-19.*  =Purchased= / =Quantity_purchased= still read
+*Not changed: the gift/purchase binding of 2018-19.*  [Later 2026-11-13: superseded, see the next section.]
+=Purchased= / =Quantity_purchased= still read
 =s16bq05= / =s16bq07a=, the gift question ("16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de
 don?"; the purchase is =s16bq08= "16B.08. Avez-vous acheté [INTRANT]?").  The 2026-11-13 ruling covers
 Guinea-Bissau, Togo and Benin only.  Measured on the file: =s16bq05= Oui on 536 applied lines, =s16bq08=
@@ -1372,4 +1375,39 @@ and =tests/test_senegal_1483_s16b.py= pin it (red team of 2026-11-13, F1).
 46 =Wave._input_hash= (both waves; =_/categorical_mapping.org= and =_/plot_features.py= are build inputs of
 every wave), =framework_imports_fingerprint= unchanged (=Country= is a class and =lsms_library.paths= is an
 excluded module, so the new imports fold nothing), no other country, =build_transforms_fingerprint= 0 of 42.
+
+* 2026-11-13 -- 2018-19 =plot_inputs= reads the purchase (ruling "Extend to all four now")
+
+*Ruling (@ligon, 2026-11-13): "Extend to all four now (Recommended)".*  Senegal 2018-19, Cote d'Ivoire
+2018-19 and Niger 2018-19 / 2021-22 read =s16bq08= / =s16bq09a= as the purchase, on the Togo template
+(=408d02a24=), measured and disclosed.  This is the Senegal cell.
+
+*What is served now* (=2018-19/_/plot_inputs.py=): =Purchased= =s16bq08=, =Quantity_purchased= =s16bq09a=,
+=Unit_purchased= =s16bq09b=; =Received_as_gift= =s16bq05=, =Quantity_received_as_gift= =s16bq07a=,
+=Unit_received_as_gift= =s16bq07b=.  The four acquisition columns were declared (optional) for 2021-22
+(GH #1483) and NA on 2018-19.  Each unit is decoded from its own value labels (=s16bq07b= and =s16bq09b= have
+five answers, Gramme, Kilogramme, Tonne, Litre, Charrette; =s16bq03b= adds =Sac=) and served in the
+vocabulary of =u= (=ehcvm.served_unit_labels=, so =Kilogramme= is =Kg=).  =u= is unchanged.
+
+*The file's questions* (2018-19 Stata labels): =s16bq05= "Avez-vous obtenu [INTRANT] sous forme de cadeau ou
+de don?", =s16bq07a= "Selon vous, quantité en [INTRANT] reçue sous forme de cadeau ou de don?", =s16bq08=
+"Avez-vous acheté [INTRANT]?", =s16bq09a= "Quelles sont la quantité et la valeur totale de [INTRANT]
+achetées?".  2021-22 words the two quantity questions differently ("Quelle quantité ... reçue", "Quelle est
+la quantité ... achetée").
+
+*What moves, on the 9,916 served 2018-19 lines* (no line is hollow under either binding, so none is gained
+or lost; burst job 41280484, source counts):
+| column | before (gift question) | after (purchase question) |
+|--------+------------------------+---------------------------|
+| =Purchased= True / False | 536 / 9,380 | 4,956 / 4,960 |
+| =Quantity_purchased= non-null | 533 | 4,951 |
+| =Received_as_gift= True / False | NA | 536 / 9,380 |
+Gift x purchase: Non/Non 4,504, Non/Oui 4,876, Oui/Non 456, Oui/Oui 80.  So 456 gifts not bought were served
+as purchases, and 4,876 purchases as not bought.  *Incomplete answers, served as filed:* 5 purchases
+(=s16bq08= Oui) have a unit and no quantity, and 3 gifts (=s16bq05= Oui) have no quantity, 1 of them with a
+unit.  =seed_kg= and =nitrogen_kg= read =Quantity= and =u= only.
+
+*A vocabulary difference across the waves, disclosed.*  The 2021-22 adapter (=_/s16b_2021.py=) decodes its
+acquisition units through the country =u= table at build time, not through =served_unit_labels=, so the
+same unit can be spelled differently in the two waves' =Unit_*= columns; measured in the stream report.
 
