@@ -104,3 +104,23 @@ household_roster:
         - v
         - i
         - pid
+
+cluster_features:
+    # One file: the cover carries one GPS point per grappe (GPS__Latitude_m /
+    # _Longitude_m, labelled "Coordonnées GPS du ménage" but constant within each of
+    # the 450 grappes), and region and milieu, constant within grappe too.  Projected
+    # to (t, v) by mapping.cluster_features, which refuses a grappe that straddles two
+    # values.  Unlike Togo's and Benin's, this point is NOT 2018-19's fix (2 of 439
+    # grappes coincide; median 0.57 km apart): CONTENTS.org, "2021-22 wired".
+    file: s00_me_gnb2021.dta
+    idxvars:
+        v: grappe
+    myvars:
+        Region: s00q01
+        Rural:
+            - s00q04
+            - mapping:
+                Rural: Rural
+                Urbano: Urban
+        Latitude: GPS__Latitude_m
+        Longitude: GPS__Longitude_m

@@ -87,3 +87,18 @@ def household_roster(df):
 
     df['Age'] = df.apply(age, axis=1)
     return df.drop(columns=['interview_date', 'StillMember'])
+
+
+def cluster_features(df):
+    '''The cover to (t, v), and a refusal if a grappe straddles two values.
+
+    Benin 2021-22's hook.  Region, Rural and the GPS point are constant within each
+    of the 450 grappes (measured), so dropping the repeats loses nothing.
+    '''
+    levels = list(df.index.names)
+    spread = df.groupby(level=levels, observed=True).nunique(dropna=False)
+    straddling = spread[(spread > 1).any(axis=1)]
+    if len(straddling):
+        raise ValueError(f'Guinea-Bissau cluster_features 2021-22: {len(straddling)} grappes '
+                         f'carry more than one value:\n{straddling.head(10)}')
+    return df[~df.index.duplicated(keep='first')]

@@ -110,7 +110,8 @@ class TestServed:
                                                            for k, v in milieu.items()})))
         assert s["Rural"].astype(str).to_dict() == rural
         assert s["v"].astype(str).to_dict() == dict(zip(_ids(cover), cover["grappe"].astype(int).astype(str)))
-        raw = pd.Series(weights["hhweight"].to_numpy() / weights["hhweight"].mean(), index=_ids(weights))
+        hw = weights["hhweight"].astype("float64")
+        raw = pd.Series(hw.to_numpy() / hw.mean(), index=_ids(weights))
         pd.testing.assert_series_equal(s["weight"].astype(float).sort_index(),
                                        raw.sort_index(), check_names=False)
         pd.testing.assert_series_equal(s["panel_weight"].astype(float).sort_index(),
@@ -194,3 +195,28 @@ class TestServed:
         age = pd.to_numeric(r["Age"], errors="coerce")
         assert age.notna().mean() > 0.95
         assert age.min() >= 0 and age.max() < 120
+
+    # --- cluster_features -------------------------------------------------------------
+
+    def test_the_cluster_point_is_a_cluster_attribute(self):
+        cover = _raw("s00_me_gnb2021.dta")
+        points = cover.groupby("grappe")[["GPS__Latitude_m", "GPS__Longitude_m"]].nunique()
+        assert (points == 1).all(axis=None)
+        c = _served("cluster_features")
+        assert len(c) == cover["grappe"].nunique() == 450
+        expected = cover.groupby("grappe")["GPS__Latitude_m"].first().astype(float)
+        got = c.droplevel("t")["Latitude"].astype(float)
+        got.index = got.index.astype(int)
+        pd.testing.assert_series_equal(got.sort_index(), expected.sort_index(),
+                                       check_names=False, check_index_type=False)
+
+    def test_region_and_rural_meet_2018s_vocabulary(self):
+        c = _served("cluster_features", waves=(OLD, WAVE))
+        new, old = c.xs(WAVE, level="t"), c.xs(OLD, level="t")
+        assert set(new["Region"]) == set(old["Region"]) == set(REGION.values())
+        assert set(new["Rural"]) == {"Rural", "Urban"}
+        # Same grappes, same region and milieu as 2018-19 on every one.
+        j = new.join(old, lsuffix="_21", rsuffix="_18", how="inner")
+        assert len(j) == 450
+        assert (j["Region_21"] == j["Region_18"]).all()
+        assert (j["Rural_21"] == j["Rural_18"]).all()
