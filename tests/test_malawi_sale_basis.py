@@ -746,11 +746,16 @@ class TestDelivered:
             value - dropped['Value_sold'].sum(), rel=1e-9)
 
     def test_a_key_marks_a_sale_and_only_a_sale(self, delivered):
-        keyed = delivered[delivered['Derivation'].notna()]
+        # A LADDER key marks a sale.  The crop-text key (GH #1228) marks a label and rides
+        # on unsold harvest rows too, so it does not count here.
+        keys = delivered['Derivation'].astype('string').str.split('+')
+        ladder = keys.map(lambda ks: isinstance(ks, list) and bool(set(ks) - LABEL_KEYS)) \
+            .to_numpy(dtype=bool)
+        keyed = delivered[ladder]
         assert ((keyed['Quantity_sold'] > 0) | (keyed['Value_sold'] > 0)).all()
-        # and the unkeyed side still carries the exact matches AND the 0.0
-        # "did not sell" lines -- Derivation is NA on both
-        unkeyed = delivered[delivered['Derivation'].isna()]
+        # and the side without a ladder key still carries the exact matches AND the 0.0
+        # "did not sell" lines
+        unkeyed = delivered[~ladder]
         assert (unkeyed['Value_sold'] > 0).sum() > 10_000
         assert (unkeyed['Value_sold'] == 0).sum() > 1_000
 

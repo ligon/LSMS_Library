@@ -487,17 +487,24 @@ def test_every_relabelled_row_carries_the_key_and_joins_its_inputs(table, key):
     served = getattr(malawi, table)().reset_index()
     keys = served['Derivation'].astype('string').str.split('+')
     keyed = keys.map(lambda ks: isinstance(ks, list) and key in ks).to_numpy(dtype=bool)
-    cowpea = served['crop'].astype(str).eq(LABEL).to_numpy()
+    cowpea = served['crop'].astype(str).eq(LABEL).to_numpy(dtype=bool)
     if table == 'plot_inputs':      # Module H's acquisition rows keep their code's label
-        cowpea &= served['input'].astype(str).eq('Seed').to_numpy()
+        cowpea = cowpea & served['input'].astype(str).eq('Seed').to_numpy(dtype=bool)
     assert (keyed == cowpea).all()
     assert set(served.loc[keyed, 't'].astype(str)) == {'2010-11', '2016-17', '2019-20'}
     for wave, rows in served[keyed].groupby(served.loc[keyed, 't'].astype(str)):
         inputs = malawi.derivation_inputs(key, wave=wave)
         assert list(inputs.index.names) == ['t', 'i', 'crop']
-        have = set(zip(inputs.index.get_level_values('i').astype(str),
-                       inputs.index.get_level_values('crop').astype(str)))
+        flat = inputs.reset_index()
+        assert not flat.duplicated(['i', 'crop', 'plot_id']).any(), wave
+        have = set(zip(flat['i'].astype(str), flat['crop'].astype(str)))
         assert set(zip(rows['i'].astype(str), rows['crop'].astype(str))) <= have, wave
+        # a plot row joins its own line, not only its household's (Farm-level sales
+        # follow the household's lines, so they join on (t, i, crop) alone)
+        plots = rows[rows['plot_id'].astype(str).ne('Farm-level')]
+        lines = set(zip(flat['i'].astype(str), flat['crop'].astype(str), flat['plot_id'].astype(str)))
+        assert set(zip(plots['i'].astype(str), plots['crop'].astype(str),
+                       plots['plot_id'].astype(str))) <= lines, wave
         if wave != '2010-11':
             assert inputs['ag_d20_oth'].astype('string').str.strip().str.upper() \
                 .isin(['COWPEAS', 'COW PEAS']).all(), wave

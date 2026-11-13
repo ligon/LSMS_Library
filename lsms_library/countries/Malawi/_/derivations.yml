@@ -847,6 +847,9 @@ Malawi::crop_production::cowpea-from-crop-text:
         Cross_Sectional 48 OTHER SPECIFY 1, 49 OTHER SPECIFY 2.  Measured: 2019-20 XS
         32,651 of 32,651 G (plot, crop) pairs are D20 entries; the texts pair exactly with
         the slots (963 plots slot 48 / text ag_d20_oth, 39 slot 49 / ag_d20b_oth, 27 both).
+        IHS4's printed G form lists the plot's crops instead of pre-filling them; 2016-17
+        matches D20 on the collapsed code (XS 24,555 of 25,975), and its G code-48 lines
+        are D20 code-48 entries 369 of 371 (XS) and 110 of 111 (Panel).
     - text: >-
         Modules D and G refer to one reference season, the household's.
       basis: questionnaire
@@ -855,9 +858,11 @@ Malawi::crop_production::cowpea-from-crop-text:
         QUESTIONNAIRE, MODULE X. WHAT WAS THE REFERENCE RAINY SEASON FOR THIS HOUSEHOLD?";
         IHS4 / IHS5 D-0, G-0 and I-0 restate it; IHS5 Basic Information Document p. 18 (one
         reference season per household, set by interview date); Module X hh_x02 exported in
-        the cross-sections.  Measured: the season of each G line's planting date equals
-        hh_x02 on about 95% of dated lines (CONTENTS.org, 2026-11-13).  Accepted as met
-        (@ligon, 2026-11-13).
+        the cross-sections (not in the Panel halves, which rest on the forms and the IHPS
+        2016 BID).  Measured: the season of each G line's planting date equals hh_x02 on
+        24,664 of 25,938 (2016-17 XS) and 31,065 of 32,646 (2019-20 XS) dated lines, and on
+        228 of 238 and 563 of 584 relabelled lines (CONTENTS.org, 2026-11-13).  Accepted as
+        met (@ligon, 2026-11-13).
     - text: >-
         single text only: a plot whose question 20 names two Other crops keeps 'Other', even
         where the slot pairing would name code 48's; and a Farm-level code-48 sale follows
@@ -869,7 +874,9 @@ Malawi::crop_production::cowpea-from-crop-text:
     An independent oracle reading Modules G and D directly
     (tests/test_gh1228_malawi_cowpea_label.py): 157 (2010-11), 302 (2016-17: 238 + 64) and
     697 (2019-20: 584 + 113) harvest lines, keys and quantities equal to the served rows;
-    every keyed row joins its inputs on (t, i, crop).  Cold builds, CONTENTS.org 2026-11-13.
+    every keyed plot row joins its own line on (t, i, crop, plot_id), and every keyed
+    Farm-level sale its household's lines on (t, i, crop).  Cold builds, CONTENTS.org
+    2026-11-13.
   contents: 'Malawi/_/CONTENTS.org, "2026-11-13 -- GH #1228 later waves"'
   since: '2026-11-13'
 
@@ -902,6 +909,7 @@ Malawi::plot_inputs::cowpea-from-crop-text:
       evidence: Malawi::crop_production::cowpea-from-crop-text
   validated_against: >-
     The served seed rows' (t, i, plot_id) are a subset of the same oracle's lines in every
-    wave; every keyed row joins its inputs on (t, i, crop).  CONTENTS.org 2026-11-13.
+    wave; every keyed row joins its own line on (t, i, crop, plot_id).  CONTENTS.org
+    2026-11-13.
   contents: 'Malawi/_/CONTENTS.org, "2026-11-13 -- GH #1228 later waves"'
   since: '2026-11-13'
