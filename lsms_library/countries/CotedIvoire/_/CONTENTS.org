@@ -1693,6 +1693,9 @@ Guinea-Bissau, Togo and Benin only.  Measured on =Menage/s16b_me_CIV2018.dta=: =
 applied lines, =s16bq08= (the purchase) Oui on 8,134; gift x purchase Non/Non 2,373, Non/Oui 7,996,
 Oui/Non 752, Oui/Oui 138.  A question for the maintainer.
 
-*Cost.*  Both wave scripts and =_/data_scheme.yml=: every Cote d'Ivoire =Country._table_cache_hash= and
-the 2018-19 and 2021-22 =Wave._input_hash= values (census in =burst/isa-sm-20261113/reports/manquant/=).
+*Cost, measured* (hash census against =f138a3d61=): 21 of 21 =Country._table_cache_hash= and 42
+=Wave._input_hash= values (the 21 of 2018-19 and the 21 of 2021-22; the four 1985-89 waves do not move);
+no other country; =build_transforms_fingerprint= 0 of 42.  Served (cold, private roots, burst jobs 41275616
+and 41275888): 25,907 rows both sides, the 4 relabelled =u= the only difference, =seed_kg= / =nitrogen_kg=
+frame-equal, =Feature('plot_inputs')= equal to =Country('CotedIvoire').plot_inputs()=.
 

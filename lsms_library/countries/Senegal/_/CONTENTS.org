@@ -1342,10 +1342,21 @@ whose script failed or never ran was dropped and the other served alone (=assert
 both were missing).  It now takes the Burkina Faso form of the #1241 refusal: every wave whose own
 metadata declares =plot_features= (=Wave.data_scheme=: a wave script or a YAML entry) must have its
 parquet under =data_root()=, or the script raises =FileNotFoundError= naming the wave before it writes;
-an undeclared wave is skipped before any read.  Both of Senegal's waves declare the table.  Whether the
-default =Country('Senegal').plot_features()= route reached the skip, and the broken-wave repro, are in
-the stream report (=burst/isa-sm-20261113/reports/manquant/=).  Synthetic tests:
-=tests/test_senegal_plot_concatenator_refusal.py=.
+an undeclared wave is skipped before any read.  Both of Senegal's waves declare the table.
+
+/Which route reached the skip, measured (burst job 41275889, private cold roots, base =f138a3d61= and
+the candidate)./  With =2021-22/_/plot_features.py= replaced by a failing script:
+- =Country('Senegal').plot_features()= raised on BOTH, before this change: the default route builds the
+  table from its waves (=load_from_waves= -> =grab_data= -> =make ../2021-22/_/plot_features.parquet=,
+  =CalledProcessError=) and never runs the concatenator; =LSMS_BUILD_BACKEND=make= raised =RuntimeError:
+  Make build failed ... refusing cached output and alternate/Python fallbacks= (the GH #1288 strict wave
+  preparation).  So the Country routes did not reach the skip.
+- The concatenator run directly (=python plot_features.py= in =_/=, on a healthy root with the 2021-22
+  wave parquet removed) did: the base exited 0 and wrote =var/plot_features.parquet= with 2018-19 alone
+  (7,767 rows); the candidate raises =FileNotFoundError: Senegal plot_features: wave 2021-22 declares
+  plot_features but its parquet was not built ...= and writes nothing.
+A healthy cold build serves 7,712 + 6,112 rows on both sides, frame-equal.  Synthetic tests:
+=tests/test_senegal_plot_concatenator_refusal.py= (the Burkina test's twin).
 
 *Not changed: the gift/purchase binding of 2018-19.*  =Purchased= / =Quantity_purchased= still read
 =s16bq05= / =s16bq07a=, the gift question ("16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de
@@ -1355,6 +1366,8 @@ Oui on 4,956; gift x purchase Non/Non 4,504, Non/Oui 4,876, Oui/Non 456, Oui/Oui
 purchase (GH #1483), so the two columns mean different things across this country's waves.  A question
 for the maintainer.
 
-*Cost.*  =_/categorical_mapping.org= and =_/plot_features.py= are build inputs of every Senegal table: one
-Senegal re-warm (census in the stream report).
+*Cost, measured* (hash census against =f138a3d61=): Senegal 23 of 23 =Country._table_cache_hash= and 46 of
+46 =Wave._input_hash= (both waves; =_/categorical_mapping.org= and =_/plot_features.py= are build inputs of
+every wave), =framework_imports_fingerprint= unchanged (=Country= is a class and =lsms_library.paths= is an
+excluded module, so the new imports fold nothing), no other country, =build_transforms_fingerprint= 0 of 42.
 

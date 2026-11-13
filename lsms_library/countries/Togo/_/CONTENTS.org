@@ -1698,5 +1698,13 @@ gift question.  Editing it would move every 2021-22 =Wave._input_hash= of this c
 directory's =.py= files are hashed whole) for a comment, so it is left for the next edit of that
 wave; this section is the record.
 
-*Cost.*  =2018/_/plot_inputs.py= and =_/data_scheme.yml=: every Togo =Country._table_cache_hash= and
-every 2018 =Wave._input_hash=; measured in the stream report (=burst/isa-sm-20261113/reports/manquant/=).
+*Cost, measured* (hash census against =f138a3d61=): =2018/_/plot_inputs.py= and =_/data_scheme.yml= move
+Togo 22 of 22 =Country._table_cache_hash= and the 22 2018 =Wave._input_hash= values; the 22 2021-22 wave
+hashes do not move; no other country; =build_transforms_fingerprint= 0 of 42.
+
+*Measured served effect* (cold, private roots, base =f138a3d61=; burst jobs 41275616 and 41275888): 29,772
+rows both sides; after reading base =Manquant= as =Unknown= the keys are identical; on 2018 only the six
+acquisition columns move (=Purchased= 7,774 cells, =Quantity_purchased= 7,833, =Received_as_gift= 13,730,
+=Quantity_received_as_gift= 804, =Unit_purchased= 7,122, =Unit_received_as_gift= 803) and the new gift
+columns equal the old purchase columns row for row; 0 cells of 2021-22 move; =seed_kg= and =nitrogen_kg=
+frame-equal; =Feature('plot_inputs')= equals =Country('Togo').plot_inputs()= on every value column.
