@@ -6146,3 +6146,28 @@ is that this entry moves only on an explicit maintainer approval of the
 specific two fields; the proposal is in the #1509 PR body.  A different BLAS
 kernel may give a second exact fingerprint (=content_hash_variants=, GH #1480
 ledger), which has not been measured for this frame.
+
+*Maintainer decision [2026-11-12]: the #1509 nutrition baseline is approved.*
+"Approve the new baseline (Recommended)", #967 precedent.  The entry
+=var/nutrition.parquet= in =tests/fixtures/uganda_baseline.json= now pins shape
+23,777 x 15 (unchanged), =content_hash=
+=e9fb4c67b2463694a2ec7b46ee5e6df1ef424db19753a74c2b82ad6a48a6a600=, and
+=content_hash_variants= [=324429c1e855440cbd87465c3853087fd7a044f9e4473438297a94960acbd07e=].
+Columns, index names and dtypes are unchanged.  Both hashes were re-measured on
+the INTEGRATED tree of the ISA batch (=integration/isa-batch-20261112=), not
+carried from the #1509 branch:
+- burst job 41254805 (n4257, cold private root, integrated code =6a670ce83=):
+  =e9fb4c67...=, Energy 2,065,011,048.47, the #1509 branch's own value.  Its
+  =27a215996= arm (#1509 merged, EHCVM-2 not yet) gave the same hash, so no
+  other branch in the batch moves this frame;
+- burst job 41255032 (Xeon Gold 6330, OpenBLAS 0.3.31): a private copy of that
+  root's Uganda L2, =nutrition.py nutrition= rebuilt at head =c4bce965a= under
+  =OPENBLAS_CORETYPE=SkylakeX= (=e9fb4c67...= again) and =Haswell=
+  (=324429c1...=).  The same Energy total holds under both kernels.
+The variant replaces =f3d3c34d...=, the Haswell fingerprint of the pre-#1509
+frame, which would otherwise accept that frame's values on a Haswell-kernel
+runner.  The same job ran the method on base =e5fdd2fa8= as a control.  It
+reproduced the shipped pair exactly: SkylakeX =12d25f6e...= and Haswell
+=f3d3c34d...=, and the invariance test passed under both.  PROVISIONAL until the
+batch's sixth branch (served-wave corrections) lands: its Uganda 2009-10 =ea=
+fill may move this frame again, and the entry is re-measured then.
