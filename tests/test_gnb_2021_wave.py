@@ -364,7 +364,7 @@ class TestFoodDeclared:
         recs = ll.Country(COUNTRY).derivations()
         r, z = recs[ROUNDED], recs[ZERO_WITHHELD]
         assert list(r.waves) == list(z.waves) == [WAVE]
-        assert r.rows == {} and z.rows == {"s": "purchased"}
+        assert r.rows == {} and z.rows == {"s": ["purchased", "other"]}
         assert r.resolve()(7.0) == 7.0                      # served as released
         assert z.resolve()([0, 2]).isna().tolist() == [True, False]   # a 0 is withheld
         assert "Guinea-Bissau::food_acquired::s07b-consumed-quantity-rounded-to-zero" not in recs
