@@ -1011,7 +1011,9 @@ Sex x age counts 40,322 -> 40,331 over the same 5,348 households (red team, 2026
 another) carry no sex and no age, so they fell in no bracket (gnb job 41278042).  Measured cold after
 (gnb job 41279578): 2021-22 =household_characteristics= is frame-equal to c35c95eaf's, built when the
 leavers were dropped (Sex x age counts 40,322, total with =log HSize= 50,240.54).  Nothing else in
-the roster moves: the 12 =MonthsSpent= values and the new =Derivation= column are the whole change.  =Sobrinho(a)= (nephew / niece: 6,186 =s01= rows, 6,139 of them members) is new in this
+the roster moves: the 12 =MonthsSpent= values and the new =Derivation= column are the whole change.
+That column is all NA on 2018-19's rows, and a =Feature('household_roster')= call that includes
+Guinea-Bissau gains it, NA for every other country (red team, 2026-11-13).  =Sobrinho(a)= (nephew / niece: 6,186 =s01= rows, 6,139 of them members) is new in this
 wave and was added to =kinship.yml= as =Sobrinho(A)= [-1, 1, consanguineal].  Ages as 2018-19's hook:
 stated years, else the birth date; 9999 is no answer; =s01q03b= =Não sabe= is no month.
 
@@ -1102,24 +1104,28 @@ q7a moving together, and the rounding moves them separately, so it inherits the 
 =s07bq07a= was rounded to 0 serves =Expenditure= NA.
 
 *The 3,945 consumed rows rounded to 0 are served NA* (ruling 2026-11-13, "Serve NA, as Togo"; Togo
-2021-22's floored-count-withheld rows are the template): each is served one purchased row with
-=Quantity= NA and =Expenditure= NA, under =Guinea-Bissau::food_acquired::s07bq03a-rounded-to-zero-withheld=
-(not the as-released key; the 7-day key rides along, as in Togo).  The value goes with the quantity
+2021-22's floored-count-withheld rows are the template): each is served one row with =Quantity= NA
+and =Expenditure= NA, under =Guinea-Bissau::food_acquired::s07bq03a-rounded-to-zero-withheld= (not the
+as-released key).  3,260 are purchased rows, which carry the 7-day key too, as in Togo; *the 685 whose
+household says it never bought the item (=s07bq06= =Nunca=) are served at =s='other'=* (ruling
+2026-11-13, "GNB 'Nunca' rows": not a purchase by the household's own answer, and own production or a
+gift, both rounded to 0, cannot be told apart), without the 7-day key.  The value goes with the quantity
 (GH #1519): =Expenditure= would derive from the withheld quantity.  A purchase is implied by Togo's
 test, neither own production nor a gift reported, and all 3,945 pass it (=s07bq04= 0 on 3,717, NA on
 228; =s07bq05= 0 on all), but =s07bq04= and =s07bq05= are rounded too, so the test is weaker here than
 in Togo.  =s07bq06= (last bought): =Últimos 7 dias= 1,897, =Ontem= 206, =Últimos 30 dias= 636, =Há mais
 de 30 dias= 521, *=Nunca= 685*; the 2,739 purchase values (median 750 FCFA) are all in the first three.
-Togo's precedent covered no row whose household says it never bought the item, so the 685 are served
-purchased by the template, not by evidence of their own; =s07bq06= rides in the key's inputs.  This replaces the
+Togo's precedent covered no row whose household says it never bought the item; =s07bq06= rides in
+the key's inputs, and the hook reads it through the myvar =LastPurchaseWhen=, which it drops.  This replaces the
 registered deletion (=s07b-consumed-quantity-rounded-to-zero=, =rows: 0=) of the same day.  Measured
-cold against a51a616e2 (gnb job 41279578): +3,945 purchased rows, 0 produced, 0 in kind; every other
-row, and =food_quantities=, =food_prices= and =food_expenditures= in both waves, frame-equal.
+cold against a51a616e2 (gnb job 41280465): +3,260 purchased rows and +685 =other=, 0 produced, 0 in kind;
+every other row, and =food_quantities=, =food_prices= and =food_expenditures= in both waves,
+frame-equal.
 
-Served, cold: 133,329 rows (purchased 99,039, produced 20,263, in kind 14,027), each keyed by the
-rounding key or the withheld key; purchased =Expenditure= 60,522,116.51 FCFA, NA on 18,392 of 99,039
-purchased rows (18.6%; the positive =s07bq08= total of the release is 101,787,610).  The NA purchased rows
-have four causes: the 3,945 withheld rows, and three the red team measured on the other 14,447
+Served, cold: 133,329 rows (purchased 98,354, produced 20,263, in kind 14,027, other 685), each keyed by
+the rounding key or the withheld key; purchased =Expenditure= 60,522,116.51 FCFA, NA on 17,707 of 98,354
+purchased rows (18.0%; the positive =s07bq08= total of the release is 101,787,610).  The NA purchased rows
+have four causes: the 3,260 withheld purchased rows, and three the red team measured on the other 14,447
 (2026-11-13): =s07bq07a=
 not asked, the instrument's skip when the last purchase was =Há mais de 30 dias= or =Nunca= (3,673);
 a unit or size mismatch between the 7-day and last-purchase lots (10,325); and =s07bq07a= rounded to 0
@@ -1162,7 +1168,7 @@ per-piece factor 0.125 -> 1.0 kg) make up 61% of the =food_prices= fall.
 2021-22 adds 129,382 =food_quantities= rows (248,610 kg on =u = kg=) and 80,647 =food_prices= rows.
 The withheld rows add 3,945 rows to =attrs['kg_factor_sources']= (=metric= 1,881, =unit= 1,847, =item_unit=
 216, =item_unit_tight= 1), because the partition counts every input row; their quantity is NA, so no
-kilogram and no price moves (=food_quantities= and =food_prices= frame-equal, gnb job 41279578).  This
+kilogram and no price moves (=food_quantities= and =food_prices= frame-equal, gnb jobs 41279578 and 41280465).  This
 is disclosed, as for Malawi 2024-25, and not a correction: the pool now holds rounded 2021-22 rows.
 Wiring the wave also brings a =StatedVsInferredKgWarning= on =food_quantities= and =food_prices= (none on
 base): =saco (25 kg)= is inferred at 0.0125 kg against its stated 25 kg; the stated factor is served
