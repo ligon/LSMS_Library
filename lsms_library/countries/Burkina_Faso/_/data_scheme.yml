@@ -199,7 +199,9 @@ Data Scheme:
     # grain.  2021-22 (panel only, GH #1436): s16c holds the harvest (s16cq16a/b,
     # blank on every finished row, GH #1437) and s16d the sale per household-crop,
     # attached to the crop's single line or a Farm-level row (option (d)), matched by
-    # crop CODE; see 2021-22/_/crop_production.py.  2014 is not built.
+    # crop CODE; a finished crop's harvest is the sum of its s16d dispositions where they
+    # share one unit (ruling @ligon 2026-11-13, Mali's rule); a recorded quantity is a
+    # partial harvest-to-date; see 2021-22/_/crop_production.py.  2014 is not built.
     # crop joins food via harmonize_food Preferred Labels; u via
     # the u table; unmapped labels pass through unchanged.  u is in the
     # index because one (plot, crop) can be reported in several units.
@@ -217,7 +219,13 @@ Data Scheme:
     # `shelled` / `unshelled` / `shell_not_applicable`, plus `unknown_condition`
     # for a blank code.  Five answers fold onto those tokens (ruled @ligon
     # 2026-11-04); condition_native below keeps what was answered.
-    index: (t, i, plot_id, crop, u, condition)
+    # production_obs (GH #1436, ruling @ligon 2026-11-13 "Add production_obs"; the Niger
+    # GH #1360 level, data_info.yml canonical axis): 2021-22 s16c records no line number
+    # and repeats (household, field, parcel, crop) on two pairs of distinct lines, so it
+    # serves the CONSTRUCTED `row:<source_fingerprint>:<n>` (the zero-based row of the
+    # held s16c release); 2018-19, unique without it, and every Farm-level row carry
+    # `unresolved_observation`.
+    index: (t, i, plot_id, crop, u, condition, production_obs)
     Quantity: float
     Quantity_sold: float
     Value_sold: float

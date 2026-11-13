@@ -454,6 +454,10 @@ def test_food_prices_tallies_the_money_only_passages_by_design(burkina):
     assert tally['expected_gross'] - tally['expected'] == (
         tally['money_only'] + tally['unknown'] + tally['currency'])
     assert tally['unknown'] == UNKNOWN_PRICED
-    assert tally['lost_fraction'] < 0.2
+    # Pinned, not bounded (red team F6: `< 0.2` held by 0.0005).  Measured cold, job
+    # 41271920: 0.15769 before GH #1442, 0.19950 after.  The rise is the 17,734 passage-1
+    # money-only produced / inkind rows whose (t, visit, s) group also carries quantities,
+    # so they count as lost rather than money_only (#864's by-design bucket is per group).
+    assert tally['lost_fraction'] == pytest.approx(0.19950, abs=5e-5)
     # The GH #591 class: the clipped zeros were the last of it (GH #864).
     assert tally['inf'] == P1_PURCHASED_ZERO_QUANTITY

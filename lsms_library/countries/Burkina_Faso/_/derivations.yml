@@ -487,20 +487,22 @@ Burkina_Faso::food_acquired::nsu-national-unit-weight:
 
 Burkina_Faso::crop_production::hh-crop-sale-single-row:
   waves: ['2021-22']
-  columns: [Quantity_sold, Unit_sold, Value_sold]
+  columns: [Quantity_sold, Unit_sold, Value_sold, Condition_sold, condition_sold_native]
   rule: >-
     s16d records a sale for the household and crop, with no plot.  A sale is a record
     with a positive s16dq05a or s16dq06: 1,548 of the file's crop records.  Where the
     household has exactly one s16c line of the same crop CODE (s16cq04 = s16dq01), the
-    sale is served on that line: Quantity_sold = s16dq05a, Unit_sold = s16dq05b, Value_sold
-    = s16dq06, as recorded, and that row carries this key.  What is derived is the
-    ATTACHMENT, not the numbers.  Any other sale is served on one row of that household
-    and crop with plot_id = 'Farm-level' and no key, because its index value already
-    discloses it.  No sale is split, summed, scaled or dropped.  This key shares a row
-    with harvest-to-date through derivations.MULTI_SEP, in sorted order.
+    sale is served on that line: Quantity_sold = s16dq05a, Unit_sold = s16dq05b on the
+    served unit labels, Value_sold = s16dq06, Condition_sold and condition_sold_native =
+    s16dq05d (GH #1528's fold), as recorded, and that row carries this key.  What is
+    derived is the ATTACHMENT, not the numbers.  Any other sale is served on one row of
+    that household and crop with plot_id = 'Farm-level' and no key, because its index
+    value already discloses it.  No sale is split, summed, scaled or dropped.  This key
+    shares a row with other keys through derivations.MULTI_SEP, in sorted order.
   function: lsms_library.ehcvm:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_hh_crop_sale
-  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq06]
+  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq05d,
+                  s16dq06]
   assumptions:
     - text: >-
         s16d asks the sale once per crop, with no plot, and s16c records no sale.  Where
@@ -517,24 +519,28 @@ Burkina_Faso::crop_production::hh-crop-sale-single-row:
         a sale of a crop on two or more lines is not allocated among them, since any split
         would be invented.  It stays with the household and crop on a Farm-level row,
         with u = 'Unknown', where gross_crop_revenue and median_price_valuation can read
-        it.  That row has no harvest Quantity.
+        it.  That row has no harvest Quantity unless its dispositions supply one.
       basis: modelling-choice
       evidence: >-
         ruling @ligon 2026-11-03, option (d), GH #824, for Mali 2021-22 (the #843 option-d
-        rule); applied here by the brief of the 2026-11-13 batch (GH #1436, second
-        residual).  The Farm-level convention in lsms_library/data_info.yml.
+        rule).  Its application to Burkina 2021-22 comes from the brief of the 2026-11-13
+        batch (GH #1436, second residual), not a ruling that names this country: flagged
+        for the maintainer's confirmation.  The Farm-level convention in
+        lsms_library/data_info.yml.
     - text: >-
-        a sale and a harvest line are the same crop when they carry the same code.  The
-        two files label one crop list with two different value-label sets (s16c 8
-        'Niebe/Haricot' against s16d 8 'Niebe', s16c 55 'Autre (a preciser)' against s16d 65
-        'Autre (a preciser)', ...), so a match by label would send 332 of the 1,548 sales to
-        Farm-level for want of a line; by code every sale has at least one line.
-      basis: variable-label
+        a sale and a harvest line are the same crop when they carry the same code.  The two
+        files label one crop list with two different value-label sets, so a match by label
+        would send 332 of the 1,548 sales to Farm-level for want of a line; by code every
+        sale has at least one line.
+      basis: derived-from-data
       evidence: >-
-        s16cq04 "Id in cultures" and s16dq01 "Id in culture_utilisation_annuel": Survey
-        Solutions roster ids.  Measured 2026-11-13 on the held files (burst
-        isa-sm-20261113, burkina census): 1,331 sales on one line, 156 on two, 61 on three
-        or more, 0 on none.
+        s16cq04 "Id in cultures" and s16dq01 "Id in culture_utilisation_annuel" name two
+        rosters, so their labels do not establish the link; the data do.  Measured
+        2026-11-13 on the held files: all 6,603 s16d crop records have an s16c line of the
+        same code in the same household (5,080 by label); the 23 s16d code-55 records all
+        sit in households with s16c code-55 lines and none with code 65; the 24 code-65
+        records all sit with 65.  1,331 sales on one line, 156 on two, 61 on three or more,
+        0 on none.
   validated_against: >-
     tests/test_burkina_faso_2021_crop_production.py, whose oracle reads s16c and s16d
     directly.  Not validated against an external total: no document here reports one.
@@ -550,21 +556,138 @@ Burkina_Faso::crop_production::harvest-to-date:
     question asks the quantity ALREADY harvested, so the row covers a part of the season
     under a column that otherwise means all of it.  A row with no recorded quantity
     carries no key.  In this wave every recorded quantity is on such a row (179 of the
-    813 unfinished rows; 0 of the 7,663 finished rows records one, GH #1437).
+    813 unfinished rows; 0 of the 7,663 finished rows records one, GH #1437), so every
+    recorded 2021-22 harvest is PARTIAL, and harvest_kg / yield_kg on these rows are a
+    partial harvest over the whole plot's area, not a yield.
   function: lsms_library.ehcvm:derive_harvest_to_date
   inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_harvest_to_date
   raw_variables: [s16cq11, s16cq12, s16cq16a, s16cq16b]
   assumptions:
     - text: >-
         the recorded quantity on an unfinished row is what has been harvested so far, and
-        not the season.
+        not the season.  On the 179 rows, s16cq12 says a median 50% of the plot is still to
+        harvest (interquartile range 15-70).
       basis: variable-label
       evidence: >-
         s16c_me_bfa2021.dta s16cq16a "16C.16a. Quelle est la quantite deja recoltee pour la
         presente campagne", s16cq11 "16C.11. Avez vous fini la recolte de cette culture",
-        s16cq12 "16C.12. Quel pourcentage de la superficie vous reste-t-il a recolter".
+        s16cq12 "16C.12. Quel pourcentage de la superficie vous reste-t-il a recolter"
+        (measured 2026-11-13).
   validated_against: >-
     tests/test_burkina_faso_2021_crop_production.py, whose oracle reads s16c directly.  An
     identity has nothing to validate but its rows.
+  contents: 'Burkina_Faso/_/CONTENTS.org, "2021-22 crop_production: the panel s16c and s16d sales"'
+  since: '2026-11-13'
+
+Burkina_Faso::crop_production::harvest-from-dispositions:
+  waves: ['2021-22']
+  columns: [Quantity, u]
+  rule: >-
+    Where every s16c row of a household's crop answers s16cq11 = Oui, none records
+    s16cq16a, and the positive s16d quantities s16dq02a (consumed), s16dq03a (given),
+    s16dq05a (sold) and s16dq13a (in stock) all state one unit (one code of the UML list,
+    on its served label), Quantity is their sum and u that unit.  It goes on the crop's
+    single s16c row, or for two or more rows on the crop's one plot_id = 'Farm-level' row,
+    created if no sale made it, and is never split among plots.  A crop whose dispositions
+    span units, a crop with none, a crop with a recorded quantity and a crop with an
+    unfinished row all stay as recorded.  It extends Mali's ruled derivation,
+    Mali::crop_production::harvest-from-dispositions, to this wave (ruling @ligon
+    2026-11-13, "Extend Mali's rule"), through the same shared function as Benin and Cote
+    d'Ivoire; GH #1437 stays open.
+  function: lsms_library.ehcvm:derive_hh_crop_harvest_total
+  inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_harvest_from_dispositions
+  raw_variables: [s16cq04, s16cq11, s16cq16a, s16dq01, s16dq02a, s16dq02b, s16dq03a, s16dq03b,
+                  s16dq05a, s16dq05b, s16dq13a, s16dq13b]
+  assumptions:
+    - text: >-
+        this extends Mali's ruled derivation to Burkina 2021-22, whose file has Mali's shape:
+        s16cq16a is on 179 of 8,476 crop rows and 0 of the 7,663 finished ones.  Why s16cq16a
+        is blank is not answered by it: GH #1437 stays open.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-13, "Wave-1 stream rulings after red team", "Burkina 2021-22
+        harvest: Extend Mali's rule (Recommended)"; Mali/_/derivations.yml; GH #1437 (open)
+    - text: >-
+        a finished harvest was consumed, given, sold or stored, so the four dispositions add
+        up to it.  The instrument asks the quantity of a finished harvest and the file lacks
+        it on every finished row, a fielded skip or a release loss.
+      basis: questionnaire
+      evidence: >-
+        bfa_ehcvm2_vague1.pdf / vague2.pdf, PDF p. 85: "(16C.11) 1 = Oui > (16C.16)" (the
+        2026-11-09 CONTENTS entry).  This wave cannot test the sum: no finished row records a
+        harvest.  Burkina 2018-19 holds the harvest and all four dispositions on one row
+        (s16cq12a; s16cq13a consumed, s16cq14a given, s16cq16a sold, s16cq22a stock): on the
+        12,490 of 14,956 finished rows whose every positive disposition is in the harvest's
+        unit, the sum equals the harvest exactly on 87.9%, within 10% on 90.5%, median ratio
+        1.000, 5.1% over 1.1 and 4.2% under 0.9 (measured 2026-11-13).  This is consistency
+        within a row, and a respondent may anchor on the harvest just stated.
+    - text: >-
+        not all of a harvest need appear: s16d asks no quantity for seed kept, loss after
+        harvest or animal feed, so the sum can fall short of what was cut.  Not sized.
+      basis: modelling-choice
+      evidence: s16d_me_bfa2021.dta variable labels
+    - text: >-
+        units are not converted: no factor exists.  Of the 6,397 household-crops finished on
+        every line with no recorded quantity, 3,958 state their dispositions in one unit and
+        are derived (3,421 on the single line, 537 Farm-level), 2,272 span units and stay NA,
+        and 167 record no disposition.  Quantities in one unit are added across states
+        (s16dq02c, s16dq03c, s16dq05d, s16dq13c), and the derived row is served under
+        `unknown_condition`.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-04, option (b) of GH #1437, for Mali; measured 2026-11-13, by
+        code, on the held s16c and s16d.
+    - text: >-
+        a crop with an unfinished row is held out (739 pairs), because its dispositions
+        cover what is harvested so far.  A crop with a recorded quantity is held out,
+        because a recorded harvest is not overridden and a Farm-level total beside it would
+        count it twice.
+      basis: modelling-choice
+      evidence: GH #1437
+  validated_against: >-
+    tests/test_burkina_faso_2021_crop_production.py, whose oracle reads s16c and s16d
+    directly.  Not validated against an external total: no document here reports one.
+  contents: 'Burkina_Faso/_/CONTENTS.org, "2021-22 crop_production: the panel s16c and s16d sales"'
+  since: '2026-11-13'
+
+Burkina_Faso::crop_production::crop-code-from-roster-text:
+  waves: ['2021-22']
+  columns: [crop]
+  rule: >-
+    The served crop of codes 55, 58 and 64 is the label the file's own roster text gives
+    them: 55 Anacarde, 58 Banane douce, 64 Soja, where s16c's value labels say 55 'Autre
+    (a preciser)' and leave 58 and 64 bare, and s16d leaves all three bare.  Every s16c
+    line and every Farm-level row of those codes carries this key.  Every other code
+    keeps the harvest file's own label (mapping.derive_crop_code_label).
+  function: lsms_library.countries.Burkina_Faso.2021-22._.mapping:derive_crop_code_label
+  inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_crop_code_from_text
+  raw_variables: [s16cq04, s16cq03b, s16cq03_autre, s16dq01]
+  assumptions:
+    - text: >-
+        the codes are those of the 2021-22 EHCVM-2 list that runs to 65, not of the list
+        whose value labels s16c carries, which ends at 55 'Autre': codes 58, 64 and 65 occur
+        in the file, which that list does not have, and 65 is the 'Autre' code (s16d labels
+        it so, and its Precisez is filled on 38 of 38 lines against 0 of 59 code-55 lines).
+      basis: derived-from-data
+      evidence: >-
+        s16c_me_bfa2021.dta, measured 2026-11-13.  The list to 65 is the one Mali, Togo,
+        Benin, Senegal and Guinea-Bissau 2021-22 label (55 Anacarde / Caju, 58 Banane douce,
+        64 Soja, 65 Autre); the list to 55 is Burkina 2018-19's and Niger's and Cote
+        d'Ivoire's 2021-22.
+    - text: >-
+        the roster text names the crop.  s16cq03b ("Roster list question", the enumerator's
+        name for the line) names anacarde or cajou on 54 of the 59 code-55 lines, banane on
+        5 of 5 code-58 lines and soja or soya on 88 of 92 code-64 lines.  The code-55
+        households are in Cascades 26, Hauts-Bassins 17, Sud-Ouest 12 and Centre-Ouest 2,
+        the cashew belt.
+      basis: derived-from-data
+      evidence: >-
+        s16c_me_bfa2021.dta s16cq03b, s16cq03_autre; s00_me_bfa2021.dta s00q01 (measured
+        2026-11-13, pattern counts only; the red team's count of 48 of 59 used a narrower
+        pattern).  Ruling default (coordinator, 2026-11-13): "Burkina code 55/58/64
+        labelled from the file's own free text (basis derived-from-data)".
+  validated_against: >-
+    tests/test_burkina_faso_2021_crop_production.py.  The 2018-19 code list ends at 55, so no
+    other Burkina wave can check these codes.
   contents: 'Burkina_Faso/_/CONTENTS.org, "2021-22 crop_production: the panel s16c and s16d sales"'
   since: '2026-11-13'
