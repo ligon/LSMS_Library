@@ -3983,3 +3983,64 @@ own private root).*  Niger serves =food_acquired= in 2018-19 and 2021-22 only.
   hashes, no build fingerprint; against development, the same as the flag's.
 - *The first scope, superseded.*  Region floor 1, all 15,014 flagged rows: cluster 1,361, region
   11,661, NA 1,992; wave total 52,486,790.70, flagged rows 13,025,201.60 (24.82%), 13,022 valued.
+
+* 2026-11-13 -- crop_production: survey kilograms against their sale prices (GH #1559)
+
+*RULED (@ligon, 2026-11-12, "GH1559 price-implied kg per unit for crops", "Also build a rung").*
+Part (1) is a report-only screen, =quantity_audit.audit_survey_kg_prices=, on Site Q's
+channels (=quantity_reports()= with =site='survey-kg-price'=, =LSMS_QUANTITY_STRICT=,
+=SurveyKgPriceWarning=).  It names a survey kilogram per unit (=Quantity_kg / Quantity=) outside
+0.1x-10x of the PRICE-IMPLIED kilograms per unit: the wave's and crop's median price per unit sold
+in that unit, over the median price per kilogram of its sales in =Kg= or in a unit stating its mass
+(=Sac de 50 kg=, =Sac de 100 kg=, =Gramme=), read at that mass.  At least 5 sales each side, spread
+at most 10x, and the product state matched where both the sale and the harvest record one.  Only
+units stating NO mass are judged (=Tiya=, =Botte=, =Panier=, =Planche=, =Unité=), which are the rows
+=kg_survey_off_label= cannot see; no row is named by both (75 and 157 rows, 0 in common).  Nothing
+is changed: the cold frame is =assert_frame_equal= to development =f138a3d61=.  Part (2), a rung, is a
+design memo only (=reports/cropkg/out/RUNG_DESIGN.md=, batch 2026-11-13).
+
+*Measured, cold, private roots* (burst jobs 41275992 and 41276357):
+
+| wave    | survey-kg rows, unit states no mass | judged | named low | named high | survey / implied, median | within 2x |
+|---------+-------------------------------------+--------+-----------+------------+--------------------------+-----------|
+| 2011-12 |                               7,070 |  1,932 |         6 |          6 |                     1.14 |     91.7% |
+| 2014-15 |                               7,246 |  6,394 |        26 |         89 |                     1.13 |     88.0% |
+| 2018-19 |                                   0 |      0 |           |            |                          |           |
+| 2021-22 |                               9,798 |  9,020 |         2 |         28 |                     1.25 |     89.0% |
+
+The names are a few cells, as GH #1559's measurement found: 2014-15 =Niébé/Haricots secs= / =Tiya= 30
+high (a median 29 kg per tiya against 2.5 implied) and 5 low (0.15); =Sorgho= / =Botte= 30 high (110
+kg per botte against 8.1, on 7 botte sales and 6 by mass); =Mil= / =Botte= 12 high and 12 low (151.5
+and 0.76 against 10.2); 2021-22 =Mil= / =Botte= 16 high (200 against 10) and =Sorgho= / =Botte= 8 (175
+against 6.75); 2011-12 =Niébé= / =Tiya= 6 high (30 against 2.4).  They read like a sack or a line
+total keyed against a small unit's label; that is not established.  Served as recorded.
+
+*Idiosyncrasies.*
+- *The survey sits above the prices.*  Survey kilograms run 1.13-1.25x the price-implied mass at the
+  median in every wave, which is why the band is ten and not two.  Holding a stated sack out of the
+  baseline shows the estimator's own lean: =Sac de 100 kg= is inferred at 0.80 of its label and =Sac
+  de 50 kg= at 1.25, so big lots read light and small ones heavy.
+- *3E's sales are included, and veto one cell.*  With section 3E's sales as donors, a net 79
+  rainy-module rows of 2011-12 lose their implied mass (1,978 judged without 3E, 1,899 with): 103
+  lost and 24 gained, and all 103 are one cell, =Oseille= / =Tiya= 2011-12, where a single 3E =Kg=
+  sale moves the baseline from 5 to 6 sales and its max/min spread from 4.0 to 12.0, past the gate
+  (red team F7).  A one-donor veto under max/min below 10 sales, not a broad 3E price difference.
+  3 of the 12 2011-12 names are 3E rows.  The measurement the ruling was made on excluded 3E both
+  ways.  The framework has no Niger rule to drop them; their window key (=dry-season-sale-window=)
+  would allow a generic one, which is a question in the memo.
+- *The state rung decides 4,187 of 2021-22's 9,020 rows*, and removes 2 low names (state-blind: 4).
+  2011-12 and 2014-15 record no state.
+- *2018-19 has nothing to judge* (no kilograms), and its 21 =Kg= sales are a thin baseline for a
+  rung: every cell one could serve rests on exactly 5 of them, all roselle (=Oseille=) and fresh tomato.
+  Roselle's 5 come from 2 households and tomato's from 5, so a 5-household gate keeps the 23 tomato
+  rows of the 161 (red team F2).
+  Within roselle a =Gros sac= (21 kg, 37 sales) reads lighter than a =Sac Moyen= (28 kg,
+  6 sales).  Whether those masses are wrong is not established (roselle is light); the size
+  inversion is recorded in the memo, and nothing is served from it.
+- *Region* is not a rung (it lives in =cluster_features=): a region-then-national ladder names 155
+  rows against the screen's 157.
+- *A one-wave read names the same rows* as the all-waves read (pinned in
+  =tests/test_gh1559_survey_kg_price_screen.py=).
+
+*Cost.*  47 ms of a 659 ms warm read.  Cache: none (=quantity_audit= is excluded from every
+fingerprint; census 0 of 555 / 2,321 / 42 / 38).

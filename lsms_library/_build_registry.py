@@ -267,6 +267,11 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.quantity_audit.check_quantities",
     "lsms_library.quantity_audit.audit_quantities",
     "lsms_library.quantity_audit.audit_near_zero",
+    # GH #1559: the survey kilogram against the mass its sale prices imply.
+    # The same argument: it reads a built frame, names rows and returns
+    # nothing that reaches a parquet.  Reached only through `check_quantities`.
+    "lsms_library.quantity_audit.audit_survey_kg_prices",
+    "lsms_library.quantity_audit.survey_kg_price_factors",
     # The null-index-key audit (null_index_audit, GH #847): the same argument,
     # one of the four guards up.  Counts NaN keys on declared index levels and
     # warns; provably returns its input unchanged.
