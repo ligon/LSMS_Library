@@ -290,3 +290,14 @@ class TestCopingHook:
     def test_an_unknown_answer_is_refused(self):
         with pytest.raises(ValueError, match="unknown answers"):
             self._served(c1="Primeira estratégia")
+
+
+@pytest.mark.requires_s3
+def test_a_two_wave_roster_keeps_2018s_months_dtype():
+    """The 2021-22 leavers carried MonthsSpent's only NA; without the cast the concat
+    widened 2018-19's int64 column to float64."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        r = ll.Country(COUNTRY).household_roster(waves=[OLD, WAVE])
+    assert str(r["MonthsSpent"].dtype) == "int64"
+    assert set(r["MonthsSpent"].unique()) <= {0, 12}

@@ -75,6 +75,11 @@ def household_roster(df):
     if unknown:
         raise ValueError(f'Guinea-Bissau 2021-22 s01q00aa: unknown answers {unknown}')
     df = df[still.map(_STILL).fillna(True).astype(bool).to_numpy()].copy()
+    # The leavers carried the column's only NA (s01q12 blank), which made it a float.
+    # Whole numbers, as 2018-19's int64, so a two-wave concat does not widen that
+    # wave's column (Benin 2021-22's fix).  A future NA keeps the float.
+    if df['MonthsSpent'].notna().all():
+        df['MonthsSpent'] = df['MonthsSpent'].astype('int64')
 
     def _known(x):
         return None if (pd.isna(x) or int(float(x)) == 9999) else x
