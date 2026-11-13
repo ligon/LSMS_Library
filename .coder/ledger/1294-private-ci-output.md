@@ -95,3 +95,30 @@ Linux tests do not establish a native Windows result.
 - Scope: four authorized files only; no real microdata/network/acquisition,
   dependency/fixture/lock edits or weakened existing assertions. No native
   Windows execution claim. SIGKILL/host teardown cleanup remains OS/runner-owned.
+
+## Addendum, 2026-11-13: GH #1716 pin results (`--public-pins`)
+
+A narrow extension of §3's public-output boundary, for the
+`windows-script-build` stage only: one line per pin in the workflow's own
+`EXPECT`, giving the expected rows and digest (checked-in workflow text,
+already public), the child's row count, and a `match`/`mismatch` verdict on
+its digest. Counts plus a verdict; nothing else from the child.
+
+**Why the actual digest is NOT published** (red team, `reports/ci-redteam/`
+F1, 2026-11-13). The digest from `windows_build_check.py` is a sum of
+per-row hashes mod 2^48 under pandas' fixed, public hash key, so it is
+additive: actual minus the public expected digest is the hash-sum of exactly
+the rows that changed. The red team measured both
+`digest(T+r) - digest(T) == digest(r)` on synthetic data and, on real data,
+that the #1478 change's digest delta equals the hash-sum of the two added
+2015-16 shock rows. For a one-row change that is one survey row's 48-bit
+hash: survey-derived, not a count, so outside this ledger's counts-only
+contract. A re-pin is measured on Linux in any case, never copied from the
+Windows log.
+
+**Bounds.** The child's line must match the `RESULT` format in full, exactly
+once per pinned table, ASCII, at most 4 KiB, from a log of at most 256 MiB.
+Otherwise the result is `actual unavailable`. A malformed `EXPECT` prints only
+`pin unavailable`. The exit status is unchanged. The flag is refused on any
+other stage, and a test pins it to the single step whose child is
+`windows_build_check.py`. Tests: `tests/test_private_ci_check.py` (pin tests).
