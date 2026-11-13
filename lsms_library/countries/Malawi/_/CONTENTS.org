@@ -17,9 +17,10 @@ comparison.  It passes by inference from three released measures:
 - *One season per interview.*  A G line's season is derived from its planting month
   and year (=ag_g05a= / =ag_g05b=; July-December of Y is season Y/Y+1).  Households
   whose dated G lines all fall in one season: 8,876 of 9,463 (2016-17 XS), 1,780 of
-  1,880 (Panel), 8,022 of 8,771 (2019-20 XS), 2,184 of 2,333 (Panel).  Every mixed
-  household holds two ADJACENT seasons, which is what a planting month near the July
-  boundary gives.
+  1,880 (Panel), 8,022 of 8,771 (2019-20 XS), 2,184 of 2,333 (Panel).  The mixed
+  households hold ADJACENT seasons -- two (1,558 of 1,585) or three consecutive (24) --
+  which is what a planting month near the July boundary gives; 3 (2019-20) carry one
+  line dated 2014 or 2009.
 - *A step by interview date.*  Against the agriculture meta file's Module G start date,
   2016-17 XS households interviewed April-August 2016 report the 2014/15 season (2,251
   of 2,404), those interviewed October 2016-May 2017 the 2015/16 season (5,965 of
