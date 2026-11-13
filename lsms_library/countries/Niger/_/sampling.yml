@@ -1,15 +1,16 @@
 # Sampling design record -- HOW this survey's sample was drawn (GH #793).
 #
-# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
+# NO DESIGN FIELDS (GH #942, ruling 2026-10-18, option A): each entry carries
 # the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
-# wave of `Country('Niger').waves`?  The design fields are #793's curation and
-# are not written yet; their absence here is "not curated", not "not found".
+# wave of `Country('Niger').waves`? -- and the `served_strata:` block below, each
+# with its own provenance.  The design fields are #793's curation and are not
+# written yet; their absence here is "not curated", not "not found".
 #
 # Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in
 # {wave-scoped, redefined, mixed} makes a `Country('Niger')` frame that carries
 # `v` across that boundary warn (`ClusterIdentityWarning`); nothing is ever
 # dropped or rewritten.  The first wave (2011-12) has no preceding wave and so
-# no entry.  Vocabulary and field names: see sampling.py.  Modelled on
+# no `panel:` block.  Vocabulary and field names: see sampling.py.  Modelled on
 # Burkina_Faso/_/sampling.yml (PR #1246, the same ECVMA/EMC -> EHCVM shape),
 # in the Ethiopia/Nigeria format.
 #
@@ -26,10 +27,45 @@
 # construction, because `niger.i` prefixes every EHCVM id with 'E_' (the
 # prefix exists to keep the two programmes' ids apart).  Zero shared `i` is
 # not evidence about `v`.
+#
+# SERVED STRATA (GH #1577, ruling 2026-11-12, "Registry + sampling.yml tag"): the
+# two programmes serve different stratifications under one name -- ECVMA's own
+# `strate`, region x agro-ecological zone, as recorded (`Agadez pastorale`), and
+# EHCVM's region x milieu, a construction registered in _/derivations.yml
+# (`Agadez Rural`).  Not harmonised, because they are different schemes
+# (CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels").
+# 2011-12 is the first `native-label` record (sampling.py).
 
 Sampling:
 
+  '2011-12':
+    served_strata:
+      holds: native-label
+      variable: 'strate (NER_2011_ECVMA_v01_M_Stata8/ecvmamen_p1_en.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: 'CONTENTS.org, "2026-11-04 -- the NPK slot''s label, and strata by wave (GH #1445, #812)": `strate` = 10 x `region` + `zae` for 3,968 of 3,968 households, 27 value labels, BID Table 4 equal to its 25 occupied cells; served by 2011-12/_/data_info.yml `sample.myvars.strata: strate`'
+      note: |-
+        The file's own stratum: Niamey, and the urban, agricultural,
+        agro-pastoral and pastoral zones of the other seven regions (BID,
+        2011-12/Documentation/ECVMA_Information_de_Base_V9_eng.pdf, p.8).  The BID
+        says 26 strata, the variable has 27 value labels, and 25 are occupied.
+        The country's `strata` table holds EHCVM spellings only and matches no
+        ECVMA label, so the label is served as recorded.
+
   '2014-15':
+    served_strata:
+      holds: native-label
+      variable: 'strate (NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2014_P1P2_Conso.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: 'CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)", paragraph "2014-15": `strate` constant within GRAPPE on all 270 grappes and 3,617 households, the same 25 labels as 2011-12; served by 2014-15/_/data_info.yml `sample.df_strate`, reduced to one row per grappe by 2014-15/_/mapping.py `df_strate` (reduce_to_agreed)'
+      note: |-
+        The household file `sample` reads (ECVMA2014welfare_T1c.dta) has no
+        `strate`; the consumption file repeats the grappe's.  A recorded value,
+        so no derivation: a grappe holding two strata is refused, not resolved.
+        Equal to the 2011 `strate` and to 10 x region + zae on 270 of 270
+        grappes (CONTENTS.org, "Strata, measured").
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
@@ -56,6 +92,16 @@ Sampling:
       locator: 'measured 2026-10-23 through Country("Niger").sample() and .cluster_features() on a cold build at development 9a0ed5f3c, linkage from Niger/_/updated_ids.json (3,529 2014-15 -> 2011-12 links, built by panel_ids.py from the shared (GRAPPE, MENAGE) key); design: 2014-15 DDI (microdata-2676), "Sampling Procedure" > "2014 Survey", PDF p. 6 (quoted in CONTENTS.org, "2014-15 -- ECVM/A 2014")'
 
   '2018-19':
+    served_strata:
+      holds: constructed
+      derivation: 'Niger::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Niger::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2018-19/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2018-19/_/mapping.py `sample`; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)": 16 region x milieu labels'
+      note: |-
+        No EHCVM household file records a stratum.  `domaine` of
+        ehcvm_individu_ner2018.dta is zae x vague, not the stratum, and is not
+        read (CONTENTS.org, "Strata, measured").
     panel:
       household_continuity: independent
       cluster_id_continuity: redefined
@@ -106,6 +152,16 @@ Sampling:
       locator: 'measured 2026-10-23 through Country("Niger").sample() and .cluster_features() on a cold build at development 9a0ed5f3c (coordinates as served: 2011-12 NER_EA_Offsets.dta, 2018-19 grappe_gps_ner2018.dta); draw: 2018-19 DDI (microdata-4296), "Sampling" > "SAMPLING PROCEDURE", PDF p. 4 (quoted in CONTENTS.org, "2018-19 -- EHCVM 2018/19"); no linkage: Niger/_/panel_ids.py docstring'
 
   '2021-22':
+    served_strata:
+      holds: constructed
+      derivation: 'Niger::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Niger::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2021-22/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)": 15 region x milieu labels'
+      note: |-
+        `Niamey Rural` is contested here: none on the 2021-22 cover, which is what
+        `strata` serves, while ehcvm_ponderations_ner2021.dta still codes 2 Niamey
+        clusters Rural (CONTENTS.org, "Niamey Rural is contested in 2021-22").
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: stable

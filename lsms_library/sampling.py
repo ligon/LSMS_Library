@@ -33,9 +33,10 @@ reason, not by a curator typing a new word into a ``.yml``.
 What is controlled and what is not: ``design_tag``, ``source_type``,
 ``confidence``, ``documentation_status`` and ``oversamples[].status`` are
 controlled vocabularies -- the three the issue named for freezing, plus the
-provenance pair every editorial reading must travel with.  Free-text values
-(``frame``, ``stratification.basis``, ``selection.psu``, ``panel.role``, ...)
-are not controlled; their field NAMES are.
+provenance pair every editorial reading must travel with -- and so, since GH
+#1577, is ``served_strata.holds``.  Free-text values (``frame``,
+``stratification.basis``, ``selection.psu``, ``panel.role``,
+``served_strata.variable``, ...) are not controlled; their field NAMES are.
 
 The tag is an editorial reading, so it never travels alone
 -----------------------------------------------------------
@@ -73,6 +74,20 @@ typed, optional record with its OWN provenance (``source_type`` /
 and cited; nothing generates it, and nothing computes it at warn time.  See
 ``_MEASUREMENT_FIELDS``.  Design-level counts (PSUs, strata) stay out.
 
+What the SERVED ``strata`` column holds (GH #1577)
+-------------------------------------------------
+@ligon, 2026-11-12: "Registry + sampling.yml tag".  ``sample().strata`` pools a
+survey's stratum code, a survey's stratum label, a library construction and
+nothing, under one name.  A wave's ``served_strata`` block records which, so
+code can ask (:attr:`SamplingRecord.strata_holds`).  It describes the column
+the library SERVES, so it is not a design field: the design's stratification
+is ``stratification``, which travels with the design triple.  Like ``panel``,
+the block carries its own ``source_type`` / ``confidence`` / ``locator``, and
+an entry holding only ``served_strata`` (and ``panel``) is a record without a
+design triple.  Constructed strata stay in the derivations registry: a
+``constructed`` block names the registry key and nothing else about the
+construction.  See ``STRATA_HOLDS`` and ``_check_served_strata``.
+
 Placement costs no cache
 ------------------------
 ``sampling.yml`` is a sibling of ``data_scheme.yml``, never a block in it, for
@@ -99,6 +114,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
+from .derivations import parse_key as _parse_derivation_key
 from .paths import countries_root
 from .yaml_utils import SchemeLoader
 
@@ -106,6 +122,8 @@ __all__ = [
     "ATTRS_KEY",
     "ATTRS_RESOLUTION_KEY",
     "DESIGN_TAGS",
+    "STRATA_HOLDS",
+    "NATIVE_STRATA",
     "NOT_STATED_SOURCE_TYPES",
     "SOURCE_TYPES",
     "DOCUMENTED_SOURCE_TYPES",
@@ -271,6 +289,65 @@ _MEASUREMENT_FIELDS_UNUSED: dict[str, str] = {
         "by @ligon 2026-10-23 because the count depends on the mover marker",
     "mover_rule": "travels with households_changed_net_of_movers",
 }
+
+# ---------------------------------------------------------------------------
+# GH #1577 -- what the SERVED `strata` column holds in a wave
+# ---------------------------------------------------------------------------
+#
+# Ruling (@ligon, 2026-11-12, "Registry + sampling.yml tag"): constructed
+# strata stay in the derivations registry; a small per-wave tag records the
+# native-code, native-label and absent cases, added under GH #1134's rule --
+# widened one value at a time, each with its first evidenced record.
+#
+# The tag is a fact about the column the library SERVES in one wave, read off
+# the wave's source files and its served `sample()` -- not a reading of the
+# design (that is `stratification`, a design field).  "Native" makes a
+# narrow claim: the served value is a variable the wave's OWN files or
+# documents name, label or describe as the sampling stratum.  A recorded
+# region, district or province served as `strata` is none of these values
+# (it is a recorded variable, but nothing says it is the stratum), and such a
+# wave stays unrecorded until that case is ruled on.  So does a native code
+# the library DECODES through a lookup of its own (Burkina Faso 2014, GH
+# #1573): neither "the file's label" nor "a code".
+
+#: ``served_strata.holds``.  Each value was added with the first shipped
+#: record that uses it, named here (GH #1134 rule); the freeze test pins both
+#: directions.
+STRATA_HOLDS: frozenset[str] = frozenset({
+    # The wave's stratum variable, served as the recorded code; the file
+    # carries no label for it, so what a code means is not served.
+    # First record: Mali 2017-18, `strate` of EACI17_ECHANTILLON.dta
+    # (variable label `codestrate`, no value labels; GH #1574).
+    "native-code",
+    # The wave's stratum variable, served as its recorded label.  Spelling
+    # may be folded by the country's `strata` categorical table, nothing
+    # else.  First record: Niger 2011-12, `strate` of ecvmamen_p1_en.dta
+    # (25 occupied labels such as `Agadez pastorale`).
+    "native-label",
+    # Built by the library from other recorded variables.  The construction
+    # is a registered derivation: `derivation` names its key, and the served
+    # rows carry it in `Derivation`.  Nothing else about it is restated here.
+    # First record: Mali 2018-19, region x milieu from the cover's labels
+    # (`Mali::sample::region-milieu-stratum`, GH #812).
+    "constructed",
+    # No stratum is served: `strata` is NA on every row of the wave.  The
+    # locator says what was searched, because silence in config is not
+    # evidence of absence.  First record: Mali 2014-15 (no variable in its 55
+    # files is named or labelled a stratum; GH #812 ruling).
+    "absent",
+})
+
+#: The ``holds`` values that serve a recorded variable, and so name it.
+NATIVE_STRATA: frozenset[str] = frozenset({"native-code", "native-label"})
+
+#: Every field a ``served_strata`` block may carry: the tag; ``variable`` (the
+#: source variable served, for a native value only); ``derivation`` (the
+#: registry key, for ``constructed`` only); ``note`` (free text); and the
+#: provenance triple every reading in this file travels with.
+_SERVED_STRATA_FIELDS: frozenset[str] = frozenset({
+    "holds", "variable", "derivation", "note",
+    "source_type", "confidence", "locator",
+})
 
 # ---------------------------------------------------------------------------
 # GH #942 -- is `v` the same cluster id across a wave boundary?
@@ -440,10 +517,16 @@ class SamplingRecord(dict):
         "panel", "oversamples",
         "source_file", "locator", "design_statement",
         "documentation_status", "notes", "record_source",
+        # GH #1577: what the served `strata` column holds; own provenance
+        "served_strata",
     )
     #: The design triple.  ``design_tag`` alone is an editorial reading
     #: presented as a fact; see the module docstring.
     _DESIGN_TRIPLE: tuple[str, ...] = ("design_tag", "source_type", "confidence")
+    #: Top-level blocks that carry their OWN provenance, so an entry holding
+    #: only these is a record without the design triple (GH #942 ``panel``,
+    #: GH #1577 ``served_strata``).
+    _SELF_VOUCHING: frozenset[str] = frozenset({"panel", "served_strata"})
     #: Fields that are claims about a DOCUMENT, and so may not appear on a
     #: record whose source is not one.
     _DOCUMENT_ONLY: tuple[str, ...] = ("design_statement", "documentation_status")
@@ -497,6 +580,13 @@ class SamplingRecord(dict):
     def household_continuity(self) -> str | None:
         """``panel.household_continuity`` (GH #942), or ``None``."""
         return (self.get("panel") or {}).get("household_continuity")
+
+    @property
+    def strata_holds(self) -> str | None:
+        """``served_strata.holds`` -- what ``sample().strata`` holds in this
+        wave (GH #1577; ``STRATA_HOLDS``) -- or ``None`` where nobody has
+        recorded it.  ``None`` is "unrecorded", never "absent"."""
+        return (self.get("served_strata") or {}).get("holds")
 
     def __repr__(self) -> str:
         inner = ", ".join(f"{k}={self[k]!r}" for k in self._FIELDS if k in self)
@@ -560,8 +650,16 @@ class SamplingRecord(dict):
         # record too (GH #942 ruling, option A: "land the panel: block now"),
         # so the design triple is required iff any DESIGN field is present.
         # The panel block then carries its own provenance; see _check_panel.
-        is_design = bool(set(block) - {"panel"})
+        # GH #1577: `served_strata` vouches for itself the same way, so an
+        # entry of `served_strata` (with or without `panel`) is a record too
+        # -- which is what lets a FIRST wave, which has no boundary and so no
+        # `panel`, say what its `strata` holds.
+        is_design = bool(set(block) - cls._SELF_VOUCHING)
+        if not is_design and all(block.get(k) is None
+                                 for k in cls._SELF_VOUCHING):
+            raise ValueError(f"{where}: empty sampling record")
         _check_panel(where, block.get("panel"), panel_only=not is_design)
+        _check_served_strata(where, country, block.get("served_strata"))
         if not is_design:
             return cls._finish(country, wave, block)
 
@@ -691,8 +789,8 @@ def _check_panel(where: str, panel: Any, *, panel_only: bool) -> None:
       quotes.
     """
     if panel is None:
-        if panel_only:
-            raise ValueError(f"{where}: empty sampling record")
+        # An entry with neither a design field nor a self-vouching block is
+        # refused as empty by from_config, before this is called.
         return
     _check_nested(where, "panel", panel, _PANEL_FIELDS)
     hh = panel.get("household_continuity")
@@ -838,6 +936,99 @@ def _check_measurement(where: str, block: Any, *, continuity: Any) -> None:
             "households_changed_net_of_movers -- a net count must say how "
             "movers were told apart, and a rule with no net count describes "
             "nothing (put it in note).")
+
+
+def _check_served_strata(where: str, country: str, block: Any) -> None:
+    """Validate a ``served_strata`` block (GH #1577).
+
+    * Field names are frozen (``_SERVED_STRATA_FIELDS``).
+    * ``holds`` is required and controlled (``STRATA_HOLDS``).
+    * Its own provenance: ``source_type`` and ``confidence`` (controlled) and
+      a non-empty string ``locator`` -- the design triple, where a record has
+      one, describes the design statement, not the served column.
+      ``not-found`` is refused: the served column can always be read, so a
+      wave that serves no stratum is ``holds: absent``, located where its
+      absence was read.
+    * A native value names the source ``variable`` it serves and carries no
+      ``derivation``: a recorded value is not a construction.
+    * ``constructed`` names its ``derivation`` and carries no ``variable``:
+      the construction, its raw variables and its evidence stay in the
+      registry entry, and restating them here would be a second copy to
+      drift.  The key must be a registry key for this country's ``sample``
+      table (``<country>::sample::<name>``); that it resolves to a shipped
+      entry covering the wave is pinned by a test, not checked here, because
+      this runs on every read.
+    * ``absent`` carries neither: nothing is served, so nothing is named.
+    * ``variable`` / ``derivation`` / ``note`` are non-empty strings.
+    """
+    if block is None:
+        return
+    name = "served_strata"
+    if not isinstance(block, Mapping):
+        raise ValueError(f"{where}: {name} must be a mapping, "
+                         f"got {type(block).__name__}")
+    _check_nested(where, name, block, _SERVED_STRATA_FIELDS)
+    for k in ("holds", "variable", "derivation", "note", "source_type",
+              "confidence", "locator"):
+        v = block.get(k)
+        if v is not None and (not isinstance(v, str) or not v.strip()):
+            got = "an empty string" if isinstance(v, str) else type(v).__name__
+            raise ValueError(
+                f"{where}: {name}.{k} must be a non-empty string, got {got}.")
+    missing = [k for k in ("holds", "source_type", "confidence", "locator")
+               if not block.get(k)]
+    if missing:
+        raise ValueError(
+            f"{where}: {name} is missing {missing}. What the served strata "
+            "column holds is a reading, and it travels with its own "
+            "provenance (GH #1577).")
+    holds = block["holds"]
+    _check_vocab(where, f"{name}.holds", holds, STRATA_HOLDS)
+    _check_vocab(where, f"{name}.source_type", block["source_type"],
+                 SOURCE_TYPES)
+    _check_vocab(where, f"{name}.confidence", block["confidence"],
+                 CONFIDENCE_LEVELS)
+    if block["source_type"] == "not-found":
+        raise ValueError(
+            f"{where}: {name}.source_type='not-found' -- the served column can "
+            "always be read.  A wave that serves no stratum is "
+            "`holds: absent`, with the source its absence was read from.")
+    variable, key = block.get("variable"), block.get("derivation")
+    if holds in NATIVE_STRATA:
+        if variable is None:
+            raise ValueError(
+                f"{where}: {name}.holds={holds!r} serves a recorded variable; "
+                "name it in `variable`.")
+        if key is not None:
+            raise ValueError(
+                f"{where}: {name}.holds={holds!r} is a recorded value, so it "
+                "has no derivation; a construction is `holds: constructed`.")
+    elif holds == "constructed":
+        if key is None:
+            raise ValueError(
+                f"{where}: {name}.holds='constructed' needs `derivation`, the "
+                "registry key of the construction: constructed strata stay "
+                "in the derivations registry (GH #1577 ruling).")
+        if variable is not None:
+            raise ValueError(
+                f"{where}: {name}.holds='constructed' may not name a "
+                "`variable`; the construction's raw variables are in its "
+                f"registry entry {key!r}.")
+        try:
+            k_country, k_table, _name = _parse_derivation_key(key)
+        except ValueError as exc:
+            raise ValueError(f"{where}: {name}.derivation: {exc}") from None
+        if k_country != country or k_table != "sample":
+            raise ValueError(
+                f"{where}: {name}.derivation={key!r} must be a key of "
+                f"{country}'s `sample` table, '{country}::sample::<name>'.")
+    else:                                                     # absent
+        named = [k for k in ("variable", "derivation")
+                 if block.get(k) is not None]
+        if named:
+            raise ValueError(
+                f"{where}: {name}.holds='absent' serves nothing, so it may not "
+                f"carry {named}; say what was searched in `locator` / `note`.")
 
 
 # ---------------------------------------------------------------------------

@@ -83,7 +83,10 @@ class TestSamplingRecord:
     def test_the_programme_switch_is_declared_and_warns(self):
         from lsms_library.sampling import INCOMPARABLE_CLUSTER_IDS, sampling_records
         recs = sampling_records("Mali")
-        assert set(recs) == {"2017-18", "2018-19", "2021-22"}
+        # 2014-15 has an entry since GH #1577 (what its `strata` holds); it is
+        # the first wave, so it declares no boundary.
+        assert set(recs) == {"2014-15", "2017-18", "2018-19", "2021-22"}
+        assert recs["2014-15"].get("panel") is None
         switch = recs["2018-19"]
         assert switch.household_continuity == "independent"
         assert switch.cluster_id_continuity in INCOMPARABLE_CLUSTER_IDS

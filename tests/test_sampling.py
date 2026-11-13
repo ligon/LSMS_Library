@@ -1969,3 +1969,355 @@ class TestUgandaHistoricalClusterView:
         for name in ["ea-comm-link", "ea-own-comm"]:
             assert set(records[f"Uganda::sample::{name}"].waves) == {
                 "2005-06", "2009-10", "2010-11", "2011-12"}
+
+
+# ===========================================================================
+# GH #1577 -- `served_strata`: what the SERVED `strata` column holds
+# ===========================================================================
+#
+# Ruling (@ligon, 2026-11-12): "Registry + sampling.yml tag".  Constructed
+# strata stay in the derivations registry; a per-wave tag records the
+# native-code, native-label and absent cases, widened under GH #1134's rule
+# (one value at a time, each with its first evidenced record).
+
+def strata(**kw):
+    """A minimal valid ``served_strata`` block (a native label)."""
+    block = {"holds": "native-label", "variable": "strate",
+             "source_type": "derived-from-data", "confidence": "high",
+             "locator": "measured"}
+    block.update(kw)
+    return {k: v for k, v in block.items() if v is not None}
+
+
+CONSTRUCTED = dict(holds="constructed", variable=None,
+                   derivation="A::sample::region-milieu-stratum")
+
+
+class TestServedStrataIsItsOwnRecord:
+    """Like ``panel``, the block vouches for itself, so a FIRST wave -- which
+    has no boundary and so no ``panel`` -- can say what its strata hold."""
+
+    def test_a_served_strata_only_entry_is_a_record(self):
+        r = SamplingRecord.from_config("A", "1", {"served_strata": strata()})
+        assert r.design_tag is None and r.cluster_id_continuity is None
+        assert r.strata_holds == "native-label"
+        assert type(r["served_strata"]) is S._FrozenDict
+
+    def test_beside_a_panel_block_no_design_triple_is_needed(self):
+        r = SamplingRecord.from_config(
+            "A", "2", {"panel": panel(), "served_strata": strata()})
+        assert r.design_tag is None and r.strata_holds == "native-label"
+        assert r.cluster_id_continuity == "wave-scoped"
+
+    def test_the_panel_beside_it_still_needs_its_own_provenance(self):
+        """``served_strata`` vouches for itself, not for the panel block."""
+        with pytest.raises(ValueError, match="missing"):
+            SamplingRecord.from_config(
+                "A", "2", {"panel": {"role": "panel"},
+                           "served_strata": strata()})
+
+    def test_a_design_field_beside_it_still_needs_the_triple(self):
+        with pytest.raises(ValueError, match="travel together"):
+            SamplingRecord.from_config(
+                "A", "1", {"stages": 2, "served_strata": strata()})
+        r = SamplingRecord.from_config("A", "1", design(served_strata=strata()))
+        assert r.design_tag and r.strata_holds == "native-label"
+
+    @pytest.mark.parametrize("block", [
+        {}, {"panel": None}, {"served_strata": None},
+        {"panel": None, "served_strata": None},
+    ])
+    def test_an_empty_entry_is_still_refused(self, block):
+        with pytest.raises(ValueError, match="empty sampling record"):
+            SamplingRecord.from_config("A", "1", block)
+
+    def test_unrecorded_is_None_never_absent(self):
+        assert SamplingRecord.unrecorded("A", "1").strata_holds is None
+        assert rec().strata_holds is None
+
+
+class TestServedStrataRefusals:
+
+    @pytest.mark.parametrize("bad", [
+        "code", "label", "native", "region", "region-x-milieu",
+        "decoded", "derived", "not-stated", S.UNRECORDED_TAG,
+    ])
+    def test_an_unknown_holds_value_is_refused(self, bad):
+        with pytest.raises(ValueError, match="controlled vocabulary"):
+            SamplingRecord.from_config(
+                "A", "1", {"served_strata": strata(holds=bad)})
+
+    @pytest.mark.parametrize("field,bad", [
+        ("source_type", "questionnaire"), ("confidence", "certain")])
+    def test_its_provenance_is_controlled(self, field, bad):
+        with pytest.raises(ValueError, match="controlled vocabulary"):
+            SamplingRecord.from_config(
+                "A", "1", {"served_strata": strata(**{field: bad})})
+
+    @pytest.mark.parametrize("drop", ["holds", "source_type", "confidence",
+                                      "locator"])
+    def test_the_tag_never_travels_without_its_provenance(self, drop):
+        with pytest.raises(ValueError, match="missing"):
+            SamplingRecord.from_config(
+                "A", "1", {"served_strata": strata(**{drop: None})})
+
+    def test_the_design_triple_does_not_vouch_for_it(self):
+        """A design record's provenance describes the design statement, not
+        the served column."""
+        with pytest.raises(ValueError, match="missing"):
+            SamplingRecord.from_config("A", "1", design(
+                served_strata=strata(source_type=None, confidence=None)))
+
+    def test_not_found_is_refused(self):
+        with pytest.raises(ValueError, match="holds: absent"):
+            SamplingRecord.from_config("A", "1", {"served_strata": strata(
+                holds="absent", variable=None, source_type="not-found",
+                confidence="low")})
+
+    @pytest.mark.parametrize("block", [
+        strata(count=25),                                   # a derived count
+        strata(labels=["Agadez pastorale"]),
+        strata(design_tag="two-stage-stratified-cluster"),
+    ])
+    def test_an_unknown_field_is_refused(self, block):
+        with pytest.raises(ValueError, match="unknown"):
+            SamplingRecord.from_config("A", "1", {"served_strata": block})
+
+    @pytest.mark.parametrize("field,bad", [
+        ("holds", 1), ("variable", ""), ("variable", 7), ("note", " "),
+        ("locator", ""), ("derivation", ["A::sample::x"]),
+    ])
+    def test_values_are_non_empty_strings(self, field, bad):
+        with pytest.raises(ValueError, match="non-empty string"):
+            SamplingRecord.from_config(
+                "A", "1", {"served_strata": strata(**{field: bad})})
+
+    def test_a_non_mapping_is_refused(self):
+        with pytest.raises(ValueError, match="must be a mapping"):
+            SamplingRecord.from_config("A", "1",
+                                       {"served_strata": "native-code"})
+
+    @pytest.mark.parametrize("holds", sorted(S.NATIVE_STRATA))
+    def test_a_native_value_names_its_variable(self, holds):
+        with pytest.raises(ValueError, match="name it in `variable`"):
+            SamplingRecord.from_config("A", "1", {"served_strata": strata(
+                holds=holds, variable=None)})
+
+    @pytest.mark.parametrize("holds", sorted(S.NATIVE_STRATA))
+    def test_a_native_value_has_no_derivation(self, holds):
+        with pytest.raises(ValueError, match="no derivation"):
+            SamplingRecord.from_config("A", "1", {"served_strata": strata(
+                holds=holds, derivation="A::sample::x")})
+
+    def test_constructed_is_accepted_with_its_registry_key(self):
+        r = SamplingRecord.from_config(
+            "A", "1", {"served_strata": strata(**CONSTRUCTED)})
+        assert r.served_strata["derivation"] == "A::sample::region-milieu-stratum"
+
+    def test_constructed_needs_its_registry_key(self):
+        with pytest.raises(ValueError, match="derivations registry"):
+            SamplingRecord.from_config("A", "1", {"served_strata": strata(
+                **{**CONSTRUCTED, "derivation": None})})
+
+    def test_constructed_restates_nothing_the_registry_holds(self):
+        with pytest.raises(ValueError, match="may not name a `variable`"):
+            SamplingRecord.from_config("A", "1", {"served_strata": strata(
+                **{**CONSTRUCTED, "variable": "s00q01"})})
+
+    @pytest.mark.parametrize("key,match", [
+        ("region-milieu-stratum", "three"),             # not a key at all
+        ("A::sample::", "empty name"),
+        ("A::sample::a+b", "may not contain"),
+        ("B::sample::region-milieu-stratum", "must be a key of A's"),
+        ("::sample::region-milieu-stratum", "must be a key of A's"),
+        ("A::food_acquired::x", "must be a key of A's"),
+        ("A::::x", "must be a key of A's"),
+    ])
+    def test_constructed_key_must_be_this_countrys_sample_key(self, key, match):
+        with pytest.raises(ValueError, match=match):
+            SamplingRecord.from_config("A", "1", {"served_strata": strata(
+                **{**CONSTRUCTED, "derivation": key})})
+
+    @pytest.mark.parametrize("extra", [{"variable": "strate"},
+                                       {"derivation": "A::sample::x"}])
+    def test_absent_names_nothing(self, extra):
+        block = strata(holds="absent", variable=None)
+        block.update(extra)
+        with pytest.raises(ValueError, match="serves nothing"):
+            SamplingRecord.from_config("A", "1", {"served_strata": block})
+
+
+class TestServedStrataIsFrozen:
+    """GH #1134's rule, applied to the new tag: every value is used by a
+    shipped record, and the first record of each is the one sampling.py
+    names."""
+
+    def test_the_vocabulary_is_exactly_the_four_values(self):
+        assert S.STRATA_HOLDS == {"native-code", "native-label",
+                                  "constructed", "absent"}
+        assert S.NATIVE_STRATA < S.STRATA_HOLDS
+
+    def test_every_allowed_value_is_used_by_a_shipped_record(self):
+        used = {r.strata_holds for r in _shipped()} - {None}
+        assert used == S.STRATA_HOLDS
+
+    def test_every_served_strata_field_is_used_by_a_shipped_record(self):
+        used = {k for r in _shipped() for k in (r.get("served_strata") or {})}
+        assert used == set(S._SERVED_STRATA_FIELDS), \
+            set(S._SERVED_STRATA_FIELDS) ^ used
+
+    @pytest.mark.parametrize("country,wave,holds", [
+        ("Mali", "2017-18", "native-code"),
+        ("Niger", "2011-12", "native-label"),
+        ("Mali", "2018-19", "constructed"),
+        ("Mali", "2014-15", "absent"),
+    ])
+    def test_the_first_record_of_each_value(self, country, wave, holds):
+        r = sampling_records(country)[wave]
+        assert r.strata_holds == holds
+        blk = r.served_strata
+        assert blk["source_type"] and blk["confidence"] and blk["locator"]
+
+    def test_the_named_first_records_are_cited_in_sampling_py(self):
+        import inspect
+        src = inspect.getsource(S)
+        for cite in ("Mali 2017-18", "Niger 2011-12", "Mali 2018-19",
+                     "Mali 2014-15"):
+            assert cite in src, cite
+
+    def test_a_first_wave_tag_declares_no_boundary(self):
+        for country, wave in (("Mali", "2014-15"), ("Niger", "2011-12")):
+            r = sampling_records(country)[wave]
+            assert r.get("panel") is None and r.strata_holds is not None
+
+
+# -- the registry, both directions ----------------------------------------
+
+#: Countries whose registered strata construction is NOT yet tagged in their
+#: own ``sampling.yml``, each with its reason.  The 2026-11-13 batch kept
+#: these two files for other streams; their records are proposed in the
+#: #1577 report for integration.  ``test_a_pending_country_is_still_pending``
+#: fails once one is tagged, so the entry cannot outlive its reason.
+SERVED_STRATA_PENDING: dict[str, str] = {
+    "Benin": "sampling.yml edited by another 2026-11-13 stream; record proposed "
+             "in the #1577 report",
+    "Guinea-Bissau": "sampling.yml created by another 2026-11-13 stream; record "
+                     "proposed in the #1577 report",
+}
+
+
+def _registered_strata_constructions():
+    """``{(country, wave): key}`` for every registered ``sample`` derivation
+    that writes ``strata``, in every country.  Filtered on the COLUMN, not on
+    ``::sample::`` -- Tanzania, Uganda and Nigeria register sample keys for
+    other columns."""
+    import lsms_library as ll
+    from lsms_library.derivations import derivation_records
+    out = {}
+    for name in ll.countries():
+        for key, r in derivation_records(name).items():
+            if r.table != "sample" or "strata" not in (r.columns or []):
+                continue
+            waves = (list(ll.Country(name).waves) if r.waves in (None, "all")
+                     else list(r.waves))
+            for w in waves:
+                assert (name, w) not in out, (name, w, key, out.get((name, w)))
+                out[(name, w)] = key
+    return out
+
+
+class TestServedStrataAgreesWithTheRegistry:
+
+    def test_every_constructed_tag_resolves_to_a_registered_entry(self):
+        from lsms_library.derivations import derivation_records
+        import lsms_library as ll
+        for name in ll.countries():
+            for wave, r in sampling_records(name).items():
+                if r.strata_holds != "constructed":
+                    continue
+                key = r.served_strata["derivation"]
+                entry = derivation_records(name).get(key)
+                assert entry is not None, (name, wave, key)
+                assert entry.table == "sample", (name, wave, key)
+                assert "strata" in (entry.columns or []), (name, wave, key)
+                assert entry.waves in (None, "all") or wave in entry.waves, \
+                    (name, wave, key, entry.waves)
+
+    def test_every_registered_strata_construction_is_tagged(self):
+        """The converse: a registered construction of `strata` is visible from
+        `Country(c).sampling` too, under the same key."""
+        missing = []
+        for (name, wave), key in sorted(_registered_strata_constructions().items()):
+            if name in SERVED_STRATA_PENDING:
+                continue
+            r = sampling_records(name).get(wave)
+            got = (r.served_strata or {}) if r is not None else {}
+            if (got.get("holds"), got.get("derivation")) != ("constructed", key):
+                missing.append((name, wave, key, got.get("holds")))
+        assert not missing, missing
+
+    @pytest.mark.parametrize("country", sorted(SERVED_STRATA_PENDING))
+    def test_a_pending_country_is_still_pending(self, country):
+        cells = [w for (c, w) in _registered_strata_constructions() if c == country]
+        tagged = [w for w in cells
+                  if (sampling_records(country).get(w) is not None
+                      and sampling_records(country)[w].strata_holds == "constructed")]
+        assert cells and tagged != cells, (
+            f"{country} is now tagged; remove it from SERVED_STRATA_PENDING")
+
+    def test_a_native_or_absent_tag_has_no_registered_construction(self):
+        """A registered construction of a wave's strata contradicts a tag that
+        says the value is recorded, or that nothing is served."""
+        registered = _registered_strata_constructions()
+        import lsms_library as ll
+        for name in ll.countries():
+            for wave, r in sampling_records(name).items():
+                if r.strata_holds in S.NATIVE_STRATA | {"absent"}:
+                    assert (name, wave) not in registered, (name, wave)
+
+
+# -- delivered: the tag agrees with the served column ----------------------
+
+def _tagged():
+    """Evaluated at collection.  A malformed shipped file must not turn this
+    module into a collection error; ``test_every_shipped_file_loads`` is the
+    test that fails for it."""
+    try:
+        return sorted((r.country, r.wave) for r in _shipped()
+                      if r.strata_holds is not None)
+    except Exception:                                  # pragma: no cover
+        return []
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize("country,wave", _tagged())
+def test_the_tag_agrees_with_the_served_strata(country, wave):
+    """absent: NA on every row; constructed: the pointed key on every row that
+    has a stratum, and on no row that has none; native-code: digit strings;
+    native-label: no value is a bare code."""
+    import lsms_library as ll
+    from lsms_library.derivations import MULTI_SEP
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        s = ll.Country(country).sample(waves=[wave])
+    assert len(s), (country, wave)
+    blk = sampling_records(country)[wave].served_strata
+    values = s["strata"]
+    present = values.notna()
+    if blk["holds"] == "absent":
+        assert not present.any(), values[present].unique()[:5]
+        return
+    assert present.any(), (country, wave)
+    as_text = values[present].astype(str).str.strip()
+    is_code = as_text.str.fullmatch(r"[0-9]+(\.0)?")
+    if blk["holds"] == "native-code":
+        assert is_code.all(), as_text[~is_code].unique()[:5]
+    else:
+        assert not is_code.any(), as_text[is_code].unique()[:5]
+    if blk["holds"] == "constructed":
+        keys = s.get("Derivation")
+        assert keys is not None, "no Derivation column"
+        carried = keys.fillna("").astype(str).str.split(MULTI_SEP).apply(
+            lambda ks: blk["derivation"] in [k.strip() for k in ks])
+        assert carried[present].all(), int((~carried[present]).sum())
+        assert not carried[~present].any(), int(carried[~present].sum())
