@@ -375,12 +375,15 @@ of its own that subclasses :class:`QuantityImplausibleWarning`.  It is the item
 #1559's body names as missing ("not on Site Q's channels").  A flag and not a
 verdict: the reference has measured biases (survey kilograms 1.1-1.4x it at the
 median; state; sacks at their stated mass; sellers' prices), set out in the #1559
-rung design memo.  Measured cold (2026-11-13, burst jobs 41275992 / 41276357): only
-Niger and Mali serve ``Quantity_kg``.  Niger judges 1,932 / 6,394 / 9,020 rows in
+rung design memo.  Measured cold (2026-11-13, burst jobs 41275992 / 41276357), on the
+two countries serving ``Quantity_kg`` on development ``f138a3d61``.  Niger judges 1,932 / 6,394 / 9,020 rows in
 2011-12 / 2014-15 / 2021-22 and names 12 / 115 / 30 (low 6 / 26 / 2, high 6 / 89 /
 28), median survey / implied 1.14 / 1.13 / 1.25; 2018-19 asks no kilograms.  Mali
 judges 1 row and names none.  Cost 47 ms of a 659 ms warm Niger read, 41 of 658 on
 Mali (a first cut on row text cost 314 ms and was rewritten on integer codes).
+Any other country that serves ``Quantity_kg`` is judged too: with the 2026-11-13
+Nigeria stream, Nigeria 2016Q1 serves 8,507 such rows, 5,520 judged, none named,
+median 1.25 (red team, jobs 41278029 / 41278382).
 
 CACHE.  Like ``null_read_audit`` this is pure reporting -- it provably returns
 its input unchanged -- so its entry points are listed in
@@ -1639,8 +1642,8 @@ def _format_survey_kg_price_report(report: dict[str, Any]) -> str:
         f"A flag, not a verdict: the price-implied mass has biases of its own (survey "
         f"kilograms run 1.1-1.4x it at the median, sacks are read at their stated mass, "
         f"a state the sale does not share moves a price per kilogram, and the prices are "
-        f"the sellers'). A sack or a total keyed against a small unit's label has been "
-        f"the answer in this corpus. Use quantity_reports() to get the rows "
+        f"the sellers'). A sack or a total keyed against a small unit's label may be "
+        f"the answer; that is not established. Use quantity_reports() to get the rows "
         f"programmatically. Set {_QUANTITY_STRICT_ENV}=1 to make this fatal."
     )
 
@@ -1793,8 +1796,8 @@ def check_quantities(df: Any, *, country: str, table: str) -> Any:
     columns = _SCREENED_COLUMNS.get(str(table), ())
     if not columns:
         return df
+    reports: list[dict[str, Any]] = []
     try:
-        reports: list[dict[str, Any]] = []
         near_zero = _NEAR_ZERO_COLUMNS.get(str(table), ())
         for column in columns:
             tails = ("high", "low") if column in near_zero else ("high",)
@@ -1806,15 +1809,18 @@ def check_quantities(df: Any, *, country: str, table: str) -> Any:
         # An instrument that fails silently and reports clean is the disease
         # this module exists to cure, so say so rather than swallow it.  A
         # broken audit must never break a read, though: the read is the job.
+        # Its partial findings are dropped, as they always were; the price
+        # screen below still runs.
         warnings.warn(
             f"{country}/{table}: quantity plausibility audit could not run "
             f"({type(exc).__name__}: {exc}). The table itself is unaffected, "
             f"but its quantities are NOT known to be plausible.",
             QuantityImplausibleWarning, stacklevel=2)
-        return df
+        reports = []
     # GH #1559: the survey's kilograms against their sale prices.  After the
     # distributional screens, so a frame's reports keep their old order, and in
-    # its own guard, so a failure here cannot silence those screens' findings.
+    # its OWN guard, both ways: a failure here cannot silence those screens'
+    # findings, and a failure there cannot skip this one (red team F6).
     try:
         reports.extend(audit_survey_kg_prices(df, country=country, table=table))
     except Exception as exc:                                   # noqa: BLE001

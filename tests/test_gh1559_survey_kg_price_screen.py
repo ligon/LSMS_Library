@@ -148,6 +148,36 @@ def test_the_warning_is_site_q_s_and_the_lever_is_site_q_s(monkeypatch):
         check_quantities(df, country="X", table="crop_production")
 
 
+def test_each_screen_has_its_own_guard(monkeypatch):
+    """A failure in the distributional audit must not skip the price screen, and a
+    failure in the price screen must not silence the distributional one (red team F6).
+    Either way the frame comes back unchanged and the failure is announced."""
+    df = _frame(_market() + _harvests(extra=[_row("big", "Tiya", q=10.0, kg=500.0)]))
+
+    def boom(*_a, **_k):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(Q, "audit_quantities", boom)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        assert check_quantities(df, country="X", table="crop_production") is df
+    assert any("quantity plausibility audit could not run" in str(w.message) for w in caught)
+    assert _named(_site()) == [("2021-22", "high", "big", 50.0)]
+    monkeypatch.undo()
+
+    Q._clear_quantity_reports()
+    seen = []
+    real = Q.audit_quantities
+    monkeypatch.setattr(Q, "audit_quantities",
+                        lambda *a, **k: seen.append(a[1]) or real(*a, **k))
+    monkeypatch.setattr(Q, "survey_kg_price_factors", boom)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        assert check_quantities(df, country="X", table="crop_production") is df
+    assert any("price screen could not run" in str(w.message) for w in caught)
+    assert "Quantity_kg" in seen and _site() == []
+
+
 def test_band_is_the_label_screen_s_band():
     from lsms_library.transformations import SURVEY_KG_LABEL_BAND
     assert tuple(SURVEY_KG_PRICE_BAND) == tuple(SURVEY_KG_LABEL_BAND) == (0.1, 10.0)
