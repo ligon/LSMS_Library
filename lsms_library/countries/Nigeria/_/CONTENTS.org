@@ -4279,7 +4279,7 @@ next section.
 
 * 2026-11-12 -- Post-planting community prices (GH #587)
 
-/Rulings (@ligon, 2026-11-12, seven GH587 entries in the decision log)./
+/Rulings (@ligon, 2026-11-12, six GH587 entries in the decision log)./
 "Develop the item and unit code mapping, then provide community_prices using
 those harmonized labels."  Base =u=, native size in its own column.  W1:
 register the division by the Number of Units.  W5: accept the printed
