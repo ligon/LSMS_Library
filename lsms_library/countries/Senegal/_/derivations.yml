@@ -303,12 +303,17 @@ Senegal::food_acquired::salt-per-capita-withheld:
   rows: 0
   rule: >-
     A record of s07b_me_sen2021.dta for product 139 (Sel) in kg, size-free, whose
-    s07bq03a equals 0.0199997 kg times the household's hhsize in
-    ehcvm_welfare_sen2021.dta, to within 1e-9, is not served: not its purchased
-    row, its own-production row or its gift row.  100 records meet it (34% of the
-    wave's 294 salt-in-kg records), each within 1e-12; no record of any other
-    product or unit does.  No record equals 0.02 x hhsize; the 2026-11-12 data
-    check's "0.02" was the constant at 4 significant digits.
+    s07bq03a is a whole multiple of 0.0199997 kg (s07bq03a / 0.0199997 within 1e-9
+    of a whole number n >= 1) is not served: not its purchased row, its
+    own-production row or its gift row.  100 records meet it (34% of the wave's 294
+    salt-in-kg records); no record of any other product or unit does.  On all 100, n
+    is the household's hhsize in ehcvm_welfare_sen2021.dta, so the rule is "0.0199997
+    kg a person"; the build reads s07b alone and does not need the welfare file,
+    which only the inputs callable reads, as evidence.  No record equals 0.02 x
+    hhsize; the 2026-11-12 data check's "0.02" was the constant at 4 significant
+    digits.  (Until the red team of 2026-11-12 the selector read hhsize itself and
+    the table failed when the welfare file could not be fetched; the two selectors
+    pick the same 100 records.)
   function: lsms_library.countries.Senegal.2021-22._.mapping:salt_per_capita_rows
   inputs: lsms_library.countries.Senegal.2021-22._.mapping:inputs_salt_per_capita
   raw_variables: [vague, s07bq01, s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05,
@@ -328,8 +333,12 @@ Senegal::food_acquired::salt-per-capita-withheld:
         imputation (BID FR p.19 and EN, ANSD Rapport final 2021-22, World Bank DDI
         6278, the EHCVM-2 enumerator manual; documentation search 2026-11-12).
         A typed answer cannot meet the rule by chance: 0.0199997 x an integer
-        carries 6-7 significant digits (0.099998 kg for 5 persons), and the
-        constant is met to 1e-12 or not at all.
+        carries 6-7 significant digits (0.099998 kg for 5 persons).  Measured on
+        the released file, the 100 sit within 3.6e-15 of a whole multiple and the
+        nearest other salt-in-kg record 4.5e-5 away; every tolerance from 1e-12 to
+        1e-5 selects the same 100, and 1e-9 sits inside that range.  A value typed
+        on a 0.01 kg grid sits at least 1.5e-5 from a whole multiple below 600 kg
+        (0.02 kg is 1.5e-5 away, 0.1 kg 7.5e-5).
   validated_against: >-
     the base build: the 100 records were 100 served rows (95 purchased, 5 in kind;
     17.04 kg, 17.78 FCFA of Expenditure on the 2 that had one), all gone, and no

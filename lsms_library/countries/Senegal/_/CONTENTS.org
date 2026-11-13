@@ -1279,11 +1279,21 @@ scoped to 2021-22.
 
 *What is served now.*  None of the 100: =2021-22/_/mapping.py= marks them in the wide frame and drops
 every row they become after the shared hook (95 purchased, 5 in kind, the latter where the whole
-quantity was a gift).  =hhsize= is read from the welfare file, now declared in the wave's
-=food_acquired= block (=household_size:=) so its sidecar is in the table's hash; the welfare file's
-(grappe, menage) is unique and covers every salt record.  Disclosed as
-=Senegal::food_acquired::salt-per-capita-withheld= (=rows: 0=); =derivation_inputs= returns the 100
-records with =hhsize= beside them.
+quantity was a gift).  Disclosed as =Senegal::food_acquired::salt-per-capita-withheld= (=rows: 0=);
+=derivation_inputs= returns the 100 records with the welfare =hhsize= beside them.
+
+*The selector reads s07b alone* (red team of 2026-11-12, F1).  It selects salt in kg, size-free,
+whose =s07bq03a= / 0.0199997 is within 1e-9 of a whole number n >= 1.  The first version read
+=hhsize= from =ehcvm_welfare_sen2021.dta= and tested =s07bq03a= = 0.0199997 x =hhsize=; that made
+the welfare file a build input, and =food_acquired= and the derived food tables raised
+=FileNotFoundError= whenever it could not be fetched.  The two selectors pick the same 100 records
+(n = =hhsize= on all 100), so the build no longer reads the welfare file and its =household_size:=
+declaration is gone; only the =inputs= callable reads it, as evidence.  The tolerance sits in a
+measured gap: the 100 lie within 3.6e-15 of a whole multiple, and the nearest of the other 194
+positive salt-in-kg records 4.5e-5 away; every tolerance from 1e-12 to 1e-5 selects the same 100
+(1e-4 adds 2, 1e-3 adds 101).  A value typed on a 0.01 kg grid sits at least 1.5e-5 from a whole
+multiple below 600 kg (0.02 kg is 1.5e-5 away, 0.1 kg 7.5e-5).  Measured 2026-11-12 on the
+released file through =get_dataframe= (burst job 41253614).
 
 *Measured, cold, development =e5fdd2fa8= against the candidate (burst job 41249476).*
 =food_acquired= 2021-22: 220,955 -> 220,855 rows; the 100 carried 17.04 kg and, on the 2 that had

@@ -91,10 +91,13 @@ class TestRegistry:
     def test_withholdings_are_rows_zero(self, key):
         assert derivation_records(key.split("::")[0])[key].rows == 0
 
-    def test_salt_household_size_file_is_declared(self):
+    def test_salt_declares_no_household_size_file(self):
+        """Red team F1 (2026-11-12): the build reads s07b alone, so the welfare file
+        is not a build input of food_acquired and is not declared as one."""
         from lsms_library.yaml_utils import load_yaml
         info = load_yaml(countries_root() / "Senegal" / "2021-22" / "_" / "data_info.yml")
-        assert info["food_acquired"]["household_size"]["file"] == "ehcvm_welfare_sen2021.dta"
+        assert "household_size" not in info["food_acquired"]
+        assert "ehcvm_welfare" not in str(info["food_acquired"])
 
 
 def _mali_raw(**over):
@@ -124,16 +127,41 @@ class TestMaliRule:
 
 
 class TestSenegalRules:
-    def test_salt_constant_is_exact(self, senegal21):
-        raw = pd.DataFrame({"s07bq01": [139, 139, 139, 1], "s07bq03b": [100, 100, 100, 100],
-                            "s07bq03c": [0, 0, 0, 0], "hhsize": [5, 5, 6, 5],
-                            "s07bq03a": [0.0199997 * 5, 0.02 * 5, 0.0199997 * 5, 0.0199997 * 5]})
-        assert senegal21.salt_per_capita_rows(raw).tolist() == [True, False, False, False]
+    def test_salt_is_a_whole_multiple_of_the_constant(self, senegal21):
+        c = 0.0199997
+        q = [c * 5, 0.02 * 5, c * 6, c * 5, c * 5 + 1e-6, c * 0.5, 0.0, c * 12]
+        prod = [139, 139, 139, 1, 139, 139, 139, 139]
+        raw = pd.DataFrame({"s07bq01": prod, "s07bq03b": [100] * 8, "s07bq03c": [0] * 8,
+                            "s07bq03a": q})
+        assert senegal21.salt_per_capita_rows(raw).tolist() == [
+            True, False, True, False, False, False, False, True]
 
-    def test_salt_without_household_size_is_never_selected(self, senegal21):
-        raw = pd.DataFrame({"s07bq01": [139], "s07bq03b": [100], "s07bq03c": [0],
-                            "hhsize": [np.nan], "s07bq03a": [0.0]})
+    @pytest.mark.parametrize("over", [{"s07bq03b": 101}, {"s07bq03c": 1}, {"s07bq01": 138}])
+    def test_salt_outside_its_cell_is_never_selected(self, senegal21, over):
+        raw = pd.DataFrame([{"s07bq01": 139, "s07bq03b": 100, "s07bq03c": 0,
+                             "s07bq03a": 0.0199997 * 4, **over}])
         assert not senegal21.salt_per_capita_rows(raw).any()
+
+    def test_the_build_reads_s07b_alone(self, senegal21, monkeypatch):
+        """Red team F1: the build path must not read the welfare file, so that it
+        cannot fail when that file is unavailable.  The hook's own reads are recorded."""
+        c = 0.0199997
+        fake = pd.DataFrame({"s07bq01": [139, 1], "s07bq03b": [100, 100], "s07bq03c": [0, 0],
+                             "s07bq03a": [c * 3, 2.0]})
+        read = []
+
+        def get_dataframe(path, *a, **k):
+            read.append(str(path))
+            if "ehcvm_welfare" in str(path):
+                raise FileNotFoundError(path)
+            return fake.copy()
+        monkeypatch.setattr(senegal21.tools, "get_dataframe", get_dataframe)
+        df = pd.DataFrame({"Quantity": fake["s07bq03a"]},
+                          index=pd.MultiIndex.from_arrays([["a", "b"], ["Sel", "Riz"]],
+                                                          names=["i", "j"]))
+        out = senegal21._withhold_salt_per_capita_rows(df)
+        assert [p.rsplit("/", 1)[-1] for p in read] == ["s07b_me_sen2021.dta"]
+        assert out.index.get_level_values("j").tolist() == [senegal21._WITHHELD_J, "Riz"]
 
     def test_near_zero_needs_both_quantities(self, senegal18):
         q3 = [4.2e-19, 4.2e-19, 0.5, 0.0, np.nan]
@@ -196,7 +224,15 @@ class TestHeld:
         assert round(float(pd.to_numeric(raw.loc[block, "s07bq03a"]).sum()), 1) == 32313.4
 
     def test_senegal_salt(self, senegal21):
-        assert int(senegal21.salt_per_capita_rows(senegal21._salt_raw()).sum()) == 100
+        raw = senegal21._salt_raw()
+        hit = senegal21.salt_per_capita_rows(raw)
+        assert int(hit.sum()) == 100
+        # The evidence the rule rests on, read here and never by the build: each
+        # record's whole multiple of the constant is its household's size.
+        persons = np.round(pd.to_numeric(raw.loc[hit, "s07bq03a"]).to_numpy()
+                           / senegal21.SALT_KG_PER_PERSON)
+        hhsize = senegal21._household_size(raw)[hit]
+        assert (persons == hhsize).all()
 
     def test_senegal_near_zero(self, senegal18):
         raw = senegal18._near_zero_raw()

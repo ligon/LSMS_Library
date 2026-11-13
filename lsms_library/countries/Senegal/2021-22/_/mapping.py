@@ -62,21 +62,34 @@ def food_acquired(df):
 # ---------------------------------------------------------------------------
 #
 # 100 records of s07b_me_sen2021.dta, all product 139 (`Sel`) in kg, size-free,
-# have s07bq03a = 0.0199997 kg x the household's `hhsize` (ehcvm_welfare_sen2021),
-# to within 1e-12 on every one; 34% of the wave's 294 salt-in-kg records.  No other
-# record of any product or unit meets that constant.  It reads as "0.02 kg a person"
-# rounded, which is how the 2026-11-12 data check reported it; no record equals
-# 0.02 x hhsize.  No document explains them.  The source records go, every row they
-# become with them; a deletion, disclosed by
+# have s07bq03a = 0.0199997 kg x a whole number of persons, and that number is the
+# household's `hhsize` (ehcvm_welfare_sen2021) on every one; 34% of the wave's 294
+# salt-in-kg records.  No other record of any product or unit meets that constant.
+# It reads as "0.02 kg a person" rounded, which is how the 2026-11-12 data check
+# reported it; no record equals 0.02 x hhsize.  No document explains them.  The
+# source records go, every row they become with them; a deletion, disclosed by
 # `Senegal::food_acquired::salt-per-capita-withheld` (`rows: 0`).
+#
+# The selector reads s07b alone (red team of 2026-11-12, F1): "a whole multiple of
+# the constant" picks the same 100 records as "the constant x hhsize" did, so the
+# build does not read the welfare file and cannot fail when it is unavailable.  The
+# welfare `hhsize` is read only by the `inputs` callable, as the evidence that each
+# multiple is the household's size.
 SALT_PER_CAPITA_KEY = 'Senegal::food_acquired::salt-per-capita-withheld'
 #: The fixed amount, kg per household member, as the file holds it.
 SALT_KG_PER_PERSON = 0.0199997
 #: The records' cell in s07b's own codes: product, consumption unit, size.
 _SALT_CELL = {'s07bq01': 139, 's07bq03b': 100, 's07bq03c': 0}
+#: How far ``s07bq03a / SALT_KG_PER_PERSON`` may sit from a whole number.  Measured
+#: on the released file (2026-11-12): the 100 selected records sit at most 3.6e-15
+#: from one, and the nearest of the other 194 positive salt-in-kg records 4.5e-5
+#: away; every tolerance from 1e-12 to 1e-5 selects the same 100.  A value typed on
+#: a 0.01 kg grid cannot come close below 600 kg: a whole multiple of 0.02 kg, j x
+#: 0.02, sits 1.5e-5 x j away (0.02 kg 1.5e-5, 0.1 kg 7.5e-5), and an odd multiple
+#: of 0.01 kg about 0.5 away.
 _SALT_TOLERANCE = 1e-9
 _SALT_SOURCE = 's07b_me_sen2021.dta'
-#: Declared in data_info.yml (`household_size:`), so its sidecar is hashed.
+#: Read by :func:`inputs_salt_per_capita` only (evidence), never by the build.
 _SALT_HOUSEHOLD_SIZE = 'ehcvm_welfare_sen2021.dta'
 #: The withheld rows' `j` while the shared reshape runs; never served.
 _WITHHELD_J = '\x00withheld: salt per capita'
@@ -90,12 +103,20 @@ class SaltPerCapitaJoinError(Exception):
 
 
 def _salt_raw(wave='2021-22'):
-    """``s07b`` in its codes, with each record's welfare ``hhsize`` beside it."""
+    """``s07b_me_sen2021.dta`` in its codes, every record, in file order."""
     if wave != '2021-22':
         raise ValueError(f'{SALT_PER_CAPITA_KEY} covers 2021-22 only, not {wave!r}')
     from lsms_library.paths import countries_root
     data = countries_root() / 'Senegal' / wave / 'Data'
-    raw = tools.get_dataframe(str(data / _SALT_SOURCE), convert_categoricals=False)
+    return tools.get_dataframe(str(data / _SALT_SOURCE), convert_categoricals=False)
+
+
+def _household_size(raw, wave='2021-22'):
+    """The welfare file's ``hhsize`` for each record of ``raw``, by (grappe, menage).
+
+    Evidence for :func:`inputs_salt_per_capita`; the build never calls it."""
+    from lsms_library.paths import countries_root
+    data = countries_root() / 'Senegal' / wave / 'Data'
     welfare = tools.get_dataframe(str(data / _SALT_HOUSEHOLD_SIZE), convert_categoricals=False)
 
     def key(frame):
@@ -106,23 +127,26 @@ def _salt_raw(wave='2021-22'):
                      index=key(welfare))
     if size.index.duplicated().any():
         raise SaltPerCapitaJoinError(f'{_SALT_HOUSEHOLD_SIZE} repeats a (grappe, menage)')
-    raw = raw.copy()
-    raw['hhsize'] = size.reindex(key(raw)).to_numpy()
-    return raw
+    return size.reindex(key(raw)).to_numpy()
 
 
 def salt_per_capita_rows(raw):
-    """Boolean ndarray: salt in kg at 0.0199997 kg x ``hhsize`` (to 1e-9).
+    """Boolean ndarray: salt in kg at a whole multiple of 0.0199997 kg.
 
-    ``raw`` is s07b in its codes with the welfare ``hhsize`` per record
-    (:func:`_salt_raw`).  A record with no ``hhsize`` is never selected.
+    ``raw`` is s07b in its codes (:func:`_salt_raw`).  A record is selected when it
+    is product 139 in kg, size-free, with ``s07bq03a`` positive and within
+    :data:`_SALT_TOLERANCE` of ``n x SALT_KG_PER_PERSON`` for a whole ``n >= 1``.
+    No household size is read: on the released file ``n`` is the welfare
+    ``hhsize`` on all 100 selected records (:func:`inputs_salt_per_capita`).
     """
     def col(name):
         return pd.to_numeric(raw[name], errors='coerce').to_numpy(dtype=float)
 
     q = col('s07bq03a')
-    with np.errstate(invalid='ignore'):
-        hit = (q > 0) & (np.abs(q - SALT_KG_PER_PERSON * col('hhsize')) < _SALT_TOLERANCE)
+    with np.errstate(invalid='ignore', divide='ignore'):
+        multiple = q / SALT_KG_PER_PERSON
+        persons = np.round(multiple)
+        hit = (q > 0) & (persons >= 1) & (np.abs(multiple - persons) < _SALT_TOLERANCE)
         for name, code in _SALT_CELL.items():
             hit &= col(name) == code
     return hit
@@ -159,8 +183,11 @@ def _withhold_salt_per_capita_rows(df):
 def inputs_salt_per_capita(wave='2021-22'):
     """The registry ``inputs`` callable: the withheld records at ``(t, i, j)``.
 
-    The file's own names and codes, with ``hhsize`` from the welfare file, indexed
-    as the served table is (:func:`inputs_food_acquired` supplies the index).
+    The file's own names and codes, indexed as the served table is
+    (:func:`inputs_food_acquired` supplies the index), with ``hhsize`` from the
+    welfare file beside them: the evidence that each record's whole multiple of
+    the constant is its household's size.  This callable reads the welfare file;
+    the build does not.
     """
     raw = _salt_raw(wave)
     frame = _inputs_last_purchase('Senegal', wave)
@@ -170,9 +197,9 @@ def inputs_salt_per_capita(wave='2021-22'):
         raise SaltPerCapitaJoinError(f'the input frame is not {_SALT_SOURCE} row for row')
     hit = salt_per_capita_rows(raw)
     columns = ['vague', 's07bq01', 's07bq03a', 's07bq03b', 's07bq03c', 's07bq04',
-               's07bq05', 's07bq06', 's07bq07a', 's07bq07b', 's07bq07c', 's07bq08',
-               'hhsize']
+               's07bq05', 's07bq06', 's07bq07a', 's07bq07b', 's07bq07c', 's07bq08']
     out = raw.loc[hit, columns].copy()
+    out['hhsize'] = _household_size(raw, wave)[hit]
     out.index = frame.index[hit]
     return out
 from collections import defaultdict
