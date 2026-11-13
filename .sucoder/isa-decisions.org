@@ -1,5 +1,15 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Togo recovered zeros and the derived-from-data basis -- ANSWERED
+- "NA row only for the 11 (Recommended)": of 21 Togo 2021-22 counts outside
+  Grand Lome that recover to 0, only the 11 with no other served row get an NA
+  purchased row under the withheld key; the 10 that report small own
+  production or a gift stay represented by those rows (no invented purchase).
+- "Above filename (Recommended)": derivations.BASES order becomes
+  questionnaire > variable-label > config-comment > derived-from-data >
+  filename > modelling-choice; Cote d'Ivoire H/L entries also carry their
+  documentary basis (UEMOA/WB Document de travail no 4, ANStat) beside it.
+
 * 2026-11-12: Togo floored counts and CIV H scope (EHCVM-2 re-review) -- ANSWERED
 Evidence: reports/ehcvm2-2021-redteam2/VERDICT.md.
 - Togo 2021-22 unite rows: "Recover; a 0 becomes NA (Recommended)".  Keep the
