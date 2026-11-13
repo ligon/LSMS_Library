@@ -268,8 +268,8 @@ Data Scheme:
     # `crop` is in the index; non-crop-specific rows carry the sentinel
     # '(not crop-specific)' rather than NaN (a NaN index level is dropped by
     # the framework's canonical NaN-key de-dup collapse).  `u` is in the index
-    # and a missing unit is filled with 'Manquant' for the same non-null
-    # reason.
+    # and a missing unit is filled with the canonical 'Unknown' for the same
+    # non-null reason (GH #1118; 2018-19 minted 'Manquant' until 2026-11-13).
     #
     # GRAIN (GH #323, fixed 2026-07-13).  71 rows -- 11,445.2 units of
     # reported input quantity, and 4 households' Purchased flag flipped
@@ -288,9 +288,11 @@ Data Scheme:
     # writing, so a re-widened bucket fails the build instead of shipping
     # short.  API rows 10,534 -> 10,605 = every reported line-item.
     #
-    # 2021-22 (GH #1697) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
-    # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018-19 still
-    # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
+    # Both waves read the purchase, s16bq08 / s16bq09a / s16bq09b, under Purchased /
+    # Quantity_purchased / Unit_purchased, and the gift beside it, s16bq05 / s16bq07a /
+    # s16bq07b, under the three *_received_as_gift columns, as Burkina Faso (GH #1188).
+    # 2018-19 served the GIFT question under Purchased and Quantity_purchased until
+    # 2026-11-13 (ruling "Fix all three now"): _/CONTENTS.org.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool

@@ -8,9 +8,9 @@ households plus 4,345 blank rows for the others.  11,368 rows answer s16bq02 = O
   s16bq08, s16bq09a/b        a purchase, its quantity and unit
 
 THE PURCHASE IS s16bq08 (the Stata labels of both waves; Burkina Faso's GH #1188).  Benin
-2018-19's script serves s16bq05 and s16bq07a under Purchased and Quantity_purchased, which is
-the gift question.  This wave reads the purchase.  So those two columns do not mean the same
-thing across Benin's waves until 2018-19 is corrected: see _/CONTENTS.org.
+2018-19's script served s16bq05 and s16bq07a, the gift question, under Purchased and
+Quantity_purchased until 2026-11-13; it now reads the purchase as this wave does (ruling "Fix
+all three now"), so the columns mean the same thing in both waves: see _/CONTENTS.org.
 
 s16bq03b has a code the file does not label: 6, on 160 rows.  The questionnaire prints codes 1
 to 5 for this variable, and s16bq09b's list, where 6 is Sachet, does not settle it (97 of the

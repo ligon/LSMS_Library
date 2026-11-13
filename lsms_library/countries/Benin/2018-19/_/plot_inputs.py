@@ -4,9 +4,27 @@ Single source file: s16b_me_ben2018.dta — the household agricultural-input
 roster, one row per input-type the household was asked about.  Columns:
   s16bq01   input type (organic / inorganic fert / phyto / seeds-by-crop)
   s16bq02   USED this input? (Oui / Non) — application gate (all Oui in 2018)
-  s16bq03a / s16bq03b   quantity used + native unit
-  s16bq05   purchased? (Oui / Non)
-  s16bq07a  quantity purchased
+  s16bq03a / s16bq03b   quantity used + native unit -> Quantity, index u
+  s16bq05 / s16bq07a / s16bq07b   GIFT: "Avez-vous obtenu [INTRANT] sous forme
+            de cadeau ou de don?", the quantity received, its unit
+            -> Received_as_gift, Quantity_received_as_gift, Unit_received_as_gift
+  s16bq08 / s16bq09a / s16bq09b   PURCHASE: "Avez-vous acheté [INTRANT]?", the
+            quantity bought, its unit
+            -> Purchased, Quantity_purchased, Unit_purchased
+
+THE PURCHASE IS s16bq08 (the Stata labels above, which are this file's own).
+Until 2026-11-13 this script served the GIFT question s16bq05 / s16bq07a under
+Purchased / Quantity_purchased: 383 "purchases" where the file records 4,719.
+Fixed on the ruling "Fix all three now" (@ligon 2026-11-13; Togo 2018 and
+Guinea-Bissau 2018-19 had the same defect), as Burkina Faso's 2018-19 script
+was (GH #1188) and as this country's 2021-22 script already reads it.  Each
+acquisition unit is decoded from its OWN variable's labels and left NA where
+blank; only the index ``u`` takes the missing-unit sentinel.
+
+A blank unit of use (one row in this release: 100 of "Autres semences",
+grappe 166, menage 133) is ``u = 'Unknown'``, the canonical missing-unit
+sentinel of data_info.yml (GH #1118); it used to be the minted 'Manquant'.  No
+raw s16bq03b label reads 'Manquant', so there is no raw answer to keep beside it.
 
 We keep s16bq02==1 (applied) rows.  The EHCVM roster has NO crop column — the
 seed's crop is embedded in the input-type label ('Semences de petit mil'),
@@ -38,6 +56,10 @@ from benin import i as benin_i
 # makes "no crop dimension" explicit; it is deliberately not a food/crop label
 # so it never collides with the harmonize_food `crop` values seed rows carry.
 CROP_NA = '(not crop-specific)'
+
+# The canonical missing-unit sentinel for the `u` index level (data_info.yml,
+# GH #842 / #1118).  Was the minted 'Manquant' until 2026-11-13.
+UNIT_NA = 'Unknown'
 
 
 def _label_map(tablename):
@@ -78,22 +100,30 @@ def _finish_plot_inputs(df, t):
     identity.  The `crop` and `u` index levels are filled with sentinels
     wherever absent so the index is fully non-null and no row is lost to the
     framework's NaN-key duplicate collapse."""
-    for col in ['Quantity', 'Quantity_purchased']:
+    for col in ['Quantity', 'Quantity_purchased', 'Quantity_received_as_gift']:
         if col not in df.columns:
             df[col] = pd.NA
         df[col] = pd.to_numeric(df[col], errors='coerce').astype('Float64')
-    if 'Purchased' not in df.columns:
-        df['Purchased'] = pd.NA
-    df['Purchased'] = df['Purchased'].astype('boolean')
+    for col in ['Purchased', 'Received_as_gift']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = df[col].astype('boolean')
+    # Acquisition units are payload columns: NA stays NA, never a sentinel.
+    for col in ['Unit_purchased', 'Unit_received_as_gift']:
+        if col not in df.columns:
+            df[col] = pd.NA
+        df[col] = df[col].astype('string')
     df['t'] = t
     df['input'] = df['input'].astype('string')
     if 'crop' not in df.columns:
         df['crop'] = pd.NA
     df['crop'] = df['crop'].astype('string').fillna(CROP_NA)
-    df['u'] = df['u'].astype('string').fillna('Manquant')
+    df['u'] = df['u'].astype('string').fillna(UNIT_NA)
     df = df[df['input'].notna()]
     keep = ['t', 'i', 'input', 'crop', 'u',
-            'Quantity', 'Purchased', 'Quantity_purchased']
+            'Quantity', 'Purchased', 'Quantity_purchased', 'Unit_purchased',
+            'Received_as_gift', 'Quantity_received_as_gift',
+            'Unit_received_as_gift']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'input', 'crop', 'u'])
     return df
@@ -114,8 +144,11 @@ srcn = srcn[applied.values]
 hh = srcn.apply(lambda r: benin_i(pd.Series([r['grappe'], r['menage']])),
                 axis=1)
 
-# purchased: s16bq05 Oui/Non (loaded as labels with convert_categoricals)
-purchased = src['s16bq05'].astype('string').map({'Oui': True, 'Non': False})
+# The purchase is s16bq08 / s16bq09a / s16bq09b; the gift is s16bq05 / s16bq07a /
+# s16bq07b (see the docstring).  Flags are labels (convert_categoricals=True).
+yes_no = {'Oui': True, 'Non': False}
+purchased = src['s16bq08'].astype('string').str.strip().map(yes_no)
+received_as_gift = src['s16bq05'].astype('string').str.strip().map(yes_no)
 
 df = pd.DataFrame({
     'i':                  hh.values,
@@ -124,7 +157,11 @@ df = pd.DataFrame({
     'u':                  _unit_labels(src['s16bq03b'], unit_map).values,
     'Quantity':           pd.to_numeric(srcn['s16bq03a'], errors='coerce').values,
     'Purchased':          purchased.values,
-    'Quantity_purchased': pd.to_numeric(srcn['s16bq07a'], errors='coerce').values,
+    'Quantity_purchased': pd.to_numeric(srcn['s16bq09a'], errors='coerce').values,
+    'Unit_purchased':     _unit_labels(src['s16bq09b'], unit_map).values,
+    'Received_as_gift':   received_as_gift.values,
+    'Quantity_received_as_gift': pd.to_numeric(srcn['s16bq07a'], errors='coerce').values,
+    'Unit_received_as_gift': _unit_labels(src['s16bq07b'], unit_map).values,
 })
 
 df = _finish_plot_inputs(df, '2018-19')
