@@ -2,9 +2,10 @@
 """Build item-level crop_production for Nigeria GHS-Panel (GAP 1).
 
 Natural grain (t, i, plot_id, crop, production_obs): one row per harvest line of
-the post-harvest crop module (secta3*).  Stores REPORTED item-level fields only
--- no kg conversion, no yield, no main_crop, no value shares (those are
-transformations).
+the post-harvest crop module (secta3*).  Stores REPORTED item-level fields --
+no yield, no main_crop, no value shares (those are transformations) -- plus one
+construction: W3's Quantity_kg from the World Bank's own ag_conv_w3 table
+(GH #1518, below).
 
 production_obs (GH #1433) names the line, because harmonize_food folds several codes
 onto one label (Yam--roots is 1120-1124) and the W1-W3 rosters can repeat a code on

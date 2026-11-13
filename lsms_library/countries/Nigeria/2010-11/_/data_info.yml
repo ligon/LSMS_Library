@@ -35,9 +35,19 @@ individual_education:
     # coverage (~640 rows) in W1.  Raw labels mapped onto the canonical
     # ordinal vocabulary via the row-additive harmonize_education table
     # (global base + Nigeria delta in _/categorical_mapping.org).
+    # GH #1713 (ruling @ligon 2026-11-13, "Wire W1/W2 PP + verdicts"): the
+    # POST-PLANTING round fields its own full Section 2 (sect2_plantingw1,
+    # 23,321 members; s2q7 "highest educational level completed" on 17,116),
+    # served under its own t = 2010Q3.  Distinct series, never pooled with
+    # the PH new-member block.
     file:
         - Post Harvest Wave 1/Household/sect2a_harvestw1.dta:
             t: '2011Q1'
+        - Post Planting Wave 1/Household/sect2_plantingw1.dta:
+            t: '2010Q3'
+            Educational Attainment:
+                - s2q7
+                - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
     idxvars:
         t: hhid
         i: hhid

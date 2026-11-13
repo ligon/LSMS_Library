@@ -1126,7 +1126,11 @@ Columns:
         possible, since the two numbers stay distinct.  An earlier version
         of this note read "the survey (or a survey-supplied conversion
         table)", which pointed a loader author at this column; it does not
-        any more.
+        any more.  The one sanctioned exception routes a shipped table into
+        `Quantity_kg`, never here: Nigeria W3 (`ag_conv_w3`, GH #1518, ruling
+        @ligon 2026-11-12), joined at build time on the row's native crop,
+        sized-unit and zone codes and registered as a derivation -- see
+        `Quantity_kg` below.
 
         A FACTOR HERE, A PRODUCT IN `Quantity_kg`.  The antecedent is
         `food_acquired.Quantity_kg` (Nigeria `s10bq2_cvn`, Malawi
@@ -1156,10 +1160,17 @@ Columns:
       note: |
         The harvest of this LINE in kilograms, AS THE SURVEY WROTE IT DOWN --
         e.g. Niger 2011-12 `as02eq07c` "quantite en kgs recoltee", or 2021-22
-        `s16cq16c` "Estimation Quantite totale UML en kg".  A TOTAL, not a
-        factor: within a unit it scales with `Quantity`, where a factor per unit
-        would not move.  NaN where the survey does not record it; optional
-        because most countries never ask.
+        `s16cq16c` "Estimation Quantite totale UML en kg" -- OR, where a
+        ruling says so, `Quantity` times the survey's own SHIPPED conversion
+        table at the line's native key: Nigeria 2015-16 (2016Q1) reads the
+        World Bank's `ag_conv_w3` on crop code, sized unit code and the
+        household's zone (GH #1518, ruling @ligon 2026-11-12), registered as
+        `Nigeria::crop_production::w3-ag-conversion`, whose `Derivation` key
+        is on every such row.  So `survey_kg` here says the kilograms come
+        from the survey's own material, not that an enumerator wrote them.  A
+        TOTAL, not a factor: within a unit it scales with `Quantity`, where a
+        factor per unit would not move.  NaN where the survey does not record
+        it; optional because most countries never ask.
 
         `harvest_kg` reads it first (`KgFactorSource == 'survey_kg'`, ruling
         @ligon 2026-11-04, GH #1436), ahead of a reported `KgFactor`, and serves

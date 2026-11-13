@@ -628,8 +628,10 @@ PH_QUARTER = {
 # line of the post-harvest crop module (secta3*).  Stores REPORTED item-level
 # fields only -- Quantity (native harvest qty) + u (native unit),
 # Quantity_sold + Value_sold (reported), planting_month + harvest_month
-# (item dates), intercropped + perennial flags.  No kg conversion, no
-# yield, no main_crop, no shares -- those are transformations.
+# (item dates), intercropped + perennial flags.  No yield, no main_crop,
+# no shares -- those are transformations.  The one kg construction is W3's
+# Quantity_kg from the shipped ag_conv_w3 table (GH #1518,
+# `crop_conversion_table`).
 #
 # crop labels (j): cropcode -> Preferred Label via harmonize_food
 # (extended with the crop codes; reused food labels where a crop is a
@@ -3525,8 +3527,10 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
         size_text_col = fr.get('size_text')
         if size_text_col and size_text_col in df.columns:
             # W3: c8q2b is free text and blank on the whole metric-unit
-            # block -- 13,767 of the 13,768 g/cl rows (the 13,768th parses
-            # '50cl') and every Kg/l row (2,597 + 836; 20 hold a lone '.').
+            # block -- 11,170 of the 11,171 g/cl rows (the 11,171st parses
+            # '50cl'; the older "13,767 of 13,768" is not reproducible on the
+            # held files, 2026-11-13) and every Kg/l row (2,597 + 836; 20 hold
+            # a lone '.').
             # Parse the handful that state a quantity ('300gram', 'one 75cl
             # bottle'); the blank g/cl remainder is dropped just below.
             txt = df[size_text_col]
@@ -3854,7 +3858,11 @@ def response_status_label(code):
 #   `conv` and `g_cl` are identical.
 # * A g_cl = 0 row is centilitres; kg = conv / 100 is LITRES read as
 #   kilograms (1 l = 1 kg), the Kg/L convention W3's table and W4's *_cvn
-#   already follow.
+#   already follow -- but only for the LIQUID items of
+#   W2_CL_CLASS_LIQUID_ITEMS.  The class's solids (tomatoes, groundnuts,
+#   eggs, puree, powders, ...) sit ~10x above every reference under conv / 100
+#   and are read as GRAMS (conv / 1000) under their own registered key
+#   (ruling @ligon 2026-11-13, "Re-read solids as grams").
 # * A served key two source rows share must have every contributor tabled,
 #   or its Quantity_kg is left NA (no partial sum).  W2 / W3 have no such key
 #   today (0 duplicate keys).
@@ -3873,6 +3881,21 @@ FOOD_CONVERSION_KEYS = {
 #: Food unit codes no conversion table is read for (Kg, g, l, cl in W2/W3).
 FOOD_CONVERSION_METRIC_CODES = frozenset((1, 2, 3, 4))
 
+#: GH #1502 red team F1 (ruling @ligon 2026-11-13, "Re-read solids as grams").
+#: W2's g_cl = 0 ("centilitre") class holds solids at ~10x every reference
+#: under conv / 100.  Within it, only the items below are LIQUIDS and keep
+#: conv / 100 (litres, at 1 l = 1 kg); every other item's g_cl = 0 cell is read
+#: as GRAMS, conv / 1000, under its own key.  An explicit, reviewed item-code
+#: list per round (the codes collide between W2's rounds, GH #1144), decided
+#: item by item on the evidence in CONTENTS.org ("food_acquired: the World
+#: Bank's own W2 / W3 food conversion tables"), never a name pattern.  Every
+#: other item carrying a g_cl = 0 cell is listed there with its evidence.
+W2_CL_CLASS_LIQUID_ITEMS = {
+    '2012Q3': frozenset({50, 52, 53}),  # Palm oil, Groundnut oil, Other oils and fats
+    '2013Q1': frozenset({50, 52}),      # Palm oil, Groundnut oil
+}
+W2_CL_AS_GRAMS_KEY = 'Nigeria::food_acquired::w2-cl-class-read-as-grams'
+
 #: The W3 table's zone columns, by the household file's numeric `zone`.
 W3_CONVERSION_ZONES = {1: 'conv_NC_1', 2: 'conv_NE_2', 3: 'conv_NW_3',
                        4: 'conv_SE_4', 5: 'conv_SS_5', 6: 'conv_SW_6'}
@@ -3886,21 +3909,25 @@ def food_conversion_table(table, t):
 
     ``table`` is the file as read (``convert_categoricals=False``).  Returns
     one row per (item_cd, unit_cd, other, zone) with ``kg_per_unit`` (kg, or
-    litres on a volume row), ``g_cl`` (W2) and ``note`` (W3).  ``zone`` is 0
-    on W2, whose tables carry no zone.  Rows with no positive finite factor
-    are dropped; metric codes are dropped (see the block comment above).
+    litres on a volume row), ``g_cl`` and the raw ``conv`` (W2), ``as_grams``
+    (W2: a g_cl = 0 cell of a non-liquid item, read as grams) and ``note``
+    (W3).  ``zone`` is 0 on W2, whose tables carry no zone.  Rows with no
+    positive finite factor are dropped; metric codes are dropped (see the
+    block comment above).
     """
     num = lambda s: pd.to_numeric(s, errors='coerce')  # noqa: E731
     if t in ('2012Q3', '2013Q1'):
         unit = 's7bq2b' if t == '2012Q3' else 'nsu_cd'
         conv, g_cl = num(table['conv']), num(table['g_cl'])
-        kg = np.where(g_cl == 1, conv / 1000.0,
+        item = num(table['item_cd'])
+        as_grams = ((g_cl == 0) & ~item.isin(W2_CL_CLASS_LIQUID_ITEMS[t])).to_numpy(dtype=bool)
+        kg = np.where((g_cl == 1) | as_grams, conv / 1000.0,
                       np.where(g_cl == 0, conv / 100.0, np.nan))
-        out = pd.DataFrame({'item_cd': num(table['item_cd']),
+        out = pd.DataFrame({'item_cd': item,
                             'unit_cd': num(table[unit]),
                             'other': _NO_OTHER, 'zone': 0,
-                            'kg_per_unit': kg, 'g_cl': g_cl,
-                            'note': pd.NA})
+                            'kg_per_unit': kg, 'g_cl': g_cl, 'conv': conv,
+                            'as_grams': as_grams, 'note': pd.NA})
     elif t in ('2015Q3', '2016Q1'):
         unit_cd = num(table['unit_cd'])
         is900 = (unit_cd == _OTHER_SPECIFY_UNIT).to_numpy(dtype=bool)
@@ -3916,7 +3943,7 @@ def food_conversion_table(table, t):
             'item_cd': num(table['item_cd']), 'unit_cd': unit_cd,
             'other': other, 'zone': z,
             'kg_per_unit': num(table[col]).astype('float64'),
-            'g_cl': np.nan, 'note': note})
+            'g_cl': np.nan, 'conv': np.nan, 'as_grams': False, 'note': note})
             for z, col in W3_CONVERSION_ZONES.items()], ignore_index=True)
     else:
         raise KeyError(f'Nigeria: no shipped food conversion table for {t!r}')
@@ -3959,11 +3986,12 @@ def food_conversion_match(table, t, item, unit, other=None, zone=None):
     rows['other'] = rows['other'].astype('string')
     tab['other'] = tab['other'].astype('string')
     m = rows.merge(tab[['item_cd', 'unit_cd', 'other', 'zone', 'kg_per_unit',
-                        'g_cl', 'note']],
+                        'g_cl', 'conv', 'as_grams', 'note']],
                    how='left', on=['item_cd', 'unit_cd', 'other', 'zone'],
                    validate='m:1')
     m.index = u.index
-    return m[['kg_per_unit', 'g_cl', 'note']]
+    m['as_grams'] = m['as_grams'].fillna(False).astype(bool)
+    return m[['kg_per_unit', 'g_cl', 'conv', 'as_grams', 'note']]
 
 
 def food_conversion_kg_per_unit(table, t, item, unit, other=None, zone=None):
@@ -3991,19 +4019,17 @@ def derive_food_conversion_kg(quantity, kg_per_unit):
 # as the line's Quantity_kg, the harvest ladder's survey_kg rung, on the
 # row's own zone column (as for food: W4's reported crop *_conv reproduces the
 # own-zone value on 319 of the 366 W4 rows where zone and national differ,
-# the national on 40).  Held, exactly as the opt-in GH #1518 helper
-# (lsms_library.nigeria_harvest) holds them, because the ruling lifts
-# neither:
-# * the 9 table rows whose unit_name contradicts the harvest file's own card
-#   for that code (codes 160-162 of pumpkin, pumpkin leave, green vegetable:
-#   the table says BUNDLE LARGE / BUNCH MEDIUM / BUNCH LARGE, the card
-#   BUNDLE SMALL / MEDIUM / LARGE);
-# * the fluid units (LITRE, and the jerry cans that state litres): the #1035
-#   litre decision.
+# the national on 40).  Held, as the opt-in GH #1518 helper
+# (lsms_library.nigeria_harvest) holds them: the 9 table rows whose unit_name
+# contradicts the harvest file's own card for that code (codes 160-162 of
+# pumpkin, pumpkin leave, green vegetable: the table says BUNDLE LARGE / BUNCH
+# MEDIUM / BUNCH LARGE, the card BUNDLE SMALL / MEDIUM / LARGE).  The jerry
+# cans that state litres (190-192, 10 / 20 / 25 l) are SERVED at density 1,
+# as the food side serves the tables' litre containers (ruling @ligon
+# 2026-11-13, "Serve tabled litres both sides"); the helper holds them.
 # Metric codes (KILOGRAM, GRAMS, LITRE) keep their label rung.
 
 CROP_CONVERSION_KEY = 'Nigeria::crop_production::w3-ag-conversion'
-_CROP_FLUID = re.compile(r'\b(?:LITRE|LITRES|CENTILITRE|CENTILITRES)\b', re.IGNORECASE)
 
 
 def _card_bodies(dec_unit, raw_unit):
@@ -4031,10 +4057,10 @@ def crop_conversion_table(table, card):
     body = unit.map(lambda c: card.get(int(c)) if pd.notna(c) else None)
     named = table['unit_name'].astype('string').str.strip()
     conflict = body.notna() & (named != body.astype('string')).fillna(True)
-    fluid = body.fillna(named).astype('string').str.contains(_CROP_FLUID).fillna(False)
     metric = body.fillna(named).astype('string').str.upper().isin(
         ['KILOGRAM (KG)', 'KILOGRAMS (KG)', 'GRAMS (G)', 'LITRE (L)'])
-    keep = ~(conflict | fluid | metric).to_numpy(dtype=bool)
+    # A fluid container (the jerry cans) is NOT held: served at 1 l = 1 kg.
+    keep = ~(conflict | metric).to_numpy(dtype=bool)
     note = table['note'].astype('string').str.strip()
     note = note.mask(note.fillna('') == '', pd.NA)
     out = pd.concat([pd.DataFrame({
@@ -4147,16 +4173,17 @@ def _read_conversion_table(path):
     return get_dataframe(path, convert_categoricals=False)
 
 
-def inputs_food_acquired_conversion(wave, rounds=None):
+def inputs_food_acquired_conversion(wave, rounds=None, key=None):
     """The registry `inputs` callable of the GH #1502 table conversions.
 
     One row per DERIVED served row of the wave's rounds (both, or those in
-    ``rounds``), indexed
+    ``rounds``; only the rows carrying ``key`` when one is named), indexed
     ``(t, i, j, u, s)`` as the served table is (``i``, ``j``, ``u`` decoded as
     the build decodes them), with the source row's original variables --
     ``hhid``, ``item_cd``, ``zone`` and the source's own quantity, unit (and
     Other) variables -- plus ``quantity`` (that source's quantity), and the
-    table's ``kg_per_unit``, ``g_cl`` (W2) and ``note`` (W3).
+    table's ``kg_per_unit``, raw ``conv`` and ``g_cl`` (W2), ``as_grams``
+    (W2: a centilitre-class solid read as grams) and ``note`` (W3).
     `derive_food_conversion_kg` on ``quantity`` and ``kg_per_unit``
     reproduces the served ``Quantity_kg``.
     """
@@ -4177,7 +4204,9 @@ def inputs_food_acquired_conversion(wave, rounds=None):
                                             conversion=sp['conversion'])
             df = get_dataframe(sp['fn'])
             table = _read_conversion_table(sp['conversion'])
-        derived = served.index[served['Derivation'].notna()]
+        der = served['Derivation'].astype('string')
+        derived = served.index[(der == key).fillna(False).to_numpy(dtype=bool)
+                               if key else der.notna().to_numpy(dtype=bool)]
         food_labels = harmonized_food_labels(t)
         unit_codes = food_unit_labels(t)
         i = df['hhid'].astype(int).astype(str)
@@ -4192,7 +4221,7 @@ def inputs_food_acquired_conversion(wave, rounds=None):
             match = food_conversion_match(
                 table, t, df['item_cd'], df[spec['unit']],
                 df[spec['other']] if spec.get('other') else None, df.get('zone'))
-            for c in ('kg_per_unit', 'g_cl', 'note'):
+            for c in ('kg_per_unit', 'conv', 'g_cl', 'as_grams', 'note'):
                 piece[c] = match[c].to_numpy()
             piece.index = pd.MultiIndex.from_arrays(
                 [[t] * len(df), i.values, j.values, u.values, [s] * len(df)],
@@ -4205,12 +4234,20 @@ def inputs_food_acquired_conversion(wave, rounds=None):
 
 def inputs_food_acquired_w2_pp_conversion(wave='2012-13'):
     """`inputs` of `Nigeria::food_acquired::w2-pp-food-conversion`: 2012Q3 only."""
-    return inputs_food_acquired_conversion(wave, rounds=('2012Q3',))
+    return inputs_food_acquired_conversion(
+        wave, rounds=('2012Q3',), key=FOOD_CONVERSION_KEYS['2012Q3'])
 
 
 def inputs_food_acquired_w2_ph_conversion(wave='2012-13'):
     """`inputs` of `Nigeria::food_acquired::w2-ph-food-conversion`: 2013Q1 only."""
-    return inputs_food_acquired_conversion(wave, rounds=('2013Q1',))
+    return inputs_food_acquired_conversion(
+        wave, rounds=('2013Q1',), key=FOOD_CONVERSION_KEYS['2013Q1'])
+
+
+def inputs_food_acquired_w2_cl_as_grams(wave='2012-13'):
+    """`inputs` of `Nigeria::food_acquired::w2-cl-class-read-as-grams`: the W2
+    centilitre-class solids of both rounds, with the raw ``conv`` and ``g_cl``."""
+    return inputs_food_acquired_conversion(wave, key=W2_CL_AS_GRAMS_KEY)
 
 
 def food_acquired_for_wave(fn, t, sources, expenditure,
@@ -4316,12 +4353,19 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
                 q.values * pd.to_numeric(df[kg_factor], errors='coerce').values)
         if table is not None:
             # GH #1502: the round's own table, on the row's native key.
-            f = food_conversion_kg_per_unit(
+            match = food_conversion_match(
                 table, t, df[item], df[spec['unit']],
                 df[spec['other']] if spec.get('other') else None,
                 df['zone'] if 'zone' in df.columns else None)
-            piece['Quantity_kg'] = derive_food_conversion_kg(q.values, f)
-            piece['_tabled'] = np.isfinite(piece['Quantity_kg'].to_numpy())
+            piece['Quantity_kg'] = derive_food_conversion_kg(
+                q.values, match['kg_per_unit'].to_numpy(dtype='float64'))
+            tabled = np.isfinite(piece['Quantity_kg'].to_numpy())
+            piece['_tabled'] = tabled
+            # The W2 centilitre-class solids read as grams carry their own key.
+            key = np.where(match['as_grams'].to_numpy(dtype=bool),
+                           W2_CL_AS_GRAMS_KEY, FOOD_CONVERSION_KEYS[t])
+            piece['_key'] = pd.Series(np.where(tabled, key, None),
+                                      dtype='string').values
         pieces.append(piece)
 
     out = pd.concat(pieces, ignore_index=True)
@@ -4346,15 +4390,17 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
     g = active.groupby(keys, dropna=False, sort=False)['_tabled']
     n_rows, n_tabled = g.size(), g.sum()
     partial = n_rows.index[(n_tabled > 0) & (n_tabled < n_rows)]
-    res = _finalize_canonical_food_acquired(out.drop(columns='_tabled'))
+    res = _finalize_canonical_food_acquired(out.drop(columns=['_tabled', '_key']))
     if len(partial):
         res.loc[res.index.isin(partial), 'Quantity_kg'] = np.nan
         import warnings
         warnings.warn(f'Nigeria food_acquired {t}: {len(partial)} served key(s) '
                       'share contributors the conversion table does not all '
                       'cover; their Quantity_kg is NA (GH #1502).', stacklevel=2)
-    derivation = pd.Series(pd.NA, index=res.index, dtype='string')
-    derivation[res['Quantity_kg'].notna().to_numpy()] = FOOD_CONVERSION_KEYS[t]
+    from lsms_library.derivations import union_keys_by_group
+    keyed = active.set_index(keys)['_key']
+    derivation = union_keys_by_group(keyed, keys, res.index).astype('string')
+    derivation[res['Quantity_kg'].isna().to_numpy()] = pd.NA
     res['Derivation'] = derivation
     return res
 

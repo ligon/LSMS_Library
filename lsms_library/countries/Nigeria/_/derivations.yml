@@ -292,9 +292,13 @@ Nigeria::community_prices::c8-unrecorded-size-drop:
     package SIZE is unrecorded are dropped from community_prices rather than
     served as a per-unit price: with no size, the recorded Naira figure is
     the price of a package of unknown quantity, and no division can recover
-    a per-unit price.  The set is all of W3's 13,767 g/cl rows whose
-    free-text c8q2b is blank (the 13,768th parses '50cl' and is derived,
-    not dropped), and W5's 182 rows -- 133 on '2. GRAMS (G)' and 49 on
+    a per-unit price.  The set is all of W3's g/cl rows whose free-text
+    c8q2b is blank: 11,170 of the files' 11,171 g/cl rows (8,557 at the 1st
+    location, 2,614 at the 2nd; the 11,171st parses '50cl' and is derived,
+    not dropped).  An earlier version of this entry said "13,767 of 13,768";
+    the held files, decoded by today's _canon_community_unit, hold 11,171
+    (measured 2026-11-13, burst job 41275442), which is also what the build
+    drops and these inputs return, and W5's 182 rows -- 133 on '2. GRAMS (G)' and 49 on
     '4. CENTLITRES (CL)' (served as 'l' until GH #587 corrected the decoder)
     -- whose coded size c8aq2_c is blank.  W4 drops NOTHING under this rule: its 1,191 rows on raw unit
     code 1 read '1. KILOGRAMS (KG)' in sectc8_harvestw4.dta (pre-#834 prose
@@ -1094,8 +1098,11 @@ Nigeria::food_acquired::w2-pp-food-conversion: &w2_food_conversion
     shipped table at the row's native key: the item code and the acquisition
     source's OWN unit code (q3b purchased, q6b produced, q7b in kind).  W2's
     tables give `conv` per unit with a class flag g_cl: g_cl = 1 grams
-    (kg_per_unit = conv / 1000), g_cl = 0 centilitres (kg_per_unit = conv /
-    100, litres read as kilograms).  Post-planting (2012Q3) reads
+    (kg_per_unit = conv / 1000); g_cl = 0 centilitres, read as litres
+    (kg_per_unit = conv / 100, at 1 l = 1 kg) ONLY for the reviewed liquid
+    items of nigeria.W2_CL_CLASS_LIQUID_ITEMS (the oils: 2012Q3 codes 50, 52,
+    53; 2013Q1 50, 52) -- every other g_cl = 0 cell is a solid read as grams
+    under Nigeria::food_acquired::w2-cl-class-read-as-grams.  Post-planting (2012Q3) reads
     food_conv_w2pp.csv, keyed on the item and the planting unit code s7bq2b;
     post-harvest (2013Q1) reads food_conv_w2ph.csv, keyed on nsu_cd.  The
     tables cover only the non-metric codes 5-16 (mudu, olodo, congo, paint
@@ -1129,15 +1136,17 @@ Nigeria::food_acquired::w2-pp-food-conversion: &w2_food_conversion
         identical (51 cl / cl, 285 g / g); measured 2026-11-13, burst job
         41271653, reports/nigeria/out/m1/m1.json (tables_describe).
     - text: >-
-        a centilitre row is served in LITRES as kilograms (1 l = 1 kg), the
-        Kg/L convention of W3's table and W4's per-row *_cvn.  Differs from
-        the W1 card-weight decision (GH #1035), which leaves litre containers
-        to the inference.
+        a centilitre row of a LIQUID item is served in LITRES as kilograms
+        (1 l = 1 kg), the Kg/L convention of W3's table and W4's per-row
+        *_cvn.  It cannot be declined with volume_as_mass=False, which acts on
+        unit labels, not on survey_kg.  Differs from the W1 card-weight
+        decision (GH #1035), which leaves litre containers to the inference.
       basis: modelling-choice
       evidence: >-
-        food_conv_w3 metric controls l = 1, cl = 0.01; W4 s7bq2_cvn /
-        s10bq2_cvn ("Kg/L conversion factor").  Rows on the cl class: 1,124
-        in 2012Q3, 843 in 2013Q1 (measured 2026-11-13).
+        ruling @ligon 2026-11-13, "Serve tabled litres both sides"; the oils'
+        cl reading fits: 2012Q3 Palm oil cell median 1.49x the inference and
+        1.99x W3's table (0.149 / 0.199 under grams), Groundnut oil 1.49 / 1.99;
+        a mudu of palm oil is 1.272 l and a milk cup 0.159 l in both tables.
   validated_against: >-
     two independent references, measured on the base build (f138a3d61,
     2026-11-13).  The household's own price-implied kg per unit (its Naira per
@@ -1158,6 +1167,59 @@ Nigeria::food_acquired::w2-ph-food-conversion:
   <<: *w2_food_conversion
   rows: {t: '2013Q1'}
   inputs: lsms_library.countries.Nigeria._.nigeria:inputs_food_acquired_w2_ph_conversion
+
+# GH #1502 red team F1 (ruling @ligon 2026-11-13, "Re-read solids as grams").
+Nigeria::food_acquired::w2-cl-class-read-as-grams:
+  waves: ['2012-13']
+  columns: [Quantity_kg]
+  rows: {t: ['2012Q3', '2013Q1']}
+  rule: >-
+    Quantity_kg = Quantity x conv / 1000 on W2 rows whose table cell is flagged
+    g_cl = 0 ("centilitres") but whose item is NOT a liquid: the flag is read
+    as GRAMS there.  The liquid items are an explicit, reviewed item-code list
+    per round, nigeria.W2_CL_CLASS_LIQUID_ITEMS (2012Q3: 50 Palm oil, 52
+    Groundnut oil, 53 Other oils and fats; 2013Q1: 50, 52), which keep conv /
+    100 under the round's own key; every other item carrying a g_cl = 0 cell
+    -- groundnuts, other nuts, tomatoes, tomato puree, onions, eggs, beef,
+    mutton, fish (dried), snails, baby milk powder, chocolate drinks, coffee,
+    tea, mangoes, cassava, yam -- is read here.  Same native key, collapse and
+    stamping as the round keys.
+  function: lsms_library.countries.Nigeria._.nigeria:derive_food_conversion_kg
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_food_acquired_w2_cl_as_grams
+  raw_variables: [hhid, item_cd, zone, s7bq3a, s7bq3b, s7bq6a, s7bq6b, s7bq7a,
+                  s7bq7b, s10bq3a, s10bq3b, s10bq6a, s10bq6b, s10bq7a, s10bq7b,
+                  conv, g_cl]
+  assumptions:
+    - text: >-
+        on a non-liquid item the table's `conv` is GRAMS per unit whatever its
+        g_cl flag says.  The flag contradicts the table: one class gives a mudu
+        of palm oil 1.272 and a mudu of tomatoes 10 (litres under the flag's
+        reading), a milk cup of oil 0.159 and of groundnuts 1.0.  Read as
+        grams, the solids sit about 1x every reference; read as centilitres,
+        about 10x.  Which field the World Bank got wrong is not established.
+      basis: derived-from-data
+      evidence: >-
+        GH #1502 red team (reports/nigeria-redteam/VERDICT.md, F1): cell
+        medians against the inference 12.2x / 11.8x under cl, 1.22 / 1.18 under
+        grams; 8.4x against W3's table.  Per item, burst job 41275442
+        (reports/nigeria/out/m8/w2_gcl0_items.csv) and Nigeria/_/CONTENTS.org.
+    - text: >-
+        the liquid list is decided item by item on what the item is, with the
+        evidence displayed: the oils' cl reading fits the references and the
+        grams reading sits ~0.15x.  Three solids whose small cells fit the cl
+        reading better on the references (chocolate drinks / Milo, coffee, tea:
+        a milk cup of 20, a tea bag of 2) are read as grams as the ruling says
+        for non-liquids, and are named for review.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-13 ("non-liquid items are read as grams; liquids
+        stay conv/100 litres"); reports/nigeria/out/m8/w2_gcl0_items.csv.
+  validated_against: >-
+    W2_GRAMS_VALIDATION
+  contents: >-
+    Nigeria/_/CONTENTS.org, "food_acquired: the World Bank's own W2 / W3 food
+    conversion tables" (GH #1502)
+  since: '2026-11-13'
 
 Nigeria::food_acquired::w3-food-conversion:
   waves: ['2015-16']
@@ -1250,10 +1312,10 @@ Nigeria::crop_production::w3-ag-conversion:
     carries the size: 130 SACK/BAG SMALL, 131 MEDIUM, 132 LARGE, ...) and the
     household's own zone column (conv_NC_1 ... conv_SW_6), never the
     size-collapsed served u.  Not read: the metric units (KILOGRAM, GRAMS,
-    LITRE), which keep their label rung; the jerry cans that state litres (the
-    GH #1035 litre decision); and the 9 table rows whose unit_name contradicts
-    the harvest file's own card for that code (codes 160-162 of crops 2190,
-    2191 and 2194).  Every other line keeps Quantity_kg NA.  KgFactor is not
+    LITRE), which keep their label rung, and the 9 table rows whose unit_name
+    contradicts the harvest file's own card for that code (codes 160-162 of
+    crops 2190, 2191 and 2194).  The jerry cans that state litres (codes
+    190-192, 10 / 20 / 25 l; oil palm, palm oil) ARE read, at 1 l = 1 kg.  Every other line keeps Quantity_kg NA.  KgFactor is not
     written: W3 asks no factor beside the quantity.
   function: lsms_library.countries.Nigeria._.nigeria:derive_crop_conversion_kg
   inputs: lsms_library.countries.Nigeria._.nigeria:inputs_crop_production_conversion
@@ -1272,7 +1334,16 @@ Nigeria::crop_production::w3-ag-conversion:
         ag_conv_w3.dta (crop_cd, unit_cd, unit_name, conv_national, six zone
         columns; 711 rows) against the secta3i_harvestw3.dta value labels of
         sa3iq6ii; the opt-in GH #1518 helper lsms_library.nigeria_harvest
-        applies the same 9 identity and 7 fluid holds.
+        holds the same 9 identity rows (and its 7 fluid rows, which this key
+        serves: the jerry cans at density 1, the LITRE rows by their label).
+    - text: >-
+        the litres of a jerry can are served as kilograms (1 l = 1 kg), as the
+        food side serves the tables' litre containers; harvest_kg's
+        volume_as_mass=False cannot decline them (it acts on unit labels).
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-13, "Serve tabled litres both sides"; 71 native
+        positive-quantity rows (oil palm, palm oil) were held until then.
     - text: >-
         the household's own zone column, not conv_national, as on the food
         side: W4's reported crop factor sa3iq6_conv, matched to the W3 card

@@ -84,11 +84,56 @@ def test_w3_table_reads_own_zone_metric_out_and_other_literally(nigeria):
 
 
 def test_w2_table_reads_g_cl(nigeria):
-    tab = pd.DataFrame({'item_cd': [10, 10, 10], 'nsu_cd': [5, 12, 1],
-                        'conv': [1200.0, 50.0, 1000.0], 'g_cl': [1, 0, 1]})
-    kg = nigeria.food_conversion_kg_per_unit(
-        tab, '2013Q1', item=pd.Series([10, 10, 10]), unit=pd.Series([5, 12, 1]))
-    np.testing.assert_allclose(kg, [1.2, 0.5, np.nan])   # g / 1000, cl / 100, metric out
+    # GH #1502 red team F1 (ruling @ligon 2026-11-13, "Re-read solids as
+    # grams"): a g_cl = 0 cell is litres (conv / 100) only for a listed LIQUID
+    # item (50 Palm oil); a solid's g_cl = 0 cell is grams (conv / 1000).
+    tab = pd.DataFrame({'item_cd': [10, 10, 10, 50, 70], 'nsu_cd': [5, 12, 1, 5, 5],
+                        'conv': [1200.0, 50.0, 1000.0, 127.2, 1000.0],
+                        'g_cl': [1, 0, 1, 0, 0]})
+    match = nigeria.food_conversion_match(
+        tab, '2013Q1', item=pd.Series([10, 10, 10, 50, 70]),
+        unit=pd.Series([5, 12, 1, 5, 5]))
+    np.testing.assert_allclose(match['kg_per_unit'], [1.2, 0.05, np.nan, 1.272, 1.0])
+    assert match['as_grams'].tolist() == [False, True, False, False, True]
+    assert match['conv'].tolist()[:2] == [1200.0, 50.0]
+
+
+def test_w2_liquid_list_is_explicit_and_per_round(nigeria):
+    assert nigeria.W2_CL_CLASS_LIQUID_ITEMS == {
+        '2012Q3': frozenset({50, 52, 53}), '2013Q1': frozenset({50, 52})}
+    for t, codes in nigeria.W2_CL_CLASS_LIQUID_ITEMS.items():
+        labels = nigeria.harmonized_food_labels(t)
+        assert all('oil' in labels[c].lower() for c in codes), (t, codes)
+
+
+def w2_food_csv(tmp_path, rows):
+    cols = ['hhid', 'item_cd', 'zone', 's10bq3a', 's10bq3b', 's10bq4',
+            's10bq6a', 's10bq6b', 's10bq7a', 's10bq7b']
+    p = tmp_path / 'w2food.csv'
+    pd.DataFrame(rows, columns=cols).to_csv(p, index=False)
+    return str(p)
+
+
+def test_w2_builder_keys_liquids_and_solids_apart(nigeria, tmp_path):
+    fn = w2_food_csv(tmp_path, [
+        [1, 50, 1, 2.0, 5, 200, np.nan, np.nan, np.nan, np.nan],   # palm oil / mudu, cl
+        [2, 70, 1, 3.0, 5, 300, np.nan, np.nan, np.nan, np.nan],   # tomatoes / mudu, cl flag
+        [3, 13, 1, 1.0, 5, 100, np.nan, np.nan, np.nan, np.nan],   # rice / mudu, grams flag
+    ])
+    conv = tmp_path / 'conv.csv'
+    pd.DataFrame({'item_cd': [50, 70, 13], 'nsu_cd': [5, 5, 5],
+                  'conv': [127.2, 1000.0, 1350.0], 'g_cl': [0, 0, 1]}).to_csv(conv, index=False)
+    src = {'purchased': {'quantity': 's10bq3a', 'unit': 's10bq3b'},
+           'produced': {'quantity': 's10bq6a', 'unit': 's10bq6b'},
+           'inkind': {'quantity': 's10bq7a', 'unit': 's10bq7b'}}
+    out = nigeria.food_acquired_for_wave(fn, '2013Q1', src, 's10bq4', conversion=str(conv))
+    out = out.reset_index().set_index('i')
+    assert out.loc['1', 'Quantity_kg'] == pytest.approx(2 * 1.272)
+    assert out.loc['2', 'Quantity_kg'] == pytest.approx(3 * 1.0)
+    assert out.loc['3', 'Quantity_kg'] == pytest.approx(1 * 1.35)
+    assert out.loc['1', 'Derivation'] == W2_PH_KEY
+    assert out.loc['2', 'Derivation'] == 'Nigeria::food_acquired::w2-cl-class-read-as-grams'
+    assert out.loc['3', 'Derivation'] == W2_PH_KEY
 
 
 def test_repeated_table_key_is_refused(nigeria):
@@ -184,10 +229,13 @@ CARD = {130: 'SACK/BAG SMALL', 1: 'KILOGRAM (KG)', 160: 'BUNDLE SMALL',
         191: 'JERRY CAN/RUBBER 20 LITRES'}
 
 
-def test_crop_table_holds_identity_fluid_and_metric(nigeria):
+def test_crop_table_holds_identity_and_metric_serves_jerry_cans(nigeria):
+    # Ruling @ligon 2026-11-13, "Serve tabled litres both sides": the jerry
+    # cans are served at 1 l = 1 kg; the identity conflict and metric stay out.
     tab = nigeria.crop_conversion_table(ag_table(), CARD)
-    assert set(zip(tab['crop_cd'], tab['unit_cd'])) == {(1080, 130)}
-    assert sorted(tab['kg_per_unit']) == [40.0 + k for k in range(6)]
+    assert set(zip(tab['crop_cd'], tab['unit_cd'])) == {(1080, 130), (3183, 191)}
+    assert sorted(tab.loc[tab['unit_cd'] == 130, 'kg_per_unit']) == [40.0 + k for k in range(6)]
+    assert (tab.loc[tab['unit_cd'] == 191, 'kg_per_unit'] == 20.0).all()
 
 
 def test_crop_builder_writes_quantity_kg_never_kgfactor(nigeria):

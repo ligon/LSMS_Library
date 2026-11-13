@@ -1016,6 +1016,7 @@ Level collapse (mirrors Uganda's grade collapse):
 | 24. SENIOR SECONDARY 1 (SS 1)                                      | Upper secondary              |
 | 25. SENIOR SECONDARY 2 (SS 2)                                      | Upper secondary              |
 | lower 6                                                            | Upper secondary              |
+| LOWER 6                                                            | Upper secondary              |
 | 27. LOWER 6                                                        | Upper secondary              |
 | 27. LOWER 6 (HSE 1)                                                | Upper secondary              |
 | ss3                                                                | Upper secondary complete     |
@@ -1023,6 +1024,7 @@ Level collapse (mirrors Uganda's grade collapse):
 | 26. SS3                                                            | Upper secondary complete     |
 | 26. SENIOR SECONDARY 3 (SS 3)                                      | Upper secondary complete     |
 | upper 6                                                            | Upper secondary complete     |
+| UPPER 6                                                            | Upper secondary complete     |
 | 28. UPPER 6                                                        | Upper secondary complete     |
 | 28. UPHER 6                                                        | Upper secondary complete     |
 | 28. UPPER 6 (HSE 2)                                                | Upper secondary complete     |
@@ -1038,6 +1040,8 @@ Level collapse (mirrors Uganda's grade collapse):
 | 35. NURSING SCHOOL                                                 | Tertiary certificate/diploma |
 | 35. NURSING SCHOOL (NON-UNIVERSITY)                                | Tertiary certificate/diploma |
 | 31. TEACHER TRAINING                                               | Tertiary certificate/diploma |
+| teacher training                                                   | Tertiary certificate/diploma |
+| TEACHER TRAINING                                                   | Tertiary certificate/diploma |
 | 31. TEACHER CERTIFICATE GRADE II (TCGDII)                          | Tertiary certificate/diploma |
 | poly/prof                                                          | Tertiary certificate/diploma |
 | POLY/PROF                                                          | Tertiary certificate/diploma |
@@ -1059,15 +1063,18 @@ Level collapse (mirrors Uganda's grade collapse):
 | 424. UNIVERSITY  - 600 LEVEL                                       | Bachelor                     |
 | 424. UNIVERSITY - 600 LEVEL                                        | Bachelor                     |
 | higher degree                                                      | Postgraduate                 |
+| HIGHER DEGREE                                                      | Postgraduate                 |
 | 43. HIGHER DEGREE                                                  | Postgraduate                 |
 | 43. HIGHER DEGREE / POST-GRADUATE DEGREE                           | Postgraduate                 |
 | quaranic                                                           | Informal                     |
 | QUARANIC                                                           | Informal                     |
 | 51. QUARANIC                                                       | Informal                     |
 | integrated quaranic                                                | Informal                     |
+| quaranic integrated                                                | Informal                     |
 | INTEGRATED QUARANIC                                                | Informal                     |
 | 52. INTEGRATED QUARANIC                                            | Informal                     |
 | 52. INTEGRATED ISLAMIC EDUCATION (ISLAMIYYA, TSANGAYA, OR QUR'ANIC) | Informal                    |
 | 61. ADULT EDUCATION                                                | Informal                     |
+| adult education                                                    | Informal                     |
 | 62. BASIC LITERACY PROGRAM                                         | Informal                     |
 | 64. POST LITERACY II                                               | Informal                     |

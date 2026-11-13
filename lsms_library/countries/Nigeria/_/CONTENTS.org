@@ -215,6 +215,11 @@ are left as codes.
 Future enhancement (not yet wired): the W3/W4 data carry a per-row Kg/L
 conversion factor =s10bq2_cvn= (99.6% coverage) --- an exact Approach-B kg
 factor for =food_quantities=, independent of the unit label.
+/Corrected 2026-11-13 (GH #1502 red team): only W4 carries =*_cvn= (wired as
+=Quantity_kg= since GH #378); neither W3 food CSV has a cvn or conv column.
+W3 (and W2) get their per-row kilograms from the World Bank's shipped
+conversion tables since GH #1502 (section "food_acquired: the World Bank's
+own W2 / W3 food conversion tables")./
 
 ** Unit codes collide ACROSS waves -- decoded per round (GH #607)
 
@@ -4215,6 +4220,9 @@ sources/cards, current crop labels and committed ID mappings. It requires an
 explicit national-versus-own-zone choice and keeps raw release positions, full
 native crop/unit codes and actual container sizes. It does not wire a default
 table, replace native quantities or select a scientific geography/default.
+/Superseded for the default table 2026-11-13 (subsection below): the #1518
+ruling wires =ag_conv_w3= into =crop_production.Quantity_kg= at the own-zone
+column.  The helper itself is unchanged and still opt-in./
 
 On the exact held two-release artifacts and frozen implementation2323284b,
 all11956 native harvest rows retained their current pure-producer + once-walked
@@ -4845,6 +4853,10 @@ is blank as =u = 'Unknown'= (read off the raw field, so a metric row the
 size steps dropped is not resurrected; a bare code stays dropped), pinned by
 =tests/test_gh1502_nigeria_food_conversion.py=.  Nothing served moves.
 
-*Observed, not resolved*: the deletion entry's rule text counts "13,767 g/cl
-rows", but its own inputs return 11,170 (and 14,603 = 11,170 + 3,433 before).
-The two counts are not reconciled here; the build and its inputs agree on 11,170.
+*Reconciled (2026-11-13, burst job 41275442)*: the deletion entry's rule text
+used to count "13,767 g/cl rows".  The held W3 C8 files, decoded by today's
+=_canon_community_unit=, hold 11,171 g / cl rows (8,557 at the 1st location,
+2,614 at the 2nd, all priced), 11,170 of them with no parsable size -- what
+the build drops and the inputs return.  The 13,767 / 13,768 (and the "9,427 g
+/ 4,341 cl" in =_c8_w3_size_text='s docstring) are not reproducible on these
+files and are recorded as superseded; the registry entry now says 11,170.
