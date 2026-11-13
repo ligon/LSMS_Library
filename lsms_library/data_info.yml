@@ -1238,6 +1238,22 @@ Columns:
         2026-11-12).  It rides with the sale wherever the sale is placed, a
         `plot_id = 'Farm-level'` row included.  The state of what was sold is
         `Condition_sold`, not `condition`.
+
+        SOME TOTALS ARE NOT TOTALS, AND NOTHING NAMES THEM.  Under the totals
+        reading, a few answers look like the weight of ONE sold unit (5 or
+        more sized sacks sold, kilograms within 25% of one sack's stated
+        mass) or like the unit count typed as kilograms (kilograms equal to
+        `Quantity_sold`, more than one sack).  Counted by the independent red
+        team on 2026-11-12 (GH #1560, F4): one sack's weight on Niger 25 and
+        Mali 15 rows, the sack count on Mali 30 and Niger 4.  On such a row
+        `Value_sold / Quantity_sold_kg` is wrong by about `Quantity_sold`
+        (one-sack rows) or about the sack's stated mass (count rows), and
+        Site Q does not name it, because the value is an ordinary size for
+        its cell.  They are served as recorded, as the ruling asks; screen
+        them before using this column as a price denominator.  Per-wave
+        counts are in each country's CONTENTS.org.  Site Q's warning prints
+        this column's comparison unit as `harvest_u` and its value as "kg
+        sold".
     Unit_sold:
       type: str
       optional: true
