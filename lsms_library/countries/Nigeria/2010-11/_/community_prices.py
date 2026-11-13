@@ -13,12 +13,20 @@ Registered as a wave-level script so the build flows through the framework's
 wave path (getattr(wave, 'community_prices')()), which preserves the (t,v,j,u,variety,obs)
 grain -- the country-level fallback path's map_index() would swap the j level
 to i for a j-without-i index.
+
+Post-planting round (GH #587, rulings 2026-11-12): the PP COMMUNITY
+questionnaire prices food too, in Section C2 (Post Planting Wave 1/Community/sectc2_plantingw1.dta), so
+this script also serves t = 2010Q3 through the PP adapter
+(../../_/pp_community_prices.py): j / u on Nigeria's shared labels, the native
+size in `Size`, Price on the form's own basis -- price of N units (sc2q3a Naira / sc2q3b Number of Units / sc2q3c unit).
+Distinct t per round (pp-ph skill).
 """
 import sys
 
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet
 from nigeria import PH_QUARTER, community_prices_for_wave
+from pp_community_prices import combine_rounds, pp_community_prices_for_folder
 
 t = PH_QUARTER['2010-11']
 f = '../Data/sectc8_harvestw1.csv'
@@ -28,6 +36,15 @@ df = community_prices_for_wave(t, [dict(
     mode='names')
 
 # Native variety is the original item/size code; obs is the single C8 slot.
+# The post-planting round's Section C2 (GH #587), its own t (2010Q3).
+# Literal paths: the content hash folds the sidecar of every data file a
+# wave script spells literally (the adapter checks they match its sources).
+PP_SOURCES = (
+    '../Data/Post Planting Wave 1/Community/sectc2_plantingw1.dta',
+)
+df = combine_rounds(df, pp_community_prices_for_folder(
+    '2010-11', lambda f: get_dataframe(f, convert_categoricals=False), PP_SOURCES))
+
 assert df.index.is_unique, "community_prices W1: (t,v,j,u,variety,obs) not unique"
 assert len(df) > 0
 to_parquet(df, 'community_prices.parquet')

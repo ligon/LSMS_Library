@@ -62,7 +62,10 @@ Senegal::food_acquired::7day-purchase-at-last-purchase-unit-value:
         the last purchase used a different unit CODE, 9,712 because it used
         the same code in a different SIZE (Petit / Moyen / Grand / Taille
         unique), which is a different container and so a different price per
-        unit.
+        unit.  Since 2026-11-12 (measured as a change against the build before
+        it, not re-counted from scratch): 2021-22 serves 95 fewer purchased
+        rows, 93 of them NA here (salt-per-capita-withheld), and 2018-19 2 more
+        NA (near-zero-quantity-withheld, whose quantity is now NA).
       basis: variable-label
       evidence: >-
         the 2018-19 waves distribute no unit-conversion table, and 2021-22's
@@ -291,3 +294,111 @@ Senegal::food_acquired::nsu-national-unit-weight:
     Measured kilograms are in Senegal/_/CONTENTS.org.
   contents: 'Senegal/_/CONTENTS.org, "EHCVM unit-weight table wired (GH #1452)"'
   since: '2026-11-04'
+
+# A DELETION: the records are not served, so none can carry a key.  This entry is
+# the disclosure (`rows: 0`), and `derivation_inputs` returns the records.
+Senegal::food_acquired::salt-per-capita-withheld:
+  waves: ['2021-22']
+  columns: [Quantity, Expenditure]
+  rows: 0
+  rule: >-
+    A record of s07b_me_sen2021.dta for product 139 (Sel) in kg, size-free, whose
+    s07bq03a is a whole multiple of 0.0199997 kg (s07bq03a / 0.0199997 within 1e-9
+    of a whole number n >= 1) is not served: not its purchased row, its
+    own-production row or its gift row.  100 records meet it (34% of the wave's 294
+    salt-in-kg records); no record of any other product or unit does.  On all 100, n
+    is the household's hhsize in ehcvm_welfare_sen2021.dta, so the rule is "0.0199997
+    kg a person"; the build reads s07b alone and does not need the welfare file,
+    which only the inputs callable reads, as evidence.  No record equals 0.02 x
+    hhsize; the 2026-11-12 data check's "0.02" was the constant at 4 significant
+    digits.  (Until the red team of 2026-11-12 the selector read hhsize itself and
+    the table failed when the welfare file could not be fetched; the two selectors
+    pick the same 100 records.)
+  function: lsms_library.countries.Senegal.2021-22._.mapping:salt_per_capita_rows
+  inputs: lsms_library.countries.Senegal.2021-22._.mapping:inputs_salt_per_capita
+  raw_variables: [vague, s07bq01, s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05,
+                  s07bq06, s07bq07a, s07bq07b, s07bq07c, s07bq08, hhsize]
+  assumptions:
+    - text: >-
+        a quantity that is one constant times household size on 100 records, and
+        on no record of any other good, is a fill by the file's producers, not a
+        household's answer.  The households' own median is 0.0278 kg a person, and
+        none of the 28 region x milieu medians is the constant, so it is not the
+        harmonised rule's region x milieu median either.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-12, "Remove, registered", on the principle that
+        undocumented imputations are not served without a very good reason.  No
+        document held or public mentions salt, a per-capita norm or a 7B
+        imputation (BID FR p.19 and EN, ANSD Rapport final 2021-22, World Bank DDI
+        6278, the EHCVM-2 enumerator manual; documentation search 2026-11-12).
+        A typed answer cannot meet the rule by chance: 0.0199997 x an integer
+        carries 6-7 significant digits (0.099998 kg for 5 persons).  Measured on
+        the released file, the 100 sit within 3.6e-15 of a whole multiple and the
+        nearest other salt-in-kg record 4.5e-5 away; every tolerance from 1e-12 to
+        1e-5 selects the same 100, and 1e-9 sits inside that range.  A value typed
+        on a 0.01 kg grid sits at least 1.5e-5 from a whole multiple below 600 kg
+        (0.02 kg is 1.5e-5 away, 0.1 kg 7.5e-5).
+  validated_against: >-
+    the base build: the 100 records were 100 served rows (95 purchased, 5 in kind;
+    17.04 kg, 17.78 FCFA of Expenditure on the 2 that had one), all gone, and no
+    other row of the table changes (Senegal/_/CONTENTS.org).
+  contents: 'Senegal/_/CONTENTS.org, "2021-22 salt at a fixed amount per person withheld"'
+  since: '2026-11-12'
+
+# A WITHHELD VALUE (GH #1519): the rows stay, their quantity is NA, so no row
+# carries this key; the entry is the disclosure (`rows: 0`), as Burkina Faso's
+# copied-grappe-gps-withheld is.  The value precedent is GH #1594 (Mali 2014-15,
+# s13q03c = 99,999,999 masked in the wave mapper), which has no entry here.
+Senegal::food_acquired::near-zero-quantity-withheld:
+  waves: ['2018-19']
+  columns: [Quantity, Expenditure, Quantity_kg]
+  rows: 0
+  rule: >-
+    A record of s07b_me_sen2018.dta whose s07bq03a and s07bq07a are both positive
+    and below 1e-3 is served with Quantity NA.  Its Expenditure is NA too, because
+    the registered 7day-purchase-at-last-purchase-unit-value rule multiplies that
+    quantity by s07bq08 / s07bq07a, and because a value computed from a withheld
+    quantity is withheld with it (ruled 2026-11-12).  Its Quantity_kg is NA, as it already was on all
+    three (their kilograms came from the bottle's stated volume at read time, so
+    none carried the nsu-national-unit-weight key; the hook would drop that key
+    where it did).  The row stays, with its #876 key.
+    Three records meet it, all product 132 (Autres tisanes et infusions), each
+    with s07bq03a exactly 40 times s07bq07a; no other record of this file or of any
+    other EHCVM wave's s07b does.  The third already had Expenditure NA (its last
+    purchase is in a sachet, its consumption in a bottle), so it is left with no
+    measurement.
+  function: lsms_library.countries.Senegal.2018-19._.mapping:near_zero_quantity_rows
+  inputs: lsms_library.countries.Senegal.2018-19._.mapping:inputs_near_zero_quantity
+  raw_variables: [vague, s07bq01, s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05,
+                  s07bq06, s07bq07a, s07bq07b, s07bq07c, s07bq08]
+  assumptions:
+    - text: >-
+        a released s07bq03a of 4e-19 to 9e-19 bottles, beside an s07bq07a of 1e-20 to
+        2e-20, is not a quantity anyone answered; the pair is treated as
+        missing.  Served as recorded they put 2018-19 food_prices (kgvalue) at 1.45e22
+        and 1.79e22 FCFA/kg.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-12, "Exact-value NA rule" (GH #1519).  The values are in
+        the released file, not a subtraction in the build: both subtraction orders
+        agree on all 434,299 source rows examined (GH #1519).  Their cause is unknown.
+    - text: >-
+        the Expenditure the #876 rule computes from such a quantity is withheld with it,
+        on the 2 rows that had one (2,000 and 4,000 FCFA).  The value, (s07bq03a /
+        s07bq07a) x s07bq08 = 40 x s07bq08, would not depend on the common scale that
+        corrupted the two quantities; it is withheld because it is computed from a
+        quantity the table does not serve.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-12, "GH1519 Expenditure on the NA rows": "Yes, NA
+        Expenditure too", on the red team's note that the first ruling named only the
+        quantity.  "A value computed from a withheld quantity is withheld with it."
+  validated_against: >-
+    the base build: the three rows keep their keys and change only in Quantity (3)
+    and Expenditure (2, 2,000 and 4,000 FCFA); every other row and column of the
+    table is unchanged.  2018-19 food_prices (kgvalue) maximum 1.79e22 -> 479,452
+    FCFA/kg and mean 2.17e17 -> 1,698.5; units='unitvalue' maximum 4.79e21 -> 70,000;
+    no served price above 1e10 (Senegal/_/CONTENTS.org).
+  contents: 'Senegal/_/CONTENTS.org, "the three near-zero 2018-19 quantities are served NA (GH #1519)"'
+  since: '2026-11-12'

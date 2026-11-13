@@ -65,6 +65,29 @@ def proposal(table):
     return pd.concat([table, additions], ignore_index=True)
 
 
+#: GH #587 (ruling 2026-11-12, "Add a Semovita row"): the one deliberate
+#: harmonize_food change made AFTER this baseline.  Code 15's 2012Q3 cell
+#: names the W2 post-planting community card's Semovita (the 2012Q3
+#: household card has no code 15) and a label-only row, appended after the
+#: two #1537 rows, carries its Preferred / Aggregate Labels.
+GH587_SEMOVITA_ROW = {'Preferred Label': 'Semovita', 'Aggregate Label': 'Other grains and flour'}
+
+
+def gh587_semovita_cell(table):
+    """The baseline with GH #587's one changed cell (code 15, 2012Q3)."""
+    out = table.copy()
+    code15 = pd.to_numeric(out['Code'], errors='coerce').eq(15)
+    assert code15.sum() == 1
+    out.loc[code15, '2012Q3'] = 'Semovita'
+    return out
+
+
+def gh587_semovita(table):
+    """``table`` with all of GH #587's harmonize_food change: the cell and the row."""
+    row = pd.DataFrame([GH587_SEMOVITA_ROW]).reindex(columns=table.columns, fill_value='')
+    return pd.concat([gh587_semovita_cell(table), row], ignore_index=True)
+
+
 @pytest.mark.parametrize('labels', [None, 'Preferred', 'Preferred Label'])
 def test_default_is_identity_even_with_proposed_rows(curation, labels):
     frame = prices(['Groundnuts', 'Maize (shelled)', 'Pepper', None])
@@ -124,7 +147,9 @@ def test_proposed_rows_leave_complete_quarter_decoders_unchanged(curation, monke
               ['2010Q3', '2011Q1', '2012Q3', '2013Q1',
                '2015Q3', '2016Q1', '2018Q3', '2019Q1']}
     from lsms_library import local_tools
-    proposed = proposal(curation)
+    # The live table also carries GH #587's Semovita change (cell + row),
+    # made after this baseline; apply it so the comparison stays exact.
+    proposed = gh587_semovita(proposal(curation))
     monkeypatch.setattr(local_tools, 'df_from_orgfile', lambda *a, **k: proposed.copy())
     for t, expected in before.items():
         assert nigeria.harmonized_food_labels(t) == expected

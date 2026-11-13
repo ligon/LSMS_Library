@@ -72,12 +72,13 @@ def test_food_prices_unitvalue_native_per_unit(synthetic_food_acquired):
     assert rice_sack == pytest.approx(800.0)
 
 
-def test_food_prices_unitvalue_kwacha_per_kwacha(synthetic_food_acquired):
-    """Designed sentinel: u='Value' rows give Price=1 (Kwacha per Kwacha)."""
+def test_food_prices_unitvalue_drops_kwacha_per_kwacha(synthetic_food_acquired):
+    """u='Value' rows used to give Price=1 (Kwacha per Kwacha); since GH #1129
+    (ruling @ligon 2026-11-12) they are dropped and counted as ``currency``."""
     out = food_prices_from_acquired(synthetic_food_acquired, units='unitvalue')
     val_rows = out[out.index.get_level_values('u') == 'Value']
-    assert len(val_rows) == 1
-    assert val_rows['Price'].iloc[0] == pytest.approx(1.0)
+    assert len(val_rows) == 0
+    assert out.attrs['price_rows_dropped']['currency'] == 1
 
 
 # ----- food_prices: unitprice ----------------------------------------------

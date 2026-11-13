@@ -8,10 +8,28 @@ from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
 import numpy as np
 from lsms_library.local_tools import df_from_orgfile
+from lsms_library.country import Country as _Country
+from lsms_library.transformations import food_quantities_from_acquired
 
 """
 Create a nutrition DataFrame for households based on food consumption quantities
 """
+
+
+# GH #1509 (@ligon 2026-11-12, "Make the dependency visible").  The
+# quantities below come from ``uga.food_quantities()``, which the Country API
+# derives at read time through ``food_quantities_from_acquired`` and its
+# kilogram ladder (``food_kg_factors``).  A call through the Country API is
+# invisible to ``framework_imports_fingerprint``, so a kg-factor edit used to
+# leave a warm ``var/nutrition.parquet`` serving the old numbers.  The import
+# above folds the transform's closure into every Uganda cache hash; this
+# assertion keeps it honest: if the API stops deriving ``food_quantities``
+# through it, the build fails rather than the hash tracking the wrong code.
+assert _Country._FOOD_DERIVED['food_quantities'] == \
+    food_quantities_from_acquired.__name__, (
+        'Uganda nutrition.py imports food_quantities_from_acquired to version '
+        'the code behind food_quantities(); the API now derives it from '
+        f"{_Country._FOOD_DERIVED['food_quantities']!r}: import that instead")
 
 
 # GH #1062; see .coder/ledger/1062-uganda-sibling-writes.md sections 2/4.

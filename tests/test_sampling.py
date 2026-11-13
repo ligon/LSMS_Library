@@ -433,18 +433,19 @@ class TestFeatureCarriesTheRecord:
 
         monkeypatch.setattr(ll, "Country", lambda name, **kw: _FakeCountry(name))
         f = Feature("household_roster")
-        object.__setattr__(f, "_countries", ["Uganda", "Benin"])
+        # Liberia, since Benin gained a sampling.yml with its 2021-22 wave (GH #1697).
+        object.__setattr__(f, "_countries", ["Uganda", "Liberia"])
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            with_records = f(["Uganda", "Benin"], currency=None)
-        assert set(with_records.attrs[S.ATTRS_KEY]) == {"Uganda"}   # Benin: none
+            with_records = f(["Uganda", "Liberia"], currency=None)
+        assert set(with_records.attrs[S.ATTRS_KEY]) == {"Uganda"}   # Liberia: none
         assert isinstance(
             with_records.attrs[S.ATTRS_KEY]["Uganda"]["2009-10"], SamplingRecord)
 
         monkeypatch.setattr(S, "sampling_records", lambda country: {})
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            without = f(["Uganda", "Benin"], currency=None)
+            without = f(["Uganda", "Liberia"], currency=None)
         assert S.ATTRS_KEY not in without.attrs
         pd.testing.assert_frame_equal(with_records, without)
 
@@ -1234,6 +1235,9 @@ class TestShippedDeclarations:
         ("Niger", "2014-15", "stable"),              # ECVMA panel keeps GRAPPE
         ("Niger", "2018-19", "redefined"),           # ECVMA / EHCVM serials overlap
         ("Niger", "2021-22", "stable"),              # s00q07f1 == grappe
+        ("Togo", "2021-22", "stable"),               # one point per grappe, = 2018's fix
+        ("Benin", "2021-22", "stable"),              # one point per grappe, = 2018-19's fix
+        ("CotedIvoire", "2021-22", "stable"),        # one point per grappe, = 2018-19's fix
         ("GhanaLSS", "1988-89", "wave-scoped"),      # GLSS2 renumbering
         ("GhanaLSS", "1991-92", "unobservable"),     # no linkage: correct to group
         ("Ethiopia", "2013-14", "wave-scoped"),      # ea_id -> ea_id2
@@ -1359,6 +1363,8 @@ def _uganda_historical_cluster_view(sample):
         "Uganda::sample::ea-comm-link": early,
         "Uganda::sample::ea-own-comm": early,
         "Uganda::sample::ea-tracking-key": {"2018-19", "2019-20"},
+        # GH #1536 (2026-11-12): an `ea` fill; it never touches `v`.
+        "Uganda::sample::ea-same-household": {"2009-10"},
     }
     assert isinstance(sample, pd.DataFrame)
     assert list(sample.index.names) == ["i", "t"], "historical operand index"

@@ -110,9 +110,9 @@ Data Scheme:
 
   plot_features:
     # Lasting parcel-level characteristics from the EHCVM agriculture
-    # module s16a (GH #167; Mali is the EHCVM reference, PR #284).  Togo
-    # has a single EHCVM wave (2018).  The source file lives in
-    # 2018/Data1/ (NOT 2018/Data/, which holds only _forEthan extracts).
+    # module s16a (GH #167; Mali is the EHCVM reference, PR #284).  The 2018
+    # source file lives in 2018/Data1/ (NOT 2018/Data/, which holds only
+    # _forEthan extracts); 2021-22's is in 2021-22/Data/.
     # plot_id = "{field_no}_{parcel_no}".  Latitude / Longitude are NOT
     # emitted — EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is
     # an area, not a coordinate); deferred as in Uganda.
@@ -166,23 +166,33 @@ Data Scheme:
     # s16c); harvest_month all-NaN here (only 2014-15 ECVMA recorded it) but
     # carried for cross-wave schema parity; intercropped from s16cq07.
     #
+    # 2021-22 (GH #1697) splits the module: s16c holds the harvest and s16d, with no
+    # plot, the sales.  A sale goes on the household's single harvest row for the crop,
+    # keyed hh-crop-sale-single-row, else on one row with plot_id = 'Farm-level' and
+    # u = 'Unknown' (option (d), @ligon 2026-11-03).  Unit_sold is the sold unit there;
+    # 2018's sold unit is not read yet, so it is NA on 2018.  A recorded harvest of an
+    # unfinished crop is keyed harvest-to-date.
     # condition (GH #1436) is "Etat du produit", s16cq12c, the state of the crop
     # when the harvest Quantity was measured, read by code through
     # harmonize_crop_condition_ehcvm1 in categorical_mapping.org.  The instrument
     # asks the form and never the dryness, so the values are the BARE FORM tokens
     # `shelled` / `unshelled` / `shell_not_applicable`, plus `unknown_condition`
     # for a blank code.  Five answers fold onto those tokens (ruled @ligon
-    # 2026-11-04); condition_native below keeps what was answered.
+    # 2026-11-04); condition_native below keeps what was answered.  2021-22 reads
+    # s16cq16d through its own eight-code table, in 2021-22/_/categorical_mapping.org.
     index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     Quantity_sold: float
+    Unit_sold:
+      type: str
+      optional: true
     Value_sold: float
     harvest_month:
       type: float
       optional: true
     intercropped: bool
     # condition_native (GH #1436, ruling @ligon 2026-11-04) is the state label as
-    # recorded (s16cq12c), the answer the `condition` fold cannot show.  `optional`
+    # recorded (s16cq12c; s16cq16d in 2021-22), the answer the `condition` fold cannot show.  `optional`
     # because a blank state is NA, never a sentinel.
     condition_native:
       type: str
@@ -203,10 +213,26 @@ Data Scheme:
     # Non-crop-specific rows carry the sentinel '(not crop-specific)' and a
     # missing unit the 'Manquant' u label, both non-null so the framework's
     # canonical NaN-key de-dup collapse does not silently drop them.
+    #
+    # 2021-22 (GH #1697) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
+    # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018 still
+    # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
     materialize: make
 
   plot_labor:

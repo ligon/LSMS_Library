@@ -311,8 +311,11 @@ def test_upstream_nonpositive_or_missing_eligibility_is_not_changed(monkeypatch,
 def test_live_yaml_and_2021_binding_remain_source_exact():
     protected = {
         '2018-19/_/data_info.yml': '6699bceaf41a0d213ab5666502f96471714809d089a2e429a6564a431a3b6de7',
+        # Re-pinned 2026-11-12: the salt-per-capita rule (ruling @ligon 2026-11-12)
+        # adds its hook to the 2021-22 wave.  Its selector reads s07b alone (red team
+        # F1), so 2021-22's data_info.yml is development's again, byte for byte.
         '2021-22/_/data_info.yml': '2522506789ff4584a08c37454eb774cb99189ade93a9e7fdd38351913f913ebc',
-        '2021-22/_/mapping.py': 'c415c75d1a799aebaa166c2883886243a8bdf3fb3e10873184aa9c9254f5c183',
+        '2021-22/_/mapping.py': '29f39839d100bfec4164e14d420af0367a2a8f9c95939618ca97dd5a8c9a3a60',
         '_/data_scheme.yml': '07f4dd61260cae7722050738bfaff992fb45257c42c0c6d4ca9d0d55c55f0894',
         '_/categorical_mapping.org': '31cde2d70a121c4f0c985920466c96c33db47bbcef0c02ccd13e13d7df241bfc',
     }
@@ -342,4 +345,8 @@ def test_all_other_mapping_symbols_and_imports_keep_the_base_ast():
                      and [(a.name, a.asname) for a in n.names] == [('U_UNKNOWN', None)])]
     normal = ast.dump(ast.Module(body=body, type_ignores=[]), include_attributes=False)
     # Base-source AST identity, not a data fixture or generated output baseline.
-    assert hashlib.sha256(normal.encode()).hexdigest() == '2bd544884a0f38ec7384d194650ce4add24acfb7d0c769dcbec5a8d5c3d824cb'
+    # Re-pinned 2026-11-12 for GH #1519: the shared hook is imported as
+    # `_shared_food_acquired_with_unit_weights` and wrapped by a module-level
+    # `_food_acquired_with_unit_weights` plus the near-zero helpers; `food_acquired`
+    # itself is unchanged.
+    assert hashlib.sha256(normal.encode()).hexdigest() == 'da0f54bd5fec7d825c56b02d437cd0cdea1422f79de4f424b3968aba580c8834'

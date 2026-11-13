@@ -980,6 +980,15 @@ _COMMUNITY_UNIT_LABELS = {
     'crate': 'Crate',
     'slice': 'Slice',
     'whole animal': 'Whole Animal',
+    # GH #587 (2026-11-12): two W4/W5 labels the substring decoder below
+    # places WRONGLY, not unplaced.  '251. BAG OF 20 SACHETS' hits 'bag' and
+    # was served 'Sack/Bag' (PH 2019Q1 148 rows, 2024Q1 261); W5's typo
+    # '4. CENTLITRES (CL)' misses 'centilitre', hits 'litre' and was served
+    # 'l' (2024Q1 49 rows, all with a blank size -- as 'cl' they fall under
+    # the existing c8-unrecorded-size-drop).  Both are the `u` table's own
+    # Preferred Labels (codes 251 and 4).
+    'bag of 20 sachets': 'Bag of 20 Sachets',
+    'centlitres (cl)': 'cl',
 }
 
 
@@ -3184,8 +3193,10 @@ def people_last7days_from_s4aq(t, df, hhid='hhid', indiv='indiv'):
 #         per-item unit is supplied from _W1W2_PRICE_UNIT (Section C8's
 #         column heads: KG / PIECE / BUNCH / LITRE / TIN / BOTTLE / ...).
 #
-# t = PH_QUARTER[wave] (the price module sits in the post-harvest round,
-# matching crop_production / anthropometry).
+# t = PH_QUARTER[wave] for the post-harvest C8 rows built here.  The
+# post-planting round prices food too (Section C2, not C8; GH #587): its rows
+# are built by pp_community_prices.py at PP_QUARTER[wave] and appended by
+# each wave script (combine_rounds).  Everything below describes C8 / PH.
 
 
 # W1/W2 community-price questionnaire (Section C8) item codes -> canonical
@@ -3337,7 +3348,8 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     13,768 g/cl rows bar one (c8q2b is free text, blank on the rest), all
     3,433 of W3's Kg/l rows (the same blank free text, caught only when the
     deletion entry's inputs were written), and W5's 133 rows on '2. GRAMS
-    (G)' (c8aq2_c blank) -- is DROPPED: its price is of an unrecorded
+    (G)' and 49 on '4. CENTLITRES (CL)' (c8aq2_c blank; the second set was
+    served as 'l' until GH #587 corrected the decoder) -- is DROPPED: its price is of an unrecorded
     package and per-unit normalization is impossible; serving it under the
     base unit would misprice by the package size (~189x/~42x measured).
     The drop is registered as the deletion entry
@@ -3466,7 +3478,8 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             # on g/cl with no size: nothing in W4 (its g/cl unit labels
             # carry a coded size on every row or none -- see
             # _/derivations.yml, c8-unrecorded-size-drop), and in W5 the
-            # 133 rows on '2. GRAMS (G)' with a BLANK c8aq2_c.  Exempt the
+            # 133 rows on '2. GRAMS (G)' and 49 on '4. CENTLITRES (CL)'
+            # with a BLANK c8aq2_c (GH #587).  Exempt the
             # questionnaire's own '99. ONE SIZE ONLY' code.
             one_size = size_lab.str.match(_C8_SIZE_ONE_SIZE_ONLY,
                                           na=False)
@@ -3954,18 +3967,21 @@ def _c8_raw_inputs(folder, keep):
             # blank, non-'99. ONE SIZE ONLY' size -- a blank size beside
             # KILOGRAMS / LITRES there reads as one kilogram / one litre
             # and is SERVED, not dropped (W4 drops 0; W5 drops the 133
-            # 'GRAMS (G)' rows).  The free-text wave (W3) drops its WHOLE
+            # 'GRAMS (G)' and, since GH #587, 49 'CENTLITRES (CL)' rows).  The free-text wave (W3) drops its WHOLE
             # metric block -- g, cl AND the base Kg/l -- because c8q2b is
             # blank on all of them (14,603 rows: 13,767 g/cl + 2,597 Kg +
             # 836 l, the Kg/l share previously uncounted anywhere).
+            # The build decodes C8 units with `_canon_community_unit`, so
+            # the deletion mask must too (GH #587: W5 '4. CENTLITRES (CL)'
+            # is 'cl' there and 'l' under the shared `_canon_unit`).
             if sp['size'] is not None:
                 one_size = size_lab.str.match(_C8_SIZE_ONE_SIZE_ONLY,
                                               na=False)
-                mask = (unit_lab.map(_canon_unit).isin(['g', 'cl'])
+                mask = (unit_lab.map(_canon_community_unit).isin(['g', 'cl'])
                         & qty.isna() & ~one_size)
             else:
-                mask = (unit_lab.map(_canon_unit).isin(['g', 'cl', 'Kg', 'l'])
-                        & qty.isna())
+                mask = (unit_lab.map(_canon_community_unit)
+                        .isin(['g', 'cl', 'Kg', 'l']) & qty.isna())
         frames.append(pd.DataFrame({
             't': PH_QUARTER[folder], 'v': v[mask].values,
             'obs': int(sp.get('obs', 1)),

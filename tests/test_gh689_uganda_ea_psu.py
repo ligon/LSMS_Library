@@ -328,11 +328,16 @@ class TestServedAgainstTheSourceFiles:
             ea = sample.xs(wave, level="t")["ea"]
             assert (ea.notna().sum(), ea.nunique(), len(ea)) == (filled, labels, rows), wave
 
-    @pytest.mark.parametrize("wave, filled", [("2005-06", 3123), ("2009-10", 2410),
-                                              ("2010-11", 2715), ("2011-12", 2850)])
-    def test_early_waves_are_filled_from_comm(self, sample, wave, filled):
-        """Re-pinned for GH #1459: they stayed NA here until that ruling."""
-        assert sample.xs(wave, level="t")["ea"].notna().sum() == filled
+    @pytest.mark.parametrize("wave, filled, same", [("2005-06", 3123, 0), ("2009-10", 2410, 514),
+                                                    ("2010-11", 2715, 0), ("2011-12", 2850, 0)])
+    def test_early_waves_are_filled_from_comm(self, sample, wave, filled, same):
+        """Re-pinned for GH #1459: they stayed NA here until that ruling.  2009-10 adds the
+        514 that GH #1536 fills from the same household in another wave."""
+        frame = sample.xs(wave, level="t")
+        by_same = frame["Derivation"].astype("string").str.contains(
+            "Uganda::sample::ea-same-household", regex=False).fillna(False)
+        assert (frame.loc[~by_same, "ea"].notna().sum(), int(by_same.sum())) == (filled, same)
+        assert frame.loc[by_same, "ea"].notna().all()
 
     @pytest.mark.parametrize("wave", DIRECT_WAVES + INHERITED_WAVES)
     def test_served_equals_the_rule(self, served, oracle, wave):

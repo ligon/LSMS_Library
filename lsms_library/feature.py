@@ -208,7 +208,8 @@ def _convert_convertible_waves(df: pd.DataFrame, country: str, table: str,
     than the slice: ``labels_unmatched`` (GH #787), and the ``kg_factor_*``
     records ``food_quantities(units='kgs')`` / ``food_prices`` write
     (``kg_factor_sources``, ``kg_factor_baseline_gate``,
-    ``kg_factor_wave_spread``, ``kg_factor_declared_none``; GH #850 / #1042).
+    ``kg_factor_wave_spread``, ``kg_factor_declared_none``; GH #850 / #1042;
+    and ``kg_factor_evidence``, GH #1509).
     Those partition and count the rows the kg inference RAN OVER, and the
     inference pooled over every wave read -- the very reason the slice, not a
     ``waves=`` re-call, is what gets converted -- so on a degraded

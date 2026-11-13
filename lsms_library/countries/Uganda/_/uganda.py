@@ -745,6 +745,158 @@ def _mark_comm_ea(flat):
     return flat
 
 
+#: GH #1536: a 2009-10 row whose ``ea`` is the same household's label in another wave.
+_EA_SAME_HOUSEHOLD_KEY = 'Uganda::sample::ea-same-household'
+#: Columns the two 2009-10 sub-dfs hand ``sample``; popped, never served.
+_EA_COMM_WAVES_COL = '_ea_comm_waves'
+_EA_2013_14_COL = '_ea_2013_14'
+#: The covers they read, by original id: the ``comm`` waves by ``HHID``, which is
+#: unchanged 2005-06 .. 2011-12, and 2013-14 by ``HHID_old``, the 2011-12 ``HHID``.
+_EA_COMM_COVERS = ('2005-06/Data/GSEC1.dta', '2010-11/Data/GSEC1.dta',
+                   '2011-12/Data/GSEC1.dta')
+_EA_2013_14_COVER = '2013-14/Data/GSEC1.dta'
+
+
+def _ea_fill_targets(wave):
+    """Raw ``HHID`` of the 2009-10 cover households whose own ``comm`` gives no ``ea``.
+
+    These are the households GH #1536 may fill: 2009-10's movers and split-offs
+    with a blank ``comm`` (and five originals with the same gap).  Only cover
+    households: a ``dfs:`` merge is outer, so a row for anyone else would become a
+    phantom 2009-10 household.
+    """
+    if wave != '2009-10':
+        raise ValueError(f'Uganda {_EA_SAME_HOUSEHOLD_KEY}: {wave} fills no ea (GH #1536)')
+    cover = _uganda_cover('2009-10/Data/GSEC1.dta')
+    hhid = cover['HHID'].map(format_id)
+    return set(hhid[cover['comm'].map(comm_ea).isna()].dropna())
+
+
+def _ea_from_another_wave(df, column):
+    """``df_edit`` hook body of the two GH #1536 sub-dfs of 2009-10 ``sample``.
+
+    ``df`` is another wave's cover, keyed on the id that names a 2009-10
+    household.  Keep the households :func:`_ea_fill_targets` names that carry a
+    label, one row each; a household with two different labels here raises
+    ``OriginEaError``.
+    """
+    flat = df.reset_index()
+    if flat.empty:
+        return df
+    targets = _ea_fill_targets(str(flat['t'].iloc[0]))
+    flat[column] = flat[column].map(format_id)
+    flat = flat.loc[flat['i'].isin(targets) & flat[column].notna(), ['t', 'i', column]]
+    labels = flat.groupby('i')[column].nunique()
+    if (labels > 1).any():
+        raise OriginEaError(
+            f'Uganda sample 2009-10: {int((labels > 1).sum())} household(s) carry two '
+            f'different ea in the covers behind {column}, so the label is not one '
+            f'household\'s (GH #1536).')
+    return flat.drop_duplicates(['t', 'i']).set_index(['t', 'i'])
+
+
+def ea_comm_waves(df):
+    """Hook of the ``ea_comm_waves`` sub-df: 2005-06, 2010-11 and 2011-12 ``comm``."""
+    return _ea_from_another_wave(df, _EA_COMM_WAVES_COL)
+
+
+def ea_2013_14(df):
+    """Hook of the ``ea_2013_14`` sub-df: 2013-14 ``GSEC1.ea`` by ``HHID_old``."""
+    return _ea_from_another_wave(df, _EA_2013_14_COL)
+
+
+def _choose_ea(comm_waves, later):
+    """The GH #1536 label: a ``comm`` wave's, else 2013-14's; raise if they differ."""
+    comm_waves = comm_waves.map(format_id)
+    later = later.map(format_id)
+    clash = comm_waves.notna() & later.notna() & comm_waves.ne(later)
+    if clash.any():
+        raise OriginEaError(
+            f'Uganda sample 2009-10: {int(clash.sum())} household(s) carry one ea in '
+            f'2005-06 .. 2011-12 and another in 2013-14 (GH #1536).')
+    return comm_waves.where(comm_waves.notna(), later)
+
+
+def derive_ea_same_household(inputs):
+    """``ea`` of a 2009-10 household from its own label in another wave (GH #1536).
+
+    ``inputs`` is :func:`inputs_ea_same_household`: rows of other waves' covers at
+    ``(t, i)``.  A ``comm`` wave's label (``comm`` through ``comm_ea``) comes first;
+    2013-14's ``ea`` only where no ``comm`` wave records the household.  The labels
+    must agree, or ``OriginEaError`` is raised.
+    """
+    flat = inputs.reset_index()
+    comm_rows = flat['_source'].isin(_EA_COMM_COVERS)
+    flat['_label'] = np.where(comm_rows, flat['comm'].map(comm_ea),
+                              flat['ea'].map(format_id))
+    by_hh = {}
+    for source, col in ((True, 'comm_waves'), (False, 'later')):
+        part = flat.loc[(comm_rows == source) & flat['_label'].notna()]
+        n = part.groupby(['t', 'i'])['_label'].nunique()
+        if (n > 1).any():
+            raise OriginEaError(
+                f'Uganda sample 2009-10: {int((n > 1).sum())} household(s) carry two '
+                f'different ea in one group of covers (GH #1536).')
+        by_hh[col] = part.drop_duplicates(['t', 'i']).set_index(['t', 'i'])['_label']
+    idx = by_hh['comm_waves'].index.union(by_hh['later'].index)
+    return _choose_ea(by_hh['comm_waves'].reindex(idx).astype(object),
+                      by_hh['later'].reindex(idx).astype(object)).rename('ea')
+
+
+def inputs_ea_same_household(wave):
+    """Raw rows behind each GH #1536 fill, by their original names, at ``(t, i)``.
+
+    For each 2009-10 household :func:`_ea_fill_targets` names: its ``GSEC1`` row in
+    each ``comm`` wave whose ``comm`` gives a label (``HHID``, ``comm``), and its
+    2013-14 ``GSEC1`` row by ``HHID_old`` (``HHID``, ``HHID_old``, ``ea``).
+    ``_source`` names the cover.  A household with no such row has nothing to show.
+    """
+    targets = _ea_fill_targets(wave)
+    pieces = []
+    for rel in _EA_COMM_COVERS:
+        raw = _uganda_cover(rel)[['HHID', 'comm']]
+        key = raw['HHID'].map(format_id)
+        keep = key.isin(targets) & raw['comm'].map(comm_ea).notna()
+        pieces.append(raw.loc[keep].assign(i=key[keep], _source=rel))
+    raw = _uganda_cover(_EA_2013_14_COVER)[['HHID', 'HHID_old', 'ea']]
+    key = raw['HHID_old'].map(format_id)
+    keep = key.isin(targets) & raw['ea'].map(format_id).notna()
+    pieces.append(raw.loc[keep].assign(i=key[keep], _source=_EA_2013_14_COVER))
+    out = pd.concat(pieces, ignore_index=True, sort=False)
+    return out.assign(t=wave).set_index(['t', 'i'])
+
+
+def _fill_ea_same_household(flat):
+    """Fill 2009-10's NA ``ea`` from the two GH #1536 sub-dfs, and stamp the key.
+
+    Runs after :func:`_mark_comm_ea`, so a filled row carries this key and not a
+    ``comm`` key, whose ``inputs`` would not return it.  A row with an ``ea`` of
+    its own is never changed.
+    """
+    cols = [c for c in (_EA_COMM_WAVES_COL, _EA_2013_14_COL) if c in flat.columns]
+    if not cols:
+        return flat
+    blank = pd.Series(pd.NA, index=flat.index, dtype=object)
+    comm_waves = flat.pop(_EA_COMM_WAVES_COL) if _EA_COMM_WAVES_COL in flat else blank
+    later = flat.pop(_EA_2013_14_COL) if _EA_2013_14_COL in flat else blank
+    if 'ea' not in flat.columns:
+        flat['ea'] = pd.Series(pd.NA, index=flat.index, dtype=object)
+    need = flat['ea'].isna()
+    label = _choose_ea(comm_waves.astype(object).where(need, None),
+                       later.astype(object).where(need, None))
+    fill = need & label.notna()
+    if fill.any():
+        dtype = flat['ea'].dtype
+        col = flat['ea'].astype(object).copy()
+        col.loc[fill] = label.loc[fill]
+        try:
+            flat['ea'] = col.astype(dtype)
+        except (TypeError, ValueError):
+            flat['ea'] = col
+        flat = _add_derivation(flat, fill, _EA_SAME_HOUSEHOLD_KEY)
+    return flat
+
+
 def _add_derivation(flat, mask, key):
     """Stamp ``key`` on ``mask``; a row already carrying a key carries both."""
     from lsms_library.derivations import union_keys
@@ -767,6 +919,8 @@ def sample(df):
     3. Give every household with no ``v`` its singleton (D2).
     4. Disclose an inherited ``ea`` on the rows that received one (GH #689), and
        an early wave's ``ea`` by the branch that gave it (GH #1459).
+    5. In 2009-10, fill an ``ea`` that is still NA from the same household's label
+       in another wave, and disclose it (GH #1536).
     """
     idx = [n for n in df.index.names if n is not None]
     flat = _adopt_alternate_cover(df.reset_index())
@@ -789,6 +943,7 @@ def sample(df):
         inherited = flat.pop(_EA_INHERITED_MARKER).notna()
         flat = _add_derivation(flat, inherited, _EA_INHERITED_KEY)
     flat = _mark_comm_ea(flat)
+    flat = _fill_ea_same_household(flat)
     return flat.set_index(idx) if idx else flat
 
 

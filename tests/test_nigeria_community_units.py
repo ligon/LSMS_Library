@@ -219,3 +219,54 @@ def test_existing_reporter_default_is_unchanged(nigeria):
         'Nigeria : 1 row(s) carry a unit label that cannot be placed and are '
         "served as Unknown: {'999. CALABASH': 1}. "
         'Teach the canonicaliser in nigeria.py (GH #1047).')
+
+
+# ---------------------------------------------------------------------------
+# GH #587 (2026-11-12): two W4/W5 labels the substring decoder PLACED WRONGLY.
+# '251. BAG OF 20 SACHETS' hit 'bag' (served 'Sack/Bag'); W5's typo
+# '4. CENTLITRES (CL)' hit 'litre' (served 'l').  Community-only fix: the
+# shared harvest decoder `_canon_unit` is deliberately unchanged.
+# ---------------------------------------------------------------------------
+
+def test_bag_of_20_sachets_is_its_own_unit_not_a_sack(nigeria):
+    with warnings.catch_warnings():
+        warnings.simplefilter('error', nigeria.UnplacedUnitLabelWarning)
+        out = _call(nigeria, '251. BAG OF 20 SACHETS')
+    assert out.index.get_level_values('u').tolist() == ['Bag of 20 Sachets']
+    assert out.Price.iloc[0] == 500 and 'Derivation' not in out
+    assert nigeria._canon_community_unit('130. SACK/BAG') == 'Sack/Bag'
+    assert nigeria._canon_unit('251. BAG OF 20 SACHETS') == 'Sack/Bag'  # harvest side unchanged
+
+
+def test_centlitres_typo_is_centilitres_and_obeys_the_size_rule(nigeria):
+    assert nigeria._canon_community_unit('4. CENTLITRES (CL)') == 'cl'
+    assert nigeria._canon_unit('4. CENTLITRES (CL)') == 'l'   # harvest side unchanged
+    with warnings.catch_warnings():
+        warnings.simplefilter('error', nigeria.UnplacedUnitLabelWarning)
+        # A blank size beside a metric unit is an unrecorded package: dropped,
+        # exactly as '2. GRAMS (G)' is (it used to be served as one litre).
+        assert _call(nigeria, '4. CENTLITRES (CL)').empty
+        sized = _call(nigeria, '4. CENTLITRES (CL)', '24. 75 CL', price=150)
+        one = _call(nigeria, '4. CENTLITRES (CL)', '99. ONE SIZE ONLY')
+    assert sized.index.get_level_values('u').tolist() == ['cl']
+    assert sized.Price.iloc[0] == 2.0
+    assert sized.Derivation.iloc[0] == 'Nigeria::community_prices::c8-metric-size'
+    assert one.index.get_level_values('u').tolist() == ['cl']
+
+
+def test_c8_drop_inputs_use_the_community_decoder(nigeria, monkeypatch):
+    """The deletion entry's inputs must name exactly the rows the build drops,
+    so they decode units the way the build does."""
+    import lsms_library.local_tools as lt
+    raw = pd.DataFrame({'state': [1, 1, 1], 'lga': [101, 101, 101], 'ea': [1, 1, 1],
+                        'item_cd': [1, 2, 3], 'c8aq2_b': [4, 2, 3], 'c8aq2_c': [np.nan] * 3,
+                        'c8aq3': [50., 60., 70.]})
+    dec = raw.copy()
+    dec['c8aq2_b'] = pd.Series(['4. CENTLITRES (CL)', '2. GRAMS (G)', '3. LITRES (L)'], dtype='string')
+    dec['c8aq2_c'] = pd.Series([pd.NA] * 3, dtype='string')
+
+    def fake(fn, convert_categoricals=True, **kw):
+        return (dec if convert_categoricals else raw).copy()
+    monkeypatch.setattr(lt, 'get_dataframe', fake)
+    dropped = nigeria._c8_raw_inputs('2023-24', keep='dropped')
+    assert sorted(dropped['unit_label']) == ['2. GRAMS (G)', '4. CENTLITRES (CL)']

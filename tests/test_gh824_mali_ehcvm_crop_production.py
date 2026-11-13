@@ -55,6 +55,8 @@ KEY = "Mali::crop_production::hh-crop-sale-single-row"
 #: GH #1437: a harvest key can share `Derivation` with KEY, joined with '+'.
 WINDOW = "Mali::crop_production::harvest-to-date"
 TOTAL = "Mali::crop_production::harvest-from-dispositions"
+#: GH #1560 (c): a sale's kilograms carry this one.
+SOLD_KG = "Mali::crop_production::sold-kg-estimate"
 FARM = "Farm-level"
 # Reviewed namespace transport at d47ff849; ledger 1687-mali-namespace-oracle §3.
 UPDATED_IDS_SHA256 = "7c17086a611c44bdd1f99b79305636feb67c8273cd349b3e81a580cdbe6649dd"
@@ -212,7 +214,9 @@ class TestDeclared:
         rec = records_for(COUNTRY, TABLE)[KEY]
         # Re-pinned for GH #1457: the same rule now serves the 2017-18 s7g sales.
         assert list(rec.waves) == ["2017-18", "2021-22"]
-        assert set(rec.columns) == {"Quantity_sold", "Unit_sold", "KgFactor_sold", "Value_sold",
+        # Re-pinned for GH #1560: the sale's kilograms ride with it.
+        assert set(rec.columns) == {"Quantity_sold", "Quantity_sold_kg", "Unit_sold",
+                                    "KgFactor_sold", "Value_sold",
                                     "Condition_sold", "condition_sold_native"}
         assert callable(rec.resolve("function")) and callable(rec.resolve("inputs"))
 
@@ -422,11 +426,13 @@ class TestServed:
 
     def test_2021_a_farm_level_row_states_a_sale_or_a_derived_total(self, w21):
         # Re-pinned for GH #1437: the row that holds a sale can hold the total too.
+        # Re-pinned for GH #1560 (c): a sale's kilograms carry sold-kg-estimate, joined '+'.
         farm = w21[w21.plot_id == FARM]
-        total = farm.Derivation.astype("string").eq(TOTAL).fillna(False)
+        keys = farm.Derivation.astype("string").fillna("").str.split("+")
+        total = keys.map(lambda k: TOTAL in k)
         assert (farm.Quantity_sold.notna() | farm.Value_sold.notna() | total).all()
         assert (farm.Quantity.notna() == total).all() and (farm.u.notna() == total).all()
-        assert farm.Derivation[~total].isna().all()
+        assert keys[~total].map(lambda k: set(k) <= {"", SOLD_KG}).all()
         for col in ("intercropped", "KgFactor_sold"):
             assert farm[col].isna().all(), col
         assert not farm.duplicated(["i", "crop"]).any()
@@ -481,7 +487,8 @@ class TestServed:
         got = T.harvest_kg(built).reset_index()
         farm = built.reset_index()
         farm = farm[(farm.t == "2021-22") & (farm.plot_id == FARM)]
-        assert (farm.Quantity.notna() == farm.Derivation.astype("string").eq(TOTAL).fillna(False)).all()
+        assert (farm.Quantity.notna() == farm.Derivation.astype("string").str.contains(
+            TOTAL, regex=False).fillna(False)).all()
         assert set(got.loc[(got.t == "2021-22") & (got.plot_id == FARM), "i"]) <= set(
             farm.loc[farm.Quantity.notna(), "i"])
         plots = ll.Country(COUNTRY).plot_features()

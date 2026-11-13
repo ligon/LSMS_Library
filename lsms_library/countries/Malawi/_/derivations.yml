@@ -46,6 +46,63 @@
 # summed to 0 by `_sale_block`) is served as 0.0 as before and carries NO
 # key: it is the survey's "did not sell", not a sale.
 
+Malawi::food_acquired::borrow-ihs5-factor:
+  waves: ['2024-25']
+  columns: [Quantity_kg]
+  rule: >-
+    Multiply each contributing native quantity by its released IHS5 2019 Factor,
+    joining region, native item code, full size-bearing unit code and informative
+    exact Otherunit text for code 23. Admit only item/unit meanings supported by
+    the two source dictionaries and the current questionnaire. Keep the existing
+    native Quantity, unit and Expenditure; do not borrow for already metric units,
+    except unit code 26 ('5 Litre Bucket(Chigoba)'), a volume container whose
+    label states a capacity rather than a mass and which borrows like any other
+    native unit, as 2019-20 serves it (PR #1604 review F1).
+    Sum via the existing canonical reducer only when every active retained
+    contributor has an observed quantity and supported factor, including
+    expenditure-only rows with unknown quantity. Otherwise Quantity_kg
+    remains missing and the existing conversion ladder handles the residual.
+  function: lsms_library.countries.Malawi.2024-25._.food_borrowing:derive_borrowed_food
+  inputs: lsms_library.countries.Malawi.2024-25._.food_borrowing:inputs_borrowed_food
+  raw_variables:
+    - case_id / y5_hhid, hh_g02
+    - hh_g03a, hh_g03b, hh_g03b_label, hh_g03b_oth
+    - hh_g04a, hh_g04b, hh_g04b_label, hh_g04b_oth, hh_g05
+    - hh_g06a, hh_g06b, hh_g06b_label, hh_g06b_oth
+    - hh_g07a, hh_g07b, hh_g07b_label, hh_g07b_oth
+    - cover.region
+    - ihs_foodconversion_factor_2020.region, item_code, unit_code, Otherunit, factor, source, item_name, unit_name
+  assumptions:
+    - text: >-
+        The applicable IHS5 released factor is transportable to a compatible
+        2024-25 native item/unit/region. This is cross-wave borrowing, not a new
+        measurement. Replace it when an appropriate newer source is available.
+      basis: modelling-choice
+      evidence: 'Maintainer 2026-11-07 item 49: "yes, borrow"; source 2019-20, MD5 dc1bed57a31e20232d04bd1ac5bb0f01.'
+    - text: >-
+        Matching numeric codes must retain their item/unit meanings; only
+        case/whitespace and nonnumeric punctuation differences are ignored.
+        Numeric fractions, decimals, ranges and Unicode numeric fractions retain
+        their literal meaning; no numeric aliases are inferred. Otherunit text is
+        matched without synonym inference. The factor source includes field,
+        imputed, calculated-standard and sparse-field origins, retained in inputs.
+      basis: variable-label
+      evidence: 'IHS5/current Module G dictionaries, current household questionnaire PDF p49 and the complete IHS5 source table. Item119 yellow flour versus Grain Meal, unit74 Tin1Kg versus Bundle, new120 versus835 Popcorn, undocumented size codes and broadened items are refused.'
+  validated_against: >-
+    Invented full-key/ambiguity/metric/completeness controls
+    (tests/test_malawi_food_borrowing.py). Source-backed: private cold build at
+    c964c6c4f (job 41005535) rederived all 169,995 public inputs with native
+    quantity/expenditure/units and older-wave Quantity_kg exact; private cold
+    base-vs-candidate builds on development e5fdd2fa8 (jobs 41232294/41232295,
+    2026-11-12) reproduce 169,995 borrowed rows with every pre-2024 wave
+    unchanged. After unit code 26 was admitted (PR #1604 review F1), a private
+    cold build at 1ca84789a (job 41240388) serves 174,026 borrowed rows;
+    derivation_inputs joins them one-to-one and rederives all 174,026, the
+    4,031 bucket rows included. No external accuracy check of the borrowed
+    factors.
+  contents: 'Malawi/_/CONTENTS.org, 2026-11-07 food follow-ups 49/50'
+  since: '2026-11-07'
+
 Malawi::crop_production::sale-basis-unknown-wildcard:
   waves: ['2010-11', '2013-14', '2016-17', '2019-20']
   columns: [Quantity_sold, Value_sold]

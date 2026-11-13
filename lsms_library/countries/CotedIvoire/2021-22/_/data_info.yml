@@ -1,2 +1,392 @@
 Country: CotedIvoire
 Wave: 2021-22
+
+# EHCVM-2 (WB 6273).  Read _/CONTENTS.org "2021-22 wired" first.  What shapes every
+# block here:
+#   - `i` is `E2_<grappe><menage, three digits>`, by mapping.i: the (grappe, menage) keys
+#     recur from 2018-19 and do not name the same household (GH #1697), so no link is
+#     served;
+#   - s00_me holds 728 households answering s00q08 = Non rempli, with no record in any
+#     section, no date and no weight.  Sub-frames that merge the cover take it on the left;
+#   - variable names survive where meanings do not: compare labels, not names.
+
+sample:
+    dfs:
+        - df_weights
+        - df_cover
+    df_weights:
+        # Primary: the 12,965 households interviewed.  One row per household, where
+        # 2018-19's file has one per grappe.  There is no longitudinal weight, so
+        # panel_weight is poids, as Togo 2021-22 (a family ruling is pending).
+        file: ehcvm_ponderations_civ2021.dta
+        idxvars:
+            i:
+                - grappe
+                - menage
+        myvars:
+            weight: poids
+            panel_weight: poids
+    df_cover:
+        file: s00_me_civ2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            # The documented stratum, region x milieu, as 2018-19's (GH #1575, extended to
+            # this wave by the ruling of 2026-11-12, "Same rule as #1575"), by the shared
+            # helper.  mapping.strata_label_upper_region first upper-cases the region, as
+            # mapping.Region does for cluster_features: this file labels 23 of its 33 regions
+            # in lower case on 2018-19's codes, and upper case is 2018-19's label on all 33.
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label_upper_region
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    Urbain: Urban
+    merge_on:
+        - i
+    merge_how: left
+    final_index:
+        - i
+        - t
+
+cluster_features:
+    # One file: the cover carries the GPS 2018-19 kept in grappe_gps_CIV2018.dta, and
+    # one point per grappe.  Projected to (t, v) by mapping.cluster_features.
+    file: s00_me_civ2021.dta
+    idxvars:
+        v: grappe
+    myvars:
+        Region: s00q01
+        Rural:
+            - s00q04
+            - mapping:
+                Rural: Rural
+                Urbain: Urban
+        Latitude: GPS__Latitude
+        Longitude: GPS__Longitude
+
+household_roster:
+    dfs:
+        - df_main
+        - df_cover
+    df_main:
+        file: s01_me_civ2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+            pid: membres__id
+        myvars:
+            Sex: s01q01
+            Relationship: s01q02
+            Age:
+                - s01q04a
+                - s01q03a
+                - s01q03b
+                - s01q03c
+            MonthsSpent:
+                - s01q12
+                - mapping:
+                    Oui: 12
+                    Non: 0
+    df_cover:
+        file: s00_me_civ2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            interview_date: s00q23a
+    merge_on:
+        - v
+        - i
+    merge_how: left
+    final_index:
+        - v
+        - i
+        - pid
+
+individual_education:
+    file: ehcvm_individu_civ2021.dta
+    idxvars:
+        v: grappe
+        i:
+            - grappe
+            - menage
+        pid: numind
+    myvars:
+        Educational Attainment:
+            - educ_hi
+            - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+
+subjective_well_being:
+    # 2018-19's s20q05 is s20aq05 here, on the same code list (1 = Riche).  The mapping is
+    # keyed on the labels, and the served step runs the other way from the codes.
+    file: s20a_me_civ2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Own Step:
+            - s20aq05
+            - mapping:
+                Très pauvre: 1
+                Pauvre: 2
+                Moyen: 3
+                Riche: 4
+                Ne sait pas: null
+                Refus: null
+
+assets:
+    # The full grid, as 2018-19: 45 items per household, s12q02 oui or non.  A row with
+    # no number and no value is dropped by the framework, as there.
+    file: s12_me_civ2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age: s12q07
+        Value: s12q09
+        Purchase Price: s12q08
+
+shocks:
+    # s14a is the COVID-19 module; s14b is the module 2018-19 called s14.  The coping
+    # columns hold ranks here, not 2018-19's indicators, except Cope25: see mapping.shocks.
+    # The framework drops the rows with no follow-up: the instrument asks follow-ups only
+    # of the last 12 months, so 7,588 of 15,473 reported shocks have one.  2018-19 serves
+    # 13,778 of its 15,762, so a cross-wave incidence reads as a false fall.  This file's
+    # keys are damaged: _/CONTENTS.org, "2021-22 wired".
+    file: s14b_me_civ2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        Shock: s14bq01
+    myvars:
+        AffectedIncome:
+            - s14bq04a
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedAssets:
+            - s14bq04b
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedProduction:
+            - s14bq04c
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        # s14bq04d is the herd, s14bq04e the food stock and s14bq04f the food purchases,
+        # by this file's labels.  Ruling (GH #1556 / #1561): AffectedConsumption is food
+        # PURCHASES and AffectedFoodStock food STOCKS, which is also how 2018-19 now reads
+        # its s14q04f / s14q04e.  Non-concerné is code 4 in every column of this file,
+        # where 2018-19 also stores it as Stata .d.
+        AffectedFoodStock:
+            - s14bq04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14bq04f
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        Cope1: s14bq05__1
+        Cope2: s14bq05__2
+        Cope3: s14bq05__3
+        Cope4: s14bq05__4
+        Cope5: s14bq05__5
+        Cope6: s14bq05__6
+        Cope7: s14bq05__7
+        Cope8: s14bq05__8
+        Cope9: s14bq05__9
+        Cope10: s14bq05__10
+        Cope11: s14bq05__11
+        Cope12: s14bq05__12
+        Cope13: s14bq05__13
+        Cope14: s14bq05__14
+        Cope15: s14bq05__15
+        Cope16: s14bq05__16
+        Cope17: s14bq05__17
+        Cope18: s14bq05__18
+        Cope19: s14bq05__19
+        Cope20: s14bq05__20
+        Cope21: s14bq05__21
+        Cope22: s14bq05__22
+        Cope23: s14bq05__23
+        Cope24: s14bq05__24
+        Cope25: s14bq05__25
+        Cope26: s14bq05__26
+
+housing:
+    # The section shifted by one: roof and floor are s11q19 and s11q20 here,
+    # s11q20 and s11q21 in 2018-19.  The served words are 2018-19's, then the country's
+    # Roof and Floor tables.  Plastique is new in this wave.
+    file: s11_me_civ2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Roof:
+            - s11q19
+            - mapping:
+                Dalle en ciment: Concrete Slab
+                Tuile: Clay Tiles
+                Tôles: Iron Sheets
+                Paille: Thatch
+                Banco: Adobe
+                Chaume: Straw
+                Nattes: Woven Mats
+                Autre (à préciser): Other
+                Plastique: Plastic
+        Floor:
+            - s11q20
+            - mapping:
+                Carreaux/Marbre: Tiles
+                Ciment/Béton: Cement
+                Terre battue/Sable: Earth
+                Bouse d'animaux: Dung
+                Autre: Other
+
+interview_date:
+    file: s00_me_civ2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        # q23/q24/q25 a/b = visits 1/2/3 start/end.  The hook drops the 728 Non rempli
+        # households, 167 of which record an end and no start.
+        Result:       s00q08
+        int_start:    s00q23a
+        int_end:      s00q23b
+        int_start_v2: s00q24a
+        int_end_v2:   s00q24b
+        int_start_v3: s00q25a
+        int_end_v3:   s00q25b
+
+food_security:
+    # FIES, EHCVM section 8A, last 12 months.  s08aq01..s08aq08 map in order to the
+    # 8 canonical items, by the labels of this file.  s08aq07a and s08aq08a are
+    # frequency follow-ups and are not read.  The file has 728 empty rows with no key.
+    file: s08a_me_civ2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+    myvars:
+        Worried:
+            - s08aq01
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        HealthyDiet:
+            - s08aq02
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        FewFoods:
+            - s08aq03
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        SkippedMeal:
+            - s08aq04
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        AteLess:
+            - s08aq05
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        RanOut:
+            - s08aq06
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        Hungry:
+            - s08aq07
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+        WholeDay:
+            - s08aq08
+            - mapping:
+                Oui: True
+                Non: False
+                Ne sait pas: null
+                Refus: null
+
+food_acquired:
+    # READ _/CONTENTS.org, "s07bq03a: H withheld, L flagged" before using this table.  6.7% of
+    # its positive s07bq03a (off the quarter grid, 4+ decimals: H) read as the producer's
+    # outlier replacement, undocumented in this file; mapping.food_acquired serves every row of
+    # such a source row with Quantity and Expenditure NA, and flags the 8.5% off the grid with 3
+    # or fewer decimals (L) (GH #1697, ruled 2026-11-12, "H to NA, flag L").
+    file: s07b_me_civ2021.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j:
+            - s07bq01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        # Labelled here with the code ('139. Sachet'), and the code list moved from
+        # 2018-19's (304 is Sac (22,5 kg) there and Papier/feuille d'emballage here), so
+        # mapping.u reads the label.
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Produced: s07bq04
+        # GH #876.  Expenditure is derived by mapping.food_acquired, as in 2018-19; these
+        # raw inputs feed that hook and are dropped by the reshape.  s07bq03b and s07bq07b
+        # carry one label set, so no formatter is needed here (Togo's two differ).
+        GiftQuantity: s07bq05
+        ConsumptionUnitCode: s07bq03b
+        ConsumptionUnitSize: s07bq03c
+        LastPurchaseQuantity: s07bq07a
+        LastPurchaseUnitCode: s07bq07b
+        LastPurchaseUnitSize: s07bq07c
+        LastPurchaseValue: s07bq08

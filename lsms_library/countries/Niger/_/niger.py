@@ -645,8 +645,8 @@ def _finish_crop_production(df, t):
     column set (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave
     that passes no ``condition`` gets :data:`CONDITION_NA`; one that passes no
     ``production_obs`` gets :data:`CROP_OBS_NA`; one that passes no
-    ``condition_native``, ``Condition_sold``, ``condition_sold_native`` or
-    ``Quantity_kg`` carries NA there."""
+    ``condition_native``, ``Condition_sold``, ``condition_sold_native``,
+    ``Quantity_kg`` or ``Quantity_sold_kg`` carries NA there."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     # Quantity_kg (GH #1436): the survey's total for the line, where its harvest
@@ -659,6 +659,19 @@ def _finish_crop_production(df, t):
     no_answer = (df['Quantity_kg'].eq(0).fillna(False).astype(bool)
                  & df['Quantity'].gt(0).fillna(False).astype(bool))
     df['Quantity_kg'] = df['Quantity_kg'].mask(no_answer)
+    # Quantity_sold_kg (GH #1560 / #1571, ruling @ligon 2026-11-12, "Treat 2021 as
+    # totals"): the survey's kilograms for the SALE, a TOTAL in the window of
+    # Quantity_sold, read literally.  The wave script clears each column's own code.
+    # The harvest rule applies on the sale side: a 0 beside a positive Quantity_sold is
+    # no answer, not a sale of nothing.  A 0 beside no positive sold quantity stays.
+    # It is never a factor: KgFactor_sold, kg per ONE sold unit, is not Niger's.
+    if 'Quantity_sold_kg' not in df.columns:
+        df['Quantity_sold_kg'] = pd.NA
+    df['Quantity_sold_kg'] = pd.to_numeric(df['Quantity_sold_kg'],
+                                           errors='coerce').astype('Float64')
+    no_sold_answer = (df['Quantity_sold_kg'].eq(0).fillna(False).astype(bool)
+                      & df['Quantity_sold'].gt(0).fillna(False).astype(bool))
+    df['Quantity_sold_kg'] = df['Quantity_sold_kg'].mask(no_sold_answer)
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
     # because >=1 wave has it).  planting_month / perennial are omitted from
     # the schema entirely — no Niger wave records them.
@@ -711,8 +724,8 @@ def _finish_crop_production(df, t):
         df['production_obs'] = CROP_OBS_NA
     df['production_obs'] = df['production_obs'].astype('string')
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs',
-            'Quantity', 'Quantity_kg', 'Quantity_sold', 'Value_sold', 'Unit_sold',
-            'Condition_sold',
+            'Quantity', 'Quantity_kg', 'Quantity_sold', 'Quantity_sold_kg', 'Value_sold',
+            'Unit_sold', 'Condition_sold',
             'harvest_month', 'intercropped', 'condition_native', 'condition_sold_native']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
@@ -851,12 +864,12 @@ _HH_SALE_SOURCE = {
                     harvest_qty='AS02EQ07A', harvest_month='AS02EQ06A',
                     hh=['GRAPPE', 'MENAGE', 'EXTENSION'],
                     qty='AS02EQ12A', value='AS02EQ13', qty_codes=(9999,), value_codes=(9999999,),
-                    raw=['AS02EQ110B', 'AS02EQ12A', 'AS02EQ12B', 'AS02EQ13']),
+                    raw=['AS02EQ110B', 'AS02EQ12A', 'AS02EQ12B', 'AS02EQ12C', 'AS02EQ13']),
     '2021-22': dict(harvest='s16c_me_ner2021.dta', sale='s16d_me_ner2021.dta',
                     harvest_crop='s16cq04', sale_crop='s16dq01', hh=['grappe', 'menage'],
                     harvest_qty='s16cq16a', harvest_stand='s16cq07',
                     qty='s16dq05a', value='s16dq06', drop_repeats=True,
-                    raw=['s16dq01', 's16dq05a', 's16dq05b', 's16dq05d', 's16dq06']),
+                    raw=['s16dq01', 's16dq05a', 's16dq05b', 's16dq05c', 's16dq05d', 's16dq06']),
 }
 
 
@@ -891,7 +904,7 @@ def derive_dry_season_cycle_total(per_cycle, cycles):
     return total.mask(x.gt(0) & n.eq(0))
 
 
-def derive_dry_season_sale_window(quantity_sold, value_sold):
+def derive_dry_season_sale_window(quantity_sold, value_sold, kilograms_sold=None):
     """A dry-season sale -> ``Quantity_sold`` / ``Value_sold``: THE IDENTITY.
 
     Registered as ``Niger::crop_production::dry-season-sale-window``, the Mali
@@ -900,11 +913,19 @@ def derive_dry_season_sale_window(quantity_sold, value_sold):
     pair is served as recorded beside a ``Quantity`` over all cycles, and on a
     multi-cycle line ``Quantity_sold / Quantity`` is not a sold share.  Both inputs
     are cleared of their codes by the caller.
+
+    ``kilograms_sold`` is 3E.11c ``as03eq11c`` (GH #1560), the sale in kilograms,
+    asked beside 3E.11a and so in its window: served as recorded, a TOTAL for that
+    window, and like ``Quantity_sold`` NOT multiplied by the cycle count, which the
+    harvest's ``Quantity_kg`` is.  Returned as ``Quantity_sold_kg`` when given.
     """
-    return pd.DataFrame({
+    out = pd.DataFrame({
         'Quantity_sold': pd.to_numeric(quantity_sold, errors='coerce').astype('float64'),
         'Value_sold': pd.to_numeric(value_sold, errors='coerce').astype('float64'),
     })
+    if kilograms_sold is not None:
+        out['Quantity_sold_kg'] = pd.to_numeric(kilograms_sold, errors='coerce').astype('float64')
+    return out
 
 
 def stamp_dry_season_derivations(df):
@@ -951,7 +972,62 @@ def inputs_dry_season_sale_window(wave):
     """The registry ``inputs`` callable of dry-season-sale-window; the cycle count
     is there so a user can rescale the sale."""
     return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
-                                     'as03eq10', 'as03eq11a', 'as03eq11b', 'as03eq12'])
+                                     'as03eq10', 'as03eq11a', 'as03eq11b', 'as03eq11c',
+                                     'as03eq12'])
+
+
+# Sold kilograms on a 3E record that states no sale (GH #1560 / #1571, ruling @ligon
+# 2026-11-12, "Sold-kg details" (a)).  Seven records give as03eq11c but no positive
+# as03eq11a or as03eq12; their own sold flag says Non on six, and six equal the line's
+# harvest kilograms.  The kilograms are masked; the row, a harvest, is served.
+DRY_SEASON_SOLD_KG_NO_SALE = 'Niger::crop_production::dry-season-sold-kg-no-sale'
+#: 3E's codes, the wave script's DRY_QTY_SENTINELS and VALUE_SENTINELS.
+_DRY_SOLD_KG_CODES = (99999,)
+_DRY_VALUE_CODES = (9999999,)
+
+
+def derive_dry_season_sold_kg_no_sale(kilograms_sold, quantity_sold, value_sold):
+    """3E.11c ``as03eq11c`` -> ``Quantity_sold_kg``, NA on a record that states no sale.
+
+    Registered as ``Niger::crop_production::dry-season-sold-kg-no-sale``.  A sale is a
+    positive sold quantity (3E.11a) or a positive value (3E.12), the test every Niger
+    wave uses (:func:`is_crop_sale`); all three inputs are cleared of their codes by the
+    caller.  Where there is none, the sold kilograms are NA, whatever the sold flag
+    (3E.10) says.  Elsewhere the identity.  Returns float64.
+    """
+    kg = pd.to_numeric(kilograms_sold, errors='coerce').astype('float64')
+    q = pd.to_numeric(quantity_sold, errors='coerce').astype('float64')
+    v = pd.to_numeric(value_sold, errors='coerce').astype('float64')
+    return kg.where(q.gt(0) | v.gt(0))
+
+
+def stamp_dry_season_sold_kg_no_sale(df, masked):
+    """The ``Derivation`` column of the finished 2011-12 frame with
+    :data:`DRY_SEASON_SOLD_KG_NO_SALE` joined (``MULTI_SEP``, sorted) onto the Farm-level
+    rows whose ``(i, production_obs)`` is in *masked*: the records whose sold kilograms
+    the rule removed.  The row keeps its other keys."""
+    out = df['Derivation'].astype('string').copy()
+    idx = df.index
+    hit = ((idx.get_level_values('plot_id') == FARM_LEVEL)
+           & pd.MultiIndex.from_arrays([idx.get_level_values('i'),
+                                        idx.get_level_values('production_obs')]).isin(
+               list(masked)))
+    out[hit] = pd.array([union_keys((key, DRY_SEASON_SOLD_KG_NO_SALE)) for key in out[hit]],
+                        dtype='string')
+    return out
+
+
+def inputs_dry_season_sold_kg_no_sale(wave):
+    """The registry ``inputs`` callable of dry-season-sold-kg-no-sale: the 3E records
+    whose sold kilograms are masked, as recorded, with their sold flag, sale and harvest
+    kilograms, keyed by the served ``(t, i, plot_id, production_obs)``."""
+    raw = _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06', 'as03eq09a',
+                                    'as03eq09b', 'as03eq09c', 'as03eq10', 'as03eq11a',
+                                    'as03eq11b', 'as03eq11c', 'as03eq12'])
+    kg = _na_exact(raw['as03eq11c'], _DRY_SOLD_KG_CODES)
+    kept = derive_dry_season_sold_kg_no_sale(kg, _na_exact(raw['as03eq11a'], _DRY_SOLD_KG_CODES),
+                                             _na_exact(raw['as03eq12'], _DRY_VALUE_CODES))
+    return raw[(kg.notna() & kept.isna()).to_numpy()]
 
 
 # ---------------------------------------------------------------------------
@@ -986,6 +1062,62 @@ def stamp_survey_kg_estimate(df):
     out[mask] = pd.array([union_keys((value, SURVEY_KG_ESTIMATE)) for value in out[mask]],
                          dtype='string')
     return out
+
+
+# The SALE's kilograms in 2021-22, s16dq05c, carry the sibling key (GH #1560, ruling
+# @ligon 2026-11-12, "Sold-kg details" (c)): the same "Estimation Quantite totale UML en
+# kg", on the crop-level sale record rather than the harvest line, so its inputs are
+# s16d's and not s16c's.
+SOLD_KG_ESTIMATE = 'Niger::crop_production::sold-kg-estimate'
+
+
+def derive_sold_kg_estimate(kilograms):
+    """2021-22 s16dq05c -> ``Quantity_sold_kg``: THE IDENTITY, read as a total.
+
+    Registered as ``Niger::crop_production::sold-kg-estimate``.  Nothing is computed; the
+    registry says what the number is: the instrument's estimate of the sale in kilograms,
+    served as a total by ruling (2026-11-12, "Treat 2021 as totals").  Returns float64.
+    """
+    return pd.to_numeric(kilograms, errors='coerce').astype('float64')
+
+
+def stamp_sold_kg_estimate(df):
+    """The ``Derivation`` column of the finished 2021-22 frame with
+    :data:`SOLD_KG_ESTIMATE` APPENDED (``MULTI_SEP``, sorted) wherever ``Quantity_sold_kg``
+    holds a value, a Farm-level sale row included."""
+    out = (df['Derivation'].astype('string').copy() if 'Derivation' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    mask = df['Quantity_sold_kg'].notna().to_numpy(dtype=bool)
+    out[mask] = pd.array([union_keys((value, SOLD_KG_ESTIMATE)) for value in out[mask]],
+                         dtype='string')
+    return out
+
+
+def inputs_sold_kg_estimate(wave):
+    """The registry ``inputs`` callable of sold-kg-estimate: the s16d sale records whose
+    s16dq05c holds a value, as recorded, once each (the exact repeats dropped as the build
+    drops them), keyed by the served ``(t, i, crop)``."""
+    from lsms_library.paths import countries_root
+    if wave != '2021-22':
+        raise ValueError(f"sold-kg-estimate is ['2021-22'], not {wave!r}")
+    root = Path(countries_root()) / 'Niger' / wave
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        dirs=[f"{root / '_'}/", f"{Path(countries_root()) / 'Niger' / '_'}/"],
+        **{'Preferred Label': 'Preferred Label'})
+    path = str(root / 'Data' / 's16d_me_ner2021.dta')
+    lab = tools.get_dataframe(path, convert_categoricals=True)
+    code = tools.get_dataframe(path, convert_categoricals=False)
+    keep = ~code.duplicated(keep='first').to_numpy()
+    lab, code = lab[keep], code[keep]
+    out = code[['s16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq05c', 's16dq05d',
+                's16dq06']].copy()
+    out['t'] = wave
+    out['i'] = lab.apply(lambda r: i(pd.Series([r['grappe'], r['menage']],
+                                               index=['grappe', 'menage'])), axis=1).values
+    out['crop'] = _crop_labels(code['s16dq01'], lab['s16dq01'], crop_map).values
+    has_kg = pd.to_numeric(out['s16dq05c'], errors='coerce').notna().to_numpy()
+    return out[has_kg & out['crop'].notna().to_numpy()].set_index(['t', 'i', 'crop'])
 
 
 def inputs_survey_kg_estimate(wave):

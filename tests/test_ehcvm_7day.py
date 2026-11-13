@@ -41,16 +41,16 @@ from lsms_library.ehcvm import (
 )
 from lsms_library.paths import countries_root
 
-#: The twelve EHCVM 2018+ waves, country -> waves.
+#: The EHCVM 2018+ waves, country -> waves.
 WAVES = {
-    'Togo': ['2018'],
-    'Benin': ['2018-19'],
+    'Togo': ['2018', '2021-22'],
+    'Benin': ['2018-19', '2021-22'],
     'Guinea-Bissau': ['2018-19'],
     'Senegal': ['2018-19', '2021-22'],
     'Mali': ['2018-19', '2021-22'],
     'Niger': ['2018-19', '2021-22'],
     'Burkina_Faso': ['2018-19', '2021-22'],
-    'CotedIvoire': ['2018-19'],
+    'CotedIvoire': ['2018-19', '2021-22'],
 }
 CELLS = [(c, w) for c, ws in WAVES.items() for w in ws]
 FUNCTION = 'lsms_library.ehcvm:derive_ehcvm_purchase_value'
@@ -60,7 +60,9 @@ FUNCTION = 'lsms_library.ehcvm:derive_ehcvm_purchase_value'
 #: scale the change is against.
 BEFORE_SUM = {
     ('Togo', '2018'): 44_452_024.0,
+    ('Togo', '2021-22'): 45_908_210.33,
     ('Benin', '2018-19'): 87_287_926.96,
+    ('Benin', '2021-22'): 111_687_481.85,
     ('Guinea-Bissau', '2018-19'): 91_353_379.75,
     ('Senegal', '2018-19'): 171_946_367.74,
     ('Senegal', '2021-22'): 185_854_824.98,
@@ -71,6 +73,7 @@ BEFORE_SUM = {
     ('Burkina_Faso', '2018-19'): 65_315_307.5,
     ('Burkina_Faso', '2021-22'): 39_905_158.0,
     ('CotedIvoire', '2018-19'): 119_107_505.0,
+    ('CotedIvoire', '2021-22'): 170_793_500.0,
 }
 
 #: Served purchased-side ``Expenditure`` AFTER, under construction C, and the
@@ -82,18 +85,43 @@ BEFORE_SUM = {
 #: quantities and every Expenditure total are unchanged.
 AFTER = {
     ('Togo', '2018'): (31_676_794.87, 10_213),
+    # GH #1697 (2026-11-12): 34,464,072.25 before the producer's factor was divided out.
+    ('Togo', '2021-22'): (29_435_020.05, 10_579),
     ('Benin', '2018-19'): (68_929_996.70, 18_645),
+    ('Benin', '2021-22'): (82_870_829.43, 27_522),
     ('Guinea-Bissau', '2018-19'): (57_552_942.85, 13_818),
-    ('Senegal', '2018-19'): (147_345_570.63, 10_802),
-    ('Senegal', '2021-22'): (182_628_314.17, 10_917),
+    # 2026-11-12: 2018-19 -6,000 FCFA (GH #1519: two near-zero quantities served NA);
+    # 2021-22 -17.78 FCFA and 5 gift rows (salt-per-capita-withheld).
+    ('Senegal', '2018-19'): (147_339_570.63, 10_802),
+    ('Senegal', '2021-22'): (182_628_296.39, 10_912),
     # 16,459 until GH #1513: its food labels now fold, and 46 gift rows sum into others.
     ('Mali', '2018-19'): (89_614_678.64, 16_413),
     ('Mali', '2021-22'): (97_178_691.52, 16_886),
-    ('Niger', '2018-19'): (53_351_991.10, 8_141),
+    # 53,351,991.10 until 2026-11-12 (GH #1708, "Revalue at local median"): the 12,227
+    # flagged purchased rows #876 values are valued at a local median of genuine last
+    # purchases, cluster or region, each needing 3 reports ("Region floor of 3", "Only
+    # previously valued"); 2,872 of them have no such median and are served NA.
+    # 52,486,790.70 under the first scope (every flagged row, region floor 1).
+    ('Niger', '2018-19'): (46_636_756.04, 8_141),
     ('Niger', '2021-22'): (67_358_383.42, 7_112),
     ('Burkina_Faso', '2018-19'): (52_466_280.38, 9_386),
     ('Burkina_Faso', '2021-22'): (27_888_221.36, 6_148),
     ('CotedIvoire', '2018-19'): (105_011_084.65, 35_289),
+    # GH #1697 (2026-11-12): 121,393,491.0 before the H rows were withheld.
+    ('CotedIvoire', '2021-22'): (118_357_863.94, 29_050),
+}
+
+#: Keys a wave's food rows may carry beside this one (GH #1697, rulings of 2026-11-12):
+#: Togo 2021-22's s07bq03a is recovered from the producer's regional factor before the
+#: residual is formed, and Cote d'Ivoire 2021-22's H rows are withheld and its L rows
+#: flagged.  The purchased row joins the key of its rule to the 7-day key with '+'.
+OTHER_KEYS = {
+    ('Togo', '2021-22'): {'Togo::food_acquired::s07bq03a-regional-factor-divided-out',
+                          'Togo::food_acquired::s07bq03a-floored-count-recovered',
+                          'Togo::food_acquired::s07bq03a-floored-count-withheld'},
+    ('CotedIvoire', '2021-22'): {
+        'CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld',
+        'CotedIvoire::food_acquired::s07bq03a-partial-triplet-conversion'},
 }
 
 #: The unit sizes each country may serve in `u` (GH #1224): each instrument's own
@@ -102,9 +130,10 @@ AFTER = {
 SIZES = {
     'Benin': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Sans brassée',
               'Avec 1 brassée', 'Avec 2 brassées', 'A 2 doigts', 'A 3 doigts',
-              'A 5 doigts', 'Autre taille'},
+              'A 5 doigts', 'Autre taille', 'Très petit', 'Très grand', 'Entier'},
     'Burkina_Faso': {'Petit', 'Moyen', 'Grand'},
-    'CotedIvoire': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},
+    'CotedIvoire': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier', 'Très petit',
+                    'Très grand'},
     'Guinea-Bissau': {'Pequeno', 'Medio', 'Grande'},
     'Mali': {'Petit', 'Moyen', 'Grand'},
     'Niger': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},
@@ -305,8 +334,14 @@ class TestDelivered:
         got = x['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).to_numpy()
         assert (got == (s == 'purchased')).all()
         keys = set(x['Derivation'].dropna().str.split('+').explode())
+        # GH #1708: Niger 2018-19's purchased rows built from a computed s07bq07a also
+        # carry that flag, and the key of their revaluation at a local median.
+        flags = {'Niger::food_acquired::computed-last-purchase-quantity',
+                 'Niger::food_acquired::flagged-purchase-local-median'} \
+            if (country, wave) == ('Niger', '2018-19') else set()
         assert keys - {derivation_key(country)} <= {
-            f'{country}::food_acquired::nsu-national-unit-weight'}
+            f'{country}::food_acquired::nsu-national-unit-weight'} \
+            | OTHER_KEYS.get((country, wave), set()) | flags
 
     @pytest.mark.parametrize('country', sorted(NON_EHCVM_WAVES))
     def test_a_non_ehcvm_wave_of_the_same_country_carries_no_key(self, built, country):
@@ -356,7 +391,10 @@ class TestDelivered:
         _, n = AFTER[(country, wave)]
         assert len(inkind) == n
         assert inkind['Expenditure'].isna().all()
-        assert (inkind['Quantity'] > 0).all()
+        # GH #1697: Cote d'Ivoire 2021-22's H rows are served with no quantity, and only those.
+        withheld = inkind['Derivation'].fillna('').str.contains('withheld', regex=False)
+        assert (inkind.loc[~withheld, 'Quantity'] > 0).all()
+        assert inkind.loc[withheld, 'Quantity'].isna().all()
         # A reported quantity, not a derivation of it.  GH #1452: its kilograms can be.
         assert not inkind['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).any()
 

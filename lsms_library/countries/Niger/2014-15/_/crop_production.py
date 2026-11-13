@@ -6,8 +6,9 @@ Two source files, as the instrument splits harvest from sale:
     ``Quantity_kg`` column, GH #1436) plus the harvest start/end month
     (AS02EQ06A / AS02EQ06B).  One row per reported (field, parcel, crop) line.
   - ECVMA2_AS2E2P2.dta : CROP level (no plot) — sold qty + unit
-    (AS02EQ12A / AS02EQ12B -> the ``Unit_sold`` column, GH #824) and sale
-    value (AS02EQ13).
+    (AS02EQ12A / AS02EQ12B -> the ``Unit_sold`` column, GH #824), the sold
+    kilograms (AS02EQ12C -> the ``Quantity_sold_kg`` column, a total, GH #1560)
+    and sale value (AS02EQ13).
 
 i is built from (GRAPPE, MENAGE, EXTENSION) via niger.i -- the full
 ECVMA2 household key, matching this wave's sample / roster idxvars
@@ -55,6 +56,13 @@ VALUE_SENTINELS = (9999999,)
 # and the line's own sale would be 0.42 FCFA per kg.  One value to remove to reverse it.
 # See CONTENTS.org, "the survey harvest kilograms are served".
 KG_SENTINELS = (999999, 999998)
+# The SOLD kilograms' code (GH #1560, ruling 2026-11-12: sold kg are served as totals).
+# AS02EQ12C == 9999 on 11 of its 1,089 answers and is the column maximum: 7 are
+# all-code lines (AS02EQ12A 9999, AS02EQ13 9999999, unit and sold flag 'Manquant'),
+# the other 4 would be 83-5,000 kg per 50 / 100 kg sack, and 8 of the 11 sit beside
+# AS02EQ110E == 9999, the crop's harvest kg.  The quantity code's width, not the
+# harvest kg's.  Exact value only.
+SOLD_KG_SENTINELS = (9999,)
 
 
 crop_map, unit_map = _crop_maps()
@@ -93,6 +101,8 @@ sold_df = pd.DataFrame({
     'i':             sold_i.values,
     'crop':          sold_crop.values,
     'Quantity_sold': _na_exact(sold['AS02EQ12A'], QTY_SENTINELS).values,
+    # The sale in kilograms, a TOTAL (GH #1560): kg == quantity on 20 of 22 Kg sales.
+    'Quantity_sold_kg': _na_exact(soldn['AS02EQ12C'], SOLD_KG_SENTINELS).values,
     'Value_sold':    _na_exact(sold['AS02EQ13'], VALUE_SENTINELS).values,
     # The SOLD unit (AS02EQ12B; same 12-code label set as the harvest unit
     # AS02EQ07B, same `u` table) -- GH #824.  Part of the KEY below, so a
@@ -103,7 +113,7 @@ sold_df = pd.DataFrame({
 # ECVMA2_AS2E2P2 (5,226 rows): every (household, crop) is one row, so the
 # sum is a no-op here; the key still names the grain the sum is taken over.
 sold_one = (sold_df.groupby(['i', 'crop', 'Unit_sold'], as_index=False, dropna=False)
-            [['Quantity_sold', 'Value_sold']].sum(min_count=1))
+            [['Quantity_sold', 'Quantity_sold_kg', 'Value_sold']].sum(min_count=1))
 records = sold_one
 
 # Attribute ONLY to (i, crop) pairs with a single harvest LINE -- one plot,
@@ -133,5 +143,9 @@ assert df.index.is_unique, 'crop_production 2014-15 repeats a native harvest lin
 # Conservation: the records' sums, on one row each.
 assert df['Value_sold'].sum() == records['Value_sold'].sum(), 'a sale value moved'
 assert df['Quantity_sold'].sum() == records['Quantity_sold'].sum(), 'a sold quantity moved'
+# Every recorded sold kilogram is on a served row: none rides on a record that is not a
+# sale and has no single line to sit on (GH #1560).
+assert abs(float(df['Quantity_sold_kg'].sum()) - float(records['Quantity_sold_kg'].sum())) < 1e-6, \
+    'a sold kilogram moved'
 assert len(df) > 0, 'crop_production 2014-15 produced no rows'
 to_parquet(df, 'crop_production.parquet')

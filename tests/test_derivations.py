@@ -108,6 +108,18 @@ class TestLoaderRefuses:
         assert "modelling-choice" in BASES
         assert "modelling-choice" not in BASIS_LADDER
         assert "not-recorded" not in BASES
+        # GH #1697: a measured regularity of the file, which is not a document either.
+        assert "derived-from-data" in BASES
+        assert "derived-from-data" not in BASIS_LADDER
+
+    def test_the_ladder_order_is_the_ruled_one(self):
+        """Ruling 2026-11-12, "Above filename": a measured regularity ranks below what a
+        document or a maintainer states and above a filename guess; `bases` reports in
+        that order whatever order the assumptions are written in."""
+        assert BASES == ("questionnaire", "variable-label", "config-comment",
+                         "derived-from-data", "filename", "modelling-choice")
+        r = _rec(assumptions=[dict(text=b, basis=b) for b in reversed(BASES)])
+        assert r.bases == BASES
 
     @pytest.mark.parametrize("field", ["function", "inputs"])
     def test_callables_are_dotted(self, field):

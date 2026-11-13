@@ -50,8 +50,10 @@ Mali::food_acquired::7day-purchase-at-last-purchase-unit-value:
         denominator -- purchased rows of the delivered table, after the
         canonical reshape and the (t, v, i, j, u, s) collapse -- because that
         is the number a user sees; the source-row counts are smaller and were
-        what an earlier version of this entry quoted. 2018-19: 25,572 of the
-        129,085 SERVED purchased rows (19.8%), since GH #1513 folded its food labels;
+        what an earlier version of this entry quoted. 2018-19: 22,216 of the
+        125,729 SERVED purchased rows (17.7%), since GH #1707 withheld the 3,356
+        rice-ration rows, every one of them NA here; 25,572 of 129,085 (19.8%)
+        from GH #1513, which folded its food labels, until then;
         before that 25,667 of 129,598 -- 10,771 because no last
         purchase was reported at all (s07bq08 or s07bq07a missing / not
         positive), 6,731 because the last purchase used a different unit CODE,
@@ -222,13 +224,16 @@ Mali::crop_production::tree-sale-window:
 
 Mali::crop_production::hh-crop-sale-single-row:
   waves: ['2017-18', '2021-22']
-  columns: [Quantity_sold, Unit_sold, KgFactor_sold, Value_sold, Condition_sold, condition_sold_native]
+  columns: [Quantity_sold, Quantity_sold_kg, Unit_sold, KgFactor_sold, Value_sold, Condition_sold,
+            condition_sold_native]
   rule: >-
     s16d records a sale for the household and crop, with no plot.  A sale is a
     record with a positive s16dq05a or s16dq06.  Where the household has exactly
     one s16c row for the crop -- one served row, not merely one plot -- the sale
     is served on that row: Quantity_sold = s16dq05a, Unit_sold = s16dq05b,
-    Value_sold = s16dq06, as recorded, and that row carries this key. The own
+    Value_sold = s16dq06, as recorded, and that row carries this key.  Its kilograms,
+    s16dq05c, ride with it as Quantity_sold_kg, a total (GH #1560, ruling @ligon
+    2026-11-12), a 0 beside a positive s16dq05a NA. The own
     s16dq05d sold state accompanies that same sale as Condition_sold and
     condition_sold_native (GH1528), without supplying a harvest state. What is
     derived is the ATTACHMENT, not the numbers.  Any other sale is served on one
@@ -245,8 +250,8 @@ Mali::crop_production::hh-crop-sale-single-row:
     one plot, s7gq20 = 'Non' as Quantity_sold = Value_sold = 0, with no key.
   function: lsms_library.countries.Mali._.mali:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Mali._.mali:inputs_hh_crop_sale_single_row
-  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq05d,
-                  s16dq06, s7fq01, s7fq02, s7fq03, s7gq01, s7gq20, s7gq21a, s7gq21b,
+  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq05c,
+                  s16dq05d, s16dq06, s7fq01, s7fq02, s7fq03, s7gq01, s7gq20, s7gq21a, s7gq21b,
                   s7gq21d, s7gq22]
   assumptions:
     - text: >-
@@ -416,8 +421,10 @@ Mali::crop_production::survey-kg-estimate:
     its local unit and not a weighing.  A 0 beside a positive quantity (3 rows) is no
     answer and is NA.  A row whose Quantity is harvest-from-dispositions
     has none: s16d's other "c" columns are the state of the product, and s16dq05c, the
-    sale's kilograms, is not served.  Shares a row with harvest-to-date and
-    hh-crop-sale-single-row through derivations.MULTI_SEP, in sorted order.
+    sale's kilograms, is served as Quantity_sold_kg under the sibling key
+    sold-kg-estimate (GH #1560).  Shares a row with harvest-to-date,
+    hh-crop-sale-single-row and sold-kg-estimate through derivations.MULTI_SEP, in sorted
+    order.
   function: lsms_library.countries.Mali._.mali:derive_survey_kg_estimate
   inputs: lsms_library.countries.Mali._.mali:inputs_survey_kg_estimate
   raw_variables: [s16cq16a, s16cq16b, s16cq16c, s16cq16d]
@@ -435,6 +442,39 @@ Mali::crop_production::survey-kg-estimate:
     nothing to validate but its rows.
   contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the survey harvest kilograms, 2021-22 (GH #1436)"'
   since: '2026-11-04'
+
+# GH #1560, ruling @ligon 2026-11-12 ("Sold-kg details" (c)): the sold kilograms carry the
+# "estimate" key the harvest kilograms carry -- a sibling, because survey-kg-estimate's rule,
+# inputs (s16c lines) and tests are the harvest's.
+Mali::crop_production::sold-kg-estimate:
+  waves: ['2021-22']
+  columns: [Quantity_sold_kg]
+  rule: >-
+    Identity on a 2021-22 row with a Quantity_sold_kg: 16D.05c s16dq05c, "Estimation Quantite
+    totale UML en kg", served as recorded as the TOTAL kilograms of the sale (ruling @ligon
+    2026-11-12, "Treat 2021 as totals"), with a 0 beside a positive s16dq05a NA (4 rows).
+    The key says what the number is: the instrument calls it an estimate.  It rides with the
+    sale, on the single s16c row or the Farm-level row, and joins any key already there with
+    sorted '+'.
+  function: lsms_library.countries.Mali._.mali:ehcvm_sold_kilograms
+  inputs: lsms_library.countries.Mali._.mali:inputs_sold_kg_estimate
+  raw_variables: [s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq05c, s16dq06]
+  assumptions:
+    - text: >-
+        s16dq05c is the sale's total in kilograms, as estimated, and not a factor per unit,
+        although both own vague forms instruct a weight per ONE unit: the released label says
+        a total, kg equals the sold quantity on all 495 sales in Kg and 1 on none, and the
+        median per 100 kg sack is 100.
+      basis: variable-label
+      evidence: >-
+        s16d_me_mli2021.dta s16dq05c "16D.05c. Estimation Quantite totale UML en kg";
+        mli_ehcvm2_qnr_men_excel_vague1.pdf and _vague2.pdf, PDF p. 88, 16D05; ruling @ligon
+        2026-11-12 (.sucoder/isa-decisions.org, "Sold kilograms" and "Sold-kg details" (c)).
+  validated_against: >-
+    tests/test_mali_crop_sold_kg.py, whose oracle reads s16d directly.  An identity has nothing
+    to validate but its rows.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-12 -- crop_production: the sold kilograms are served (GH #1560)"'
+  since: '2026-11-12'
 
 Mali::community_prices::gram-centilitre-poids:
   waves: ['2014-15']
@@ -625,3 +665,51 @@ Mali::food_acquired::nsu-national-unit-weight:
     Measured kilograms are in Mali/_/CONTENTS.org.
   contents: 'Mali/_/CONTENTS.org, "EHCVM unit-weight table wired (GH #1452)"'
   since: '2026-11-04'
+
+# A DELETION (GH #1707): the rows are not served, so none can carry a key.  This
+# entry is the disclosure (`rows: 0`), and `derivation_inputs` returns the records.
+Mali::food_acquired::rice-ration-block-withheld:
+  waves: ['2018-19']
+  columns: [Quantity]
+  rows: 0
+  rule: >-
+    The records of s07b_me_mli2018.dta with no vague are not served.  There are 3,357,
+    one per household, every one `Riz local Gambiaka` in kg (size-free), answered
+    `Plus de 30 jours`, with nothing produced, given or bought (s07bq04, s07bq05,
+    s07bq07a and s07bq08 empty) and s07bq03a a whole multiple of 1.4 kg; every other
+    record of the file has a vague.  The build checks that fingerprint on every
+    record with no vague and raises if one lacks it.  Before GH #1707 each was served
+    as a purchased row with Expenditure NA, 32,313.4 kg in all.
+  function: lsms_library.countries.Mali.2018-19._.mapping:rice_ration_rows
+  inputs: lsms_library.countries.Mali.2018-19._.mapping:inputs_rice_ration_block
+  raw_variables: [vague, s07bq01, s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05,
+                  s07bq06, s07bq07a, s07bq07b, s07bq07c, s07bq08]
+  assumptions:
+    - text: >-
+        the block is a construction by the file's producers, not a household's answer:
+        a ration of 0.2 kg a person a day for 7 days (s07bq03a = 1.4 x the welfare
+        file's hhsize on 3,348 of the 3,357; on the other 9 a whole multiple of 1.4,
+        of another integer, and 3 of those households are on no cover), on a record
+        with no passage and no purchase.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-12, "Remove, registered", on the maintainer's principle
+        that undocumented imputations are not served without a very good reason.
+        No document explains the block: the World Bank DDI (catalog 4295,
+        Documentation.pdf p.487) counts the 3,357 missing vague without comment, the
+        CAPI questionnaires list Riz local Gambiaka only as an ordinary roster item,
+        and neither copy of the 2018-19 poverty profile mentions it (documentation
+        search of 2026-11-12, reports/ehcvm2-s07bq03a-docsearch).
+    - text: >-
+        the missing vague selects the block; the 1.4 x hhsize equality does not.  On
+        records WITH a vague it holds by coincidence for 284 rice-kg answers.
+      basis: modelling-choice
+      evidence: measured on s07b_me_mli2018.dta and ehcvm_welfare_mli2018.dta, 2026-11-12
+  validated_against: >-
+    the base build: each withheld record had become one purchased row, and 3,356 of
+    those rows disappear from the served table.  The 3,357th shared its key with the
+    household's own rice-kg purchase, which core summed with it; that row now serves
+    the household's answer alone.  No other row of the table changes
+    (Mali/_/CONTENTS.org).
+  contents: 'Mali/_/CONTENTS.org, "2018-19 rice-ration block withheld (GH #1707)"'
+  since: '2026-11-12'

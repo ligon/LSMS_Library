@@ -8,8 +8,13 @@ from tests import test_uganda_invariance as invariance
 
 
 NUTRITION = "var/nutrition.parquet"
-PRIMARY = "12d25f6ec6d069af7d3cff703b5091bc4770944eaafacf2e87bc2f058f450e3a"
-HASWELL = "f3d3c34d3fad5253d6b026d3d397d2895bc92ce3124dbdd16a92da1553d89fd6"
+# #1509; maintainer approval 2026-11-12 ("Approve the new baseline", #967
+# precedent).  The approved SkylakeX primary and its exact Haswell OpenBLAS
+# counterpart, both measured on the integrated tree (burst job 41255032,
+# private roots).  The same job's base control reproduced the previous pair,
+# 12d25f6e... and f3d3c34d..., exactly.  See Uganda/_/CONTENTS.org.
+PRIMARY = "e9fb4c67b2463694a2ec7b46ee5e6df1ef424db19753a74c2b82ad6a48a6a600"
+HASWELL = "324429c1e855440cbd87465c3853087fd7a044f9e4473438297a94960acbd07e"
 UNMEASURED = "0" * 64
 
 

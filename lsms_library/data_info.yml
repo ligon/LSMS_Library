@@ -1199,6 +1199,61 @@ Columns:
         Tree total-equivalent fields are not per-unit factors. The existing
         sold-quantity consumer screens supplied factors and retains its
         Unit_sold/fallback/disagreement policy; wiring does not change it.
+    Quantity_sold_kg:
+      type: float
+      optional: true
+      note: |
+        The SALE in kilograms, AS THE SURVEY WROTE IT DOWN: the sold-side twin
+        of `Quantity_kg`.  A TOTAL for the sale this row carries, in the window
+        of `Quantity_sold`, not a factor per sold unit; within a sold unit it
+        scales with `Quantity_sold`.  First instances (GH #1560 / #1571, ruling
+        @ligon 2026-11-12, "Treat 2021 as totals"): Niger 2011-12 `as02eq12c`
+        and `as03eq11c`, 2014-15 `AS02EQ12C`, Niger and Mali 2021-22
+        `s16dq05c` ("Estimation Quantite totale UML en kg"), which is served as
+        a total on its released label and its Kg controls although the own
+        vague forms instruct kg per ONE unit.
+
+        ITS WINDOW IS THE SALE'S, NOT THE SEASON'S.  Niger 2011-12 section 3E
+        (the dry season, `plot_id = 'Farm-level'`) asks the sale for the FIRST
+        production cycle, so its `Quantity_sold_kg` is per first cycle, beside
+        a `Quantity_kg` over all cycles: not a sold share there (ruling @ligon
+        2026-11-12; any cycle product waits on GH #1529).
+
+        NEVER CONVERTED INTO `KgFactor_sold`.  That column is kg per ONE sold
+        unit and only what an instrument wrote per unit; dividing this total
+        by `Quantity_sold` to fill it would be a number no instrument wrote.
+        `Value_sold / Quantity_sold_kg` is a price per kilogram on the same
+        row, and nothing computes it by default: `median_price_valuation`
+        reads it only when a caller passes it as `kg_qty=` (an explicit kg
+        denominator bypasses all unit work).
+
+        A "don't know" code is NA, and so is a 0 beside a positive
+        `Quantity_sold`, as on the harvest side; count both in the country's
+        CONTENTS.org.  Sold kilograms on a record with no positive sold
+        quantity or value are not a sale's weight: Niger 2011-12 3E's seven
+        are NA under the registered rule `dry-season-sold-kg-no-sale` (ruling
+        @ligon 2026-11-12), and no other served wave has one.  A total is
+        served as recorded and at most NAMED: Site Q screens this column on
+        both tails, report-only (`quantity_audit._SCREENED_COLUMNS`, ruling
+        2026-11-12).  It rides with the sale wherever the sale is placed, a
+        `plot_id = 'Farm-level'` row included.  The state of what was sold is
+        `Condition_sold`, not `condition`.
+
+        SOME TOTALS ARE NOT TOTALS, AND NOTHING NAMES THEM.  Under the totals
+        reading, a few answers look like the weight of ONE sold unit (5 or
+        more sized sacks sold, kilograms within 25% of one sack's stated
+        mass) or like the unit count typed as kilograms (kilograms equal to
+        `Quantity_sold`, more than one sack).  Counted by the independent red
+        team on 2026-11-12 (GH #1560, F4): one sack's weight on Niger 25 and
+        Mali 15 rows, the sack count on Mali 30 and Niger 4.  On such a row
+        `Value_sold / Quantity_sold_kg` is wrong by about `Quantity_sold`
+        (one-sack rows) or about the sack's stated mass (count rows), and
+        Site Q does not name it, because the value is an ordinary size for
+        its cell.  They are served as recorded, as the ruling asks; screen
+        them before using this column as a price denominator.  Per-wave
+        counts are in each country's CONTENTS.org.  Site Q's warning prints
+        this column's comparison unit as `harvest_u` and its value as "kg
+        sold".
     Unit_sold:
       type: str
       optional: true

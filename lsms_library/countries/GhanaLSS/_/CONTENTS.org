@@ -2492,6 +2492,15 @@ verdict:
 | 1988-89 | =correctly-empty=         | same form (see below)                                                                                 |
 | 1991-92 | =empty-pending-machinery= | 8H records a quantity and a per-unit price; =food_prices(units='kgprice')= already serves 28,754 rows  |
 
+(Two figures in this table moved on 2026-11-12.  Since GH #1129, =unitvalue= drops
+=u='Value'= rows, so 1987-88 and 1988-89 are empty in that mode too.  Since GH #1509
+the kg factors read purchases only, and 1991-92 =kgprice= served 15,028 rows, not
+28,754; the same day's amendments added the disclosed =item_unit_nonpurchase= rung
+(a (j, u) cell with no purchase in any wave reads the 8H valuations on their own
+rung), which served 26,854, and below it the unit-level =unit_nonpurchase= rung
+(the u-pooled estimate on the same rows), which brings it back to 28,754.  Neither
+changes a verdict: 1991-92 still serves rows in =kgprice=.)
+
 1991-92 is *not* correctly empty: only the default =kgvalue= mode is
 empty, and only because 8H is "deliberately NOT wired" (the farmgate
 section above).  It stays in the queue until that decision is taken.  The
@@ -3844,7 +3853,10 @@ before and after in every wave".
 *Victim 2 -- a fabricated price, and this one is undiminished.*  On
 =s='purchased'= with =u='Value'= the LCU-only convention sets
 =Quantity == Expenditure=, so the re-derived "price" is *1.0* --- the "Kwacha
-per Kwacha" quantity =CLAUDE.md= warns about:
+per Kwacha" quantity =CLAUDE.md= used to warn about (since GH #1129,
+2026-11-12, =food_prices(units='unitvalue')= drops =u='Value'= rows and counts
+them as =currency=, so GLSS1-3 serve no =unitvalue= rows; this trap is about
+=food_acquired.Price= in the core collapse, which that ruling does not touch):
 
 | wave    | =u='Value'= rows | =Quantity == Expenditure= |
 |---------+------------------+---------------------------|
@@ -5854,3 +5866,31 @@ code, and is now served as =Unknown= with no inferred kilograms; the
 own-produced chicken, egg and fresh-coconut rows whose code 0 prices like
 one item are served on the count unit =Single=.  See the GH #1042 entries
 under the food_acquired section.
+
+* Food kilograms read purchases only, with two self-valued fallbacks; what that does to =nutrition= (GH #1509, 2026-11-12)
+
+Before 2016-17 GhanaLSS's purchases are almost all =u='Value'= (an amount,
+no physical unit), so purchases-only kg evidence (#1509, "all purchase rows")
+left the 1991-92 to 2012-13 own-produce rows with almost no purchase
+evidence in their own =(j, u)= cell: the 8H farmgate valuation had been their
+only physical-unit evidence.  The two disclosed rungs serve those cells from
+the non-purchase rows themselves: =item_unit_nonpurchase= (the item
+estimator) and =unit_nonpurchase= (pooled over items).  Ruling @ligon
+2026-11-12, "Item self-valued first": for a cell with no purchase evidence
+the item rung ranks ABOVE the u-pooled purchase rung =unit=, which moved
+79,773 produced rows (147 cells; 1991-92 18,943, 1998-99 13,313, 2005-06
+14,990, 2012-13 18,577, 2016-17 13,950) from another item's purchase factor
+back to their own item's, each at its pre-#1509 value (+290,479 kg).
+
+Measured cold, base =e5fdd2fa8= -> =30523f946=: =food_quantities()= kg
+11,007,392 -> 10,209,230 (-7.25%); =item_unit_nonpurchase= 287,863 rows,
+=unit_nonpurchase= 28,939, =unit= 814,840; =food_prices()= 560,023 and
+=kgprice= 187,096 rows, both as before.  What is still short is cells WITH
+purchase evidence that the item rungs refuse and =unit= serves (238,616 rows,
+-756,133 kg) plus purchase factors changed in place (-42,104 kg); the ruling
+keeps those cells off the self-valued rungs.  =nutrition= (34,798
+households) follows the kilograms: Energy -15.08%, Protein -5.80%,
+Carbohydrate -17.58%, Fiber -11.63% against base (Energy -18.67% under the
+order before "Item self-valued first").  =test_ghanalss_nutrition.py= passes
+either way; =tests/test_gh1509_data_pins.py= pins the totals.  A movement,
+not a correction: no external unit weight was scored.

@@ -1,5 +1,11 @@
 Country: Malawi
 
+# Read only by _/panel_ids.py, which writes the committed panel_ids.json /
+# updated_ids.json.  Country serves those files and does not read this key, so
+# its no-JSON DataFrame fallback would build without the guard (PR #1604).
+Panel IDs:
+  guard_minted_from: '2024-25'
+
 Data Scheme:
   sample:
     index: (i, t)
@@ -10,6 +16,18 @@ Data Scheme:
     Rural: str
     Region: str
     District: str
+    # 2024-25 only: the IHPS 2024 id and cross-sectional weight, carried onto the
+    # IHS6 rows of refreshment households (PR #1604).  Served as wired per the
+    # 2026-11-12 ruling, which does not settle decision 48's joint-inclusion question.
+    # ihps_weight is served at its RAW expansion scale (2024-25 mean ~1,785),
+    # unlike weight and panel_weight, which are normalised to mean 1 within each
+    # wave at read time.  Use it as a ratio weight within its own 2,763 rows.
+    ihps_hhid:
+      type: str
+      optional: true
+    ihps_weight:
+      type: float
+      optional: true
   cluster_features:
     index: (t, v)
     Region: str

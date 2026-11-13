@@ -3016,7 +3016,8 @@ waves hold 2.5M and 3.0M.  =Gros sac= and =Sac Moyen= state no size in this wave
 - *More kilograms cross a state.*  =harvest_kg= sums across =condition= (GH #1460), and with the survey's kilograms read
   53 plot-crops in 2021-22 hold kilograms in two states, 26,469 kg of the wave's 2,954,597, where it was 1 and 400 kg.
 - *=as03eq11c=, =as02eq12c=, =AS02EQ12C=, =s16dq05c=* are the sold kilograms in the same shape, and unread.  Only
-  the harvest is ruled.
+  the harvest is ruled.  [2026-11-12, GH #1560 / #1571: ruled and served as =Quantity_sold_kg=; see "the sold
+  kilograms are served" at the end of this file.]
 
 *Against the simulation that went to the ruling* (=KgFactor = kg / Quantity= through =reported=).  Reproduced to
 the kilogram on this build, then the differences:
@@ -3205,6 +3206,10 @@ This is a documentation of the bounded investigation at
 =8283ad309120e34f2e9822c3a3eee7651de49f8f=. Independent scientific review and a
 ruling remain necessary before selecting an interpretation. No sold-kg carrier,
 missing-code rule, sale eligibility, state/price policy or default is selected.
+[2026-11-12: superseded for the carrier and the codes.  @ligon ruled "Treat 2021 as
+totals"; the column is =Quantity_sold_kg= and its codes are set in "the sold kilograms
+are served" at the end of this file.  Eligibility, the 3E cycle product, state and
+price policy are still not selected.]
 The earlier note, "Only the harvest is ruled", still applies. Its description
 of sold kg "in the same shape" is qualified by the own 2021 forms below; it is
 not a reason to assume a questionnaire stale.
@@ -3672,3 +3677,309 @@ This holding result does not resolve the first/average-cycle,999, physical
 land-grain/yield or fielded/export-version questions above. The six-native-
 column proposal remains UNIMPLEMENTED, its six pure controls UNRUN; no native
 3E/scientific tests or API table acceptance follows. Whole1529 stays open.
+
+* 2026-11-12 -- crop_production: the sold kilograms are served (GH #1560, #1571)
+
+*RULED (@ligon, 2026-11-12, "Treat 2021 as totals").*  The sold kilograms are served as the
+TOTAL kilograms of the sale, in a literal optional column =Quantity_sold_kg= (#1571 option (a)),
+following the released label and the stored Kg controls rather than the own 2021 forms'
+"poids en kg d'UNE UML".  =KgFactor_sold= is not Niger's and nothing is put there: a total is
+never divided into a factor.  No consumer reads the column by default; =median_price_valuation=
+uses it only if a caller passes it as =kg_qty=.  The state question (#1698) is separate.
+
+| wave    | source      | window                       | code masked | 0 beside a sale, NA | served > 0 |      kg |
+|---------+-------------+------------------------------+-------------+---------------------+------------+---------|
+| 2011-12 | =as02eq12c= | the line's sale (2E12)       | 9999 x 10   |                   0 |      1,286 | 333,568 |
+| 2011-12 | =as03eq11c= | 3E's sale, the first cycle   | 99999 x 39  |                  36 |        356 | 364,768 |
+| 2014-15 | =AS02EQ12C= | the crop's sale (2E12)       | 9999 x 11   |                  26 |      1,051 | 467,963 |
+| 2018-19 | none        | --                           | --          |                  -- |          0 |       0 |
+| 2021-22 | =s16dq05c=  | the crop's sale (16D.05)     | none        |                   0 |      1,818 | 380,476 |
+
+Counted on the held files after each wave's existing drops (3E's one byte-identical row, s16d's
+3,329 exact repeats).  2021-22's 2,585 raw answers are 1,818 after the repeat drop, all positive.
+
+*Idiosyncrasies.*
+- *The codes are each module's own, and the rainy one is a judgement.*  3E's 99999 is the width
+  this file already documents for 3E (=as03eq09a=, =as03eq09c=), and 33 of the 39 sit beside
+  =as03eq09c= = 99999 on the same line.  2014-15's 9999 is that wave's quantity code; it is the
+  column's maximum, 7 of the 11 are all-code lines (=AS02EQ12A= 9999, =AS02EQ13= 9999999, unit
+  and sold flag =Manquant=), and 8 sit beside =AS02EQ110E= = 9999.  The rainy module writes
+  999999 on its quantities, so its 9999 is NARROWER and unlabelled.  *RULED (@ligon, 2026-11-12,
+  "Sold-kg details" (b)): it is a code and stays masked*, on the file's own evidence: 10 rows at exactly 9999 against 13 anywhere in 5,000-9,998 and 1
+  above (the max is 11,000); 2 are all-code lines; the 7 with a sold quantity would be 500-5,000
+  kg per =Tiya= or =Botte=; 7 of the 8 beside a harvest kg exceed the SAME line's =as02eq07c=
+  (24 of 1,286 other sales do); and the one sold in Kg would break kg = quantity, which holds on
+  151 of 151 other Kg sales.  One value to remove to reverse it (=SOLD_KG_SENTINELS=).
+- *The zero rule is the harvest's.*  A 0 beside a positive =Quantity_sold= is no answer, not a sale
+  of nothing (3E 36, every one beside a positive quantity and value; 2014-15 26, of 27 zero
+  records, 23 of which have a positive value).  A 0 beside no positive sold quantity would stay;
+  2014-15's one such record reaches no served row, so no 0 is served.
+- *Sold kilograms often equal the harvest's.*  The sold kg equal the same record's harvest kg on 495
+  of 1,286 rainy 2011-12 sales, 142 of 356 3E sales, and 285 of 1,038 2014-15 crop-level sales
+  (against =AS02EQ110E=).  Selling the whole harvest would do that; whether the sold QUANTITY also
+  equals the harvest quantity there was not measured.
+- *3E's sold kilograms are NOT multiplied by the cycle count.*  =as03eq11c= is asked beside 3E.11a
+  (the first cycle), so it shares =Quantity_sold='s footing, and =dry-season-sale-window= now lists
+  it.  =Quantity_kg= on the same rows IS multiplied (=dry-season-cycle-total=), so on the 43
+  multi-cycle 3E sales =Quantity_sold_kg / Quantity_kg= is not a sold share.  This departs from
+  GH #1436 comment 6648014838 ("multiply by =as03eq06=").  *RULED (@ligon, 2026-11-12, "First
+  cycle, as recorded"):* 3E's =Quantity_sold_kg= is the recorded sale of the FIRST production
+  cycle and is disclosed as such (=data_scheme.yml=, the canonical =data_info.yml= note,
+  =dry-season-sale-window=); any multiplication waits on GH #1529's cycle-semantics ruling.
+- *Seven 3E records state sold kilograms and no sale* (8,740 kg, on their native Farm-level rows):
+  the sold flag says Non on 6 and Oui on 1, and 6 equal the line's harvest kg.  *RULED (@ligon,
+  2026-11-12, "Sold-kg details" (a)): masked under a registered rule*,
+  =Niger::crop_production::dry-season-sold-kg-no-sale=: on a 3E record with no positive sold
+  quantity and no positive value, =Quantity_sold_kg= is NA, whatever the flag, and the row (a
+  harvest) carries the key; =derivation_inputs= returns the seven records.  Measured on the cold
+  build: the six Non records have sold quantity and value both missing, the Oui record has both 0
+  (and kilograms equal to its harvest's); all seven are one-cycle lines with no sold unit, and
+  exactly these seven rows carry the key.  The Oui record is masked too, because the rule is the
+  missing sale.  So 3E serves 356 sold kilograms, 364,768 kg
+  (363 and 373,508 before the mask; the table above is after it).  No other wave has such a row
+  once the codes are masked.
+- *2021-22's sold kilograms are the harvest's conversion.*  On a sale in the harvest's own unit,
+  sold kg per unit equals the line's harvest kg per unit on 939 of 1,134 (median ratio 1.000;
+  2011-12 1,107 of 1,574; 2014-15 337 of 499), and =Tiya= is exactly 2.5 on 61% of sales, as it is
+  on 65% of harvest lines.  So the column is the same survey's arithmetic, not a second weighing.
+  *RULED (@ligon, 2026-11-12, "Sold-kg details" (c)): it carries the estimate key*, as the harvest
+  kilograms do.  A sibling, =Niger::crop_production::sold-kg-estimate=, not =survey-kg-estimate=
+  itself, because that key's rule, inputs (s16c harvest lines) and tests are the harvest's, and
+  these are s16d's crop-level sale records.  It is on every row with a =Quantity_sold_kg= in
+  2021-22, the 553 Farm-level sale rows included, joined to any other key with sorted '+'.
+- *It rides with the sale.*  On its line in 2011-12; on the crop's one served line, or the one
+  =Farm-level= row, in 2014-15 and 2021-22 (GH #1457), so =hh-crop-sale-single-row= lists the
+  column, its =inputs= return =AS02EQ12C= / =s16dq05c=, and both wave scripts assert that every
+  recorded sold kilogram is on a served row.
+- *Screened by Site Q, report-only* (ruling @ligon 2026-11-12, "Sold-kg details" (d)): both tails,
+  on the generic =(t,u,j)= ladder, as =Quantity_kg= is.  Measured on the cold build: it names no
+  Niger row.  Nothing names a sold total far from its unit's label (the harvest side has
+  =kg_survey_off_label=).  When it does name one, the warning prints the row's harvest unit as
+  =harvest_u== and the value as "kg sold": the cell is the harvest unit's, the value a total of
+  kilograms (red team F2, 2026-11-12).
+- *Some answers read as one sack's weight or as a sack count, and are served as recorded*
+  (disclosure, no data change; counts are the independent red team's, 2026-11-12, F4, on the
+  served frame of =43632ff5b=).  Under the totals ruling, among sales with a positive
+  =Quantity_sold_kg= in a sized sack (=Sac de 50 kg=, =Sac de 100 kg=):
+  - *kg of ONE sack*, i.e. 5 or more sacks sold and =Quantity_sold_kg= within 25% of one sack's
+    stated mass (the own forms' "poids d'UNE UML" reading): *25 rows*, 12 in 2011-12 (both
+    modules; all =Sac de 100 kg=), 8 in 2014-15 (6 =Sac de 100 kg=, 2 =Sac de 50 kg=) and 5 in
+    2021-22 (=Sac de 100 kg=);
+  - *the sack count typed as kilograms*, i.e. more than one sack and =Quantity_sold_kg= equal to
+    =Quantity_sold=: *4 rows*, 3 in 2011-12 and 1 in 2021-22, all =Sac de 100 kg=.
+  The two are counted separately and are not summed.  On such a row =Value_sold /
+  Quantity_sold_kg= is wrong by a large factor: by about =Quantity_sold= (5 or more) on a
+  one-sack row, the red team's statement; and, by the same arithmetic, by about the sack's stated
+  mass (100) on a count row.  Site Q does not name them, because each value is an ordinary size
+  for its cell.  3E is the noisiest module (red team, served rows after the masks): =Sac de 100
+  kg= sales read a median 80 kg per sack, p10 8, and kg equal the quantity on 4 of 9 =Kg= sales.
+  Served as recorded, because the ruling asks for that; a consumer computing a price per kg from
+  this column should screen these patterns itself.
+- *Farm-level price support, measured and not wired.*  "Usable" is a positive =Value_sold= over a
+  positive kilogram denominator; "now" converts =Quantity_sold= through the existing sold-unit
+  resolver (=transformations._sold_kg_factors=, which knows only stated masses: =Tiya=, =Botte= and
+  =Panier= have none), "with" divides by =Quantity_sold_kg=.  Sale rows only.
+
+  | wave    | where      | sales | usable now | with sold kg | gain | lose |
+  |---------+------------+-------+------------+--------------+------+------|
+  | 2011-12 | Farm-level |   438 |        256 |          350 |  121 |   27 |
+  | 2011-12 | on a line  | 1,294 |        306 |        1,286 |  980 |    0 |
+  | 2014-15 | Farm-level |   498 |        107 |          487 |  383 |    3 |
+  | 2014-15 | on a line  |   583 |        251 |          562 |  321 |   10 |
+  | 2021-22 | Farm-level |   553 |        144 |          553 |  409 |    0 |
+  | 2021-22 | on a line  | 1,265 |        556 |        1,265 |  709 |    0 |
+
+  So the GH #1457 Farm-level sales of 2014-15 and 2021-22 go from 251 of 1,051 (23.9%) to 1,040
+  (99.0%), and 792 (75.4%) gain a price per kilogram, which reproduces #1571's 24% -> ~100%
+  (the investigation's 1,041 counted the 9999 it did not mask).  2011-12's Farm-level rows are
+  3E's dry season (GH #1462), not sale-only rows.  3E's are per cycle, and its
+  value window is unstated, so a 3E price per kg is not a season price.  "Lose" is a sale with a
+  resolved unit and a masked or absent kilogram.  Nothing reads this by default.
+
+*Measured, cold, private roots, default backend* (base = development =e5fdd2fa8=): 49,042 rows
+before and after; the frame is =assert_frame_equal= to base once =Quantity_sold_kg= and
+=Derivation= are dropped, columns in base order.  =Derivation= moves on 1,825 rows and only by an
+added key: =sold-kg-estimate= on 1,818 (2021-22, 553 of them Farm-level) and
+=dry-season-sold-kg-no-sale= on 7 (2011-12 Farm-level); no key is removed.  Against the first
+cut of this column (=c7cb7d625=), =Quantity_sold_kg= moves on exactly those 7 rows (8,740 kg).
+=tests/test_niger_crop_sold_kg.py= reads each wave against its source.
+
+*Cache.*  =niger.py=, =data_scheme.yml= and three wave scripts are build inputs of every Niger
+table: one Niger re-warm.  Hash census, development =e5fdd2fa8= against this change, 38
+countries: all 25 Niger and all 24 Mali =Country._table_cache_hash= values move (49 of 555) and
+all 100 / 96 =Wave._input_hash= values (196 of 2,321), no other country's; 0 of 42
+=build_transforms_fingerprint= and 0 of 38 =framework_imports_fingerprint= values.  The
+=.yml= edits (=derivations.yml=, the canonical =data_info.yml=) move nothing.  Re-measured after
+the 2026-11-12 follow-up rulings (head =3199f2f6b=): the same 49 / 196 and nothing else; the Site Q
+commit alone (=quantity_audit._SCREENED_COLUMNS= / =_NEAR_ZERO_COLUMNS=) moves 0 of 555, 0 of
+2,321, 0 of 42 and 0 of 38, because Site Q's callables are excluded from every fingerprint.
+
+* 2026-11-12 -- 2018-19 =s07bq07a= computed on 14.2% of records (GH #1708)
+
+/Ruling @ligon 2026-11-12, "Flag now, diagnose"./  Registered key, keep serving, diagnose; the drop
+decision returns to the maintainer.  /It has returned: the second ruling of 2026-11-12, "Revalue at
+local median", revalues the =Expenditure= of the 12,227 of these rows that #876 values (next
+section)./
+
+*What is flagged.*  A record of =s07b_me_ner2018.dta= whose =s07bq07a= (the quantity of the LAST
+purchase) is positive and off the quarter grid (not a multiple of 0.25): 15,264 of the 107,263
+positive values (14.2%).  14,908 of them carry 13 to 18 decimals, which is double-precision
+arithmetic; 2021-22, the same instrument, has 15 off-grid values in 112,923.  The 356 with fewer
+decimals are kept in the class: a value divided by a round price can be short (25 / 200 = 0.125),
+and the 2021-22 rate bounds the typed ones at about 15.  A computed value that lands ON the grid
+cannot be seen.  Each served purchased row built from a flagged record carries
+=Niger::food_acquired::computed-last-purchase-quantity= beside its #876 key (=2018-19/_/mapping.py=):
+15,014 rows, 12,227 of them with an =Expenditure=, which was 26.0% of 2018-19's served
+=Expenditure=, since =Expenditure= = =Quantity= x =s07bq08= / =s07bq07a=.  Under this first ruling
+nothing else changed; under the second the =Expenditure= of those 12,227 is revalued, and the other
+2,787 stay NA (next section).
+
+*The flagged rows are rows where the questionnaire ENABLES the field.*  15,263 of the 15,264 have
+=s07bq06= in (1, 2, 3) (hier 3,543, 7 jours 10,774, 30 jours 946; one =Plus de 30 jours=), where
+=s07Bq07a= is enabled, and their values were reconstructed from a reference unit value (diagnosis
+below).  /The premise of the first ruling's summary is reversed:/ it read "s07bq07a on 14.2% of rows
+(CAPI disables it there)", but the disabled rows are a different set.
+
+*A separate set: disabled but filled.*  The file ALSO fills =s07bq07a= on 21,063 records where the
+CAPI disables it (=s07bq06= =Plus de 30 jours= or =Jamais=, or missing): all on the grid but one (the
+=Plus de 30 jours= record above), 8,050 equal to =s07bq03a=, 114 in the consumption unit, and with
+=s07bq08= empty on every one, so they feed no served value.  They are recorded here and not keyed.
+
+*Diagnosis: how the values were built.*  Read-only, on the raw file (burst jobs 41248432, 41248724,
+41249061; aggregates under =reports/served-corrections/= of the 2026-11-12 sweep).
+
+1. /A unit-value rule./  On 13,735 of the flagged records (90.0%) the unit value =s07bq08= /
+   =s07bq07a= is one value per (product, unit, size, region): 926 such cells, the value repeating
+   across households whose =s07bq08= differ.  On 12,250 records =s07bq08= is an integer, as the
+   field requires, so there =s07bq07a= = =s07bq08= / P: the QUANTITY was backed out of the reported
+   value at a reference unit value P.  On 3,013 (3,008 of them at P) =s07bq08= is not an integer
+   either, though the CAPI field is "NUMERIQUE: ENTIER", so both the value and the quantity are
+   constructed (=s07bq08= = =s07bq07a= x P); every one of the 2,186 records of product 119 at P =
+   200 FCFA a =Sachet (Moyen)= is of this kind.  The values are rationals whose denominators (9,
+   13, 27, 189, 477, 567, 1,967, ...) come from dividing by a P with decimals.
+2. /P is not a statistic of this file./  It equals the median of the cell's on-grid (reported) unit
+   values on 3,184 records and their mean on 2,168; the national median of (product, unit, size)
+   on-grid unit values in 76 of 926 cells; the mean or median of the 2018-19 community prices
+   (=s05_co_ner2018=, by product, unit-size and region) in 8 to 24 of the 282-539 cells that have
+   one.  431 of the 926 P are integers (200, 4,500, 150, ...); others are like 45.325 or 49.175.
+3. /Not a conversion through the survey's own unit weights./  =s07bq07a= x the NSU weight of its
+   unit lands on a round 0.1 kg for 0.95% of flagged records, against 9.4% of on-grid ones.
+4. /Systematic, not a few outliers./  14.2% in each =vague=, 10-18% of a grappe's records (p10 to
+   p90), and 5,509 of 5,987 households have at least one (none has all).  The on-grid unit values
+   in the same cells run 0.46 to 1.36 times P (p5 to p95), and 1,289 of 20,133 lie beyond 2x, so the
+   rule did not replace everything outside a band around P.
+
+So: a reference unit value per cell, applied to about one record in seven, either to back out the
+quantity from the value or to rebuild both.  Not established: how P was chosen, which records were
+selected, and what was originally answered (not recoverable from the file).  No document explains
+it: the Niger 2018 BID and INS profile are generic, and the 2021-22 documents describe valuation at
+"les valeurs unitaires calculées dans le ménage" or a geographic mean, an analysis step, not a
+rewrite of the section file.  The World Bank DDI (4296) itself shows =s07bq08= with minimum 8.547.
+
+*Measured under the first ruling, cold, development =e5fdd2fa8= against the candidate (burst job
+41249476).*  =food_acquired=: same index, every column but =Derivation= equal, =Derivation= changed
+on exactly the 15,014 rows and only by this key; =food_expenditures=, =food_prices= and
+=food_quantities= frame-equal.
+=derivation_inputs= returns the 15,264 records (with =s07bq06= in its code); every stamped row
+joins them.  Cost: 24 of 24 Niger table hashes and the 24 2018-19 wave hashes, no other country's.
+
+* 2026-11-12 -- 2018-19 flagged purchases revalued at a local median (GH #1708)
+
+/Ruling @ligon 2026-11-12, "Revalue at local median"./  The maintainer asked first whether
+=food_expenditures= reconstructs values from reported quantities and local prices (it does not: EHCVM
+=Expenditure= is the purchased quantity x the household's OWN last-purchase unit value, #876), then
+chose: "For the flagged rows, Expenditure = purchased quantity x the median GENUINE (unflagged)
+last-purchase unit value for the same product x unit x size in the same cluster, falling back to
+region; rows with no genuine local price get NA."  Registered as
+=Niger::food_acquired::flagged-purchase-local-median= (=2018-19/_/mapping.py=).
+
+/Two details ruled afterwards, @ligon 2026-11-12, "GH1708 revaluation details, and the release
+plan"./  "Region floor of 3": a local median needs >= 3 genuine reports at cluster AND at region
+level; otherwise NA.  "Only previously valued": revalue only flagged rows that already carried a
+served =Expenditure= under #876; rows the library left NA (2,787) stay NA.  "The ruling corrects a
+construction, it does not add new values."  The first implementation (=5f113252a=..=e338fedba=, the
+same day) used a region floor of 1 and revalued all 15,014 flagged rows; its numbers are at the end
+of this section.
+
+*The rule.*  On each of the 12,227 flagged purchased rows that #876 values (not NA), =Expenditure= =
+the served purchased =Quantity= x the median of =s07bq08= / =s07bq07a= over the GENUINE reports in
+the row's cell (product =s07bq01= x consumption unit =s07bq03b= x size =s07bq03c=): its cluster's
+when the cluster has at least 3, else its region's (=s00q01= of the cover) when the region has at
+least 3, else NA.  A genuine report is an unflagged record with =s07bq07a= and =s07bq08= positive and
+its last-purchase unit and size recorded (70,933 records); it prices the cell of its OWN
+last-purchase unit and size, compared through #876's unit identity, so nothing is converted between
+units.  The row keeps its #876 and flag keys; =Quantity=, =Quantity_kg= and every consumed quantity
+are unchanged.  The scope is read by calling #876's own function (=ehcvm.derive_ehcvm_purchase_value=)
+on the inputs, and the hook checks it against the value it served.  The other 2,787 flagged
+purchased rows, which #876 serves NA (2,786 whose own last purchase used another unit or size, 1 with
+no =s07bq08=: the flagged record that answered =Plus de 30 jours=), are not revalued: they stay NA and
+carry the flag key alone.
+
+*The floors.*  Each genuine report was scored against the median of the OTHER genuine reports in its
+cell.  Within 25% of the held-out price, a cluster median of 1 other report scores 67.1% against the
+region median's 64.6%, of 2 others 63.6% against 67.4%, of 3 others 71.7% against 69.1%, of 4 69.7%
+against 70.7%, of 5 73.5% against 70.8%, and of 10 or more 87.2% against 84.9%.  The comparison
+is noisy below 5 and does not single out 3; it permits it: from 3 the cluster median is within a
+point of the region's or better, and 3 is also the smallest median one stray report cannot move.
+At the region the floor is 3 too, by ruling.  For reports whose cluster has fewer than 3 others, a
+region median of 1 other report is within 25% of the held-out price 48.5% of the time, of 2 others
+43.1%, of 3-4 49.8%, of 5-9 57.9% and of 10 or more 64.5%.  The report counts behind every value are
+in the registered function's output (=cluster_reports=, =region_reports=), so another floor is a
+re-derivation from =derivation_inputs=, not a rebuild.
+
+*Measured, cold, development =e5fdd2fa8= against =7644de2b5= (burst job 41254597, each build in its
+own private root).*  Niger serves =food_acquired= in 2018-19 and 2021-22 only.
+
+| 2018-19 purchased rows               | before (#876) | after         |
+|--------------------------------------+---------------+---------------|
+| =Expenditure=, all purchases (FCFA)  | 53,351,991.10 | 46,636,756.04 |
+| of which the 15,014 flagged rows     | 13,890,402.00 | 7,175,166.95  |
+| their share                          | 26.04%        | 15.39%        |
+| flagged rows with an =Expenditure=   | 12,227        | 9,355         |
+
+- *Levels*, of the 12,227 revalued: cluster 1,107 (9.1%), region 8,248 (67.5%), NA 2,872 (23.5%).
+  Of the NA, 1,415 have no genuine report in their region cell and 1,457 have 1 or 2 (the region
+  floor's cost).  The region values rest on 3-4 reports for 225 rows, 5-9 for 1,949 and 10 or more
+  for 6,074.  With the 2,787 left NA, 5,659 of the 15,014 flagged rows are served NA.  (The ruling's
+  "about 3,787 NA instead of 1,992" was measured over all 15,014 under the first scope.)
+- *A served total falls by 12.6%.*  The wave's purchased =Expenditure= falls by 6,715,235.06 FCFA,
+  all of it on flagged rows: 2,872 rows #876 valued are now NA, and the 9,355 that stay valued move
+  by a median ratio of 1.00.  An NA =Expenditure= is not served by =food_expenditures=, so those
+  2,872 household-item cells leave it.
+- *Against the producer's values.*  On the 9,355 rows valued before and after, revalued unit value
+  / the producer's =s07bq08= / =s07bq07a=: median 1.00, exactly equal on 28.9%, p10-p90 0.73-1.25
+  (p5-p95 0.62-1.31), within 10% 50.9%, within 25% 77.7%, within 2x 95.8%.  At the cluster level
+  (1,107) p10-p90 0.71-1.22, within 25% 69.0%; at the region level (8,248) 0.73-1.25, within 25%
+  78.9%.  The producer's reference value P is often a common real price (the diagnosis above),
+  which is why so many land on it.
+- *What else moves, against development.*  =food_acquired=: only =Expenditure= (9,618 rows change,
+  all carrying the new key) and =Derivation= (15,014 rows: the 12,227 gain the flag and this key, the
+  2,787 the flag alone) in 2018-19; same index; =Quantity= and =Quantity_kg= equal; 2021-22
+  frame-equal.  =food_expenditures= and =food_prices(units='unitvalue')= 2018-19: 2,872 rows go (now
+  NA), 6,746 change, none appear; 2021-22 frame-equal.  =food_quantities(units='units')= frame-equal.
+  The kilogram modes move in BOTH waves, because the inferred kg factors pool across waves (GH
+  #1487): =food_quantities= (='kgs'=) changes 810 rows in 2018-19 and 93 in 2021-22, totals
+  202,924.9 -> 202,940.0 kg and 208,904.3 -> 208,906.0 kg; =food_prices= (='kgvalue'=) loses the 2,872
+  rows and changes 6,894 in 2018-19, and changes 57 in 2021-22.
+- *Against the first scope (=e338fedba=).*  =Expenditure= changes on 3,667 rows, all flagged: 2,210
+  of the 2,787 it had valued are NA again, and 1,457 are withheld by the region floor.  The 9,355
+  valued by both are identical.  =food_expenditures= loses those 3,667 rows and changes none; the
+  kilogram modes move by 670 / 94 rows (=food_quantities=, 2018-19 / 2021-22) and 95 / 54 prices
+  (=food_prices=).
+- *Joins.*  =derivation_inputs= returns all 107,269 records with =flagged= (15,264); the registered
+  function run on them gives 12,227 rows and reproduces the served =Expenditure= exactly (max
+  difference 0, same NA pattern); every revalued row joins.
+- *A new build input* (measured on the first implementation, whose cover read is unchanged).  The
+  cover =s00_me_ner2018.dta= supplies the region (each of the 504 grappes in one region; every s07b
+  record on the cover), declared under =household_region:= in the wave's =food_acquired= block.  With
+  it unfetchable, =food_acquired(waves=['2018-19'])= raises =FileNotFoundError= naming the file, and
+  =food_acquired(waves=['2021-22'])= still serves.  Not measured: an all-waves call, and the kilogram
+  modes of a 2021-22 subset, which read every wave (GH #1487) and so should raise too.
+- *Residual for the maintainer.*  162 genuine reports carry a non-integer =s07bq08= (more than 1e-9
+  from an integer; an earlier count gave 167), the same "cannot have been entered" signal as the
+  flagged class.  They are unflagged, so the ruling counts them as genuine and they price their
+  cells.  How many revalued rows read such a cell was not re-measured at the ruled floors.
+- Cost: against the first implementation, 24 of 24 Niger table hashes and the 24 2018-19 wave
+  hashes, no build fingerprint; against development, the same as the flag's.
+- *The first scope, superseded.*  Region floor 1, all 15,014 flagged rows: cluster 1,361, region
+  11,661, NA 1,992; wave total 52,486,790.70, flagged rows 13,025,201.60 (24.82%), 13,022 valued.

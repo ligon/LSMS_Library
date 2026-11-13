@@ -206,8 +206,10 @@ $(VAR_DIR)/anthropometry.parquet: anthropometry.py
 	python anthropometry.py
 
 # community_prices (GAP C).  Wave-level scripts read each year folder's
-# post-harvest community price module (Section C8, sectc8_harvest*) and
-# write a wave parquet at the PH quarter; the country-level concatenator
+# post-harvest community price module (Section C8, sectc8_harvest*) and,
+# through pp_community_prices.py, its post-planting one (Section C2,
+# sectc2_planting*; GH #587), and write a wave parquet holding both rounds
+# at their own quarters (PH and PP); the country-level concatenator
 # joins them to var/community_prices.parquet.  The wave-level split routes
 # the build through the framework's wave path, preserving the (t, v, j, u)
 # grain (the country-only fallback applies map_index(), which swaps a

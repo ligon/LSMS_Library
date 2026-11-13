@@ -8,9 +8,26 @@ import sys
 sys.path.append('../../_/')
 import lsms_library as ll
 from lsms_library.local_tools import df_from_orgfile
+from lsms_library.country import Country as _Country
+from lsms_library.transformations import food_quantities_from_acquired
 from fct_tools import fct_filter
 import pandas as pd
 import numpy as np
+
+# GH #1509 (@ligon 2026-11-12, "Make the dependency visible").  Part 3 below
+# reads ``eth.food_quantities()``, which the Country API derives at read time
+# through ``food_quantities_from_acquired`` and its kilogram ladder
+# (``food_kg_factors``).  A call through the Country API is invisible to
+# ``framework_imports_fingerprint``, so a kg-factor edit used to leave a warm
+# ``var/nutrition.parquet`` serving the old numbers.  The import above folds
+# the transform's closure into every Ethiopia cache hash; this assertion keeps
+# it honest: if the API stops deriving ``food_quantities`` through it, the
+# build fails rather than the hash tracking the wrong code.
+assert _Country._FOOD_DERIVED['food_quantities'] == \
+    food_quantities_from_acquired.__name__, (
+        'Ethiopia nutrition.py imports food_quantities_from_acquired to version '
+        'the code behind food_quantities(); the API now derives it from '
+        f"{_Country._FOOD_DERIVED['food_quantities']!r}: import that instead")
 
 
 #retrieve org tables 

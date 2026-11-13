@@ -252,7 +252,14 @@ def test_old_helper_and_r1_r3_source_inverse_exact():
     rel='lsms_library/countries/Malawi/_/malawi.py'
     old=ast.parse(old_source(rel));new=ast.parse((ROOT/rel).read_text())
     added={'SEED_ACQUISITION_ROLE','_seed_acquisition_block','_append_seed_acquisitions'}
+    # Malawi 2024-25 identity helpers (GH #1275, PR #1604): an independent
+    # addition after this fixture's baseline.  Named exactly, so any other
+    # change to malawi.py still fails the inverse.
+    added|={'CS_24','ihps24_refreshed','_ihps24_refreshed','drop_ihps24_refreshed'}
+    added_imports={'functools'}
     def owned(n):
+        if isinstance(n,ast.Import) and {a.name for a in n.names}<=added_imports and not any(a.asname for a in n.names):
+            return True
         return getattr(n,'name',None) in added or isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id in added for t in n.targets)
     new.body=[n for n in new.body if not owned(n)]
     assert ast.dump(new,include_attributes=False)==ast.dump(old,include_attributes=False)
