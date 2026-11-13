@@ -994,13 +994,18 @@ other 41,160 are =ehcvm_individu='s people, =Departed= False, including the 9,72
 put to (new members).  No canonical flag existed and no country served departed members (GhanaSPS and
 GhanaAHIES leave them out), so =Departed= is a proposal: one optional bool in this country's
 =data_scheme.yml=, NA on 2018-19, which does not ask.  246 of the 341 carry a sex, 95 none; their other
-answers are mostly blank and stay so.  *Benin 2021-22 still drops its 6,138 leavers*, so the two
+answers are mostly blank and stay so.  227 of the 341 leavers are in households =PanelHH= flags =Ménage non-panel=,
+and only 258 non-panel members were asked =s01q00aa= at all (red team, 2026-11-13); why a non-panel
+household carries a prior roster is not established.  *Benin 2021-22 still drops its 6,138 leavers*, so the two
 countries' rosters differ until GH #1565 settles the family.  =MonthsSpent= is nullable =Int64= (blank
 on most leavers), so a two-wave read serves 2018-19's values unchanged as =Int64=.
 =household_characteristics= keeps its own rule (it skips a member whose =MonthsSpent= is NA):
-but 12 of the 341 have an answered =s01q12=, so they are not all skipped, and
-2021-22's =household_characteristics= moves (totals 50,240.5 -> 50,250.7 over the same 5,348 households,
-log HSize included).  Excluding =Departed= there is a =transformations.py= edit, not made in this stream.  =Sobrinho(a)= (nephew / niece: 6,186 =s01= rows, 6,139 of them members) is new in this
+12 of the 341 have an answered =s01q12= (all =Sim=, 12), in 3 households, and *9 of them, in 2
+households, enter 2021-22's =household_characteristics=*: +9 persons, the Sex x age counts 40,322 ->
+40,331 over the same 5,348 households (red team, 2026-11-13; the 50,240.5 -> 50,250.7 quoted earlier
+added =log HSize= to the counts).  The other 3 (2 in one household, 1 in another) carry no sex and no
+age, so they fall in no Sex x age bracket; the 9 counted are exactly those of the 12 that carry both (gnb job
+41278042).  EHCVM's 12 means "lived 6 months or more", which a recent leaver can truthfully answer.  Excluding =Departed= there is a =transformations.py= edit, not made in this stream.  =Sobrinho(a)= (nephew / niece: 6,186 =s01= rows, 6,139 of them members) is new in this
 wave and was added to =kinship.yml= as =Sobrinho(A)= [-1, 1, consanguineal].  Ages as 2018-19's hook:
 stated years, else the birth date; 9999 is no answer; =s01q03b= =Não sabe= is no month.
 
@@ -1094,14 +1099,21 @@ row (the shared reshape needs a positive quantity) and are a registered deletion
 them); Togo 2021-22 served its recovered zeros as NA purchased rows under a different ruling.  Served,
 cold: 129,384 rows (purchased 95,094, produced 20,263, in kind 14,027), every one keyed;
 purchased =Expenditure= 60,522,116.51 FCFA, NA on 15.2% of purchased rows (the positive =s07bq08= total
-of the release is 101,787,610).  =derivation_inputs= of the rounding key returns 128,229 source rows
+of the release is 101,787,610).  The 14,447 NA purchased rows have three causes (red team, 2026-11-13): =s07bq07a=
+not asked, the instrument's skip when the last purchase was =Há mais de 30 dias= or =Nunca= (3,673);
+a unit or size mismatch between the 7-day and last-purchase lots (10,325); and =s07bq07a= rounded to 0
+(449), the only cause particular to this release (0 in every sibling and in 2018-19).  =derivation_inputs= of the rounding key returns 128,229 source rows
 whose (i, j) pairs are exactly the served ones; the deletion's 3,945 meet no served row.
 
 *=j=.*  182 item codes (2018-19: 138), renumbered from code 12 on, with clean labels; =harmonize_food=
 gains 59 rows on Niger's #833 rule (15 clean twins of double-encoded 2018-19 keys, 44 respellings,
 sugar's two codes folded as Benin's).  Splits and new goods stay raw Portuguese: 176 =j= labels are served in 2021-22, 71 of them not
 in 2018-19's served vocabulary; 64.6% of the wave's rows sit on a =j= 2018-19 also serves.  Djagatu is
-inside code 107, =Outros legumes frescos, n.e.s (Djagatu, nabo, beterraba)=.
+inside code 107, =Outros legumes frescos, n.e.s (Djagatu, nabo, beterraba)=, so =Jaxatu= exists in
+2018-19 food only (red team, 2026-11-13).  Two of the 59 rows change what a cross-wave =j= means, and
+want the user's eye: =Chá= -> =Thé= (916 rows) while =Chá tipo 2= (788) stays raw, against 2018-19's
+1,244 =Thé= rows, so 2021-22's =Thé= may be the narrower good; and =Chabéu= -> =Huile de palme rouge=
+(1,573) while the literal =Óleo de palma vermelho (Citi)= (3,002) stays raw.
 
 *=u=.*  This file's own labels, sized (=Monte (Pequeno)=), no fold onto 2018-19's (=Lata/caneca= and
 =Saquinho/carteira= bundle 2018-19's =Lata= / =Caneca= and =Saquinho= / =Carteira=).  =s07bq07b= labels codes
@@ -1122,6 +1134,9 @@ read time*: 2018-19 =food_quantities(units='kgs')= 226,907 -> 236,031 kg (+4.0%)
 sum 64.91M -> 58.14M FCFA (-10.4%), on unchanged rows (126,925 and 77,155); a 2018-19-alone request is
 the same slice (#1487).  The ladder over both waves: =metric= 24,830, =item_unit= 87,772,
 =item_unit_tight= 7,495, =unit= 136,208, =none= 4 (2018-19 alone on base: 12,974 / 45,574 / 2,232 / 66,141 / 4).
+The red team decomposed it: 2,638 2018-19 rows move from =unit= to an item rung estimated from
+2021-22 alone; 7,618 item-rung rows take a two-wave median; four smoked-catfish cells (=Sillure fumé=,
+per-piece factor 0.125 -> 1.0 kg) make up 61% of the =food_prices= fall.
 2021-22 adds 129,382 =food_quantities= rows (248,610 kg on =u = kg=) and 80,647 =food_prices= rows.  This
 is disclosed, as for Malawi 2024-25, and not a correction: the pool now holds rounded 2021-22 rows.
 Wiring the wave also brings a =StatedVsInferredKgWarning= on =food_quantities= and =food_prices= (none on
