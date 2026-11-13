@@ -312,9 +312,10 @@ def test_live_yaml_and_2021_binding_remain_source_exact():
     protected = {
         '2018-19/_/data_info.yml': '6699bceaf41a0d213ab5666502f96471714809d089a2e429a6564a431a3b6de7',
         # Re-pinned 2026-11-12: the salt-per-capita rule (ruling @ligon 2026-11-12)
-        # declares the welfare file and adds its hook to the 2021-22 wave.
-        '2021-22/_/data_info.yml': '3c4f62ffb5c66f67e8178da907283217c9bdb1f33c3b3df60ff91ac80c5a9620',
-        '2021-22/_/mapping.py': '581e24fc79955a67b0a6c2af0668a6a9b74c2988cd8f5421303097fb97d04f58',
+        # adds its hook to the 2021-22 wave.  Its selector reads s07b alone (red team
+        # F1), so 2021-22's data_info.yml is development's again, byte for byte.
+        '2021-22/_/data_info.yml': '2522506789ff4584a08c37454eb774cb99189ade93a9e7fdd38351913f913ebc',
+        '2021-22/_/mapping.py': '29f39839d100bfec4164e14d420af0367a2a8f9c95939618ca97dd5a8c9a3a60',
         '_/data_scheme.yml': '07f4dd61260cae7722050738bfaff992fb45257c42c0c6d4ca9d0d55c55f0894',
         '_/categorical_mapping.org': '31cde2d70a121c4f0c985920466c96c33db47bbcef0c02ccd13e13d7df241bfc',
     }
