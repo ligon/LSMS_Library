@@ -3,9 +3,39 @@ name: PR data validation
 on:
   pull_request:
     branches: [development]
-    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, edited]
+    # GH #1714 (ruling 2026-11-13, option a): no `edited`.  A title or body
+    # edit must create NO run of this workflow.  It used to create one whose
+    # job was named pr-data-metadata-edit.  On PR #1711 GitHub then showed the
+    # required pr-data-validation as "Expected" and kept the merge BLOCKED,
+    # although a passing run on the same head existed: the newest run of this
+    # workflow on the head appears to replace older ones (observed there, not
+    # documented).  A run whose jobs all skip is still a run, so the cure is
+    # at the trigger, not in the jobs.
+    #
+    # What a base change does now.  Per GitHub's webhook docs a base change
+    # emits only `edited` ("...or the base branch of a pull request was
+    # changed"; `synchronize` is "head branch was updated"), so retargeting to
+    # development without a push starts no run here.  That fails closed:
+    #   - If no successful pr-data-validation exists on the head commit, the
+    #     required check stays "Expected" and the merge is blocked until a
+    #     push, a close/reopen, or draft -> ready for review starts a run.
+    #   - If one does exist (validated earlier against development, then
+    #     retargeted away and back), it validated exactly the tree that would
+    #     merge.  The classifier only ever validates a development base, and
+    #     ruleset 25124452 sets strict_required_status_checks_policy: true, so
+    #     the merge needs development's tip in the head's history.  The base
+    #     that run validated is an ancestor of that tip (ruleset 9389899 bans
+    #     non-fast-forward, with no bypass), so both merges have the head's
+    #     tree.  A development move without a head update is blocked as "out
+    #     of date"; updating the branch is a push, so it re-validates.
+    # This argument depends on the strict setting, read from the rulesets API
+    # on 2026-11-13.  If that setting is ever cleared, a retarget reuses an
+    # older validation, as the other required check, unit-tests (ci.yml,
+    # default types), always has.  The base-change-only-emits-edited premise
+    # is from the docs and was not tested here.
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
 
-# No workflow concurrency: even a queued text edit must not replace a pending
+# No workflow concurrency: a later event must not replace a pending
 # credentialed validation. Only the dependent job uses classified concurrency.
 permissions: {}
 
@@ -33,12 +63,17 @@ jobs:
 
 
           def classify_event(event, repository, event_name):
-              """Only known text-only edits avoid validation; uncertainty fails closed."""
+              """Every accepted event validates; anything else fails closed.
+
+              `edited` is refused (GH #1714): the workflow is not triggered by
+              it, and if it ever were, a failing required check is safer than a
+              text edit standing in for, or hiding, a validation.
+              """
               if event_name != 'pull_request' or not isinstance(event, dict):
                   raise ValueError('Expected a pull_request event')
               action = event.get('action')
               if action not in {'opened', 'synchronize', 'reopened', 'ready_for_review',
-                                'converted_to_draft', 'edited'}:
+                                'converted_to_draft'}:
                   raise ValueError('Unsupported pull_request action')
               pr = event.get('pull_request')
               if not isinstance(pr, dict) or type(pr.get('number')) is not int or pr['number'] <= 0:
@@ -55,30 +90,7 @@ jobs:
               for side in (head, base):
                   if not isinstance(side.get('sha'), str) or not re.fullmatch('[0-9a-f]{40}', side['sha']):
                       raise ValueError('Missing exact head/base commit identity')
-              mode = 'validate'
-              if action == 'edited':
-                  changes = event.get('changes')
-                  if not isinstance(changes, dict) or not changes:
-                      raise ValueError('Unknown edited-event changes')
-                  if not set(changes) <= {'title', 'body', 'base'}:
-                      raise ValueError('Unrecognized edited-event change')
-                  for key in ('title', 'body'):
-                      if key in changes:
-                          value = changes[key]
-                          if (not isinstance(value, dict) or set(value) != {'from'}
-                                  or not (isinstance(value['from'], str)
-                                          or (key == 'body' and value['from'] is None))):
-                              raise ValueError('Malformed text-change declaration')
-                  if 'base' in changes:
-                      previous_base = changes['base']
-                      if (not isinstance(previous_base, dict) or set(previous_base) != {'ref', 'sha'}
-                              or not all(isinstance(value, dict) and set(value) == {'from'}
-                                         and isinstance(value['from'], str)
-                                         for value in previous_base.values())):
-                          raise ValueError('Malformed base-change declaration')
-                  else:
-                      mode = 'metadata'
-              return {'mode': mode, 'head': head['sha'], 'base': base['sha']}
+              return {'mode': 'validate', 'head': head['sha'], 'base': base['sha']}
 
 
           if __name__ == '__main__':
@@ -97,16 +109,19 @@ jobs:
           # END_PR_DATA_EVENT_GATE
 
   validation:
-    # Classifier failure must run a failing required check, never skip it.
+    # Classifier failure must run a failing required check, never skip it:
+    # GitHub counts a job skipped by a conditional as a passing required check.
     if: ${{ always() }}
     needs: classify
-    name: ${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'pr-data-metadata-edit' || 'pr-data-validation' }}
+    # One static name (GH #1714).  The metadata mode that renamed this job to
+    # pr-data-metadata-edit for title/body edits is gone with the trigger.
+    name: pr-data-validation
     runs-on: ubuntu-latest
     permissions:
       contents: read
     concurrency:
       # Refused/uncertain classifiers must not cancel an eligible request.
-      group: pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'validate' && 'validation' || (needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'metadata' || format('refused-{0}', github.run_id)) }}
+      group: pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'validate' && 'validation' || format('refused-{0}', github.run_id) }}
       cancel-in-progress: true
     # The credentialed acceptance run exceeded two hours before pytest finished.
     # Allow the hosted runner's full budget; keep every test and its own timeout.
@@ -129,45 +144,43 @@ jobs:
 
 
           def guard_mode(result, mode):
-              if result != 'success' or mode not in {'validate', 'metadata'}:
+              """Only a successful 'validate' classification may proceed (GH #1714).
+
+              The later steps carry no conditions of their own: a failure here
+              stops them and fails the required check, and there is no path to
+              a green pr-data-validation that skips the data steps.
+              """
+              if result != 'success' or mode != 'validate':
                   raise ValueError('Event classification failed; no data validation claimed')
-              return mode == 'validate'
+              return True
 
 
           if __name__ == '__main__':
               try:
-                  run_data = guard_mode(os.environ['CLASSIFICATION_RESULT'], os.environ['REQUEST_MODE'])
+                  guard_mode(os.environ['CLASSIFICATION_RESULT'], os.environ['REQUEST_MODE'])
               except (KeyError, ValueError) as error:
                   raise SystemExit(str(error))
-              with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
-                  stream.write('run_data=' + str(run_data).lower() + '\n')
-              if not run_data:
-                  print('Title/body-only edit: no required data-validation check is emitted')
+              print('Eligible ready development PR: validating the exact synthetic merge')
           PY
           # END_PR_DATA_RESULT_GATE
       - name: Checkout the exact synthetic merge
-        if: steps.guard.outputs.run_data == 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 2
           persist-credentials: false
       - name: Verify synthetic merge and both event parents
-        if: steps.guard.outputs.run_data == 'true'
         env:
           EXPECTED_MERGE: ${{ github.sha }}
           EXPECTED_HEAD: ${{ needs.classify.outputs.head }}
           EXPECTED_BASE: ${{ needs.classify.outputs.base }}
         run: python3 .github/scripts/pr_data_checkout.py
       - uses: actions/setup-python@v5
-        if: steps.guard.outputs.run_data == 'true'
         with:
           python-version: '3.11'
       - name: Install Poetry
-        if: steps.guard.outputs.run_data == 'true'
         run: pip install poetry
       - name: Install dependencies
-        if: steps.guard.outputs.run_data == 'true'
         run: poetry install --no-root
       # GH #1031: the USER-CONFIG path (`config.s3_creds_path()`), as in the
       # Windows job, so this run exercises what a user has: no
@@ -176,7 +189,6 @@ jobs:
       # in tests/conftest.py use.  `config.py` is loaded BY FILE so writing
       # the file does not run the package's import-time auth flow.
       - name: Configure S3 read credentials
-        if: steps.guard.outputs.run_data == 'true'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.LSMS_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.LSMS_AWS_SECRET_ACCESS_KEY }}
@@ -197,14 +209,12 @@ jobs:
       # Fail loudly rather than let ~4,250 `requires_s3` tests skip and report
       # green, which is what a credential the gate cannot see would do.
       - name: Assert the requires_s3 gate is open
-        if: steps.guard.outputs.run_data == 'true'
         run: >-
           poetry run python -c "import importlib.util as u;
           s = u.spec_from_file_location('c', 'tests/conftest.py'); m = u.module_from_spec(s);
           s.loader.exec_module(m);
           assert m.aws_creds_available(), 'requires_s3 tests would be SKIPPED: no reader credentials'"
       - name: Build Uganda tables
-        if: steps.guard.outputs.run_data == 'true'
         working-directory: lsms_library/countries/Uganda/_
         run: >-
           python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
@@ -215,7 +225,6 @@ jobs:
       # the invariance test compares. Run that normal path before xdist starts,
       # so test scheduling cannot decide which of the two stages it reads.
       - name: Finalize Uganda shocks cache for invariance
-        if: steps.guard.outputs.run_data == 'true'
         working-directory: lsms_library/countries/Uganda/_
         run: >-
           python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
@@ -223,7 +232,6 @@ jobs:
           "import lsms_library as ll; ll.Country('Uganda').shocks()"
         timeout-minutes: 15
       - name: Run full test suite
-        if: steps.guard.outputs.run_data == 'true'
         # Capture both streams before Poetry/pytest starts. Assertion rewriting,
         # explicit messages, warnings and plugins can all contain row values;
         # flags alone do not form the public-output boundary. The wrapper emits

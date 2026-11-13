@@ -42,54 +42,42 @@ def test_ready_source_events_require_validation(classify, action):
 
 
 @pytest.mark.parametrize('changes', [
+    # GH #1714 (ruling 2026-11-13, option a): the workflow no longer runs on
+    # `edited`, and no edited event selects any mode, well formed or not.  A
+    # text edit can neither stand in for a validation nor, as a newer run on
+    # the same head, hide one (#1711: required check "Expected").
+    {'title': {'from': 'before'}}, {'body': {'from': None}},
+    {'title': {'from': 'before'}, 'body': {'from': 'before'}},
     {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40}}},
     {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40}},
      'title': {'from': 'before'}, 'body': {'from': None}},
-])
-def test_base_retarget_is_validation_even_without_a_new_head(classify, changes):
-    value = event('edited')
-    value['changes'] = changes
-    assert classify(value, 'owner/project', 'pull_request')['mode'] == 'validate'
-
-
-@pytest.mark.parametrize('changes', [
-    {'title': {'from': 'before'}}, {'body': {'from': None}},
-    {'title': {'from': 'before'}, 'body': {'from': 'before'}},
-])
-def test_known_text_edits_emit_only_metadata_mode(classify, changes):
-    value = event('edited')
-    value['changes'] = changes
-    actual = classify(value, 'owner/project', 'pull_request')
-    assert actual == {'mode': 'metadata', 'head': 'a' * 40, 'base': 'b' * 40}
-
-
-@pytest.mark.parametrize('changes', [
-    {'title': {'from': []}}, {'title': {'from': {}}},
-    {'title': {'from': None}}, {'title': {'from': 17}},
-    {'body': {'from': []}}, {'body': {'from': {}}},
-    {'body': {'from': False}}, {'title': {}}, {'body': {}},
-    {'title': {'from': 'before', 'extra': 'unknown'}},
-    {'body': {'from': None, 'extra': 'unknown'}},
-    {'title': {'from': 'before'}, 'body': {'from': []}},
-    {'base': {}}, {'base': {'ref': {'from': 'master'}}},
-    {'base': {'sha': {'from': 'd' * 40}}},
-    {'base': {'ref': {}, 'sha': {'from': 'd' * 40}}},
-    {'base': {'ref': {'from': []}, 'sha': {'from': 'd' * 40}}},
-    {'base': {'ref': {'from': 'master'}, 'sha': {'from': {}}}},
-    {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40, 'extra': 1}}},
-    {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40}, 'extra': {}}},
-    {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40}},
-     'title': {'from': []}},
+    {'title': {'from': []}}, {'title': {'from': None}}, {'body': {'from': False}},
+    {'title': {}}, {'body': {}}, {'base': {}}, {'base': {'ref': {'from': 'master'}}},
     {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40}},
      'future_source_field': {'from': 'old'}},
+    {}, None,
 ])
-def test_malformed_nested_edits_cannot_select_metadata_success(classify, changes):
+def test_every_edited_event_is_refused_and_selects_no_mode(classify, changes):
     value = event('edited')
-    value['changes'] = changes
+    if changes is not None:
+        value['changes'] = changes
     before = deepcopy(value)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='Unsupported pull_request action'):
         classify(value, 'owner/project', 'pull_request')
     assert value == before
+
+
+def test_no_edit_of_title_body_or_base_triggers_a_run():
+    """A run whose jobs all skip is still a run, so `edited` must not trigger."""
+    triggers = _workflow()['on']['pull_request']
+    assert triggers['types'] == ['opened', 'synchronize', 'reopened',
+                                 'ready_for_review', 'converted_to_draft']
+    assert 'edited' not in triggers['types']
+    # The documented ways to re-validate after a retarget without a push.
+    assert {'synchronize', 'reopened', 'ready_for_review'} <= set(triggers['types'])
+    # The fail-closed argument for a retarget rests on the strict ruleset
+    # setting; the workflow must keep saying so where it can be checked.
+    assert 'strict_required_status_checks_policy: true' in WORKFLOW.read_text()
 
 
 @pytest.mark.parametrize('fault', [
@@ -132,16 +120,16 @@ def test_classifier_failure_never_becomes_required_success(result):
         guard(result, 'validate')
 
 
-@pytest.mark.parametrize('mode', ['', 'unexpected', None])
-def test_missing_or_unknown_mode_is_not_a_metadata_success(mode):
+@pytest.mark.parametrize('mode', ['', 'unexpected', None, 'metadata'])
+def test_missing_unknown_or_retired_mode_is_refused(mode):
+    # 'metadata' was the title/body-edit mode, retired with `edited` (GH #1714).
     guard = _inline('PR_DATA_RESULT_GATE')['guard_mode']
     with pytest.raises(ValueError):
         guard('success', mode)
 
 
-@pytest.mark.parametrize('mode,run_data', [('validate', True), ('metadata', False)])
-def test_only_validation_mode_reaches_credentialed_steps(mode, run_data):
-    assert _inline('PR_DATA_RESULT_GATE')['guard_mode']('success', mode) is run_data
+def test_only_validation_mode_reaches_credentialed_steps():
+    assert _inline('PR_DATA_RESULT_GATE')['guard_mode']('success', 'validate') is True
 
 
 def _checkout():
@@ -179,18 +167,21 @@ def _workflow():
     return yaml.load(WORKFLOW.read_text(), Loader=yaml.BaseLoader)
 
 
-def test_required_job_is_always_run_and_metadata_has_separate_name_and_concurrency():
+def test_required_job_is_always_run_under_one_static_name():
     workflow = _workflow()
     assert set(workflow['on']) == {'pull_request'}
     assert workflow['on']['pull_request']['branches'] == ['development']
-    assert 'edited' in workflow['on']['pull_request']['types']
+    assert 'edited' not in workflow['on']['pull_request']['types']
     assert 'concurrency' not in workflow
     classify_job, validation = workflow['jobs']['classify'], workflow['jobs']['validation']
     assert classify_job['permissions'] == {} and len(classify_job['steps']) == 1
     assert 'uses' not in classify_job['steps'][0]
+    # A job skipped by a conditional counts as a passing required check, so the
+    # required job must run even when the classifier fails, and then fail.
     assert validation['if'] == '${{ always() }}' and validation['needs'] == 'classify'
-    assert validation['name'] == "${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'pr-data-metadata-edit' || 'pr-data-validation' }}"
-    assert validation['concurrency']['group'] == "pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'validate' && 'validation' || (needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'metadata' || format('refused-{0}', github.run_id)) }}"
+    # GH #1714: no event renames the required job any more.
+    assert validation['name'] == 'pr-data-validation'
+    assert validation['concurrency']['group'] == "pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'validate' && 'validation' || format('refused-{0}', github.run_id) }}"
     assert validation['concurrency']['cancel-in-progress'] == 'true'
     steps = validation['steps']
     assert steps[0]['id'] == 'guard' and 'uses' not in steps[0]
@@ -198,7 +189,10 @@ def test_required_job_is_always_run_and_metadata_has_separate_name_and_concurren
     assert steps[1]['with'] == {'ref': '${{ github.sha }}', 'fetch-depth': '2',
                               'persist-credentials': 'false'}
     assert 'pr_data_checkout.py' in steps[2]['run']
-    assert all(step['if'] == "steps.guard.outputs.run_data == 'true'" for step in steps[1:])
+    # No step after the guard is conditional: the guard's failure stops them
+    # all, and its success runs them all, so a green required check cannot
+    # come from skipped data steps.
+    assert all('if' not in step for step in steps)
     assert 'secrets.' not in str(classify_job) and 'secrets.' not in str(steps[:3])
 
 
@@ -206,8 +200,6 @@ def test_existing_data_recipe_is_reused_without_weaker_test_or_credential_gate()
     workflow = _workflow()
     existing = yaml.load((ROOT / '.github/workflows/ci.yml').read_text(), Loader=yaml.BaseLoader)
     reused = deepcopy(workflow['jobs']['validation']['steps'][3:])
-    for step in reused:
-        del step['if']
     flag = '--public-test-failures'
     full = next(step for step in reused if step.get('name') == 'Run full test suite')
     assert full['run'].split().count(flag) == 1
@@ -248,9 +240,10 @@ def _render_job_field(field, result, mode, run_id, number=17):
 
 
 def test_late_draft_refusal_cannot_cancel_ready_validation(classify):
-    draft = event('edited')
+    # The incident's late event was an edit of a draft; `edited` no longer
+    # triggers (GH #1714), and converted_to_draft is the draft event that does.
+    draft = event('converted_to_draft')
     draft['pull_request']['draft'] = True
-    draft['changes'] = {'body': {'from': 'before'}}
     with pytest.raises(ValueError, match='draft'):
         classify(draft, 'owner/project', 'pull_request')
     ready = classify(event('ready_for_review'), 'owner/project', 'pull_request')
@@ -268,7 +261,7 @@ def test_late_draft_refusal_cannot_cancel_ready_validation(classify):
 @pytest.mark.parametrize('result,mode', [
     ('failure', ''), ('failure', 'validate'), ('failure', 'metadata'), ('cancelled', ''),
     ('skipped', ''), ('', ''), (None, None), ('success', ''),
-    ('success', 'unexpected'),
+    ('success', 'unexpected'), ('success', 'metadata'),
 ])
 def test_refused_or_uncertain_requests_have_run_specific_groups_and_fail(result, mode):
     group = _render_job_field('group', result, mode, 199)
@@ -276,7 +269,6 @@ def test_refused_or_uncertain_requests_have_run_specific_groups_and_fail(result,
     assert _render_job_field('name', result, mode, 199) == 'pr-data-validation'
     assert group != _render_job_field('group', result, mode, 200)
     assert group != _render_job_field('group', 'success', 'validate', 200)
-    assert group != _render_job_field('group', 'success', 'metadata', 200)
     with pytest.raises(ValueError):
         _inline('PR_DATA_RESULT_GATE')['guard_mode'](result, mode)
 
@@ -294,14 +286,10 @@ def test_new_valid_head_or_base_retains_same_validation_cancellation_group(class
     assert _workflow()['jobs']['validation']['concurrency']['cancel-in-progress'] == 'true'
 
 
-def test_successful_metadata_group_remains_isolated_and_nonrequired(classify):
-    value = event('edited')
-    value['changes'] = {'body': {'from': None}}
-    decision = classify(value, 'owner/project', 'pull_request')
-    assert _render_job_field('group', 'success', decision['mode'], 199) == (
-        'pr-data-17-metadata')
-    assert _render_job_field('group', 'success', decision['mode'], 199) != (
-        _render_job_field('group', 'success', 'validate', 200))
-    assert _render_job_field('name', 'success', decision['mode'], 199) == (
-        'pr-data-metadata-edit')
-    assert _inline('PR_DATA_RESULT_GATE')['guard_mode']('success', decision['mode']) is False
+@pytest.mark.parametrize('result,mode', [
+    ('success', 'validate'), ('success', 'metadata'), ('failure', ''), (None, None),
+])
+def test_every_run_reports_the_required_name(result, mode):
+    """GH #1714: no run of this workflow names its job anything else, so no
+    newer run on the same head can leave pr-data-validation 'Expected'."""
+    assert _render_job_field('name', result, mode, 199) == 'pr-data-validation'
