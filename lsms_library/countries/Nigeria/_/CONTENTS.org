@@ -4068,7 +4068,7 @@ and [[https://github.com/ligon/LSMS_Library/pull/1622][PR #1622]]. Durable sourc
 with =RESULT.json= and =STAGE-RECEIPT.json= in the same directory. The source
 audit contains every original row; private outputs/IDs are not published here.
 
-* 2026-11-08 -- GH #1537: two label-only Aggregate aliases; Pepper remains unqualified
+* 2026-11-08 -- GH #1537: two label-only Aggregate aliases; Pepper remains unqualified (mapped 2026-11-13, below)
 
 Preferred =Groundnuts= now maps to the already existing Aggregate =Groundnuts=,
 and =Maize (shelled)= to existing =Maize=.  These are two label-only rows in
@@ -4088,6 +4088,40 @@ was checked by its unchanged source chain and pure decoder tail, not a real
 no-argument producer/API invocation.  No actual source/current coverage count,
 quantity/price/unit/factor/weight rule or cold/warm acceptance is claimed.  The
 historical 121-label/11,649-row/2.4% figures were not remeasured.
+
+** 2026-11-13 -- Pepper takes the Fresh Pepper Aggregate (GH #1537)
+
+/Ruling (@ligon, 2026-11-12, "Check codes, then Fresh")/: confirm that every
+served generic =Pepper= row comes from codes 76 / 2140 (Preferred =Fresh
+Pepper=); if so, map it to the Fresh Pepper Aggregate.
+
+*The check*, cold build of =f138a3d61= in a private root (burst job 41271653,
+=reports/nigeria/out/m1/=).  Every served =j = Pepper= row is code 76:
+
+| table | round | served =Pepper= rows | raw rows decoding to =Pepper= | codes |
+|-+-+-+-+-|
+| =food_acquired= | 2010Q3 | 3,496 | 3,496 | 76 |
+| =food_acquired= | 2011Q1 | 3,496 | 3,496 | 76 |
+| =food_acquired= | 2012Q3 | 3,454 | 3,454 | 76 |
+| =community_prices= | 2010Q3 (PP C2) | 396 | 427 priced code-76 rows | 76 |
+| =community_prices= | 2012Q3 (PP C2) | 412 | 420 priced code-76 rows | 76 |
+| =crop_production= | any | 0 | | |
+
+The served counts per round and source (=s=) equal the raw trace exactly
+(10,446 food rows: 8,930 purchased, 1,101 produced, 295 in kind).  The PP
+community shortfall is the GH #587 holds, not other codes.  No other code
+decodes to =Pepper= in any route: the PH quarter maps of 2011Q1 / 2013Q1 /
+2016Q1 / 2019Q1 also list crop code 2140 (its quarter cells say =Pepper=), but
+no food or community file carries 2140, and crop / community code-mode
+consumers read 2140 through the Code contract as =Fresh Pepper=.
+
+*What changed*: one label-only =harmonize_food= row (blank Code and quarter
+cells, the #1631 convention), =Pepper= -> Aggregate =Fresh Pepper=, the
+existing bucket of codes 76 and 2140.  The served =j= stays =Pepper=; no
+fresh / dry attribute is added to the native name, and every quarter map is
+unchanged.  =labels='Aggregate'= no longer passes =Pepper= through (base:
+10,446 =food_acquired= rows, 1 of 121 labels; 808 =community_prices= rows,
+1 of 143), so Nigeria now passes no label through on either table.
 
 * 2026-11-09 -- Equal W1/W2 sale payloads are not transaction identity (GH #1552)
 

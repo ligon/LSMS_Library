@@ -123,7 +123,10 @@ foods, 42,240 rows); it now carries `{'Malawi': …}`. `Feature('food_prices')(
 ['Malawi', 'Uganda', 'Nigeria'], labels='Aggregate')` is that case. Measured
 2026-11-04, Malawi and Uganda match every label and Nigeria passes 3 of 121
 through (`Groundnuts`, `Maize (shelled)`, `Pepper`; 11,649 rows, 2.4%), so it
-carries `{'Nigeria': …}`. When this section was written all three matched, so
+carries `{'Nigeria': …}`. (Since GH #1537 all three are curated: `Groundnuts`
+and `Maize (shelled)` on 2026-11-08, `Pepper` -> `Fresh Pepper` on 2026-11-13,
+after every served `Pepper` row was traced to code 76; the 2026-11-04 count is
+kept as measured.) When this section was written all three matched, so
 the evidence for the fix is the synthetic two-country tests in
 `tests/test_feature_attrs_carriers.py::TestLabelsUnmatchedSurvivesAssembly`.
 Four of its five tests fail on the pre-fix `feature.py`; the fifth,

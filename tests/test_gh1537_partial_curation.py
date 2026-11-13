@@ -33,23 +33,34 @@ def test_actual_parsers_only_add_two_label_rows(curation):
     assert_frame_equal(one, many)
     # The two #1537 label rows, then GH #587's Semovita row (ruling
     # 2026-11-12, "Add a Semovita row"), whose change also names Semovita in
-    # code 15's 2012Q3 cell -- the only other cell that differs from baseline.
-    assert len(one) == len(curation) + 3
+    # code 15's 2012Q3 cell -- the only other cell that differs from baseline
+    # -- then #1537's Pepper row (ruling 2026-11-12, "Check codes, then
+    # Fresh": every served Pepper row is code 76, Preferred Fresh Pepper).
+    assert len(one) == len(curation) + 4
     assert list(one.columns) == list(curation.columns)
     # Empty numeric cells promote Code to float; every old numeric code is
     # exactly representable, and format_id restores its original spelling.
-    pd.testing.assert_frame_equal(one.iloc[:-3].drop(columns='Code'),
+    pd.testing.assert_frame_equal(one.iloc[:-4].drop(columns='Code'),
                                   gh587_semovita_cell(curation).drop(columns='Code'))
-    np.testing.assert_array_equal(one['Code'].iloc[:-3], curation['Code'])
-    assert one['Code'].iloc[:-3].map(local_tools.format_id).tolist() == (
+    np.testing.assert_array_equal(one['Code'].iloc[:-4], curation['Code'])
+    assert one['Code'].iloc[:-4].map(local_tools.format_id).tolist() == (
         curation['Code'].map(local_tools.format_id).tolist())
-    semovita = one.iloc[-1:]
+    pepper = one.iloc[-1:]
+    assert pepper['Preferred Label'].tolist() == ['Pepper']
+    assert pepper['Aggregate Label'].tolist() == ['Fresh Pepper']
+    assert pepper['Code'].isna().all()
+    assert (pepper[list(QUARTERS)] == '').all().all()
+    # The target bucket already exists: code 76's own Aggregate.
+    code76 = pd.to_numeric(curation['Code'], errors='coerce').eq(76)
+    assert curation.loc[code76, 'Preferred Label'].tolist() == ['Fresh Pepper']
+    assert curation.loc[code76, 'Aggregate Label'].tolist() == ['Fresh Pepper']
+    semovita = one.iloc[-2:-1]
     assert semovita['Preferred Label'].tolist() == [GH587_SEMOVITA_ROW['Preferred Label']]
     assert semovita['Aggregate Label'].tolist() == [GH587_SEMOVITA_ROW['Aggregate Label']]
     assert semovita['Code'].isna().all()
     assert (semovita[list(QUARTERS)] == '').all().all()
     assert GH587_SEMOVITA_ROW['Aggregate Label'] in set(curation['Aggregate Label'])
-    additions = one.iloc[-3:-1]
+    additions = one.iloc[-4:-2]
     assert additions['Preferred Label'].tolist() == ['Groundnuts', 'Maize (shelled)']
     assert additions['Aggregate Label'].tolist() == ['Groundnuts', 'Maize']
     assert additions['Code'].isna().all()
@@ -57,15 +68,16 @@ def test_actual_parsers_only_add_two_label_rows(curation):
     assert (additions[list(QUARTERS)] == '').all().all()
     for target in additions['Aggregate Label']:
         assert target in set(curation['Aggregate Label'])
-    assert 'Pepper' not in set(one['Preferred Label'])
+    assert (one['Preferred Label'] == 'Pepper').sum() == 1
     assert 'Pepper' not in set(one['Aggregate Label'])
 
 
 def test_actual_quarter_maps_warnings_and_missing_codes_equal_baseline(curation, monkeypatch):
     candidate = local_tools.df_from_orgfile(ORG, name='harmonize_food')
-    observed = candidate['Code'].iloc[:-3].tolist() + [None, np.nan, pd.NA, '', 99999]
+    observed = candidate['Code'].iloc[:-4].tolist() + [None, np.nan, pd.NA, '', 99999]
     # The baseline as GH #587 changed it (its one cell and its label row):
-    # the #1537 rows must leave every quarter map exactly as that table gives it.
+    # the #1537 rows (Groundnuts, Maize (shelled) and Pepper) must leave
+    # every quarter map exactly as that table gives it.
     baseline_587 = gh587_semovita(curation)
     for quarter in QUARTERS:
         with warnings.catch_warnings(record=True) as current_warnings:
@@ -127,7 +139,7 @@ def test_default_crop_decoder_boundary_skips_actual_parser_blank_keys(curation, 
     pd.testing.assert_series_equal(codes.map(results[0]), codes.map(results[1]))
 
 
-def test_actual_candidate_labels_preserve_price_grain_payload_and_pepper(curation, monkeypatch):
+def test_actual_candidate_labels_preserve_price_grain_payload_and_map_pepper(curation, monkeypatch):
     candidate = local_tools.all_dfs_from_orgfile(ORG)['harmonize_food']
     raw = prices(['Groundnuts', 'Groundnuts (shelled)', 'Maize (shelled)',
                   'Maize (shelled, on the cob)', 'Pepper', None, 17, 'Uncurated'])
@@ -140,7 +152,7 @@ def test_actual_candidate_labels_preserve_price_grain_payload_and_pepper(curatio
     with pytest.warns(LabelPassThroughWarning):
         result = relabel(raw, {'harmonize_food': candidate})
     assert result.index.get_level_values('j')[:5].tolist() == [
-        'Groundnuts', 'Groundnuts', 'Maize', 'Maize', 'Pepper']
+        'Groundnuts', 'Groundnuts', 'Maize', 'Maize', 'Fresh Pepper']
     assert len(result) == len(raw)
     assert result.index.duplicated(keep=False).sum() == 4
     assert_frame_equal(result.reset_index(drop=True), raw.reset_index(drop=True))
@@ -148,13 +160,17 @@ def test_actual_candidate_labels_preserve_price_grain_payload_and_pepper(curatio
         assert result.index.get_level_values(level).equals(raw.index.get_level_values(level))
     assert result.attrs['opaque'] == raw.attrs['opaque']
     assert result.attrs['id_converted'] is True
-    assert result.attrs['labels_unmatched']['examples'] == ['17', 'Pepper', 'Uncurated']
+    assert result.attrs['labels_unmatched']['examples'] == ['17', 'Uncurated']
     with monkeypatch.context() as scoped:
         scoped.setenv('LSMS_LABELS_STRICT', '1')
-        with pytest.raises(LabelPassThroughError, match='Pepper'):
-            relabel(prices(['Pepper']), {'harmonize_food': candidate})
-        # The two covered names no longer produce a strict coverage refusal.
-        relabel(prices(['Groundnuts', 'Maize (shelled)']), {'harmonize_food': candidate})
+        with pytest.raises(LabelPassThroughError, match='Uncurated'):
+            relabel(prices(['Uncurated']), {'harmonize_food': candidate})
+        # The three covered names no longer produce a strict coverage refusal
+        # (GH #1537: Pepper -> Fresh Pepper, ruling 2026-11-12).
+        out = relabel(prices(['Groundnuts', 'Maize (shelled)', 'Pepper']),
+                      {'harmonize_food': candidate})
+        assert out.index.get_level_values('j').tolist() == [
+            'Groundnuts', 'Maize', 'Fresh Pepper']
     assert_frame_equal(raw, before)
     assert raw.attrs == before.attrs
     assert_frame_equal(candidate, table_before)
