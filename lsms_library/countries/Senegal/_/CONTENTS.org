@@ -1364,7 +1364,9 @@ don?"; the purchase is =s16bq08= "16B.08. Avez-vous acheté [INTRANT]?").  The 2
 Guinea-Bissau, Togo and Benin only.  Measured on the file: =s16bq05= Oui on 536 applied lines, =s16bq08=
 Oui on 4,956; gift x purchase Non/Non 4,504, Non/Oui 4,876, Oui/Non 456, Oui/Oui 80.  2021-22 reads the
 purchase (GH #1483), so the two columns mean different things across this country's waves.  A question
-for the maintainer.
+for the maintainer. The same binding survives in four cells after this batch: Senegal 2018-19, Cote d'Ivoire 2018-19,
+Niger 2018-19 and Niger 2021-22 (=Niger/_/CONTENTS.org= records it); =tests/test_ehcvm_plot_inputs_identity.py=
+and =tests/test_senegal_1483_s16b.py= pin it (red team of 2026-11-13, F1).
 
 *Cost, measured* (hash census against =f138a3d61=): Senegal 23 of 23 =Country._table_cache_hash= and 46 of
 46 =Wave._input_hash= (both waves; =_/categorical_mapping.org= and =_/plot_features.py= are build inputs of

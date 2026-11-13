@@ -320,7 +320,9 @@ def test_live_yaml_and_2021_binding_remain_source_exact():
         # comment in data_scheme.yml now names the Unknown fill, and
         # harmonize_seed_crop maps maize / cowpea seed to crop_production's 'Maïs'
         # / 'Niébé'.  Neither touches the food_acquired u path this test guards.
-        '_/data_scheme.yml': '3dac806c2c685a526992fa44137af959b83776e5f6ec1e89ade482c40b8fa3ad',
+        # The scheme digest moved again (comments only) when the plot_inputs
+        # comment stopped calling the 2018-19 gift answers a purchase.
+        '_/data_scheme.yml': '3a5f81563d8ef788b7340809dfde266925fc742432e22ee970c7f93721147f77',
         '_/categorical_mapping.org': '24fe7f2d0b79a64578d4dffdc1861ac1b9f1434afca766b2cac26dae53f5c8c7',
     }
     for rel, digest in protected.items():

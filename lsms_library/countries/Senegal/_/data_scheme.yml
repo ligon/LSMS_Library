@@ -196,10 +196,12 @@ Data Scheme:
     # Item-level agricultural inputs (GAP 2), cloned from the Niger EHCVM
     # template.  One row per REPORTED input applied by a household from the
     # EHCVM s16b roster (s16b_me_sen2018.dta): input identity, reported
-    # quantity used + native unit, purchased flag + reported purchased
-    # quantity, and (seed rows) the seed's crop on the shared harmonize_food
-    # labels.  REPORTED values only: seed_kg / nitrogen_kg / fertilizer
-    # totals are transformations, never columns.  EHCVM 2018-19 only.
+    # quantity used + native unit, a purchased flag + quantity (in 2018-19 the
+    # GIFT answers s16bq05 / s16bq07a, a known defect not yet ruled for
+    # Senegal: _/CONTENTS.org), and (seed rows) the seed's crop, on the labels
+    # crop_production serves (GH #1119).  REPORTED values only: seed_kg /
+    # nitrogen_kg / fertilizer totals are transformations, never columns.
+    # 2018-19 here; 2021-22 through _/s16b_2021.py (GH #1483).
     #
     # GRAIN (t, i, input, crop, u): Senegal (like Niger) records inputs at
     # the HOUSEHOLD x input grain, NOT plot x input, so `plot_id` is NOT in the

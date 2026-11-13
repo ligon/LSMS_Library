@@ -6,12 +6,22 @@ roster, one row per input-type the household was asked about.  Columns:
   s16bq01   input type (organic / inorganic fert / phyto / seeds-by-crop)
   s16bq02   USED this input? (1=Oui) — application gate (all 1 in 2018)
   s16bq03a / s16bq03b   quantity used + native unit
-  s16bq05   purchased? (Oui / Non)
-  s16bq07a  quantity purchased (native unit)
+  s16bq05   received as a GIFT or donation? (Oui / Non) -- the file's label is
+            "16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de
+            don?"; the purchase question is s16bq08
+  s16bq07a  quantity received as a gift (native unit); the purchased
+            quantity is s16bq09a
+
+KNOWN DEFECT, NOT YET RULED FOR SENEGAL: `Purchased` / `Quantity_purchased`
+below are read from s16bq05 / s16bq07a, i.e. they serve the GIFT answers
+under purchase names (the defect the 2026-11-13 ruling "Fix all three now"
+corrected for Guinea-Bissau, Togo and Benin).  See _/CONTENTS.org.
 
 We keep s16bq02==1 (applied) rows.  The EHCVM roster has NO crop column —
 the seed's crop is embedded in the input-type label ('Semences de petit
-mil'), resolved to the harmonize_food crop label via harmonize_seed_crop.
+mil'), resolved to a crop label via harmonize_seed_crop: the labels
+crop_production serves for the crop (GH #1119: 'Maïs', 'Niébé', 'Mil', ...),
+or a catch-all ('Autre céréale', 'Autre tubercule', 'Autre crop').
 Non-seed input rows carry the CROP_NA sentinel.  Grain (t, i, input, crop,
 u); no plot column (EHCVM records inputs at the household x input grain).
 
@@ -124,7 +134,8 @@ srcn = srcn[applied.values]
 
 hh = srcn.apply(lambda r: i(pd.Series([r['grappe'], r['menage']])), axis=1)
 
-# purchased: s16bq05 Oui/Non (loaded as labels with convert_categoricals)
+# Served as `Purchased`, but s16bq05 is the GIFT flag (Oui/Non, loaded as
+# labels with convert_categoricals): the known defect in the docstring.
 purchased = src['s16bq05'].astype('string').map({'Oui': True, 'Non': False})
 
 df = pd.DataFrame({
