@@ -143,8 +143,11 @@ df['intercropped'] = df['intercropped'].astype('boolean')
 df['t'] = T
 df['u'] = df['u'].astype('string').fillna(UNIT_NA)
 df['condition'] = df['condition'].astype('string').fillna(CONDITION_NA)
-for col in ('crop', 'plot_id', 'Unit_sold', 'Derivation', 'condition_native'):
+for col in ('crop', 'Unit_sold', 'Derivation', 'condition_native'):
     df[col] = df[col].astype('string')
+# `str`, as the 2018-19 builder writes it: a different dtype here would retype the
+# 2018-19 rows of the concatenated country table (measured: str -> string).
+df['plot_id'] = df['plot_id'].astype(str)
 # The 2018-19 contract: a sold unit is NA, never the sentinel.
 df['Unit_sold'] = df['Unit_sold'].where(df['Unit_sold'] != UNIT_NA, pd.NA)
 df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition'])[

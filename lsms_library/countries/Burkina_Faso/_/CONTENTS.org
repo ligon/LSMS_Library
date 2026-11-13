@@ -1242,7 +1242,7 @@ pre-fix config).
   =conso3mois= alike.  =data_info.yml= uses =16032015=, the later one, which
   is also the one whose column set matches p2/p3.  The =10032015= food file
   has 167,324 rows against 168,463; they are not interchangeable.
-- /Served since 2026-11-04: see GH #1442 at the end of this file./
+- /Ruled 2026-11-04, served since 2026-11-13: see GH #1442 at the end of this file./
   *p1's =autocons= / =cadeau= (auto-consumption VALUE and gift value) and
   p2-p4's =autocons= / =cadeau= are not read.*  Only =achat= reaches
   =Expenditure=.  So the served figure is *purchases*, plus p1's
@@ -1473,9 +1473,9 @@ answer -- C04 quantity and value, C05 quantity, C06 quantity -- so nothing is
 registered as a derivation.  =Expenditure= is NaN on produced and inkind rows,
 as in the EHCVM waves; =autocons=, =cadeau= and =mtt_dep= stay unread.  A
 quantity the survey did not ask for stays NaN, as before.  /Superseded for
-=autocons= and =cadeau= on 2026-11-04: see GH #1442 at the end of this file.
-So is the statement below that produced and inkind rows cannot enter the kg
-estimate./
+=autocons= and =cadeau= (ruled 2026-11-04, served 2026-11-13): see GH #1442 at the end of this file.
+Since GH #1509 produced and inkind rows still give no PURCHASE rung evidence; they reach only
+the disclosed non-purchase fallback, for a cell no purchase reaches (17 rows, same section)./
 
 Measured on cold builds in private data roots, development =7c2b5ed01=
 against the change:
@@ -1907,7 +1907,7 @@ usually resolves toward =Unit_sold=.
   harvest.
 - The shelled/unshelled state (=s16cq12c= / =s16cq16c=, differing on 313
   priced rows) is not added as a =condition= level.
-- 2014 and 2021-22 stay unbuilt.
+- 2014 and 2021-22 stay unbuilt.  /2021-22 is built since 2026-11-13: see "2021-22 crop_production" at the end of this file./
 
 The 540 rows whose missing harvest =u= is served as the literal =unit= are
 GH #1234 (PR #1251), not this fix.
@@ -2750,7 +2750,7 @@ Tanzania 2014-15 also serve an NA =v=, but on =food_acquired= too.
 
 Q16C.11 routes a finished harvest TO the quantity ("Si la réponse est 1=Oui alors aller à Q16C.16",
 =manuelagent_ehcvm2_version_v2.pdf=, printed p. 124), and =s16cq16a= is filled on 0 of the 7,663
-finished rows and 179 of 813 unfinished.  =crop_production= does not serve 2021-22 yet, so nothing here
+finished rows and 179 of 813 unfinished.  =crop_production= does not serve 2021-22 yet (/it does since 2026-11-13; see the end of this file/), so nothing here
 is affected until it is wired.  Of 6,444 household-crop pairs with a finished row, 3,983 have a positive
 =s16d= disposition sum in one unit, 2,289 span units and 172 record none.  The measurement of that sum
 against a real harvest is in =Mali/_/CONTENTS.org=, same date.
@@ -3016,7 +3016,7 @@ every 2014 wave hash moves, one Burkina re-warm.  No other country's, and no
 The ruling said to stop folding =Boîte de tomate= onto =Boîte= in the =u= table, measuring the kg
 factors first and stopping if they got materially worse.  They do, on a line fixed before looking, so
 the table is unchanged.  Measured on cold builds with the edit in a private clone.  A second pair of builds also served the
-C05 / C06 values of GH #1442, which is held and not on development; the two agree except where noted.
+C05 / C06 values of GH #1442, then held and not on development (landed 2026-11-13); the two agree except where noted.
 
 *Which rows are tomato tins differs by wave.*  2018-19 has both codes, and 5,314 of its 9,187 served
 tin rows are code 108.  2021-22 fields code 107 only (5,302 source rows), so nothing there says what a
@@ -3121,7 +3121,7 @@ through =harmonize_crop_condition_ehcvm1=.
 
 15,593 lines, unique on (household, field, parcel, crop code, unit), so the level separates nothing and adds no row.  A blank state is a
 blank unit on all 546.  The answer describes the harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).
-This supersedes the 2026-10-23 entry's "not added as a =condition= level".  2021-22 has no =crop_production= script (wiring it is still a decision, same entry), so the level reaches no 2021-22 row.  For whoever wires it: =s16c_me_bfa2021.dta= =s16cq16d= carries the same five codes under the same labels, 7 / 56 / 10 / 47 / 53, blank on 9,421 of 9,594 lines, so this table applies and no second one is needed.
+This supersedes the 2026-10-23 entry's "not added as a =condition= level".  2021-22 had no =crop_production= script (wiring it was still a decision, same entry), so the level reached no 2021-22 row; /since 2026-11-13 it does, through this table/.  For whoever wires it: =s16c_me_bfa2021.dta= =s16cq16d= carries the same five codes under the same labels, 7 / 56 / 10 / 47 / 53, blank on 9,421 of 9,594 lines, so this table applies and no second one is needed.
 
 *The printed form is not what was fielded.*  The household forms of both vagues
 (=Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague{1,2}.xls=, sheet =S16c_Agri=) print four
@@ -3559,3 +3559,183 @@ are not newly measured counts. Implementation verification is limited to
 invented pure frames and committed metadata, not actual sample/data/API or
 fresh planned-design evidence. The wave mapping file is a build hash input;
 final integrated metadata measurement and any rewarm are separate work.
+
+* 2026-11-13 -- 2021-22 crop_production: the panel s16c and s16d sales (GH #1436, #824, #1437)
+
+=2021-22/_/crop_production.py= builds the wave from the panel component (catalog 6224; the
+cross-section ships no agriculture module we hold, GH #1276): the =s16c= harvest lines, plus
+the =s16d= household-crop sales on the option-(d) rule of Mali 2021-22 (GH #824, @ligon
+2026-11-03): a sale goes on the crop's single line, keyed
+=Burkina_Faso::crop_production::hh-crop-sale-single-row=, else on one =Farm-level= row with
+=u = 'Unknown'= and no key.  A recorded harvest on an unfinished line is served as recorded,
+keyed =::harvest-to-date=.  It runs on the shared =lsms_library.ehcvm= helpers, as Togo
+2021-22 does.
+
+*The idiosyncrasy that shaped it: one crop list, two label sets.*  =s16cq04= ("Id in
+cultures") and =s16dq01= ("Id in culture_utilisation_annuel") are Survey Solutions roster
+ids on one crop list, but the two held files carry different value-label sets for it
+(measured 2026-11-13):
+
+| code | =s16c= label | =s16d= label | EHCVM-2 siblings (Mali, Togo, Niger, Benin, Senegal) |
+|------+---------------------------+--------------------+-----------------------|
+|    3 | Riz                        | Riz Paddy          | Riz Paddy             |
+|    8 | Niébé/Haricot              | Niébé              | Niébé                 |
+|    9 | Voandzou (pois de terre)   | Voandzou           | Voandzou              |
+|   27 | Laitue (salade)            | Laitue             | Laitue                |
+|   53 | Agrume                     | (bare)             | Agrume                |
+|   54 | Manguier                   | (bare)             | Manguier              |
+|   55 | Autre (à préciser)         | (bare)             | Anacarde              |
+|   58 | (bare)                     | (bare)             | Banane douce          |
+|   64 | (bare)                     | (bare)             | Soja                  |
+|   65 | (bare)                     | Autre (à préciser) | Autre (à préciser)    |
+
+So =s16d= carries the EHCVM-2 list (stripped of 53-64), and =s16c= a set in which 55 is
+"Autre" -- which every other EHCVM-2 file, and Burkina's own =s16d=, put on 65.  2018-19
+=s16cq04= spells 3, 8, 9 and 27 as =s16d= does.  Matched by label, 332 of the 1,548 sales find
+no harvest line and would go to =Farm-level=; matched by code none does (1,331 sales on one
+line, 156 on two, 61 on three or more).  So the attachment joins on the code.  The served
+label is the harvest file's own, through =harmonize_food= as in 2018-19; a code the file
+leaves bare (58, 64, 65), or labels with a word =s16d= gives to a different code (55), keeps
+a source-qualified identity, =Unknown [Burkina_Faso 2021-22 s16cq04=55]=, the form the 2021
+=s16b= adapter uses.  *Not decided here*: whether 55 is Anacarde (the sibling list says so;
+the file does not), and whether 2021-22's =Riz= / =Niébé/Haricot= / =Voandzou (pois de terre)=
+/ =Laitue (salade)= should be served in 2018-19's spellings.  Both are questions for the
+maintainer; as served, cowpea is =Niébé= in 2018-19 and =Niébé/Haricot= in 2021-22.
+
+Units likewise: =s16cq16b= and =s16dq05b= label codes 1-7 (=s16c= 3 =Plat Yoruba=, =s16d= 3
+=Yorouba=; 2018-19 =Plat yorouba=) and leave the longer list bare (=s16cq16b= 8, 9; =s16dq05b=
+8, 10, 13, ... 64 on 89 sales).  A bare code keeps its source-qualified identity, by field.
+A missing harvest unit is =Unknown=; a missing sold unit stays NA (the 2018-19 contract).
+
+*GH #1437, the Burkina half, diagnosed (no imputation).*  The harvest block is blank on every
+finished row, not just =s16cq16a=.  On the 8,476 crop rows of =s16c=, =s16cq11= is =Oui= on
+7,663 and =Non= on 813.  Filled on the finished / unfinished rows:
+
+| variable | label | finished (7,663) | unfinished (813) |
+|----------+-------+-----+-----|
+| =s16cq12= | % de la superficie qui reste à récolter | 0 | 813 |
+| =s16cq13= | surface récoltée plus petite que plantée | 0 | 811 |
+| =s16cq14= / =s16cq15= | pourquoi / % perdu | 0 | 107 |
+| =s16cq16a= | quantité déjà récoltée | 0 | 179 |
+| =s16cq16b= / =s16cq16d= | unité / état | 0 | 173 |
+| =s16cq16c= | estimation en kg | 0 | 116 |
+
+Every column before =s16cq11= is filled on both.  So the released file behaves as if the
+fielded program skipped Q16C.12-16 for =Oui=, the reverse of the printed route (Oui ►
+16C.16, the 2026-11-09 entry above).  The printed route is still not proof of the fielded
+program, and this is a description of the file, not a cause.  Nothing is filled in.
+
+*Measured* cold in private roots, base =f138a3d61= against the branch (job 41271920):
+
+| | base | branch |
+|-+------+--------|
+| =crop_production= rows | 15,587 (2018-19) | 24,278 = 15,587 + 8,691 (2021-22) |
+| 2021-22 rows: plot lines / =Farm-level= | -- | 8,474 / 217 |
+| 2021-22 rows with a sale | -- | 1,548 (1,331 keyed on their line; 217 =Farm-level=) |
+| 2021-22 =Value_sold= | -- | 270,464,270 FCFA, the =s16dq06= sum of the raw file |
+| 2021-22 rows with a =Quantity= | -- | 179, every one keyed =harvest-to-date= |
+| =harvest_kg= rows 2018-19 / 2021-22 | 1,606 / -- | 1,606 / 56 |
+| =yield_kg= rows 2018-19 / 2021-22 | 1,485 / -- | 1,485 / 53 |
+| 2018-19 rows | -- | equal in every value; a =Derivation= column, NA, is new |
+
+=harvest_kg= and =yield_kg= are this small because the harvest is blank on finished rows;
+that is the finding, not a defect of the builder.  =Feature('crop_production')= equals the
+country table (24,278 rows, same units, same quantity total), index unique.
+
+*Two repeated lines.*  =s16c= repeats (household, field, parcel, crop) on 2 pairs of lines,
+which differ in =s16cq03b= (the roster list item), =s16cq08= and =s16cq10a=; neither pair
+records a harvest.  On the served key each pair is one row: one pair is identical on every
+served column (a lossless de-dup), the other differs in =intercropped=, so the GH #323 audit
+reports it (=GrainCollapseWarning=, 1 of 8,693 rows) and =LSMS_GRAIN_STRICT=1= refuses the
+table.  Niger 2021-22 resolved the same shape with a constructed =production_obs= (GH #1360);
+doing that here changes the country's declared index for 2018-19 too, so it is a question,
+not done.  The builder refuses a third pair, or a pair with a quantity.
+
+*Not served, each for want of a ruling that names this country*: =s16cq16c= as =Quantity_kg=
+(108 rows, the #1436 survey-kg ruling is Mali's and Niger's), =s16dq05c= as =Quantity_sold_kg=
+(1,537 sales; the 2026-11-12 sold-kg ruling names Niger and Mali), =s16dq05d= as
+=Condition_sold= (1,548 sales; GH1528 wired 2018-19 only), and a harvest from the
+dispositions.  Measured for that last one, by code, with Mali's rule
+(=lsms_library.ehcvm.harvest_totals=, run in a measurement only): of 7,136 household-crop
+pairs, 6,397 are finished on every line with no recorded quantity; 3,958 of those have
+dispositions in one unit (3,421 on a single line, 537 that would be =Farm-level=), 2,272 span
+units and 167 record none.  Units of the 3,958: Sac gros 1,424, Yorouba 1,231, Kilogramme 530,
+Autres 315, Sac moyen 256, Tine 162, 40 on bare codes.  (The 2026-11-04 entry's 3,983 / 2,289
+/ 172 counted pairs with any finished row.)
+
+Cache: a new wave script, =2021-22/_/mapping.py= and =_/data_scheme.yml=: one Burkina
+re-warm.  Pinned by =tests/test_burkina_faso_2021_crop_production.py=, whose oracle reads
+=s16c= and =s16d= directly.
+
+* 2026-11-13 -- =interview_date= through the build-time parser (GH #1045)
+
+The six per-visit stamps =s00q23a/b=, =s00q24a/b=, =s00q25a/b= of 2018-19 and of 2021-22's two
+covers are declarative =datetime:= specs (=format: '%Y-%m-%dT%H:%M:%S'=, =calendar:
+gregorian=, =sentinels: ['##N/A##']=), parsed in =Wave.grab_data= before the hook, as
+Ethiopia W4/W5 did in #1413.  The hook (=melt_visit_intervals=) now receives =datetime64[us]=
+and is unchanged.  2014 declares no =interview_date=.
+
+The only non-ISO value in either wave is Survey Solutions' =##N/A##=: 2018-19 =s00q23b= 3,
+=s00q24a= 1, =s00q24b= 11, =s00q25a= 1, =s00q25b= 11; the 2021-22 panel cover =s00q25b= 18;
+the cross-section none.  Blank strings: 2018-19 one each in =s00q24b= and =s00q25b=;
+cross-section =s00q25a= 3, =s00q25b= 32.  Measured cold, base against branch: the served table
+is frame-equal (52,234 rows, values and dtypes), and =datetime_reports(country='Burkina_Faso')=
+holds twelve reports with 0 =unparsed=, 0 =out_of_range=, 0 =ambiguous=; the sentinels are
+counted, so reads now warn (=DatetimeParseWarning=) and =LSMS_DATE_STRICT=1= refuses the table,
+as it does Ethiopia's.  No =window:=: 2018-19's two vagues (Sep-Nov 2018, Apr-Jun 2019) need
+two spans and a spec takes one, and no 2021-22 span is cited.  The served stamps run 2018-08-31
+to 2019-07-28 and 2021-05-04 to 2022-09-01.
+
+* 2026-11-13 -- =plot_inputs=: a blank input unit is =Unknown= (GH #1118)
+
+Both builders filled a missing used-quantity unit =s16bq03b= with a minted =Manquant=.  They
+now write the missing-unit sentinel =Unknown= (GH #1041).  Counted first, cold on base: 0
+served rows carry =Manquant= in either wave (2018-19 22,877 rows, 2021-22 12,223); =s16bq03b=
+is never blank on an applied row; =Manquant= is no value label of =s16bq03b=, =s16bq07b= or
+=s16bq09b= in either file, so there is no raw answer to keep.  Measured: =plot_inputs=,
+=nitrogen_kg= and =seed_kg= frame-equal; Country equals Feature (35,100 rows).  The change is
+the guard for the next blank unit.
+
+* 2026-11-13 -- GH #1442: section C's money is =Expenditure= on every block, re-measured under #1509
+
+*Ruling (@ligon, 2026-11-04).*  =autocons= and =cadeau=, "Montant en fcfa C05 / C06", are
+served as =Expenditure= on =produced= and =inkind= rows, as direct answers with no derivation,
+on Uganda's =value_own= / =value_inkind= precedent.  A block with money and no quantity is a
+money-only row, =Quantity= NaN and, with no unit recorded, =u = 'Unknown'=.  =mtt_dep= (C02)
+stays unread.  The change was held (archived =d81358091=) because the kg inference pooled
+self-valued rows; #1509's ruling of 2026-11-12, "All purchase rows", unblocked it.
+
+*Measured* cold in private roots, base =f138a3d61= against the branch (job 41271920).  2014,
+rows and =Expenditure= by source and passage:
+
+|           | rows, base | rows, branch: p1 / p2 / p3 / p4 | =Expenditure=, branch: p1 / p2 / p3 / p4 |
+|-----------+------------+---------------------------------+------------------------------------------|
+| purchased | 546,293 | 141,166 / 139,798 / 136,913 / 128,416 (unchanged) | 93,383,167 / 82,473,394 / 93,328,730 / 72,925,224 (unchanged) |
+| produced  | 11,419  | 27,341 / 23,527 / 24,934 / 37,029 | 43,472,367 / 32,132,465 / 32,250,801 / 43,364,488 |
+| inkind    | 1,468   | 3,280 / 3,775 / 3,490 / 3,049     | 2,505,140 / 2,613,985 / 2,794,504 / 1,809,695 |
+
+- =food_acquired= 559,180 -> 672,718 2014 rows (113,538 new money-only rows); 12,843 existing
+  produced / inkind rows gain their =Expenditure=.  2018-19 and 2021-22 unchanged.
+- =food_expenditures()= (=basis='purchased'=): frame-equal.  =basis='total'=: 2014 342,110,515
+  -> 503,053,960 FCFA (+47.0%), rows 239,916 -> 313,814.
+- =valuation='median_price'=: =reported= 683,735 -> 810,115, =median_price= 61,627 -> 48,898,
+  =none= 21,968 -> 21,855; 11,274 existing rows move from the ladder to the survey's answer.
+- =food_prices()= and =units='unitvalue'=: 234,524 -> 247,336 rows, the 12,812 new rows being
+  2014 produced / inkind blocks with both money and a quantity.  *No existing row moves*,
+  in either mode (the archive measured 27,789 moved through the kg factor before #1509).
+- =price_rows_dropped=: =money_only= 405,127 -> 500,931; =unknown= 178 -> 208 (30 passage-1
+  blocks with money and a quantity but no unit); =lost_fraction= (=unitvalue=) 0.158 -> 0.199.
+- *Kilograms.*  Under #1509 only purchases set a factor, except the disclosed non-purchase
+  fallback for a =(j, u)= cell no purchase reaches.  Of the 767,330 existing rows, 17 change
+  factor, all 2014 =produced=, all from =unit= to =item_unit_nonpurchase= (ratios 9 to 14x); 0
+  rows on a purchase rung move.  =food_quantities()= kg 2014 334,742 -> 334,842 (+0.03%);
+  2018-19 and 2021-22 unchanged.  Against the survey's own unit weights
+  (=ehcvm_nsu_bfa2021.dta=, by label), the 17 go from median absolute log error 1.87, 0%
+  within 2x, to 0.77, 35% within 2x; all inferred 2014 rows stay 0.618, 58.6%.
+- Money equal across blocks: 1,090 =(i, j, visit)= with =achat == autocons= (1,151,410 FCFA) and
+  353 with =achat == cadeau= (150,525).  =basis='total'= counts each twice: the money side of the
+  GH #864 "serve as recorded" decision.
+
+Cache: =2014/_/data_info.yml= and =mapping.py=: one Burkina re-warm.  Pinned by
+=tests/test_gh1442_burkina_section_c_values.py= (oracle on the four passage files) and
+=tests/test_burkina_faso_2014_passages.py=.

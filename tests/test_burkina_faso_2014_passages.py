@@ -342,7 +342,9 @@ P1_INKIND_UNKNOWN_UNIT = 15           # C06 quantity with no ucadeau
 MONEY_ONLY = (139_798 + 136_913 + 128_416        # purchased, passages 2-4
               + 23_527 + 24_934 + 37_029         # produced, passages 2-4
               + 3_775 + 3_490 + 3_049)           # inkind, passages 2-4: 500,931
-UNKNOWN_PRICED = 178
+# 178 purchased rows before GH #1442; +30 passage-1 produced / inkind rows that record a
+# value and a quantity but no unit (measured cold, job 41271920).
+UNKNOWN_PRICED = 208
 
 
 def test_the_hook_serves_each_section_c_block_in_its_own_unit():
