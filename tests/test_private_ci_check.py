@@ -272,9 +272,30 @@ def test_workflow_wraps_each_credentialed_data_command_without_changing_coverage
     assert sorted(_expected_pins(expect)) == sorted(windows["run"].split()[-2:])
 
 
+def test_public_pins_is_used_once_on_the_windows_build_check_step():
+    """F2 (red team, GH #1716): the stage is a caller-supplied label, so pin the
+    flag to the one step whose child is windows_build_check.py."""
+    uses = []
+    for workflow in (".github/workflows/ci.yml", ".github/workflows/pr-data-validation.yml"):
+        jobs = yaml.safe_load((ROOT / workflow).read_text())["jobs"]
+        for job_name, job in jobs.items():
+            for step in job.get("steps", []):
+                words = str(step.get("run", "")).split()
+                uses += [(workflow, job_name, step.get("name"), words)] * words.count("--public-pins")
+    assert len(uses) == 1, uses
+    workflow, job_name, name, words = uses[0]
+    assert (workflow, job_name, name) == (
+        ".github/workflows/ci.yml", "windows-script-build", "Cold-build and compare with Linux")
+    child = words[words.index("--") + 1:]
+    assert child[0] == "python" and child[1].endswith('\\scripts\\windows_build_check.py"')
+    assert words[words.index("--stage") + 1] == "windows-script-build"
+
+
 # GH #1716: a stale pin must be diagnosable from the public log, which before
-# showed only `exit=1`.  The pin line adds nothing the child chooses beyond a
-# decimal row count and a 12-hex digest read from a fully matching RESULT line.
+# showed only `exit=1`.  The pin line adds the child's decimal row count and a
+# match/mismatch verdict on its digest, never the digest itself: the digest is
+# additive (a sum of row hashes under pandas' public key), so actual minus the
+# public expected digest is the hash-sum of the changed rows (red team F1).
 def _wrapper_module():
     spec = importlib.util.spec_from_file_location("private_ci_check_under_test", WRAPPER)
     module = importlib.util.module_from_spec(spec)
@@ -303,18 +324,34 @@ def _result_line(spec, rows, digest, end="\n"):
 
 
 @pytest.mark.parametrize("end", ["\n", "\r\n"])
-def test_pins_publish_expected_and_actual_rows_and_digest(tmp_path, end):
+def test_pins_publish_actual_rows_and_a_digest_verdict(tmp_path, end):
     lines = [_result_line("Uganda:shocks", 14459, "aac42079f006", end),
-             _result_line("Uganda:assets", 116808, "0123456789ab", end)]
+             _result_line("Uganda:assets", 116810, "0123456789ab", end)]
     result = _invoke(tmp_path, _result_child(lines, 1), stage="windows-script-build",
                      pins=True, expect=PIN_EXPECT)
     assert result.returncode == 1
     assert result.stdout == (
         "private-ci-check stage=windows-script-build exit=1\n"
         "pin Uganda:shocks expected rows=14459 digest=aac42079f006 "
-        "actual rows=14459 digest=aac42079f006 match\n"
+        "actual rows=14459 digest match\n"
         "pin Uganda:assets expected rows=116808 digest=9202ed542a14 "
-        "actual rows=116808 digest=0123456789ab mismatch\n")
+        "actual rows=116810 digest mismatch\n")
+
+
+@pytest.mark.parametrize("actual_rows", [14459, 14460])
+def test_actual_digest_is_never_published(tmp_path, actual_rows):
+    """Red team F1: only the public expected digest may appear, never the child's."""
+    actual = "0123456789ab"
+    lines = [_result_line("Uganda:shocks", actual_rows, actual)]
+    result = _invoke(tmp_path, _result_child(lines, 1), stage="windows-script-build",
+                     pins=True, expect="Uganda:shocks=14459:aac42079f006")
+    assert actual not in result.stdout
+    assert result.stdout.endswith(f"actual rows={actual_rows} digest mismatch\n")
+    # The digest is reduced to a verdict before it leaves the parser.
+    log = tmp_path / "result.log"
+    log.write_text("".join(lines), encoding="ascii")
+    (spec, want, verdict), = _wrapper_module()._pin_results(log, "Uganda:shocks=14459:aac42079f006")
+    assert verdict == (actual_rows, False) and actual not in repr(verdict)
 
 
 @pytest.mark.parametrize("lines", [
@@ -347,7 +384,7 @@ def test_pins_report_only_tables_named_in_expect(tmp_path):
                      pins=True, expect="Uganda:shocks=14459:aac42079f006")
     assert result.returncode == 0
     assert "secret_table" not in result.stdout
-    assert result.stdout.endswith("actual rows=14459 digest=aac42079f006 match\n")
+    assert result.stdout.endswith("actual rows=14459 digest match\n")
 
 
 @pytest.mark.parametrize("expect", [

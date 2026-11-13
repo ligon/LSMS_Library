@@ -7,12 +7,21 @@ from other processes running as the same user (ledger #1294, sections 3-4).
 Public output is a fixed stage label and exit status, plus three opt-in
 classes: numeric JUnit counts (--junit), checked-in test file/function
 locators (--public-test-failures), and, for the Windows script build only,
-fingerprint pins (--public-pins, GH #1716). A pin line repeats an entry of
-the workflow's own EXPECT variable, which is checked-in and already public,
-and adds what the child's RESULT line reports for that table. Only a decimal
-row count and a 12-digit hex digest are read from the child, and only from a
-line that matches windows_build_check.py's RESULT format in full, once per
-table. Neither is a survey value: the digest is a 48-bit sum of row hashes.
+pin results (--public-pins, GH #1716; ledger 1294 addendum). A pin line
+repeats an entry of the workflow's own EXPECT variable, which is checked in
+and already public, and adds two things about the child's RESULT line for
+that table: its row count, and whether its digest equals the expected one.
+
+The actual digest is never published. The digest is a sum of per-row hashes
+under pandas' fixed, public hash key, so it is additive: the actual digest
+minus the public expected digest is the hash-sum of exactly the rows that
+changed, and for a one-row change that is one survey row's hash. Publishing
+it would be a survey-derived value, not a count. A re-pin is measured on
+Linux in any case, never copied from the Windows log.
+
+Only a decimal row count and a 12-digit hex digest are read from the child,
+and only from a line that matches windows_build_check.py's RESULT format in
+full, exactly once per pinned table.
 """
 from __future__ import annotations
 
@@ -218,8 +227,10 @@ def _pin_results(log: Path, expect: str):
     """Pair each EXPECT pin with the child's unique, fully matching RESULT line.
 
     Returns None when EXPECT is unusable; otherwise (spec, expected, actual)
-    triples in EXPECT order, where actual is None if the child printed no such
-    line, more than one, or the log could not be read within its bounds.
+    triples in EXPECT order. actual is (rows, digest_matches): the child's
+    digest is compared here and dropped, so no caller can publish it. actual
+    is None if the child printed no such line, more than one, or the log
+    could not be read within its bounds.
     """
     pins = _expected_pins(expect)
     if pins is None:
@@ -248,8 +259,14 @@ def _pin_results(log: Path, expect: str):
                     found[match["spec"]].append((int(match["rows"]), match["digest"]))
     except (OSError, ValueError):
         readable = False
-    return [(spec, want, found[spec][0] if readable and len(found[spec]) == 1 else None)
-            for spec, want in pins.items()]
+    results = []
+    for spec, want in pins.items():
+        actual = None
+        if readable and len(found[spec]) == 1:
+            rows, digest = found[spec][0]
+            actual = (rows, digest == want[1])
+        results.append((spec, want, actual))
+    return results
 
 
 def _exit_status(returncode: int) -> int:
@@ -339,8 +356,8 @@ def main(argv: list[str] | None = None) -> int:
         if actual is None:
             print(line + "unavailable")
         else:
-            verdict = "match" if actual == (rows, digest) else "mismatch"
-            print(line + f"rows={actual[0]} digest={actual[1]} {verdict}")
+            actual_rows, digest_matches = actual
+            print(line + f"rows={actual_rows} digest {'match' if digest_matches else 'mismatch'}")
     return status
 
 

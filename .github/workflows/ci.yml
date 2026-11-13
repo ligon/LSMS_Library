@@ -211,8 +211,12 @@ jobs:
   # Shocks went 14,457 -> 14,459 when #1478 kept the two AGSEC1-only Uganda
   # 2015-16 shock rows (#1434); assets is unchanged.  The same method at
   # cbcf85f8f, the last green Windows push, reproduces the old pin
-  # (14457:0ab2ea4c79dd).  --public-pins prints each pin's expected and
-  # actual rows and digest, so a stale pin is diagnosable from the log.
+  # (14457:0ab2ea4c79dd).  --public-pins prints each pin's expected values,
+  # the actual row count and a digest match/mismatch verdict, so a stale pin
+  # is diagnosable from the log.  The actual digest is never printed (it is
+  # additive over rows; see scripts/private_ci_check.py), so a re-pin is
+  # always measured on Linux.  The pin holds for one tree: any change to the
+  # served Uganda shocks or assets columns or rows needs a re-measurement.
   # GH #805: 2,012 HowCoped cells now decode U+0085 as U+2026; the
   # aggregate-only proof is in slurm_logs/framework_campaign_2026-10-20/windows/.
   # Secrets are restricted to integration pushes or an explicit maintainer
@@ -265,7 +269,8 @@ jobs:
         # System Python owns capture; the existing installed-wheel check runs
         # inside it with the same conda environment and arguments.  The
         # wrapper still publishes no child text: --public-pins adds only the
-        # EXPECT pins above and each table's parsed row count and 12-hex digest.
+        # EXPECT pins above, each table's parsed row count, and whether its
+        # digest matched.
         run: >-
           python "%GITHUB_WORKSPACE%\scripts\private_ci_check.py"
           --stage windows-script-build --public-pins --
