@@ -206,3 +206,21 @@ shocks:
         Cope25: s14bq05__25
         Cope26: s14bq05__26
 
+
+
+assets:
+    # The grid, as in Benin 2021-22: 240,795 rows of which 29,727 are owned
+    # (s12q02 Oui), and only those record a number, so the all-NA drop serves the owned
+    # lines.  s12q09 (GH #1566's check): 4 of 29,407 positive values are off the 25
+    # grid, none is a non-integer and none sentinel-shaped (2018-19: 1 of 28,428).
+    file: s12_me_gnb2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age: s12q07
+        Value: s12q09
+        Purchase Price: s12q08

@@ -532,6 +532,8 @@ only, no cache hash moves" is wrong on that point.
 
 # harmonize_assets (GH #168): per-country delta on top of the global
 # categorical_mapping/harmonize_assets.org base (row-additive merge).
+# The last two rows (2026-11-13) are 2021-22's respellings of s12q01 codes 25 and 30;
+# the other 43 labels of that file are 2018-19's, character for character.
 #+name: harmonize_assets
 | Original Label                                        | Preferred Label |
 |-------------------------------------------------------+-----------------|
@@ -579,3 +581,5 @@ only, no cache hash moves" is wrong on that point.
 | Terreno não edificado                                 | Land            |
 | Ventoinha de pé                                       | Fan             |
 | Viatura pessoal                                       | Car             |
+| Aparelhos de ar condicionado/splits removível        | Air Conditioner |
+| Bicicleta, bicicleta de corrida                       | Bicycle         |

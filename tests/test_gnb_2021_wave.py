@@ -251,6 +251,23 @@ class TestServed:
         assert set(sh["HowCoped0"].dropna()) <= set(m.COPING_LABELS.values())
 
 
+
+    # --- assets -----------------------------------------------------------------------
+
+    def test_assets_are_the_owned_lines_of_the_grid(self):
+        s12 = _raw("s12_me_gnb2021.dta")
+        labels = get_dataframe(ROOT / "s12_me_gnb2021.dta", categories_only=True)
+        oui = [int(k) for k, v in labels["s12q02"].items() if str(v).strip() == "Oui"]
+        owned = s12[s12["s12q02"].isin(oui)]
+        a = _served("assets")
+        assert a["Quantity"].astype(float).sum() == pytest.approx(owned["s12q03"].sum())
+        assert a["Value"].astype(float).sum() == pytest.approx(owned["s12q09"].sum())
+        bikes = owned[owned["s12q01"] == 30]       # `Bicicleta, bicicleta de corrida`
+        got = a.xs("Bicycle", level="j")["Quantity"].astype(float).sum()
+        assert got == pytest.approx(bikes["s12q03"].sum())
+        assert "Bicicleta, bicicleta de corrida" not in set(a.index.get_level_values("j"))
+
+
 class TestCopingHook:
     """Benin's hook after GH #1556, on synthetic rows through this wave's function."""
 
