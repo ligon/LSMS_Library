@@ -201,3 +201,53 @@ Measured cold in private roots, three arms: base `e5fdd2fa8`, item fallback head
 - Unchanged — Cambodia, Serbia, Burkina Faso, Malawi, Niger, EthiopiaRHS frame-equal to head.
 - Closure (§4) — OK: GhanaLSS only (22/555, 154/2,321, 1/38, 0/42), as before.
 - Movement, not correction: no external unit weight scored.
+
+---
+### Third amendment (2026-11-12) — ladder order and build-time Country-API dependencies
+
+Rulings (`docs/isa-sweep-20261103:.sucoder/isa-decisions.org`, "GH1509 ladder order and
+build-time Country-API dependencies"), made after the red team
+(`burst/isa-sm-20261112/reports/framework-1509-redteam/VERDICT.md`, F2 and F3):
+
+- "Item self-valued first": for a `(j, u)` cell with NO purchase evidence in any wave,
+  `item_unit_nonpurchase` ranks ABOVE the u-pooled purchase rung `unit`; then
+  `unit_nonpurchase`; then `none`.  Cells with any purchase evidence are unaffected.
+- "Make the dependency visible": a country script that calls the Country food API at build
+  time imports the transform, so `framework_imports_fingerprint` folds the kg-factor code
+  into its hash.
+
+The order recorded in the two sections above (`unit` above both fallbacks) was this branch's
+choice, not a ruling's; the maintainer set the order on 2026-11-12.
+
+| quantity | decision | reason |
+|---|---|---|
+| ladder | `FOOD_KG_FACTOR_LAYERS = ('survey_kg', 'metric', 'item_unit', 'item_unit_tight', 'item_unit_nonpurchase', 'unit', 'unit_nonpurchase', 'none')` | one total order expresses the ruling because `kg_item_unit` needs purchases in the cell and `kg_item_unit_nonpurchase` needs none (never both set: 0 rows in 11 countries); the `np.where` swap is in both the `resolved` and the `source` chain |
+| gate ledger | `rows_refused_spread == refused_spread_to_unit + refused_spread_to_unit_nonpurchase + refused_spread_to_none` | `unit` is now below the item fallback, so a row its dispersion gate refuses and `unit` serves was costed by the gate |
+| build-time callers | `Uganda/_/nutrition.py`, `Ethiopia/_/nutrition.py` (`uga/eth.food_quantities()`) import `food_quantities_from_acquired`; GhanaLSS already did | `rg` over `countries/*/_/*.py` and `countries/*/*/_/*.py` for `.food_quantities(`, `.food_prices(`, `.food_expenditures(` and `Country(`: only these two read a derived food table through the API (Panama's `nutrition.py` is unreachable and reads a retired parquet; Uganda `income.py`'s `getattr` reads `earnings` / `enterprise_income`) |
+| functional use | each script asserts `lsms_library.country.Country._FOOD_DERIVED['food_quantities'] == food_quantities_from_acquired.__name__` | the import must describe the real route; `lsms_library.country.Country`, not `ll.Country`, because the scripts' exec tests replace `ll.Country` with a fake |
+| enforcement | `tests/test_gh1509_build_time_food_api_dependency.py`: static AST sweep + no-op probe (exactly Ethiopia, GhanaLSS, Uganda move; 0 `btf`) | a twelfth script that reads the API without the import goes red |
+
+#### Third amendment — verification
+
+Measured cold in private scratch roots, three arms in one job on one node (41251759,
+n4257): base `e5fdd2fa8`, unit-first head `0966d62ef`, this order `30523f946`; report at
+`burst/isa-sm-20261112/reports/framework-1509-final2/REPORT.md`.
+
+- Ladder (GhanaLSS) — head -> cand changes exactly 79,773 produced rows, all `unit ->
+  item_unit_nonpurchase`, 147 cells (1991-92 18,943, 1998-99 13,313, 2005-06 14,990,
+  2012-13 18,577, 2016-17 13,950), each at its `e5fdd2fa8` factor (to 1e-9); 46,889 ->
+  337,368 kg; kg 9,918,751 -> 10,209,230 (-7.25% against base).  0 rows in a purchase cell
+  change.  Counts in every price/quantity mode unchanged.
+- Every other country (GhanaSPS, Uganda, Ethiopia, Cambodia, Serbia, Burkina Faso, Malawi,
+  Niger, Panama, EthiopiaRHS) frame-equal head -> cand.
+- Eligibility recount — 0 fallback rows in a cell with any purchased row, in all 11.
+- #1487 — `kgs` / `kgvalue` subsets are slices in every wave of GhanaLSS, Uganda, GhanaSPS,
+  all three arms.
+- Closure (§4) — base -> cand: 75/555 `_table_cache_hash`, 503/2,321 `_input_hash`,
+  3/38 `fwimp`, 0/42 `btf` (Ethiopia, GhanaLSS, Uganda, every table and wave); the no-op
+  probe in `food_kg_factors` moves exactly the same set against cand.
+- Warm root — base-built Uganda `var/nutrition.parquet`: head serves it stale (0.9 s,
+  base's Energy); cand rebuilds it (70 s) and serves its cold value.
+- `nutrition` — GhanaLSS Energy -15.08% against base (-18.67% under the unit-first
+  order); Uganda -1.07% (either order); Ethiopia frame-equal.
+- Movement, not correction: no external unit weight scored.

@@ -2829,7 +2829,10 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     ``unit``, ``none`` in the order it always had, and a cell without sees
     ``item_unit_nonpurchase``, ``unit``, ``unit_nonpurchase``, ``none``.
     Before that ruling the branch ranked ``unit`` first (an implementation
-    choice, not a ruling).
+    choice, not a ruling).  Measured cold, the reorder moves 79,773 GhanaLSS
+    produced rows (147 cells, 1991-92 to 2016-17) from ``unit`` to their own
+    item's factor, +290,479 kg, and no row of the other ten countries
+    measured.
 
     THE UNIT-LEVEL FALLBACK (GH #1509, @ligon 2026-11-12, "Add a unit-level
     rung").  Below ``unit``, a second, separately labelled rung,
