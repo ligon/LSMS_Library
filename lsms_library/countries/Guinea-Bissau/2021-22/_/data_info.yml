@@ -1,2 +1,58 @@
 Country: Guinea-Bissau
 Wave: 2021-22
+
+# EHCVM-2 (WB 6274, GNB_2021_EHCVM-2_v01_M).  Read _/CONTENTS.org "2021-22 wired"
+# first.  The facts that shape every block here:
+#   - `i` is `E2_<grappe>0<menage:02d>`, by mapping.i: 4,893 of the 5,351
+#     (grappe, menage) keys recur from 2018-19 and no link is served (no panel
+#     IDs, ruling 2026-11-12), so the ids must not be able to meet;
+#   - the file's VALUE labels are Portuguese and mostly clean UTF-8, unlike
+#     2018-19's double-encoded ones; the variable labels are French;
+#   - variable names survive where meanings do not: compare labels, not names.
+
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: s00_me_gnb2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            # The documented stratum, region x milieu, as 2018-19's (GH #1575; the
+            # ruling of 2026-11-12, "EHCVM-2 2021-22 strata, GH1575 extension: Same
+            # rule as #1575", names Togo, Benin and Cote d'Ivoire; applied here per
+            # the gnb brief).  This file spells three regions otherwise than 2018-19
+            # (`Bafatá`, `Gabú`, `Bolama/Bijagós`); _/categorical_mapping.org's
+            # strata table folds them.  The weights file's own `strate` (17 codes)
+            # is recorded in CONTENTS.org and not served.
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    Urbano: Urban
+    df_weights:
+        # One row per household (2018-19's file had one per grappe).  `hhweight`,
+        # labelled " Ponderation panel", takes two values in some grappes, by
+        # `panelHH`.  It is the file's only weight, so panel_weight is hhweight, as
+        # Togo, Benin and Cote d'Ivoire 2021-22 serve their one weight in both.
+        file: ehcvm_ponderations_gnb2021.dta
+        idxvars:
+            i:
+                - grappe
+                - menage
+        myvars:
+            weight: hhweight
+            panel_weight: hhweight
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t

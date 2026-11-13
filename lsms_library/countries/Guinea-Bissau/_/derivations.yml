@@ -139,7 +139,7 @@ Guinea-Bissau::community_prices::one-item-per-price:
   since: '2026-11-04'
 
 Guinea-Bissau::sample::region-milieu-stratum:
-  waves: ['2018-19']
+  waves: ['2018-19', '2021-22']
   columns: [strata]
   rows: {}
   rule: >-
@@ -154,8 +154,13 @@ Guinea-Bissau::sample::region-milieu-stratum:
   assumptions:
     - text: >-
         the original 2018/19 design defines a stratum as region combined with
-        residence milieu. The later survey revisits the original clusters;
-        this entry wires only the existing 2018-19 sample.
+        residence milieu. The later survey revisits the original clusters, so
+        its households carry their clusters' strata. 2018-19 was wired on
+        2026-11-10; 2021-22 on 2026-11-13 (gnb stream), by the rule of the
+        2026-11-12 ruling "EHCVM-2 2021-22 strata, GH1575 extension: Same rule
+        as #1575", which names Togo, Benin and Cote d'Ivoire; the 2021-22
+        weights file's own `strate` (17 codes) is recorded as a comparison,
+        not served (Guinea-Bissau/_/CONTENTS.org).
       basis: questionnaire
       evidence: >-
         Own INE Basic Information Document (survey design documentation, not a

@@ -1,0 +1,29 @@
+# Sampling record -- does `v` denote the same cluster as in the PRECEDING wave of
+# `Country('Guinea-Bissau').waves`?  The design fields are #793's curation and are
+# not written yet; their absence here is "not curated", not "not found".  Read by
+# `lsms_library/sampling.py`.  Vocabulary: see sampling.py.  Modelled on
+# Benin/_/sampling.yml and Togo/_/sampling.yml.  The first wave has no preceding
+# wave and so no entry.
+
+Sampling:
+
+  '2021-22':
+    panel:
+      household_continuity: rotating-panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        `grappe` in both waves, and the BID says the 2021/22 survey "is a panel survey by
+        cluster" that revisits the 2018/19 clusters and completes them to 12 households
+        where needed.  Measured on the raw covers: all 450 grappes recur and each keeps its
+        region and milieu (450/450, up to the 2021 file's spelling of three region names).
+        UNLIKE Togo and Benin, the 2021-22 cover point (GPS__Latitude_m / _Longitude_m,
+        one point per grappe) is NOT 2018-19's fix: 2 of 439 grappes coincide, median
+        0.57 km apart, p90 6.3 km, max 39.4 km (_/CONTENTS.org, "2021-22 wired").
+        `rotating-panel` records the DESIGN.  The library serves NO household link
+        across this boundary: 2021-22's `i` is `E2_`-prefixed (no panel IDs, ruling
+        2026-11-12), although s00q07f1/f2 record the 2018/19 grappe and household and
+        4,893 of the 5,351 (grappe, menage) keys recur.
+      source_type: local-documentation
+      confidence: medium
+      source_file: 'lsms_library/countries/Guinea-Bissau/2021-22/Documentation/gnb_ehcvm2_information_de_base_eng.pdf'
+      locator: 'section 4 / 4.1, as quoted in _/CONTENTS.org (2026-11-04 "held and registered" and 2026-11-08 "documented planned region/milieu strata" entries); measured on s00_me_gnb2021.dta, s00_me_gnb2018.dta and grappe_gps_gnb2018.dta through get_dataframe, 2026-11-13'

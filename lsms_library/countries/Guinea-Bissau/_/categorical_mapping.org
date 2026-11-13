@@ -31,6 +31,11 @@
 | Tabuleiro      | Tabuleiro       |
 | Copo           | Copo            |
 
+# strata: the last six rows (2026-11-13) are 2021-22's own region spellings
+# (s00q01: `Bafatá`, `Gabú`, `Bolama/Bijagós`; the other six are spelled as
+# rows above already hold them), folded onto 2018-19's served labels so the two
+# waves' strata meet.  Same grappes, same region on all 450 (measured).
+
 #+NAME: strata
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|
@@ -79,6 +84,12 @@
 | tombali Rural | Tombali Rural |
 | Tombali Urbano | Tombali Urbano |
 | Tombali Rural | Tombali Rural |
+| Bafatá Urbano | Bafata Urbano |
+| Bafatá Rural | Bafata Rural |
+| Gabú Urbano | Gabu Urbano |
+| Gabú Rural | Gabu Rural |
+| Bolama/Bijagós Urbano | Bolama-Bijagos Urbano |
+| Bolama/Bijagós Rural | Bolama-Bijagos Rural |
 
 * Region
 
@@ -131,6 +142,9 @@ only, no cache hash moves" is wrong on that point.
 | SAB                | SAB             |
 | tombali            | Tombali         |
 | Tombali            | Tombali         |
+| Bafatá             | Bafata          |
+| Gabú               | Gabu            |
+| Bolama/Bijagós     | Bolama-Bijagos  |
 
 #+name: Roof
 | Alternate Spelling | Preferred Label |
