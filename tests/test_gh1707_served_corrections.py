@@ -6,10 +6,12 @@
 - Niger 2018-19: an off-grid s07bq07a is flagged and served (GH #1708, "Flag now, diagnose").
 - Uganda 2009-10: a missing ea is filled from the same household (GH #1536, "Fill, registered").
 
-Two tiers: synthetic frames through the real wave modules (no microdata), and
-``TestHeld``, which reads the raw files through ``get_dataframe`` and pins the
-counts the rulings were made on.  Each module is loaded by path, as the
-framework loads it; none reads data at import.
+Three tiers: synthetic frames through the real wave modules (no microdata);
+``TestServed``, which pins the SERVED tables (red team of 2026-11-12, F2: the
+selector pins alone stayed green with a hook unwired); and ``TestHeld``, which
+reads the raw files through ``get_dataframe`` and pins the counts the rulings
+were made on.  Each module is loaded by path, as the framework loads it; none
+reads data at import.
 """
 from __future__ import annotations
 
@@ -191,6 +193,19 @@ class TestUgandaRule:
         with pytest.raises(uganda.OriginEaError):
             uganda._choose_ea(pd.Series(["12"], dtype=object), pd.Series(["13"], dtype=object))
 
+    def test_two_labels_for_one_household_across_the_covers_are_refused(self, uganda, monkeypatch):
+        """The per-household guard of the two sub-df hooks (red team of 2026-11-12):
+        two comm covers that give one household different labels must raise, not
+        pick one."""
+        monkeypatch.setattr(uganda, "_ea_fill_targets", lambda t: {"a", "b"})
+        col = uganda._EA_COMM_WAVES_COL
+        df = pd.DataFrame({"t": ["2009-10"] * 4, "i": ["a", "a", "b", "c"],
+                           col: ["12", "13", "40", "41"]}).set_index(["t", "i"])
+        with pytest.raises(uganda.OriginEaError):
+            uganda._ea_from_another_wave(df, col)
+        out = uganda._ea_from_another_wave(df.iloc[[0, 0, 2, 3]], col)
+        assert out[col].to_dict() == {("2009-10", "a"): "12", ("2009-10", "b"): "40"}
+
     def test_derive_from_inputs(self, uganda):
         inputs = pd.DataFrame({
             "t": ["2009-10"] * 3, "i": ["a", "a", "b"],
@@ -211,6 +226,62 @@ class TestUgandaRule:
         assert pd.isna(out["Derivation"].iloc[0])
         assert out["Derivation"].iloc[1] == "Uganda::sample::ea-same-household"
         assert "_ea_comm_waves" not in out and "_ea_2013_14" not in out
+
+
+@pytest.fixture(scope="module")
+def served():
+    """``Country(c).food_acquired()``, built once per country for this module."""
+    import warnings
+    import lsms_library as ll
+    cache = {}
+
+    def get(country):
+        if country not in cache:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                cache[country] = ll.Country(country).food_acquired()
+        return cache[country]
+    return get
+
+
+def _carries(frame, key):
+    return frame["Derivation"].astype("string").fillna("").str.contains(key, regex=False).to_numpy()
+
+
+@pytest.mark.requires_s3
+class TestServed:
+    """The served tables, not the selectors (red team of 2026-11-12, F2): unwiring a
+    hook must turn these red even though the raw selectors in TestHeld still pass."""
+
+    def test_mali_2018_19_withholds_the_rice_ration_block(self, served):
+        import warnings
+        import lsms_library as ll
+        x = served("Mali").xs("2018-19", level="t")
+        assert len(x) == 157_856                       # 161,212 before GH #1707
+        j = x.index.get_level_values("j").astype(str)
+        u = x.index.get_level_values("u").astype(str)
+        s = x.index.get_level_values("s").astype(str)
+        rice = ((j == "Riz local Gambiaka") & (u == "Kg") & (s == "purchased")).to_numpy()
+        assert int(rice.sum()) == 2_276                # 5,632 before
+        assert round(float(x.loc[rice, "Quantity"].sum()), 1) == 23_581.7   # 55,895.1 before
+        key = "Mali::food_acquired::rice-ration-block-withheld"
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            block = ll.Country("Mali").derivation_inputs(key, wave="2018-19")
+        assert len(block) == 3_357
+        # Of the 3,357 block households, only the one that also answered a rice-kg
+        # purchase of its own still has a served rice-kg purchased row.
+        hit = set(block.index.get_level_values("i")) & set(x.index.get_level_values("i")[rice])
+        assert len(hit) == 1
+        assert not _carries(x, key).any()              # a deletion carries no key
+
+    def test_niger_flags_exactly_the_purchases_of_a_computed_quantity(self, served):
+        fa = served("Niger")
+        key = "Niger::food_acquired::computed-last-purchase-quantity"
+        has = _carries(fa, key)
+        assert int(has.sum()) == 15_014
+        assert set(fa.index.get_level_values("t")[has].astype(str)) == {"2018-19"}
+        assert set(fa.index.get_level_values("s")[has].astype(str)) == {"purchased"}
 
 
 @pytest.mark.requires_s3
