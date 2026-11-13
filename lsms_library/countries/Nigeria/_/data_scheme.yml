@@ -137,8 +137,8 @@ Data Scheme:
     # ask it ("2. EDUCATION ... PH ONLY", W3 PP questionnaire), recorded as
     # correctly-empty verdicts in .coder/coverage/absent_verdicts.csv.  The
     # PP and PH series are different questions to different members and are
-    # not pooled.  Three W2 PP cells hold an unlabelled numeric code (4, 19,
-    # 20) and pass through as recorded, like any unmapped label (GH #1292).
+    # not pooled.  Three W2 PP cells hold a code their value labels do not
+    # define (4, 19, 20): served 'Unknown' (2012-13/_/mapping.py, D4).
     # Quarter t values label logical visits; PH fieldwork can extend
     # beyond calendar Q1.
     # Educational Attainment = highest level completed: s2aq9 in W1-W4

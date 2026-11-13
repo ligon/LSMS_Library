@@ -4022,12 +4022,14 @@ held PDFs (the W2 PDFs did not extract).
   =UPPER 6= -> Upper secondary complete.  =categorical_mapping.org= is a
   build input, so this is part of Nigeria's re-warm.
 - *Three W2 PP cells carry a code the file's own value labels do not define*
-  (4, 19, 20; one member each).  They pass through as recorded (served as
-  ="4.0"=, ="19.0"=, ="20.0"=), like any unmapped label (GH #1292 pins that
-  pass-through); mapping them needs the W2 PP code list, which the held PDF
-  does not yield.  OPEN, awaiting a ruling (red team delta D4): the canonical
-  note makes =Unknown= the sentinel for an unmappable value, and at the least
-  the float spelling is wrong.
+  (4, 19, 20; one member each).  They used to pass through as ="4.0"=,
+  ="19.0"=, ="20.0"=.  /Ruling @ligon 2026-11-13, "Serve 'Unknown'" (red team
+  delta D4)/: they are served the canonical sentinel =Unknown=, by a df_edit
+  hook in =2012-13/_/mapping.py= that touches only the 2012Q3 rows and only a
+  bare numeric code (an unlabelled code arrives as a number under
+  =convert_categoricals=True=).  A LABELLED answer =harmonize_education= does
+  not map still passes through as recorded, and the post-harvest rows are
+  untouched (GH #1292's test now pins both sides).  Measured: see the D4 note in the GH #1502 PR (exactly 3 rows; D4_MEASURED)
 - *W3-W5 PP are =correctly-empty=*: three rows in
   =.coder/coverage/absent_verdicts.csv= (D1, D2, C4; the evidence is the
   table above).  =latest.csv= is not regenerated here.

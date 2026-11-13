@@ -30,7 +30,15 @@ BINDINGS = (
      'Post Harvest Wave 5/Household/sect2_harvestw5.dta', 's2q9'),
 )
 POPULATIONS = ('singleton', 'mixed', 'all_missing', 'nullable_string',
-               'categorical', 'native_duplicates')
+               'categorical', 'native_duplicates', 'unlabelled')
+#: GH #1713 D4 (ruling @ligon 2026-11-13, "Serve 'Unknown'"): in the W2
+#: POST-PLANTING round only, a code the file's value labels do not define (it
+#: arrives as a bare number) is served 'Unknown'; a LABELLED answer that
+#: harmonize_education does not map still passes through.  The hook is the
+#: candidate's 2012-13/_/mapping.py, so the baseline arm does not get it.
+CANDIDATE_HOOKS = {'2012-13'}
+#: Positions, per population, of the bare numeric codes in source_frame.
+UNLABELLED_AT = {'mixed': [2], 'unlabelled': [1, 2]}
 #: GH #1713 (ruling @ligon 2026-11-13, "Wire W1/W2 PP + verdicts"): W1 / W2
 #: also serve their POST-PLANTING round's own Section 2 under the PP quarter.
 PP_SOURCES = {
@@ -99,7 +107,8 @@ def metadata(tmp_path, monkeypatch):
                         content = baseline_yaml(content, source, ph, folder, pp)
                     target.write_text(content, encoding='utf-8')
                     mapping = original.parent / 'mapping.py'
-                    if mapping.is_file():
+                    if mapping.is_file() and not (
+                            arm == 'baseline' and folder in CANDIDATE_HOOKS):
                         shutil.copyfile(mapping, target.parent / mapping.name)
             data = tmp_path / 'data'
             data.mkdir()
@@ -174,6 +183,8 @@ def source_frame(column, population):
         'categorical': pd.Categorical(['0. NONE', None, '16. P6'],
                                      categories=['16. P6', '0. NONE', 'P1']),
         'native_duplicates': ['P6', '0. NONE', 'P6', pd.NA],
+        # A labelled answer no table maps, two bare (unlabelled) codes, a gap.
+        'unlabelled': ['99. NOT A MAPPED LEVEL', 4.0, '19', None],
     }[population]
     n = len(values)
     hh = [303., 101., 202., 303., 0.][:n]
@@ -250,8 +261,14 @@ def test_actual_wave_keeps_ph_payload_and_refuses_false_pp_date(
     pd.testing.assert_frame_equal(retimed, old[ph], check_exact=True)
     if folder in PP_SOURCES:
         # The PP round's own file, same answers: what the baseline served by
-        # re-dating the PH rows, now from the PP section (GH #1713).
-        pd.testing.assert_frame_equal(new[pp], old[pp], check_exact=True)
+        # re-dating the PH rows, now from the PP section (GH #1713) -- except
+        # that in W2 a bare unlabelled code is 'Unknown' (D4).
+        expected = old[pp].copy()
+        if folder in CANDIDATE_HOOKS and UNLABELLED_AT.get(population):
+            values = expected[VALUE].astype(object)
+            values.iloc[UNLABELLED_AT[population]] = 'Unknown'
+            expected[VALUE] = values
+        pd.testing.assert_frame_equal(new[pp], expected, check_exact=True)
     else:
         pd.testing.assert_frame_equal(new[pp], new[ph].iloc[:0], check_exact=True)
     assert new[pp].attrs == new[ph].attrs
@@ -264,6 +281,18 @@ def test_actual_wave_keeps_ph_payload_and_refuses_false_pp_date(
     if population == 'mixed':
         assert new[ph][VALUE].iloc[2] == 0
         assert new[ph][VALUE].iloc[1:2].isna().all()
+    if population == 'unlabelled':
+        # Post-harvest: everything passes through, the bare codes included.
+        assert new[ph][VALUE].iloc[0] == '99. NOT A MAPPED LEVEL'
+        assert new[ph][VALUE].iloc[1] == 4.0 and new[ph][VALUE].iloc[2] == '19'
+        if folder in CANDIDATE_HOOKS:
+            # W2 post-planting: the labelled-but-unmapped answer passes
+            # through; the unlabelled codes are the sentinel; the gap stays.
+            assert new[pp][VALUE].iloc[0] == '99. NOT A MAPPED LEVEL'
+            assert new[pp][VALUE].iloc[1:3].tolist() == ['Unknown', 'Unknown']
+            assert pd.isna(new[pp][VALUE].iloc[3])
+        elif folder in PP_SOURCES:
+            assert new[pp][VALUE].iloc[1] == 4.0
     if population == 'native_duplicates':
         assert not new[ph].index.is_unique
     pd.testing.assert_frame_equal(operand, protected, check_exact=True)
