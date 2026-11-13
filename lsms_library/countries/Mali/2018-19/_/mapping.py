@@ -3,6 +3,7 @@ import re
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
+from lsms_library.ehcvm import coping_set_from_grid as _coping_set_from_grid
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
@@ -393,33 +394,14 @@ def _food_stock_by_vague(df):
 
 
 def shocks(df):
+    """The coping SET from the s14q05__N grid; no HowCoped<n> position (GH #1562).
+
+    The grid records which strategies were chosen, not their order (ruling
+    2026-11-12), so the set only: ehcvm.coping_set_from_grid, which says which
+    cell values count as chosen.
+    """
     df = _food_stock_by_vague(df)
-    cope_cols = [c for c in df.columns if c.startswith('Cope')]
-
-    # For 2018-19 binary coping: values are numeric (0=No, 1=Yes)
-    # Convert to float for comparison; pick the first 3 strategies with value >= 1
-    how_coped = {0: [], 1: [], 2: []}
-    for _, row in df[cope_cols].iterrows():
-        found = []
-        for c in cope_cols:
-            num = int(c.replace('Cope', ''))
-            val = row[c]
-            try:
-                val = float(val)
-            except (ValueError, TypeError):
-                continue
-            if val >= 1:
-                found.append(COPING_LABELS.get(num, f'Strategy {num}'))
-            if len(found) == 3:
-                break
-        for k in range(3):
-            how_coped[k].append(found[k] if k < len(found) else np.nan)
-
-    df['HowCoped0'] = how_coped[0]
-    df['HowCoped1'] = how_coped[1]
-    df['HowCoped2'] = how_coped[2]
-    df = df.drop(columns=cope_cols)
-    return df
+    return _coping_set_from_grid(df, COPING_LABELS, country="Mali")
 
 
 _FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',

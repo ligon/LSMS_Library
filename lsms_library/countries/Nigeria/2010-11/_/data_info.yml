@@ -11,22 +11,37 @@ Wave: 2010-11
 # state/lga/ea `v`, GH #323, and the `moved-{hhid}` singleton are unchanged).
 
 assets:
-    file: Post Planting Wave 1/Household/sect5_plantingw1.dta
+    # GH #1562: read ONCE, under the post-planting quarter its file belongs to.
+    # This folder is read once per round, so an unpinned block was served under
+    # both quarters (the shocks defect; individual_education pins the same way).
+    file:
+        - Post Planting Wave 1/Household/sect5_plantingw1.dta:
+            t: '2010Q3'
     idxvars:
+        t: hhid
         i: hhid
         j: item_cd
     myvars:
         Quantity: s5q1
 
 shocks:
-    file: Post Harvest Wave 1/Household/sect15a_harvestw1.dta
+    # GH #1562 (ruling 2026-11-13).  Read ONCE, under the post-harvest quarter
+    # whose file this is, as individual_education is; unpinned, the block was
+    # served under both quarters (2,200 rows twice).  s15aq5a..d are the four
+    # ranked columns ("1st".."4th"), so the fourth is HowCoped3.  HowCopedSet is
+    # derived from the four at read time (lsms_library/coping.py).
+    file:
+        - Post Harvest Wave 1/Household/sect15a_harvestw1.dta:
+            t: '2011Q1'
     idxvars:
+        t: hhid
         i: hhid
         Shock: shock_cd
     myvars:
         HowCoped0: s15aq5a
         HowCoped1: s15aq5b
         HowCoped2: s15aq5c
+        HowCoped3: s15aq5d
 
 individual_education:
     # GH #171: highest education level completed per household member.

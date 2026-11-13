@@ -74,10 +74,19 @@ Data Scheme:
     materialize: make
 
   shocks:
+    # GH #1562 (ruling 2026-11-13).  Served ONCE per wave, under the post-harvest
+    # quarter (2011Q1, 2013Q1, 2016Q1, 2019Q1) whose file it is; it used to be
+    # served under both quarters.  W1-W3 rank four strategies (HowCoped0..3);
+    # W4 is "select all that apply", so it serves HowCopedSet only and no
+    # position.  See CONTENTS.org, "shocks".
     index: (t, i, Shock)
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
+    HowCoped3:
+      type: str
+      optional: true
+    HowCopedSet: str
 
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
@@ -170,6 +179,9 @@ Data Scheme:
     #
     # and it is destroyed in EACH of the two quarters the wave is tagged on
     # (2012Q3 and 2013Q1 both return the same truncated N429,001,558).
+    # [2026-11-13, GH #1562: assets is now served once per wave, under the
+    # post-planting quarter its sect5 files belong to (2010Q3, 2012Q3, 2015Q3,
+    # 2018Q3), so the W2 truncation is now in 2012Q3 alone.]
     #
     # `item_seq` is exactly the missing level -- but declaring it here does NOT
     # close the bug, and that was verified rather than assumed:
