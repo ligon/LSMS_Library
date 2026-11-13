@@ -39,10 +39,15 @@ sample:
                     Rural: Rural
                     Urbano: Urban
     df_weights:
-        # One row per household (2018-19's file had one per grappe).  `hhweight`,
-        # labelled " Ponderation panel", takes two values in some grappes, by
-        # `panelHH`.  It is the file's only weight, so panel_weight is hhweight, as
-        # Togo, Benin and Cote d'Ivoire 2021-22 serve their one weight in both.
+        # One row per household (2018-19's file had one per grappe).  `hhweight` is
+        # the CROSS-SECTIONAL household weight, whatever its source label
+        # (" Ponderation panel") says: it is positive on all 5,351 households, the 454
+        # non-panel ones included, equals ehcvm_welfare.hhweight ("Ponderation menage")
+        # on 5,351 of 5,351, and within a grappe varies only with `panelHH`.  No other
+        # weight variable exists in the wave's 60 files, so panel_weight is hhweight,
+        # as Mali 2021-22 (hhweight beside PanelHH, the exact precedent) and Benin
+        # 2021-22 serve their one weight.  Do not read panel_weight as a longitudinal
+        # weight.
         file: ehcvm_ponderations_gnb2021.dta
         idxvars:
             i:
