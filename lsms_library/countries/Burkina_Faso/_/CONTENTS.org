@@ -3610,12 +3610,15 @@ of this section listed Niger among the siblings with 55 Anacarde (red team F1); 
 2026-11-13, basis derived-from-data), registered as
 =Burkina_Faso::crop_production::crop-code-from-roster-text=: =s16cq03b= ("Roster list
 question", the enumerator's name for the line) names anacarde or cajou on 54 of the 59
-code-55 lines, banane on 5 of 5 code-58 lines, soja or soya on 88 of 92 code-64 lines; the
+code-55 lines, banane on 5 of 5 code-58 lines, soja or soya on 88 of 92 code-64 lines (the other
+4 code-64 lines name maize, red team count, and are served =Soja=, as their code says); the
 code-55 households are in Cascades 26, Hauts-Bassins 17, Sud-Ouest 12 and Centre-Ouest 2, the
 cashew belt.  The =Précisez= field =s16cq03_autre= is filled on 38 of 38 code-65 lines and 0
-of 59 code-55 lines, so 65 is the =Autre= code, and since =s16c= leaves it bare it takes
-=s16d='s label.  Every other code keeps the harvest file's own label, through
-=harmonize_food=.  *Not decided*: whether 2021-22's =Riz= / =Niébé/Haricot= / =Voandzou (pois
+of 59 code-55 lines, so 65 is the =Autre= code; since =s16c= leaves it bare it is served with
+=s16d='s own value label =Autre (à préciser)=, carried across by the code link (the 24 =s16d=
+code-65 records all sit with =s16c= code-65 lines), with no key, being a source label (41
+rows, red team count).  Every remaining code keeps the harvest file's own label, through =harmonize_food=.
+*Not decided*: whether 2021-22's =Riz= / =Niébé/Haricot= / =Voandzou (pois
 de terre)= / =Laitue (salade)= should be served in 2018-19's spellings.  As served, cowpea is
 =Niébé= in 2018-19 and =Niébé/Haricot= in 2021-22, and so in 2021-22 0 of 984 =Niébé= and 0 of
 291 =Riz Paddy= seed rows of =plot_inputs= (spelled as 2018-19 harvests are, GH #1119) find a
@@ -3634,6 +3637,12 @@ UML=<code>]= -- and served through the read-path =u= table (=ehcvm.served_unit_l
 through the country table only and served =Kilogramme= beside a =u= of =Kg=.  =Plat Yoruba=
 (2021-22) and =Plat yorouba= (2018-19) remain two spellings of one unit across waves.
 A missing harvest unit is =Unknown=; a missing sold unit stays NA (the 2018-19 contract).
+*"One UML list" is shown for codes 1-7 only* (red team S4).  Each of the five fields carries
+its own Stata value-label set, all five label codes 1-7 alike (but for code 3's spelling), and
+none labels a code above 7, so that a bare code means one unit in every field is an
+assumption the file cannot show.  Of the 32 dispositions totals on bare codes, 30 draw on a
+single field and need no such assumption; 2 add two or more fields on one bare code and rest
+on it.
 
 *GH #1437, the Burkina half, diagnosed (no imputation).*  The harvest block is blank on every
 finished row, not just =s16cq16a=.  On the 8,476 crop rows of =s16c=, =s16cq11= is =Oui= on
@@ -3663,10 +3672,17 @@ finished on every line with no recorded quantity, 3,958 qualify (3,421 on a sing
 =Farm-level=), 2,272 span units and stay NA, and 167 record no disposition; 739 crops with an
 unfinished line are held out.  This wave cannot test the sum, since no finished line records
 a harvest.  Burkina 2018-19 can: its module holds the harvest =s16cq12a= and all four
-dispositions (=s16cq13a=, =s16cq14a=, =s16cq16a=, =s16cq22a=) on one row, and on the 12,490 of
-14,956 finished rows whose every positive disposition is in the harvest's unit the sum equals
-the harvest exactly on 87.9%, within 10% on 90.5% (median ratio 1.000; 5.1% over 1.1, 4.2%
-under 0.9).  That is consistency within a row, and a respondent may anchor on the harvest just
+dispositions (=s16cq13a=, =s16cq14a=, =s16cq16a=, =s16cq22a=) on one row.  Of its 14,956 finished
+rows, 12,561 (a positive harvest in a recorded unit) have every positive disposition in the
+harvest's unit, and on them the sum equals the harvest exactly on 87.4%, within 10% on 90.0%;
+on the 12,490 of those with at least one disposition, exactly on 87.9%, within 10% on 90.5%
+(median ratio 1.000; 5.1% over 1.1, 4.2% under 0.9).  /The red team counts 12,573 under a
+looser filter, 87.4% exact; an earlier version of this paragraph called 12,490 the set "whose
+every positive disposition is in the harvest's unit" (red team S2)./  Quantities in one unit
+are added across states: 239 of the 3,958 totals add dispositions recorded in two or more
+states, and 197 of those fold to different =condition= tokens (Sac gros 82, Plat Yoruba 59,
+Kg 31, Autres 12, Sac moyen 8, Tine 5; 27,042 of the 771,071 kg on =Kg= totals, 3.5%); all
+are served under =unknown_condition=, and none is held out.  That is consistency within a row, and a respondent may anchor on the harvest just
 stated.  s16d asks nothing about seed kept, post-harvest loss or feed, so a sum may fall
 short of what was cut.
 
@@ -3682,8 +3698,11 @@ answer; neither records a harvest, and 2018-19 has no such pair.  With =producti
 lines of each pair are served, the framework collapses nothing, and =LSMS_GRAIN_STRICT=1=
 passes on =crop_production= (it refused the table under the build that folded them).  The
 builder refuses a keyed row, or a quantity, in a group that repeats the plot-crop key.
-2018-19 and every =Farm-level= row carry =unresolved_observation=, the canonical sentinel, so
-=Feature('crop_production')= is unchanged for 2018-19.
+2018-19 and every =Farm-level= row carry =unresolved_observation=, the canonical sentinel.  So
+the COUNTRY index of 2018-19 gains a =production_obs= level (=unresolved_observation= on every
+row), and =Feature('crop_production')= for 2018-19 keeps its values (digest-equal to base,
+job 41276125); its =production_obs= dtype goes =str= -> =string= in any Feature call without
+Niger, whose rows were already =string= (red team delta review).
 
 *Not served, for want of a ruling that names this country*: =s16cq16c= as =Quantity_kg= (108
 rows; the #1436 survey-kg ruling is Mali's and Niger's) and =s16dq05c= as =Quantity_sold_kg=
@@ -3709,9 +3728,11 @@ source in either file and stays NA, as in 2018-19.
 | grain reports on =crop_production= | none | none; =LSMS_GRAIN_STRICT=1= passes on all-waves, 2021-22 and 2018-19 requests |
 | Site Q, 2021-22 | -- | 1 low =Quantity=, 2 high =Sale_price= (reported, nothing changed) |
 
-The 2021-22 =harvest_kg= / =yield_kg= rows are mostly derived totals in =Kg= (530) plus the
-recorded =Kg= harvests; totals in sacks, tines or plates have no kilogram factor on this
-ladder yet.  Read the 179 =harvest-to-date= rows as partial (above).  =Feature('crop_production')=
+The 2021-22 =harvest_kg= rows (586) are mostly dispositions totals: 530 =Kg= totals and 56
+recorded =Kg= harvests, which are =harvest-to-date= and partial (the 179 recorded rows are
+all partial; above).  57 of the 586 are =Farm-level= rows, not plots (red team count), and
+=yield_kg= (506) leaves out rows with no plot area.  Totals in sacks, tines or plates have
+no kilogram factor on this ladder yet.  =Feature('crop_production')=
 equals the country table (24,705 rows, same units, same quantity total), index unique, and
 raises =PopulationHeterogeneityWarning= now that a 2021-22 panel wave joins (red team F11).
 A cold =crop_production(waves=['2018-19'])= lacks the =Derivation= column that an all-waves

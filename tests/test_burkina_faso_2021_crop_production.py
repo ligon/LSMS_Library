@@ -260,6 +260,16 @@ def test_harvest_from_dispositions_follows_mali_rule(served, raw):
 
 
 @requires_s3
+def test_served_index_is_unique_and_condition_is_in_vocabulary(served):
+    assert served.index.is_unique
+    cond = served.index.get_level_values("condition")
+    assert not pd.isna(cond).any()
+    assert set(cond) <= {"shelled", "unshelled", "shell_not_applicable", "unknown_condition"}
+    sold = served["Condition_sold"].dropna()
+    assert set(sold) <= {"shelled", "unshelled", "shell_not_applicable"}
+
+
+@requires_s3
 def test_production_obs_keeps_the_repeated_lines_apart(served, raw):
     c, _ = raw
     assert served.index.is_unique
@@ -322,9 +332,11 @@ def test_no_household_is_off_sample(served):
 @pytest.mark.parametrize("key", KEYS)
 def test_inputs_join_to_the_keyed_served_rows(served, key):
     """`derivation_inputs` returns the raw answers of each keyed row, at the served line
-    grain (t, i, plot_id, crop) after the id walk (COMMON-RULES).  One input row per keyed
-    row, except the text key, whose inputs also hold the s16d record a Farm-level row of a
-    many-line crop MAY carry."""
+    grain (t, i, plot_id, crop) after the id walk (COMMON-RULES): one input row per keyed
+    row and no other, for every key (1,331 / 179 / 3,958 / 159 at the 2026-11-13 build).
+    The text key's inputs may in principle hold the s16d record of a many-line crop with
+    no Farm-level row; that this join is exact says none exists, and a change makes it
+    fail here rather than widen quietly (red team S3)."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         got = ll.Country(COUNTRY).derivation_inputs(key, wave=WAVE)
@@ -334,9 +346,7 @@ def test_inputs_join_to_the_keyed_served_rows(served, key):
     keyed = _keyed(served, key)
     want = set(zip(*(keyed[n].astype(str) for n in levels)))
     have = set(zip(*(got.index.get_level_values(n).astype(str) for n in levels)))
-    assert want <= have
-    if key != KEY_TEXT:
-        assert len(got) == len(keyed) and have == want
+    assert len(got) == len(keyed) and have == want
     if key == KEY_SALE:
         assert got["s16dq06"].astype("float64").sum() == pytest.approx(keyed["Value_sold"].sum())
 

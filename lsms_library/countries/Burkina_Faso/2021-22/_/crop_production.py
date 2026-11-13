@@ -34,11 +34,13 @@ mapping.py, "THE IDENTITY OF A CROP IS ITS CODE"), and by label 332 sales would 
 sent to Farm-level for want of a line.  The sale's state s16dq05d is Condition_sold, by
 the 2018-19 fold (GH #1528), with the answer in condition_sold_native.
 
-Units: every unit field codes on one UML list, decoded by code and served through the
-read-path `u` table (mapping._served_units), so u, Unit_sold and the dispositions share
-one vocabulary.  A missing harvest unit is `Unknown`, a missing sold unit NA.  condition
-is s16cq16d through harmonize_crop_condition_ehcvm1 (the same five codes as 2018-19's
-s16cq12c), the answer as recorded in condition_native (GH #1436).  intercropped is s16cq07.
+Units: every unit field is decoded by code as one UML list (codes 1-7 are labelled alike in
+all five fields; that a bare code above 7 is one unit across fields is assumed, not shown)
+and served through the read-path `u` table (mapping._served_units), so u, Unit_sold and
+the dispositions share one vocabulary.  A missing harvest unit is `Unknown`, a missing
+sold unit NA.  condition is s16cq16d through harmonize_crop_condition_ehcvm1 (the same
+five codes as 2018-19's s16cq12c), the answer as recorded in condition_native (GH #1436).
+intercropped is s16cq07.
 harvest_month has no source in either file and stays NA, as in 2018-19.
 
 Not served, for want of a ruling that names this country: s16cq16c (the line's kilograms)

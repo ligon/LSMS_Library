@@ -429,11 +429,12 @@ def _crop_label_table(harvest_labels, record_labels, food_map):
 
 
 def _unit_code_table(pairs):
-    """``{code: label}`` for the one UML list every 2021-22 crop unit field codes on:
+    """``{code: label}`` for the UML codes of the 2021-22 crop unit fields, read as one list:
     the harvest field's label first (``pairs`` is ordered), else the first other field
-    that labels the code, else the qualified identity ``UML=<code>``.  Codes 1-7 are
-    labelled alike in s16c and s16d but for spelling (3: 'Plat Yoruba' in s16c,
-    'Yorouba' in s16d); the rest are bare in both."""
+    that labels the code, else the qualified identity ``UML=<code>``.  Each field has its
+    own value-label set; all five label codes 1-7 alike but for spelling (3: 'Plat
+    Yoruba' in s16c, 'Yorouba' in s16d) and none labels a code above 7, so that a bare
+    code means one unit in every field is ASSUMED, not shown (measured 2026-11-13)."""
     table = {}
     for labels in pairs:
         for code, label in labels.items():

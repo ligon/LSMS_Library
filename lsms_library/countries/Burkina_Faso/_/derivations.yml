@@ -616,10 +616,13 @@ Burkina_Faso::crop_production::harvest-from-dispositions:
         bfa_ehcvm2_vague1.pdf / vague2.pdf, PDF p. 85: "(16C.11) 1 = Oui > (16C.16)" (the
         2026-11-09 CONTENTS entry).  This wave cannot test the sum: no finished row records a
         harvest.  Burkina 2018-19 holds the harvest and all four dispositions on one row
-        (s16cq12a; s16cq13a consumed, s16cq14a given, s16cq16a sold, s16cq22a stock): on the
-        12,490 of 14,956 finished rows whose every positive disposition is in the harvest's
-        unit, the sum equals the harvest exactly on 87.9%, within 10% on 90.5%, median ratio
-        1.000, 5.1% over 1.1 and 4.2% under 0.9 (measured 2026-11-13).  This is consistency
+        (s16cq12a; s16cq13a consumed, s16cq14a given, s16cq16a sold, s16cq22a stock).  Of the
+        14,956 finished rows, 12,561 (a positive harvest in a recorded unit) have every positive
+        disposition in the harvest's unit, and on them the sum equals the harvest exactly on
+        87.4%, within 10% on 90.0%; restricted to the 12,490 of those with at least one
+        disposition, exactly on 87.9%, within 10% on 90.5%, median ratio 1.000, 5.1% over 1.1
+        and 4.2% under 0.9 (measured 2026-11-13; the red team counts 12,573 under a looser
+        filter, 87.4% exact).  This is consistency
         within a row, and a respondent may anchor on the harvest just stated.
     - text: >-
         not all of a harvest need appear: s16d asks no quantity for seed kept, loss after
@@ -631,8 +634,17 @@ Burkina_Faso::crop_production::harvest-from-dispositions:
         every line with no recorded quantity, 3,958 state their dispositions in one unit and
         are derived (3,421 on the single line, 537 Farm-level), 2,272 span units and stay NA,
         and 167 record no disposition.  Quantities in one unit are added across states
-        (s16dq02c, s16dq03c, s16dq05d, s16dq13c), and the derived row is served under
-        `unknown_condition`.
+        (s16dq02c, s16dq03c, s16dq05d, s16dq13c): 239 of the 3,958 totals add dispositions
+        recorded in two or more states, and 197 of them fold to different `condition` tokens under
+        2018-19's fold (Sac gros 82, Plat Yoruba 59, Kg 31, Autres 12, Sac moyen 8, Tine 5),
+        27,042 of the 771,071 kg on Kg totals, 3.5%.  They are served under
+        `unknown_condition`, and nothing is held out.  "One unit" is one code.  Each of the
+        four s16d unit fields and s16cq16b carries its own value-label set; all five label
+        codes 1-7 alike (but for code 3's spelling, Plat Yoruba in s16c, Yorouba in s16d) and
+        none labels a code above 7, so that a bare code means the same unit in every field is
+        an assumption the file cannot show.  32 totals are on bare codes: 30 draw on a single
+        field and need no such assumption; 2 add two or more fields on one bare code and rest
+        on it.
       basis: modelling-choice
       evidence: >-
         ruling @ligon 2026-11-04, option (b) of GH #1437, for Mali; measured 2026-11-13, by
@@ -657,8 +669,14 @@ Burkina_Faso::crop_production::crop-code-from-roster-text:
     The served crop of codes 55, 58 and 64 is the label the file's own roster text gives
     them: 55 Anacarde, 58 Banane douce, 64 Soja, where s16c's value labels say 55 'Autre
     (a preciser)' and leave 58 and 64 bare, and s16d leaves all three bare.  Every s16c
-    line and every Farm-level row of those codes carries this key.  Every other code
-    keeps the harvest file's own label (mapping.derive_crop_code_label).
+    line and every Farm-level row of those codes carries this key.  Code 65 is the one
+    other code whose served label is not the harvest file's: s16c leaves it bare, so it is
+    served with s16d's own value label 'Autre (a preciser)', carried across by the code
+    link (hh-crop-sale-single-row, its derived-from-data assumption: the 24 s16d code-65
+    records all sit with s16c code-65 lines), and its rows carry no key, being a source
+    label.  The file's own Precisez field s16cq03_autre agrees: it is filled on 38 of 38
+    code-65 lines and on 0 of 59 code-55 lines.  Every remaining code keeps the harvest
+    file's own label (mapping.derive_crop_code_label).
   function: lsms_library.countries.Burkina_Faso.2021-22._.mapping:derive_crop_code_label
   inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_crop_code_from_text
   raw_variables: [s16cq04, s16cq03b, s16cq03_autre, s16dq01]
@@ -677,7 +695,8 @@ Burkina_Faso::crop_production::crop-code-from-roster-text:
     - text: >-
         the roster text names the crop.  s16cq03b ("Roster list question", the enumerator's
         name for the line) names anacarde or cajou on 54 of the 59 code-55 lines, banane on
-        5 of 5 code-58 lines and soja or soya on 88 of 92 code-64 lines.  The code-55
+        5 of 5 code-58 lines and soja or soya on 88 of 92 code-64 lines; the other 4 code-64
+        lines name maize (red team count) and are served Soja, as their code says.  The code-55
         households are in Cascades 26, Hauts-Bassins 17, Sud-Ouest 12 and Centre-Ouest 2,
         the cashew belt.
       basis: derived-from-data
