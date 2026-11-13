@@ -24,9 +24,12 @@ def sample(df):
     return _stamp_region_milieu_stratum(df, 'Benin')
 
 
-#: `i` of this wave.  6,994 of the 8,032 (grappe, menage) keys also occur in 2018-19.
-#: No link is served here (GH #1697), so the ids must not be able to meet.  The link is
-#: ruled (2026-11-12, "Make Benin a panel country") for a follow-up PR, GH #1705.
+#: `i` of this wave, as built.  6,994 of the 8,032 (grappe, menage) keys also occur in
+#: 2018-19, so the raw ids carry a prefix and cannot meet.  The link is the committed
+#: crosswalk (_/panel_ids.py, _/updated_ids.json, GH #1705): id_walk renames the 6,878
+#: PanelHH = Panel households onto their bare 2018-19 id, and every other household,
+#: the 116 recurring Non-panel keys included, keeps this prefix.  panel_ids.py relies on
+#: the prefix for its no-chain / no-rename-onto-occupied guarantee: do not remove it.
 ID_PREFIX = 'E2_'
 
 

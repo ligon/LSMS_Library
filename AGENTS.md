@@ -872,9 +872,13 @@ Skill: `.claude/skills/add-feature/sample/SKILL.md`. Migration history: `slurm_l
 `panel_ids` and `updated_ids` are `@property` attributes on `Country`, not methods — they return dicts, not DataFrames. Code iterating over `data_scheme` entries and calling `getattr(c, name)()` must special-case these. Use `diagnostics.load_feature(c, name)` which handles both.
 
 **The crosswalk is a committed SOURCE, not a build product (GH #914/#894).**
-All eleven panel countries (Burkina_Faso, Ethiopia, EthiopiaRHS, GhanaLSS,
-Malawi, Mali, Niger, Nigeria, Senegal, Tanzania, Uganda) ship git-tracked
-`_/panel_ids.json` + `_/updated_ids.json`. **Design A is the convention** — a
+All twelve panel countries (Benin, Burkina_Faso, Ethiopia, EthiopiaRHS,
+GhanaLSS, Malawi, Mali, Niger, Nigeria, Senegal, Tanzania, Uganda) ship
+git-tracked `_/panel_ids.json` + `_/updated_ids.json`. Benin joined in GH #1705
+(EHCVM 2018-19 -> 2021-22 from `PanelHH`, ruling @ligon 2026-11-12); its
+`_/Makefile`, its first, exists for the `panel-ids` target, and once a country
+has one `Wave.grab_data` builds every script-path wave table through `make`,
+so it carries a rule per wave script. **Design A is the convention** — a
 panel crosswalk is a *harmonization decision*, not a derived measurement (4 ms
 to recompute, identical for every user, and the input to every longitudinal
 result), so it belongs where a change shows up as a reviewable diff.
@@ -888,7 +892,7 @@ gone. Ethiopia's are gone too (#1447): its `panel_ids.py` never read them, and
 `panel_ids` entries against the committed 4,981, with blank baselines minted
 into household ids. That backend now serves the committed dicts.
 `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` is now empty, so a
-twelfth country cannot pick a design by accident.
+new panel country cannot pick a design by accident.
 
 > **Never give the JSON a Make rule.** The nine Makefiles used to carry
 > `panel_ids.json updated_ids.json: panel_ids.py` / `python panel_ids.py`,

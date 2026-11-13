@@ -28,6 +28,7 @@ Many LSMS-ISA countries have waves from **different survey programs** that canno
 | Mali | — | EACI 2014-15, 2017-18 | Not longitudinal |
 | Mali | EHCVM 2018-19 → 2021-22 | — | Only within EHCVM |
 | Burkina Faso | EHCVM 2018-19 → 2021-22 | EMC 2014 | Different program |
+| Benin | EHCVM 2018-19 → 2021-22 (`PanelHH = Panel`, identity on `(grappe, menage)`) | — | 2021-22 adds new households beside the panel ones (GH #1705) |
 
 Nigeria's repository folder `2018-19/` is **GHS-Panel Wave 4**, not the
 separate same-year NLSS. Its [recorded provenance](../../../../lsms_library/countries/Nigeria/2018-19/Documentation/SOURCE.org)
@@ -168,9 +169,17 @@ That is design **A**, and it is the convention (#894). A panel crosswalk is a
 *harmonization decision*, not a derived measurement: it is small (GhanaLSS is
 714 mappings, 4 ms to recompute), identical for every user, and the input to
 every longitudinal result -- so it belongs where a change to it shows up as a
-reviewable line-level diff. All eleven panel countries do this: Burkina_Faso,
-Ethiopia, EthiopiaRHS, GhanaLSS, Malawi, Mali, Niger, Nigeria, Senegal,
-Tanzania, Uganda.
+reviewable line-level diff. All twelve panel countries do this: Benin,
+Burkina_Faso, Ethiopia, EthiopiaRHS, GhanaLSS, Malawi, Mali, Niger, Nigeria,
+Senegal, Tanzania, Uganda.
+
+**Adding a panel country that has no `_/Makefile`** (Benin, GH #1705): the
+`panel-ids` target needs one, and a Makefile is not inert. Once it exists,
+`Wave.grab_data` builds every script-path wave table with
+`make -s ../<wave>/_/<table>.parquet` instead of running the script itself, so
+the Makefile must carry a `../%/_/<table>.parquet: ../%/_/<table>.py` rule for
+every wave script (recipe `(cd $(@D) && python <table>.py)`), or those tables
+stop building. Verify cold that every table is frame-equal before and after.
 
 Malawi and Nigeria were design **B** (per-wave `data_info.yml` wiring, cache
 parquet only) until #894. `Country._compute_panel_ids` still branches on which
@@ -188,7 +197,7 @@ blocks are gone and its script (Pattern 3) holds the wiring; leaving them would
 have made the make backend serve a different crosswalk from the committed one
 before #1468 made both backends use the same source reader.
 `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` is now empty, so a
-*twelfth* country cannot pick a design by accident.
+new panel country cannot pick a design by accident.
 
 ### Never make the JSON a Make target
 

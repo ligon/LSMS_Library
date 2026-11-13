@@ -1,7 +1,7 @@
 """The panel crosswalk is a REVIEWED SOURCE, not a build product (GH #914, #894).
 
 ``panel_ids.json`` / ``updated_ids.json`` are committed to the config tree and
-shipped in the wheel.  All eleven panel countries persist the crosswalk that
+shipped in the wheel.  All twelve panel countries persist the crosswalk that
 way (design A); Malawi and Nigeria used to derive theirs from per-wave YAML
 into a cache parquet (design B) until GH #894.  This module pins two things:
 
@@ -35,7 +35,7 @@ asserts ``make`` still has nothing to do.  A future edit that reintroduces a
 rule under any spelling fails it.  ``-n`` writes nothing and ``os.utime`` does
 not change file content, so the test is read-only with respect to git.
 
-**#894 -- a twelfth country cannot pick the other design by accident.**
+**#894 -- a new panel country cannot pick the other design by accident.**
 ``test_every_panel_ids_country_declares_its_design`` enumerates the countries
 declaring ``panel_ids`` and requires each to be design A (tracked JSON on disk)
 or named in ``DESIGN_B_PENDING``.  Malawi and Nigeria were listed there until
@@ -58,9 +58,10 @@ from lsms_library.paths import countries_root
 # Malawi and Nigeria joined in GH #894.  Malawi's panel_ids.py reads the same
 # per-wave `panel_ids:` blocks in data_info.yml that design B read at run time;
 # Nigeria's has held its own wiring since GH #1264 (own covers, interview gate);
-# Ethiopia's never read its blocks, which are gone since GH #1447.
+# Ethiopia's never read its blocks, which are gone since GH #1447.  Benin joined in
+# GH #1705 (ruling 2026-11-12, "Make Benin a panel country"), with its first _/Makefile.
 DESIGN_A = [
-    "Burkina_Faso", "Ethiopia", "EthiopiaRHS", "GhanaLSS", "Malawi", "Mali",
+    "Benin", "Burkina_Faso", "Ethiopia", "EthiopiaRHS", "GhanaLSS", "Malawi", "Mali",
     "Niger", "Nigeria", "Senegal", "Tanzania", "Uganda",
 ]
 

@@ -3,9 +3,10 @@ Wave: 2021-22
 
 # EHCVM-2 (WB 6272).  Read _/CONTENTS.org "2021-22 wired" first.  What shapes every
 # block here:
-#   - `i` is `E2_<grappe><menage:03d>`, by mapping.i: no link to 2018-19 is served
-#     (GH #1697), so the ids must not be able to meet.  The link is ruled (2026-11-12,
-#     "Make Benin a panel country") for a follow-up PR, GH #1705;
+#   - `i` is built as `E2_<grappe><menage:03d>`, by mapping.i, so the raw ids of the two
+#     waves cannot meet.  The link is served by the committed crosswalk, _/updated_ids.json
+#     (GH #1705): id_walk renames the 6,878 PanelHH = Panel households onto their 2018-19
+#     id; every other household keeps its E2_ id;
 #   - variable names survive where meanings do not: compare labels, not names;
 #   - the files are full grids where 2018-19's held only the answered lines, and s01
 #     and s04a carry 6,138 people who have left, with only why and when they left.

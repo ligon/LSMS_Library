@@ -1,5 +1,8 @@
 """GH #1697: Benin 2021-22 (EHCVM-2, WB 6272) is wired, under ids of its own.
 
+Since GH #1705 the 6,878 linked panel households are served under their 2018-19 id:
+the oracle's ``_i`` applies the link's rule, read from the raw covers (``_linked``).
+
 ``TestDeclared``, ``TestHarvestRule`` and ``TestCopingHook`` need no microdata.
 ``TestServed`` builds real tables and carries ``requires_s3``; its ORACLE reads the
 ``.dta`` files through ``get_dataframe``, imports nothing from ``Benin/_/`` or
@@ -9,6 +12,7 @@ in the file, with its own tables.
 from __future__ import annotations
 
 import ast
+import functools
 import importlib.util
 import warnings
 
@@ -33,8 +37,22 @@ def _raw(name, labels=False, root=ROOT):
     return get_dataframe(root / name, convert_categoricals=labels)
 
 
+@functools.lru_cache(maxsize=1)
+def _linked():
+    """The (grappe, menage) keys the panel link serves (GH #1705), by its rule, read here
+    from the raw covers and not from the committed crosswalk: PanelHH = Panel on the
+    2021-22 cover, and the same (grappe, menage) on the 2018-19 cover."""
+    new = _raw("s00_me_ben2021.dta", labels=True)
+    old = _raw("s00_me_ben2018.dta", root=OLD_ROOT)
+    old_keys = {(int(g), int(m)) for g, m in zip(old["grappe"], old["menage"])}
+    return frozenset((int(g), int(m)) for g, m, p in zip(new["grappe"], new["menage"], new["PanelHH"])
+                     if str(p).strip() == "Panel" and (int(g), int(m)) in old_keys)
+
+
 def _i(grappe, menage):
-    return f"{PREFIX}{int(grappe)}{int(menage):03d}"
+    """The SERVED id: a linked household's 2018-19 id, else this wave's prefixed id."""
+    bare = f"{int(grappe)}{int(menage):03d}"
+    return bare if (int(grappe), int(menage)) in _linked() else f"{PREFIX}{bare}"
 
 
 def _ids(frame):
@@ -227,12 +245,25 @@ def _dedup(s16d):
 
 @pytest.mark.requires_s3
 class TestServed:
-    def test_the_ids_cannot_meet_2018s(self):
-        s = _served("sample")
-        assert s.index.get_level_values("i").str.startswith(PREFIX).all()
+    def test_only_the_linked_ids_meet_2018s(self):
+        """GH #1705: exactly the PanelHH = Panel households with a 2018-19 key are served
+        under their 2018-19 id; every other household, the recurring keys flagged Non
+        panel included, keeps this wave's prefix and meets no 2018-19 id."""
+        served = set(_served("sample").index.get_level_values("i"))
         old = _raw("s00_me_ben2018.dta", root=OLD_ROOT)
         bare = {f"{int(g)}{int(m):03d}" for g, m in zip(old["grappe"], old["menage"])}
-        assert not bare & set(s.index.get_level_values("i"))
+        linked = {f"{g}{m:03d}" for g, m in _linked()}
+        assert len(linked) == 6878
+        assert served & bare == linked
+        assert all(i.startswith(PREFIX) for i in served - linked)
+        new = _raw("s00_me_ben2021.dta", labels=True)
+        non_panel = {f"{int(g)}{int(m):03d}"
+                     for g, m, p in zip(new["grappe"], new["menage"], new["PanelHH"])
+                     if str(p).strip() != "Panel"}
+        recurring_non_panel = non_panel & bare
+        assert len(recurring_non_panel) == 116
+        assert not recurring_non_panel & served
+        assert {PREFIX + i for i in recurring_non_panel} <= served
 
     def test_sample_is_the_cover_and_the_weights(self):
         cover = _raw("s00_me_ben2021.dta")

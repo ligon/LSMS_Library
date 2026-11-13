@@ -15,12 +15,20 @@ Sampling:
         cluster".  Measured on the raw covers: all 670 grappes recur; region and milieu
         agree 670/670; the 2021-22 point equals the 2018-19 fix to the last digit on all
         670 (0.0 km).  `rotating-panel` records the DESIGN: the BID has the 12 households of
-        2018/19 surveyed if found and the cluster completed otherwise.  The library serves
-        NO household link across this boundary yet: 2021-22's `i` is `E2_`-prefixed (GH #1697).
-        The 6,878 recurring keys with PanelHH = Panel agree with their 2018-19 head at
-        real-link level (_/CONTENTS.org, "2021-22 wired"), and the link is ruled (2026-11-12,
-        "Make Benin a panel country") for a follow-up PR with its own verification, GH #1705.
+        2018/19 surveyed if found and the cluster completed otherwise.  The household link is
+        SERVED since GH #1705 (ruling 2026-11-12, "Make Benin a panel country"): the committed
+        crosswalk _/updated_ids.json renames the 6,878 households with PanelHH = Panel and a
+        2018-19 (grappe, menage) onto their 2018-19 id.  So the boundary is part retained and
+        part replaced, measured on the raw files: 6,878 of 8,032 retained; 1,154 keep their own
+        `E2_` id (1,027 new keys, 116 recurring keys flagged Non panel, 11 flagged Panel with
+        no 2018-19 household).  The link is identity on (grappe, menage), so every linked
+        household keeps its cluster: same `v`, region, milieu and vague on 6,878 of 6,878.
+        Link quality, linked against another 2018-19 household of the same grappe: head sex
+        94.8% against 67.6%; head age up 1 to 5 years 60.4% against 10.9%; household size
+        within 2 members 86.2% against 53.6%; pre-loaded members (s01q00aa answered) found in
+        2018-19 by member number 100.0%, same sex 98.5%.  _/CONTENTS.org, "2026-11-13 -- Benin
+        is a panel country".
       source_type: local-documentation
       confidence: high
       source_file: 'lsms_library/countries/Benin/2021-22/Documentation/ben_ehcvm2_information_de_base_eng.pdf'
-      locator: 'section 4.1 "Household and Community Components", PDF pp. 14-15; measured on s00_me_ben2021.dta, s00_me_ben2018.dta and grappe_gps_ben2018.dta through get_dataframe, 2026-11-04'
+      locator: 'section 4.1 "Household and Community Components", PDF pp. 14-15, and section 7.1 on PanelHH; measured on s00_me_ben2021.dta, s00_me_ben2018.dta and grappe_gps_ben2018.dta through get_dataframe, 2026-11-04; the household link measured on s00_me_ben2021.dta, s00_me_ben2018.dta, s01_me_ben2021.dta and s01_me_ben2018.dta through get_dataframe, 2026-11-13 (GH #1705)'

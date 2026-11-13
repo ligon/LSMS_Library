@@ -8,6 +8,12 @@ Data Scheme:
     panel_weight: float
     strata: str
     Rural: str
+  # The panel crosswalk, 2021-22 -> 2018-19 (GH #1705; ruling @ligon 2026-11-12, "Make
+  # Benin a panel country").  A COMMITTED SOURCE (_/panel_ids.json, _/updated_ids.json),
+  # written by _/panel_ids.py from PanelHH and regenerated only by `make panel-ids`
+  # (design A, GH #894 / #914).  6,878 households linked; every other 2021-22 household
+  # keeps its own E2_ id.  _/CONTENTS.org, "2026-11-13 -- Benin is a panel country".
+  panel_ids: !make
   cluster_features:
     # GRAIN (GH #323).  The declared grain is the cluster, (t, v) -- 670
     # grappes in 2018-19 -- but `df_main` in 2018-19/_/data_info.yml reads
