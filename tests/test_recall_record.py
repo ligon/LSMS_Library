@@ -546,7 +546,7 @@ class TestFromConfigByColumn:
             assert record.n_asks_by_column is None
             assert "n_asks_by_column" not in record
 
-    def test_all_68_packaged_records_equal_exact_parent_config_method(self):
+    def test_all_packaged_records_equal_exact_parent_config_method(self):
         from lsms_library.country import load_yaml
         seen = set()
         for country in COUNTRIES:
@@ -561,7 +561,7 @@ class TestFromConfigByColumn:
                 assert type(after) is type(before) is RecallRecord
                 for column in ("Quantity", "Expenditure"):
                     assert after.exposure_days(column) == before.exposure_days(column), key
-        assert len(seen) == 68
+        assert len(seen) == 71
 
 
 # Exact pre-correction configuration method, function name only changed.

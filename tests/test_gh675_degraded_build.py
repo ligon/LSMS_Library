@@ -347,11 +347,21 @@ def _new_process():
     C._REBUILD_HISTORY.clear()
 
 
+def _geo_absent(df):
+    """2018-19 lost its fix.  Re-pinned GH #1697: 2021-22 reads the GPS off its cover, a file
+    this test leaves alone, so the column is present and null on the degraded wave."""
+    return df.xs("2018-19", level="t")["Latitude"].isna().all()
+
+
+def _geo_present(df):
+    return df.xs("2018-19", level="t")["Latitude"].notna().any()
+
+
 def test_civ_degrade_stay_down_then_heal(civ_root, monkeypatch):
     # 1. the degraded build: stamped at BOTH tiers (it used to be silent)
     down = _GeoUnavailable().__enter__()
     df, degraded, rebuilt = _read(civ_root)
-    assert "Latitude" not in df.columns
+    assert _geo_absent(df)
     stamps = _stamps(civ_root)
     for tier in ("country", "wave"):
         assert stamps[tier] and stamps[tier][0]["file"] == GEO_REL, tier
@@ -364,7 +374,7 @@ def test_civ_degrade_stay_down_then_heal(civ_root, monkeypatch):
     _new_process()
     for _ in range(2):
         df, degraded, rebuilt = _read(civ_root)
-        assert "Latitude" not in df.columns
+        assert _geo_absent(df)
         assert len(degraded) == 1 and not rebuilt
         assert degraded[0].missing == ("Latitude", "Longitude")
         assert degraded[0].files == (GEO_REL,)
@@ -374,7 +384,7 @@ def test_civ_degrade_stay_down_then_heal(civ_root, monkeypatch):
     _new_process()
     df, degraded, rebuilt = _read(civ_root)
     assert {"Latitude", "Longitude"} <= set(df.columns)
-    assert df["Latitude"].notna().any()
+    assert _geo_present(df)
     assert not degraded
     assert len(rebuilt) == 1 and rebuilt[0].reason.startswith("degraded:")
     assert _stamps(civ_root) == {"country": None, "wave": None}
@@ -390,7 +400,7 @@ def test_civ_degraded_wave_parquet_reaches_a_rebuilt_country_parquet(civ_root, m
     (civ_root / "CotedIvoire" / "var" / "cluster_features.parquet").unlink()
     _new_process()
     df, degraded, rebuilt = _read(civ_root)
-    assert "Latitude" not in df.columns
+    assert _geo_absent(df)
     assert degraded and degraded[0].missing == ("Latitude", "Longitude")
     assert _stamps(civ_root)["country"][0]["file"] == GEO_REL
 
@@ -398,7 +408,7 @@ def test_civ_degraded_wave_parquet_reaches_a_rebuilt_country_parquet(civ_root, m
     (civ_root / "CotedIvoire" / "var" / "cluster_features.parquet").unlink()
     _new_process()
     df, degraded, rebuilt = _read(civ_root)
-    assert df["Latitude"].notna().any() and not degraded
+    assert _geo_present(df) and not degraded
     assert _stamps(civ_root) == {"country": None, "wave": None}
 
 

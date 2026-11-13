@@ -23,7 +23,7 @@ daily = ll.Country('Mali').food_expenditures(period='day')
 ```
 
 Inspect the recall record before choosing a period. The packaged records
-currently establish a single declared exposure for **56 of 68** food cells.
+currently establish a single declared exposure for **59 of 71** food cells.
 The remaining cells have no established window or vary within the wave.
 Questionnaire, variable-label and config-comment rungs remain distinct; a
 config-comment assertion converts but stays visibly weaker than a quoted

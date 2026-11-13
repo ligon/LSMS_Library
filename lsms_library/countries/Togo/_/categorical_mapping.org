@@ -176,6 +176,8 @@
 | Semences de césame                        | Seed                |
 | Semences de haricots/niébé                | Seed                |
 | Plants/boutures de tubercules             | Seed                |
+| Semences d'arichide                       | Seed                |
+| Plants d'hévéa, de teck                   | Seed                |
 | Autres semences                           | Seed                |
 | 20                                        | Seed                |
 
@@ -230,6 +232,8 @@
 | Semences de haricots/niébé    | Niébé/Haricots secs |
 | Semences d'autres céréales    | Autre céréale       |
 | Plants/boutures de tubercules | Autre tubercule     |
+| Semences d'arichide           | Arachide            |
+| Plants d'hévéa, de teck       | Hévéa, teck         |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
 
@@ -244,6 +248,17 @@
 # Rows whose draft Preferred Label was blank (undecodable bare numeric
 # codes / unresolved items) are DROPPED so those Original Labels pass
 # through raw instead of mapping to ''.
+
+# 2021-22 (GH #1697).  That file's labels are clean UTF-8 where 2018's keys above are
+# mojibake, its code list is longer, and its codes do not line up with 2018's.  Its
+# labels are appended at the end of this table, on Niger's rule (GH #833): a
+# respelling of a good 2018 names takes 2018's Preferred Label; two goods 2018
+# bundles and 2021-22 splits stay split, each under its own label, and 2018's bundle
+# label stays on 2018 alone.  So 2021-22's `Fromage` and `Arachides décortiquées` take
+# labels of their own (2018's `Fromage local` prices with the soy cheese, and its
+# `décortiquées ou pilées` covers both).  `Piment frais` is the recorded exception: 2018's
+# `Piment` prices as this wave's fresh chilli, ratio 1.00.  The list and the evidence are
+# in _/CONTENTS.org.
 
 #+NAME: harmonize_food
 | Original Label                                                          | Preferred Label                                                                      |
@@ -410,6 +425,95 @@
 | Thé                                                                     | Thé                                                                                  |
 | Tomate                                                                  | Tomate fraîche                                                                       |
 | Voandzou                                                                | Voandzou                                                                             |
+| Adémè (Feuilles crin-crin) | Autres légumes en feuilles |
+| Anchois fumés | Autres poissons fumés |
+| Arachide grillée | Arachide grillée |
+| Arachides décortiquées | Arachides décortiquées (hors pilées) |
+| Arachides fraîches en coques | Arachides fraîches en coques |
+| Arachides séchées en coques | Arachides séchées en coques |
+| Arôme (Maggi, Jumbo, etc.) | Arôme (Maggi, Jumbo, etc.) |
+| Attiéke | Attiéke |
+| Autres Poissons et petits poissons frais | Autres poissons frais |
+| Autres agrumes (mandarine, pamplemousse, etc.) | Autres agrumes |
+| Autres huiles n.d.a. (maïs, huile palmiste, huile d'olive, huile de tournesol, huile de lait de vache etc.) | Autres huiles n.d.a. (maïs, huile palmiste, etc.) |
+| Autres légumes secs n.d.a | Autres légumes secs n.d.a |
+| Autres produits alimentaires (noix de pomme sauvage, etc) | Autres produits alimentaires |
+| Autres viandes non-déclarées ailleurs | Autres viandes n.d.a |
+| Banane plantain | Plantain |
+| Beurre de karité | Beurre de karité |
+| Bières et vins traditionnels (dolo, vin de palme, vin de raphia, vin de cajou, etc.) | Bières et vins traditionnels (dolo, vin de palme, vin de raphia, vin de cajou, etc.) |
+| Bières industrielles | Bières industrielles |
+| Canne à sucre | Canne à sucre |
+| Carpe fraiche | Carpes fraîches |
+| Chinchard et Maquéreau fumé | Autres poissons fumés |
+| Chocolat à croquer, pâte à tartiner | Chocolat à croquer, pâte à tartiner |
+| Concentré de tomate | Concentré de tomate |
+| Eau minérale/ filtrée | Eau minérale/ filtrée |
+| Farine de blé local ou importé | Farine de blé local ou importé |
+| Farine de maïs | Farine de maïs |
+| Feuilles d'oseille | Feuilles d'oseille |
+| Fromage | Fromage (hors soja) |
+| Gboma (Feuilles d'aubergine) | Autres légumes en feuilles |
+| Gâteaux | Gâteaux |
+| Huile de palme raffinée | Huile de palme raffinée |
+| Lait caillé, yaourt | Lait caillé, yaourt |
+| Lait concentré non-sucré | Lait concentré non-sucré |
+| Lait concentré sucré | Lait concentré sucré |
+| Lait et farines pour bébé | Lait et farines pour bébé |
+| Maïs en grain | Maïs en grain |
+| Maïs en épi | Maïs en épi |
+| Moringa, feuilles de manioc, feuilles de taro , feuilles de haricot, aloma, autres feuilles | Feuilles de manioc, feuilles de taro et, autres feuilles |
+| Niébé/Haricots secs | Niébé/Haricots secs |
+| Noix de karité | Noix de karité |
+| Piment frais | Piment frais |
+| Poisson séché | Poisson séché |
+| Poivron | Poivron frais |
+| Pâte d'arachide | Pâte d'arachide |
+| Pâtes alimentaires | Pâtes alimentaires |
+| Riz importé brisé | Riz importé non parfumé |
+| Riz importé longs grains | Riz importé non parfumé |
+| Riz local (Kovié) | Autre Riz local |
+| Soumbala (moutarde africaine) | Soumbala (moutarde africaine) |
+| Sucre morceaux | Sucre (poudre ou morceaux) |
+| Sucre poudre | Sucre (poudre ou morceaux) |
+| Tomate fraîche | Tomate fraîche |
+| Tomate séchée | Tomate séchée |
+| Viande de bœuf | Viande de bœuf |
+| Viande de chèvre | Viande de chèvre |
+| Œufs | Œufs |
+| Arachides pilées | Arachides pilées |
+| Aubergine, | Aubergine, |
+| Autres céréales | Autres céréales |
+| Autres farines de céréales | Autres farines de céréales |
+| Autres fruits de mer | Autres fruits de mer |
+| Autres semoules de céréales | Autres semoules de céréales |
+| Café en poudre | Café en poudre |
+| Café soluble | Café soluble |
+| Courge/Courgette | Courge/Courgette |
+| Crabes | Crabes |
+| Crevettes fraiches | Crevettes fraiches |
+| Crevettes séchées | Crevettes séchées |
+| Farine/semoule de mil | Farine/semoule de mil |
+| Fromage à base de soja | Fromage à base de soja |
+| Fruit de baobab | Fruit de baobab |
+| Gingembre frais | Gingembre frais |
+| Gingembre moulu | Gingembre moulu |
+| Huile d'arachide "Segal" | Huile d'arachide "Segal" |
+| Huile d'arachide raffinée | Huile d'arachide raffinée |
+| Huile de soja | Huile de soja |
+| Moutarde | Moutarde |
+| Noix de palme | Noix de palme |
+| Néré | Néré |
+| Papaye | Papaye |
+| Pastèque | Pastèque |
+| Piment séché | Piment séché |
+| Poivre | Poivre |
+| Pommes | Pommes |
+| Viande séchée (boeuf, mouton, chameau) | Viande séchée (boeuf, mouton, chameau) |
+| Vinaigre de citron | Vinaigre de citron |
+| semoule de blé | semoule de blé |
+| semoule de mais | semoule de mais |
+| semoule de mil | semoule de mil |
 
 # harmonize_education (GH #171): per-country delta on the global ordinal base
 # (categorical_mapping/harmonize_education.org, row-additive). Maps this country's
@@ -438,11 +542,13 @@
 | Armoires et autres meubles                     | Furniture       |
 | Aspirateur                                     | Appliances      |
 | Bicyclette                                     | Bicycle         |
+| Bicyclette, vélo de course                     | Bicycle         |
 | Bonbonne de gaz                                | Gas Cylinder    |
 | Camescope                                      | Camera          |
 | Caméra Vidéo                                   | Camera          |
 | Chaîne Hi Fi                                   | DVD/CD Player   |
 | Climatiseurs/splits                            | Air Conditioner |
+| Climatiseurs/Splits amovibles                  | Air Conditioner |
 | Congélateur                                    | Freezer         |
 | Cuisinière à gaz ou électrique                 | Cooker          |
 | Cyclomoteur/Vélomoteur, motocyclette           | Motorcycle      |

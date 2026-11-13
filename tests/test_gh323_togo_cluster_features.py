@@ -137,8 +137,11 @@ def test_api_still_returns_every_cluster(togo):
     `test_hook_is_the_shipped_reducer_not_a_private_copy`.
     """
     df = togo.cluster_features()
-    assert len(df) == N_GRAPPES, (
-        f'Togo cluster_features returned {len(df)} rows, expected {N_GRAPPES}.'
+    # Per wave since GH #1697: 2021-22 revisits the same 540 grappes.
+    per_wave = df.groupby(level='t').size()
+    assert (per_wave == N_GRAPPES).all(), (
+        f'Togo cluster_features returned {per_wave.to_dict()} rows, expected '
+        f'{N_GRAPPES} in each wave.'
     )
     assert set(df.index.names) == {'t', 'v'}
 

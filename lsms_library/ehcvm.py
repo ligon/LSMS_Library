@@ -222,7 +222,7 @@ def community_price_slots(base, codes, columns, rank):
     return pd.concat(pieces, ignore_index=True)
 
 from .build_transforms import food_acquired_to_canonical
-from .derivations import COLUMN as DERIVATION_COLUMN
+from .derivations import COLUMN as DERIVATION_COLUMN, union_keys
 
 
 def crop_condition_codes(codes, table):
@@ -256,6 +256,9 @@ __all__ = [
     "StatedLabelOverruledWarning", "UnitWeightJoinError", "derive_nsu_kg_factor",
     "food_acquired_with_unit_weights", "inputs_unit_weight",
     "nsu_derivation_key", "nsu_unit_weights",
+    "FARM_LEVEL", "derive_harvest_to_date", "derive_hh_crop_sale_attachment",
+    "hh_crop_records", "is_crop_sale", "stamp_harvest_to_date",
+    "DISPOSITIONS", "derive_hh_crop_harvest_total", "harvest_totals",
 ]
 
 #: The eight countries whose ``food_acquired`` comes from EHCVM section 7B.
@@ -1431,3 +1434,179 @@ def inputs_unit_weight(country: str, wave: str) -> pd.DataFrame:
              for c in ("s07bq01", "s07bq03b", "s07bq03c")])
         out["nsu_year"] = np.where(found, years.reindex(codes).to_numpy(dtype=float), np.nan)
     return out
+
+
+# ---------------------------------------------------------------------------
+# crop_production of an EHCVM-2 wave (GH #552; rulings @ligon 2026-11-03)
+# ---------------------------------------------------------------------------
+#
+# EHCVM-2 splits the module EHCVM-1 kept on one line: s16c holds the plot-by-crop
+# harvest, and s16d, with no plot, what became of each crop.  Benin, Cote d'Ivoire and
+# Guinea-Bissau read as Togo does.  Mali has its own copy of the two functions below,
+# in mali.py, and Niger its older rule; neither imports these, so this section is in
+# neither's fingerprint.  Check that s16cq16a is filled before assuming a wave is
+# like Togo (10,325 of 10,877 rows): Mali's is on 309 of 7,247, which is GH #1437.
+
+#: The canonical structural sentinel for ``plot_id``: the record has no plot by
+#: design (lsms_library/data_info.yml, top of file).
+FARM_LEVEL = "Farm-level"
+
+_SALE_KEYS = ["i", "crop"]
+_SALE_COLUMNS = ["Quantity_sold", "Unit_sold", "Value_sold"]
+
+
+def hh_crop_records(frame: pd.DataFrame, crop: str = "s16dq01") -> pd.DataFrame:
+    """``s16d`` with one record per (grappe, menage, crop), or a refusal.
+
+    The export repeats a crop's record once per harvest line, byte for byte
+    (Niger 2021-22, GH #824; Togo 2021-22: 1,111 of 10,325 rows).  A line
+    identical to another on every column is the same record, not a second sale.
+    A pair that still has two different records is not an artefact of that kind,
+    so it raises rather than picking one.
+    """
+    out = frame[~frame.duplicated(keep="first")]
+    if out.duplicated(["grappe", "menage", crop]).any():
+        raise ValueError("s16d: two different records for one (household, crop)")
+    return out
+
+
+def is_crop_sale(quantity, value) -> pd.Series:
+    """A sale is a record with a positive sold quantity or a positive value."""
+    return (pd.to_numeric(quantity, errors="coerce").gt(0)
+            | pd.to_numeric(value, errors="coerce").gt(0))
+
+
+def derive_hh_crop_sale_attachment(harvest: pd.DataFrame, sales: pd.DataFrame,
+                                   key: str) -> pd.DataFrame:
+    """Place each household-crop sale on the served rows of a wave (option (d)).
+
+    ``harvest`` holds one row per plot-crop harvest record, with ``i``, ``crop`` and
+    ``plot_id``.  ``sales`` holds one row per sale, with ``i``, ``crop``,
+    ``Quantity_sold``, ``Unit_sold`` and ``Value_sold``; a second sale of one
+    (i, crop) raises.
+
+    A sale of an (i, crop) with EXACTLY ONE harvest row goes on that row, in its own
+    ``Unit_sold``, and that row alone carries ``key`` in ``Derivation``.  Any other
+    sale becomes ONE new row of that (i, crop) with ``plot_id = FARM_LEVEL``, its
+    other columns NA; the index value discloses it, so it carries no key.
+
+    No sold quantity or value is split, summed or scaled.  Registered per country as
+    ``<country>::crop_production::hh-crop-sale-single-row``.
+    """
+    if sales.duplicated(_SALE_KEYS).any():
+        raise ValueError("crop_production: more than one sale for a (i, crop)")
+    lines = harvest.groupby(_SALE_KEYS).size().rename("_lines").reset_index()
+    n = sales[_SALE_KEYS].merge(lines, on=_SALE_KEYS, how="left")["_lines"]
+    single = n.fillna(0).eq(1).to_numpy()
+    served = harvest.merge(sales.loc[single, _SALE_KEYS + _SALE_COLUMNS],
+                           on=_SALE_KEYS, how="left", validate="many_to_one",
+                           indicator="_attached")
+    derivation = pd.Series(pd.NA, index=served.index, dtype="string")
+    derivation[served.pop("_attached").eq("both")] = key
+    served[DERIVATION_COLUMN] = derivation
+    farm = sales.loc[~single, _SALE_KEYS + _SALE_COLUMNS].copy()
+    farm["plot_id"] = FARM_LEVEL
+    return pd.concat([served, farm], ignore_index=True)
+
+
+def derive_harvest_to_date(quantity):
+    """The identity: a recorded harvest of an unfinished crop, served as recorded.
+
+    The registry is the point.  s16cq16a asks the quantity ALREADY harvested, so on a
+    row whose harvest is not finished the served ``Quantity`` covers a part of the
+    season under a name that implies all of it.
+    """
+    return quantity
+
+
+def stamp_harvest_to_date(frame: pd.DataFrame, key: str) -> pd.DataFrame:
+    """Key the rows with ``finished == 'Non'`` and a recorded ``Quantity``."""
+    out = frame.copy()
+    out["Quantity"] = derive_harvest_to_date(pd.to_numeric(out["Quantity"], errors="coerce"))
+    mask = (out["finished"].astype("string").str.strip().eq("Non").fillna(False).astype(bool)
+            & out["Quantity"].notna())
+    derivation = out[DERIVATION_COLUMN].astype("string").copy()
+    derivation[mask] = pd.array([union_keys((value, key)) for value in derivation[mask]],
+                                dtype="string")
+    out[DERIVATION_COLUMN] = derivation
+    return out
+
+
+#: What s16d records of a crop, each with its own quantity <var>a and unit <var>b:
+#: consumed, given away, sold, in stock.
+DISPOSITIONS = ("s16dq02", "s16dq03", "s16dq05", "s16dq13")
+
+
+def harvest_totals(lines: pd.DataFrame, dispositions: pd.DataFrame) -> pd.DataFrame:
+    """The (i, crop) pairs whose harvest their dispositions can state, with the sum.
+
+    The EHCVM-2 harvest of Mali and Benin (GH #1437): the instrument sends a finished crop
+    to the quantity, and the file lacks it on nearly every finished row.  Mali has its own
+    copy of this rule, in mali.py; neither imports the other, so an edit to this one is in
+    no Mali fingerprint.  ``lines`` holds the household's s16c rows of the crop: ``i``,
+    ``crop``, ``Quantity`` and ``finished``.  ``dispositions`` holds one row per (i, crop),
+    with ``<var>a`` and ``<var>b`` for each of :data:`DISPOSITIONS`.  A pair qualifies when
+
+    - every s16c row of it says the harvest is finished: a mixed pair's dispositions cover
+      what is harvested so far, and an unanswered row has not said so;
+    - no row of it records a quantity: a recorded harvest is never overridden, and a total
+      beside it on a Farm-level row would count it twice;
+    - its positive dispositions all state one unit: no factor between units exists.
+
+    Returns ``Quantity``, ``u`` (the dispositions' own unit label) and ``lines`` (how many
+    s16c rows the pair has), indexed by (i, crop).
+    """
+    if dispositions.duplicated(_SALE_KEYS).any():
+        raise ValueError("crop_production: more than one s16d record for a (i, crop)")
+    long = pd.concat([
+        dispositions[_SALE_KEYS].assign(
+            quantity=pd.to_numeric(dispositions[f"{var}a"], errors="coerce").astype("float64"),
+            unit=dispositions[f"{var}b"].astype("string").str.strip())
+        for var in DISPOSITIONS], ignore_index=True)
+    long = long[long["quantity"].gt(0)]
+    long["unitless"] = long["unit"].isna()
+    stated = long.groupby(_SALE_KEYS).agg(Quantity=("quantity", "sum"), u=("unit", "first"),
+                                          units=("unit", "nunique"), unitless=("unitless", "any"))
+    facts = pd.DataFrame({"i": lines["i"], "crop": lines["crop"],
+                          "open": (lines["finished"].astype("string").str.strip().ne("Oui")
+                                   .fillna(True).astype(bool)),
+                          "recorded": pd.to_numeric(lines["Quantity"], errors="coerce").notna()})
+    facts = facts.groupby(_SALE_KEYS).agg(lines=("open", "size"), open=("open", "any"),
+                                          recorded=("recorded", "any"))
+    pairs = stated.join(facts, how="inner")
+    keep = pairs["units"].eq(1) & ~pairs["unitless"] & ~pairs["open"] & ~pairs["recorded"]
+    return pairs.loc[keep, ["Quantity", "u", "lines"]]
+
+
+def derive_hh_crop_harvest_total(served: pd.DataFrame, dispositions: pd.DataFrame,
+                                 key: str) -> pd.DataFrame:
+    """A finished EHCVM-2 harvest the file lacks, from its dispositions (GH #1437).
+
+    ``served`` is what :func:`derive_hh_crop_sale_attachment` returns, with ``finished``
+    beside it.  For a pair of :func:`harvest_totals`, ``Quantity`` is the sum of consumed,
+    given, sold and in stock, and ``u`` their unit.  It goes where the sale of that pair
+    goes: on the single s16c row, or, for two or more rows, on the pair's one Farm-level
+    row, created if no sale already made it.  That row carries ``key``.  It is never split
+    among plots, and every other row keeps what it had.
+    """
+    plots = served["plot_id"].ne(FARM_LEVEL).fillna(True).astype(bool)
+    totals = harvest_totals(served[plots], dispositions)
+    out = served.reset_index(drop=True)
+    plots = plots.reset_index(drop=True)
+    pair = pd.MultiIndex.from_frame(out[_SALE_KEYS])
+    target = ((plots & pair.isin(totals.index[totals["lines"].eq(1)]))
+              | (~plots & pair.isin(totals.index[totals["lines"].gt(1)])))
+    placed = totals.reindex(pair[target])
+    out["Quantity"] = pd.to_numeric(out["Quantity"], errors="coerce").astype("float64")
+    out.loc[target, "Quantity"] = placed["Quantity"].to_numpy()
+    out["u"] = out["u"].astype("string")
+    out.loc[target, "u"] = pd.array(placed["u"].to_numpy(), dtype="string")
+    derivation = out[DERIVATION_COLUMN].astype("string").copy()
+    derivation[target] = pd.array([union_keys((value, key)) for value in derivation[target]],
+                                  dtype="string")
+    out[DERIVATION_COLUMN] = derivation
+    several = totals[totals["lines"].gt(1)]
+    new = several[~several.index.isin(pair[~plots])].reset_index()[_SALE_KEYS + ["Quantity", "u"]]
+    new["plot_id"] = FARM_LEVEL
+    new[DERIVATION_COLUMN] = key
+    return pd.concat([out, new], ignore_index=True)

@@ -29,8 +29,30 @@ def sample(df):
 # purchased row.  See lsms_library/ehcvm.py and Togo/_/derivations.yml.
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Togo')
 
+#: GH #1557, ruling @ligon 2026-11-12, "Decode 2018 with 2021 labels (Recommended)".
+#: This file's s07bq03b keeps no value labels and `ehcvm_units` (built from the sibling
+#: countries' labels) names no 659, 660 or 662.  Togo 2021-22's own s07b labels them Main,
+#: Quartier and Tête, and its unit-weight file ehcvm_nsu_tgo2021.dta uses them for the same
+#: goods 2018 records them on: 659 Main on Banane douce and Plantain (2018: Banane douce
+#: 437, Plantain 77 rows), 660 Quartier on six meats (2018: goat, mutton, other meat,
+#: beef), 662 Tête on Igname, Manioc, Taro (2018: Igname 1,317, Manioc 148, Plantain 21).
+#: So the code book is read as one across the waves.  Code 114 (one row) has no label in
+#: either wave and stays a code.  The only change this ruling makes to an older wave.
+UNIT_CODES_DECODED_FROM_2021 = {'659': 'Main', '660': 'Quartier', '662': 'Tête'}
+
+
+def _decode_unit(value):
+    '''A bare 659, 660 or 662 as 2021-22 labels it; anything else unchanged.'''
+    key = str(value).strip()
+    if key.endswith('.0'):
+        key = key[:-2]
+    return UNIT_CODES_DECODED_FROM_2021.get(key, value)
+
 
 def food_acquired(df):
+    # The unit level only: ConsumptionUnitCode and LastPurchaseUnitCode keep the codes
+    # that unit_match compares, so no Expenditure moves.
+    df = df.rename(index=_decode_unit, level='u')
     return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
 
 

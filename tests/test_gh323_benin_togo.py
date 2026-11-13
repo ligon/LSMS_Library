@@ -46,6 +46,8 @@ from lsms_library.country import Country
 # Benin:  the wave script emits 10,605 reported line-items and ALL of them must
 #         survive.  Pre-fix the API returned 10,534 -- 71 destroyed.
 BENIN_ROWS = 10605
+# Benin 2021-22 (GH #1697): every applied line of s16b_me_ben2021.dta.
+BENIN_2021_ROWS = 11368
 #
 # Togo:   the wave script emits 13,733 reported line-items.  Pre-fix the API
 #         returned 13,565 -- 168 missing.  165 of those were destroyed by the
@@ -56,6 +58,8 @@ BENIN_ROWS = 10605
 #         in country.py.  That is not a #323 collapse: it destroys no reported
 #         value, and it is not this fix's business to change it.
 TOGO_ROWS = 13730
+# Togo 2021-22 (GH #1697): every applied line of s16b_me_tgo2021.dta.
+TOGO_2021_ROWS = 16042
 
 # The three seed labels that actually occur in the s16b roster of BOTH
 # countries.  harmonize_seed_crop must keep them apart.
@@ -83,7 +87,7 @@ def _plot_inputs(c):
 @pytest.mark.requires_s3
 def test_plot_inputs_keeps_every_reported_row(country):
     """Every reported input line-item must survive to the API."""
-    expected = {'Benin': BENIN_ROWS, 'Togo': TOGO_ROWS}[country.name]
+    expected = {'Benin': BENIN_ROWS + BENIN_2021_ROWS, 'Togo': TOGO_ROWS + TOGO_2021_ROWS}[country.name]
     df = _plot_inputs(country)
     assert len(df) == expected, (
         f'{country.name}/plot_inputs has {len(df)} rows, expected {expected}. '

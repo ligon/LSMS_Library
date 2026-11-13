@@ -1,7 +1,10 @@
 """GH1575: actual CIV wiring with invented, fenced providers; no native data.
 
 Ledger 1575-cotedivoire1575-stratawiring §§2–5. These are construction controls,
-not observed-cell counts or normal Country/Feature/cold-cache acceptance.
+not observed-cell counts or normal Country/Feature/cold-cache acceptance.  2021-22
+has the same construction since the ruling of 2026-11-12 ("Same rule as #1575"),
+from its own cover, with the region upper-cased first: that file labels 23 of its
+33 regions in lower case on 2018-19's codes (GH #1697).
 """
 from copy import deepcopy
 import importlib.util
@@ -26,7 +29,13 @@ ROOT = countries_root() / COUNTRY
 COVER = "Menage/s00_me_CIV2018.dta"
 WEIGHTS = "Menage/ehcvm_ponderations_CIV2018.dta"
 KEY = "CotedIvoire::sample::region-milieu-stratum"
+# 2021-22 has its own key since F1 of the GH #1697 red team: its function upper-cases the region.
+LATER_KEY = "CotedIvoire::sample::region-milieu-stratum-upper-region"
 MODULE = ROOT / WAVE / "_" / "mapping.py"
+LATER = "2021-22"
+LATER_COVER = "s00_me_civ2021.dta"
+LATER_WEIGHTS = "ehcvm_ponderations_civ2021.dta"
+LATER_MODULE = ROOT / LATER / "_" / "mapping.py"
 
 # The complete pre-change sample declaration, including the original join.
 ORIGINAL_SAMPLE = {
@@ -43,8 +52,8 @@ ORIGINAL_SAMPLE = {
 }
 
 
-def _module():
-    spec = importlib.util.spec_from_file_location("_gh1575_civ_strata", MODULE)
+def _module(path=MODULE):
+    spec = importlib.util.spec_from_file_location(f"_gh1575_civ_strata_{path.parent.parent.name}", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -71,16 +80,22 @@ def make_wave(monkeypatch):
     monkeypatch.setattr(Wave, "resources", property(lambda w: w._fixture_resources))
     monkeypatch.setattr(Wave, "formatting_functions", property(lambda w: dict(w._fixture_functions)))
 
-    def make(*, original=False):
+    def make(*, original=False, label=WAVE):
         functions = local_tools.get_formatting_functions(
             ROOT / "_" / "cotedivoire.py", "_gh1575_civ_country")
-        functions.update(local_tools.get_formatting_functions(MODULE, "_gh1575_civ_wave"))
-        block = load_yaml(ROOT / WAVE / "_" / "data_info.yml")["sample"]
-        if original:
+        module = MODULE if label == WAVE else LATER_MODULE
+        functions.update(local_tools.get_formatting_functions(module, f"_gh1575_civ_wave_{label}"))
+        block = load_yaml(ROOT / label / "_" / "data_info.yml")["sample"]
+        if original and label == WAVE:
             block = deepcopy(ORIGINAL_SAMPLE)
             functions.pop("sample", None)
+        elif original:
+            # 2021-22's block as wired before 2026-11-12: the region alone, upper-cased.
+            block = deepcopy(block)
+            block["df_cover"]["myvars"]["strata"] = ["s00q01", {"mapping": "Region"}]
+            functions.pop("sample", None)
         country = SimpleNamespace(name=COUNTRY, resources=load_yaml(ROOT / "_" / "data_scheme.yml"))
-        wave = Wave(WAVE, WAVE, country)
+        wave = Wave(label, label, country)
         wave._fixture_resources = {"sample": block}
         wave._fixture_functions = functions
         return wave
@@ -88,8 +103,10 @@ def make_wave(monkeypatch):
     return make
 
 
-def _providers(monkeypatch, cover, weights):
+def _providers(monkeypatch, cover, weights, **later):
     frames = {COVER: cover, WEIGHTS: weights}
+    frames.update({LATER_COVER: later.get("later_cover"), LATER_WEIGHTS: later.get("later_weights")})
+    frames = {k: v for k, v in frames.items() if v is not None}
     calls = []
 
     def read(path, **kwargs):
@@ -109,7 +126,16 @@ def test_only_strata_changes_in_the_complete_sample_declaration():
     expected = deepcopy(ORIGINAL_SAMPLE)
     expected["df_cover"]["myvars"]["strata"] = ["s00q01", "s00q04", {"mapping": "strata_label"}]
     assert actual == expected
-    assert "sample" not in load_yaml(ROOT / "2021-22" / "_" / "data_info.yml")
+    # 2021-22 (GH #1697) takes the same construction since 2026-11-12, on its own cover,
+    # through a wave-local formatter that upper-cases the region and calls the shared
+    # helper; nothing else in its block changes.
+    later = load_yaml(ROOT / LATER / "_" / "data_info.yml")["sample"]
+    assert later["df_cover"]["file"] == LATER_COVER
+    assert later["df_cover"]["myvars"]["strata"] == [
+        "s00q01", "s00q04", {"mapping": "strata_label_upper_region"}]
+    assert later["dfs"] == ["df_weights", "df_cover"] and later["merge_how"] == "left"
+    assert list(derivation_records(COUNTRY)[KEY].waves) == [WAVE]
+    assert list(derivation_records(COUNTRY)[LATER_KEY].waves) == [LATER]
 
 
 def test_real_yaml_extraction_merge_and_hook_conserve_every_other_field(monkeypatch, make_wave):
@@ -210,6 +236,10 @@ def test_registry_is_unique_scoped_optional_and_resolves_unchanged_helpers():
     assert len(re.findall(rf"^{re.escape(KEY)}:", text, flags=re.M)) == 1
     rec = derivation_records(COUNTRY)[KEY]
     assert rec.waves == [WAVE] and rec.columns == ["strata"] and rec.rows == {}
+    later = derivation_records(COUNTRY)[LATER_KEY]
+    assert later.waves == [LATER] and later.columns == ["strata"] and later.rows == {}
+    assert later.raw_variables == ["s00q01", "s00q04"] and later.inputs == rec.inputs
+    assert all(a["basis"] in BASES for a in later.assumptions)
     assert rec.raw_variables == ["s00q01", "s00q04"]
     assert rec.resolve() is ehcvm.derive_region_milieu_stratum
     assert rec.inputs == "lsms_library.countries.CotedIvoire.2018-19._.mapping:inputs_strata"
@@ -225,15 +255,13 @@ def test_registry_is_unique_scoped_optional_and_resolves_unchanged_helpers():
 
 
 def test_registered_inputs_use_own_cover_and_original_names_only(monkeypatch, make_wave):
-    wave = make_wave()
+    wave, later = make_wave(), make_wave(label=LATER)
     requested = []
 
     class InventedCountry:
         def __getitem__(self, value):
             requested.append(value)
-            if value != WAVE:
-                raise KeyError("invented provider: wave has no sample cover")
-            return wave
+            return {WAVE: wave, LATER: later}[value]
 
     def provider(name):
         assert name == COUNTRY
@@ -243,17 +271,94 @@ def test_registered_inputs_use_own_cover_and_original_names_only(monkeypatch, ma
     cover = pd.DataFrame({"grappe": [7, 2], "menage": [3, 8],
                           "s00q01": [" Autonome d'Abidjan ", "Folon"],
                           "s00q04": ["Rural", "Urbain"]})
-    before = cover.copy(deep=True)
-    calls = _providers(monkeypatch, cover, pd.DataFrame())
+    later_cover = pd.DataFrame({"grappe": [7, 2], "menage": [3, 8],
+                                "s00q01": ["poro", "gÔh"], "s00q04": ["Rural", "Urbain"]})
+    before, later_before = cover.copy(deep=True), later_cover.copy(deep=True)
+    calls = _providers(monkeypatch, cover, pd.DataFrame(), later_cover=later_cover)
     rec = derivation_records(COUNTRY)[KEY]
-    actual = call_inputs(rec)
-    expected = before[["s00q01", "s00q04"]].copy()
-    expected.index = pd.MultiIndex.from_tuples([(WAVE, "7003"), (WAVE, "2008")], names=["t", "i"])
+    later_rec = derivation_records(COUNTRY)[LATER_KEY]
+    actual = pd.concat([call_inputs(rec), call_inputs(later_rec)])
+    # Each wave's OWN cover, original names, and the labels AS THE FILE HAS THEM: the
+    # upper-casing is the served value's, not the inputs'.  Each key reads its own wave.
+    expected = pd.concat([before[["s00q01", "s00q04"]], later_before[["s00q01", "s00q04"]]],
+                         ignore_index=True)
+    expected.index = pd.MultiIndex.from_tuples(
+        [(WAVE, "7003"), (WAVE, "2008"), (LATER, "E2_7003"), (LATER, "E2_2008")], names=["t", "i"])
     pd.testing.assert_frame_equal(actual, expected)
     pd.testing.assert_frame_equal(cover, before)
-    assert calls == [COVER] and requested == [WAVE]
-    # Explicit out-of-scope requests are inherited provider failures; the
-    # registry alone does not enforce scope or invent a 2021 fallback.
-    with pytest.raises(KeyError, match="wave has no sample cover"):
-        call_inputs(rec, wave="2021-22")
-    assert requested == [WAVE, "2021-22"] and calls == [COVER]
+    assert calls == [COVER, LATER_COVER] and requested == [WAVE, LATER]
+    only = call_inputs(later_rec, wave=LATER)
+    assert only.index.get_level_values("i").tolist() == ["E2_7003", "E2_2008"]
+    assert requested == [WAVE, LATER, LATER] and calls == [COVER, LATER_COVER, LATER_COVER]
+    # The registered function re-derives the served value from those inputs.
+    got = [later_rec.resolve()(r, m) for r, m in zip(only["s00q01"], only["s00q04"])]
+    assert got == ["PORO Rural", "GÔH Urbain"]
+
+
+def _later_weights(grappes, menages):
+    return pd.DataFrame({"grappe": grappes, "menage": menages,
+                         "poids": [float(10 + k) for k in range(len(grappes))]})
+
+
+def test_2021_22_upper_cases_the_region_and_conserves_every_other_field(monkeypatch, make_wave):
+    later_cover = pd.DataFrame({
+        "grappe": [7, 2, 7, 4, 6], "menage": [3, 8, 1, 9, 2],
+        "s00q01": ["poro", "gÔh", "AUTONOME D'ABIDJAN", " poro ", pd.NA],
+        "s00q04": ["Rural", "Urbain", "Urbain", "Rural", "Rural"],
+    })
+    # The weights file is primary (merge_how: left): a cover-only household is not served.
+    weights = _later_weights([7, 2, 7, 4, 6], [3, 8, 1, 9, 2])
+    calls = _providers(monkeypatch, pd.DataFrame(), pd.DataFrame(),
+                       later_cover=later_cover, later_weights=weights)
+    old = make_wave(original=True, label=LATER).grab_data("sample")
+    new = make_wave(label=LATER).grab_data("sample")
+    assert calls == [LATER_WEIGHTS, LATER_COVER] * 2
+    pd.testing.assert_frame_equal(new.drop(columns=["strata", "Derivation"]),
+                                  old.drop(columns="strata"))
+    got = new["strata"].droplevel("t").to_dict()
+    assert pd.isna(got.pop("E2_6002"))  # a missing region: NA, never the milieu alone
+    assert got == {"E2_7003": "PORO Rural", "E2_2008": "GÔH Urbain",
+                   "E2_7001": "AUTONOME D'ABIDJAN Urbain", "E2_4009": "PORO Rural"}
+    # The region part is the same wave's Region, by the same formatter.
+    region = make_wave(label=LATER).formatting_functions["Region"]
+    assert {region(r) for r in ["poro", "gÔh"]} == {"PORO", "GÔH"}
+    assert (new["Derivation"].isna() == new["strata"].isna()).all()
+    assert (new.loc[new["strata"].notna(), "Derivation"] == LATER_KEY).all()
+
+
+@pytest.mark.parametrize("region,milieu", [
+    (pd.NA, "Rural"), ("poro", pd.NA), ("", "Rural"), ("poro", " \t "), ("  ", "Urbain"),
+])
+def test_2021_22_missing_or_blank_is_na(monkeypatch, make_wave, region, milieu):
+    later_cover = pd.DataFrame({"grappe": [2], "menage": [8], "s00q01": [region], "s00q04": [milieu]})
+    _providers(monkeypatch, pd.DataFrame(), pd.DataFrame(),
+               later_cover=later_cover, later_weights=_later_weights([2], [8]))
+    out = make_wave(label=LATER).grab_data("sample")
+    assert out["strata"].isna().all() and out["Derivation"].isna().all()
+
+
+@pytest.mark.parametrize("region,milieu,operand", [(3, "Rural", "region"), ("poro", 2, "milieu")])
+def test_2021_22_refuses_a_code(monkeypatch, make_wave, region, milieu, operand):
+    later_cover = pd.DataFrame({"grappe": [2], "menage": [8], "s00q01": [region], "s00q04": [milieu]})
+    _providers(monkeypatch, pd.DataFrame(), pd.DataFrame(),
+               later_cover=later_cover, later_weights=_later_weights([2], [8]))
+    with pytest.raises(ehcvm.StratumError, match=operand + ".*never from codes") as caught:
+        make_wave(label=LATER).grab_data("sample")
+    assert type(caught.value) is ehcvm.StratumError
+
+
+def test_2021_22_formatter_and_hook_are_the_shared_helpers():
+    module = _module(LATER_MODULE)
+    assert module._derive_region_milieu_stratum is ehcvm.derive_region_milieu_stratum
+    # F1 of the GH #1697 red team: this wave stamps its own key, whose function upper-cases
+    # the region and calls the shared helper, so the shared stamp (2018-19's key) is not used.
+    assert not hasattr(module, "_stamp_region_milieu_stratum")
+    assert module.KEY_STRATUM == LATER_KEY
+    rec = derivation_records(COUNTRY)[LATER_KEY]
+    assert rec.resolve() is module.derive_upper_region_milieu_stratum or (
+        rec.function == "lsms_library.countries.CotedIvoire.2021-22._.mapping:"
+                        "derive_upper_region_milieu_stratum")
+    assert rec.resolve()("gÔh", "Urbain") == "GÔH Urbain"
+    row = pd.Series(["gÔh", "Urbain"])
+    assert module.strata_label_upper_region(row) == "GÔH Urbain"
+    assert module.strata_label_upper_region(pd.Series(["poro", pd.NA])) is pd.NA
