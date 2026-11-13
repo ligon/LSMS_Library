@@ -453,6 +453,13 @@ def test_no_transformations_symbol_reaches_any_fingerprint():
     imports: ``transformations`` may be imported by build-path code (it is,
     for ``validate_acquisition_source``) as long as no kg-inference symbol is
     reachable from a tagged entry point.
+
+    It is a statement about ``build_transforms_fingerprint`` ONLY.  A country
+    whose ``_/*.py`` imports a kg-inference transform folds it through
+    ``framework_imports_fingerprint`` instead, and a kg edit re-warms that
+    whole country: GhanaLSS, Uganda and Ethiopia, whose ``nutrition.py``
+    scripts read the kilogram ladder at build time (GH #1509, "Make the
+    dependency visible"; ``test_gh1509_build_time_food_api_dependency.py``).
     """
     seen = set()
     for _qn, (fn, _tables) in sorted(R._BUILD_TRANSFORMS.items()):

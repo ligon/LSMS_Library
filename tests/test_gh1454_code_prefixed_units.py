@@ -12,7 +12,10 @@ So the parser's answer is pinned as a known defect rather than blessed: the
 xfail states the right answer and fails loudly once someone fixes the parser.  A
 fix was not made here because it moves every GhanaLSS L2 hash (22 of 22 tables,
 154 of 154 wave hashes, no other country, measured with a no-op body edit):
-``GhanaLSS/_/nutrition.py`` imports the transform.  What actually protects the
+``GhanaLSS/_/nutrition.py`` imports the transform.  (Since GH #1509's "Make the
+dependency visible", 2026-11-12, Uganda's and Ethiopia's ``nutrition.py`` import
+it too, so such a fix now re-warms those two countries as well.)  What actually
+protects the
 served numbers is the rule below, that every label the parser misreads is mapped
 away, and that the ladder really does receive the mapped label.
 """

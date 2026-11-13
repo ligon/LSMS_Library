@@ -410,7 +410,11 @@ def test_food_prices_tallies_the_money_only_passages_by_design(burkina):
         fp = burkina.food_prices(units='unitvalue')
     tally = fp.attrs['price_rows_dropped']
     assert tally['money_only'] == 139_798 + 136_913 + 128_416     # 405,127
-    assert tally['expected_gross'] - tally['expected'] == tally['money_only']
+    # GH #1068 (ruling @ligon 2026-11-12) adds the `unknown` bucket beside it:
+    # 178 priced passage-1 rows on u='Unknown', outside the money-only groups.
+    assert tally['expected_gross'] - tally['expected'] == (
+        tally['money_only'] + tally['unknown'] + tally['currency'])
+    assert tally['unknown'] == 178
     assert tally['lost_fraction'] < 0.2
     # The GH #591 class: the clipped zeros were the last of it (GH #864).
     assert tally['inf'] == P1_PURCHASED_ZERO_QUANTITY

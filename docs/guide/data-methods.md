@@ -103,7 +103,11 @@ units : {'kgvalue', 'kgprice', 'unitvalue', 'unitprice'}, optional
     Price basis.  Default ``'kgvalue'`` (Expenditure /
     Quantity_kg, currency per kg).  Other modes:
     ``'unitvalue'`` (Expenditure / Quantity, per native
-    u; gives 1 = Kwacha-per-Kwacha for u='Value' rows),
+    u; rows with u='Value' -- where it is the amount
+    over itself, 1.0 -- and with u='Unknown' are
+    dropped and counted in
+    ``attrs['price_rows_dropped']`` as ``currency`` and
+    ``unknown``, GH #1129 / #1068),
     ``'kgprice'`` (reported Price × kg_factor),
     ``'unitprice'`` (reported Price as-is).
     ``food_acquired.Price`` is whatever the source

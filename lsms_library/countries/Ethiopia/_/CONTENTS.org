@@ -5045,3 +5045,20 @@ repair is established by this packet. Exact authority tiers, missing export
 cards/component/factor operands and the residual proposal are in
 =.coder/ledger/824-ethiopia-sold-source-audit.md= and its private evidence.
 No native/header/document reparse, test/API/cache/provider or numeric run.
+
+* 2026-11-12 -- =nutrition.py= imports the transform behind =food_quantities()= (GH #1509)
+
+=nutrition.py= reads =eth.food_quantities()= through the Country API at build
+time, which =framework_imports_fingerprint= cannot see, so an edit to the food
+kilogram ladder (=transformations.food_kg_factors=) changed what the script
+would build and moved no Ethiopia cache hash.  Ruling @ligon 2026-11-12, "Make
+the dependency visible": the script now imports =food_quantities_from_acquired=
+and asserts that =Country._FOOD_DERIVED= still routes =food_quantities= through
+it.  Consequence, measured: every Ethiopia L2-country hash (25 of 25 tables) and
+L2-wave hash (125) moved once, and every later kg-factor logic edit re-warms
+Ethiopia cold (=tests/test_gh1509_build_time_food_api_dependency.py= pins it
+with a no-op probe).  Ethiopia's =nutrition= itself did not move under #1509:
+frame-equal base =e5fdd2fa8= -> =30523f946= (25,644 x 21), because its
+non-purchase =food_acquired= rows carry no =Expenditure=, so purchases-only
+evidence changes no Ethiopia factor.  The script's exec tests (GH #771) replace
+=ll.Country=; the assertion uses =lsms_library.country.Country= so they still run.

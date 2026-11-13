@@ -6108,3 +6108,41 @@ derivation/version remain needed. The #967 approval, container-mass caveats,
 This is source/document-only progress. No country table, native source/header,
 getter/provider, Make producer, tests, API/cache operation or new demand fit ran.
 No Preferred/Nutrition/Aggregate cell, FCT source note, value or default changed.
+
+* 2026-11-12 -- =nutrition.py= imports the transform behind =food_quantities()=; the #967 fixture entry moves (GH #1509)
+
+=nutrition.py= (both its =nutrition= and =fct= targets) reads
+=uga.food_quantities()= through the Country API at build time.
+=framework_imports_fingerprint= folds the closures of functions a country
+script imports, and =Country= is a class, so the kilogram ladder behind
+=food_quantities()= (=transformations.food_kg_factors=) was in no Uganda hash.
+Measured on a warm root: a =var/nutrition.parquet= built by base =e5fdd2fa8=,
+read by =0966d62ef= (whose ladder reads purchases only), was served as fresh in
+0.9 s with Energy 2,087,321,650 -- base's number, where that code's cold build
+gives 2,065,011,048 (red team on #1509, F3).  Ruling @ligon 2026-11-12, "Make the
+dependency visible": the script now imports =food_quantities_from_acquired= and
+asserts that =Country._FOOD_DERIVED= still routes =food_quantities= through it
+(=lsms_library.country.Country=, not =ll.Country=, so the GH #1062 exec tests,
+which replace =ll.Country=, still run).  Read by =30523f946=, the same warm
+copy grades stale, rebuilds (70 s) and serves 2,065,011,048.  Cost: every
+Uganda L2-country hash (28 tables) and L2-wave hash (224) moved once, and every
+later kg-factor logic edit re-warms Uganda cold.
+
+*What moved in =nutrition=* (cold, private roots, base =e5fdd2fa8= ->
+=30523f946=, 23,777 households either way): Energy -1.07% (2,087,321,650 ->
+2,065,011,048), Protein +0.40%; the values are the same under the
+"Item self-valued first" ladder order and the order before it, because no
+Uganda row has both an item-level non-purchase estimate and a purchase =unit=
+factor.  The cause is #1509's purchases-only evidence: 141,884 of 355,571
+=food_acquired= rows change kg factor (4,850 by more than 2x).
+
+*The #967 fixture entry no longer matches, and is NOT regenerated here.*
+=tests/test_uganda_invariance.py::test_parquet_matches_baseline[var/nutrition.parquet]=
+passes on base and fails on this branch: shape 23,777 x 15 unchanged,
+=content_hash= =e9fb4c67b2463694a2ec7b46ee5e6df1ef424db19753a74c2b82ad6a48a6a600=
+(measured on n4257, OpenBLAS kernel not recorded) against the approved
+=12d25f6e...= and its Haswell variant =f3d3c34d...=.  The #967 precedent above
+is that this entry moves only on an explicit maintainer approval of the
+specific two fields; the proposal is in the #1509 PR body.  A different BLAS
+kernel may give a second exact fingerprint (=content_hash_variants=, GH #1480
+ledger), which has not been measured for this frame.
