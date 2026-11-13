@@ -293,7 +293,9 @@ def test_new_parser_symbols_reach_no_build_fingerprint():
     ``build_transforms_fingerprint`` values.  (It DOES move every GhanaLSS
     L2-country and L2-wave hash, through ``GhanaLSS/_/nutrition.py``'s import
     of ``food_quantities_from_acquired`` and ``framework_imports_fingerprint``
-    -- a one-country re-warm, not a corpus one.)"""
+    -- a one-country re-warm, not a corpus one.  Since GH #1509's "Make the
+    dependency visible", 2026-11-12, Uganda's and Ethiopia's ``nutrition.py``
+    import it too, so the same edit today re-warms three countries.)"""
     from lsms_library import _build_registry as R
     seen = set()
     for _qn, (fn, _tables) in sorted(R._BUILD_TRANSFORMS.items()):
