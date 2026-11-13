@@ -1,5 +1,19 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: GH1509 ladder order and build-time Country-API dependencies -- ANSWERED
+Evidence: reports/framework-1509-redteam/VERDICT.md.
+- "Item self-valued first (Recommended)": for a (j,u) cell with NO purchase
+  evidence in any wave, the item-level self-valued rung (item_unit_nonpurchase)
+  ranks ABOVE the pooled-unit purchase rung (unit); then unit-level
+  self-valued; then none.  Cells with any purchase evidence are unaffected
+  (they never reach a self-valued rung).  GhanaLSS: ~79,773 rows / 290,479 kg
+  move from other foods' pooled purchase factor to their own item's factor.
+- "Make the dependency visible (Recommended)": Uganda's nutrition script (and
+  any other country script that calls the Country food API at build time)
+  imports the transform explicitly, so framework_imports_fingerprint folds the
+  kg-factor code into its hash.  One-time re-warm of those countries now, and
+  on later kg-factor edits.  Fixes warm Uganda nutrition serving stale values.
+
 * 2026-11-12: GH587 W1 division after red team -- ANSWERED (amends the W1 ruling)
 Evidence: reports/587-redteam/VERDICT.md F1/F2 (three references, each
 calibrated by N = 1 rows; within-item elasticity of Naira on N 0.46-0.47).
