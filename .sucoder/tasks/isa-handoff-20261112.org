@@ -161,3 +161,16 @@ reports/*/work/private, */data.
   from reports/release-v0.17.0/MERGE_PR_BODY.md (0 Closes lines needed per
   CLOSES.tsv; add any batch closures that need master to fire -- none: they
   are closed by hand); user publishes the GitHub Release v0.17.0.
+
+* Update, 2026-11-13 13:40Z -- batch merged; release PR open
+- #1711 MERGED as f138a3d61 (admin merge, user-approved: the required
+  pr-data-validation had passed on head 3ccfbcd0c, but a PR-body edit created a
+  newer workflow run without that job, leaving the check "Expected"; filed
+  #1714).  #1604 auto-marked merged.  Mirror/clone development = f138a3d61.
+- Post-merge issue close/narrow agent running -> reports/post-merge-issues/LOG.tsv.
+- Release notes final draft: reports/release-v0.17.0/RELEASE_NOTES.md (batch
+  section filled; pre-batch copy RELEASE_NOTES.prebatch.md).
+- #1715 development -> master opened (no closing keywords; all 55 issue numbers
+  named by commit keywords in range are already closed).  On green: merge;
+  then the user publishes GitHub Release v0.17.0 (tag on master) with the notes.
+- Lesson: never edit a PR's title/body after its data gate starts (#1714).
