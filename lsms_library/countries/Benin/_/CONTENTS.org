@@ -1552,3 +1552,18 @@ Two fixes in =2018-19/_/plot_inputs.py=, measured on the same cold builds as abo
   semences" (grappe 166, menage 133), has no =s16bq03b=; it was served =u= = =Manquant=, a label the
   survey never wrote (no raw label reads =Manquant=), and is now the canonical =Unknown=.  That row is
   the only index change; =nitrogen_kg= and =seed_kg= do not move (no unit, no kilograms either way).
+
+* 2026-11-13 -- integration: =served_strata= recorded (GH #1577)
+
+At the integration of the 2026-11-13 ISA batch the strata stream's proposed =served_strata= blocks
+were merged into =_/sampling.yml=: 2018-19 a new, =served_strata=-only entry; 2021-22 beside its
+=panel:= block (no duplicate wave key).  Both =constructed=, naming
+=Benin::sample::region-milieu-stratum=.  Measured cold at the integrated tree =fbed85bba= (burst job
+41283665): 2021-22 =sample()= serves a stratum on all 8,032 households with the key on every one,
+after the GH #1705 id walk (1,217 households keep their =E2_= id, =panel_weight= on 6,815).  Benin
+leaves =tests/test_sampling.py::SERVED_STRATA_PENDING=.  The option-25 key of 2021-22 =shocks= is on
+13 rows and =derivation_inputs= returns the same 13 =(t, i, Shock)= rows on the walked ids (coping red
+team F10; =tests/test_gh1562_coping_build.py::test_option_25_key_sits_on_its_rows_and_joins_its_inputs=).
+=shocks= at the integrated tree equals the coping head once that head's ids are mapped through the
+committed =_/updated_ids.json=; against the benin head it differs only in coping's 2018-19 positions
+(12,305 =HowCoped0= and 2,504 =HowCoped1= cells now NA) and the new =HowCopedSet= / =Derivation=.

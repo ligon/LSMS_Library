@@ -32,13 +32,14 @@ Sampling:
       holds: constructed
       derivation: 'Guinea-Bissau::sample::region-milieu-stratum'
       source_type: derived-from-data
-      confidence: medium
-      locator: '_/derivations.yml, Guinea-Bissau::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2021-22/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2021-22 wired", sample'
+      confidence: high
+      locator: '_/derivations.yml, Guinea-Bissau::sample::region-milieu-stratum (waves 2018-19, 2021-22), validated_against: a cold sample(), ISA integration 2026-11-13 (burst job 41283657), serves a stratum on all 5,351 households of 2021-22, 17 labels, with the key on every one and on no row without a stratum; 2021-22/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2021-22 wired", sample'
       note: |-
         Wired with the wave (GH #1697).  This file spells three regions otherwise
         than 2018-19 (Bafatá, Gabú, Bolama/Bijagós), folded by the `strata` table; the
         weights file's own `strate` (17 codes) is recorded in CONTENTS.org and not
-        served.
+        served.  Raised from medium to high at integration, on the measurement in
+        the locator (the strata red team's condition).
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: stable

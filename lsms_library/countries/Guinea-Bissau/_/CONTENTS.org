@@ -925,6 +925,8 @@ set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical co
   declared =optional: true= in =_/data_scheme.yml= and =HowCopedSet= is declared.  When 2021-22 is
   wired (it ranks strategies), that =optional:= becomes a one-wave silencing of the 2018-19 gap; revisit
   it then.
+  [2026-11-13, at integration of the ISA batch: done.  The positions are required again and 2018-19's
+  empty positions warn (Site B, 3 per-wave reports); see "2026-11-13 -- integration".]
 - *Codes 18-25 follow the PORTUGUESE questionnaire, not the release's variable labels* (coordinator
   default under the 2026-11-13 ruling; =derivations.BASES= puts questionnaire above variable-label).
   The release labels =s14q05__1..25= with the French template's first 25 options (18 = "Louer/mettre
@@ -1230,3 +1232,39 @@ base): =saco (25 kg)= is inferred at 0.0125 kg against its stated 25 kg; the sta
 
 =s07bq07a= is filled on every =Nunca= (23,204) and =Há mais de 30 dias= (11,458) row of 2018-19, with
 =s07bq08= empty there (Niger 2018-19's shape); 2021-22 has 10 and 7.
+
+* 2026-11-13 -- integration: the 2021-22 option-25 stamp, required positions, served_strata
+
+Done at the integration of the 2026-11-13 ISA batch, after the coping and gnb streams met (coping
+red team F5).  Measured cold in a private root at the integrated tree =fbed85bba= (burst job
+41283657), against each stream's own head (=b7e65b83e= gnb, job 41283658; =2ee44de32= coping, job
+41283659).
+
+- *Option 25 is stamped.*  2021-22's =s14bq05__25= carries the =nonoui= label set (=Oui= / =Non=)
+  where the other 25 options carry =Première / Deuxième / Troisième stratégie= or =Non= (value labels
+  read in burst job 41283564).  The hook now infers its slot with the shared
+  =ehcvm.derive_coping_autre_rank= and, where it sits beside a ranked strategy, stamps
+  =Guinea-Bissau::shocks::code25-rank-inferred= (=_/derivations.yml=, Benin's and Niger's entry;
+  ruling 2026-11-13, "Keep slot, registered").  34 rows choose option 25; the key is on *3*, the
+  coping red team's count.  =derivation_inputs= returns the same 3 =(t, i, Shock)= rows
+  (=tests/test_gh1562_coping_build.py::test_option_25_key_sits_on_its_rows_and_joins_its_inputs=).
+- *=HowCopedSet= is on every row* (9,487 in 2018-19 from the grid at build time, 4,417 in 2021-22
+  derived from the positions at read time).  The hook writes no set; the read-time rule fills it per
+  row where the build wrote none.  Positions are frame-equal to the gnb head; 2018-19 is frame-equal
+  to the coping head; the only new column is =Derivation= (NA on 2018-19).
+- *=HowCoped0..2= are required again* (=optional: true= removed).  2018-19's positions are present
+  and NA, so Site B files 3 per-wave =NullReadWarning= reports on a =shocks()= read (0 on either
+  stream head, where =optional:= silenced them); under =LSMS_READ_STRICT=1= Guinea-Bissau =shocks=
+  raises =NullReadError=, as Benin, Côte d'Ivoire, Mali, Senegal and Togo already do.  2021-22 fills
+  =HowCoped0= on 4,417 rows, =HowCoped1= 1,204, =HowCoped2= 234.
+- *=served_strata=* (GH #1577): the strata stream's proposed blocks are merged into =_/sampling.yml=
+  (2018-19 a new, =served_strata=-only entry; 2021-22 beside its =panel:= block, no duplicate wave
+  key).  Measured: the registered key sits on 5,351 of 5,351 rows with a stratum in each wave (17
+  labels each) and on none without, so 2021-22 is at =confidence: high=.  Guinea-Bissau leaves
+  =tests/test_sampling.py::SERVED_STRATA_PENDING=.
+- *=sample= covers 2021-22*, so the wave leaves =tests/test_sample.py::PARTIALLY_WIRED_SAMPLE=.
+- *Recall*: a 2021-22 row in =.coder/coverage/food_recall.csv= (7 days, one ask, basis
+  =variable-label=: =s07bq03a= "7B.03a. Qtité tot du [PRODUIT] conso par le MEN au cours des 7
+  derniers jours", read from the file), promoted into =_/recall.yml= by the generator.
+- *Cache:* =2021-22/_/mapping.py= and =_/data_scheme.yml= are build inputs; the integration's
+  census (task h of the batch) records what moved.

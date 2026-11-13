@@ -5106,3 +5106,22 @@ used to count "13,767 g/cl rows".  The held W3 C8 files, decoded by today's
 the build drops and the inputs return.  The 13,767 / 13,768 (and the "9,427 g
 / 4,341 cl" in =_c8_w3_size_text='s docstring) are not reproducible on these
 files and are recorded as superseded; the registry entry now says 11,170.
+
+* 2026-11-13 -- integration: the eight coping-stream cells get =correctly-empty= verdicts
+
+At the integration of the 2026-11-13 ISA batch, the eight cells the GH #1562 pins left =dropped=
+(=shocks= in 2010Q3 / 2012Q3 / 2015Q3 / 2018Q3; =assets= in 2011Q1 / 2013Q1 / 2016Q1 / 2019Q1) get
+=correctly-empty= rows in =.coder/coverage/absent_verdicts.csv=, each with D1 (what the release ships,
+and that the table is served once per wave), D2 and C4 (each round's own household questionnaire,
+read with pypdf in burst jobs 41283564 / 41283635: no post-planting questionnaire has a shocks
+section; W3's post-harvest contents say "7 HOUSEHOLD ASSETS MOVED TO PP" and W4's list none).
+
+*W1 / W2 post-harvest =assets= is a judgement call, flagged.*  Section 7 of both post-harvest rounds,
+"Household Assets Sale and Acquisition" (=sect7_harvestw1= / =_w2=), records items sold and items
+bought or received since post-planting beside the post-planting count (=s7x= "owned in post
+planting"; =s7= "THE NUMBER OWNED BY HOUSEHOLD AT THE TIME OF POST PLANTING INTERVIEW").  It asks no
+holding at post-harvest, but a post-harvest holding (count less sold plus acquired) is computable in
+principle, which would make the cells =empty-pending-machinery= instead.  Closed as =correctly-empty= on
+the batch brief; the maintainer may reclassify.  Measured at the integrated tree (job 41283638):
+=shocks= rows by quarter 2011Q1 2,202, 2013Q1 2,882, 2016Q1 2,323, 2019Q1 3,870 (none at post-planting);
+=assets= 2010Q3 38,947, 2012Q3 161,125, 2015Q3 188,229, 2018Q3 44,358 (none at post-harvest).
