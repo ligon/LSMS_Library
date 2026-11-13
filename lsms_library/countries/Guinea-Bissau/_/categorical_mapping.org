@@ -242,6 +242,79 @@ only, no cache hash moves" is wrong on that point.
 |   10 | Guinea Fowl     |
 |   11 | Other Poultry   |
 
+* plot_inputs labels (GH #1107, #1119; 2026-11-13)
+
+# harmonize_input -- s16bq01 input-type label -> canonical input identity,
+# read by 2018-19/_/plot_inputs.py.  Only the three INORGANIC labels with a
+# product named are mapped, on Togo's rows (Togo/_/categorical_mapping.org):
+# ureia -> Urea, fosfatos -> Phosphate, NPK/Formula unica -> NPK.  The
+# instrument prints no NPK grade, so the generic `npk` share applies, as for
+# Togo's `NPK/Formule unique`.
+#
+# NOT mapped, deliberately:
+# - `DAP e outros adubos inorganicos` (code 6, 41 applied rows), a mixed
+#   bucket.  #1107: "until [#1696] is made, leave this label unmatched rather
+#   than mapping it to DAP".  It passes through raw and nitrogen_kg names it.
+# - the organic labels (codes 1-2): refused a share by the #867 ruling, and
+#   named by nitrogen_kg whatever they are called.
+# - the phytosanitary and seed labels (codes 7-20): their raw Portuguese
+#   label is kept.  #1119's acceptance is that only the crop axis changes, so
+#   seed rows are not relabelled `Seed` here, and seed_kg (input == 'Seed')
+#   reads no Guinea-Bissau row before or after.  That is an open question.
+#
+# harmonize_seed_crop -- seed-type label (s16bq01 codes 11-20) -> the seed's
+# crop, spelled as crop_production serves it (this file's harmonize_food
+# Preferred Label of the s16cq04 crop), so a seed row carries the crop a
+# grown crop does.  The residual slots take Togo's own labels (`Autre
+# cereale`, `Autre tubercule`, `Autre crop`).  Injective over the labels the
+# file holds; and since `input` stays the raw, per-code label, the
+# (t, i, input, crop, u) index cannot collide through this table anyway.
+# `Sementes de  milho preto` carries a double space in the source; the
+# script folds whitespace before the lookup.
+
+#+NAME: harmonize_input
+| Original Label                          | Preferred Label |
+|-----------------------------------------+-----------------|
+| Adubos inorgânicos - ureia              | Urea            |
+| Adubos inorgânicos - fosfatos           | Phosphate       |
+| Adubos inorgânicos - NPK/Fórmula única  | NPK             |
+
+#+NAME: harmonize_seed_crop
+| Original Label                       | Preferred Label     |
+|--------------------------------------+---------------------|
+| Sementes de milho preto              | Mil                 |
+| Sementes de milho cavalo             | Sorgho              |
+| Sementes de milho bacil              | Maïs en grain       |
+| Sementes de arroz                    | Riz Paddy           |
+| Outros Sementes de cereais           | Autre céréale       |
+| Sementes de algodão                  | Coton               |
+| Sementes de sésamo                   | Sésame              |
+| Sementes de feijão                   | Niébé/Haricots secs |
+| Plantas, cordas/caules de tuberculos | Autre tubercule     |
+| Outras sementes                      | Autre crop          |
+
+* Unit masses (GH #1107; 2026-11-13)
+
+# u_kg -- declared kilograms of a canonical unit, row-unioned with the global
+# lsms_library/categorical_mapping/u.org `u_kg` (Quintal).  plot_inputs' s16b
+# unit card is `1 Grama, 2 Quilograma, 3 Tonelada, 4 Litro, 5 Carroca,
+# 6 Outras`: Portuguese spellings that transformations.KNOWN_METRIC does not
+# know, so before this the 3,496 Quilograma and 144 Grama applied rows had no
+# mass and nitrogen_kg / seed_kg could not convert them.  Declared here, under
+# the label the file uses, rather than relabelled `Kg` through the `u` table:
+# no served label changes, and `Grama` has no cross-country canonical spelling
+# (categorical_mapping/u.org leaves gram's form undecided).  Country._unit_kg_factors
+# hands this to the crop/input ladders (attrs['unit_kg']) and to the food
+# ladder.  No 2018-19 crop_production or food_acquired unit carries either
+# label (crop uses `Kg`).  `Tonelada` (16 rows) and `Litro` (600) are left out:
+# #1107 names only these two.
+
+#+name: u_kg
+| Unit       |    Kg |
+|------------+-------|
+| Quilograma |     1 |
+| Grama      | 0.001 |
+
 * Food / Crop Labels (the j and crop axes)
 
 # harmonize_food (EHCVM label foundation, finalized 2026-06-15 from the
@@ -253,6 +326,15 @@ only, no cache hash moves" is wrong on that point.
 # Rows whose draft Preferred Label was blank (undecodable bare numeric
 # codes / unresolved items) are DROPPED so those Original Labels pass
 # through raw instead of mapping to ''.
+#
+# GH #1539 (2026-11-13): `Djagatu` (s16cq04 code 31; s07bq01 / s05q01 code
+# 145) and `Beringela` (s16cq04 code 32) both used to map to `Aubergine,`,
+# trailing comma included, so crop_production repeated its key and the
+# collapse destroyed real harvests.  Djagatu is the bitter tomato / African
+# eggplant (Solanum aethiopicum) that Niger, Mali and Cote d'Ivoire serve as
+# `Jaxatu`; Beringela is the aubergine, served `Aubergine` as in Niger, Mali,
+# Burkina and Senegal.  The Djagatu row is shared by food_acquired.j and
+# community_prices.j, so those rows move to `Jaxatu` too.
 
 #+NAME: harmonize_food
 | Original Label                                                 | Preferred Label                                                                      |
@@ -304,7 +386,7 @@ only, no cache hash moves" is wrong on that point.
 | Conservas de peixe                                             | Conserves de poisson                                                                 |
 | Croissants                                                     | Croissants                                                                           |
 | Cubos de caldo (Maggi, Jumbo)                                  | Cube alimentaire (Maggi, Jumbo, )                                                    |
-| Djagatu                                                        | Aubergine,                                                                           |
+| Djagatu                                                        | Jaxatu                                                                               |
 | Donetes/panguetes, panquecas                                   | Beignets, galettes                                                                   |
 | Ervilhas                                                       | Petits pois                                                                          |
 | Ervilhas secas                                                 | Petit pois secs                                                                      |
@@ -394,7 +476,7 @@ only, no cache hash moves" is wrong on that point.
 | Arroz Mpampam                                                  | Riz du Niger                                                                         |
 | Arroz paddy                                                    | Riz Paddy                                                                            |
 | Badjiqui                                                       | Feuilles d'oseille                                                                   |
-| Beringela                                                      | Aubergine,                                                                           |
+| Beringela                                                      | Aubergine                                                                            |
 | Beterraba                                                      | Betterave                                                                            |
 | Cajueiro                                                       | Noix de cajou                                                                        |
 | Cana-de-açucar                                                 | Canne à sucre                                                                        |
