@@ -90,9 +90,11 @@ def test_semovita_is_served_and_the_w2_sentinel_held():
     tab = _harmonize_food()
     row = tab[tab['Preferred Label'].astype(str).str.strip().eq('Semovita')]
     assert len(row) == 1
-    assert str(row['Code'].iloc[0]).strip() in ('', 'nan', '<NA>', 'None')   # label-only
+    code = row['Code'].iloc[0]
+    assert pd.isna(code) or str(code).strip() == ''                         # label-only
     assert row['Aggregate Label'].iloc[0] == SEMOVITA_AGGREGATE
-    code15 = tab[tab['Code'].astype(str).str.strip().eq('15')]
+    code15 = tab[pd.to_numeric(tab['Code'], errors='coerce').eq(15)]
+    assert len(code15) == 1
     assert code15['2012Q3'].iloc[0] == 'Semovita'
     assert code15['Preferred Label'].iloc[0] == 'Bread'        # W1's code 15
     # the wave-blind Code contract is unchanged; only the quarter resolver moves
@@ -162,7 +164,7 @@ def test_the_w1_pp_unit_tokens_are_registered_u_labels_no_decode_reads():
     waves = [c for c in tab.columns if c not in ('Code', 'Preferred Label')]
     for code, label in (('1020', 'Congo/Mudu'), ('1021', 'ml'), ('1022', 'Tomatoes cup')):
         assert tab.loc[code, 'Preferred Label'] == label
-        assert (tab.loc[code, waves].astype(str).str.strip() == '---').all()
+        assert tab.loc[code, waves].isna().all()          # '---' in every wave column
         assert (tab['Preferred Label'] == label).sum() == 1
     assert 'Unknown' not in set(tab['Preferred Label'])
     for t in ('2010Q3', '2011Q1', '2012Q3', '2013Q1', '2015Q3', '2016Q1', '2018Q3', '2019Q1'):
