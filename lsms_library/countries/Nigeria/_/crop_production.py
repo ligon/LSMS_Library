@@ -178,18 +178,21 @@ pieces.append(crop_production_for_wave(t, [dict(
 
 # ----------------------------- W3 2015-16 -----------------------------
 # secta3i: annual plot-crop harvest.  Sold/value are hh-crop grain (secta3ii);
-# hh_sales places them per the GH #843 ruling.
+# hh_sales places them per the GH #843 ruling.  GH #1518: the shipped
+# ag_conv_w3.dta gives the line's Quantity_kg on its native (crop, sized unit,
+# zone) key (nigeria.crop_conversion_table; never a KgFactor).
 t = PH_QUARTER['2015-16']
 f = '../2015-16/Data/secta3i_harvestw3.dta'
 raw = get_dataframe(f, convert_categoricals=False)
 dec = get_dataframe(f, convert_categoricals=True)
+ag_conv = get_dataframe('../2015-16/Data/ag_conv_w3.dta', convert_categoricals=False)
 inter = _align_intercropped(
     raw, 'hhid', 'plotid', 'cropcode',
     '../2015-16/Data/sect11f_plantingw3.dta')
 pieces.append(crop_production_for_wave(t, [dict(
     df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode', line='cropid',
     qty='sa3iq6i', unit='sa3iq6ii', value_harvested='sa3iq6a',
-    harv_m='sa3iq6c1', harv_y='sa3iq6c2',
+    harv_m='sa3iq6c1', harv_y='sa3iq6c2', conversion=ag_conv, zone='zone',
     intercropped=inter, perennial=False)], crop_labels,
     hh_sales=hh_crop_sale_records('2015-16', crop_labels)))
 

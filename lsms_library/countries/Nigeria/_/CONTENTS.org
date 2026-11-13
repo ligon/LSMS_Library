@@ -4108,7 +4108,7 @@ Pepper=); if so, map it to the Fresh Pepper Aggregate.
 | =crop_production= | any | 0 | | |
 
 The served counts per round and source (=s=) equal the raw trace exactly
-(10,446 food rows: 8,930 purchased, 1,101 produced, 295 in kind).  The PP
+(10,446 food rows: 9,050 purchased, 1,101 produced, 295 in kind).  The PP
 community shortfall is the GH #587 holds, not other codes.  No other code
 decodes to =Pepper= in any route: the PH quarter maps of 2011Q1 / 2013Q1 /
 2016Q1 / 2019Q1 also list crop code 2140 (its quarter cells say =Pepper=), but

@@ -539,8 +539,8 @@ def pp_dispositions(raw, source_key):
     # W3 kg/l and W5 g/cl"): W3's c2q2b is free text and blank on every
     # metric-unit row (0 parse); its Kg / l measure as per-kilogram /
     # per-litre prices (1.07x / 1.00x the household unit value) and are
-    # SERVED as recorded -- unlike PH W3, which still drops its Kg / l for
-    # the same blank field.  g / cl with no size stay held in W2 and W3
+    # SERVED as recorded -- as PH W3's are since GH #587's "Measure PH, then
+    # align" (2026-11-13), on the same evidence.  g / cl with no size stay held in W2 and W3
     # (package prices: W3 150x / 57x; W2 g 2.2x, mixed).  W5 g / cl are
     # divided by c2q2a where it is recorded (below), held where it is not.
     # W4 records no g/cl unit.  '99. ONE SIZE ONLY' is the questionnaire's
