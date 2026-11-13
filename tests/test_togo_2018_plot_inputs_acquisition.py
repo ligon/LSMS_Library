@@ -119,6 +119,6 @@ class TestServed:
 
     def test_a_missing_unit_is_unknown_not_manquant(self, served, raw):
         kept, _ = raw
-        u = served.index.get_level_values('u')
-        assert (u == 'Manquant').sum() == 0
-        assert (u == 'Unknown').sum() == kept['s16bq03b'].isna().sum() == 9
+        u = pd.Series(served.index.get_level_values('u'), dtype=object)
+        assert int((u == 'Manquant').sum()) == 0
+        assert int((u == 'Unknown').sum()) == int(kept['s16bq03b'].isna().sum()) == 9

@@ -8,6 +8,7 @@ the second builds the real table (``requires_s3``) and counts against the
 import ast
 import warnings
 
+import pandas as pd
 import pytest
 
 import lsms_library as ll
@@ -31,8 +32,8 @@ def test_served_missing_units_are_unknown():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         served = ll.Country('CotedIvoire').plot_inputs()
-    u = served.index.get_level_values('u')
-    t = served.index.get_level_values('t')
+    u = pd.Series(served.index.get_level_values('u'), dtype=object)
+    t = pd.Series(served.index.get_level_values('t'), dtype=object)
     assert (u == 'Manquant').sum() == 0
     for wave, rel in CELLS.items():
         codes = get_dataframe(ROOT / wave / rel, convert_categoricals=False)
