@@ -349,4 +349,7 @@ def test_all_other_mapping_symbols_and_imports_keep_the_base_ast():
     # `_shared_food_acquired_with_unit_weights` and wrapped by a module-level
     # `_food_acquired_with_unit_weights` plus the near-zero helpers; `food_acquired`
     # itself is unchanged.
-    assert hashlib.sha256(normal.encode()).hexdigest() == 'da0f54bd5fec7d825c56b02d437cd0cdea1422f79de4f424b3968aba580c8834'
+    # Re-pinned 2026-11-13 for GH #1562: the `shocks` hook now writes HowCopedSet
+    # from the s14q05__N grid (`ehcvm.coping_set_from_grid`, imported as
+    # `_coping_set_from_grid`) and HowCoped0..2 NA; no food hook changed.
+    assert hashlib.sha256(normal.encode()).hexdigest() == '8e8141f0d5df304fc6ec4797b410d5ee9b7f62495647eeb4bdcd76f3942d54ab'
