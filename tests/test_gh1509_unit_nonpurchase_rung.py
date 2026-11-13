@@ -1,16 +1,19 @@
 """The second, unit-level non-purchase rung of GH #1509: ``unit_nonpurchase``.
 
-Ruling by @ligon, 2026-11-12 ("Add a unit-level rung").  Below the item-level
-fallback ``item_unit_nonpurchase`` sits a separately labelled rung, pooled
-across items per unit: the non-purchase twin of the purchase ``unit`` rung.
-It serves a row under the same condition as the item fallback -- the row's own
-``(j, u)`` cell has no priced purchase in any wave -- and only where no rung
-above serves it.
+Ruling by @ligon, 2026-11-12 ("Add a unit-level rung").  A separately
+labelled rung, pooled across items per unit: the non-purchase twin of the
+purchase ``unit`` rung.  It serves a row under the same condition as the item
+fallback ``item_unit_nonpurchase`` -- the row's own ``(j, u)`` cell has no
+priced purchase in any wave -- and only where no rung above serves it.  Since
+"Item self-valued first" (@ligon, 2026-11-12) the order for such a cell is
+``item_unit_nonpurchase``, then the purchase ``unit``, then this rung, then
+``none``.
 
 What these tests pin:
 
-- its place in the ladder, and that it is labelled and counted (the partition
-  sums, and ``attrs['kg_factor_evidence']['fallback']['unit_rung']`` agrees);
+- its place in the ladder, directly below ``unit`` and directly above
+  ``none``, and that it is labelled and counted (the partition sums, and
+  ``attrs['kg_factor_evidence']['fallback']['unit_rung']`` agrees);
 - it serves only no-purchase cells the item rungs could not serve, pooling the
   non-purchase rows of every item sharing the label;
 - a cell with any purchase evidence never reaches it, even where the purchase
@@ -96,7 +99,10 @@ def factors(rows, **kw):
     assert fb['rows_served'] == counts[NP]
     assert fb['unit_rung']['layer'] == UNP
     assert fb['unit_rung']['rows_served'] == counts[UNP]
-    assert fb['rows_refused_spread'] == (fb['refused_spread_to_unit_nonpurchase']
+    # Three terms since "Item self-valued first" put ``unit`` below the item
+    # fallback (see test_gh1509_nonpurchase_fallback.py).
+    assert fb['rows_refused_spread'] == (fb['refused_spread_to_unit']
+                                         + fb['refused_spread_to_unit_nonpurchase']
                                          + fb['refused_spread_to_none'])
     assert sum(fb['none_by_reason'].values()) == counts['none']
     pool = f.attrs['kg_factor_size_pool']
@@ -114,15 +120,18 @@ def cell(f, j, u):
 # The ladder
 # ---------------------------------------------------------------------------
 
-def test_the_rung_sits_between_the_item_fallback_and_none():
-    # Pinned 2026-11-12 ("Add a unit-level rung"): the second non-purchase rung
-    # goes directly below the first and directly above none.
+def test_the_rung_sits_between_unit_and_none():
+    # Pinned 2026-11-12 ("Add a unit-level rung"): directly above none.
+    # Moved the same day ("Item self-valued first"): the item fallback now
+    # ranks above the purchase ``unit`` rung, so this rung's neighbour above
+    # is ``unit``, not the item fallback, and the old ``unit < NP`` pin is
+    # reversed.
     layers = FOOD_KG_FACTOR_LAYERS
     assert UNP == 'unit_nonpurchase'
     assert FOOD_KG_NONPURCHASE_LAYERS == (NP, UNP)
-    assert layers.index(UNP) == layers.index(NP) + 1
+    assert layers.index(UNP) == layers.index('unit') + 1
     assert layers.index('none') == layers.index(UNP) + 1
-    assert layers.index('unit') < layers.index(NP)
+    assert layers.index('item_unit_tight') < layers.index(NP) < layers.index('unit')
 
 
 # ---------------------------------------------------------------------------
@@ -363,6 +372,7 @@ def test_the_item_fallbacks_dispersion_gate_refusal_lands_on_it():
     assert heap['kg_per_unit'].to_numpy() == pytest.approx(np.full(10, expected))
     fb = f.attrs['kg_factor_evidence']['fallback']
     assert fb['rows_refused_spread'] == 10
+    assert fb['refused_spread_to_unit'] == 0       # no purchase of a Heap
     assert fb['refused_spread_to_unit_nonpurchase'] == 10
     assert fb['refused_spread_to_none'] == 0
     # The purchase gate's ledger is about purchase baselines only.

@@ -8,7 +8,11 @@ those rows are visibly weaker evidence.
 
 What these tests pin:
 
-- the rung's place in the ladder: below every purchase rung, above ``none``;
+- the rung's place in the ladder (@ligon 2026-11-12, "Item self-valued
+  first"): below the purchase item rungs, ABOVE the u-pooled purchase rung
+  ``unit``, then ``unit_nonpurchase``, then ``none``.  The purchase item rungs
+  never compete with it (they need purchases in the cell, it needs none);
+  against ``unit`` it wins;
 - a cell with ANY purchase evidence never reads it, even when that evidence
   fails a floor or the dispersion gate, and "any" means any wave and, for an
   unsized label, its size-pooled family;
@@ -91,9 +95,16 @@ def factors(rows, **kw):
     assert fb['rows_served'] == counts[NP]
     assert fb['unit_rung']['layer'] == UNP
     assert fb['unit_rung']['rows_served'] == counts[UNP]
-    assert fb['rows_refused_spread'] == (fb['refused_spread_to_unit_nonpurchase']
+    # "Item self-valued first" put ``unit`` below the item fallback, so a row
+    # its dispersion gate refuses can land there too: a third term.
+    assert fb['rows_refused_spread'] == (fb['refused_spread_to_unit']
+                                         + fb['refused_spread_to_unit_nonpurchase']
                                          + fb['refused_spread_to_none'])
     assert sum(fb['none_by_reason'].values()) == counts['none']
+    # The purchase item rungs and the item fallback never both hold a factor
+    # for one row: the first needs purchases in the cell, the second none.
+    assert not (f['kg_item_unit'].notna()
+                & f['kg_item_unit_nonpurchase'].notna()).any()
     return df, f
 
 
@@ -109,11 +120,14 @@ def rows_of(f, u, s=None):
 # ---------------------------------------------------------------------------
 
 def test_the_layer_tuple_and_the_rungs_place_in_it():
-    # Moved 2026-11-12: "Add a unit-level rung" puts unit_nonpurchase below
-    # item_unit_nonpurchase and above none.
+    # Moved 2026-11-12, twice.  "Add a unit-level rung" added
+    # unit_nonpurchase above none.  Then "Item self-valued first" (@ligon,
+    # after the red team showed the order had been an implementation choice)
+    # moved item_unit_nonpurchase ABOVE the u-pooled purchase rung ``unit``;
+    # unit_nonpurchase stays below ``unit``.
     assert FOOD_KG_FACTOR_LAYERS == (
-        'survey_kg', 'metric', 'item_unit', 'item_unit_tight', 'unit',
-        'item_unit_nonpurchase', 'unit_nonpurchase', 'none')
+        'survey_kg', 'metric', 'item_unit', 'item_unit_tight',
+        'item_unit_nonpurchase', 'unit', 'unit_nonpurchase', 'none')
     assert NP == 'item_unit_nonpurchase'
 
 
@@ -148,27 +162,71 @@ def test_a_cell_without_purchases_reads_the_fallback_and_is_labelled(s):
     assert ev['priced_rows_excluded'] == {s: 40}
 
 
-def test_a_purchase_unit_rung_outranks_the_fallback():
-    """Below EVERY purchase rung, ``unit`` included."""
+def test_the_fallback_outranks_a_purchase_unit_rung():
+    """Above the u-pooled purchase rung (@ligon 2026-11-12, "Item self-valued
+    first").
+
+    Moved 2026-11-12: this test was ``test_a_purchase_unit_rung_outranks_the_
+    fallback`` and pinned the opposite order, which the red team showed was an
+    implementation choice no ruling had made; the maintainer then ruled that
+    a cell's own item, valued by the household, beats a label factor pooled
+    over other items' purchases.
+    """
     rows = own()
     # Cassava purchases price a Heap at twice a kg, household by household, so
-    # the u-pooled purchase rung serves every Heap row at 2.0 kg.
+    # the u-pooled purchase rung has a factor of 2.0 kg for the label.
     for k in range(10):
         rows += [('2020', f'c{k}', 'cassava', 'kg', 'purchased', 1, 50),
                  ('2020', f'c{k}', 'cassava', 'Heap', 'purchased', 1, 100)]
     _, f = factors(rows)
     yam = f[f.index.get_level_values('j') == 'yam'].xs('Heap', level='u')
-    assert set(yam['KgFactorSource']) == {'unit'}
-    assert yam['kg_per_unit'].to_numpy() == pytest.approx(np.full(20, 2.0))
+    assert set(yam['KgFactorSource']) == {NP}
+    assert yam['kg_per_unit'].to_numpy() == pytest.approx(np.full(20, 3.0))
     # The candidates are still there, beside the rung that won.
-    assert yam['kg_item_unit_nonpurchase'].to_numpy() == \
-        pytest.approx(np.full(20, 3.0))
+    assert yam['kg_unit'].to_numpy() == pytest.approx(np.full(20, 2.0))
     assert yam['kg_unit_nonpurchase'].to_numpy() == \
         pytest.approx(np.full(20, 3.0))
+    # Cassava's cell has purchases: it keeps its purchase item rung.
     cassava = f[f.index.get_level_values('j') == 'cassava'].xs('Heap', level='u')
     assert set(cassava['KgFactorSource']) == {'item_unit'}
-    assert f.attrs['kg_factor_sources'][NP] == 0
+    assert f.attrs['kg_factor_sources'][NP] == 20
+    assert f.attrs['kg_factor_sources']['unit'] == 0
     assert f.attrs['kg_factor_sources'][UNP] == 0
+    # Without the item fallback's estimate (two kg households, below
+    # min_baseline) the same yam rows fall to the purchase ``unit`` rung, not
+    # to the unit-level fallback, which ``unit`` outranks.
+    _, g = factors(own(kg_hh=2) + rows[len(own()):])
+    yam = g[g.index.get_level_values('j') == 'yam'].xs('Heap', level='u')
+    assert yam['kg_item_unit_nonpurchase'].isna().all()
+    assert set(yam['KgFactorSource']) == {'unit'}
+    assert yam['kg_per_unit'].to_numpy() == pytest.approx(np.full(20, 2.0))
+
+
+def test_the_dispersion_gates_refusal_falls_to_a_purchase_unit_factor():
+    """Refused by its own dispersion gate, the item fallback's row falls to
+    ``unit`` where the label has a purchase factor, and the ledger counts it
+    under ``refused_spread_to_unit`` (the term "Item self-valued first" added:
+    the gate cost the row its own item's factor)."""
+    rows = [('2020', f'h{k}', 'yam', 'kg', 'produced', 1, 10 ** (k / 3))
+            for k in range(10)]
+    rows += [('2020', f'g{k}', 'yam', 'Heap', 'produced', 1, 300)
+             for k in range(20)]
+    for k in range(10):
+        rows += [('2020', f'c{k}', 'cassava', 'kg', 'purchased', 1, 50),
+                 ('2020', f'c{k}', 'cassava', 'Heap', 'purchased', 1, 100)]
+    rows += _control('produced')
+    _, f = factors(rows)
+    heap = f[f.index.get_level_values('j') == 'yam'].xs('Heap', level='u')
+    assert heap['kg_item_unit_nonpurchase'].isna().all()
+    assert set(heap['KgFactorSource']) == {'unit'}
+    assert heap['kg_per_unit'].to_numpy() == pytest.approx(np.full(20, 2.0))
+    fb = f.attrs['kg_factor_evidence']['fallback']
+    assert fb['rows_refused_spread'] == 20
+    assert fb['refused_spread_to_unit'] == 20
+    assert fb['refused_spread_to_unit_nonpurchase'] == 0
+    assert fb['refused_spread_to_none'] == 0
+    # The purchase gate's ledger is about purchase baselines only.
+    assert f.attrs['kg_factor_baseline_gate']['rows_refused'] == 0
 
 
 def test_the_fallback_ratio_is_self_valued_on_both_sides():
@@ -386,6 +444,7 @@ def test_the_dispersion_gate_refuses_a_nonpurchase_baseline():
     # The Heap households report no kg, so no household ratio exists for the
     # unit-level rung either: they stay none.
     assert fb['refused_spread_to_none'] == 20
+    assert fb['refused_spread_to_unit'] == 0       # no purchase of a Heap
     assert fb['refused_spread_to_unit_nonpurchase'] == 0
     assert fb['none_by_reason']['no_estimate'] == 20
     # The purchase rungs' gate ledger is about purchase baselines only.

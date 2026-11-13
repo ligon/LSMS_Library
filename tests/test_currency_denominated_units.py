@@ -414,7 +414,8 @@ def test_drop_unpriceable_unitvalue_drops_currency_by_label():
 
 #: Measured on `development` @ 30c06c56 with Step 1 applied (2026-09-05).
 #: The GhanaLSS all-wave counts in
-#: ``test_ghanalss_unitvalue_and_units_modes_are_unaffected`` were RE-DERIVED
+#: ``test_ghanalss_native_unit_modes_read_no_kg_factor`` (then named
+#: ``..._unitvalue_and_units_modes_are_unaffected``) were RE-DERIVED
 #: cold on 2026-09-07 after merging `development` @ 96e051c5: #785
 #: canonicalised GhanaLSS ``food_acquired.j`` (5,259,320 rows cold) and every
 #: table pinned here groups on ``j``.  Private ``LSMS_DATA_DIR``, no wave
@@ -588,8 +589,13 @@ def test_ghanalss_food_prices_are_not_a_made_up_constant():
 
 @pytest.mark.requires_s3
 @pytest.mark.slow
-def test_ghanalss_unitvalue_and_units_modes_are_unaffected():
+def test_ghanalss_native_unit_modes_read_no_kg_factor():
     """Only the kg-denominated modes touch the factor map.
+
+    Renamed 2026-11-12 (was ``..._unitvalue_and_units_modes_are_unaffected``):
+    GH #1129 / #1068 moved two of the three counts below by dropping rows by
+    label, so "unaffected" no longer described the assertions (red team on
+    #1509, F8).  What it pins is unchanged: no kg factor reaches these modes.
 
     That premise is intact -- the kg factor map still does not reach these
     modes.  ``unitvalue`` moved for an unrelated reason: it is
