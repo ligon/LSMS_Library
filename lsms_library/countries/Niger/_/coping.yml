@@ -1,0 +1,39 @@
+# Coping-strategy label classes for the read-time rules of GH #1562
+# (lsms_library/coping.py), applied in Country._finalize_result on every
+# shocks read.  Not a build input: editing this file moves no cache hash.
+#
+#   filler       a slot filler, terminator or missing code: served NA in its
+#                HowCoped<n> position and never a member of HowCopedSet
+#                (ruling 2026-11-13, "NA in positions, not in set").
+#   did_nothing  an explicit "did nothing" answer: kept in its position as
+#                recorded; a HowCopedSet member only when it is the only
+#                answer, dropped from the set beside a real strategy
+#                (ruling 2026-11-13, "Member only when alone").
+#
+# A label matches the SERVED string exactly.  `waves` (served t values)
+# scopes an entry; without it the entry applies to every wave.  `evidence`
+# is required.  Counts are from the GH #1562 audit
+# (burst/isa-sm-20261113/reports/1562-coping-audit, base f138a3d61).
+
+filler:
+  - label: Manquant
+    waves: ['2014-15']
+    evidence: >-
+      Code 99 of MS10Q05A/B/C, labelled "Manquant" (missing), 207 served
+      cells.  Named by the ruling.
+  - label: '99.0'
+    waves: ['2011-12']
+    evidence: >-
+      Code 99 of ms11q05a/b/c with no value label, served as '99.0' on 317
+      cells; 2014-15 labels the same code "Manquant".  Named by the ruling.
+
+did_nothing:
+  - label: Nothing
+    waves: ['2011-12']
+    evidence: >-
+      ms11q05a/b/c code 24 (English release), filling later slots after a
+      strategy (audit, per-wave instrument notes).
+  - label: Aucune stratégie
+    evidence: >-
+      MS10Q05A/B/C (2014-15) value label and option 26 of s14q05 (2018-19)
+      and s14bq05 (2021-22).

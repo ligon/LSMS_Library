@@ -691,10 +691,95 @@ Columns:
         instrument does not ask the question; do not substitute purchases.
     HowCoped0:
       type: str
+      note: |
+        The coping strategy the household reported FIRST for this shock
+        (ruling 2026-11-12, "Coping-strategy contract, GH1562": positions are
+        the household's REPORTED order).  Filled only where the instrument
+        records an order: a 1st/2nd/3rd battery (Uganda s16q04a/b/c, Malawi
+        hh_u04a/b/c, ...) or an explicit rank per option (EHCVM 2021-22
+        s14bq05__N).  NA where the instrument records WHICH strategies but not
+        their order -- EHCVM 2018-19 (the s14q05__N grid) and Nigeria 2018-19
+        (s15aq7_*, "SELECT ALL THAT APPLY"): those waves fill HowCopedSet only.
+        Never filled by listing options in code order.  One inferred slot is
+        served, and registered: EHCVM 2021-22 records option 25 ("Autre
+        strategie") as Oui/Non with no rank, and the hook gives it the rank no
+        other strategy holds; where it sits beside another strategy the row
+        carries <Country>::shocks::code25-rank-inferred in Derivation (ruling
+        2026-11-13, "Keep slot, registered").  At READ time a slot filler or
+        missing code ("Nothing else", "No other response given", "Manquant",
+        "99.0", ...) is served NA in its position; the labels are listed with
+        their evidence per country in countries/<C>/_/coping.yml
+        (lsms_library/coping.py).  A "did nothing" answer keeps its position as
+        recorded.  A recorded gap (HowCoped0 NA, HowCoped1 filled) is served as
+        recorded.  Values are the wave's own labels; they are not harmonized
+        across countries or waves.
     HowCoped1:
       type: str
+      note: |
+        The strategy reported SECOND; the same rule as HowCoped0.
     HowCoped2:
       type: str
+      note: |
+        The strategy reported THIRD; the same rule as HowCoped0.
+    HowCoped3:
+      type: str
+      optional: true
+      note: |
+        The strategy reported FOURTH; the same rule as HowCoped0.  Only where
+        the instrument ranks four: Nigeria 2010-11, 2012-13 and 2015-16
+        (s15aq5d, columns headed 1st..4th; ruling 2026-11-13, "Add HowCoped3").
+    HowCopedSet:
+      type: str
+      optional: true
+      note: |
+        UNORDERED set of the coping strategies the household reported for this
+        shock (rulings 2026-11-12 and 2026-11-13, GH1562), so "which
+        strategies" composes across every shocks country whether or not its
+        instrument records an order.  Representation: the distinct labels,
+        sorted, joined with derivations.MULTI_SEP ('+'); a plain string, so it
+        hashes, survives parquet and the grain audit, and splits back with
+        str.split('+').explode().  Test membership by splitting, NEVER by
+        substring.  Every position counts, the fourth included where the
+        instrument has one.  Slot fillers and missing codes are never members.
+        A "did nothing" answer ("Did nothing", "Aucune strategie", ...) is a
+        member only when it is the only answer -- alone the set is that one
+        label, which is distinct from NA (no answer recorded); beside a real
+        strategy it is dropped from the set while the positions keep it.
+        Written at BUILD time where positions cannot carry it (EHCVM 2018-19:
+        every option of the s14q05__N grid with a positive value; Nigeria
+        2018-19: s15aq7_1..4) and derived at READ time from HowCoped<n>
+        everywhere else; the two rules above are applied at read time to
+        both (lsms_library/coping.py).  The parquet holds what the build wrote.
+        NA where no strategy is recorded.  Labels are the wave's own, not
+        harmonized across countries or waves.
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        Registry key for a constructed field (countries/<C>/_/derivations.yml).
+        Today: <Country>::shocks::code25-rank-inferred, the EHCVM 2021-22
+        position given to option 25, which the file records without a rank.
+    ForestProduct0:
+      type: str
+      optional: true
+      note: |
+        Liberia 2018-19 only (NHFS S17_5_A): the FIRST forest or wild product,
+        by order of importance, the household used to recover from this shock
+        ("List up to 3 forest/wild products by order of importance", asked only
+        where S17_4 says forest products were used).  A product, not a coping
+        strategy, so it is not a HowCoped position and is not in HowCopedSet
+        (ruling 2026-11-13, "LBR own column").  The filler "no other product"
+        is served NA.  Name flagged for review.
+    ForestProduct1:
+      type: str
+      optional: true
+      note: |
+        The SECOND product (S17_5_B); the same rule as ForestProduct0.
+    ForestProduct2:
+      type: str
+      optional: true
+      note: |
+        The THIRD product (S17_5_C); the same rule as ForestProduct0.
   interview_date:
     # Int_t: legacy single interview datetime (most countries).  EHCVM
     # records a start (and end) timestamp per enumerator visit, melted onto
