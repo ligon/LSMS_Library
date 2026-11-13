@@ -1378,7 +1378,7 @@ Nigeria::crop_production::w3-ag-conversion:
         one litre (645 kg); this key serves 14,310 kg.  The served u is still
         'l' on these rows (Quantity counts cans), an open question.
         volume_as_mass=False leaves all 71 on survey_kg at 14,310 kg (burst
-        jobs 41276093 / 41276285, reports/nigeria/out/m9, m11).
+        jobs 41276093 / 41276349, reports/nigeria/out/m9, m11).
     - text: >-
         the household's own zone column, not conv_national, as on the food
         side: W4's reported crop factor sa3iq6_conv, matched to the W3 card
