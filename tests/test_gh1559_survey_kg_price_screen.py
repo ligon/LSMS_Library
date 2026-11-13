@@ -381,9 +381,16 @@ def mali():
 
 
 #: (wave, direction) -> rows named on a cold build of this branch (burst job
-#: in the PR body).  A movement here is a data change to explain, not a pin to bump.
-NIGER_FIRING = None
-MALI_FIRING = None
+#: 41275992, development f138a3d61 plus this screen).  A movement here is a data
+#: change to explain, not a pin to bump.  Niger 2018-19 asks no kilograms, so it
+#: has nothing to judge; Mali has 70 survey-kg rows in units stating no mass, and
+#: one of them has a price-implied mass (no firing).
+NIGER_FIRING = {("2011-12", "high"): 6, ("2011-12", "low"): 6,
+                ("2014-15", "high"): 89, ("2014-15", "low"): 26,
+                ("2021-22", "high"): 28, ("2021-22", "low"): 2}
+NIGER_JUDGED = {"2011-12": 1932, "2014-15": 6394, "2021-22": 9020}
+MALI_FIRING = {}
+MALI_JUDGED = 1
 
 
 def _count(reports):
@@ -410,9 +417,8 @@ class TestNiger:
                 assert o["u"] not in ("Kg", "Sac de 50 kg", "Sac de 100 kg", "Unknown")
 
     def test_the_firing_is_pinned(self, niger):
-        if NIGER_FIRING is None:
-            pytest.skip("pin not yet recorded")
         assert _count(niger[2]) == NIGER_FIRING
+        assert {r["wave"]: r["n_judged"] for r in niger[2]} == NIGER_JUDGED
 
     def test_the_ledger_names_what_the_served_frame_flags(self, niger):
         df, _, reports = niger
@@ -451,6 +457,10 @@ class TestMali:
         assert not [w for w in caught if "could not run" in str(w.message)]
 
     def test_the_firing_is_pinned(self, mali):
-        if MALI_FIRING is None:
-            pytest.skip("pin not yet recorded")
         assert _count(mali[2]) == MALI_FIRING
+
+    def test_one_row_is_judged(self, mali):
+        df, _, _ = mali
+        factors = survey_kg_price_factors(df)
+        judged = factors["kg_price_implied"].notna() & factors["kg_survey"].notna()
+        assert int(judged.sum()) == MALI_JUDGED
