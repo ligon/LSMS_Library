@@ -786,9 +786,10 @@ served =u=:
   rows).  Kilograms on the class: 64,666 / 12,593 under cl, 6,467 / 1,259
   under grams.  Which field the World Bank got wrong (=g_cl= or =conv=) is
   not established.
-- *OPEN, awaiting a ruling (red team delta D1, 2026-11-13): W2 LIQUIDS whose
-  cells are flagged =g_cl= = 1 ("grams") are served about 10x low.*  The
-  mirror image of the solids above: a milk cup of tinned milk is =conv= 15,
+- *W2 LIQUIDS whose cells are flagged =g_cl= = 1 ("grams") are read as
+  centilitres* (red team delta D1; ruling @ligon 2026-11-13, "Read as
+  centilitres").  They were served about 10x low.  The mirror image of the
+  solids above: a milk cup of tinned milk is =conv= 15,
   which is the milk cup's own volume in centilitres (the oils put a milk cup
   at 0.159 l), so conv / 1000 serves 0.094 kg per litre of container.
   Screened numerically on every W2 =g_cl= = 1 cell against the container
@@ -796,7 +797,7 @@ served =u=:
   reading 0.5-1.6 kg/l; burst job 41279390, =reports/nigeria/out/m13/=),
   served rows, kg:
 
-  | item (code) | cells (=conv=) | 2012Q3 rows: served / cl reading / inference kg | 2013Q1 rows: served / cl / inference kg |
+  | item (code) | cells (=conv=) | 2012Q3 rows: grams reading / cl reading (served since D1) / inference kg | 2013Q1 rows: grams / cl / inference kg |
   |-+-+-+-|
   | 113 Milk tinned (unsweetened) | milk cup 15 | 45: 6.33 / 63.3 / 71.7 | 34: 0.98 / 9.75 / 11.1 |
   | 110 Fresh milk | mudu 100, milk cup 15 | 4: 0.48 / 4.75 / 3.73 | 2: 0.23 / 2.3 / 1.81 |
@@ -808,9 +809,22 @@ served =u=:
   | total | | 64: 11.5 / 114.7 / 99.0 | 42: 1.68 / 16.8 / 14.6 |
 
   The centilitre reading sits near the inference (114.7 against 99.0 kg; 16.8
-  against 14.6).  Their =food_prices()= per-kg values are about 10x high
-  (median Naira/kg, base -> served: tinned milk 706 -> 8,000; palm wine 276
-  -> 2,000; bottled water 188 -> 1,500).  Not changed here.  The same screen
+  against 14.6), and under the grams reading their =food_prices()= per-kg
+  values were about 10x high (median Naira/kg, base -> grams reading: tinned
+  milk 706 -> 8,000; palm wine 276 -> 2,000; bottled water 188 -> 1,500).
+  So exactly these cells -- an explicit (item_cd, unit_cd) list per round,
+  =nigeria.W2_GRAMS_FLAG_LIQUID_CELLS= (13 cells in 2012Q3, 6 in 2013Q1),
+  each with its conv 0.79-0.96 of the container in centilitres -- are conv /
+  100 litres at 1 l = 1 kg, under the round's own key.  Beverage powders
+  (tea, Milo, coffee) are not liquids and stay grams.  Measured cold (burst
+  job 41279736, =reports/nigeria/out/m15/=, against =f6361d068='s frames):
+  exactly 106 =food_acquired= rows move, each x10 (=Quantity_kg= 11.47 ->
+  114.7 kg in 2012Q3, 1.68 -> 16.8 in 2013Q1), keys unchanged;
+  =food_quantities(units='kgs')= 2012Q3 201,888 -> 201,991, 2013Q1 158,307 ->
+  158,322; =food_prices()= keeps every row and moves on 62 / 39 rows (x0.1),
+  medians unchanged; the =KgFactorSource= partition and every other table are
+  unchanged.  A held-table test pins the list to the screen's liquid hits.
+  The same screen
   also picks Pepper (76, 2012Q3, 183 rows) and Dry Pepper (77, 2013Q1, 313
   rows), at 0.157 kg/l under grams: those are solids, and the centilitre
   reading (1.57 kg/l, denser than water) is impossible for them, so they are
@@ -886,7 +900,9 @@ cells are roots by the heap (Cassava--roots / medium heap 21.6 kg against
 1.0 and 1.0), where W4's =*_cvn= carries the same values.
 
 *Movement, base =f138a3d61= -> =f6361d068=, cold, private roots* (burst jobs
-41271653 / 41275807; =reports/nigeria/out/v1-f6361d068/=).  =food_acquired=
+41271653 / 41275807; =reports/nigeria/out/v1-f6361d068/=; the W2 rows and the
+total re-measured at =73176e056=, after the D1 liquid cells, burst job
+41279736).  =food_acquired=
 rows, keys, =Quantity= and =Expenditure= do not move; 139,621 rows gain
 =Quantity_kg= and their key (1,521 of them, in W2, the grams key).
 
@@ -894,13 +910,13 @@ rows, keys, =Quantity= and =Expenditure= do not move; 139,621 rows gain
 |-+-+-+-|
 | 2010Q3 | 191,707 -> 192,250 (+0.3%) | unchanged (3,679 factors move, median x1.13) | 187.5 -> 187.5 |
 | 2011Q1 | 245,539 -> 245,539 | unchanged | 200 -> 200 |
-| 2012Q3 | 189,161 -> 201,888 (+6.7%) | =item_unit= 14,444 -> 37, =unit= 763 -> 444, =survey_kg= 0 -> 14,726 | 250 -> 250 |
-| 2013Q1 | 147,523 -> 158,307 (+7.3%) | =item_unit= 17,582 -> 57, =unit= 653 -> 134, =survey_kg= 0 -> 18,044 | 266.7 -> 266.7 |
+| 2012Q3 | 189,161 -> 201,991 (+6.8%) | =item_unit= 14,444 -> 37, =unit= 763 -> 444, =survey_kg= 0 -> 14,726 | 250 -> 250 |
+| 2013Q1 | 147,523 -> 158,322 (+7.3%) | =item_unit= 17,582 -> 57, =unit= 653 -> 134, =survey_kg= 0 -> 18,044 | 266.7 -> 266.7 |
 | 2015Q3 | 119,919 -> 206,721 (+72.4%) | =item_unit= 35,507 -> 785, =unit= 21,572 -> 728, =none= 14 -> 16, =survey_kg= 0 -> 55,564 | 400 -> 260.9 |
 | 2016Q1 | 108,068 -> 189,116 (+75.0%) | =item_unit= 32,646 -> 567, =unit= 19,737 -> 529, =survey_kg= 0 -> 51,287 | 400 -> 272.1 |
 | 2018Q3 | 251,251 -> 251,487 (+0.09%) | =item_unit= 1,784 -> 1,778, =unit= 742 -> 748 (308 factors move, median x2.50) | 390.6 -> 389.6 |
 | 2019Q1 | 214,080 -> 214,134 (+0.03%) | =item_unit= 69 -> 61, =unit= 318 -> 326 (213 factors move, median x1.93) | 372.1 -> 370.4 |
-| total | 1,467,249 -> 1,659,443 (+13.1%) | | |
+| total | 1,467,249 -> 1,659,561 (+13.1%) | | |
 
 The phase-1 version of this table (=1c906836a=, before the re-read) had W2 at
 260,124 (+37.5%) and 169,675 (+15.0%) and a total of 1,729,051 (+17.8%); it
