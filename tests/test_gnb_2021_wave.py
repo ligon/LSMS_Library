@@ -393,14 +393,19 @@ class TestFoodServed:
         for key in (ROUNDED, ZERO_WITHHELD):
             assert not old["Derivation"].fillna("").str.contains(key, regex=False).any()
 
-    def test_the_zeroed_rows_are_served_one_purchased_row_na(self, fa):
+    def test_the_zeroed_rows_are_served_one_row_na(self, fa):
         """Ruling 2026-11-13, "Serve NA, as Togo": each of the 3,945 consumed rows the
-        release rounds to 0 is served one purchased row with Quantity and Expenditure NA,
-        and the registry inputs, which carry s07bq06, are those rows."""
+        release rounds to 0 is served one row with Quantity and Expenditure NA: purchased,
+        or at s='other' where s07bq06 says the household never bought the item ("GNB
+        'Nunca' rows").  The registry inputs, which carry s07bq06, are those rows."""
         new = fa.xs(WAVE, level="t")
         held = new[new["Derivation"].fillna("").str.contains(ZERO_WITHHELD, regex=False)]
         assert len(held) == 3945
-        assert set(held.index.get_level_values("s")) == {"purchased"}
+        s = pd.Series(held.index.get_level_values("s")).value_counts().to_dict()
+        assert s == {"purchased": 3260, "other": 685}
+        other = held.xs("other", level="s")
+        assert not other["Derivation"].fillna("").str.contains("7day", regex=False).any()
+        assert set(new.index.get_level_values("s")) == {"purchased", "produced", "inkind", "other"}
         assert held["Quantity"].isna().all() and held["Expenditure"].isna().all()
         assert new.index.is_unique
         with warnings.catch_warnings():
@@ -409,6 +414,7 @@ class TestFoodServed:
         assert len(z) == 3945 and "s07bq06" in z.columns
         assert (pd.to_numeric(z["s07bq03a"], errors="coerce") == 0).all()
         assert (z["s07bq02"] == "Oui").all()
+        assert int((z["s07bq06"] == "Nunca").sum()) == 685
         pairs = lambda f: set(zip(f.index.get_level_values("i").astype(str),
                                   f.index.get_level_values("j").astype(str)))
         assert pairs(held) == pairs(z)

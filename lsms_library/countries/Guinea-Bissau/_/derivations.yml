@@ -278,19 +278,21 @@ Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even:
 Guinea-Bissau::food_acquired::s07bq03a-rounded-to-zero-withheld:
   waves: ['2021-22']
   columns: [Quantity, Expenditure]
-  rows: {s: purchased}
+  rows: {s: [purchased, other]}
   rule: >-
     A row of s07b whose household says it consumed the item in the last 7 days
-    (s07bq02 = Oui) but whose released s07bq03a is 0 is served one purchased row with
-    Quantity NA and Expenditure NA, and this key.  The 0 is the release's rounding of a
+    (s07bq02 = Oui) but whose released s07bq03a is 0 is served one row with Quantity NA
+    and Expenditure NA, and this key: a purchased row, or, where the household says it
+    never bought the item (s07bq06 = Nunca, 685 rows), a row at s='other' (ruling
+    2026-11-13, "GNB 'Nunca' rows").  The other 3,260 are purchased.  The 0 is the release's rounding of a
     small quantity (see Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even),
     which cannot be inverted, so the quantity is withheld rather than served as 0 or
     guessed; the purchase value goes with it, because the served Expenditure would be
     derived from the withheld quantity (GH #1519).  A purchased row is served where a
     purchase is implied by Togo's test, the row reporting neither own production nor a
-    gift, and every one of the 3,945 passes it.  The row carries the 7-day key too (the
-    shared reshape stamps every purchased row), not the as-released key: nothing on it is
-    served as released.  Downstream, the derived food tables drop an NA before they sum,
+    gift, and every one of the 3,945 passes it.  A purchased row carries the 7-day key too
+    (the shared reshape stamps every purchased row); an 'other' row does not.  Neither
+    carries the as-released key: nothing on it is served as released.  Downstream, the derived food tables drop an NA before they sum,
     so these rows are absent there, never a zero.
   function: lsms_library.countries.Guinea-Bissau.2021-22._.mapping:zero_quantity_withheld
   inputs: lsms_library.countries.Guinea-Bissau.2021-22._.mapping:inputs_zero_quantity_withheld
@@ -317,16 +319,17 @@ Guinea-Bissau::food_acquired::s07bq03a-rounded-to-zero-withheld:
         the 685 whose household says it never bought the item, and the 521 whose last
         purchase is over 30 days old, carry none.  Togo's precedent covered no row whose
         household says it never bought the item (its 11: 7 derniers jours 6, 30 derniers
-        jours 1, Plus de 30 jours 4), so the 685 Nunca rows are served purchased by the
-        template, not by evidence of their own.
+        jours 1, Plus de 30 jours 4).  The 685 Nunca rows are served at s='other': the
+        source is not a purchase, by the household's own answer, and whether it is own
+        production or a gift is not known, both being rounded to 0.
       basis: modelling-choice
       evidence: >-
-        ruling @ligon 2026-11-13, "Guinea-Bissau 2021-22 follow-ups and Burkina
-        confirmations": "Serve NA, as Togo (Recommended)" (.sucoder/isa-decisions.org);
-        probe counts, gnb stream burst job 41279256 (reports/gnb/out/zero_probe.json).
+        rulings @ligon 2026-11-13, "Guinea-Bissau 2021-22 follow-ups and Burkina
+        confirmations": "Serve NA, as Togo (Recommended)", and "GNB 'Nunca' rows":
+        "s='other' (Recommended)" (.sucoder/isa-decisions.org); probe counts, gnb stream burst job 41279256 (reports/gnb/out/zero_probe.json).
   validated_against: >-
-    The inputs are the 3,945 rows, and each is served exactly one purchased row with
-    Quantity and Expenditure NA that joins it at (t, i, j); no other row carries the key
+    The inputs are the 3,945 rows, and each is served exactly one row with Quantity and
+    Expenditure NA that joins it at (t, i, j): 3,260 purchased, 685 at s='other'; no other row carries the key
     (tests/test_gnb_2021_wave.py).  No household holds both sugar codes in one unit and
     size, so the Togo collision rule withholds no other row.
   contents: 'Guinea-Bissau/_/CONTENTS.org, "food_acquired 2021-22: served as released, the rounding registered"'

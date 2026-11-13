@@ -243,8 +243,9 @@ food_acquired:
     # registered").
     # mapping.food_acquired stamps every row with a quantity with
     # Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even; each zeroed row is
-    # served one purchased row with Quantity and Expenditure NA, under
-    # ...::s07bq03a-rounded-to-zero-withheld (ruling 2026-11-13, "Serve NA, as Togo").
+    # served one row with Quantity and Expenditure NA, under
+    # ...::s07bq03a-rounded-to-zero-withheld (ruling 2026-11-13, "Serve NA, as Togo"):
+    # purchased, or s='other' where the household says it never bought the item.
     # The file is a grid: 968,524 rows, 132,176 consumed (128,229 positive, 3,945 zero, 2
     # blank).
     file: s07b_me_gnb2021.dta
@@ -273,3 +274,7 @@ food_acquired:
         LastPurchaseUnitCode: s07bq07b
         LastPurchaseUnitSize: s07bq07c
         LastPurchaseValue: s07bq08
+        # s07bq06, when the item was last bought: read by mapping.food_acquired only, to
+        # serve a zeroed row whose household says it never bought the item (Nunca) at
+        # s='other' (ruling 2026-11-13, "GNB 'Nunca' rows"); dropped there.
+        LastPurchaseWhen: s07bq06

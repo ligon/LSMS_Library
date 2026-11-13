@@ -317,34 +317,62 @@ def zero_quantity_withheld(quantity):
     return q.mask(q == 0)
 
 
+#: s07bq06 ("when did you last buy it?") answer of a household that says it never bought
+#: the item.  Ruling 2026-11-13, "GNB 'Nunca' rows": "s='other'".
+NEVER_BOUGHT = 'Nunca'
+
+
+def _withheld_rows(df, s, stamp_7day):
+    '''One served row per wide row of `df`, Quantity and Expenditure NA, at source `s`,
+    keyed KEY_ZERO_WITHHELD.  The shared reshape builds the row's index (sized u
+    included) from a placeholder quantity it never serves.'''
+    held = _food_acquired_ehcvm(df.assign(Quantity=1.0, Produced=0.0, GiftQuantity=0.0),
+                                FOOD_ACQUIRED_DERIVATION)
+    held = held[_purchased(held)].copy()
+    held['Quantity'] = np.nan
+    held['Expenditure'] = np.nan
+    if not stamp_7day:
+        # Not a purchase, so not the 7-day key's row (it is on every purchased row and
+        # nowhere else).
+        held['Derivation'] = pd.Series(pd.NA, index=held.index, dtype='string')
+    if s != 'purchased':
+        names = list(held.index.names)
+        flat = held.reset_index()
+        flat['s'] = s
+        held = flat.set_index(names)
+    return _add_key(held, KEY_ZERO_WITHHELD, np.ones(len(held), dtype=bool))
+
+
 def food_acquired(df):
     '''GH #876's construction (Expenditure at the last purchase's unit value, keyed; size
     in u, GH #1224) on the release's rounded quantities, KEY_ROUNDED on every row with a
-    quantity, and one purchased row NA, under KEY_ZERO_WITHHELD, for each consumed row the
-    release rounds to 0.
+    quantity, and one row NA, under KEY_ZERO_WITHHELD, for each consumed row the release
+    rounds to 0.
 
     Ruling 2026-11-13, "Serve NA, as Togo": Togo 2021-22's withheld rows are the template.
     A purchased row is served where a purchase is implied, which is Togo's test, the row
     reporting neither own production nor a gift; every one of the 3,945 passes it
     (s07bq04 is 0 or NA, s07bq05 0).  Its Quantity is NA and so is its Expenditure: the
-    purchase value goes with the quantity it would be derived from (GH #1519).
+    purchase value goes with the quantity it would be derived from (GH #1519).  Ruling
+    2026-11-13, "GNB 'Nunca' rows": a row whose household says it never bought the item
+    (s07bq06 = Nunca, 685) is served at s='other' instead, under the same key and without
+    the 7-day key; the other 3,260 stay purchased.
     '''
+    when = df['LastPurchaseWhen'].astype('string').str.strip()
+    df = df.drop(columns=['LastPurchaseWhen'])
     out = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
     out = _add_key(out, KEY_ROUNDED, np.ones(len(out), dtype=bool))
     q3 = pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
     q4 = pd.to_numeric(df['Produced'], errors='coerce').fillna(0).to_numpy(dtype=float)
     q5 = pd.to_numeric(df['GiftQuantity'], errors='coerce').fillna(0).to_numpy(dtype=float)
-    implied = (q3 == 0) & (q4 <= 0) & (q5 <= 0)
-    if implied.any():
-        # The shared reshape builds the purchased row's index (sized u included), from a
-        # placeholder quantity it never serves.
-        held = _food_acquired_ehcvm(df[implied].assign(Quantity=1.0, Produced=0.0, GiftQuantity=0.0),
-                                    FOOD_ACQUIRED_DERIVATION)
-        held = held[_purchased(held)].copy()
-        held['Quantity'] = np.nan
-        held['Expenditure'] = np.nan
-        out = pd.concat([out, _add_key(held, KEY_ZERO_WITHHELD, np.ones(len(held), dtype=bool))])
-    return _withhold_collisions(out, KEY_ZERO_WITHHELD)
+    zero = (q3 == 0) & (q4 <= 0) & (q5 <= 0)
+    never = when.eq(NEVER_BOUGHT).fillna(False).to_numpy(dtype=bool)
+    parts = [out]
+    if (zero & ~never).any():
+        parts.append(_withheld_rows(df[zero & ~never], 'purchased', stamp_7day=True))
+    if (zero & never).any():
+        parts.append(_withheld_rows(df[zero & never], 'other', stamp_7day=False))
+    return _withhold_collisions(pd.concat(parts), KEY_ZERO_WITHHELD)
 
 
 def _withhold_collisions(out, key):
