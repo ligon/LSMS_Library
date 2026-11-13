@@ -100,12 +100,14 @@ def _run_script(monkeypatch, country, wave, codes, *, seed_override=None):
         'vague': [1] * n, 'grappe': [7] * n, 'menage': [3] * n,
         's16bq01': codes, 's16bq02': [1] * n,
         's16bq03a': [1.25] * n, 's16bq03b': [2] * n,
-        's16bq05': [2] * n, 's16bq07a': [np.nan] * n,
+        's16bq05': [2] * n, 's16bq07a': [np.nan] * n, 's16bq07b': [np.nan] * n,
+        's16bq08': [2] * n, 's16bq09a': [np.nan] * n, 's16bq09b': [np.nan] * n,
     })
     labelled = numeric.copy()
     labelled['s16bq01'] = labelled['s16bq01'].map(case['labels'])
     labelled['s16bq03b'] = 'Kilogramme'
     labelled['s16bq05'] = 'Non'
+    labelled['s16bq08'] = 'Non'
     real_read = local_tools.get_categorical_mapping
     written = []
 
@@ -175,6 +177,9 @@ _INPUTS = {1: 'Organic manure', 2: 'Organic compost', 3: 'Urea', 4: 'Phosphate',
            10: 'Other phytosanitary'}
 _NAMED = {11: 'Mil', 12: 'Sorgho', 13: 'Maïs en grain', 14: 'Riz Paddy',
           16: 'Coton', 17: 'Sésame', 18: 'Niébé/Haricots secs'}
+# GH #1119 (2026-11-13): Senegal's maize and cowpea seed rows take the labels
+# its crop_production serves (the Burkina Faso #1203 pattern).
+_SENEGAL_CROP_LABELS = {13: 'Maïs', 18: 'Niébé'}
 _HHID = {
     'Niger': lambda g, m: 'E_' + local_tools.format_id(g) + '0' + local_tools.format_id(m, zeropadding=2),
     'Senegal': lambda g, m: local_tools.format_id(g) + '0' + local_tools.format_id(m, zeropadding=2),
@@ -186,6 +191,8 @@ def _expected_input_crop(country, wave, code):
     code = int(code)
     if code in _INPUTS:
         return _INPUTS[code], '(not crop-specific)'
+    if country == 'Senegal' and code in _SENEGAL_CROP_LABELS:
+        return 'Seed', _SENEGAL_CROP_LABELS[code]
     if code in _NAMED:
         return 'Seed', _NAMED[code]
     if country == 'Senegal' and code == 21:
@@ -209,9 +216,13 @@ def built():
 def test_every_real_native_line_and_payload_is_served(built, country, wave):
     """Every applied (household, s16bq01) line of the held source is served,
     on the expected (input, crop), with its exact Quantity / Purchased /
-    Quantity_purchased (the existing API bindings, s16bq03a / s16bq05 /
-    s16bq07a).  Multisets per (i, input, crop), so Niger 2018-19's two
-    'Autre crop' slots (19 and the unlabelled 20) are each counted."""
+    Quantity_purchased / Received_as_gift / Quantity_received_as_gift.  The
+    bindings are s16bq03a, the PURCHASE s16bq08 / s16bq09a and the GIFT
+    s16bq05 / s16bq07a: re-pinned 2026-11-13 under the ruling "Extend to all
+    four now (Recommended)" (Togo template 408d02a24); until then these four
+    cells served the gift question as the purchase.  Multisets per (i, input,
+    crop), so Niger 2018-19's two 'Autre crop' slots (19 and the unlabelled 20)
+    are each counted."""
     case = CASES[(country, wave)]
     path = countries_root() / country / wave / 'Data' / case['source']
     raw = local_tools.get_dataframe(path, convert_categoricals=False)
@@ -222,23 +233,27 @@ def test_every_real_native_line_and_payload_is_served(built, country, wave):
     qty = pd.to_numeric(raw['s16bq03a'], errors='coerce')
     if (country, wave) == ('Niger', '2021-22'):
         qty = qty.mask(qty == 9999)          # GH #865 sentinel, as the script does
-    purchased = raw['s16bq05'].map({1: True, 2: False})
-    qpur = pd.to_numeric(raw['s16bq07a'], errors='coerce')
-    keep = ~(qty.isna() & purchased.isna() & qpur.isna())
+    purchased = raw['s16bq08'].map({1: True, 2: False})
+    qpur = pd.to_numeric(raw['s16bq09a'], errors='coerce')
+    gift = raw['s16bq05'].map({1: True, 2: False})
+    qgift = pd.to_numeric(raw['s16bq07a'], errors='coerce')
+    keep = ~(qty.isna() & purchased.isna() & qpur.isna() & gift.isna() & qgift.isna()
+             & raw['s16bq09b'].isna() & raw['s16bq07b'].isna())
     assert int((~keep).sum()) == HOLLOW.get((country, wave), 0)
     ic = [_expected_input_crop(country, wave, c) for c in raw['s16bq01']]
     expected = collections.Counter(
-        (_HHID[country](g, m), inp, crop, _f(q), _b(p), _f(qp))
-        for g, m, (inp, crop), q, p, qp, k in zip(
-            raw['grappe'], raw['menage'], ic, qty, purchased, qpur, keep) if k)
+        (_HHID[country](g, m), inp, crop, _f(q), _b(p), _f(qp), _b(gf), _f(qg))
+        for g, m, (inp, crop), q, p, qp, gf, qg, k in zip(
+            raw['grappe'], raw['menage'], ic, qty, purchased, qpur, gift, qgift, keep) if k)
 
     api = built(country)
     api = api.loc[api.index.get_level_values('t') == wave].reset_index()
     assert len(api) == SERVED[(country, wave)] == sum(expected.values())
     got = collections.Counter(
-        (i, inp, crop, _f(q), _b(p), _f(qp))
-        for i, inp, crop, q, p, qp in zip(api['i'], api['input'], api['crop'], api['Quantity'],
-                                          api['Purchased'], api['Quantity_purchased']))
+        (i, inp, crop, _f(q), _b(p), _f(qp), _b(gf), _f(qg))
+        for i, inp, crop, q, p, qp, gf, qg in zip(
+            api['i'], api['input'], api['crop'], api['Quantity'], api['Purchased'],
+            api['Quantity_purchased'], api['Received_as_gift'], api['Quantity_received_as_gift']))
     assert got == expected
 
 

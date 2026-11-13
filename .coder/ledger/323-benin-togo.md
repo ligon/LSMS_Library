@@ -82,8 +82,11 @@ consistent.
   wave script fails the build loudly. Verified by re-widening the bucket and
   watching both builds die (Benin: 47 dup tuples; Togo: 59).
 - **`Purchased` is NOT an index level and must not become one.** Togo's colliding
-  rows differ in `Purchased` (grappe 101 / menage 9: 16 Charrette purchased vs.
-  3 Charrette own-production), which makes adding it to the index look tempting.
+  rows differ in `Purchased` (grappe 101 / menage 9: 16 Charrette received as a
+  gift from another household vs. 3 Charrette bought at the market -- read from
+  s16bq05 / s16bq08 / s16bq04; this line had the two reversed until 2026-11-13,
+  because the served `Purchased` was then the gift flag s16bq05), which makes
+  adding it to the index look tempting.
   It is wrong: `Purchased` is a measured *attribute* of a line-item, not part of
   its identity — it would not separate two distinct seeds that were both
   purchased, and it would corrupt the declared grain. Evidence that the

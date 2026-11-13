@@ -2028,7 +2028,9 @@ d'animaux"=, i.e. =Organic manure=; it is one of the four hollow lines.
 
 *Not changed.*  =Purchased= / =Quantity_purchased= in the EHCVM waves still
 read =s16bq05= / =s16bq07a=, the gift flag and gift quantity (the Burkina
-finding of #1188 applies by inspection).  The country concatenator's
+finding of #1188 applies by inspection).  [2026-11-13: changed, under the ruling
+"Extend to all four now"; see "EHCVM =plot_inputs= reads the purchase" at the
+end of this file.]  The country concatenator's
 docstring used to call the index "intentionally NON-unique"; it now says the
 index is meant to be unique and names the ECVMA residual as an open defect.
 
@@ -4073,3 +4075,62 @@ set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical co
   chosen on 52 rows, 17 of them beside a ranked strategy; those carry
   =Niger::shocks::code25-rank-inferred= (=_/derivations.yml=; ruling "Keep slot, registered").  On 2 of
   them the only other strategy is a Deuxième, so option 25 is served first.
+
+* 2026-11-13 -- EHCVM =plot_inputs= reads the purchase (ruling "Extend to all four now")
+
+*Ruling (@ligon, 2026-11-13): "Extend to all four now (Recommended)".*  Senegal 2018-19, Cote d'Ivoire
+2018-19 and Niger 2018-19 / 2021-22 read =s16bq08= / =s16bq09a= as the purchase, on the Togo template
+(=408d02a24=), measured and disclosed.  These are the two Niger cells.  The ECVMA waves (2011-12, 2014-15) are
+a different roster and are not touched.
+
+*What is served now* (=2018-19/_/plot_inputs.py=, =2021-22/_/plot_inputs.py=): =Purchased= =s16bq08=,
+=Quantity_purchased= =s16bq09a=, =Unit_purchased= =s16bq09b=; =Received_as_gift= =s16bq05=,
+=Quantity_received_as_gift= =s16bq07a=, =Unit_received_as_gift= =s16bq07b=, declared optional in
+=_/data_scheme.yml= and NA on the ECVMA waves.  Each unit is decoded from its own value labels and served in
+the vocabulary of =u= (=ehcvm.served_unit_labels=).  =u= and =input_obs= are unchanged.
+
+*Idiosyncrasies this rests on.*
+- *The shared tail is not edited.*  =niger._finish_plot_inputs= keeps only =Quantity=, =Purchased= and
+  =Quantity_purchased=, and =niger.py= is in every Niger wave's hash.  The two EHCVM scripts therefore
+  attach the four acquisition columns themselves, after the tail, by position (same input filter first, the
+  line count asserted), so the ECVMA waves' hashes do not move.
+- *2021-22's three unit questions use three code lists.*  =s16bq03b= puts =Sachet= at 13; =s16bq07b= has
+  =Charrette asine= 5 and =Charrette bovine= 6 and no =Sachet=; =s16bq09b= has =Charrette Bovine= 5,
+  =Sachet= 6 and =Charrette Asine= 13, with a capital letter.  Read by label (=convert_categoricals=), never by
+  code across questions.  2018-19's three questions share one 12-answer list.
+- *The questions are worded differently across the waves* (Stata labels): 2018-19 =s16bq07a= "Selon vous,
+  quantité ... reçue", =s16bq09a= "Quelles sont la quantité et la valeur totale ... achetées?"; 2021-22
+  "Quelle quantité ... reçue", "Quelle est la quantité ... achetée?".
+- *Hollow lines.*  2021-22 has 9 applied lines blank on both flags; 4 of them are hollow (the three with no
+  quantity and the 9999 line, whose quantity the GH #865 strip removes) and are dropped by
+  =dropna(how='all')= under either binding, so the hollow set does not change.  2018-19 has none.  Neither
+  =s16bq07a= nor =s16bq09a= carries 9999 in either wave (maxima 1,000 / 6,000 in 2018-19, 800 / 1,200 in
+  2021-22).
+
+*What moves* (burst job 41280484, source counts on the applied lines):
+| wave    | served lines | =Purchased= True, before -> after | =Quantity_purchased= non-null, before -> after | =Received_as_gift= True | gift x purchase: Non/Non, Non/Oui, Oui/Non, Oui/Oui |
+|---------+--------------+-----------------------------------+------------------------------------------------+-------------------------+-----------------------------------------------------|
+| 2018-19 | 13,401       | 1,383 -> 4,557                    | 1,383 -> 4,557                                 | 1,383                   | 7,602 / 4,416 / 1,242 / 141                          |
+| 2021-22 | 12,435       | 856 -> 3,593                      | 856 -> 3,593                                   | 856                     | 8,052 / 3,522 / 785 / 71 (+ 9 blank on both)         |
+Every 2018-19 acquisition quantity has its unit; in 2021-22 one gift quantity has no =s16bq07b=.
+=seed_kg= and =nitrogen_kg= read =Quantity= and =u= only.
+
+*Measured, served* (cold, private roots, previous head =1d89815f0= against the candidate =14606914c=; burst
+job 41280722).  43,620 rows both sides, index equal, every wave's row count unchanged (12,435 in 2021-22: the
+hollow set did not move, and 5 served 2021-22 lines keep both flags NA).  Cells move only in the two EHCVM
+waves' acquisition columns (=Purchased= 5,658 / 4,307 cells, =Quantity_purchased= 5,760 / 4,356); the new
+gift columns equal the old purchase columns row for row; the four columns are NA on the ECVMA waves.
+=seed_kg= and =nitrogen_kg= are frame-equal, and =Feature('plot_inputs')= equals the Country table on every
+value column.
+
+*Unit vocabulary, one mismatch disclosed and not folded.*  Every served =Unit_purchased= / =Unit_received_as_gift=
+label is a label =u= serves, except 2021-22's =Charrette Bovine= (62 lines) and =Charrette Asine= (12) on
+=Unit_purchased=: =s16bq09b='s value labels capitalise them, while =s16bq03b= and =s16bq07b= write
+=Charrette bovine= / =Charrette asine=, which is what =u= and =Unit_received_as_gift= serve.  Folding the case
+needs a row in =_/categorical_mapping.org='s =u= table, which is a build input of every Niger wave (the ECVMA
+ones included), so it is left for the next edit of that table.
+
+*Cost, measured* (hash census against =f138a3d61=): Niger 25 of 25 =Country._table_cache_hash= and 50 of 100
+=Wave._input_hash= (the 25 of 2018-19 and the 25 of 2021-22; 2011-12 and 2014-15 do not move, because
+=niger.py= is not edited); =build_transforms_fingerprint= 0 of 42, =framework_imports_fingerprint= 0 of 38.
+

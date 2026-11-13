@@ -211,12 +211,15 @@ Data Scheme:
     # into Togo/_/categorical_mapping.org — the EHCVM s16b labels are
     # identical across EHCVM countries); u via the library-level u table.
     # Non-crop-specific rows carry the sentinel '(not crop-specific)' and a
-    # missing unit the 'Manquant' u label, both non-null so the framework's
+    # missing unit the corpus missing-unit sentinel 'Unknown' (GH #1118; it was
+    # the minted 'Manquant' until 2026-11-13), both non-null so the framework's
     # canonical NaN-key de-dup collapse does not silently drop them.
     #
-    # 2021-22 (GH #1697) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
-    # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018 still
-    # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
+    # Both waves read the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
+    # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188):
+    # 2021-22 since GH #1697, 2018 since 2026-11-13 (ruling "Fix all three
+    # now"; until then 2018 served the GIFT question under Purchased and
+    # Quantity_purchased).  _/CONTENTS.org.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool

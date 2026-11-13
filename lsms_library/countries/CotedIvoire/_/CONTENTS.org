@@ -941,7 +941,8 @@ but no document consulted says so.  Served as recorded; a separate issue.
 
 *Not changed.*  =Purchased= / =Quantity_purchased= read =s16bq05= /
 =s16bq07a=, the gift flag and gift quantity (the #1188 finding applies by
-inspection).
+inspection).  [2026-11-13: changed, under the ruling "Extend to all four now";
+see "2018-19 =plot_inputs= reads the purchase" at the end of this file.]
 
 *Cache.*  =_/categorical_mapping.org= is a build input of every CotedIvoire
 table: all 21 country hashes move (one CotedIvoire re-warm).  Evidence:
@@ -1701,3 +1702,70 @@ set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical co
   inferred beside another strategy and nothing is stamped.
 - *Read time.*  "Aucune stratégie" is a "did nothing" answer (=_/coping.yml=); beside a real strategy
   (56 rows in 2021-22) it leaves the set and keeps its position.
+
+* 2026-11-13 -- =plot_inputs=: a missing unit is =Unknown= in both waves (GH #1118)
+
+Both wave scripts filled a blank used unit =s16bq03b= with a minted ='Manquant'=; both now write
+=Unknown=, the corpus missing-unit sentinel (GH #1041 contract).  Measured cold at development
+=f138a3d61= (burst job 41275616):
+| wave    | applied lines | =s16bq03b= blank | served =u= = =Manquant= |
+|---------+---------------+------------------+-------------------------|
+| 2018-19 | 11,259        | 0                | 0                       |
+| 2021-22 | 14,704        | 4 (2 with no quantity, 2 positive) | 4             |
+So 2018-19 (the site GH #1118 lists) serves no row on the fill, and the 4 rows are 2021-22's, a site
+the issue's inventory missed because =2021-22/_/plot_inputs.py= was written after it (GH #1697).  Neither
+wave's =s16bq03b= has a missing-marker label (2018-19: Gramme, Kilogramme, Tonne, Litre, Charrette), so
+there is no raw answer to keep in a column of its own.  Only =u= changes on those 4 rows.  Both spellings
+are missing-unit sentinels to the kg ladder (=transformations._U_SENTINELS=), so =seed_kg= and
+=nitrogen_kg= do not move.  The 2021-22 collisions of the 38 damaged households (above) are unchanged:
+=Unknown= was served on no 2021-22 row before, so the relabel can make no new key.
+
+*Not changed: the gift/purchase binding of 2018-19.*  [Later 2026-11-13: superseded, see the next section.]
+=Purchased= / =Quantity_purchased= still read
+=s16bq05= / =s16bq07a=, the gift question; the 2026-11-13 ruling "Fix all three now" names
+Guinea-Bissau, Togo and Benin only.  Measured on =Menage/s16b_me_CIV2018.dta=: =s16bq05= Oui on 890
+applied lines, =s16bq08= (the purchase) Oui on 8,134; gift x purchase Non/Non 2,373, Non/Oui 7,996,
+Oui/Non 752, Oui/Oui 138.  A question for the maintainer. The same binding survives in four cells after this batch: Senegal 2018-19, Cote d'Ivoire 2018-19,
+Niger 2018-19 and Niger 2021-22 (=Niger/_/CONTENTS.org= records it); =tests/test_ehcvm_plot_inputs_identity.py=
+and =tests/test_senegal_1483_s16b.py= pin it (red team of 2026-11-13, F1).
+
+*Cost, measured* (hash census against =f138a3d61=): 21 of 21 =Country._table_cache_hash= and 42
+=Wave._input_hash= values (the 21 of 2018-19 and the 21 of 2021-22; the four 1985-89 waves do not move);
+no other country; =build_transforms_fingerprint= 0 of 42.  Served (cold, private roots, burst jobs 41275616
+and 41275888): 25,907 rows both sides, the 4 relabelled =u= the only difference, =seed_kg= / =nitrogen_kg=
+frame-equal, =Feature('plot_inputs')= equal to =Country('CotedIvoire').plot_inputs()=.
+
+* 2026-11-13 -- 2018-19 =plot_inputs= reads the purchase (ruling "Extend to all four now")
+
+*Ruling (@ligon, 2026-11-13): "Extend to all four now (Recommended)".*  Senegal 2018-19, Cote d'Ivoire
+2018-19 and Niger 2018-19 / 2021-22 read =s16bq08= / =s16bq09a= as the purchase, on the Togo template
+(=408d02a24=), measured and disclosed.  This is the Cote d'Ivoire cell; it also closes the WAITING note under
+"2021-22 wired" / =plot_inputs= (the two waves' columns now mean the same thing).
+
+*What is served now* (=2018-19/_/plot_inputs.py=): =Purchased= =s16bq08=, =Quantity_purchased= =s16bq09a=,
+=Unit_purchased= =s16bq09b=; =Received_as_gift= =s16bq05=, =Quantity_received_as_gift= =s16bq07a=,
+=Unit_received_as_gift= =s16bq07b=.  Each unit is decoded from its own value labels (all three unit questions
+carry the five answers Gramme, Kilogramme, Tonne, Litre, Charrette here) and served in the vocabulary of =u=
+(=ehcvm.served_unit_labels=), as 2021-22 does.  =u= is unchanged.  The Stata labels are the EHCVM-1 ones
+(=s16bq09a= "Quelles sont la quantité et la valeur totale de [INTRANT] achetées?"; 2021-22 asks "Quelle est
+la quantité ... achetée?").
+
+*What moves, on the 11,259 served 2018-19 lines* (no line is hollow under either binding; burst job
+41280484, source counts):
+| column | before (gift question) | after (purchase question) |
+|--------+------------------------+---------------------------|
+| =Purchased= True / False | 890 / 10,369 | 8,134 / 3,125 |
+| =Quantity_purchased= non-null | 890 | 8,134 |
+| =Received_as_gift= True / False | NA | 890 / 10,369 |
+Gift x purchase: Non/Non 2,373, Non/Oui 7,996, Oui/Non 752, Oui/Oui 138.  Every acquisition quantity has its
+unit.  The four largest purchased quantities (400,000, 140,000, 120,000, 87,000) equal the four largest used
+quantities; served as filed.  =seed_kg= and =nitrogen_kg= read =Quantity= and =u= only.
+
+*Measured, served* (cold, private roots, previous head =1d89815f0= against the candidate =14606914c=; burst
+job 41280722).  25,907 rows both sides, index equal.  2018-19 cells move only in the acquisition columns
+(=Purchased= 8,748, =Quantity_purchased= 8,863, =Received_as_gift= 11,259, =Quantity_received_as_gift= 890,
+=Unit_purchased= 8,134, =Unit_received_as_gift= 890); 2021-22: 0.  The new gift columns equal the old purchase
+columns row for row; every =Unit_*= label is a =u= label.  =seed_kg= and =nitrogen_kg= are frame-equal;
+=Feature('plot_inputs')= equals the Country table.  *Cost:* Cote d'Ivoire 21 of 21 =Country._table_cache_hash=
+and the 21 2018-19 =Wave._input_hash= against the previous head (already moving against =f138a3d61=).
+

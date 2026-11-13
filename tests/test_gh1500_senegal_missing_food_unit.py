@@ -316,8 +316,15 @@ def test_live_yaml_and_2021_binding_remain_source_exact():
         # F1), so 2021-22's data_info.yml is development's again, byte for byte.
         '2021-22/_/data_info.yml': '2522506789ff4584a08c37454eb774cb99189ade93a9e7fdd38351913f913ebc',
         '2021-22/_/mapping.py': '29f39839d100bfec4164e14d420af0367a2a8f9c95939618ca97dd5a8c9a3a60',
-        '_/data_scheme.yml': '07f4dd61260cae7722050738bfaff992fb45257c42c0c6d4ca9d0d55c55f0894',
-        '_/categorical_mapping.org': '31cde2d70a121c4f0c985920466c96c33db47bbcef0c02ccd13e13d7df241bfc',
+        # Re-pinned 2026-11-13 (GH #1118 / #1119, stream manquant): the plot_inputs
+        # comment in data_scheme.yml now names the Unknown fill, and
+        # harmonize_seed_crop maps maize / cowpea seed to crop_production's 'Maïs'
+        # / 'Niébé'.  Neither touches the food_acquired u path this test guards.
+        # The scheme digest moved again (comments only) when the plot_inputs
+        # comment stopped calling the 2018-19 gift answers a purchase, and when
+        # 2018-19 began reading the purchase (ruling "Extend to all four now").
+        '_/data_scheme.yml': '45e9a5fe58ea0d3d4ce91b3873546ef2bf7fc6233b29495fc09ab3f5ef14718c',
+        '_/categorical_mapping.org': '24fe7f2d0b79a64578d4dffdc1861ac1b9f1434afca766b2cac26dae53f5c8c7',
     }
     for rel, digest in protected.items():
         assert hashlib.sha256((COUNTRY / rel).read_bytes()).hexdigest() == digest, rel
