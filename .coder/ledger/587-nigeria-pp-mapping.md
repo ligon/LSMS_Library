@@ -185,3 +185,39 @@ failed to connect).
 - Every PP registry key: constructions' inputs equal the stamped rows and reproduce Price; omissions' inputs are
   disjoint from the served index, unique, at `rows: 0` in attrs.  Site B / I / Q: 0 / 0 / 0 on community_prices
   in every arm; warnings identical to the previous head.
+
+## Step 4 -- red-team findings and the two newest rulings (2026-11-12), Claude Opus 5.5
+
+Rulings: "GH587 label judgements and two follow-ups" and "GH587 W1 division after red team"
+(`reports/587-redteam/VERDICT.md` F1-F7).
+
+### §2 Machinery used or added
+| symbol | path | decision |
+|---|---|---|
+| `pp_dispositions` | `Nigeria/_/pp_community_prices.py` | **extended**: `w1-metric-small-count-hold`, `w1-kg-mid-count-hold`, `w1-nonmetric-count-as-size-hold` (held) and `w1-divided-unvalidated` (served); W5 Bottle/Can with a coded metric size leaves `w5-quantity-hold` for `metric-size` |
+| `derive_pp_w1_unit_price` | same | **reused** under a second key, `pp-w1-number-of-units-unvalidated` (one function, two keys: the key says which band) |
+| `inputs_pp_w1_number_of_units_unvalidated`, `inputs_pp_w1_{metric_small_count,kg_mid_count,nonmetric_count_as_size}_hold` | same | **new**, through `pp_inputs` |
+| `harmonize_food` | `Nigeria/_/categorical_mapping.org` | code 15's 2012Q3 cell names Semovita; a label-only row (GH #1144 convention) carries Preferred `Semovita`, Aggregate `Other grains and flour` |
+| `u` | same | codes 1020-1022 `Congo/Mudu`, `ml`, `Tomatoes cup`, no per-wave cell |
+
+### §5 Decisions
+| quantity | decision | reason |
+|---|---|---|
+| W1 Kg N 6-50 (208), non-metric N > 50 (241), g/ml N 2-5 (61 + 3) | **held**, one key each | ruling; red team F1/F2 evidence in each key's assumptions |
+| W1 non-metric N 2-50 (3,033), Kg N 2-5 (547), Unknown N > 1 (49) | **divided**, key `pp-w1-number-of-units-unvalidated` | ruling ("Flag them") |
+| W1 g/ml N >= 6, l N 2-50 (2,725) | **divided**, key `pp-w1-number-of-units` | ruling ("Supported bands") |
+| W2 code 15 Semovita (72) | **served**; Aggregate `Other grains and flour` | ruling; W4/W5/NLSS household files put Semovita (recode 231) under item 23 on 189 of 190 rows |
+| W5 Bottle/Can with coded metric size, `c2q2a` != 1 (63) | **served**, `pp-c2-metric-size` | ruling; 0.96x same-round item medians |
+| `pp-unharmonized-item-hold` | 0 rows; waves widened to all PP folders | F7 |
+
+### §6 Open questions for the human
+1. Semovita's Aggregate: the within-Nigeria evidence says `Other grains and flour`; GhanaLSS folds semolina into `Wheat Flour`.
+2. Follow-ups already ruled for the next batch: PH W3 Kg/l ("Measure PH, then align"), PH's blank-unit drop.
+
+### Phase 3 -- verification (step 4)
+- Counts measured on the raw sources (burst 41250939; Semovita sweep 41250997): every W1 band equals the red team's.
+- Cold, private roots (burst 41251132): base `e5fdd2fa8`, previous head `e5940eaa9`, candidate `d0ba8ee23`.
+  `sample`, `household_roster`, `food_acquired`, `crop_production`, `plot_inputs`, `plot_features` frame-equal
+  to base (attrs and warnings too); PH rows frame-equal to `e5940eaa9` (146,792).  PP: 513 leave, 135 arrive,
+  3,629 change key only, 0 price changes.  Registry (burst 41251275): every construction joins and reproduces
+  Price; every omission unique, disjoint, `rows: 0`.

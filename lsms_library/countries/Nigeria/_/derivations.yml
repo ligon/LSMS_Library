@@ -500,7 +500,10 @@ Nigeria::community_prices::pp-c2-metric-size:
         package of that size even where its c2q2a Quantity is not 1 (63
         rows; sizes 33 CL to 1.5 LITRE).  c2q2a restates the coded size on
         8 of the 63; what it means on the other 55 is not established, and
-        it is not used.  The other 60 W5 rows recording a c2q2a other than
+        it is not used.  Divided by the size they sit at 0.96x the same
+        round's other pp-c2-metric-size rows (median against the item-unit
+        median, 62 matched, p10-p90 0.88-1.07, all within 2x) and 0.70x PH
+        2024Q1's c8-metric-size (62, all within 2x).  The other 60 W5 rows recording a c2q2a other than
         1 stay held (pp-w5-quantity-not-one-hold).  Ruled 2026-11-12,
         "Serve the 63 via c8".
       basis: modelling-choice

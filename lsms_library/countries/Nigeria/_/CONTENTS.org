@@ -4279,7 +4279,7 @@ next section.
 
 * 2026-11-12 -- Post-planting community prices (GH #587)
 
-/Rulings (@ligon, 2026-11-12, five GH587 entries in the decision log)./
+/Rulings (@ligon, 2026-11-12, seven GH587 entries in the decision log)./
 "Develop the item and unit code mapping, then provide community_prices using
 those harmonized labels."  Base =u=, native size in its own column.  W1:
 register the division by the Number of Units.  W5: accept the printed
@@ -4289,7 +4289,17 @@ after the household-unit-value test below: *"Hold both groups"* -- W1 =g= /
 registered omission; and *"Serve W3 kg/l and W5 g/cl"* -- W3's =Kg= / =l=
 with no size are served as recorded, W5's =g= / =cl= with no size are
 served as =c2q3 / c2q2a= (a registered derivation), and W3 =g= / =cl= and
-W2 grams stay held.
+W2 grams stay held.  Then, on the wiring PR's label tables ("GH587 label
+judgements and two follow-ups"): *"Add a Semovita row"* (W2 code 15 is
+served, W3 161 is Palm wine, W2 code 0 is a dropped sentinel), *"Accept
+all"* unit proposals, *"Measure PH, then align"* for PH W3's blank-size
+=Kg= / =l= (next Nigeria batch), *"Serve the 63 via c8"* for W5; and, on
+the red team's N-band test ("GH587 W1 division after red team"): *"Hold
+both"* (W1 =Kg= N 6-50, non-metric N > 50), *"Flag them, hold g N 2-5"*
+(non-metric N 2-50, =Kg= N 2-5 and =Unknown= keep the division under a
+SEPARATE key marking it unvalidated; =g= / =ml= N 2-5 held) and *"Register
+tokens, keep Unknown"* (=Congo/Mudu=, =ml=, =Tomatoes cup= enter the =u=
+table; blank-unit PP rows stay =Unknown=).
 
 *The idiosyncrasy.*  The PP community questionnaire prices food in Section
 C2, not C8 (the entry "C8 is POST-HARVEST ONLY" above concluded otherwise).
@@ -4328,8 +4338,8 @@ The PP cards are NOT the PH C8 cards:
   document describes =c2q2a=.
 - *W5's Other-unit text =c2q2b_os= states the package on the =g= / =cl=
   rows.*  On all 231 priced =2. GRAMS (G)= / =4. CENTLITRES (CL)= rows with a
-  blank SIZE it is non-blank ('250G', '400 GRAMS TIN', '750ML BOTTLE', or
-  just 'GRAM' / 'ML').  Where it carries a number, =c2q2a= restates it in the
+  blank SIZE it is non-blank (a gram figure, a gram or millilitre figure with
+  a container word, or just the unit word).  Where it carries a number, =c2q2a= restates it in the
   row's unit: on 172 of the 176 =g= rows that record =c2q2a= it equals the
   text's gram figure (a number in the text on 175, one only to float32
   precision; the last row is unresolved -- its text has a letter inside its
@@ -4347,26 +4357,53 @@ The PP cards are NOT the PH C8 cards:
 - *PP and PH now treat W3's blank-size =Kg= / =l= differently.*  PH W3 drops
   its 3,433 (=c8-unrecorded-size-drop=); PP W3 serves its 4,120, because
   they measured as per-kilogram / per-litre prices (1.07x / 1.00x the
-  household unit value, below).  PH W3's rows were not re-measured.
+  household unit value, below).  PH W3's rows were not re-measured.  Ruled
+  "Measure PH, then align": test PH W3's 3,433 against household unit
+  values and, if per-unit, serve them too -- a FOLLOW-UP for the next
+  Nigeria batch, not done here.
+- *PP and PH treat a blank unit differently.*  PP serves its 399 blank-unit
+  rows as =u = 'Unknown'= (the =data_info.yml= sentinel; W1 390, W3 9),
+  where PH drops a blank unit.  Ruled "Register tokens, keep Unknown";
+  aligning PH's drop is a FOLLOW-UP.
+- *Semovita is a PP-card item the household card does not number.*  W2's
+  PP community card code 15 is "Semovita"; the 2012Q3 household card has
+  no code 15 (0 rows in =sect7b_plantingw2= / =sect10b_harvestw2=, and none
+  in any later household food file; W1's code 15 is Bread).  Where the
+  household files do record Semovita -- W4 PP / PH, W5 PP and NLSS 2018-19
+  -- it is the other-specify recode ='231. Semovita/semolina'= (=item_os_cd=
+  / =item_cd_alt=) under =item_cd= 23 "Other grains and flour (specify)"
+  (59 of 60, 29 of 29, 32 of 32 and 69 of 69 rows; the 60th under 38,
+  other roots and tuber).  So =harmonize_food='s 2012Q3 cell for code 15
+  names Semovita, a label-only row (the GH #1144 convention) gives it the
+  Aggregate =Other grains and flour=, and the wave-blind Code contract
+  still reads code 15 as Bread.  GhanaLSS 2016-17 folds "Wheat semolina,
+  suji" into =Wheat Flour= (=GhanaLSS/2016-17/_/categorical_mapping.org=);
+  EHCVM keeps =Semoule de blé= as its own label.
 
 *What is served* (cold build, private root, after the final rulings):
 
 | PP t | served | Derivation | held (registered) |
 |-+-+-+-|
-| 2010Q3 | 20,839 | 6,867 =pp-w1-number-of-units= | 105 no count; 1,043 g/ml with N = 1 (963 g, 80 ml); 332 Kg/l with N > 50 (128 Kg, 204 l) |
-| 2012Q3 | 21,124 | -- | 209 g/cl no size (204 g, 5 cl); 72 Semovita (code 15, no =j=; the code-0 sentinel has no priced row) |
+| 2010Q3 | 20,326 | 2,725 =pp-w1-number-of-units=; 3,629 =pp-w1-number-of-units-unvalidated= | 105 no count; 1,043 g/ml with N = 1 (963 g, 80 ml); 332 Kg/l with N > 50 (128 Kg, 204 l); 64 g/ml with N 2-5 (61 g, 3 ml); 208 Kg with N 6-50; 241 non-metric with N > 50 |
+| 2012Q3 | 21,196 (72 Semovita) | -- | 209 g/cl no size (204 g, 5 cl); the code-0 sentinel has no priced row |
 | 2015Q3 | 24,995 (obs 1 18,365, obs 2 6,630) | -- | 12,934 g/cl no size (g 8,445, cl 4,489); its 4,120 Kg/l are served |
 | 2018Q3 | 32,246 | 3,156 =pp-c2-metric-size= | none |
-| 2023Q3 | 29,875 | 4,556 =pp-c2-metric-size=; 208 =pp-w5-metric-unit-quantity= (176 g, 32 cl) | 23 g/cl with no size and no =c2q2a= (19 g, 4 cl); 123 =c2q2a= not 1 |
+| 2023Q3 | 29,938 | 4,619 =pp-c2-metric-size= (63 Bottle/Can whose =c2q2a= is not 1); 208 =pp-w5-metric-unit-quantity= (176 g, 32 cl) | 23 g/cl with no size and no =c2q2a= (19 g, 4 cl); 60 =c2q2a= not 1 (41 Cube, 2 Bottle/Can with no size, 10 Kg, 7 l) |
 
-The first wiring (=03fe9034c=) served 22,214 / 21,124 / 20,875 / 32,246 /
-29,667; the difference is exactly the rows the two final rulings moved.
+128,701 PP rows.  The first wiring (=03fe9034c=) served 22,214 / 21,124 /
+20,875 / 32,246 / 29,667; =e5940eaa9= (the "Hold both groups" / "Serve W3
+kg/l and W5 g/cl" head) 20,839 / 21,124 / 24,995 / 32,246 / 29,875; the
+differences are exactly the rows the later rulings moved (2010Q3 -513 held,
+2012Q3 +72 Semovita, 2023Q3 +63 Bottle/Can).
 
 Unpriced rows (no positive Naira: not available, or unpriced) are excluded
 as PH excludes them.  =u= is the PH base label; the six PP-only overrides
 are W1 =Tomatoes cup=, =Congo/Mudu=, =ml= (=millilitre=, which the decoder
 reads as litres), W2 =Derica= for the typo =MEDIUM DERCA=, W3 31 =Mudu= and
-42 =Derica=.  A PP row with no unit recorded is =Unknown= (390 W1, 9 W3
+42 =Derica=.  The three W1 spellings are =u= Preferred Labels since the
+2026-11-12 ruling (codes 1020-1022, no per-wave cell, so no food or harvest
+decode reads them); served on 1,830 (=Congo/Mudu=), 372 (=ml=) and 229
+(=Tomatoes cup=) rows.  A PP row with no unit recorded is =Unknown= (390 W1, 9 W3
 rows), where PH drops a blank unit.  =Size= keeps what base =u= folds away:
 the W4/W5 SIZE label verbatim (='0. SMALL'=, ='34. 250 GRAMS'=), the size word
 W1-W3 code into the unit (='small'=, ='LARGE'=); NA on PH rows.  PH rows are
@@ -4408,24 +4445,78 @@ reads more like a size than a count (undivided, the litre rows sit at
 reading fits them) -- both held since the final ruling.  The numbers are
 re-measurable with the wiring report's scripts.
 
+*W1 Number of Units, band by band* (the red team's test, 2026-11-12,
+=reports/587-redteam/VERDICT.md= F1 / F2; the basis of "GH587 W1 division
+after red team").  The evidence above covered metric units only.  Three
+references, each calibrated by its own N = 1 rows: the household unit value
+in the same =(v, j, u)= cell (Kg N = 1: 1.05), PH 2011Q1's community price
+in the same cluster (Kg 1.00, l 0.85, non-metric 1.00), and W1's own N = 1
+price for the same =(j, u)= (1 by construction).  Median price /
+reference, share within 2x in brackets, cells or rows after the slash:
+
+| band (rows) | household, divided | PH 2011Q1, divided | W1 N = 1, divided | W1 N = 1, undivided | ruling | key |
+|-+-+-+-+-+-+-|
+| Kg N 2-5 (547) | 0.75 (63%) / 237 | 0.56 (47%) / 266 | 0.60 (51%) / 534 | 1.6 (53%) | divided, unvalidated | =pp-w1-number-of-units-unvalidated= |
+| Kg N 6-50 (208) | 0.33 (32%) / 94 | 0.16 (22%) / 72 | 0.155 (16%) / 193 | 2.0 (38%) | *held* | =pp-w1-kg-mid-count-hold= |
+| Kg N > 50 (128) | 0.009-0.23 (see above) | | | | held | =pp-w1-count-as-size-hold= |
+| non-metric N 2-5 (1,432) | -- | 0.40 (36%) / 271 | 0.50 (42%) / 1,240 | 1.67 (32%) | divided, unvalidated | =pp-w1-number-of-units-unvalidated= |
+| non-metric N 6-50 (1,601) | -- | 0.20 (24%) / 233 | 0.14 (17%) / 1,408 | 1.5 (39%) | divided, unvalidated | =pp-w1-number-of-units-unvalidated= |
+| non-metric N > 50 (241) | -- | 0.087 (17%) / 6 | 0.015 (0%) / 238 | 1.0 (70%) | *held* | =pp-w1-nonmetric-count-as-size-hold= |
+| Unknown N > 1 (49: 20 / 26 / 3) | -- | -- | 0.38 / 0.23 / 0.005 on 13 / 12 / 2 | 1.1 / 1.75 / 0.99 | divided, unvalidated | =pp-w1-number-of-units-unvalidated= |
+| g N 2-5 (61), ml N 2-5 (3) | 9.0 (10%) / 21 (undivided 30) | | | | *held* | =pp-w1-metric-small-count-hold= |
+| g N 6-50 (263) | 1.01 (44%) / 90 (undivided 30) | | | | divided | =pp-w1-number-of-units= |
+| g N > 50 (1,754) | 0.75 (58%) / 566 (undivided 233) | | | | divided | =pp-w1-number-of-units= |
+| ml N 6-50 (44) | no matched cell | | | | divided | =pp-w1-number-of-units= |
+| ml N > 50 (328) | 1.00 (74%) / 27 (undivided 330) | | | | divided | =pp-w1-number-of-units= |
+| l N 2-5 (183) | 1.00 (79%) / 84 | 0.89 (77%) / 53 | 0.83 (56%) / 177 | 2.2 (28%) | divided | =pp-w1-number-of-units= |
+| l N 6-50 (153) | 0.67 (54%) / 79 | 0.71 (55%) / 40 | 0.12 (33%) / 147 | 1.1 (53%) | divided (mixed) | =pp-w1-number-of-units= |
+
+Non-metric by unit, divided / W1 N = 1 (all bands): Piece 0.25 (1,735
+rows), Basket 0.05, Bunch 0.19, Tuber 0.33, Congo/Mudu 0.33, Milk cup 0.63,
+Cigarette cup 0.89 (the one fit), other specify 0.024 (pools several
+units); the same within state.  Within each item and unit the elasticity
+of the Naira figure with respect to N is 0.47 (non-metric), 0.46 (Kg),
+0.41 (Unknown), 0.40 (g), 0.33 (l), 0.08 (ml) -- a true count would give 1,
+a count that is really a size 0.  *Caveat (red team):* the within-W1
+reference and the elasticity assume N is unrelated to the size of what is
+priced; "5 small pieces" beside another cluster's "1 large piece" would
+give this pattern under a correct division, and base =u= folds W1's size
+into =Size=.  So the non-metric N 2-50 rows are UNVALIDATED, not refuted --
+which is why they stay divided under their own key.  The Kg legs and the
+N > 50 legs do not depend on that assumption.  Every W1 count is integral
+(0 non-integral of 22,319 priced rows), so the bands are exact.  W1's
+priced rows: 15,015 with N = 1, 7,199 with N > 1, 105 with no count (22,319;
+the "Register the division" ruling quoted 15,014 / 7,198).
+
 *W5 =c2q2a=.*  350 priced rows record it; 19 equal 1 (18 CUBE, 1 LITRES)
 and are served.  208 are on GRAMS / CENTLITRES with a blank size: there it
 is the package size in g / cl, and Price = =c2q3 / c2q2a=
-(=Nigeria::community_prices::pp-w5-metric-unit-quantity=).  The remaining
-123 (41 CUBE, 65 BOTTLE/CAN -- 63 with a coded metric size -- 10 KILOGRAMS,
-7 LITRES) are not served, registered as
+(=Nigeria::community_prices::pp-w5-metric-unit-quantity=).  Of the
+remaining 123 (41 CUBE, 65 BOTTLE/CAN, 10 KILOGRAMS, 7 LITRES), the 63
+BOTTLE/CAN rows with a coded metric size (33 CL to 1.5 LITRE) are served
+by the size division, =pp-c2-metric-size=, their =c2q2a= unused (ruled
+"Serve the 63 via c8"; =c2q2a= equals the coded size on 8 of them; divided,
+they sit at 0.96x the same round's other =pp-c2-metric-size= item-unit
+medians and 0.70x PH 2024Q1's, 62 matched, all within 2x); the
+other 60 (41 CUBE, 2 BOTTLE/CAN with no size, 10 KILOGRAMS, 7 LITRES) are
+not served, registered as
 =Nigeria::community_prices::pp-w5-quantity-not-one-hold=.  On CUBE the price
 scales with =c2q2a= (price / same item-unit-size median = 0.7-1.0 x
-=c2q2a=), so "one cube" would overstate it up to ~1,400x; on BOTTLE/CAN
-=c2q2a= equals the coded size on 8 of 63 rows.
+=c2q2a=), so "one cube" would overstate it up to ~1,400x.
 
-*Registered* (=_/derivations.yml=): three constructions --
-=pp-w1-number-of-units=, =pp-c2-metric-size= (the PH function; its own key
-because the PH entry's =inputs= return PH rows only) and
-=pp-w5-metric-unit-quantity= -- and six =rows: 0= omissions, one per held
-group: =pp-w1-no-count-hold=, =pp-w1-metric-package-hold=,
-=pp-w1-count-as-size-hold=, =pp-unrecorded-size-hold= (now W2 g/cl, W3 g/cl
-and W5's 23), =pp-unharmonized-item-hold=, =pp-w5-quantity-not-one-hold=.
+*Registered* (=_/derivations.yml=): four constructions --
+=pp-w1-number-of-units= (the supported bands), =pp-w1-number-of-units-unvalidated=
+(the same function on the unvalidated bands), =pp-c2-metric-size= (the PH
+function; its own key because the PH entry's =inputs= return PH rows only)
+and =pp-w5-metric-unit-quantity= -- and nine =rows: 0= omissions, one per
+held group: =pp-w1-no-count-hold= (105), =pp-w1-metric-package-hold=
+(1,043), =pp-w1-count-as-size-hold= (332), =pp-w1-metric-small-count-hold=
+(64), =pp-w1-kg-mid-count-hold= (208), =pp-w1-nonmetric-count-as-size-hold=
+(241), =pp-unrecorded-size-hold= (13,166: W2 g/cl 209, W3 g/cl 12,934, W5
+23), =pp-unharmonized-item-hold= (0: W2's code-0 sentinel has no priced
+row; it spans every PP folder so an off-card item would be reachable) and
+=pp-w5-quantity-not-one-hold= (60).  The =unit-unplaced= disposition (an
+unlabelled unit code off the native card) has no key: 0 rows, and it warns.
 Each =inputs= returns its rows with their original variables under the
 served =(t, v, j, u, variety, obs)= labels.  The crosswalk lives in
 =_/pp_community_prices.py=, not in =categorical_mapping.org= (where a table
@@ -4435,4 +4526,23 @@ every judgement row are in =.coder/ledger/587-nigeria-pp-mapping/MAPPING.org=.
 *Not changed.*  PH C8, its size rule and its first-row / variety contracts;
 =Size= is not filled for PH; =labels='Aggregate'= still collapses W3-W5 items
 onto one label without making the index unique (pre-existing, base too);
-W1/W2 PP =Pepper= passes through =Aggregate= (837 rows, GH #1537).
+W1/W2 PP =Pepper= passes through =Aggregate= on 808 rows (2010Q3 396,
+2012Q3 412; =LabelPassThroughWarning= measures the same).  It was 837 at
+the first wiring and 817 at =e5940eaa9= (the red team's count); the 9 W1
+=Pepper= rows the N-band holds remove are the difference.  Its Aggregate
+is GH #1537's ruling ("Check codes, then Fresh"), a separate batch.
+
+*Owed, not done here.*
+- *A full Nigeria re-warm.*  Every Nigeria table hash moves: =nigeria.py=,
+  =categorical_mapping.org=, =data_scheme.yml= and the two new =_/*.py=
+  files are in every Nigeria table's input hash, so any later edit to
+  =pp_community_prices.py= or =pp_community_price_sources.py= re-warms all
+  of Nigeria.  No other country moves.
+- *The coverage regrade.*  =.coder/coverage/latest.csv= still grades the
+  five PP =community_prices= cells =dropped=; =make matrix= was not rerun.
+- *PH W3 blank-size =Kg= / =l=* ("Measure PH, then align") and *PH's
+  blank-unit drop* (aligning with PP's =Unknown=): next Nigeria batch.
+- *W2's 5 =cl= rows* are held with W2's grams (no size field); no ruling
+  names them.
+- *One W5 gram row* is served at about 12x its item median under
+  =pp-w5-metric-unit-quantity= (its text's number is garbled), as ruled.
