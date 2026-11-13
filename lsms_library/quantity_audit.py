@@ -1130,34 +1130,8 @@ _SURVEY_KG_PRICE_RUNGS: tuple[tuple[str, bool], ...] = (
 )
 
 
-def _row_labels(axis: tuple[np.ndarray, np.ndarray] | None) -> np.ndarray | None:
-    """Per-row labels of an :func:`_axis` result, ``None`` where missing."""
-    if axis is None:
-        return None
-    codes, categories = axis
-    out = np.full(len(codes), None, dtype=object)
-    hit = codes >= 0
-    out[hit] = categories[codes[hit]]
-    out[pd.isna(out)] = None
-    return out
-
-
-def _key_text(labels: np.ndarray | None, n: int) -> np.ndarray:
-    """Grouping text: stripped, case-folded; ``'\\x00'`` for a missing label.
-
-    Case-folded because a sold unit and a harvest unit are compared by LABEL,
-    and Niger's s16d sold labels arrive lower-case where s16c's do not
-    (``CONTENTS.org``, "the SOLD unit is Unit_sold").
-    """
-    if labels is None:
-        return np.full(n, "", dtype=object)
-    series = pd.Series(labels, dtype=object)
-    text = series.astype(str).str.strip().str.casefold().to_numpy(dtype=object)
-    return np.where(series.isna().to_numpy(), "\x00", text)
-
-
-def _stated_masses(labels: np.ndarray) -> np.ndarray:
-    """Kilograms a unit label STATES, per row; ``NaN`` where it states none.
+def _stated_masses(labels: Any) -> np.ndarray:
+    """Kilograms each unit label STATES; ``NaN`` where it states none.
 
     The ruling's baseline is "kg sales plus sacks at stated mass": a label is
     read, never estimated -- :data:`~lsms_library.transformations.KNOWN_METRIC`'s
@@ -1166,31 +1140,31 @@ def _stated_masses(labels: np.ndarray) -> np.ndarray:
     kg``, ``Sac (50 Kg)``).  VOLUMES ARE NOT MASSES: litre spellings are dropped
     (``volume_as_mass=False``), as the food ladder's baseline drops them
     (``_BASELINE_UNIT_CONVERSION``).  A country's declared ``u_kg`` is not read:
-    it is a table, not a label.
+    it is a table, not a label.  Applied to an axis's CATEGORIES, so each
+    distinct label is parsed once.
     """
     from .transformations import _FLUID_UNITS, KNOWN_METRIC, _parse_explicit_metric
 
     fluids = {u.lower() for u in _FLUID_UNITS}
-    masses: dict[Any, float] = {}
-    for label in pd.unique(pd.Series(labels, dtype=object).dropna()):
+    out = np.full(len(labels), np.nan)
+    for k, label in enumerate(labels):
+        if label is None or pd.isna(label):
+            continue
         text = str(label).strip()
         low = text.lower()
-        kg = np.nan
         if low in fluids:
-            kg = np.nan
-        elif low in KNOWN_METRIC:
-            kg = float(KNOWN_METRIC[low])
-        else:
-            parsed = _parse_explicit_metric(text, volume_as_mass=False)
-            if parsed is not None and np.isfinite(parsed) and parsed > 0:
-                kg = float(parsed)
-        masses[label] = kg
-    return pd.Series(labels, dtype=object).map(masses).to_numpy(
-        dtype="float64", na_value=np.nan)
+            continue
+        if low in KNOWN_METRIC:
+            out[k] = float(KNOWN_METRIC[low])
+            continue
+        parsed = _parse_explicit_metric(text, volume_as_mass=False)
+        if parsed is not None and np.isfinite(parsed) and parsed > 0:
+            out[k] = float(parsed)
+    return out
 
 
-def _usable_units(labels: np.ndarray) -> np.ndarray:
-    """Rows whose unit label names a unit at all.
+def _usable_units(labels: Any) -> np.ndarray:
+    """Which unit labels name a unit at all, per label.
 
     Not the missing-unit sentinel (``Unknown``, ``Manquant``, NA), not blank, and
     not a currency-denominated label: a price per ``Value`` is the amount over
@@ -1198,40 +1172,104 @@ def _usable_units(labels: np.ndarray) -> np.ndarray:
     """
     from .transformations import _is_currency_denominated, _unit_sentinel_mask
 
-    series = pd.Series(labels, dtype=object)
-    sentinel = _unit_sentinel_mask(pd.DataFrame({"u": series}))
+    series = pd.Series(list(labels), dtype=object)
+    sentinel = np.asarray(_unit_sentinel_mask(pd.DataFrame({"u": series})), dtype=bool)
     blank = series.astype(str).str.strip().eq("").to_numpy(dtype=bool)
     currency = _is_currency_denominated(series.fillna("").astype(str))
-    return ~(np.asarray(sentinel, dtype=bool) | blank | currency)
+    return ~(sentinel | blank | currency)
 
 
-def _known_state(labels: np.ndarray | None, n: int) -> np.ndarray:
-    """Rows whose product state is recorded: not NA, not ``unknown_condition``."""
-    if labels is None:
-        return np.zeros(n, dtype=bool)
-    text = pd.Series(_key_text(labels, n), dtype=object).astype(str)
-    return (~text.isin(["\x00", ""]) & ~text.str.startswith("unknown")).to_numpy(dtype=bool)
+def _axis_ids(df: pd.DataFrame, axis: str, vocab: dict[str, int]
+              ) -> tuple[np.ndarray, np.ndarray, np.ndarray] | None:
+    """Per-row ids of *axis*'s stripped, case-folded labels in a SHARED *vocab*.
 
-
-def _cell_stats(keys: dict[str, np.ndarray], values: np.ndarray,
-                rows: np.ndarray) -> pd.DataFrame:
-    """``n``, ``median`` and ``spread`` of *values* over *rows*, per cell of *keys*.
-
-    ``spread`` is ``p90/p10`` at ``n >= 10`` and ``max/min`` below (the food
-    ladder's dispersion statistic).  Quantiles interpolate as ``Series.quantile``.
+    ``(row_ids, categories, codes)``: ``-1`` for a missing label, ``None`` for an absent
+    axis.  Two axes read into one vocab compare by label -- a sold unit against a
+    harvest unit, a sale state against a harvest state -- and case-folded because
+    Niger's s16d sold labels arrive lower-case where s16c's do not (``CONTENTS.org``,
+    "the SOLD unit is Unit_sold").  Only the categories are touched as text.
     """
-    names = list(keys)
-    frame = pd.DataFrame({k: keys[k][rows] for k in names})
-    frame["_v"] = values[rows]
-    grouped = frame.groupby(names, sort=False, dropna=False)["_v"]
-    out = pd.DataFrame({"n": grouped.size(), "median": grouped.median(),
-                        "lo": grouped.min(), "hi": grouped.max()})
-    q = grouped.quantile([0.1, 0.9]).unstack()
-    with np.errstate(divide="ignore", invalid="ignore"):
-        decile = (q[0.9] / q[0.1]).reindex(out.index)
-        extreme = out["hi"] / out["lo"]
-    out["spread"] = np.where(out["n"] >= 10, decile, extreme)
+    got = _axis(df, axis)
+    if got is None:
+        return None
+    codes, categories = got
+    cat_ids = np.full(len(categories), -1, dtype=np.int64)
+    for k, label in enumerate(categories):
+        if label is None or pd.isna(label):
+            continue
+        text = str(label).strip().casefold()
+        if text:
+            cat_ids[k] = vocab.setdefault(text, len(vocab))
+    ids = np.full(len(codes), -1, dtype=np.int64)
+    hit = codes >= 0
+    ids[hit] = cat_ids[codes[hit]]
+    return ids, categories, codes
+
+
+def _per_row(axis: tuple[np.ndarray, np.ndarray, np.ndarray], per_category: np.ndarray,
+             fill: Any) -> np.ndarray:
+    """Spread a per-category array over the rows of an :func:`_axis_ids` result."""
+    if axis is None:
+        return None
+    codes = axis[2]
+    out = np.full(len(codes), fill, dtype=per_category.dtype)
+    hit = codes >= 0
+    out[hit] = per_category[codes[hit]]
     return out
+
+
+def _fold(parts: list[np.ndarray]) -> np.ndarray:
+    """One int64 group code from several id arrays (``-1`` = missing, a group)."""
+    n = len(parts[0]) if parts else 0
+    codes = np.zeros(n, dtype=np.int64)
+    width = 1
+    for ids in parts:
+        w = int(ids.max()) + 2 if len(ids) else 1
+        codes = codes * w + (ids + 1)
+        width *= w
+        if width > _MAX_COMBINED_WIDTH:
+            codes = np.unique(codes, return_inverse=True)[1].astype(np.int64)
+            width = int(codes.max()) + 1 if n else 1
+    return codes
+
+
+def _group_summary(codes: np.ndarray, values: np.ndarray, rows: np.ndarray
+                   ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Per cell of *codes* over *rows*: ``(cell codes, n, median, spread)``.
+
+    ``spread`` is ``p90/p10`` at ``n >= 10`` and ``max/min`` below -- the food
+    ladder's dispersion statistic.  Quantiles interpolate linearly between order
+    statistics, as ``Series.quantile`` does (:func:`_group_quantiles`' arithmetic).
+    """
+    keep = rows & np.isfinite(values)
+    c, v = codes[keep], values[keep]
+    if not len(c):
+        empty = np.zeros(0)
+        return np.zeros(0, dtype=np.int64), np.zeros(0, dtype=np.int64), empty, empty
+    order = np.lexsort((v, c))
+    c, v = c[order], v[order]
+    first = np.flatnonzero(np.concatenate(([True], c[1:] != c[:-1])))
+    counts = np.diff(np.concatenate((first, [len(c)])))
+
+    def quantile(p: float) -> np.ndarray:
+        position = p * (counts - 1)
+        low = np.floor(position).astype(np.int64)
+        high = np.ceil(position).astype(np.int64)
+        frac = position - low
+        return v[first + low] * (1.0 - frac) + v[first + high] * frac
+
+    with np.errstate(divide="ignore", invalid="ignore"):
+        spread = np.where(counts >= 10, quantile(0.9) / quantile(0.1),
+                          quantile(1.0) / quantile(0.0))
+    return c[first], counts, quantile(0.5), spread
+
+
+def _lookup(cells: np.ndarray, want: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """``(slot, hit)``: where each of *want* sits in the sorted *cells*."""
+    if not len(cells):
+        return np.zeros(len(want), dtype=np.int64), np.zeros(len(want), dtype=bool)
+    slot = np.clip(np.searchsorted(cells, want), 0, len(cells) - 1)
+    return slot, cells[slot] == want
 
 
 def survey_kg_price_factors(df: Any) -> pd.DataFrame | None:
@@ -1270,6 +1308,10 @@ def survey_kg_price_factors(df: Any) -> pd.DataFrame | None:
     survey's sold kilograms (``Quantity_sold_kg``) are not read: on a sale in the
     harvest's unit they equal the harvest's kilograms per unit on most rows (Niger
     2021-22: 939 of 1,134), so they would judge the survey by itself.
+
+    Integer codes throughout, as Site Q's arithmetic is: only an axis's
+    categories are ever handled as text, because this runs on every
+    ``crop_production`` read.
     """
     if not isinstance(df, pd.DataFrame) or df.empty:
         return None
@@ -1282,8 +1324,9 @@ def survey_kg_price_factors(df: Any) -> pd.DataFrame | None:
     survey = np.isfinite(total) & (total > 0) & np.isfinite(quantity) & (quantity > 0)
     if not survey.any():
         return None
-    harvest_u = _row_labels(_axis(df, "u"))
-    sold_u = _row_labels(_axis(df, "Unit_sold"))
+    units: dict[str, int] = {}
+    harvest_u = _axis_ids(df, "u", units)
+    sold_u = _axis_ids(df, "Unit_sold", units)
     if harvest_u is None or sold_u is None:
         return None
 
@@ -1292,13 +1335,15 @@ def survey_kg_price_factors(df: Any) -> pd.DataFrame | None:
     with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
         price = sold_v / sold_q
         kg_survey = total / quantity
-    mass_sold = _stated_masses(sold_u)
-    mass_harvest = _stated_masses(harvest_u)
+    mass_sold = _per_row(sold_u, _stated_masses(sold_u[1]), np.nan)
+    mass_harvest = _per_row(harvest_u, _stated_masses(harvest_u[1]), np.nan)
+    usable_sold = _per_row(sold_u, _usable_units(sold_u[1]), False)
+    usable_harvest = _per_row(harvest_u, _usable_units(harvest_u[1]), False)
     sale = (np.isfinite(sold_q) & (sold_q > 0) & np.isfinite(sold_v) & (sold_v > 0)
-            & np.isfinite(price) & (price > 0) & _usable_units(sold_u))
+            & np.isfinite(price) & (price > 0) & usable_sold)
     by_mass = sale & np.isfinite(mass_sold)
     by_unit = sale & ~np.isfinite(mass_sold)
-    judged = survey & _usable_units(harvest_u) & ~np.isfinite(mass_harvest)
+    judged = survey & usable_harvest & ~np.isfinite(mass_harvest)
     with np.errstate(divide="ignore", invalid="ignore"):
         price_kg = np.where(by_mass, price / mass_sold, np.nan)
 
@@ -1309,63 +1354,73 @@ def survey_kg_price_factors(df: Any) -> pd.DataFrame | None:
     unit_price = np.full(n, np.nan)
     kg_price = np.full(n, np.nan)
 
-    base = {a: _key_text(_row_labels(_axis(df, a)), n)
-            for a in ("country", "t", "season", "j") if _axis(df, a) is not None}
+    base = []
+    for a in ("country", "t", "season", "j"):
+        got = _axis_ids(df, a, {})
+        if got is not None:
+            base.append(got[0])
     if not base:
-        base = {"_frame": np.full(n, "", dtype=object)}
-    sold_unit = _key_text(sold_u, n)
-    harvest_unit = _key_text(harvest_u, n)
-    sold_state = _key_text(_row_labels(_axis(df, "Condition_sold")), n)
-    harvest_state = _key_text(_row_labels(_axis(df, "condition")), n)
-    sold_known = _known_state(_row_labels(_axis(df, "Condition_sold")), n)
-    harvest_known = _known_state(_row_labels(_axis(df, "condition")), n)
+        base = [np.zeros(n, dtype=np.int64)]
+    states: dict[str, int] = {}
+    harvest_s = _axis_ids(df, "condition", states)
+    sold_s = _axis_ids(df, "Condition_sold", states)
+    known = np.array([not t.startswith("unknown") for t in states], dtype=bool)
+
+    def state_known(ids: tuple[np.ndarray, np.ndarray] | None) -> np.ndarray:
+        if ids is None or not len(known):
+            return np.zeros(n, dtype=bool)
+        row = ids[0]
+        out = np.zeros(n, dtype=bool)
+        hit = row >= 0
+        out[hit] = known[row[hit]]
+        return out
+
+    harvest_known, sold_known = state_known(harvest_s), state_known(sold_s)
+    none = np.full(n, -1, dtype=np.int64)
+    harvest_state = harvest_s[0] if harvest_s is not None else none
+    sold_state = sold_s[0] if sold_s is not None else none
 
     if by_mass.any() and by_unit.any() and judged.any():
         for name, with_state in _SURVEY_KG_PRICE_RUNGS:
             todo = judged & np.isnan(implied)
+            mass_rows, unit_rows = by_mass, by_unit
             if with_state:
                 todo &= harvest_known
                 mass_rows, unit_rows = by_mass & sold_known, by_unit & sold_known
-            else:
-                mass_rows, unit_rows = by_mass, by_unit
             if not (todo.any() and mass_rows.any() and unit_rows.any()):
                 continue
-            keys = dict(base)
+            # The two sides must fold to ONE radix, or a sale's cell and a harvest
+            # row's cell cannot compare as integers: fold the sale and harvest
+            # halves together (the state column differs between them), and give the
+            # two unit columns one width.
             if with_state:
-                keys["state"] = sold_state
-            baseline = _cell_stats(keys, price_kg, mass_rows)
-            units = _cell_stats({**keys, "u": sold_unit}, price, unit_rows)
-            baseline = baseline[(baseline["n"] >= SURVEY_KG_PRICE_MIN_BASELINE)
-                                & (baseline["spread"] <= SURVEY_KG_PRICE_MAX_SPREAD)]
-            units = units[(units["n"] >= SURVEY_KG_PRICE_MIN_REPORTS)
-                          & (units["spread"] <= SURVEY_KG_PRICE_MAX_SPREAD)]
-            if baseline.empty or units.empty:
-                continue
-            names = list(keys)
-            cell = units.reset_index().merge(
-                baseline.reset_index(), on=names, suffixes=("_u", "_kg"))
-            if cell.empty:
-                continue
-            cell["implied"] = cell["median_u"] / cell["median_kg"]
-            cell = cell.set_index(names + ["u"])
-            want = {k: v for k, v in keys.items()}
-            if with_state:
-                want["state"] = harvest_state
-            want["u"] = harvest_unit
-            positions = np.flatnonzero(todo)
-            lookup = pd.MultiIndex.from_arrays(
-                [want[k][positions] for k in names + ["u"]], names=names + ["u"])
-            got = cell.reindex(lookup)
-            hit = got["implied"].notna().to_numpy()
+                stacked = _fold([np.concatenate((b, b)) for b in base]
+                                + [np.concatenate((sold_state, harvest_state))])
+                sale_base, want_base = stacked[:n], stacked[n:]
+            else:
+                sale_base = want_base = _fold(base)
+            width_u = int(max(sold_u[0].max(), harvest_u[0].max())) + 2
+            sale_cell = sale_base * width_u + (sold_u[0] + 1)
+            want_cell = want_base * width_u + (harvest_u[0] + 1)
+            m_cells, m_n, m_med, m_spread = _group_summary(sale_base, price_kg, mass_rows)
+            u_cells, u_n, u_med, u_spread = _group_summary(sale_cell, price, unit_rows)
+            m_ok = (m_n >= SURVEY_KG_PRICE_MIN_BASELINE) & (m_spread <= SURVEY_KG_PRICE_MAX_SPREAD)
+            u_ok = (u_n >= SURVEY_KG_PRICE_MIN_REPORTS) & (u_spread <= SURVEY_KG_PRICE_MAX_SPREAD)
+            pos = np.flatnonzero(todo)
+            m_slot, m_hit = _lookup(m_cells, want_base[pos])
+            u_slot, u_hit = _lookup(u_cells, want_cell[pos])
+            hit = m_hit & u_hit
+            hit[hit] = m_ok[m_slot[hit]] & u_ok[u_slot[hit]]
             if not hit.any():
                 continue
-            take = positions[hit]
-            implied[take] = got["implied"].to_numpy()[hit]
+            take = pos[hit]
+            mu, mk = u_med[u_slot[hit]], m_med[m_slot[hit]]
+            implied[take] = mu / mk
             rung[take] = name
-            n_unit[take] = got["n_u"].to_numpy(dtype="float64")[hit]
-            n_kg[take] = got["n_kg"].to_numpy(dtype="float64")[hit]
-            unit_price[take] = got["median_u"].to_numpy()[hit]
-            kg_price[take] = got["median_kg"].to_numpy()[hit]
+            n_unit[take] = u_n[u_slot[hit]]
+            n_kg[take] = m_n[m_slot[hit]]
+            unit_price[take] = mu
+            kg_price[take] = mk
 
     with np.errstate(divide="ignore", invalid="ignore"):
         ratio = np.where(judged, kg_survey, np.nan) / implied
@@ -1399,40 +1454,35 @@ def audit_survey_kg_prices(df: Any, *, country: str,
     kilograms, and where nothing fires.
 
     A flag, not a verdict.  The price-implied mass has measured biases of its own
-    (``survey_kg_price_factors``; the GH #1559 design memo): survey kilograms run
-    1.1-1.4x it at the median; a state the sale does not share moves a price per
-    kilogram by about 2.4x (shelled against unshelled groundnut) and only the
-    EHCVM waves record it; sacks are read at their stated mass, which the
-    survey's own kilograms dispute; and the prices come from the fifth of
-    households that sell.
+    (the GH #1559 rung design memo): survey kilograms run 1.1-1.4x it at the
+    median; a state the sale does not share moves a price per kilogram by about
+    2.4x (shelled against unshelled groundnut) and only the EHCVM waves record a
+    state; sacks are read at their stated mass, which the survey's own kilograms
+    dispute; and the prices come from the fifth of households that sell.
     """
     if str(table) != "crop_production":
         return []
     factors = survey_kg_price_factors(df)
     if factors is None:
         return []
-    flag = factors["kg_price_flag"].to_numpy(dtype=object)
     flagged = factors["kg_price_flag"].notna().to_numpy(dtype=bool)
     if not flagged.any():
         return []
 
     named = {a: _axis(df, a) for a in ("country", "t", "i", "plot", "j", "u", "condition")}
-    judged = np.isfinite(factors["kg_price_implied"].to_numpy(dtype="float64")) \
-        & np.isfinite(factors["kg_survey"].to_numpy(dtype="float64"))
+    judged = (np.isfinite(factors["kg_price_implied"].to_numpy(dtype="float64"))
+              & np.isfinite(factors["kg_survey"].to_numpy(dtype="float64")))
     quantity = _numeric(df["Quantity"])
     total = _numeric(df["Quantity_kg"])
     cols = {c: factors[c].to_numpy() for c in factors.columns}
     n = len(df)
-    country_of = (np.array([None if v is None else str(v)
-                            for v in _row_labels(named["country"])], dtype=object)
-                  if named["country"] is not None else np.full(n, country, dtype=object))
-    wave_of = (np.array([None if v is None else str(v) for v in _row_labels(named["t"])],
-                        dtype=object)
-               if named["t"] is not None else np.full(n, None, dtype=object))
+    country_codes = (named["country"][0] if named["country"] is not None
+                     else np.zeros(n, dtype=np.int64))
+    wave_codes = named["t"][0] if named["t"] is not None else np.zeros(n, dtype=np.int64)
 
-    by_scope: dict[tuple[Any, Any, str], list[dict[str, Any]]] = {}
+    by_scope: dict[tuple[int, int, str], list[dict[str, Any]]] = {}
     for pos in np.flatnonzero(flagged):
-        direction = str(flag[pos])
+        direction = str(cols["kg_price_flag"][pos])
         value = float(cols["kg_survey"][pos])
         implied = float(cols["kg_price_implied"][pos])
         fold = value / implied if direction == "high" else implied / value
@@ -1457,20 +1507,26 @@ def audit_survey_kg_prices(df: Any, *, country: str,
             "kg_price": float(cols["kg_price_kg_price"][pos]),
             "row_position": int(pos),
         }
-        by_scope.setdefault((country_of[pos], wave_of[pos], direction), []).append(offender)
+        key = (int(country_codes[pos]), int(wave_codes[pos]), direction)
+        by_scope.setdefault(key, []).append(offender)
 
     reports: list[dict[str, Any]] = []
-    for (c, w, direction) in sorted(by_scope, key=lambda k: (str(k[0]), str(k[1]), k[2])):
-        in_scope = (country_of == c) & (wave_of == w)
-        offenders = sorted(by_scope[(c, w, direction)], key=lambda o: -o["ratio"])
+    scopes = []
+    for key, offenders in by_scope.items():
+        pos = offenders[0]["row_position"]
+        label_c = _label(named["country"], pos) if named["country"] is not None else country
+        scopes.append((str(label_c), str(_label(named["t"], pos)), key[2], key))
+    for label_c, wave, direction, key in sorted(scopes):
+        in_scope = (country_codes == key[0]) & (wave_codes == key[1])
+        offenders = sorted(by_scope[key], key=lambda o: -o["ratio"])
         reports.append({
             "site": _SURVEY_KG_PRICE_SITE,
-            "country": c,
+            "country": label_c,
             "table": "crop_production",
             "column": _SURVEY_KG_PRICE_COLUMN,
             "definition": "Quantity_kg / Quantity",
             "direction": direction,
-            "wave": w,
+            "wave": None if named["t"] is None else wave,
             "rows": int(in_scope.sum()),
             "n_judged": int((judged & in_scope).sum()),
             "n_implausible": len(offenders),
