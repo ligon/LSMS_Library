@@ -260,6 +260,52 @@ def test_a_farm_level_code_48_sale_follows_the_households_lines(malawi, plots, e
     assert farm['Value_sold'].tolist() == [100.0]
 
 
+@pytest.mark.parametrize('cached', [True, False])
+def test_the_restricted_d_reader_uses_held_bytes_and_cleans_up(malawi, tmp_path, monkeypatch, cached):
+    """2016-17 XS Module D: the held blob, else DVCFS; only the columns the file carries."""
+    import contextlib
+    import io
+    from pathlib import Path
+    from types import SimpleNamespace
+    import pyreadstat
+    from lsms_library import local_tools
+    payload = b'invented source bytes, including \xff'
+    blob = tmp_path / 'blob'
+    blob.write_bytes(payload)
+    countries = tmp_path / 'countries'
+    target = countries / 'Malawi/2016-17/Data/Cross_Sectional/ag_mod_d.dta'
+    target.parent.mkdir(parents=True)
+    calls, temps = [], []
+    monkeypatch.setattr(local_tools, '_ensure_dvc_pulled', lambda p: calls.append(('ensure', p)))
+    monkeypatch.setattr(local_tools, '_dvc_cache_path', lambda p: blob if cached else None)
+    monkeypatch.setattr(local_tools, '_COUNTRIES_DIR', countries)
+    monkeypatch.setattr(local_tools, '_dvc_working_directory', lambda _: contextlib.nullcontext())
+
+    def dvc_open(rel):
+        assert not cached, 'a held blob must not construct the DVC index'
+        calls.append(('dvc', rel))
+        return io.BytesIO(payload)
+
+    monkeypatch.setattr(local_tools, 'DVCFS', SimpleNamespace(open=dvc_open))
+    frame = pd.DataFrame({'case_id': [1]})
+
+    def read_dta(path, **kwargs):
+        temps.append(Path(path))
+        assert Path(path).read_bytes() == payload
+        if kwargs.get('metadataonly'):
+            return None, SimpleNamespace(column_names=['case_id', 'gardenid', 'ag_d20_oth'])
+        assert kwargs == {'usecols': ['case_id', 'ag_d20_oth'], 'apply_value_formats': False}
+        return frame, None
+
+    monkeypatch.setattr(pyreadstat, 'read_dta', read_dta)
+    out = malawi.read_module_d_columns(target, ['case_id', 'ag_d20_oth', 'ag_d20b_oth'])
+    assert out is frame
+    assert [c[0] for c in calls] == ['ensure'] + ([] if cached else ['dvc'])
+    if not cached:
+        assert calls[-1][1] == 'Malawi/2016-17/Data/Cross_Sectional/ag_mod_d.dta'
+    assert temps and not any(t.exists() for t in temps)
+
+
 def test_raw_sale_lines_take_the_label_their_household_agrees_on(malawi):
     harv = pd.DataFrame({'i': ['h0', 'h1', 'h1', 'h2'], '_crop_code': [48, 48, 48, 12],
                          'crop': [LABEL, LABEL, 'Other', 'Groundnut']})

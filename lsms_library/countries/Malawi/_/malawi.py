@@ -1298,9 +1298,11 @@ def _normalise_unit_text(series):
     return s.where(s.notna() & (s != ''), pd.NA)
 
 
-#: GH #1228: seasonal code 48 is OTHER (SPECIFY).  A crop name its own Module G
-#: specify text states, in the form `_normalise_unit_text` writes, and the label
-#: that line is served.  Exact strings from a measured list, never a pattern.
+#: GH #1228: seasonal code 48 is OTHER (SPECIFY).  A crop name the line's crop text
+#: states (2010-11: its own Module G specify text; 2016-17 / 2019-20: its plot's single
+#: Module D "Other Crop" text, `module_d_other_crop_text`), in the form
+#: `_normalise_unit_text` writes, and the label that line is served.  Exact strings
+#: from a measured list, never a pattern.
 #: The label is `harmonize_food`'s, so it is the same string food_acquired.j
 #: carries in every wave.  No crop code is reserved for it: the instrument has
 #: none, so `_crop_code` and `production_obs` stay the recorded 48 and the sale
@@ -1442,7 +1444,7 @@ def read_module_d_columns(path, usecols):
         with open(cache_path, 'rb') as f:
             data = f.read()
     else:
-        rel = p.relative_to(Path(_COUNTRIES_DIR)).as_posix()
+        rel = p.resolve().relative_to(Path(_COUNTRIES_DIR).resolve()).as_posix()
         with _dvc_working_directory(_COUNTRIES_DIR):
             with DVCFS.open(rel) as f:
                 data = f.read()

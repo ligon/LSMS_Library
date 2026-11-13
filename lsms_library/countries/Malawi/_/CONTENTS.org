@@ -125,10 +125,10 @@ Measured, cold builds in private roots, development =f138a3d61= against =e857a9c
 
 *Cache*: every Malawi L2-country (26 of 26) and L2-wave (156 of 156) hash moves, no
 other country's (555 / 2,321 probed), no =build_transforms_fingerprint= (0 of 42).
-Malawi's =framework_imports_fingerprint= moves too: =read_module_d_columns= imports five
-=local_tools= DVC helpers (=_ensure_dvc_pulled=, =_dvc_cache_path=, =DVCFS=, ...), which
-the 2016-17 wave readers already import, so a later edit to those helpers re-warms every
-Malawi table, not only 2016-17's.
+Malawi's =framework_imports_fingerprint= moves too.  The likely cause, not isolated by a
+probe: =read_module_d_columns= imports five =local_tools= DVC helpers (=_ensure_dvc_pulled=,
+=_dvc_cache_path=, =DVCFS=, ...), which the 2016-17 wave readers already import; if so, a
+later edit to those helpers re-warms every Malawi table, not only 2016-17's.
 
 *Left as they are, for a decision* (none is in the ruling): the 25 two-text 2019-20 XS
 plots with cowpea in one text (2 say it twice), the one =COWPEAS(NSEULA)=, the one

@@ -271,6 +271,8 @@ def test_old_helper_and_r1_r3_source_inverse_exact():
         if isinstance(n,ast.Import) and {a.name for a in n.names}<=added_imports and not any(a.asname for a in n.names):
             return True
         return named(n,added|changed)
+    for tree in (old,new):      # a mistyped name must not silently widen the exception
+        assert {c for c in changed if any(named(n,{c}) for n in tree.body)}==changed
     new.body=[n for n in new.body if not owned(n)]
     old.body=[n for n in old.body if not named(n,changed)]
     assert ast.dump(new,include_attributes=False)==ast.dump(old,include_attributes=False)
