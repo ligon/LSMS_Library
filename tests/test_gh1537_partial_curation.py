@@ -15,7 +15,8 @@ from pandas.testing import assert_frame_equal
 from lsms_library import local_tools
 from lsms_library.countries.Nigeria._ import nigeria
 from lsms_library.paths import countries_root
-from tests.test_gh1537_aggregate_diagnosis import curation, prices, relabel
+from tests.test_gh1537_aggregate_diagnosis import (
+    curation, prices, relabel, GH587_SEMOVITA_ROW, gh587_semovita, gh587_semovita_cell)
 from lsms_library.country import LabelPassThroughError, LabelPassThroughWarning
 
 
@@ -30,16 +31,25 @@ def test_actual_parsers_only_add_two_label_rows(curation):
     all_tables = local_tools.all_dfs_from_orgfile(ORG)
     many = all_tables['harmonize_food']
     assert_frame_equal(one, many)
-    assert len(one) == len(curation) + 2
+    # The two #1537 label rows, then GH #587's Semovita row (ruling
+    # 2026-11-12, "Add a Semovita row"), whose change also names Semovita in
+    # code 15's 2012Q3 cell -- the only other cell that differs from baseline.
+    assert len(one) == len(curation) + 3
     assert list(one.columns) == list(curation.columns)
     # Empty numeric cells promote Code to float; every old numeric code is
     # exactly representable, and format_id restores its original spelling.
-    pd.testing.assert_frame_equal(one.iloc[:-2].drop(columns='Code'),
-                                  curation.drop(columns='Code'))
-    np.testing.assert_array_equal(one['Code'].iloc[:-2], curation['Code'])
-    assert one['Code'].iloc[:-2].map(local_tools.format_id).tolist() == (
+    pd.testing.assert_frame_equal(one.iloc[:-3].drop(columns='Code'),
+                                  gh587_semovita_cell(curation).drop(columns='Code'))
+    np.testing.assert_array_equal(one['Code'].iloc[:-3], curation['Code'])
+    assert one['Code'].iloc[:-3].map(local_tools.format_id).tolist() == (
         curation['Code'].map(local_tools.format_id).tolist())
-    additions = one.iloc[-2:]
+    semovita = one.iloc[-1:]
+    assert semovita['Preferred Label'].tolist() == [GH587_SEMOVITA_ROW['Preferred Label']]
+    assert semovita['Aggregate Label'].tolist() == [GH587_SEMOVITA_ROW['Aggregate Label']]
+    assert semovita['Code'].isna().all()
+    assert (semovita[list(QUARTERS)] == '').all().all()
+    assert GH587_SEMOVITA_ROW['Aggregate Label'] in set(curation['Aggregate Label'])
+    additions = one.iloc[-3:-1]
     assert additions['Preferred Label'].tolist() == ['Groundnuts', 'Maize (shelled)']
     assert additions['Aggregate Label'].tolist() == ['Groundnuts', 'Maize']
     assert additions['Code'].isna().all()
@@ -53,16 +63,29 @@ def test_actual_parsers_only_add_two_label_rows(curation):
 
 def test_actual_quarter_maps_warnings_and_missing_codes_equal_baseline(curation, monkeypatch):
     candidate = local_tools.df_from_orgfile(ORG, name='harmonize_food')
-    observed = candidate['Code'].iloc[:-2].tolist() + [None, np.nan, pd.NA, '', 99999]
+    observed = candidate['Code'].iloc[:-3].tolist() + [None, np.nan, pd.NA, '', 99999]
+    # The baseline as GH #587 changed it (its one cell and its label row):
+    # the #1537 rows must leave every quarter map exactly as that table gives it.
+    baseline_587 = gh587_semovita(curation)
     for quarter in QUARTERS:
         with warnings.catch_warnings(record=True) as current_warnings:
             warnings.simplefilter('always')
             actual = nigeria.harmonized_food_labels(quarter, observed_codes=observed)
         with monkeypatch.context() as scoped:
-            scoped.setattr(local_tools, 'df_from_orgfile', lambda *a, **k: curation.copy())
+            scoped.setattr(local_tools, 'df_from_orgfile', lambda *a, **k: baseline_587.copy())
             with warnings.catch_warnings(record=True) as prior_warnings:
                 warnings.simplefilter('always')
                 expected = nigeria.harmonized_food_labels(quarter, observed_codes=observed)
+        with monkeypatch.context() as scoped:
+            scoped.setattr(local_tools, 'df_from_orgfile', lambda *a, **k: curation.copy())
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                pure = nigeria.harmonized_food_labels(quarter, observed_codes=observed)
+        # GH #587 moves exactly one code of one quarter: 2012Q3 code 15.
+        moved = {k: v for k, v in actual.items() if pure.get(k) != v}
+        assert set(pure) - set(actual) == set()
+        assert moved == ({15: 'Semovita', '15': 'Semovita', '15.0': 'Semovita'}
+                         if quarter == '2012Q3' else {})
         assert actual == expected
         assert [(w.category, str(w.message)) for w in current_warnings] == [
             (w.category, str(w.message)) for w in prior_warnings]
