@@ -152,7 +152,8 @@ SIZES = {
 }
 #: A trailing parenthesis that belongs to the unit itself, not to its size: a
 #: stated quantity (`Sac (50 Kg)`, `Paquet (250 g)`), or one of two named units.
-_UNITS_OWN_PARENTHESIS = re.compile(r'^(\d[\d,.]*\s*(kg|g)|Kantou|30)$', re.IGNORECASE)
+#: Guinea-Bissau 2021-22's egg trays `Tabuleiro (8)` and `Tabuleiro (30)` count eggs in their name.
+_UNITS_OWN_PARENTHESIS = re.compile(r'^(\d[\d,.]*\s*(kg|g)|Kantou|30|8)$', re.IGNORECASE)
 
 #: Waves of these countries that are NOT EHCVM 2018+ and must carry no key.
 NON_EHCVM_WAVES = {
