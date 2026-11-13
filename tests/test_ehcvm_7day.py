@@ -91,9 +91,12 @@ AFTER = {
     # 16,459 until GH #1513: its food labels now fold, and 46 gift rows sum into others.
     ('Mali', '2018-19'): (89_614_678.64, 16_413),
     ('Mali', '2021-22'): (97_178_691.52, 16_886),
-    # 53,351,991.10 until 2026-11-12 (GH #1708, "Revalue at local median"): the 15,014
-    # flagged purchased rows are valued at a local median of genuine last purchases.
-    ('Niger', '2018-19'): (52_486_790.70, 8_141),
+    # 53,351,991.10 until 2026-11-12 (GH #1708, "Revalue at local median"): the 12,227
+    # flagged purchased rows #876 values are valued at a local median of genuine last
+    # purchases, cluster or region, each needing 3 reports ("Region floor of 3", "Only
+    # previously valued"); 2,872 of them have no such median and are served NA.
+    # 52,486,790.70 under the first scope (every flagged row, region floor 1).
+    ('Niger', '2018-19'): (46_636_756.04, 8_141),
     ('Niger', '2021-22'): (67_358_383.42, 7_112),
     ('Burkina_Faso', '2018-19'): (52_466_280.38, 9_386),
     ('Burkina_Faso', '2021-22'): (27_888_221.36, 6_148),
