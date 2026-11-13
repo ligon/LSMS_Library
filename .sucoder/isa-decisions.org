@@ -1,5 +1,15 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Coverage snapshot before v0.17.0 -- ANSWERED
+The user explicitly selected: "Regrade before release (Recommended)".  Run
+`make matrix` on the final integrated tree on a free burst node while the data
+gate runs; commit the new .coder/coverage/latest.csv to development before the
+development -> master PR.  (Snapshot was 2026-09-18, 3,252 commits back.)
+Release prep: reports/release-v0.17.0/ -- 0 Closes lines (191 resolved issues
+already closed by hand; 57 open ones narrowed to remaining work); 355 PRs.
+Must-state from #1708 as ruled: Niger 2018-19 served purchase Expenditure
+falls 12.6% (53.35M -> 46.64M FCFA); 2,872 previously valued flagged rows NA.
+
 * 2026-11-12: GH1708 revaluation details, and the release plan -- ANSWERED
 - Region floor: "Region floor of 3 (Recommended)": a local median needs >= 3
   genuine reports at cluster AND at region level; otherwise NA (about 3,787
