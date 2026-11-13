@@ -196,13 +196,35 @@ _STRATEGY_RANK = {
 }
 
 
+# GH #1562 (coping red team F5, done at integration 2026-11-13): the inferred option-25
+# position is the shared rule, registered as Benin's and Niger's (ruling 2026-11-13,
+# "Keep slot, registered").
+from lsms_library.ehcvm import (  # noqa: E402
+    coping_autre_rank_key as _coping_autre_rank_key,
+    derive_coping_autre_rank as _derive_coping_autre_rank,
+    inputs_coping_autre_rank as _inputs_coping_autre_rank,
+)
+
+#: GH #1562: the inferred option-25 position, where it sits beside a ranked strategy.
+CODE25_RANK_DERIVATION = _coping_autre_rank_key('Guinea-Bissau')
+
+
+def inputs_shocks_code25_rank(wave='2021-22'):
+    """Registry `inputs`: the raw s14bq05__1..26 of the rows the shocks hook stamps."""
+    return _inputs_coping_autre_rank('Guinea-Bissau', wave)
+
+
 def shocks(df):
     '''HowCoped0..2 by the survey's own rank: s14bq05__N holds a rank label or Non.
 
     Benin 2021-22's hook (Niger's after GH #1556).  Column 25, `Autre stratégie`,
     carries the Oui/Non label set (`nonoui`), so its rank is not in the file: it takes
-    the rank no other strategy holds.  34 rows choose it here.  A label outside the
-    two sets is refused.
+    the rank no other strategy holds (`ehcvm.derive_coping_autre_rank`).  34 rows
+    choose it here.  Beside a ranked strategy the position is inferred and the row
+    carries `Guinea-Bissau::shocks::code25-rank-inferred` (GH #1562); alone it is the
+    household's only answer and carries no key.  A label outside the two sets is
+    refused.  `HowCopedSet` is not written here: it is derived from the positions at
+    read time (`lsms_library/coping.py`), as for every ranked wave.
     '''
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
     seen = {str(v) for c in cope_cols for v in df[c].dropna().unique()}
@@ -211,6 +233,7 @@ def shocks(df):
         raise ValueError(f'Guinea-Bissau 2021-22 s14bq05: unknown answers {unknown}')
 
     how_coped = {0: [], 1: [], 2: []}
+    derivation = []
     for _, row in df[cope_cols].iterrows():
         ranked = []
         unranked = []
@@ -225,9 +248,13 @@ def shocks(df):
             elif str(val) == 'Oui':
                 unranked.append(COPING_LABELS.get(num, f'Strategy {num}'))
 
+        # GH #1562: beside a ranked strategy the position is inferred, and the
+        # row carries the registered key (ruling 2026-11-13, "Keep slot,
+        # registered").  Alone, option 25 is the only answer: not in doubt.
+        derivation.append(CODE25_RANK_DERIVATION if (unranked and ranked) else pd.NA)
         held = {rank for rank, _ in ranked}
         for label in unranked:
-            rank = min(set(range(1, len(held) + 2)) - held)
+            rank = _derive_coping_autre_rank(held)
             held.add(rank)
             ranked.append((rank, label))
 
@@ -239,6 +266,7 @@ def shocks(df):
     df['HowCoped0'] = how_coped[0]
     df['HowCoped1'] = how_coped[1]
     df['HowCoped2'] = how_coped[2]
+    df['Derivation'] = pd.array(derivation, dtype='string')
     return df.drop(columns=cope_cols)
 
 

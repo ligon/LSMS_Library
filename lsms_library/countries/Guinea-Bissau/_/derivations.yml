@@ -370,3 +370,58 @@ Guinea-Bissau::household_roster::departed-monthsspent-withheld:
     (tests/test_gnb_2021_wave.py).
   contents: 'Guinea-Bissau/_/CONTENTS.org, "2021-22 wired", household_roster'
   since: '2026-11-13'
+
+Guinea-Bissau::shocks::code25-rank-inferred:
+  waves: ['2021-22']
+  columns: [HowCoped0, HowCoped1, HowCoped2]
+  rule: >-
+    s14bq05__25 ("Autre stratégie") carries the Oui/Non label set (`nonoui`)
+    where the other 25 options carry a rank (Première / Deuxième / Troisième
+    stratégie), so the file does not say where option 25 stands.  Where it
+    is Oui beside at least one ranked strategy it is served at the least
+    rank in 1 .. k+1 that no ranked strategy holds (k = the number of ranked
+    strategies), and the positions are filled in rank order; the row carries
+    this key.  Alone, option 25 is the household's only answer and is served
+    first without the key: its position is not in doubt.  34 rows choose
+    option 25 here, 3 of them beside another strategy (coping red team F5,
+    reports/coping-redteam/VERDICT.md; CONTENTS.org, "2021-22 wired", shocks).
+    Added at integration of the 2026-11-13 ISA batch, as Benin's and Niger's.
+  function: lsms_library.ehcvm:derive_coping_autre_rank
+  inputs: lsms_library.countries.Guinea-Bissau.2021-22._.mapping:inputs_shocks_code25_rank
+  raw_variables: [s14bq05__1, s14bq05__2, s14bq05__3, s14bq05__4, s14bq05__5,
+                  s14bq05__6, s14bq05__7, s14bq05__8, s14bq05__9, s14bq05__10,
+                  s14bq05__11, s14bq05__12, s14bq05__13, s14bq05__14,
+                  s14bq05__15, s14bq05__16, s14bq05__17, s14bq05__18,
+                  s14bq05__19, s14bq05__20, s14bq05__21, s14bq05__22,
+                  s14bq05__23, s14bq05__24, s14bq05__25, s14bq05__26]
+  assumptions:
+    - text: >-
+        option 25 was recorded yes/no, with no rank: its label set is
+        {Oui, Non} (`nonoui`) where every other option's is the three ranks
+        and Non.
+      basis: variable-label
+      evidence: >-
+        value labels of s14b_me_gnb2021.dta (the 2021-22 hook refuses any
+        answer outside the rank labels and Oui / Non);
+        tests/test_gh1556_ehcvm_shocks_2021.py::test_only_code_25_has_the_oui_non_label_set
+        reads the same for Niger, Mali and Senegal; Guinea-Bissau/_/CONTENTS.org,
+        "2021-22 wired", shocks.
+    - text: >-
+        an "other" strategy takes the next rank no other strategy holds: the
+        ranks are otherwise gapless, and Burkina Faso 2021-22, whose file keeps
+        option 25's raw rank, shows it filling the next one.
+      basis: derived-from-data
+      evidence: >-
+        Niger/_/CONTENTS.org and Burkina_Faso/_/CONTENTS.org, 2026-11-04
+        (GH #1556); the slot test in tests/test_gh1556_ehcvm_shocks_2021.py.
+    - text: >-
+        the inferred position is kept in HowCoped<n>, rather than option 25
+        being served in HowCopedSet only.
+      basis: modelling-choice
+      evidence: >-
+        ruling 2026-11-13, "Coping-strategy implementation, GH1562": "Keep
+        slot, registered" (Benin 13 rows, Niger 17, GNB 34 named in the
+        ruling; 34 is every row choosing option 25, of which the 3 beside a
+        ranked strategy carry the key).
+  contents: 'Guinea-Bissau/_/CONTENTS.org, "shocks: coping strategies, the set and the positions (GH #1562)"'
+  since: '2026-11-13'

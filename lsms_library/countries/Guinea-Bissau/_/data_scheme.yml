@@ -51,18 +51,17 @@ Data Scheme:
     AffectedProduction: bool
     AffectedConsumption: bool  # food purchases, not food stocks
     AffectedFoodStock: bool
-    # 2018-19, the only wave wired here, records WHICH coping strategies (the
-    # s14q05__N grid), not their order: it serves HowCopedSet only and no
-    # position (GH #1562), so the positions are optional for this country.
-    HowCoped0:
-      type: str
-      optional: true
-    HowCoped1:
-      type: str
-      optional: true
-    HowCoped2:
-      type: str
-      optional: true
+    # 2018-19 records WHICH coping strategies (the s14q05__N grid), not their
+    # order: it serves HowCopedSet only and its positions are present and NA
+    # (GH #1562).  2021-22 ranks them (s14bq05__N), so the positions are filled
+    # there and are REQUIRED here, as in every other EHCVM country: 2018-19's
+    # empty positions warn (Site B), honestly, per wave.  They were optional
+    # while 2018-19 was the only wave; keeping that once 2021-22 was wired would
+    # have silenced one wave with a country-grain flag (coping red team F5,
+    # removed at integration of the 2026-11-13 ISA batch).
+    HowCoped0: str
+    HowCoped1: str
+    HowCoped2: str
     HowCopedSet: str
 
   assets:

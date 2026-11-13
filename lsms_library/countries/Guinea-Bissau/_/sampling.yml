@@ -3,11 +3,42 @@
 # not written yet; their absence here is "not curated", not "not found".  Read by
 # `lsms_library/sampling.py`.  Vocabulary: see sampling.py.  Modelled on
 # Benin/_/sampling.yml and Togo/_/sampling.yml.  The first wave has no preceding
-# wave and so no entry.
+# wave and so no `panel:` block.
+#
+# SERVED STRATA (GH #1577, ruling 2026-11-12, "Registry + sampling.yml tag"; the
+# 'constructed' value kept by the 2026-11-13 ruling "Keep constructed"):
+# `served_strata` says what `sample().strata` holds.  Both waves serve the region x
+# milieu construction registered in _/derivations.yml, each from its own cover.  The
+# blocks were proposed by the strata stream (reports/strata/out/
+# proposed-Guinea-Bissau-served_strata.yml) and merged here at integration of the
+# 2026-11-13 ISA batch, into the existing '2021-22' entry (never a duplicate wave key:
+# the loader keeps the last of two silently).
 
 Sampling:
 
+  '2018-19':
+    served_strata:
+      holds: constructed
+      derivation: 'Guinea-Bissau::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Guinea-Bissau::sample::region-milieu-stratum; 2018-19/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2018-19/_/mapping.py `sample`; CONTENTS.org, "Selected 2018-19 region/milieu strata (GH #1575)"'
+      note: |-
+        The native Portuguese Urbano / Rural suffix is kept.  SAB is documented as
+        urban-only (own 2018 DDI p.4; registry entry).
+
   '2021-22':
+    served_strata:
+      holds: constructed
+      derivation: 'Guinea-Bissau::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: medium
+      locator: '_/derivations.yml, Guinea-Bissau::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2021-22/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2021-22 wired", sample'
+      note: |-
+        Wired with the wave (GH #1697).  This file spells three regions otherwise
+        than 2018-19 (Bafatá, Gabú, Bolama/Bijagós), folded by the `strata` table; the
+        weights file's own `strate` (17 codes) is recorded in CONTENTS.org and not
+        served.
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: stable

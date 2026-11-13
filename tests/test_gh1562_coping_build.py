@@ -143,10 +143,13 @@ def test_gnb_codes_follow_the_portuguese_questionnaire():
     assert all(labels[k] == benin[k] for k in range(1, 18))
 
 
-def test_gnb_positions_are_optional_and_the_set_declared():
+def test_gnb_positions_are_required_and_the_set_declared():
+    """2021-22 ranks the strategies, so GNB's positions are required, as every other
+    EHCVM country's: 2018-19's empty positions warn per wave (coping red team F5;
+    the 'optional: true' they carried while 2018-19 was the only wave is removed)."""
     shocks = load_yaml(ROOT / 'Guinea-Bissau' / '_' / 'data_scheme.yml')['Data Scheme']['shocks']
     for k in range(3):
-        assert shocks[f'HowCoped{k}'].get('optional') is True
+        assert shocks[f'HowCoped{k}'] == 'str', k
     assert shocks['HowCopedSet'] == 'str'
 
 
@@ -160,7 +163,7 @@ def test_option_25_takes_the_least_rank_no_other_holds(held, rank):
 FIRST, SECOND = 'Première stratégie', 'Deuxième strategie'
 
 
-@pytest.mark.parametrize('country', ['Benin', 'Niger'])
+@pytest.mark.parametrize('country', ['Benin', 'Niger', 'Guinea-Bissau'])
 def test_option_25_beside_a_ranked_strategy_carries_the_key(country):
     module = _module(country, '2021-22')
     rows = [{'Cope1': FIRST, 'Cope25': 'Oui'},    # beside: inferred, keyed
@@ -175,7 +178,7 @@ def test_option_25_beside_a_ranked_strategy_carries_the_key(country):
     assert out['HowCoped0'].tolist() == [lab[1], lab[25], lab[25], lab[1]]
 
 
-@pytest.mark.parametrize('country', ['Benin', 'Niger'])
+@pytest.mark.parametrize('country', ['Benin', 'Niger', 'Guinea-Bissau'])
 def test_option_25_is_registered(country):
     from lsms_library.derivations import records_for, resolve_callable
     recs = records_for(country, 'shocks')
@@ -364,3 +367,30 @@ def test_uganda_lone_nothing_else_is_served_as_did_nothing():
         assert (lone[COPING_SET_COLUMN] == 'Did nothing').all()
         assert lone[['HowCoped1', 'HowCoped2']].isna().all().all()
         assert not (g[['HowCoped0', 'HowCoped1', 'HowCoped2']] == 'Nothing else').any().any()
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize('country,n', [('Benin', 13), ('Niger', 17), ('Guinea-Bissau', 3)])
+def test_option_25_key_sits_on_its_rows_and_joins_its_inputs(country, n):
+    """2021-22: the option-25 key is on exactly the served rows that choose option 25
+    beside a ranked strategy, and ``derivation_inputs`` -- which re-keys ``i``
+    through ``updated_ids`` -- returns the same ``(t, i, Shock)`` rows.  Benin's
+    2021-22 ids are walked since GH #1705, so this is the join coping red team F10
+    asked to re-check after integration; GNB's stamp was added there (F5)."""
+    import lsms_library as ll
+    key = coping_autre_rank_key(country)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        c = ll.Country(country)
+        df = c.shocks(waves=['2021-22'])
+        inputs = c.derivation_inputs(key, wave='2021-22')
+
+    def rows(frame):
+        flat = frame.index.to_frame(index=False)[['t', 'i', 'Shock']].astype(str)
+        return set(map(tuple, flat.to_numpy()))
+
+    has_key = df['Derivation'].astype('string').fillna('').str.split('+').map(lambda ks: key in ks)
+    keyed = df[has_key.to_numpy()]
+    assert len(keyed) == n, len(keyed)
+    assert len(inputs) == n, len(inputs)
+    assert rows(keyed) == rows(inputs)

@@ -2,11 +2,42 @@
 # `Country('Benin').waves`?  The design fields are #793's curation and are not
 # written yet; their absence here is "not curated", not "not found".  Read by
 # `lsms_library/sampling.py`.  Vocabulary: see sampling.py.  Modelled on
-# Togo/_/sampling.yml.  The first wave has no preceding wave and so no entry.
+# Togo/_/sampling.yml.  The first wave has no preceding wave and so no `panel:` block.
+#
+# SERVED STRATA (GH #1577, ruling 2026-11-12, "Registry + sampling.yml tag"; the
+# 'constructed' value kept by the 2026-11-13 ruling "Keep constructed"):
+# `served_strata` says what `sample().strata` holds.  Both waves serve the department
+# x milieu construction registered in _/derivations.yml, each from its own cover, with
+# the same 23 labels.  The blocks were proposed by the strata stream
+# (reports/strata/out/proposed-Benin-served_strata.yml) and merged here at integration
+# of the 2026-11-13 ISA batch, into the existing '2021-22' entry (never a duplicate wave
+# key: the loader keeps the last of two silently).
 
 Sampling:
 
+  '2018-19':
+    served_strata:
+      holds: constructed
+      derivation: 'Benin::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Benin::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2018-19/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2018-19/_/mapping.py `sample`; CONTENTS.org, "2018-19 department x milieu strata wiring (GH #1575)"'
+      note: |-
+        The department, not a region, crossed with residence milieu: "La strate est
+        la combinaison département/milieu de résidence" (own September 2023 BID,
+        section 4.1, PDF p.13, quoted in the registry entry).
+
   '2021-22':
+    served_strata:
+      holds: constructed
+      derivation: 'Benin::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Benin::sample::region-milieu-stratum, validated_against: a cold sample() serves a stratum on all 8,032 households with the key on every one; 2021-22/_/data_info.yml `sample.df_cover.strata`, stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2026-11-12 -- 2021-22 strata on the #1575 rule, and the day''s other rulings (GH #1697)"'
+      note: |-
+        The weights file's own `strat` is not served: it is department x visit, not
+        this construction, and is recorded as a comparison only (ruling 2026-11-12,
+        "Same rule as #1575").
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: stable

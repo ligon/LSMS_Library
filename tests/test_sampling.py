@@ -2215,16 +2215,12 @@ class TestServedStrataIsFrozen:
 # -- the registry, both directions ----------------------------------------
 
 #: Countries whose registered strata construction is NOT yet tagged in their
-#: own ``sampling.yml``, each with its reason.  The 2026-11-13 batch kept
-#: these two files for other streams; their records are proposed in the
-#: #1577 report for integration.  ``test_a_pending_country_is_still_pending``
-#: fails once one is tagged, so the entry cannot outlive its reason.
-SERVED_STRATA_PENDING: dict[str, str] = {
-    "Benin": "sampling.yml edited by another 2026-11-13 stream; record proposed "
-             "in the #1577 report",
-    "Guinea-Bissau": "sampling.yml created by another 2026-11-13 stream; record "
-                     "proposed in the #1577 report",
-}
+#: own ``sampling.yml``, each with its reason.  ``test_a_pending_country_is_still_pending``
+#: fails once one is tagged, so the entry cannot outlive its reason.  Empty since
+#: the integration of the 2026-11-13 ISA batch, which merged the #1577 report's
+#: proposed Benin and Guinea-Bissau records into their sampling.yml (both waves
+#: of each), the two files other streams of that batch held.
+SERVED_STRATA_PENDING: dict[str, str] = {}
 
 
 def _registered_strata_constructions():
