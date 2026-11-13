@@ -1,5 +1,15 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Togo floored counts and CIV H scope (EHCVM-2 re-review) -- ANSWERED
+Evidence: reports/ehcvm2-2021-redteam2/VERDICT.md.
+- Togo 2021-22 unite rows: "Recover; a 0 becomes NA (Recommended)".  Keep the
+  exact integer recovery outside Grand Lome; any count that recovers to 0 is
+  served NA under the withheld key (no reported item disappears); disclose the
+  ~54 (0.43%) recovered rows that were probably fractional counts.
+- Cote d'Ivoire 2021-22 H rows: "Withhold all three (Recommended)":
+  consumption, own production and gifts on H rows are NA (20,536 served rows),
+  since none is the household's answer.
+
 * 2026-11-12: GH1519 Expenditure on the NA rows -- ANSWERED
 The user explicitly selected: "Yes, NA Expenditure too (Recommended)".  On the
 2 Senegal 2018-19 product-132 rows whose Expenditure the registered #876 rule
