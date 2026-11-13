@@ -2,7 +2,8 @@
 """Concatenate wave-level community_prices for Nigeria GHS-Panel (GAP C).
 
 Item-level reported community food prices at grain (t, v, j, u, variety, obs) from
-the post-harvest COMMUNITY questionnaire's food-price module (Section C8);
+the COMMUNITY questionnaire's food-price module -- post-harvest Section C8 and,
+since GH #587, post-planting Section C2 (built by pp_community_prices.py);
 `variety` is W1/W2's native item/size code (unknown_variety elsewhere);
 `obs` is the C8 reading slot (W3's 1st / 2nd location, 1 elsewhere; GH #637).
 CLUSTER-level (no household i); v = cluster_id(state, lga, ea) is the community EA id -- the COMPOSITE key
@@ -12,8 +13,9 @@ Stores the REPORTED surveyed Price ONLY -- no index, no cross-cluster
 median/mean, no HH-median imputation (those are transformations).
 
 Each year folder's ``<wave>/_/community_prices.py`` produces a wave-level
-parquet at the post-harvest quarter (2011Q1 / 2013Q1 / 2016Q1 / 2019Q1 /
-2024Q1); this script concatenates them.  The wave-level split (mirroring
+parquet holding its post-harvest quarter (2011Q1 / 2013Q1 / 2016Q1 / 2019Q1 /
+2024Q1) and its post-planting quarter (2010Q3 / 2012Q3 / 2015Q3 / 2018Q3 /
+2023Q3, GH #587); this script concatenates them.  The wave-level split (mirroring
 food_acquired and Tanzania's community_prices) routes the build through the
 framework's wave path, which preserves the (t, v, j, u, variety, obs) grain -- the
 country-only fallback path applies map_index(), which swaps a j-without-i
@@ -49,7 +51,7 @@ df = pd.concat(pieces, axis=0).sort_index()
 # (t, v, j, u, variety, obs) must be unique; the wave builder guarantees it
 # per wave.
 # Guard against any cross-wave overlap (there is none -- each wave owns a
-# distinct PH quarter).
+# distinct PH quarter and a distinct PP quarter).
 assert df.index.is_unique, "community_prices: (t,v,j,u,variety,obs) not unique after concat"
 
 to_parquet(df, '../var/community_prices.parquet')

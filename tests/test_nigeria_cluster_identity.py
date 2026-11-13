@@ -105,14 +105,16 @@ CF_QUARTERS = [q for pair in CF_ROUNDS for q in pair]
 GEO_ROUNDS = ROUNDS
 GEO_QUARTERS = [q for pair in GEO_ROUNDS for q in pair]
 
-# community_prices comes from the COMMUNITY questionnaire's Section C8, which is
-# administered in the post-harvest round only.  Verified structurally: across all
-# five waves there are 11 `sectc8*` files and every one is a `_harvest` file --
-# there is no `sectc8*_planting*` anywhere.  The planting community files that do
-# carry an `item_cd` (sectc2_plantingw1, sectc2a/b_plantingw3) have no price
-# column at all; C2 is an availability module.  So no planting-round price data
-# is being dropped -- there is none to drop.
+# community_prices comes from the COMMUNITY questionnaire's food-price module,
+# which is fielded in BOTH rounds: post-harvest Section C8 (the 11 `sectc8*`
+# files are all `_harvest`) and post-planting Section C2 (GH #587).  This comment
+# used to say "the planting community files ... have no price column at all; C2
+# is an availability module" -- contradicted by the files: sectc2_plantingw1
+# carries sc2q3a "What is the price for [ITEM]? (Naira)", and every PP C2 source
+# (W1 sc2q3a, W2-W5 c2q3) prices food.  Since the 2026-11-12 rulings the PP rows
+# are served at the PP quarter.
 PH_QUARTERS = ['2011Q1', '2013Q1', '2016Q1', '2019Q1', '2024Q1']
+PP_QUARTERS = ['2010Q3', '2012Q3', '2015Q3', '2018Q3', '2023Q3']
 
 
 @pytest.fixture(scope='module')
@@ -285,18 +287,103 @@ def test_sample_and_cluster_features_share_one_keyspace(nigeria, cf, sample):
     assert not orphans, f'{len(orphans)} sample clusters absent from cluster_features'
 
 
-def test_community_prices_is_post_harvest_only(nigeria):
-    """Section C8 is asked in the post-harvest round only (there is no
-    sectc8*_planting* file in any wave), so community_prices must land on the PH
-    quarter -- and on NO planting quarter."""
+def test_community_prices_serves_each_round_at_its_own_quarter(nigeria):
+    """C8 (post-harvest) rows land on the PH quarter, C2 (post-planting) rows on
+    the PP quarter (GH #587) -- distinct t per round, never one shared label.
+    PP rows carry only PP derivation keys; PH rows never carry `Size`."""
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         cp = nigeria.community_prices()
-    ts = set(cp.reset_index()['t'].unique())
-    assert ts == set(PH_QUARTERS), (
-        f'community_prices t values {sorted(ts)}; expected exactly the '
-        f'post-harvest quarters {PH_QUARTERS}'
-    )
+    r = cp.reset_index()
+    ts = set(r['t'].unique())
+    assert ts == set(PH_QUARTERS) | set(PP_QUARTERS), sorted(ts)
+    is_pp = r['t'].isin(PP_QUARTERS)
+    pp_keys = set(r.loc[is_pp, 'Derivation'].dropna())
+    assert pp_keys == {'Nigeria::community_prices::pp-w1-number-of-units',
+                       'Nigeria::community_prices::pp-w1-number-of-units-unvalidated',
+                       'Nigeria::community_prices::pp-c2-metric-size',
+                       'Nigeria::community_prices::pp-w5-metric-unit-quantity'}, pp_keys
+    assert not set(r.loc[~is_pp, 'Derivation'].dropna()) & pp_keys
+    assert r.loc[~is_pp, 'Size'].isna().all()
+    # Rulings 2026-11-12: every served PP gram / centilitre / millilitre row
+    # is a constructed per-unit price -- W1 g / ml with N = 1, W2 / W3 g / cl
+    # and W5 g / cl with no size and no c2q2a are all held -- bar a recorded
+    # '99. ONE SIZE ONLY', the form's own one-unit statement (as in PH).
+    one_size = r['Size'].astype('string').str.match(r'^\s*99\.', na=False)
+    pp_metric_small = r[is_pp & r['u'].isin(['g', 'cl', 'ml']) & ~one_size]
+    assert pp_metric_small['Derivation'].notna().all(), (
+        pp_metric_small.loc[pp_metric_small['Derivation'].isna(), ['t', 'u']].value_counts())
+    # W3 Kg / l are served as recorded (no key); W3 g / cl are not served.
+    w3 = r[r['t'].eq('2015Q3')]
+    assert w3['u'].isin(['Kg', 'l']).sum() > 0
+    assert not w3['u'].isin(['g', 'cl']).any()
+    assert w3.loc[w3['u'].isin(['Kg', 'l']), 'Derivation'].isna().all()
+    assert r.loc[r['t'].isin(['2018Q3', '2023Q3']), 'Size'].notna().mean() > 0.5
+
+
+@pytest.mark.parametrize('key', [
+    'Nigeria::community_prices::pp-w1-number-of-units',
+    'Nigeria::community_prices::pp-w1-number-of-units-unvalidated',
+    'Nigeria::community_prices::pp-c2-metric-size',
+    'Nigeria::community_prices::pp-w5-metric-unit-quantity',
+])
+def test_pp_derivation_inputs_join_and_reproduce_the_served_rows(nigeria, key):
+    """Each PP construction's `inputs` are keyed to the served rows, and the
+    registered function on them gives the served Price."""
+    import importlib
+    D = importlib.import_module('lsms_library.derivations')
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        cp = nigeria.community_prices()
+        inp = nigeria.derivation_inputs(key)
+    served = cp[cp['Derivation'].eq(key)]
+    assert len(inp) == len(served) > 0
+    assert set(inp.index) == set(served.index)
+    fn = D.resolve_callable(nigeria.derivations()[key].function)
+    if 'number-of-units' in key:        # both W1 division keys
+        again = fn(inp['sc2q3a'], inp['sc2q3b'])
+        assert set(inp.index.get_level_values('t')) == {'2010Q3'}
+        assert (pd.to_numeric(inp['sc2q3b']) > 1).all()
+    elif key.endswith('metric-unit-quantity'):
+        again = fn(inp['c2q3'], inp['c2q2a'])
+        assert set(inp.index.get_level_values('u')) == {'g', 'cl'}
+        assert set(inp.index.get_level_values('t')) == {'2023Q3'}
+    else:
+        from lsms_library.countries.Nigeria._ import pp_community_prices as pp
+        labels = {}
+        for source in ('W4', 'W5'):      # W5's SIZE card extends W4's, same labels
+            labels.update(pp._card(pp.pp_source(source), 'size'))
+        quantity = inp['c2q2c'].map(labels).map(pp._ng._c8_size_metric_grams)
+        again = fn(inp['c2q3'], quantity)
+    got = pd.Series(again, index=inp.index, dtype='float64')
+    pd.testing.assert_series_equal(got.sort_index(),
+                                   served['Price'].astype('float64').sort_index(),
+                                   check_names=False, check_index=False, rtol=1e-12)
+
+
+@pytest.mark.parametrize('key,held', [
+    ('Nigeria::community_prices::pp-w1-no-count-hold', 105),
+    ('Nigeria::community_prices::pp-w1-metric-package-hold', 1043),
+    ('Nigeria::community_prices::pp-w1-count-as-size-hold', 332),
+    ('Nigeria::community_prices::pp-w1-metric-small-count-hold', 64),
+    ('Nigeria::community_prices::pp-w1-kg-mid-count-hold', 208),
+    ('Nigeria::community_prices::pp-w1-nonmetric-count-as-size-hold', 241),
+    ('Nigeria::community_prices::pp-unrecorded-size-hold', 13166),
+    # W2 code 0, the "No more option" sentinel, has no priced row; code 15
+    # (Semovita) is served since the 2026-11-12 "Add a Semovita row" ruling.
+    ('Nigeria::community_prices::pp-unharmonized-item-hold', 0),
+    ('Nigeria::community_prices::pp-w5-quantity-not-one-hold', 60),
+])
+def test_pp_omissions_return_rows_the_table_does_not_serve(nigeria, key, held):
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        cp = nigeria.community_prices()
+        inp = nigeria.derivation_inputs(key)
+    assert len(inp) == held
+    assert inp.index.is_unique
+    assert not set(inp.index) & set(cp.index)
+    summary = cp.attrs['derivations']['Nigeria']
+    assert summary[key]['rows'] == 0
 
 
 def test_community_prices_joins_the_household_keyspace(nigeria, sample):
