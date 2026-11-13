@@ -4569,13 +4569,16 @@ labels in =_/coping.yml=.  This file had no shocks passage before.
   either quarter, the same rows).
 - *=assets= had the same defect and is pinned the same way*, to the post-planting quarter its
   =sect5_planting*= files belong to: =2010Q3= / =2012Q3= / =2015Q3= / =2018Q3= (both W2 =dfs:=
-  sub-frames carry the pin, so the merge on =t= still lines up).  *One request now fails loudly:* a cold
-  =assets(waves=['2011Q1'])= raises the GH #1292 empty-answer check ("successful empty YAML result is
-  missing required declared column(s) ['Age', 'Value']"): W1's block wires only =Quantity=, while
-  =data_scheme.yml= requires =Age= and =Value=, and an empty answer must carry its required schema.
-  Base served the 38,947 duplicated rows there.  The other post-harvest quarters return 0 rows (W2-W4
-  wire both columns).  Not silenced here with =optional:= (country-grain); a residual in the GH #1562
-  report.  On base the two quarters were
+  sub-frames carry the pin, so the merge on =t= still lines up).  *W1 serves =Age= and =Value= as NA*
+  (ruling 2026-11-13, "Coping follow-ups": "Pin + W1 NA columns"), from the =assets= hook in the new
+  wave module =2010-11/_/2010-11.py= (chosen so the fix touches no file another stream edits).
+  Without it a cold =assets(waves=['2011Q1'])= raised the GH #1292 empty-answer check ("successful
+  empty YAML result is missing required declared column(s) ['Age', 'Value']") while the same request
+  warm returned 0 rows: W1's block wires only =Quantity= (=s5q1=) and an empty answer must carry its
+  required schema.  Now both answer 0 rows; the served 2010Q3 rows are unchanged (the cross-wave concat
+  already gave them NA).  *NA here means not wired, not not asked:* W1's per-unit roster
+  =sect5b_plantingw1= (56,816 rows) carries =s5q3= and =s5q4= (56,755 and 56,588 non-null), the variables
+  W2 wires as =Age= and =Value=; wiring them is a question in the GH #1562 report.  On base the two quarters were
   identical row for row: 38,947 / 161,125 / 188,229 / 44,358 duplicated rows, 432,659 in all.  The
   per-quarter Value totals are unchanged (2012Q3 N576,299,043 cold, base and candidate): W2's per-unit
   =item_seq= rows are summed on Value since PR #629, so the =data_scheme.yml= "KNOWN OPEN DEFECT" note

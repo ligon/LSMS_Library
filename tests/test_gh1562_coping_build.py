@@ -212,8 +212,9 @@ def test_nigeria_shocks_is_served_once_under_the_post_harvest_quarter(wave):
     pp, ph = NIGERIA[wave]
     assert _pinned(info['shocks']) == [ph]
     assert 't' in info['shocks']['idxvars']
-    # the same shape as the individual_education pin it follows
-    assert _pinned(info['individual_education'])[-1] == ph
+    # the same shape as the individual_education pin it follows (that block may
+    # also list the post-planting file, #1713, so test membership, not position)
+    assert ph in _pinned(info['individual_education'])
 
 
 @pytest.mark.parametrize('wave', NIGERIA)
@@ -314,3 +315,52 @@ def test_the_served_2018_sets_are_the_grid_positives(country):
         n_raw = int(positive[col].sum())
         n_built = int(members.apply(lambda m, lab=labels[code]: lab in m).sum())
         assert n_built == n_raw, (country, code, labels[code], n_built, n_raw)
+
+
+# --------------------------------------------------------------- follow-ups (2026-11-13)
+
+def test_nigeria_w1_assets_carry_age_and_value_as_na():
+    """Ruling "Pin + W1 NA columns": W1 serves Age and Value NA, with no `optional:`."""
+    module = _module('Nigeria', '2010-11', '2010-11.py')
+    out = module.assets(pd.DataFrame({'Quantity': [1.0, 2.0]}))
+    assert list(out.columns) == ['Quantity', 'Age', 'Value']
+    assert out[['Age', 'Value']].isna().all().all()
+    assets = load_yaml(ROOT / 'Nigeria' / '_' / 'data_scheme.yml')['Data Scheme']['assets']
+    assert assets['Age'] == 'float' and assets['Value'] == 'float'
+
+
+def test_the_w1_wave_module_declares_no_table():
+    """`2010-11.py` is the wave module, excluded from Wave.data_scheme by name."""
+    import lsms_library as ll
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        scheme = ll.Country('Nigeria')['2011Q1'].data_scheme
+    assert '2010-11' not in scheme and 'assets' in scheme
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize('wave', ['2011Q1', '2013Q1', '2016Q1', '2019Q1'])
+def test_a_post_harvest_assets_request_is_empty_with_its_columns(wave):
+    """Cold or warm, the post-harvest quarter answers 0 rows with the declared
+    columns (it raised cold, and gave 0 rows warm, before the W1 NA columns)."""
+    import lsms_library as ll
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        got = ll.Country('Nigeria').assets(waves=[wave])
+    assert len(got) == 0 and {'Quantity', 'Age', 'Value'} <= set(got.columns)
+
+
+@pytest.mark.requires_s3
+def test_uganda_lone_nothing_else_is_served_as_did_nothing():
+    """55 / 41 rows: code 40 first and alone is {Did nothing}, position and set."""
+    import lsms_library as ll
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        df = ll.Country('Uganda').shocks().reset_index()
+    for wave, n in (('2013-14', 55), ('2015-16', 41)):
+        g = df[df['t'] == wave]
+        lone = g[(g['HowCoped0'] == 'Did nothing')]
+        assert len(lone) == n, (wave, len(lone))
+        assert (lone[COPING_SET_COLUMN] == 'Did nothing').all()
+        assert lone[['HowCoped1', 'HowCoped2']].isna().all().all()
+        assert not (g[['HowCoped0', 'HowCoped1', 'HowCoped2']] == 'Nothing else').any().any()

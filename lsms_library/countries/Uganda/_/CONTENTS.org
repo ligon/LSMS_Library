@@ -6242,8 +6242,15 @@ Nothing changes at build time.  At READ time (=lsms_library/coping.py=, labels i
 
 - *Code 40 "Nothing else" is a slot terminator* (2013-14, 2015-16): served NA in its position and never
   in =HowCopedSet=.  It is in the file's value labels but not in the printed code list
-  (=unps_2013_14_household_qx.pdf= p32 prints 1-15 and 96).  1,035 / 1,065 slot cells; "Nothing else"
-  in all three slots on 55 / 41 rows, which therefore serve no strategy at all.
+  (=unps_2013_14_household_qx.pdf= p32 prints 1-15 and 96).  1,035 / 1,065 slot cells, 628 / 697 rows
+  with it in a later slot.
+- *Except as the FIRST and only answer* (ruling 2026-11-13, "Coping follow-ups", "Did nothing when
+  alone"): code 40 in =HowCoped0= with nothing else recorded (later slots empty or 40) is the
+  household's "did nothing", 55 / 41 rows.  It is served as Uganda's own "did nothing" label, "Did
+  nothing" (2018-19's), in =HowCoped0= AND in the set, so position and set agree as for every other lone
+  "did nothing" answer; =HowCoped1/2= are NA.  The parquet keeps "Nothing else".  First and followed by a
+  strategy (3 / 3 rows) it stays a filler: =HowCoped0= NA, a recorded gap.  A slot-aware class in
+  =_/coping.yml= (=did_nothing_when_alone_first=).
 - *Unlabelled code 99*, served ='99.0'= (2009-10, 1 cell): a missing code, NA.
 - *Code 96 "Other (specify)" STAYS a strategy* (ruling), although 2010-11 and 2011-12 use it in filler
   patterns (('k','96','96') on 165 / 131 rows, ('96','96','96') on 129 / 72): the positions keep it, and

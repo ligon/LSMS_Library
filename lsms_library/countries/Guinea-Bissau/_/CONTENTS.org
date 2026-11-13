@@ -925,12 +925,17 @@ set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical co
   estratégia" (cells N30-N34, N36).  It prints NO 23 or 24 -- there is no cell N35 in either workbook
   -- so those two are the template's next two options by elimination: 23 "Pratique de la culture de
   contre saison", 24 "Autre stratégie".  GNB 2021-22's form (=gnb_ehcvm2_qnr_men_excel_vague1.pdf=
-  p68) prints the full 26-option template, with "Aluguer / penhora do seu terreno" back at 18.  The
-  data agree with the shifted alignment where they can discriminate (audit F1, per mille of positive
-  cells, the other seven countries against GNB): French 20 "pêche" 0-2 against GNB 27, French 21
-  "bétail" 9-149 against GNB 3; GNB 25 is positive on 1,540 rows and never beside another option, as
-  the others' "Aucune stratégie" is.  No 2018-19 =s14= file carries an "autre, préciser" text column,
-  so code 24 cannot be checked against one.  Served in the template's French labels so one strategy
+  p68) prints the full 26-option template, with "Aluguer / penhora do seu terreno" back at 18.
+  *The within-country evidence* is the strongest: GNB 2021-22 uses the full list, and per mille of
+  chosen cells its shares match 2018-19 under the shift -- "Vente de bétail" 24.8 (2021-22 code 21)
+  against 27.9 (2018-19 code 20), "Engagé dans des activités spirituelles" 2.2 (23) against 1.9 (22),
+  "Aucune stratégie" 177.8 (26) against 137.9 (25) -- while under the old alignment codes 20, 21 and
+  25 miss badly (red team, =reports/coping-redteam/VERDICT.md= F4, job 41279618).  The cross-country
+  comparison (audit F1, the other seven countries against GNB) is mixed: it favours the shift at
+  codes 20, 21 and 25, and the old labels at codes 18 and 22; it is not evidence on its own.  GNB 25 is
+  positive on 1,540 rows and never beside another option, as the others' "Aucune stratégie" is.  No
+  2018-19 =s14= file carries an "autre, préciser" text column, so code 24 cannot be checked against
+  one.  2,199 served rows carry at least one relabelled code.  Served in the template's French labels so one strategy
   has one label across the EHCVM countries.  /Codes 23 and 24 are an inference, not a printed label:/
   question to the user in the GH #1562 report.
 - *Read time.*  Code 25, now "Aucune stratégie", is a "did nothing" answer (=_/coping.yml=).

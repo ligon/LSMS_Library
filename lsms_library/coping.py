@@ -49,19 +49,26 @@ from .paths import countries_root
 
 __all__ = [
     "SET_COLUMN", "REGISTRY_FILE", "CLASSES", "CopingLabel", "CopingLabelError",
-    "position_columns", "label_classes", "classes_for_wave", "coping_set",
-    "normalise_coping",
+    "position_columns", "label_classes", "classes_for_wave", "alone_first_for_wave",
+    "coping_set", "normalise_coping", "ALONE_FIRST",
 ]
 
 #: The unordered set column.
 SET_COLUMN = "HowCopedSet"
 #: The per-country registry file, under ``countries/<C>/_/``.
 REGISTRY_FILE = "coping.yml"
-#: The two label classes a registry may declare.
-CLASSES = ("filler", "did_nothing")
+#: The label classes a registry may declare.  The third is SLOT-AWARE (ruling
+#: 2026-11-13, "Coping follow-ups", "Did nothing when alone"): the label is a
+#: "did nothing" answer when it is the FIRST position and nothing else is
+#: recorded (every later position empty, a filler, or the same label), and is
+#: then served as ``served_as`` -- one of the country's ``did_nothing`` labels --
+#: in that position and in the set; anywhere else it falls through to the other
+#: classes (Uganda's code 40 "Nothing else" is also a ``filler``).
+CLASSES = ("filler", "did_nothing", "did_nothing_when_alone_first")
+ALONE_FIRST = "did_nothing_when_alone_first"
 
 _POSITION = re.compile(r"^HowCoped(\d+)$")
-_ENTRY_FIELDS = frozenset({"label", "waves", "evidence"})
+_ENTRY_FIELDS = frozenset({"label", "waves", "evidence", "served_as"})
 
 
 class CopingLabelError(Exception):
@@ -81,6 +88,7 @@ class CopingLabel:
     klass: str
     waves: frozenset | None  # None: every wave
     evidence: str
+    served_as: str | None = None  # ALONE_FIRST only: the did_nothing label served
 
     def applies_to(self, wave: Any) -> bool:
         return self.waves is None or (wave is not None and str(wave) in self.waves)
@@ -137,8 +145,29 @@ def _parse_registry(data: Any, path: Path) -> tuple[CopingLabel, ...]:
                     raise CopingLabelError(f"{path}: {klass} entry {label!r}: waves must "
                                            f"be a non-empty list of wave strings")
                 waves = frozenset(waves)
-            out.append(CopingLabel(label, klass, waves, evidence.strip()))
-    # One label in two classes for an overlapping scope is a contradiction.
+            served_as = entry.get("served_as")
+            if klass == ALONE_FIRST:
+                if not isinstance(served_as, str) or not served_as or MULTI_SEP in served_as:
+                    raise CopingLabelError(f"{path}: {klass} entry {label!r} needs a "
+                                           f"served_as label (without {MULTI_SEP!r})")
+            elif served_as is not None:
+                raise CopingLabelError(f"{path}: served_as is only for {ALONE_FIRST} "
+                                       f"entries, not {klass} {label!r}")
+            out.append(CopingLabel(label, klass, waves, evidence.strip(), served_as))
+    # An ALONE_FIRST entry serves one of the country's did_nothing labels, and
+    # that label must apply wherever the entry does, or the "did nothing" rule
+    # would not reach what it serves.
+    for rec in out:
+        if rec.klass != ALONE_FIRST:
+            continue
+        covering = [d for d in out if d.klass == "did_nothing" and d.label == rec.served_as
+                    and (d.waves is None or (rec.waves is not None and rec.waves <= d.waves))]
+        if not covering:
+            raise CopingLabelError(f"{path}: {ALONE_FIRST} {rec.label!r} serves "
+                                   f"{rec.served_as!r}, which is not a did_nothing label "
+                                   f"for every wave the entry names")
+    # One label in two classes for an overlapping scope is a contradiction --
+    # except filler + ALONE_FIRST, which is the slot-aware class's purpose.
     by_label: dict[str, list[CopingLabel]] = {}
     for rec in out:
         by_label.setdefault(rec.label, []).append(rec)
@@ -146,6 +175,8 @@ def _parse_registry(data: Any, path: Path) -> tuple[CopingLabel, ...]:
         for a in recs:
             for b in recs:
                 if a is b or a.klass == b.klass:
+                    continue
+                if {a.klass, b.klass} == {"filler", ALONE_FIRST}:
                     continue
                 if a.waves is None or b.waves is None or a.waves & b.waves:
                     raise CopingLabelError(f"{path}: {label!r} is both {a.klass} and "
@@ -172,9 +203,15 @@ def classes_for_wave(country: str, wave: Any) -> tuple[frozenset, frozenset]:
     """``(fillers, did_nothing)``: the exact labels of each class that apply to ``wave``."""
     filler, none = set(), set()
     for rec in label_classes(country):
-        if rec.applies_to(wave):
+        if rec.applies_to(wave) and rec.klass in ("filler", "did_nothing"):
             (filler if rec.klass == "filler" else none).add(rec.label)
     return frozenset(filler), frozenset(none)
+
+
+def alone_first_for_wave(country: str, wave: Any) -> dict[str, str]:
+    """``{label: served_as}`` of the slot-aware class that applies to ``wave``."""
+    return {rec.label: rec.served_as for rec in label_classes(country)
+            if rec.klass == ALONE_FIRST and rec.applies_to(wave)}
 
 
 def _is_missing(value: Any) -> bool:
@@ -223,6 +260,11 @@ def _wave_of_rows(df: pd.DataFrame) -> list[Any]:
 def normalise_coping(df: pd.DataFrame, country: str) -> pd.DataFrame:
     """Apply the GH #1562 read-time rules to a ``shocks`` frame.
 
+    0. A slot-aware label (``did_nothing_when_alone_first``) that is the FIRST
+       position with nothing else recorded is served as its ``served_as``
+       "did nothing" label in that position (so position and set agree, as for
+       every lone "did nothing" answer); decided on the recorded positions,
+       before step 1.  Elsewhere it is whatever its other classes say.
     1. A filler or missing code (per ``coping.yml``, per wave) is set NA in
        every ``HowCoped<n>`` position.
     2. ``HowCopedSet`` is the build's own set where the build wrote one for the
@@ -242,6 +284,20 @@ def normalise_coping(df: pd.DataFrame, country: str) -> pd.DataFrame:
     out = df.copy()
     waves = _wave_of_rows(out)
     classes = {w: classes_for_wave(country, w) for w in dict.fromkeys(waves)}
+    alone = {w: alone_first_for_wave(country, w) for w in classes}
+
+    lone: list[Any] = [None] * len(out)
+    if positions and any(alone.values()):
+        first = out[positions[0]].tolist()
+        rest = [out[col].tolist() for col in positions[1:]]
+        for i, w in enumerate(waves):
+            value = first[i]
+            if _is_missing(value) or str(value) not in alone[w]:
+                continue
+            filler = classes[w][0]
+            if all(_is_missing(r[i]) or str(r[i]) == str(value) or str(r[i]) in filler
+                   for r in rest):
+                lone[i] = alone[w][str(value)]
 
     for col in positions:
         filler_rows = [v is not None and not _is_missing(v) and str(v) in classes[w][0]
@@ -250,6 +306,18 @@ def normalise_coping(df: pd.DataFrame, country: str) -> pd.DataFrame:
             if isinstance(out[col].dtype, pd.CategoricalDtype):
                 out[col] = out[col].astype(object)
             out.loc[pd.Series(filler_rows, index=out.index).to_numpy(), col] = pd.NA
+
+    is_lone = [x is not None for x in lone]
+    if any(is_lone):
+        col = positions[0]
+        if isinstance(out[col].dtype, pd.CategoricalDtype):
+            out[col] = out[col].astype(object)
+        for k in positions[1:]:   # anything left there was the same label: not a strategy
+            if isinstance(out[k].dtype, pd.CategoricalDtype):
+                out[k] = out[k].astype(object)
+            out.loc[pd.Series(is_lone, index=out.index).to_numpy(), k] = pd.NA
+        out.loc[pd.Series(is_lone, index=out.index).to_numpy(), col] = [
+            x for x in lone if x is not None]
 
     pos_values = [out[col].tolist() for col in positions]
     built = out[SET_COLUMN].tolist() if SET_COLUMN in out.columns else [None] * len(out)

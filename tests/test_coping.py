@@ -37,9 +37,10 @@ ROOT = Path(countries_root())
 
 
 def _labels(*entries):
-    """Patchable stand-in for ``label_classes``: (label, klass, waves) triples."""
-    recs = tuple(CopingLabel(label, klass, None if waves is None else frozenset(waves), "test")
-                 for label, klass, waves in entries)
+    """Patchable stand-in for ``label_classes``: (label, klass, waves[, served_as])."""
+    recs = tuple(CopingLabel(e[0], e[1], None if e[2] is None else frozenset(e[2]), "test",
+                             e[3] if len(e) > 3 else None)
+                 for e in entries)
     return lambda country: recs
 
 
@@ -193,6 +194,76 @@ def test_categorical_positions_are_handled(monkeypatch):
     assert out[SET_COLUMN].iloc[0] == 'Sold animals'
 
 
+# ---------------------------------------------------------- slot-aware "did nothing"
+# Ruling 2026-11-13, "Coping follow-ups": Uganda 2013-14 / 2015-16 code 40
+# "Nothing else" in the FIRST slot with nothing else recorded is {Did nothing};
+# in later slots it stays a filler.
+
+UGANDA_LIKE = (('Nothing else', 'filler', ['2013-14']),
+               ('Did nothing', 'did_nothing', None),
+               ('Nothing else', 'did_nothing_when_alone_first', ['2013-14'], 'Did nothing'))
+
+
+def test_lone_first_slot_is_served_as_did_nothing_in_position_and_set(monkeypatch):
+    monkeypatch.setattr(coping, 'label_classes', _labels(*UGANDA_LIKE))
+    df = _frame([('Nothing else', 'Nothing else', 'Nothing else'),
+                 ('Nothing else', pd.NA, pd.NA)], waves=['2013-14', '2013-14'])
+    out = normalise_coping(df, 'Uganda')
+    assert out['HowCoped0'].tolist() == ['Did nothing', 'Did nothing']
+    assert out['HowCoped1'].isna().all() and out['HowCoped2'].isna().all()
+    assert out[SET_COLUMN].tolist() == ['Did nothing', 'Did nothing']
+
+
+def test_first_slot_followed_by_a_strategy_stays_a_filler(monkeypatch):
+    monkeypatch.setattr(coping, 'label_classes', _labels(*UGANDA_LIKE))
+    df = _frame([('Nothing else', 'Relied on savings', 'Nothing else')], waves=['2013-14'])
+    out = normalise_coping(df, 'Uganda')
+    assert pd.isna(out['HowCoped0'].iloc[0]) and pd.isna(out['HowCoped2'].iloc[0])
+    assert out['HowCoped1'].iloc[0] == 'Relied on savings'
+    assert out[SET_COLUMN].iloc[0] == 'Relied on savings'
+
+
+def test_later_slot_stays_a_filler_and_other_waves_are_untouched(monkeypatch):
+    monkeypatch.setattr(coping, 'label_classes', _labels(*UGANDA_LIKE))
+    df = _frame([('Relied on savings', 'Nothing else'), ('Nothing else',)],
+                waves=['2013-14', '2010-11'])
+    out = normalise_coping(df, 'Uganda')
+    assert pd.isna(out['HowCoped1'].iloc[0]) and out[SET_COLUMN].iloc[0] == 'Relied on savings'
+    # outside the entry's waves the label is neither a filler nor a lone answer
+    assert out['HowCoped0'].iloc[1] == 'Nothing else' and out[SET_COLUMN].iloc[1] == 'Nothing else'
+
+
+def test_the_slot_aware_rule_is_idempotent(monkeypatch):
+    monkeypatch.setattr(coping, 'label_classes', _labels(*UGANDA_LIKE))
+    df = _frame([('Nothing else', 'Nothing else', 'Nothing else'),
+                 ('Nothing else', 'Obtained credit', pd.NA)], waves=['2013-14'] * 2)
+    once = normalise_coping(df, 'Uganda')
+    pd.testing.assert_frame_equal(normalise_coping(once, 'Uganda'), once)
+
+
+@pytest.mark.parametrize('bad,match', [
+    ({'did_nothing_when_alone_first': [{'label': 'x', 'evidence': 'e'}]}, 'needs a served_as'),
+    ({'filler': [{'label': 'x', 'evidence': 'e', 'served_as': 'y'}]}, 'only for'),
+    ({'did_nothing_when_alone_first': [{'label': 'x', 'evidence': 'e', 'served_as': 'y'}]},
+     'not a did_nothing label'),
+    ({'did_nothing': [{'label': 'y', 'evidence': 'e', 'waves': ['2010']}],
+      'did_nothing_when_alone_first': [{'label': 'x', 'evidence': 'e', 'served_as': 'y',
+                                        'waves': ['2011']}]}, 'not a did_nothing label'),
+    ({'did_nothing': [{'label': 'x', 'evidence': 'e'}, {'label': 'y', 'evidence': 'e'}],
+      'did_nothing_when_alone_first': [{'label': 'x', 'evidence': 'e', 'served_as': 'y'}]},
+     'both'),
+])
+def test_a_malformed_slot_aware_entry_is_refused(bad, match, tmp_path):
+    with pytest.raises(CopingLabelError, match=match):
+        coping._parse_registry(bad, tmp_path / 'coping.yml')
+
+
+def test_uganda_declares_the_slot_aware_rule():
+    recs = [r for r in coping.label_classes('Uganda') if r.klass == coping.ALONE_FIRST]
+    assert [(r.label, sorted(r.waves), r.served_as) for r in recs] == [
+        ('Nothing else', ['2013-14', '2015-16'], 'Did nothing')]
+
+
 def test_a_frame_with_no_coping_columns_is_returned_untouched():
     idx = pd.MultiIndex.from_tuples([('2012', 'h1', 'Drought')], names=['t', 'i', 'Shock'])
     df = pd.DataFrame({'Years': ['2012']}, index=idx)
@@ -302,8 +373,9 @@ def test_every_registry_label_occurs_where_it_is_declared(country):
     missing = []
     for rec in coping.label_classes(country):
         where = long if rec.waves is None else long[long['t'].astype(str).isin(rec.waves)]
-        if rec.klass == 'filler':
-            # a filler is served NA, so look for it in the build's own frame
+        if rec.klass in ('filler', coping.ALONE_FIRST):
+            # a filler is served NA and a lone first-slot label is served as its
+            # served_as, so both are looked for in the build's own frame
             continue
         if not (where['label'].astype(str) == rec.label).any():
             missing.append((rec.klass, rec.label, sorted(rec.waves or [])))
@@ -317,7 +389,8 @@ def test_every_filler_occurs_in_the_build_output(country):
     parquet (pre-normalisation) rather than the served frame."""
     import lsms_library as ll
     from lsms_library.paths import data_root
-    fillers = [r for r in coping.label_classes(country) if r.klass == 'filler']
+    fillers = [r for r in coping.label_classes(country)
+               if r.klass in ('filler', coping.ALONE_FIRST)]
     if not fillers:
         pytest.skip(f'{country} declares no filler')
     with warnings.catch_warnings():

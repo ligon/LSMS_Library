@@ -15,8 +15,9 @@
 # is required.  Counts are from the GH #1562 audit
 # (burst/isa-sm-20261113/reports/1562-coping-audit, base f138a3d61).
 
-# NOT classed: the unlabelled codes served as '0.0', '21.0', '24.0', '25.0'
-# and '60.0' (2011-12, 10 cells) and '21.0' (2013-14, 1 cell).  An undocumented
+# NOT classed: the unlabelled codes served as '0.0' (10 cells), '24.0', '25.0'
+# and '60.0' (1 cell each) in 2011-12, 13 cells in all, and '21.0' (2013-14,
+# 1 cell; W2 only).  An undocumented
 # code is not a documented missing code, and the ruling names only '99.0';
 # they stay as recorded pending the user's answer (GH #1562 report, questions).
 

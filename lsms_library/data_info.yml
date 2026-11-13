@@ -710,7 +710,11 @@ Columns:
         "99.0", ...) is served NA in its position; the labels are listed with
         their evidence per country in countries/<C>/_/coping.yml
         (lsms_library/coping.py).  A "did nothing" answer keeps its position as
-        recorded.  A recorded gap (HowCoped0 NA, HowCoped1 filled) is served as
+        recorded.  One label is slot-aware (ruling 2026-11-13, "Coping
+        follow-ups"): Uganda 2013-14 / 2015-16 code 40 "Nothing else" is a filler
+        except as the FIRST answer with nothing else recorded, where it is the
+        household's "did nothing" and is served as Uganda's "Did nothing" in
+        HowCoped0 and in the set.  A recorded gap (HowCoped0 NA, HowCoped1 filled) is served as
         recorded.  Values are the wave's own labels; they are not harmonized
         across countries or waves.
     HowCoped1:

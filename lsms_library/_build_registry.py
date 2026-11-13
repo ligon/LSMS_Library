@@ -283,6 +283,7 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.coping.normalise_coping",
     "lsms_library.coping.coping_set",
     "lsms_library.coping.classes_for_wave",
+    "lsms_library.coping.alone_first_for_wave",
     "lsms_library.coping.label_classes",
     "lsms_library.coping._registry",
     "lsms_library.coping._parse_registry",

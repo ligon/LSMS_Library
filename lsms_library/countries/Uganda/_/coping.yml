@@ -39,3 +39,21 @@ did_nothing:
     evidence: >-
       s16q04a/b/c value label, 2018-19 and 2019-20: the only answer on 220 /
       226 rows, beside a strategy on 69 / 70 (audit F7).
+
+did_nothing_when_alone_first:
+  # Ruling 2026-11-13, "Coping follow-ups (... Uganda lone 'Nothing else')":
+  # "Did nothing when alone".  Code 40 as the FIRST answer with nothing else
+  # recorded (every later slot empty or code 40) means the household did
+  # nothing: the set is {Did nothing}.  In any other position, or first and
+  # followed by a strategy, it stays a filler (NA), per the filler entry above.
+  - label: Nothing else
+    waves: ['2013-14', '2015-16']
+    served_as: Did nothing
+    evidence: >-
+      h16q4a = 40 "Nothing else" with h16q4b/c empty or 40: 55 rows in 2013-14
+      and 41 in 2015-16 (GH #1562 red team F3).  The printed code list
+      (unps_2013_14_household_qx.pdf p32: 1-15 and 96) has no "did nothing"
+      option; 2018-19 and 2019-20 add one, labelled "Did nothing", which is the
+      label served here, in the first position and in the set, so that
+      position and set agree as for every other lone "did nothing" answer and
+      the answer composes within Uganda.  The parquet keeps "Nothing else".
