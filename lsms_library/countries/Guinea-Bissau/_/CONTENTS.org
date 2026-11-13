@@ -5,7 +5,8 @@
 
 Guinea-Bissau EHCVM (Enquete Harmonisee sur les Conditions de Vie des
 Menages), the harmonized West African household-conditions survey
-template.  One wave configured: =2018-19=.
+template.  One wave configured: =2018-19=.  [2026-11-13: two -- =2021-22= (EHCVM-2) is wired
+for sample, household_roster, cluster_features, shocks and assets; see "2021-22 wired".]
 
 * Sampling Design
 
@@ -72,7 +73,8 @@ verbatim from its own documentation.  This is deliberately kept separate
 from what the data look like: nothing below is inferred from any =.dta=.
 
 Guinea-Bissau has exactly one wave directory in the library, =2018-19=,
-so this section is the complete record for the country.
+so this section is the complete record for the country.  [2026-11-13: no longer
+true; =2021-22= is held and partly wired.  Its universe is not recorded here; see "2021-22 wired".]
 
 ** 2018-19 -- the declared universe
 
@@ -636,10 +638,16 @@ Measured, nothing changed.  Code 5 of =s16bq01= is =Adubos inorgânicos - NPK/F�
 =harmonize_input=, so every label passes through and none keys =_NITROGEN_CONTENT=:
 =nitrogen_kg= matches 0 rows and returns nothing, whatever the share.  Separately
 =Quilograma= and =Grama= have no kg factor, so the 38 + 2 NPK rows in them have no mass
-either.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 60 positive), which the
+either.  [2026-11-13, GH #1107: =harmonize_input= now maps ureia, fosfatos and
+NPK, and a country =u_kg= table gives =Quilograma= and =Grama= a mass; =nitrogen_kg= matches 293
+rows.  See "2018-19 label bundle".]  =s16a= asks fertilizer per parcel (=s16aq29c1=, 60 positive), which the
 =data_scheme.yml= grain note says it does not.
 
 * 2026-11-04 -- 2021-22 held and registered, not wired (GH #552)
+
+[2026-11-13: sample, household_roster, cluster_features, shocks and assets are wired; food_acquired is
+NOT, because its quantities are rounded to even integers (see "2021-22 wired").  The GPS note below:
+the =_m= point is one per grappe and is not 2018-19's fix.]
 
 Acquired whole by =add_wave=: EHCVM-2 (6274, =GNB_2021_EHCVM-2_v01_M=) in =2021-22/Data/=, 60
 files, 178 MB, with the BIDs and both household questionnaires in
@@ -685,7 +693,8 @@ Guinea-Bissau wave at read time (GH #1487).
 - *Every label is double-encoded.*  =j=, =u= and =Description= all go through this wave's =_decode_mojibake=, as every other table here does.  =Description= is therefore repaired, where Niger's is as recorded.
 - *Portuguese sizes, in the household's words.*  =Monte (Medio)=, =Pedaço (Grande)=.  The form says =Médio= and the household =Medio=; the form says =Inteiro= and the household =Integer=, so =Corda (Integer)= (7 records) is the household's word, carried over untranslated (#1224).
 - *The unit-size code has two forms.*  =10 x unit + size=, but sizes 98 and 99 (=Outro tamanho 1 / 2=) make it =100 x unit + size=: =41398= is Monte, size 98.  4 codes, 59 records.  The household labels list neither size, so the form's word is served.
-- *Product 94 has no household label.*  =Feijão seco= (348 records) is on the price form but not in =s07bq01=, whose nearest code is 95, =Feijão-frade, feijão seco=.  D3 bridges by code and there is no code to bridge by, so it is served under its own label and meets no household row.  Whether 94 is the household's 95 is not established here.
+- *Product 94 has no household label.*  =Feijão seco= (348 records) is on the price form but not in =s07bq01=, whose nearest code is 95, =Feijão-frade, feijão seco=.  D3 bridges by code and there is no code to bridge by, so it is served under its own label and meets no household row.  Whether 94 is the household's 95 is not established here.  [2026-11-13: bridged by code, ruled
+2026-11-04 (GH #1226); see "2018-19 label bundle".]
 
 *The join.*  Household (t, j, u) cells with a community price: 445 of 705, covering 109,331 of 126,925 =food_acquired= rows.  77,158 of the 80,202 community rows find a household cell.  78 of the 80 =j= occur in the household table.  =Feijão seco= does not, and neither does =Cube alimentaire (Maggi, Jumbo, )=, because the household file has 4,882 rows of product 121 and none with a positive quantity.
 
@@ -887,3 +896,155 @@ The cross-run cold and warm capture comparisons, source seals and prior
 failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
 =5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
 earlier job-local caches were reaped; source and survey values did not change.
+
+* 2026-11-13 -- 2018-19 label bundle (GH #1107, #1119, #1539, #1226, #1118)
+
+One Guinea-Bissau re-warm, measured cold in private roots against base =f138a3d61= (gnb stream,
+isa-sm-20261113, burst job 41271716).
+
+- *Inputs (#1107).*  =harmonize_input= maps the three inorganic labels that name a product, on Togo's
+  rows: =Adubos inorgânicos - ureia= -> =Urea=, =- fosfatos= -> =Phosphate=, =- NPK/Fórmula única= ->
+  =NPK= (no grade is printed, so the generic =npk= share applies, as for Togo's =NPK/Formule unique=).
+  =DAP e outros adubos inorgânicos= (code 6, 41 applied rows) is a mixed bucket and stays RAW and
+  unmatched until #1696 is ruled (#1107's own instruction); the organic labels stay refused (#867).
+  =nitrogen_kg= goes from 0 to 293 matched rows (Urea 190, Phosphate 57, NPK 46), 188 households.
+- *Kilograms (#1107).*  The s16b unit card is =1 Grama, 2 Quilograma, 3 Tonelada, 4 Litro, 5 Carroça,
+  6 Outras=, none of them in =transformations.KNOWN_METRIC=.  A country =u_kg= table declares
+  =Quilograma= 1 kg and =Grama= 0.001 kg under the file's own labels (no served label changes; gram
+  has no cross-country canonical spelling).  =Tonelada= (16 rows) and =Litro= (600) are not declared.
+  No 2018-19 =crop_production= or =food_acquired= unit carries either label (crop uses =Kg=).
+- *Seed crops (#1119).*  =harmonize_seed_crop= gives each seed record (s16bq01 codes 11-20, read by
+  CODE in the script) the crop as =crop_production= serves it; Togo's residual labels for the three
+  catch-alls.  Seed =input= labels stay raw, so =seed_kg= (=input == 'Seed'=) reads no Guinea-Bissau
+  row before or after -- relabelling seeds =Seed= is an open question, not done here.  Code 11 is
+  spelled =Sementes de  milho preto= (double space) in the source; the lookup folds whitespace.
+- *Djagatu / Beringela (#1539).*  =Djagatu= -> =Jaxatu= (Niger, Mali and Cote d'Ivoire's label for the
+  bitter tomato), =Beringela= -> =Aubergine=, no trailing comma.  =crop_production= 12,173 -> 12,188
+  rows: the 11 harvests the collapse destroyed (and 4 identical repeats) are back, no
+  =GrainCollapseWarning=.  The Djagatu row also serves =food_acquired.j= and =community_prices.j=
+  (s07bq01 / s05q01 code 145), so those rows move from =Aubergine,= to =Jaxatu= too.
+- *Product 94 (#1226).*  Bridged by code to household 95 (ruled 2026-11-04): s05 holds 348 records
+  of 94 and none of 95, so its 696 rows take =Niébé/Haricots secs= and nothing is lumped;
+  =Description= keeps =Feijão seco=.
+- *Missing unit (#1118).*  Counted first: the held s16b ships only applied rows (5,534 of 5,534) and
+  none has a missing unit, so =Manquant= was served on 0 rows; the fill is now =Unknown=.
+- *Found, recorded, not changed.*  2018-19's =Purchased= / =Quantity_purchased= read =s16bq05= /
+  =s16bq07a=, whose variable labels are "16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou
+  de don?" and "16B.07a. ... quantité en [INTRANT] reçue sous forme de cadeau ou de don?"; =s16bq06=
+  names the giver.  The purchase is =s16bq08= / =s16bq09a=.  The same defect as Togo 2018 and Benin
+  2018-19 (their CONTENTS.org), so =Purchased= means "received as a gift" here.
+
+* 2026-11-13 -- 2021-22 wired: sample, household_roster, cluster_features, shocks, assets (GH #1697)
+
+EHCVM-2 (WB 6274, =GNB_2021_EHCVM-2_v01_M=), on the Togo / Benin / Cote d'Ivoire 2021-22 template
+(PR #1711), under the ruling "EHCVM-2 2021-22 wiring ... -- GO" (2026-11-12).  *=food_acquired= is
+not wired* (below); nor is anything outside the brief's six tables.
+
+** What shapes every table
+
+- *Ids.*  =i= is =E2_<grappe>0<menage:02d>= (=2021-22/_/mapping.py:i=).  4,893 of the 5,351
+  (grappe, menage) keys recur from 2018-19; =s00q07f1= / =s00q07f2= record the 2018/19 grappe and
+  household, =PanelHH= flags 4,897 =Ménage Panel= and 454 =Ménage non-panel=.  No link is served (no
+  panel IDs without a ruling).  =pid= is =membres__id=.
+- *Labels.*  The VALUE labels are Portuguese and mostly clean UTF-8, unlike 2018-19's double-encoded
+  ones; the VARIABLE labels are French.  Exceptions: =s01q00aa= spells =não= double-encoded with a
+  byte lost (=nÃo=), and =s00q02= carries mojibake.  The rank labels of =s14bq05= are French.
+- *Regions.*  The file spells =Bafatá=, =Gabú= and =Bolama/Bijagós= where 2018-19 has =bafata=,
+  =gabu=, =BOLAMA_BIJAGOS=; the =Region= and =strata= tables fold them onto the served labels.  All 450
+  grappes recur and keep their region and milieu.
+- *Grids.*  =s07b= (968,524 rows), =s12= (240,795) and =s14b= (117,722) are household x item grids;
+  filter by the gate before counting.
+
+** sample
+
+5,351 households, =v= = =grappe=.  =weight= = =panel_weight= = =hhweight= of
+=ehcvm_ponderations_gnb2021.dta=, the file's one weight, one row per household, labelled
+" Ponderation panel" (the BID: "Weights are calculated for each household, taking into account the
+panel dimension"); it equals =ehcvm_welfare.hhweight= on 5,351 of 5,351 and takes two values in 240
+grappes, one per =panelHH= value.  =strata= is region x milieu by the #1575 rule; the 2026-11-12
+ruling "EHCVM-2 2021-22 strata, GH1575 extension: Same rule as #1575" names Togo, Benin and Cote
+d'Ivoire, and is applied here per the gnb brief.  *The weights file's own =strate= (17 codes) is
+EXACTLY that construction*: one code per region x milieu cell, one-to-one (not Benin's =strat=, which
+is department x vague).  Recorded as a comparison, not served.  17 cells (SAB urban only), the same
+17 as 2018-19.
+
+** household_roster
+
+=s01= lists the 2018-19 roster again with =s01q00aa= ("est-il toujours un membre de ce ménage?").
+The 341 who have left are dropped, as =ehcvm_individu= does (41,160 = 41,501 - 341) and as Benin
+2021-22 does pending GH #1565.  Unlike Benin's, 246 of them still carry a sex.  =Sobrinho(a)=
+(nephew/niece, 6,186 rows) is new in this wave and was added to =kinship.yml= as =Sobrinho(A)= [-1,
+1, consanguineal].  Ages as 2018-19's hook: stated years, else the birth date; 9999 is no answer;
+=s01q03b= =Não sabe= is no month.
+
+** cluster_features
+
+One file, the cover.  The GPS point =GPS__Latitude_m= / =_Longitude_m= ("Coordonnées GPS du
+ménage") is ONE point per grappe, inside the country (lat 11.03-12.68, lon -16.58 to -13.65), none
+null or zero.  *Unlike Togo's and Benin's, it is not 2018-19's fix* (=grappe_gps_gnb2018.dta=): 2 of
+439 grappes coincide.  Distance to the 2018-19 point, by milieu:
+| milieu | grappes | median km | p90 km | max km | > 5 km | > 10 km | > 20 km |
+|--------+---------+-----------+--------+--------+--------+---------+---------|
+| Rural  |     275 |      1.02 |   7.97 |   33.0 |     52 |      21 |       4 |
+| Urbano |     164 |      0.49 |   1.17 |   39.4 |      2 |       2 |       1 |
+Two independent WB displacements of one true point stay within 4 km urban and 10 km rural (20 km for
+1% of rural points), so the tail is not two displacements of the same point.  What the =_m= suffix
+means, and which point is the cluster's, is not established; served as recorded (GH #791).
+
+** shocks
+
+=s14b= (=s14a= is the COVID-19 module).  Consequences on 2018-19's Portuguese labels; by this file's
+own variable labels =s14bq04d= is the herd, =e= the food stock, =f= the food purchases, all three on
+the same answered rows, so =AffectedConsumption= = =f= and =AffectedFoodStock= = =e= (GH #1556 /
+#1561).  =s14bq05__N= holds the French rank labels or =Non=; column 25 is =nonoui= (34 Oui) and takes
+the rank no other strategy holds (Benin's hook); 26 is =Aucune stratégie=.  4,417 of the 10,842
+reported shocks carry follow-ups and are served; a cross-wave incidence reads as a false fall.
+
+** assets
+
+The owned lines of the grid (29,727 of 240,795, =s12q02 = Oui=).  43 of the 45 item labels are
+2018-19's character for character; codes 25 and 30 are respelled and =harmonize_assets= gains them.
+GH #1566's =s12q09= check, measured: 4 of 29,407 positive values off the 25 grid, no non-integer,
+no sentinel shape (2018-19: 1 of 28,428).
+
+** food_acquired: NOT wired -- the released quantities are rounded to even integers
+
+Tested before serving, as the brief requires, with the isa-sm-20261112 =s07bq03a= check (Togo / CIV /
+Mali / Senegal / Niger patterns) patched for Portuguese labels, plus an on-grid extension.  The five
+known patterns are absent (no regional factor: q3/q4 mode 1.0 in all 9 regions; no H/L rows; no
+per-capita block -- the controls Mali 2018-19 rice and Senegal 2021-22 salt light up; no rows
+without =vague=).  But:
+
+- *Every positive 2021-22 =s07bq03a= (128,229) and =s07bq07a= (96,262) is an EVEN integer*, in every
+  unit: Kg, Litro, Unidade (33,961 counts, not one odd), Monte, the rest.  =s07bq04= / =s07bq05= are
+  99.9% even (23 odd each).  No =Kg= or =Litro= row equals 1 or is below 1.
+- 2018-19: 38.6% of positive q3 even, 4.5% halves, =Kg= mode 1.  The other 2021-22 EHCVM-2 waves:
+  4-7% halves.  The SAME 2021-22 release holds halves elsewhere (s16b q03a 159, s16c q16a 92), so the
+  CAPI took decimals.
+- It is a rounding, not a doubling: per item x unit x size cell (95 cells shared with 2018-19) the
+  median q3 ratio 2021/2018 is 1.00, the mean ratio 1.20 (Litro 1.93, Kg 1.25, Unidade 1.13).
+- *3,945 consumed-yes rows carry q3 = 0* (2018-19: 0), 1,881 Kg and 1,682 Litro (palm oil, lemon
+  vinegar, sugar, ground groundnut): small quantities rounded to zero.  2,739 of them record a
+  purchase value (median 750 FCFA).  None has any =depan= in =ehcvm_conso_gnb2021=, so UEMOA's
+  aggregate was built from these rounded quantities.
+- The #876 rule reproduces =depan(Compra)= within 1% on 91.3% of rows; that is arithmetic, since the
+  rule is scale-invariant in q3 and q7a together, and says nothing about the quantities.
+- Documented nowhere found: the English BID (7B description, section 7 processing), the EHCVM-2
+  enumerator manual (Q7B.03-Q7B.08 ask the quantity actually consumed, in its unit), and the World
+  Bank DDI (=dataProcessing= empty, isa-sm-20261112 docsearch).
+
+So the quantities are not the households' answers, by the 2026-11-12 principle ("Without a very good
+reason we don't want to serve up someone else's undocumented imputations").  Brought back as a
+question; nothing served.  For whoever wires it:
+- 182 item codes (2018-19: 138), renumbered from code 12 on; labels clean, so =harmonize_food= needs
+  rows (Niger's #833 rule).  Djagatu is inside code 107 =Outros legumes frescos, n.e.s (Djagatu, nabo,
+  beterraba)=.
+- =s07bq03b= and =s07bq07b= label codes 107 (=Lata/caneca= / =Lata=), 122 and 126 (=Pedaço= /
+  =Pedaço (25 F)=) differently: read the purchase unit by code, as Benin does.
+- Size =Inteiro= (26 rows) is not in =transformations._UNIT_SIZE_WORDS=; adding it is a
+  =transformations.py= edit (GhanaLSS / Uganda / Ethiopia re-warm), as Benin's =Très grand= was.
+- =ehcvm_nsu_gnb2021.dta=: 4,419 rows, region x milieu x product x unit x size -> =poids= (the BID:
+  "collected in 2018 and updated in 2021").  Wiring it (#1598) needs =ehcvm.NSU_TABLES=, an
+  =lsms_library/ehcvm.py= edit, and by the 2026-11-04 ruling it would move 2018-19's kilograms too.
+- 2018-19 finding, not served through: =s07bq07a= is filled on every =Nunca= (23,204) and =Há mais
+  de 30 dias= (11,458) row, with =s07bq08= empty there (Niger 2018-19's shape); 2021-22 has 10 and 7.

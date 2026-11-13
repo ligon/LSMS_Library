@@ -182,6 +182,11 @@ Guinea-Bissau::sample::region-milieu-stratum:
   validated_against: >-
     Documentary definition and static wiring only. Actual-row validation,
     missingness, cluster consistency, non-strata conservation, normal cold/warm
-    sample and Feature acceptance are UNRUN in this source/pure worker.
+    sample and Feature acceptance are UNRUN in this source/pure worker. (That
+    sentence is the 2026-11-10 construction stage; CONTENTS.org records its completed
+    2018-19 validation.) 2021-22, extended 2026-11-13: the weights file's own `strate`
+    (17 codes) is one-to-one with this construction on all 5,351 households (measured,
+    gnb stream); a cold sample() serves it on every household with the key, and
+    tests/test_gnb_2021_wave.py re-derives the served value from the inputs.
   contents: 'Guinea-Bissau/_/CONTENTS.org, "Selected 2018-19 region/milieu strata (GH #1575)"'
   since: '2026-11-10'
