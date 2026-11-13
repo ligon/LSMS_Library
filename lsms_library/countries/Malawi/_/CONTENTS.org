@@ -153,9 +153,11 @@ lines carry it (the =_farm_level_sales= rule GH #1457 already applied for 2010-1
   text is the line's own =ag_g0d_os=.
 - Stamping: on every row whose =crop= a text set, 2010-11 included (the #1523 rows,
   unregistered until now).  A row that already carries a sale-basis key keeps it, and
-  the two are joined with =derivations.MULTI_SEP= (sorted, ='+'=).  A seed row is stamped
-  only where it has a payload, so =seed-line-no-payload= still deletes a line with no seed
-  answer.
+  the two are joined with =derivations.MULTI_SEP= (sorted, ='+'=).  =plot_inputs= has no
+  other key today, but its stamp also unions with any =Derivation= already on the frame,
+  so a later upstream key is kept (red team D3).  A seed row is stamped only where it has a
+  payload (columns other than =Derivation=), so =seed-line-no-payload= still deletes a
+  line with no seed answer.
 - =plot_inputs.Derivation= is declared =optional: true= in =lsms_library/data_info.yml=.
 - =_assert_label_is_text_only= refuses to stamp if a =harmonize_crop= code ever maps to
   =Cowpea (Khobwe)=, because the stamp reads the label as "set from a text".
@@ -277,7 +279,18 @@ to them.
 *Ruling (@ligon, 2026-11-13): "Drop the six."*  =_seed_acquisition_block= no longer
 carries them (=_H_EMPTY_IN_RELEASE=), and only while each is blank (NA or whitespace) on
 every row of its file.  A release that fills one brings it back under its own name.  The
-source evidence is the table above.  Measured (job 41275716): =plot_inputs= keeps every
+source evidence is the table above.
+
+*The condition reads the FILE, not the carried rows* (red team D2, accepted as is, 2026-11-13).
+A release that fills one of the six only on rows the carrier does not keep brings the
+column back, blank on every served row, and =no_all_null_columns= fails again.  That
+failure is loud, not silent.
+=tests/test_gh1190_selected_farm_carrier.py::test_an_empty_native_h_column_is_dropped_only_while_blank_in_the_file=
+pins the rule:
+- dropped when blank on every row (NA, =''= or whitespace);
+- served under its own name when filled on a carried row;
+- served blank when filled only on a row the carrier does not keep;
+- =ag_h33=, which is not one of the six, served however blank it is.  Measured (job 41275716): =plot_inputs= keeps every
 row and every other column, and no served column is now all-NA.
 =test_table_structure -k Malawi= passes on the candidate (128 passed); on the base its
 two =Malawi/plot_inputs= failures (=test_no_fully_null_columns=, =test_feature_is_sane=)

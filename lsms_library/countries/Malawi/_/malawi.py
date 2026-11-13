@@ -4745,10 +4745,13 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
     named = (level('input').eq('Seed').fillna(False).to_numpy(dtype=bool)
              & level('crop').isin(sorted(set(_CROP_TEXT_RECODE.values()))).fillna(False)
              .to_numpy(dtype=bool))
-    payload = out.notna().any(axis=1).to_numpy(dtype=bool)
+    # A key already on a row (none today) is kept beside this one, and is not a payload.
+    existing = (out['Derivation'] if 'Derivation' in out.columns
+                else pd.Series(pd.NA, index=out.index, dtype='string'))
+    payload = out.drop(columns='Derivation', errors='ignore').notna().any(axis=1) \
+        .to_numpy(dtype=bool)
     out['Derivation'] = union_derivation_key(
-        pd.Series(pd.NA, index=out.index, dtype='string'),
-        named & payload, CROP_TEXT_KEYS['plot_inputs'])
+        existing, named & payload, CROP_TEXT_KEYS['plot_inputs'])
     # Readable by a test; the warning above is what a build log sees.
     out.attrs['seed_purchase_mixed_units'] = int(refused_purchases)
     return out

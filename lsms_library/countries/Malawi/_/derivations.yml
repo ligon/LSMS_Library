@@ -904,9 +904,20 @@ Malawi::plot_inputs::cowpea-from-crop-text:
         Module G asks seed planted (G04) and harvest (G13) on the same crop line; the 2010-11
         precedent (CONTENTS.org, "2010-11: the lines whose own text says cowpea").
     - text: >-
-        the crop text's assumptions, as under Malawi::crop_production::cowpea-from-crop-text.
+        the crop text names cowpea, ag_d20_oth names the G line coded 48, and Modules D and G
+        refer to the household's one reference season, as under
+        Malawi::crop_production::cowpea-from-crop-text.
+      basis: questionnaire
+      evidence: >-
+        Malawi::crop_production::cowpea-from-crop-text, its first three assumptions (the
+        specify field, the D20 pre-population and slot pairing, Module X hh_x02 and the
+        IHS4 / IHS5 forms).
+    - text: >-
+        single text only, as under Malawi::crop_production::cowpea-from-crop-text.
       basis: modelling-choice
-      evidence: Malawi::crop_production::cowpea-from-crop-text
+      evidence: >-
+        Malawi::crop_production::cowpea-from-crop-text, its fourth assumption (rulings
+        @ligon 2026-11-12, "Join D, single-text only", and 2026-11-13).
   validated_against: >-
     The served seed rows' (t, i, plot_id) are a subset of the same oracle's lines in every
     wave; every keyed row joins its own line on (t, i, crop, plot_id).  CONTENTS.org

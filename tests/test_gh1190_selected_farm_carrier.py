@@ -408,3 +408,45 @@ def test_nitrogen_exact_old_role_absent_and_other_country_behavior(mw,role):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         exact(tr.nitrogen_kg(frame),ns['nitrogen_kg'](expected))
+
+
+# GH #1712 (ruling @ligon 2026-11-13, "Drop the six").  Six native H columns are left
+# out of the carrier, and only while each is blank (NA or whitespace) on EVERY row of its
+# file.  The condition reads the file, not the carried rows (red team D2, accepted): a
+# value on a row the carrier does not keep brings the column back, blank on every served
+# row.  An independent list, checked against the production constant.
+H_EMPTY_IN_RELEASE = {'ag_h17_os': ('2010-11', 'Full_Sample'), 'ag_h26b_os': ('2010-11', 'Full_Sample'),
+                      'ag_h27_os': ('2010-11', 'Full_Sample'), 'ag_h36b_os': ('2010-11', 'Full_Sample'),
+                      'ag_h26_1b': ('2019-20', 'Panel'), 'ag_h36_1b': ('2019-20', 'Panel')}
+
+
+def test_the_six_are_the_ruled_six(mw):
+    assert set(mw._H_EMPTY_IN_RELEASE) == set(H_EMPTY_IN_RELEASE)
+
+
+@pytest.mark.parametrize('col', sorted(H_EMPTY_IN_RELEASE) + ['ag_h33'])
+@pytest.mark.parametrize('case,values,served,cells', [
+    ('all NA', [np.nan] * 9, False, 0),
+    ('all empty strings', [''] * 9, False, 0),
+    ('all whitespace', ['  '] * 9, False, 0),
+    ('a value on a carried row', ['BICYCLE'] + [np.nan] * 8, True, None),
+    ('a value only on a row not carried', [''] * 8 + ['CAR'], True, 0),
+])
+def test_an_empty_native_h_column_is_dropped_only_while_blank_in_the_file(mw, col, case, values, served, cells):
+    wave, half = H_EMPTY_IN_RELEASE.get(col, ('2010-11', 'Full_Sample'))
+    h = hframe()
+    h[col] = np.array(values, dtype=object)   # positional: hframe's index is [44] * n
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        out = components(mw, h, wave, half)
+    assert len(out) and out.index.get_level_values('input_obs').str.contains(':0/field:').any()
+    if col not in H_EMPTY_IN_RELEASE:     # not one of the six: served however blank it is
+        assert col in out.columns, case
+        return
+    assert (col in out.columns) is served, case
+    if served:
+        text = out[col].astype('string').str.strip().replace('', pd.NA).dropna()
+        if cells is None:                 # the carried row's value, under its own name
+            assert len(text) and text.eq('BICYCLE').all(), case
+        else:
+            assert len(text) == cells, case
