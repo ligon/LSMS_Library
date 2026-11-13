@@ -1,5 +1,14 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-13: Release with the stale Windows pin -- ANSWERED
+The user explicitly selected: "Release now, fix pin after (Recommended)".
+#1715 (development f138a3d61 -> master) MERGED as cf09ea6b4.  The non-required
+windows-script-build job is red since #1478 (Uganda shocks 14,457 -> 14,459;
+stale ci.yml EXPECT pin); tracked in #1716; noted in the v0.17.0 release notes.
+The user publishes GitHub Release v0.17.0 on master (web-UI publish is the
+reliable trigger; workflow_dispatch fallback: gh workflow run publish.yml --ref
+master -f tag=v0.17.0).
+
 * 2026-11-12: Coverage snapshot before v0.17.0 -- ANSWERED
 The user explicitly selected: "Regrade before release (Recommended)".  Run
 `make matrix` on the final integrated tree on a free burst node while the data

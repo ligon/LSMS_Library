@@ -174,3 +174,14 @@ reports/*/work/private, */data.
   named by commit keywords in range are already closed).  On green: merge;
   then the user publishes GitHub Release v0.17.0 (tag on master) with the notes.
 - Lesson: never edit a PR's title/body after its data gate starts (#1714).
+
+* Update, 2026-11-13 13:45Z -- master updated; awaiting user publish
+- #1715 MERGED: master = cf09ea6b4148719bcc5edf30fc6e31eed7f26d68.
+- Batch issues: 9 closed, 4 narrowed, 6 commented (reports/post-merge-issues/LOG.tsv).
+- New issues: #1714 (CI edited-event block), #1716 (stale Windows pin).
+- Release notes: reports/release-v0.17.0/RELEASE_NOTES.md.  User publishes v0.17.0.
+- Still pending user "go": delete scratch private data roots (26 GB+).
+- Not yet dispatched (next batch): #1562 coping audit+schema, #1577 strata tag
+  (+#1134), Nigeria #1502/#1518 + #1537 + #587 PH follow-ups, Malawi #1228,
+  GNB labels, Manquant (#1118), Burkina bundle (+#1442), GNB 2021-22, Benin panel
+  (#1705), #1559 price screen + crop rung, #1709 CFE test, #1712, #1713, #1714, #1716.
