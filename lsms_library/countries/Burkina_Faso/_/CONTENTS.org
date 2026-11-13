@@ -3601,6 +3601,11 @@ a source-qualified identity, =Unknown [Burkina_Faso 2021-22 s16cq04=55]=, the fo
 the file does not), and whether 2021-22's =Riz= / =Niébé/Haricot= / =Voandzou (pois de terre)=
 / =Laitue (salade)= should be served in 2018-19's spellings.  Both are questions for the
 maintainer; as served, cowpea is =Niébé= in 2018-19 and =Niébé/Haricot= in 2021-22.
+The cost, measured: =plot_inputs= seed crops are spelled as 2018-19 harvests are (GH #1119),
+so in 2021-22 0 of 984 =Niébé= and 0 of 291 =Riz Paddy= seed rows find a harvest row at
+=(t, i, crop)=, against 2,097 of 2,156 and 525 of 532 in 2018-19; the other seed crops of
+2021-22 match on 97.8-100% (=Maïs= 1,238 of 1,246, =Sorgho= 1,131 of 1,141, =Sésame= 272 of
+278), and the catch-all seed slots (=Autre crop= and the like) match none, as in 2018-19.
 
 Units likewise: =s16cq16b= and =s16dq05b= label codes 1-7 (=s16c= 3 =Plat Yoruba=, =s16d= 3
 =Yorouba=; 2018-19 =Plat yorouba=) and leave the longer list bare (=s16cq16b= 8, 9; =s16dq05b=
