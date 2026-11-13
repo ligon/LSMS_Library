@@ -19,8 +19,11 @@ Sampling:
         to 12 households".  Measured on the raw covers: all 450 grappes recur and each keeps its
         region and milieu (450/450, up to the 2021 file's spelling of three region names).
         UNLIKE Togo and Benin, the 2021-22 cover point (GPS__Latitude_m / _Longitude_m,
-        one point per grappe) is NOT 2018-19's fix: 2 of 439 grappes coincide, median
-        0.57 km apart, p90 6.3 km, max 39.4 km (_/CONTENTS.org, "2021-22 wired").
+        one point per grappe) is NOT 2018-19's fix: of the 445 grappes in both GPS files, 6 carry a
+        null 2018-19 point, and 2 of the other 439 coincide; median 0.57 km apart, p90 6.3 km, max
+        39.4 km.  The two are different objects (the community village or quarter point in 2018-19,
+        the household-GPS variable in 2021-22); that they are not two displacements of one point is
+        a hypothesis (_/CONTENTS.org, "2021-22 wired").
         `rotating-panel` records the DESIGN.  The library serves NO household link
         across this boundary: 2021-22's `i` is `E2_`-prefixed (no panel IDs, ruling
         2026-11-12), although s00q07f1/f2 record the 2018/19 grappe and household and
