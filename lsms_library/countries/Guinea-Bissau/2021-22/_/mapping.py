@@ -196,3 +196,106 @@ def shocks(df):
     df['HowCoped1'] = how_coped[1]
     df['HowCoped2'] = how_coped[2]
     return df.drop(columns=cope_cols)
+
+
+# --- food_acquired: served as released, the rounding registered (GH #1697) ------------
+#
+# Ruling @ligon 2026-11-13, "Serve, registered key" (not the recommended hold).  The
+# release's s07b quantities are rounded to even integers by a step no document records:
+# every positive s07bq03a (128,229) and s07bq07a (96,262) is even (s07bq04 / s07bq05: 23
+# odd each, on the 23 rows where q3 = q4 + q5), 3,945 consumed rows carry s07bq03a = 0,
+# and 2 x round-half-up(x / 2) applied to 2018-19's answers reproduces 2021-22's
+# distribution.  The rule maps 1, 2 and 2.5 all to 2, so it cannot be inverted: nothing is
+# recovered, every row of the wave is served as released and carries KEY_ROUNDED, and the
+# zeroed consumed rows, which the shared reshape serves no row for, are a registered
+# deletion (KEY_ROUNDED_TO_ZERO).
+from lsms_library.ehcvm import (  # noqa: E402
+    derivation_key as _derivation_key,
+    food_acquired_ehcvm as _food_acquired_ehcvm,
+    inputs_last_purchase as _inputs_last_purchase,
+)
+
+FOOD_ACQUIRED_DERIVATION = _derivation_key('Guinea-Bissau')
+KEY_ROUNDED = 'Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even'
+#: A DELETION (`rows: 0`, no served row carries it): consumed rows the release rounds to 0.
+KEY_ROUNDED_TO_ZERO = 'Guinea-Bissau::food_acquired::s07b-consumed-quantity-rounded-to-zero'
+
+#: s07bq03b and s07bq07b label one code book twice: 107 is `Lata/caneca` and `Lata`, 122
+#: `Rede de batata` and `Rede de cebola, alho`, 126 `Pedaço` and `Pedaço (25 F)`.  These
+#: labels carry no code prefix, so unit_match would read every such purchase as another
+#: unit.  Put on s07bq03b's spelling of the same code, as Togo 2021-22 does.
+_PURCHASE_UNIT_AS_CONSUMPTION_UNIT = {'Lata': 'Lata/caneca',
+                                      'Rede de cebola, alho': 'Rede de batata',
+                                      'Pedaço (25 F)': 'Pedaço'}
+
+
+def LastPurchaseUnitCode(value):
+    '''s07bq07b, on s07bq03b's spelling of the same code.'''
+    if isinstance(value, str):
+        return _PURCHASE_UNIT_AS_CONSUMPTION_UNIT.get(value.strip(), value)
+    return value
+
+
+def quantity_as_released(quantity):
+    '''The registered function of KEY_ROUNDED: the identity.  The release's quantity is
+    served unchanged, because the rounding cannot be inverted; the key says what the
+    number is.  The fitted rounding is `round_half_up_to_even`, a hypothesis.'''
+    return quantity
+
+
+def round_half_up_to_even(x):
+    '''2 x floor(x / 2 + 0.5): the rule that reproduces the release's distribution from
+    2018-19's answers (Kg and Litro shares of 0 / 2 / 4; it is also Stata's round(x, 2)).
+    A fit, not a proof: ceiling to even fits Unidade and Monte as well (red team F3), and
+    only the Kg / Litro zeros tell the two apart.  Not applied to anything served.'''
+    return 2 * np.floor(np.asarray(x, dtype=float) / 2 + 0.5)
+
+
+def _add_key(out, key, rows):
+    from lsms_library.derivations import union_keys
+    current = out['Derivation'].astype(object).to_numpy()
+    stamped = [union_keys([c, key]) if r else c for c, r in zip(current, rows)]
+    out['Derivation'] = pd.Series(stamped, index=out.index, dtype='string')
+    return out
+
+
+def food_acquired(df):
+    '''GH #876's construction (Expenditure at the last purchase's unit value, keyed; size
+    in u, GH #1224) on the release's rounded quantities, and KEY_ROUNDED on every row.'''
+    out = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    return _add_key(out, KEY_ROUNDED, np.ones(len(out), dtype=bool))
+
+
+def inputs_food_acquired(wave):
+    """The registry `inputs` callable: raw section-7B answers at (t, i, j)."""
+    return _inputs_last_purchase('Guinea-Bissau', wave)
+
+
+def _s07b_with_consumed(wave):
+    '''The 7-day key's raw inputs with s07bq02 (consumed in the last 7 days?) beside them,
+    row for row: both read the file in its own order.'''
+    from pathlib import Path
+
+    from lsms_library.paths import countries_root
+    raw = _inputs_last_purchase('Guinea-Bissau', wave)
+    s07 = tools.get_dataframe(str(Path(countries_root()) / 'Guinea-Bissau' / wave / 'Data'
+                                  / 's07b_me_gnb2021.dta'), convert_categoricals=True)
+    if len(s07) != len(raw):
+        raise ValueError(f'Guinea-Bissau {wave} s07b: {len(s07)} rows against {len(raw)} inputs')
+    return raw.assign(s07bq02=s07['s07bq02'].astype('string').str.strip().to_numpy())
+
+
+def inputs_quantities_rounded(wave):
+    '''Registry `inputs` of KEY_ROUNDED: the released answers of every consumed row with a
+    positive s07bq03a, the rows every served row of the wave comes from, at (t, i, j).
+    The quantities are the release's, rounded.'''
+    raw = _inputs_last_purchase('Guinea-Bissau', wave)
+    return raw[pd.to_numeric(raw['s07bq03a'], errors='coerce') > 0]
+
+
+def inputs_quantity_rounded_to_zero(wave):
+    '''Registry `inputs` of KEY_ROUNDED_TO_ZERO: the consumed rows (s07bq02 = Oui) whose
+    released s07bq03a is 0, which no served row carries, at (t, i, j).'''
+    raw = _s07b_with_consumed(wave)
+    q3 = pd.to_numeric(raw['s07bq03a'], errors='coerce')
+    return raw[(raw['s07bq02'] == 'Oui') & (q3 == 0)]

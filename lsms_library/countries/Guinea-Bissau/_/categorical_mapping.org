@@ -349,6 +349,19 @@ only, no cache hash moves" is wrong on that point.
 # `Jaxatu`; Beringela is the aubergine, served `Aubergine` as in Niger, Mali,
 # Burkina and Senegal.  The Djagatu row is shared by food_acquired.j and
 # community_prices.j, so those rows move to `Jaxatu` too.
+#
+# 2021-22 (GH #1697, 2026-11-13).  That file's s07bq01 labels are clean UTF-8 where
+# 2018-19's keys above are double-encoded, and its 182 codes are renumbered from code 12
+# on.  The 59 rows at the end of the table are its labels, on Niger's rule (GH #833): a
+# respelling of a good 2018-19 names takes 2018-19's Preferred Label (15 are the clean
+# twins of a double-encoded key; 44 respell, e.g. `Carne bovina` for `Carne de vaca`);
+# sugar's two codes fold, as 2018-19's own `Açúcar (em pó ou cubos)` and Benin's table do.
+# Goods 2018-19 bundles and 2021-22 splits (rice simple Nhelem / Gros, bread types,
+# shellfish, groundnut oils, dried / fresh chilli, ginger, juices, the offal pair, the
+# milks, the coffees), and goods new in 2021-22, are NOT given a row: they are served
+# under their own Portuguese label, and 2018-19's bundle label stays on 2018-19 alone.
+# 54 of the 182 labels already meet a key exactly; `Djafal fresco` is raw in both waves.
+# A cross-wave demand system on `j` must bundle the rest itself (_/CONTENTS.org).
 
 #+NAME: harmonize_food
 | Original Label                                                 | Preferred Label                                                                      |
@@ -516,6 +529,65 @@ only, no cache hash moves" is wrong on that point.
 | Sésamo                                                         | Sésame                                                                               |
 | Taro/Manfafa                                                   | Taro, macabo                                                                         |
 | Tomate                                                         | Tomate fraîche                                                                       |
+| Milho bacil em grão | Maïs en grain |
+| Milho preto/Painço | Mil |
+| Farinha de milho | Farine de maïs |
+| Farinha de trigo local ou importada | Farine de blé local ou importé |
+| Massas | Pâtes alimentaires |
+| Donetes, Panquecas, panguetes | Beignets, galettes |
+| Carne bovina | Viande de bœuf |
+| Carne de galinha / frango | Viande de poulet |
+| Carne de outras aves domésticas | Viande d'autres volailles |
+| Charcutaria (presunto, salsichas), carnes enlatadas | Charcuterie (jambon, saucisson), conserves de viandes |
+| Caça | Gibiers |
+| Outras carnes, n.e.s | Autres viandes n.d.a |
+| Peixe enlatado (sardinhas, atum,…) | Conserves de poisson |
+| Leite condensado sem açúcar | Lait concentré non-sucré |
+| Leite em pó | Lait en poudre |
+| Leite e farinha para bebês | Lait et farines pour bébé |
+| Outros produtos lácteos | Autres produits laitiers |
+| Manteiga de karité | Beurre de karité |
+| Óleo de Soja | Huile de soja |
+| Óleo de palma refinado | Huile de palme raffinée |
+| Chabéu | Huile de palme rouge |
+| Outros óleos, n.e.s. (milho, soja, óleo de palmiste, etc.) | Autres huiles n.d.a. (maïs, huile palmiste, etc.) |
+| Ananás | Ananas |
+| Limão | Citrons |
+| Outros citrinos (mandarina, toranja, etc) | Autres agrumes (mandarine, pamplemousse, etc.) |
+| Tâmaras | Dattes |
+| Coco | Noix de coco |
+| Cana de açúcar | Canne à sucre |
+| Abóbora / Abobrinha | Courge/Courgette |
+| Pimentão fresco | Poivron frais |
+| Folhas azeda/badjique | Feuilles d'oseille |
+| Folhas de cabaceira/embomdeiro | Feuilles de baobab |
+| Concentrado de tomate/Calda | Concentré de tomate |
+| Ervilhas frescas | Petits pois |
+| Feijão seco | Niébé/Haricots secs |
+| Mancarra fresco com casca | Arachides fraîches en coques |
+| Mancarra seco com casca | Arachides séchées en coques |
+| Sésamo/beno | Sésame |
+| Castanha de cajú | Noix de cajou |
+| Banana-plantain/banana da terra | Plantain |
+| Taro/manfafa | Taro, macabo |
+| Outros tubérculos, n.e.s | Autres tubercules n.d.a |
+| Farinha de mandioca | Farines de manioc |
+| Attiéke | Attiéké |
+| Açúcar em pó | Sucre (poudre ou morceaux) |
+| Cubos de açúcar | Sucre (poudre ou morceaux) |
+| Chocolate para mastigar, barrar | Chocolat à croquer, pâte à tartiner |
+| Caramelo, doce, confeitaria, etc | Caramel, bonbons, confiseries, etc |
+| Cubo alimentar (Maggi, Jumbo,) | Cube alimentaire (Maggi, Jumbo, ) |
+| Sumbala/neteto (mostarda africana) | Soumbala (moutarde africaine) |
+| Vinagre de limão | Vinaigre de citron |
+| Nozes de cola | Noix de cola |
+| Chá | Thé |
+| Chocolate em pó | Chocolat en poudre |
+| Outras chás de ervas e infusões n.e.s.(quinqueliba, citronela, belgate, etc.) | Autres tisanes et infusions n.d.a. (quinquelibat, citronelle, etc.) |
+| Água mineral / filtrada | Eau minérale/ filtrée |
+| Refrigerantes (cola, fanta, sumol, etc.) | Boissons gazeuses (coca, etc.) |
+| Sumos em pó | Jus en poudre |
+| Cervejas e vinhos tradicionais (dolo, vinho de palma, vinho de ráfia, vinho de caju, etc.) | Bières et vins traditionnels (dolo, vin de palme, vin de raphia, vin de cajou, etc.) |
 
 # harmonize_education (GH #171): per-country delta on the global ordinal base
 # (categorical_mapping/harmonize_education.org, row-additive). Maps this country's

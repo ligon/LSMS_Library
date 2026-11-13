@@ -229,3 +229,39 @@ assets:
         Age: s12q07
         Value: s12q09
         Purchase Price: s12q08
+
+food_acquired:
+    # Served AS RELEASED (ruling 2026-11-13, "Serve, registered key"), although the
+    # release's quantities are not the households' answers: every positive s07bq03a and
+    # s07bq07a is an EVEN integer, 3,945 consumed rows carry s07bq03a = 0, and the fit
+    # is 2 x round-half-up(x / 2), which cannot be inverted and is documented nowhere
+    # found (_/CONTENTS.org, "food_acquired: the released quantities are rounded").
+    # mapping.food_acquired stamps every row with
+    # Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even; the zeroed rows
+    # are a registered deletion.  The file is a grid (968,524 rows, 128,229 consumed).
+    file: s07b_me_gnb2021.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j:
+            - s07bq01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Produced: s07bq04
+        # GH #876.  Expenditure is derived by mapping.food_acquired from these raw
+        # inputs, as in 2018-19; they are dropped by the reshape.  It is derived from the
+        # ROUNDED quantities, so it inherits the rounding: q3 and q7a move separately.
+        GiftQuantity: s07bq05
+        ConsumptionUnitCode: s07bq03b
+        ConsumptionUnitSize: s07bq03c
+        LastPurchaseQuantity: s07bq07a
+        # Read through mapping.LastPurchaseUnitCode: s07bq07b labels codes 107, 122 and
+        # 126 otherwise than s07bq03b, and unit_match reads labels.
+        LastPurchaseUnitCode: s07bq07b
+        LastPurchaseUnitSize: s07bq07c
+        LastPurchaseValue: s07bq08
