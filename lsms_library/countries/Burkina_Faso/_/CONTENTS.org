@@ -1242,7 +1242,8 @@ pre-fix config).
   =conso3mois= alike.  =data_info.yml= uses =16032015=, the later one, which
   is also the one whose column set matches p2/p3.  The =10032015= food file
   has 167,324 rows against 168,463; they are not interchangeable.
-- *p1's =autocons= / =cadeau= (auto-consumption VALUE and gift value) and
+- /Served since 2026-11-04: see GH #1442 at the end of this file./
+  *p1's =autocons= / =cadeau= (auto-consumption VALUE and gift value) and
   p2-p4's =autocons= / =cadeau= are not read.*  Only =achat= reaches
   =Expenditure=.  So the served figure is *purchases*, plus p1's
   own-production QUANTITY via =qautocons= and (since 2026-11-03, GH #864) p1's
@@ -1449,6 +1450,8 @@ three quantity grids (20 with none; most of the rest have no C05 grid --
 flours, bread, sugar, drinks).  This is C4 evidence that their missing
 =qachat= is by design, i.e. the =money_only= pattern at item grain.
 
+/=qcadeau=, =autocons= and =cadeau= are served now (GH #864 below, GH #1442 at the end of this
+file); =mtt_dep= stays unread./
 *Still unread* (p1): =qcadeau= > 0 on 1,468 rows and =cadeau= > 0 on 3,263
 (2,505,140 CFA); =autocons= > 0 on 27,313 (43,472,367 CFA); and =mtt_dep=
 (C02) sums to 106,129,109 CFA against =achat= (C04 value) 93,383,167 -- equal
@@ -1469,7 +1472,10 @@ the C06 gift quantity =qcadeau= as =s = 'inkind'= (in =ucadeau=); (iv) keep
 answer -- C04 quantity and value, C05 quantity, C06 quantity -- so nothing is
 registered as a derivation.  =Expenditure= is NaN on produced and inkind rows,
 as in the EHCVM waves; =autocons=, =cadeau= and =mtt_dep= stay unread.  A
-quantity the survey did not ask for stays NaN, as before.
+quantity the survey did not ask for stays NaN, as before.  /Superseded for
+=autocons= and =cadeau= on 2026-11-04: see GH #1442 at the end of this file.
+So is the statement below that produced and inkind rows cannot enter the kg
+estimate./
 
 Measured on cold builds in private data roots, development =7c2b5ed01=
 against the change:

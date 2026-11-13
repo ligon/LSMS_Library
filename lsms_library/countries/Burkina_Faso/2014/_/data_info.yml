@@ -259,16 +259,21 @@ food_acquired:
         # `Quantity` is C04's purchased quantity, NOT a total: 2014/_/mapping.py
         # serves each block on its own `s` row in its own unit, and never
         # subtracts one block from another (@ligon ruling, 2026-11-03).
-        # `Expenditure` is C04's `achat` (ruling iv); the C02 `mtt_dep` and
-        # the C05 / C06 values (`autocons`, `cadeau`) are not read.  Only
-        # passage 1 fields the quantity grid; in passages 2-4 these columns
-        # do not exist and arrive NaN.
+        # Each block's money is that block's `Expenditure`: `achat`, and since
+        # GH #1442 (@ligon ruling, 2026-11-04) `autocons` and `cadeau`, which the
+        # file labels "Montant en fcfa C05 / C06".  They are answers, so no
+        # derivation.  The C02 `mtt_dep` is outlay, a different question, and is
+        # not read.  Only passage 1 fields the quantity grid; in passages 2-4
+        # the quantity and unit columns do not exist and arrive NaN, while the
+        # three money columns are in all four files.
         Quantity: qachat
         Expenditure: achat
         Produced: qautocons
         ProducedUnit: uautocons
+        ProducedValue: autocons
         GiftQuantity: qcadeau
         GiftUnit: ucadeau
+        GiftValue: cadeau
         # Passage 1 (the un-overridden default; see the `file:` list below).
         visit:
             - zd
