@@ -204,8 +204,15 @@ jobs:
   # PATH and make/sh/find are asserted to resolve inside the conda env, so
   # this measures what a user with only that environment gets.  Cold-builds
   # two Uganda script-path tables and checks them against the Linux build:
-  #   Uganda:shocks rows=14459 waves=8 digest=aac42079f006
+  #   Uganda:shocks rows=14459 waves=8 digest=5121fae9a3a4
   #   Uganda:assets rows=116808 waves=8 digest=9202ed542a14
+  # Re-measured for the 2026-11-13 ISA batch integration (GH #1562, the coping
+  # stream): shocks keeps its 14,459 rows but gains the HowCopedSet column (10 ->
+  # 11 columns), serves filler codes NA in its positions and a lone first-slot
+  # "Nothing else" (2013-14 / 2015-16) as "Did nothing", so its digest moved
+  # from aac42079f006 to 5121fae9a3a4; assets is unchanged.  Measured on Linux at
+  # the integrated tree, cold, in two separate empty data roots (burst job
+  # 41283671, identical results), with scripts/windows_build_check.py.
   # GH #1716: re-measured on Linux at development f138a3d61 (v0.17.0), cold,
   # in two separate empty data roots, with scripts/windows_build_check.py.
   # Shocks went 14,457 -> 14,459 when #1478 kept the two AGSEC1-only Uganda
@@ -262,7 +269,7 @@ jobs:
           PROBE_STRIP: '\Git\,mingw64,chocolatey'
           REQUIRE_CONDA_TOOLS: "1"
           REQUIRE_INSTALLED_LIBRARY: "1"
-          EXPECT: "Uganda:shocks=14459:aac42079f006,Uganda:assets=116808:9202ed542a14"
+          EXPECT: "Uganda:shocks=14459:5121fae9a3a4,Uganda:assets=116808:9202ed542a14"
           LSMS_DATA_DIR: ${{ runner.temp }}\lsmsdata
           LSMS_BUILD_WORKERS: "1"
           PYTHONUNBUFFERED: "1"
