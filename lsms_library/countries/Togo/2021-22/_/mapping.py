@@ -184,11 +184,20 @@ def inputs_food_acquired(wave):
 # s07bq03a - s07bq04 - s07bq05 is formed, so the residual no longer leaves phantom
 # purchases.  A count (`unité`) was scaled and then floored to an integer: where the
 # floor is injective (f >= 1) the count is recovered exactly; where it is not (Grand
-# Lomé, f < 1) the quantity is withheld, NA, and never guessed.
+# Lomé, f < 1), or where it recovers to 0, the quantity is withheld, NA, and never
+# guessed.  A row whose filed residual was positive and whose recovered one is not loses
+# its purchased row; that deletion is registered too (`KEY_PURCHASE_REMOVED`).
+#
+# The cover s00_me_tgo2021.dta is read by a constructed path, so it is not a declared
+# source of `food_acquired` and its sidecar is not in the table's cache hash (CLAUDE.md,
+# cache limitation (a)): a re-released cover alone does not invalidate the table.
 
 KEY_DIVIDED = 'Togo::food_acquired::s07bq03a-regional-factor-divided-out'
 KEY_COUNT_RECOVERED = 'Togo::food_acquired::s07bq03a-floored-count-recovered'
 KEY_COUNT_WITHHELD = 'Togo::food_acquired::s07bq03a-floored-count-withheld'
+#: A DELETION (`rows: 0`, no served row carries it): the purchased rows the filed value
+#: served and the recovered one does not; `inputs_purchase_removed_by_division`.
+KEY_PURCHASE_REMOVED = 'Togo::food_acquired::s07bq03a-purchase-removed-by-division'
 
 #: The common scalar and the round regional multipliers (doc search T-TGO-4/-6A).
 COMMON_FACTOR = 1.115
@@ -268,7 +277,11 @@ def _recover(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
 
     # A count elsewhere: q3 = floor(k x f) with f >= 1.0035, injective on integers k.
     # The integer k whose floor reproduces q3 is the answer; if none does, or q3 is not
-    # an integer, the row did not follow the rule and is withheld.
+    # an integer, the row did not follow the rule and is withheld.  A count that
+    # recovers to 0 is withheld too (ruling 2026-11-12, "Recover; a 0 becomes NA"): q3
+    # was filed as 0, the floor of a count below 1 / f, which is a fraction, so the
+    # count is not known, and a recovered 0 would serve no row for an item the
+    # household reported.
     floored = has & count & ~lome
     k0 = np.ceil(np.where(floored, q3, 0) / np.where(floored, f, 1) - 1e-9)
     found = np.full(q3.shape, np.nan)
@@ -277,7 +290,7 @@ def _recover(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
         trip = floored & (k >= 0) & (np.abs(np.floor(k * f + 1e-9) - q3) <= 1e-9)
         hits += trip
         found = np.where(trip & np.isnan(found), k, found)
-    rec = floored & _on_grid(q3, 1) & (hits == 1)
+    rec = floored & _on_grid(q3, 1) & (hits == 1) & (found > 0)
     value[rec], branch[rec] = found[rec], BRANCH_COUNT_RECOVERED
     branch[floored & ~rec] = BRANCH_WITHHELD
 
@@ -300,9 +313,10 @@ def recover_s07bq03a(s07bq03a, s07bq03b, s00q01, s07bq04, s07bq05):
 
     * a unit other than `unité`, or a Grand Lomé `unité` reporting own production or a
       gift: s07bq03a / f, f from `regional_factor`;
-    * an `unité` outside Grand Lomé: the integer k with floor(k x f) = s07bq03a;
+    * an `unité` outside Grand Lomé: the positive integer k with floor(k x f) = s07bq03a;
     * NaN where it cannot be recovered: a Grand Lomé `unité` with neither own production
-      nor a gift, an `unité` no integer reproduces, or a Grand Lomé `unité` with own
+      nor a gift, an `unité` no integer reproduces, an `unité` outside Grand Lomé filed
+      as 0 (it recovers to 0, the floor of a fraction), or a Grand Lomé `unité` with own
       production or a gift whose quotient is off the quarter grid;
     * a value within `SAME_NUMBER` of s07bq04 + s07bq05 is that sum exactly.
 
@@ -353,6 +367,12 @@ def _purchased(out):
     return out.index.get_level_values('s').to_numpy() == 'purchased'
 
 
+def _purchase_implied(q4, q5, filed_residual):
+    '''Where a withheld row is served one purchased row, NA: it reports neither own
+    production nor a gift, or its filed residual s07bq03a - s07bq04 - s07bq05 is positive.'''
+    return ((q4 <= 0) & (q5 <= 0)) | (filed_residual > SAME_NUMBER)
+
+
 def food_acquired(df):
     '''GH #876's construction on s07bq03a with the regional factor divided out (GH #1697).
 
@@ -384,7 +404,7 @@ def food_acquired(df):
         parts.append(_shared(df[held]))
         q4 = df['Produced'].fillna(0).to_numpy()
         q5 = df['GiftQuantity'].fillna(0).to_numpy()
-        implied = held & (((q4 <= 0) & (q5 <= 0)) | (filed - q4 - q5 > SAME_NUMBER))
+        implied = held & _purchase_implied(q4, q5, filed - q4 - q5)
         if implied.any():
             # The shared reshape builds the purchased row's index (sized u included), from
             # a placeholder quantity it never serves.
@@ -452,8 +472,22 @@ def inputs_floored_count_withheld(wave):
     and Expenditure NA, at (t, i, j): those reporting neither own production nor a gift,
     and those whose filed residual is positive.'''
     raw, branch, _, filed_residual, q4, q5 = _inputs_s07bq03a(wave)
-    implied = ((q4 <= 0) & (q5 <= 0)) | (filed_residual > SAME_NUMBER)
-    return raw[(branch == BRANCH_WITHHELD) & implied]
+    return raw[(branch == BRANCH_WITHHELD) & _purchase_implied(q4, q5, filed_residual)]
+
+
+def inputs_purchase_removed_by_division(wave):
+    '''Registry `inputs` of the DELETION entry (`rows: 0`): the source rows that the filed
+    s07bq03a served a purchased row and the recovered one serves none, at (t, i, j).
+
+    A filed residual s07bq03a - s07bq04 - s07bq05 above 0 is the shared reshape's own test
+    for serving a purchased row; after the factor is divided out (or the count recovered)
+    the residual is 0 or below, so the row has no purchased row to carry a key.  A
+    withheld row is not here: where a purchase is implied it is served one, NA.  The
+    deleted row's produced and in-kind rows are served as filed.
+    '''
+    raw, branch, residual, filed_residual, _, _ = _inputs_s07bq03a(wave)
+    recovered = (branch == BRANCH_DIVIDED) | (branch == BRANCH_COUNT_RECOVERED)
+    return raw[recovered & (filed_residual > 0) & ~(residual > 0)]
 
 
 # --- the wave's scripts, and the registry's raw inputs ------------------------------

@@ -282,6 +282,46 @@ Togo::food_acquired::s07bq03a-floored-count-withheld:
   contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
   since: '2026-11-12'
 
+# A DELETION (red team r2, N4): a purchased row that the filed s07bq03a served and the
+# recovered one does not has nowhere to carry a Derivation key, so this entry is the
+# disclosure: `rows: 0`, the attrs summary lists the key at 0, and `derivation_inputs`
+# returns those source rows as filed.
+Togo::food_acquired::s07bq03a-purchase-removed-by-division:
+  waves: ['2021-22']
+  columns: [Quantity, Expenditure]
+  rows: 0
+  rule: >-
+    A source row whose filed purchased residual s07bq03a - s07bq04 - s07bq05 is
+    above 0, and whose residual formed from the recovered s07bq03a (the
+    s07bq03a-regional-factor-divided-out or -floored-count-recovered rule) is 0
+    or below, is served no purchased row: the shared reshape serves one only for
+    a positive residual, so the filed value served one and the recovered value
+    serves none.  The row's produced and in-kind rows are served from s07bq04 and
+    s07bq05 as filed.  A withheld row (-floored-count-withheld) is not deleted:
+    where a purchase is implied it is served one purchased row, NA.
+  function: lsms_library.countries.Togo.2021-22._.mapping:recover_s07bq03a
+  inputs: lsms_library.countries.Togo.2021-22._.mapping:inputs_purchase_removed_by_division
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s00q01]
+  assumptions:
+    - text: >-
+        the deleted purchase was the producer's factor and not the household's
+        answer: once the factor is divided out, the household's consumption is
+        its own production and gifts and nothing more.  This is the
+        s07bq03a-regional-factor-divided-out entry's first assumption, seen from
+        the rows it leaves with no purchase; most of them say the household never
+        bought the item (s07bq06 Jamais) or did not buy it in the last 30 days.
+      basis: derived-from-data
+      evidence: >-
+        the divided-out entry's evidence; red team round 2 of GH #1697
+        (burst/isa-sm-20261112/reports/ehcvm2-2021-redteam2/VERDICT.md, N4):
+        25,234 rows, 11,645 Jamais, 11,871 "plus de 30 jours", 1,718 bought within
+        30 days with a value.
+  validated_against: >-
+    The count above is the red team's, at 9b5585cf2; measured again on this
+    entry's inputs callable in the burst job of the final head.
+  contents: 'Togo/_/CONTENTS.org, "s07bq03a: the regional factor is divided out (GH #1697)"'
+  since: '2026-11-12'
+
 Togo::crop_production::hh-crop-sale-single-row:
   waves: ['2021-22']
   columns: [Quantity_sold, Unit_sold, Value_sold]

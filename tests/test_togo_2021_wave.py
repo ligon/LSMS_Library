@@ -115,6 +115,31 @@ class TestSaleRules:
         assert out["Derivation"].iloc[1:].isna().all()
 
 
+class TestRecoveryRules:
+    """The registered s07bq03a functions on synthetic rows, through the registry."""
+
+    RECOVERED = "Togo::food_acquired::s07bq03a-floored-count-recovered"
+    WITHHELD = "Togo::food_acquired::s07bq03a-floored-count-withheld"
+
+    def test_a_count_that_recovers_to_zero_is_withheld(self):
+        """Ruling 2026-11-12, "Recover; a 0 becomes NA": a filed 0 outside Grand Lomé is the
+        floor of a count below 1 / f, a fraction, so it is withheld, never served as 0."""
+        from lsms_library.derivations import derivation_records
+
+        recs = derivation_records("Togo")
+        recover, classify = recs[self.RECOVERED].resolve(), recs[self.WITHHELD].resolve()
+        q3 = pd.Series([0.0, 1.0, 3.0, 0.0, 2.5])
+        unit = pd.Series(["unité"] * 4 + ["Kg"])
+        region = pd.Series(["Centrale", "Centrale", "Kara", "Grand Lomé", "Centrale"])
+        zero = pd.Series([0.0] * 5)
+        assert list(classify(q3, unit, region, zero, zero)) == [
+            "withheld", "count-recovered", "count-recovered", "withheld", "divided"]
+        got = recover(q3, unit, region, zero, zero)
+        assert np.isnan(got[0]) and np.isnan(got[3])
+        assert got[1] == 1.0 and got[2] == 3.0
+        assert got[4] == pytest.approx(2.5 / 1.6725)
+
+
 class TestDeclared:
     def test_a_split_good_does_not_take_2018s_bundle_label(self):
         """#833's rule.  2018's `Fromage local` is 20x this wave's `Fromage` per small
@@ -351,7 +376,9 @@ class TestServed:
         floors = np.isclose(np.floor(k * f + 1e-9), q3) & np.isclose(q3, q3.round())
         quarter = np.isclose(q3 / f * 4, (q3 / f * 4).round())
         answer = (q3 / f).where(~count, k)
-        withheld = count & ((lome & ~own_or_gift) | (~lome & ~floors)
+        # A count outside Grand Lomé that recovers to 0 (filed 0) is withheld too: ruling
+        # 2026-11-12, "Recover; a 0 becomes NA".
+        withheld = count & ((lome & ~own_or_gift) | (~lome & ~floors) | (~lome & (k <= 0))
                             | (lome & own_or_gift & ((q3 <= 0) | ~quarter)))
         answer = answer.where(~(count & lome & own_or_gift), q3 / 1.2).where(~withheld)
         answer = answer.where(~np.isclose(answer, q4 + q5, rtol=1e-6, atol=1e-6), q4 + q5)
@@ -398,6 +425,25 @@ class TestServed:
         held = d.str.contains("floored-count-withheld", regex=False).to_numpy()
         assert f.loc[held, "Quantity"].isna().all() and f.loc[held, "Expenditure"].isna().all()
         assert f.loc[~held, "Quantity"].notna().all()
+
+    def test_the_deletion_entry_returns_the_rows_the_division_removed(self):
+        """Red team r2, N4: a row with a positive filed residual and none after the division
+        has no purchased row to carry a key, so the `rows: 0` entry's inputs are exactly
+        those source rows, and no served row carries the key."""
+        s07, answer, withheld, implied, q4, q5 = self._answer()
+        filed = s07["s07bq03a"] - q4 - q5
+        removed = (~withheld & (filed > 0) & ~((answer - q4 - q5) > 0)).to_numpy()
+        c = ll.Country("Togo")
+        key = "Togo::food_acquired::s07bq03a-purchase-removed-by-division"
+        assert c.derivations()[key].rows == 0
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            raw = c.derivation_inputs(key, wave=WAVE)
+        assert len(raw) == int(removed.sum()) > 20000
+        expected = sorted(np.asarray(_ids(s07), dtype=object)[removed])
+        assert sorted(raw.index.get_level_values("i").astype(str)) == expected
+        served = _served("food_acquired")["Derivation"].fillna("")
+        assert not served.str.contains(key, regex=False).any()
 
     def test_the_inputs_rederive_the_recovered_quantity(self):
         c = ll.Country("Togo")
