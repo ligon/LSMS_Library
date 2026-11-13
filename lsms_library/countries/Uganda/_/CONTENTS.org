@@ -6175,9 +6175,12 @@ The variant replaces =f3d3c34d...=, the Haswell fingerprint of the pre-#1509
 frame, which would otherwise accept that frame's values on a Haswell-kernel
 runner.  The same job ran the method on base =e5fdd2fa8= as a control.  It
 reproduced the shipped pair exactly: SkylakeX =12d25f6e...= and Haswell
-=f3d3c34d...=, and the invariance test passed under both.  PROVISIONAL until the
-batch's sixth branch (served-wave corrections) lands: its Uganda 2009-10 =ea=
-fill may move this frame again, and the entry is re-measured then.
+=f3d3c34d...=, and the invariance test passed under both.  Re-measured once the
+batch's sixth branch (served-wave corrections, with its Uganda 2009-10 =ea= fill)
+had merged: the six-branch tree (=fb87c461e=) gives the same frame, cold in a
+private root (burst job 41255173: =e9fb4c67...=) and rebuilt under both kernels
+(burst job 41256344: SkylakeX =e9fb4c67...=, Haswell =324429c1...=).  The
+=ea= fill does not move nutrition, and the entry stands as pinned.
 
 * 2026-11-12 -- 2009-10 ea from the same household in another wave (GH #1536)
 
