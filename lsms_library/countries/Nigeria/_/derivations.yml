@@ -1224,12 +1224,13 @@ Nigeria::food_acquired::w3-food-conversion:
       evidence: >-
         W4 s7bq2_cvn / s10bq2_cvn ("Kg/L conversion factor").
   validated_against: >-
-    W4's *_cvn on the same served (item, unit) label: median cell ratio 1.000,
+    W4's *_cvn on the same served (item, unit) label, against the table's
+    national column: median cell ratio 1.000,
     within 2x on 99.1% of 554 (2015Q3) and 99.0% of 496 (2016Q1) cells.  The
     household's own price-implied kg per unit: table / implied median 0.81 /
     0.885, within 2x on 64.1% / 67.4% of 31,103 / 23,590 purchased rows,
     against 0.46 / 0.50 and 43.8% / 47.7% for the inference it replaces
-    (whose median is 0.59 / 0.56 of the table).  Measured 2026-11-13 on the
+    (whose median is 0.59 / 0.56 of the national column).  Measured 2026-11-13 on the
     base build (f138a3d61).
   contents: >-
     Nigeria/_/CONTENTS.org, "food_acquired: the World Bank's own W2 / W3 food
