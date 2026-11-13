@@ -1,10 +1,14 @@
 """GH #1705: Benin is a panel country, EHCVM 2018-19 -> 2021-22, from PanelHH.
 
-Ruling (@ligon, 2026-11-12, "Make Benin a panel country"): a committed design-A
-crosswalk built from ``PanelHH``.  The rule (``_/panel_ids.py``): a 2021-22
-household is linked to the 2018-19 household with the same ``(grappe, menage)``
-when the 2021-22 cover flags it ``PanelHH = Panel`` and that key is a 2018-19
-household.  The 2021-22 files carry no 2018-19 identifier of their own.
+Rulings (@ligon): 2026-11-12, "Make Benin a panel country": a committed design-A
+crosswalk built from ``PanelHH``; 2026-11-13, "Unlink the 63": one registered
+exception.  The rule (``_/panel_ids.py``): a 2021-22 household is linked to the
+2018-19 household with the same ``(grappe, menage)`` when the 2021-22 cover flags
+it ``PanelHH = Panel``, that key is a 2018-19 household, and its 2021-22 roster
+does not record its whole pre-loaded 2018-19 roster as gone
+(``Benin::panel_ids::all-preloaded-left-not-linked``).  The 2021-22 files carry no
+2018-19 identifier of their own.  2021-22 ``panel_weight`` is ``poids`` on the
+linked households and NA on the others (ruling 2026-11-13, "NA for unlinked").
 
 ``TestCommittedCrosswalk`` reads only the committed JSON and needs no microdata.
 It pins what makes a single-pass ``id_walk`` safe here: every key carries the
@@ -12,7 +16,7 @@ It pins what makes a single-pass ``id_walk`` safe here: every key carries the
 occupied id (CLAUDE.md, "Panel ID Transitive Chains").
 
 ``TestAgainstTheFiles`` (``requires_s3``) re-derives the crosswalk from the raw
-covers with its own rule, measures the link against the rosters, and reads the
+files with its own rule, measures the link against the rosters, and reads the
 served tables.
 """
 from __future__ import annotations
@@ -30,7 +34,8 @@ from lsms_library.paths import countries_root
 C_DIR = countries_root() / "Benin" / "_"
 OLD, NEW = "2018-19", "2021-22"
 PREFIX = "E2_"
-LINKED = 6878
+LINKED = 6815            # 6,878 PanelHH = Panel with a 2018-19 key, less the 63 excepted
+EXCEPTED = 63
 
 
 def _committed():
@@ -138,21 +143,40 @@ class TestCommittedCrosswalk:
             gen.check_single_pass(links, baseline, current)
 
     def test_the_generator_links_by_panelhh_and_the_2018_key(self):
-        """panel_ids.link on invented covers: Panel and recurring links; Panel without a
-        2018-19 key, Non panel recurring and Non panel new keep their own id."""
+        """panel_ids.link on invented files: Panel and recurring links; Panel without a
+        2018-19 key, Non panel recurring, Non panel new, and a Panel household whose
+        whole pre-loaded roster is gone (the registered exception) keep their own id."""
         gen = _generator()
-        old = pd.DataFrame({"grappe": [1, 1, 2], "menage": [1, 2, 1]})
-        new = pd.DataFrame({"grappe": [1, 1, 2, 2], "menage": [1, 2, 1, 9],
-                            "PanelHH": ["Panel", "Non panel", "Panel", "Non panel"]})
-        links, baseline, current, counts = gen.link(old, new)
+        old = pd.DataFrame({"grappe": [1, 1, 2, 3], "menage": [1, 2, 1, 1]})
+        new = pd.DataFrame({"grappe": [1, 1, 2, 2, 3], "menage": [1, 2, 1, 9, 1],
+                            "PanelHH": ["Panel", "Non panel", "Panel", "Non panel", "Panel"]})
+        # s01q00aa: 1 still a member, 2 gone, NaN not pre-loaded.  (3, 1): every
+        # pre-loaded member gone, plus one new member -> excepted.  (2, 1): one of two
+        # gone -> linked.  (1, 1): no pre-load at all -> linked (PanelHH stays the rule).
+        roster = pd.DataFrame({"grappe": [1, 2, 2, 3, 3, 3], "menage": [1, 1, 1, 1, 1, 1],
+                               "s01q00aa": [float("nan"), 1, 2, 2, 2, float("nan")]})
+        links, baseline, current, counts = gen.link(old, new, roster)
         assert links == {PREFIX + "1001": "1001", PREFIX + "2001": "2001"}
-        assert counts == {"panel_no_target": 0, "recurring_non_panel": 1, "linked": 2, "own_id": 2}
+        assert counts == {"panel_no_target": 0, "recurring_non_panel": 1,
+                          "all_preloaded_left": 1, "linked": 2, "own_id": 3}
+        assert gen.all_preloaded_left(roster) == {(3, 1)}
         gen.check_single_pass(links, baseline, current)
         new.loc[3, "PanelHH"] = "Panel"
-        assert gen.link(old, new)[3]["panel_no_target"] == 1
+        assert gen.link(old, new, roster)[3]["panel_no_target"] == 1
+        bad = roster.assign(s01q00aa=[float("nan"), 1, 2, 3, 2, float("nan")])
+        with pytest.raises(AssertionError, match="s01q00aa codes"):
+            gen.link(old, new, bad)
         new.loc[3, "PanelHH"] = "Oui"           # a vocabulary the rule was not written for
-        with pytest.raises(AssertionError):
-            gen.link(old, new)
+        with pytest.raises(AssertionError, match="PanelHH vocabulary"):
+            gen.link(old, new, roster)
+
+    def test_the_exception_is_registered(self):
+        from lsms_library.derivations import derivation_records, resolve_callable
+        rec = derivation_records("Benin")["Benin::panel_ids::all-preloaded-left-not-linked"]
+        assert rec.rows == 0 and list(rec.waves) == [NEW] and rec.table == "panel_ids"
+        assert resolve_callable(rec.function).__name__ == "all_preloaded_left"
+        assert callable(resolve_callable(rec.inputs))
+        assert _generator().EXPECTED["all_preloaded_left"] == EXCEPTED
 
 
 def _key(g, m):
@@ -171,29 +195,56 @@ class TestAgainstTheFiles:
         old = old.assign(key=[_key(g, m) for g, m in zip(old["grappe"], old["menage"])])
         return new, old
 
-    def test_the_committed_crosswalk_is_the_rule_on_the_files(self, covers):
+    @pytest.fixture(scope="class")
+    def roster(self):
+        s21 = get_dataframe(countries_root() / "Benin" / NEW / "Data" / "s01_me_ben2021.dta",
+                            convert_categoricals=False)
+        return s21.assign(key=[_key(g, m) for g, m in zip(s21["grappe"], s21["menage"])])
+
+    def test_the_committed_crosswalk_is_the_rule_on_the_files(self, covers, roster):
         new, old = covers
         panel = new["PanelHH"].astype(str).str.strip()
         assert set(panel) == {"Panel", "Non panel"}
         recurs = new["key"].isin(set(old["key"]))
-        expected = {PREFIX + k: k for k in new.loc[(panel == "Panel") & recurs, "key"]}
+        pre = roster[roster["s01q00aa"].notna()]
+        gone = set(pre.groupby("key")["s01q00aa"].apply(lambda x: bool((x == 2).all()))
+                   .loc[lambda s: s].index)
+        excepted = (panel == "Panel") & recurs & new["key"].isin(gone)
+        expected = {PREFIX + k: k for k in new.loc[(panel == "Panel") & recurs & ~excepted, "key"]}
         assert _committed()[0][NEW] == expected
         # The counts the PR reports.
         assert int((panel == "Panel").sum()) == 6889
+        assert int(((panel == "Panel") & recurs).sum()) == 6878
+        assert int(excepted.sum()) == EXCEPTED
+        assert len(expected) == LINKED
         assert int(((panel == "Panel") & ~recurs).sum()) == 11
         assert int(((panel != "Panel") & recurs).sum()) == 116
         assert int(((panel != "Panel") & ~recurs).sum()) == 1027
 
-    def test_the_generator_on_the_files_is_the_committed_crosswalk(self, covers):
-        """panel_ids.link and check_single_pass, executed on the real covers (the work
+    def test_the_generator_on_the_files_is_the_committed_crosswalk(self, covers, roster):
+        """panel_ids.link and check_single_pass, executed on the real files (the work
         `make panel-ids` does, without the write)."""
         new, old = covers
         gen = _generator()
-        links, baseline, current, counts = gen.link(old.drop(columns="key"), new.drop(columns="key"))
+        links, baseline, current, counts = gen.link(old.drop(columns="key"), new.drop(columns="key"),
+                                                    roster.drop(columns="key"))
         gen.check_single_pass(links, baseline, current)
         assert links == _committed()[0][NEW]
-        assert counts == {"panel_no_target": 11, "recurring_non_panel": 116,
-                          "linked": LINKED, "own_id": 1154}
+        assert counts == gen.EXPECTED == {"panel_no_target": 11, "recurring_non_panel": 116,
+                                          "all_preloaded_left": EXCEPTED, "linked": LINKED,
+                                          "own_id": 1217}
+
+    def test_the_excepted_inputs_are_the_63_households(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            inputs = ll.Country("Benin").derivation_inputs(
+                "Benin::panel_ids::all-preloaded-left-not-linked", wave=NEW)
+        ids = set(inputs.index.get_level_values("i"))
+        assert len(ids) == EXCEPTED and all(i.startswith(PREFIX) for i in ids)
+        assert not ids & set(_committed()[0][NEW])
+        pre = inputs[inputs["s01q00aa"].notna()]
+        assert (pre["s01q00aa"] == 2).all()
+        assert (inputs["PanelHH"].astype(str).str.strip() == "Panel").all()
 
     def test_the_2021_cover_records_no_2018_id(self, covers):
         """The link has to be the key itself: nothing else on the cover points back."""
@@ -223,13 +274,13 @@ class TestAgainstTheFiles:
                 other.append((k, rest[len(k) % len(rest)]))
         control = (sex21.reindex([a for a, _ in other]).to_numpy()
                    == sex18.reindex([b for _, b in other]).to_numpy()).mean()
-        # Measured 0.948 linked against 0.676 control (and 0.836 on the 116 recurring
-        # Non-panel keys).  The floor is set at 0.90, not at the measurement: what this
-        # guards against is a crosswalk onto the WRONG households, which falls to
-        # control level, not a drift of a few households in a regeneration.
+        # Measured about 0.95 on the link against 0.68 for the control (0.836 on the 116
+        # recurring Non-panel keys).  The floor is set at 0.90, not at the measurement:
+        # what this guards against is a crosswalk onto the WRONG households, which falls
+        # to control level, not a drift of a few households in a regeneration.
         assert agree > 0.90 and control < 0.75 and agree - control > 0.2, (agree, control)
 
-    def test_served_ids_walk_once_and_keep_their_cluster(self):
+    def test_served_ids_walk_once_keep_their_cluster_and_weigh_only_the_linked(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             c = ll.Country("Benin")
@@ -243,6 +294,14 @@ class TestAgainstTheFiles:
         assert len(both) == LINKED
         assert (a.loc[both] == b.loc[both]).all()
         assert not (hc.index.get_level_values("v") == "Mover").any()
+        # Ruling 2026-11-13, "NA for unlinked": 2021-22 panel_weight on the linked only.
+        new = s[s["t"] == NEW].set_index("i")
+        linked = new.index.isin(set(_committed()[0][NEW].values()))
+        assert int(linked.sum()) == LINKED
+        assert new.loc[linked, "panel_weight"].notna().all()
+        assert new.loc[~linked, "panel_weight"].isna().all() and int((~linked).sum()) == 8032 - LINKED
+        assert new["weight"].notna().all()
+        assert s.loc[s["t"] == OLD, "panel_weight"].notna().all()
 
     def test_check_panel_consistency(self):
         from lsms_library.diagnostics import check_panel_consistency

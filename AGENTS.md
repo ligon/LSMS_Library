@@ -875,7 +875,8 @@ Skill: `.claude/skills/add-feature/sample/SKILL.md`. Migration history: `slurm_l
 All twelve panel countries (Benin, Burkina_Faso, Ethiopia, EthiopiaRHS,
 GhanaLSS, Malawi, Mali, Niger, Nigeria, Senegal, Tanzania, Uganda) ship
 git-tracked `_/panel_ids.json` + `_/updated_ids.json`. Benin joined in GH #1705
-(EHCVM 2018-19 -> 2021-22 from `PanelHH`, ruling @ligon 2026-11-12); its
+(EHCVM 2018-19 -> 2021-22 from `PanelHH`, ruling @ligon 2026-11-12, with one registered
+exception, `Benin::panel_ids::all-preloaded-left-not-linked`, 2026-11-13); its
 `_/Makefile`, its first, exists for the `panel-ids` target, and once a country
 has one `Wave.grab_data` builds every script-path wave table through `make`,
 so it carries a rule per wave script. **Design A is the convention** — a

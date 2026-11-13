@@ -1,6 +1,6 @@
 """GH #1697: Benin 2021-22 (EHCVM-2, WB 6272) is wired, under ids of its own.
 
-Since GH #1705 the 6,878 linked panel households are served under their 2018-19 id:
+Since GH #1705 the 6,815 linked panel households are served under their 2018-19 id:
 the oracle's ``_i`` applies the link's rule, read from the raw covers (``_linked``).
 
 ``TestDeclared``, ``TestHarvestRule`` and ``TestCopingHook`` need no microdata.
@@ -40,13 +40,20 @@ def _raw(name, labels=False, root=ROOT):
 @functools.lru_cache(maxsize=1)
 def _linked():
     """The (grappe, menage) keys the panel link serves (GH #1705), by its rule, read here
-    from the raw covers and not from the committed crosswalk: PanelHH = Panel on the
-    2021-22 cover, and the same (grappe, menage) on the 2018-19 cover."""
+    from the raw files and not from the committed crosswalk: PanelHH = Panel on the
+    2021-22 cover, the same (grappe, menage) on the 2018-19 cover, and NOT the ruled
+    exception ("Unlink the 63", 2026-11-13): a household whose every pre-loaded s01
+    member answers s01q00aa = 2 (Non)."""
     new = _raw("s00_me_ben2021.dta", labels=True)
     old = _raw("s00_me_ben2018.dta", root=OLD_ROOT)
+    s01 = _raw("s01_me_ben2021.dta")
+    pre = s01[s01["s01q00aa"].notna()]
+    gone = {(int(g), int(m)) for (g, m), every in
+            (pre["s01q00aa"] == 2).groupby([pre["grappe"], pre["menage"]]).all().items() if every}
     old_keys = {(int(g), int(m)) for g, m in zip(old["grappe"], old["menage"])}
     return frozenset((int(g), int(m)) for g, m, p in zip(new["grappe"], new["menage"], new["PanelHH"])
-                     if str(p).strip() == "Panel" and (int(g), int(m)) in old_keys)
+                     if str(p).strip() == "Panel" and (int(g), int(m)) in old_keys
+                     and (int(g), int(m)) not in gone)
 
 
 def _i(grappe, menage):
@@ -246,14 +253,15 @@ def _dedup(s16d):
 @pytest.mark.requires_s3
 class TestServed:
     def test_only_the_linked_ids_meet_2018s(self):
-        """GH #1705: exactly the PanelHH = Panel households with a 2018-19 key are served
-        under their 2018-19 id; every other household, the recurring keys flagged Non
-        panel included, keeps this wave's prefix and meets no 2018-19 id."""
+        """GH #1705: exactly the linked households (PanelHH = Panel, a 2018-19 key, not the
+        63 excepted) are served under their 2018-19 id; every other household, the
+        recurring keys flagged Non panel included, keeps this wave's prefix and meets no
+        2018-19 id."""
         served = set(_served("sample").index.get_level_values("i"))
         old = _raw("s00_me_ben2018.dta", root=OLD_ROOT)
         bare = {f"{int(g)}{int(m):03d}" for g, m in zip(old["grappe"], old["menage"])}
         linked = {f"{g}{m:03d}" for g, m in _linked()}
-        assert len(linked) == 6878
+        assert len(linked) == 6815    # 6,878 PanelHH = Panel with a key, less the 63 excepted
         assert served & bare == linked
         assert all(i.startswith(PREFIX) for i in served - linked)
         new = _raw("s00_me_ben2021.dta", labels=True)
@@ -286,6 +294,13 @@ class TestServed:
         raw = pd.Series(weights["poids"].to_numpy() / weights["poids"].mean(), index=_ids(weights))
         pd.testing.assert_series_equal(s["weight"].astype(float).sort_index(),
                                        raw.sort_index(), check_names=False)
+        # panel_weight (ruling 2026-11-13, "NA for unlinked"): poids on the linked
+        # households, at mean 1 over them, and NA on every other household.
+        linked = [f"{g}{m:03d}" for g, m in _linked()]
+        on = raw.loc[linked] / raw.loc[linked].mean()
+        pd.testing.assert_series_equal(s.loc[linked, "panel_weight"].astype(float).sort_index(),
+                                       on.sort_index(), check_names=False)
+        assert s.drop(index=linked)["panel_weight"].isna().all()
 
     def test_the_registered_inputs_rederive_the_served_strata(self):
         key = "Benin::sample::region-milieu-stratum"

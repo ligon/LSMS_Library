@@ -11,7 +11,8 @@ Data Scheme:
   # The panel crosswalk, 2021-22 -> 2018-19 (GH #1705; ruling @ligon 2026-11-12, "Make
   # Benin a panel country").  A COMMITTED SOURCE (_/panel_ids.json, _/updated_ids.json),
   # written by _/panel_ids.py from PanelHH and regenerated only by `make panel-ids`
-  # (design A, GH #894 / #914).  6,878 households linked; every other 2021-22 household
+  # (design A, GH #894 / #914).  6,815 households linked (PanelHH, less the 63 whose whole
+  # pre-loaded roster is gone: ruling 2026-11-13, "Unlink the 63"); every other 2021-22 household
   # keeps its own E2_ id.  _/CONTENTS.org, "2026-11-13 -- Benin is a panel country".
   panel_ids: !make
   cluster_features:

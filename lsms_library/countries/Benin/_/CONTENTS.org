@@ -1300,7 +1300,20 @@ A 2021-22 household is linked to the 2018-19 household with the SAME =(grappe, m
   control (another 2018-19 household of the same grappe, numbers matched the same way) finds 70.0%
   of them, because member numbers start at 1 in every household, and agrees on sex for 61.6%: so
   "found by number" is weak evidence alone, and the sex agreement is what separates the link
-  (=reports/benin/scripts/explore3.py=, burst job 41276456).
+  (=slurm_logs/isa_backlog_2026-11-13/1705-benin-panel/scripts/explore3.py=, burst job 41276456).
+  The red team (GH #1705 review) adds birth year: on linked, still-member, number-found members,
+  within one year 67.1% against 11.5% for the control, exactly 48.0% against 4.1%, so the birth
+  year was not pre-filled from 2018-19.
+- *The support is not uniform: 63 linked households look like other households.*  On 63 of the
+  6,878, every pre-loaded member is recorded as having left (=s01q00aa= = Non); 52 of them answer
+  =s00q07e= (same dwelling) Oui, and they hold 261 current members, none pre-loaded (re-derived,
+  =fixup_facts.py=, burst job 41279397).  Matched to the same key's 2018-19 roster on sex and birth
+  year within one year, ignoring member numbers, 21 of 258 of those members match (8.1%) against
+  28 of 258 (10.9%) for another 2018-19 household of the same grappe: control level (red team, job
+  41278460, not re-measured here).  They read as replacement households carrying a Panel flag.  They
+  ARE linked, because the ruling is "from PanelHH"; whether to keep them linked is the maintainer's.
+  The 19 linked households with no pre-loaded roster at all (=s01q00aa= blank on every row) match
+  well, 24 of 64 members against 8 of 64 (red team), so they are mostly the same people.
 - *=s00q07d= is not the rule.*  It is Oui on all 6,878 linked households, on all 116 recurring keys
   flagged Non panel and on 2 new keys, and Non on the 11 flagged Panel that have no 2018-19 key.
 
@@ -1327,7 +1340,7 @@ remove it.
 ** Verification, on the raw files
 
 Each 2021-22 household against the 2018-19 household it is linked to, and, as a control, against
-another 2018-19 household of the same grappe (=reports/benin/scripts/explore.py=, burst job 41275630;
+another 2018-19 household of the same grappe (=slurm_logs/isa_backlog_2026-11-13/1705-benin-panel/scripts/explore.py=, burst job 41275630;
 heads by =s01q02= = 1; age the answer =s01q04a=, else the interview year less =s01q03c=, NEVER
 =ehcvm_individu.age=, which UEMOA set from 2018-19 for panel members, "2021-22 wired" above):
 | group                                   |     n | head sex | head age +1..+5 | size equal | size within 2 |
@@ -1347,17 +1360,24 @@ is by construction: the same grappe, and region and milieu agree on 6,878 of 6,8
   their 465 pre-loaded members are 2018-19 members of the same key under the same number, of the same
   sex on 95.5% of those found and still members (the same-grappe control: 62.4% found, 57.8% same
   sex; the link: 100.0%, 98.5%).  That reads as a mix with many genuine panel households in it.  The ruling says "from PanelHH" and the BID
-  says only =PanelHH= marks a valid merge, so they are not linked here; whether to link them (all, or
-  those with a pre-loaded roster) is the maintainer's.
+  says only =PanelHH= marks a valid merge, so they are not linked here; whether to link them is the
+  maintainer's.  "Only those with a pre-loaded roster" would not discriminate: 96 of the 116 have one.
+  The red team's reading (birth year: members within one year 49.5% against 13.6% for their control;
+  32 of the 96 with a pre-load match their own key strongly) is that roughly 55-70% are the same
+  household.
 - *The 11 flagged Panel with no 2018-19 key* answer =s00q07d= Non and have pre-loaded rosters (18
-  members) under a key that is no 2018-19 household.  With no recorded 2018-19 id there is nothing to link to.
+  members) under a key that is no 2018-19 household.  With no recorded 2018-19 id there is nothing to
+  link to.  The red team finds 1 of the 11 matching a 2018-19 household that is already linked.
 - *96 of the 1,027 new keys* also answer =s01q00aa= on 422 members, none of them a 2018-19 member of the
-  key.  Not investigated: possibly split-offs.  No link is possible without a recorded origin.
+  key.  Not investigated here.  The red team finds 28 of the 96 strongly matching a 2018-19 household
+  none of which has a 2021-22 record under its own key (against 87% recurrence overall), which points
+  to renumbering, with the caveat that its scorer is lenient on missing birth years.  No link is
+  possible without a recorded origin or a roster-linkage rule, which would be a ruling of its own.
 
 ** What moved, measured
 
 Every table, cold, base =f138a3d61= against the branch, each in its own empty private root (burst
-jobs 41275931 / 41275932; =reports/benin/scripts/build_side.py= and =compare.py=).  The base frame is
+jobs 41275931 / 41275932; =slurm_logs/isa_backlog_2026-11-13/1705-benin-panel/scripts/build_side.py= and =compare.py=).  The base frame is
 mapped through the committed crosswalk and compared with the branch on every column: *equal on every
 table but =plot_inputs= 2018-19* (next section), and no row count moves anywhere.  2018-19 rows are
 untouched; on 2021-22 exactly the rows of the 6,878 linked households change =i=:
@@ -1400,7 +1420,10 @@ eight checks: 6,878 chain endpoints present, 2018-19 -> 2021-22 attrition 6,878 
 - *=panel_weight=* is still =poids=, the cross-sectional weight, on every 2021-22 household ("2021-22
   wired", Weights): no longitudinal weight is shipped, and the ruling covers ids, not weights.  The
   library's convention is a NaN or zero =panel_weight= for a household outside the panel; whether the
-  1,154 unlinked households get one is a question for the maintainer.
+  1,154 unlinked households get one is a question for the maintainer.  So is the third option the red
+  team names: NA on all of 2021-22, since no longitudinal weight is shipped (the BID calls the shipped
+  weight one "calculated for each household, taking into account the panel dimension", i.e. a
+  cross-sectional weight).
 - *Cost.*  Every Benin hash moves (=data_scheme.yml=, three new =_/= files, the Makefile): 22 of 22
   existing =Country._table_cache_hash= and 44 of 44 =Wave._input_hash=, plus the new =panel_ids=
   entries; no other country, =build_transforms_fingerprint= 0 of 42, =framework_imports_fingerprint=
@@ -1439,6 +1462,25 @@ Two fixes in =2018-19/_/plot_inputs.py=, measured on the same cold builds as abo
   NA on 2018-19 before, now hold the 383 gifts.  An acquisition unit is left NA where its question is
   blank (one purchase has no =s16bq09b=).  No library transform reads these columns; the purchase VALUE
   =s16bq09c= is not served, in either wave.
+- *Three purchase quantities look like FCFA amounts keyed into the quantity* (GH #1705 red team F5;
+  re-derived, =fixup_facts.py=, burst job 41279397).  Served as recorded: Site Q does not screen
+  =Quantity_purchased=, and no rule for them is ruled.
+  | grappe, menage | input                | used        | =s16bq09a= / =s16bq09b= | =s16bq09c= (FCFA) |
+  |----------------+----------------------+-------------+-------------------------+-------------------|
+  | 221, 37        | NPK / Formule unique | 5 Kilogramme   | 60,000 Sac(50kg)     |            13,000 |
+  | 33, 19         | Urée                 | 100 Kilogramme | 28,000 Sac(50kg)     |            14,000 |
+  | 177, 101       | NPK / Formule unique | 50 Kilogramme  | 10,000 Kilogramme    |            10,000 |
+  Two more lines of the same top of the list have the same shape and were not named by the red team:
+  grappe 3, menage 41, rice seed, 60 kg used and 8,000 kg bought for 8,000 FCFA; grappe 10, menage 27,
+  pesticide, 8 litres used and 3,500 litres bought for 28,000 FCFA.
+- *The unit columns are spelled as =u= is* (GH #1705 red team F2).  Decoded through the country =u=
+  table alone, 2018-19's =Unit_purchased= and =Unit_received_as_gift= served the raw ='Kilogramme'=
+  (2,363 and 272 rows) where =u= and 2021-22 serve ='Kg'=, so a filter on ='Kg'= dropped every 2018-19
+  kilogram purchase.  Both now go through =ehcvm.served_unit_labels('Benin', ...)=, as 2021-22's do.
+  Measured cold (burst job 41279397): ='Kg'= on 2,363 =Unit_purchased= and 272 =Unit_received_as_gift=
+  rows, and no other label changes; every label of both columns is now one 2021-22 also serves
+  (=Litre=, =Sac(50kg)=, =Sac(100kg)=, =Charrette=, =Gramme=, =Sachet=, =Tonne=, =Boîte=, =Tas=,
+  =Waygouizé=).  The rest of =plot_inputs=, =nitrogen_kg= and =seed_kg= are as above.
 - *A blank unit of use is =Unknown=* (GH #1118).  Counted first: one applied line, 100 of "Autres
   semences" (grappe 166, menage 133), has no =s16bq03b=; it was served =u= = =Manquant=, a label the
   survey never wrote (no raw label reads =Manquant=), and is now the canonical =Unknown=.  That row is

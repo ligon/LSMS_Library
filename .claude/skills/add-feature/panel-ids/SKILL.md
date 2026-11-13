@@ -28,7 +28,7 @@ Many LSMS-ISA countries have waves from **different survey programs** that canno
 | Mali | — | EACI 2014-15, 2017-18 | Not longitudinal |
 | Mali | EHCVM 2018-19 → 2021-22 | — | Only within EHCVM |
 | Burkina Faso | EHCVM 2018-19 → 2021-22 | EMC 2014 | Different program |
-| Benin | EHCVM 2018-19 → 2021-22 (`PanelHH = Panel`, identity on `(grappe, menage)`) | — | 2021-22 adds new households beside the panel ones (GH #1705) |
+| Benin | EHCVM 2018-19 → 2021-22 (`PanelHH = Panel`, identity on `(grappe, menage)`, less a registered exception: a household whose whole pre-loaded roster is recorded as gone) | — | 2021-22 adds new households beside the panel ones (GH #1705) |
 
 Nigeria's repository folder `2018-19/` is **GHS-Panel Wave 4**, not the
 separate same-year NLSS. Its [recorded provenance](../../../../lsms_library/countries/Nigeria/2018-19/Documentation/SOURCE.org)
