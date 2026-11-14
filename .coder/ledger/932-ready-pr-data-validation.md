@@ -33,3 +33,31 @@ Root reviewed the original workflow, checkout script, tests and corrective sourc
 PR1680 ready run42733260628 passed eligibility, exact synthetic merge/parent checks, the real credential gate and Uganda prebuild. Full pytest was cancelled at the job's two-hour deadline; GitHub annotation explicitly says the maximum execution time was exceeded. No full-data pass or ruleset enforcement is established. The separate body-edit run emitted pr-data-metadata-edit and did not cancel that credentialed run; the earlier draft run refused before credentials as intended. Ordinary CI passed on283c.
 
 One workflow-only operational correction97c1bb0a3 raises the PR job budget from120 to360 minutes (the hosted runner budget), preserving every step, credential/test gate, sequential recipe, per-test timeout and advisory workflow. Official source: https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idtimeout-minutes . The existing source conservation test now pins360 and verifies it is at least the advisory job allowance rather than requiring equal deadlines. Both existing routing and recipe source-control functions were directly executed from their exact AST bodies and passed; this was two direct pure source checks, not a new pytest67 run or data acceptance. No library import or data read occurred. Evidence/operator: reports/932-data-validation-time-budget-20261110. The original timed-out run remains preserved; source publication triggers a new exact-head acceptance run. Ruleset mutation remains pending real completion.
+
+## Addendum, 2026-11-13: metadata mode removed (GH #1714, option a)
+
+Ruling 2026-11-13: "(a) Stop edited triggers". A PR title or body edit must
+create no new run of this workflow; a base change still forces
+re-validation, or fails closed.
+
+The title/body-only `pr-data-metadata-edit` path described above is gone. On
+PR #1711 a body edit after the gate started a second run on the same head. Its
+job was named `pr-data-metadata-edit`, and GitHub then showed the required
+`pr-data-validation` as "Expected" and blocked the merge, although a passing
+run existed on that head. A run whose jobs all skip is still a run, so the fix
+is at the trigger:
+- `edited` is removed from `types`;
+- the classifier refuses `edited` as an unsupported action;
+- the guard accepts only `validate`;
+- the job has one static name, `pr-data-validation`;
+- the concurrency group loses its metadata branch;
+- the per-step `run_data` conditions are removed, so a green required check
+  cannot come from skipped data steps.
+
+A retarget to development without a push now starts no run. With no earlier
+success on the head, the check stays "Expected" (fails closed). With one, that
+earlier validation is reused: it is the tree that merges, because ruleset
+25124452 is strict and ruleset 9389899 bans non-fast-forward on development.
+The workflow comment states both cases. Not tested live: that a base change
+emits only `edited`, that a newer run on a head replaces an older one, and that
+a body edit now starts no run.
