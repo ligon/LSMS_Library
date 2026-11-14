@@ -53,7 +53,7 @@ def test_only_s7fq13d_is_wired_as_the_harvest_factor():
     entry, = _kgfactor_entries(WAVE)
     literals = {n.value for n in ast.walk(entry) if isinstance(n, ast.Constant)}
     assert 's7fq13d' in literals
-    # The tree "Equivalent en Kg" fields are sometimes a total (GH #1267) and stay unread.
+    # The tree "Equivalent en Kg" fields stay unread (the sold ones are sometimes a total, GH #824).
     assert not {'s11fq11c', 's11fq14c'} & literals
     # 2014-15's sibling mixes factors and totals; it is not read at all.
     assert _kgfactor_entries('2014-15') == []
@@ -62,7 +62,11 @@ def test_only_s7fq13d_is_wired_as_the_harvest_factor():
 
 def test_kgfactor_is_declared_optional():
     import yaml
-    scheme = yaml.safe_load((COUNTRY_DIR / '_' / 'data_scheme.yml').read_text())
+
+    class _SchemeLoader(yaml.SafeLoader):   # the scheme carries `!make` tags
+        pass
+    _SchemeLoader.add_multi_constructor('!', lambda loader, suffix, node: None)
+    scheme = yaml.load((COUNTRY_DIR / '_' / 'data_scheme.yml').read_text(), Loader=_SchemeLoader)
     col = scheme['Data Scheme']['crop_production']['KgFactor']
     assert col == {'type': 'float', 'optional': True}
 
