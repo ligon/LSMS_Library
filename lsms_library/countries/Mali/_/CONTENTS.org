@@ -946,7 +946,10 @@ in both vocabularies at all, and =_kg_factor_series= resolves a factor for
 =Kg= (2,300 of 35,060 rows, 6.6%) and =Tonne= (2 rows; a metric factor) only.
 [Corrected 2026-10-23, GH #824: this said "even =Tonne= is unmapped"; on a cold
 development build =harvest_kg_factors= serves =Tonne= as =metric=, 2,302 rows
-in all.]  That list -- "en UML de la colonne suivante" -- is the SOLD quantity's
+in all.]  [Since GH #1749 (2026-11-13) 2017-18's harvest rows carry the
+survey's own kg per unit, =s7fq13d=, as =KgFactor=, so that wave's unsized
+units convert through the =reported= rung: section "crop_production:
+s7fq13d is served as KgFactor".]  That list -- "en UML de la colonne suivante" -- is the SOLD quantity's
 OWN unit column (=s3aq23b=), not the harvest one; 2017-18's sold set
 (=s7gq21b=) differs at the tail: =10=Tonne  11=Autre=.
 
@@ -4115,7 +4118,10 @@ has 70 such rows, all 2021-22 (carts, =Autre=, =Grenier=, ...), and one of them 
 mass (survey / implied 0.30).  It names none.  The cold frame is =assert_frame_equal= to development
 =f138a3d61=.  Cost: 41 ms of a 658 ms warm read; cache: none.
 
-*2017-18 ALREADY HOLDS THE INSTRUMENT'S KILOGRAMS PER UNIT, UNWIRED (red team F1, 2026-11-13).*
+*2017-18 ALREADY HOLDS THE INSTRUMENT'S KILOGRAMS PER UNIT (red team F1, 2026-11-13).*  [Updated
+2026-11-13: WIRED the same day, GH #1749, ruling "Okay, let's wire it"; the served numbers are in
+the next section, "crop_production: s7fq13d is served as KgFactor".  The paragraph below is the
+#1559 simulation, kept as written.]
 =eaci17_s7fp2.s7fq13d=, "Equivalent en Kg", is the fourth sub-column of Q7F13, beside the quantity
 (=s7fq13a=) and the unit (=s7fq13c=) this file serves.  Joined row by row to the served 2017-18
 seasonal rows, with keys rebuilt as =2017-18/_/crop_production.py= builds them (burst job 41279383):
@@ -4136,11 +4142,13 @@ crops, would go from 7.6% to 94.6%; no other wave moves.  No ruling leaves it un
 are about the state, not this column.  2014-15's sibling =s3aq08c= is positive on 9,502 of 9,571
 rows but mixes factors and totals (it equals the quantity on 10% of =Kg= rows, and on those 511
 rows quantity x factor sums to 45.5M kg), so it is not usable as is.  Wiring =s7fq13d= is a ruling
-of its own, asked first in the #1559 rung memo (Q0).  Not done here.
+of its own, asked first in the #1559 rung memo (Q0).  Not done here.  [Answered 2026-11-13 and done
+in GH #1749, next section.]
 
 *For the rung (part (2), a design memo only), Mali's EAC-I waves are the case.*  Measured cold (burst
 jobs 41275992, 41276357, 41276727 and 41279383), nothing served:
-- 2017-18 is mostly unconverted today (23,160 of 24,921 rows on =none=; 1.66M kg served).  A
+- 2017-18 is mostly unconverted today (23,160 of 24,921 rows on =none=; 1.66M kg served; that is
+  before GH #1749 wired =s7fq13d=, next section).  A
   price-implied =Sac= (=Mil= 120 kg, =Maïs= 105, =Arachide= 60, =Coton= 100) would serve 9,052 of them
   and the wave would gain 14.8M kg: a change of coverage (millet, maize and groundnut household-crops
   with kilograms from about
