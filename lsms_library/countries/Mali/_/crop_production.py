@@ -5,7 +5,8 @@ indexed by ``(t, i, plot, crop, condition)`` with the reported item-level harves
 columns (Quantity, u, Quantity_sold, Value_sold, planting_month,
 harvest_month, intercropped, perennial; since GH #824 / #1267 also
 Unit_sold, field-only KgFactor_sold, months_harvested and, on tree rows,
-Derivation). Native grain footers are relayed independently from attrs.
+Derivation; since GH #1749 the 2017-18 harvest KgFactor, NA elsewhere).
+Native grain footers are relayed independently from attrs.
 All four waves contribute: EAC-I 2014-15 (EACI14) and 2017-18 (EACI17), and,
 since GH #824, EHCVM 2018-19 (s16c) and 2021-22 (s16c + s16d).  In 2017-18 and
 2021-22 a household-crop sale sits on a single harvest row or on a plot_id =

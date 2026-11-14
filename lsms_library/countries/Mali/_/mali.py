@@ -734,7 +734,8 @@ def crop_production_finalize(df):
         t, i, plot, crop (decoded), u (decoded), Quantity, Quantity_sold,
         Value_sold, planting_month, harvest_month, intercropped, perennial,
     and optionally Unit_sold (decoded sold unit), KgFactor_sold (reported
-    FIELD kg per sold unit) and months_harvested.
+    FIELD kg per sold unit), KgFactor (reported kg per harvest unit; 2017-18
+    s7fq13d only, GH #1749) and months_harvested.
     Maps crop/unit labels -- the sold unit through the SAME ``u`` table as
     the harvest unit (GH #824) -- coerces dtypes, collapses on (t, i, plot, crop),
     and appends ``condition`` to that index as the sentinel (GH #1436).  The
@@ -759,6 +760,12 @@ def crop_production_finalize(df):
     if 'KgFactor_sold' not in df.columns:
         df['KgFactor_sold'] = pd.NA
     df['KgFactor_sold'] = pd.to_numeric(df['KgFactor_sold'], errors='coerce')
+    # KgFactor (GH #1749): the instrument's kg per ONE harvest unit, as recorded.
+    # 2017-18 s7fq13d only; 2014-15's s3aq08c mixes factors and totals and is not
+    # read, and tree rows carry none.
+    if 'KgFactor' not in df.columns:
+        df['KgFactor'] = np.nan
+    df['KgFactor'] = pd.to_numeric(df['KgFactor'], errors='coerce')
     if 'months_harvested' not in df.columns:
         df['months_harvested'] = pd.NA
     df['months_harvested'] = pd.to_numeric(
@@ -812,6 +819,14 @@ def crop_production_finalize(df):
         df.set_index(keys)[['KgFactor_sold']],
         on_conflict='na', na_is_conflict=True,
         country='Mali', table='crop_production')
+    # The harvest factor folds the same way, in its own call so its report names
+    # only its own column: kept only where every row of the group reports the same
+    # factor (a missing one disagrees), since the group's Quantity is summed.
+    # Measured: no 2017-18 group has two rows, so this never fires today.
+    agreed_kg = reduce_to_agreed(
+        df.set_index(keys)[['KgFactor']],
+        on_conflict='na', na_is_conflict=True,
+        country='Mali', table='crop_production')
     out = pd.DataFrame({
         'Quantity':       g['Quantity'].sum(min_count=1),
         'Quantity_sold':  g['Quantity_sold'].sum(min_count=1).mask(mixed_sold_unit),
@@ -827,7 +842,8 @@ def crop_production_finalize(df):
     out['Unit_sold'] = out['Unit_sold'].astype('string')
     out['KgFactor_sold'] = (agreed_factor['KgFactor_sold'].reindex(out.index)
                             .mask(mixed_sold_unit))
-    out = out[['Quantity', 'u', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold', 'Value_sold',
+    out['KgFactor'] = agreed_kg['KgFactor'].reindex(out.index)
+    out = out[['Quantity', 'u', 'KgFactor', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold', 'Value_sold',
                'months_harvested', 'planting_month', 'harvest_month',
                'intercropped', 'perennial']]
     # GH #1436: the EHCVM waves serve the `condition` level, and every wave the

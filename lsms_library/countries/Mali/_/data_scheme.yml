@@ -237,6 +237,20 @@ Data Scheme:
     Quantity_kg:
       type: float
       optional: true
+    # KgFactor (GH #1749, ruling @ligon 2026-11-13, "Okay, let's wire it") is the
+    # survey's own kilograms per ONE harvest unit, a FACTOR and not a total: 2017-18
+    # s7fq13d, Q7F13's fourth sub-column "Equivalent en Kg", as recorded on every
+    # seasonal row that answers it (a 0 is no answer and reads NA, Uganda's q6d rule).
+    # 1 on every Kg row.  REPORTED, so no Derivation key.  harvest_kg reads it as the
+    # `reported` rung through the unchanged reported-factor screen: a factor above
+    # KG_FACTOR_MAX (250 kg) is refused and that row is served its unit's survey_median
+    # instead (Charretee, Autre, Grenier and Sac rows; counts and the rows whose factor
+    # equals the quantity are in CONTENTS.org).  NA on tree and Farm-level rows, and in
+    # the other waves: 2014-15's s3aq08c mixes factors and totals, and the EHCVM waves
+    # ask a total (Quantity_kg).
+    KgFactor:
+      type: float
+      optional: true
     u: str
     Quantity_sold: float
     # Quantity_sold_kg (GH #1560, ruling @ligon 2026-11-12 "Treat 2021 as totals") is

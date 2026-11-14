@@ -25,6 +25,7 @@ plot rule below: a filled-in 0 on a crop's one plot, and nothing elsewhere.
 
 Variable map (Stata labels; WB MLI_EACI2.do for the field/parcel keys):
   field=s7fq01 parcel=s7fq02 crop=s7fq03 harvest_qty=s7fq13a unit=s7fq13c
+  kg per ONE harvest unit=s7fq13d (served as KgFactor, below)
   fully_harvested=s7fq06 harvest_month=s7fq12b
   sold: crop=s7gq01 sold_y/n=s7gq20 sold_qty=s7gq21a SOLD UNIT=s7gq21b
         sold_value=s7gq22
@@ -62,6 +63,23 @@ mali.DERIVATION_TREE_SALES on tree rows with a positive sale.  The WB
 MLI_EACI2.do:242/313/353 multiplies the harvest and sold kg equivalents
 (s11fq11c, s11fq14c) and the value by s11fq10; the evidence is in
 Mali/_/CONTENTS.org.
+
+The harvest kg factor (GH #1749, ruling @ligon 2026-11-13, "Okay, let's
+wire it").  Q7F13's fourth sub-column, "Equivalent en Kg" (s7fq13d, DDI
+V876), is the instrument's kilograms per ONE unit of s7fq13c.  The P2
+enumerator manual says so (eaci17_manuel_p2_french.pdf, PDF p. 30, 7F.13:
+"on écrit le poids en Kg d’une unité de l’UML reportée", with a worked
+example of 97 sheaves at 2.5 kg each), it is 1 on every Kilogramme row, and
+in no unit with 100 or more rows does it rise with the quantity as a total
+would.  It is served as recorded in the canonical
+KgFactor column, the `reported` rung of transformations.harvest_kg_factors,
+as Uganda serves UNPS q6d; a 0 is no answer and reads NA, the Uganda rule.
+REPORTED, so it carries no Derivation key.  The ladder is unchanged: its
+reported-factor screen refuses a factor above KG_FACTOR_MAX (250 kg), and
+such a row falls to its unit's survey_median.  A few rows record a factor
+equal to the quantity and are served as recorded too.  Tree rows (11F) and
+Farm-level sale rows carry no factor.  Counts, by unit, and the rows that
+look like totals: Mali/_/CONTENTS.org (2026-11-13, GH #1749).
 
 Unanswered sales (ruling @ligon 2026-10-23, PR #1272).  The s7g sale is
 summed with sum(min_count=1), so a sale whose quantity or value was not
@@ -107,6 +125,9 @@ seasonal = pd.DataFrame({
     'crop': s7f['s7fq03'],
     'u': s7f['s7fq13c'],
     'Quantity': s7f['s7fq13a'],
+    # The instrument's kg per ONE unit of s7fq13c, as recorded (GH #1749); a 0 is
+    # no answer and reads NA (Uganda q6d).  No sentinel mask: none occurs.
+    'KgFactor': (lambda kg: kg.where(kg > 0))(pd.to_numeric(s7f['s7fq13d'], errors='coerce')),
     'harvest_month': s7f['s7fq12b'],
     'planting_month': pd.NA,
     'intercropped': pd.NA,   # 2017-18 s11cq05 has no documented monoculture/
