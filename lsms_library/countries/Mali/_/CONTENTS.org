@@ -4183,9 +4183,13 @@ jobs 41275992, 41276357, 41276727 and 41279383), nothing served:
 =crop_production.KgFactor=, the =reported= rung of =transformations.harvest_kg_factors=, through
 today's ladder unchanged: the reported-factor screen and its 250 kg ceiling apply, refused rows fall
 to =survey_median=, disclosed.  Whether the ceiling suits carts (rung memo Q5) stays open.  Served as
-recorded, as Uganda serves UNPS q6d: a 0 reads NA, and a reported factor carries no =Derivation= key.
+recorded, as Uganda serves UNPS q6d: a 0 reads NA, and a reported factor carries no =Derivation= key
+(as Uganda q6d and this wave's =KgFactor_sold=; whether it should carry an identity key, as 2021-22's
+=Quantity_kg= carries =survey-kg-estimate=, is an open question to the user, GH #1749 report Q-D).
 Tree rows (11F) and Farm-level sale rows carry none; the other waves carry none (2014-15's =s3aq08c=
-mixes factors and totals, the EHCVM waves ask a total, =Quantity_kg=).
+mixes factors and totals, the EHCVM waves ask a total, =Quantity_kg=).  Red team on GH #1749:
+=reports/mali1749-redteam/VERDICT.md= (CHANGES, no blocker; jobs 41290049-41290283), whose findings
+F1-F8 are folded in below.
 
 *What the column is, by instruction.*  The P2 enumerator manual,
 =2017-18/Documentation/eaci17_manuel_p2_french.pdf=, PDF p. 30, 7F.13 (text extracted with =pypdf= in
@@ -4211,8 +4215,14 @@ instruction governs the 7F.28 / 7F.31 losses and 7G.03-7G.09 dispositions, none 
 
 *What the file holds* (raw =s7f=, 24,457 rows; burst jobs 41288157, 41288449):
 - 1 on every one of the 1,688 =Kilogramme= rows.  A line total would equal the quantity there; that
-  happens on 0 of 1,688, where the tree sold-kg fields =s3bq13c= / =s11fq14c= fail it on 26% / 44% of
-  their Kg sales (section "crop_production: the sold unit") and 2014-15's =s3aq08c= on 10% of Kg rows.
+  happens on 0 of the 1,677 Kg rows with a quantity other than 1 (on the other 11 the quantity is 1,
+  so factor and quantity agree trivially), where the tree sold-kg fields =s3bq13c= / =s11fq14c= fail
+  it on 26% / 44% of their Kg sales (section "crop_production: the sold unit") and 2014-15's
+  =s3aq08c= on 10% of Kg rows.  Necessary, not decisive: a prefilled 1 would give the same.  The
+  stronger evidence is the red team's sale test (F8, job 41290282): over 572 household-crops with a
+  priced sale and a factor on every harvest row, sold kg exceeds harvest kg on 8 under the per-unit
+  reading and on 402 under the line-total reading (sales with a sold factor above 250 or a 9999
+  quantity excluded; 2 of the 8 span more than one plot).
 - In no unit with 100 or more rows does it rise with the quantity: the slope of log factor on log
   quantity is -0.24 to 0.07 (=Sac= 0.02 on 15,052 rows, =Charretée= -0.05 on 3,732); a total would be
   near 1.  =Grenier= (67 rows) is 0.43.
@@ -4227,15 +4237,25 @@ instruction governs the 7F.28 / 7F.31 losses and 7G.03-7G.09 dispositions, none 
   so =crop_production_finalize='s exact-agreement fold never meets two factors.
 
 *The idiosyncrasy: a factor equal to the quantity.*  221 non-Kg rows record =s7fq13d= = =s7fq13a= > 1,
-1.0% of the 21,226 non-Kg rows with a positive factor and a quantity above 1; 154 of them are not at
-their unit's mode.  101 are =Charretée=, every one with quantity 100 and factor 100: EVERY cart row with a quantity of 100 has a
-factor of 100 (a quantity of 100 is 2.7% of cart rows but 35% of those with factor 100), in 4 clusters
-and 23 households (=Mil= 53, =Haricots secs= 17, =Arachide= 14, =Sorgho= 8); they look like kilograms
-keyed under a cart.  The rest: =Sac= 35 (19 at 100 / 100), =Panier= 32, =Gerbe= 30, =Autre= 15,
-=Bassine= 6, =Calebasse= 1, =Moude= 1.  Served as recorded they carry 1,334,989 kg (the carts
-1,010,000); read as line totals they would carry 16,551.  Site Q names none of them.  The ruling did
-not reach them and the column cannot repair them (blanking the factor would serve =survey_median=, 250
-a cart, times 100), so they are disclosed, not changed: a question in the GH #1749 report.  A second
+1.13% of the 19,550 non-Kg rows with a positive factor and a quantity above 1 (a count of 21,226
+taken first had the Kg rows in it; red team F1); 154 of them are not at their unit's mode.  They
+split in two:
+- *101 carts, a fill pattern in BOTH columns* (red team F2).  Each is =Charretée= with quantity 100
+  and factor 100.  In their 4 clusters (23 households) every one of the 102 cart rows has factor 100,
+  and 101 of the 102 have quantity 100 (the other 20); across the wave a quantity of 100 is 2.7% of
+  cart rows.  So the quantity is as suspect as the factor, and neither reading has evidence: none of
+  these household-crops has a sale to test it.  Served per unit, each is 10,000 kg: 55
+  household-crops (=Mil= 53 rows, =Haricots secs= 17, =Arachide= 14, =Sorgho= 8) and 1,010,000 kg,
+  3.1% of the wave.  No screen names them: Site Q has no cart-100 offender, and the GH #1559 screen
+  reads =Quantity_kg= only.  Blanking the factor would be worse: =survey_median= would serve 250 x 100
+  = 25,000 kg a row.
+- *120 other rows*: =Sac= 35 (19 at 100 / 100), =Panier= 32, =Gerbe= 30, =Autre= 15, =Bassine= 6,
+  =Calebasse= 1, =Moude= 1.  Where a sale lets them be tested the evidence supports the per-unit
+  reading: of the 221, 8 household-crops have a sale, and the per-unit reading fails on 0 of them, the
+  line-total reading on 6 (red team F8).
+Served as recorded, the 221 carry 1,334,989 kg (the carts 1,010,000); read as line totals they would
+carry 16,551.  The ruling did not reach them and =KgFactor= cannot repair them, so they are disclosed,
+not changed: questions Q-A1 (the 120) and Q-A2 (the carts) in the GH #1749 report.  A second
 signature, factor = quantity x the unit's mode, marks 38 rows; 32 of them are over 250 (=Sac= 24,
 =Charretée= 5, =Autre= 3) and so refused (below).
 
@@ -4258,6 +4278,11 @@ signature, factor = quantity x the unit's mode, marks 38 rows; 32 of them are ov
   split "=reported= 25.9M, =survey_median= 7.2M" is the red team's arm (job 41280001: 25,939,205 and
   7,164,185 kg); served: 26.2M and 6.6M.  Likewise the memo, GH #1749 and the #1559 paragraph above quote
   the red team's =Charretée= 1,576 refused; served, 1,581, the 5 rows between its 2,162 and 2,167.
+- *The tail is concentrated* (red team F4): 174 rows above 10 t carry 6.96M kg, 21% of the wave (119
+  of them =reported=, 54 =survey_median=).  The largest is one cotton row in carts: quantity 4,000, its
+  own factor of 1,000 refused and re-served at 250, so 1,000,000 kg, 3.0% of the wave on one
+  plot-crop; Site Q names its =Quantity= (=EACI17_173001=, ratio 159).  Next are cotton =Autre= rows
+  of 16,000 and 13,500 at 15 kg: 240,000 and 202,500 kg, quantities that look like kilograms.
 - =reported_vs_survey_median= disagreement (=harvest_kg_factors= attrs): 6,011 of 21,039 reported
   factors differ from their unit's median by more than 10%; =reported_vs_inferred=: 0 of 1,688.
 - =yield_kg=: =plot_features= covers 2018-19 and 2021-22 only, so 2017-18 has no yield on either side;
@@ -4277,8 +4302,13 @@ accepted factors: 6,068,115 kg, against 82,219,799 at their own factors.  It doe
 - =Charretée=: carts of 300-400 kg, plausible masses, are trimmed to the accepted median of 250.
 - =Autre=: 416 rows at 1,000 kg a unit read as a tonne (the printed harvest list calls code 10
   "Autre"; the sale list's code 10 is =Tonne=: "The two 2017-18 unit label sets are not
-  code-compatible", above), and are served at 15 kg, the median of the =Autre= factors at or below 250
-  (15 on 85 rows): a 67-fold cut.  A reading of the label, not a fact the file states.
+  code-compatible", above), and are served at 15 kg, the median of the 183 =Autre= factors at or below
+  250 (85 rows at 15, 32 at 1, 19 at 100): a 67-fold cut.  A reading of the label, not a fact the file
+  states.  *The cut falls on cotton* (red team F3): 378 of the 416 are =Coton=, at a median quantity
+  of 3 (p10 1, p90 10), which fits a tonne, so 3 t of cotton is served as 45 kg.  The 2017-18
+  household-crop median for cotton is 1,125 kg, against 2,500 in 2018-19 and 2,000 in 2021-22, which
+  is consistent with the cut; millet, maize, sorghum, rice and groundnut sit within about 1.5x of the
+  EHCVM waves.
 - =Sac=: 24 of the 31 are exactly quantity x 100, line totals, so the median of 100 a sack serves
   their total.  The ceiling is right here.
 - =Grenier=: granaries of 260-3,000 kg served at 100.
@@ -4287,23 +4317,36 @@ Unchanged, as ruled; the numbers are for Q5.
 
 *Tree rows borrow the seasonal medians.*  =survey_median= pools by (=u=, =condition=) within the wave,
 and 11F tree rows share those cells with the seasonal rows, so 104 tree rows in a non-Kg unit (of 270)
-now carry 373,151 kg at the seasonal median: =Charretée= 34 (154,965 kg at 250), =Sac= 37 (153,006 at
-100), =Panier= 18 (56,740 at 20), =Bassine= 14 (8,220 at 30), =Calebasse= 1; mango 46 and cashew 26.
-Their own harvest "Equivalent en Kg" (=s11fq11c=) stays unread.  One is a row Site Q names: a mango
-harvest of 240 =Charretée= (a 12-month total), now 60,000 kg; two named cashew rows get 1,500 and 600.
-Today's ladder doing what it does; a question in the GH #1749 report.
+now carry 373,151 kg (1.1% of the wave) at the seasonal median: =Charretée= 34 (154,965 kg at 250),
+=Sac= 37 (153,006 at 100), =Panier= 18 (56,740 at 20), =Bassine= 14 (8,220 at 30), =Calebasse= 1;
+mango 46 and cashew 26.  Their own harvest "Equivalent en Kg" (=s11fq11c=) stays unread.  Among them is
+a mango row whose sale Site Q names: a harvest of 240 =Charretée= (a 12-month total), now 60,000 kg;
+two cashew rows whose sales it names get 1,500 and 600.  Site Q's harvest-=Quantity= screen names none
+of the 104 (red team F5).  Today's ladder doing what it does; question Q-B in the GH #1749 report.
 
 *Screens.*  Site Q reads =Quantity= and =Quantity_kg=, not =KgFactor=: the same 14 reports base and
-candidate, and of its four 2017-18 rows (all trees) three now carry kilograms (above), one stays
+candidate.  It names the 1,000,000 kg cotton cart row's =Quantity= (above); the four 2017-18 tree rows
+it names are named on the sale side (cashew 210,000 and 125,000 =Sac=, mango 100,000 =Charretée= and
+100,000 =Kg=), and three of them now carry harvest kilograms through =survey_median= (above), one stays
 =none=.  The GH #1559 price screen reads =Quantity_kg= only: 1 row judged, 0 named, both sides; it does
 not judge a reported =KgFactor=.  Cold-read warnings: the same classes and counts.
+
+*Found on the way, not changed* (red team F7; the wave script is a hashed input, so not in this change):
+- Partial harvests.  7F.13 says "Si la récolte est partielle on report seulement la production déjà
+  récolte"; =s7fq10= (Fin de la récolte) is =Non= on 72 rows, 54 of which now carry kilograms.  2017-18
+  has no =harvest-to-date= key, where the EHCVM waves do.
+- The wave script's variable map says "fully_harvested=s7fq06", but the manual's 7F.06 is "Perte
+  pré-récolte" (=Non= 17,897 / =Oui= 6,560).  The script never reads =s7fq06=, so it is docstring only;
+  fix it with the next Mali re-warm.
 
 *Cache.*  The wave script, =mali.py=, =data_scheme.yml= and the country concatenator's docstring: one
 Mali re-warm.  Hash census, base =cd199d4a3= -> =1a2bd6bd9=: =Country._table_cache_hash= 24 of 556,
 all Mali; =Wave._input_hash= 96 of 2,323, all Mali; =build_transforms_fingerprint= 0 of 42,
 =framework_imports_fingerprint= 0 of 38.  Coverage: =bench/matrix.py --countries Mali= at base and
 candidate grades the same 99 cells (71 =sane=, 23 =absent=, 5 =undeclared=); the merged snapshot is
-byte-identical to the committed one.  Tests: =tests/test_gh1749_mali_kgfactor.py=.
+byte-identical to the committed one.  The red team reproduced the census, the coverage (job 41290283)
+and the tests (1,520 passed over 42 files, job 41290067) at =1d52ab79e=.  Tests:
+=tests/test_gh1749_mali_kgfactor.py=.
 
 * shocks: coping strategies, the set and the positions (GH #1562, 2026-11-13)
 

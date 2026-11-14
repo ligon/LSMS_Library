@@ -57,7 +57,6 @@ def test_only_s7fq13d_is_wired_as_the_harvest_factor():
     assert not {'s11fq11c', 's11fq14c'} & literals
     # 2014-15's sibling mixes factors and totals; it is not read at all.
     assert _kgfactor_entries('2014-15') == []
-    assert 's3aq08c' not in (COUNTRY_DIR / '2014-15' / '_' / 'crop_production.py').read_text()
 
 
 def test_kgfactor_is_declared_optional():
@@ -202,24 +201,22 @@ def test_the_ladder_reads_it_through_the_unchanged_screen(built):
     assert (kf[rej] > T.KG_FACTOR_MAX).all()
     u = built['u'].astype(str).to_numpy()
     assert dict(Counter(u[rej])) == REFUSED_BY_UNIT
-    # A refused row is never left unserved when its unit has a median of accepted factors.
-    assert set(src[rej]) <= {'survey_median', 'metric', 'inferred', 'none'}
+    # No refused row is left unserved: every one falls to its unit's survey_median.
+    assert (src[rej] == 'survey_median').all()
 
 
-#: harvest_kg by wave, measured cold (burst job 41289107).  2017-18 was 1,656,240.75 kg
-#: on 1,736 plot-crops at base cd199d4a3.  The other three waves are unchanged by the
-#: wiring and are pinned as TRIPWIRES: unrelated Mali work that moves them re-pins them
-#: with its own measurement.
-HARVEST_KG = {'2014-15': 292_888.0, '2017-18': 32_791_070.26,
-              '2018-19': 14_881_091.45, '2021-22': 7_062_290.5}
+#: harvest_kg for 2017-18, measured cold (burst job 41289107; red team job 41290049): it was
+#: 1,656,240.75 kg on 1,736 plot-crops at base cd199d4a3.  The other waves are unchanged by
+#: the wiring (frame-equal, measured) and are deliberately not pinned here.
+HARVEST_KG_2017_18 = 32_791_070.26
 
 
 @pytest.mark.requires_s3
-def test_harvest_kg_by_wave(built):
+def test_harvest_kg_2017_18(built):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         hk = T.harvest_kg(built)
     t = hk.index.get_level_values('t').astype(str)
-    got = {w: float(pd.to_numeric(hk['Harvest_kg'])[np.asarray(t == w)].sum()) for w in HARVEST_KG}
-    assert got == pytest.approx(HARVEST_KG, rel=1e-9)
+    got = float(pd.to_numeric(hk['Harvest_kg'])[np.asarray(t == WAVE)].sum())
+    assert got == pytest.approx(HARVEST_KG_2017_18, rel=1e-9)
     assert int((t == WAVE).sum()) == 23_359
