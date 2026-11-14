@@ -4176,6 +4176,133 @@ jobs 41275992, 41276357, 41276727 and 41279383), nothing served:
   value) are donors with a window mismatch.  Excluding them changes nothing on the screen; the memo
   asks whether a rung should.
 
+* 2026-11-13 -- crop_production: s7fq13d is served as KgFactor (GH #1749)
+
+*RULED (@ligon, 2026-11-13, "Mali 2017-18 s7fq13d, GH1749"): "Okay, let's wire it."*  Serve
+=eaci17_s7fp2.s7fq13d=, "Equivalent en Kg", the fourth sub-column of Q7F13, as the 2017-18
+=crop_production.KgFactor=, the =reported= rung of =transformations.harvest_kg_factors=, through
+today's ladder unchanged: the reported-factor screen and its 250 kg ceiling apply, refused rows fall
+to =survey_median=, disclosed.  Whether the ceiling suits carts (rung memo Q5) stays open.  Served as
+recorded, as Uganda serves UNPS q6d: a 0 reads NA, and a reported factor carries no =Derivation= key.
+Tree rows (11F) and Farm-level sale rows carry none; the other waves carry none (2014-15's =s3aq08c=
+mixes factors and totals, the EHCVM waves ask a total, =Quantity_kg=).
+
+*What the column is, by instruction.*  The P2 enumerator manual,
+=2017-18/Documentation/eaci17_manuel_p2_french.pdf=, PDF p. 30, 7F.13 (text extracted with =pypdf= in
+burst job 41288776; no page image was viewed):
+
+#+begin_quote
+Dans la colonne « Equivalent en Kg », on écrit le poids en Kg d’une unité de l’UML reportée.
+Par exemple si le répondant indique que pour la culture dans la parcelle concernée, 97 gerbes ont été
+récoltées, alors il faut écrire 97 dans la colonne « Production en UML », 9 dans la colonne « UML ».
+Ensuite il faut demander le poids d’une gerbe dans la localité. Si le répondant indique que le poids
+d’une gerbe est généralement 2.5 kg, alors on écrira 2.5 dans la colonne « Equivalent en Kg ».
+• Attention : On parle ici de poids brut de l’UML !
+#+end_quote
+
+Translation (supplied here; NOT source text): "In the 'Equivalent en Kg' column, write the weight in kg
+of ONE unit of the reported local unit.  For example, if 97 sheaves were harvested, write 97 under
+'Production en UML' and 9 under 'UML'; then ask the weight of a sheaf in the locality, and if it is
+usually 2.5 kg, write 2.5 under 'Equivalent en Kg'.  Note: this is the GROSS weight of the unit."  So
+it is a factor per unit, asked as the locality's usual weight: a conversion, not a weighing (=Sac= is
+100 on 69% of sack rows), and gross, so the product's state is not in it.  The printed form
+(=eaci17_p2_french.pdf=, PDF p. 29) heads the column "Equivalent en Kg" and says no more.  The same
+instruction governs the 7F.28 / 7F.31 losses and 7G.03-7G.09 dispositions, none of them read.
+
+*What the file holds* (raw =s7f=, 24,457 rows; burst jobs 41288157, 41288449):
+- 1 on every one of the 1,688 =Kilogramme= rows.  A line total would equal the quantity there; that
+  happens on 0 of 1,688, where the tree sold-kg fields =s3bq13c= / =s11fq14c= fail it on 26% / 44% of
+  their Kg sales (section "crop_production: the sold unit") and 2014-15's =s3aq08c= on 10% of Kg rows.
+- In no unit with 100 or more rows does it rise with the quantity: the slope of log factor on log
+  quantity is -0.24 to 0.07 (=Sac= 0.02 on 15,052 rows, =Charretée= -0.05 on 3,732); a total would be
+  near 1.  =Grenier= (67 rows) is 0.43.
+- Modal factor (share): =Sac= 100 (69%), =Charretée= 250 (37%; 300 on 1,235 rows), =Autre= 1,000
+  (58%), =Gerbe= 25 (65%), =Moude= 2.5 (96%), =Panier= 20, =Bassine= 30, =Calebasse= 15, =Grenier= 100.
+- Missing: NA on 1,248 rows (1,107 with no quantity either, 141 with a positive quantity and no
+  unit); 0 on 3 =Charretée= rows with a quantity, served NA.  No 99 / 999 / 9999 code occurs, so no
+  mask; two =Grenier= rows read 2,000 (the year band), refused by the ceiling anyway.  The labelled and
+  the coded reads agree on every row.  Leger and Lourd households both answer it (positive on 15,232
+  of 15,328 and 7,974 of 8,022 positive-quantity rows).
+- After the crop map (8 rows carry a crop it drops) there is one record per household, plot and crop,
+  so =crop_production_finalize='s exact-agreement fold never meets two factors.
+
+*The idiosyncrasy: a factor equal to the quantity.*  221 non-Kg rows record =s7fq13d= = =s7fq13a= > 1,
+1.0% of the 21,226 non-Kg rows with a positive factor and a quantity above 1; 154 of them are not at
+their unit's mode.  101 are =Charretée=, every one with quantity 100 and factor 100: EVERY cart row with a quantity of 100 has a
+factor of 100 (a quantity of 100 is 2.7% of cart rows but 35% of those with factor 100), in 4 clusters
+and 23 households (=Mil= 53, =Haricots secs= 17, =Arachide= 14, =Sorgho= 8); they look like kilograms
+keyed under a cart.  The rest: =Sac= 35 (19 at 100 / 100), =Panier= 32, =Gerbe= 30, =Autre= 15,
+=Bassine= 6, =Calebasse= 1, =Moude= 1.  Served as recorded they carry 1,334,989 kg (the carts
+1,010,000); read as line totals they would carry 16,551.  Site Q names none of them.  The ruling did
+not reach them and the column cannot repair them (blanking the factor would serve =survey_median=, 250
+a cart, times 100), so they are disclosed, not changed: a question in the GH #1749 report.  A second
+signature, factor = quantity x the unit's mode, marks 38 rows; 32 of them are over 250 (=Sac= 24,
+=Charretée= 5, =Autre= 3) and so refused (below).
+
+*What is served* (cold, private roots, default backend; base = integration =cd199d4a3=, candidate
+=1a2bd6bd9=; burst jobs 41288942 and 41289107):
+- =crop_production=: 50,752 rows, every wave, before and after; with =KgFactor= dropped the frame is
+  =assert_frame_equal= to base (=check_exact=), index and =Derivation= included.  =KgFactor= is set on
+  23,206 2017-18 seasonal rows and equals the file's positive =s7fq13d= on all 24,449 (joined on
+  household, plot and crop: 24,449 of 24,449); NA on every tree and Farm-level row and in the other
+  waves.
+- =harvest_kg= 2017-18: 1,656,241 kg on 1,736 plot-crops -> 32,791,070 kg on 23,359; the other three
+  waves are frame-equal.  =KgFactorSource= in 2017-18: base =none= 23,160 and =metric= 1,761 ->
+  =reported= 21,039 (26,169,675 kg), =survey_median= 2,345 (6,601,395 kg), =none= 1,535 (1,527 of them
+  with no unit) and =metric= 2 (20,000 kg).  Transitions: =none= -> =reported= 19,351, =metric= ->
+  =reported= 1,688 (the =Kg= rows, 1 both ways), =none= -> =survey_median= 2,274, =metric= ->
+  =survey_median= 71 (tree =Kg= rows, 1 both ways); no row that had a factor changed it.
+  Household-crops with kilograms: 1,232 of 16,318 (7.6%) -> 15,431 (94.6%).
+- *The memo's figures hold*: 32.8M kg and 2,167 refused rows are this wiring's numbers; the red team's
+  33.1M and 2,162 came from the 76 rows its household-plot-quantity join could not place.  The memo's
+  split "=reported= 25.9M, =survey_median= 7.2M" is the red team's arm; served: 26.2M and 6.6M.
+- =reported_vs_survey_median= disagreement (=harvest_kg_factors= attrs): 6,011 of 21,039 reported
+  factors differ from their unit's median by more than 10%; =reported_vs_inferred=: 0 of 1,688.
+- =yield_kg=: =plot_features= covers 2018-19 and 2021-22 only, so 2017-18 has no yield on either side;
+  frame-equal.
+
+*The ceiling, per unit (the rung memo's Q5).*  The screen refuses 2,167 rows, every one above
+=KG_FACTOR_MAX= (none is a =Kg= row off 1), and =survey_median= serves each at the median of its unit's
+accepted factors: 6,068,115 kg, against 82,219,799 at their own factors.  It does three different things:
+
+| unit       | refused | own factor (rows)                         | served at | kg served | at own factor |
+|------------+---------+-------------------------------------------+-----------+-----------+---------------|
+| Charretée  |   1,581 | 300 (1,235), 400 (179), 350 (94), 500 (25) |       250 | 4,667,343 |     8,804,431 |
+| Autre      |     534 | 1,000 (416), 600 (27), 500 (23), 400 (17)  |        15 | 1,042,723 |    69,429,598 |
+| Grenier    |      21 | 260 to 3,000                              |       100 |   312,350 |     1,552,590 |
+| Sac        |      31 | 300 to 9,000                              |       100 |    45,700 |     2,433,180 |
+
+- =Charretée=: carts of 300-400 kg, plausible masses, are trimmed to the accepted median of 250.
+- =Autre=: 416 rows at 1,000 kg a unit read as a tonne (the printed harvest list calls code 10
+  "Autre"; the sale list's code 10 is =Tonne=: "The two 2017-18 unit label sets are not
+  code-compatible", above), and are served at 15 kg, the median of the =Autre= factors at or below 250
+  (15 on 85 rows): a 67-fold cut.  A reading of the label, not a fact the file states.
+- =Sac=: 24 of the 31 are exactly quantity x 100, line totals, so the median of 100 a sack serves
+  their total.  The ceiling is right here.
+- =Grenier=: granaries of 260-3,000 kg served at 100.
+
+Unchanged, as ruled; the numbers are for Q5.
+
+*Tree rows borrow the seasonal medians.*  =survey_median= pools by (=u=, =condition=) within the wave,
+and 11F tree rows share those cells with the seasonal rows, so 104 tree rows in a non-Kg unit (of 270)
+now carry 373,151 kg at the seasonal median: =Charretée= 34 (154,965 kg at 250), =Sac= 37 (153,006 at
+100), =Panier= 18 (56,740 at 20), =Bassine= 14 (8,220 at 30), =Calebasse= 1; mango 46 and cashew 26.
+Their own harvest "Equivalent en Kg" (=s11fq11c=) stays unread.  One is a row Site Q names: a mango
+harvest of 240 =Charretée= (a 12-month total), now 60,000 kg; two named cashew rows get 1,500 and 600.
+Today's ladder doing what it does; a question in the GH #1749 report.
+
+*Screens.*  Site Q reads =Quantity= and =Quantity_kg=, not =KgFactor=: the same 14 reports base and
+candidate, and of its four 2017-18 rows (all trees) three now carry kilograms (above), one stays
+=none=.  The GH #1559 price screen reads =Quantity_kg= only: 1 row judged, 0 named, both sides; it does
+not judge a reported =KgFactor=.  Cold-read warnings: the same classes and counts.
+
+*Cache.*  The wave script, =mali.py=, =data_scheme.yml= and the country concatenator's docstring: one
+Mali re-warm.  Hash census, base =cd199d4a3= -> =1a2bd6bd9=: =Country._table_cache_hash= 24 of 556,
+all Mali; =Wave._input_hash= 96 of 2,323, all Mali; =build_transforms_fingerprint= 0 of 42,
+=framework_imports_fingerprint= 0 of 38.  Coverage: =bench/matrix.py --countries Mali= at base and
+candidate grades the same 99 cells (71 =sane=, 23 =absent=, 5 =undeclared=); the merged snapshot is
+byte-identical to the committed one.  Tests: =tests/test_gh1749_mali_kgfactor.py=.
+
 * shocks: coping strategies, the set and the positions (GH #1562, 2026-11-13)
 
 Rulings (=isa-decisions.org=): 2026-11-12 "Coping-strategy contract, GH1562" (positions are the
