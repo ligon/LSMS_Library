@@ -207,7 +207,9 @@ def test_the_ladder_reads_it_through_the_unchanged_screen(built):
 
 
 #: harvest_kg by wave, measured cold (burst job 41289107).  2017-18 was 1,656,240.75 kg
-#: on 1,736 plot-crops at base cd199d4a3; the other waves are unchanged by the wiring.
+#: on 1,736 plot-crops at base cd199d4a3.  The other three waves are unchanged by the
+#: wiring and are pinned as TRIPWIRES: unrelated Mali work that moves them re-pins them
+#: with its own measurement.
 HARVEST_KG = {'2014-15': 292_888.0, '2017-18': 32_791_070.26,
               '2018-19': 14_881_091.45, '2021-22': 7_062_290.5}
 

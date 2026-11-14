@@ -4255,7 +4255,9 @@ signature, factor = quantity x the unit's mode, marks 38 rows; 32 of them are ov
   Household-crops with kilograms: 1,232 of 16,318 (7.6%) -> 15,431 (94.6%).
 - *The memo's figures hold*: 32.8M kg and 2,167 refused rows are this wiring's numbers; the red team's
   33.1M and 2,162 came from the 76 rows its household-plot-quantity join could not place.  The memo's
-  split "=reported= 25.9M, =survey_median= 7.2M" is the red team's arm; served: 26.2M and 6.6M.
+  split "=reported= 25.9M, =survey_median= 7.2M" is the red team's arm (job 41280001: 25,939,205 and
+  7,164,185 kg); served: 26.2M and 6.6M.  Likewise the memo, GH #1749 and the #1559 paragraph above quote
+  the red team's =Charretée= 1,576 refused; served, 1,581, the 5 rows between its 2,162 and 2,167.
 - =reported_vs_survey_median= disagreement (=harvest_kg_factors= attrs): 6,011 of 21,039 reported
   factors differ from their unit's median by more than 10%; =reported_vs_inferred=: 0 of 1,688.
 - =yield_kg=: =plot_features= covers 2018-19 and 2021-22 only, so 2017-18 has no yield on either side;
