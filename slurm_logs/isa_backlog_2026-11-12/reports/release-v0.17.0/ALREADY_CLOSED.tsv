@@ -1,0 +1,192 @@
+number	title	closed_at	state_reason	resolving_prs_sha	resolver_source	disposition
+218	Refresh generated skill references to retired food helpers	2026-11-09	COMPLETED	#1659 (952690833)	keyword	fixed on development
+381	Food derivation: clear terminal diagnostic for registered but unwired tables	2026-11-09	COMPLETED	#1678 (bb5f4cca5)	keyword	fixed on development
+562	GhanaLSS Phase 3: community_prices feature + inverse price->quantity imputation (split fro	2026-11-12	COMPLETED	-	-	fix already in v0.16.0
+592	cluster_features: 18 waves across 6 countries have zero GPS (Latitude/Longitude) — will be	2026-10-23	COMPLETED	#1262 (7f6a10c97)	keyword	fixed on development
+637	Tanzania seed grain: decide native observations and Improved aggregation	2026-11-03	COMPLETED	#1430 (5dcbe95f1)	keyword	fixed on development
+650	Documentation: land minimum standard, automatic fetching and verified backfills	2026-11-10	COMPLETED	#1685 (83ddab2e8)	branch	fixed on development
+660	Ethiopia: establish the release-side cause of the agriculture/household-cover discrepancy	2026-11-04	COMPLETED	#1412 (e574ff316)	branch	closed on maintainer ruling (listed PR delivered related code or docs)
+689	Uganda: `cluster_features` is at PARISH grain from 2013-14 — coarser than the sampling clu	2026-11-04	COMPLETED	#1472 (e1c1b9905)	keyword	fixed on development
+709	Docs: 1.7498e100 is Stata's pre-108 double missing code -- append the correction block to 	2026-11-09	COMPLETED	#1660 (333d047bb)	keyword	fixed on development
+771	Uganda/Ethiopia nutrition.py: Ethiopia has no FCT csv and hits the USDA API on EVERY build	2026-10-31	COMPLETED	#1375 (82362dce0)	closing-comment	fixed on development
+778	Tests that rebuild in the SHARED root under LSMS_NO_CACHE still open the #866 delete-then-	2026-11-12	COMPLETED	-	-	fix already in v0.16.0
+798	Interview-date coverage: refresh final-source raw-cache and served-API matrix	2026-11-12	COMPLETED	-	-	fix already in v0.16.0
+812	Investigate remaining EHCVM allocation and strata gaps after Guinea-Bissau/Togo documentat	2026-11-05	COMPLETED	#1572 (111b64ed7)	keyword	fixed on development
+820	Ethiopia crop_production reads ESS §11 (field crops) only; the §12 tree/fruit/root module 	2026-10-23	COMPLETED	#1257 (f6aaee234)	keyword	fixed on development
+822	Mali 2014-15 community_prices: restore readings 1-2 and declare native observation slots	2026-10-22	COMPLETED	#1180 (94098ff45)	keyword	fixed on development
+823	Niger 2018-19 ships an unwired cluster-grain community price file (s05_co_ner2018.dta, 504	2026-10-23	COMPLETED	#1227 (683665128)	keyword	fixed on development
+827	Malawi community_prices: u and NumberOfUnits jointly blank on 38,506 of 82,635 rows (46%) 	2026-10-23	COMPLETED	#1239 (7f1d69988)	keyword	fixed on development
+839	Correct Mali's stale food-acquired config comment; Tanzania's quantity note is already res	2026-10-23	COMPLETED	#1231 (856d9ddbf)	closing-comment	fixed on development
+843	Nigeria crop_production has no sale price in W3-W5 (0 of 37,315 rows): secta3ii is hh-crop	2026-11-04	COMPLETED	#1473 (ec3f4a370)	keyword	fixed on development
+844	Nigeria asks a farmgate valuation of the whole harvest (sa3q18, 76% of rows) that no table	2026-11-03	COMPLETED	#1419 (d47b296a2)	keyword	fixed on development
+846	Tanzania: record a not-asked capability for food price and own-consumption value (Section 	2026-11-03	COMPLETED	#1308 (033669be3); #1410 (a39ad3200)	closing-comment	fixed on development
+849	Uganda: wire reported kg factors in the remaining five waves after preserving native produ	2026-10-22	COMPLETED	#1207 (79a374e0b)	branch	fixed on development
+851	Recall Phase II: review and integrate approved period= conversion and exposure disclosure	2026-11-09	COMPLETED	#1671 (1c1ef12da); #1672 (ba03bf85a)	branch	fixed on development
+855	Malawi: _livestock_block never reads ag_r07 ("owned exactly 12 months ago"), which is pres	2026-11-03	COMPLETED	#1421 (e42fb8812)	keyword	fixed on development
+856	Malawi: measure the harvest-side 'other (specify)' free-text residue per wave before decid	2026-10-23	COMPLETED	#1229 (fc56812a6)	keyword	fixed on development
+860	Nigeria: no factors for heaps/ridges/stands areas; EPAR's two grids disagree by a median o	2026-11-04	COMPLETED	#1508 (fe62137f1)	keyword	fixed on development
+864	Burkina 2014 food: adjudicate passage-1 quantity meaning and unread in-kind values	2026-11-04	COMPLETED	#1431 (f6ed07ae9)	closing-comment	fixed on development
+881	DECISION: Nigeria W4 purchased row -- identity derivation labelling the 30-day window (A) 	2026-11-03	COMPLETED	#1429 (55b558ef2)	keyword	fixed on development
+882	DECISION: Niger 2011-12 people_last7days dummies -- keep as served (A), re-point wage_work	2026-11-03	COMPLETED	#1417 (24cc79875)	keyword	fixed on development
+894	panel_ids: convert Malawi and Nigeria from the cache-parquet path to committed _/panel_ids	2026-10-23	COMPLETED	#1265 (9105d5d90)	keyword	fixed on development
+913	DECISION: GhanaLSS 1991-92 own production -- value the 28% of rows carrying both factors (	2026-11-12	NOT_PLANNED	-	-	duplicate (NOT_PLANNED)
+932	Development CI: enforce actual data validation with a compatible required gate	2026-11-10	COMPLETED	#1680 (e2710db21)	branch	fixed on development
+978	Nigeria W5: wire the acquired v02 household geovariables into cluster_features	2026-10-30	COMPLETED	#1335 (318e216fc)	keyword	fixed on development
+1006	Uganda derived-table tests skip successful builds and retain obsolete index/dtype assertio	2026-10-22	COMPLETED	#1191 (7e365fec2)	keyword	fixed on development
+1032	DVC writes countries_root()/.dvc/tmp/btime when the DVCFileSystem is built: the last runti	2026-11-10	COMPLETED	#1683 (d3d42e9e7)	branch	fixed on development
+1033	Nigeria W4 food unit labels carry invented W3 size prefixes; W4's size columns (s7bq2c/s7b	2026-11-04	COMPLETED	#1508 (fe62137f1)	keyword	fixed on development
+1034	Nigeria W3 post-planting unit codes 131/151/152/161 are labelled in the planting .dta but 	2026-10-22	COMPLETED	#1172 (5f2d198db)	keyword	fixed on development
+1043	Ethiopia crop_production tags a missing harvest unit as 'Other (Specify)' (ethiopia.py:182	2026-10-30	COMPLETED	#1324 (24e2cf629)	keyword	fixed on development
+1051	Degraded-build grading (#675) residuals: outage crashes the build, single-file probe, read	2026-11-09	COMPLETED	#1663 (389694ee1); #1665 (5d525ce50); #1666 (03acc1d8d); #1669 (20c85655a); +1 more	xref	fixed on development
+1055	DECISION: Ethiopia 2021-22 interview_date dates the post-harvest agriculture visit (1,475 	2026-11-03	COMPLETED	#1412 (e574ff316)	closing-comment	fixed on development
+1056	Ethiopia interview_date serves 33 device-clock dates years outside fieldwork (W4 15, W5 18	2026-11-04	COMPLETED	#1413 (62f6aaa99)	branch	closed on maintainer ruling (listed PR delivered related code or docs)
+1057	DECISION: Burkina Faso 2021-22 cluster_features -- serve the 2018-19 cluster GPS for the 5	2026-11-04	COMPLETED	#1465 (033988095)	keyword	fixed on development
+1058	Burkina Faso 2021 plot_features: expose 4,180 reported GPS pairs on 7,350 retained parcels	2026-10-22	COMPLETED	#1194 (6b3e67e0d)	branch	fixed on development
+1059	Burkina Faso cluster_features District: 50 cross-wave spelling variants (mapping table) an	2026-10-23	COMPLETED	#1242 (50fbf9e92)	keyword	fixed on development
+1060	Burkina Faso 2014: province varies within 94 of 900 zd in the source (pre-existing cluster	2026-11-04	COMPLETED	#1465 (033988095)	keyword	fixed on development
+1062	Uganda: Makefile recipes rewrite sibling var/ tables without a hash (fct by nutrition, ear	2026-10-22	COMPLETED	#1173 (801e47978)	keyword	fixed on development
+1063	EHCVM household_roster row order differs between builds of the same commit (Benin, Guinea-	2026-10-23	COMPLETED	#1273 (3450bd6c2)	keyword	fixed on development
+1066	assume_cache_fresh: define and restore stored grain-audit replay	2026-11-09	COMPLETED	#1674 (50a927d69)	keyword	fixed on development
+1071	Correct script-wave LSMS_NO_CACHE read-gate documentation (code repairs landed)	2026-11-11	COMPLETED	#1687 (16c3f4d9c); #1690 (1e549e96a)	closing-comment	fixed on development
+1074	DECISION: Malawi rows served u=Unknown keep a shipped code-23 survey_kg (29 Mango rows at 	2026-11-03	COMPLETED	#1428 (1f36bca40)	keyword	fixed on development
+1075	Malawi leftover unit codes: 2010-11 suffixed codes (16b/16a/12a/21b/12b/03a, 13 rows) and 	2026-11-03	COMPLETED	#1428 (1f36bca40)	keyword	fixed on development
+1077	Label selection: handle nonfinite keys and prevent missing-input label fabrication	2026-10-22	COMPLETED	#1182 (b42b3bf68)	keyword	fixed on development
+1078	Uganda food cache: confirmed producer race writes nine missing values as zero under curren	2026-10-22	COMPLETED	#1197 (9cce8c88a)	keyword	fixed on development
+1081	Derived food/roster methods: reviewed categorical-error preservation awaits merge	2026-10-22	COMPLETED	#1195 (cb99555a3)	keyword	fixed on development
+1087	DECISION: how to serve a second source record that disagrees with the first (Niger communi	2026-11-05	COMPLETED	#1527 (997f33c8a)	keyword	fixed on development
+1088	Niger CS07: recognize the stored 9999.9 missing-quantity code without changing Price	2026-10-22	COMPLETED	#1176 (c598082ee)	keyword	fixed on development
+1089	Mali community_prices reads only relevé 3 of three	2026-10-21	NOT_PLANNED	#1180 (94098ff45)	xref	duplicate (NOT_PLANNED)
+1090	Niger `cs07q01` "Riz" decodes to `j = 'Autre Riz local'` for both of its varieties	2026-11-03	COMPLETED	#1426 (c90d9c825)	keyword	fixed on development
+1091	Retire duplicate country community-price builders in Mali, Niger and Tanzania	2026-10-22	COMPLETED	#1199 (609d9bac8); #1200 (51944a0c5); #1201 (2c9b519d7)	branch	fixed on development
+1095	Nigeria community_prices: land recorded-unit recovery and decide future unplaced-label ret	2026-11-04	COMPLETED	#1508 (fe62137f1)	keyword	fixed on development
+1096	DECISION: Nigeria interview_date serves visit dates for households that were not interview	2026-11-04	COMPLETED	#1508 (fe62137f1)	keyword	fixed on development
+1106	Malawi `NPK Fertilizer` is Chitowe 23:21:0+4S but is served at the shared map's NPK 17-17-	2026-11-04	COMPLETED	#1446 (7e43ce2a4)	keyword	fixed on development
+1109	Malawi organic fertilizer: restore reported quantities and units; retain missing amounts w	2026-10-22	COMPLETED	#1175 (ec067f800)	keyword	fixed on development
+1110	`fertilizer_rate`'s default `on='parcel'` mis-joins Malawi and empties Ethiopia; its docst	2026-10-30	COMPLETED	#1333 (2ae987e7b)	keyword	fixed on development
+1111	Malawi applied fertilizer: correct timing-derived units while retaining enumerator kg tota	2026-10-23	COMPLETED	#1238 (ee1fc7d44)	keyword	fixed on development
+1120	Plot tables: implement approved source-frame, singleton-v and unknown_plot repairs	2026-10-31	COMPLETED	#1534 (3aefbbedf)	closing-comment	fixed on development
+1123	Niger ECVMA plot_inputs: preserve the 73/45 colliding native seed-slot lines	2026-10-30	COMPLETED	#1336 (5a4b2ac62)	keyword	fixed on development
+1127	Ethiopia 2021-22: acquired ESPS-5 v03_M and corrected provenance	2026-10-25	COMPLETED	#1211 (725d66b5c); #1284 (6d8d696b6)	xref	fixed on development
+1133	Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-0	2026-10-23	COMPLETED	#1232 (4593442d3)	keyword	fixed on development
+1144	Nigeria food_acquired j is decoded wave-blind: W1 'Other vegetables' served as 'Leaves', '	2026-10-22	COMPLETED	#1178 (989c7abb0)	keyword	fixed on development
+1146	Test-side follow-ups to #1113: baseline generator pins partial parquets; Nigeria sold-unit	2026-10-30	COMPLETED	#1367 (88c7b540e)	closing-comment	fixed on development
+1149	add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested 	2026-10-22	COMPLETED	#1211 (725d66b5c)	keyword	fixed on development
+1150	plot_features: serve the WB plot geovariables (elevation, slope, wetness, distance to dwel	2026-10-30	COMPLETED	#1352 (373af66f0)	closing-comment	fixed on development
+1171	Ethiopia nutrition: diagnose the legacy food_acquired Make prerequisite and unused FCT tar	2026-10-31	COMPLETED	#1371 (dc23e3206); #1375 (82362dce0); #1376 (1864a9bd1)	closing-comment	fixed on development
+1174	Malawi plot_inputs: determine reported use for 437 nonorganic rows whose missing quantitie	2026-11-08	COMPLETED	#1523 (14c0f5790)	closing-comment	fixed on development
+1177	Nigeria: verify inherited W4-PH maize-shell and tinned-milk qualifiers against its instrum	2026-10-30	COMPLETED	#1346 (96d9b3970)	closing-comment	fixed on development
+1183	Ethiopia plot_inputs: diagnose missing seed-purchase answers before recoding them as No/ze	2026-11-03	COMPLETED	#1425 (98ac1b27e)	keyword	fixed on development
+1184	Ethiopia W2 plot_inputs: diagnose all-missing holder/crop seed-purchase quantities summed 	2026-10-30	COMPLETED	#1330 (d0ed41726)	keyword	fixed on development
+1187	Burkina Faso 2018-19: establish the source meaning of unlabelled agricultural input code21	2026-11-03	COMPLETED	#1427 (bc2e15f4d)	keyword	fixed on development
+1188	Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields	2026-10-22	COMPLETED	#1219 (7080ad52e)	keyword	fixed on development
+1190	Malawi plot_inputs: preserve seed purchase-unit identity before aggregating or joining pla	2026-11-11	COMPLETED	#1694 (7f1a9c954)	keyword	fixed on development
+1196	Cold/warm index StringDtype drift: Niger food_acquired and Uganda cluster_features	2026-10-22	COMPLETED	#1212 (1d3c035bd)	keyword	fixed on development
+1198	Uganda crop_production: preserve distinct production records before pairing quantities wit	2026-10-22	COMPLETED	#1202 (019b7d05e)	keyword	fixed on development
+1204	Uganda crop_production: merge the reviewed requested-wave assembly repair	2026-10-23	COMPLETED	#1217 (8d02d0881)	branch	fixed on development
+1205	Uganda yield_kg: merge the reviewed parcel-area repair and coverage correction	2026-10-23	COMPLETED	#1216 (76556b07b)	branch	fixed on development
+1206	Campaign validation: finish exact numeric and object-type saved-result reassessment	2026-11-03	NOT_PLANNED	#1208 (529161c4e)	keyword	ruling: not planned
+1209	Malawi: country food_acquired Make builder expects retired wave columns	2026-10-22	COMPLETED	#1213 (954c18ca4)	keyword	fixed on development
+1210	Malawi: invalid food wave request evicts native caches before raising	2026-10-23	COMPLETED	#1214 (26b8f1982)	keyword	fixed on development
+1215	Constructed empty tables: implement the approved declaration-order rule	2026-10-23	COMPLETED	#1220 (a3aad0d43)	keyword	fixed on development
+1218	Constructed empty tables ignore declared types of country-local optional fields	2026-10-23	COMPLETED	#1221 (326b6e3de)	keyword	fixed on development
+1224	EHCVM food_acquired: the served u drops the unit SIZE for 60-88% of consumed rows in all e	2026-11-04	COMPLETED	#1458 (98c6069d2)	keyword	fixed on development
+1225	_coerce_datetime_column raises on an empty Series with a MultiIndex (swallowed by both dty	2026-10-25	COMPLETED	#1302 (3f77cf3ca)	keyword	fixed on development
+1234	map_index mints u='unit' for a missing unit (the #1041 sentinel is 'Unknown')	2026-10-23	COMPLETED	#1251 (675e544d5)	keyword	fixed on development
+1237	Malawi Makefile: per-wave rules omit the wave script prerequisite, so the make backend nev	2026-10-23	COMPLETED	#1258 (ff3962e23)	keyword	fixed on development
+1240	Burkina Faso panel_ids.json: 1,088 of 3,132 2018-19 targets lack the '0' separator, so a t	2026-10-23	COMPLETED	#1249 (1f2b2bead)	keyword	fixed on development
+1243	Burkina Faso: v reuses 1-585 for 2014 zd and EHCVM grappe (different frames); no sampling.	2026-10-23	COMPLETED	#1246 (3c41a3717)	keyword	fixed on development
+1244	Burkina household namespaces: review the fix and complete the independent-sample census	2026-11-04	COMPLETED	#1322 (a19390fcc)	branch	fixed on development
+1245	Resolved: single-pass id_walk restores the 80 Burkina panel links	2026-10-25	COMPLETED	#1282 (c3674e863)	keyword	fixed on development
+1250	Uganda plot_labor: a MISSING use-flag is served as 'answered No' (PersonDays=0): ~5,200 fa	2026-10-23	COMPLETED	#1255 (3c0434d07)	keyword	fixed on development
+1252	Ethiopia harmonize_crop: codes 19 and 86 change meaning across waves (W1/W2 CACTUS served 	2026-10-23	COMPLETED	#1274 (6c99c6554)	keyword	fixed on development
+1253	Ethiopia crop_production §11 sales: all-blank groups served as 0 (bare .sum()), 'No' overw	2026-10-23	COMPLETED	#1274 (6c99c6554)	closing-comment	fixed on development
+1254	median_price_valuation: default item_keys=('j',) pools prices across waves (and the nation	2026-10-31	COMPLETED	#1399 (d0acdf610)	keyword	fixed on development
+1256	Ethiopia W4/W5 crop_production: permanent-crop rows in §11 use a fixed 12-month window, se	2026-10-23	COMPLETED	#1274 (6c99c6554)	closing-comment	fixed on development
+1259	Site Q: the p90 reference includes zero quantities, so 'did not harvest' rows collapse it 	2026-10-23	COMPLETED	#1266 (eff9e25de)	keyword	fixed on development
+1260	Malawi IHPS panel EAs serve no GPS: household geovariables ARE released (2939 HouseholdGeo	2026-10-23	COMPLETED	#1279 (8a8278a2a)	keyword	fixed on development
+1261	Nigeria: account for W3 geo-only household outside the cover/roster frame	2026-11-03	COMPLETED	#1416 (931376950)	keyword	fixed on development
+1264	Nigeria panel crosswalk: 328 targets not in household_roster, 99 W3->W2 links to absent hh	2026-11-04	COMPLETED	#1449 (3067c0352)	keyword	fixed on development
+1267	Mali 2014-15 tree crops: crop_production.Quantity is the NUMBER OF HARVEST MONTHS (s3bq09)	2026-10-23	COMPLETED	#1272 (e6ed24ee5)	keyword	fixed on development
+1277	Malawi panel provenance corrected: held files belong to catalog 3819 v06	2026-10-25	COMPLETED	#1286 (09f8af262)	keyword	fixed on development
+1278	Malawi 2019-20 data_info.yml: 'function: cs_i' is a no-op (the recognised key is 'mapping:	2026-11-05	COMPLETED	#1523 (14c0f5790)	keyword	fixed on development
+1283	Provenance: secondary held/latest release records implemented	2026-10-25	COMPLETED	#1286 (09f8af262); #1293 (eea68586e)	xref	fixed on development
+1290	Uganda housing 2015-16: reconcile three unsupported keys after recorded-link repairs	2026-11-03	COMPLETED	#1415 (724f9bd60)	closing-comment	fixed on development
+1291	Uganda nonfood IDs: finish other-table rendering check after merged fix	2026-10-30	COMPLETED	#1325 (169b0d337)	keyword	fixed on development
+1292	Nigeria individual_education: one post-harvest file read for both rounds serves 56,967 dup	2026-10-30	COMPLETED	#1309 (21069ab20); #1318 (188adf03f); #1328 (32db08452); #1332 (d08eac030)	closing-comment	fixed on development
+1297	Uganda parcel recovery: decide how to treat a unique complete candidate with an incomplete	2026-11-04	COMPLETED	#1338 (1542a886f); #1350 (123fef6af); #1358 (c4ae83cfb)	xref	closed on maintainer ruling (listed PR delivered related code or docs)
+1298	Malawi plot_inputs seed rows stay at label grain (two crop codes sharing a label share one	2026-10-30	COMPLETED	#1323 (3e2f22f69)	closing-comment	fixed on development
+1304	Ethiopia quintal regression calls unsupported sum on an Arrow boolean mask	2026-10-25	COMPLETED	#1305 (6a8660461)	xref	fixed on development
+1331	Fix Nigeria source-test oracle import under checkout-only PYTHONPATH	2026-10-30	COMPLETED	#1332 (d08eac030)	keyword	fixed on development
+1357	DECISION: Ethiopia W3 agriculture rows have field identity but no recorded household ident	2026-10-30	COMPLETED	#1359 (af0a53ee0); #1365 (8578ec314); #1371 (dc23e3206); #1374 (0b1effb22); +13 more	xref	closed on maintainer ruling (listed PR delivered related code or docs)
+1360	Niger crop_production: resolve Make/default ordering and index mismatch	2026-11-04	COMPLETED	#1477 (cbcf85f8f)	closing-comment	closed on maintainer ruling (listed PR delivered related code or docs)
+1401	DECISION: Uganda anthropometry zero-month age and repeated-measurement selection	2026-11-03	COMPLETED	#1415 (724f9bd60)	closing-comment	fixed on development
+1432	Tests failing on development: Malawi crop_production (17), Uganda test_sample (4), Mali co	2026-11-04	COMPLETED	#1481 (3934879c3)	keyword	fixed on development
+1433	Nigeria crop_production keep-first dedup at (t,i,plot_id,crop) discards distinct sales and	2026-11-05	COMPLETED	#1550 (07174098d)	keyword	fixed on development
+1434	Uganda 2015-16 shocks: inner merge on gsec1.hh drops 2 agriculture-cover-only households	2026-11-04	COMPLETED	#1478 (5d90d405b)	keyword	fixed on development
+1435	Malawi livestock: sum reducer serves blank HeadCount/HeadAcquired/HeadSold cells as 0	2026-11-04	COMPLETED	#1486 (e92ae6b0f)	keyword	fixed on development
+1439	cfe demands.main fails: food_expenditures(market=) returns (i,t,m,j,s), cfe expects (i,t,m	2026-11-08	COMPLETED	#1612 (1fb02d5b2)	branch	fixed on development
+1440	Pakistan market= raises on a cold data root until cluster_features has been built	2026-11-09	COMPLETED	#1647 (6d9563f7a)	keyword	fixed on development
+1443	Ethiopia documentation follow-ups: W2/W3 agriculture-only households, BID acquisition, cal	2026-11-04	COMPLETED	#1506 (df8faa75f)	keyword	fixed on development
+1444	DECISION: Nigeria -- should interview status (HHTrack / interview_result) gate D1 roster a	2026-11-04	COMPLETED	#1508 (fe62137f1)	keyword	fixed on development
+1445	EHCVM NPK 15/15 is served at NPK 17-17-17's 0.17 N; Malawi fertilizer_rate note is stale	2026-11-05	COMPLETED	#1527 (997f33c8a)	keyword	fixed on development
+1447	Ethiopia: panel_ids YAML blocks disagree with the committed JSON, and LSMS_BUILD_BACKEND=m	2026-11-04	COMPLETED	#1470 (fdf309523)	keyword	fixed on development
+1448	Nigeria sampling.yml notes quote cover overlaps that disagree with the #1264 crosswalk	2026-11-05	COMPLETED	#1550 (07174098d)	keyword	fixed on development
+1450	Kg factors: #1224 makes Mali 2014-15 and Burkina 2014 worse; fix before the next release	2026-11-04	COMPLETED	#1474 (56085be48)	keyword	fixed on development
+1452	Wire approved EHCVM survey unit weights for 2018-19 and 2021-22	2026-11-07	COMPLETED	#1597 (0c4004872)	keyword	fixed on development
+1453	Mali community_prices spelling does not join household sized u (#1224 Mali half)	2026-11-05	COMPLETED	#1515 (ad44c8d46)	keyword	fixed on development
+1455	LSMS_NO_CACHE=1 on a YAML-path food_acquired writes a degraded parquet graded fresh	2026-11-04	COMPLETED	#1504 (4646a0fd2)	closing-comment	fixed on development
+1456	Feature(labels=...) returns a frame with no country level when every country degrades	2026-11-04	COMPLETED	#1490 (c37e5e70a)	keyword	fixed on development
+1457	Multi-plot household-crop sales are still unserved in Malawi, Mali 2017-18, Niger, Tanzani	2026-11-12	COMPLETED	#1690 (1e549e96a)	closing-comment	fixed on development
+1459	Uganda: one design-PSU label across all eight waves (comm vs ea)	2026-11-05	COMPLETED	#1534 (3aefbbedf)	keyword	fixed on development
+1461	Ethiopia crop_production: 639 repeated native groups need production_obs	2026-11-04	COMPLETED	#1477 (cbcf85f8f)	keyword	fixed on development
+1462	Niger: Condition_sold and the dry-season harvest modules are unread	2026-11-05	COMPLETED	#1527 (997f33c8a)	keyword	fixed on development
+1463	Soft drop of a dfs: sub-df does not catch an unreachable remote (EndpointConnectionError)	2026-11-09	COMPLETED	#1646 (af91b3f71)	keyword	fixed on development
+1464	Burkina 2014 valuation frame loses v on 6,841 rows that food_acquired has	2026-11-05	COMPLETED	#1522 (19db1a068)	keyword	fixed on development
+1467	Ethiopia crosswalk: link 48 W3 households the BID counts as ESS1; record Panel II and W2-W	2026-11-05	COMPLETED	#1558 (45f713df9)	keyword	fixed on development
+1468	LSMS_BUILD_BACKEND=make without make on PATH reruns panel_ids.py and rewrites committed JS	2026-11-09	COMPLETED	#1643 (a63306951)	keyword	fixed on development
+1469	crop_diversity(weight='count') counts a Farm-level row as an occurrence	2026-11-04	COMPLETED	#1491 (153d18b47)	keyword	fixed on development
+1475	Crop transforms do not group on country, so pooled frames sum across countries	2026-11-07	COMPLETED	#1545 (0abbb1723)	closing-comment	fixed on development
+1476	harvest_kg silently deletes null-plot_id rows (Mali tree rows, 185,908 kg)	2026-11-04	COMPLETED	#1507 (b95e927f3)	keyword	fixed on development
+1480	test_uganda_invariance skips silently on a partly built root, so it can check 3 of 53 entr	2026-11-08	COMPLETED	#1609 (c780562b2)	branch	fixed on development
+1487	A wave's kilograms depend on which other waves were requested: 10 of 50 cells differ by mo	2026-11-04	COMPLETED	#1511 (807393d6e)	keyword	fixed on development
+1489	Senegal 2018-19 food_prices has values up to 1.79e22 on bottle units	2026-11-04	COMPLETED	#1496 (cf5a4bbf6)	keyword	fixed on development
+1493	Nothing screens a near-zero Quantity or food_prices: Senegal's quantities near 1e-19 put 1	2026-11-05	COMPLETED	#1544 (167d566d0)	closing-comment	fixed on development
+1494	Mali EHCVM 2021–22: namespace raw household IDs and preserve approved panel links	2026-11-08	COMPLETED	#1638 (dd40aae55)	keyword	fixed on development
+1495	Farm-level rows that carry a harvest: data_info.yml says such a row holds a sale	2026-11-09	COMPLETED	#1644 (11714b185)	keyword	fixed on development
+1499	_normalize_dataframe_index concatenates a string-typed additive column on a repeated key	2026-11-08	COMPLETED	#1636 (5695e0855)	keyword	fixed on development
+1500	Senegal 2018-19: 21 food_acquired rows serve NaN on the declared u	2026-11-08	COMPLETED	#1641 (6863a6bf6)	keyword	fixed on development
+1501	LSMS_NO_CACHE: route the L2-wave write gate in Wave.grab_data through _no_cache at the nex	2026-11-09	COMPLETED	#1642 (29de1acf3)	keyword	fixed on development
+1503	Test order: fixtures repoint countries_root without clearing derivation_records, giving 17	2026-11-05	COMPLETED	#1521 (84c0c3e4e)	keyword	fixed on development
+1510	_collect_file_paths_from_block skips file: members with a per-file override, so a new rele	2026-11-07	COMPLETED	#1601 (f51ccf213)	branch	fixed on development
+1512	Four small follow-ups from #1487's review	2026-11-05	COMPLETED	#1542 (ae965b29a)	keyword	fixed on development
+1513	Mali 2018-19 household j never receives harmonize_food: labels carry seven leading spaces	2026-11-05	COMPLETED	#1587 (2a888bcea)	keyword	fixed on development
+1516	household_characteristics reads a build failure as absence	2026-11-05	COMPLETED	#1589 (efd817667)	closing-comment	fixed on development
+1517	Uganda yield_kg on a Feature frame gives 14,520 rows against 27,755 on a Country frame	2026-11-07	COMPLETED	#1545 (0abbb1723); #1600 (3b28d293f)	xref	fixed on development
+1520	Country.wave_folder_map is empty until Country.waves has been read	2026-11-08	COMPLETED	#1628 (d82ecf6e3)	keyword	fixed on development
+1524	A guard raised from a by-path mapping.py can become an empty derived table under parallel 	2026-11-05	COMPLETED	#1589 (efd817667)	closing-comment	fixed on development
+1526	demand-estimation skill: the recipe raises 'y must have index (i,t,m,j)' because of the s 	2026-11-08	COMPLETED	#1612 (1fb02d5b2)	branch	fixed on development
+1528	Burkina Faso and Mali crop_production: Condition_sold is recorded and not read	2026-11-08	COMPLETED	#1605 (bcd77200f)	branch	fixed on development
+1532	Strict-mode errors that subclass RuntimeError may be swallowed by the food dispatch	2026-11-05	COMPLETED	#1589 (efd817667)	closing-comment	fixed on development
+1535	Feature('crop_production') cannot to_parquet: harvest_month mixes float and string	2026-11-08	COMPLETED	#1608 (72197c8ee)	branch	fixed on development
+1540	EHCVM crop_production: condition helpers now live in eight files	2026-11-08	COMPLETED	#1633 (5cd21347d)	keyword	fixed on development
+1546	_join_v_from_sample swallows ValueError at INFO, so a sample failure serves tables without	2026-11-05	COMPLETED	#1589 (efd817667)	keyword	fixed on development
+1547	NoCredentialsError is outside the #515 handler	2026-11-08	COMPLETED	#1629 (bee011377)	branch	fixed on development
+1549	Stale counts in framework docstrings after Nigeria #1433	2026-11-08	COMPLETED	#1626 (a799ce58d)	keyword	fixed on development
+1551	Nigeria #843: attach W3-W5 sales by the sale's own crop code?	2026-11-12	NOT_PLANNED	-	-	ruling: not planned
+1554	Niger 2011-12 onion dates and region investigation documented	2026-11-09	COMPLETED	#1657 (86077a65f)	keyword	fixed on development
+1561	CotedIvoire 2018-19 shocks: decode Stata .d not-concerned answers	2026-11-09	COMPLETED	#1661 (53b0c26c9)	branch	fixed on development
+1569	Site Q does not screen Quantity_sold or sale price	2026-11-09	COMPLETED	#1650 (42a25fabc)	branch	fixed on development
+1573	Validate and integrate approved Burkina 2014 strata labels	2026-11-11	COMPLETED	#1690 (1e549e96a)	closing-comment	fixed on development
+1575	Wire documented region × milieu sample strata for Benin, Togo, Guinea-Bissau and Côte d’Iv	2026-11-11	COMPLETED	#1693 (e5fdd2fa8)	closing-comment	fixed on development
+1576	Mali Region: fold Taoudenit to Taoudenit with its accent, and drop the extra strata pair	2026-11-08	COMPLETED	#1611 (ff3276096)	branch	fixed on development
+1578	derivations.yml accepts a duplicate key silently	2026-11-08	COMPLETED	#1624 (bb828626f)	keyword	fixed on development
+1585	conversion._interview_dates fails on `Interview start`: seven countries convert numeraire=	2026-11-05	COMPLETED	#1595 (65b1730f0)	keyword	fixed on development
+1588	Feature: a country served without v wins the shape filter and costs a sibling its rows	2026-11-08	COMPLETED	#1619 (631bb6d84)	branch	fixed on development
+1590	Prevent failed waves and corrupt crosswalks from becoming trusted cached data	2026-11-07	COMPLETED	#1599 (c964c6c4f)	keyword	fixed on development
+1591	_parallel_waves: an exception class only the child imported reads as a dead worker	2026-11-08	COMPLETED	#1625 (ebb87135c)	keyword	fixed on development
+1592	market= with sample missing warns of a fallback, then raises KeyError	2026-11-08	COMPLETED	#1623 (b8346cf1f)	branch	fixed on development
+1594	Mali 2014-15 food_expenditures(numeraire=FX) is about 70x the later waves	2026-11-08	COMPLETED	#1634 (fdec032ef)	keyword	fixed on development
+1602	Prewarm misses sidecars for bare Data-relative source paths	2026-11-08	COMPLETED	#1610 (1ce4f525b)	branch	fixed on development
+1603	Unqualified shipped crop factors lack their documented pooled-country warning	2026-11-08	COMPLETED	#1613 (2df9fb9bd)	branch	fixed on development
+1606	Diagnostics: distinguish native-cache and finalized dtypes for canonical overrides	2026-11-08	COMPLETED	#1627 (b284112ed)	keyword	fixed on development
+1616	tlu() pools distinct households when supplied countries share local (t,i) keys	2026-11-08	COMPLETED	#1620 (8a35e1c22)	branch	fixed on development

@@ -1,0 +1,78 @@
+title	action	issue	source_stream	reason
+Nigeria W3 crop sales: jerry-can sale codes 190–192 decode Unit_sold = 'l'	filed	1721	nigeria	Coordinator-added residual (nigeria-redteam VERDICT-delta2 item 2: 20 rows); carries the worker's D2 residual (15 records). Tier B per coordinator.
+Burkina 2021-22 crop_production: survey kg (s16cq16c) and sold kg (s16dq05c) are not served	filed	1722	burkina	Drafted Tier B (REPORT §6, #1436); coordinator default 'left to a residual'. #1436 names the survey-kg half for Burkina but not sold kg, so filed new and cross-referenced.
+Burkina Faso 2021-22 serves different crop and unit spellings from 2018-19, so its seed rows join no harvest	filed	1723	burkina	Drafted Tier C (REPORT §6 'Burkina crop spellings across waves'; PR question 3). #1119 covers other countries' seed-crop axes, not Burkina 2021-22.
+Malawi crop text after #1228: IHS6 code 50 (cowpea) hazard, 66 code-49 lines dropped, and lines left 'Other'	filed	1724	malawi	Drafted residual issue in PR_BODY (#1228 ruled scope done). #1228's body does not name 2024-25 code 50 or the code-49 loss. No tier in the draft; Tier B is my choice (66 lines dropped, and a build-stopping hazard).
+Scope Guinea-Bissau 2021-22's rounded-key rows out of the kilogram evidence	filed	1725	gnb	Drafted Tier B (REPORT-fixup2); the 2026-11-13 ruling 'Accept, disclosed' explicitly asks for this residual issue.
+Add 'Inteiro' to transformations._UNIT_SIZE_WORDS (Guinea-Bissau 2021-22 'Carcaça (Inteiro)')	filed	1726	gnb	Drafted R-I, Tier B. #1454 (EHCVM sized-unit follow-ups) does not list it.
+Guinea-Bissau 2021-22: wire the own-country NSU food weights (ehcvm_nsu_gnb2021.dta)	filed	1727	gnb	Drafted R-N as a comment on #1598. Comments are not allowed, and #1598 names Togo, Benin and CIV only, so filed new. Tier B, as #1598.
+Guinea-Bissau 2021-22 s07b food quantities are released rounded to even integers; seek an unrounded release	filed	1728	gnb	Drafted R1, Tier C (re-framed after 'Serve, registered key'). #791 is the UEMOA source route, not this data defect.
+Guinea-Bissau plot_inputs: 'Tonelada' and 'Litro' have no mass route; re-check food 'Litro'	filed	1729	gnb	Drafted R3, Tier B; still open ('Tonelada is undeclared'). #1107 (closing on the branch) covers only Quilograma and Grama.
+Nigeria W1 (2010Q3) assets: Age and Value are recorded in sect5b_plantingw1 but not wired	filed	1730	coping	Drafted residual 1, Tier C (REPORT §6); the ruled NA columns mean 'not wired'. Includes the set-order caveat on the 2010-11.py hook (coping and strata red-team deltas).
+EHCVM 2021-22 coping option 25: share the stamped rank inference, or guard CIV, Mali, Senegal and Togo	filed	1731	coping	Drafted residual 2, Tier C. Narrowed: the GNB 3-row stamp is assigned to integration task (a); CIV, Mali, Senegal and Togo remain.
+Liberia 2018-19 shocks: 2,164 of 3,522 experienced shocks are not served (S17_3 / S17_4 unwired)	filed	1732	coping	Drafted residual 3, Tier C (coping REPORT §6). Merged with the identical 1562-coping-audit residual.
+Tanzania 2008-09 and 2010-11: coping is 100% NA in the UPD release; establish whether NPS Y1/Y2 asked it	filed	1733	coping	Drafted residual 4, Tier C (coping REPORT §6). Merged with the identical 1562-coping-audit residual (F5).
+Uganda 2005-06 shocks: the coping relabel folds two code pairs into one label each	filed	1734	coping	Drafted residual 5, Tier C (coping REPORT §6). Merged with 1562-coping-audit F6 and its docs-list item.
+Shocks: 'Other, specify' coping text is unwired (Ethiopia, Malawi, Nigeria)	filed	1735	coping	Drafted residual 6, Tier C (coping REPORT §6). Thin draft: no counts measured, and the body says so.
+Togo and Benin plot_features concatenators skip a declared wave since their 2021-22 wiring	filed	1736	manquant	Drafted R1, Tier B. #1287's body records these two as 'not at risk' (now stale), so filed new. Manquant R3 (stale Togo comments) merged in as a ride-along.
+Senegal 2021-22 plot_inputs serves 26 columns its scheme does not declare (_/s16b_2021.py)	filed	1737	manquant	PR body 'Residual to file against #1483'; red team F6 reframed question 3 (the Feature flag dtype) into this. #1483's remaining list does not name it. No tier in the draft; Tier C is my choice.
+Benin 2021-22: households PanelHH leaves unlinked whose pre-loaded rosters point back to 2018-19	filed	1738	benin	Drafted Tier B (REPORT §6). Its panel_weight half was resolved by the ruling 'NA for unlinked'. #1705 closes with the Benin PR.
+Site Q: screen plot_inputs.Quantity_purchased	filed	1739	benin	Drafted Tier C (REPORT §6). #1482 and PR #1618 screen plot_inputs.Quantity only.
+Check Burkina Faso 2018-19 plot_inputs unit columns: decoded through the country u table only?	filed	1740	benin	Drafted Tier C (benin REPORT §6), not measured; filed as a check, and the body states what was not measured.
+Strata constructions in Ethiopia, GhanaAHIES and EthiopiaRHS are not registered derivations	filed	1741	strata	Drafted R2, Tier B (REPORT §8).
+A one-wave request serves a different column set cold than after an all-waves call	filed	1742	strata	Drafted R3, Tier B (reframed by the red team as pre-existing). Merged with burkina-redteam F8 and coping-redteam delta (HowCoped3), which are the same defect.
+_SamplingLoader silently keeps the last of duplicate keys in sampling.yml	filed	1743	strata	Drafted R4, Tier C (REPORT §8; red team F3).
+scan.py: add taxonomy entries for the Site Q warnings, including SurveyKgPriceWarning	filed	1744	cropkg	Drafted Tier C (REPORT 'Drafted residuals'; red team F8).
+ci: execute the inline __main__ blocks of pr-data-validation.yml's event and result gates in tests	filed	1745	ci	Drafted Tier B (REPORT-fixup 'Drafted residuals'; red team F3).
+docs: add v0.12.0–v0.16.0 to the mkdocs Releases nav	filed	1746	ci	Drafted Tier C, docs only (ci REPORT 'Questions'); the red team agreed.
+tests: test_gh932_safe_ci_failure_locations::test_real_wrapper_optin_… is intermittent on --shared clones / under xdist	filed	1747	ci	Coordinator flaky test 2, merged with the ci drafted Tier B residual (and the ci-redteam draft). Also seen by the coping, coping-redteam, benin and burkina runs.
+tests: test_sample.py::test_covers_all_waves is intermittent under xdist	filed	1748	burkina	Coordinator flaky test 1 (PR #1717 data gate run 43495904814; Burkina jobs 41275804 / 41276377). No tier given; Tier B is my choice, since it fails the required data gate.
+Mali 2017-18: wire s7fq13d ('Equivalent en Kg') as crop_production KgFactor	filed	1749	cropkg	Coordinator decision item (memo Q0), merged with cropkg's drafted Tier B residual 'Wire Mali 2017-18 s7fq13d as KgFactor'. Needs a ruling.
+demand-estimation skill: for EHCVM countries basis='total' equals 'purchased'; note min_prop_items attrition	filed	1750	1709-cfe	Drafted Tier C docs residual (REPORT §9). #828 is the code contract, not the skill note; cross-referenced.
+Nigeria W1/W2 harvest kilograms: quantity-mode split before the agns cards	existing	1518	nigeria	Drafted Tier B (REPORT-r1 §6). #1518's Remaining names it: 'Establish W1/W2 own unit-card/form/quantity-mode evidence and conversion routes'.
+Nigeria: 9 card-contradicting W3 bundle crop rows held	existing	1518	nigeria	A review item, not drafted. Coordinator default: stay held. #1518's Remaining covers it: 'held bundle/fluid basis'.
+Burkina 2021-22: why s16cq16a is blank on finished harvests (tier D)	existing	1437	burkina	#1437 remaining item 2 (deployed CAPI/export binding). Its item 1, harvest from dispositions, is done on the branch.
+Burkina 2014 EMC sale wiring (Y22A-Y23)	existing	824	burkina	#824 item 1 names the Burkina 2014 sale wiring; 2021-22 sale wiring is done on the branch.
+Guinea-Bissau 2021-22: unwired tables (R4)	existing	1697	gnb	#1697 Remaining item 1 (Guinea-Bissau 2021-22 wiring). Six tables are wired on the branch; the rest stay under #1697.
+GNB 2021-22 cover GPS is not 2018-19's fix (R5)	existing	791	gnb	Drafted as '#791'. #791 is the displacement question (also #1697 item 6). Coordinator default: served as recorded.
+served_strata for the remaining strata-serving waves (strata R1)	existing	1577	strata	#1577 stays partial, and this is its remainder. Benin served_strata is still pending, in Benin's own PR.
+Build the price-implied crop rung (GH #1559 part 2)	existing	1559	cropkg	#1559 stays partial. Part 2 awaits rulings on memo Q0-Q10 (Q0 is filed as #1749).
+Mass-less survey kg with no price cell stay unscreened	existing	1559	cropkg	The remainder of #1559's own 'units with no stated mass cannot fire'.
+CFE w's cross-wave level shifts +6 to +30 points (Togo, Senegal, Niger)	existing	1709	1709-cfe	#1709 stays partial. Its hypothesis 3 and asks (price/level separation; other EHCVM-2 countries) name this work.
+Benin 2021-22 still drops its leavers	existing	1565	gnb	From the gnb issue table (asymmetry with GNB's flagged leavers). #1565 is that decision.
+Nigeria: 15 W3 sale records still decode Unit_sold = 'l' (D2 residual)	filed	1721	nigeria	Merged into the coordinator-added #1721 (20 rows, red team delta 2).
+Burkina 2021-22 crop_production: survey kg, sold kg, sold condition (r1 draft)	filed	1722	burkina	Superseded draft. Sold condition (s16dq05d) is now wired; the rest is #1722.
+Burkina 2021-22: one crop list, two label sets (r1 draft)	filed	1723	burkina	Superseded draft. Codes 55/58/64/65 are labelled on the branch; the spelling differences that remain are #1723.
+Liberia 2018-19 drops 2,164 of 3,522 experienced shocks (audit copy)	filed	1732	1562-coping-audit	Same residual as coping item 3; merged.
+Tanzania R1/R2 coping all NA in the UPD release (audit copy)	filed	1733	1562-coping-audit	Same residual as coping item 4; merged.
+Uganda 2005-06 relabel folds two code pairs (audit F6 / docs list)	filed	1734	1562-coping-audit	Same residual as coping item 5; merged.
+Two stale Togo comments, left to avoid a 2021-22 re-warm (manquant R3)	filed	1736	manquant	Merged into #1736 as a ride-along: the concatenator fix moves the same Togo 2021-22 hashes.
+Senegal Feature *_unlisted flags served as strings (manquant Q3)	filed	1737	manquant	Red team F6 reframed it as #1737 (undeclared adapter columns).
+test_real_wrapper_optin_... intermittent on --shared clones under xdist (ci-redteam draft)	filed	1747	ci-redteam	Same as the ci draft and coordinator flaky test 2; merged.
+Wire Mali 2017-18 s7fq13d as KgFactor (GH #1559 follow-up)	filed	1749	cropkg	Same as the coordinator's decision item (memo Q0); merged under the coordinator's title.
+Nigeria W1/W2 post-planting education is unwired	dropped	-	nigeria	Resolved in batch by the ruling 'Wire W1/W2 PP + verdicts' (+17,116 / +17,403 rows on the branch).
+Nigeria W2 g_cl=1 liquids served ~10x low (red team delta D1)	dropped	-	nigeria	Resolved by the ruling 'Read as centilitres' (106 rows, on the branch).
+Nigeria W2 PP education codes 4/19/20 unlabelled (red team delta D4)	dropped	-	nigeria	Resolved by the ruling 'Serve Unknown' (3 rows, on the branch).
+Nigeria W1-PP / W4 kg spillover; #1452 overlay not extended (F4 / Q3)	dropped	-	nigeria	Coordinator default 'left as is', disclosed as a must-state; never drafted as a residual.
+Nigeria: superseded counts in hashed docstrings (nigeria.py ~820/~3383, 2015-16 mapping.py)	dropped	-	nigeria	A review note, not a drafted residual. Fix with the next Nigeria re-warm.
+Lead: Cote d'Ivoire 2021-22 crop codes 55-57 (55 'Autre', 56/57 unlabelled)	dropped	-	burkina-redteam	A lead, not a drafted residual; #1697 already discloses CIV crop codes 56-60 served as numbers.
+Guinea-Bissau 2018-19 plot_inputs: Purchased reads the gift question (R2)	dropped	-	gnb	Fixed in batch by the ruling 'Fix all three now'.
+Departed members can enter household_characteristics (R-H)	dropped	-	gnb	Resolved by the ruling 'Exclude from HH size' (MonthsSpent NA for Departed).
+Recall record for Guinea-Bissau 2021-22 (R-R)	dropped	-	gnb	Assigned to the integration stream (task d).
+GNB 2021-22: 3,945 consumed rows rounded to 0 / 685 'Nunca' rows	dropped	-	gnb	Resolved by the rulings 'Serve NA, as Togo' and 'GNB Nunca rows'.
+Nigeria W1: cold assets(waves=['2011Q1']) raises (coping r1 item 1)	dropped	-	coping	Resolved by the ruling 'Pin + W1 NA columns'; cold = warm measured (red team delta).
+8 new 'dropped' Nigeria shocks/assets coverage cells (coping item 7)	dropped	-	coping	Assigned to the integration stream (task e: correctly-empty verdicts).
+GNB 2021-22 option-25 stamp on 3 rows and optional: positions (coping red team F5)	dropped	-	coping-redteam	Assigned to the integration stream (task a). The other countries' part is #1731.
+Windows build pin re-measure after HowCopedSet (coping red team F6)	dropped	-	coping-redteam	Assigned to the integration stream (task f); tracked in #1716.
+GNB 2018-19 coping codes 18-25 follow the French list (audit)	dropped	-	1562-coping-audit	Done on the coping branch (coordinator default: Portuguese questionnaire).
+Nigeria shocks served under both quarters (audit)	dropped	-	1562-coping-audit	Done by the ruling 'Pin to post-harvest t' (-11,275 rows on the coping branch).
+Nigeria's 4th coping slot is unwired (audit)	dropped	-	1562-coping-audit	Done by the ruling 'Add HowCoped3'.
+Filler and missing codes served as strategies (audit)	dropped	-	1562-coping-audit	Done by the rulings 'NA in positions, not in set' and 'Did nothing when alone'.
+CONTENTS corrections: Guatemala, Mali/Niger 'CHOC' labels, GNB F1 (audit docs list)	dropped	-	1562-coping-audit	Done in the coping stream's CONTENTS edits. The Uganda fold item is #1734.
+Senegal 2018-19 and CIV 2018-19 plot_inputs read the gift question (manquant R2)	dropped	-	manquant	Resolved by the ruling 'Extend to all four now' (Senegal, CIV, Niger 2018-19 and 2021-22).
+Benin 2021-22: panel_weight for unlinked households (r1 Tier B half)	dropped	-	benin	Resolved by the ruling 'NA for unlinked'. The linkage half is #1738.
+Niger 2021-22 plot_inputs: Unit_purchased spells two cart units 'Charrette Bovine' / 'Charrette Asine', unlike u	filed	1751	manquant-redteam	Late red-team delta (14:55) 'Recommend a residual'. No tier given; Tier C is my choice. The positional-assert hardening note rides along.
+Benin: 63 Panel households whose whole pre-loaded roster is recorded as left	dropped	-	benin	Resolved by the ruling 'Unlink the 63' (registered exception, 6,815 links; benin-redteam VERDICT-delta confirms).
+Malawi 2024-25: IHS6 adds crop codes 49/50; decide the cowpea rule before wiring (r1 draft, tier B)	filed	1724	malawi	Superseded r1 draft; folded into the final drafted residual, #1724.
+Malawi leftovers: two-text plots, COWPEAS(NSEULA), no-slot line, Module H Farm-level rows, 2013-14 (r1 draft, tier C)	filed	1724	malawi	Superseded r1 draft; folded into #1724. Its Module H Farm-level item is not in the final draft (red team: count loose).
+Nigeria W1/W2 PP education (r1 'Optional residual, Tier B')	dropped	-	nigeria	Duplicate row of the same item: resolved by the ruling 'Wire W1/W2 PP + verdicts'.

@@ -1,0 +1,78 @@
+time	number	kind	result	url
+2026-11-12T17:12:24Z	1696	split-residual	ok: created N1 (seq 1, parent #1483)	https://github.com/ligon/LSMS_Library/issues/1696
+2026-11-12T17:12:30Z	1483	split-parent	ok: edit body + title, 8010 chars (seq 2)	https://github.com/ligon/LSMS_Library/issues/1483
+2026-11-12T17:12:36Z	1483	split-parent	ok: comment (seq 3)	https://github.com/ligon/LSMS_Library/issues/1483#issuecomment-6830544186
+2026-11-12T17:12:43Z	1107	narrow	ok: edit body + title, 3380 chars (seq 4)	https://github.com/ligon/LSMS_Library/issues/1107
+2026-11-12T17:12:48Z	1697	split-residual	ok: created N2 (seq 5, parent #552)	https://github.com/ligon/LSMS_Library/issues/1697
+2026-11-12T17:12:54Z	552	split-parent	ok: edit body + title, 7794 chars (seq 6)	https://github.com/ligon/LSMS_Library/issues/552
+2026-11-12T17:13:00Z	552	split-parent	ok: comment (seq 7)	https://github.com/ligon/LSMS_Library/issues/552#issuecomment-6830553766
+2026-11-12T17:13:06Z	1556	narrow	ok: edit body, 4442 chars (seq 8)	https://github.com/ligon/LSMS_Library/issues/1556
+2026-11-12T17:13:12Z	791	narrow	ok: edit body + title, 6663 chars (seq 9)	https://github.com/ligon/LSMS_Library/issues/791
+2026-11-12T17:13:17Z	1565	narrow	ok: edit body + title, 2568 chars (seq 10)	https://github.com/ligon/LSMS_Library/issues/1565
+2026-11-12T17:13:23Z	1698	split-residual	ok: created N3 (seq 11, parent #1571)	https://github.com/ligon/LSMS_Library/issues/1698
+2026-11-12T17:13:29Z	1571	split-parent	ok: comment (seq 12)	https://github.com/ligon/LSMS_Library/issues/1571#issuecomment-6830565083
+2026-11-12T17:13:35Z	1699	split-residual	ok: created N4 (seq 13, parent #562)	https://github.com/ligon/LSMS_Library/issues/1699
+2026-11-12T17:13:41Z	562	split-parent	ok: comment (seq 14)	https://github.com/ligon/LSMS_Library/issues/562#issuecomment-6830569821
+2026-11-12T17:13:47Z	562	split-parent	ok: closed as completed (seq 15)	https://github.com/ligon/LSMS_Library/issues/562
+2026-11-12T17:13:52Z	1700	split-residual	ok: created N5 (seq 16, parent #845)	https://github.com/ligon/LSMS_Library/issues/1700
+2026-11-12T17:13:58Z	845	split-parent	ok: edit body + title, 7362 chars (seq 17)	https://github.com/ligon/LSMS_Library/issues/845
+2026-11-12T17:14:04Z	845	split-parent	ok: comment (seq 18)	https://github.com/ligon/LSMS_Library/issues/845#issuecomment-6830579571
+2026-11-12T17:14:10Z	1701	split-residual	ok: created N6 (seq 19, parent #1460)	https://github.com/ligon/LSMS_Library/issues/1701
+2026-11-12T17:14:16Z	1460	split-parent	ok: comment (seq 20)	https://github.com/ligon/LSMS_Library/issues/1460#issuecomment-6830584891
+2026-11-12T17:14:22Z	1438	narrow	ok: edit body, 2469 chars (seq 21)	https://github.com/ligon/LSMS_Library/issues/1438
+2026-11-12T17:14:29Z	798	close	ok: comment (seq 22)	https://github.com/ligon/LSMS_Library/issues/798#issuecomment-6830590355
+2026-11-12T17:14:35Z	798	close	ok: closed as completed (seq 23)	https://github.com/ligon/LSMS_Library/issues/798
+2026-11-12T17:14:40Z	1130	narrow	ok: edit body, 3334 chars (seq 24)	https://github.com/ligon/LSMS_Library/issues/1130
+2026-11-12T17:14:46Z	913	close	ok: comment (seq 25)	https://github.com/ligon/LSMS_Library/issues/913#issuecomment-6830598296
+2026-11-12T17:14:52Z	913	close	ok: closed as not planned (seq 26)	https://github.com/ligon/LSMS_Library/issues/913
+2026-11-12T17:14:59Z	778	close	ok: comment (seq 27)	https://github.com/ligon/LSMS_Library/issues/778#issuecomment-6830604192
+2026-11-12T17:15:05Z	778	close	ok: closed as completed (seq 28)	https://github.com/ligon/LSMS_Library/issues/778
+2026-11-12T17:15:11Z	140	narrow	ok: edit body + title, 7116 chars (seq 29)	https://github.com/ligon/LSMS_Library/issues/140
+2026-11-12T17:15:18Z	279	narrow	ok: edit body + title, 3951 chars (seq 30)	https://github.com/ligon/LSMS_Library/issues/279
+2026-11-12T17:15:24Z	438	narrow	ok: edit body, 3997 chars (seq 31)	https://github.com/ligon/LSMS_Library/issues/438
+2026-11-12T17:15:30Z	438	narrow	ok: comment (seq 32)	https://github.com/ligon/LSMS_Library/issues/438#issuecomment-6830618828
+2026-11-12T17:15:36Z	449	narrow	ok: edit body + title, 3837 chars (seq 33)	https://github.com/ligon/LSMS_Library/issues/449
+2026-11-12T17:15:41Z	468	narrow	ok: edit body + title, 3522 chars (seq 34)	https://github.com/ligon/LSMS_Library/issues/468
+2026-11-12T17:15:47Z	560	narrow	ok: edit body, 2467 chars (seq 35)	https://github.com/ligon/LSMS_Library/issues/560
+2026-11-12T17:15:53Z	567	narrow	ok: edit body, 1398 chars (seq 36)	https://github.com/ligon/LSMS_Library/issues/567
+2026-11-12T17:15:59Z	647	narrow	ok: edit body + title, 4570 chars (seq 37)	https://github.com/ligon/LSMS_Library/issues/647
+2026-11-12T17:16:05Z	816	narrow	ok: edit body + title, 6012 chars (seq 38)	https://github.com/ligon/LSMS_Library/issues/816
+2026-11-12T17:16:11Z	821	narrow	ok: edit body + title, 6326 chars (seq 39)	https://github.com/ligon/LSMS_Library/issues/821
+2026-11-12T17:16:18Z	824	narrow	ok: edit body + title, 10041 chars (seq 40)	https://github.com/ligon/LSMS_Library/issues/824
+2026-11-12T17:16:25Z	833	narrow	ok: edit body + title, 3514 chars (seq 41)	https://github.com/ligon/LSMS_Library/issues/833
+2026-11-12T17:16:31Z	837	narrow	ok: edit body + title, 4187 chars (seq 42)	https://github.com/ligon/LSMS_Library/issues/837
+2026-11-12T17:16:37Z	905	narrow	ok: edit body + title, 13066 chars (seq 43)	https://github.com/ligon/LSMS_Library/issues/905
+2026-11-12T17:16:43Z	939	narrow	ok: edit body + title, 4182 chars (seq 44)	https://github.com/ligon/LSMS_Library/issues/939
+2026-11-12T17:16:48Z	975	narrow	ok: edit body, 1649 chars (seq 45)	https://github.com/ligon/LSMS_Library/issues/975
+2026-11-12T17:16:55Z	1000	narrow	ok: edit body + title, 6149 chars (seq 46)	https://github.com/ligon/LSMS_Library/issues/1000
+2026-11-12T17:17:01Z	1044	narrow	ok: edit body + title, 3001 chars (seq 47)	https://github.com/ligon/LSMS_Library/issues/1044
+2026-11-12T17:17:07Z	1045	narrow	ok: edit body, 5022 chars (seq 48)	https://github.com/ligon/LSMS_Library/issues/1045
+2026-11-12T17:17:12Z	1103	narrow	ok: edit body + title, 2414 chars (seq 49)	https://github.com/ligon/LSMS_Library/issues/1103
+2026-11-12T17:17:18Z	1118	narrow	ok: edit body + title, 6510 chars (seq 50)	https://github.com/ligon/LSMS_Library/issues/1118
+2026-11-12T17:17:25Z	1119	narrow	ok: edit body + title, 13667 chars (seq 51)	https://github.com/ligon/LSMS_Library/issues/1119
+2026-11-12T17:17:31Z	1136	narrow	ok: edit body, 5368 chars (seq 52)	https://github.com/ligon/LSMS_Library/issues/1136
+2026-11-12T17:17:37Z	1179	narrow	ok: edit body + title, 6024 chars (seq 53)	https://github.com/ligon/LSMS_Library/issues/1179
+2026-11-12T17:17:43Z	1226	narrow	ok: edit body + title, 4404 chars (seq 54)	https://github.com/ligon/LSMS_Library/issues/1226
+2026-11-12T17:17:50Z	1235	narrow	ok: edit body + title, 3506 chars (seq 55)	https://github.com/ligon/LSMS_Library/issues/1235
+2026-11-12T17:17:56Z	1247	narrow	ok: edit body + title, 2985 chars (seq 56)	https://github.com/ligon/LSMS_Library/issues/1247
+2026-11-12T17:18:01Z	1276	narrow	ok: edit body + title, 9372 chars (seq 57)	https://github.com/ligon/LSMS_Library/issues/1276
+2026-11-12T17:18:08Z	1281	narrow	ok: edit body + title, 6991 chars (seq 58)	https://github.com/ligon/LSMS_Library/issues/1281
+2026-11-12T17:18:15Z	1287	narrow	ok: comment (old body part 1) (seq 59)	https://github.com/ligon/LSMS_Library/issues/1287#issuecomment-6830686760
+2026-11-12T17:18:22Z	1287	narrow	ok: comment (old body part 2) (seq 60)	https://github.com/ligon/LSMS_Library/issues/1287#issuecomment-6830689643
+2026-11-12T17:18:29Z	1287	narrow	ok: edit body + title, 2401 chars (seq 61)	https://github.com/ligon/LSMS_Library/issues/1287
+2026-11-12T17:18:35Z	1288	narrow	ok: edit body, 45903 chars (seq 62)	https://github.com/ligon/LSMS_Library/issues/1288
+2026-11-12T17:18:40Z	1436	narrow	ok: edit body, 12703 chars (seq 63)	https://github.com/ligon/LSMS_Library/issues/1436
+2026-11-12T17:18:46Z	1437	narrow	ok: edit body + title, 3073 chars (seq 64)	https://github.com/ligon/LSMS_Library/issues/1437
+2026-11-12T17:18:52Z	1441	narrow	ok: edit body, 6720 chars (seq 65)	https://github.com/ligon/LSMS_Library/issues/1441
+2026-11-12T17:18:57Z	1442	narrow	ok: edit body + title, 3459 chars (seq 66)	https://github.com/ligon/LSMS_Library/issues/1442
+2026-11-12T17:19:03Z	1497	narrow	ok: edit body + title, 3919 chars (seq 67)	https://github.com/ligon/LSMS_Library/issues/1497
+2026-11-12T17:19:08Z	1529	narrow	ok: edit body, 5672 chars (seq 68)	https://github.com/ligon/LSMS_Library/issues/1529
+2026-11-12T17:19:14Z	1531	narrow	ok: edit body, 5212 chars (seq 69)	https://github.com/ligon/LSMS_Library/issues/1531
+2026-11-12T17:19:19Z	1702	new	ok: created N7 (seq 70)	https://github.com/ligon/LSMS_Library/issues/1702
+2026-11-12T17:19:24Z	1703	new	ok: created N8 (seq 71)	https://github.com/ligon/LSMS_Library/issues/1703
+2026-11-12T17:19:30Z	1509	ruling-comment	ok: comment (seq 72)	https://github.com/ligon/LSMS_Library/issues/1509#issuecomment-6830717581
+2026-11-12T17:19:36Z	1068	ruling-comment	ok: comment (seq 73)	https://github.com/ligon/LSMS_Library/issues/1068#issuecomment-6830719977
+2026-11-12T17:19:42Z	1129	ruling-comment	ok: comment (seq 74)	https://github.com/ligon/LSMS_Library/issues/1129#issuecomment-6830722285
+2026-11-12T17:19:49Z	1502	ruling-comment	ok: comment (seq 75)	https://github.com/ligon/LSMS_Library/issues/1502#issuecomment-6830724693
+2026-11-12T17:19:55Z	1518	ruling-comment	ok: comment (seq 76)	https://github.com/ligon/LSMS_Library/issues/1518#issuecomment-6830727440
+2026-11-12T17:20:02Z	587	ruling-comment	ok: comment (seq 77)	https://github.com/ligon/LSMS_Library/issues/587#issuecomment-6830729991
