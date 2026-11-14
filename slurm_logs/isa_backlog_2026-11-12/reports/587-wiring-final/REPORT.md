@@ -106,7 +106,7 @@ The PH entries are untouched.
 | PP interviewer manual; BID | no community section; BID p.21: "Section C2: Food Prices -- No changes" | no |
 | codebook (`.dta` labels) | `c2q2a` "Quantity", `c2q2b` "Unit of measurement", `c2q2b_os` "Other unit", `c2q2c` "Size", `c2q2_cvn` "conversion factor item-unit-size-zone" | partly: a quantity of the named unit |
 | `c2q2_cvn` values | 0.001 on every g row, 0.01 on every cl row that has one (196 of 208) | partly: a per-g / per-cl factor |
-| `c2q2b_os` text (non-blank on all 231 g/cl no-size rows) | states the package: '250G', '400 GRAMS TIN', '750ML BOTTLE'; just 'GRAM' / 'ML' on the 23 with no `c2q2a` | **yes** |
+| `c2q2b_os` text (non-blank on all 231 g/cl no-size rows) | states the package, as a gram or millilitre package description; on the 23 with no `c2q2a`, just the unit word (gram or millilitre) | **yes** |
 
 What the text shows, row by row:
 - **g rows:** `c2q2a` equals the text's gram figure on 172 of 176, and a number in the text on 175 (one only to

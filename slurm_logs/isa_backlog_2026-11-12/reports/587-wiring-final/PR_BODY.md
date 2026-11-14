@@ -68,7 +68,7 @@ The evidence is in the file itself:
 - **Conversion factor.** `c2q2_cvn`, labelled "conversion factor item-unit-size-zone", is 0.001 on every g
   row and 0.01 on every cl row that carries one (196 of the 208).
 - **Other-unit text.** `c2q2b_os` is non-blank on all 231 g / cl rows with no size, and it states the package
-  ('250G', '750ML BOTTLE'):
+  (a gram or millilitre package description):
   - g rows: `c2q2a` equals a number in the text on 175 of 176 (172 exactly the gram figure, one to float32
     precision).
   - cl rows: the text is in ml, and `c2q2a` equals that figure / 10 on all 32, which is centilitres.

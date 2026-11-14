@@ -11,7 +11,11 @@ This directory is a COPY, made at the integration of the 2026-11-13 batch (the i
 =integration/isa-batch-20261113=), of the batch's working record on scratch
 (=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261112/reports/=).  *Absolute
 =/global/scratch/...= and =/local/job...= paths inside the reports and scripts point to scratch or
-to job-local disk and may no longer exist.*  Nothing was rewritten.  Copied, per report
+to job-local disk and may no longer exist.*  Nothing was rewritten, except two lines in
+=reports/587-wiring-final/= (=REPORT.md= line 109, =PR_BODY.md= line 71): they quoted raw =c2q2b_os=
+free-text values, which the GH #587 red team had removed from the tracked tree under the 587
+ledger rule "No raw microdata in commits", and are paraphrased here ("a gram or millilitre package
+description"; integration red team F1).  The scratch originals are unchanged.  Copied, per report
 directory: its top-level =*.md= and =*.tsv=, and its =*.py= / =*.sh= scripts (top level and
 =scripts/=), the latter under =scripts/<report>/=.  Not copied: =private/=, =work/=, =data/=,
 =out/= dumps, =JSON= state files, job logs and =.sbatch= files.
