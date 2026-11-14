@@ -5122,6 +5122,8 @@ bought or received since post-planting beside the post-planting count (=s7x= "ow
 planting"; =s7= "THE NUMBER OWNED BY HOUSEHOLD AT THE TIME OF POST PLANTING INTERVIEW").  It asks no
 holding at post-harvest, but a post-harvest holding (count less sold plus acquired) is computable in
 principle, which would make the cells =empty-pending-machinery= instead.  Closed as =correctly-empty= on
-the batch brief; the maintainer may reclassify.  Measured at the integrated tree (job 41283638):
+the batch brief; the maintainer may reclassify.  [Ruled the same day (@ligon, "Nigeria W1/W2 post-harvest assets
+coverage verdict"): =empty-pending-machinery=.  2011Q1 and 2013Q1 now carry that verdict and stay
+=dropped=, open as future work; 2016Q1 and 2019Q1 stay =correctly-empty=.]  Measured at the integrated tree (job 41283638):
 =shocks= rows by quarter 2011Q1 2,202, 2013Q1 2,882, 2016Q1 2,323, 2019Q1 3,870 (none at post-planting);
 =assets= 2010Q3 38,947, 2012Q3 161,125, 2015Q3 188,229, 2018Q3 44,358 (none at post-harvest).

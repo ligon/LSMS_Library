@@ -1,10 +1,19 @@
 # SNAPSHOT, taken 2026-11-13 at the integration of the 2026-11-13 ISA batch, of
-# `.sucoder/isa-decisions.org` on the docs branch `docs/isa-sweep-20261103` at e61da1d04fc274dfc6e874fe57d4028cbd6897ad
+# `.sucoder/isa-decisions.org` on the docs branch `docs/isa-sweep-20261103` at 34fbb386a03d5ea3b0b3140146e54e529256656b
 # (`git show docs/isa-sweep-20261103:.sucoder/isa-decisions.org`).  It is NOT maintained
 # here: the live copy is on that docs branch, newest ruling first.  Rulings after this
 # date are not in this file.
 
 #+title: LSMS-ISA maintainer decisions
+
+* 2026-11-13: Nigeria W1/W2 post-harvest assets coverage verdict -- ANSWERED
+After #1562 serves Nigeria assets once (post-planting), the W1/W2 post-harvest
+cells (2011Q1, 2013Q1) are 'dropped'.  The user selected
+"empty-pending-machinery" (NOT the recommended correctly-empty): a post-harvest
+holding is computable from the post-planting count, section-7 sales and
+acquisitions; the cells stay open as future work.  W3/W4 post-harvest (2016Q1
+"assets moved to PP", 2019Q1 no section) stay correctly-empty.
+Also: #1717 (#1714 option (a)) merged as 1ba0ef607; #1714 and #1716 closed.
 
 * 2026-11-13: GNB 'Nunca' rows, Nigeria unlabelled codes, gift fix x4, strata tag -- ANSWERED
 - GNB 2021-22: the 685 zeroed rows whose household says it never bought the
