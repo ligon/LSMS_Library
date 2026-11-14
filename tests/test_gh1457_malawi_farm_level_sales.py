@@ -182,8 +182,16 @@ class TestOracle:
         assert ((g.Quantity_sold > 0) | (g.Value_sold > 0)).all()
         key = "Malawi::crop_production::sale-basis-unresolved"
         refused = {"2010-11": 94, "2013-14": 21, "2016-17": 89, "2019-20": 137}[wave]
-        assert g.Derivation.dropna().tolist() == [key] * refused
-        assert int(g.Derivation.isna().sum()) == len(g) - refused
+        # GH #1228 ("Register all waves", @ligon 2026-11-13): a Farm-level code-48 sale
+        # that took its household's cowpea label also carries the crop-text key, alone or
+        # '+'-joined beside the ladder's; it marks the label, so it is set aside here.
+        label = "Malawi::crop_production::cowpea-from-crop-text"
+        keys = g.Derivation.astype("string").str.split("+")
+        ladder = keys.map(lambda ks: [k for k in ks if k != label] if isinstance(ks, list) else [])
+        assert [k for ks in ladder for k in ks] == [key] * refused
+        assert int(ladder.map(len).eq(0).sum()) == len(g) - refused
+        labelled = keys.map(lambda ks: isinstance(ks, list) and label in ks).to_numpy(dtype=bool)
+        assert (labelled == g.crop.astype(str).eq("Cowpea (Khobwe)").to_numpy(dtype=bool)).all()
         assert g.production_obs.str.fullmatch(r"reported:[IQ]:\d+(/row:\d+)?").all()
 
     def test_a_sale_row_says_its_unit_and_a_harvest_rows_is_its_u(self, served, wave):

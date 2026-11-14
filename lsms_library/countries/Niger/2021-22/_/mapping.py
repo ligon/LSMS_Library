@@ -14,6 +14,11 @@ from lsms_library.transformations import (
     food_acquired_to_canonical as _food_acquired_canonical)
 
 from lsms_library.ehcvm import (
+    coping_autre_rank_key as _coping_autre_rank_key,
+    derive_coping_autre_rank as _derive_coping_autre_rank,
+    inputs_coping_autre_rank as _inputs_coping_autre_rank,
+)
+from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
     inputs_unit_weight as _inputs_unit_weight,
@@ -206,10 +211,20 @@ _STRATEGY_RANK = {
 }
 
 
+#: GH #1562: the inferred option-25 position, where it sits beside a ranked strategy.
+CODE25_RANK_DERIVATION = _coping_autre_rank_key('Niger')
+
+
+def inputs_shocks_code25_rank(wave='2021-22'):
+    """Registry `inputs`: the raw s14bq05__1..26 of the rows the shocks hook stamps."""
+    return _inputs_coping_autre_rank('Niger', wave)
+
+
 def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
     how_coped = {0: [], 1: [], 2: []}
+    derivation = []
     for _, row in df[cope_cols].iterrows():
         # In 2021-22, cope columns contain rank strings instead of binary indicators.
         # Collect (rank, label) pairs and sort by rank to get ordered coping strategies.
@@ -232,9 +247,13 @@ def shocks(df):
         # the raw rank, shows 25 always filling the next one.  The instrument
         # allows three strategies, so a fourth falls off the three served slots
         # below and is dropped (0 held rows).
+        # GH #1562: beside a ranked strategy the position is inferred, and the
+        # row carries the registered key (ruling 2026-11-13, "Keep slot,
+        # registered").  Alone, option 25 is the only answer: not in doubt.
+        derivation.append(CODE25_RANK_DERIVATION if (unranked and ranked) else pd.NA)
         held = {rank for rank, _ in ranked}
         for label in unranked:
-            rank = min(set(range(1, len(held) + 2)) - held)
+            rank = _derive_coping_autre_rank(held)
             held.add(rank)
             ranked.append((rank, label))
 
@@ -247,6 +266,7 @@ def shocks(df):
     df['HowCoped0'] = how_coped[0]
     df['HowCoped1'] = how_coped[1]
     df['HowCoped2'] = how_coped[2]
+    df['Derivation'] = pd.array(derivation, dtype='string')
     df = df.drop(columns=cope_cols)
     return df
 

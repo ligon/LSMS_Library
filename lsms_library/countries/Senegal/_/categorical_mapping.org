@@ -757,6 +757,15 @@ scheme match no key and pass through unchanged.
 # bare '20' row is unused (code 20 is labelled in 2018-19) and unchanged.
 # The uniqueness guard before to_parquet in 2018-19/_/plot_inputs.py is the
 # enforcement; this comment is not.
+#
+# MAIZE AND COWPEA SPEAK THE HARVEST'S WORDS (GH #1119, 2026-11-13; the
+# Burkina Faso #1203 pattern).  'Semences de maïs' and 'Semences de
+# haricots/niébé' used to map to the FOOD labels 'Maïs en grain' and
+# 'Niébé/Haricots secs', which crop_production never serves: its s16cq04
+# answers are 'Maïs' and 'Niébé', passed through unmapped.  They now map to
+# those two crop labels, so a seed row and a harvest row of one household
+# name the crop alike.  The 2021-22 driver (_/s16b_2021.py) reads this table
+# too, so its maize and cowpea seed rows move with 2018-19's.
 
 #+NAME: harmonize_seed_crop
 | Original Label                | Preferred Label     |
@@ -764,12 +773,12 @@ scheme match no key and pass through unchanged.
 | Semences d'arachide           | Arachide            |
 | Semences de petit mil         | Mil                 |
 | Semences de sorgho            | Sorgho              |
-| Semences de maïs              | Maïs en grain       |
+| Semences de maïs              | Maïs                |
 | Semences de riz               | Riz Paddy           |
 | Semences de coton             | Coton               |
 | Semences de sésame            | Sésame              |
 | Semences de césame            | Sésame              |
-| Semences de haricots/niébé    | Niébé/Haricots secs |
+| Semences de haricots/niébé    | Niébé               |
 | Semences d'autres céréales    | Autre céréale       |
 | Plants/boutures de tubercules | Autre tubercule     |
 | Autres semences               | Autre crop          |

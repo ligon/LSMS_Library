@@ -5,6 +5,11 @@ import pandas as pd
 import lsms_library.local_tools as tools
 
 from lsms_library.ehcvm import (
+    coping_autre_rank_key as _coping_autre_rank_key,
+    derive_coping_autre_rank as _derive_coping_autre_rank,
+    inputs_coping_autre_rank as _inputs_coping_autre_rank,
+)
+from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
@@ -20,13 +25,39 @@ from lsms_library.ehcvm import (  # noqa: E402
 )
 
 
+def _linked_ids():
+    '''The raw (E2_) ids the committed crosswalk links, Benin/_/updated_ids.json (GH #1705).'''
+    import json
+    from pathlib import Path
+    path = Path(__file__).resolve().parents[2] / '_' / 'updated_ids.json'
+    with open(path, encoding='utf-8') as fh:
+        return set(json.load(fh).get('2021-22', {}))
+
+
 def sample(df):
-    return _stamp_region_milieu_stratum(df, 'Benin')
+    '''The strata key (GH #1575), and `panel_weight` only on the linked households.
+
+    No longitudinal weight is shipped: `poids` is the wave's cross-sectional weight
+    ("calculated for each household, taking into account the panel dimension", BID).
+    Ruling @ligon 2026-11-13, "NA for unlinked": `panel_weight` is `poids` on the
+    households the crosswalk links and NA on every other one (the sample()
+    convention for a household outside the panel).  It is still a cross-sectional
+    weight on the linked households: _/CONTENTS.org.
+    '''
+    out = _stamp_region_milieu_stratum(df, 'Benin')
+    ids = (out.index.get_level_values('i') if 'i' in out.index.names else out['i'])
+    linked = pd.Index(ids).astype(str).isin(_linked_ids())
+    out['panel_weight'] = out['panel_weight'].where(linked)
+    return out
 
 
-#: `i` of this wave.  6,994 of the 8,032 (grappe, menage) keys also occur in 2018-19.
-#: No link is served here (GH #1697), so the ids must not be able to meet.  The link is
-#: ruled (2026-11-12, "Make Benin a panel country") for a follow-up PR, GH #1705.
+#: `i` of this wave, as built.  6,994 of the 8,032 (grappe, menage) keys also occur in
+#: 2018-19, so the raw ids carry a prefix and cannot meet.  The link is the committed
+#: crosswalk (_/panel_ids.py, _/updated_ids.json, GH #1705): id_walk renames the 6,815
+#: linked households (PanelHH = Panel, less the 63 excepted) onto their bare 2018-19
+#: id, and every other household,
+#: the 116 recurring Non-panel keys included, keeps this prefix.  panel_ids.py relies on
+#: the prefix for its no-chain / no-rename-onto-occupied guarantee: do not remove it.
 ID_PREFIX = 'E2_'
 
 
@@ -131,6 +162,15 @@ _STRATEGY_RANK = {
 }
 
 
+#: GH #1562: the inferred option-25 position, where it sits beside a ranked strategy.
+CODE25_RANK_DERIVATION = _coping_autre_rank_key('Benin')
+
+
+def inputs_shocks_code25_rank(wave='2021-22'):
+    """Registry `inputs`: the raw s14bq05__1..26 of the rows the shocks hook stamps."""
+    return _inputs_coping_autre_rank('Benin', wave)
+
+
 def shocks(df):
     '''HowCoped0..2 by the survey's own rank: s14bq05__N holds a rank label or Non.
 
@@ -142,6 +182,7 @@ def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
     how_coped = {0: [], 1: [], 2: []}
+    derivation = []
     for _, row in df[cope_cols].iterrows():
         ranked = []
         unranked = []
@@ -156,9 +197,13 @@ def shocks(df):
             elif str(val) == 'Oui':
                 unranked.append(COPING_LABELS.get(num, f'Strategy {num}'))
 
+        # GH #1562: beside a ranked strategy the position is inferred, and the
+        # row carries the registered key (ruling 2026-11-13, "Keep slot,
+        # registered").  Alone, option 25 is the only answer: not in doubt.
+        derivation.append(CODE25_RANK_DERIVATION if (unranked and ranked) else pd.NA)
         held = {rank for rank, _ in ranked}
         for label in unranked:
-            rank = min(set(range(1, len(held) + 2)) - held)
+            rank = _derive_coping_autre_rank(held)
             held.add(rank)
             ranked.append((rank, label))
 
@@ -171,6 +216,7 @@ def shocks(df):
     df['HowCoped0'] = how_coped[0]
     df['HowCoped1'] = how_coped[1]
     df['HowCoped2'] = how_coped[2]
+    df['Derivation'] = pd.array(derivation, dtype='string')
     return df.drop(columns=cope_cols)
 
 

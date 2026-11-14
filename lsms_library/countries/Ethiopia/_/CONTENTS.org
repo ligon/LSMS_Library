@@ -5062,3 +5062,18 @@ frame-equal base =e5fdd2fa8= -> =30523f946= (25,644 x 21), because its
 non-purchase =food_acquired= rows carry no =Expenditure=, so purchases-only
 evidence changes no Ethiopia factor.  The script's exec tests (GH #771) replace
 =ll.Country=; the assertion uses =lsms_library.country.Country= so they still run.
+
+* shocks: coping labels and the set (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 and 2026-11-13 "Coping-strategy ... GH1562".  All five
+questionnaires ask for up to 3 answers "BY ORDER OF IMPORTANCE", so =HowCoped0..2= are ranked; nothing
+changes at build time.  At READ time (=lsms_library/coping.py=, labels in =_/coping.yml=) "Did Not Do
+Anything" (W1-W3) and "19. DID NOT DO ANYTHING" (W4-W5) are "did nothing" answers: alone they are the
+set; beside a strategy (260 / 388 / 446 rows in W1-W3) they leave the set and keep their position.
+The label spelling differs between W1-W3 and W4-W5, as the =Shock= index does ("not harmonized across
+waves", above); the set does not harmonize it either.
+
+*Not classed, a question to the user:* W1 serves unlabelled codes as ='0.0'= (10 cells), ='24.0'=,
+='25.0'= and ='60.0'= (1 cell each), 13 cells in all; ='21.0'= occurs only in W2 (1 cell).  ='0.0'= x 10
+may be a "none" code; nothing documents it.  They stay as recorded, in the positions and the
+set: an undocumented code is not a documented missing code, and the ruling names only ='99.0'=.

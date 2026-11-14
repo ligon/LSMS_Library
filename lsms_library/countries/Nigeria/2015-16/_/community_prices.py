@@ -20,8 +20,10 @@ CLUSTER-level (no household i); v = cluster_id(state, lga, ea).
 W3 item_cd is the consumption-module scheme already in harmonize_food
 (resolved via Code); c8q2 is the per-row unit label, c8q3 the reported price,
 c8q2b the free-text SIZE (GH #834: blank on 13,767 of the 13,768 g/cl rows
-AND on all 3,433 Kg/l rows -- those package prices are dropped; the handful
-stating '300gram' / 'one 75cl bottle' are normalised to per-g / per-cl).
+AND on all 3,433 Kg/l rows; the handful stating '300gram' / 'one 75cl bottle'
+are normalised to per-g / per-cl and the blank g/cl package prices are dropped).
+The blank-size Kg / l rows are SERVED as recorded since GH #587's "Measure PH,
+then align" (2026-11-13): they price per kilogram / per litre, as PP's do.
 t = 2016Q1 (post-harvest quarter).
 
 Post-planting round (GH #587, rulings 2026-11-12): the PP COMMUNITY
@@ -29,9 +31,9 @@ questionnaire prices food too, in Section C2 (sectc2a_plantingw3.dta (1st locati
 this script also serves t = 2015Q3 through the PP adapter
 (../../_/pp_community_prices.py): j / u on Nigeria's shared labels, the native
 size in `Size`, Price on the form's own basis -- quantity of one (c2q2 unit, c2q2b other-unit text, c2q3 Naira).
-Unlike the PH rows above, the PP Kg / l rows with blank c2q2b are SERVED as
-recorded (ruling 2026-11-12: they measure as per-kg / per-litre prices); PP
-g / cl with blank c2q2b stay held (pp-unrecorded-size-hold).
+Like the PH rows above (since 2026-11-13), the PP Kg / l rows with blank c2q2b
+are SERVED as recorded (ruling 2026-11-12: they measure as per-kg / per-litre
+prices); PP g / cl with blank c2q2b stay held (pp-unrecorded-size-hold).
 Distinct t per round (pp-ph skill).
 """
 import sys

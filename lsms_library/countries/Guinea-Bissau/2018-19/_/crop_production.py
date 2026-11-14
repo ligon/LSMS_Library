@@ -14,14 +14,16 @@ Index = (t, i, plot, crop, u); plot = "{s16cq02}_{s16cq03}" aligns with
 plot_features' plot_id.  i = EHCVM composite via the Guinea-Bissau helper
 (grappe + '0' + zero-padded menage, NO 'E_' prefix).
 
-LABEL NOTE (silent-failure gotcha): Guinea-Bissau's categorical_mapping.org
-has NO harmonize_food table (the EHCVM crop value labels are Portuguese:
-'Cajueiro', 'Arroz paddy', 'Mancarra', ...).  A bare get_categorical_mapping
-on a missing table silently returns the FIRST org table (here `u`), which
-would mis-map crops to unit labels.  We guard with _table_exists(): if the
-named table is absent the map is empty and the raw (Portuguese) crop label
-passes through unchanged — visible and flagged by the sanity checker, never
-silently corrupted.  The `u` table DOES exist for Guinea-Bissau (Portuguese
+LABEL NOTE (silent-failure gotcha): a bare get_categorical_mapping on a
+missing table silently returns the FIRST org table (here `u`), which would
+mis-map crops to unit labels, so _table_exists() guards the lookup.
+Guinea-Bissau's categorical_mapping.org HAS carried a harmonize_food table
+since 2026-06-15 (an earlier version of this note said it had none): its crop
+rows map the Portuguese s16cq04 labels ('Cajueiro' -> 'Noix de cajou',
+'Arroz paddy' -> 'Riz Paddy', ...), and a label it does not name passes
+through unchanged.  'Djagatu' -> 'Jaxatu' and 'Beringela' -> 'Aubergine'
+since GH #1539 (both used to be 'Aubergine,', one key for two crops).  The
+`u` table DOES exist for Guinea-Bissau (Portuguese
 units: Kg / Saco grande / Bacia / ...), so units harmonize normally.  The
 intercrop labels are Portuguese ('Associação de culturas' / 'Pura').
 """
@@ -117,7 +119,7 @@ def _finish_crop_production(df, t):
 src = get_dataframe('../Data/s16c_me_gnb2018.dta', convert_categoricals=True)
 src_codes = get_dataframe('../Data/s16c_me_gnb2018.dta', convert_categoricals=False)
 
-crop_map = _safe_map('harmonize_food')   # absent in GNB -> identity passthrough
+crop_map = _safe_map('harmonize_food')   # present since 2026-06-15; unmapped labels pass through
 unit_map = _safe_map('u')                # present in GNB
 
 hh = src.apply(lambda r: i(pd.Series([r['grappe'], r['menage']],

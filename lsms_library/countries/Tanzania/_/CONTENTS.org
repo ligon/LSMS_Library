@@ -3318,3 +3318,13 @@ metadata and three selected public resource requests stayed below10MB each;
 no raw payload/header/row, Country/Feature, source join, test or census ran.
 WAITING114, back-casting,1441 code frames,587 fielding,1497 continuation,
 Extended/Refresh and all ID/weight/cluster rules remain separate and unchanged.
+
+* shocks: coping and the set (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 and 2026-11-13 "Coping-strategy ... GH1562".  =HowCoped0..2=
+are ranked (UPD =hr_06_1..3=, headed 1ST/2ND/3RD; 2019-20 and 2020-21 ask two, =hh_r04_1/2=), so
+nothing changes at build time.  At READ time (=lsms_library/coping.py=, =_/coping.yml=) "DID NOT DO
+ANYTHING" is a "did nothing" answer: alone it is =HowCopedSet=, beside a strategy it leaves the set
+and keeps its position.  Rounds 1-2 (2008-09, 2010-11) carry no coping in the UPD release (0 of 10,241
+and 0 of 10,216 experienced rows), so their set is NA throughout; whether coping was asked in the
+original R1/R2 forms is not established (GH #1562 audit F5, a residual).

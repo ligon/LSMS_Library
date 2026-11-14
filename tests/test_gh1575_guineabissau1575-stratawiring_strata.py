@@ -183,7 +183,8 @@ def test_registry_and_shared_callable_bindings(mapping):
     text = (ROOT / "_" / "derivations.yml").read_text()
     assert len(re.findall(rf"^{re.escape(KEY)}:", text, flags=re.M)) == 1
     rec = derivation_records(COUNTRY)[KEY]
-    assert list(rec.waves) == [WAVE] and list(rec.columns) == ["strata"]
+    # 2021-22 joined the scope on 2026-11-13 (the GH #1575 extension rule, gnb stream).
+    assert list(rec.waves) == [WAVE, "2021-22"] and list(rec.columns) == ["strata"]
     assert dict(rec.rows) == {} and list(rec.raw_variables) == ["s00q01", "s00q04"]
     assert rec.resolve() is ehcvm.derive_region_milieu_stratum
     assert rec.resolve("inputs").__name__ == "inputs_strata"
@@ -212,16 +213,17 @@ def test_registered_inputs_use_actual_cover_mapping_and_default_wave_scope(monke
         return _cover().copy()
     monkeypatch.setattr(local_tools, "get_dataframe", provider)
     rec = derivation_records(COUNTRY)[KEY]
-    inputs = call_inputs(rec)
+    inputs = call_inputs(rec, wave=WAVE)
     assert calls == [WAVE]
     assert inputs.index.names == ["t", "i"]
     assert list(inputs.columns) == ["s00q01", "s00q04"]
     assert inputs.index.get_level_values("i").tolist() == ["43002", "11001", "43001", "17001", "19001", "23001"]
     assert_frame_equal(inputs.reset_index(drop=True), _cover()[["s00q01", "s00q04"]])
-    # Scope is metadata: explicit unsupported inputs must propagate their error.
+    # The default scope is the entry's waves, 2018-19 and 2021-22 (since 2026-11-13);
+    # the invented fixture configures 2018-19 only, so the 2021-22 call propagates its error.
     with pytest.raises(KeyError, match="no configured sample"):
-        call_inputs(rec, wave="2021-22")
-    assert calls == [WAVE, "2021-22"]
+        call_inputs(rec)
+    assert calls == [WAVE, WAVE, "2021-22"]
 
 
 def test_composite_aliases_are_full_own_region_crossproduct_with_bare_entries_preserved():

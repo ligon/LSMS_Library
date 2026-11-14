@@ -769,7 +769,8 @@ First entry for this table.  =plot_inputs= is a script-path table
 - =s16bq03b= has six unit labels: =Gramme=, =Kilogramme=, =Tonne=, =Litre=,
   =Charrette= and an unsized =Sac=.  No applied line lacks a unit, so the
   script's ='Manquant'= =u= fill (not migrated to Niger's =Unknown=) never
-  fires today.
+  fires today.  [2026-11-13: migrated; the fill is =Unknown= (GH #1118), still
+  0 rows.  See the 2026-11-13 section at the end of this file.]
 - =i= is =grappe + '0' + menage= (two-digit menage), no =E_= prefix, matching
   =sample()=; 2,760 households, injective.
 - The native key (=grappe=, =menage=, =s16bq01=) is unique and non-null over
@@ -777,7 +778,11 @@ First entry for this table.  =plot_inputs= is a script-path table
   component.
 - =Purchased= / =Quantity_purchased= read =s16bq05= / =s16bq07a=, which the
   file labels as the GIFT flag and gift quantity (the Burkina finding of
-  #1188 applies by inspection).  Not changed here.
+  #1188 applies by inspection).  Not changed here.  [2026-11-13: still not
+  changed.  The ruling "Fix all three now" names Guinea-Bissau, Togo and Benin,
+  not Senegal; measured on the file, see the 2026-11-13 section.]  [Later
+  2026-11-13: changed, under the ruling "Extend to all four now"; see "2018-19
+  =plot_inputs= reads the purchase" at the end of this file.]
 
 *The collapse, and the fix.*  The three catch-all seed slots -- 15 ="Semences
 d'autres céréales"= (27 lines), 19 =Plants/boutures= (98), 20 =Autres
@@ -1307,3 +1312,138 @@ equal.  =food_expenditures= and =food_prices= lose the 2 valued rows, =food_quan
 nothing else moves, so no kilogram factor of another row depended on them.  Cost, with GH #1519
 above: one Senegal re-warm, 22 of 22 Senegal table hashes and 44 of 44 wave hashes, no other
 country's.
+
+* shocks: coping strategies, the set and the positions (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 "Coping-strategy contract, GH1562" (positions are the
+household's REPORTED order; every shocks country also gets an unordered set; EHCVM 2018-19 fills the
+set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical contract:
+=lsms_library/data_info.yml= =shocks= (=HowCoped0..3=, =HowCopedSet=); read-time rules:
+=lsms_library/coping.py=, labels in =_/coping.yml=.
+
+- *2018-19: the set only.*  =s14q05__N= is a grid, one column per option, recording WHICH strategies
+  were chosen and not their order: the paper form asks for strategies "par ordre d'importance", but
+  the release holds {0, 1, 2, 3}, a 2 only ever on option 26 ("Aucune stratégie", 26 cells) per option.  The hook now writes =HowCopedSet= from the grid
+  (=ehcvm.coping_set_from_grid=) and leaves =HowCoped0..2= present and NA (an empty answer must
+  carry its required columns, GH #1292).  Until GH #1562 it listed the positive options
+  in CODE order as =HowCoped0..2=, which disagrees with the value order on 80 rows.  Chosen = a
+  positive cell (1, 2 or 3); 0 = offered and not chosen (every answered row carries 0 on all its unchosen
+  options); NA = not asked; any other value, or a chosen code with no label, is refused
+  (=CopingGridError=).  What a positive value says about ORDER is not established, which is why no
+  position is filled.  Evidence per country: the GH #1562 audit, =out/raw/=.
+- *Site B now warns* that =HowCoped0= / =HowCoped1= are empty in 2018-19.  That is the honest report of
+  a wave that records no order; do not silence it with =optional:=, which is country-grain.
+- *Option 26 beside other options, 37 rows*, as in Mali; the read-time rule drops it from the set
+  there and keeps it alone.  1 row marks three options.
+- *2021-22: positions by rank.*  Option 25 (Oui/Non) is chosen on 65 rows, all alone: nothing
+  inferred beside another strategy, nothing stamped.
+
+* 2026-11-13 -- =plot_inputs=: =Unknown=, the harvest's crop names, and a refusing =plot_features= concatenator (GH #1118, #1119, #1287)
+
+Three changes in one Senegal re-warm, as the 2026-11-12 reconcile queue bundles them (Q3).
+
+*GH #1118, the minted unit.*  =2018-19/_/plot_inputs.py= filled a blank used unit with ='Manquant'=;
+it now writes =Unknown=, the corpus missing-unit sentinel.  Measured on the held source and the
+served table (burst job 41275616): 0 of 9,916 applied 2018-19 lines and 0 of 9,368 applied 2021-22
+lines lack =s16bq03b=, and no =s16bq03b= value label is a missing-marker, so the fill serves 0 rows in
+both waves and no served row moves.  The 2021-22 adapter (=_/s16b_2021.py=) already wrote =Unknown=.
+
+*GH #1119, maize and cowpea (the Burkina Faso #1203 pattern).*  =harmonize_seed_crop= sent =Semences de
+maïs= to =Maïs en grain= and =Semences de haricots/niébé= to =Niébé/Haricots secs=: the FOOD labels of
+=harmonize_food=, which =crop_production= never serves.  Its =s16cq04= answers are =Maïs= (882 lines, 881
+served) and =Niébé= (715, 713), passed through unmapped, and each is one label (no split).  The two cells
+now read =Maïs= and =Niébé=; every other cell and every key is unchanged, and the map stays injective over
+the slots in use.  Measured on the cold base frames (burst jobs 41275616, 41275746):
+| wave    | seed rows relabelled | maize: seed rows with a harvest row of the same (t, i, crop), before -> after | cowpea, the same |
+|---------+----------------------+------------------------------------------------------------------------------+------------------|
+| 2018-19 | 735 maize, 460 cowpea | 0 -> 723 of 735 | 0 -> 448 of 460 |
+| 2021-22 | 555 maize, 386 cowpea | (no =crop_production= this wave) | |
+The 2021-22 rows move because =_/s16b_2021.py= reads the same table.  This is a household/crop existence
+join: the input roster has no parcel axis, so a seed quantity must not be allocated to a harvest plot.
+=seed_kg= is a household total and does not read =crop=.  =harmonize_food= keeps =Maïs en grain= and
+=Niébé/Haricots secs= as food labels.
+
+*GH #1287, the =plot_features= concatenator.*  =_/plot_features.py= looped over a hardcoded
+=['2018-19', '2021-22']= with =try: get_dataframe(...) except Exception: continue=, so a declared wave
+whose script failed or never ran was dropped and the other served alone (=assert pieces= fired only when
+both were missing).  It now takes the Burkina Faso form of the #1241 refusal: every wave whose own
+metadata declares =plot_features= (=Wave.data_scheme=: a wave script or a YAML entry) must have its
+parquet under =data_root()=, or the script raises =FileNotFoundError= naming the wave before it writes;
+an undeclared wave is skipped before any read.  Both of Senegal's waves declare the table.
+
+/Which route reached the skip, measured (burst job 41275889, private cold roots, base =f138a3d61= and
+the candidate)./  With =2021-22/_/plot_features.py= replaced by a failing script:
+- =Country('Senegal').plot_features()= raised on BOTH, before this change: the default route builds the
+  table from its waves (=load_from_waves= -> =grab_data= -> =make ../2021-22/_/plot_features.parquet=,
+  =CalledProcessError=) and never runs the concatenator; =LSMS_BUILD_BACKEND=make= raised =RuntimeError:
+  Make build failed ... refusing cached output and alternate/Python fallbacks= (the GH #1288 strict wave
+  preparation).  So the Country routes did not reach the skip.
+- The concatenator run directly (=python plot_features.py= in =_/=, on a healthy root with the 2021-22
+  wave parquet removed) did: the base exited 0 and wrote =var/plot_features.parquet= with 2018-19 alone
+  (7,767 rows); the candidate raises =FileNotFoundError: Senegal plot_features: wave 2021-22 declares
+  plot_features but its parquet was not built ...= and writes nothing.
+A healthy cold build serves 7,712 + 6,112 rows on both sides, frame-equal.  Synthetic tests:
+=tests/test_senegal_plot_concatenator_refusal.py= (the Burkina test's twin).
+
+*Not changed: the gift/purchase binding of 2018-19.*  [Later 2026-11-13: superseded, see the next section.]
+=Purchased= / =Quantity_purchased= still read
+=s16bq05= / =s16bq07a=, the gift question ("16B.05. Avez-vous obtenu [INTRANT] sous forme de cadeau ou de
+don?"; the purchase is =s16bq08= "16B.08. Avez-vous acheté [INTRANT]?").  The 2026-11-13 ruling covers
+Guinea-Bissau, Togo and Benin only.  Measured on the file: =s16bq05= Oui on 536 applied lines, =s16bq08=
+Oui on 4,956; gift x purchase Non/Non 4,504, Non/Oui 4,876, Oui/Non 456, Oui/Oui 80.  2021-22 reads the
+purchase (GH #1483), so the two columns mean different things across this country's waves.  A question
+for the maintainer. The same binding survives in four cells after this batch: Senegal 2018-19, Cote d'Ivoire 2018-19,
+Niger 2018-19 and Niger 2021-22 (=Niger/_/CONTENTS.org= records it); =tests/test_ehcvm_plot_inputs_identity.py=
+and =tests/test_senegal_1483_s16b.py= pin it (red team of 2026-11-13, F1).
+
+*Cost, measured* (hash census against =f138a3d61=): Senegal 23 of 23 =Country._table_cache_hash= and 46 of
+46 =Wave._input_hash= (both waves; =_/categorical_mapping.org= and =_/plot_features.py= are build inputs of
+every wave), =framework_imports_fingerprint= unchanged (=Country= is a class and =lsms_library.paths= is an
+excluded module, so the new imports fold nothing), no other country, =build_transforms_fingerprint= 0 of 42.
+
+* 2026-11-13 -- 2018-19 =plot_inputs= reads the purchase (ruling "Extend to all four now")
+
+*Ruling (@ligon, 2026-11-13): "Extend to all four now (Recommended)".*  Senegal 2018-19, Cote d'Ivoire
+2018-19 and Niger 2018-19 / 2021-22 read =s16bq08= / =s16bq09a= as the purchase, on the Togo template
+(=408d02a24=), measured and disclosed.  This is the Senegal cell.
+
+*What is served now* (=2018-19/_/plot_inputs.py=): =Purchased= =s16bq08=, =Quantity_purchased= =s16bq09a=,
+=Unit_purchased= =s16bq09b=; =Received_as_gift= =s16bq05=, =Quantity_received_as_gift= =s16bq07a=,
+=Unit_received_as_gift= =s16bq07b=.  The four acquisition columns were declared (optional) for 2021-22
+(GH #1483) and NA on 2018-19.  Each unit is decoded from its own value labels (=s16bq07b= and =s16bq09b= have
+five answers, Gramme, Kilogramme, Tonne, Litre, Charrette; =s16bq03b= adds =Sac=) and served in the
+vocabulary of =u= (=ehcvm.served_unit_labels=, so =Kilogramme= is =Kg=).  =u= is unchanged.
+
+*The file's questions* (2018-19 Stata labels): =s16bq05= "Avez-vous obtenu [INTRANT] sous forme de cadeau ou
+de don?", =s16bq07a= "Selon vous, quantité en [INTRANT] reçue sous forme de cadeau ou de don?", =s16bq08=
+"Avez-vous acheté [INTRANT]?", =s16bq09a= "Quelles sont la quantité et la valeur totale de [INTRANT]
+achetées?".  2021-22 words the two quantity questions differently ("Quelle quantité ... reçue", "Quelle est
+la quantité ... achetée").
+
+*What moves, on the 9,916 served 2018-19 lines* (no line is hollow under either binding, so none is gained
+or lost; burst job 41280484, source counts):
+| column | before (gift question) | after (purchase question) |
+|--------+------------------------+---------------------------|
+| =Purchased= True / False | 536 / 9,380 | 4,956 / 4,960 |
+| =Quantity_purchased= non-null | 533 | 4,951 |
+| =Received_as_gift= True / False | NA | 536 / 9,380 |
+Gift x purchase: Non/Non 4,504, Non/Oui 4,876, Oui/Non 456, Oui/Oui 80.  So 456 gifts not bought were served
+as purchases, and 4,876 purchases as not bought.  *Incomplete answers, served as filed:* 5 purchases
+(=s16bq08= Oui) have a unit and no quantity, and 3 gifts (=s16bq05= Oui) have no quantity, 1 of them with a
+unit.  =seed_kg= and =nitrogen_kg= read =Quantity= and =u= only.
+
+*A vocabulary difference across the waves, disclosed.*  The 2021-22 adapter (=_/s16b_2021.py=) decodes its
+acquisition units through the country =u= table at build time, not through =served_unit_labels=, so it serves
+the raw =Kilogramme= (3,281 purchase and 213 gift lines) and =Charrettée= (79 / 125) where 2018-19 now serves
+=Kg= and =Charrette=, the =u= vocabulary.  A cross-wave group on =Unit_purchased= splits those units.  Left to
+the #1483 adapter residual (it also serves 26 undeclared columns).
+
+*Measured, served* (cold, private roots, previous head =1d89815f0= against the candidate =14606914c=; burst
+job 41280722).  19,284 rows both sides, index equal.  2018-19 cells move only in the acquisition columns
+(=Purchased= 5,332, =Quantity_purchased= 5,389, =Received_as_gift= 9,916, =Quantity_received_as_gift= 533,
+=Unit_purchased= 4,956, =Unit_received_as_gift= 534); 2021-22: 0.  The new gift columns equal the old purchase
+columns row for row; every =Unit_*= label is a =u= label.  =seed_kg=, =nitrogen_kg=, =crop_production= and
+=plot_features= are frame-equal; =Feature('plot_inputs')= equals the Country table on every value column.
+*Cost:* Senegal 23 of 23 =Country._table_cache_hash= and the 23 2018-19 =Wave._input_hash= against the previous
+head (already moving against =f138a3d61=); no other country.
+

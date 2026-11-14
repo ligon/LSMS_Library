@@ -1,6 +1,321 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* 2026-11-13 -- GH #1228 later waves: the season, the Module D join, and the registered relabel
+
+Rulings @ligon 2026-11-12 ("Join D, single-text only") and 2026-11-13, after the red
+team ("Accept as met"; "Register all waves").  Burst jobs against development
+=f138a3d61=: read-only 41271534, 41271583, 41271657, 41275928, 41276022, 41276124; cold
+builds 41272723 (at =af8178463=) and 41275716 (at =51a918684=).  Scripts and JSON are in
+the batch's =reports/malawi/=; the red team's verdict is =reports/malawi-redteam/VERDICT.md=.
+
+** The season precondition: accepted as met
+
+*Idiosyncrasy: the household's reference season is exported in the HOUSEHOLD file, not
+the agriculture files.*  Module X =hh_x02=, "ENUMERATOR: WHAT WAS THE LAST COMPLETED RAINY
+SEASON?", ships in the 2016-17 and 2019-20 cross-sections (=hh_mod_x.dta= /
+=HH_MOD_X.dta=; 2016-17 1 = 2014/2015 on 3,681 households, 2 = 2015/2016 on 8,766;
+2019-20 1 = 2017/2018 on 3,788, 2 = 2018/2019 on 7,646) and in 2024-25.  The Panel
+halves' Module X files (=hh_mod_x_16.dta=, =hh_mod_x_19.dta=) have no =hh_x02=.  No
+per-module D-0 / G-0 / I-0 answer is exported.  An earlier version of this entry said
+"the reference season is not exported".  That was wrong: it had searched Modules D, G,
+I and A, the agriculture meta files and the household cover, but not Module X (red team
+F1).
+
+The forms tie the agriculture modules to that answer.  The IHS4 agriculture
+questionnaire opens with "B_A-1. ENUMERATOR: REFER TO THE HOUSEHOLD QUESTIONNAIRE,
+MODULE X. WHAT WAS THE REFERENCE RAINY SEASON FOR THIS HOUSEHOLD?", and in IHS4 and IHS5,
+D-0, E00, F-0, G-0, H-0 and I-0 each restate it.  The IHS5 Basic Information Document
+(p. 18) and the DDI of catalog entries 2936 and 3818 give the rule: one reference season
+per household, set by interview date (red team, job 41274221).
+
+Measured (jobs 41275928 and 41276124, reproducing the red team's job 41274221).  The season of a G
+line comes from its planting month and year (=ag_g05a= / =ag_g05b=; July-December of Y
+is season Y/Y+1).
+- It equals =hh_x02= on 24,664 of 25,938 dated lines in 2016-17 XS (the red team counts
+  25,939) and 31,065 of 32,646 in 2019-20 XS.  Lines planted one season earlier: 472 /
+  567; one season later: 800 / 1,002.
+- On the relabelled lines it equals =hh_x02= on 228 of 238 and 563 of 584.  On every line
+  of the relabelled households: 831 of 858 and 2,708 of 2,805.
+- Where a module's own season answer is exported, it agrees with Module X for 7,536 of
+  7,724 households in IHS3 (=ag_c0a=) and 8,857 of 8,957 in IHS6 (=ag_e00=) (red team,
+  job 41274412).  These bound module-versus-household disagreement in those waves; they
+  are not D-versus-G in the ruled waves.  Nothing in the data dates Module D.
+- The Panel halves rest on the forms, the IHPS 2016 BID (one fixed season, 2015/16) and
+  the corroboration below.
+
+*Ruling (@ligon, 2026-11-13): accepted as met.*
+
+The measures this entry used before =hh_x02= was found, kept as corroboration:
+- One season per interview.  Households whose dated G lines all fall in one season:
+  8,876 of 9,463 (2016-17 XS), 1,780 of 1,880 (Panel), 8,022 of 8,771 (2019-20 XS), 2,184
+  of 2,333 (Panel).  The mixed households hold two adjacent seasons (1,558 of 1,585) or
+  three consecutive (24); 3 (2019-20) carry one line dated 2014 or 2009.
+- A step by interview date, against the agriculture meta file's Module G start date.
+  2016-17 XS: households interviewed April-August 2016 report 2014/15 (2,251 of 2,404),
+  October 2016-May 2017 2015/16 (5,965 of 6,172).  2019-20 XS: April-July 2019 2017/18
+  (2,187 of 2,304), September 2019-April 2020 2018/19 (5,218 of 5,474).  The cross-sections
+  straddle two reference seasons by design, which is why about a quarter of G lines were
+  planted a year earlier.
+- D and G started the same day for 9,368 of 9,604 households (2016-17 XS), 1,733 of
+  1,801 (Panel), 8,487 of 8,813 (2019-20 XS) and 2,289 of 2,368 (Panel).  *Unreconciled
+  (red team F8):* the red team counts 3,176 of 3,301 for the 2016-17 Panel.  The Panel
+  meta file has 3,704 rows, and neither count has been traced to them.
+
+** The Module D join
+
+*G's crop roster is D20's, more strictly in IHS5 than in IHS4.*  The IHS5 form prints G's
+crop column as "PRE-POPULATED WITH CROPS THAT ARE LISTED IN MODULE D (question 20)":
+2019-20 XS 32,651 of 32,651 G (plot, crop) pairs are D20 entries, Panel 9,947 of 9,978.
+IHS4's printed G form has the enumerator list the plot's crops instead (red team), and
+2016-17 matches only on the collapsed code: XS 24,555 of 25,975, Panel 6,174 of 6,289
+(on =crop_code=, 18,426 / 4,425: maize and groundnut varieties).  G code-48 pairs found
+in D20: 369 / 371, 110 / 111, 990 / 990, 231 / 234.
+
+*Idiosyncrasy: each Other slot has its own text, and 2019-20 XS has two Other slots.*
+2016-17 (both halves) and 2019-20 Panel ship ONE text, =ag_d20_oth= "Other Crop", for code
+48.  2019-20 Cross_Sectional's D20 value labels are =48 OTHER SPECIFY 1= and =49 OTHER
+SPECIFY 2=, and it ships =ag_d20_oth= for code 48 and =ag_d20b_oth= "Other Crop 2" for
+code 49.  The pairing is exact: 963 plots have slot 48 only and their text in
+=ag_d20_oth=, 39 have slot 49 only and their text in =ag_d20b_oth=, and 27 have both slots
+and both texts (red team F2).  Reproduced (job 41275928): the 27 two-text plots all carry
+slots 48 and 49, and the 39 single texts in =ag_d20b_oth= sit on plots with no code-48
+slot.  An earlier version of this entry said "two texts against one code-48 slot"; that
+was wrong.  The build reads a code-48 line's text from =ag_d20_oth= only.  A plot whose one
+text is in =ag_d20b_oth= gets the reason =text_not_for_code_48=.  That happens on no line
+today, so the pairing moves no served row.
+
+*The join, per G code-48 line*, on (household, =gardenid=, =plotid=): 0 incomplete
+keys, 0 lines without a D row, 0 non-unique D rows, 0 plots with two code-48 G lines.
+
+| half          | G code-48 lines | one text, one D code-48 slot | of which cowpea | no text | two texts (slots 48 and 49) | text, no D code-48 slot |
+|---------------+-----------------+------------------------------+-----------------+---------+-----------------------------+-------------------------|
+| 2016-17 XS    |             371 |                          369 | 238 =COWPEAS=   |       2 |                           0 |                       0 |
+| 2016-17 Panel |             111 |                          110 | 64 =COWPEAS=    |       0 |                           0 |                       1 |
+| 2019-20 XS    |             990 |                          963 | 584 =COW PEAS=  |       0 |                          27 |                       0 |
+| 2019-20 Panel |             234 |                          231 | 113 =COW PEAS=  |       0 |                           0 |                       3 |
+
+Each wave writes cowpea ONE way (2016-17 =COWPEAS=, 2019-20 =COW PEAS=, 2010-11's own G
+text =COWPEAS=; no other spelling on code 48).  These are the checkpoint's 238 / 64 /
+584 / 113 exactly.  The rest of the single texts is the familiar tail (=MUCUNA=,
+=SESAME=, =CASSAVA=, =NKHUNGUDZU=, =CHITOWE=, =CUCUMBER=, ...).
+
+Text naming cowpea that the rule leaves =Other=:
+- 2016-17 XS: one =COWPEAS(NSEULA)= (a local name in the text; not on the exact list).
+- 2016-17 Panel: one =COWPEAS= on a D row with no code-48 slot.
+- 2019-20 XS: 25 of the 27 two-text plots name cowpea.  =ag_d20_oth=, code 48's own text,
+  does on 15 of them (2 also in =ag_d20b_oth=), and =ag_d20b_oth= alone on 10.  The
+  ruling's "exactly one 'Other Crop' text" keeps all 27 =Other= (reason =multi_text=),
+  although the slot pairing would name code 48's crop on the 15.
+
+*Module I.*  2016-17 labels I's =crop_code= "Consistent CC across Modules", the same
+value-label set as G (=crop_complete=).  2019-20 labels it "Id in ag_H_seed_roster" (set
+=ag_H_seed_roster__id=, G's =ag_G_crop_roster__id=), but the two sets' labels are
+identical code for code, and I's (household, code) pairs are G's: 25,891 of 26,120 (XS),
+7,162 of 7,264 (Panel); sold pairs 7,516 of 7,572 and 2,039 of 2,064 (2016-17: 21,681 /
+22,189, 4,268 / 4,717; sold 5,456 / 5,552, 1,031 / 1,150).  So "Id in ag_H_seed_roster"
+is a CAPI roster-id name whose ids are the crop codes.  The later I files carry NO crop
+specify text (their =_oth= columns are units, transport, loss, storage).  Code-48 sale
+lines with a positive value: 50 / 25 / 187 / 62 (2016-17 XS / Panel, 2019-20 XS / Panel).
+Of those, every G code-48 line of the household resolves to cowpea for 16 / 14 / 58 /
+20, some but not all for 1 / 2 / 6 / 0, and none for 28 / 9 / 114 / 39; 5 / 0 / 9 / 3
+households have no G code-48 line.
+
+*Pre-existing, not changed here: code 49 never reaches =crop_production=.*  2019-20 XS has
+66 G lines coded 49, which =harmonize_crop= does not list.  On both arms,
+=crop_production= drops all 66 (each with a quantity) under the GH #869 "absent from
+harmonize_crop" warning, and =plot_inputs= serves their seed rows as crop ='49'=, the raw
+code (66 rows).  Their =ag_d20b_oth=: =COW PEAS= 41, =CUCUMBER= 6, =NKHAKA= 6, =MUCUNA= 3,
+=MPHONDA= 2, =NZAMA= 2, and six singletons (jobs 41275928, 41276022).  2013-14 drops one line coded
+1019 the same way.
+
+** The relabel, as built and registered
+
+=malawi.module_d_other_crop_text= / =attach_module_d_text= implement the join above in
+all four later halves.  2016-17 XS D goes through the restricted =read_module_d_columns=
+route, because that file has a latin-1 byte.  The line's text reaches =_harvest_block= /
+=_seed_block= as =crop_text=, the 2010-11 mechanism.  =_CROP_TEXT_RECODE= gains =COW PEAS=.
+The code stays 48, so =production_obs= (=reported:G:48=) and =crop_variety= still say
+what was recorded, and a sale attaches exactly as before.  "Module I code-48 sales move
+by the same rule" is read at household grain: a sale on its single-plot line moves with
+it, and a Farm-level code-48 sale takes the label only where ALL its household's code-48
+lines carry it (the =_farm_level_sales= rule GH #1457 already applied for 2010-11).
+=_crop_pieces= now labels the raw I / Q lines by the same rule.
+
+*Registered (ruling "Register all waves").*  The keys are
+=Malawi::crop_production::cowpea-from-crop-text= and
+=Malawi::plot_inputs::cowpea-from-crop-text= (=_/derivations.yml=): one rule,
+=derive_cowpea_from_crop_text=, served in two tables.
+- Inputs: one callable, =inputs_cowpea_from_crop_text=, indexed =(t, i, crop)=.  It
+  returns the relabelled code-48 G lines under their original names, with =plot_id= and
+  =source=.  In 2016-17 / 2019-20 it adds the plot's question-20 answers (=ag_d20a= ..
+  =ag_d20e=, =ag_d20_oth=, and =ag_d20b_oth= where shipped) and =d_source=.  2010-11's
+  text is the line's own =ag_g0d_os=.
+- Stamping: on every row whose =crop= a text set, 2010-11 included (the #1523 rows,
+  unregistered until now).  A row that already carries a sale-basis key keeps it, and
+  the two are joined with =derivations.MULTI_SEP= (sorted, ='+'=).  =plot_inputs= has no
+  other key today, but its stamp also unions with any =Derivation= already on the frame,
+  so a later upstream key is kept (red team D3).  A seed row is stamped only where it has a
+  payload (columns other than =Derivation=), so =seed-line-no-payload= still deletes a
+  line with no seed answer.
+- =plot_inputs.Derivation= is declared =optional: true= in =lsms_library/data_info.yml=.
+- =_assert_label_is_text_only= refuses to stamp if a =harmonize_crop= code ever maps to
+  =Cowpea (Khobwe)=, because the stamp reads the label as "set from a text".
+
+Measured, cold builds in private roots, =51a918684= against =f138a3d61= (job 41275716).
+The first build of the relabel (=af8178463=, job 41272723) gave the same =crop= moves.
+- =crop_production=: 141,661 rows either way; rows by wave unchanged.
+  - =crop= moves on 310 rows in 2016-17 (302 harvest rows, 8 Farm-level sales) and 716 in
+    2019-20 (697, 19), all =Other= -> =Cowpea (Khobwe)=.  2010-11 and 2013-14 do not move.
+  - =Derivation= moves on 1,186 rows, all of them cowpea rows of 2010-11, 2016-17 and
+    2019-20.  1,146 gain the key alone, 37 go =sale-other-unit-single-row= ->
+    =cowpea-from-crop-text+sale-other-unit-single-row=, and 3 =sale-basis-no-reference= ->
+    joined the same way.  Keyed rows: 160 / 310 / 716 (2010-11: 157 harvest lines + 3
+    Farm-level sales), of which 6 / 5 / 29 carry two keys.
+  - No other cell moves, and every ladder tally replays identically.
+  - Sales on a cowpea row: 2016-17 30 (733,110 MWK), 2019-20 78 (2,185,350 MWK).  The
+    waves' sale totals are unchanged.
+  - Lines left =Other= (=attrs['crop_text_left_other']=): 2010-11 no text 2, not on the
+    list 169; 2016-17 no text 2, no D code-48 slot 1, not on the list 177; 2019-20 two
+    texts 27, no slot 3, not on the list 497.
+- =plot_inputs=: 222,662 rows either way.
+  - =crop= moves on 301 (2016-17) and 697 (2019-20) seed rows and nothing else; keyed seed
+    rows 155 / 301 / 697.
+  - The keyed inputs hold 157 / 302 / 697 lines.  2 lines in 2010-11 and 1 in 2016-17
+    (=cs-17-103041550311= =RG02_R01=) have no seed answer, so =seed-line-no-payload=
+    deletes their seed rows.  That is the 302 / 301 of red team F8.
+  - Module H's acquisition-only Farm-level rows keep the code's label =Other=.
+  - The frame gains =Derivation= and loses the six GH #1712 columns (next entry).
+- =harvest_kg= (default and with the shipped IHS5 tables): rows and wave kilograms
+  unchanged; on =j=, 2016-17 =Other= 244 -> 104 + 140 cowpea, 2019-20 821 -> 354 + 467.
+  =seed_kg=, =nitrogen_kg= and =gross_crop_revenue= are frame-equal.  =crop_diversity=
+  rises on 7 / 52 households that grow cowpea beside another =Other= crop.
+- Site Q (red team F3):
+  - =crop_production= has 28 offenders either way, identical.
+  - =plot_inputs= goes 73 -> 72: 2019-20 25 -> 24.  Once the cowpea seed rows leave the
+    =(2019-20, Other (Specify), Seed, Other)= cell, its reference rises from 4.0 to 19.6.
+    So =cs-19-102031310144= =RG03_R01= (450) leaves the warning.  The cell's other three
+    stay (9,999, 4,500 and 4,500; ratios 2,500 / 1,125 / 1,125 -> 510 / 230 / 230).
+  - =cs-19-307106330251= =RG02_R01= (2,016 kg) moves cell, =Other= -> =Cowpea (Khobwe)=: it
+    is judged at 672 times a reference of 3.0 instead of 403 times 5.0.
+- Joins: every keyed row of the two tables joins its inputs, in 38 of 38 key x wave
+  checks.
+  - The cowpea key's plot rows join on =(t, i, crop, plot_id)=: 157 / 302 / 697
+    (=crop_production=) and 155 / 301 / 697 (=plot_inputs=).
+  - Its Farm-level sales join on =(t, i, crop)=: 3 / 8 / 19.
+  - Its inputs are unique on =(t, i, crop, plot_id)= (job 41276124).
+- =derivation_inputs= of the 41 pre-existing key x wave frames of the two tables, base
+  against candidate:
+  - 38 are equal, every 2010-11 frame among them, so the 132 relabelled 2010-11 raw I / Q
+    lines change none.
+  - 3 differ only in =crop=, =Other= -> =Cowpea (Khobwe)= (job 41276022):
+    =sale-other-unit-single-row= 2016-17 5 rows and 2019-20 26, =sale-basis-no-reference=
+    2019-20 3.  These are exactly the rows that now carry both keys.
+- Sensitivity: of the relabelled harvest rows, 294 of 302 / 665 of 697 are in households
+  whose Modules D and G started the same day, 271 / 618 in households whose dated G lines
+  fall in one season, 265 / 587 both.
+
+*Cache* (hash census =f138a3d61= -> =51a918684=, job 41275716): every Malawi L2-country
+hash (26 of 26) and L2-wave hash (156 of 156) moves, and no other country's (555 / 2,321
+probed).  No =build_transforms_fingerprint= moves (0 of 42).
+
+Malawi's =framework_imports_fingerprint= moves by exactly one closure part,
+=local_tools._dvc_working_directory=, which =read_module_d_columns= reaches.
+=_ensure_dvc_pulled= and =_dvc_cache_path= were already in Malawi's closure, and they
+are in every table's build fingerprint through =get_dataframe=.  =DVCFS= and
+=_COUNTRIES_DIR= are not callables.  This is red team F4 at =af8178463= (job 41273982);
+its probe re-run at =51a918684= (job 41276124) finds the same single part.  So a later
+edit to =_dvc_working_directory= re-warms every Malawi table.  An earlier version of this
+entry named five helpers, which was wrong.
+
+*Left as they are, for a decision* (none is in the ruling):
+- the 15 two-text 2019-20 XS plots whose =ag_d20_oth= says cowpea;
+- the 10 whose =ag_d20b_oth= alone does, which would name a code-49 line, itself dropped;
+- the 41 =COW PEAS= code-49 lines;
+- the one =COWPEAS(NSEULA)=, and the one =COWPEAS= on a D row without a code-48 slot;
+- 2013-14, which holds no text.
+
+*2024-25 (IHS6 / IHPS 2024), measured and NOT relabelled* (outside the ruling;
+=crop_production= is not wired for this wave).
+- *Idiosyncrasy: IHS6 has a cowpea code.*  Module G lists =48 OTHER (SPECIFY) 1=, =49 OTHER
+  (SPECIFY) 2= and =50 COW PEAS (KHOBWE)= (1,223 XS / 273 Panel G rows on 50).  D's two
+  texts pair with 48 and 49 (160 / 9 plots carry both).
+- The residue the ruling targets is smaller: one text on a 48-only plot saying =COW PEAS=
+  on 106 / 17 plots, and 7 / 0 on a code-49 plot.
+- The season measures hold as for the earlier waves (one season 8,836 of 9,570 and 1,848
+  of 2,054; D and G the same day 9,257 of 9,627 and 1,958 of 2,068).  2024-25 also
+  exports =hh_x02= and Module E's own =ag_e00= (red team).
+- If code 50 is mapped to =Cowpea (Khobwe)= in the country-level =harmonize_crop=,
+  =_assert_label_is_text_only= stops every =crop_production= and =plot_inputs= build.
+  The stamp would then have to read the code, not the label.
+
+* 2026-11-13 -- plot_inputs: the six all-null native Module H columns dropped (GH #1712)
+
+GH #1190's carrier copied every native =ag_h*= column of the H file onto the acquisition
+rows (the ruling of 2026-11-10: "all native H scalar columns are retained literally,
+including blank source text").  Six of them were empty in the whole country, so
+=plot_inputs= failed =no_all_null_columns= and graded =builds=.
+
+Measured on the raw file (=pyreadstat=), through =get_dataframe=, and on the rows the
+carrier keeps, each is present under its own release name and label, and empty on EVERY
+row of the one source that carries it.  There is no wiring error and no filter:
+
+| column       | source                 | label (abridged)                                    | parent answer routing to it          |
+|--------------+------------------------+-----------------------------------------------------+--------------------------------------|
+| =ag_h17_os=  | 2010-11 Full_Sample H  | transport mode, 1st purchase source (O/S)           | =ag_h17= = 5 Other (Specify) on 21 rows, all carried |
+| =ag_h26b_os= | 2010-11 Full_Sample H  | 2nd-source purchase UNIT (O/S)                      | =ag_h26b= = 9 Other on 0 rows        |
+| =ag_h27_os=  | 2010-11 Full_Sample H  | transport mode, 2nd source (O/S)                    | =ag_h27= = 5 Other on 0 rows         |
+| =ag_h36b_os= | 2010-11 Full_Sample H  | 3rd-source purchase UNIT (O/S)                      | =ag_h36b= = 9 Other on 0 rows        |
+| =ag_h26_1b=  | 2019-20 Panel H        | "Who in your household paid for the purchase of SEED 2nd" | =ag_h26_1a= (1st payer) answered on 14 rows |
+| =ag_h36_1b=  | 2019-20 Panel H        | same label                                          | =ag_h36_1a= answered on 1 row        |
+
+*Idiosyncrasy: 21 "Other (Specify)" transport answers have no text.*  The 21 =ag_h17=
+= 5 rows carry no text in any string column.  The unread 2010-11 =Panel/Agriculture= H
+file has the same 21 rows, equally blank.  The release does keep specify text elsewhere
+in that file (=ag_h43_os= 1,063 rows, =ag_h0b_os= 434, =ag_h42b_os= 54, =ag_h38b_os= 27,
+=ag_h07b_os= 12, =ag_h16b_os= 9).  The other five columns are empty because no row routes
+to them.
+
+*Ruling (@ligon, 2026-11-13): "Drop the six."*  =_seed_acquisition_block= no longer
+carries them (=_H_EMPTY_IN_RELEASE=), and only while each is blank (NA or whitespace) on
+every row of its file.  A release that fills one brings it back under its own name.  The
+source evidence is the table above.
+
+*The condition reads the FILE, not the carried rows* (red team D2, accepted as is, 2026-11-13).
+A release that fills one of the six only on rows the carrier does not keep brings the
+column back, blank on every served row, and =no_all_null_columns= fails again.  That
+failure is loud, not silent.
+=tests/test_gh1190_selected_farm_carrier.py::test_an_empty_native_h_column_is_dropped_only_while_blank_in_the_file=
+pins the rule:
+- dropped when blank on every row (NA, =''= or whitespace);
+- served under its own name when filled on a carried row;
+- served blank when filled only on a row the carrier does not keep;
+- =ag_h33=, which is not one of the six, served however blank it is.  Measured (job 41275716): =plot_inputs= keeps every
+row and every other column, and no served column is now all-NA.
+=test_table_structure -k Malawi= passes on the candidate (128 passed); on the base its
+two =Malawi/plot_inputs= failures (=test_no_fully_null_columns=, =test_feature_is_sane=)
+stand.
+
+*Three more columns are blank in the served frame (red team).  Checked, and NOT dropped*
+(jobs 41275716, 41276022):
+
+| column        | source (rows)                                   | label                                                                        | source rows with text                        | served       |
+|---------------+-------------------------------------------------+------------------------------------------------------------------------------+----------------------------------------------+--------------|
+| =ag_h33=      | 2010-11 Full_Sample H (24,009), 2013-14 H (8,524) | "What was the source of credit for this [SEED] purchase?"                   | 0, 0 (stored as =''=, not NA)                | blank        |
+| =ag_h36b_oth= | 2016-17 Panel H (4,745), 2019-20 Panel H (7,327)  | "Specify Unit" / "H36b_oth. SPECIFY UNIT"                                    | 0, 0; parent =ag_h36b= answered on 0 / 1 rows, never Other | blank |
+| =ag_h42b_os=  | 2010-11 Full_Sample H (24,009)                    | "How much of [SEED] used during [RS] was left over from a previous season (U)(O/S)?" | 54 (=CUP= 7, =PAIL= 6, =SMALL PAIL= 5, =NO. 10 PLATE= 4, ...); parent =ag_h42b= = 9 Other on 50 | 0 of 54 |
+
+=ag_h33= and =ag_h36b_oth= meet the six's evidence, except that the file stores =''=
+rather than NA, so nothing (=no_all_null_columns=) fails on them.  Whether to drop them
+is a question for the maintainer.
+
+*Idiosyncrasy: the left-over seed answer is not an acquisition.*  =ag_h42b_os= is not
+empty in the release.  Its 54 texts sit on rows that answer only the left-over question
+(=ag_h42a= on 53, =ag_h42b= on 54), with no purchase or gift quantity.  The #1190 carrier
+serves acquisitions, so it carries none of the 54, and the column is blank on every served
+row.  That is #1190's scope, not a wiring error.  Whether left-over seed should be served
+is outside this issue.
+
 * 2026-11-12 -- PR #1604 review: what 2024-25 serves, and four disclosures
 
 Measured on private cold builds (development =e5fdd2fa8=, the reviewed head
@@ -976,6 +1291,10 @@ named differently.  Module I's text is not read here (deferred with the rest).
 (=_crop_pieces=), so it would say =Other= where a relabelled harvest row says cowpea,
 and would not join that row on =(t, i, crop, u)=.  None of the 157 carries a =Derivation=
 key today, so nothing is broken, but a sale reaching one on a registered rung would be.
+(/2026-11-13:/ the latent one is closed, since =_crop_pieces= now labels the raw lines by the
+same rule.  At development =f138a3d61=, 6 of 2010-11's cowpea rows carry a sale-basis key,
+and they join.  Every cowpea row now also carries
+=Malawi::crop_production::cowpea-from-crop-text=: the top entry.)
 The =MPHODZA= line is why Module I's text cannot simply be reused for this: PFAF (a plant
 database, not a Chichewa dictionary) lists Mphodza as =Vigna radiata=, mung bean, so it is
 probably not cowpea.  That household's own G line says =COWPEAS=, so the label is right for
@@ -1004,7 +1323,8 @@ now grow one more named crop.
 
 *A wave break on =crop=.*  The label exists only in 2010-11, while later waves' =Other= is
 still mostly cowpea (above), so a cowpea series cannot be read across waves until the
-Module D halves land.
+Module D halves land.  /2026-11-13: they have, on a branch awaiting the season decision;
+see the entry of that date at the top of this file.  2013-14 still has no text./
 
 *Lines left out.*  6 more 2010-11 G lines say exactly =COWPEAS= on codes 1, 5, 11, 21 and 42
 (42 twice).  They keep their code's label: a text on a coded crop is a different decision
@@ -5898,3 +6218,20 @@ The historical seven-group/zero-attachment evidence retains its original scope;
 it is not an added-row target or a current native acceptance claim. Integration
 owns independent review, final metadata footprint and any separately admitted
 actual validation. Ledger: =.coder/ledger/1190-selected-farm-carrier.md=.
+
+* shocks: coping fillers and the set (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 and 2026-11-13 "Coping-strategy ... GH1562".  Every held
+questionnaire asks for up to 3 responses "BY ORDER OF IMPORTANCE", so =HowCoped0..2= are ranked;
+nothing changes at build time.  At READ time (=lsms_library/coping.py=, labels in =_/coping.yml=):
+
+- *2004-05 code 99 "No other response given" is a slot filler* in slots 2-3 (49,158 served cells on
+  27,046 rows): served NA in its position and never in =HowCopedSet=.
+- *2004-05 "Dont know"* (185 cells) is a labelled non-response, so a missing code: NA.  An UNLABELLED
+  numeric code is not classed (undocumented, Ethiopia W1 and Nigeria W2); a labelled "don't know" is.
+  It leaves 26 shocks with no recorded content ("Dont know", then "No other response given" twice, every
+  Affected column NA); they are kept, not deleted.  A reading of the ruling, flagged in the GH #1562
+  report.
+- *"Did not do anything"* / *"DID NOT DO ANYTHING"*: alone it is the set; beside a strategy (257-530
+  rows per wave) it leaves the set and keeps its position.
+- Not wired, as before: the "other, specify" text (=ab07*oth=, =hh_u04*_os=).

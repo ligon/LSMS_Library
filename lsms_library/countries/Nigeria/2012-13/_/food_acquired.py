@@ -20,6 +20,12 @@ PURCHASED quantity as own production, leaving the purchased row with
 Price = Expenditure / 0 = inf for ~40% of rows, which
 food_prices_from_acquired silently dropped: 2013Q1 kept 161 price rows out
 of a 134k-row food_acquired.
+
+GH #1502 (ruling @ligon 2026-11-12, "Wire W2 and W3"): each round reads its OWN
+shipped conversion table -- food_conv_w2ph.csv (keyed nsu_cd) for the harvest,
+food_conv_w2pp.csv (keyed s7bq2b) for the planting round -- on the row's item
+code and its source's own unit code, giving Quantity_kg on non-metric units
+(nigeria.food_conversion_table: g_cl 1 = grams, 0 = centilitres).
 """
 import sys
 
@@ -37,7 +43,8 @@ harvest = food_acquired_for_wave(
         'produced':  {'quantity': 's10bq6a', 'unit': 's10bq6b'},
         'inkind':    {'quantity': 's10bq7a', 'unit': 's10bq7b'},
     },
-    expenditure='s10bq4')
+    expenditure='s10bq4',
+    conversion='../Data/food_conv_w2ph.csv')
 
 # --- Planting (2012Q3) ---
 planting = food_acquired_for_wave(
@@ -47,7 +54,8 @@ planting = food_acquired_for_wave(
         'produced':  {'quantity': 's7bq6a', 'unit': 's7bq6b'},
         'inkind':    {'quantity': 's7bq7a', 'unit': 's7bq7b'},
     },
-    expenditure='s7bq4')
+    expenditure='s7bq4',
+    conversion='../Data/food_conv_w2pp.csv')
 
 df = pd.concat([harvest, planting]).sort_index()
 

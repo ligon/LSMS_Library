@@ -50,7 +50,9 @@ pytestmark = pytest.mark.requires_s3
 
 @pytest.fixture(scope="module")
 def cf():
-    return Country("Guinea-Bissau").cluster_features()
+    # The 2018-19 pins below are that wave's facts; 2021-22 has its own 450 clusters
+    # since 2026-11-13 (tests/test_gnb_2021_wave.py).
+    return Country("Guinea-Bissau").cluster_features(waves=["2018-19"])
 
 
 def test_one_row_per_cluster(cf):

@@ -4,6 +4,7 @@ import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import food_acquired_to_canonical as _food_acquired_canonical
 
+from lsms_library.ehcvm import coping_set_from_grid as _coping_set_from_grid
 from lsms_library.ehcvm import (
     UnitSizeLabelError,
     derivation_key as _derivation_key,
@@ -317,6 +318,17 @@ def food_security(df):
     return df
 
 
+#: GH #1562.  Codes 1-17 are the EHCVM template's, in its French labels as in the
+#: other seven countries.  Codes 18-25 follow the PORTUGUESE questionnaire, not the
+#: release's variable labels (which copy the French 26-option template): the
+#: Guinea-Bissau form drops the template's option 18 "Louer/mettre ses terres en
+#: gages", so every later option moves down one.  The form prints 18-22 and 25
+#: (gnb_ehcvm1_qnr_household_excel_vague1.xlsx and _vague2.xlsx, sheet S14_Chocs,
+#: cells N30-N34, N36); it prints NO 23 or 24 (no cell N35 in either workbook), so
+#: those two are the template's next two options by elimination (24 contre saison,
+#: 25 autre), which GNB 2021-22's form (gnb_ehcvm2_qnr_men_excel_vague1.pdf p68)
+#: numbers 24 and 25 in the full list.  Served in the template's French labels
+#: so that one strategy has one label across the EHCVM countries.
 COPING_LABELS = {
     1: "Utilisation de son épargne",
     2: "Aide de parents ou d'amis",
@@ -335,42 +347,25 @@ COPING_LABELS = {
     15: "Vente des actifs agricoles",
     16: "Vente des biens durables du ménage",
     17: "Vente de terrain/immeubles/Maisons",
-    18: "Louer/mettre ses terres en gages",
-    19: "Vente du stock de vivres",
-    20: "Pratique plus importante des activités de pêche",
-    21: "Vente de bétail",
-    22: "Confiage des enfants à d'autres ménages",
-    23: "Engagé dans des activités spirituelles",
-    24: "Pratique de la culture de contre saison",
-    25: "Autre stratégie",
+    18: "Vente du stock de vivres",                   # 18. Venda das existencias de provisoes
+    19: "Pratique plus importante des activités de pêche",  # 19. Pratica mais importante de atividades de pesca
+    20: "Vente de bétail",                            # 20. Venda de gado
+    21: "Confiage des enfants à d'autres ménages",    # 21. Confiar os filhos a outros agregados familiares
+    22: "Engagé dans des activités spirituelles",     # 22. Praticante de atividades espirituais
+    23: "Pratique de la culture de contre saison",    # not printed: by elimination
+    24: "Autre stratégie",                            # not printed: by elimination
+    25: "Aucune stratégie",                           # 25. Nenhuma estrategia
 }
 
 
 def shocks(df):
-    cope_cols = [c for c in df.columns if c.startswith('Cope')]
+    """The coping SET from the s14q05__N grid; HowCoped0..2 NA (GH #1562).
 
-    how_coped = {0: [], 1: [], 2: []}
-    for _, row in df[cope_cols].iterrows():
-        found = []
-        for c in cope_cols:
-            num = int(c.replace('Cope', ''))
-            val = row[c]
-            try:
-                val = float(val)
-            except (ValueError, TypeError):
-                continue
-            if val >= 1:
-                found.append(COPING_LABELS.get(num, f'Strategy {num}'))
-            if len(found) == 3:
-                break
-        for k in range(3):
-            how_coped[k].append(found[k] if k < len(found) else np.nan)
-
-    df['HowCoped0'] = how_coped[0]
-    df['HowCoped1'] = how_coped[1]
-    df['HowCoped2'] = how_coped[2]
-    df = df.drop(columns=cope_cols)
-    return df
+    The grid records which strategies were chosen, not their order (ruling
+    2026-11-12), so the set only: ehcvm.coping_set_from_grid, which says which
+    cell values count as chosen.
+    """
+    return _coping_set_from_grid(df, COPING_LABELS, country="Guinea-Bissau")
 
 
 
@@ -386,6 +381,14 @@ COMMUNITY_PRICES_DERIVATION = 'Guinea-Bissau::community_prices::one-item-per-pri
 _S05_SOURCE = 's05_co_gnb2018.dta'
 _S05_HOUSEHOLD = 's07b_me_gnb2018.dta'
 _S05_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
+
+#: s05 product code -> the household s07bq01 code whose label it is served under.
+#: GH #1226, ruled by the maintainer 2026-11-04: "Bridge Guinea-Bissau product 94
+#: (`Feijão seco`) to the household's 95 (`Feijão-frade, feijão seco`)".  94 is on the
+#: price form only, 95 in the household file only (s05 holds 348 records of 94 and
+#: none of 95), so the bridge lumps no two priced codes and `variety` stays
+#: `unknown_variety`.  `Description` keeps the form's own `Feijão seco`.
+_S05_PRODUCT_BRIDGE = {94: 95}
 
 
 def _s05_labels(categories, name):
@@ -446,7 +449,9 @@ def _s05_base(codes, community, household):
 
     ``j`` is the household's ``s07bq01`` label of the same product code through
     ``harmonize_food`` and the mojibake repair.  Product 94 (`Feijão seco`) is
-    priced but has no household label, so it takes its own.  ``Description`` is
+    priced but has no household label; it takes household code 95's
+    (:data:`_S05_PRODUCT_BRIDGE`, GH #1226).  A code with no household label
+    and no bridge would take its own.  ``Description`` is
     the s05 label with the mojibake repaired, as every other table of this wave
     serves its labels.  The form names nothing finer than ``j``, so ``variety``
     is the canonical ``unknown_variety``, unless ``harmonize_food`` lumps two
@@ -465,7 +470,7 @@ def _s05_base(codes, community, household):
     unit = codes['s05q02'].astype(int)
 
     def item(code):
-        raw = hh_items.get(code, s05_items[code])
+        raw = hh_items.get(_S05_PRODUCT_BRIDGE.get(code, code), s05_items[code])
         return _decode_mojibake(item_map.get(raw, raw)).strip()
     j_by_code = {c: item(c) for c in product.unique()}
     lumped = pd.Series(j_by_code).value_counts()

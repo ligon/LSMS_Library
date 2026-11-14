@@ -11,19 +11,27 @@ Wave: 2012-13
 # state/lga/ea `v`, GH #323, and the `moved-{hhid}` singleton are unchanged).
 
 assets:
+    # GH #1562: read ONCE, under the post-planting quarter its files belong to
+    # (both sub-frames carry the pin, so the merge on t still lines up).
     dfs:
         - df_qty
         - df_detail
     df_qty:
-        file: Post Planting Wave 2/Household/sect5a_plantingw2.dta
+        file:
+            - Post Planting Wave 2/Household/sect5a_plantingw2.dta:
+                t: '2012Q3'
         idxvars:
+            t: hhid
             i: hhid
             j: item_cd
         myvars:
             Quantity: s5q1
     df_detail:
-        file: Post Planting Wave 2/Household/sect5b_plantingw2.dta
+        file:
+            - Post Planting Wave 2/Household/sect5b_plantingw2.dta:
+                t: '2012Q3'
         idxvars:
+            t: hhid
             i: hhid
             j: item_cd
         myvars:
@@ -38,14 +46,20 @@ assets:
         - j
 
 shocks:
-    file: Post Harvest Wave 2/Household/sect15a_harvestw2.dta
+    # GH #1562: once, under the post-harvest quarter; s15aq5d is the fourth
+    # ranked column.  See 2010-11/_/data_info.yml.
+    file:
+        - Post Harvest Wave 2/Household/sect15a_harvestw2.dta:
+            t: '2013Q1'
     idxvars:
+        t: hhid
         i: hhid
         Shock: shock_cd
     myvars:
         HowCoped0: s15aq5a
         HowCoped1: s15aq5b
         HowCoped2: s15aq5c
+        HowCoped3: s15aq5d
 
 individual_education:
     # GH #171: highest education level completed per household member.
@@ -54,9 +68,19 @@ individual_education:
     # current students). See CONTENTS.org; not a left-school-only series.
     # Raw labels mapped onto the canonical ordinal vocabulary via the
     # row-additive harmonize_education table.
+    # GH #1713 (ruling @ligon 2026-11-13, "Wire W1/W2 PP + verdicts"): the
+    # POST-PLANTING round fields its own full Section 2 (sect2_plantingw2,
+    # 27,165 members; s2q8 "HIGHEST EDUCATIONAL LEVEL COMPLETED" on 17,403),
+    # served under its own t = 2012Q3.  Distinct series, never pooled with
+    # the PH new-member block.
     file:
         - Post Harvest Wave 2/Household/sect2a_harvestw2.dta:
             t: '2013Q1'
+        - Post Planting Wave 2/Household/sect2_plantingw2.dta:
+            t: '2012Q3'
+            Educational Attainment:
+                - s2q8
+                - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
     idxvars:
         t: hhid
         i: hhid

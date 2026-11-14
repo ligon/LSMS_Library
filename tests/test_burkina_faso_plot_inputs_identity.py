@@ -150,7 +150,8 @@ def test_nonseed_missing_unit_and_native_fractional_payload_are_unchanged(monkey
     assert result.index.names == ['t', 'i', 'input', 'crop', 'u']
     assert result.index.get_level_values('input').tolist() == ['Urea']
     assert result.index.get_level_values('crop').tolist() == ['(not crop-specific)']
-    assert result.index.get_level_values('u').tolist() == ['Manquant']
+    # A blank unit is the missing-unit sentinel, not a minted label (GH #1118).
+    assert result.index.get_level_values('u').tolist() == ['Unknown']
     assert result['Quantity'].tolist() == [1.25]
 
 

@@ -1,0 +1,57 @@
+#+title: ISA batch 2026-11-12: the record
+
+The 2026-11-12 LSMS-ISA batch, coordinated by Sue (Claude Opus 5.5, Slurm job 41201840 on Savio
+n0035): six work streams verified against development =e5fdd2fa8=, each red-teamed, merged into
+=integration/isa-batch-20261112= and landed on =development= as PR #1711 (merge commit
+=f138a3d61=), which was then released as v0.17.0 (=master= =cf09ea6b4=).  The batch also ran the
+v0.17.0 coverage regrade, the release preparation, and a reconciliation of the open issue backlog
+against merged work.
+
+This directory is a COPY, made at the integration of the 2026-11-13 batch (the integration PR of
+=integration/isa-batch-20261113=), of the batch's working record on scratch
+(=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261112/reports/=).  *Absolute
+=/global/scratch/...= and =/local/job...= paths inside the reports and scripts point to scratch or
+to job-local disk and may no longer exist.*  Nothing was rewritten, except two lines in
+=reports/587-wiring-final/= (=REPORT.md= line 109, =PR_BODY.md= line 71): they quoted raw =c2q2b_os=
+free-text values, which the GH #587 red team had removed from the tracked tree under the 587
+ledger rule "No raw microdata in commits", and are paraphrased here ("a gram or millilitre package
+description"; integration red team F1).  The scratch originals are unchanged.  Copied, per report
+directory: its top-level =*.md= and =*.tsv=, and its =*.py= / =*.sh= scripts (top level and
+=scripts/=), the latter under =scripts/<report>/=.  Not copied: =private/=, =work/=, =data/=,
+=out/= dumps, =JSON= state files, job logs and =.sbatch= files.
+
+* The streams (PR #1711)
+
+| # | branch head | what | issues | reports |
+|---+-------------+------+--------+---------|
+| 1 | =538eec00d9eb354d0dd7f296660295a8488f61bd= | Malawi 2024-25 =sample= and =food_acquired= (IHS5 factors), 1,948 panel links | #1275 | =1604-final=, =1604-redteam=, =1604-reverify= |
+| 2 | =5fca3904e1919bd11fdbe9c4ab7eaa426f72a7be= | sold kilograms as =crop_production.Quantity_sold_kg= (Niger, Mali) | #1560, #1571 | =sold-kg-1560=, =sold-kg-final=, =sold-kg-redteam= |
+| 3 | =9e74f2cf9b5961d2c6873f791967166e8eb40dad= | Nigeria post-planting =community_prices=, PH C8 decoder fix | #587 | =587-*= |
+| 4 | =30f461b04ed1f3c9e2a1c3d989506c3cdda3714e= | food kg evidence from purchases only, two disclosed self-valued rungs; =unitvalue= / =units= drops | #1509, #1068, #1129 | =framework-1509-*= |
+| 5 | =ef76430aa16d8c44038ec638ccde93e2f5e8da9a= | EHCVM-2 2021-22 for Togo, Benin, Cote d'Ivoire; Togo 2018 unit decode | #1697, #1557 | =ehcvm2-2021*=, =ehcvm2-live-s07bq03a-check=, =ehcvm2-s07bq03a-docsearch= |
+| 6 | =06bac74298656d4f76b300ddd3b736f61eaf3f69= | served-wave corrections: Mali rice block, Senegal salt and near-zero quantities, Niger #1708, Uganda 2009-10 =ea= | #1707, #1708, #1536, #1519 | =served-corrections*= |
+
+Each stream's red-team verdicts are the =*redteam*= directories (=VERDICT*.md= / =REPORT.md=);
+the integration PR body is =reports/integration/PR_BODY.md=.
+
+Other records:
+- =coverage-regrade/=: the v0.17.0 matrix regrade (per-country cold shards, merged with
+  =save_snapshot=; its =merge_diff.py= is reused by the 2026-11-13 regrade);
+- =release-v0.17.0/=: the release checklist, notes and the =Closes= audit;
+- =reconcile-20261112/=, =reconcile-apply/=, =reconcile-apply-check/=: the backlog triage and the
+  issue edits applied after the batch;
+- =post-merge-issues/=: the issue comments, closes and edits made after PR #1711 merged
+  (=LOG.tsv= links each one).
+
+* The rulings
+
+The 2026-11-12 entries of the maintainer rulings log; a dated snapshot of that log is
+=../isa_backlog_2026-11-13/isa-decisions.org= (the live copy is on the =docs/isa-sweep-20261103=
+branch).
+
+* Residuals
+
+Issues closed, edited or commented on after the merge are in =post-merge-issues/LOG.tsv=; the
+backlog triage of 2026-11-12 (=reconcile-20261112/TRIAGE.tsv=) and its applied edits
+(=reconcile-apply/MANIFEST.tsv=, =reconcile-apply-check/VERDICTS.tsv=) record which open issues
+were narrowed to their remaining work.

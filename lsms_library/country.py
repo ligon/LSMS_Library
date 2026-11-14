@@ -86,6 +86,7 @@ from .null_index_audit import (NullIndexKeyError, NullIndexKeyWarning,
                                _NULL_INDEX_LEDGER,
                                _read_strict as _null_index_strict)
 from .quantity_audit import check_quantities
+from .coping import normalise_coping
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
 from .sampling import (attach as attach_sampling, check_cluster_identity,
@@ -4470,6 +4471,16 @@ class Country:
                     "-- every dropped row had NO non-index data at all",
                     self.name, method_name or "?", n_dropped, n_before,
                     100.0 * n_dropped / n_before)
+
+            # GH #1562: coping strategies.  Fillers and missing codes are served
+            # NA in their HowCoped<n> position, and HowCopedSet is the build's
+            # set where it wrote one, else the positions, with the filler and
+            # "did nothing" rules applied to both (lsms_library/coping.py,
+            # labels per country in _/coping.yml).  AFTER the dropna above so
+            # the rules never delete a recorded shock; read path, so 0 hashes
+            # (this method and coping.* are in _EXCLUDED_CALLABLES).
+            if method_name == 'shocks':
+                df = normalise_coping(df, self.name)
 
             # Post-condition: the `s` (acquisition source) axis is canonical.
             # Runs here -- after mappings/spellings/dropna -- so it validates the

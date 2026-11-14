@@ -107,22 +107,51 @@ countries, and sometimes in different waves of one country. A region, a region
 crossed with urban and rural, a survey's own design code and a district are all
 served as `strata`, because that is what each survey's design or files offer:
 
-| `strata` holds | Where |
-|---|---|
-| Region x milieu, as a label | EHCVM waves of Senegal, Mali, Niger, Burkina Faso; Ethiopia |
-| Region alone | Benin, Togo, Guinea-Bissau, Cote d'Ivoire 2018-19; GhanaLSS 1998-99 onward |
-| The file's own stratum, a label | Niger 2011-12 and 2014-15 (region x agro-ecological zone) |
-| The file's own stratum, a code | Mali 2017-18, Burkina Faso 2014 |
-| Nothing | Mali 2014-15 |
+| `strata` holds | Where | `served_strata.holds` |
+|---|---|---|
+| Region x milieu, a registered construction | EHCVM waves of Senegal, Mali, Niger, Burkina Faso, Benin, Togo, Cote d'Ivoire; Guinea-Bissau 2018-19 (2021-22 once it is wired) | `constructed` (Benin, Guinea-Bissau: not recorded yet) |
+| Region x milieu, built in a wave script and not registered | Ethiopia | not recorded |
+| Region alone | GhanaLSS 1991-92 onward | not recorded |
+| The file's own stratum, a label | Niger 2011-12 and 2014-15 (region x agro-ecological zone); Uganda 2005-06 to 2010-11 | `native-label` |
+| The file's own stratum, a code | Mali 2017-18 | `native-code` |
+| The file's own code, decoded by the library to region x milieu labels | Burkina Faso 2014 (GH #1573) | not recorded |
+| Nothing | Mali 2014-15 | `absent` |
 
-This table covers the cases measured for GH #812, not every country. So
+This table covers the cases measured for GH #812 and #1575, not every country. So
 `strata` identifies a stratum within one wave of one country. Do not compare or
 group on it across countries, and check before doing so across waves. Spelling
 differs too: the EHCVM labels end in `Urbain` or `Rural`, as the surveys write
 them, and Ethiopia's in `Urban` or `Rural`. Where the
-label is a construction it is registered: `df.attrs['derivations']` names those
+label is a registered construction, `df.attrs['derivations']` names those
 countries, and `Country(c).derivations()` gives the rule and its evidence. Each
 country's `_/CONTENTS.org` records what its `strata` holds.
+
+Code can ask, wave by wave (GH #1577):
+
+```python
+rec = Country(c).sampling.get(wave)   # a plain dict: [wave] raises KeyError
+holds = rec.strata_holds if rec is not None else None
+```
+
+`holds` is `native-code`, `native-label`, `constructed` or `absent`, from the
+wave's `served_strata` block in `_/sampling.yml`, which also names the source
+`variable` or the registry `derivation` and carries its own `source_type`,
+`confidence` and `locator`. `Country(c).sampling` holds only the waves a
+country's file records, so use `.get(wave)`: a country with no `sampling.yml`,
+and an uncurated wave of one that has it (Burkina Faso 2014, the Cote d'Ivoire
+CILSS waves), are absent from it. The same records ride on
+`df.attrs['sampling']`, where an uncurated wave of a curated country appears as
+an `unrecorded` placeholder. A `None` from `strata_holds` means nobody has
+recorded what the wave serves, never that it serves nothing. A region,
+district or province served as `strata`, and a code the library decodes
+through its own lookup, are not recorded yet: see the last column. Benin and
+Guinea-Bissau, whose strata are registered constructions, have no
+`served_strata` record yet.
+
+Read `strata` with `df.get('strata')` where a wave may serve nothing: for
+Mali 2014-15, whether a one-wave `sample()` frame has the column at all
+depends on what was built before it (absent on a cold call, all NA after an
+all-wave call; identically on the v0.17.0 base).
 
 ### Error Handling
 

@@ -1,2 +1,280 @@
 Country: Guinea-Bissau
 Wave: 2021-22
+
+# EHCVM-2 (WB 6274, GNB_2021_EHCVM-2_v01_M).  Read _/CONTENTS.org "2021-22 wired"
+# first.  The facts that shape every block here:
+#   - `i` is `E2_<grappe>0<menage:02d>`, by mapping.i: 4,893 of the 5,351
+#     (grappe, menage) keys recur from 2018-19 and no link is served (no panel
+#     IDs, ruling 2026-11-12), so the ids must not be able to meet;
+#   - the file's VALUE labels are Portuguese and mostly clean UTF-8, unlike
+#     2018-19's double-encoded ones; the variable labels are French;
+#   - variable names survive where meanings do not: compare labels, not names.
+
+sample:
+    dfs:
+        - df_cover
+        - df_weights
+    df_cover:
+        file: s00_me_gnb2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            # The documented stratum, region x milieu, as 2018-19's (GH #1575; the
+            # ruling of 2026-11-12, "EHCVM-2 2021-22 strata, GH1575 extension: Same
+            # rule as #1575", names Togo, Benin and Cote d'Ivoire; applied here per
+            # the gnb brief).  This file spells three regions otherwise than 2018-19
+            # (`Bafatá`, `Gabú`, `Bolama/Bijagós`); _/categorical_mapping.org's
+            # strata table folds them.  The weights file's own `strate` (17 codes)
+            # is recorded in CONTENTS.org and not served.
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    Urbano: Urban
+    df_weights:
+        # One row per household (2018-19's file had one per grappe).  `hhweight` is
+        # the CROSS-SECTIONAL household weight, whatever its source label
+        # (" Ponderation panel") says: it is positive on all 5,351 households, the 454
+        # non-panel ones included, equals ehcvm_welfare.hhweight ("Ponderation menage")
+        # on 5,351 of 5,351, and within a grappe varies only with `panelHH`.  No other
+        # weight variable exists in the wave's 60 files, so panel_weight is hhweight,
+        # as Mali 2021-22 (hhweight beside PanelHH, the exact precedent) and Benin
+        # 2021-22 serve their one weight.  Do not read panel_weight as a longitudinal
+        # weight.
+        file: ehcvm_ponderations_gnb2021.dta
+        idxvars:
+            i:
+                - grappe
+                - menage
+        myvars:
+            weight: hhweight
+            panel_weight: hhweight
+    merge_on:
+        - i
+    final_index:
+        - i
+        - t
+
+household_roster:
+    # Everyone s01 lists: it lists the 2018-19 roster again and asks of each person
+    # whether they are still a member (s01q00aa).  The 341 who are not are SERVED with
+    # `Departed` True (ruling 2026-11-13, "Serve leavers"; mapping.household_roster),
+    # where ehcvm_individu leaves them out (41,160 = 41,501 - 341) and Benin 2021-22
+    # drops them (GH #1565).  246 of them still carry a sex.  Their MonthsSpent is served
+    # NA (ruling 2026-11-13, "Exclude from HH size"), so household_characteristics counts
+    # the survey's household; the 12 recorded answers carry
+    # Guinea-Bissau::household_roster::departed-monthsspent-withheld.
+    dfs:
+        - df_main
+        - df_cover
+    df_main:
+        file: s01_me_gnb2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+            pid: membres__id
+        myvars:
+            Sex: s01q01
+            Relationship: s01q02
+            Age:
+                - s01q04a
+                - s01q03a
+                - s01q03b
+                - s01q03c
+            MonthsSpent:
+                - s01q12
+                - mapping:
+                    Sim: 12
+                    Não: 0
+            StillMember: s01q00aa
+    df_cover:
+        file: s00_me_gnb2021.dta
+        idxvars:
+            v: grappe
+            i:
+                - grappe
+                - menage
+        myvars:
+            interview_date: s00q23a
+    merge_on:
+        - v
+        - i
+    final_index:
+        - v
+        - i
+        - pid
+
+cluster_features:
+    # One file: the cover carries one GPS point per grappe (GPS__Latitude_m /
+    # _Longitude_m, labelled "Coordonnées GPS du ménage" but constant within each of
+    # the 450 grappes), and region and milieu, constant within grappe too.  Projected
+    # to (t, v) by mapping.cluster_features, which refuses a grappe that straddles two
+    # values.  Unlike Togo's and Benin's, this point is NOT 2018-19's fix: of the 445
+    # grappes in both files 6 have a null 2018-19 point, and 2 of the other 439
+    # coincide (median 0.57 km apart): CONTENTS.org, "2021-22 wired".
+    file: s00_me_gnb2021.dta
+    idxvars:
+        v: grappe
+    myvars:
+        Region: s00q01
+        Rural:
+            - s00q04
+            - mapping:
+                Rural: Rural
+                Urbano: Urban
+        Latitude: GPS__Latitude_m
+        Longitude: GPS__Longitude_m
+
+shocks:
+    # s14a is the COVID-19 module; s14b is the module 2018-19 called s14.  The
+    # consequence labels are 2018-19's Portuguese ones; the coping columns hold the
+    # French ranks `Première / Deuxième / Troisième stratégie` or `Non`, where 2018-19's
+    # held indicators, except column 25 (`nonoui`): see mapping.shocks.  The framework
+    # drops the rows with no follow-up: 4,417 of the 10,842 reported shocks are served,
+    # because the instrument asks follow-ups only of some (as Benin, Togo), so a
+    # cross-wave incidence on this table reads as a false fall.
+    file: s14b_me_gnb2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        Shock: s14bq01
+    myvars:
+        AffectedIncome:
+            - s14bq04a
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        AffectedAssets:
+            - s14bq04b
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        AffectedProduction:
+            - s14bq04c
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        # s14bq04d is the herd ("l'Effectif du cheptel"), s14bq04e the food stock and
+        # s14bq04f the food purchases, by this file's own variable labels, in both
+        # vagues.  Ruling (GH #1556 / #1561): AffectedConsumption is food PURCHASES and
+        # AffectedFoodStock food STOCKS.
+        AffectedFoodStock:
+            - s14bq04e
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        AffectedConsumption:
+            - s14bq04f
+            - mapping:
+                Diminuiu: True
+                Aumentou: True
+                Não se alterou: False
+                Não abrangido: False
+        Cope1: s14bq05__1
+        Cope2: s14bq05__2
+        Cope3: s14bq05__3
+        Cope4: s14bq05__4
+        Cope5: s14bq05__5
+        Cope6: s14bq05__6
+        Cope7: s14bq05__7
+        Cope8: s14bq05__8
+        Cope9: s14bq05__9
+        Cope10: s14bq05__10
+        Cope11: s14bq05__11
+        Cope12: s14bq05__12
+        Cope13: s14bq05__13
+        Cope14: s14bq05__14
+        Cope15: s14bq05__15
+        Cope16: s14bq05__16
+        Cope17: s14bq05__17
+        Cope18: s14bq05__18
+        Cope19: s14bq05__19
+        Cope20: s14bq05__20
+        Cope21: s14bq05__21
+        Cope22: s14bq05__22
+        Cope23: s14bq05__23
+        Cope24: s14bq05__24
+        Cope25: s14bq05__25
+        Cope26: s14bq05__26
+
+
+
+assets:
+    # The grid, as in Benin 2021-22: 240,795 rows of which 29,727 are owned
+    # (s12q02 Oui), and only those record a number, so the all-NA drop serves the owned
+    # lines.  s12q09 (GH #1566's check): 4 of 29,407 positive values are off the 25
+    # grid, none is a non-integer and none sentinel-shaped (2018-19: 1 of 28,428).
+    file: s12_me_gnb2021.dta
+    idxvars:
+        i:
+            - grappe
+            - menage
+        j: s12q01
+    myvars:
+        Quantity: s12q03
+        Age: s12q07
+        Value: s12q09
+        Purchase Price: s12q08
+
+food_acquired:
+    # Served AS RELEASED (ruling 2026-11-13, "Serve, registered key"), although the
+    # release's quantities are not the households' answers: every positive s07bq03a and
+    # s07bq07a is an EVEN integer, 3,945 consumed rows carry s07bq03a = 0, and the fit
+    # is 2 x round-half-up(x / 2), which cannot be inverted and is documented nowhere
+    # found (_/CONTENTS.org, "food_acquired 2021-22: served as released, the rounding
+    # registered").
+    # mapping.food_acquired stamps every row with a quantity with
+    # Guinea-Bissau::food_acquired::s07b-quantities-rounded-to-even; each zeroed row is
+    # served one row with Quantity and Expenditure NA, under
+    # ...::s07bq03a-rounded-to-zero-withheld (ruling 2026-11-13, "Serve NA, as Togo"):
+    # purchased, or s='other' where the household says it never bought the item.
+    # The file is a grid: 968,524 rows, 132,176 consumed (128,229 positive, 3,945 zero, 2
+    # blank).
+    file: s07b_me_gnb2021.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j:
+            - s07bq01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Produced: s07bq04
+        # GH #876.  Expenditure is derived by mapping.food_acquired from these raw
+        # inputs, as in 2018-19; they are dropped by the reshape.  It is derived from the
+        # ROUNDED quantities, so it inherits the rounding: q3 and q7a move separately.
+        GiftQuantity: s07bq05
+        ConsumptionUnitCode: s07bq03b
+        ConsumptionUnitSize: s07bq03c
+        LastPurchaseQuantity: s07bq07a
+        # Read through mapping.LastPurchaseUnitCode: s07bq07b labels codes 107, 122 and
+        # 126 otherwise than s07bq03b, and unit_match reads labels.
+        LastPurchaseUnitCode: s07bq07b
+        LastPurchaseUnitSize: s07bq07c
+        LastPurchaseValue: s07bq08
+        # s07bq06, when the item was last bought: read by mapping.food_acquired only, to
+        # serve a zeroed row whose household says it never bought the item (Nunca) at
+        # s='other' (ruling 2026-11-13, "GNB 'Nunca' rows"); dropped there.
+        LastPurchaseWhen: s07bq06

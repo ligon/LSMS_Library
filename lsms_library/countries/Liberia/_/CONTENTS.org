@@ -377,3 +377,23 @@ declares nothing in either wave, so no table moves.
 - *Size.*  24 file names are shared between the two HIES waves, and 512 of 809 of those
   files' columns keep their names, so the 2014-15 and 2016-17 wiring can share a template.
   All tables are new work: no block carries over from 2018-19.
+
+* shocks: forest products are not coping strategies (GH #1562, 2026-11-13)
+
+Section 17 of the National Household Forest Survey (=liberia_hh_forestry_qx_final.pdf= p31) asks of
+each event: 1 severely affected?; 3 did it hinder access to forests?; 4 did the household collect or
+use forest products to help recover?; 5 "What forest or wild products did your household collect or
+use? List up to 3 forest/wild products by order of importance" (=S17_5_A/B/C=, asked only where 4 is
+yes); 6 consumed or sold; 7 source; 8 how important.  None asks what the household did to cope.  Until
+GH #1562 =S17_5_A/B/C= were served as =HowCoped0..2=, which made a list of PRODUCTS (bamboo, bush
+meat, fuelwood) read as coping strategies beside every other country's.
+
+The ruling (2026-11-13, "GTM stays; LBR own column") moves them to their own columns:
+=ForestProduct0= / =ForestProduct1= / =ForestProduct2=, by order of importance, declared optional in
+the canonical =shocks= schema.  *The names are flagged for review.*  The slot filler "no other
+product" (named by the ruling; 577 served cells) is served NA in its position, by =2018-19/_/mapping.py=
+=shocks= at build time.  Liberia's =shocks= therefore carries no =HowCoped<n>= and no =HowCopedSet=.
+
+Residual, not in scope here: the always-asked follow-ups =S17_3= / =S17_4= are not wired, so the
+table holds only the 1,358 experienced shocks whose household used forest products (2,164 of 3,522
+experienced shocks are not served).

@@ -123,8 +123,13 @@ class TestDelivered:
 
     def test_recoded_groups_present_in_ihs4_ihs5(self, cp):
         counts = cp.reset_index().groupby(['t', 'crop']).size()
-        assert int(counts.get(('2019-20', 'Other'), 0)) == 1551
-        assert int(counts.get(('2016-17', 'Other'), 0)) == 522
+        # GH #1228 re-pin (ruling 2026-11-12): 697 / 302 code-48 harvest lines whose
+        # plot's single Module D text says cowpea are `Cowpea (Khobwe)` now (1551 / 522
+        # before).  The recode rows this test is about are untouched.
+        assert int(counts.get(('2019-20', 'Other'), 0)) == 1551 - 697
+        assert int(counts.get(('2016-17', 'Other'), 0)) == 522 - 302
+        assert int(counts.get(('2019-20', 'Cowpea (Khobwe)'), 0)) == 697
+        assert int(counts.get(('2016-17', 'Cowpea (Khobwe)'), 0)) == 302
         trees = ['Fodder Trees', 'Fertiliser Trees', 'Fuel Wood Trees']
         for wave, n in [('2016-17', 15), ('2019-20', 164)]:
             got = sum(int(counts.get((wave, c), 0)) for c in trees)

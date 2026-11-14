@@ -62,11 +62,11 @@ def inputs_community_prices(wave='2015-16'):
 def inputs_c8_unrecorded_size_drop(wave):
     """The deletion entry's `inputs` callable: the DROPPED W3 rows.
 
-    One row per W3 C8 record whose unit is metric (g / cl / Kg / l) but
-    whose free-text size c8q2b records no quantity: 13,767 of the 13,768
-    g/cl rows (the 13,768th parses '50cl' and is derived, not dropped),
-    plus all 2,597 Kg and 836 l rows -- the same blank-c8q2b rule,
-    previously uncounted anywhere.  A price of an unrecorded package is not
+    One row per W3 C8 record whose unit is g / cl but whose free-text size
+    c8q2b records no quantity: 13,767 of the 13,768 g/cl rows (the 13,768th
+    parses '50cl' and is derived, not dropped).  The 2,597 Kg and 836 l rows
+    with the same blank field were in this set until GH #587 (2026-11-13);
+    they price per kilogram / per litre and are served.  A price of an unrecorded package is not
     a per-unit price, so the build drops these rather than serving them
     mis-scaled (~189x/~42x measured); a dropped row has nowhere to carry a
     Derivation key, so the registry entry carries `rows: 0` and these are

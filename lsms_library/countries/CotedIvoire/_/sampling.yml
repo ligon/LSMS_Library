@@ -1,10 +1,40 @@
 # Sampling record -- does `v` denote the same cluster as in the PRECEDING wave of
 # `Country('CotedIvoire').waves`?  Read by `lsms_library/sampling.py`.  Vocabulary: see
 # sampling.py.  Only the EHCVM boundary is written; the CILSS waves have no entry.
+#
+# SERVED STRATA (GH #1577, ruling 2026-11-12): `served_strata` says what
+# `sample().strata` holds.  Both EHCVM waves serve the documented region x milieu
+# construction, under two registry keys because 2021-22 upper-cases its region
+# first (_/derivations.yml).  The CILSS waves (1985-86 .. 1988-89) serve the cover's
+# REGION, a recorded variable nothing here identifies as the stratum, so they are
+# not recorded: that case is a question in the #1577 report.
 
 Sampling:
 
+  '2018-19':
+    served_strata:
+      holds: constructed
+      derivation: 'CotedIvoire::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, CotedIvoire::sample::region-milieu-stratum (waves 2018-19); 2018-19/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}] on Menage/s00_me_CIV2018.dta, stamped by 2018-19/_/mapping.py `sample`; CONTENTS.org, "2026-11-12 -- 2021-22 strata on the #1575 rule", "What is served, measured" (burst job 41240821): 66 labels, 0 NA, 12,992 of 12,992 keyed'
+      note: |-
+        Wired by the #1575 ruling of 2026-11-10 (the own BID: "La strate est la
+        combinaison région/milieu").  One grappe (648) holds two strata, as recorded:
+        11 households Rural and one Urbain.  Do not force one stratum per `v`
+        (CONTENTS.org, "Sampling Design").
+
   '2021-22':
+    served_strata:
+      holds: constructed
+      derivation: 'CotedIvoire::sample::region-milieu-stratum-upper-region'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, CotedIvoire::sample::region-milieu-stratum-upper-region (waves 2021-22); 2021-22/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label_upper_region}], stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2026-11-12 -- 2021-22 strata on the #1575 rule", "What is served, measured" (burst job 41240821) and "Strata key (red team F1)" (burst job 41249059): 66 labels, 0 NA, 12,965 of 12,965 keyed'
+      note: |-
+        Its own key, because the region is upper-cased before the shared
+        construction: the file labels 23 of its 33 regions in lower case on
+        2018-19's codes.  The two waves serve the same 66 labels.
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: stable

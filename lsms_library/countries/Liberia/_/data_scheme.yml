@@ -57,14 +57,21 @@ Data Scheme:
     # redundant Experienced flag (a row's existence conveys it, matching the
     # other countries). This forest-survey instrument has NO income/asset/
     # production/consumption impact breakdown, so the canonical Affected*
-    # columns are omitted. Coping is forest-specific: HowCoped0/1/2 are the
-    # first/second/third forest products the household collected to recover
-    # (S17_5_A/B/C); only populated for the ~38% of experienced shocks where
-    # forest products were used (S17_4=yes).
+    # columns are omitted. ForestProduct0/1/2 are the first/second/third forest
+    # products the household used to recover (S17_5_A/B/C, "by order of
+    # importance"); only populated for the ~38% of experienced shocks where
+    # forest products were used (S17_4=yes).  They are products, not coping
+    # strategies: until GH #1562 they were served as HowCoped0/1/2 (ruling
+    # 2026-11-13, "LBR own column").  The filler "no other product" is NA.
+    # Column names flagged for review.  Section 17's eight questions
+    # (liberia_hh_forestry_qx_final.pdf p31: affected; hindered forest access;
+    # used forest products to recover; which products; consumed or sold;
+    # source; importance) include no "what did the household do" question, so
+    # this table has no HowCopedSet.
     index: (t, i, Shock)
-    HowCoped0: str
-    HowCoped1: str
-    HowCoped2: str
+    ForestProduct0: str
+    ForestProduct1: str
+    ForestProduct2: str
 
   months_food_inadequate:
     # 2018-19 §16 'Food security' (sect16a_public.dta). MonthsInadequate=S16_2

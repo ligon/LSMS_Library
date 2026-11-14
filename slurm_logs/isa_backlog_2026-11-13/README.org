@@ -1,0 +1,89 @@
+#+title: ISA batch 2026-11-13: the record
+
+The 2026-11-13 LSMS-ISA batch, coordinated by Sue (Claude Opus 5.5, Slurm job 41201840 on Savio
+n0035): nine work streams, each written by one worker agent on its own branch from development
+=f138a3d61= (v0.17.0), each reviewed by an independent red-team agent until approved, then merged
+by an integration worker into =integration/isa-batch-20261113= (based on development =c79f543da=,
+=f138a3d61= plus #1718) and opened as *the integration PR* into =development= (its number is not
+known as this is written).  Integration tasks a-k (option-25 stamp, served_strata, sample list,
+recall, Nigeria verdicts, Windows pin, coverage regrade, hash census, combined-effect check, tests,
+this record) are described in that PR's body.
+
+This directory is a COPY of the batch's working record from scratch
+(=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261113/=), so it can be found without
+scratch.  *Absolute =/global/scratch/...= and =/local/job...= paths inside the reports and
+scripts point to scratch or to job-local disk and may no longer exist.*  Nothing was rewritten.
+
+* What is here
+
+| path | what |
+|------+------|
+| =COMMON-RULES.md=, =REDTEAM-RULES.md= | the rules every worker / red-team agent was given |
+| =tools/= | =burst-env.sh= (private roots, clone at a SHA, venv mount), =hash_census.py=, =hashdiff.py= |
+| =reports/<stream>/= | =BRIEF.md= (the task), =REPORT*.md= (the worker's report, =-rN= earlier rounds), =PR_BODY*.md= |
+| =reports/<stream>-redteam/= | =VERDICT*.md= (first review, then =-delta=, =-delta2= on later heads) |
+| =reports/cropkg/out/RUNG_DESIGN.md= | the #1559 part (2) rung design memo (nothing in it is wired) |
+| =reports/1562-coping-audit/out/per_wave_*.tsv= | the GH #1562 coping audit's per-wave instrument and measured tables |
+| =reports/residuals/LOG.tsv= | every drafted residual, mapped to the issue it was filed as (#1721-#1751) or folded into |
+| =scripts/<stream>/=, =scripts/<stream>/redteam/= | the =*.py= / =*.sh= scripts each worker and red team ran (no =.sbatch=) |
+| =isa-decisions.org= | a dated SNAPSHOT of the maintainer rulings log; the live copy is on the =docs/isa-sweep-20261103= branch |
+| =1705-benin-panel/= | (already in the repo, from the benin stream) its verification scripts |
+
+Not copied, by instruction: =private/= (data roots, frames), =out/= dumps (JSON, parquet,
+pickles), job logs.  Dropped after the content scan: =reports/burkina-redteam/VERDICT.md= (the
+first Burkina review), because it quotes raw multi-word free-text answers (the =s16cq03b= plot
+descriptions); its outcome is in =VERDICT-delta.md= and in =reports/burkina/REPORT.md=.  The integration stream's own =REPORT.md= / =PR_BODY.md= are saved to scratch
+by the coordinator after the integration worker returns; its PR body is the integration PR's body.
+
+* The streams
+
+Merged in this order.  "Verdict file" is the newest one copied here; where the coordinator
+approved a later head after its own delta review, that is said.
+
+| # | stream | branch head merged | issues | red team |
+|---+--------+--------------------+--------+----------|
+| 1 | strata | =79739f8162b706b72bbc54dffe739e855b154f80= | #1577, #1134 | APPROVE (=VERDICT-delta.md=, on this head) |
+| 2 | cropkg | =bda250217906c4303e79bfab23a71a5781168708= | #1559 part 1 | =VERDICT-delta.md= is CHANGES on =529f0bd57= (memo text only); the D1/D2 text fixes are this head, approved by the coordinator |
+| 3 | malawi | =5093b49398424e953fe049cfe12b3f29eb991443= | #1228, #1712 | APPROVE (=VERDICT-delta.md= on =9ca3518a3=; this head adds its D1-D6 fixes) |
+| 4 | burkina | =f962ef7c9b1cb6c4bc699a20aa5845e94abdc4de= | #1436, #824, #1437, #1045, #1118, #1442 | APPROVE (=VERDICT-delta.md= on =d4d063fa1=; this head applies its S1-S4) |
+| 5 | coping | =2ee44de32c1d13ad8f5c1b4ea13ac3c5b7e9e847= | #1562 | APPROVE (=VERDICT-delta.md=, on this head) |
+| 6 | manquant | =63aa569cad2d2d4d2d8f9f928a686dd443af931b= | #1118, #1119, #1287 | APPROVE (=VERDICT-delta.md=, on this head) |
+| 7 | nigeria | =dc3db3dc795d99fa82fbbcfb697323e000b4be1f= | #1537, #1502, #1518, #587, #1713 | APPROVE (=VERDICT-delta2.md=, on this head) |
+| 8 | gnb | =b7e65b83e40f5a6026493f5f42e48f49b09653f6= | #1697, #1107, #1539, #1119, #1226, #1118 | =VERDICT-delta2.md= is APPROVE on =6a124b46a=; a third delta review approved this head (reported to the coordinator, not saved as a file here) |
+| 9 | benin | =2aa1e428736450e5190992019c1b5eaa0b71b5ba= | #1705, #1118 | APPROVE (=VERDICT-delta.md=, on this head) |
+
+Side streams with no code in the integration PR:
+- =ci= (#1716, the Windows pin and =--public-pins=; merged separately as PR #1718), red team
+  =reports/ci-redteam/=;
+- =1562-coping-audit= (the coping audit behind the #1562 rulings, 17 countries, 52 waves);
+- =1709-cfe= (#1709, the Togo 2018 vs 2021-22 CFE research, read-only);
+- =integration= (the brief; its scripts are under =scripts/integration/=).
+
+* The rulings
+
+Every ruling the batch implemented is in =isa-decisions.org= (newest first; the 2026-11-12 and
+2026-11-13 entries are this batch's).  Each stream's =REPORT.md= / =PR_BODY.md= quotes the ruling
+it implements.
+
+* Residual issues filed
+
+=reports/residuals/LOG.tsv= lists each drafted residual with its action (=filed=, =existing=,
+=dropped=), the issue, and the stream it came from.  Filed: #1721-#1751, among them
+
+- #1721: Nigeria W3 crop sales on jerry cans decode =Unit_sold = 'l'=;
+- #1722 / #1723: Burkina 2021-22 survey and sold kg; spellings;
+- #1724: Malawi crop text after #1228;
+- #1725-#1729: Guinea-Bissau (rounded-key kg evidence, =Inteiro=, NSU weights, an unrounded
+  release, =Tonelada= / =Litro=);
+- #1730-#1735: coping (Nigeria W1 =Age= / =Value=, the option-25 guard, Liberia, Tanzania, Uganda
+  2005-06, "other, specify" text);
+- #1736 / #1737: Togo / Benin =plot_features= concatenators; Senegal 2021-22 adapter columns;
+- #1738-#1740: Benin unlinked households, Site Q on =Quantity_purchased=, Burkina 2018-19 units;
+- #1741-#1743: strata registrations, the cache-state column set, =_SamplingLoader= duplicate keys;
+- #1744 / #1749: scan.py taxonomy; Mali 2017-18 =s7fq13d=;
+- #1745-#1748: CI gates, docs nav, two intermittent tests;
+- #1750: the demand-estimation skill note;
+- #1751: Niger 2021-22 cart spellings.
+
+Others were folded into existing issues (#1518, #1437, #824, #1697, #791, #1577, #1559, #1709,
+#1565).

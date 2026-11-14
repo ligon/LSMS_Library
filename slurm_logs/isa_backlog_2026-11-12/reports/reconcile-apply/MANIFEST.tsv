@@ -1,0 +1,78 @@
+number	kind	text_source	title	seq	op	mode	extracted_text	new_key	depends_on	extra
+NEW:N1	split-residual	corrected/1483-residual.md	EHCVM fertilizer: decide parcel-level s16a representation and the DAP catch-all nutrient basis	1	create		texts/001-NEW_N1-create.md	N1		{"parent": 1483}
+1483	split-parent	corrected/1483.md (BODY)	EHCVM household inputs: validate the Burkina/Mali routes publicly and reconcile Niger/Senegal documentation authority	2	edit	replace	texts/002-1483-edit.md		N1	{}
+1483	split-parent	corrected/1483.md (PARENT COMMENT)		3	comment		texts/003-1483-comment.md		N1	{}
+1107	narrow	corrected/1107.md	Guinea-Bissau `nitrogen_kg` returns 0 rows: add `harmonize_input` for the Portuguese inorganic labels and kg routes for `Quilograma`/`Grama`	4	edit	replace	texts/004-1107-edit.md		N1	{}
+NEW:N2	split-residual	corrected/552-residual.md	Wire EHCVM-2 2021-22 for Benin, CotedIvoire, Guinea-Bissau and Togo (held since #1506)	5	create		texts/005-NEW_N2-create.md	N2		{"parent": 552}
+552	split-parent	corrected/552.md (BODY)	WB microdata acquisition gaps: Jamaica, Ecuador, Vietnam (external) and the late-2026 ISA re-audit	6	edit	replace	texts/006-552-edit.md		N2	{}
+552	split-parent	corrected/552.md (PARENT COMMENT)		7	comment		texts/007-552-comment.md		N2	{}
+1556	narrow	corrected/1556.md		8	edit	replace	texts/008-1556-edit.md		N2	{}
+791	narrow	corrected/791.md	UEMOA PHMECV as a source: ERI-ESI 2018 studies and the community files (licensed, human-reviewed access)	9	edit	replace	texts/009-791-edit.md		N2	{}
+1565	narrow	corrected/1565.md	EHCVM 2021-22 leavers: decide roster membership for departed persons and where departure reasons are served	10	edit	replace	texts/010-1565-edit.md		N2	{}
+NEW:N3	split-residual	corrected/new-condition-price-pool.md	median_price_valuation keyed on `condition` files every Farm-level sale price under `unknown_condition`	11	create		texts/011-NEW_N3-create.md	N3		{"parent": 1571}
+1571	split-parent	corrected/new-condition-price-pool.md (PARENT COMMENT)		12	comment		texts/012-1571-comment.md		N3	{}
+NEW:N4	split-residual	corrected/562-residual.md	GhanaLSS: decide whether to impute Quantity from community prices (former #562 phase 3b)	13	create		texts/013-NEW_N4-create.md	N4		{"parent": 562}
+562	split-parent	REPORT.md:1787		14	comment		texts/014-562-comment.md		N4	{}
+562	split-parent	REPORT.md:1786 ("then close #562")		15	close					{"reason": "completed"}
+NEW:N5	split-residual	REPORT.md:1753-1759	Panama 2008 food_acquired: Price is a mean of row prices beside summed Quantity/Expenditure	16	create		texts/016-NEW_N5-create.md	N5		{"parent": 845}
+845	split-parent	corrected/845.md	Price provenance: record elicited-vs-derived Price for Panama/GhanaLSS/Guatemala/Serbia; decide on a read-time diagnostic	17	edit	replace	texts/017-845-edit.md		N5	{}
+845	split-parent	REPORT.md:1761		18	comment		texts/018-845-comment.md		N5	{}
+NEW:N6	split-residual	REPORT.md:1011-1018	Nigeria yield_kg: the documented `area_t=pp_ph_area_t(c)` call raises now that W1-W3 serve PH-round plot areas	19	create		texts/019-NEW_N6-create.md	N6		{"parent": 1460}
+1460	split-parent	REPORT.md:1021		20	comment		texts/020-1460-comment.md		N6	{}
+1438	narrow	corrected/1438.md		21	edit	replace	texts/021-1438-edit.md			{}
+798	close	REPORT.md:1429		22	comment		texts/022-798-comment.md			{}
+798	close	REPORT.md:1425-1429		23	close					{"reason": "completed"}
+1130	narrow	REPORT.md:1813-1821		24	edit	replace	texts/024-1130-edit.md			{}
+913	close	REPORT.md:1807		25	comment		texts/025-913-comment.md			{}
+913	close	REPORT.md:1804-1807 (duplicate of #1130)		26	close					{"reason": "not planned"}
+778	close	REPORT.md:1582-1591		27	comment		texts/027-778-comment.md			{}
+778	close	REPORT.md:1578-1591		28	close					{"reason": "completed"}
+140	narrow	corrected/140.md	GhanaSPS: wire cluster_features/Region and finish the remaining feature gap (anthropometry, assets, nonfood, panel_ids)	29	edit	replace	texts/029-140-edit.md			{}
+279	narrow	corrected/279.md	labels=: accept an out-of-tree {Preferred Label: bucket} scheme (the dict form is taken)	30	edit	replace	texts/030-279-edit.md			{}
+438	narrow	REPORT.md:1946-1949 (in-place: paragraph replacement + Resolved line)		31	edit	inplace438	texts/031-438-edit.md			{}
+438	narrow	REPORT.md:1951		32	comment		texts/032-438-comment.md			{}
+449	narrow	REPORT.md:1207-1218	Tanzania W1–W3 geovariables: choose the W2 variant and grain, then wire a native extractor through the r_hhid bridge	33	edit	replace	texts/033-449-edit.md			{}
+468	narrow	corrected/468.md	EthiopiaRHS crop_production 1999 (R5): establish which round area_output_99 is, then wire or retire it	34	edit	replace	texts/034-468-edit.md			{}
+560	narrow	REPORT.md:2137-2137		35	edit	prepend	texts/035-560-edit.md			{}
+567	narrow	REPORT.md:2145-2145		36	edit	prepend	texts/036-567-edit.md			{}
+647	narrow	REPORT.md:1100-1106	Uganda 2019-20 PART-harvest slots (5A1): ruled status quo; ask UBOS/World Bank whether 5A1 Q6 is incremental or cumulative	37	edit	replace	texts/037-647-edit.md			{}
+816	narrow	REPORT.md:733-744 + §8.0 header	Burkina Faso: acquire the Enquête Prioritaire 1994 and 1998 as new waves (ruled), with a "different instrument" coverage marker	38	edit	replace	texts/038-816-edit.md			{}
+821	narrow	REPORT.md:714-725	Mali 2021-22 community prices: obtain the community questionnaire to settle whether a cluster-grain price module was fielded	39	edit	replace	texts/039-821-edit.md			{}
+824	narrow	REPORT.md:936-944	Sold-unit valuation: Burkina 2014/2021-22 sale wiring, Nigeria W1/W2 other-buyer sales, Ethiopia export cards	40	edit	replace	texts/040-824-edit.md			{}
+833	narrow	REPORT.md:1187-1199	Food/crop identity: Uganda's five unruled processing-state families, Millet code 115, and Ethiopia's per-item unit comparison	41	edit	replace	texts/041-833-edit.md			{}
+837	narrow	REPORT.md:1284-1290	Cluster disagreements: decide Ethiopia's shipped GPS conflicts and Tanzania's household-grain Rural, without bypassing the signed audit	42	edit	replace	texts/042-837-edit.md			{}
+905	narrow	REPORT.md:1502-1515	Vectorized min_count reducers: 10 remaining Python-callback sites (GhanaSPS, Cambodia, Serbia, Guatemala, GhanaLSS, Iraq, Albania) and Tanzania's held multirow branch	43	edit	replace_details905	texts/043-905-edit.md			{}
+939	narrow	corrected/939.md	GhanaLSS Aggregate partition (#940): check ranking stability across min_goods	44	edit	replace	texts/044-939-edit.md			{}
+975	narrow	corrected/975.md (header only; original body taken live)		45	edit	prepend	texts/045-975-edit.md			{}
+1000	narrow	REPORT.md:1171-1179	Uganda FCT row 4003 (yellow sweet potato): acquire Kidmose et al. 2007 and the electronic FCT version (status quo ruled)	46	edit	replace	texts/046-1000-edit.md			{}
+1044	narrow	corrected/1044.md	EthiopiaRHS 1989 food: decode food89 unit codes (1989 still serves raw unit tokens, so it has no kg baseline)	47	edit	replace	texts/047-1044-edit.md			{}
+1045	narrow	REPORT.md:1387-1417		48	edit	replace	texts/048-1045-edit.md			{}
+1103	narrow	corrected/1103.md	Kosovo 2000 kinship: truncated .dta labels appear to file in-law codes as blood relatives; serve s1a_q03 by its code list	49	edit	replace	texts/049-1103-edit.md			{}
+1118	narrow	REPORT.md:1054-1071	plot_inputs: replace the minted `Manquant` unit with `Unknown` in six EHCVM countries, and settle GhanaLSS cost-only rows	50	edit	replace	texts/050-1118-edit.md			{}
+1119	narrow	REPORT.md:1034-1043	plot_inputs crop axis: Guinea-Bissau seed crops, Senegal maize/cowpea spelling, GhanaLSS `j='Farm-level'` marker	51	edit	replace	texts/051-1119-edit.md			{}
+1136	narrow	corrected/1136.md		52	edit	replace	texts/052-1136-edit.md			{}
+1179	narrow	REPORT.md:698-706	Mali EAC-I 2014-15 community prices: 129 positive-priced entries with unresolved unit codes need producer evidence	53	edit	replace	texts/053-1179-edit.md			{}
+1226	narrow	REPORT.md:681-688	EHCVM community prices: bridge Guinea-Bissau 94, one variety convention with the s05 helper move, and re-measure Burkina's tomato tin	54	edit	replace	texts/054-1226-edit.md			{}
+1235	narrow	REPORT.md:818-828 + §8.0 header	CotedIvoire 2018-19 plot_inputs: diagnose the modal quantity 350 (39.5% of applied lines) from the held CAPI questionnaires	55	edit	replace	texts/055-1235-edit.md			{}
+1247	narrow	REPORT.md:1307-1321	Site C: add evidence-backed boundary records for Iraq, Albania and Timor-Leste	56	edit	replace	texts/056-1247-edit.md			{}
+1276	narrow	corrected/1276.md	Burkina 2021-22: relocate 6224 into Data/Panel, acquire 6277 into Data/Cross_Section, and wire the remaining cross-section tables	57	edit	replace	texts/057-1276-edit.md			{}
+1281	narrow	REPORT.md:1560-1575 (fenced)	Declared-wave KeyErrors: corpus exposure inventory and audit of pre-#1599 warm caches	58	edit	replace	texts/058-1281-edit.md			{}
+1287	narrow	old body of #1287 (part 1 of 2)		59	comment	oldbody_part				{"part": 1, "of": 2}
+1287	narrow	old body of #1287 (part 2 of 2)		60	comment	oldbody_part				{"part": 2, "of": 2}
+1287	narrow	REPORT.md:1460-1478 (body moved to comments, link appended)	Country compilers: two non-ISA concatenators still skip a declared wave (GhanaLSS community_prices, Senegal plot_features)	61	edit	replace_link1287	texts/061-1287-edit.md			{}
+1288	narrow	REPORT.md:1529-1551 (fenced; details placeholder filled from live body)		62	edit	replace_details1288	texts/062-1288-edit.md			{}
+1436	narrow	REPORT.md:920-921 (in-place: first paragraph last two sentences)		63	edit	inplace1436	texts/063-1436-edit.md			{}
+1437	narrow	REPORT.md:909-915	Burkina 2021-22 EHCVM: harvest quantity s16cq16a is blank for finished harvests (Mali done by #1515)	64	edit	replace	texts/064-1437-edit.md			{}
+1441	narrow	REPORT.md:1229-1232 (in-place: one sentence + Resolved addition)		65	edit	inplace1441	texts/065-1441-edit.md			{}
+1442	narrow	corrected/1442.md	Burkina 2014 food: land the ruled C05/C06 values (`autocons`, `cadeau`) as Expenditure once #1509 lands	66	edit	replace	texts/066-1442-edit.md			{}
+1497	narrow	REPORT.md:1159-1163	Tanzania 2019-20 split-offs: decide the first-cover-row fallback when the former head is absent or no longer head	67	edit	replace	texts/067-1497-edit.md			{}
+1529	narrow	REPORT.md:891-899		68	edit	replace	texts/068-1529-edit.md			{}
+1531	narrow	REPORT.md:781-781		69	edit	prepend	texts/069-1531-edit.md			{}
+NEW:N7	new	REPORT.md:119-128 (§5.1 item 4)	Malawi 2010-11 crop_production: a `Value_sold` of 9,999,999 is served as a sale value	70	create		texts/070-NEW_N7-create.md	N7		{}
+NEW:N8	new	corrected/new-crop-diversity-docstring.md	crop_diversity docstring: Farm-level counts predate the #1457 rows in five countries	71	create		texts/071-NEW_N8-create.md	N8		{}
+1509	ruling-comment	coordinator brief step 7 (verbatim)		72	comment		texts/072-1509-comment.md			{}
+1068	ruling-comment	coordinator brief step 7 (verbatim)		73	comment		texts/073-1068-comment.md			{}
+1129	ruling-comment	coordinator brief step 7 (verbatim)		74	comment		texts/074-1129-comment.md			{}
+1502	ruling-comment	coordinator brief step 7 (verbatim)		75	comment		texts/075-1502-comment.md			{}
+1518	ruling-comment	coordinator brief step 7 (verbatim)		76	comment		texts/076-1518-comment.md			{}
+587	ruling-comment	coordinator brief step 7 (verbatim)		77	comment		texts/077-587-comment.md			{}

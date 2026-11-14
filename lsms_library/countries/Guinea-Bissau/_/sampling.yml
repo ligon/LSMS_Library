@@ -1,0 +1,66 @@
+# Sampling record -- does `v` denote the same cluster as in the PRECEDING wave of
+# `Country('Guinea-Bissau').waves`?  The design fields are #793's curation and are
+# not written yet; their absence here is "not curated", not "not found".  Read by
+# `lsms_library/sampling.py`.  Vocabulary: see sampling.py.  Modelled on
+# Benin/_/sampling.yml and Togo/_/sampling.yml.  The first wave has no preceding
+# wave and so no `panel:` block.
+#
+# SERVED STRATA (GH #1577, ruling 2026-11-12, "Registry + sampling.yml tag"; the
+# 'constructed' value kept by the 2026-11-13 ruling "Keep constructed"):
+# `served_strata` says what `sample().strata` holds.  Both waves serve the region x
+# milieu construction registered in _/derivations.yml, each from its own cover.  The
+# blocks were proposed by the strata stream (reports/strata/out/
+# proposed-Guinea-Bissau-served_strata.yml) and merged here at integration of the
+# 2026-11-13 ISA batch, into the existing '2021-22' entry (never a duplicate wave key:
+# the loader keeps the last of two silently).
+
+Sampling:
+
+  '2018-19':
+    served_strata:
+      holds: constructed
+      derivation: 'Guinea-Bissau::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Guinea-Bissau::sample::region-milieu-stratum; 2018-19/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2018-19/_/mapping.py `sample`; CONTENTS.org, "Selected 2018-19 region/milieu strata (GH #1575)"'
+      note: |-
+        The native Portuguese Urbano / Rural suffix is kept.  SAB is documented as
+        urban-only (own 2018 DDI p.4; registry entry).
+
+  '2021-22':
+    served_strata:
+      holds: constructed
+      derivation: 'Guinea-Bissau::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Guinea-Bissau::sample::region-milieu-stratum (waves 2018-19, 2021-22), validated_against: a cold sample(), ISA integration 2026-11-13 (burst job 41283657), serves a stratum on all 5,351 households of 2021-22, 17 labels, with the key on every one and on no row without a stratum; 2021-22/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2021-22 wired", sample'
+      note: |-
+        Wired with the wave (GH #1697).  This file spells three regions otherwise
+        than 2018-19 (Bafatá, Gabú, Bolama/Bijagós), folded by the `strata` table; the
+        weights file's own `strate` (17 codes) is recorded in CONTENTS.org and not
+        served.  Raised from medium to high at integration, on the measurement in
+        the locator (the strata red team's condition).
+    panel:
+      household_continuity: rotating-panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        `grappe` in both waves, and the BID says "The survey is a panel survey by cluster"
+        and "In 2021/2022, the strategy involved revisiting the same clusters. The aim was
+        to either survey the same 12 households from 2018/2019 if they were found (after the
+        counting phase) or to survey the households that were found and complete the sample
+        to 12 households".  Measured on the raw covers: all 450 grappes recur and each keeps its
+        region and milieu (450/450, up to the 2021 file's spelling of three region names).
+        UNLIKE Togo and Benin, the 2021-22 cover point (GPS__Latitude_m / _Longitude_m,
+        one point per grappe) is NOT 2018-19's fix: of the 445 grappes in both GPS files, 6 carry a
+        null 2018-19 point, and 2 of the other 439 coincide; median 0.57 km apart, p90 6.3 km, max
+        39.4 km.  The two are different objects (the community village or quarter point in 2018-19,
+        the household-GPS variable in 2021-22); that they are not two displacements of one point is
+        a hypothesis (_/CONTENTS.org, "2021-22 wired").
+        `rotating-panel` records the DESIGN.  The library serves NO household link
+        across this boundary: 2021-22's `i` is `E2_`-prefixed (no panel IDs, ruling
+        2026-11-12), although s00q07f1/f2 record the 2018/19 grappe and household and
+        4,893 of the 5,351 (grappe, menage) keys recur.
+      source_type: local-documentation
+      confidence: high
+      source_file: 'lsms_library/countries/Guinea-Bissau/2021-22/Documentation/gnb_ehcvm2_information_de_base_eng.pdf'
+      locator: 'section 4.1 "Household and Community Component", PDF pp. 13-14 (text read from the docsearch conversion, isa-sm-20261112 ehcvm2-s07bq03a-docsearch work/txt2); measured on s00_me_gnb2021.dta, s00_me_gnb2018.dta and grappe_gps_gnb2018.dta through get_dataframe, 2026-11-13'

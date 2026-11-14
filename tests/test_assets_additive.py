@@ -5,7 +5,9 @@ individual unit owned, enumerated by `item_seq` (1..15), each carrying its own
 reported Value.  The canonical assets grain is (t, i, j), so those rows arrive
 as duplicates on the declared index and the historical `.first()` collapse kept
 ONE UNIT and discarded the rest: N576,299,043 true -> N429,001,558 kept, i.e.
-N147,297,485 (25.6%) destroyed, in EACH of t=2012Q3 and t=2013Q1.
+N147,297,485 (25.6%) destroyed, in each quarter the wave was then served
+under (2012Q3 and 2013Q1).  Since GH #1562 W2 assets is served once, under
+the post-planting quarter 2012Q3, and the summed Value there is N576,299,043.
 
 Summing `Value` is exactly lossless.  `Quantity` and `Age` must NOT be summed:
   * Quantity comes from the separate, already-clean `sect5a` grid and is merely

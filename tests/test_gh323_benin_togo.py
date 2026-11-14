@@ -21,8 +21,11 @@ cuttings" and "other seeds".  Splitting the bucket restores injectivity and the
 rows come back.
 
 DO NOT "FIX" THIS BY ADDING `Purchased` TO THE INDEX.  The colliding Togo rows
-happen to differ in `Purchased` (grappe 101 / menage 9: 16 Charrette purchased
-vs 3 Charrette own-production), which makes that look tempting.  It is wrong:
+happen to differ in `Purchased` (grappe 101 / menage 9: 3 Charrette bought at
+the market vs 16 Charrette received as a gift from another household -- read
+from s16bq08 / s16bq05 / s16bq04; until 2026-11-13 the served `Purchased` was
+the gift flag, and this note had the two reversed), which makes that look
+tempting.  It is wrong:
 `Purchased` is a measured ATTRIBUTE of a line-item, not part of its identity --
 it would not separate two distinct seeds that were both purchased, and it would
 corrupt the declared grain.  The two rows are two different planting materials,
@@ -132,8 +135,8 @@ def test_harmonize_seed_crop_is_injective_over_labels_in_use(country):
     # Both mapped to crop 'Autre crop', colliding on (i, Seed, Autre crop, Kg).
     ('Benin', '133053', {('Autre crop', 9.0), ('Autre tubercule', 6.0)}),
     # Togo grappe 101 / menage 9 reported BOTH
-    #   "Plants/boutures de tubercules" 16 Charrette  (market-purchased)
-    #   "Autres semences"                3 Charrette  (own production)
+    #   "Plants/boutures de tubercules" 16 Charrette  (a gift from another household)
+    #   "Autres semences"                3 Charrette  (bought at the market)
     # Both mapped to crop 'Autre crop', colliding on (i, Seed, Autre crop,
     # Charrette).  NB assert the exact (crop, Quantity) PAIR: merely checking
     # that 3.0 appears among this household's seed rows passes even with the bug

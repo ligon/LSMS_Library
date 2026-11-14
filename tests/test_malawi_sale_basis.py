@@ -62,6 +62,9 @@ KEYS = (W, P, OV, N, NR, CS, CH)
 #: row for, in the rulings queued on the #1457 review.
 OFF_LADDER = {'Malawi::crop_production::sale-other-unit-single-row',
               'Malawi::crop_production::sale-one-row-states-harvest'}
+#: Not a rung: the GH #1228 relabel's key, on cowpea rows beside any rung key
+#: (MULTI_SEP).  Counted apart, and no row is dropped for carrying it.
+LABEL_KEYS = {'Malawi::crop_production::cowpea-from-crop-text'}
 SINCE = {OV: '2026-09-25', NR: '2026-09-25'}
 
 #: Delivered ROWS carrying each key, per wave -- first measured on the cold
@@ -175,12 +178,19 @@ def _ladder():
     Scoped to the table: the country file also registers other tables'
     derivations (community_prices, GH #827), which are not rungs."""
     return {k: r for k, r in derivation_records(COUNTRY).items()
-            if r.table == 'crop_production' and k not in OFF_LADDER}
+            if r.table == 'crop_production' and k not in OFF_LADDER | LABEL_KEYS}
 
 
 def _keys_of(frame):
     """Rows per key.  A row can carry two (`Derivation` is MULTI_SEP-joined)."""
     return frame['Derivation'].astype('string').str.split('+').explode().value_counts().to_dict()
+
+
+def _carrying(frame, key):
+    """The rows whose `Derivation` holds ``key``, alone or joined with another (GH #1228:
+    a relabelled cowpea row carries its sale-basis key beside the crop-text key)."""
+    keys = frame['Derivation'].astype('string').str.split('+')
+    return frame[keys.map(lambda ks: isinstance(ks, list) and key in ks).to_numpy(dtype=bool)]
 
 
 def _without(frame, keys):
@@ -304,7 +314,10 @@ class TestScripts:
         """`_CROP_SALE_SOURCES` transcribes the scripts; a drift fails here."""
         src = (ROOT / wave / '_' / 'crop_production.py').read_text()
         for half in malawi_mod._CROP_SALE_SOURCES[wave]:
-            for k in ('g', 'p', 'i', 'q'):
+            # `d`: the Module D file whose question-20 text names a code-48 line (GH #1228).
+            for k in ('g', 'p', 'i', 'q', 'd'):
+                if k == 'd' and k not in half:
+                    continue
                 assert half[k] in src, (wave, half[k])
             assert half['hhid'] in src, (wave, half['hhid'])
             for k in ('gplot', 'gcrop', 'pplot', 'icrop', 'qcrop'):
@@ -690,7 +703,7 @@ class TestDelivered:
     def test_rows_per_key_per_wave(self, delivered, wave):
         x = delivered.xs(wave, level='t', drop_level=False)
         assert len(x) == TOTAL_ROWS[wave]
-        got = _keys_of(_without(x, OFF_LADDER))
+        got = {k: n for k, n in _keys_of(_without(x, OFF_LADDER)).items() if k not in LABEL_KEYS}
         assert {k: got.get(k, 0) for k in KEYS} == ROWS[wave]
         assert set(got) <= set(KEYS)
 
@@ -733,18 +746,23 @@ class TestDelivered:
             value - dropped['Value_sold'].sum(), rel=1e-9)
 
     def test_a_key_marks_a_sale_and_only_a_sale(self, delivered):
-        keyed = delivered[delivered['Derivation'].notna()]
+        # A LADDER key marks a sale.  The crop-text key (GH #1228) marks a label and rides
+        # on unsold harvest rows too, so it does not count here.
+        keys = delivered['Derivation'].astype('string').str.split('+')
+        ladder = keys.map(lambda ks: isinstance(ks, list) and bool(set(ks) - LABEL_KEYS)) \
+            .to_numpy(dtype=bool)
+        keyed = delivered[ladder]
         assert ((keyed['Quantity_sold'] > 0) | (keyed['Value_sold'] > 0)).all()
-        # and the unkeyed side still carries the exact matches AND the 0.0
-        # "did not sell" lines -- Derivation is NA on both
-        unkeyed = delivered[delivered['Derivation'].isna()]
+        # and the side without a ladder key still carries the exact matches AND the 0.0
+        # "did not sell" lines
+        unkeyed = delivered[~ladder]
         assert (unkeyed['Value_sold'] > 0).sum() > 10_000
         assert (unkeyed['Value_sold'] == 0).sum() > 1_000
 
     def test_attrs_summary_counts_the_labelled_rows_and_lists_the_deletion(self, delivered, country):
         full = country.crop_production()
         summ = full.attrs['derivations'][COUNTRY]
-        assert set(summ) - OFF_LADDER == set(KEYS) | {DEL}
+        assert set(summ) - OFF_LADDER - LABEL_KEYS == set(KEYS) | {DEL}
         for key in KEYS:
             assert summ[key]['rows'] == _keys_of(delivered).get(key, 0)
             assert summ[key]['in'] == 'crop_production'
@@ -755,17 +773,17 @@ class TestDelivered:
         """The overrule rung is Groundnut on a not-applicable harvest row
         with an S/U sale; the no-reference rung never lands on a Groundnut
         row (every wave has a Groundnut reference)."""
-        ov = delivered[delivered['Derivation'] == OV]
+        ov = _carrying(delivered, OV)
         assert len(ov) == sum(r[OV] for r in ROWS.values()) == 4
         assert set(ov.index.get_level_values('crop')) == {'Groundnut'}
         assert set(ov.index.get_level_values('condition')) == {'shell_not_applicable'}
         assert (ov['Value_sold'] > 0).all()
         assert ov['Value_sold'].sum() == pytest.approx(157_000.0)
-        nr = delivered[delivered['Derivation'] == NR]
+        nr = _carrying(delivered, NR)
         assert len(nr) == sum(r[NR] for r in ROWS.values()) == 296
         assert 'Groundnut' not in set(nr.index.get_level_values('crop'))
         assert nr['Value_sold'].sum() == pytest.approx(13_270_507.0)
-        n = delivered[delivered['Derivation'] == N]
+        n = _carrying(delivered, N)
         assert len(n) == sum(r[N] for r in ROWS.values()) == 114
         assert n['Value_sold'].sum() == pytest.approx(25_416_200.0)
         # Cotton is entirely no-reference; Tobacco is split across the two
@@ -775,7 +793,7 @@ class TestDelivered:
 
     def test_registry_lists_every_key(self, country):
         import lsms_library as ll
-        assert set(country.derivations('crop_production')) - OFF_LADDER == set(KEYS) | {DEL}
+        assert set(country.derivations('crop_production')) - OFF_LADDER - LABEL_KEYS == set(KEYS) | {DEL}
         tbl = ll.derivations()
         assert set(KEYS) | {DEL} <= set(tbl.index)
 

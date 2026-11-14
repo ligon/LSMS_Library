@@ -1,0 +1,758 @@
+# SNAPSHOT, taken 2026-11-13 at the integration of the 2026-11-13 ISA batch, of
+# `.sucoder/isa-decisions.org` on the docs branch `docs/isa-sweep-20261103` at 34fbb386a03d5ea3b0b3140146e54e529256656b
+# (`git show docs/isa-sweep-20261103:.sucoder/isa-decisions.org`).  It is NOT maintained
+# here: the live copy is on that docs branch, newest ruling first.  Rulings after this
+# date are not in this file.
+
+#+title: LSMS-ISA maintainer decisions
+
+* 2026-11-13: Nigeria W1/W2 post-harvest assets coverage verdict -- ANSWERED
+After #1562 serves Nigeria assets once (post-planting), the W1/W2 post-harvest
+cells (2011Q1, 2013Q1) are 'dropped'.  The user selected
+"empty-pending-machinery" (NOT the recommended correctly-empty): a post-harvest
+holding is computable from the post-planting count, section-7 sales and
+acquisitions; the cells stay open as future work.  W3/W4 post-harvest (2016Q1
+"assets moved to PP", 2019Q1 no section) stay correctly-empty.
+Also: #1717 (#1714 option (a)) merged as 1ba0ef607; #1714 and #1716 closed.
+
+* 2026-11-13: GNB 'Nunca' rows, Nigeria unlabelled codes, gift fix x4, strata tag -- ANSWERED
+- GNB 2021-22: the 685 zeroed rows whose household says it never bought the
+  item (s07bq06 = Nunca): "s='other' (Recommended)": served under the same
+  withheld key with source 'other'; the other 3,260 stay purchased.
+- Nigeria W2 post-planting education codes 4 / 19 / 20 (no value label):
+  "Serve 'Unknown' (Recommended)": the canonical sentinel; #1292's test to
+  distinguish labelled-but-unmapped from unlabelled codes.
+- Gift/purchase binding: "Extend to all four now (Recommended)": Senegal
+  2018-19, Cote d'Ivoire 2018-19, Niger 2018-19 and Niger 2021-22 read
+  s16bq08/s16bq09a as the purchase (Togo template 408d02a24), in the manquant
+  branch; re-pin the two tests; measured and disclosed.
+- #1577: "Keep constructed (Recommended)": the served_strata tag keeps the
+  'constructed' value with its registry pointer and the sync test.
+
+* 2026-11-13: Coping follow-ups (Nigeria assets, Uganda lone 'Nothing else') -- ANSWERED
+Evidence: reports/coping-redteam/VERDICT.md (F2, F3).
+- Nigeria assets: "Pin + W1 NA columns (Recommended)": keep the de-duplication
+  (assets served once, under the post-planting quarter; 865,318 -> 432,659
+  rows, values unchanged); W1's assets block serves Age and Value as NA (no
+  optional:), so an empty-quarter request answers the same cold and warm.
+- Uganda 2013-14 / 2015-16 code 40 'Nothing else': "Did nothing when alone
+  (Recommended)": in the first slot with nothing else recorded, the set is
+  {Did nothing} (55 / 41 rows); in later slots it stays a filler (NA).
+  Slot-aware registry class.
+
+* 2026-11-13: Nigeria W2 liquids, Benin panel exceptions and weight, Malawi keys -- ANSWERED
+Evidence: reports/nigeria-redteam/VERDICT-delta.md (D1), reports/benin-redteam/VERDICT.md (F3).
+- Nigeria W2 g_cl=1 liquids (tinned milk per milk cup conv 15, fresh milk,
+  bottled water, palm wine, pito, honey, butter/margarine; ~107 rows served
+  ~10x low): "Read as centilitres (Recommended)": onto the reviewed liquid
+  list (conv/100 l, density 1) with per-item container-volume evidence.
+- Benin: "Unlink the 63 (Recommended)": PanelHH stays the rule, but a
+  household whose whole pre-loaded 2018-19 roster is recorded as left is not
+  linked (keeps its E2_ id); registered, disclosed exception; 6,815 links.
+- Benin 2021-22 panel_weight: "NA for unlinked (Recommended)": panel_weight =
+  poids for linked households, NA for the unlinked, per the sample()
+  convention; disclosed as cross-sectional.
+- Malawi #1228: "Two keys (Recommended)": cowpea-from-crop-text registered
+  once per table (crop_production, plot_inputs), one rule and inputs callable.
+
+* 2026-11-13: Guinea-Bissau 2021-22 follow-ups and Burkina confirmations -- ANSWERED
+Evidence: reports/gnb-redteam/VERDICT-delta.md, reports/burkina-redteam/VERDICT-delta.md.
+- GNB kg-pool spillover onto 2018-19 (+4.0% kg, -10.4% food_prices sum; 61% of
+  the price fall from four smoked-catfish cells): "Accept, disclosed
+  (Recommended)".  Must-states in PR and CONTENTS; residual issue to scope
+  rounded-key rows out of the kg evidence later (transformations.py).
+- GNB 3,945 consumed rows rounded to 0: "Serve NA, as Togo (Recommended)":
+  keep the rows with quantity NA under a registered key (no reported item
+  disappears; the purchase value goes with the quantity, as #1519).  Replaces
+  the registered deletion.
+- GNB leavers in household size: "Exclude from HH size (Recommended)": serve
+  leavers in the roster but MonthsSpent NA for Departed=True rows (12 rows),
+  so household_characteristics matches the survey's household; disclosed.
+- Burkina 2021-22: "Confirm both (Recommended)": #843 option (d) for Burkina
+  2021-22 crop_production, and code 65 served as s16d's 'Autre (a preciser)'.
+
+* 2026-11-13: Wave-1 stream rulings after red team -- ANSWERED
+Evidence: burst/isa-sm-20261113/reports/{nigeria,burkina,gnb,malawi}/REPORT.md
+and the matching *-redteam/VERDICT.md.  The user selected:
+- Nigeria W2 g_cl=0 ('centilitre') class: "Re-read solids as grams" (NOT the
+  recommended hold).  Within W2's g_cl=0 cells, non-liquid items are read as
+  grams (conv/1000 kg); liquids stay conv/100 litres.  The red team measured
+  solids at ~10x every reference under cl and ~1.0-1.2x under grams.  A
+  registered derivation; the liquid/solid split must be an explicit reviewed
+  item list with per-item evidence, not a name regex (powders misfile).
+- Nigeria litres: "Serve tabled litres both sides (Recommended)": the WB
+  tables' litre containers are served as kg at density 1 on food AND crops
+  (release the 71 W3 jerry-can crop rows), disclosed.
+- Nigeria #1713: "Wire W1/W2 PP + verdicts (Recommended)": serve W1/W2
+  post-planting education (sect2), and file correctly-empty verdicts with C4
+  questionnaire evidence for W3-W5 post-planting.
+- Guinea-Bissau 2021-22 food: "Serve, registered key" (NOT the recommended
+  leave-unwired).  Serve as released under a registered key that names the
+  even-integer rounding and its evidence (every positive s07bq03a/s07bq07a is
+  even; 3,945 consumed rows q3 = 0; fitted 2 x round-half-up(x/2); not
+  invertible; undocumented).  Expenditure derives from the rounded quantities.
+- Guinea-Bissau 2021-22 leavers: "Serve leavers": keep the 341 departed
+  members, flagged as leavers (Benin 2021-22 drops them de facto; #1565 open).
+- Guinea-Bissau 2021-22 strata: "Confirm (Recommended)": region x milieu; the
+  file's own 17-code strate agrees one-to-one and is recorded.
+- Gift/purchase mix-up in 2018 plot_inputs: "Fix all three now (Recommended)":
+  Purchased / Quantity_purchased read s16bq08 / s16bq09a (the purchase), not
+  s16bq05 / s16bq07a (the gift question), in Guinea-Bissau 2018-19, Togo 2018
+  and Benin 2018-19; measured and disclosed.
+- Burkina 2021-22 harvest: "Extend Mali's rule (Recommended)":
+  harvest-from-dispositions, registered, as Mali / Benin / CIV.
+- Burkina 2021-22 repeated s16c lines: "Add production_obs (Recommended)"
+  (Niger #1360 level).
+- Malawi #1228 season precondition: "Accept as met (Recommended)" on the
+  red team's Module X hh_x02 + questionnaire evidence; CONTENTS and PR body to
+  cite it.
+- Malawi #1228 registration: "Register all waves (Recommended)": one key for
+  the Module-D-text relabel, stamped in 2010-11, 2016-17 and 2019-20, inputs
+  returning the D text.
+- Malawi #1712: "Drop the six (Recommended)" all-null Module H columns.
+Coordinator defaults (not asked; open to objection): Nigeria W3 own-zone kept;
+Nigeria 9 held bundle crop rows stay held; Nigeria data_scheme declares
+Quantity_kg optional and the canonical KgFactor/Quantity_kg note is corrected
+to admit a shipped table; W1-PP/W4 spillover left as is; GNB DAP left raw (per
+#1107, #1696 open); GNB seeds not relabelled; GNB 2021-22 GPS served as
+recorded (#791); GNB asset code 26 follows the global harmonize_assets;
+Burkina code 55/58/64 labelled from the file's own free text (basis
+derived-from-data); Burkina Condition_sold 2021-22 wired (s16dq05d, as 2018-19
+#1528); Burkina 2021-22 survey/sold kg left to a residual; Malawi
+harmonize_crop label declined per #1523.
+
+* 2026-11-13: Coping-strategy implementation, GH1562 -- ANSWERED
+Evidence: burst/isa-sm-20261113/reports/1562-coping-audit/REPORT.md (17
+countries, 52 waves; hash probes against f138a3d61).  The user selected:
+- Build: "(iii) Mixed, with Nigeria (Recommended)".  The unordered set is
+  written at BUILD time in the EHCVM 2018-19 hooks (Benin, Burkina, CIV, GNB,
+  Mali, Niger, Senegal, Togo; positions emptied there per the 11-12 ruling) and
+  for Nigeria; derived at READ time from HowCoped* everywhere else (0 hashes).
+- Name: "HowCopedSet (Recommended)": distinct labels, sorted, joined with
+  derivations.MULTI_SEP ('+'); membership by split, never substring.
+- Fillers: "NA in positions, not in set (Recommended)": a slot filler or
+  missing code ('Nothing else', 'No other response given', 'Manquant', '99.0',
+  'no other product', ...) is served NA in its position and excluded from the
+  set.  Uganda's 96 'Other (specify)' stays a strategy (de-duplicated in the set).
+- 'Did nothing / aucune strategie': "Member only when alone (Recommended)":
+  alone, the set is {did nothing} (distinct from NA = not asked); beside real
+  strategies it is dropped from the set; positions keep what was recorded.
+- Nigeria slots: "Add HowCoped3": W1-W3 get a 4th ranked position (HowCoped3,
+  optional canonical column) plus the set; W4 ("select all that apply") fills
+  the set only.
+- Nigeria duplicate serving: "Pin to post-harvest t (Recommended)": shocks are
+  served once, under the post-harvest quarter, as individual_education is;
+  check assets (same unpinned shape).  Removes 11,275 duplicate rows.
+- EHCVM 2021-22 option 25 ('Autre', Oui/Non only): "Keep slot, registered":
+  keep the inferred position, as a registered derivation with recoverable
+  inputs (Benin 13 rows, Niger 17, GNB 34).
+- Guatemala / Liberia: "GTM stays; LBR own column (Recommended)": Guatemala's
+  single action stays HowCoped0 and fills the set; Liberia's forest products
+  move out of HowCoped*/the set into their own column(s), CONTENTS updated.
+Not asked (coordinator defaults, open to objection): GNB 2018-19 coping codes
+18-25 relabel per the Portuguese questionnaire (BASES order: questionnaire >
+variable-label); cross-country label harmonization of the set is out of scope.
+
+* 2026-11-13: development branch deletion, #1714 trigger, #1709 -- ANSWERED
+- GitHub `development` was deleted at 2026-11-13T13:43:13Z by
+  delete_branch_on_merge when #1715 (development -> master) merged; ruleset
+  25124452's deletion rule has an admin bypass.  Sue restored it at f138a3d61.
+  The user explicitly selected: "No-bypass deletion rule (Recommended)".  Done:
+  refs/heads/development added to ruleset 9389899 "No deletions" (deletion +
+  non_fast_forward, no bypass actors); feature branches still auto-delete.
+- #1714: "(a) Stop edited triggers (Recommended)".  A PR title/body edit must
+  create no new run of the PR data validation workflow; a base change still
+  forces (or fails closed to) re-validation.  Own small PR.
+- #1709: "Run it now".  One read-only research agent runs the Togo 2018 vs
+  2021-22 CFE test (arms A-D) alongside the batch; no code or data change.
+
+* 2026-11-13: Release with the stale Windows pin -- ANSWERED
+The user explicitly selected: "Release now, fix pin after (Recommended)".
+#1715 (development f138a3d61 -> master) MERGED as cf09ea6b4.  The non-required
+windows-script-build job is red since #1478 (Uganda shocks 14,457 -> 14,459;
+stale ci.yml EXPECT pin); tracked in #1716; noted in the v0.17.0 release notes.
+The user publishes GitHub Release v0.17.0 on master (web-UI publish is the
+reliable trigger; workflow_dispatch fallback: gh workflow run publish.yml --ref
+master -f tag=v0.17.0).
+
+* 2026-11-12: Coverage snapshot before v0.17.0 -- ANSWERED
+The user explicitly selected: "Regrade before release (Recommended)".  Run
+`make matrix` on the final integrated tree on a free burst node while the data
+gate runs; commit the new .coder/coverage/latest.csv to development before the
+development -> master PR.  (Snapshot was 2026-09-18, 3,252 commits back.)
+Release prep: reports/release-v0.17.0/ -- 0 Closes lines (191 resolved issues
+already closed by hand; 57 open ones narrowed to remaining work); 355 PRs.
+Must-state from #1708 as ruled: Niger 2018-19 served purchase Expenditure
+falls 12.6% (53.35M -> 46.64M FCFA); 2,872 previously valued flagged rows NA.
+
+* 2026-11-12: GH1708 revaluation details, and the release plan -- ANSWERED
+- Region floor: "Region floor of 3 (Recommended)": a local median needs >= 3
+  genuine reports at cluster AND at region level; otherwise NA (about 3,787
+  NA instead of 1,992).
+- Scope: "Only previously valued (Recommended)": revalue only flagged rows
+  that already carried a served Expenditure under #876; rows the library left
+  NA (2,787) stay NA.  The ruling corrects a construction, it does not add new
+  values.
+- Release: "One release after batch".  The standing "no master release" hold
+  is LIFTED for one release, v0.17.0, cut after the six-branch integration
+  batch lands on development with a green data gate.  Sue prepares the
+  development -> master PR (one verified "Closes #N" per resolved issue) and
+  release notes for review; the user publishes the GitHub Release.
+
+* 2026-11-12: GH1509 fixture, eligibility grain and attrs naming -- ANSWERED
+- Uganda nutrition invariance fixture: "Approve the new baseline
+  (Recommended)".  Update tests/test_uganda_invariance.py's var/nutrition.parquet
+  entry (shape [23777, 15]; content_hash e9fb4c67b2463694a2ec7b46ee5e6df1ef424db19753a74c2b82ad6a48a6a600)
+  with a note citing #1509 and this approval (#967 precedent).
+- Self-valued eligibility: "Keep per food x unit cell (Recommended)": a
+  purchase of one food does not bar another food's self-valued evidence.
+- Attrs: "Accept, document the asymmetry (Recommended)": keep
+  price_rows_dropped / quantity_rows_dropped; docstrings state that 'currency'
+  counts input rows and 'unknown' counts rows that would otherwise be served.
+
+* 2026-11-12: Togo recovered zeros and the derived-from-data basis -- ANSWERED
+- "NA row only for the 11 (Recommended)": of 21 Togo 2021-22 counts outside
+  Grand Lome that recover to 0, only the 11 with no other served row get an NA
+  purchased row under the withheld key; the 10 that report small own
+  production or a gift stay represented by those rows (no invented purchase).
+- "Above filename (Recommended)": derivations.BASES order becomes
+  questionnaire > variable-label > config-comment > derived-from-data >
+  filename > modelling-choice; Cote d'Ivoire H/L entries also carry their
+  documentary basis (UEMOA/WB Document de travail no 4, ANStat) beside it.
+
+* 2026-11-12: Togo floored counts and CIV H scope (EHCVM-2 re-review) -- ANSWERED
+Evidence: reports/ehcvm2-2021-redteam2/VERDICT.md.
+- Togo 2021-22 unite rows: "Recover; a 0 becomes NA (Recommended)".  Keep the
+  exact integer recovery outside Grand Lome; any count that recovers to 0 is
+  served NA under the withheld key (no reported item disappears); disclose the
+  ~54 (0.43%) recovered rows that were probably fractional counts.
+- Cote d'Ivoire 2021-22 H rows: "Withhold all three (Recommended)":
+  consumption, own production and gifts on H rows are NA (20,536 served rows),
+  since none is the household's answer.
+
+* 2026-11-12: GH1519 Expenditure on the NA rows -- ANSWERED
+The user explicitly selected: "Yes, NA Expenditure too (Recommended)".  On the
+2 Senegal 2018-19 product-132 rows whose Expenditure the registered #876 rule
+computes from the withheld near-zero quantity, Expenditure is NA as well
+(6,000 FCFA).  A value computed from a withheld quantity is withheld with it.
+
+* 2026-11-12: GH1708 Niger 2018-19 purchase valuation -- ANSWERED
+Diagnosis (reports/served-corrections/REPORT.md): on 90% of the 15,264 flagged
+records the unit value s07bq08/s07bq07a is one producer reference value per
+product x unit x size x region; quantity backed out of value on 12,250, both
+rebuilt on 3,013; reference matches nothing documented; originals unrecoverable.
+The user asked whether food_expenditures reconstructs values from reported
+quantities and local prices (answer: no -- EHCVM Expenditure = purchased
+quantity x the household's OWN last-purchase unit value, #876).  Then
+explicitly selected: "Revalue at local median (Recommended)".  For the flagged
+rows, Expenditure = purchased quantity x the median GENUINE (unflagged)
+last-purchase unit value for the same product x unit x size in the same
+cluster, falling back to region; rows with no genuine local price get NA.  A
+registered derivation; the producer's values stay recoverable via
+derivation_inputs.  Consumed quantities are unchanged.
+
+* 2026-11-12: GH1509 ladder order and build-time Country-API dependencies -- ANSWERED
+Evidence: reports/framework-1509-redteam/VERDICT.md.
+- "Item self-valued first (Recommended)": for a (j,u) cell with NO purchase
+  evidence in any wave, the item-level self-valued rung (item_unit_nonpurchase)
+  ranks ABOVE the pooled-unit purchase rung (unit); then unit-level
+  self-valued; then none.  Cells with any purchase evidence are unaffected
+  (they never reach a self-valued rung).  GhanaLSS: ~79,773 rows / 290,479 kg
+  move from other foods' pooled purchase factor to their own item's factor.
+- "Make the dependency visible (Recommended)": Uganda's nutrition script (and
+  any other country script that calls the Country food API at build time)
+  imports the transform explicitly, so framework_imports_fingerprint folds the
+  kg-factor code into its hash.  One-time re-warm of those countries now, and
+  on later kg-factor edits.  Fixes warm Uganda nutrition serving stale values.
+
+* 2026-11-12: GH587 W1 division after red team -- ANSWERED (amends the W1 ruling)
+Evidence: reports/587-redteam/VERDICT.md F1/F2 (three references, each
+calibrated by N = 1 rows; within-item elasticity of Naira on N 0.46-0.47).
+- "Hold both (Recommended)": hold Kg N 6-50 (208 rows; divided 0.33x/0.16x/
+  0.155x) and non-metric N > 50 (241 rows; divided 0.015x, undivided 1.0x --
+  N reads as a size) under registered omissions with the evidence.
+- "Flag them, hold g N 2-5 (Recommended)": keep the division on the
+  unvalidated rows (non-metric N 2-50, 3,033; Kg N 2-5, 547; 49 Unknown-unit)
+  under a SEPARATE registered key marking them unvalidated; hold W1 g/ml N 2-5
+  (61 + 3 rows, ~9x household).  Supported bands (g other N, ml, l) stay under
+  the existing division key.
+- Unit tokens: "Register tokens, keep Unknown (Recommended)": add Congo/Mudu,
+  ml and Tomatoes cup to Nigeria's unit table; serve the 399 blank-unit PP rows
+  as u='Unknown' per data_info.yml; aligning PH's blank-unit drop is a
+  follow-up.
+
+* 2026-11-12: Sold-kg details, GH1560/GH1571 follow-up -- ANSWERED
+- Niger 2011-12 dry season: "First cycle, as recorded (Recommended)": served as
+  the recorded first-cycle kg, disclosed as per-first-cycle; any multiplication
+  waits on #1529's cycle-semantics ruling.
+- Selected all four: (a) mask the seven dry-season records stating 8,740 sold
+  kg with no sale (own sold flag No on 6), under a registered rule; (b) keep the
+  rainy-season 2011-12 9999 code mask; (c) stamp 2021-22 sold kg with the same
+  'estimate' Derivation key the 2021-22 harvest kg carry (2,954 rows); (d) Site
+  Q screens Quantity_sold_kg (report-only).
+
+* 2026-11-12: GH1559 price-implied kg per unit for crops -- ANSWERED
+Measured (reports/sold-kg-1560/REPORT.md, Part 2).  The user explicitly
+selected: "Also build a rung".  So: (1) a report-only screen flagging survey kg
+outside 0.1x-10x of the price-implied kg per unit (baseline: kg sales plus sacks
+at stated mass), and (2) design a price-implied INFERRED rung for crop units in
+harvest_kg_factors, as its own design, never merged with the food ladder.
+Measured caveats to carry into the design: product state (shelled/unshelled,
+~2.4x price gap; only 2021-22 records it), selection (21-24% of rows from
+sellers), seasonality (~1.3x, Mali), survey kg 1.1-1.4x the price-implied value
+at the median.  Next batch (not the current one).
+
+* 2026-11-12: GH587 label judgements and two follow-ups -- ANSWERED
+Put from reports/587-wiring-final/PR_BODY.md ("For maintainer review").
+- Items: "Add a Semovita row".  W3 161 served as Palm wine (native 'Palm oil'
+  collides with code 50; printed PP/PH/household cards say Palm wine); W2 code
+  0 'No more option' dropped (sentinel); ADD a 'Semovita' row to Nigeria's
+  harmonize_food so W2 code 15 is served (not 'Bread'), with a sourced
+  Aggregate; Nigeria re-warm already in the batch.  The other 25 flagged item
+  rows are spelling/truncation and are accepted as proposed.
+- Units: "Accept all (Recommended)".  'Tomatoes cup' (weightless token),
+  'Congo/Mudu' (combined token), TIN -> Derica (PH fold), 125 PACKET ->
+  Packet/Sachet, and the other unit rows as proposed in MAPPING.org.
+- PH W3 Kg/l consistency: "Measure PH, then align (Recommended)".  Test PH
+  W3's 3,433 dropped blank-size Kg/l rows against household unit values; if
+  per-unit, serve them too -- follow-up in the next Nigeria batch.
+- W5 c2q2a != 1: "Serve the 63 via c8 (Recommended)".  The 63 BOTTLE/CAN rows
+  with a coded metric size go through the approved c8-metric-size division;
+  the other 60 stay excluded with their count.
+
+* 2026-11-12: Coping-strategy contract, GH1562 -- ANSWERED
+The user explicitly selected: "Positions = respondent order (Recommended)".
+HowCoped0..2 mean the household's REPORTED order (1st/2nd/3rd) and are filled
+only where an instrument records an order (Uganda s16q04a/b/c, ...).  Every
+shocks country also gets an UNORDERED set column of chosen strategies, so
+"which strategies" composes everywhere.  EHCVM 2018-19 fills the set only (not
+positions) until its order is proven from export documentation.  First step:
+audit every shocks country's coping semantics.  Canonical data_info.yml shocks
+columns change (a new set column; position semantics stated).
+
+* 2026-11-12: Nigeria W3-W5 sale attachment by crop code, GH1551 -- ANSWERED
+The user explicitly selected: "Keep Farm-level (Recommended)".  No change;
+#843 rule A stands.  #1551 can be closed with this ruling.
+
+* 2026-11-12: Strata meaning record, GH1577 -- ANSWERED
+The user explicitly selected: "Registry + sampling.yml tag (Recommended)".
+Constructed strata stay in the derivations registry; add a small per-wave tag
+in _/sampling.yml for native-code, native-label and absent cases, decided with
+#1134's vocabulary extension (#793 vocabulary is frozen; widen one tag at a
+time with its first evidenced record).
+
+* 2026-11-12: Senegal 2018-19 near-zero quantities, GH1519 -- ANSWERED
+The user explicitly selected: "Exact-value NA rule".  Set the quantity to NA on
+exactly the three product-132 rows whose released s07bq03a / s07bq07a are below
+1e-3 (about 1e-19 / 1e-20; s07bq03a = 40 x s07bq07a), under a registered rule
+(precedent: Mali 99,999,999 sentinel, GH1594).  One Senegal re-warm.
+
+* 2026-11-12: Nigeria generic Pepper, GH1537 -- ANSWERED
+The user explicitly selected: "Check codes, then Fresh (Recommended)".  Confirm
+served 'Pepper' rows all come from codes 76 / 2140 (Preferred 'Fresh Pepper');
+if so map to the Fresh Pepper Aggregate, else leave pass-through and report.
+
+* 2026-11-12: Malawi later-wave cowpea, GH1228 -- ANSWERED
+The user explicitly selected: "Join D, single-text only (Recommended)".  After
+a read-only check that Modules D and G share the season reference, relabel
+2016-17 / 2019-20 'Other' G rows to Cowpea (Khobwe) from Module D text only
+where the plot has exactly one 'Other Crop' text; move Module I code-48 sales by
+the same rule; local names stay unmapped.
+
+* 2026-11-12: EHCVM coping order, GH1562 -- QUESTION BACK, then direction (below)
+The user asked: "We would want these to be composable with the shocks
+features for other countries (e.g., Uganda); does that change the problem?"
+Measured: Uganda 2019-20 HowCoped0/1/2 = s16q04a/b/c, labelled "1st / 2nd / 3rd
+hh coping strategy" -- a respondent order.  EHCVM's code order is therefore not
+composable even if documented.
+
+* 2026-11-12: Undocumented producer constructions in EHCVM food quantities -- ANSWERED
+Evidence: reports/ehcvm2-s07bq03a-docsearch/REPORT.md and
+reports/ehcvm2-live-s07bq03a-check/REPORT.md.  Four selections:
+- Togo 2021-22 s07bq03a (factor = 1.115 x regional multiplier, every unit;
+  unite rows then floored): "Invert, registered (Recommended)".  Divide out the
+  exact factor as a registered derivation to recover the household's answers;
+  Lome count rows that were rounded cannot be inverted and are served NA under
+  a registered omission.
+- Cote d'Ivoire 2021-22 H rows (outlier-replaced by region x milieu median per
+  UEMOA/WB Document de travail no 4, undocumented in the distributed file):
+  "H to NA, flag L (Recommended)".  H quantity NA under a registered key; L
+  rows (partial triplet conversion) flagged with their own key.
+- Mali 2018-19 rice block (3,357 rows, q3 = 1.4 kg x hhsize, no vague, served
+  as purchases; #1707) and Senegal 2021-22 salt (100 rows, 0.02 kg x hhsize):
+  "Remove, registered (Recommended)".  Stop serving them, under a registered
+  omission whose inputs return them.
+- Niger 2018-19 s07bq07a on 14.2% of rows (CAPI disables it there; #1708):
+  "Flag now, diagnose (Recommended)".  Registered key, keep serving; diagnose
+  the construction; the drop decision comes back to the user.
+Principle (user, 2026-11-12): "Without a very good reason we don't want to
+serve up someone else's undocumented imputations."
+
+* 2026-11-12: Sold kilograms, GH1560 + GH1571 -- ANSWERED
+The user explicitly selected: "Treat 2021 as totals".  Serve Niger 2011, 2014
+and 2021 and Mali 2021 reported sold kilograms (as02eq12c / as03eq11c /
+AS02EQ12C / s16dq05c) as TOTAL kg sold, following the released label and the
+stored kg-unit controls (Niger 45/48, Mali 495/495 equal the sold quantity),
+not the own forms' "poids en kg d'UNE UML".  Carrier per #1571 option (a), a
+literal Quantity_sold_kg column; KgFactor_sold stays kg per ONE unit and a total
+must not be inserted there.  Whether a consumer (median_price_valuation) uses it
+is a separate step; the condition-key question (#1698) stays separate.
+
+* 2026-11-12: Survey-kg screen, GH1559 -- QUESTION BACK
+Offered: report-only 0.1x-10x band, band + Site Q channels, none.  The user
+asked: "Can we not use the same idea as with units for food_quantities, where we
+infer units from expenditures (assuming quantity prices the same within a
+period-region)?"  Sue answered (price-implied kg per unit from crop sales) and
+proposed measuring coverage/agreement on Niger and Mali first.  Not decided.
+
+* 2026-11-12: Uganda 2009-10 ea, GH1536 -- ANSWERED
+The user explicitly selected: "Fill, registered (Recommended)".  Fill the 569
+missing 2009-10 ea from the same household's label in another wave, as a
+registered derivation stamped per filled row (one Uganda re-warm).
+
+* 2026-11-12: Togo 2018 unit codes 659/660/662, GH1557 -- ANSWERED
+The user explicitly selected: "Decode 2018 with 2021 labels (Recommended)".
+Apply the 2021-22 labels (Main, Quartier, Tete) to Togo 2018's bare codes,
+record the codebook evidence (Togo 2021 unit-weight file uses the codes for the
+same goods), and correct Togo/_/CONTENTS.org:466.  Lands with the EHCVM-2 batch.
+
+* 2026-11-12: Malawi code-26 buckets with no released factor, PR1604 -- ANSWERED
+The user explicitly selected: "Keep, disclose, file issue (Recommended)".
+1,783 unmatched 2024-25 '5 Litre Bucket(Chigoba)' rows stay at the shared
+malawi.py metric conversion (5 kg, density 1), as older waves do; disclosed;
+issue filed for litre-capacity containers at the shared conversion point.
+
+* 2026-11-12: Cote d'Ivoire 2021-22 region case fold -- ANSWERED
+The user explicitly selected: "Accept the case fold (Recommended)": spelling
+normalisation on identical codes (red team: upper-cased 2021-22 equals the
+2018-19 label on 33 of 33 codes).  The registry must reproduce it (own key).
+
+* 2026-11-12: Merge order -- ANSWERED
+The user explicitly selected: "Wait and batch all (Recommended)".  Hold #1604
+until the other streams pass red team; one integration PR, one data gate.
+
+* 2026-11-12: GH1509 second (unit-level) non-purchase rung -- ANSWERED
+The user explicitly selected: "Add a unit-level rung".  Below the per-item
+non-purchase rung, add a separately labelled unit-level non-purchase rung
+(pooled across items per unit), same no-purchase-evidence condition, to recover
+GhanaLSS's remaining 28,939 rows.
+
+* 2026-11-12: Togo 2021-22 s07bq03a regional factor -- NOT ANSWERED (question back)
+Offered: divide out (registered), hold purchases, serve as filed.  The user
+asked instead: "What rationale might explain these factors?  Trying to supply a
+region-specific price index?"  Sue answered with hypotheses and a
+discriminating test; a documentation search and the test are commissioned.
+Nothing is decided; the branch must not land Togo 2021-22 purchases as filed
+without a ruling.
+
+* 2026-11-12: Cote d'Ivoire 2021-22 H/L s07bq03a rows -- DIRECTION
+Offered: flag H and L, hold H and flag L, serve as filed.  The user wrote:
+"Let's commission a doc search to verify this.  Without a very good reason we
+don't want to serve up someone else's undocumented imputations."  So: a
+documentation search is commissioned; absent a very good documented reason,
+the apparently imputed H rows are NOT served as household answers.  The final
+treatment comes back to the user with the search result.
+
+* 2026-11-12: GH1509 GhanaLSS consequence -- ANSWERED (amends the earlier #1509 entry)
+Shown after implementation: purchases-only evidence costs GhanaLSS 13.0% of kg
+(11.01M -> 9.57M), 237,029 produced rows lose their factor (pre-2016-17
+purchases are u='Value' only); Uganda -1.37% (18 rows).  The user explicitly
+selected: "Fallback rung, disclosed (Recommended)".  Purchases only, EXCEPT a
+(j, u) cell with no purchase evidence in any wave may fall back to
+non-purchase (self-valued) evidence on a NEW, separately labelled rung of the
+kg-factor ladder, so those rows are visibly weaker evidence.
+
+* 2026-11-12: GH587 W1 metric rows with a count -- ANSWERED
+The user explicitly selected: "Hold both groups (Recommended)".  Hold, under
+registered omissions with counts: W1 g/ml rows with Number of Units = 1
+(963 + 80; ~144x household unit values, package prices) and W1 kg/l rows with
+Number of Units > 50 (~332; 50-1000x below household after division, the count
+reads as a size).  All other W1 rows as ruled.
+
+* 2026-11-12: GH587 metric units with no recorded package size -- ANSWERED
+The user explicitly selected: "Serve W3 kg/l and W5 g/cl (Recommended)".
+Serve the 4,120 W3 kg/l rows as recorded (1.07x / 1.00x household); serve the
+208 W5 g/cl rows as price / c2q2a as a REGISTERED derivation (1.5x same-round
+community prices).  Keep W3 g/cl (150x / 57x) and W2 grams (2.2x, mixed) held.
+
+* 2026-11-12: Malawi stacked-sample weights, PR1604 -- ANSWERED
+Measured (candidate frames, mean-1 weights): retained IHPS households are 13%
+of 2024-25 rows and 33% of its weight; live 2016-17 17%/59%; live 2019-20
+22%/63% (two samples' national-scale weights stacked in one column).  The user
+explicitly selected: "Merge, disclose, file issue (Recommended)".  Merge #1604
+as wired, consistent with 2016-17/2019-20; state the shares plainly in the PR,
+Malawi CONTENTS.org and a new issue covering all three stacked waves so one
+rule fixes them together.  Decision 48 itself stays unruled.
+
+* 2026-11-12: EHCVM-2 2021-22 strata, GH1575 extension -- ANSWERED
+The user explicitly selected: "Same rule as #1575 (Recommended)".  Apply the
+documented region (Benin: department) x residence milieu construction to the
+2021-22 waves of Togo, Benin and Cote d'Ivoire; record Benin's own 2021-22
+`strat` (24 cells) as a comparison, not the served value.
+
+* 2026-11-12: Benin 2018-19 -> 2021-22 household link -- ANSWERED
+The user explicitly selected: "Make Benin a panel country".  Build and commit a
+Benin panel crosswalk (panel_ids.json / updated_ids.json, Design A) from
+PanelHH in a FOLLOW-UP PR with its own verification (head-sex agreement 94.8%
+on 6,878 flagged households was the offered evidence).  This authorizes a
+panel-ID change for Benin only.
+
+* 2026-11-12: Harvest from dispositions in Benin / Cote d'Ivoire 2021-22 -- ANSWERED
+The user explicitly selected: "Extend Mali's derivation (Recommended)".  Serve
+harvest-from-dispositions (registered, Derivation-stamped, inputs recoverable)
+in Benin and Cote d'Ivoire 2021-22 as wired, consistent with Mali 2021-22.
+#1437 (why s16cq16a is blank) stays open.
+
+* 2026-11-12: Nigeria PP community_prices representation, GH587 (second round) -- ANSWERED
+Put after the mapping report (reports/587-mapping/REPORT.md; tables committed
+on feature/587-nigeria-pp-mapping-20261112 at 2b4a3632c).  Four selections:
+- Unit axis: "Base u, size column (Recommended)".  PP rows get the PH
+  size-agnostic base unit labels; the native size stays in its own column.  A
+  sized axis is decided for PP and PH together later.
+- W1 (2010Q3): "Register the division (Recommended)".  Price of one unit =
+  sc2q3a / sc2q3b where Number of Units > 1 (7,198 rows), as a registered
+  derivation; N = 1 rows (15,014) served as recorded; 105 priced rows with no
+  count stay unserved.
+- W5 (2023Q3): "Accept quantity of one".  Follow the printed PP form ("please
+  use a quantity of one"): every W5 PP price is the price of one unit.  THIS
+  LIFTS the earlier "no default quantity of one" restriction FOR W5 PP ONLY.
+  The c2q2a Quantity present on 350 rows (19 equal to 1) must be disclosed, not
+  silently ignored; the rows where it is present and not 1 need an explicit
+  treatment in the PR (recommend: serve as recorded with the quantity in its
+  column and flag, or exclude with a count -- bring the choice back if unclear).
+- W4/W5 metric-size containers: "Reuse PH c8-metric-size".  Register the PH
+  metric-size division for PP, so PP and PH treat these rows alike.  THIS LIFTS
+  the earlier "no PH size rule" restriction for this rule only.
+Still pending (not asked): metric units with no recorded package size (g/cl:
+W2 209, W3 ~12.9k, W5 231; plus W3 Kg/l) -- test against household unit values
+first, then decide; and the item/unit label judgements in MAPPING.org (Pepper,
+Palm wine 161, Semovita unserved, W3 31/42/22/32, congo/mudu, tomato cup, tin,
+251 Bag of 20 Sachets, ml/cl), to be shown with the wiring PR.
+
+* 2026-11-12: Kg-factor evidence rows, GH1509 -- ANSWERED
+The user explicitly selected: "All purchase rows (Recommended)".
+food_kg_factors' price-ratio inference uses only source-labelled PURCHASE rows
+as evidence (a one-line eligibility filter); self-valued own-production and gift
+rows no longer enter the estimate.  Record an 'allocated-quantity' caveat for
+Cambodia, whose purchased quantity is total x spent/(spent+obtained).  Measure
+Uganda and GhanaLSS before landing (GhanaLSS hashes move through nutrition.py).
+Offered measurements: Cambodia -1.08% kg, Serbia -2.12% kg, no factor lost.
+Not selected: directly-observed-quantity purchases only (needs a per-country
+provenance flag) and keeping the current pooling.  Unblocks the archived #1442
+Burkina implementation (d81358091) and #1509's archived fix (cc962ee15), both of
+which need fresh review on current development.
+
+* 2026-11-12: Native-unit modes on Unknown and currency units, GH1068 + GH1129 -- ANSWERED
+The user explicitly selected: "Drop and count (Recommended)".
+In food_prices(units='unitvalue'), and food_quantities(units='units') for
+Unknown, rows with u='Unknown' (U_UNKNOWN) or a currency-denominated unit
+(_CURRENCY_DENOMINATED_UNITS, e.g. 'Value') are dropped and tallied in
+attrs['price_rows_dropped'] (existing 'currency' bucket; an Unknown bucket
+alongside), as kgvalue already does.  GhanaLSS GLSS1-3 unitvalue becomes empty,
+consistent with their correctly-empty / empty-pending-machinery verdicts.
+Correct CLAUDE.md's derived-tables "gives 1 = Kwacha per Kwacha" sentence in the
+same PR.  Not selected: keep rows as NaN; keep and document.
+
+* 2026-11-12: Nigeria shipped conversion tables, GH1502 + GH1518 -- ANSWERED
+The user explicitly selected: "Wire W2 and W3 (Recommended)".
+Serve the World Bank's own W2 (separate PP and PH tables) and W3 food conversion
+tables as per-row Quantity_kg (the survey_kg rung, the #1452 EHCVM precedent),
+by round, after a bounded measurement of W2's table and of the effect on
+food_prices; the harvest-side W3 table ag_conv_w3 (#1518) is included.  Offered
+evidence: W3 inference serves 164,823 kg against 330,793 kg at the table on
+106,152 rows (0.556x); W4's own cvn matches the W3 table at median ratio 1.000.
+One Nigeria re-warm; bundle with the #587 PP wiring if timing allows.
+
+* 2026-11-12: EHCVM-2 2021-22 wiring, Benin / Cote d'Ivoire / Togo / Guinea-Bissau -- GO
+The user explicitly selected: "Go: restore and wire (Recommended)".
+Restore refs/archive/2026-11-11/isa/wire-{togo,benin,civ}-2021-20261104 onto
+current development with fresh review, Togo/Benin/CIV first, then wire
+Guinea-Bissau 2021-22 fresh.  Order per country: sample, household_roster,
+cluster_features, then food (with #1598's own-country NSU weights), shocks
+(#1556's ruling), assets (#1566's s12q09 check).  Serves four new waves with
+their own weights; no existing wave's weights or panel IDs change; adding a wave
+moves that country's cross-wave kg inference pool (disclosed, as Malawi 2024-25).
+Each country gets its own red team and data gate.  Preserve Togo's Lome
+Commune/Grand Lome domain discrepancy and the 2021 same-cluster revisit design.
+
+* 2026-11-12: Intake resumed; merge on green (Sue, Claude Opus 5.5)
+The user wrote: "Resume intake; start with the drafts and put R2b/#587 to me.
+Merge to development on green."  The 2026-11-11 queue freeze is lifted.  Merge
+authority: a PR into development may be merged once the required checks
+(unit-tests, pr-data-validation) are green on its current head.  Standing holds
+are unchanged: no master release, no shared-cache rebuild, and no production
+weight or panel-ID change except as #1604 below.  Drafts #1688 and #1689
+landed through integration PR #1690 (ed1df1ea2, 6b3b09ea6, both ancestors of
+1e549e96a); they are closed as superseded, not re-merged.
+
+* 2026-11-12: Single-plot zero/missing-harvest sales, GH1457 R2b -- ANSWERED
+The user explicitly selected: "Keep on plot row (Recommended)".
+A sale attached to a household-crop's SOLE plot row stays on that row when the
+row's harvest Quantity is zero or missing.  No country changes: Malawi, Niger,
+Mali 2017-18, Tanzania and Ethiopia keep today's placement, and the 2026-10-23
+Ethiopia ruling (a row carrying a sale is never dropped) stands.  Consistent
+with R2a: zero/missing quantities do not establish no production.  Nigeria's
+different handling is left as is.  The r2b_* patches are not applied.
+
+* 2026-11-12: Nigeria PP community_prices, GH587 -- ANSWERED (not either option)
+Offered: serve native PP reports with codebook-qualified native j/u tokens and
+Price NA, or leave the five PP cells unwired.  The user answered instead: "We
+should develop the item and unit code mapping, then provide community_prices
+using those harmonized labels."  So: build reviewed crosswalks from each PP
+wave's own C2 item and unit codes to Nigeria's shared harmonize_food Preferred
+Label (j) and shared unit labels (u), then wire PP community_prices on those
+labels, keeping the j/u promise in Nigeria data_scheme.yml.  This does NOT
+authorize inferring the W5 Quantity/conversion basis, a default quantity of
+one, a PH size rule or an inferred factor; an unresolved price basis stays
+unresolved and is brought back as a question, not guessed.
+
+* 2026-11-12: Malawi 2024-25 food, PR1604 -- hold LIFTED
+The user explicitly selected: "Lift hold, rebase, merge" for PR #1604, offered
+with: serves Malawi 2024-25 food_acquired and a 2024-25 sample (weight =
+hh_wgt (IHS6) / wt_cross (IHPS), panel_weight = wt_long), adds 1,948 new
+2024-25 panel links with no existing link changed, materially moves older
+waves' inferred kg factors and kg prices, and its country.py/local_tools.py ID
+guard moves every build fingerprint (corpus-wide re-warm, not performed here).
+Bring development into the branch by merge (no force-push), re-verify against
+#1694, independent red team, one full data gate, merge on green.  This lifts
+the decision-48 / whole-wave-promotion hold FOR THIS PR'S CONTENT ONLY; it does
+not settle decision 48's joint-inclusion question or change any other wave's
+weights.
+
+* 2026-11-10: Malawi1190 acquisition carrier and coverage
+User explicitly selected "Acquisition-only Farm-level rows" for the carrier
+and "All admitted quantity components (Recommended)" for support. This is
+optionB in current9b6a09fc brief; older765555draft A/B letters were REVERSED,
+so bind semanticchoice, not letter. Extend existing plot_inputs with unallocated
+household acquisition observations, dedicated Acquisition_* fields and own
+source/row/field input_obs/provenance/units. Keep original G/D rows and existing
+attached summaries exact. On new rows, plot_id=Farm-level, planted Quantity/
+Applied/Improved and all legacy purchase/gift summary columns remain missing;
+acquisition amounts/units live only in their dedicated fields, with planted
+u=existingUnknown. No allocation, like/unlike-unit summation, conversion,
+expenditure inference, factor/weight/seed-identity/other scientific change.
+Cover ALL quantity-bearing H components admitted by existing first/second/gift
+rules, not only the seven historical residual groups. Preserve those existing
+gates and recorded0/negative values; flag/unit-only answers remain outside this
+quantity-bearing support and in the native witness. Historical7groups/0attachable
+is not an acceptancecount. Source/header wording conflicts stay explicit; this
+choice neither rebinds fields nor declares labels stale.1298observationidentity
+is settled/reused, not reopened. No separate seed_acquisitions API is selected.
+Concrete design is reports/admission-1190-1298-malawi-carrier-design-20261110
+and source9b6a09fc3fdf86a34eee5a0cd8c1db4c12ce8db3 (REPORT/DECISIONS in dispatch).
+
+User ALSO explicitly selected "Keep literal recorded amounts (Recommended)"
+for third-source H36. Carry a recorded H36 amount with its own native crop/unit
+and preserve H34 No/missing/contradictory answers literally; do NOT require
+H34=Yes or infer expenditure/application/a plot. No positivity filter, missing
+value fill, payer/transport/value borrowing or new sentinel/unit policy.
+All THREE choices are now ANSWERED. Implement the concrete Farm carrier with
+all admitted quantity-bearing components and literal H36, preserving original
+G/D/legacy behavior. Existing field-binding contradictions stay documented,
+not silently adjudicated. Source/pure implementation, independent review and
+normal full PR gates are authorized; fresh raw/native/API validation still
+needs its explicit finite already-managed-source plan. Existing unrelated
+49/50/51/R1/R2a/R2b and no-weight/no-master/sharedrewarm holds remain.
+
+* 2026-11-10: Four EHCVM 2018 sample strata, GH1575
+The user explicitly selected: "Use documented combination (Recommended)".
+For Benin2018-19, Togo2018, Guinea-Bissau2018-19 and CotedIvoire2018-19,
+replace region-only strata with own recorded region/department x residence
+milieu using the existing812 construction. Preserve rows, weights, identifiers,
+Rural, joins and unrelated fields. A missing/blank component yields missing
+strata. Preserve Togo's domain discrepancy and documented exceptions; no guessed
+exclusion, crosswalk, stratum-count golden, 2021 integration or oldCILSS change.
+The earlier pending question is ANSWERED. Existing own-country coding must be
+verified; shared helper semantics/refusals and registered provenance are reused.
+Implementation and scoped verification of these already-managed2018 releases
+are authorized under the existing backlog workflow; no new raw-release acquisition,
+production-weight change, master release or shared-cache rebuild follows.
+Concrete charter: reports/1575-approved-four-country-rollout-20261110/CHARTER.md.
+
+* 2026-11-10: Burkina Faso 2014 strata labels, GH1573
+The user explicitly selected: "Decode the 2014 strata labels (Recommended)".
+Decode native 2014 strata with the authenticated own-survey 26-pair lookup to
+the existing preferred Region x Urbain/Rural labels. Apply after the unchanged
+GH1464 food-to-welfare bijection/refusals and household extension. Preserve all
+rows, weights (including added-household NA weights), non-strata fields, attrs,
+true missing and unknown nonmissing codes. Keep the explicit lookup invertible;
+no additional public strata_native column is approved by this choice.
+This is recorded-code decoding, not a claim of an explicitly planned 26-cell
+design or identical sample designs/PSUs across waves. Other waves stay unchanged.
+Source design: reports/1573-burkina-strata-decision-preparation-20261110/PROPOSAL.md.
+Implementation delegated to finish_1590; integration lead owns independent review.
+
+* 2026-11-10: Malawi different-unit sale attachment, GH1457 R1
+The user explicitly selected: "Attach to the sole row, preserving the sale’s own unit (Recommended)".
+Attach a sale in a different unit only to its household/native-crop's SOLE
+known-plot harvest row, when reported states are compatible (equal, or either
+unknown), that row is unoccupied and no competing sale wants it. Keep the sale's
+own Unit_sold and Condition_sold; no conversion or borrowed harvest unit.
+This approves R1, not the recovered commits' other scientific changes. Port the
+specific R1 logic with current provenance/input compatibility and verify it.
+Root implementation clarification: require an actually reported, non-NA sale
+unit for this different-unit extension. Source review shows an NA Unit_sold
+activates the already-approved harvest-unit fallback after plot attachment.
+Missing-unit sales therefore retain their existing Farm-level placement/NA;
+reported unconvertible/Other labels remain eligible. No factor requirement,
+NA-to-Unknown substitution or change to the shared fallback policy is authorized.
+
+* 2026-11-10: Ambiguous multi-row sales, GH1457 R2a
+The user explicitly selected: "Keep ambiguous sales on Farm-level rows (Recommended)".
+Do NOT select a plot merely because exactly one of multiple harvest rows has a
+positive Quantity. Other zero/missing quantities do not establish no production.
+Retain current Farm-level treatment and reference-pool semantics; the recovered
+R2a positive-quantity candidate expansion is rejected.
+
+* Single-plot zero/missing-harvest choice, GH1457 R2b -- answered 2026-11-12 above
+Root submitted a separate question about moving an already attached single-plot
+sale solely because its harvest Quantity is zero/missing. No answer yet; no
+positive-quantity eligibility filter or Ethiopia retention reversal is approved.
+R3 provenance is a separate engineering repair admitted by Root after independent
+source/loader/cardinality review and 68 applied-source pure passes. It changes
+the refusal key/inputs representation, not sale attachment or quantity policy.
+
+* 2026-11-08: Mali household namespaces, GH1494
+The user selected: "Namespace all 2021–22 raw IDs, then map back only approved panel links (recommended). Unlinked, unknown and orphan records retain distinct IDs."
+ROOT implementation choice: EHCVM21_ for the raw2021 namespace, consistent with EACI14_/EACI17_. Preserve every approved panel target/canonical ID and existing conservative link omission; no new link recovery, classification, filtering or reweighting. Implemented/merged PR1638 atdd40aae55; issue1494closed. No new held-link recovery or production-weight change.
+
+* 2026-11-08: Numeric text in additive aggregation, GH1499
+Convert valid numeric strings BEFORE aggregation. Malformed nonmissing text must raise; true missing/native numeric values and precision remain intact. Implemented/merged PR1636 at5695e0855; issue1499closed. Full configured offline12661PASS/5652SKIP/4XFAIL and all18195parent outcomes exact; global fingerprint footprint recorded, shared rewarm deferred.
+
+* 2026-11-08: Mali purchased-food sentinel, GH1594
+Treat exactly99,999,999 in raw2014–15 purchased-food expenditure as missing before passage aggregation. Preserve quantities, native eligibility and legitimate paired values. Implemented/merged PR1634; issue closed. Recall/exposure GH851 remains separate.
+
+* 2026-11-08: Document investigation, GH1575
+The user requested delegation to establish planned stratification, if any, from sample-design documents for Benin, Togo, Guinea-Bissau and CotedIvoire. This is a document-evidence investigation; no strata/default/weight change has been made.
+Completed and ROOT reviewed: all four explicitly planned region × residence milieu (department in Benin); their own second-edition BIDs describe the original2018 design and a same-cluster2021 revisit. Exact French PDF pages: Benin13, Togo12, Guinea-Bissau16, CotedIvoire13. Togo's Lomé Commune/Grand Lomé domain discrepancy remains unresolved. Report: burst/isa-sm-20261103/reports/1575-ehcvm-stratification-doccheck-20261108/REPORT.md, SHA256 f551c55e50aac9d00cfc4df42f59e5df8f77f6673cfe265a7d53dd2fe3b1b4fd. GitHub1575 updated, still open for implementation. Country notes mergedPR1637. Three missing original BIDs subsequently passed normalmanagedpush+freshreadonlyreadback; metadataPR1640 merged at27577bc2d3 with sidecars/provenance and fresh readonly retrieval proof. No sample-strata/weight change; whole1575 remainsopen.
+
+* Earlier pending GH1575 choice -- answered 2026-11-10 above
+The 2026-11-08 concrete2018-only design is now user-selected. Historical proposal
+reports/1575-tier-c-strata-wiring-design-20261108/WIRING-PROPOSAL.md retains its
+then-current NOTSELECTED status; the new decision/charter supersedes that boundary.
+
+* Earlier decisions preserved
+AffectedConsumption means food purchases; AffectedFoodStock means food stocks, following Ethiopia's model.
+Malawi49: borrow IHS5 conversion factors. Malawi50: final accepted interpretation is maize flour; this supersedes the earlier milling-service discussion. Malawi51: no date clamp. Malawi48: joint inclusion cannot be identified from marginal cross/long weights alone; production weights remain unchanged under the investigation.
+
+* 2026-11-09: Stored grain diagnostics, GH1066
+The user explicitly selected: "Replay warnings and normal strict policy (Recommended)". Successful assume_cache_fresh=True hits must replay stored wave-filtered grain warnings/reports and enforce existing LSMS_GRAIN_STRICT refusal, with normal grain-before-date precedence. This supersedes the previous pending-policy hold. No freshness check, source probe, rebuild or cache write is added. Reviewed final private candidate6b4ee1559b7552969ab3a1c8eed16528a92ac1bd; MERGED PR1674 at50a927d69fcba3497b6956f7c5dff55004d42590; exactCI/premerge/postmergeproof passed (13699unitPASS/362WindowsPASS). Whole1066CLOSEDcompleted21:17:03Z. No sharedcache/data/source-freshness claim.
+
+* 2026-11-08:1288 private-input finding withdrawn
+Root and independent reviewer withdrew the proposed privateOther-overwriteP2 after
+checking native producer semantics and healthy grouped-output/computedOther controls.
+A blanket private-input immutability protocol is not authorized or required by this
+witness. Original7d product bytes remain; only8b26ledgererratum added. Original-contract
+synthetic verification is pending; this withdrawal is not runtime acceptance.
+
+* 2026-11-09: Required PR data validation, GH932
+The user explicitly selected: "Require full data validation on every ready development PR (Recommended)" in response to the replacement-policy question. This supersedes the unavailable merge-queue strategy and the pending A/B/C choice. Implement a dedicated PR-only, unique required full-data check, with strict base freshness and explicit non-success for ineligible draft/fork cases; preserve nightly advisory coverage and all unrelated rules/bypass actors. Full data validation may take1–2h and must be revalidated when development advances. Proposal: reports/932-compatible-pr-data-gate-policy-20261109/PROPOSAL.md, manifest89c165d8283877c018bab72a625bf4daffd9c1bcdee88b418d6ce934ac114aef.
+This authorizes building and enabling the selected policy after concrete source review and actual check-wiring verification; no additional policy/permission question is needed for its necessary preserved-rules delta. No settings changed or full-data run triggered at decision time. Root owns publication/readiness/settings after review; source-only implementation delegated to finish_1452 on4381. No master release, shared local cache rebuild or production-weight change follows.
+
+* Nigeria PP raw-report serving preference, GH587 (2026-11-10) -- answered 2026-11-12 above
+Root async question submitted: retain original price/quantity/unit/size reports
+while leaving standardized Price missing where unresolved (recommended), versus
+serve only reports with resolved standardized Price. No user answer received.
+This is representation preference, not authority to infer W5 Quantity/cvn basis
+or choose conflicting native/printed unit meanings. Pure source-preserving
+foundation is accepted, public wiring remains pending. Other country work continues.

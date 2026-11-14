@@ -353,6 +353,38 @@ not as established physical truth. Only the upper tail is added by default.
 No real-data firing rate or runtime cost has been measured for this extension;
 see ledger ``1569-sold-diagnostics-remote-task.md``.
 
+THE SURVEY KILOGRAM AGAINST ITS SALE PRICES (GH #1559, ruling @ligon 2026-11-12,
+"GH1559 price-implied kg per unit for crops", "Also build a rung", part 1).  Site Q
+judges a total against other totals, and ``kg_survey_off_label`` judges a survey
+kilogram per unit against the mass its unit's label STATES; neither can see a
+survey kilogram per ``Tiya`` or ``Botte``, which is most of Niger's survey kilograms.
+:func:`audit_survey_kg_prices` names a row whose ``Quantity_kg / Quantity`` lies
+outside 0.1x-10x (:data:`SURVEY_KG_PRICE_BAND`) of the PRICE-IMPLIED kilograms per
+unit: the median price per unit of the same wave's and crop's sales in that unit,
+over the median price per kilogram of its sales in ``Kg`` or in a unit stating its
+mass, read at that mass (the ruling's baseline, "kg sales plus sacks at stated
+mass").  Both sides need :data:`SURVEY_KG_PRICE_MIN_REPORTS` /
+:data:`SURVEY_KG_PRICE_MIN_BASELINE` sales and a spread within
+:data:`SURVEY_KG_PRICE_MAX_SPREAD`; the product state is matched where both the sale
+and the harvest record one.  Only a unit stating NO mass is judged, so this screen
+and the label screen never name the same row.  It is Site Q's concern (a value
+present, non-null and implausible), so it rides Site Q's channels: the ledger,
+:func:`quantity_reports` (``site='survey-kg-price'``, ``column='kg_survey'``, a
+diagnostic name as ``Sale_price`` is), ``LSMS_QUANTITY_STRICT``, and a warning class
+of its own that subclasses :class:`QuantityImplausibleWarning`.  It is the item
+#1559's body names as missing ("not on Site Q's channels").  A flag and not a
+verdict: the reference has measured biases (survey kilograms 1.1-1.4x it at the
+median; state; sacks at their stated mass; sellers' prices), set out in the #1559
+rung design memo.  Measured cold (2026-11-13, burst jobs 41275992 / 41276357), on the
+two countries serving ``Quantity_kg`` on development ``f138a3d61``.  Niger judges 1,932 / 6,394 / 9,020 rows in
+2011-12 / 2014-15 / 2021-22 and names 12 / 115 / 30 (low 6 / 26 / 2, high 6 / 89 /
+28), median survey / implied 1.14 / 1.13 / 1.25; 2018-19 asks no kilograms.  Mali
+judges 1 row and names none.  Cost 47 ms of a 659 ms warm Niger read, 41 of 658 on
+Mali (a first cut on row text cost 314 ms and was rewritten on integer codes).
+Any other country that serves ``Quantity_kg`` is judged too: with the 2026-11-13
+Nigeria stream, Nigeria 2016Q1 serves 8,507 such rows, 5,520 judged, none named,
+median 1.25 (red team, jobs 41278029 / 41278382).
+
 CACHE.  Like ``null_read_audit`` this is pure reporting -- it provably returns
 its input unchanged -- so its entry points are listed in
 ``_build_registry._EXCLUDED_CALLABLES`` and its ledger in
@@ -377,15 +409,22 @@ import pandas as pd
 __all__ = [
     "QuantityImplausibleError",
     "QuantityImplausibleWarning",
+    "SurveyKgPriceWarning",
     "QUANTITY_OUTLIER_K",
     "QUANTITY_MIN_CELL",
     "QUANTITY_REFERENCE_QUANTILE",
     "QUANTITY_REFERENCE_FLOOR",
     "QUANTITY_LOW_REFERENCE_QUANTILE",
+    "SURVEY_KG_PRICE_BAND",
+    "SURVEY_KG_PRICE_MIN_REPORTS",
+    "SURVEY_KG_PRICE_MIN_BASELINE",
+    "SURVEY_KG_PRICE_MAX_SPREAD",
     "audit_near_zero",
     "audit_quantities",
+    "audit_survey_kg_prices",
     "check_quantities",
     "quantity_reports",
+    "survey_kg_price_factors",
 ]
 
 
@@ -427,6 +466,36 @@ QUANTITY_REFERENCE_FLOOR = 1.0
 #: it is just as immune to a few contaminated rows.  Only a positive value is
 #: judged and a zero never sets the scale, so a recorded "none" is never near zero.
 QUANTITY_LOW_REFERENCE_QUANTILE = 0.10
+
+#: GH #1559 (ruling @ligon 2026-11-12, "GH1559 price-implied kg per unit for
+#: crops", "Also build a rung", part 1).  A SURVEY kilogram per unit
+#: (``Quantity_kg / Quantity``) outside this multiple of the PRICE-IMPLIED
+#: kilograms per unit is named.  It is the label screen's band
+#: (``transformations.SURVEY_KG_LABEL_BAND``, ruling 2026-11-05), so the two
+#: halves of #1559 judge on one footing; a test pins them equal.  Ten and not
+#: two because the survey runs 1.1-1.4x the price-implied mass at the median:
+#: a 2x band would name 11-12% of the rows it can judge (#1559 measurement,
+#: reports/sold-kg-1560, Part 2).
+SURVEY_KG_PRICE_BAND = (0.1, 10.0)
+
+#: Support floors of the price-implied mass, per cell: sales in the UNIT, and
+#: sales stating a MASS (the per-kilogram baseline).  The food ladder's numbers
+#: (``FOOD_KG_MIN_REPORTS``, ``FOOD_KG_MIN_BASELINE``), and the ones the #1559
+#: measurement the ruling was made on used.  Own constants, not imports: the
+#: ruling keeps the crop design apart from the food ladder, so a food-ladder
+#: change must not move this screen in silence.
+SURVEY_KG_PRICE_MIN_REPORTS = 5
+SURVEY_KG_PRICE_MIN_BASELINE = 5
+
+#: Dispersion gate on BOTH sides of the ratio: ``p90/p10`` where a cell has 10
+#: or more sales, ``max/min`` below that (``FOOD_KG_BASELINE_MAX_SPREAD``'s
+#: statistic and value).  The food ladder gates only its baseline; the #1559
+#: measurement gated both sides, and a screen that names rows should not judge
+#: them against a unit price whose own sales disagree by more than the band.
+SURVEY_KG_PRICE_MAX_SPREAD = 10.0
+
+_SURVEY_KG_PRICE_SITE = "survey-kg-price"
+_SURVEY_KG_PRICE_COLUMN = "kg_survey"
 
 #: ``{tail: (quantile, floor)}``.  The lower tail has no floor: lifting a small
 #: reference would make the rule fire more often, not less.
@@ -531,6 +600,15 @@ class QuantityImplausibleWarning(RuntimeWarning):
     Its own class -- not a bare ``RuntimeWarning`` -- so callers, tests and CI
     can target it precisely:
     ``warnings.simplefilter("error", QuantityImplausibleWarning)``.
+    """
+
+
+class SurveyKgPriceWarning(QuantityImplausibleWarning):
+    """A survey kilogram per unit far from what the unit's sale prices imply (GH #1559).
+
+    A subclass, so a filter on :class:`QuantityImplausibleWarning` still sees it
+    (it is Site Q's concern and Site Q's lever), while a caller who wants only
+    this screen, or only the distributional one, can target it.
     """
 
 
@@ -1044,6 +1122,434 @@ def _reports_for(df, column, named, flagged, ratio, q, reference, rung, *,
 
 
 # ---------------------------------------------------------------------------
+# GH #1559 -- a SURVEY KILOGRAM against the mass its unit's SALE PRICES imply.
+# ---------------------------------------------------------------------------
+
+#: The rungs of the price-implied mass, finest first.  ``state`` is the sale's
+#: ``Condition_sold`` on the price side and the harvest's ``condition`` on the
+#: survey side, used only where BOTH are recorded; ``country`` and ``season`` join
+#: every rung when the frame carries them (a ``Feature`` frame), and ``t`` always
+#: does: a wave's prices never judge another wave's kilograms.  There is no region
+#: rung, because ``Region`` lives in ``cluster_features`` and this runs on the read
+#: path of a table that must not re-enter another one (``attach_recall``'s reason).
+_SURVEY_KG_PRICE_RUNGS: tuple[tuple[str, bool], ...] = (
+    ("t,j,state,u", True),
+    ("t,j,u", False),
+)
+
+
+def _stated_masses(labels: Any) -> np.ndarray:
+    """Kilograms each unit label STATES; ``NaN`` where it states none.
+
+    The ruling's baseline is "kg sales plus sacks at stated mass": a label is
+    read, never estimated -- :data:`~lsms_library.transformations.KNOWN_METRIC`'s
+    mass tokens (``Kg``, ``Gramme``, ``Tonne``, ...) and what
+    ``_parse_explicit_metric`` takes off a self-describing label (``Sac de 100
+    kg``, ``Sac (50 Kg)``).  VOLUMES ARE NOT MASSES: litre spellings are dropped
+    (``volume_as_mass=False``), as the food ladder's baseline drops them
+    (``_BASELINE_UNIT_CONVERSION``).  A country's declared ``u_kg`` is not read:
+    it is a table, not a label.  Applied to an axis's CATEGORIES, so each
+    distinct label is parsed once.
+    """
+    from .transformations import _FLUID_UNITS, KNOWN_METRIC, _parse_explicit_metric
+
+    fluids = {u.lower() for u in _FLUID_UNITS}
+    out = np.full(len(labels), np.nan)
+    for k, label in enumerate(labels):
+        if label is None or pd.isna(label):
+            continue
+        text = str(label).strip()
+        low = text.lower()
+        if low in fluids:
+            continue
+        if low in KNOWN_METRIC:
+            out[k] = float(KNOWN_METRIC[low])
+            continue
+        parsed = _parse_explicit_metric(text, volume_as_mass=False)
+        if parsed is not None and np.isfinite(parsed) and parsed > 0:
+            out[k] = float(parsed)
+    return out
+
+
+def _usable_units(labels: Any) -> np.ndarray:
+    """Which unit labels name a unit at all, per label.
+
+    Not the missing-unit sentinel (``Unknown``, ``Manquant``, NA), not blank, and
+    not a currency-denominated label: a price per ``Value`` is the amount over
+    itself (GH #1129).
+    """
+    from .transformations import _is_currency_denominated, _unit_sentinel_mask
+
+    series = pd.Series(list(labels), dtype=object)
+    sentinel = np.asarray(_unit_sentinel_mask(pd.DataFrame({"u": series})), dtype=bool)
+    blank = series.astype(str).str.strip().eq("").to_numpy(dtype=bool)
+    currency = _is_currency_denominated(series.fillna("").astype(str))
+    return ~(sentinel | blank | currency)
+
+
+def _axis_ids(df: pd.DataFrame, axis: str, vocab: dict[str, int]
+              ) -> tuple[np.ndarray, np.ndarray, np.ndarray] | None:
+    """Per-row ids of *axis*'s stripped, case-folded labels in a SHARED *vocab*.
+
+    ``(row_ids, categories, codes)``: ``-1`` for a missing label, ``None`` for an absent
+    axis.  Two axes read into one vocab compare by label -- a sold unit against a
+    harvest unit, a sale state against a harvest state -- and case-folded because
+    Niger's s16d sold labels arrive lower-case where s16c's do not (``CONTENTS.org``,
+    "the SOLD unit is Unit_sold").  Only the categories are touched as text.
+    """
+    got = _axis(df, axis)
+    if got is None:
+        return None
+    codes, categories = got
+    cat_ids = np.full(len(categories), -1, dtype=np.int64)
+    for k, label in enumerate(categories):
+        if label is None or pd.isna(label):
+            continue
+        text = str(label).strip().casefold()
+        if text:
+            cat_ids[k] = vocab.setdefault(text, len(vocab))
+    ids = np.full(len(codes), -1, dtype=np.int64)
+    hit = codes >= 0
+    ids[hit] = cat_ids[codes[hit]]
+    return ids, categories, codes
+
+
+def _per_row(axis: tuple[np.ndarray, np.ndarray, np.ndarray], per_category: np.ndarray,
+             fill: Any) -> np.ndarray:
+    """Spread a per-category array over the rows of an :func:`_axis_ids` result."""
+    if axis is None:
+        return None
+    codes = axis[2]
+    out = np.full(len(codes), fill, dtype=per_category.dtype)
+    hit = codes >= 0
+    out[hit] = per_category[codes[hit]]
+    return out
+
+
+def _fold(parts: list[np.ndarray]) -> np.ndarray:
+    """One int64 group code from several id arrays (``-1`` = missing, a group)."""
+    n = len(parts[0]) if parts else 0
+    codes = np.zeros(n, dtype=np.int64)
+    width = 1
+    for ids in parts:
+        w = int(ids.max()) + 2 if len(ids) else 1
+        codes = codes * w + (ids + 1)
+        width *= w
+        if width > _MAX_COMBINED_WIDTH:
+            codes = np.unique(codes, return_inverse=True)[1].astype(np.int64)
+            width = int(codes.max()) + 1 if n else 1
+    return codes
+
+
+def _group_summary(codes: np.ndarray, values: np.ndarray, rows: np.ndarray
+                   ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Per cell of *codes* over *rows*: ``(cell codes, n, median, spread)``.
+
+    ``spread`` is ``p90/p10`` at ``n >= 10`` and ``max/min`` below -- the food
+    ladder's dispersion statistic.  Quantiles interpolate linearly between order
+    statistics, as ``Series.quantile`` does (:func:`_group_quantiles`' arithmetic).
+    """
+    keep = rows & np.isfinite(values)
+    c, v = codes[keep], values[keep]
+    if not len(c):
+        empty = np.zeros(0)
+        return np.zeros(0, dtype=np.int64), np.zeros(0, dtype=np.int64), empty, empty
+    order = np.lexsort((v, c))
+    c, v = c[order], v[order]
+    first = np.flatnonzero(np.concatenate(([True], c[1:] != c[:-1])))
+    counts = np.diff(np.concatenate((first, [len(c)])))
+
+    def quantile(p: float) -> np.ndarray:
+        position = p * (counts - 1)
+        low = np.floor(position).astype(np.int64)
+        high = np.ceil(position).astype(np.int64)
+        frac = position - low
+        return v[first + low] * (1.0 - frac) + v[first + high] * frac
+
+    with np.errstate(divide="ignore", invalid="ignore"):
+        spread = np.where(counts >= 10, quantile(0.9) / quantile(0.1),
+                          quantile(1.0) / quantile(0.0))
+    return c[first], counts, quantile(0.5), spread
+
+
+def _lookup(cells: np.ndarray, want: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """``(slot, hit)``: where each of *want* sits in the sorted *cells*."""
+    if not len(cells):
+        return np.zeros(len(want), dtype=np.int64), np.zeros(len(want), dtype=bool)
+    slot = np.clip(np.searchsorted(cells, want), 0, len(cells) - 1)
+    return slot, cells[slot] == want
+
+
+def survey_kg_price_factors(df: Any) -> pd.DataFrame | None:
+    """Per-row PRICE-IMPLIED kilograms per unit for ``crop_production`` (GH #1559).
+
+    The measurement half of :func:`audit_survey_kg_prices`, public for tests and
+    for an analyst who wants the per-row comparison rather than the offenders.
+    Returns ``None`` when nothing can be judged (no ``Quantity_kg``, no sales, no
+    ``u`` or ``Unit_sold``); otherwise a frame on *df*'s index, in its order:
+
+    ``kg_survey``
+        ``Quantity_kg / Quantity`` on rows with both finite and positive and a
+        usable harvest unit that states NO mass, else NaN.  A stated-mass unit is
+        never judged here: it is in the baseline, and
+        ``transformations.harvest_kg_factors``' ``kg_survey_off_label`` judges it
+        against its label, so the two screens never name the same row.
+    ``kg_price_implied``
+        median ``Value_sold / Quantity_sold`` of the cell's sales in that unit,
+        over the median price per kilogram of its sales in a unit STATING a mass,
+        read at that mass (:func:`_stated_masses`).  NaN where no rung passes its
+        gates.
+    ``kg_price_rung``
+        ``'t,j,state,u'`` or ``'t,j,u'`` (:data:`_SURVEY_KG_PRICE_RUNGS`).
+    ``kg_price_n_unit`` / ``kg_price_n_kg``
+        sales behind each side of the ratio.
+    ``kg_price_unit_price`` / ``kg_price_kg_price``
+        the two medians.
+    ``survey_over_implied``
+        ``kg_survey / kg_price_implied``.
+    ``kg_price_flag``
+        ``'low'`` below :data:`SURVEY_KG_PRICE_BAND`, ``'high'`` above, else missing
+        (read it with ``notna()``: pandas 3 may store the column as ``str``).
+
+    A sale is a row with ``Quantity_sold > 0``, ``Value_sold > 0`` and a usable
+    ``Unit_sold`` -- the sale's OWN unit, never the harvest's (GH #824).  The
+    survey's sold kilograms (``Quantity_sold_kg``) are not read: on a sale in the
+    harvest's unit they equal the harvest's kilograms per unit on most rows (Niger
+    2021-22: 939 of 1,134), so they would judge the survey by itself.
+
+    Integer codes throughout, as Site Q's arithmetic is: only an axis's
+    categories are ever handled as text, because this runs on every
+    ``crop_production`` read.
+    """
+    if not isinstance(df, pd.DataFrame) or df.empty:
+        return None
+    if any(c not in df.columns
+           for c in ("Quantity", "Quantity_kg", "Quantity_sold", "Value_sold")):
+        return None
+    n = len(df)
+    total = _numeric(df["Quantity_kg"])
+    quantity = _numeric(df["Quantity"])
+    survey = np.isfinite(total) & (total > 0) & np.isfinite(quantity) & (quantity > 0)
+    if not survey.any():
+        return None
+    units: dict[str, int] = {}
+    harvest_u = _axis_ids(df, "u", units)
+    sold_u = _axis_ids(df, "Unit_sold", units)
+    if harvest_u is None or sold_u is None:
+        return None
+
+    sold_q = _numeric(df["Quantity_sold"])
+    sold_v = _numeric(df["Value_sold"])
+    with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+        price = sold_v / sold_q
+        kg_survey = total / quantity
+    mass_sold = _per_row(sold_u, _stated_masses(sold_u[1]), np.nan)
+    mass_harvest = _per_row(harvest_u, _stated_masses(harvest_u[1]), np.nan)
+    usable_sold = _per_row(sold_u, _usable_units(sold_u[1]), False)
+    usable_harvest = _per_row(harvest_u, _usable_units(harvest_u[1]), False)
+    sale = (np.isfinite(sold_q) & (sold_q > 0) & np.isfinite(sold_v) & (sold_v > 0)
+            & np.isfinite(price) & (price > 0) & usable_sold)
+    by_mass = sale & np.isfinite(mass_sold)
+    by_unit = sale & ~np.isfinite(mass_sold)
+    judged = survey & usable_harvest & ~np.isfinite(mass_harvest)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        price_kg = np.where(by_mass, price / mass_sold, np.nan)
+
+    implied = np.full(n, np.nan)
+    rung = np.full(n, None, dtype=object)
+    n_unit = np.full(n, np.nan)
+    n_kg = np.full(n, np.nan)
+    unit_price = np.full(n, np.nan)
+    kg_price = np.full(n, np.nan)
+
+    base = []
+    for a in ("country", "t", "season", "j"):
+        got = _axis_ids(df, a, {})
+        if got is not None:
+            base.append(got[0])
+    if not base:
+        base = [np.zeros(n, dtype=np.int64)]
+    states: dict[str, int] = {}
+    harvest_s = _axis_ids(df, "condition", states)
+    sold_s = _axis_ids(df, "Condition_sold", states)
+    known = np.array([not t.startswith("unknown") for t in states], dtype=bool)
+
+    def state_known(ids: tuple[np.ndarray, np.ndarray] | None) -> np.ndarray:
+        if ids is None or not len(known):
+            return np.zeros(n, dtype=bool)
+        row = ids[0]
+        out = np.zeros(n, dtype=bool)
+        hit = row >= 0
+        out[hit] = known[row[hit]]
+        return out
+
+    harvest_known, sold_known = state_known(harvest_s), state_known(sold_s)
+    none = np.full(n, -1, dtype=np.int64)
+    harvest_state = harvest_s[0] if harvest_s is not None else none
+    sold_state = sold_s[0] if sold_s is not None else none
+
+    if by_mass.any() and by_unit.any() and judged.any():
+        for name, with_state in _SURVEY_KG_PRICE_RUNGS:
+            todo = judged & np.isnan(implied)
+            mass_rows, unit_rows = by_mass, by_unit
+            if with_state:
+                todo &= harvest_known
+                mass_rows, unit_rows = by_mass & sold_known, by_unit & sold_known
+            if not (todo.any() and mass_rows.any() and unit_rows.any()):
+                continue
+            # The two sides must fold to ONE radix, or a sale's cell and a harvest
+            # row's cell cannot compare as integers: fold the sale and harvest
+            # halves together (the state column differs between them), and give the
+            # two unit columns one width.
+            if with_state:
+                stacked = _fold([np.concatenate((b, b)) for b in base]
+                                + [np.concatenate((sold_state, harvest_state))])
+                sale_base, want_base = stacked[:n], stacked[n:]
+            else:
+                sale_base = want_base = _fold(base)
+            width_u = int(max(sold_u[0].max(), harvest_u[0].max())) + 2
+            sale_cell = sale_base * width_u + (sold_u[0] + 1)
+            want_cell = want_base * width_u + (harvest_u[0] + 1)
+            m_cells, m_n, m_med, m_spread = _group_summary(sale_base, price_kg, mass_rows)
+            u_cells, u_n, u_med, u_spread = _group_summary(sale_cell, price, unit_rows)
+            m_ok = (m_n >= SURVEY_KG_PRICE_MIN_BASELINE) & (m_spread <= SURVEY_KG_PRICE_MAX_SPREAD)
+            u_ok = (u_n >= SURVEY_KG_PRICE_MIN_REPORTS) & (u_spread <= SURVEY_KG_PRICE_MAX_SPREAD)
+            pos = np.flatnonzero(todo)
+            m_slot, m_hit = _lookup(m_cells, want_base[pos])
+            u_slot, u_hit = _lookup(u_cells, want_cell[pos])
+            hit = m_hit & u_hit
+            hit[hit] = m_ok[m_slot[hit]] & u_ok[u_slot[hit]]
+            if not hit.any():
+                continue
+            take = pos[hit]
+            mu, mk = u_med[u_slot[hit]], m_med[m_slot[hit]]
+            implied[take] = mu / mk
+            rung[take] = name
+            n_unit[take] = u_n[u_slot[hit]]
+            n_kg[take] = m_n[m_slot[hit]]
+            unit_price[take] = mu
+            kg_price[take] = mk
+
+    with np.errstate(divide="ignore", invalid="ignore"):
+        ratio = np.where(judged, kg_survey, np.nan) / implied
+    low, high = SURVEY_KG_PRICE_BAND
+    flag = np.full(n, None, dtype=object)
+    flag[np.isfinite(ratio) & (ratio < low)] = "low"
+    flag[np.isfinite(ratio) & (ratio > high)] = "high"
+    return pd.DataFrame({
+        "kg_survey": np.where(judged, kg_survey, np.nan),
+        "kg_price_implied": implied,
+        "kg_price_rung": rung,
+        "kg_price_n_unit": n_unit,
+        "kg_price_n_kg": n_kg,
+        "kg_price_unit_price": unit_price,
+        "kg_price_kg_price": kg_price,
+        "survey_over_implied": ratio,
+        "kg_price_flag": flag,
+    }, index=df.index)
+
+
+def audit_survey_kg_prices(df: Any, *, country: str,
+                           table: str = "crop_production") -> list[dict[str, Any]]:
+    """Name every survey kilogram outside the band of its price-implied mass (GH #1559).
+
+    REPORT ONLY, by the same contract as the rest of this module: it reads *df*
+    and returns reports; it never touches a value.  One report per wave and
+    direction (``'low'``: below 0.1x, ``'high'``: above 10x), each naming every
+    offending row with the implied factor, both cell sizes, both medians and the
+    rung, because a reader must be able to see what the row was judged against.
+    ``[]`` for any table but ``crop_production``, for a frame with no survey
+    kilograms, and where nothing fires.
+
+    A flag, not a verdict.  The price-implied mass has measured biases of its own
+    (the GH #1559 rung design memo): survey kilograms run 1.1-1.4x it at the
+    median; a state the sale does not share moves a price per kilogram by about
+    2.4x (shelled against unshelled groundnut) and only the EHCVM waves record a
+    state; sacks are read at their stated mass, which the survey's own kilograms
+    dispute; and the prices come from the fifth of households that sell.
+    """
+    if str(table) != "crop_production":
+        return []
+    factors = survey_kg_price_factors(df)
+    if factors is None:
+        return []
+    flagged = factors["kg_price_flag"].notna().to_numpy(dtype=bool)
+    if not flagged.any():
+        return []
+
+    named = {a: _axis(df, a) for a in ("country", "t", "i", "plot", "j", "u", "condition")}
+    judged = (np.isfinite(factors["kg_price_implied"].to_numpy(dtype="float64"))
+              & np.isfinite(factors["kg_survey"].to_numpy(dtype="float64")))
+    quantity = _numeric(df["Quantity"])
+    total = _numeric(df["Quantity_kg"])
+    cols = {c: factors[c].to_numpy() for c in factors.columns}
+    n = len(df)
+    country_codes = (named["country"][0] if named["country"] is not None
+                     else np.zeros(n, dtype=np.int64))
+    wave_codes = named["t"][0] if named["t"] is not None else np.zeros(n, dtype=np.int64)
+
+    by_scope: dict[tuple[int, int, str], list[dict[str, Any]]] = {}
+    for pos in np.flatnonzero(flagged):
+        direction = str(cols["kg_price_flag"][pos])
+        value = float(cols["kg_survey"][pos])
+        implied = float(cols["kg_price_implied"][pos])
+        fold = value / implied if direction == "high" else implied / value
+        offender = {
+            "i": _label(named["i"], pos),
+            "plot": _label(named["plot"], pos),
+            "j": _label(named["j"], pos),
+            "u": _label(named["u"], pos),
+            "condition": _label(named["condition"], pos),
+            "value": value,
+            "quantity": float(quantity[pos]),
+            "quantity_kg": float(total[pos]),
+            "implied": implied,
+            "reference": implied,
+            "survey_over_implied": float(cols["survey_over_implied"][pos]),
+            "ratio": round(float(fold), 1),
+            "rung": (None if pd.isna(cols["kg_price_rung"][pos])
+                     else str(cols["kg_price_rung"][pos])),
+            "n_unit_sales": int(cols["kg_price_n_unit"][pos]),
+            "n_kg_sales": int(cols["kg_price_n_kg"][pos]),
+            "unit_price": float(cols["kg_price_unit_price"][pos]),
+            "kg_price": float(cols["kg_price_kg_price"][pos]),
+            "row_position": int(pos),
+        }
+        key = (int(country_codes[pos]), int(wave_codes[pos]), direction)
+        by_scope.setdefault(key, []).append(offender)
+
+    reports: list[dict[str, Any]] = []
+    scopes = []
+    for key, offenders in by_scope.items():
+        pos = offenders[0]["row_position"]
+        label_c = _label(named["country"], pos) if named["country"] is not None else country
+        scopes.append((str(label_c), str(_label(named["t"], pos)), key[2], key))
+    for label_c, wave, direction, key in sorted(scopes):
+        in_scope = (country_codes == key[0]) & (wave_codes == key[1])
+        offenders = sorted(by_scope[key], key=lambda o: -o["ratio"])
+        reports.append({
+            "site": _SURVEY_KG_PRICE_SITE,
+            "country": label_c,
+            "table": "crop_production",
+            "column": _SURVEY_KG_PRICE_COLUMN,
+            "definition": "Quantity_kg / Quantity",
+            "direction": direction,
+            "wave": None if named["t"] is None else wave,
+            "rows": int(in_scope.sum()),
+            "n_judged": int((judged & in_scope).sum()),
+            "n_implausible": len(offenders),
+            "max_ratio": offenders[0]["ratio"],
+            "k": SURVEY_KG_PRICE_BAND[1],
+            "band": list(SURVEY_KG_PRICE_BAND),
+            "min_reports": SURVEY_KG_PRICE_MIN_REPORTS,
+            "min_baseline": SURVEY_KG_PRICE_MIN_BASELINE,
+            "max_spread": SURVEY_KG_PRICE_MAX_SPREAD,
+            "offenders": offenders,
+        })
+    return reports
+
+
+# ---------------------------------------------------------------------------
 # Reporting -- one choke point, mirroring null_read_audit._emit_null_read_report
 # ---------------------------------------------------------------------------
 
@@ -1094,7 +1600,57 @@ def _format_offender(offender: dict[str, Any], direction: str = "high",
     return " ".join(parts)
 
 
+def _format_survey_kg_price_report(report: dict[str, Any]) -> str:
+    """The GH #1559 warning.  Its own text: the reference is a price ratio, not a p90."""
+    where = f"{report['country']}/{report['table']}"
+    if report.get("wave"):
+        where = f"{where} {report['wave']}"
+    offenders = report["offenders"]
+    shown = offenders[:_MAX_NAMED]
+    more = len(offenders) - len(shown)
+    low, high = report["band"]
+    side = (f"more than {high:g}x" if report["direction"] == "high"
+            else f"less than {low:g}x")
+
+    def one(o: dict[str, Any]) -> str:
+        parts = [f"i={o['i']}"]
+        if o["plot"] is not None:
+            parts.append(f"plot={o['plot']}")
+        if o["j"] is not None:
+            parts.append(str(o["j"]))
+        if o["u"] is not None:
+            parts.append(f"u={o['u']}")
+        if o.get("condition") is not None:
+            parts.append(f"condition={o['condition']}")
+        parts.append(
+            f"{o['quantity_kg']:,.10g} kg on {o['quantity']:,.10g} = {o['value']:,.4g} kg per "
+            f"unit against {o['implied']:,.4g} implied ({o['survey_over_implied']:,.3g}x; "
+            f"{o['n_unit_sales']} sales in the unit, {o['n_kg_sales']} by mass; cell {o['rung']})")
+        return " ".join(parts)
+
+    listed = "; ".join(one(o) for o in shown)
+    return (
+        f"{where}: {report['n_implausible']:,} of the {report['n_judged']:,} row(s) this "
+        f"screen can judge (of {report['rows']:,}) report a survey kilogram per unit "
+        f"(Quantity_kg / Quantity) {side} the kilograms per unit the wave's own crop sales "
+        f"imply (median price per unit sold, over the median price per kilogram of sales "
+        f"in Kg or in a unit stating its mass, read at that mass; same wave and crop, and "
+        f"the same product state where both record one; at least "
+        f"{report['min_reports']} sales on each side, spread at most "
+        f"{report['max_spread']:g}x): {listed}{f' (+{more} more)' if more else ''}. "
+        f"NOTHING HAS BEEN CHANGED -- these rows are returned exactly as they are stored. "
+        f"A flag, not a verdict: the price-implied mass has biases of its own (survey "
+        f"kilograms run 1.1-1.4x it at the median, sacks are read at their stated mass, "
+        f"a state the sale does not share moves a price per kilogram, and the prices are "
+        f"the sellers'). A sack or a total keyed against a small unit's label may be "
+        f"the answer; that is not established. Use quantity_reports() to get the rows "
+        f"programmatically. Set {_QUANTITY_STRICT_ENV}=1 to make this fatal."
+    )
+
+
 def _format_quantity_report(report: dict[str, Any]) -> str:
+    if report.get("site") == _SURVEY_KG_PRICE_SITE:
+        return _format_survey_kg_price_report(report)
     where = f"{report['country']}/{report['table']}"
     if report.get("wave"):
         where = f"{where} {report['wave']}"
@@ -1179,7 +1735,9 @@ def _emit_quantity_report(report: dict[str, Any]) -> None:
     msg = _format_quantity_report(report)
     if _quantity_strict():
         raise QuantityImplausibleError(msg)
-    warnings.warn(msg, QuantityImplausibleWarning, stacklevel=2)
+    category = (SurveyKgPriceWarning if report.get("site") == _SURVEY_KG_PRICE_SITE
+                else QuantityImplausibleWarning)
+    warnings.warn(msg, category, stacklevel=2)
 
 
 def quantity_reports(country: str | None = None,
@@ -1238,8 +1796,8 @@ def check_quantities(df: Any, *, country: str, table: str) -> Any:
     columns = _SCREENED_COLUMNS.get(str(table), ())
     if not columns:
         return df
+    reports: list[dict[str, Any]] = []
     try:
-        reports: list[dict[str, Any]] = []
         near_zero = _NEAR_ZERO_COLUMNS.get(str(table), ())
         for column in columns:
             tails = ("high", "low") if column in near_zero else ("high",)
@@ -1251,12 +1809,26 @@ def check_quantities(df: Any, *, country: str, table: str) -> Any:
         # An instrument that fails silently and reports clean is the disease
         # this module exists to cure, so say so rather than swallow it.  A
         # broken audit must never break a read, though: the read is the job.
+        # Its partial findings are dropped, as they always were; the price
+        # screen below still runs.
         warnings.warn(
             f"{country}/{table}: quantity plausibility audit could not run "
             f"({type(exc).__name__}: {exc}). The table itself is unaffected, "
             f"but its quantities are NOT known to be plausible.",
             QuantityImplausibleWarning, stacklevel=2)
-        return df
+        reports = []
+    # GH #1559: the survey's kilograms against their sale prices.  After the
+    # distributional screens, so a frame's reports keep their old order, and in
+    # its OWN guard, both ways: a failure here cannot silence those screens'
+    # findings, and a failure there cannot skip this one (red team F6).
+    try:
+        reports.extend(audit_survey_kg_prices(df, country=country, table=table))
+    except Exception as exc:                                   # noqa: BLE001
+        warnings.warn(
+            f"{country}/{table}: survey-kilogram price screen could not run "
+            f"({type(exc).__name__}: {exc}). The table itself is unaffected, "
+            f"but its survey kilograms are NOT known to agree with its sale prices.",
+            SurveyKgPriceWarning, stacklevel=2)
     for report in reports:
         _record_quantity_report(report)
     return df

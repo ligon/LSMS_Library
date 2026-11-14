@@ -222,7 +222,7 @@ def community_price_slots(base, codes, columns, rank):
     return pd.concat(pieces, ignore_index=True)
 
 from .build_transforms import food_acquired_to_canonical
-from .derivations import COLUMN as DERIVATION_COLUMN, union_keys
+from .derivations import COLUMN as DERIVATION_COLUMN, MULTI_SEP, union_keys
 
 
 def crop_condition_codes(codes, table):
@@ -1610,3 +1610,178 @@ def derive_hh_crop_harvest_total(served: pd.DataFrame, dispositions: pd.DataFram
     new["plot_id"] = FARM_LEVEL
     new[DERIVATION_COLUMN] = key
     return pd.concat([out, new], ignore_index=True)
+
+
+# ---------------------------------------------------------------------------
+# section 14.05: coping strategies (GH #1562)
+# ---------------------------------------------------------------------------
+#
+# The BUILD-time half of the coping contract (rulings 2026-11-12 and
+# 2026-11-13, GH1562).  The read-time half -- fillers served NA, the "did
+# nothing" rule, the set derived from positions elsewhere -- is
+# lsms_library/coping.py, which build code must never call (it is excluded
+# from every fingerprint).  These functions write what the file records and
+# nothing more: the read-time rules are applied to the set they write.
+
+#: The served column for the unordered set (canonical ``shocks.HowCopedSet``).
+COPING_SET_COLUMN = "HowCopedSet"
+#: An EHCVM 2018-19 ``s14q05__N`` cell for an option OFFERED and not chosen.
+COPING_GRID_NOT_CHOSEN = 0
+#: The cell values that mark an option CHOSEN.  See coping_set_from_grid.
+COPING_GRID_CHOSEN = (1, 2, 3)
+#: The positions a set-only hook writes, all NA (the paper form asks for up to 3).
+COPING_GRID_POSITIONS = 3
+#: The release's rank labels of ``s14bq05__N`` (EHCVM 2021-22), and the rank.
+COPING_RANK_LABELS = {"Première stratégie": 1, "Deuxième strategie": 2,
+                      "Troisième stratégie": 3}
+#: The option the 2021-22 release labels Oui/Non instead of with a rank.
+COPING_UNRANKED_OPTION = 25
+#: Registry name slot of the inferred option-25 position (ruling 2026-11-13).
+COPING_AUTRE_RANK_NAME = "code25-rank-inferred"
+
+
+class CopingGridError(Exception):
+    """A coping grid holds a value, or chooses a code, this reading does not cover.
+
+    Not a ValueError/KeyError/RuntimeError: a refused release must fail the
+    build loudly, not read as a failed build a fallback may retry.
+    """
+
+
+def coping_autre_rank_key(country: str) -> str:
+    """``<country>::shocks::code25-rank-inferred``."""
+    return f"{country}::shocks::{COPING_AUTRE_RANK_NAME}"
+
+
+def _join_coping_labels(labels) -> object:
+    picked = sorted(set(labels))
+    for label in picked:
+        if MULTI_SEP in label:
+            raise CopingGridError(
+                f"coping label {label!r} contains {MULTI_SEP!r}, the HowCopedSet "
+                f"separator")
+    return MULTI_SEP.join(picked) if picked else pd.NA
+
+
+def coping_set_from_grid(df: pd.DataFrame, labels: dict, *, country: str,
+                         prefix: str = "Cope") -> pd.DataFrame:
+    """``HowCopedSet`` from the EHCVM 2018-19 ``s14q05__N`` grid; no positions.
+
+    The grid has one column per option (``Cope<N>`` in ``data_info.yml``,
+    ``s14q05__N`` in the file).  Ruling 2026-11-12: "EHCVM 2018-19 fills the
+    set only (not positions) until its order is proven".  So this returns
+    ``df`` with the grid columns dropped and ``HowCopedSet`` added -- the
+    labels of the CHOSEN options, distinct, sorted, joined with
+    ``derivations.MULTI_SEP`` -- and ``HowCoped0..2`` all NA: the positions are
+    present, so the served schema does not depend on which waves are asked for
+    (an EMPTY answer must carry its required columns, GH #1292), and empty,
+    because the grid records no order.  ``HowCopedSet`` is NA where the row
+    chose nothing (no follow-up asked).
+
+    Which cell values count as chosen (GH #1562; counts are the audit's, per
+    country, ``burst/isa-sm-20261113/reports/1562-coping-audit/out/raw``):
+
+    * NA: the option was not offered (the shock had no follow-up).
+    * 0: offered, not chosen.  Every row that has any answer carries 0 on all
+      its unchosen options.
+    * 1, 2, 3: CHOSEN.  The CAPI form prints 14.05 as "CHOIX MULTIPLE:
+      ORDONNE" (CIV-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf p169), an ordered
+      multi-select whose export writes 0 for an unselected option and a
+      positive number for a selected one.  The release agrees: every row
+      with a positive cell has exactly one 1 (but Guinea-Bissau's 47 (1,1)
+      and 5 (1,1,3) rows and Benin's one lone 3); a 3 never stands without a
+      1 (but that Benin row); no row has more than three positives, the
+      form's "jusqu'a 3 strategies"; and option 26, "Aucune strategie",
+      is positive alone (never beside another option) in Burkina, CIV,
+      Niger and Togo.  A 3 meaning "not chosen" would sit on many options of
+      a row, not on at most one beside a single 1.  2 occurs only on option
+      26 (Mali 253 cells, Senegal 26, Benin 1).
+    * What a positive value says about ORDER is NOT established: positives
+      are {1,3} rather than {1,2}, and 2 appears only on option 26.  That is
+      why no position is filled.
+
+    Anything else -- a non-numeric cell, a value outside {0,1,2,3}, a chosen
+    code ``labels`` does not name, a label containing the separator --
+    raises :class:`CopingGridError`: a different release must be read again,
+    not served by a rule written for this one.
+    """
+    pattern = re.compile(rf"^{re.escape(prefix)}(\d+)$")
+    cols = [c for c in df.columns if pattern.match(str(c))]
+    if not cols:
+        raise CopingGridError(f"{country}: no {prefix}<n> coping grid columns")
+    codes = [int(pattern.match(str(c)).group(1)) for c in cols]
+    grid = pd.DataFrame({c: pd.to_numeric(df[c].astype(object), errors="coerce")
+                         for c in cols}, index=df.index)
+    non_numeric = df[cols].notna().to_numpy() & grid.isna().to_numpy()
+    if non_numeric.any():
+        bad = sorted({str(v) for v in df[cols].to_numpy()[non_numeric]})[:5]
+        raise CopingGridError(f"{country}: non-numeric coping grid values {bad}")
+    allowed = grid.isna() | grid.isin([COPING_GRID_NOT_CHOSEN, *COPING_GRID_CHOSEN])
+    if not allowed.to_numpy().all():
+        bad = sorted(set(grid.to_numpy()[~allowed.to_numpy()].tolist()))[:5]
+        raise CopingGridError(f"{country}: coping grid values {bad} are outside "
+                              f"{{0}} (not chosen) and {COPING_GRID_CHOSEN} (chosen)")
+    chosen = grid.isin(COPING_GRID_CHOSEN).to_numpy()
+    unnamed = sorted({code for k, code in enumerate(codes)
+                      if chosen[:, k].any() and code not in labels})
+    if unnamed:
+        raise CopingGridError(f"{country}: chosen coping codes {unnamed} have no label")
+    names = [labels.get(code) for code in codes]
+    sets = [_join_coping_labels(names[k] for k in range(len(codes)) if row[k])
+            for row in chosen]
+    out = df.drop(columns=cols)
+    for k in range(COPING_GRID_POSITIONS):
+        out[f"HowCoped{k}"] = pd.array([pd.NA] * len(out), dtype="string")
+    out[COPING_SET_COLUMN] = pd.array(sets, dtype="string")
+    return out
+
+
+def derive_coping_autre_rank(held_ranks) -> int:
+    """The rank EHCVM 2021-22 option 25 is served at: the least rank no other holds.
+
+    ``s14bq05__25`` ("Autre strategie") carries the Oui/Non label set where the
+    other 25 options carry a rank (GH #1556), so its rank is not in the file.
+    It takes the least rank in ``1 .. len(held) + 1`` that no ranked strategy
+    holds: ranks are otherwise gapless, and Burkina's file, which keeps the
+    raw rank of option 25, shows it filling the next one.  Registered per
+    country as ``<country>::shocks::code25-rank-inferred`` (ruling 2026-11-13,
+    "Keep slot, registered"); the hooks stamp it only where option 25 sits
+    beside a ranked strategy -- alone, it is the household's only answer and
+    its position is not in doubt.
+    """
+    held = set(held_ranks)
+    return min(set(range(1, len(held) + 2)) - held)
+
+
+def inputs_coping_autre_rank(country: str, wave: str) -> pd.DataFrame:
+    """The raw ``s14bq05__1..26`` answers behind the inferred option-25 positions.
+
+    Re-reads the wave's ``shocks`` file through the wave's own column mapping
+    (so ``i`` and ``Shock`` are formatted as served) and returns, at
+    ``(t, i, Shock)``, the rows where option 25 says ``Oui`` beside at least
+    one ranked strategy -- exactly the rows the hook stamps -- with the
+    ORIGINAL variable names and the file's own labels.
+    """
+    from .country import Country
+    from .local_tools import df_data_grabber
+
+    wave_obj = Country(country)[wave]
+    info = wave_obj.resources.get("shocks")
+    if not info:
+        raise ValueError(f"{country}/{wave} declares no shocks in data_info.yml")
+    names = [f"s14bq05__{n}" for n in range(1, 27)]
+    spec = dict(info)
+    spec["idxvars"] = {k: v for k, v in spec["idxvars"].items() if k in ("i", "Shock")}
+    spec["myvars"] = {name: name for name in names}
+    mapping = wave_obj.column_mapping("shocks", spec)
+    mapping.pop("df_edit", None)
+    (filename, cols), = mapping.items()
+    raw = df_data_grabber(str(wave_obj.file_path / "Data" / filename),
+                          cols["idxvars"], **cols["myvars"])
+    other = [n for n in names if n != f"s14bq05__{COPING_UNRANKED_OPTION}"]
+    ranked = raw[other].isin(list(COPING_RANK_LABELS)).any(axis=1)
+    autre = raw[f"s14bq05__{COPING_UNRANKED_OPTION}"].astype(object).eq("Oui")
+    raw = raw[(ranked & autre).to_numpy()].reset_index()
+    raw["t"] = wave
+    raw = raw.set_index(["t", "i", "Shock"])[names]
+    return _normalise_index_as_served(raw, wave_obj)

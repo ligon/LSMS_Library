@@ -290,3 +290,312 @@ def shocks(df):
     df['HowCoped2'] = how_coped[2]
     df = df.drop(columns=cope_cols)
     return df
+
+
+# --- crop_production (GH #1436 second residual, #824, #1437) -------------------------
+#
+# The 2021-22 builder is crop_production.py beside this file; these helpers are shared
+# with the registry `inputs` callables below, so the decoding is written once.  Names
+# carry a leading underscore, a `derive_` or an `inputs_` prefix: every callable here is
+# also a formatting function keyed by its name, and none may shadow a column or a table.
+#
+# THE IDENTITY OF A CROP IS ITS CODE.  s16cq04 ("Id in cultures") and s16dq01 ("Id in
+# culture_utilisation_annuel") are Survey Solutions roster ids, and the code is the link
+# between them: every one of the 6,603 s16d crop records has an s16c line of the same
+# code in the same household (5,080 do by label), the 23 s16d code-55 records all sit
+# with s16c code-55 lines and none with 65, and the 24 code-65 records all sit with 65
+# (measured 2026-11-13).  The two files carry DIFFERENT value-label sets: s16c says
+# 3 'Riz', 8 'Niébé/Haricot', 9 'Voandzou (pois de terre)', 27 'Laitue (salade)', 53
+# 'Agrume', 54 'Manguier', 55 'Autre (à préciser)' and leaves 58, 64, 65 bare; s16d says
+# 3 'Riz Paddy', 8 'Niébé', 9 'Voandzou', 27 'Laitue', 65 'Autre (à préciser)' and leaves
+# 53-58 and 64 bare.  s16c's set is the list that ends at 55 'Autre' (Burkina 2018-19,
+# Niger and Cote d'Ivoire 2021-22); the codes the file holds are those of the list that
+# runs to 65 (Mali, Togo, Benin, Senegal, Guinea-Bissau 2021-22: 55 Anacarde / Caju, 58
+# Banane douce, 64 Soja, 65 Autre).  So a sale is matched to its harvest lines by CODE:
+# by label, 332 of the 1,548 sales find no line, by code none.
+#
+# The served label is the harvest file's own, through harmonize_food as in 2018-19,
+# except:
+# * 55, 58 and 64, whose s16c label is wrong or absent, take the label the file's own
+#   roster text gives them (CROP_CODES_FROM_TEXT, registered as
+#   Burkina_Faso::crop_production::crop-code-from-roster-text);
+# * a code s16c leaves bare takes s16d's label (65 'Autre (à préciser)');
+# * a code neither file labels, or whose label the other file gives to a different code,
+#   keeps its source-qualified identity (none today).
+
+KEY_HH_CROP_SALE = 'Burkina_Faso::crop_production::hh-crop-sale-single-row'
+KEY_HARVEST_TO_DATE = 'Burkina_Faso::crop_production::harvest-to-date'
+KEY_HARVEST_DISPOSITIONS = 'Burkina_Faso::crop_production::harvest-from-dispositions'
+KEY_CROP_FROM_TEXT = 'Burkina_Faso::crop_production::crop-code-from-roster-text'
+_CROP_WAVE = '2021-22'
+FARM_LEVEL = 'Farm-level'
+CROP_OBS_NA = 'unresolved_observation'
+
+#: Codes labelled from the file's own roster text (s16cq03b, "Roster list question", the
+#: enumerator's name for the line), measured 2026-11-13 on s16c_me_bfa2021.dta: 55 names
+#: anacarde / cajou on 54 of 59 lines, whose households are in Cascades 26, Hauts-Bassins
+#: 17, Sud-Ouest 12 and Centre-Ouest 2, the cashew belt; 58 names banane on 5 of 5; 64
+#: names soja / soya on 88 of 92.  The labels are those of the 2021-22 EHCVM-2 list the
+#: codes come from (Mali, Togo, Benin, Senegal).  Ruling default (coordinator, 2026-11-13,
+#: "labelled from the file's own free text", basis derived-from-data).
+CROP_CODES_FROM_TEXT = {55: 'Anacarde', 58: 'Banane douce', 64: 'Soja'}
+
+#: The four s16d dispositions, each with its quantity <var>a and unit <var>b.
+_DISPOSITION_UNITS = ('s16dq02b', 's16dq03b', 's16dq05b', 's16dq13b')
+
+
+def _crop_household_ids(frame):
+    """The native 2021-22 panel `i`: burkina_faso.i's rule, grappe + menage.zfill(3).
+    The framework walks it to the 2018-19 id exactly once (updated_ids.json)."""
+    return pd.Series([tools.format_id(g) + tools.format_id(m, zeropadding=3)
+                      for g, m in zip(frame['grappe'], frame['menage'])],
+                     index=frame.index, dtype='string')
+
+
+def _crop_plot_ids(frame):
+    """`{s16cq02}_{s16cq03}`: the spelling of plot_features' plot_id."""
+    return (frame['s16cq02'].apply(tools.format_id).astype('string') + '_'
+            + frame['s16cq03'].apply(tools.format_id).astype('string'))
+
+
+def _crop_row_observations(n_rows, source_path, *, script_path):
+    """Constructed ``row:<fingerprint>:<n>`` tokens for s16c, which records no line id
+    (the Niger 2021-22 rule, GH #1360).  ``n`` is the zero-based row of the file as read,
+    BEFORE any filter, so a token names one physical line of one held release; the
+    fingerprint is ``source_fingerprint`` of the literal path the script reads, and a
+    source without a DVC sidecar is refused."""
+    from pathlib import Path
+
+    from lsms_library.local_tools import source_fingerprint
+    path = Path(source_path)
+    if not path.is_absolute():
+        path = Path(script_path).resolve().parent / path
+    reference = source_fingerprint(path.resolve())
+    if not reference.startswith('dvc:'):
+        raise ValueError('Burkina_Faso constructed crop observations require a declared sidecar')
+    return 'row:' + reference + ':' + pd.Series(np.arange(n_rows)).astype('string')
+
+
+def _code_labels(labelled, codes, field):
+    """``{code: label or None}`` of one variable, from its labelled and numeric reads.
+    A code the file leaves bare (the labelled read returns the number) maps to None.
+    Refuses a code read with two different labels."""
+    num = pd.to_numeric(codes, errors='coerce')
+    text = labelled.astype('string').str.strip()
+    out = {}
+    for code, label in zip(num, text):
+        if pd.isna(code):
+            continue
+        code = int(code)
+        bare = pd.isna(label) or pd.to_numeric(pd.Series([label]), errors='coerce').eq(code).iloc[0]
+        out.setdefault(code, set()).add(None if bare else str(label))
+    bad = sorted(c for c, labels in out.items() if len(labels) > 1)
+    if bad:
+        raise ValueError(f'{field}: codes read with two labels: {bad}')
+    return {c: next(iter(labels)) for c, labels in sorted(out.items())}
+
+
+def _qualified(field, code):
+    return f'Unknown [Burkina_Faso {_CROP_WAVE} {field}={int(code)}]'
+
+
+def derive_crop_code_label(code, harvest_labels, record_labels):
+    """The served crop of one 2021-22 code (see the block comment above): the roster-text
+    label for a code in CROP_CODES_FROM_TEXT, else s16c's label unless s16d gives that
+    word to another code, else s16d's label, else the source-qualified identity."""
+    code = int(code)
+    if code in CROP_CODES_FROM_TEXT:
+        return CROP_CODES_FROM_TEXT[code]
+    claimed = {}
+    for c, label in record_labels.items():
+        if label is not None:
+            claimed.setdefault(label, set()).add(c)
+    label = harvest_labels.get(code)
+    if label is not None and not (claimed.get(label, {code}) - {code}):
+        return label
+    other = record_labels.get(code)
+    if label is None and other is not None:
+        return other
+    return _qualified('s16cq04', code)
+
+
+def _crop_label_table(harvest_labels, record_labels, food_map):
+    """``{code: served crop label}`` for the wave, through harmonize_food."""
+    table = {}
+    for code in sorted(set(harvest_labels) | set(record_labels) | set(CROP_CODES_FROM_TEXT)):
+        label = derive_crop_code_label(code, harvest_labels, record_labels)
+        table[code] = food_map.get(label, label)
+    return table
+
+
+def _unit_code_table(pairs):
+    """``{code: label}`` for the UML codes of the 2021-22 crop unit fields, read as one list:
+    the harvest field's label first (``pairs`` is ordered), else the first other field
+    that labels the code, else the qualified identity ``UML=<code>``.  Each field has its
+    own value-label set; all five label codes 1-7 alike but for spelling (3: 'Plat
+    Yoruba' in s16c, 'Yorouba' in s16d) and none labels a code above 7, so that a bare
+    code means one unit in every field is ASSUMED, not shown (measured 2026-11-13)."""
+    table = {}
+    for labels in pairs:
+        for code, label in labels.items():
+            if label is not None and code not in table:
+                table[code] = label
+    for labels in pairs:
+        for code in labels:
+            table.setdefault(code, _qualified('UML', code))
+    return table
+
+
+def _served_units(codes, table):
+    """Unit codes -> the label the API serves for them (the merged read-path `u` table,
+    ehcvm.served_unit_labels), so `u`, Unit_sold and the dispositions share one
+    vocabulary ('Kilogramme' -> 'Kg', as the read path does).  NA stays NA."""
+    from lsms_library.ehcvm import served_unit_labels
+    num = pd.to_numeric(codes, errors='coerce')
+    raw = pd.Series([pd.NA if pd.isna(c) else table[int(c)] for c in num],
+                    index=codes.index, dtype='string')
+    known = raw.dropna().unique()
+    served = dict(zip(known, served_unit_labels('Burkina_Faso', known)))
+    return raw.map(served).astype('string')
+
+
+def _crop_maps():
+    """harmonize_food and the harvest-condition table, as the 2018-19 builder reads them."""
+    food = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label', dirs=[str(_country_dir()) + '/'],
+        **{'Preferred Label': 'Preferred Label'})
+    return food
+
+
+def _country_dir():
+    from lsms_library.paths import countries_root
+    return countries_root() / 'Burkina_Faso' / '_'
+
+
+def _raw_crop_file(name):
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Burkina_Faso' / _CROP_WAVE / 'Data' / name
+    return (tools.get_dataframe(str(path), convert_categoricals=True),
+            tools.get_dataframe(str(path), convert_categoricals=False))
+
+
+def _crop_tables(c_lab, c_num, d_lab, d_num):
+    """The crop and unit code tables of the wave, from the files as read."""
+    crop = _crop_label_table(_code_labels(c_lab['s16cq04'], c_num['s16cq04'], 's16cq04'),
+                             _code_labels(d_lab['s16dq01'], d_num['s16dq01'], 's16dq01'),
+                             _crop_maps())
+    unit = _unit_code_table(
+        [_code_labels(c_lab['s16cq16b'], c_num['s16cq16b'], 's16cq16b')]
+        + [_code_labels(d_lab[f], d_num[f], f) for f in _DISPOSITION_UNITS])
+    return crop, unit
+
+
+def _dispositions(records, records_codes, unit_table):
+    """s16d, one row per (i, crop CODE), with its four dispositions on the served units."""
+    from lsms_library.ehcvm import DISPOSITIONS
+    out = pd.DataFrame({
+        'i': _crop_household_ids(records_codes).to_numpy(),
+        'crop': pd.to_numeric(records_codes['s16dq01']).astype('int64').astype('string').to_numpy()})
+    for var in DISPOSITIONS:
+        out[f'{var}a'] = pd.to_numeric(records_codes[f'{var}a'], errors='coerce').to_numpy()
+        out[f'{var}b'] = _served_units(records_codes[f'{var}b'], unit_table).to_numpy()
+    return out
+
+
+def _raw_crop_frames():
+    """s16c (crop rows only) and s16d (exact repeats and crop-less placeholders removed),
+    each with the served t, i, crop and crop_code beside the answers as recorded, and
+    s16c's served plot_id."""
+    from lsms_library.ehcvm import hh_crop_records
+    c_lab, c_num = _raw_crop_file('s16c_me_bfa2021.dta')
+    d_lab, d_num = _raw_crop_file('s16d_me_bfa2021.dta')
+    crop_table, unit_table = _crop_tables(c_lab, c_num, d_lab, d_num)
+    keep = c_num['s16cq04'].notna().to_numpy()
+    c_lab, c_num = c_lab[keep], c_num[keep]
+    d_num = hh_crop_records(d_num)
+    # A record with no crop code is the placeholder of a household with no crop (1,164).
+    d_num = d_num[d_num['s16dq01'].notna()]
+    d_lab = d_lab.loc[d_num.index]
+    for lab, num, field in ((c_lab, c_num, 's16cq04'), (d_lab, d_num, 's16dq01')):
+        lab['t'] = _CROP_WAVE
+        lab['i'] = _crop_household_ids(num).to_numpy()
+        lab['crop_code'] = pd.to_numeric(num[field], errors='coerce').astype('Int64').to_numpy()
+        lab['crop'] = pd.array([crop_table[int(c)] for c in lab['crop_code']], dtype='string')
+    c_lab['plot_id'] = _crop_plot_ids(c_num).astype(str).to_numpy()
+    return c_lab, c_num, d_lab, d_num, unit_table
+
+
+def inputs_hh_crop_sale(wave):
+    """Registry `inputs`: the s16d sale as recorded, with the field and parcel of the one
+    s16c line of the same crop CODE it went on, one row per keyed served row, at
+    (t, i, plot_id, crop), the served line's grain."""
+    if wave != _CROP_WAVE:
+        raise ValueError(f'{KEY_HH_CROP_SALE} covers {_CROP_WAVE} only, not {wave!r}')
+    from lsms_library.ehcvm import is_crop_sale
+    harvest, _, records, _, _ = _raw_crop_frames()
+    sold = records[is_crop_sale(records['s16dq05a'], records['s16dq06']).to_numpy()]
+    lines = harvest.groupby(['i', 'crop_code']).size()
+    single = lines[lines == 1].index
+    harvest = harvest[harvest.set_index(['i', 'crop_code']).index.isin(single)]
+    out = sold[['t', 'i', 'crop', 'crop_code', 's16dq01', 's16dq04', 's16dq05a', 's16dq05b',
+                's16dq05d', 's16dq06']].merge(
+                    harvest[['i', 'crop_code', 'plot_id', 's16cq02', 's16cq03']],
+                    on=['i', 'crop_code'], how='inner', validate='one_to_one')
+    return out.set_index(['t', 'i', 'plot_id', 'crop'])
+
+
+def inputs_harvest_to_date(wave):
+    """Registry `inputs`: the unfinished s16c rows with a recorded quantity, at
+    (t, i, plot_id, crop), the served line's grain."""
+    if wave != _CROP_WAVE:
+        raise ValueError(f'{KEY_HARVEST_TO_DATE} covers {_CROP_WAVE} only, not {wave!r}')
+    harvest = _raw_crop_frames()[0]
+    keep = (harvest['s16cq11'].astype('string').str.strip().eq('Non').fillna(False)
+            & pd.to_numeric(harvest['s16cq16a'], errors='coerce').notna())
+    return harvest.loc[keep.to_numpy(), ['t', 'i', 'plot_id', 'crop', 's16cq02', 's16cq03',
+                                         's16cq11', 's16cq12', 's16cq16a', 's16cq16b']].set_index(
+                                             ['t', 'i', 'plot_id', 'crop'])
+
+
+def inputs_harvest_from_dispositions(wave):
+    """Registry `inputs`: the s16d answers behind each derived total, its four quantities
+    and units as recorded, one row per keyed served row, at (t, i, plot_id, crop): the
+    crop's single s16c line, or 'Farm-level' for a crop on two or more lines."""
+    if wave != _CROP_WAVE:
+        raise ValueError(f'{KEY_HARVEST_DISPOSITIONS} covers {_CROP_WAVE} only, not {wave!r}')
+    from lsms_library.ehcvm import DISPOSITIONS, harvest_totals
+    harvest, _, records, records_codes, unit_table = _raw_crop_frames()
+    lines = pd.DataFrame({'i': harvest['i'].to_numpy(),
+                          'crop': harvest['crop_code'].astype('string').to_numpy(),
+                          'Quantity': pd.to_numeric(harvest['s16cq16a'], errors='coerce').to_numpy(),
+                          'finished': harvest['s16cq11'].astype('string').to_numpy()})
+    totals = harvest_totals(lines, _dispositions(records, records_codes, unit_table))
+    pair = pd.MultiIndex.from_arrays([records['i'], records['crop_code'].astype('string')])
+    out = records[pair.isin(totals.index)].copy()
+    n = totals['lines'].reindex(pd.MultiIndex.from_arrays(
+        [out['i'], out['crop_code'].astype('string')])).to_numpy()
+    plot = harvest.drop_duplicates(['i', 'crop_code']).set_index(['i', 'crop_code'])['plot_id']
+    out['plot_id'] = [plot.get((i, c)) if k == 1 else FARM_LEVEL
+                      for i, c, k in zip(out['i'], out['crop_code'], n)]
+    raw = [f'{var}{part}' for var in DISPOSITIONS for part in 'ab']
+    return out[['t', 'i', 'plot_id', 'crop', 's16dq01'] + raw].set_index(['t', 'i', 'plot_id', 'crop'])
+
+
+def inputs_crop_code_from_text(wave):
+    """Registry `inputs`: every row whose crop label came from the roster text, with the
+    code and the text it rests on: the s16c lines of those codes at (t, i, plot_id, crop),
+    and for a crop on two or more lines the s16d record a Farm-level row may carry, at
+    (t, i, 'Farm-level', crop)."""
+    if wave != _CROP_WAVE:
+        raise ValueError(f'{KEY_CROP_FROM_TEXT} covers {_CROP_WAVE} only, not {wave!r}')
+    harvest, _, records, _, _ = _raw_crop_frames()
+    codes = list(CROP_CODES_FROM_TEXT)
+    lines = harvest[harvest['crop_code'].isin(codes)]
+    n = lines.groupby(['i', 'crop_code']).size()
+    farm = records[records['crop_code'].isin(codes)].copy()
+    many = pd.MultiIndex.from_arrays([farm['i'], farm['crop_code']]).isin(n[n > 1].index)
+    farm = farm[many].assign(plot_id=FARM_LEVEL)
+    out = pd.concat([lines[['t', 'i', 'plot_id', 'crop', 'crop_code', 's16cq04', 's16cq03b']],
+                     farm[['t', 'i', 'plot_id', 'crop', 'crop_code', 's16dq01']]],
+                    ignore_index=True)
+    return out.set_index(['t', 'i', 'plot_id', 'crop'])

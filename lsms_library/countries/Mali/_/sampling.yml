@@ -1,15 +1,16 @@
 # Sampling design record -- HOW this survey's sample was drawn (GH #793).
 #
-# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only the
+# NO DESIGN FIELDS (GH #942, ruling 2026-10-18, option A): each entry carries the
 # `panel:` block -- does `v` denote the same cluster as in the PRECEDING wave of
-# `Country('Mali').waves`?  The design fields are #793's curation and are not
+# `Country('Mali').waves`? -- and the `served_strata:` block described below, each
+# with its own provenance.  The design fields are #793's curation and are not
 # written yet; their absence here is "not curated", not "not found".
 #
 # Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in {wave-scoped,
 # redefined, mixed} makes a `Country('Mali')` frame that carries `v` across that
 # boundary warn (`ClusterIdentityWarning`); nothing is ever dropped or rewritten.
-# The first wave (2014-15) has no preceding wave and so no entry.  Vocabulary and
-# field names: see sampling.py.
+# The first wave (2014-15) has no preceding wave and so no `panel:` block.
+# Vocabulary and field names: see sampling.py.
 #
 # The idiosyncrasy (GH #1494): two programmes, EAC-I (2014-15, 2017-18) and EHCVM
 # (2018-19, 2021-22), each numbering its clusters from 1 and its households within
@@ -21,10 +22,48 @@
 # (mali.eaci14_i, mali.eaci17_i, GH #1494).  That says nothing about `v`, exactly
 # as Burkina Faso's 'EMC_' and Niger's 'E_' do not.  Before the prefix, 3,613 ids
 # were shared with 2017-18.
+#
+# SERVED STRATA (GH #1577, ruling 2026-11-12, "Registry + sampling.yml tag"): each
+# wave also says what `sample().strata` holds, in `served_strata` -- nothing
+# (2014-15), EAC-I's stratum code (2017-18), and the library's region x milieu
+# construction, registered in _/derivations.yml (2018-19, 2021-22).  The three are
+# not comparable across waves.  2014-15 has no boundary, so its entry is
+# `served_strata` alone.  These are Mali's first `served_strata` records and the
+# first record of every `holds` value but `native-label` (sampling.py).
 
 Sampling:
 
+  '2014-15':
+    served_strata:
+      holds: absent
+      source_type: derived-from-data
+      confidence: high
+      locator: 'CONTENTS.org, "2026-11-04 -- the NPK slot, the EHCVM input files, and strata by wave (GH #1445, #812)", "Strata, measured", verbatim: "2014-15: no variable in its 55 files is named or labelled a stratum, except =deflator= in =eaci2014_agregatconso.dta= ("Strata deflator"), which is one-to-one with region x milieu, 15 cells, not the design''s 51."; and "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)", where 2014-15 `strata` is "empty, by the ruling"; 2014-15/_/data_info.yml `sample` declares no `strata`'
+      note: |-
+        The EAC-I 2014 BID (catalog 2583) states "51 explicit sample strata", so
+        the design was stratified; what is absent is a stratum variable in the
+        files.  The one candidate, `deflator` of eaci2014_agregatconso.dta
+        ("Strata deflator"), is one-to-one with region x milieu, 15 cells, not the
+        design's 51, and is not read.  Carrying 2017-18's `strate` back by
+        `grappe` is an inference that would leave 69 of 989 clusters empty, and is
+        not done.  An own-wave stratum field or assignment rule is what would
+        change this (GH #1574; .coder/ledger/1577-mali-current-served-strata.md).
+
   '2017-18':
+    served_strata:
+      holds: native-code
+      variable: 'strate (EACI17_ECHANTILLON.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: 'CONTENTS.org, "2026-11-09 -- GH #1574: held BID visual and sampling-header checks": a metadata-only read of EACI17_ECHANTILLON.dta found `strate` labelled `codestrate`, an empty value-label-set reference and no value-label dictionaries; served through 2017-18/_/mapping.py `strata` (format_id), per "2026-11-10 -- current served-strata source trace (GH #1577)"'
+      note: |-
+        The weights file names it the stratum code (`codestrate`), and the BID
+        (2017-18/Documentation/bid_eaci17.pdf) states 51 explicit strata (PDF
+        p.10) and names this file as the sampling file (PDF p.16).  Measured
+        2026-11-04 (CONTENTS.org, "Strata, measured"): codes 1-45 nest in one
+        region each, 50 is "other urban" across 7 regions, 51 is Bamako; 47 of
+        51 codes are occupied.  No held document names the 51 codes or binds
+        them to `strate`, so no label is served (GH #1574, open).
     panel:
       household_continuity: independent
       cluster_id_continuity: stable
@@ -50,6 +89,17 @@ Sampling:
       locator: 'measured 2026-11-04 from eaci_geovariables_2014.dta, eaci_geovariables_2017.dta, EACIIND_p1.dta and eaci17_s01p1.dta through get_dataframe; design: EAC-I 2017 BID (WB 3409), Section 4, quoted in CONTENTS.org, "2017-18 -- EAC-I 2017"'
 
   '2018-19':
+    served_strata:
+      holds: constructed
+      derivation: 'Mali::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Mali::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2018-19/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2018-19/_/mapping.py; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)": 20 region x milieu labels'
+      note: |-
+        No EHCVM household file records a stratum; the BID's "The stratum is the
+        combination of region and residence area" is what the construction rests
+        on (the registry entry quotes it).  The region part is spelled through the
+        country's `strata` table, so it equals `cluster_features.Region`.
     panel:
       household_continuity: independent
       cluster_id_continuity: redefined
@@ -74,6 +124,22 @@ Sampling:
       locator: 'measured 2026-11-04 from eaci_geovariables_2017.dta, grappe_gps_mli2018.dta, eaci17_s01p1.dta and s01_me_mli2018.dta through get_dataframe; draws quoted in CONTENTS.org, "2017-18 -- EAC-I 2017" and "2018-19 -- EHCVM-1 2018/19"; no linkage: Mali/_/panel_ids.py docstring'
 
   '2021-22':
+    served_strata:
+      holds: constructed
+      derivation: 'Mali::sample::region-milieu-stratum'
+      source_type: derived-from-data
+      confidence: high
+      locator: '_/derivations.yml, Mali::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2021-22/_/data_info.yml `sample.df_cover.strata` = [s00q01, s00q04, {mapping: strata_label}], stamped by 2021-22/_/mapping.py; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)": 17 region x milieu labels, equal to BID Table 1'
+      note: |-
+        Each wave's label is its own cover's: 2021-22 writes Menaka and Taoudenit
+        under Gao and Tombouctou, so households change stratum on the label
+        alone.  CONTENTS.org ("Why 20 then 17", 2026-11-04) counts 429 of the
+        6,133 households it found in both waves, in 36 clusters.  On the
+        households the served panel links today (after the GH #1494 id
+        namespace) the red team on GH #1577 counts 415 of 5,011, in 36 clusters,
+        all three pairs relabels (Menaka Rural to Gao Rural 195, Taoudénit Rural
+        to Tombouctou Rural 154, Menaka Urbain to Gao Urbain 66; burst job
+        41277169).
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: stable

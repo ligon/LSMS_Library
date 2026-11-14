@@ -71,8 +71,11 @@ shocks:
     # labels (drought, floods, large rise in price of food, death of a
     # member, ...).  S17_1 = "severely negatively affected in the past 12
     # months" (yes/no) -> Experienced.  S17_5_A/B/C = first/second/third
-    # forest product collected to recover -> HowCoped0/1/2 (populated only
-    # where S17_4=yes, ~38% of experienced shocks).  Rows whose shock_name is
+    # forest product collected to recover -> ForestProduct0/1/2 (populated only
+    # where S17_4=yes, ~38% of experienced shocks).  They are PRODUCTS, not
+    # coping strategies, so not HowCoped<n> and not in HowCopedSet (ruling
+    # 2026-11-13, GH #1562, "LBR own column"); mapping.shocks serves the filler
+    # "no other product" NA.  Rows whose shock_name is
     # the Stata '.' sentinel (84 HH with the module left blank) format_id to
     # None and are dropped by the null-index guard.
     file:
@@ -86,9 +89,9 @@ shocks:
             - mapping:
                 "yes": True
                 "no": False
-        HowCoped0: S17_5_A
-        HowCoped1: S17_5_B
-        HowCoped2: S17_5_C
+        ForestProduct0: S17_5_A
+        ForestProduct1: S17_5_B
+        ForestProduct2: S17_5_C
 
 plot_features:
     # Section 10 (Land Parcels) of the National Household Forest Survey is

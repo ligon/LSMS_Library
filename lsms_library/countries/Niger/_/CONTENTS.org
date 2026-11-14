@@ -2028,7 +2028,9 @@ d'animaux"=, i.e. =Organic manure=; it is one of the four hollow lines.
 
 *Not changed.*  =Purchased= / =Quantity_purchased= in the EHCVM waves still
 read =s16bq05= / =s16bq07a=, the gift flag and gift quantity (the Burkina
-finding of #1188 applies by inspection).  The country concatenator's
+finding of #1188 applies by inspection).  [2026-11-13: changed, under the ruling
+"Extend to all four now"; see "EHCVM =plot_inputs= reads the purchase" at the
+end of this file.]  The country concatenator's
 docstring used to call the index "intentionally NON-unique"; it now says the
 index is meant to be unique and names the ECVMA residual as an open defect.
 
@@ -3983,3 +3985,152 @@ own private root).*  Niger serves =food_acquired= in 2018-19 and 2021-22 only.
   hashes, no build fingerprint; against development, the same as the flag's.
 - *The first scope, superseded.*  Region floor 1, all 15,014 flagged rows: cluster 1,361, region
   11,661, NA 1,992; wave total 52,486,790.70, flagged rows 13,025,201.60 (24.82%), 13,022 valued.
+
+* 2026-11-13 -- crop_production: survey kilograms against their sale prices (GH #1559)
+
+*RULED (@ligon, 2026-11-12, "GH1559 price-implied kg per unit for crops", "Also build a rung").*
+Part (1) is a report-only screen, =quantity_audit.audit_survey_kg_prices=, on Site Q's
+channels (=quantity_reports()= with =site='survey-kg-price'=, =LSMS_QUANTITY_STRICT=,
+=SurveyKgPriceWarning=).  It names a survey kilogram per unit (=Quantity_kg / Quantity=) outside
+0.1x-10x of the PRICE-IMPLIED kilograms per unit: the wave's and crop's median price per unit sold
+in that unit, over the median price per kilogram of its sales in =Kg= or in a unit stating its mass
+(=Sac de 50 kg=, =Sac de 100 kg=, =Gramme=), read at that mass.  At least 5 sales each side, spread
+at most 10x, and the product state matched where both the sale and the harvest record one.  Only
+units stating NO mass are judged (=Tiya=, =Botte=, =Panier=, =Planche=, =Unité=), which are the rows
+=kg_survey_off_label= cannot see; no row is named by both (75 and 157 rows, 0 in common).  Nothing
+is changed: the cold frame is =assert_frame_equal= to development =f138a3d61=.  Part (2), a rung, is a
+design memo only (=reports/cropkg/out/RUNG_DESIGN.md=, batch 2026-11-13).
+
+*Measured, cold, private roots* (burst jobs 41275992 and 41276357):
+
+| wave    | survey-kg rows, unit states no mass | judged | named low | named high | survey / implied, median | within 2x |
+|---------+-------------------------------------+--------+-----------+------------+--------------------------+-----------|
+| 2011-12 |                               7,070 |  1,932 |         6 |          6 |                     1.14 |     91.7% |
+| 2014-15 |                               7,246 |  6,394 |        26 |         89 |                     1.13 |     88.0% |
+| 2018-19 |                                   0 |      0 |           |            |                          |           |
+| 2021-22 |                               9,798 |  9,020 |         2 |         28 |                     1.25 |     89.0% |
+
+The names are a few cells, as GH #1559's measurement found: 2014-15 =Niébé/Haricots secs= / =Tiya= 30
+high (a median 29 kg per tiya against 2.5 implied) and 5 low (0.15); =Sorgho= / =Botte= 30 high (110
+kg per botte against 8.1, on 7 botte sales and 6 by mass); =Mil= / =Botte= 12 high and 12 low (151.5
+and 0.76 against 10.2); 2021-22 =Mil= / =Botte= 16 high (200 against 10) and =Sorgho= / =Botte= 8 (175
+against 6.75); 2011-12 =Niébé= / =Tiya= 6 high (30 against 2.4).  They read like a sack or a line
+total keyed against a small unit's label; that is not established.  Served as recorded.
+
+*Idiosyncrasies.*
+- *The survey sits above the prices.*  Survey kilograms run 1.13-1.25x the price-implied mass at the
+  median in every wave, which is why the band is ten and not two.  Holding a stated sack out of the
+  baseline shows the estimator's own lean: =Sac de 100 kg= is inferred at 0.80 of its label and =Sac
+  de 50 kg= at 1.25, so big lots read light and small ones heavy.
+- *3E's sales are included, and veto one cell.*  With section 3E's sales as donors, a net 79
+  rainy-module rows of 2011-12 lose their implied mass (1,978 judged without 3E, 1,899 with): 103
+  lost and 24 gained, and all 103 are one cell, =Oseille= / =Tiya= 2011-12, where a single 3E =Kg=
+  sale moves the baseline from 5 to 6 sales and its max/min spread from 4.0 to 12.0, past the gate
+  (red team F7).  A one-donor veto under max/min below 10 sales, not a broad 3E price difference.
+  3 of the 12 2011-12 names are 3E rows.  The measurement the ruling was made on excluded 3E both
+  ways.  The framework has no Niger rule to drop them; their window key (=dry-season-sale-window=)
+  would allow a generic one, which is a question in the memo.
+- *The state rung decides 4,187 of 2021-22's 9,020 rows*, and removes 2 low names (state-blind: 4).
+  2011-12 and 2014-15 record no state.
+- *2018-19 has nothing to judge* (no kilograms), and its 21 =Kg= sales are a thin baseline for a
+  rung: every cell one could serve rests on exactly 5 of them, all roselle (=Oseille=) and fresh tomato.
+  Roselle's 5 come from 2 households and tomato's from 5, so a 5-household gate keeps the 23 tomato
+  rows of the 161 (red team F2).
+  Within roselle a =Gros sac= (21 kg, 37 sales) reads lighter than a =Sac Moyen= (28 kg,
+  6 sales).  Whether those masses are wrong is not established (roselle is light); the size
+  inversion is recorded in the memo, and nothing is served from it.
+- *Region* is not a rung (it lives in =cluster_features=): a region-then-national ladder names 155
+  rows against the screen's 157.
+- *A one-wave read names the same rows* as the all-waves read (pinned in
+  =tests/test_gh1559_survey_kg_price_screen.py=).
+
+*Cost.*  47 ms of a 659 ms warm read.  Cache: none (=quantity_audit= is excluded from every
+fingerprint; census 0 of 555 / 2,321 / 42 / 38).
+
+* shocks: coping strategies, the set and the positions (GH #1562, 2026-11-13)
+
+Rulings (=isa-decisions.org=): 2026-11-12 "Coping-strategy contract, GH1562" (positions are the
+household's REPORTED order; every shocks country also gets an unordered set; EHCVM 2018-19 fills the
+set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical contract:
+=lsms_library/data_info.yml= =shocks= (=HowCoped0..3=, =HowCopedSet=); read-time rules:
+=lsms_library/coping.py=, labels in =_/coping.yml=.
+
+- *2018-19: the set only.*  =s14q05__N= is a grid, one column per option, recording WHICH strategies
+  were chosen and not their order: the paper form asks for strategies "par ordre d'importance", but
+  the release holds {0, 1, 3} per option.  The hook now writes =HowCopedSet= from the grid
+  (=ehcvm.coping_set_from_grid=) and leaves =HowCoped0..2= present and NA (an empty answer must
+  carry its required columns, GH #1292).  Until GH #1562 it listed the positive options
+  in CODE order as =HowCoped0..2=, which disagrees with the value order on 249 rows.  Chosen = a
+  positive cell (1, 2 or 3); 0 = offered and not chosen (every answered row carries 0 on all its unchosen
+  options); NA = not asked; any other value, or a chosen code with no label, is refused
+  (=CopingGridError=).  What a positive value says about ORDER is not established, which is why no
+  position is filled.  Evidence per country: the GH #1562 audit, =out/raw/=.
+- *Site B now warns* that =HowCoped0= / =HowCoped1= are empty in 2018-19.  That is the honest report of
+  a wave that records no order; do not silence it with =optional:=, which is country-grain.
+- *2011-12 and 2014-15: positions.*  Ranked 1ère/2ème/3ème (questionnaires).  Missing codes are served
+  NA in their position and never in the set (=_/coping.yml=): 2011-12's unlabelled code 99, served as
+  ='99.0'= (317 cells), and 2014-15's =Manquant= (code 99, 207 cells).  2011-12's "Nothing" (code 24)
+  and 2014-15's "Aucune stratégie" are "did nothing" answers and keep their positions.
+- *2021-22: positions by rank; option 25 registered.*  Option 25 ("Autre stratégie", Oui/Non) is
+  chosen on 52 rows, 17 of them beside a ranked strategy; those carry
+  =Niger::shocks::code25-rank-inferred= (=_/derivations.yml=; ruling "Keep slot, registered").  On 2 of
+  them the only other strategy is a Deuxième, so option 25 is served first.
+
+* 2026-11-13 -- EHCVM =plot_inputs= reads the purchase (ruling "Extend to all four now")
+
+*Ruling (@ligon, 2026-11-13): "Extend to all four now (Recommended)".*  Senegal 2018-19, Cote d'Ivoire
+2018-19 and Niger 2018-19 / 2021-22 read =s16bq08= / =s16bq09a= as the purchase, on the Togo template
+(=408d02a24=), measured and disclosed.  These are the two Niger cells.  The ECVMA waves (2011-12, 2014-15) are
+a different roster and are not touched.
+
+*What is served now* (=2018-19/_/plot_inputs.py=, =2021-22/_/plot_inputs.py=): =Purchased= =s16bq08=,
+=Quantity_purchased= =s16bq09a=, =Unit_purchased= =s16bq09b=; =Received_as_gift= =s16bq05=,
+=Quantity_received_as_gift= =s16bq07a=, =Unit_received_as_gift= =s16bq07b=, declared optional in
+=_/data_scheme.yml= and NA on the ECVMA waves.  Each unit is decoded from its own value labels and served in
+the vocabulary of =u= (=ehcvm.served_unit_labels=).  =u= and =input_obs= are unchanged.
+
+*Idiosyncrasies this rests on.*
+- *The shared tail is not edited.*  =niger._finish_plot_inputs= keeps only =Quantity=, =Purchased= and
+  =Quantity_purchased=, and =niger.py= is in every Niger wave's hash.  The two EHCVM scripts therefore
+  attach the four acquisition columns themselves, after the tail, by position (same input filter first, the
+  line count asserted), so the ECVMA waves' hashes do not move.
+- *2021-22's three unit questions use three code lists.*  =s16bq03b= puts =Sachet= at 13; =s16bq07b= has
+  =Charrette asine= 5 and =Charrette bovine= 6 and no =Sachet=; =s16bq09b= has =Charrette Bovine= 5,
+  =Sachet= 6 and =Charrette Asine= 13, with a capital letter.  Read by label (=convert_categoricals=), never by
+  code across questions.  2018-19's three questions share one 12-answer list.
+- *The questions are worded differently across the waves* (Stata labels): 2018-19 =s16bq07a= "Selon vous,
+  quantité ... reçue", =s16bq09a= "Quelles sont la quantité et la valeur totale ... achetées?"; 2021-22
+  "Quelle quantité ... reçue", "Quelle est la quantité ... achetée?".
+- *Hollow lines.*  2021-22 has 9 applied lines blank on both flags; 4 of them are hollow (the three with no
+  quantity and the 9999 line, whose quantity the GH #865 strip removes) and are dropped by
+  =dropna(how='all')= under either binding, so the hollow set does not change.  2018-19 has none.  Neither
+  =s16bq07a= nor =s16bq09a= carries 9999 in either wave (maxima 1,000 / 6,000 in 2018-19, 800 / 1,200 in
+  2021-22).
+
+*What moves* (burst job 41280484, source counts on the applied lines):
+| wave    | served lines | =Purchased= True, before -> after | =Quantity_purchased= non-null, before -> after | =Received_as_gift= True | gift x purchase: Non/Non, Non/Oui, Oui/Non, Oui/Oui |
+|---------+--------------+-----------------------------------+------------------------------------------------+-------------------------+-----------------------------------------------------|
+| 2018-19 | 13,401       | 1,383 -> 4,557                    | 1,383 -> 4,557                                 | 1,383                   | 7,602 / 4,416 / 1,242 / 141                          |
+| 2021-22 | 12,435       | 856 -> 3,593                      | 856 -> 3,593                                   | 856                     | 8,052 / 3,522 / 785 / 71 (+ 9 blank on both)         |
+Every 2018-19 acquisition quantity has its unit; in 2021-22 one gift quantity has no =s16bq07b=.
+=seed_kg= and =nitrogen_kg= read =Quantity= and =u= only.
+
+*Measured, served* (cold, private roots, previous head =1d89815f0= against the candidate =14606914c=; burst
+job 41280722).  43,620 rows both sides, index equal, every wave's row count unchanged (12,435 in 2021-22: the
+hollow set did not move, and 5 served 2021-22 lines keep both flags NA).  Cells move only in the two EHCVM
+waves' acquisition columns (=Purchased= 5,658 / 4,307 cells, =Quantity_purchased= 5,760 / 4,356); the new
+gift columns equal the old purchase columns row for row; the four columns are NA on the ECVMA waves.
+=seed_kg= and =nitrogen_kg= are frame-equal, and =Feature('plot_inputs')= equals the Country table on every
+value column.
+
+*Unit vocabulary, one mismatch disclosed and not folded.*  Every served =Unit_purchased= / =Unit_received_as_gift=
+label is a label =u= serves, except 2021-22's =Charrette Bovine= (62 lines) and =Charrette Asine= (12) on
+=Unit_purchased=: =s16bq09b='s value labels capitalise them, while =s16bq03b= and =s16bq07b= write
+=Charrette bovine= / =Charrette asine=, which is what =u= and =Unit_received_as_gift= serve.  Folding the case
+needs a row in =_/categorical_mapping.org='s =u= table, which is a build input of every Niger wave (the ECVMA
+ones included), so it is left for the next edit of that table.
+
+*Cost, measured* (hash census against =f138a3d61=): Niger 25 of 25 =Country._table_cache_hash= and 50 of 100
+=Wave._input_hash= (the 25 of 2018-19 and the 25 of 2021-22; 2011-12 and 2014-15 do not move, because
+=niger.py= is not edited); =build_transforms_fingerprint= 0 of 42, =framework_imports_fingerprint= 0 of 38.
+

@@ -74,10 +74,19 @@ Data Scheme:
     materialize: make
 
   shocks:
+    # GH #1562 (ruling 2026-11-13).  Served ONCE per wave, under the post-harvest
+    # quarter (2011Q1, 2013Q1, 2016Q1, 2019Q1) whose file it is; it used to be
+    # served under both quarters.  W1-W3 rank four strategies (HowCoped0..3);
+    # W4 is "select all that apply", so it serves HowCopedSet and NA positions.
+    # See CONTENTS.org, "shocks".
     index: (t, i, Shock)
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
+    HowCoped3:
+      type: str
+      optional: true
+    HowCopedSet: str
 
   food_acquired:
     # Canonical post-2026-05-05 (GH #169): s axis carries acquisition
@@ -129,9 +138,16 @@ Data Scheme:
   individual_education:
     # Highest education level completed per household member (GH #171).
     # Wired on the YAML path (per-wave _/data_info.yml block), mirroring
-    # Uganda -- the selected post-harvest section-2 series is dated only
-    # to each wave's PH visit, not duplicated at PP. Earlier W1/W2 PP
-    # attainment questions are separate sources and remain unwired here.
+    # Uganda -- the post-harvest section-2 series is dated to each wave's PH
+    # visit, not duplicated at PP.  W1 / W2 ALSO serve their post-planting
+    # round's own Section 2 (sect2_plantingw1 s2q7 / sect2_plantingw2 s2q8,
+    # "highest educational level completed", each member the section asks) under
+    # the PP quarter (GH #1713, ruling @ligon 2026-11-13); W3-W5 PP do not
+    # ask it ("2. EDUCATION ... PH ONLY", W3 PP questionnaire), recorded as
+    # correctly-empty verdicts in .coder/coverage/absent_verdicts.csv.  The
+    # PP and PH series are different questions to different members and are
+    # not pooled.  Three W2 PP cells hold a code their value labels do not
+    # define (4, 19, 20): served 'Unknown' (2012-13/_/mapping.py, D4).
     # Quarter t values label logical visits; PH fieldwork can extend
     # beyond calendar Q1.
     # Educational Attainment = highest level completed: s2aq9 in W1-W4
@@ -170,6 +186,13 @@ Data Scheme:
     #
     # and it is destroyed in EACH of the two quarters the wave is tagged on
     # (2012Q3 and 2013Q1 both return the same truncated N429,001,558).
+    # [2026-11-13, GH #1562: assets is now served once per wave, under the
+    # post-planting quarter its sect5 files belong to (2010Q3, 2012Q3, 2015Q3,
+    # 2018Q3); it was served under both quarters.  Measured cold, base and
+    # candidate alike: the served 2012Q3 Value sums to N576,299,043, the true
+    # total above -- Value is summed per item now (feature._ADDITIVE_MEASURE_
+    # COLUMNS["assets"], PR #629), so the N147M loss described here is closed
+    # for Value; Age still keeps one unit's value.]
     #
     # `item_seq` is exactly the missing level -- but declaring it here does NOT
     # close the bug, and that was verified rather than assumed:
@@ -397,8 +420,10 @@ Data Scheme:
     # (same wave, different round; plot_id aligns via format_id).
     # Country-level script (_/crop_production.py) joins/reshapes per wave
     # (W3-W5 split the module across secta3i / secta3ii / secta3iii) ->
-    # materialize: make.  Stores REPORTED fields only -- no kg
-    # conversion, yield, main_crop, or value shares (transformations).
+    # materialize: make.  Stores reported fields -- no yield, main_crop or
+    # value shares (transformations) -- plus one construction: W3 (2016Q1)
+    # `Quantity_kg` from the World Bank's own ag_conv_w3 table (GH #1518,
+    # below; a registered derivation).
     # crop (j) on the shared harmonize_food Preferred Label so it joins
     # food_acquired.j; u normalized to the shared `u` table base labels.
     # Quantity_sold / Value_sold: W1/W2 record them on the plot-crop row.
@@ -515,6 +540,18 @@ Data Scheme:
     #          harvested from [PLOT] during ...?"
     # Required (not optional): every wave carries it.  See _/CONTENTS.org.
     Value_harvested: float
+    # The LINE's kilograms, the harvest ladder's survey_kg rung (GH #1518,
+    # ruling @ligon 2026-11-12).  Only W3 (2016Q1) fills it: Quantity x the
+    # World Bank's own ag_conv_w3 factor at the line's native (crop, sized
+    # unit, own zone) key -- NOT a total an enumerator wrote down, and never a
+    # KgFactor, which stays the factor asked beside the quantity (W4/W5).
+    # Registered as Nigeria::crop_production::w3-ag-conversion (Derivation);
+    # metric units and the 9 card-contradicting table rows are not read, the
+    # jerry cans are served at 1 l = 1 kg.  NaN in every other wave, hence
+    # optional.  See _/CONTENTS.org, "W3 shipped harvest factors".
+    Quantity_kg:
+      type: float
+      optional: true
     materialize: make
 
   plot_inputs:

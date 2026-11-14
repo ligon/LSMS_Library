@@ -30,11 +30,37 @@ BINDINGS = (
      'Post Harvest Wave 5/Household/sect2_harvestw5.dta', 's2q9'),
 )
 POPULATIONS = ('singleton', 'mixed', 'all_missing', 'nullable_string',
-               'categorical', 'native_duplicates')
+               'categorical', 'native_duplicates', 'unlabelled')
+#: GH #1713 D4 (ruling @ligon 2026-11-13, "Serve 'Unknown'"): in the W2
+#: POST-PLANTING round only, a code the file's value labels do not define (it
+#: arrives as a bare number) is served 'Unknown'; a LABELLED answer that
+#: harmonize_education does not map still passes through.  The hook is the
+#: candidate's 2012-13/_/mapping.py, so the baseline arm does not get it.
+CANDIDATE_HOOKS = {'2012-13'}
+#: Positions, per population, of the bare numeric codes in source_frame.
+UNLABELLED_AT = {'mixed': [2], 'unlabelled': [1, 2]}
+#: GH #1713 (ruling @ligon 2026-11-13, "Wire W1/W2 PP + verdicts"): W1 / W2
+#: also serve their POST-PLANTING round's own Section 2 under the PP quarter.
+PP_SOURCES = {
+    '2010-11': ('Post Planting Wave 1/Household/sect2_plantingw1.dta', 's2q7'),
+    '2012-13': ('Post Planting Wave 2/Household/sect2_plantingw2.dta', 's2q8'),
+}
+MAPPING = ['harmonize_education', 'Original Label', 'Preferred Label']
 
 
-def baseline_yaml(candidate, source, ph):
+def pp_entry(folder, pp):
+    source, column = PP_SOURCES[folder]
+    return (f"        - {source}:\n            t: '{pp}'\n"
+            f"            {VALUE}:\n                - {column}\n"
+            f"                - mappings: {MAPPING}\n")
+
+
+def baseline_yaml(candidate, source, ph, folder=None, pp=None):
     """Restore only the independent public predecessor's file/t spelling."""
+    if folder in PP_SOURCES:
+        entry = pp_entry(folder, pp)
+        assert candidate.count(entry) == 1
+        candidate = candidate.replace(entry, '', 1)
     override = f"    file:\n        - {source}:\n            t: '{ph}'\n"
     assert candidate.count(override) == 1
     text = candidate.replace(override, f'    file: {source}\n', 1)
@@ -78,10 +104,11 @@ def metadata(tmp_path, monkeypatch):
                     target.parent.mkdir(parents=True, exist_ok=True)
                     content = original.read_text(encoding='utf-8')
                     if arm == 'baseline':
-                        content = baseline_yaml(content, source, ph)
+                        content = baseline_yaml(content, source, ph, folder, pp)
                     target.write_text(content, encoding='utf-8')
                     mapping = original.parent / 'mapping.py'
-                    if mapping.is_file():
+                    if mapping.is_file() and not (
+                            arm == 'baseline' and folder in CANDIDATE_HOOKS):
                         shutil.copyfile(mapping, target.parent / mapping.name)
             data = tmp_path / 'data'
             data.mkdir()
@@ -129,7 +156,12 @@ def test_selected_question_mapping_and_actual_quarter_registry(metadata, binding
         specs[arm] = obj[ph].resources[TABLE]
     old_spec, new_spec = specs['baseline'], specs['candidate']
     assert old_spec['file'] == source
-    assert new_spec['file'] == [{source: {'t': ph}}]
+    expected_files = [{source: {'t': ph}}]
+    if folder in PP_SOURCES:
+        pp_source, pp_column = PP_SOURCES[folder]
+        expected_files.append({pp_source: {'t': pp, VALUE: [
+            pp_column, {'mappings': MAPPING}]}})
+    assert new_spec['file'] == expected_files
     assert old_spec['idxvars'] == {'i': 'hhid', 'pid': 'indiv'}
     assert new_spec['idxvars'] == {'t': 'hhid', 'i': 'hhid', 'pid': 'indiv'}
     assert old_spec['myvars'] == new_spec['myvars'] == expected_question
@@ -151,6 +183,8 @@ def source_frame(column, population):
         'categorical': pd.Categorical(['0. NONE', None, '16. P6'],
                                      categories=['16. P6', '0. NONE', 'P1']),
         'native_duplicates': ['P6', '0. NONE', 'P6', pd.NA],
+        # A labelled answer no table maps, two bare (unlabelled) codes, a gap.
+        'unlabelled': ['99. NOT A MAPPED LEVEL', 4.0, '19', None],
     }[population]
     n = len(values)
     hh = [303., 101., 202., 303., 0.][:n]
@@ -185,9 +219,12 @@ def test_actual_wave_keeps_ph_payload_and_refuses_false_pp_date(
         assert convert_categoricals is True and encoding is None
         assert categories_only is False
         path = Path(os.path.abspath(filename))
-        wanted = roots[active['arm']] / 'Nigeria' / folder / 'Data' / source
-        assert path == wanted
+        data = roots[active['arm']] / 'Nigeria' / folder / 'Data'
         reads.append((active['arm'], path))
+        if folder in PP_SOURCES and path == data / PP_SOURCES[folder][0]:
+            # The PP section-2 file: the same invented answers, its own column.
+            return operand.rename(columns={column: PP_SOURCES[folder][1]}).copy(deep=True)
+        assert path == data / source
         return operand.copy(deep=True)
 
     # Reuse actual df_data_grabber; only its sanctioned source-reader leaf moves.
@@ -199,7 +236,12 @@ def test_actual_wave_keeps_ph_payload_and_refuses_false_pp_date(
         outputs[arm] = {quarter: obj[quarter].individual_education()
                         for quarter in (ph, pp)}
     old, new = outputs['baseline'], outputs['candidate']
-    assert len(reads) == 4
+    data = {arm: roots[arm] / 'Nigeria' / folder / 'Data' for arm in roots}
+    assert {p for a, p in reads if a == 'baseline'} == {data['baseline'] / source}
+    expected = {data['candidate'] / source}
+    if folder in PP_SOURCES:
+        expected.add(data['candidate'] / PP_SOURCES[folder][0])
+    assert {p for a, p in reads if a == 'candidate'} == expected
     for frame in (old[ph], old[pp], new[ph], new[pp]):
         assert isinstance(frame, pd.DataFrame)
         assert list(frame.index.names) == ['t', 'i', 'pid']
@@ -217,7 +259,18 @@ def test_actual_wave_keeps_ph_payload_and_refuses_false_pp_date(
     retimed['t'] = ph
     retimed = retimed.set_index(['t', 'i', 'pid'])
     pd.testing.assert_frame_equal(retimed, old[ph], check_exact=True)
-    pd.testing.assert_frame_equal(new[pp], new[ph].iloc[:0], check_exact=True)
+    if folder in PP_SOURCES:
+        # The PP round's own file, same answers: what the baseline served by
+        # re-dating the PH rows, now from the PP section (GH #1713) -- except
+        # that in W2 a bare unlabelled code is 'Unknown' (D4).
+        expected = old[pp].copy()
+        if folder in CANDIDATE_HOOKS and UNLABELLED_AT.get(population):
+            values = expected[VALUE].astype(object)
+            values.iloc[UNLABELLED_AT[population]] = 'Unknown'
+            expected[VALUE] = values
+        pd.testing.assert_frame_equal(new[pp], expected, check_exact=True)
+    else:
+        pd.testing.assert_frame_equal(new[pp], new[ph].iloc[:0], check_exact=True)
     assert new[pp].attrs == new[ph].attrs
     assert set(new[ph].index.get_level_values('t')) == {ph}
     assert set(old[pp].index.get_level_values('t')) == {pp}
@@ -228,6 +281,18 @@ def test_actual_wave_keeps_ph_payload_and_refuses_false_pp_date(
     if population == 'mixed':
         assert new[ph][VALUE].iloc[2] == 0
         assert new[ph][VALUE].iloc[1:2].isna().all()
+    if population == 'unlabelled':
+        # Post-harvest: everything passes through, the bare codes included.
+        assert new[ph][VALUE].iloc[0] == '99. NOT A MAPPED LEVEL'
+        assert new[ph][VALUE].iloc[1] == 4.0 and new[ph][VALUE].iloc[2] == '19'
+        if folder in CANDIDATE_HOOKS:
+            # W2 post-planting: the labelled-but-unmapped answer passes
+            # through; the unlabelled codes are the sentinel; the gap stays.
+            assert new[pp][VALUE].iloc[0] == '99. NOT A MAPPED LEVEL'
+            assert new[pp][VALUE].iloc[1:3].tolist() == ['Unknown', 'Unknown']
+            assert pd.isna(new[pp][VALUE].iloc[3])
+        elif folder in PP_SOURCES:
+            assert new[pp][VALUE].iloc[1] == 4.0
     if population == 'native_duplicates':
         assert not new[ph].index.is_unique
     pd.testing.assert_frame_equal(operand, protected, check_exact=True)

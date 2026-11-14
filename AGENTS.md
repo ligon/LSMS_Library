@@ -804,7 +804,7 @@ A handler that catches a builtin cannot tell a real absence from a refusal. Four
 
 **Who this could have cost, measured.** No country has a legacy route for `household_characteristics`, so the roster fall-through never protected a served row. Four have one for a food table (CotedIvoire, Nigeria, Tanzania, Togo), and it fired on none of their cold calls; asked directly on a cold root, those ten cells built nothing (12 of 12 calls raised), so where a legacy build fails too the derivation's own failure is raised, with the legacy failure in a note. Cold, base against tip, over all 38 countries with a config: 585 calls (`sample`, the roster, `food_acquired` and the derived tables, all waves and per wave, and `market=`), 554 frames equal, 59,116,645 rows both sides, none lost. The only change on a call that did not already raise is Armenia `household_characteristics(waves=['1996'])`, whose source is not held: 0 rows became `FileNotFoundError`. `sample()` serves `v` in 36 of the 37 countries that declare it; Nepal, with no microdata, is the one `FileNotFoundError` the v-join degrades over, and every table it warned on (9 calls) has 0 rows. `LegacyFallbackWarning` fired on no call. With one source blob lost, cold, base against tip (Niger, Mali, Albania, Malawi, Uganda, Guatemala; 32 call forms; 896 pairs): 883 identical, 23,775,033 rows both sides; of the 13 that differ, 9 go from 0 rows to raising and 4 from "Could not materialize" to the cause.
 
-**Still open, because the code is in the fingerprinted `_aggregate_wave_data` closure and fixing it moves every hash.** A hook that raises `AttributeError` is a warning: on a cold root Burkina `sample()` served 17,413 of 28,213 rows, with all of 2014 gone, and the parquet's manifest still claimed 2014, so later processes read `sample(waves=['2014'])` as 0 rows with no warning; on a warm root it served the old wave parquet. A wave script that fails raises `CalledProcessError` only where the country has a `_/Makefile`. On a country with none (14 have wave scripts, about 60 of them), `Wave.grab_data` reports `Makefile not found`, `try_script` catches the failure and warns, and the wave is skipped: with 2005's script failing, Albania `sample()` served 17,517 of 21,357 rows, the manifest still listed 2005, later reads of 2005 answer 0 rows with no warning, and `household_characteristics(waves=['2005'])` labels 16,434 roster rows `Mover`. A lost source blob does the same with nothing injected. `Makefile not found` prints for most of those waves whether or not anything failed, so it diagnoses nothing. A declared wave that builds nothing is skipped the same way (`pd.DataFrame(), 'missing'`). A corrupt `updated_ids.json` is passed over in silence: Burkina 2021-22 served 2,846 of 10,403 households under another `i`.
+**Still open, because the code is in the fingerprinted `_aggregate_wave_data` closure and fixing it moves every hash.** A hook that raises `AttributeError` is a warning: on a cold root Burkina `sample()` served 17,413 of 28,213 rows, with all of 2014 gone, and the parquet's manifest still claimed 2014, so later processes read `sample(waves=['2014'])` as 0 rows with no warning; on a warm root it served the old wave parquet. A wave script that fails raises `CalledProcessError` only where the country has a `_/Makefile`. On a country with none (13 have wave scripts, about 60 of them; 14 until Benin gained a `_/Makefile` in GH #1705), `Wave.grab_data` reports `Makefile not found`, `try_script` catches the failure and warns, and the wave is skipped [2026-11-13, GH #1705 red team: stale for Benin, where at base `f138a3d61` a failing wave script raised `CalledProcessError` from `try_script` after the warning, on the one route measured (cold, serial, all waves); the other 13 countries were not re-measured]: with 2005's script failing, Albania `sample()` served 17,517 of 21,357 rows, the manifest still listed 2005, later reads of 2005 answer 0 rows with no warning, and `household_characteristics(waves=['2005'])` labels 16,434 roster rows `Mover`. A lost source blob does the same with nothing injected. `Makefile not found` prints for most of those waves whether or not anything failed, so it diagnoses nothing. A declared wave that builds nothing is skipped the same way (`pd.DataFrame(), 'missing'`). A corrupt `updated_ids.json` is passed over in silence: Burkina 2021-22 served 2,846 of 10,403 households under another `i`.
 
 **Cache cost: none.** Every edited callable is out of every closure, which `tests/test_failure_is_not_absence.py` pins. The tip against its base moved 0 of 450 tables, 0 of 1,895 waves, 0 of 35 `build_transforms_fingerprint` and 0 of 157 `framework_imports_fingerprint`, with a no-op in `_rebuild_failure_error` as the positive control (450, 1,877, 35).
 
@@ -872,9 +872,14 @@ Skill: `.claude/skills/add-feature/sample/SKILL.md`. Migration history: `slurm_l
 `panel_ids` and `updated_ids` are `@property` attributes on `Country`, not methods — they return dicts, not DataFrames. Code iterating over `data_scheme` entries and calling `getattr(c, name)()` must special-case these. Use `diagnostics.load_feature(c, name)` which handles both.
 
 **The crosswalk is a committed SOURCE, not a build product (GH #914/#894).**
-All eleven panel countries (Burkina_Faso, Ethiopia, EthiopiaRHS, GhanaLSS,
-Malawi, Mali, Niger, Nigeria, Senegal, Tanzania, Uganda) ship git-tracked
-`_/panel_ids.json` + `_/updated_ids.json`. **Design A is the convention** — a
+All twelve panel countries (Benin, Burkina_Faso, Ethiopia, EthiopiaRHS,
+GhanaLSS, Malawi, Mali, Niger, Nigeria, Senegal, Tanzania, Uganda) ship
+git-tracked `_/panel_ids.json` + `_/updated_ids.json`. Benin joined in GH #1705
+(EHCVM 2018-19 -> 2021-22 from `PanelHH`, ruling @ligon 2026-11-12, with one registered
+exception, `Benin::panel_ids::all-preloaded-left-not-linked`, 2026-11-13); its
+`_/Makefile`, its first, exists for the `panel-ids` target, and once a country
+has one `Wave.grab_data` builds every script-path wave table through `make`,
+so it carries a rule per wave script. **Design A is the convention** — a
 panel crosswalk is a *harmonization decision*, not a derived measurement (4 ms
 to recompute, identical for every user, and the input to every longitudinal
 result), so it belongs where a change shows up as a reviewable diff.
@@ -888,7 +893,7 @@ gone. Ethiopia's are gone too (#1447): its `panel_ids.py` never read them, and
 `panel_ids` entries against the committed 4,981, with blank baselines minted
 into household ids. That backend now serves the committed dicts.
 `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` is now empty, so a
-twelfth country cannot pick a design by accident.
+new panel country cannot pick a design by accident.
 
 > **Never give the JSON a Make rule.** The nine Makefiles used to carry
 > `panel_ids.json updated_ids.json: panel_ids.py` / `python panel_ids.py`,

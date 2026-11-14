@@ -88,7 +88,7 @@ Armenia,crop_production,,undeclared,absent,,not declared by this country for any
 Armenia,food_acquired,,undeclared,absent,,not declared by this country for any wave
 Armenia,food_coping,,undeclared,absent,,not declared by this country for any wave
 Armenia,food_security,,undeclared,absent,,not declared by this country for any wave
-Armenia,household_characteristics,1996,broken,declared,,"FileNotFoundError: [Errno 2] source is not on disk, has no DVC sidecar under /local/job41258793/cov-a0-4006462/LSMS_Library/lsms_library/countries, and could not be fetched from the World Bank Microdata Library (see data_access.get_data_file): '/local/job41258793/cov-a0-4006462/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta'"
+Armenia,household_characteristics,1996,broken,declared,,"FileNotFoundError: [Errno 2] source is not on disk, has no DVC sidecar under /local/job41283742/src-4c2f386901f1/lsms_library/countries, and could not be fetched from the World Bank Microdata Library (see data_access.get_data_file): '/local/job41283742/src-4c2f386901f1/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta'"
 Armenia,household_characteristics,2001,absent,absent,,source not declared for wave
 Armenia,household_characteristics,2002,absent,absent,,source not declared for wave
 Armenia,household_characteristics,2003,absent,absent,,source not declared for wave
@@ -106,7 +106,7 @@ Armenia,household_characteristics,2014,absent,absent,,source not declared for wa
 Armenia,household_characteristics,2015,absent,absent,,source not declared for wave
 Armenia,household_characteristics,2016,absent,absent,,source not declared for wave
 Armenia,household_characteristics,2017,absent,absent,,source not declared for wave
-Armenia,household_roster,1996,broken,declared,,"FileNotFoundError: [Errno 2] source is not on disk, has no DVC sidecar under /local/job41258793/cov-a0-4006462/LSMS_Library/lsms_library/countries, and could not be fetched from the World Bank Microdata Library (see data_access.get_data_file): '/local/job41258793/cov-a0-4006462/LSMS_Library/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta'"
+Armenia,household_roster,1996,broken,declared,,"FileNotFoundError: [Errno 2] source is not on disk, has no DVC sidecar under /local/job41283742/src-4c2f386901f1/lsms_library/countries, and could not be fetched from the World Bank Microdata Library (see data_access.get_data_file): '/local/job41283742/src-4c2f386901f1/lsms_library/countries/Armenia/1996/Data/../Data/INDSECA.dta'"
 Armenia,household_roster,2001,absent,absent,,source not declared for wave
 Armenia,household_roster,2002,absent,absent,,source not declared for wave
 Armenia,household_roster,2003,absent,absent,,source not declared for wave
@@ -200,11 +200,12 @@ Benin,livestock,2021-22,sane,declared,6416,all checks pass
 Benin,months_food_inadequate,,undeclared,absent,,not declared by this country for any wave
 Benin,nonfood_expenditures,,undeclared,absent,,not declared by this country for any wave
 Benin,nutrition,,undeclared,absent,,not declared by this country for any wave
+Benin,panel_ids,,sane,declared,6815,6815 entries
 Benin,people_last7days,2018-19,sane,declared,35042,"warn: index_levels_match_scheme,no_constant_columns"
 Benin,people_last7days,2021-22,sane,declared,42660,"warn: index_levels_match_scheme,no_constant_columns"
 Benin,plot_features,2018-19,sane,declared,7588,"warn: index_levels_match_scheme,no_constant_columns"
 Benin,plot_features,2021-22,sane,declared,7554,"warn: index_levels_match_scheme,no_constant_columns"
-Benin,plot_inputs,2018-19,sane,declared,10605,"warn: index_levels_match_scheme,no_constant_columns"
+Benin,plot_inputs,2018-19,sane,declared,10605,warn: index_levels_match_scheme
 Benin,plot_inputs,2021-22,sane,declared,11368,warn: index_levels_match_scheme
 Benin,plot_labor,2018-19,sane,declared,10738,warn: index_levels_match_scheme
 Benin,plot_labor,2021-22,sane,declared,10254,warn: index_levels_match_scheme
@@ -214,6 +215,7 @@ Benin,shocks,2018-19,sane,declared,12305,warn: no_constant_columns
 Benin,shocks,2021-22,sane,declared,4756,all checks pass
 Benin,subjective_well_being,2018-19,sane,declared,7953,warn: index_levels_match_scheme
 Benin,subjective_well_being,2021-22,sane,declared,7915,warn: index_levels_match_scheme
+Benin,updated_ids,,sane,declared,2,2 entries
 Burkina_Faso,anthropometry,,undeclared,absent,,not declared by this country for any wave
 Burkina_Faso,assets,2014,sane,declared,50461,all checks pass
 Burkina_Faso,assets,2018-19,sane,declared,42215,all checks pass
@@ -226,8 +228,8 @@ Burkina_Faso,community_prices,2018-19,sane,declared,138534,"warn: has_household_
 Burkina_Faso,community_prices,2021-22,absent,absent,,source not declared for wave
 Burkina_Faso,crop_production,2014,absent,absent,,source not declared for wave
 Burkina_Faso,crop_production,2018-19,sane,declared,15587,"warn: index_levels_match_scheme,no_constant_columns,dtype_consistency"
-Burkina_Faso,crop_production,2021-22,absent,absent,,source not declared for wave
-Burkina_Faso,food_acquired,2014,sane,declared,559180,warn: no_constant_columns
+Burkina_Faso,crop_production,2021-22,sane,declared,9118,"warn: index_levels_match_scheme,no_constant_columns,dtype_consistency"
+Burkina_Faso,food_acquired,2014,sane,declared,672718,warn: no_constant_columns
 Burkina_Faso,food_acquired,2018-19,sane,declared,138429,all checks pass
 Burkina_Faso,food_acquired,2021-22,sane,declared,69721,all checks pass
 Burkina_Faso,food_coping,2014,sane,declared,51099,warn: index_levels_match_scheme
@@ -236,7 +238,7 @@ Burkina_Faso,food_coping,2021-22,absent,absent,,source not declared for wave
 Burkina_Faso,food_expenditures,2014,sane,declared,239916,all checks pass
 Burkina_Faso,food_expenditures,2018-19,sane,declared,91919,all checks pass
 Burkina_Faso,food_expenditures,2021-22,sane,declared,45728,all checks pass
-Burkina_Faso,food_prices,2014,sane,declared,96801,all checks pass
+Burkina_Faso,food_prices,2014,sane,declared,109613,all checks pass
 Burkina_Faso,food_prices,2018-19,sane,declared,91957,all checks pass
 Burkina_Faso,food_prices,2021-22,sane,declared,45766,all checks pass
 Burkina_Faso,food_quantities,2014,sane,declared,110101,all checks pass
@@ -452,7 +454,7 @@ CotedIvoire,plot_inputs,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,plot_inputs,1986-87,absent,absent,,source not declared for wave
 CotedIvoire,plot_inputs,1987-88,absent,absent,,source not declared for wave
 CotedIvoire,plot_inputs,1988-89,absent,absent,,source not declared for wave
-CotedIvoire,plot_inputs,2018-19,sane,declared,11259,"warn: index_levels_match_scheme,no_constant_columns"
+CotedIvoire,plot_inputs,2018-19,sane,declared,11259,warn: index_levels_match_scheme
 CotedIvoire,plot_inputs,2021-22,sane,declared,14648,warn: index_levels_match_scheme
 CotedIvoire,plot_labor,1985-86,absent,absent,,source not declared for wave
 CotedIvoire,plot_labor,1986-87,absent,absent,,source not declared for wave
@@ -1121,28 +1123,28 @@ Guatemala,shocks,2000,sane,declared,11752,warn: no_constant_columns
 Guatemala,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
 Guinea-Bissau,anthropometry,,undeclared,absent,,not declared by this country for any wave
 Guinea-Bissau,assets,2018-19,sane,declared,30125,all checks pass
-Guinea-Bissau,assets,2021-22,absent,absent,,source not declared for wave
+Guinea-Bissau,assets,2021-22,sane,declared,29713,all checks pass
 Guinea-Bissau,cluster_features,2018-19,sane,declared,450,warn: has_household_index
-Guinea-Bissau,cluster_features,2021-22,absent,absent,,source not declared for wave
+Guinea-Bissau,cluster_features,2021-22,sane,declared,450,warn: has_household_index
 Guinea-Bissau,community_prices,2018-19,sane,declared,80202,"warn: has_household_index,no_constant_columns"
 Guinea-Bissau,community_prices,2021-22,absent,absent,,source not declared for wave
-Guinea-Bissau,crop_production,2018-19,sane,declared,12173,"warn: index_levels_match_scheme,no_constant_columns,dtype_consistency"
+Guinea-Bissau,crop_production,2018-19,sane,declared,12188,"warn: index_levels_match_scheme,no_constant_columns,dtype_consistency"
 Guinea-Bissau,crop_production,2021-22,absent,absent,,source not declared for wave
 Guinea-Bissau,food_acquired,2018-19,sane,declared,126925,all checks pass
-Guinea-Bissau,food_acquired,2021-22,absent,absent,,source not declared for wave
+Guinea-Bissau,food_acquired,2021-22,sane,declared,133329,all checks pass
 Guinea-Bissau,food_coping,,undeclared,absent,,not declared by this country for any wave
 Guinea-Bissau,food_expenditures,2018-19,sane,declared,77155,all checks pass
-Guinea-Bissau,food_expenditures,2021-22,absent,absent,,source not declared for wave
+Guinea-Bissau,food_expenditures,2021-22,sane,declared,80646,all checks pass
 Guinea-Bissau,food_prices,2018-19,sane,declared,77155,all checks pass
-Guinea-Bissau,food_prices,2021-22,absent,absent,,source not declared for wave
+Guinea-Bissau,food_prices,2021-22,sane,declared,80647,all checks pass
 Guinea-Bissau,food_quantities,2018-19,sane,declared,126925,all checks pass
-Guinea-Bissau,food_quantities,2021-22,absent,absent,,source not declared for wave
+Guinea-Bissau,food_quantities,2021-22,sane,declared,129382,all checks pass
 Guinea-Bissau,food_security,2018-19,sane,declared,5350,warn: index_levels_match_scheme
 Guinea-Bissau,food_security,2021-22,absent,absent,,source not declared for wave
 Guinea-Bissau,household_characteristics,2018-19,sane,declared,5348,all checks pass
-Guinea-Bissau,household_characteristics,2021-22,absent,absent,,source not declared for wave
-Guinea-Bissau,household_roster,2018-19,sane,declared,42839,warn: index_levels_match_scheme
-Guinea-Bissau,household_roster,2021-22,absent,absent,,source not declared for wave
+Guinea-Bissau,household_characteristics,2021-22,sane,declared,5348,all checks pass
+Guinea-Bissau,household_roster,2018-19,sane,declared,42839,"warn: index_levels_match_scheme,no_constant_columns"
+Guinea-Bissau,household_roster,2021-22,sane,declared,41501,warn: index_levels_match_scheme
 Guinea-Bissau,housing,2018-19,sane,declared,5351,warn: index_levels_match_scheme
 Guinea-Bissau,housing,2021-22,absent,absent,,source not declared for wave
 Guinea-Bissau,individual_education,2018-19,sane,declared,42839,warn: index_levels_match_scheme
@@ -1164,9 +1166,9 @@ Guinea-Bissau,plot_inputs,2021-22,absent,absent,,source not declared for wave
 Guinea-Bissau,plot_labor,2018-19,sane,declared,15516,warn: index_levels_match_scheme
 Guinea-Bissau,plot_labor,2021-22,absent,absent,,source not declared for wave
 Guinea-Bissau,sample,2018-19,sane,declared,5351,all checks pass
-Guinea-Bissau,sample,2021-22,absent,absent,,source not declared for wave
+Guinea-Bissau,sample,2021-22,sane,declared,5351,all checks pass
 Guinea-Bissau,shocks,2018-19,sane,declared,9487,warn: no_constant_columns
-Guinea-Bissau,shocks,2021-22,absent,absent,,source not declared for wave
+Guinea-Bissau,shocks,2021-22,sane,declared,4417,all checks pass
 Guinea-Bissau,subjective_well_being,2018-19,sane,declared,5334,warn: index_levels_match_scheme
 Guinea-Bissau,subjective_well_being,2021-22,absent,absent,,source not declared for wave
 Guyana,anthropometry,,undeclared,absent,,not declared by this country for any wave
@@ -1475,10 +1477,10 @@ Malawi,plot_features,2016-17,sane,declared,19759,"warn: index_levels_match_schem
 Malawi,plot_features,2019-20,sane,declared,23259,"warn: index_levels_match_scheme,no_constant_columns"
 Malawi,plot_features,2024-25,absent,absent,,source not declared for wave
 Malawi,plot_inputs,2004-05,absent,absent,,source not declared for wave
-Malawi,plot_inputs,2010-11,builds,declared,56320,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Malawi,plot_inputs,2013-14,builds,declared,20026,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Malawi,plot_inputs,2016-17,builds,declared,65375,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
-Malawi,plot_inputs,2019-20,builds,declared,80941,"fail: no_all_null_columns; warn: index_levels_match_scheme,no_constant_columns"
+Malawi,plot_inputs,2010-11,sane,declared,56320,"warn: index_levels_match_scheme,no_constant_columns"
+Malawi,plot_inputs,2013-14,sane,declared,20026,"warn: index_levels_match_scheme,no_constant_columns"
+Malawi,plot_inputs,2016-17,sane,declared,65375,"warn: index_levels_match_scheme,no_constant_columns"
+Malawi,plot_inputs,2019-20,sane,declared,80941,"warn: index_levels_match_scheme,no_constant_columns"
 Malawi,plot_inputs,2024-25,absent,absent,,source not declared for wave
 Malawi,plot_labor,2004-05,absent,absent,,source not declared for wave
 Malawi,plot_labor,2010-11,sane,declared,21016,warn: index_levels_match_scheme
@@ -1737,8 +1739,8 @@ Niger,plot_features,2011-12,absent,absent,,source not declared for wave
 Niger,plot_features,2014-15,absent,absent,,source not declared for wave
 Niger,plot_features,2018-19,sane,declared,6684,"warn: index_levels_match_scheme,no_constant_columns"
 Niger,plot_features,2021-22,sane,declared,5729,"warn: index_levels_match_scheme,no_constant_columns"
-Niger,plot_inputs,2011-12,sane,declared,9605,warn: index_levels_match_scheme
-Niger,plot_inputs,2014-15,sane,declared,8179,warn: index_levels_match_scheme
+Niger,plot_inputs,2011-12,sane,declared,9605,"warn: index_levels_match_scheme,no_constant_columns"
+Niger,plot_inputs,2014-15,sane,declared,8179,"warn: index_levels_match_scheme,no_constant_columns"
 Niger,plot_inputs,2018-19,sane,declared,13401,warn: index_levels_match_scheme
 Niger,plot_inputs,2021-22,sane,declared,12435,warn: index_levels_match_scheme
 Niger,plot_labor,2011-12,sane,declared,19643,warn: index_levels_match_scheme
@@ -1769,13 +1771,13 @@ Nigeria,anthropometry,2019Q1,sane,declared,3013,warn: index_levels_match_scheme
 Nigeria,anthropometry,2023Q3,absent,absent,,source not declared for wave
 Nigeria,anthropometry,2024Q1,sane,declared,2376,warn: index_levels_match_scheme
 Nigeria,assets,2010Q3,sane,declared,38947,warn: no_constant_columns
-Nigeria,assets,2011Q1,sane,declared,38947,warn: no_constant_columns
+Nigeria,assets,2011Q1,dropped,declared,,"empty-pending-machinery: NOT closed: a post-harvest holding IS computable in principle from what W1 recorded (ruling @ligon 2026-11-13, 'Nigeria W1/W2 post-harvest assets coverage verdict': 'empty-pending-machinery'; the cell stays open as future work). D1: assets are served once per wave, under the post-planting quarter 2010Q3, from sect5_plantingw1 ('Section 5 - Household Assets (Item Count)'; s5q1 'how many of the following items does your household own?') (ruling 2026-11-13, 'Pin + W1 NA columns'), so no 2011Q1 row is served. The post-harvest round ships sect7_harvestw1, file label 'Section 7 - Household Assets Sale and Acquisition': s7x 'owned in post planting', s7q1-s7q4 items sold in the previous 6 months and their value, s7q5-s7q8 items purchased or received as a gift and their cost. So a post-harvest holding is the post-planting count, less items sold, plus items acquired: a construction no table serves yet. D2: one mode. C4: GHS_PANEL_HOUSEHOLD_POST_HARVEST_FINAL.pdf (text layer, pypdf, burst jobs 41283564 / 41283635): contents (p4) '7 HOUSEHOLD ASSETS SALE AND ACQUISTION 46', p46 'SECTION 7: HOUSEHOLD ASSETS SALE AND ACQUISITION'; the round asks no count of items owned at post-harvest, only the sales and acquisitions since post-planting. [declared for wave but absent from built t-index]"
 Nigeria,assets,2012Q3,sane,declared,161125,all checks pass
-Nigeria,assets,2013Q1,sane,declared,161125,all checks pass
+Nigeria,assets,2013Q1,dropped,declared,,"empty-pending-machinery: NOT closed: a post-harvest holding IS computable in principle from what W2 recorded (ruling @ligon 2026-11-13, 'Nigeria W1/W2 post-harvest assets coverage verdict': 'empty-pending-machinery'; the cell stays open as future work). D1: assets are served once per wave, under 2012Q3, from the post-planting sect5a_plantingw2 ('Section 5 - Household Assets (# of items)'; s5q1) (ruling 2026-11-13, 'Pin + W1 NA columns'), so no 2013Q1 row is served. The post-harvest round ships sect7_harvestw2, file label 'Section 7 - Household Assets Sale and Acquisition': s7 'THE NUMBER OWNED BY HOUSEHOLD AT THE TIME OF POST PLANTING INTERVIEW', s7q1-s7q4 items sold, s7q5-s7q8 items purchased or received as a gift and their cost. So a post-harvest holding is the post-planting count, less items sold, plus items acquired: a construction no table serves yet. D2: one mode. C4: W2_PH_HH_Questionnaire.pdf (text layer, pypdf, burst job 41283635): contents (PDF p4) '7 HOUSEHOLD ASSETS SALE AND ACQUISTION 48'; the round asks no count of items owned at post-harvest, only the sales and acquisitions since post-planting. [declared for wave but absent from built t-index]"
 Nigeria,assets,2015Q3,sane,declared,188229,all checks pass
-Nigeria,assets,2016Q1,sane,declared,188229,all checks pass
+Nigeria,assets,2016Q1,correctly-empty,declared,,"correctly-empty: D1: assets are served once per wave, under 2015Q3, from the post-planting sect5_plantingw3 (ruling 2026-11-13, 'Pin + W1 NA columns'), so no 2016Q1 row is served; 2015-16/Data ships no post-harvest section-5 or section-7 file. D2: one mode. C4: PH_W3_Household_Quest.pdf, the W3 post-harvest household questionnaire (text layer, pypdf, burst job 41283564): its contents (PDF p4) print '7 HOUSEHOLD ASSETS MOVED TO PP' and list no assets section; PP_W3_Household_Quest.pdf lists '5. HOUSEHOLD ASSETS 28' (p4) and prints 'SECTION 5: HOUSEHOLD ASSETS' (p29)."
 Nigeria,assets,2018Q3,sane,declared,44358,all checks pass
-Nigeria,assets,2019Q1,sane,declared,44358,all checks pass
+Nigeria,assets,2019Q1,correctly-empty,declared,,"correctly-empty: D1: assets are served once per wave, under 2018Q3, from the post-planting sect5_plantingw4 (ruling 2026-11-13, 'Pin + W1 NA columns'), so no 2019Q1 row is served; 2018-19/Data ships no post-harvest section-5 or section-7 file. D2: one mode. C4: ph_w4_household_quest.pdf, the W4 post-harvest household questionnaire (text layer, pypdf, burst job 41283564): its contents (PDF p4) list 1 HOUSEHOLD ROSTER, 2 EDUCATION, 3 LABOUR, 4 HEALTH, 6 REMITTANCES, 9 NONFARM ENTERPRISE, 10A-10C, 11, 12, 13, 14 SAFETY NETS, 15A ECONOMIC SHOCKS, 16 CONTACT INFORMATION -- no assets section, and no line of its 64 pages names household assets; pp_w4_household_quest.pdf lists '5.HOUSEHOLD ASSETS 25' (p3) and prints 'SECTION 5: HOUSEHOLD ASSETS' (p25)."
 Nigeria,assets,2023Q3,absent,absent,,source not declared for wave
 Nigeria,assets,2024Q1,absent,absent,,source not declared for wave
 Nigeria,cluster_features,2010Q3,sane,declared,500,warn: has_household_index
@@ -1793,7 +1795,7 @@ Nigeria,community_prices,2011Q1,sane,declared,30628,"warn: has_household_index,n
 Nigeria,community_prices,2012Q3,sane,declared,21196,warn: has_household_index
 Nigeria,community_prices,2013Q1,sane,declared,31239,"warn: has_household_index,no_constant_columns"
 Nigeria,community_prices,2015Q3,sane,declared,24995,warn: has_household_index
-Nigeria,community_prices,2016Q1,sane,declared,23153,"warn: has_household_index,no_constant_columns"
+Nigeria,community_prices,2016Q1,sane,declared,26586,"warn: has_household_index,no_constant_columns"
 Nigeria,community_prices,2018Q3,sane,declared,32246,warn: has_household_index
 Nigeria,community_prices,2019Q1,sane,declared,31757,"warn: has_household_index,no_constant_columns"
 Nigeria,community_prices,2023Q3,sane,declared,29938,warn: has_household_index
@@ -1810,10 +1812,10 @@ Nigeria,crop_production,2023Q3,absent,absent,,source not declared for wave
 Nigeria,crop_production,2024Q1,sane,declared,11208,"warn: index_levels_match_scheme,no_constant_columns"
 Nigeria,food_acquired,2010Q3,sane,declared,72236,"warn: index_levels_match_scheme,no_constant_columns"
 Nigeria,food_acquired,2011Q1,sane,declared,69734,warn: index_levels_match_scheme
-Nigeria,food_acquired,2012Q3,sane,declared,65429,"warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,food_acquired,2013Q1,sane,declared,70649,"warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,food_acquired,2015Q3,sane,declared,77702,"warn: index_levels_match_scheme,no_constant_columns"
-Nigeria,food_acquired,2016Q1,sane,declared,70469,"warn: index_levels_match_scheme,no_constant_columns"
+Nigeria,food_acquired,2012Q3,sane,declared,65429,warn: index_levels_match_scheme
+Nigeria,food_acquired,2013Q1,sane,declared,70649,warn: index_levels_match_scheme
+Nigeria,food_acquired,2015Q3,sane,declared,77702,warn: index_levels_match_scheme
+Nigeria,food_acquired,2016Q1,sane,declared,70469,warn: index_levels_match_scheme
 Nigeria,food_acquired,2018Q3,sane,declared,82865,warn: index_levels_match_scheme
 Nigeria,food_acquired,2019Q1,sane,declared,86641,warn: index_levels_match_scheme
 Nigeria,food_acquired,2023Q3,absent,absent,,source not declared for wave
@@ -1889,15 +1891,15 @@ Nigeria,housing,2018Q3,sane,declared,5047,warn: index_levels_match_scheme
 Nigeria,housing,2019Q1,dropped,declared,,declared for wave but absent from built t-index
 Nigeria,housing,2023Q3,dropped,declared,,declared for wave but absent from built t-index
 Nigeria,housing,2024Q1,sane,declared,4715,warn: index_levels_match_scheme
-Nigeria,individual_education,2010Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,individual_education,2010Q3,sane,declared,17116,warn: index_levels_match_scheme
 Nigeria,individual_education,2011Q1,sane,declared,643,warn: index_levels_match_scheme
-Nigeria,individual_education,2012Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,individual_education,2012Q3,sane,declared,17403,warn: index_levels_match_scheme
 Nigeria,individual_education,2013Q1,sane,declared,313,warn: index_levels_match_scheme
-Nigeria,individual_education,2015Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,individual_education,2015Q3,correctly-empty,declared,,"correctly-empty: D1: the W3 release ships no post-planting section-2 file (2015-16/Data has sect2_harvestw3 only; every other PP household section is held, sect1/3/4a-c/5/7a/7b/8a-c/9/9b/11 _plantingw3); individual_education serves 2016Q1 17,687 rows and no 2015Q3 row (cold build f138a3d61, burst job 41271653). D2: the table has one mode. C4: 2015-16/Documentation/PP_W3_Household_Quest.pdf (text layer, extracted 2026-11-13): its table of contents prints '2. EDUCATION ... PH ONLY'; its sections are 1 ROSTER, 3 LABOR, 4A-4C, 5, 7A, 7B, 8, 8A, 9, 9B, 11; the PP roster asks only the parents' education."
 Nigeria,individual_education,2016Q1,sane,declared,17687,warn: index_levels_match_scheme
-Nigeria,individual_education,2018Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,individual_education,2018Q3,correctly-empty,declared,,"correctly-empty: D1: the W4 release ships no post-planting section-2 file (sect2_harvestw4 only; the PP household sections held are sect1/3/3b/4a1-4c3/5/7a/7b/8a-c/9/11 _plantingw4); no 2018Q3 row is served. D2: one mode. C4: 2018-19/Documentation/pp_w4_household_quest.pdf (text layer): sections 1 ROSTER, 3 LABOUR, 3B TIME USE, 4A-4C, 5, 7A, 7B, 8, 9, 11 -- no section 2; the PH questionnaire ph_w4_household_quest.pdf prints 'SECTION 2: EDUCATION'."
 Nigeria,individual_education,2019Q1,sane,declared,19271,warn: index_levels_match_scheme
-Nigeria,individual_education,2023Q3,dropped,declared,,declared for wave but absent from built t-index
+Nigeria,individual_education,2023Q3,correctly-empty,declared,,"correctly-empty: D1: the W5 release ships no post-planting section-2 file (listing of 2023-24/Data/Post Planting Wave 5/Household: secta, sect1, 1a, 1b, 1c, 1ca, 1d, 1e, 3, 4a, 4b, 5a1, 5a2, 5b, 5c1, 5c2, 6a, 6b, 6c, 7a, 7b, 7c, 8, 9, 10, 11 _plantingw5); no 2023Q3 row is served. D2: one mode. C4: 2023-24/Documentation/ghs_panel_w5_pp_household_questionnaire.pdf (text layer): sections 1 HOUSEHOLD ROSTER, 1A-1E, 3 HEALTH, 4A-4B, 5A-5C, 6A-6C, 7, 8, 9, 10, 11, 16 -- no education section for current members. The roster asks the parents' education (s1q28, s1q33) and, of members who have left, their education at departure (s1q39b) and as of now (s1q39c, non-null on 3,327 rows, every one with s1q4 = 'NO', no longer a member; red team delta review, reports/nigeria-redteam/out/w5edu.json); the PH questionnaire prints 'SECTION 2: EDUCATION'."
 Nigeria,individual_education,2024Q1,sane,declared,19053,warn: index_levels_match_scheme
 Nigeria,interview_date,2010Q3,sane,declared,4953,warn: index_levels_match_scheme
 Nigeria,interview_date,2011Q1,sane,declared,4915,warn: index_levels_match_scheme
@@ -1983,14 +1985,14 @@ Nigeria,sample,2018Q3,sane,declared,5263,all checks pass
 Nigeria,sample,2019Q1,sane,declared,5025,all checks pass
 Nigeria,sample,2023Q3,sane,declared,5067,all checks pass
 Nigeria,sample,2024Q1,sane,declared,4771,all checks pass
-Nigeria,shocks,2010Q3,sane,declared,2200,all checks pass
-Nigeria,shocks,2011Q1,sane,declared,2200,all checks pass
-Nigeria,shocks,2012Q3,sane,declared,2882,all checks pass
+Nigeria,shocks,2010Q3,correctly-empty,declared,,"correctly-empty: D1: section 15A (economic shocks) ships from the post-harvest round only (2010-11/Data has sect15a_harvestw1 / sect15b_harvestw1 / sect15b1_harvestw1 and no sect15 planting file), and shocks are served once per wave, under the post-harvest quarter 2011Q1 (ruling 2026-11-13 'Coping-strategy implementation, GH1562', 'Pin to post-harvest t'), so no 2010Q3 row is served (cold build, ISA integration 2026-11-13). D2: the table has one mode. C4: 2010-11/Documentation/Panel_Household_Questionnaire_FINAL.pdf, the W1 post-planting household questionnaire (text layer, pypdf, burst job 41283564): its table of contents (PDF p4) lists 1 ROSTER, 2 EDUCATION, 3 LABOR, 4 CREDIT AND SAVINGS, 5 HOUSEHOLD ASSETS, 6 NON-FARM ENTERPRISES, 7A MEALS AWAY FROM HOME, 7B HH FOOD EXPENDITURES, 8 NON-FOOD EXPENDITURES, 9 FOOD SECURITY, 10 OTHER INCOME -- no shocks section, and no line of its 43 pages matches SHOCK or COPING; the W1 post-harvest questionnaire GHS_PANEL_HOUSEHOLD_POST_HARVEST_FINAL.pdf lists '15 A. ECONOMIC SHOCKS 70' (p4) and prints 'SECTION 15A: ECONOMIC SHOCKS' (p70)."
+Nigeria,shocks,2011Q1,sane,declared,2202,all checks pass
+Nigeria,shocks,2012Q3,correctly-empty,declared,,"correctly-empty: D1: 2012-13/Data ships sect15a_harvestw2 / sect15b1_harvestw2 / sect15b2_harvestw2 and no sect15 planting file; shocks are served once per wave, under 2013Q1 (ruling 2026-11-13, 'Pin to post-harvest t'), so no 2012Q3 row is served. D2: one mode. C4: 2012-13/Documentation/GHS_Panel_PP_Household.pdf, the W2 post-planting household questionnaire (text layer, pypdf, burst job 41283564): its contents page (PDF p4) lists 1 ROSTER, 2 EDUCATION, 3A/3B LABOR, 4A/4B SAVINGS, 5 HOUSEHOLD ASSETS, 6 NONFARM ACTIVITIES, 7A/7B, 8 NON-FOOD EXPENDITURE, 9 FOOD SECURITY, 10 OTHER INCOME, CONTACT INFORMATION -- no shocks section, and no line of its 66 pages matches SHOCK or COPING; the W2 post-harvest questionnaire W2_PH_HH_Questionnaire.pdf lists '15A. ECONOMIC SHOCKS 75' on its contents page (PDF p4)."
 Nigeria,shocks,2013Q1,sane,declared,2882,all checks pass
-Nigeria,shocks,2015Q3,sane,declared,2323,all checks pass
+Nigeria,shocks,2015Q3,correctly-empty,declared,,"correctly-empty: D1: 2015-16/Data ships sect15a / sect15b1 / sect15b2 / sect15c _harvestw3 and no sect15 planting file; shocks are served once per wave, under 2016Q1 (ruling 2026-11-13, 'Pin to post-harvest t'), so no 2015Q3 row is served. D2: one mode. C4: 2015-16/Documentation/PP_W3_Household_Quest.pdf, the W3 post-planting household questionnaire (text layer, pypdf, burst job 41283564): its contents (PDF p4) list 1 HOUSEHOLD ROSTER, 2 EDUCATION (PH ONLY), 3 LABOR, 4A-4C, 5 HOUSEHOLD ASSETS, 6 (PH ONLY), 7A, 7B, 8, 9, 9B SUBJECTIVE WELLBEING, 10 (PH ONLY), 11 HOUSING -- no shocks section, and no line of its 47 pages matches SHOCK or COPING; PH_W3_Household_Quest.pdf lists '15A. ECONOMIC SHOCKS 60' (p4) and prints 'SECTION 15A: ECONOMIC SHOCKS' (p63)."
 Nigeria,shocks,2016Q1,sane,declared,2323,all checks pass
-Nigeria,shocks,2018Q3,sane,declared,3870,all checks pass
-Nigeria,shocks,2019Q1,sane,declared,3870,all checks pass
+Nigeria,shocks,2018Q3,correctly-empty,declared,,"correctly-empty: D1: 2018-19/Data ships sect15a_harvestw4 and no sect15 planting file; shocks are served once per wave, under 2019Q1 (ruling 2026-11-13, 'Pin to post-harvest t'), so no 2018Q3 row is served. D2: one mode. C4: 2018-19/Documentation/pp_w4_household_quest.pdf, the W4 post-planting household questionnaire (text layer, pypdf, burst job 41283564): its contents (PDF p3) list 1 HOUSEHOLD ROSTER, 3 LABOUR, 3B TIME USE, 4A-4C, 5 HOUSEHOLD ASSETS, 7A, 7B, 8, 9 FOOD SECURITY, 11 HOUSING, CONTACT INFORMATION -- no shocks section, and no line of its 43 pages matches SHOCK or COPING; ph_w4_household_quest.pdf lists '15A. ECONOMIC SHOCKS' (p4) and prints 'SECTION 15A: ECONOMIC SHOCKS' (p62)."
+Nigeria,shocks,2019Q1,sane,declared,3870,warn: no_constant_columns
 Nigeria,shocks,2023Q3,absent,absent,,source not declared for wave
 Nigeria,shocks,2024Q1,absent,absent,,source not declared for wave
 Nigeria,subjective_well_being,,undeclared,absent,,not declared by this country for any wave
@@ -2531,7 +2533,7 @@ Togo,people_last7days,2018,sane,declared,25282,"warn: index_levels_match_scheme,
 Togo,people_last7days,2021-22,sane,declared,28815,"warn: index_levels_match_scheme,no_constant_columns"
 Togo,plot_features,2018,sane,declared,9553,"warn: index_levels_match_scheme,no_constant_columns"
 Togo,plot_features,2021-22,sane,declared,9182,"warn: index_levels_match_scheme,no_constant_columns"
-Togo,plot_inputs,2018,sane,declared,13730,"warn: index_levels_match_scheme,no_constant_columns"
+Togo,plot_inputs,2018,sane,declared,13730,warn: index_levels_match_scheme
 Togo,plot_inputs,2021-22,sane,declared,16042,warn: index_levels_match_scheme
 Togo,plot_labor,2018,sane,declared,15052,warn: index_levels_match_scheme
 Togo,plot_labor,2021-22,sane,declared,15139,warn: index_levels_match_scheme
