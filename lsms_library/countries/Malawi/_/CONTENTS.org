@@ -1,6 +1,28 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* 2026-11-25 -- 2024-25 household roster (GH #1275, roster slice)
+
+The 815 IHPS refreshment interviews are the same as their IHS6 cross-sectional counterparts, not 815 new interviews.
+The panel Module B ships two person identifiers: =id_code= is the interview-local code and =PID= is a longitudinal person serial.
+In the 815 shared households, all 3,575 IHS6 =PID= values match the IHPS =id_code= under their IHS6 household key and none match the IHPS =PID=.
+The four served source answers (sex, relationship, age in years and months away) agree on all 3,575 matched person lines.
+
+The new YAML roster takes all 55,911 IHS6 person rows under =cs-24-= and all 8,475 retained IHPS person rows under the same walked household IDs that =sample= uses.
+The panel cover's blank =y4_hhid= distinguishes refresh interviews, as it does for =sample= and =food_acquired=, and its =case_id= gives the IHS6 household key for them.
+The builder checks that every refresh copy is genuinely redundant before discarding it and refuses missing or inconsistent source keys.
+The two roster files and the panel cover are declared L2 inputs.
+The inherited =v= and kinship steps remain framework work.
+Do not impute the two missing IHS6 ages or the one missing months-away answer.
+The joint [[https://microdata.worldbank.org/catalog/8507/download/359615][IHS6 / IHPS household questionnaire]], printed Module B pages 5-6, asks whole years at B05a and cumulative months away over the last 12 months at B07.
+This roster supplies neither a longitudinal person mapping nor a new weighting policy.
+
+Private cold subset, all-wave warm and Make checks all serve the same 64,386 current person rows over 14,836 households.
+All 1,948 retained panel targets now have roster rows and the 2019-20 to 2024-25 attrition warning clears.
+The longstanding updated-ID coverage warning remains.
+Sorted row and schema fingerprints are unchanged for 260,612 earlier roster rows and the full 71,954-row sample.
+The whole-wave YAML and mapping hashes move all 22 registered Malawi country fingerprints and no earlier-wave fingerprints.
+
 * 2026-11-13 -- GH #1228 later waves: the season, the Module D join, and the registered relabel
 
 Rulings @ligon 2026-11-12 ("Join D, single-text only") and 2026-11-13, after the red
