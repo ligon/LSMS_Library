@@ -6243,11 +6243,26 @@ def pp_ph_area_t(country):
     """``{post-planting t: post-harvest t}`` for a ``Country``, or a folder map.
 
     For :func:`yield_kg`'s *area_t*, in a country whose one wave folder holds a
-    post-planting and a post-harvest round.  Nigeria measures plots at post
-    planting and records the harvest at post harvest::
+    post-planting and a post-harvest round.  Nigeria records the harvest at post
+    harvest and measures plots at post planting; its W1-W3 post-harvest rounds
+    also serve plot areas of their own (GH #587).  Those are rounds *area_t*
+    moves onto, so the whole frame is refused: pass its post-planting rows, or
+    its post-harvest ones::
 
         c = ll.Country('Nigeria')
-        yield_kg(c.crop_production(), c.plot_features(), area_t=pp_ph_area_t(c))
+        cp, pf = c.crop_production(), c.plot_features()
+        pairs = pp_ph_area_t(c)
+        t = pf.index.get_level_values('t')
+
+        # Post-planting area moved onto the harvest round: W1-W5.
+        moved = yield_kg(cp, pf[t.isin(pairs)], area_t=pairs)
+
+        # W1-W3's own post-harvest area.  W4 and W5 serve none.
+        ph = ['2011Q1', '2013Q1', '2016Q1']
+        direct = yield_kg(cp, pf[t.isin(ph)])
+
+    Only ``moved`` reaches W4 and W5 (2019Q1, 2024Q1).  Which of the two W1-W3
+    should use is not settled (GH #1701).  Do not sum the two areas.
 
     The earlier ``t`` of a folder is the planting round.  A folder holding one
     round has nothing to pair.  One holding more than two is not this design
