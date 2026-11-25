@@ -6235,3 +6235,27 @@ nothing changes at build time.  At READ time (=lsms_library/coping.py=, labels i
 - *"Did not do anything"* / *"DID NOT DO ANYTHING"*: alone it is the set; beside a strategy (257-530
   rows per wave) it leaves the set and keeps its position.
 - Not wired, as before: the "other, specify" text (=ab07*oth=, =hh_u04*_os=).
+
+* 2026-11-25 -- Interview source for the three stacked sample waves (GH #1704)
+
+The maintainer selected a component label with no change to weights or sample membership.
+In 2016-17, 2019-20 and 2024-25, =sample().SampleComponent= is =IHS= for cross-sectional interviews and =IHPS= for retained panel interviews.
+The 815 refresh interviews in 2024-25 are served on IHS interviews, so they are =IHS= even though they also carry =ihps_hhid= and =ihps_weight=.
+The full IHPS 2024 cohort still uses =ihps_weight.notna()= and its own =ihps_weight=, not the retained IHPS subset alone.
+Earlier waves do not declare this optional column.
+
+For an IHS-only estimate, filter the wave on =SampleComponent == 'IHS'= and use =weight= within those rows.
+For a retained-panel estimate, use the panel rows and the weight appropriate to that estimand.
+Do not treat an estimate pooled across source components as a single national probability sample.
+The joint-inclusion question remains open as a survey-design question, not a change to production weights.
+
+A private rerun of the served sample compared weighted rural shares in percent:
+
+| Wave    | Pooled | IHS cross-section | Retained IHPS | Full IHPS |
+|---------+--------+-------------------+---------------+-----------|
+| 2016-17 |  81.08 |             80.95 |         81.16 |           |
+| 2019-20 |  81.89 |             83.75 |         80.79 |           |
+| 2024-25 |  85.10 |             82.86 |         89.60 |     82.83 |
+
+All rows in these comparisons had a positive weight and a recognized rural/urban answer for the relevant denominator.
+The retained 2024-25 panel and full 2024 IHPS cohort are different samples.
