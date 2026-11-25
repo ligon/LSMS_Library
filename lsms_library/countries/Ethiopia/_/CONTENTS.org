@@ -5094,7 +5094,7 @@ states*, over a =Rural= whose meaning moves.
 
 - *The basis is a modelling choice.*  "Sampling Design > Strata" above says the strata follow "the
   ESS sampling documentation".  No sentence quoted in this file states region x urban/rural.  The
-  2026-07-21 sweep's note on the ESS3 BID says the opposite of a cross: "two-stage probability
+  2026-07-21 sweep's note on the ESS3 BID names regions, not a cross: "two-stage probability
   sample, regions as strata, 5 analysis domains in ESS1 (Amhara, Oromiya, SNNP, Tigray, 'all other
   regions') plus Addis Ababa from ESS2 on"
   (=slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=, Ethiopia 2015-16, an extractor's note and not
