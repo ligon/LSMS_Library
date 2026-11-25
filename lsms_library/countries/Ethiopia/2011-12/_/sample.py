@@ -12,7 +12,8 @@ sys.path.append('../../../_/')
 from lsms_library.local_tools import get_dataframe, format_id, to_parquet
 import pandas as pd
 sys.path.append('../../_/')
-from ethiopia import with_agriculture_cover_households, ea_id2_crosswalk
+from ethiopia import (with_agriculture_cover_households, ea_id2_crosswalk,
+                      derive_region_rural_stratum, stamp_region_rural_stratum)
 
 df = get_dataframe('../Data/sect_cover_hh_w1.dta')
 
@@ -37,10 +38,8 @@ sample = pd.DataFrame({
     'Rural': df['rural'].map(rural_map),
 })
 
-# Construct strata from region x Rural
-region = df['saq01'].astype(str).str.strip()
-sample['strata'] = region + ' ' + sample['Rural'].fillna('')
-sample['strata'] = sample['strata'].str.strip()
+# Construct strata from region x Rural (Ethiopia::sample::region-rural-stratum)
+sample['strata'] = derive_region_rural_stratum(df['saq01'], sample['Rural'])
 
 # Panel weight = cross-sectional weight (single weight, pre-rotating panel)
 sample['panel_weight'] = sample['weight']
@@ -53,6 +52,8 @@ pp = get_dataframe('../Data/sect_cover_pp_w1.dta', convert_categoricals=False)
 sample = with_agriculture_cover_households(
     sample, '2011-12', hh_codes, df, pp,
     {'hhid': 'household_id', 'ea': 'ea_id', 'weight': 'pw', 'rural': 'rural'}, rural_map, ea_crosswalk=None)
+# GH #1741: stamp after the append, the last step that adds rows.
+sample = stamp_region_rural_stratum(sample)
 sample = sample.set_index(['i', 't'])
 
 to_parquet(sample, 'sample.parquet')

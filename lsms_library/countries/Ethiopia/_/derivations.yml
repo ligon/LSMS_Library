@@ -281,3 +281,80 @@ Ethiopia::crop_production::hh-crop-sale-two-units:
   validated_against: tests/test_gh1457_ethiopia_multi_plot_sales.py.
   contents: 'Ethiopia/_/CONTENTS.org, "2026-11-04 -- sales no §9 line holds: Farm-level (GH #1457)"'
   since: '2026-11-04'
+
+# GH #1741: the construction predates this entry; the served values are unchanged.
+Ethiopia::sample::region-rural-stratum:
+  waves: ['2011-12', '2013-14', '2015-16', '2018-19', '2021-22']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<saq01 label> <Rural>', for example 'Amhara Rural': the region label the
+    household cover records, stripped, a space, and the same row's Rural.  Rural is the
+    wave script's reading of the cover's `rural` (W1-W3) or `saq14` (W4/W5): the rural
+    label is Rural, and small town, large town and urban are all Urban.  Where Rural is
+    missing the region stands alone, not NA; the recorded counts of Rural leave no such
+    row on any household cover.  A household only the agriculture cover records (GH
+    #1120 D1; W2 25, W3 27, W4 124, W5 40) takes the household cover's labels for its
+    recorded region and rural codes.  The region part is then spelled through this
+    country's `strata` table in categorical_mapping.org, at read time.
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_region_rural_stratum
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_region_rural_stratum
+  raw_variables:
+    - sect_cover_hh_w{1..5}.saq01 (region)
+    - sect_cover_hh_w{1,2,3}.rural / sect_cover_hh_w{4,5}.saq14
+    - sect_cover_pp_w{2..5}.saq01 and rural / saq14, codes, for the agriculture-only households
+  assumptions:
+    - text: >-
+        no ESS cover records a stratum variable, so the library builds one.
+      basis: config-comment
+      evidence: >-
+        Ethiopia/_/CONTENTS.org, "Sampling Design" > "Strata": "Ethiopia has no explicit
+        strata variable."  No file was searched for one for this entry.
+    - text: >-
+        the stratum is region crossed with Rural / Urban.  No document quoted in this
+        repository says so.
+      basis: modelling-choice
+      evidence: >-
+        CONTENTS.org says "following the ESS sampling documentation" and quotes no
+        sentence that states the cross.  The 2026-07-21 sweep's note on the ESS3 BID reads
+        "two-stage probability sample, regions as strata, 5 analysis domains in ESS1
+        (Amhara, Oromiya, SNNP, Tigray, 'all other regions') plus Addis Ababa from ESS2 on"
+        (slurm_logs/POPULATION_STATEMENTS_2026-07-21.org, Ethiopia 2015-16).  For ESS4 and
+        ESPS-5 the quoted statements are about what the sample represents ("at regional
+        level in addition to rural and urban level", catalog 3823) and what the weights
+        represent ("at regional and rural/urban levels", catalog 6161), not about strata.
+        The documents themselves were not read for this entry.
+    - text: >-
+        in 2013-14 and 2015-16 a region's small towns and large towns are one Urban cell,
+        although they came from two frames: the 43 small-town EAs of ESS1 and 100 EAs
+        added from towns above 10,000 people.  The served cell is coarser than the draw.
+      basis: modelling-choice
+      evidence: >-
+        ESS3 BID section 3.2, printed p. 14, and DDI 2247, PDF p. 5, both as quoted in
+        CONTENTS.org, "2013-14 (ESS2) -- urban supplement added".
+    - text: >-
+        each wave takes its own cover's labels, and one name is not one stratum across
+        waves.  Urban is small towns only in 2011-12 and any urban area from 2013-14, and
+        2018-19 is a new draw (Panel II).
+      basis: modelling-choice
+      evidence: >-
+        CONTENTS.org, "The Rural COLUMN changes meaning between waves (GH #683)" and "ESS4
+        is a NEW panel".  EPAR's W1 readme says the same of the survey's own identifiers:
+        "Strata ID are not consistent across waves due to sampling" (as quoted in
+        slurm_logs/2026-09-09_epar_curation/FINDINGS_Ethiopia.org, row 1b).
+    - text: >-
+        the agriculture cover's region and rural codes mean what the household cover's
+        mean, so a household only the agriculture cover records is labelled by code
+        through the household cover.  The two covers spell the labels differently.
+      basis: config-comment
+      evidence: >-
+        ethiopia.with_agriculture_cover_households, which refuses a code the household
+        cover never uses; CONTENTS.org, "GH #1120 locating-cover correction".
+  validated_against: >-
+    tests/test_gh1741_ethiopia_strata_registry.py, source-free: the function against the
+    expression the scripts used before.  No frame was built for this entry.  Occupied
+    cells of 18 / 21 / 21 / 21 / 19 are recorded in CONTENTS.org and
+    .coder/sampling/fingerprint.csv and were not re-measured.  No document quoted here
+    gives an allocation by these cells.
+  contents: 'Ethiopia/_/CONTENTS.org, "2026-11-25 -- sample.strata is a registered construction (GH #1741)"'
+  since: '2026-11-25'
