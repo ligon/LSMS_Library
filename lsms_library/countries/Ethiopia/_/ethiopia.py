@@ -4405,6 +4405,83 @@ def cluster_features(df):
     result.attrs = df.attrs.copy()
     return result
 
+# GH #1741: `sample.strata` is a library construction.  Entry: `_/derivations.yml`.
+REGION_RURAL_STRATUM = 'Ethiopia::sample::region-rural-stratum'
+
+
+def derive_region_rural_stratum(region, rural):
+    """``'<region label> <Rural>'``, the served ``sample.strata`` before spelling.
+
+    ``region`` is the household cover's ``saq01`` label and ``rural`` the wave
+    script's own ``Rural`` ('Rural' / 'Urban'); both are Series, row for row.
+    This is the expression the five wave scripts and
+    :func:`with_agriculture_cover_households` each spelled out before GH #1741,
+    moved here unchanged, so a missing ``rural`` still yields the region alone
+    and not NA.  The country's ``#+name: strata`` table folds region spellings
+    at read time.  No options, by design (``SkunkWorks/derived_values.org``).
+    """
+    return (region.astype(str).str.strip() + ' ' + rural.fillna('')).str.strip()
+
+
+def stamp_region_rural_stratum(sample):
+    """Stamp the registry key on every ``sample`` row that has a ``strata``.
+
+    Called by each wave script after the agriculture-cover households are
+    appended, the last step that adds rows.
+    """
+    out = sample.copy()
+    key = pd.Series(REGION_RURAL_STRATUM, index=out.index, dtype='string')
+    out['Derivation'] = key.where(out['strata'].notna())
+    out.attrs = sample.attrs.copy()
+    return out
+
+
+def inputs_region_rural_stratum(wave):
+    """The raw cover answers behind one wave's ``strata``, at ``(t, i)``.
+
+    One row per household, ``i`` wave-native (``household_id2`` in W2/W3;
+    ``Country.derivation_inputs`` re-keys it).  ``saq01`` and ``rural`` (W1-W3)
+    / ``saq14`` (W4/W5) hold the label the construction reads, the household
+    cover's, and ``<name>_code`` the code recorded for the household.
+    ``module`` names the cover.  A ``sect_cover_pp`` row is a household only the
+    agriculture cover records (GH #1120 D1): it records codes, and its labels
+    are the household cover's for those codes, as the build decodes them.
+    """
+    from lsms_library.paths import countries_root
+    if wave not in CLUSTER_AGRICULTURE_SOURCES:
+        raise ValueError(f"no Ethiopia cover is declared for {wave!r}; waves are "
+                         f"{sorted(CLUSTER_AGRICULTURE_SOURCES)}")
+    spec = CLUSTER_AGRICULTURE_SOURCES[wave]
+    root = countries_root() / 'Ethiopia'
+
+    def _read(w, fn, convert=False):
+        return get_dataframe(str(root / w / 'Data' / fn), convert_categoricals=convert)
+
+    names = ['saq01', spec['rural']]
+    hh = _read(wave, spec['cover'])
+    labels = _read(wave, spec['cover'], convert=True)
+    rows = pd.DataFrame({'t': wave, 'i': hh[spec['hhid']].apply(format_id).values,
+                         'module': 'sect_cover_hh'})
+    for name in names:
+        rows[name] = labels[name].astype(object).values
+        rows[f'{name}_code'] = hh[name].values
+    frames = [rows]
+    xw = (ea_id2_crosswalk(*[_read(w, f) for w, f in spec['crosswalk']])
+          if spec.get('crosswalk') else None)
+    colmap = {k: spec[k] for k in ('hhid', 'ea', 'pp_ea', 'weight') if k in spec}
+    a = _agriculture_only_households(wave, hh, _read(wave, spec['agri']), colmap,
+                                     codes=names, ea_crosswalk=xw)
+    if a is not None:
+        extra = pd.DataFrame({'t': wave, 'i': a['i'].astype(object).values,
+                              'module': 'sect_cover_pp'})
+        for name in names:
+            extra[name] = _decode_codes(wave, hh, labels[name].astype(str), name,
+                                        a[name]).values
+            extra[f'{name}_code'] = a[name].values
+        frames.append(extra)
+    return pd.concat(frames, ignore_index=True).set_index(['t', 'i'])
+
+
 def with_agriculture_cover_households(sample, t, hh, hh_labels, pp, colmap,
                                       rural_map, ea_crosswalk=None):
     """Append to a wave's ``sample`` the households recorded ONLY in the
@@ -4453,8 +4530,7 @@ def with_agriculture_cover_households(sample, t, hh, hh_labels, pp, colmap,
                                 a[c['rural']])
     v = a['v']
     rural = rural_label.map(rural_map)
-    strata = (region_label.astype(str).str.strip() + ' '
-              + rural.fillna('')).str.strip()
+    strata = derive_region_rural_stratum(region_label, rural)
     extra = pd.DataFrame({
         'i': a['i'].astype(object).values,
         'v': v.astype(object).values,
