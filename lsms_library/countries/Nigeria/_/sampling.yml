@@ -1,15 +1,13 @@
-# Sampling design record -- HOW this survey's sample was drawn (GH #793).
+# Panel continuity and served strata for Nigeria (GH #942, #1577).
 #
-# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
-# the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
-# wave of `Country('Nigeria').waves`?  The design fields are #793's curation
-# and are not written yet; their absence here is "not curated", not "not
-# found".
+# The `panel` blocks describe continuity with the preceding logical visit.
+# The `served_strata` blocks describe returned values, not the sampling
+# design. The #793 design fields have not been curated here.
 #
 # Keys are the API wave labels, which for Nigeria are the post-planting /
-# post-harvest ROUNDS (2010Q3, 2011Q1, ...): a PP -> PH boundary is a revisit
-# of the same households within one wave directory.  The first round (2010Q3)
-# has no preceding wave and so no entry.
+# post-harvest visits (2010Q3, 2011Q1, ...). Each visit uses its own
+# household cover, and their household sets can differ (GH #1120).
+# The first visit has a strata record but no preceding panel boundary.
 #
 # `v` is the composite `state/lga/ea` built from raw codes (CONTENTS.org,
 # "Cluster (PSU) identifier"), and a real EA keeps it -- EXCEPT where the raw
@@ -32,7 +30,23 @@
 
 Sampling:
 
+  '2010Q3':
+    served_strata:
+      holds: native-label
+      variable: 'zone (Household/secta_plantingw1.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2010-11 sample.py and Nigeria/_/nigeria.py ROUND_COVERS; PP household cover zone value labels'
+      note: 'The recorded geopolitical-zone label, not an additional survey stratum field.'
+
   '2011Q1':
+    served_strata:
+      holds: native-label
+      variable: 'zone (Household/secta_harvestw1.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2010-11 sample.py and Nigeria/_/nigeria.py ROUND_COVERS; PH household cover zone value labels'
+      note: 'The recorded PH geopolitical-zone label, not a value carried forward from PP.'
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
@@ -45,6 +59,13 @@ Sampling:
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Nigeria rows); CONTENTS.org, "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2012Q3':
+    served_strata:
+      holds: native-label
+      variable: 'zone (Household/secta_plantingw2.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2012-13 sample.py and Nigeria/_/nigeria.py ROUND_COVERS; PP household cover and the separate PP agriculture cover zone value labels'
+      note: 'The PP agriculture cover contributes its own zone label for the 21 households only it records. The household cover wins when both list a household.'
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
@@ -58,6 +79,13 @@ Sampling:
       locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel), "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2013Q1':
+    served_strata:
+      holds: native-label
+      variable: 'zone (Household/secta_harvestw2.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2012-13 sample.py and Nigeria/_/nigeria.py ROUND_COVERS; PH household cover zone value labels'
+      note: 'The recorded PH geopolitical-zone label. Neither PP cover supplies this field.'
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
@@ -72,6 +100,13 @@ Sampling:
       locator: 'CONTENTS.org, "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2015Q3':
+    served_strata:
+      holds: native-label
+      variable: 'zone (secta_plantingw3.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2015-16 sample.py and Nigeria/_/nigeria.py ROUND_COVERS; PP household cover zone value labels'
+      note: 'The recorded PP geopolitical-zone label.'
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
@@ -85,6 +120,13 @@ Sampling:
       locator: 'CONTENTS.org, "Cluster (PSU) identifier" (the Moved sentinel), "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2016Q1':
+    served_strata:
+      holds: native-label
+      variable: 'zone (secta_harvestw3.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2015-16 sample.py and Nigeria/_/nigeria.py ROUND_COVERS; PH household cover zone labels and sect1_harvestw3.dta zone codes'
+      note: 'Two roster-only households use their own recorded zone code, rendered with the matching label from this PH cover.'
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
@@ -98,6 +140,13 @@ Sampling:
       locator: 'CONTENTS.org, "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
 
   '2018Q3':
+    served_strata:
+      holds: native-label
+      variable: 'strata (secta_plantingw4.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2018-19 sample.py and Nigeria/_/nigeria.py ROUND_COVERS; PP household cover strata value labels'
+      note: 'The recorded label from the PP cover''s strata field.'
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: wave-scoped
@@ -132,6 +181,13 @@ Sampling:
         locator: 'lsms_library/countries/Nigeria/_/sampling.yml at 79f5979cf8022e64928c5150950dfb00456994da, 2018Q3 panel.cluster_id_note and panel.locator (recorded 2026-11-04, GH #1448 over GH #1264 crosswalk); lsms_library/countries/Nigeria/_/CONTENTS.org at the same commit, "Panel crosswalk rebuilt" and "sampling.yml counts these links"'
 
   '2019Q1':
+    served_strata:
+      holds: native-label
+      variable: 'strata (secta_harvestw4.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2018-19 sample.py and Nigeria/_/nigeria.py ROUND_COVERS; PH household cover strata value labels'
+      note: 'The recorded label from the PH cover''s strata field. The same-location rule changes v only.'
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
