@@ -44,3 +44,24 @@ helpers are tested by loading their actual definitions.
 
 Verify all held wave source prerequisites and both APIs, plus both loaders
 where possible. Measure end-to-end benefit and exact hash scope independently.
+
+### Phase 3 — verified at development 47df62d49
+
+- 48 targeted source-free tests. The exact historical scalar cancellation
+  witness remains 0; repeated-key, NaN, infinity, differently typed and empty
+  controls match the prior aggregate.
+- Private same-source reducer replay had 0 ULP movement for both waves.
+  Three single-thread timing repetitions, best observed old/new: 2014-15
+  0.770/0.125 s, 2017-18 2.506/0.253 s. These are reducer timings, not corpus
+  or guaranteed end-to-end speedups.
+- Default cold/warm Country and Feature match all 204,740 old rows and attrs
+  across four independently staged waves. Each tested old-wave subset matches
+  its own public baseline. Feature already omits six all-empty optional
+  columns from old-wave-only requests. The all-wave EHCVM columns remain.
+- The cache estimate was broader than a table-only change. In a 345-key static
+  census, 24 Mali country hashes and 48 wave hashes (24 per edited EACI wave)
+  changed. All two EHCVM wave hashes and Niger/Burkina controls are unchanged.
+  That is the framework's conservative local-module footprint even for a
+  wave-script-only change. If the separately reviewed #1772 deploys in the
+  same release, it may absorb overlapping re-warm work. No shared cache
+  was rebuilt or mutated here.
