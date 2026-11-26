@@ -2460,6 +2460,30 @@ class TestANativeRecordIsWhatTheConfigServes:
     def test_there_are_native_records_to_check(self):
         assert len(_native_records()) >= 2
 
+    def test_uganda_2015_alternate_cover_serves_own_label_only(self):
+        import lsms_library as ll
+        from lsms_library.yaml_utils import load_yaml
+
+        w = ll.Country("Uganda", preload_panel_ids=False)["2015-16"]
+        with (w.file_path / "_" / "data_info.yml").open(encoding="utf-8") as fh:
+            ag = load_yaml(fh)["sample"]["locating_ag"]
+        assert ag["file"] == "AGSEC1.dta"
+        assert ag["myvars"]["_ag_strata"] == "sregion"
+        assert sampling_records("Uganda")["2015-16"].strata_holds == "native-label"
+
+        frame = pd.DataFrame({
+            "_cover": ["primary", "blank primary", None],
+            "_ag_member": ["primary", "blank primary", "alternate"],
+            "strata": ["Primary subregion", None, None],
+            "_ag_strata": ["Different subregion", "Unused subregion",
+                           "Alternate subregion"],
+        })
+        adopt = w.formatting_functions["_adopt_alternate_cover"]
+        result = adopt(frame)
+        assert result.loc[0, "strata"] == "Primary subregion"
+        assert pd.isna(result.loc[1, "strata"])
+        assert result.loc[2, "strata"] == "Alternate subregion"
+
     @pytest.mark.parametrize("country,wave,why", [
         # The #1573 decode: its `sample` hook relabels the code.
         ("Burkina_Faso", "2014", "hook"),

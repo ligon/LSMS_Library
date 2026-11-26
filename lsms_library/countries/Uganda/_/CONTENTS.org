@@ -23,7 +23,9 @@ both agricultural seasons.
 
 ** Strata
 
-The stratification scheme changed across waves:
+The variable served as =strata= changes across waves.
+From 2011-12 onward it is the household's recorded subregion.
+This table does not establish that those subregions were sampling design strata.
 
 | Waves          | Variable  | Strata                                                       | Count |
 |----------------+-----------+--------------------------------------------------------------+-------|

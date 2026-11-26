@@ -117,11 +117,9 @@ Sampling:
       note: |-
         The file's own stratum, region x urban/rural, named `stratum`.  Its labels
         are the scheme of 2005-06 to 2010-11.  2011-12 onward serve `sregion` /
-        `subreg`, sub-region variables, and have no `served_strata` yet: that they
-        are the stratum is the library's reading in those waves' `stratification`
-        (whose `_status` says the label list is the library's), not something a
-        file or document of the wave states, so they wait on the GH #1577 question
-        about region-type variables served as `strata`.  CONTENTS.org TODO
+        `subreg`, the households' recorded subregions.  The later tags describe
+        the served labels, not whether those labels are the design strata.
+        CONTENTS.org TODO
         "Investigate 2005-06 strata vs later sub-regions" is open.
 
   '2009-10':
@@ -359,6 +357,17 @@ Sampling:
     notes: null
     record_source: 'CONTENTS.org "Sampling Design" > oversamples (verbatim BID quote)'
 
+    served_strata:
+      holds: native-label
+      variable: 'sregion (GSEC1.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2011-12/_/data_info.yml sample.locating_cover.strata; GSEC1.dta sregion value labels; CONTENTS.org, Sampling Design > Strata'
+      note: |-
+        The household cover's own subregion, not the earlier six-label
+        `stratum`. AGSEC1 extends membership only, with no subregion for
+        those households. Existing spelling folds do not change the source.
+
   '2013-14':
     design_tag: two-stage-stratified-cluster-rotating-panel
     source_type: local-documentation
@@ -443,6 +452,16 @@ Sampling:
       `v` is a parish from this wave (GH #689).
     record_source: 'CONTENTS.org "Sampling Design" > "Rotating panel and refreshment sample" + oversamples'
 
+    served_strata:
+      holds: native-label
+      variable: 'sregion (GSEC1.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2013-14/_/data_info.yml sample.locating_cover.strata; GSEC1.dta sregion value labels; CONTENTS.org, Sampling Design > Strata'
+      note: |-
+        The household cover's own subregion. Origin EAs can span more than
+        one served label. The tag does not attest a design stratum.
+
   '2015-16':
     design_tag: two-stage-stratified-cluster-rotating-panel
     source_type: local-documentation
@@ -493,6 +512,18 @@ Sampling:
       `gsec1.ea`, and from `AGSEC1.ea` for the 72 households only AGSEC1 records;
       `v` is a parish (GH #689).
     record_source: 'CONTENTS.org "Sampling Design" > oversamples'
+
+    served_strata:
+      holds: native-label
+      variable: 'sregion (gsec1.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2015-16/_/data_info.yml sample.locating_cover.strata and sample.locating_ag._ag_strata; gsec1.dta and AGSEC1.dta sregion value labels; Uganda/_/uganda.py _adopt_alternate_cover'
+      note: |-
+        AGSEC1 supplies its own recorded `sregion` for the 72 households only
+        it records. Other households keep the primary household cover's
+        value, including missing values. Neither source constructs a design
+        stratum.
 
   '2018-19':
     design_tag: two-stage-stratified-cluster-rotating-panel
@@ -568,6 +599,16 @@ Sampling:
       derivation `Uganda::sample::ea-tracking-key`).
     record_source: 'CONTENTS.org "Sampling Design"'
 
+    served_strata:
+      holds: native-label
+      variable: 'subreg (GSEC1.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2018-19/_/data_info.yml sample.locating_cover.strata; GSEC1.dta subreg value labels; CONTENTS.org, Sampling Design > Strata'
+      note: |-
+        The household cover's own subregion, independent of its inherited
+        origin EA. AGSEC1 extends membership only and does not supply subreg.
+
   '2019-20':
     design_tag: two-stage-stratified-cluster-rotating-panel
     source_type: local-documentation
@@ -620,3 +661,12 @@ Sampling:
       2018-19 and `t0_hhid` to the 2015-16 `ea`, for 2,868 of 3,098 households
       and NA for the rest (GH #689, derivation `Uganda::sample::ea-tracking-key`).
     record_source: 'CONTENTS.org "Sampling Design"'
+    served_strata:
+      holds: native-label
+      variable: 'subreg (HH/gsec1.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2019-20/_/data_info.yml sample.locating_cover.strata; Data/HH/gsec1.dta subreg value labels; CONTENTS.org, Sampling Design > Strata'
+      note: |-
+        The household cover's own subregion, independent of its inherited
+        origin EA. This tag says nothing about the weight design.
