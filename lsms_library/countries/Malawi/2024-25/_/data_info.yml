@@ -1,6 +1,5 @@
 Country: Malawi
 Wave: 2024-25
-
 individual_education:
     # Keep the cover as a declared input to the refresh comparison and hash.
     dfs: [module_c, education_panel_cover]

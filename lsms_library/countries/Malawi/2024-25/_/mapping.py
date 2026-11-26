@@ -15,6 +15,7 @@ def cs_i(value):
     # Bare IHS6 case_ids coincide with 3 IHS3, 202 IHS4 and 83 IHS5 case_ids,
     # so a shared or absent prefix would make false panel links (GH #1278).
     return CS_24 + format_id(value.iloc[0])
+# Education uses the interview-local Module C person key.
 
 def individual_education(df):
     """Compare the native qualification before dropping its refresh copy."""
