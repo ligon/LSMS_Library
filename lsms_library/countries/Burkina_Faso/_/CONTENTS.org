@@ -3630,6 +3630,7 @@ of 59 code-55 lines, so 65 is the =Autre= code; since =s16c= leaves it bare it i
 =s16d='s own value label =Autre (à préciser)=, carried across by the code link (the 24 =s16d=
 code-65 records all sit with =s16c= code-65 lines), with no key, being a source label (41
 rows, red team count).  Every remaining code keeps the harvest file's own label, through =harmonize_food=.
+/Decided 2026-11-25 (GH #1723, "Align all four crop labels"): the four are served in 2018-19's spellings; see "2021-22 crop labels" at the end of this file.  The table's =served= column and the paragraph below describe the 2026-11-13 build./
 *Not decided*: whether 2021-22's =Riz= / =Niébé/Haricot= / =Voandzou (pois
 de terre)= / =Laitue (salade)= should be served in 2018-19's spellings.  As served, cowpea is
 =Niébé= in 2018-19 and =Niébé/Haricot= in 2021-22, and so in 2021-22 0 of 984 =Niébé= and 0 of
@@ -3867,3 +3868,69 @@ set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical co
 - *Read time.*  "Aucune stratégie" is a "did nothing" answer (=_/coping.yml=): alone it is the set,
   beside a real strategy it leaves the set and keeps its position.  2014 uses it to fill later slots
   after a strategy (146 rows): those positions are kept as recorded, per the ruling.
+
+* 2026-11-25 -- 2021-22 crop labels: codes 3, 8, 9 and 27 served in 2018-19's spelling (GH #1723)
+
+*Ruling (@ligon, 2026-11-25): "Align all four crop labels".*  It answers the "Not decided"
+paragraph of the 2026-11-13 section above for the crops, and only for them.  2021-22
+=crop_production= now serves:
+
+| code | =s16c= label (decoded) | served before | served now | =s16d= label / 2018-19 |
+|------+--------------------------+--------------------------+-----------+-----------|
+|    3 | Riz                      | Riz                      | Riz Paddy | Riz Paddy |
+|    8 | Niébé/Haricot            | Niébé/Haricot            | Niébé     | Niébé     |
+|    9 | Voandzou (pois de terre) | Voandzou (pois de terre) | Voandzou  | Voandzou  |
+|   27 | Laitue (salade)          | Laitue (salade)          | Laitue    | Laitue    |
+
+*Where and how.*  =2021-22/_/mapping.py= =CROP_DISPLAY_ALIASES=, applied by
+=_crop_display_aliases= inside =_crop_label_table=: after =derive_crop_code_label= has chosen
+the code's label (the registered selection, unchanged), before =harmonize_food= (which passes
+the four words through, as it does for 2018-19's own labels).  That table is the only place
+a 2021-22 crop label is made: the builder and the four =inputs_= helpers read it through
+=_crop_tables=, so served rows and =derivation_inputs= agree by construction.  The builder
+still matches sales, attaches dispositions and stamps =Derivation= on the CODE and writes the
+label last, so no join, quantity, sale, key or row can move.
+
+*An alias is bound to code AND label.*  It applies only where the code decodes to the
+left-hand word.  The same word on another code is left alone; a code the file does not hold
+is skipped; a code already decoding to the served word is unchanged.  A bound code that
+decodes to any other word, or that =s16d= labels with a third word, is refused
+(=CropAliasError=): passing it through unaliased would split the crop across waves again
+without a signal.  An alias whose served word is the decoded or native label of a different
+code in either file, or that =harmonize_food= would fold onto another code, is refused too,
+so the lookup cannot become many-to-one.  55, 58, 64 and 65 keep their 2026-11-13 handling
+and may not be aliased.
+
+*Not a registered derivation.*  The served word is =s16d='s own value label of the same
+code (the 2026-11-13 table), as code 65's is; no value is computed and the rows carry no new
+key.  =_/derivations.yml= =crop-code-from-roster-text= names the alias in its rule text.
+
+*What it does not touch.*  =plot_inputs= and its seed crops (=harmonize_seed_crop=, GH #1119,
+already =Riz Paddy= and =Niébé=); the raw labelled answers in =derivation_inputs= (=s16cq04=,
+=s16dq01= as read); =u=, =Unit_sold= and code 3's =Plat Yoruba= (below); the #1740 plot-input
+unit spellings; 2018-19 and 2014; =_/categorical_mapping.org= (its =Riz= row of
+=harmonize_food= is a food key shared with =food_acquired=, which is why the alias is not
+there).
+
+*A seed need not have a harvest.*  The alias makes the rice and cowpea seed slots spell
+their crop as the harvest does, which is what a =(t, i, crop)= comparison needs.  It does
+not make every seed row find a harvest row, and that is not a defect to chase: =s16b= is
+household x input with no parcel axis, a household can hold or buy seed for a crop it then
+does not plant or that s16c does not list, 2018-19 itself matches 2,097 of 2,156 cowpea and
+525 of 532 rice seed rows, and the catch-all seed slots (=Autre céréale=, =Autre tubercule=,
+=Autre crop=, rubber/teak) match none in either wave by design.  The 2021-22 counts after
+this change (0 of 984 and 0 of 291 before it) are *not measured here*: no source was read in
+this change.
+
+*Still two spellings, by this ruling's own scope*: unit code 3, =Plat Yoruba= (2021-22) and
+=Plat yorouba= (2018-19).  A cross-wave unit panel still splits on it.  Tracked on #1723's
+unit-only residual.
+
+*Verification state.*  Source-free only: synthetic label sets in
+=tests/test_burkina_faso_2021_crop_production.py= (the four aliases, the binding, the
+refusals, 55/58/64/65 unchanged, one table for every reader).  That the held =s16c= decodes
+3, 8, 9 and 27 to exactly these byte strings rests on the 2026-11-13 measurement above; if
+it does not, the build refuses rather than serving the old word.  No build, row count or
+release check was run.  Cache: =2021-22/_/mapping.py= and the wave script are build inputs,
+so one Burkina re-warm; no other country, no framework fingerprint.  Ledger:
+=.coder/ledger/1723-burkina-crop-display-aliases.md=.

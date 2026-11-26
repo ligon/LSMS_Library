@@ -31,7 +31,10 @@ Burkina_Faso::crop_production::hh-crop-sale-single-row; otherwise on ONE row wit
 = 'Farm-level', u = 'Unknown', and no key.  No sale is split, summed or dropped.  The
 match is by CROP CODE, not label: the two files label one crop list differently (see
 mapping.py, "THE IDENTITY OF A CROP IS ITS CODE"), and by label 332 sales would be
-sent to Farm-level for want of a line.  The sale's state s16dq05d is Condition_sold, by
+sent to Farm-level for want of a line.  The crop LABEL is written last, from the one
+code table: codes 3, 8, 9 and 27 are served in s16d's and 2018-19's spelling (Riz Paddy,
+Niébé, Voandzou, Laitue: mapping.CROP_DISPLAY_ALIASES, GH #1723, ruling @ligon
+2026-11-25), a display alias that touches no code, join, quantity or key.  The sale's state s16dq05d is Condition_sold, by
 the 2018-19 fold (GH #1528), with the answer in condition_sold_native.
 
 Units: every unit field is decoded by code as one UML list (codes 1-7 are labelled alike in
