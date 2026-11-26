@@ -59,14 +59,15 @@ interview_date:
     idxvars:
         i: case_id
     myvars:
-        # hh_a23_1 = "Interview Date [MDY] (Visit 1)", a Stata %td date that
-        # get_dataframe returns as datetime64.  hh_a23_2 = the Visit 2 date
-        # (same %td datetime; populated for the ~3247 panel HH revisited at
-        # post-harvest).  Both are melted to the `visit` index level by the
-        # country-level malawi.interview_date df_edit hook (visit 2 rows with
-        # a NaT date are dropped there).
-        int_t: hh_a23_1
-        int_t_v2: hh_a23_2
+        # The held Stata %dD_m_Y operands are already date-typed.
+        int_t:
+            datetime: hh_a23_1
+            calendar: gregorian
+            resolution: day
+        int_t_v2:
+            datetime: hh_a23_2
+            calendar: gregorian
+            resolution: day
 
 cluster_features:
     dfs:

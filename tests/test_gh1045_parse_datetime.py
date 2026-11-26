@@ -441,11 +441,46 @@ class TestScopedTag:
                     for col, v in (b.get("myvars") or {}).items():
                         if DP.is_datetime_spec(v) and table not in CALENDAR_TABLES:
                             offenders.append(f"{p}:{table}.{col}")
-        for p in list(roots.glob("*/_/*.py")) + list(roots.glob("*/*/_/*.py")):
+        modules = list(roots.glob("*/_/*.py")) + list(roots.glob("*/*/_/*.py"))
+        scoped_helpers = {
+            roots / "Malawi/_/_malawi_interview_dates.py":
+                ("interview_date", "parsed_interview_dates"),
+        }
+        for p in modules:
             src = p.read_text(errors="ignore")
-            if ("parse_datetime(" in src or "assign_datetime(" in src) \
-                    and p.stem not in CALENDAR_TABLES:
+            if ("parse_datetime(" not in src and "assign_datetime(" not in src) \
+                    or p.stem in CALENDAR_TABLES:
+                continue
+            if p not in scoped_helpers:
                 offenders.append(str(p))
+                continue
+            table, entry = scoped_helpers[p]
+            assert table in CALENDAR_TABLES
+            # The country-local helper is shared by the five-wave migration,
+            # but only the per-wave interview_date hooks may call its parser.
+            # Keep this exception tied to the callers, not the helper's name.
+            import ast
+            callers = []
+            for consumer in modules:
+                body = consumer.read_text(errors="ignore")
+                if consumer == p or p.stem not in body:
+                    continue
+                tree = ast.parse(body)
+                parents = {child: node for node in ast.walk(tree)
+                           for child in ast.iter_child_nodes(node)}
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Import):
+                        assert not any(n.name.rsplit(".", 1)[-1] == p.stem for n in node.names), consumer
+                    if (not isinstance(node, ast.ImportFrom) or not node.module
+                            or node.module.rsplit(".", 1)[-1] != p.stem):
+                        continue
+                    assert all(n.name != "*" for n in node.names), consumer
+                    if not any(n.name == entry for n in node.names):
+                        continue
+                    owner = parents.get(node)
+                    assert isinstance(owner, ast.FunctionDef) and owner.name == table, consumer
+                    callers.append(consumer)
+            assert callers
         assert not offenders, offenders
 
     def test_a_noop_parser_edit_moves_exactly_the_scoped_tables(self, monkeypatch):

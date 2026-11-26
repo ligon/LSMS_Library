@@ -14,6 +14,8 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
 from malawi import ihps_baseline_status  # noqa: E402,F401
 from malawi import ihps_panel_cluster_features as _ihps_panel_cluster_features  # noqa: E402
 
+from _malawi_interview_dates import panel_date_source  # noqa: E402,F401
+
 def cs_i(value):
     return 'cs-19-'+format_id(value.iloc[0])
 
@@ -93,3 +95,9 @@ def cluster_features(df):
     (``Panel/hh_mod_a_filt_19.dta``); cross-sectional rows carry NaN.
     """
     return _ihps_panel_cluster_features(df, status_source=_STATUS_SOURCE)
+
+
+def interview_date(df):
+    from _malawi_interview_dates import parsed_interview_dates
+
+    return parsed_interview_dates(df, '2019-20', panel_visit=True)

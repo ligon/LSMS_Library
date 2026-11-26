@@ -97,3 +97,9 @@ def cluster_features(df):
     wave's single cover file (every 2013-14 household is a panel household).
     """
     return _ihps_panel_cluster_features(df, status_source=_STATUS_SOURCE)
+
+
+def interview_date(df):
+    from _malawi_interview_dates import parsed_interview_dates
+
+    return parsed_interview_dates(df, '2013-14', components=True)

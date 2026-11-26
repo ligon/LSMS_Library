@@ -1,6 +1,30 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* 2026-11-26 -- Parse the five existing civil interview-date waves (GH #1045)
+
+The API serves an interview date per reported visit, not the separate start
+and end clock fields some of the forms ask for.
+The two visits use the own first attempt, not separate attempts at one visit.
+The 2024-25 cover wiring is separate (GH #1275).
+
+- 2004-05 IHS2 A14 explicitly records day, month and year in =a14a/b/c=.
+  The legacy format assembled numbers into an ambiguous string.
+  The explicit fields correct 3,052 day/month transpositions among 11,280 dates.
+- 2010-11 reuses the already decoded Stata dates and preserves both visit
+  counts. There is no second epoch conversion.
+- 2013-14 uses the first attempt of A23 (Visit 1) and A37 (Visit 2).
+  Three Visit-1 records report year and month but have no day.
+  Under the existing shared rule they use the first of the month with
+  =::interview_date::date-day-imputed=, only on that visit.
+  Three impossible Visit-2 dates and all other unparseable dates stay absent.
+- 2016-17 and 2019-20 keep the original cross-section and panel covers, IDs and
+  ISO day strings. The file supplies the Visit-2 scope, not an ID convention.
+  Only the 2016-17 panel Visit-2 field carries five =##N/A##= markers.
+  Cross-section cases without a Visit-2 question do not count as missing.
+  The separate consumption-date field is not used.
+
+
 * 2026-11-13 -- GH #1228 later waves: the season, the Module D join, and the registered relabel
 
 Rulings @ligon 2026-11-12 ("Join D, single-text only") and 2026-11-13, after the red
