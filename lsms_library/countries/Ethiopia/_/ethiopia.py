@@ -4346,9 +4346,10 @@ def cluster_features(df):
       :func:`ea_id2_crosswalk`, as for ``sample``, and must be the prefix of
       its ``household_id2``.
 
-    The hook reads the covers by path (``countries_root()``); like any
-    dynamically-read source they are covered by this module's text hash, not
-    by a sidecar md5 (CLAUDE.md, cache limitation (a)).
+    The hook reads the covers by path (``countries_root()``). Each wave also
+    declares the hook-only inputs in its ``cluster_features.locating_covers``
+    block, so changing a tracked sidecar invalidates the wave and country
+    caches (GH #1288).
     """
     if df.empty or 't' not in (df.index.names or []) or 'v' not in df.index.names:
         return df

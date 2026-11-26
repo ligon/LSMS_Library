@@ -17,6 +17,9 @@ Wave: 2011-12
 # with Latitude/Longitude 100% absent.  Verified against the source: the file
 # carries LAT_DD_MOD/LON_DD_MOD non-null for all 3,917 rows.
 cluster_features:
+    # GH #1288: the cluster hook reads these beyond the YAML subframes.
+    locating_covers:
+        file: sect_cover_pp_w1.dta
     dfs:
         - df_main
         - df_geo
