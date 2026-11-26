@@ -449,6 +449,39 @@ off the data would conflate the claim with the realization.
   paragraph for that wave is a gap in what the repo holds; it is *not* a claim
   that INSD never wrote one.
 
+** Earlier Enquete Prioritaire instruments (GH #816, 2026-11-25)
+
+The preceding universe search began at 2014; its silence about earlier
+rounds was not a search result.
+The INSD Enquete Prioritaire precedes the current EMC/EHCVM coverage.
+EP-I was fielded in late 1994 and early 1995 (IHSN 2100,
+=BFA_1994_EP_v01_M=), and EP-II in 1998 (IHSN 2106, =BFA_1998_EP_v01_M=).
+The maintainer approved pursuing these two releases on 2026-10-23.
+Neither wave is held or served by the library.
+
+Two INSD methodology notes give a concrete break even within this older
+series: household food spending was asked over the previous 30 days in
+[[https://www.insd.bf/sites/default/files/2021-12/EP_1994-2.pdf][EP-I (section 5)]] and 15 days in
+[[https://www.insd.bf/sites/default/files/2021-12/EP_1998-2.pdf][EP-II (section 4)]].
+Neither is EMC's repeated seven-day food module.
+EP-I's methodology also limits the composition section to permanent
+members, so a future roster cannot inherit the EMC/EHCVM membership rule.
+EP-II's ten economic regions and 1996 census enumeration-area frame
+do not establish a crosswalk to today's administrative regions or to the
+later EMC/EHCVM household identifiers.
+
+Both INSD access statements require advance written approval with a study
+plan. They specify attribution and return of research outputs and
+working material. Public reports and catalog metadata do not grant
+microdata access or permission to redistribute it through a shared cache.
+See the IHSN study and access records for [[https://catalog.ihsn.org/index.php/catalog/2100#data_access][1994]] and
+[[https://catalog.ihsn.org/catalog/2106#data_access][1998]].
+Confirm released file inventory, native keys, weights, instruments and
+permitted uses before declaring any feature.
+Keep source access status, instrument comparability and population
+coverage separate. No wave, population tag or food recall rule changes
+here. Later historical rounds are outside the acquisition ruling.
+
 * Files in Burkina_Faso/_/
 ** TODO food_items.org
 ** TODO nutrition
