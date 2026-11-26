@@ -4493,6 +4493,25 @@ canonical edit moves no cache hash (census: 0 of 531 non-Nigeria tables).
 side's #1035 evidence says a card weight fits a fraction of a container and
 not a count of them -- the quantity-mode split comes first.
 
+** 2026-11-25 -- W3 crop sales call the cans by their own unit (GH #1721)
+
+The exact held W3 A3.i harvest =sa3iq6ii= and A3.ii sale =sa3iiq5b= cards have the same 60 value labels.
+Code 3 is plain =LITRE (L)=, code 4 is =CENTILITRE (CL)=, and codes 190, 191, 192 and 193 name 10, 20, 25 and 50 litre jerry cans, respectively.
+In the current W3 sale file the positive-quantity-or-value counts for codes 190 through 193 are 0, 4, 11 and 0.
+All 15 can records have positive quantity and value and answer YES to =sa3iiq3=.
+Five positive sale records use plain litres and one uses centilitres.
+That is 20 raw records on codes that formerly decoded as litres, not a verification of the previously reported 20 *served* rows.
+The bounded source projection used only the four sale answer columns, without household, plot or crop keys.
+
+W4 harvest =sa3iq6ii= and sale =sa3iiq1c= both name the can simply =190. JERRY CAN/RUBBER= and neither defines 191-193.
+The two W4 cards otherwise differ at code 14 (=TIN= on sale only) and code 40 (=DERICA/TIN= on harvest, =DERICA= on sale).
+Only the W3 sale reader now uses the existing raw-code map for 190-192, solely to label =Unit_sold= as =Jerry Can=.
+The 50 litre code 193 is defined but has no records at all in this W3 sale release and its decoder behavior remains unchanged.
+If a later release uses it, review that code separately rather than extending this fix by inference.
+Sale attachment, raw grouping, quantities, values, factor fields and derivation inputs are unchanged.
+There is no sold-kilogram ruling here: the old litre label falsely admitted can sales to a per-kg price pool, and the new label supplies no substitute factor.
+The full served-row and valuation comparison was not rerun for this evidence.
+
 * 2026-11-08 -- GH #1537: two label-only Aggregate aliases; Pepper remains unqualified (mapped 2026-11-13, below)
 
 Preferred =Groundnuts= now maps to the already existing Aggregate =Groundnuts=,
