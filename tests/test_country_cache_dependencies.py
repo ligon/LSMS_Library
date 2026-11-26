@@ -111,8 +111,7 @@ def test_real_uganda_scope_is_two_inputs_not_output_columns():
     assert ug._table_cache_hash('sample', ug.waves) == ug._own_table_cache_hash('sample', ug.waves)
 
 
-@pytest.mark.parametrize('author', ['dvc', 'make'])
-def test_real_api_replaces_stale_income_regardless_of_cache_author(tmp_path, author):
+def _prepare_income_fixture(tmp_path):
     if not shutil.which('make'):
         pytest.skip('make unavailable')
     config = tmp_path / 'countries'
@@ -159,6 +158,17 @@ enterprise_income:
         (folder / 'Data/wages.csv.dvc').write_text(put(wave, 'wages.csv', 'amount', wages))
         (folder / 'Data/firms.csv.dvc').write_text(put(wave, 'firms.csv', 'profit', profits))
     new_wages = put('2020-21', 'wages.csv', 'amount', 30)
+    env = {**os.environ, 'LSMS_COUNTRIES_ROOT': str(config), 'LSMS_DATA_DIR': str(data),
+           'PYTHONPATH': str(ROOT), 'LSMS_SKIP_AUTH': '1',
+           'LSMS_BUILD_WORKERS': '1', 'LSMS_MAKE_JOBS': '1'}
+    for key in ('LSMS_NO_CACHE', 'LSMS_ALLOW_INTREE_SOURCES'):
+        env.pop(key, None)
+    return config, env, new_wages
+
+
+@pytest.mark.parametrize('author', ['dvc', 'make'])
+def test_real_api_replaces_stale_income_regardless_of_cache_author(tmp_path, author):
+    _, env, new_wages = _prepare_income_fixture(tmp_path)
 
     script = """
 import os, sys
@@ -212,12 +222,98 @@ assert rows(country(), ['2021-22']) == [22.]
 assert rows(country()) == [31.,22.]
 assert signature() == new_signature
 """
-    env = {**os.environ, 'LSMS_COUNTRIES_ROOT': str(config), 'LSMS_DATA_DIR': str(data),
-           'PYTHONPATH': str(ROOT), 'LSMS_SKIP_AUTH': '1',
-           'LSMS_BUILD_WORKERS': '1', 'LSMS_MAKE_JOBS': '1'}
-    for key in ('LSMS_NO_CACHE', 'LSMS_ALLOW_INTREE_SOURCES'):
-        env.pop(key, None)
     result = subprocess.run([sys.executable, '-c', script, author, new_wages],
                             cwd=tmp_path, env=env, capture_output=True,
                             text=True, timeout=180)
     assert result.returncode == 0, result.stderr[-6000:]
+
+
+@pytest.mark.parametrize('route', ['no-repo', 'no-stage', 'stage-consolidation'])
+def test_changed_input_during_default_build_is_not_given_the_new_hash(tmp_path, route):
+    from dvc.repo import Repo
+
+    config, env, new_wages = _prepare_income_fixture(tmp_path)
+    marker = tmp_path / 'after-earnings.txt'
+    marker.write_text(new_wages)
+    env.update(LSMS_BUILD_BACKEND='dvc', ISA_FIXTURE_AFTER_EARNINGS=str(marker))
+    source = config / 'Uganda/_/income.py'
+    lines = source.read_text().splitlines(keepends=True)
+    pos, = (i for i, line in enumerate(lines) if line.startswith('    per_source = get_dataframe('))
+    lines[pos + 1:pos + 1] = ['''    if source == 'earnings':
+        from pathlib import Path
+        marker = Path(os.environ['ISA_FIXTURE_AFTER_EARNINGS'])
+        if marker.is_file():
+            sidecar = Path(__file__).resolve().parent.parent / '2020-21/Data/wages.csv.dvc'
+            sidecar.write_text(marker.read_text())
+            marker.unlink()
+''']
+    source.write_text(''.join(lines))
+    if route != 'no-repo':
+        Repo.init(str(config), no_scm=True).close()
+    if route == 'stage-consolidation':
+        import shlex
+        import yaml
+
+        wave_ref = '$' + '{item.wave}'
+        argv = [sys.executable, 'stage.py', wave_ref]
+        stage_command = subprocess.list2cmdline(argv) if os.name == 'nt' else shlex.join(argv)
+        stage_output = (Path(env['LSMS_DATA_DIR']) / 'wave_outputs').as_posix()
+        (config / 'dvc.yaml').write_text(yaml.safe_dump({'stages': {
+            'materialize': {
+                'foreach': {f'wave{n}': {'country': 'Uganda', 'wave': w, 'table': 'income'}
+                            for n, w in enumerate(('2020-21', '2021-22'), 1)},
+                'do': {'cmd': stage_command,
+                       'outs': [{f'{stage_output}/{wave_ref}.parquet': {'cache': False}}],
+                       'always_changed': True},
+            },
+        }}))
+        (config / 'stage.py').write_text("""import os, sys
+from pathlib import Path
+from lsms_library import Country
+from lsms_library.local_tools import to_parquet
+w = sys.argv[1]
+u = Country('Uganda', preload_panel_ids=False)
+ea = u.earnings(waves=[w], currency=None)['Earnings']
+en = u.enterprise_income(waves=[w], currency=None)['profits']
+marker = Path(os.environ['ISA_FIXTURE_AFTER_EARNINGS'])
+if w == '2020-21' and marker.is_file():
+    (u.file_path/'2020-21/Data/wages.csv.dvc').write_text(marker.read_text())
+    marker.unlink()
+out = Path(os.environ['LSMS_DATA_DIR'])/'wave_outputs'/f'{w}.parquet'
+out.parent.mkdir(parents=True, exist_ok=True)
+to_parquet(ea.add(en, fill_value=0).to_frame('income'), out, absolute_path=True)
+""")
+
+    child = """
+import os,sys
+from pathlib import Path
+from lsms_library import Country, local_tools as L
+from lsms_library.paths import data_root
+route = sys.argv[1]
+u = Country('Uganda', preload_panel_ids=False)
+cache = data_root('Uganda')/'var/income.parquet'
+marker = Path(os.environ['ISA_FIXTURE_AFTER_EARNINGS'])
+assert marker.is_file() and not cache.exists()
+original = u._table_cache_hash('income', u.waves)
+try:
+    u.income(currency=None)
+except RuntimeError as err:
+    assert 'declared inputs changed during the default build' in str(err), str(err)
+else:
+    raise AssertionError('default writer stamped data after detected input change')
+assert not marker.exists()
+current = u._table_cache_hash('income', u.waves)
+assert current != original
+if route == 'stage-consolidation':
+    assert not cache.exists()
+    assert all((data_root()/'wave_outputs'/f'{w}.parquet').exists() for w in u.waves)
+else:
+    assert cache.exists() and L.read_parquet_cache_hash(cache) is None
+result = u.income(currency=None).sort_index(level='t')
+assert result.income.tolist() == [31., 22.]
+assert L.read_parquet_cache_hash(cache) == current
+assert L.read_parquet_cache_waves(cache) == u.waves
+"""
+    result = subprocess.run([sys.executable, '-c', child, route], cwd=tmp_path,
+                            env=env, capture_output=True, text=True, timeout=180)
+    assert result.returncode == 0, result.stderr[-7000:]
