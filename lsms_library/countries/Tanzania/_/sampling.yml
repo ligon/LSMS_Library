@@ -1,16 +1,14 @@
-# Sampling design record -- HOW this survey's sample was drawn (GH #793).
+# Panel continuity and served strata for Tanzania (GH #942, #1577).
 #
-# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
-# the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
-# wave of `Country('Tanzania').waves`?  The design fields are #793's curation
-# and are not written yet; their absence here is "not curated", not "not
-# found".
+# The `panel` blocks describe continuity with the preceding logical wave
+# (GH #942 option A). The `served_strata` records describe the returned
+# column, not the sampling design. The #793 design fields are not curated.
 #
 # Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in
 # {wave-scoped, redefined, mixed} makes a `Country('Tanzania')` frame that
 # carries `v` across that boundary warn (`ClusterIdentityWarning`); nothing is
-# ever dropped or rewritten.  The first wave (2008-09) has no preceding wave
-# and so no entry.
+# ever dropped or rewritten. The first wave (2008-09) has a strata record
+# but no preceding panel boundary.
 #
 # Note the two orthogonal facts (DESIGN.org Q2): 2019-20 -> 2020-21 is a
 # HOUSEHOLD refresh by design (the Extended and Refresh sub-panels are
@@ -19,7 +17,23 @@
 
 Sampling:
 
+  '2008-09':
+    served_strata:
+      holds: native-code
+      variable: 'strataid (upd4_hh_a.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2008-15/_/sample.py, UPD4 cover round 1; raw strataid has no Stata value-label binding (World Bank catalog 3814, strataid)'
+      note: 'The recorded code, formatted as a string; not the labelled strataid2 field.'
+
   '2010-11':
+    served_strata:
+      holds: native-code
+      variable: 'strataid (upd4_hh_a.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2008-15/_/sample.py, UPD4 cover round 2; raw strataid has no Stata value-label binding (World Bank catalog 3814, strataid)'
+      note: 'The recorded code, formatted as a string; not the labelled strataid2 field.'
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
@@ -32,6 +46,13 @@ Sampling:
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Tanzania rows); re-measured 2026-10-19 through Country("Tanzania").sample()'
 
   '2012-13':
+    served_strata:
+      holds: native-code
+      variable: 'strataid (upd4_hh_a.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2008-15/_/sample.py, UPD4 cover round 3; raw strataid has no Stata value-label binding (World Bank catalog 3814, strataid)'
+      note: 'The recorded code, formatted as a string; the round-three cluster-id change does not define this field.'
     panel:
       household_continuity: panel
       cluster_id_continuity: wave-scoped
@@ -74,6 +95,16 @@ Sampling:
           f1cf7d06f30367cd1e34a4b3db4012f951b2e497.
 
   '2014-15':
+    served_strata:
+      holds: native-code
+      variable: 'strataid (upd4_hh_a.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2008-15/_/sample.py, UPD4 cover round 4; raw strataid and ha_07_1 by household-round (World Bank catalog 3814, strataid)'
+      note: |-
+        The pooled wave serves the recorded codes on 989 households.
+        All 3,352 households the existing loader identifies as Refresh
+        have no value in this field. It does not substitute `strataid2`.
     panel:
       household_continuity: rotating-panel
       cluster_id_continuity: wave-scoped
@@ -120,6 +151,13 @@ Sampling:
           preserved in reviewed source f1cf7d06f30367cd1e34a4b3db4012f951b2e497.
 
   '2019-20':
+    served_strata:
+      holds: native-label
+      variable: 'strataid (HH_SEC_A.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2019-20/_/data_info.yml sample.strata; HH_SEC_A.dta strataid value labels (World Bank catalog 3885, strataid)'
+      note: 'The parent-cluster rule for v does not reassign the household cover label; see CONTENTS.org on split-offs.'
     panel:
       household_continuity: panel
       cluster_id_continuity: wave-scoped
@@ -166,6 +204,16 @@ Sampling:
           preserved in reviewed source f1cf7d06f30367cd1e34a4b3db4012f951b2e497.
 
   '2020-21':
+    served_strata:
+      holds: native-label
+      variable: 'strataid (hh_sec_a.dta)'
+      source_type: derived-from-data
+      confidence: high
+      locator: '2020-21/_/data_info.yml sample.strata; hh_sec_a.dta strataid value labels (World Bank catalog 5639, strataid)'
+      note: |-
+        The labels describe region and urban/rural classes, not the
+        separately served `y5_cluster`, despite the variable title.
+        The 545 households without a panel weight have no stratum label.
     panel:
       household_continuity: refresh
       cluster_id_continuity: unobservable
