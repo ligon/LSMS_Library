@@ -50,3 +50,34 @@ panel_ids:
         i: y5_hhid
     myvars:
         previous_i: y4_hhid
+
+
+housing:
+    # The cover defines which Panel rows are copies of the IHS6 interviews.
+    # Declare it here so a cover change invalidates the housing parquet.
+    dfs: [module_f, panel_cover]
+    merge_on: [i]
+    merge_how: outer
+    final_index: [t, i]
+    module_f:
+        file:
+            - Cross_Sectional/hh_mod_f.dta
+            - Panel/hh_mod_f_24.dta:
+                i: y5_hhid
+                _housing_module_key: y5_hhid
+        idxvars:
+            i:
+                - case_id
+                - mapping: cs_i
+        myvars:
+            Roof: hh_f08
+            Floor: hh_f09
+            _housing_module_key: case_id
+    panel_cover:
+        file: Panel/hh_mod_a_filt_24.dta
+        idxvars:
+            i: y5_hhid
+        myvars:
+            _housing_cover_key: y5_hhid
+            _housing_previous_key: y4_hhid
+            _housing_ihs6_key: case_id
