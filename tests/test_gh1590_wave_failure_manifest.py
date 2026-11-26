@@ -365,6 +365,111 @@ def test_noop_make_cannot_claim_a_missing_wave_from_country_cache(survey,monkeyp
     assert BAD not in L.read_parquet_cache_waves(survey.cache)
 
 
+@pytest.mark.parametrize('write_site', ['no_stage', 'dvc_fallback'])
+@pytest.mark.parametrize('producer', ['make', 'script'])
+@pytest.mark.parametrize('prior', ['stale', 'fresh_short', 'bypass_present', 'bypass_absent'])
+def test_country_fallback_can_serve_but_not_publish_an_unchanged_target(
+        survey, monkeypatch, write_site, producer, prior):
+    if write_site == 'dvc_fallback':
+        survey.no_repo()
+    for w in WAVES:
+        (survey.country_path / w / '_/data_info.yml').write_text('{}\n')
+    country_dir = survey.country_path / '_'
+    script = country_dir / 'facts.py'
+    if producer == 'make':
+        (country_dir / 'Makefile').write_text('# Make behavior supplied by test IO leaf\n')
+        monkeypatch.setattr(C.shutil, 'which', lambda *args, **kwargs: 'make')
+    else:
+        script.write_text('# Script behavior supplied by test IO leaf\n')
+
+    c = survey.country()
+    expected_hash = c._table_cache_hash('facts', WAVES)
+    old_hash = 'previous-orchestrator' if prior == 'stale' else expected_hash
+    old_waves = WAVES if prior.startswith('bypass') else [GOOD]
+    request = GOOD if prior == 'bypass_present' else BAD
+    if prior.startswith('bypass'):
+        monkeypatch.setenv('LSMS_NO_CACHE', '1')
+    old = pd.DataFrame({'t': [GOOD], 'i': ['old'], 'x': [7.0]}).set_index(['t', 'i'])
+    survey.cache.parent.mkdir(parents=True)
+    L.to_parquet(old, survey.cache, absolute_path=True,
+                 cache_hash=old_hash, cache_waves=old_waves)
+
+    def receipt():
+        stat = survey.cache.stat()
+        return (stat.st_ino, stat.st_mtime_ns, survey.cache.read_bytes(),
+                L.read_parquet_cache_hash(survey.cache),
+                L.read_parquet_cache_waves(survey.cache))
+
+    calls = []
+    produce = False
+
+    def run(argv, *args, **kwargs):
+        if producer == 'make':
+            assert argv[0] == 'make'
+            if '-n' in argv:
+                return subprocess.CompletedProcess(argv, 0, stdout='', stderr='')
+        else:
+            assert Path(argv[1]) == script
+        calls.append(produce)
+        if produce:
+            frame = pd.DataFrame({'t': [GOOD, BAD], 'i': ['rebuilt', 'rebuilt'],
+                                  'x': [51.0, 52.0]}).set_index(['t', 'i'])
+            L.to_parquet(frame, survey.cache, absolute_path=True)
+        return subprocess.CompletedProcess(argv, 0, stderr='')
+
+    monkeypatch.setattr(C.subprocess, 'run', run)
+    before = receipt()
+    first = survey.load([request], country=c)
+    assert list(first.index.names) == ['i', 't']
+    assert first['x'].tolist() == ([7.0] if request == GOOD else [])
+    assert receipt() == before
+    pd.testing.assert_frame_equal(survey.load([request]), first)
+    assert calls == [False, False]  # no fake warm hit for the second request
+    assert receipt() == before
+
+    if not prior.startswith('bypass'):
+        produce = True
+        repaired = survey.load([BAD])
+        assert repaired['x'].tolist() == [52.0]
+        assert L.read_parquet_cache_hash(survey.cache) == expected_hash
+        assert L.read_parquet_cache_waves(survey.cache) == [GOOD, BAD]
+        assert calls == [False, False, True]
+        after = receipt()
+        assert after != before
+        pd.testing.assert_frame_equal(survey.load([BAD]), repaired)
+        assert calls == [False, False, True]
+        assert receipt() == after
+
+
+def test_country_fallback_full_union_evicts_and_publishes(survey, monkeypatch):
+    for w in WAVES:
+        (survey.country_path / w / '_/data_info.yml').write_text('{}\n')
+    script = survey.country_path / '_/facts.py'
+    script.write_text('# Script behavior supplied by test IO leaf\n')
+    old = pd.DataFrame({'t': [GOOD], 'i': ['old'], 'x': [7.0]}).set_index(['t', 'i'])
+    survey.cache.parent.mkdir(parents=True)
+    L.to_parquet(old, survey.cache, absolute_path=True,
+                 cache_hash='previous-orchestrator', cache_waves=[GOOD, EMPTY, ABSENT])
+    writes = []
+
+    def run(argv, *args, **kwargs):
+        assert Path(argv[1]) == script
+        assert not survey.cache.exists()  # full-union #866 eviction is unchanged
+        new = pd.DataFrame({'t': [BAD], 'i': ['new'], 'x': [9.0]}).set_index(['t', 'i'])
+        L.to_parquet(new, survey.cache, absolute_path=True)
+        writes.append(True)
+        return subprocess.CompletedProcess(argv, 0)
+
+    monkeypatch.setattr(C.subprocess, 'run', run)
+    c = survey.country()
+    got = survey.load([BAD], country=c)
+    assert got['x'].tolist() == [9.0]
+    assert L.read_parquet_cache_hash(survey.cache) == c._table_cache_hash('facts', WAVES)
+    assert L.read_parquet_cache_waves(survey.cache) == WAVES
+    pd.testing.assert_frame_equal(survey.load([BAD]), got)
+    assert writes == [True]
+
+
 @pytest.mark.parametrize('route',['hook','script'])
 def test_terminal_failure_retains_original_exception_object(survey,monkeypatch,route):
     import subprocess
