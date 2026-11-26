@@ -6934,6 +6934,23 @@ class Country:
             # gate (GH #908): the union's order is the build's cross-wave concat
             # order, so it is content, not mechanism.
             build_waves = list(waves) if covered is None else self._union_waves(waves, covered)
+
+            # A declared sibling can change after the producer consumed it
+            # but before the parent stamps its output. Never stamp the new
+            # hash on values built against the old declared inputs.
+            started_hash = (self._table_cache_hash(method_name, build_waves)
+                            if method_name in self._country_cache_dependencies else None)
+
+            def publication_hash():
+                current = self._table_cache_hash(method_name, build_waves)
+                if started_hash is None:
+                    return current
+                if current != started_hash:
+                    raise RuntimeError(
+                        f"{self.name}/{method_name}: declared inputs changed "
+                        "during the default build; refusing to publish its cache"
+                    )
+                return started_hash
             self._report_rebuild(method_name, miss_reason, build_waves, cache_path)
 
             # GH #866: everything below is the rebuild descent, so we have
@@ -6982,7 +6999,7 @@ class Country:
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
                             build_drops = _stampable_build_drops(self.name, method_name)
                             to_parquet(df, cache_path,
-                                       cache_hash=self._table_cache_hash(method_name, build_waves),
+                                       cache_hash=publication_hash(),
                                        grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                        cache_waves=completed_waves,
                                        datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
@@ -7192,7 +7209,7 @@ class Country:
                         cache_path.parent.mkdir(parents=True, exist_ok=True)
                         build_drops = _stampable_build_drops(self.name, method_name)
                         to_parquet(combined_df, cache_path,
-                                   cache_hash=self._table_cache_hash(method_name, build_waves),
+                                   cache_hash=publication_hash(),
                                    grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                    cache_waves=completed_waves,
                                    datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
@@ -7348,7 +7365,7 @@ class Country:
                     cache_path.parent.mkdir(parents=True, exist_ok=True)
                     build_drops = _stampable_build_drops(self.name, method_name)
                     to_parquet(df, cache_path,
-                               cache_hash=self._table_cache_hash(method_name, build_waves),
+                               cache_hash=publication_hash(),
                                grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
                                cache_waves=completed_waves,
                                datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
