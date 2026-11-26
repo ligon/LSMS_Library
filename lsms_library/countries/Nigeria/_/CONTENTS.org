@@ -3616,6 +3616,11 @@ interviews whose DATE is one day early.  *The time of day is KEPT* (no
 =.dt.normalize()=) pending @ligon's time-of-day decision under GH #1045; do
 not normalise it here.
 
+GH #1045 audits the decoded Stata =%tc= series separately for the two logical rounds, preserving the naive clock and millisecond storage.
+The [[https://microdata.nigerianstat.gov.ng/index.php/metadata/export/81/ddi][NBS v03 dictionary]] names the household-cover fields (F98/V3073 and F99/V3097) and distinguishes 39 blank planting dates from 13 blank harvest dates.
+The [[https://microdata.nigerianstat.gov.ng/index.php/catalog/81/download/1026][NBS Basic Information Document]], section 7.1.1, documents Survey Solutions for both visits but does not establish the released clock's time zone or export version.
+The parser therefore audits blanks before the existing date filter and does not set a time zone, apply an offset, or floor to midnight.
+
 ** Households that were NOT interviewed still carry a date
 
 Every wave's cover page records the visit, interviewed or not.  Rows SERVED
