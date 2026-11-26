@@ -6,6 +6,53 @@ Wave: 2024-25
 # that ruling covers this wave's content only and does NOT settle decision 48's
 # joint-inclusion question.  No other wave's weights change.
 
+
+shocks:
+    # Use the cover to distinguish retained IHPS from copies of IHS6.
+    # Declare it so the choice follows the cover's source fingerprint.
+    dfs: [module_u, shocks_panel_cover]
+    merge_on: [i]
+    merge_how: outer
+    final_index: [t, i, Shock]
+    module_u:
+        file:
+            - Cross_Sectional/hh_mod_u.dta
+            - Panel/hh_mod_u_24.dta:
+                i: y5_hhid
+        idxvars:
+            i:
+                - case_id
+                - mapping: cs_i
+            Shock: hh_u0a
+        myvars:
+            AffectedIncome:
+                - hh_u03a
+                - mapping: &malawi_2024_shock_effect
+                    Increase: True
+                    INCREASE: True
+                    Decrease: True
+                    DECREASE: True
+                    Did not change: False
+                    Did Not Change: False
+                    DID NOT CHANGE: False
+            AffectedAssets: [hh_u03b, {mapping: *malawi_2024_shock_effect}]
+            AffectedProduction: [hh_u03c, {mapping: *malawi_2024_shock_effect}]
+            # Purchases (e) and stocks (d) are independent answers (GH #1556).
+            AffectedConsumption: [hh_u03e, {mapping: *malawi_2024_shock_effect}]
+            AffectedFoodStock: [hh_u03d, {mapping: *malawi_2024_shock_effect}]
+            HowCoped0: hh_u04a
+            HowCoped1: hh_u04b
+            HowCoped2: hh_u04c
+    shocks_panel_cover:
+        file: Panel/hh_mod_a_filt_24.dta
+        idxvars:
+            i: y5_hhid
+        myvars:
+            _shocks_cover_key: y5_hhid
+            _shocks_previous_key: y4_hhid
+            _shocks_ihs6_key: case_id
+
+
 sample:
     # weight: IHS6 households carry hh_wgt (its label is 'wt_ihs6'); retained
     # IHPS households carry wt_cross ('Cross-sectional weight').  panel_weight
