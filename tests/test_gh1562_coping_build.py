@@ -160,7 +160,7 @@ def test_option_25_takes_the_least_rank_no_other_holds(held, rank):
     assert derive_coping_autre_rank(held) == rank
 
 
-FIRST, SECOND = 'Première stratégie', 'Deuxième strategie'
+FIRST, SECOND, THIRD = 'Première stratégie', 'Deuxième strategie', 'Troisième stratégie'
 
 
 @pytest.mark.parametrize('country', ['Benin', 'Niger', 'Guinea-Bissau'])
@@ -178,7 +178,7 @@ def test_option_25_beside_a_ranked_strategy_carries_the_key(country):
     assert out['HowCoped0'].tolist() == [lab[1], lab[25], lab[25], lab[1]]
 
 
-@pytest.mark.parametrize('country', ['Benin', 'Niger', 'Guinea-Bissau'])
+@pytest.mark.parametrize('country', ['Benin', 'Niger', 'Guinea-Bissau', 'Mali'])
 def test_option_25_is_registered(country):
     from lsms_library.derivations import records_for, resolve_callable
     recs = records_for(country, 'shocks')
@@ -188,6 +188,71 @@ def test_option_25_is_registered(country):
     assert rec.function == 'lsms_library.ehcvm:derive_coping_autre_rank'
     assert callable(resolve_callable(rec.inputs))
     assert [str(w) for w in rec.waves] == ['2021-22']
+
+
+def test_mali_option_25_keeps_physical_slots_and_traces_only_served_inferences(monkeypatch):
+    from lsms_library import Country, local_tools
+
+    # Exercise every occupied subset of the three physical ranks, and also
+    # unchosen, missing and unasked code 25 alongside real reported ranks.
+    rows = [
+        ({}, 'Oui', [25, None, None], False),
+        ({1: FIRST}, 'Oui', [1, 25, None], True),
+        ({2: SECOND}, 'Oui', [25, 2, None], True),
+        ({3: THIRD}, 'Oui', [25, None, 3], True),
+        ({1: FIRST, 2: SECOND}, 'Oui', [1, 2, 25], True),
+        ({1: FIRST, 3: THIRD}, 'Oui', [1, 25, 3], True),
+        ({2: SECOND, 3: THIRD}, 'Oui', [25, 2, 3], True),
+        ({1: FIRST, 2: SECOND, 3: THIRD}, 'Oui', [1, 2, 3], False),
+        ({3: THIRD}, 'Non', [None, None, 3], False),
+        ({2: SECOND}, pd.NA, [None, 2, None], False),
+        ({}, 'Non', [None, None, None], False),
+    ]
+    names = [f's14bq05__{n}' for n in range(1, 27)]
+    raw = pd.DataFrame('Non', index=range(len(rows)), columns=names)
+    for i, (ranked, answer, _, _) in enumerate(rows):
+        for code, rank in ranked.items():
+            raw.at[i, f's14bq05__{code}'] = rank
+        raw.at[i, 's14bq05__25'] = answer
+    module = _module('Mali', '2021-22')
+    mapped = raw.set_axis([f'Cope{n}' for n in range(1, 27)], axis='columns')
+    served = module.shocks(mapped.copy())
+    key = coping_autre_rank_key('Mali')
+    assert served['Derivation'].tolist() == [
+        key if stamped else pd.NA for _, _, _, stamped in rows
+    ]
+    actual = served[[f'HowCoped{k}' for k in range(3)]].astype(object)
+    assert actual.where(actual.notna(), None).values.tolist() == [
+        [module.COPING_LABELS[code] if code is not None else None for code in slots]
+        for _, _, slots, _ in rows
+    ]
+    assert 'Derivation' not in module.shocks(mapped.iloc[[0, 7, 8, 9, 10]].copy())
+    assert 'Derivation' not in module.shocks(mapped.drop(columns='Cope25'))
+    assert 'Derivation' not in module.shocks(mapped.iloc[:0].copy())
+
+    native = raw.assign(grappe=99999, menage=range(1, len(rows) + 1), s14bq01='Test shock')
+    accesses = []
+
+    def source(fn, **kwargs):
+        assert str(fn).endswith('/Mali/2021-22/Data/s14b_me_mli2021.dta')
+        accesses.append(fn)
+        return native.copy()
+
+    monkeypatch.setattr(local_tools, 'get_dataframe', source)
+    country = Country('Mali')
+    country._panel_ids_attempted = True
+    country._updated_ids_cache = {'2021-22': {'EHCVM21_99999002': 'test-canonical'}}
+    trace = country.derivation_inputs(key)
+    expected = raw.iloc[1:7].copy()
+    expected.index = pd.MultiIndex.from_tuples(
+        [('2021-22', 'test-canonical' if j == 2 else f'EHCVM21_999990{j:02d}', 'Test shock')
+         for j in range(2, 8)],
+        names=['t', 'i', 'Shock'],
+    )
+    pd.testing.assert_frame_equal(trace, expected)
+    with pytest.raises(ValueError, match='scoped to 2021-22'):
+        country.derivation_inputs(key, wave='2018-19')
+    assert len(accesses) == 1
 
 
 def test_derivation_is_declared_under_shocks():

@@ -713,3 +713,43 @@ Mali::food_acquired::rice-ration-block-withheld:
     (Mali/_/CONTENTS.org).
   contents: 'Mali/_/CONTENTS.org, "2018-19 rice-ration block withheld (GH #1707)"'
   since: '2026-11-12'
+
+Mali::shocks::code25-rank-inferred:
+  waves: ['2021-22']
+  columns: [HowCoped0, HowCoped1, HowCoped2]
+  rule: >-
+    s14bq05__25 (Autre strategie) is recorded as Oui/Non, not ranked.
+    When selected beside another strategy, it fills the least unoccupied
+    rank, without moving a reported rank. Stamp the row only if that
+    inferred position is within the three served slots. A fourth choice
+    has no served position and is not stamped. A lone option 25 is the
+    household's only answer and is first without this key.
+  function: lsms_library.ehcvm:derive_coping_autre_rank
+  inputs: lsms_library.countries.Mali.2021-22._.mapping:inputs_shocks_code25_rank
+  raw_variables: [s14bq05__1, s14bq05__2, s14bq05__3, s14bq05__4, s14bq05__5,
+                  s14bq05__6, s14bq05__7, s14bq05__8, s14bq05__9, s14bq05__10,
+                  s14bq05__11, s14bq05__12, s14bq05__13, s14bq05__14, s14bq05__15,
+                  s14bq05__16, s14bq05__17, s14bq05__18, s14bq05__19, s14bq05__20,
+                  s14bq05__21, s14bq05__22, s14bq05__23, s14bq05__24, s14bq05__25,
+                  s14bq05__26]
+  assumptions:
+    - text: >-
+        Only option 25 is recorded yes/no; the other options carry rank
+        labels or Non.
+      basis: variable-label
+      evidence: >-
+        s14b_me_mli2021.dta (GH #1556), Mali/_/CONTENTS.org, and
+        tests/test_gh1556_ehcvm_shocks_2021.py.
+    - text: >-
+        Keep the first free place in the three reported ranks, rather
+        than inventing an extra slot or removing a served choice.
+      basis: modelling-choice
+      evidence: >-
+        Ruling 2026-11-13, "Keep slot, registered" (GH #1562); Burkina Faso
+        records the actual rank and supports the first-free rule.
+  validated_against: >-
+    The 72 choices in the released Mali wave are lone and remain first,
+    without a stamp. Source-free tests exercise mixed ranks, retained gaps,
+    and a fourth choice that cannot enter the three served slots.
+  contents: 'Mali/_/CONTENTS.org, "shocks: coping strategies, the set and the positions"'
+  since: '2026-11-25'
