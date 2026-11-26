@@ -49,7 +49,7 @@ before=None if not path.exists() else (hashlib.sha256(path.read_bytes()).hexdige
 calls=[]
 def forbidden(*a,**k):raise AssertionError('unexpected build/hash/probe/write')
 def expected(*a,**k):calls.append('expected-hash');return 'expected'
-c=SimpleNamespace(name=name,waves=['w1','w2'],wave_folder_map={'w1':'folder1','w2':'folder2'},assume_cache_fresh=True)
+c=SimpleNamespace(name=name,waves=['w1','w2'],wave_folder_map={'w1':'folder1','w2':'folder2'},assume_cache_fresh=True,_country_cache_dependencies={})
 for method in ['_restrict_to_waves','_grain_reports_for_waves','_cache_covers_waves']:setattr(c,method,MethodType(getattr(C.Country,method),c))
 c._table_cache_hash=expected if route=='normal' else forbidden
 C._probe_source=forbidden;C._probe_source_fast=forbidden;C.Wave.grab_data=forbidden

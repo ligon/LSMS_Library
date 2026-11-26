@@ -124,6 +124,7 @@ _EXCLUDED_CALLABLES = frozenset({
     "lsms_library.local_tools.cached_file_hash",
     "lsms_library.country.Wave._input_hash",          # the hash mechanism itself
     "lsms_library.country.Country._table_cache_hash",  # (would self-reference)
+    "lsms_library.country.Country._own_table_cache_hash",  # (same own-input hash)
     # The L2-country READ GATE (GH #908): grades the stored hash, checks the
     # #891 coverage manifest and, on a hit, reads + row-selects the parquet an
     # EARLIER build wrote.  It decides whether to serve; it writes nothing and

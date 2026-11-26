@@ -1,5 +1,9 @@
 Country: Uganda
 
+# The country income compiler uses these complete raw country tables.
+Cache Dependencies:
+  income: [earnings, enterprise_income]
+
 Data Scheme:
   people_last7days:
     index: (i, t)
