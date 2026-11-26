@@ -5127,3 +5127,20 @@ coverage verdict"): =empty-pending-machinery=.  2011Q1 and 2013Q1 now carry that
 =dropped=, open as future work; 2016Q1 and 2019Q1 stay =correctly-empty=.]  Measured at the integrated tree (job 41283638):
 =shocks= rows by quarter 2011Q1 2,202, 2013Q1 2,882, 2016Q1 2,323, 2019Q1 3,870 (none at post-planting);
 =assets= 2010Q3 38,947, 2012Q3 161,125, 2015Q3 188,229, 2018Q3 44,358 (none at post-harvest).
+
+* 2026-11-26 -- W1/W2 crop sales to the main buyer and other buyers (GH #824)
+
+The two A3 releases give a plot-crop line, not a transaction.
+=sa3q11a/b= and =sa3q12= are the main buyer's quantity, own unit and Naira value.
+=sa3q16a/b= and =sa3q17= are one combined response for the other buyers, not one response per network code in Q15.
+=sa3q18= is hypothetical whole-harvest value, not a check total for either set of sales.
+The production fields =Quantity_sold=, =Unit_sold= and =Value_sold= still carry only the main buyer.
+
+The [[https://microdata.worldbank.org/catalog/1002/download/48231][W1 printed form]], PDF p. 13, routes Q9 No to Q18.
+The [[https://microdata.worldbank.org/catalog/1002/download/48235][W1 interviewer manual]], PDF p. 118, instead sends it to Q14.
+On the exact held sources, both default public crop reads preserve the recorded main-buyer fields on all 12,985 W1 and 12,948 W2 served lines.
+Other-buyer quantity or value is positive on 145 W1 and 142 W2 lines, all already served for the corresponding crop.
+Among those W1 lines, seven answer No and two are blank at Q14.
+In both rounds together, 11 lines with positive main and other pairs and both units use different original unit codes.
+One of those pairs has the same harmonized label despite different native units.
+Neither the form nor matching payloads justify folding buyers, filling blanks, or deduplicating across plots (GH #1552).
