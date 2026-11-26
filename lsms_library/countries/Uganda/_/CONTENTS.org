@@ -6260,3 +6260,9 @@ Nothing changes at build time.  At READ time (=lsms_library/coping.py=, labels i
 - *Not fixed:* 2005-06's relabel map folds formal and informal borrowing into "Obtained credit" and crop
   choice and technology into "Changed cropping practices" (14 rows repeat a label the source does not;
   audit F6).  The set de-duplicates them, which hides the fold rather than repairing it.
+
+- GH #1811 restores both recorded GSEC16 answers that the 2005-06 relabel map omitted.
+  Code 4 (withdrawing children for wage employment) appears in 20 retained ranks and
+  code 15 (self-employment) in 545.  Both remain distinct and in their native ranks.
+  The existing read-time set changes on 564 records, of which 207 had no served
+  strategy before.  Row eligibility and the separately tracked #1734 folds do not change.
