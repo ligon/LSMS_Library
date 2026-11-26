@@ -171,8 +171,22 @@ def _actual_sample_waves(sample_df):
     return set(sample_df.index.get_level_values("t").unique())
 
 
-@pytest.mark.parametrize("country_name", SAMPLE_COUNTRIES)
+_NAMED_COVERAGE_COUNTRIES: set[str] = set()
+
+
+def _coverage_country(country_name):
+    """Bind a checked-in coverage test to one public country name."""
+    _NAMED_COVERAGE_COUNTRIES.add(country_name)
+    return pytest.mark.parametrize(
+        "country_name", [country_name] if country_name in SAMPLE_COUNTRIES else []
+    )
+
+
 class TestSample:
+
+    @pytest.fixture(params=SAMPLE_COUNTRIES)
+    def country_name(self, request):
+        return request.param
 
     @pytest.fixture()
     def sample_df(self, country_name):
@@ -229,6 +243,161 @@ class TestSample:
             f"{country_name} sample missing 'weight' column; has {list(sample_df.columns)}"
         )
 
+    # GH #1748: the original comparison must fail under a checked-in name.
+    # private_ci_check.py does not publish parameter values. Keep these in
+    # discovery order and use the same fixture and assertion for every case.
+
+    @_coverage_country("Albania")
+    def test_covers_all_waves_Albania(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Azerbaijan")
+    def test_covers_all_waves_Azerbaijan(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Benin")
+    def test_covers_all_waves_Benin(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Burkina_Faso")
+    def test_covers_all_waves_Burkina_Faso(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Cambodia")
+    def test_covers_all_waves_Cambodia(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("China")
+    def test_covers_all_waves_China(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("CotedIvoire")
+    def test_covers_all_waves_CotedIvoire(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Ethiopia")
+    def test_covers_all_waves_Ethiopia(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("EthiopiaRHS")
+    def test_covers_all_waves_EthiopiaRHS(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("GhanaAHIES")
+    def test_covers_all_waves_GhanaAHIES(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("GhanaLSS")
+    def test_covers_all_waves_GhanaLSS(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("GhanaSPS")
+    def test_covers_all_waves_GhanaSPS(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Guatemala")
+    def test_covers_all_waves_Guatemala(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Guinea-Bissau")
+    def test_covers_all_waves_Guinea_Bissau(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Guyana")
+    def test_covers_all_waves_Guyana(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("India")
+    def test_covers_all_waves_India(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Iraq")
+    def test_covers_all_waves_Iraq(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Kazakhstan")
+    def test_covers_all_waves_Kazakhstan(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Kosovo")
+    def test_covers_all_waves_Kosovo(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Liberia")
+    def test_covers_all_waves_Liberia(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Malawi")
+    def test_covers_all_waves_Malawi(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Mali")
+    def test_covers_all_waves_Mali(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Nepal")
+    def test_covers_all_waves_Nepal(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Niger")
+    def test_covers_all_waves_Niger(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Nigeria")
+    def test_covers_all_waves_Nigeria(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Pakistan")
+    def test_covers_all_waves_Pakistan(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Panama")
+    def test_covers_all_waves_Panama(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Peru")
+    def test_covers_all_waves_Peru(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Senegal")
+    def test_covers_all_waves_Senegal(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Serbia")
+    def test_covers_all_waves_Serbia(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Serbia and Montenegro")
+    def test_covers_all_waves_Serbia_and_Montenegro(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("South Africa")
+    def test_covers_all_waves_South_Africa(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Tajikistan")
+    def test_covers_all_waves_Tajikistan(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Tanzania")
+    def test_covers_all_waves_Tanzania(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Timor-Leste")
+    def test_covers_all_waves_Timor_Leste(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Togo")
+    def test_covers_all_waves_Togo(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @_coverage_country("Uganda")
+    def test_covers_all_waves_Uganda(self, country_name, sample_df):
+        self.test_covers_all_waves(country_name, sample_df)
+
+    @pytest.mark.parametrize(
+        "country_name", [name for name in SAMPLE_COUNTRIES if name not in _NAMED_COVERAGE_COUNTRIES]
+    )
     def test_covers_all_waves(self, country_name, sample_df):
         """sample() should cover all waves the country declares."""
         expected_waves = _expected_sample_waves(country_name)
@@ -477,8 +646,7 @@ class TestSample:
 # These supplemental checks give private CI a static, source-verified
 # locator for each known ISA country/wave. Do not parametrize or generate
 # the functions at import time: private_ci_check.py publishes only declared
-# test names, never parameters or assertion messages. Keep the dynamic
-# TestSample.test_covers_all_waves assertion for every country/new wave.
+# test names, never parameters or assertion messages. Keep the original full-coverage checks for every country and new wave.
 
 
 def _require_named_sample_wave(country_name, wave):
