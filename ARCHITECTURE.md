@@ -172,7 +172,15 @@ flowchart TD
 
 ## 5. Cross-Cutting Concerns
 
-- **Caching.** Three tiers: L1 (DVC blob cache for raw `.dta`), L2-wave (per-wave harmonized parquet), L2-country (per-country aggregated parquet). The two L2 tiers honor `LSMS_NO_CACHE=1`; none of the three does staleness checks. `LSMS_BUILD_BACKEND=make` bypasses both L2 tiers (L1 still serves blobs). `assume_cache_fresh=True` is an in-process short-circuit that still runs `_finalize_result`. See `docs/guide/caching.md`.
+- **Caching.** L1 selects raw DVC blobs by the digest in the source sidecar.
+  L2-wave stores per-wave harmonized parquets and L2-country stores aggregated
+  country parquets. Both L2 tiers check recorded build-input hashes when
+  verifiable. Their missing-hash rules differ by tier and producer.
+  `LSMS_NO_CACHE=1` bypasses the ordinary country and YAML-wave read gates,
+  not L1 or the script-wave read gate. `LSMS_BUILD_BACKEND=make` changes the
+  build route and can still use parquets. An eligible `assume_cache_fresh=True`
+  read skips the country hash check but still runs `_finalize_result`.
+  See [Caching and Performance](docs/guide/caching.md).
 - **DVC.** Rooted at `lsms_library/countries/`, *not* the top of the repo. The stage layer was retired in v0.7.0; all reads go through cache + `load_from_waves`.
 - **Credentials.** Three-tier model: nothing → import warns; WB API key → S3 read cache auto-unlocks via cosmetic obfuscation; WB key + S3 write creds → push access. The WB key is the authoritative gate.
 - **Schema source of truth.** `lsms_library/data_info.yml` defines required columns, accepted values, and rejected spellings; `tests/test_schema_consistency.py` reads from it (never hardcoded).
