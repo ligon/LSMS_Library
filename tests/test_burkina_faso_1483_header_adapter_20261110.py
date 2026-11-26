@@ -377,6 +377,11 @@ def test_driver_reads_only_own_numeric_source_and_writes_after_validation(adapte
         calls.append(('write', path))
         writes.append(frame.copy())
 
+    def served_labels(country, units):
+        assert country == 'Burkina_Faso'
+        calls.append(('serve_labels',))
+        return list(units)
+
     # Execute the actual serving wrapper's final call with only injected leaves.
     # No package imports, sys.path changes or source-provider code executes.
     wrapper = COUNTRY / '2021-22' / '_' / 'plot_inputs.py'
@@ -393,7 +398,8 @@ def test_driver_reads_only_own_numeric_source_and_writes_after_validation(adapte
     assert source_arg.value == '../Data/s16b_me_bfa2021.dta'
     namespace = dict(build_s16b_candidate=adapter.build_s16b_candidate,
                      get_dataframe=read, to_parquet=write, get_categorical_mapping=get_map,
-                     i=bindings[0]['id_fn'], format_id=bindings[1])
+                     i=bindings[0]['id_fn'], format_id=bindings[1],
+                     served_unit_labels=served_labels)
     exec(compile(ast.Module(body=[writer, call], type_ignores=[]), str(wrapper), 'exec'), namespace)
     got = writes[0]
     assert len(writes) == 1
@@ -402,7 +408,7 @@ def test_driver_reads_only_own_numeric_source_and_writes_after_validation(adapte
     assert got['Quantity_purchased'].isna().tolist() == [False, False, True, False]
     assert got['Quantity_purchased'].iloc[0] == 111.
     assert got['s16bq09c'].iloc[0] == 11100
-    assert [x[0] for x in calls] == ['map'] * 10 + ['read', 'write']
+    assert [x[0] for x in calls] == ['map'] * 10 + ['read', 'serve_labels', 'serve_labels', 'write']
     writes.clear()
     with pytest.raises(adapter.S16b2021Error, match='duplicate native'):
         adapter.build_s16b_candidate(
