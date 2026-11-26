@@ -80,3 +80,11 @@ is separately gated and not represented as complete here.
   and 22 of 22 modern wave fingerprints, and none of 110 older wave
   fingerprints. Only 2024-25 housing became newly declared.
 - Phase B/C Country/Feature data parity remains pending separate execution.
+
+### Integration placement
+
+The housing YAML and hook are between unchanged sections, so the separately
+reviewed roster, sample-component and date work can compose without clashing
+at the end of the wave files. Code ASTs and parsed YAML were checked equal
+before and after the move. This is placement only, not a prerequisite merge
+or a change to another study module.
