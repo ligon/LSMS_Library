@@ -181,17 +181,23 @@ def test_every_real_native_line_and_full_payload_survives(actual_country):
         dtype=raw['s16bq01'].dtype)
     hh = (raw['grappe'].map(local_tools.format_id) + '0'
           + raw['menage'].map(lambda x: local_tools.format_id(x, zeropadding=2)))
+    # GH #1740: decode each role from its own card, then apply the one
+    # reviewed display alias. Do not import the production mapper into
+    # this raw-source oracle or fold the distinct cart labels.
+    def expected_units(source_column):
+        return pd.array(labelled[source_column].astype('string').replace(
+            {'Kilogramme': 'Kg'}), dtype='string')
+
     expected = pd.DataFrame({
         'i': hh.to_numpy(), '_native_code': raw['s16bq01'].to_numpy(),
-        'u': pd.array(labelled['s16bq03b'].astype('string').replace(
-            {'Kilogramme': 'Kg'}), dtype='string'),
+        'u': expected_units('s16bq03b'),
         'Quantity': pd.array(raw['s16bq03a'], dtype='Float64'),
         'Purchased': pd.array(raw['s16bq08'].map({1: True, 2: False}), dtype='boolean'),
         'Quantity_purchased': pd.array(raw['s16bq09a'], dtype='Float64'),
-        'Unit_purchased': pd.array(labelled['s16bq09b'].astype('string'), dtype='string'),
+        'Unit_purchased': expected_units('s16bq09b'),
         'Received_as_gift': pd.array(raw['s16bq05'].map({1: True, 2: False}), dtype='boolean'),
         'Quantity_received_as_gift': pd.array(raw['s16bq07a'], dtype='Float64'),
-        'Unit_received_as_gift': pd.array(labelled['s16bq07b'].astype('string'), dtype='string'),
+        'Unit_received_as_gift': expected_units('s16bq07b'),
     }).set_index(['i', '_native_code']).sort_index()
     got = actual.set_index(['i', '_native_code'])[expected.columns].sort_index()
     assert got.index.is_unique
