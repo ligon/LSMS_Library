@@ -6,7 +6,7 @@ Item-level harvest at (t, i, plot_id, j, u, production_obs) from §9
 qty/value from §11
 (sect11_ph_w5).
 
-W5 specifics: crop code in s9q00b (§9), s4q01b (§4), s11q01 (§11).
+W5 specifics: crop code in s9q00b (§9), s4q01b (§4), s11q01b (§11).
 Harvest qty s9q05a (native unit s9q05b).  intercropped from §9 s9q02.
 §11 sale qty s11q11a (native unit s11q11b), value s11q12, sold-flag
 s11q07.  i = household_id.

@@ -5077,3 +5077,23 @@ waves", above); the set does not harmonize it either.
 ='25.0'= and ='60.0'= (1 cell each), 13 cells in all; ='21.0'= occurs only in W2 (1 cell).  ='0.0'= x 10
 may be a "none" code; nothing documents it.  They stay as recorded, in the positions and the
 set: an undocumented code is not a documented missing code, and the ruling names only ='99.0'=.
+
+* 2026-11-26 -- Held W2-W5 sale export cards (GH #824)
+
+Six sidecar-verified Stata headers from W2-W5 were compared with the exact loaded driver literals and the corresponding current producer DDI cards.
+No observations were decoded.
+Dimensions, selected variable labels, and defined numeric code/label pairs for the recorded identity, sale flag and sale operands agree.
+The November 2026 online DDI revisions are not authenticated replacements for the older held file bytes.
+The [[https://microdata.worldbank.org/catalog/2247/data-dictionary/F104][W2 section 12 card]] explicitly labels =ph_s12q07= as kg sold and =ph_s12q08= as Birr received, with no separate sale-unit selector.
+In W2 section 11, =ph_s11q03_b= is a numeric GRAMS component without a value-label card.
+The same column name in [[https://microdata.worldbank.org/catalog/2783/data-dictionary/F54][W3 section 11]] is a coded UNIT selector with 62 defined labels.
+The [[https://microdata.worldbank.org/catalog/2783/data-dictionary/F53][W3 section 12 card]] puts its own corresponding unit selector in =ph_s12q0b=, beside =ph_s12q07= sold quantity and =ph_s12q08= Birr value.
+
+The [[https://microdata.worldbank.org/catalog/3823/data-dictionary/F43][W4]] and [[https://microdata.worldbank.org/catalog/6161/data-dictionary/F50][W5]] section 11 cards distinguish =s11q11a/b= sold quantity and unit from =s11q03a1/a2= total harvested quantity and unit.
+=s11q12= is total sales value.
+The own sold-unit cards have 45 and 62 defined labels, respectively.
+W5 exports =s11q01b= as the crop code and has no =s11q01= column, unlike W4.
+The production binding already uses =s11q01b=; this corrects only the driver's incompatible prose.
+
+This closes the listed held export-card field identities, not the earlier W1/W2 grams, blank components or W1 Birr Decimal questions (GH #1570).
+No factor direction, fielded routing, holder uniqueness, plot linkage, coverage, arithmetic, weights or production behavior follow from matching headers.
