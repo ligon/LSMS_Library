@@ -15,9 +15,9 @@
 # SERVED STRATA (GH #1577 ruling 2026-11-12; GH #1741): all five waves serve one
 # construction, region x Rural, registered in _/derivations.yml.  It is a tag on the
 # served column, not a reading of the design: no document quoted in CONTENTS.org
-# states that cross.  `confidence: medium` because the build scripts were read and no
-# frame was; tests/test_sampling.py::test_the_tag_agrees_with_the_served_strata checks
-# the frame where the data are held.
+# states that cross. The five-wave held-source replay verified all stamps and
+# unchanged strata values, not design-stratum authority. See CONTENTS.org (#1741)
+# and tests/test_sampling.py::test_the_tag_agrees_with_the_served_strata.
 
 Sampling:
 

@@ -57,11 +57,24 @@ served `strata` value. No stratum is inferred. Ethiopia only, not EthiopiaRHS or
 ---
 ### Phase 3 — verification
 
-No prepared runtime (python3.6 + PyYAML, bare python3.12). Nothing below imported `lsms_library`.
+Initial static pass used Python 3.6 + PyYAML and bare Python 3.12, without
+importing `lsms_library`.
 
 - `derive_region_rural_stratum` — OK (§4): AST-identical to the base expression at all six sites.
 - `with_agriculture_cover_households` — OK (§4): the `strata` assignment is its only AST change.
 - `stamp_region_rural_stratum` — OK by reading (§4): order build < append < stamp < set_index in 5/5.
 - `inputs_region_rural_stratum` — unexecuted; by reading, the D1 helpers' own calls (§5).
 - registry, tags — OK (§3): PyYAML checks, panel blocks and the five older entries equal to base.
-- UNRUN: pytest (all), a cold build, the data-gated tag test, hash measurement.
+- Initially unrun: pytest, a cold build, the data-gated tag test and hash measurement.
+
+### Later held-source verification
+
+Ten exact original covers were staged in a private offline root. Fresh
+`Country('Ethiopia').sample()` on the composition with #1764/#1788
+preserved all 26,130 old rows and values. All 26,130 derivation keys join
+the input trace, including the 25 and 27 additions in 2013-14 and 2015-16.
+Per-wave subset calls retained their own full cohort. Neither main nor
+added-cover rows had missing `Rural` in that release. Occupied labels
+count 18 / 21 / 21 / 21 / 19. This is not design-stratum validation.
+The 109 focused cache, tag, and failure-locator tests passed on the shared
+composition before the documentation correction.

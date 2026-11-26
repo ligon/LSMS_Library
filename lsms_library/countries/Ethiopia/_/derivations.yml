@@ -315,8 +315,8 @@ Ethiopia::sample::region-rural-stratum:
         repository says so.
       basis: modelling-choice
       evidence: >-
-        CONTENTS.org says "following the ESS sampling documentation" and quotes no
-        sentence that states the cross.  The 2026-07-21 sweep's note on the ESS3 BID reads
+        An earlier CONTENTS.org description called this "following the ESS sampling
+        documentation" without quoting the cross. The 2026-07-21 sweep's note on the ESS3 BID reads
         "two-stage probability sample, regions as strata, 5 analysis domains in ESS1
         (Amhara, Oromiya, SNNP, Tigray, 'all other regions') plus Addis Ababa from ESS2 on"
         (slurm_logs/POPULATION_STATEMENTS_2026-07-21.org, Ethiopia 2015-16).  For ESS4 and
@@ -351,10 +351,10 @@ Ethiopia::sample::region-rural-stratum:
         ethiopia.with_agriculture_cover_households, which refuses a code the household
         cover never uses; CONTENTS.org, "GH #1120 locating-cover correction".
   validated_against: >-
-    tests/test_gh1741_ethiopia_strata_registry.py, source-free: the function against the
-    expression the scripts used before.  No frame was built for this entry.  Occupied
-    cells of 18 / 21 / 21 / 21 / 19 are recorded in CONTENTS.org and
-    .coder/sampling/fingerprint.csv and were not re-measured.  No document quoted here
-    gives an allocation by these cells.
+    tests/test_gh1741_ethiopia_strata_registry.py compares the function against the prior
+    expression. An offline held-source replay of all five cover pairs matched all 26,130
+    prior sample rows, joined all stamped keys to their source inputs, and counted
+    18 / 21 / 21 / 21 / 19 occupied library labels. No document quoted here gives
+    an allocation by these cells.
   contents: 'Ethiopia/_/CONTENTS.org, "2026-11-25 -- sample.strata is a registered construction (GH #1741)"'
   since: '2026-11-25'

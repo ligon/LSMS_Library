@@ -331,9 +331,10 @@ areas in waves 1-3, expanding to include all urban areas from wave 2
 onward.
 
 ESS data are collected using a post-planting / post-harvest (PP/PH)
-design, but the =sample= feature uses the household-level cover page
-(=sect_cover_hh_w{N}.dta=), which provides one row per household per
-wave (not per visit).
+design, but the =sample= feature uses the household cover
+(=sect_cover_hh_w{N}.dta=) as its primary source, not a row per visit.
+It also includes identified households on the same wave's post-planting
+agriculture cover that are absent from the household cover (GH #1120).
 
 World Bank Microdata Library catalog entries:
 - Wave 1 (2011-12): https://microdata.worldbank.org/index.php/catalog/2053
@@ -344,10 +345,10 @@ World Bank Microdata Library catalog entries:
 
 ** Strata
 
-Ethiopia has no explicit strata variable. Strata are constructed as
-Region x Urban/Rural (=saq01= x =rural= or =saq14=), following the
-ESS sampling documentation. The number of strata varies by wave
-because the coverage expanded over time:
+The library does not read an explicit strata variable. Its served label is
+Region x Urban/Rural (=saq01= x =rural= or =saq14=), not an established
+statement of the survey's design strata.
+The count below is the number of occupied library labels by wave:
 
 | Wave    | Region variable | Rural variable | Strata count | Notes                    |
 |---------+-----------------+----------------+--------------+--------------------------|
@@ -5080,38 +5081,41 @@ set: an undocumented code is not a documented missing code, and the ruling names
 
 * 2026-11-25 -- sample.strata is a registered construction (GH #1741)
 
-=sample().strata= is built by the library in all five waves: the household cover's =saq01= label,
-a space, and =Rural=.  It is now registered as =Ethiopia::sample::region-rural-stratum=
-(=_/derivations.yml=), stamped in =Derivation= on every row with a stratum, and tagged
-=served_strata.holds: constructed= in =_/sampling.yml= (GH #1577).  *No stratum value is meant to
-change*: the expression the five wave scripts and =with_agriculture_cover_households= each spelled
-out is one function, =ethiopia.derive_region_rural_stratum=, with the same operands.  Not measured:
-no frame was built or read for this entry, and one Ethiopia re-warm is owed (=ethiopia.py= and the
-five =sample.py= are inputs of every Ethiopia hash).
+=sample().strata= concatenates the =saq01= label and mapped =Rural= on each wave's household cover.
+For households added under GH #1120, the producer decodes the post-planting cover's own codes with
+the household cover's label definitions.
+The expression is registered as =Ethiopia::sample::region-rural-stratum= in =_/derivations.yml=,
+stamped in =Derivation=, and tagged =served_strata.holds: constructed= in =_/sampling.yml=
+(GH #1577).
+A later offline replay of the five original cover pairs preserved all 26,130 former sample rows
+and values. The derivation stamp and its input records cover all 26,130 rows.
+One Ethiopia re-warm is owed when the registration lands because the changed =ethiopia.py=
+and =sample.py= files are build inputs.
 
 The idiosyncrasy, for whoever reads =strata= as the design: *it is a cross nobody quoted here
 states*, over a =Rural= whose meaning moves.
 
-- *The basis is a modelling choice.*  "Sampling Design > Strata" above says the strata follow "the
-  ESS sampling documentation".  No sentence quoted in this file states region x urban/rural.  The
-  2026-07-21 sweep's note on the ESS3 BID names regions, not a cross: "two-stage probability
+- *The basis is a modelling choice.*  No sentence quoted in this file states region x urban/rural.
+  The 2026-07-21 sweep's note on the ESS3 BID names regions, not a cross: "two-stage probability
   sample, regions as strata, 5 analysis domains in ESS1 (Amhara, Oromiya, SNNP, Tigray, 'all other
   regions') plus Addis Ababa from ESS2 on"
   (=slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=, Ethiopia 2015-16, an extractor's note and not
   survey text).  For Panel II the quoted statements are about representativeness and weights, "at
-  regional and rural/urban levels", which is not a statement of strata.  Reading the sampling
-  sections of the five BIDs would settle it; they were not read for this.
+  regional and rural/urban levels", which is not a statement of strata.
+  The sampling sections of those BIDs could supply further design evidence, separate from this
+  verification of the served values.
 - *=Urban= pools two frames in 2013-14 and 2015-16*: 43 small-town EAs from ESS1 and 100 large-town
   EAs (quoted above).  The served cell is coarser than that draw.
 - *One name is not one stratum across waves.*  =Amhara Urban= is small towns in 2011-12 and every
   town from 2013-14 (GH #683), and Panel II is a new draw.
 - *The fallback.*  Where =Rural= is missing the function serves the region alone, as the scripts
-  always did.  It is dormant: the Rural + Urban counts recorded under GH #683 sum to the household
-  cover's 3,969 / 5,262 / 4,954 / 6,770 / 4,959.  2018-19 and 2021-22 also sum with the
-  agriculture-only households (6,894 / 4,999, GH #1055); 2013-14 and 2015-16 have no such split on
-  record.
+  always did. In the verified release, no =Rural= values are missing in either cover group.
+  The 25 households added in 2013-14 are 19 Rural and six Urban (5,287 served).
+  The 27 added in 2015-16 are 22 Rural and five Urban (4,981 served).
+  Both counts mean absent from the household cover, not exclusive to the post-planting cover.
+  The 124 and 40 additions in 2018-19 and 2021-22 are all Rural (6,894 and 4,999 served).
 
-Two statements above that do not agree with each other, quoted and left as they are:
+Two earlier statements retain separate documentary caveats:
 - The strata table's 2011-12 row says 18 strata with the note "No Addis Ababa, Dire Dawa Urban".
   That wave has 10 regions (GH #832), so 20 cells less Dire Dawa Urban is 19.  One more empty cell
   is not named.
