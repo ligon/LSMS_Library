@@ -1,6 +1,38 @@
 Country: Malawi
 Wave: 2024-25
 
+individual_education:
+    # Keep the cover as a declared input to the refresh comparison and hash.
+    dfs: [module_c, education_panel_cover]
+    merge_on: [i]
+    merge_how: outer
+    final_index: [t, i, pid]
+    module_c:
+        file:
+            - Cross_Sectional/hh_mod_c.dta
+            - Panel/hh_mod_c_24.dta:
+                i: y5_hhid
+                pid: id_code
+        idxvars:
+            i:
+                - case_id
+                - mapping: cs_i
+            pid: PID
+        myvars:
+            Educational Attainment:
+                - hh_c09
+                - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
+            _education_native_c09: hh_c09
+    education_panel_cover:
+        file: Panel/hh_mod_a_filt_24.dta
+        idxvars:
+            i: y5_hhid
+        myvars:
+            _education_cover_key: y5_hhid
+            _education_previous_key: y4_hhid
+            _education_ihs6_key: case_id
+
+
 # 2024-25 food and its sample/identity dependencies (PR #1604).  The sample
 # weights below are served as wired (maintainer ruling 2026-11-12, "Lift hold, rebase, merge"):
 # that ruling covers this wave's content only and does NOT settle decision 48's
