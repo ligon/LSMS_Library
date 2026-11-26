@@ -54,14 +54,18 @@ for method in ['_restrict_to_waves','_grain_reports_for_waves','_cache_covers_wa
 c._table_cache_hash=expected if route=='normal' else forbidden
 C._probe_source=forbidden;C._probe_source_fast=forbidden;C.Wave.grab_data=forbidden
 L._ensure_dvc_pulled=forbidden;L.to_parquet=forbidden;C.to_parquet=forbidden;L.stamp_parquet_hash=forbidden;C.stamp_parquet_hash=forbidden
-if route=='assumed':C.cache_freshness=forbidden;C._degraded_cache_verdict=forbidden
+if route=='assumed':
+ C.cache_freshness=forbidden;C._CountryCacheFooter._country_hash_grade=forbidden
+ C._degraded_cache_verdict=forbidden
 # Like a previous call in the same process: the successful hit must describe
 # THIS read only and preserve another table's ledger. No stale evidence leak.
 C._GRAIN_LEDGER[key]=[{'stale':True}];C._DATETIME_LEDGER[key]=[{'stale':True}]
 C._GRAIN_LEDGER[(name,'unrelated')]=[{'unrelated':True}]
 if case=='race':
- def gone(*a,**k):raise FileNotFoundError('invented disappearance after footer')
- L.open=gone
+ def gone(candidate,*a,**k):
+  if candidate==path:raise FileNotFoundError('invented disappearance before snapshot open')
+  return open(candidate,*a,**k)
+ C.open=gone
 if case in ['strict_grain','unrelated_strict']:os.environ['LSMS_GRAIN_STRICT']='1'
 if case in ['strict_grain','strict_date']:os.environ['LSMS_DATE_STRICT']='1'
 error=None;out=None

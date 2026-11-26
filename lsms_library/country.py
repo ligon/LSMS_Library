@@ -5025,7 +5025,7 @@ class Country:
 
         if not (_recover_unreadable or _borrowed_input):
             # Explicit legacy mode keeps its strict get_dataframe contract.
-            return self._inspect_l2_country_cache(method_name, cache_path, waves)
+            return Country._inspect_l2_country_cache(self, method_name, cache_path, waves)
 
         # #1748: a replace can publish a different coverage manifest under
         # the SAME table hash. Admit, decode and replay one opened snapshot.
@@ -5043,8 +5043,8 @@ class Country:
                               UserWarning, stacklevel=3)
             return None, None, f"read-error: {error!r}"
         with stream:
-            return self._inspect_l2_country_cache(
-                method_name, cache_path, waves, stream=stream,
+            return Country._inspect_l2_country_cache(
+                self, method_name, cache_path, waves, stream=stream,
                 borrowed_input=_borrowed_input)
 
     def _inspect_l2_country_cache(self, method_name, cache_path, waves, *,
