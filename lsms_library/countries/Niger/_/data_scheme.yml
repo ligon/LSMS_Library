@@ -306,12 +306,11 @@ Data Scheme:
     # only: seed_kg / nitrogen_kg / inorganic_fertilizer any-use flags /
     # fertilizer totals are TRANSFORMATIONS over these rows, never columns.
     #
-    # GRAIN NOTE: Niger records inputs at the HOUSEHOLD x input grain
-    # (ECVMA additionally x crop), NOT plot x input — no wave reports
-    # inputs at the parcel level.  The WB .do code that emits plot-level
-    # seed_kg / nitrogen_kg fabricates a plot split (plot_area /
-    # total_land_area); the reported-only rule forbids that, so `plot_id` is
-    # NOT in the index.  The feature keeps the GAP-2 name `plot_inputs`.
+    # GRAIN NOTE: this table serves the HOUSEHOLD x input rosters
+    # (ECVMA additionally x crop), not a plot x input table. The separate
+    # EHCVM s16a parcel source has some fertilizer responses (GH #1696);
+    # they are not supplied by these rosters. Do not allocate s16b amounts
+    # to plots by area. There is no `plot_id` in the Country table index.
     #
     # All four waves have a household input roster (script-path):
     #   2011-12 ecvmaas2c_p1   (hid, crop, input)  qty/unit + purchased
