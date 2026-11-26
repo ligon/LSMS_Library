@@ -1,18 +1,6 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
-* 2026-11-26 -- Crop-text provenance stays distinct from the displayed crop (GH #1724)
-
-The #1228 key follows the existing text-match witness, not any crop that
-uses the same displayed label.
-A Farm-level sale may inherit the crop label as before.
-It inherits the text key only when all of its contributing harvest
-observations agree on the label and took it from the crop text.
-The private witness is removed before checking seed payload.
-The 2024-25 code 50, the 2019-20 code 49 and two-text plots remain outside
-the existing rule.
-This change does not wire their rows or change a crop code, label or weight.
-
 * 2026-11-13 -- GH #1228 later waves: the season, the Module D join, and the registered relabel
 
 Rulings @ligon 2026-11-12 ("Join D, single-text only") and 2026-11-13, after the red
@@ -173,6 +161,18 @@ lines carry it (the =_farm_level_sales= rule GH #1457 already applied for 2010-1
 - =plot_inputs.Derivation= is declared =optional: true= in =lsms_library/data_info.yml=.
 - =_assert_label_is_text_only= refuses to stamp if a =harmonize_crop= code ever maps to
   =Cowpea (Khobwe)=, because the stamp reads the label as "set from a text".
+
+*2026-11-26 update (GH #1724).* Crop-text provenance stays distinct from the displayed crop.
+
+The #1228 key follows the existing text-match witness, not any crop that
+uses the same displayed label.
+A Farm-level sale may inherit the crop label as before.
+It inherits the text key only when all of its contributing harvest
+observations agree on the label and took it from the crop text.
+The private witness is removed before checking seed payload.
+The 2024-25 code 50, the 2019-20 code 49 and two-text plots remain outside
+the existing rule.
+This change does not wire their rows or change a crop code, label or weight.
 
 Measured, cold builds in private roots, =51a918684= against =f138a3d61= (job 41275716).
 The first build of the relabel (=af8178463=, job 41272723) gave the same =crop= moves.
