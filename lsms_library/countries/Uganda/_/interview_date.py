@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from lsms_library import Country
-from lsms_library.local_tools import to_parquet, get_dataframe
+from lsms_library.local_tools import get_dataframe, read_parquet_datetime_audit, to_parquet
+from lsms_library.paths import data_root
 
 """
 Compile data on interview dates.
@@ -13,6 +14,7 @@ from uganda import id_walk
 import json
 
 x = {}
+reports = []
 country = Country('Uganda')
 for t in country.waves:
     wave = country[t]
@@ -20,14 +22,15 @@ for t in country.waves:
     if 'interview_date' not in wave.data_scheme:
         continue
     print(t, file=sys.stderr)
-    fn = f'../{wave.wave_folder}/_/interview_date.parquet'
-    try: 
+    fn = data_root(country.name) / wave.wave_folder / '_' / 'interview_date.parquet'
+    try:
         x[t] = get_dataframe(fn)
     except FileNotFoundError as error:
         raise RuntimeError(
             f'Uganda/{t}: declared interview_date failed to load '
             f'{fn}; refusing a partial country table.'
         ) from error
+    reports.extend(read_parquet_datetime_audit(fn) or [])
 
 x = pd.concat(x.values())
 
@@ -36,8 +39,10 @@ x = id_walk(x, updated_ids)
 
 x = x.reset_index().set_index(['i','t'])
 
-# Canonical column name is Int_t (datetime); wave scripts emit `date`.
+# Canonical column name is Int_t (datetime); legacy wave outputs may use date.
 # Rename so the cross-country Feature('interview_date') aligns (GH #325).
 x = x.rename(columns={'date': 'Int_t'})
 
-to_parquet(x.dropna(), '../var/interview_date.parquet')
+# Keep exact dates even if another wave has nullable Derivation (GH #1045).
+to_parquet(x.dropna(subset=['Int_t']), '../var/interview_date.parquet',
+           datetime_audit=reports or None)

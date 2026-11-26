@@ -120,6 +120,7 @@ def make_compiler(monkeypatch, tmp_path):
         map_file = general / 'updated_ids.json'
         map_file.write_text(json.dumps(updated))
         monkeypatch.setenv('LSMS_COUNTRIES_ROOT', str(root))
+        monkeypatch.setenv('LSMS_DATA_DIR', str(tmp_path / 'cache'))
         countries_root.cache_clear()
         monkeypatch.chdir(general)
         state = {'reads': [], 'walks': [], 'writes': []}
@@ -131,7 +132,7 @@ def make_compiler(monkeypatch, tmp_path):
 
         monkeypatch.setattr(module, 'id_walk', walking)
         monkeypatch.setattr(local_tools, 'to_parquet',
-            lambda frame, path: state['writes'].append((frame.copy(deep=True), path)))
+            lambda frame, path, **kw: state['writes'].append((frame.copy(deep=True), path)))
 
         def run(error=None, failed_wave='2011-12'):
             country = Country('Uganda')
@@ -144,8 +145,12 @@ def make_compiler(monkeypatch, tmp_path):
 
             def reader(path):
                 parts = Path(path).parts
-                assert parts[0] == '..' and parts[2:] == ('_', table + '.parquet')
-                folder = parts[1]
+                assert parts[-2:] == ('_', table + '.parquet')
+                if table == 'interview_date':
+                    assert Path(path).parent.parent.parent == tmp_path / 'cache' / 'Uganda'
+                else:
+                    assert parts[0] == '..' and len(parts) == 4
+                folder = parts[-3]
                 state['reads'].append(folder)
                 wave = folder_map[folder]
                 assert wave in state['declared'], 'reader consulted undeclared output'

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-import pandas as pd
 import sys
 sys.path.append('../../../_/')
+from lsms_library.datetime_parse import assign_datetime, wave_datetime_audit
 from lsms_library.local_tools import df_data_grabber, to_parquet
-from datetime import datetime
 
 idxvars = dict(j = 'HHID',
                t=('region',lambda x:'2011-12'),  # Note trivial mapping
@@ -13,9 +12,12 @@ myvars = dict(day = 'day',
               year = 'year',
               )
 
-df = df_data_grabber('../Data/GSEC1.dta',idxvars,**myvars)
-# error = coerce returns NaT when encountering NaN vals in the 3 coloumns or when day/month is out of range
-# 3 instances in April have day as 31
-df['Int_t'] = pd.to_datetime(df[['year', 'month', 'day']], errors='coerce')
-df = df.drop(columns=list( myvars.keys()))
-to_parquet(df,'interview_date.parquet')
+df = df_data_grabber('../Data/GSEC1.dta', idxvars, **myvars)
+
+# The original household cover records a Gregorian civil date (GH #1045).
+components = df[list(myvars)].rename(columns={'year': 'y', 'month': 'm', 'day': 'd'})
+df = assign_datetime(df.drop(columns=list(myvars)), 'Int_t', components,
+                     calendar='gregorian', resolution='day', country='Uganda',
+                     table='interview_date', wave_folder='2011-12')
+to_parquet(df, 'interview_date.parquet',
+           datetime_audit=wave_datetime_audit('Uganda', 'interview_date', '2011-12'))
