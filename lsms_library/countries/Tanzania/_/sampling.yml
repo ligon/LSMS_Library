@@ -36,17 +36,17 @@ Sampling:
       household_continuity: panel
       cluster_id_continuity: wave-scoped
       cluster_id_note: |-
-        UPD4 round 3 RENUMBERS 82 of the 409 clusters, whole clusters at a
-        time, 81 of them in the last digit only (17113001 -> 17113000).
-        Measured 2026-10-19: 591 of 2,904 linked households change `v`, in
-        82 one-to-one cluster pairs.  Confirmed in the raw upd4_hh_a.dta
-        (1,565 of 7,082 tracking lines; 83 distinct pairs; one of 409 round-2
-        clusters, 7124001, maps to more than one round-3 cluster), so it is the
-        survey file, not our script.  Apart from the one round-2 cluster that
-        splits, no renumbered round-2 id occurs in round 3 (raw: 1 and 1, both
-        that cluster; through the API: 0 and 0).  This is NOT mover tracking, which
-        DESIGN.org §2 (and 2008-15/_/sample.py) read it as; see CONTENTS.org.
-        Partial: the other 327 clusters keep their id.
+        UPD4 round 3 has 82 one-to-one changes in linked cluster IDs.
+        Measured 2026-10-19: 591 of 2,904 linked households change `v`.
+        The raw upd4_hh_a.dta tracking-line layer shows 1,565 of 7,082
+        lines changing across 83 distinct ID pairs, 81 last-digit-only,
+        and one earlier cluster ID mapping to multiple later IDs.
+        Apart from that split, no affected ID appears on the other side
+        (through the API: zero in either direction). The NBS Round 3
+        study description says fieldwork clusters included tracked
+        households outside the same EA. The ID pairs do not certify
+        physical EA equivalence or classify household moves. See
+        CONTENTS.org for source and qualification.
       source_type: derived-from-data
       confidence: medium
       source_file: 'lsms_library/countries/Tanzania/2008-15/Data/upd4_hh_a.dta'
@@ -58,11 +58,12 @@ Sampling:
         note: |-
           Historical measurement recorded 2026-10-19, ported without
           remeasurement: 591 of 2,904 linked households changed `v`, in
-          82 one-to-one cluster pairs (82 of 409 clusters). CONTENTS.org
-          identifies whole-cluster renumbering rather than mover tracking,
-          but no movement classification was applied, so no net-of-movers
-          count is recorded. The raw tracking-line figures (1,565 of 7,082,
-          83 pairs) describe a different layer, not this denominator.
+          82 strict one-to-one changes of IDs. This counts linked ID
+          pairs, not physically unchanged PSUs. NBS documents fieldwork
+          regrouping across EAs, but no household-movement classifier
+          has been applied and no net-of-movers count is recorded.
+          The raw tracking-line figures (1,565 of 7,082, 83 pairs)
+          describe a different layer, not this denominator.
         source_type: derived-from-data
         confidence: high
         locator: >-
@@ -78,14 +79,15 @@ Sampling:
       household_continuity: rotating-panel
       cluster_id_continuity: wave-scoped
       cluster_id_note: |-
-        Partial, and partly the round-3 renumbering undone: of the 82
-        clusters renumbered in round 3, 12 return to their round-2 id here
-        (58 households).  6 of the 82 round-3 ids still occur in 2014-15, but
-        no linked household keeps one; the other non-reverting households
-        (10, in 8 clusters) move to new-format ids.  Measured: 413 of 556
-        linked households (521 with `v` on both sides) keep `v`; a further 35
-        link to refresh-sample cluster ids, a linkage that is itself
-        unverified because rounds 3 and 4 reuse 1,857 r_hhid strings.  This wave pools the Extended Panel
+        Partial, with some earlier IDs appearing again. Of the 82
+        one-to-one ID changes in round 3, 12 round-2 IDs reappear for
+        linked households (58 households). Six of the 82 round-3 IDs
+        still occur in 2014-15, but no linked household keeps one. The
+        other non-reverting households (10, in 8 clusters) carry
+        new-format IDs. Of 556 linked households, 521 have `v` on both
+        sides, and 413 of those keep it. A further 35 link to refresh
+        IDs, a linkage itself unverified because rounds 3 and 4 reuse
+        1,857 r_hhid strings. This wave pools the Extended Panel
         (tracked) with a newly drawn Refresh sample.
       source_type: derived-from-data
       confidence: medium
