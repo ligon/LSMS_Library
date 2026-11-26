@@ -148,6 +148,11 @@ through its own lookup, are not recorded yet: see the last column. Benin and
 Guinea-Bissau, whose strata are registered constructions, have no
 `served_strata` record yet.
 
+When editing `sampling.yml`, add `served_strata` beside the other fields
+inside the existing wave entry. A repeated key is a configuration error,
+including a repeated wave written once as a number and once as a quoted
+string. The loader does not silently replace a `panel` or design record.
+
 Read `strata` with `df.get('strata')` where a wave may serve nothing: for
 Mali 2014-15, whether a one-wave `sample()` frame has the column at all
 depends on what was built before it (absent on a cold call, all NA after an
