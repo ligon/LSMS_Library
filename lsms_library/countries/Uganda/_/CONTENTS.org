@@ -4077,11 +4077,12 @@ build step to the invariance module without measuring what that costs.
 
 ** TODO Investigate 2005-06 strata vs later sub-regions
 
-The 2005-06 baseline uses 6 strata (Kampala + 4 regions x
-urban/rural) while 2011-12 onward uses 10--15 sub-regions.
-These are genuinely different stratification schemes.  For
-pooled analysis across waves, analysts may need to aggregate
-the finer sub-regions back to the 4-region level.
+The 2005-06 baseline serves six labels from =stratum=.
+From 2011-12 onward =sample().strata= serves 10--15 labels for the
+household's recorded subregion (#1577, verified 2026-11-25).
+Whether the later labels describe the survey's design strata, or
+whether a common geography would be valid for pooled analysis,
+remains open.
 
 ** TODO Section 15 Part D (=gsec15d=, the 365-day durables flow) and Part E (=gsec15e=) are unwired
 
