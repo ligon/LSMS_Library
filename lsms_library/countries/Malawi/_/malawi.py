@@ -2363,6 +2363,17 @@ def _sum_reported(grouped, keys, agg):
     return out
 
 
+_RAW_HARVEST_CODE = '_keep_raw_harvest_code'
+
+
+def keep_unmapped_seasonal_harvest_code(harvest, code):
+    """Mark a released, unnamed Module G code in its declaring driver only."""
+    return harvest.assign(**{_RAW_HARVEST_CODE: (
+        harvest['production_obs'].eq(f'reported:G:{code}').fillna(False)
+        & harvest['crop'].isna()
+    ).astype('boolean')})
+
+
 def _consolidate_harvest(harvest_pieces):
     """Collapse exact duplicate (i, plot, crop, u, condition) harvest rows.
 
@@ -2384,6 +2395,9 @@ def _consolidate_harvest(harvest_pieces):
     if _CROP_TEXT_WITNESS not in harv:
         harv[_CROP_TEXT_WITNESS] = False
     harv[_CROP_TEXT_WITNESS] = harv[_CROP_TEXT_WITNESS].astype('boolean').fillna(False)
+    if _RAW_HARVEST_CODE not in harv:
+        harv[_RAW_HARVEST_CODE] = False
+    harv[_RAW_HARVEST_CODE] = harv[_RAW_HARVEST_CODE].astype('boolean').fillna(False)
     harv['u'] = harv['u'].astype('string')
     harv['condition'] = harv['condition'].astype('string')
     keys = ['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code',
@@ -2398,6 +2412,7 @@ def _consolidate_harvest(harvest_pieces):
         'intercropped':   'first',
         'perennial':      'first',
         _CROP_TEXT_WITNESS: 'all',
+        _RAW_HARVEST_CODE: 'all',
     })
 
 
@@ -2695,6 +2710,16 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         mismatch = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
         tallies = {'sale_suppressed': tally, 'sale_basis_mismatch': mismatch,
                    'sale_basis_ladder': {}}
+
+    # GH #1724: the IHS5 cross-section declares its unnamed seasonal slot.
+    # Keep its raw code like the seed table, but only AFTER the unchanged
+    # unmanaged-code sale policy has put its answers on Farm-level rows.
+    # Publishing the label earlier would also change the price-reference cells.
+    retain = harv.pop(_RAW_HARVEST_CODE).to_numpy(dtype=bool)
+    if retain.any():
+        harv.loc[retain, 'crop'] = harv.loc[retain, '_crop_code'].astype('string')
+        harv.loc[retain, ['Quantity_sold', 'Value_sold', 'Unit_sold',
+                          'Condition_sold', '_branch']] = pd.NA
 
     # GH #637 defect A: keep each native crop coordinate instead of final
     # sum/first across codes sharing a preferred label. Same-code/unit/state

@@ -4,8 +4,10 @@ IHS5 ships a Cross_Sectional half (cs-19-prefixed case_id, GH #1278) and a
 Panel half (y4_hhid), concatenated into the single 2019-20 wave -- exactly
 like plot_features.  Plot key is gardenid_plotid in both halves.
 
-Seasonal modules (G, I) carry a harmonized `crop_code` (1-48); perennial
-modules (P, Q) carry the perennial crop code -- P uses ag_p0c, Q uses
+Seasonal modules (G, I) carry crop_code. The cross-sectional G release
+also has unnamed code 49, retained verbatim (GH #1724); its I code range
+ends at 48. Perennial modules (P, Q) carry the perennial crop code --
+P uses ag_p0c, Q uses
 crop_code -- offset +1000 in harmonize_crop.  Sale (I, Q) is at the
 household-crop grain (no plot id); attached to single-plot (i, crop)
 rows only.  See lsms_library/countries/Malawi/_/malawi.py.
@@ -31,7 +33,8 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_harvest_block, _sale_block, assemble_crop_production,
-                    attach_module_d_text, D20_TEXT_COL, D20_REASON_COL)
+                    attach_module_d_text, D20_TEXT_COL, D20_REASON_COL,
+                    keep_unmapped_seasonal_harvest_code)
 
 
 WAVE = '2019-20'
@@ -42,7 +45,7 @@ def _plotkey(df):
             + df['plotid'].apply(format_id))
 
 
-def _half(d, g, p, i_mod, q, hh_of):
+def _half(d, g, p, i_mod, q, hh_of, *, keep_other_slot=False):
     for df in (d, g, p, i_mod, q):
         df['hhid'] = hh_of(df)
     attach_module_d_text(g, d, cropcode='crop_code')
@@ -63,6 +66,10 @@ def _half(d, g, p, i_mod, q, hh_of):
                        harv_m='ag_p06c', perennial=True, t=WAVE,
                        unit_text='ag_p09b_oth'),
     ]
+    if keep_other_slot:
+        # The IHS5 cross-sectional G dictionary reports 49 but no crop name.
+        # Keep the native code without borrowing either Module D crop text.
+        harvest[0] = keep_unmapped_seasonal_harvest_code(harvest[0], 49)
     sale = [
         _sale_block(i_mod, hhid='hhid', cropcode='crop_code', sold_flag='ag_i01',
                     qty_sold='ag_i02a', value_sold='ag_i03', unit_sold='ag_i02b',
@@ -85,7 +92,8 @@ p_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_p.dta', convert_categorical
 i_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_i.dta', convert_categoricals=False)
 q_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_q.dta', convert_categoricals=False)
 h, s = _half(d_xs, g_xs, p_xs, i_xs, q_xs,
-             lambda df: 'cs-19-' + df['case_id'].apply(format_id))
+             lambda df: 'cs-19-' + df['case_id'].apply(format_id),
+             keep_other_slot=True)
 harvest_all += h
 sale_all += s
 
