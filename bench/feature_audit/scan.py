@@ -75,6 +75,7 @@ from lsms_library.feature import (
     _canonical_index_levels,
     _DERIVED_SOURCE,
 )
+from lsms_library.quantity_audit import QuantityImplausibleWarning, SurveyKgPriceWarning
 
 # ---------------------------------------------------------------------------
 # Scope: which features, and which kwargs to vary per feature
@@ -155,6 +156,18 @@ WARNING_TAXONOMY: list[tuple[str, str, bool]] = [
 ]
 
 
+# Most specific class first: price warnings are also quantity warnings.
+# Site Q messages can contain survey row identities. Do not pass their text to
+# Finding.detail, which cluster.py forwards as an example for issue filing.
+# Either class can also mean that its screen failed to run.
+_SITE_Q_WARNING_TAXONOMY: tuple[tuple[type[Warning], str, str], ...] = (
+    (SurveyKgPriceWarning, "survey_kg_price",
+     "Site Q survey-kilogram versus sale-price screen warned. Inspect the local warning for details."),
+    (QuantityImplausibleWarning, "quantity_implausible",
+     "Site Q quantity plausibility screen warned. Inspect the local warning for details."),
+)
+
+
 def _classify_warning(msg: str) -> tuple[str, bool]:
     for needle, sev, expected in WARNING_TAXONOMY:
         if needle.lower() in msg.lower():
@@ -194,37 +207,47 @@ class Finding:
 # Warning-capturing build helper
 # ---------------------------------------------------------------------------
 
-def _build(fn: Callable[[], Any]) -> tuple[Any, list[str], str | None, float]:
+def _build(fn: Callable[[], Any]) -> tuple[Any, list[warnings.WarningMessage], str | None, float]:
     """Run *fn*, returning (result, warnings, error_repr, seconds).
 
-    Never raises: a build exception is returned as ``error_repr`` so one bad
-    cell can't abort the sweep.
+    Keep warning classes through classification, but don't serialize the raw
+    capture. A build exception is returned as ``error_repr`` so one bad cell
+    can't abort the sweep.
     """
     t0 = time.perf_counter()
-    captured: list[str] = []
     result = None
     err = None
-    with warnings.catch_warnings(record=True) as wlist:
+    with warnings.catch_warnings(record=True) as captured:
         warnings.simplefilter("always")
         try:
             result = fn()
         except Exception as e:  # noqa: BLE001 - sweep must continue
             err = f"{type(e).__name__}: {e}"
-        captured = [str(w.message) for w in wlist]
     return result, captured, err, time.perf_counter() - t0
 
 
 def _warnings_to_findings(
-    phase: str, feature: str, captured: list[str], kwargs: dict[str, Any]
+    phase: str, feature: str, captured: list[warnings.WarningMessage],
+    kwargs: dict[str, Any], *, country: str | None = None,
 ) -> list[Finding]:
     out = []
-    for msg in captured:
-        sev, expected = _classify_warning(msg)
-        out.append(Finding(
-            phase=phase, feature=feature, check="runtime_warning",
-            status="warn", kwargs=dict(kwargs), severity=sev, expected=expected,
-            detail=msg,
-        ))
+    for warning in captured:
+        for category, check, detail in _SITE_Q_WARNING_TAXONOMY:
+            if issubclass(warning.category, category):
+                out.append(Finding(
+                    phase=phase, feature=feature, country=country, check=check,
+                    status="warn", kwargs=dict(kwargs), severity="C",
+                    expected=False, detail=detail,
+                ))
+                break
+        else:
+            msg = str(warning.message)
+            sev, expected = _classify_warning(msg)
+            out.append(Finding(
+                phase=phase, feature=feature, check="runtime_warning",
+                status="warn", kwargs=dict(kwargs), severity=sev,
+                expected=expected, detail=msg,
+            ))
     return out
 
 
@@ -313,7 +336,7 @@ def _scan_one_country(feature: str, name: str) -> tuple[list[Finding], str, int 
     findings: list[Finding] = []
     try:
         result, captured, err, secs = _build(lambda: load_feature(ll.Country(name), feature))
-        findings += _warnings_to_findings("1a-sanity", feature, captured, {})
+        findings += _warnings_to_findings("1a-sanity", feature, captured, {}, country=name)
 
         if err is not None:
             findings.append(Finding(
