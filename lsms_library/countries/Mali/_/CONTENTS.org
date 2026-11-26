@@ -2893,7 +2893,8 @@ data, and not created by the derivation.*
 *The window key.*  =harvest-to-date= is an identity on a row with a recorded quantity and an unfinished
 harvest: 2021-22 =s16cq11= =Non=, 287 rows, a median 50% still to harvest; 2018-19 =s16cq10= =Non=, 265 rows,
 a median 30%.  The brief's "=s16cq11= = =Non=" is right for 2021-22 only: the variable numbers flip, and
-2018-19's =s16cq11= is the share left.  Its 86.9% of 2021-22 kg was the share BEFORE the total; it is now
+2018-19's =s16cq11= is the share left.  [2026-11-25, GH #1756: 2017-18 carries the key too, on
+=s7fq10=; it asks no share left.  Section "2017-18 partial harvests carry harvest-to-date".]  Its 86.9% of 2021-22 kg was the share BEFORE the total; it is now
 227,258 of 6,977,513 kg, 3.3%.  In 2018-19 it stays 12.0% (1,792,088 of 14,881,091).
 
 *How the keys share =Derivation=.*  One registered key per construction, joined in sorted order with
@@ -4334,10 +4335,13 @@ not judge a reported =KgFactor=.  Cold-read warnings: the same classes and count
 *Found on the way, not changed* (red team F7; the wave script is a hashed input, so not in this change):
 - Partial harvests.  7F.13 says "Si la récolte est partielle on report seulement la production déjà
   récolte"; =s7fq10= (Fin de la récolte) is =Non= on 72 rows, 54 of which now carry kilograms.  2017-18
-  has no =harvest-to-date= key, where the EHCVM waves do.
+  has no =harvest-to-date= key, where the EHCVM waves do.  [2026-11-25, GH #1756: it has one now;
+  section "2017-18 partial harvests carry harvest-to-date".  The 72 and 54 are counts of raw answers,
+  not of served keyed rows.]
 - The wave script's variable map says "fully_harvested=s7fq06", but the manual's 7F.06 is "Perte
   pré-récolte" (=Non= 17,897 / =Oui= 6,560).  The script never reads =s7fq06=, so it is docstring only;
-  fix it with the next Mali re-warm.
+  fix it with the next Mali re-warm.  [Fixed 2026-11-25, GH #1756: the map now reads
+  =harvest_finished=s7fq10=.]
 
 *Cache.*  The wave script, =mali.py=, =data_scheme.yml= and the country concatenator's docstring: one
 Mali re-warm.  Hash census, base =cd199d4a3= -> =1a2bd6bd9=: =Country._table_cache_hash= 24 of 556,
@@ -4347,6 +4351,62 @@ candidate grades the same 99 cells (71 =sane=, 23 =absent=, 5 =undeclared=); the
 byte-identical to the committed one.  The red team reproduced the census, the coverage (job 41290283)
 and the tests (1,520 passed over 42 files, job 41290067) at =1d52ab79e=.  Tests:
 =tests/test_gh1749_mali_kgfactor.py=.
+
+* 2026-11-25 -- crop_production: 2017-18 partial harvests carry =harvest-to-date= (GH #1756)
+
+*RULED (@ligon, 2026-11-25): "Add the key and correct the documentation."*  A 2017-18 seasonal
+(=eaci17_s7fp2=) row whose line answers =s7fq10= ("Fin de la récolte") =Non= and whose served
+=Quantity= is recorded carries =Mali::crop_production::harvest-to-date=, the key the EHCVM waves
+already carry (GH #1437).  No second key was registered: the existing entry in =derivations.yml= gains
+the wave, the variables =s7fq10=, =s7fq13a=, =s7fq13c= and an assumption of its own.
+
+*Why.*  The P2 enumerator manual's 7F.13, as quoted by the GH #1749 red team (F7) and in GH #1756:
+"Si la récolte est partielle on report seulement la production déjà récolte".  So =s7fq13a= on an
+unfinished line is a part of the season under a column that otherwise means all of it, which is what
+the key says.  The sentence was not re-read from the PDF for this change; the quotation is the one
+already in this file ("Found on the way", GH #1749 section).
+
+*What is and is not changed.*  An identity.  =Quantity=, =u=, =KgFactor= (=s7fq13d=, kg per ONE unit,
+which no window changes), the sale columns, the index and the row count are what they were; only
+=Derivation= gains a key, joined in sorted order with =derivations.MULTI_SEP= to =hh-crop-sale-single-row=
+where the row holds an s7g sale.  A consumer must test for containment, as in the EHCVM waves.
+Tree rows (11F) and =Farm-level= sale rows have no s7f line and never carry it; 11F asks no
+"finished" question that is read.  2014-15, 2018-19 and 2021-22 are untouched.
+
+*The rule, exactly.*  "Recorded" is the served =Quantity= being non-NA after
+=crop_production_finalize='s existing mask of the "Manquant" codes 99 / 9999, so a recorded 0 is
+keyed and a masked code is not: the predicate of the EHCVM stamp.  =harvest_kg= needs a factor as
+well, so fewer keyed rows carry kilograms than carry the key.
+
+*Idiosyncrasies.*
+- *The docstring was wrong, and the variable it named is a different question.*  The wave script's
+  variable map said =fully_harvested=s7fq06=.  7F.06 is "Perte pré-récolte"; "Fin de la récolte" is
+  7F.10, =s7fq10=.  The script never read =s7fq06= and still does not.
+- *2017-18 asks no share left.*  The EHCVM waves ask what percentage of the area remains
+  (=s16cq11= / =s16cq12=), so their window has a size; 7F has no such question in what this file
+  reads, so the 2017-18 key says "part", never how large a part.  The =inputs= frame for 2017-18 is
+  therefore =s7fq10=, =s7fq13a=, =s7fq13c= and nothing else, and an un-waved
+  =derivation_inputs(harvest-to-date)= now concatenates frames with different columns.
+- *The answer rides BESIDE the collapse, not through it.*  =crop_production_finalize= is shared with
+  2014-15 and returns a fixed column list, so =s7fq10= is kept in a side table of s7f lines and matched
+  to the served rows afterwards on (=i=, =plot_id=, harmonized crop), the key the finalizer collapses
+  on (=mali.stamp_eaci17_harvest_to_date=).  It refuses rather than guesses: an answer column in which
+  no line reads =Oui= or =Non=; a served key whose lines disagree about =Non= (the summed =Quantity=
+  would be part window, part season); an unfinished key that lands on no served row, on more than one,
+  or on a tree or =Farm-level= row.  A refusal fails the wave build.  The GH #1749 measurement says
+  there is one s7f record per household, plot and crop after the crop map, so none is expected.
+
+*NOT MEASURED on the survey file.*  This change was made and tested on invented rows only; no build was
+run and no survey file was read.  GH #1756's "=Non= on 72 rows, 54 of which now carry kilograms" are
+the red team's counts of raw answers, and neither is the served keyed cohort: a line with no recorded
+quantity, a masked code or a crop the map drops is not keyed, and kilograms need a factor.  Unverified
+until a build: that =s7fq10= decodes to exactly =Oui= / =Non= (the stamp refuses an undecoded column
+but cannot see a third spelling), whether Leger households answer 7F.10, and that no refusal fires.
+The oracle is =tests/test_gh1756_mali_partial_harvest_key.py::TestOracle=, which derives the cohort
+from the file and pins no count.
+
+*Cache.*  The wave script, =mali.py= and a =data_scheme.yml= comment: one Mali re-warm, the one GH #1749
+deferred this to.  =derivations.yml= and this file are not build inputs.  The hash census was not run.
 
 * shocks: coping strategies, the set and the positions (GH #1562, 2026-11-13)
 

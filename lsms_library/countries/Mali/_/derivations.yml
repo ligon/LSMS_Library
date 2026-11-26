@@ -298,11 +298,16 @@ Mali::crop_production::hh-crop-sale-single-row:
   since: '2026-11-03'
 
 Mali::crop_production::harvest-to-date:
-  waves: ['2018-19', '2021-22']
+  waves: ['2017-18', '2018-19', '2021-22']
   columns: [Quantity, Quantity_kg]
   rule: >-
     Identity on a row whose harvest is not finished and which records a quantity:
-    2018-19 s16cq10 = Non with s16cq12a, 2021-22 s16cq11 = Non with s16cq16a.  The value
+    2018-19 s16cq10 = Non with s16cq12a, 2021-22 s16cq11 = Non with s16cq16a, and
+    (GH #1756, ruling @ligon 2026-11-25) 2017-18 s7fq10 = Non with s7fq13a on a seasonal
+    (s7f) row, a quantity code 99 / 9999 masked as on every field row.  A 2017-18 tree
+    row or Farm-level sale row has no s7f line and never carries the key; the wave has
+    no Quantity_kg, and its KgFactor (s7fq13d) is kg per ONE unit, which no window
+    changes.  The value
     is served as recorded.  The key names its WINDOW: the question asks the quantity
     ALREADY harvested, so the row covers a part of the season under a column that
     otherwise means all of it, and so does the row's Quantity_kg in 2021-22 (s16cq16c,
@@ -312,7 +317,8 @@ Mali::crop_production::harvest-to-date:
     which needs a finished crop and no recorded quantity.
   function: lsms_library.countries.Mali._.mali:derive_harvest_to_date
   inputs: lsms_library.countries.Mali._.mali:inputs_harvest_to_date
-  raw_variables: [s16cq10, s16cq11, s16cq12, s16cq12a, s16cq12b, s16cq16a, s16cq16b, s16cq16c]
+  raw_variables: [s16cq10, s16cq11, s16cq12, s16cq12a, s16cq12b, s16cq16a, s16cq16b, s16cq16c,
+                  s7fq10, s7fq13a, s7fq13c]
   assumptions:
     - text: >-
         the recorded quantity on an unfinished row is what has been harvested so far,
@@ -325,10 +331,22 @@ Mali::crop_production::harvest-to-date:
         s16cq12 "16C.12. Quel pourcentage de la superficie vous reste-t-il a recolter?";
         s16c_me_mli2018.dta s16cq12a, s16cq10, s16cq11, the same questions under other
         numbers.
+    - text: >-
+        2017-18: s7fq13a on a line whose s7fq10 ("Fin de la récolte") is Non is the amount
+        already harvested, and not the season.  The form asks no share left to harvest, so
+        how large a part it is cannot be read from the file.
+      basis: questionnaire
+      evidence: >-
+        the P2 enumerator manual, 2017-18/Documentation/eaci17_manuel_p2_french.pdf, 7F.13:
+        "Si la récolte est partielle on report seulement la production déjà récolte"
+        (quoted in Mali/_/CONTENTS.org, GH #1749 red team F7, and in GH #1756).  7F.06 is
+        "Perte pré-récolte", not this answer.
   validated_against: >-
     tests/test_gh1437_mali_harvest_total.py, whose oracle reads s16c directly.  An identity
-    has nothing to validate but its rows.
-  contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)"'
+    has nothing to validate but its rows.  2017-18: tests/test_gh1756_mali_partial_harvest_key.py,
+    on invented rows; its oracle against s7f is written and had not been run on the
+    survey file when this entry was extended.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)"; "2026-11-25 -- 2017-18 partial harvests carry harvest-to-date (GH #1756)"'
   since: '2026-11-04'
 
 Mali::crop_production::harvest-from-dispositions:

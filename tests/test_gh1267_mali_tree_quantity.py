@@ -274,8 +274,12 @@ class TestServed:
         in_eaci = built.index.get_level_values("t").isin(TREE_ROWS)
         field = built[in_eaci & ~built["perennial"].fillna(False)]
         # Re-pinned for GH #1457: a 2017-18 field row holding an s7g sale carries its key.
-        assert field["Derivation"].dropna().eq(
-            "Mali::crop_production::hh-crop-sale-single-row").all()
+        # Re-pinned for GH #1756: an unfinished 2017-18 seasonal harvest carries the
+        # window key, alone or joined to the sale key.
+        field_keys = {k for joined in field["Derivation"].dropna().astype(str)
+                      for k in joined.split("+")}
+        assert field_keys <= {"Mali::crop_production::hh-crop-sale-single-row",
+                              "Mali::crop_production::harvest-to-date"}
         assert not field.xs("2014-15", level="t")["Derivation"].notna().any()
         assert field["months_harvested"].isna().all()
         summ = built.attrs["derivations"][COUNTRY]
