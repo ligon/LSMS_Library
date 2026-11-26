@@ -1097,9 +1097,11 @@ vague / round variable.  The only per-passage marks are *suffixed* copies of
 household attributes (=hhweight1= / =hhsize1= in p1, =hhweight2= in p2, ...),
 which is not a variable you can key on.  So =visit= must be *stamped per file*.
 
-*Passage 1 is the only one with a quantity grid.*  p1 fields =qachat= /
-=uachat= / =qautocons=; p2-p4 record money only (=achat=, =autocons=,
-=cadeau=).  Row and CFA totals as extracted:
+*Passage 1 is the only retained food extract with quantity and unit columns.*
+P1 contains =qachat= / =uachat= / =qautocons=; the p2-p4 extracts contain
+money (=achat=, =autocons=, =cadeau=) but no quantity or unit columns.
+This is a distinction in the released files, not in the printed forms.
+Row and CFA totals as extracted:
 
 | passage | source rows | canonical rows |  Quantity | Expenditure (CFA) |
 |---------+-------------+----------------+-----------+-------------------|
@@ -1366,11 +1368,10 @@ none"; here the quantity was NOT ASKED:
 10,259; Oignons (gousse, feuille) 7,668 of 7,672; Soumbala 7,138 of 7,190;
 Feuilles 4,821 of 4,821; Gombo 4,682 of 4,683; Pâte d'arachide 3,233 of
 3,236; Haricot 2,540 of 2,542; Beurre de Karité 1,774 of 1,774; Fruits
-1,099 of 1,099.  That is the quantity grid not being administered for those
-items -- a module-coverage fact at item grain, the same kind of fact as
-"only passage 1 fields the grid" at passage grain.  Whether the
-questionnaire skips the quantity question for them (C4) has NOT been
-checked; it is the open question behind the residual 15.9% below.
+1,099 of 1,099.  That concentration is a fact about the extract at item
+grain, not evidence of individual nonresponse.  At this checkpoint the
+printed C04 item layout had not yet been read; see the later #1442 entry
+for its comparison with the recorded quantities.
 
 *=qachat= is never 0 where =achat > 0=* (0 of 140,908 rows), so a served
 purchased 0 beside an expenditure could only be a filled null or a clipped
@@ -3380,8 +3381,9 @@ are visually checked; no as-fielded CAPI, raw/API or row-cause claim follows.
 
 * 2026-11-09 -- GH #851: column-specific declared food exposure
 
-EMC 2014 retains four seven-day expenditure asks (28 days), but only passage1
-asks quantity (7 days). The recall record now carries =Quantity: 1= under
+EMC 2014 retains expenditure from four seven-day passages (28 days), but
+the retained extract supplies quantity only for passage 1 (7 days).
+The recall record now carries =Quantity: 1= under
 =n_asks_by_column=; the module count remains four. This metadata supports only
 explicit derived-table period conversion, not a source/visit/weight change.
 =period=None= preserves the recorded data; prices have no period conversion.
@@ -3467,6 +3469,29 @@ authority, out-of-panel keys and report/status disagreement remain held.
 not a household interview-status denominator.  Declared conversion cannot
 settle the unknown-household mask, and neither ask counts nor interview dates
 supply a new visit or exposure rule.  No normalization or status census ran.
+
+* 2026-11-25 -- GH #1148: printed EMC forms and retained food files differ
+
+The official printed questionnaires for [[https://microdata.worldbank.org/index.php/catalog/2538/download/47101][passage 2 (PDF pp. 27-30)]],
+[[https://microdata.worldbank.org/index.php/catalog/2538/download/47102][passage 3 (pp. 6-9)]] and [[https://microdata.worldbank.org/index.php/catalog/2538/download/47103][passage 4 (pp. 6-9)]] include seven-day quantity and value
+questions for purchase, own production and gifts (C04-C06).
+The four exact, sidecar-verified =conso7jours_16032015.dta= headers all
+contain =achat=, =autocons= and =cadeau=, but only passage 1 contains the
+six quantity and unit columns for the three roles.
+The printed quantities therefore do not establish that answers were
+collected or released for passages 2-4.
+The existing =Quantity: 1= reflects the retained source coverage and
+does not change.
+
+The printed A13 cover in passage 2 assigns code 6 to other.  The printed
+covers in passages 3 and 4 assign code 6 to household lost and code 7 to
+other (PDF p. 1 of each).  This is a passage-4 form dictionary, not an
+authenticated mapping to the unlabelled released =res_entr4=.
+The [[https://microdata.worldbank.org/index.php/catalog/2538/download/47108][passage 4 interviewer manual (PDF p. 11)]] describes the outcome of the
+interview, not completion of each food question.
+The public catalog has no separately named household cover extract.
+The existing conflicts, incomplete carrier coverage and unknown mask
+remain held.  No carrier, denominator or household exposure is selected.
 
 * 2026-11-10 -- GH #1483 own2021 household-input candidate (source-only, inactive)
 

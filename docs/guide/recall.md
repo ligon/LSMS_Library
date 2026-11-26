@@ -30,8 +30,9 @@ config-comment assertion converts but stays visibly weaker than a quoted
 questionnaire. Filename guesses and not-recorded cells do not convert.
 
 `ll.recall()` includes `n_asks_by_column` where a column differs from the
-module's count. Burkina Faso 2014 expenditure covers four seven-day asks
-(28 days), while quantity covers only the first ask (7 days). Mali 2014-15
+module's count. The retained Burkina Faso 2014 files contain expenditure
+for four seven-day passages (28 days), but quantities only for the first
+(7 days). The later printed forms still include quantity questions. Mali 2014-15
 covers two seven-day asks (14 days). Its existing public series remains
 collapsed: this metadata correction adds no visit axis and changes no default
 quantity, expenditure, identifier or missing-value treatment.
