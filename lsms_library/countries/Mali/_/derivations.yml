@@ -333,14 +333,18 @@ Mali::crop_production::harvest-to-date:
         numbers.
     - text: >-
         2017-18: s7fq13a on a line whose s7fq10 ("Fin de la récolte") is Non is the amount
-        already harvested, and not the season.  The form asks no share left to harvest, so
-        how large a part it is cannot be read from the file.
+        already harvested, and not the season.  No share-left answer is read for this wave
+        (whether 7F asks one was not checked), so the key says a part, not how large a part.
       basis: questionnaire
       evidence: >-
         the P2 enumerator manual, 2017-18/Documentation/eaci17_manuel_p2_french.pdf, 7F.13:
         "Si la récolte est partielle on report seulement la production déjà récolte"
-        (quoted in Mali/_/CONTENTS.org, GH #1749 red team F7, and in GH #1756).  7F.06 is
-        "Perte pré-récolte", not this answer.
+        (quoted in Mali/_/CONTENTS.org, GH #1749 red team F7, and in GH #1756); and the
+        printed form eaci17_p2_french.pdf, PDF pp. 29-30, checked visually on 2026-11-09
+        (Mali/_/CONTENTS.org, "EACI 2017 harvest state", GH #1436): Q7F13 asks the
+        campaign's production, "including the quantity already harvested if harvest is
+        partial".  Neither document was re-read for GH #1756.  7F.06 is "Perte
+        pré-récolte", not this answer.
   validated_against: >-
     tests/test_gh1437_mali_harvest_total.py, whose oracle reads s16c directly.  An identity
     has nothing to validate but its rows.  2017-18: tests/test_gh1756_mali_partial_harvest_key.py,

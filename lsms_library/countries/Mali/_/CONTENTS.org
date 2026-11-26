@@ -2894,7 +2894,7 @@ data, and not created by the derivation.*
 harvest: 2021-22 =s16cq11= =Non=, 287 rows, a median 50% still to harvest; 2018-19 =s16cq10= =Non=, 265 rows,
 a median 30%.  The brief's "=s16cq11= = =Non=" is right for 2021-22 only: the variable numbers flip, and
 2018-19's =s16cq11= is the share left.  [2026-11-25, GH #1756: 2017-18 carries the key too, on
-=s7fq10=; it asks no share left.  Section "2017-18 partial harvests carry harvest-to-date".]  Its 86.9% of 2021-22 kg was the share BEFORE the total; it is now
+=s7fq10=; no share-left answer is read for it.  Section "2017-18 partial harvests carry harvest-to-date".]  Its 86.9% of 2021-22 kg was the share BEFORE the total; it is now
 227,258 of 6,977,513 kg, 3.3%.  In 2018-19 it stays 12.0% (1,792,088 of 14,881,091).
 
 *How the keys share =Derivation=.*  One registered key per construction, joined in sorted order with
@@ -4361,7 +4361,9 @@ already carry (GH #1437).  No second key was registered: the existing entry in =
 the wave, the variables =s7fq10=, =s7fq13a=, =s7fq13c= and an assumption of its own.
 
 *Why.*  The P2 enumerator manual's 7F.13, as quoted by the GH #1749 red team (F7) and in GH #1756:
-"Si la récolte est partielle on report seulement la production déjà récolte".  So =s7fq13a= on an
+"Si la récolte est partielle on report seulement la production déjà récolte".  The printed form agrees
+(section "EACI 2017 harvest state", 2026-11-09: Q7F13 includes "the quantity already harvested if
+harvest is partial").  So =s7fq13a= on an
 unfinished line is a part of the season under a column that otherwise means all of it, which is what
 the key says.  The sentence was not re-read from the PDF for this change; the quotation is the one
 already in this file ("Found on the way", GH #1749 section).
@@ -4375,16 +4377,20 @@ Tree rows (11F) and =Farm-level= sale rows have no s7f line and never carry it; 
 
 *The rule, exactly.*  "Recorded" is the served =Quantity= being non-NA after
 =crop_production_finalize='s existing mask of the "Manquant" codes 99 / 9999, so a recorded 0 is
-keyed and a masked code is not: the predicate of the EHCVM stamp.  =harvest_kg= needs a factor as
+keyed and a masked code is not: the predicate of the EHCVM stamp.  A quantity recorded with no unit
+is keyed too (GH #1749 counts 141 positive quantities with no unit in the wave); the key is about
+the window, not the unit.  =harvest_kg= needs a factor as
 well, so fewer keyed rows carry kilograms than carry the key.
 
 *Idiosyncrasies.*
 - *The docstring was wrong, and the variable it named is a different question.*  The wave script's
   variable map said =fully_harvested=s7fq06=.  7F.06 is "Perte pré-récolte"; "Fin de la récolte" is
   7F.10, =s7fq10=.  The script never read =s7fq06= and still does not.
-- *2017-18 asks no share left.*  The EHCVM waves ask what percentage of the area remains
-  (=s16cq11= / =s16cq12=), so their window has a size; 7F has no such question in what this file
-  reads, so the 2017-18 key says "part", never how large a part.  The =inputs= frame for 2017-18 is
+- *No share-left answer is read for 2017-18.*  The EHCVM waves ask what percentage of the area remains
+  (=s16cq11= / =s16cq12=), so their window has a size.  Whether 7F asks the same (7F.11 sits between
+  "Fin de la récolte" and the harvest month, and nothing in this file says what it is) was NOT
+  checked, so the 2017-18 key says "part", never how large a part.  Label =s7fq11= before reading
+  this as "the form does not ask".  The =inputs= frame for 2017-18 is
   therefore =s7fq10=, =s7fq13a=, =s7fq13c= and nothing else, and an un-waved
   =derivation_inputs(harvest-to-date)= now concatenates frames with different columns.
 - *The answer rides BESIDE the collapse, not through it.*  =crop_production_finalize= is shared with

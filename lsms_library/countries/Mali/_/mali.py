@@ -1507,8 +1507,9 @@ def inputs_harvest_to_date(wave):
     The registry ``inputs`` callable for ``harvest-to-date``: "finished?", the share
     still to harvest, the quantity and its unit, and the kilograms where the wave asks
     them, as recorded.
-    2017-18 (EAC-I, GH #1756) is s7f: s7fq10, s7fq13a and s7fq13c; the form
-    asks no share left, and s7fq13d is kg per unit, not a quantity.
+    2017-18 (EAC-I, GH #1756) is s7f: s7fq10, s7fq13a and s7fq13c.  No share-left
+    answer is read for that wave (whether 7F asks one was not checked), and
+    s7fq13d is kg per unit, not a quantity.
     """
     if wave == '2017-18':
         # s7f, on the build's rule: 7F.10 = Non, a quantity that is not a "Manquant"

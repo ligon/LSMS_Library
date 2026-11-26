@@ -317,6 +317,12 @@ class TestOracle:
         return out.dropna(subset=["crop"])
 
     @staticmethod
+    def _keys(frame):
+        """Sorted (i, plot_id, crop) tuples; a missing part is spelled, so the sort holds."""
+        on = ["i", "plot_id", "crop"]
+        return sorted(map(tuple, frame[on].astype("string").fillna("<NA>").to_numpy()))
+
+    @staticmethod
     def _keyed(frame):
         return frame["Derivation"].astype("string").str.contains(WINDOW, regex=False).fillna(False)
 
@@ -330,8 +336,10 @@ class TestOracle:
         want = expected[expected["answer"].eq("Non") & expected["q"].notna()]
         assert not want.duplicated(on).any()
         got = df[self._keyed(df)]
-        assert sorted(map(tuple, got[on].to_numpy())) == sorted(map(tuple, want[on].to_numpy()))
-        both = got.merge(want, on=on, validate="one_to_one")
+        assert self._keys(got) == self._keys(want)
+        fill = lambda f: f.assign(**{k: f[k].astype("string").fillna("<NA>") for k in on})
+        both = fill(got).merge(fill(want), on=on, validate="one_to_one")
+        assert len(both) == len(got)
         assert both["Quantity"].eq(both["q"]).all()       # as recorded
         # Fewer than the lines answering Non wherever one records no quantity.
         assert len(got) <= int(expected["answer"].eq("Non").sum())
@@ -344,7 +352,6 @@ class TestOracle:
     def test_the_inputs_join_the_keyed_rows(self, served):
         country, df = served
         raw = country.derivation_inputs(WINDOW, wave=WAVE).reset_index()
-        on = ["i", "plot_id", "crop"]
         got = df[self._keyed(df)]
-        assert sorted(map(tuple, raw[on].to_numpy())) == sorted(map(tuple, got[on].to_numpy()))
+        assert self._keys(raw) == self._keys(got)
         assert {"s7fq10", "s7fq13a", "s7fq13c"} <= set(raw.columns)
