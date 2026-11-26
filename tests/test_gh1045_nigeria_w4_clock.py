@@ -50,7 +50,7 @@ def test_w4_native_clocks_and_round_audit(monkeypatch, tmp_path):
                                             "Refused"], dtype="str"),
             },
             index=pd.MultiIndex.from_tuples(
-                [("2018Q3", "001"), ("2018Q3", "003"), ("2019Q1", "001")], names=["t", "i"]
+                [("001", "2018Q3"), ("003", "2018Q3"), ("001", "2019Q1")], names=["i", "t"]
             ),
         )
         pd.testing.assert_frame_equal(frame, expected, check_exact=True, check_index_type=False,
