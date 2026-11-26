@@ -1,6 +1,18 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* 2026-11-26 -- Crop-text provenance stays distinct from the displayed crop (GH #1724)
+
+The #1228 key follows the existing text-match witness, not any crop that
+uses the same displayed label.
+A Farm-level sale may inherit the crop label as before.
+It inherits the text key only when all of its contributing harvest
+observations agree on the label and took it from the crop text.
+The private witness is removed before checking seed payload.
+The 2024-25 code 50, the 2019-20 code 49 and two-text plots remain outside
+the existing rule.
+This change does not wire their rows or change a crop code, label or weight.
+
 * 2026-11-13 -- GH #1228 later waves: the season, the Module D join, and the registered relabel
 
 Rulings @ligon 2026-11-12 ("Join D, single-text only") and 2026-11-13, after the red

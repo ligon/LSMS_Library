@@ -309,6 +309,70 @@ def test_a_farm_level_code_48_sale_follows_the_households_lines(malawi, plots, e
     assert farm['Value_sold'].tolist() == [100.0]
 
 
+def _same_label_codes(malawi, monkeypatch, codes):
+    original = malawi._malawi_code_map
+
+    def with_coded_cowpea(table):
+        labels = original(table)
+        if table == 'harmonize_crop':
+            return {**labels, **dict.fromkeys(codes, LABEL)}
+        return labels
+
+    monkeypatch.setattr(malawi, '_malawi_code_map', with_coded_cowpea)
+
+
+def test_native_cowpea_does_not_get_the_harvest_or_farm_text_key(malawi, monkeypatch):
+    _same_label_codes(malawi, monkeypatch, [50])
+    g = _g([48, 48, 50, 50], ['COWPEAS', 'COW PEAS', 'COWPEAS', None])
+    g['hhid'] = 'h0'
+    g['plotkey'] = ['R1', 'R2', 'R1', 'R2']
+    h = _harvest(malawi, g, crop_text='text')
+    out = malawi.assemble_crop_production('2010-11', [h], _sale(malawi, [48, 50]))
+    assert out.index.get_level_values('crop').tolist() == [LABEL] * 6
+    assert '_crop_from_text' not in out
+    keyed = out['Derivation'].astype('string').str.contains(KEY, regex=False, na=False)
+    assert set(out.loc[keyed, 'production_obs']) == {'reported:G:48', 'reported:I:48'}
+    assert int(keyed.sum()) == 3
+    farm = out.xs(malawi.FARM_LEVEL, level='plot_id')
+    assert len(farm) == 2 and farm['Value_sold'].tolist() == [100.0, 100.0]
+
+
+def test_same_label_mixed_proof_does_not_stamp_consolidated_harvest_or_farm(malawi, monkeypatch):
+    _same_label_codes(malawi, monkeypatch, [48])
+    g = _g([48, 48, 48], ['COWPEAS', None, 'COWPEAS'])
+    g['hhid'] = 'h0'
+    g['plotkey'] = ['R1', 'R1', 'R2']
+    h = _harvest(malawi, g, crop_text='text')
+    out = malawi.assemble_crop_production('2010-11', [h], _sale(malawi, [48]))
+    keyed = out['Derivation'].astype('string').str.contains(KEY, regex=False, na=False)
+    assert out.loc[keyed].index.get_level_values('plot_id').tolist() == ['R2']
+    assert out.index.get_level_values('crop').tolist() == [LABEL] * 3
+    assert out.xs('R1', level='plot_id')['Quantity'].tolist() == [20.0]
+    assert out.xs(malawi.FARM_LEVEL, level='plot_id')['Value_sold'].tolist() == [100.0]
+
+
+@pytest.mark.parametrize('native', [True, False])
+def test_seed_key_uses_text_witness_without_rescuing_blank_payload(malawi, monkeypatch, native):
+    _same_label_codes(malawi, monkeypatch, [50])
+    g = _g([48, 50, 48], ['COWPEAS', 'COWPEAS', 'COW PEAS'])
+    g.loc[2, 'seed'] = float('nan')
+    identity = dict(source_ref='dvc:invented:hash', source_half='invented',
+                    row_positions=[0, 1, 2]) if native else {}
+    seed = malawi._seed_block(g, hhid='hhid', plotkey='plotkey', cropcode='code',
+                              qty='seed', unit='seed_u', crop_text='text', **identity)
+    out = malawi.assemble_plot_inputs('2010-11', [seed])
+    assert out.index.get_level_values('crop').tolist() == [LABEL] * 3
+    assert '_crop_from_text' not in out
+    assert out.xs('h0', level='i')['Derivation'].tolist() == [SEED_KEY]
+    assert out.xs('h1', level='i')['Derivation'].isna().all()
+    if native:
+        # The native line is still all-NA so the ordinary finalizer can delete it.
+        assert malawi.derive_seed_line_no_payload(out).sum() == 1
+    else:
+        # Older unresolved rows retain their existing legacy sum behavior.
+        assert out.xs('h2', level='i')['Quantity'].isna().all()
+
+
 @pytest.mark.parametrize('cached', [True, False])
 def test_the_restricted_d_reader_uses_held_bytes_and_cleans_up(malawi, tmp_path, monkeypatch, cached):
     """2016-17 XS Module D: the held blob, else DVCFS; only the columns the file carries."""
@@ -480,13 +544,15 @@ def test_the_label_joins_food_acquired_in_every_wave():
 @pytest.mark.requires_s3
 @pytest.mark.parametrize('table, key', [('crop_production', KEY), ('plot_inputs', SEED_KEY)])
 def test_every_relabelled_row_carries_the_key_and_joins_its_inputs(table, key):
-    """Ruling 2026-11-13, "Register all waves": the key on exactly the rows the label
-    names, beside any other key, and the D (or own G) text behind each one."""
+    """Ruling 2026-11-13, "Register all waves": check the shipped provenance
+    against its D (or own G) text and retain any existing derivation keys."""
     from lsms_library.country import Country
     malawi = Country('Malawi')
     served = getattr(malawi, table)().reset_index()
     keys = served['Derivation'].astype('string').str.split('+')
     keyed = keys.map(lambda ks: isinstance(ks, list) and key in ks).to_numpy(dtype=bool)
+    # These shipped waves have no code mapped directly to LABEL. That is a
+    # corpus check, not the general provenance rule (#1724).
     cowpea = served['crop'].astype(str).eq(LABEL).to_numpy(dtype=bool)
     if table == 'plot_inputs':      # Module H's acquisition rows keep their code's label
         cowpea = cowpea & served['input'].astype(str).eq('Seed').to_numpy(dtype=bool)

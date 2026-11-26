@@ -1322,6 +1322,8 @@ CROP_TEXT_KEYS = {'crop_production': 'Malawi::crop_production::cowpea-from-crop-
                   'plot_inputs': 'Malawi::plot_inputs::cowpea-from-crop-text'}
 #: The waves whose code-48 lines have a crop text the build reads.
 CROP_TEXT_WAVES = ('2010-11', '2016-17', '2019-20')
+# Private source witness, not the final display label (GH #1724).
+_CROP_TEXT_WITNESS = '_crop_from_text'
 
 
 def derive_cowpea_from_crop_text(label, df, cropcode, crop_text):
@@ -1366,18 +1368,6 @@ def union_derivation_key(existing, add, key):
             keys.add(key)
         out.append(MULTI_SEP.join(sorted(keys)) if keys else pd.NA)
     return pd.array(out, dtype='string')
-
-
-def _assert_label_is_text_only():
-    """The stamp rule reads `crop == 'Cowpea (Khobwe)'` as "set from a crop text".
-
-    That holds only while no crop code maps to the label (the #1523 decision, pinned by
-    ``test_the_label_is_the_food_tables_and_reserves_no_code``); refuse otherwise.
-    """
-    labels = set(_malawi_code_map('harmonize_crop').values())
-    if set(_CROP_TEXT_RECODE.values()) & labels:
-        raise ValueError('a harmonize_crop code now carries a crop-text label; '
-                         'the cowpea-from-crop-text stamp can no longer read crop alone')
 
 
 # --- GH #1228, 2016-17 / 2019-20: the crop name is in Module D -------------
@@ -1683,6 +1673,7 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
         'plot_id':           plot.values,
         'crop':           crop_label.values,
         '_crop_code':     crop_code_int.values,
+        _CROP_TEXT_WITNESS: crop_named,
         'production_obs': production_obs.values,
         'Quantity':       quantity.values,
         'u':              u.values,
@@ -2390,6 +2381,9 @@ def _consolidate_harvest(harvest_pieces):
     (32 / 284 / 200 / 276 groups by wave before GH #637's tail fix).
     """
     harv = pd.concat(harvest_pieces, ignore_index=True)
+    if _CROP_TEXT_WITNESS not in harv:
+        harv[_CROP_TEXT_WITNESS] = False
+    harv[_CROP_TEXT_WITNESS] = harv[_CROP_TEXT_WITNESS].astype('boolean').fillna(False)
     harv['u'] = harv['u'].astype('string')
     harv['condition'] = harv['condition'].astype('string')
     keys = ['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code',
@@ -2403,6 +2397,7 @@ def _consolidate_harvest(harvest_pieces):
         'harvest_month':  'first',
         'intercropped':   'first',
         'perennial':      'first',
+        _CROP_TEXT_WITNESS: 'all',
     })
 
 
@@ -2526,13 +2521,20 @@ def _farm_level_sales(t, decisions, harv=None):
     code = pd.to_numeric(sale['_crop_code'], errors='coerce').astype('Int64')
     crop = code.map(crop_map)
     in_table = crop.notna()
+    crop_named = np.zeros(len(sale), dtype=bool)
     if harv is not None:
-        named = harv[['i', '_crop_code', 'crop']].dropna(subset=['crop']).drop_duplicates()
+        keys = ['i', '_crop_code', 'crop']
+        named = harv[keys + [_CROP_TEXT_WITNESS]].dropna(subset=['crop'])
+        named = (named.groupby(keys, as_index=False, sort=False, dropna=False)
+                 [_CROP_TEXT_WITNESS].all())
         named = named[~named.duplicated(['i', '_crop_code'], keep=False)].astype(
             {'i': 'string', '_crop_code': 'Int64', 'crop': 'string'})
         own = pd.DataFrame({'i': sale['i'].astype('string').values, '_crop_code': code.values}).merge(
-            named, on=['i', '_crop_code'], how='left')['crop']
-        crop = own.set_axis(sale.index).where(own.notna().to_numpy(), crop)
+            named, on=['i', '_crop_code'], how='left')
+        crop = own['crop'].set_axis(sale.index).where(own['crop'].notna().to_numpy(), crop)
+        # Keep the established label routing. The key needs stronger evidence:
+        # every contributing harvest must have taken it from text.
+        crop_named = own[_CROP_TEXT_WITNESS].fillna(False).to_numpy(dtype=bool)
     native = code.where(code.lt(1000).fillna(True), code - 1000)
     out = pd.DataFrame({
         'i': sale['i'].astype('string'),
@@ -2541,6 +2543,7 @@ def _farm_level_sales(t, decisions, harv=None):
         # the harvest side drops such a row with a warning, and this one holds money.
         'crop': crop.astype('string').where(crop.notna(), native.astype('string')),
         '_crop_code': code,
+        _CROP_TEXT_WITNESS: crop_named,
         'production_obs': _production_obs_of_sale(sale),
         'Quantity': pd.Series(pd.NA, index=sale.index, dtype='Float64'),
         'u': pd.Series(U_UNKNOWN, index=sale.index, dtype='string'),
@@ -2737,9 +2740,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     # GH #1228 ("Register all waves"): every row whose crop a crop text set -- a code-48
     # harvest line, or a Farm-level code-48 sale that took its household's label --
     # carries the relabel's key, beside any ladder key the row already holds.
-    _assert_label_is_text_only()
-    named = harv['crop'].astype('string').isin(sorted(set(_CROP_TEXT_RECODE.values()))) \
-        .fillna(False).to_numpy(dtype=bool)
+    named = harv.pop(_CROP_TEXT_WITNESS).to_numpy(dtype=bool)
     harv['Derivation'] = union_derivation_key(harv['Derivation'], named,
                                               CROP_TEXT_KEYS['crop_production'])
 
@@ -4061,7 +4062,7 @@ def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
     tables (GH #1228).  Returns (i, plot, _input_code=SEED, crop, Quantity, u,
     Improved)."""
     crop_label, _crop_code = _seed_crop_identity(df[cropcode])
-    crop_label, _ = _crop_text_labels(crop_label, df, cropcode, crop_text)
+    crop_label, crop_named = _crop_text_labels(crop_label, df, cropcode, crop_text)
     q = (pd.to_numeric(df[qty], errors='coerce').astype('Float64')
          if qty and qty in df.columns
          else pd.Series(pd.NA, index=df.index, dtype='Float64'))
@@ -4083,6 +4084,7 @@ def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
         'plot_id':        _plot_ids(df['plotkey']).values,
         '_input_code': _MWI_INPUT_SEED,
         'crop':        crop_label.values,
+        _CROP_TEXT_WITNESS: crop_named,
         'Quantity':    q.values,
         'u':           u.values,
         'Improved':    imp.values,
@@ -4577,6 +4579,9 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
     """
     df = pd.concat([p for p in input_pieces if p is not None and len(p)],
                    ignore_index=True)
+    if _CROP_TEXT_WITNESS not in df:
+        df[_CROP_TEXT_WITNESS] = False
+    df[_CROP_TEXT_WITNESS] = df[_CROP_TEXT_WITNESS].astype('boolean').fillna(False)
 
     source_observations = 'input_obs' in df.columns
     if source_observations:
@@ -4716,6 +4721,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
         'Quantity_received_as_gift': 'first',
         'Unit_received_as_gift':     'first',
         'Received_as_gift':          'first',
+        _CROP_TEXT_WITNESS: 'all',
     })
 
     # The natural per-input-line grain is (t, i, plot, input, crop, u): a
@@ -4740,11 +4746,8 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
     # GH #1228 ("Register all waves"): the seed rows whose crop a crop text set carry
     # the relabel's key.  Only a row with a payload: a key on an all-NA row would keep
     # it past _finalize_result's dropna(how='all'), undoing seed-line-no-payload.
-    _assert_label_is_text_only()
-    level = lambda name: pd.Series(out.index.get_level_values(name), dtype='string')  # noqa: E731
-    named = (level('input').eq('Seed').fillna(False).to_numpy(dtype=bool)
-             & level('crop').isin(sorted(set(_CROP_TEXT_RECODE.values()))).fillna(False)
-             .to_numpy(dtype=bool))
+    named = (out.pop(_CROP_TEXT_WITNESS).to_numpy(dtype=bool)
+             & (out.index.get_level_values('input') == 'Seed'))
     # A key already on a row (none today) is kept beside this one, and is not a payload.
     existing = (out['Derivation'] if 'Derivation' in out.columns
                 else pd.Series(pd.NA, index=out.index, dtype='string'))
