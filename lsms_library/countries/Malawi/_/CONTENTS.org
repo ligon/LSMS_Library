@@ -261,6 +261,29 @@ entry named five helpers, which was wrong.
   =_assert_label_is_text_only= stops every =crop_production= and =plot_inputs= build.
   The stamp would then have to read the code, not the label.
 
+* 2026-11-26 -- 2024-25 crop_production covers rainy harvest and sales (GH #1724 / #1275)
+
+The 2024-25 producer reports the rainy-season G13 actual harvest and Module I
+household-crop sales only. It keeps IHS6 in full for the 815 refresh interviews
+shared with IHPS and includes distinct retained IHPS interviews. The cover
+bridge uses the retained panel's current =y5_hhid=, not its baseline =case_id=.
+Dry-season and tree harvests and sales are not covered.
+
+Module G contributes 36,405 plot-crop records, including 3,917 zero and 17 blank
+G13 quantities. Twenty-five positive G13 quantities have not completed harvest
+in G07. They are harvest to date, not expected harvest (G08) or a basis for
+inferring a season. Preserving the zero and blank records does not make them
+positive harvests.
+
+All 8,786 positive Module I records use =Farm-level= because I records a crop
+sale but not its plot. Nothing is allocated, even if there is only one G plot.
+=Unit_sold= and =Condition_sold= retain I's own codes in the served vocabulary.
+No historical sale-ladder refusal or crop-text derivation applies to these
+rows. G and I retain separate native codes 48 / 49 for the two Other slots and
+code 50 directly names =Cowpea (Khobwe)=. Neither D text nor the legacy
+unit-text recodes are used. No conversion, sampling-weight, or historical
+crop decisions follow from this coverage.
+
 * 2026-11-13 -- plot_inputs: the six all-null native Module H columns dropped (GH #1712)
 
 GH #1190's carrier copied every native =ag_h*= column of the H file onto the acquisition

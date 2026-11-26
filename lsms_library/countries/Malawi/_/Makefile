@@ -69,14 +69,24 @@ $(VAR_DIR)/months_food_inadequate.parquet: months_food_inadequate.py $(months_fo
 	python months_food_inadequate.py
 
 # --- crop_production / harvest (GAP 1) ------------------------------------
-# Item-level (t, i, plot, crop) harvest for the four IHS3+/IHPS waves.
+# Harvest from the four IHS3+/IHPS waves plus rainy G and I in 2024-25.
 # Each wave script writes its parquet into data_root; the country script
 # concatenates.  2004-05 is ABSENT (household-level aggregated ag file).
-crop_waves := 2010-11 2013-14 2016-17 2019-20
+crop_waves := 2010-11 2013-14 2016-17 2019-20 2024-25
 crop_production_parquet := $(foreach r,$(crop_waves),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(r)/_/crop_production.parquet)
 
 $(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/crop_production.parquet: ../%/_/crop_production.py malawi.py categorical_mapping.org
 	(cd ../$(*)/_/ && python crop_production.py)
+
+# The modern wave also depends on the exact source identities. Keep this
+# target on the same implicit recipe as the historical waves.
+crop_2024_sidecars := ../2024-25/Data/Cross_Sectional/hh_mod_a_filt.dta.dvc \
+    ../2024-25/Data/Panel/hh_mod_a_filt_24.dta.dvc \
+    ../2024-25/Data/Cross_Sectional/ag_mod_g.dta.dvc \
+    ../2024-25/Data/Panel/ag_mod_g_24.dta.dvc \
+    ../2024-25/Data/Cross_Sectional/ag_mod_i.dta.dvc \
+    ../2024-25/Data/Panel/ag_mod_i_24.dta.dvc
+$(LSMS_DATA_ROOT)/$(COUNTRY)/2024-25/_/crop_production.parquet: $(crop_2024_sidecars)
 
 $(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet)
 	python crop_production.py
