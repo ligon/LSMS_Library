@@ -56,6 +56,8 @@ from .local_tools import (
     read_parquet_build_drops,
     _read_parquet_with_index_policy,
     _read_managed_parquet_cache,
+    _read_open_country_parquet_cache,
+    _CountryCacheFooter,
     source_tier,
     _collect_file_paths_from_block,
 )
@@ -5021,8 +5023,36 @@ class Country:
         if _no_cache():
             return None, None, "LSMS_NO_CACHE"
 
+        if not (_recover_unreadable or _borrowed_input):
+            # Explicit legacy mode keeps its strict get_dataframe contract.
+            return self._inspect_l2_country_cache(method_name, cache_path, waves)
+
+        # #1748: a replace can publish a different coverage manifest under
+        # the SAME table hash. Admit, decode and replay one opened snapshot.
+        try:
+            stream = open(cache_path, 'rb')
+        except OSError as error:
+            if _borrowed_input:
+                warnings.warn(f'v0.7.0 cache read failed for {method_name} '
+                              f'({error!r}); leaving borrowed live input '
+                              'unchanged and rebuilding privately',
+                              UserWarning, stacklevel=3)
+            else:
+                warnings.warn(f'Cache open failed for {cache_path} ({error!r}); '
+                              'rebuilding through the normal route',
+                              UserWarning, stacklevel=3)
+            return None, None, f"read-error: {error!r}"
+        with stream:
+            return self._inspect_l2_country_cache(
+                method_name, cache_path, waves, stream=stream,
+                borrowed_input=_borrowed_input)
+
+    def _inspect_l2_country_cache(self, method_name, cache_path, waves, *,
+                                  stream=None, borrowed_input=False):
         cache_expected_hash = self._table_cache_hash(method_name, waves)
-        freshness = cache_freshness(cache_path, cache_expected_hash)
+        footer = None if stream is None else _CountryCacheFooter(stream)
+        freshness = (cache_freshness(cache_path, cache_expected_hash) if footer is None
+                     else footer._country_hash_grade(cache_expected_hash))
         stale_reason = "STALE: stored content hash differs from the current inputs"
         # GH #809: at the COUNTRY tier, no hash means no evidence --
         # rebuild rather than trust-once-and-stamp.
@@ -5067,7 +5097,13 @@ class Country:
         # built from a superset of the requested waves.  Unknown
         # coverage (a pre-#891 parquet with no hash to corroborate it)
         # is treated as "covers a full-waves request only".
-        covered = self._cache_covers_waves(cache_path, waves, freshness)
+        if footer is None:
+            covered = self._cache_covers_waves(cache_path, waves, freshness)
+        else:
+            covered = footer._country_coverage_manifest()
+            # Same legacy migration as _cache_covers_waves (#891).
+            if covered is None and freshness == "fresh":
+                covered = list(self.waves)
         if covered is None:
             coverage_ok = {str(w) for w in waves} == {str(w) for w in self.waves}
         else:
@@ -5094,7 +5130,8 @@ class Country:
         # that cost a REQUIRED column is graded here: a miss (rebuild) once
         # the source is readable again, at most once per process; otherwise
         # served with a DegradedCacheWarning after the read below.
-        build_drops = read_parquet_build_drops(cache_path)
+        build_drops = (read_parquet_build_drops(cache_path) if footer is None
+                       else footer._country_dropped_builds())
         verdict, degraded_reason = _degraded_cache_verdict(
             build_drops, (self.name, method_name))
         if verdict == "rebuild":
@@ -5102,21 +5139,19 @@ class Country:
             return None, covered, degraded_reason
 
         def _serve_cached():
-            if _recover_unreadable or _borrowed_input:
-                cached_df, read_error, observed = _read_managed_parquet_cache(
-                    cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
+            if stream is not None:
+                cached_df, read_error, observed = _read_open_country_parquet_cache(
+                    cache_path, stream)
                 if read_error is not None:
-                    if _borrowed_input:
+                    # Close before possible removal (notably on Windows).
+                    stream.close()
+                    if borrowed_input:
                         warnings.warn(f'v0.7.0 cache read failed for {method_name} '
                                       f'({read_error!r}); leaving borrowed live input '
                                       'unchanged and rebuilding privately',
                                       UserWarning, stacklevel=3)
-                    elif observed is not None:
-                        _reject_unreadable_cache(cache_path, observed, read_error)
                     else:
-                        warnings.warn(f'Cache open failed for {cache_path} ({read_error!r}); '
-                                      'rebuilding through the normal route',
-                                      UserWarning, stacklevel=3)
+                        _reject_unreadable_cache(cache_path, observed, read_error)
                     return None, covered, f'read-error: {read_error!r}'
             else:
                 # Explicit legacy mode retains its old strict decoder and
@@ -5131,15 +5166,16 @@ class Country:
             # warm read, which is exactly how #323 survived its first fix.
             _replay_grain_audit(
                 self._grain_reports_for_waves(
-                    read_parquet_grain_audit(cache_path), waves),
+                    read_parquet_grain_audit(cache_path) if footer is None
+                    else footer._country_grain_stamp(), waves),
                 self.name, method_name,
             )
             # GH #1045: the date-parse report, by the same argument -- filtered
             # to the waves served, so a 2019-20 request is not told (or, under
             # LSMS_DATE_STRICT, failed) about a 2008-09 defect.
             replay_datetime_audit(
-                read_parquet_datetime_audit(cache_path),
-                self.name, method_name, waves=waves,
+                read_parquet_datetime_audit(cache_path) if footer is None
+                else footer._country_datetime_stamp(), self.name, method_name, waves=waves,
             )
             # GH #675: still degraded and not healable now -- serve, loudly.
             _warn_degraded_serve(self.name, method_name, build_drops, cache_path)
@@ -5161,7 +5197,7 @@ class Country:
             # here, on the serve path -- nothing downstream filters.
             return self._restrict_to_waves(cached_df, waves), covered, None
 
-        if _recover_unreadable or _borrowed_input:
+        if stream is not None:
             # No policy/schema/index/audit exception is a decode miss.
             return _serve_cached()
         try:
@@ -5196,68 +5232,57 @@ class Country:
         ``_restrict_to_waves`` stay fingerprinted through their build-path
         call sites.)
         """
-        prefer_parquet_cache = bool(getattr(self, "assume_cache_fresh", False)) and method_name not in JSON_CACHE_METHODS
-        if prefer_parquet_cache:
-            parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
-            if parquet_path.exists():
-                # GH #892: this branch used to return the parquet whole,
-                # ignoring `waves` entirely -- a one-wave request was served
-                # every wave in the cache, silently.  Nothing downstream
-                # filters, so the restriction has to happen here.
-                #
-                # It went unnoticed because on the ORDINARY path the pre-#891
-                # hash folded in the requested wave set, so a subset request
-                # graded `stale` and rebuilt; the #891 defect was what masked
-                # this one.  Making the hash wave-independent removes that
-                # accidental guard, so the two must be fixed together.
-                #
-                # `assume_cache_fresh` skips the hash check by contract, so
-                # coverage rests on the manifest alone: absent it (a pre-#891
-                # parquet), fall through to the normal path rather than guess.
-                covered = read_parquet_cache_waves(parquet_path)
+        if (not getattr(self, "assume_cache_fresh", False)
+                or method_name in JSON_CACHE_METHODS):
+            return None
+        parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"
+        if not parquet_path.exists():
+            return None
 
-                def _replay_audits():
-                    # GH #1066: replay stored evidence like the normal
-                    # read gate, without asserting freshness or completeness.
-                    # Clear both ledgers before a strict grain report can raise.
-                    _GRAIN_LEDGER.pop((self.name, method_name), None)
-                    _DATETIME_LEDGER.pop((self.name, method_name), None)
-                    _replay_grain_audit(
-                        self._grain_reports_for_waves(
-                            read_parquet_grain_audit(parquet_path), waves),
-                        self.name, method_name,
-                    )
-                    replay_datetime_audit(read_parquet_datetime_audit(parquet_path),
-                                          self.name, method_name, waves=waves)
-
-                def _read_cached():
-                    frame, error, observed = _read_managed_parquet_cache(
-                        parquet_path, open_errors=(FileNotFoundError,), check_null=True, engine='pyarrow')
-                    if error is not None and observed is not None:
-                        _reject_unreadable_cache(parquet_path, observed, error)
-                        return None, covered, f'read-error: {error!r}'
-                    return frame
-
-                if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
-                    df_cached = _read_cached()
-                    if df_cached is None or isinstance(df_cached, tuple):
-                        return df_cached
-                    df_cached = map_index(df_cached)
-                    df_cached = self._restrict_to_waves(df_cached, waves)
-                    _replay_audits()
-                    return df_cached
-                if covered is None and set(waves) == set(self.waves):
-                    df_cached = _read_cached()
-                    if df_cached is None or isinstance(df_cached, tuple):
-                        return df_cached
-                    df_cached = map_index(df_cached)
-                    _replay_audits()
-                    return df_cached
+        # #892/#1748: skip hash/degradation, but grade coverage and decode
+        # from the same opened file. A legacy missing manifest permits only
+        # a whole-country request, just as before.
+        try:
+            stream = open(parquet_path, 'rb')
+        except FileNotFoundError:
+            return None
+        except OSError:
+            if set(waves) != set(self.waves):
+                return None
+            raise
+        with stream:
+            footer = _CountryCacheFooter(stream)
+            covered = footer._country_coverage_manifest()
+            if not ((covered is not None and set(map(str, waves)) <= set(map(str, covered)))
+                    or (covered is None and set(waves) == set(self.waves))):
                 logger.debug(
                     f"assume_cache_fresh short-circuit SKIPPED (coverage): "
                     f"{method_name} covers {covered}; request needs {sorted(waves)}"
                 )
-        return None
+                return None
+
+            frame, error, observed = _read_open_country_parquet_cache(
+                parquet_path, stream)
+            if error is not None:
+                stream.close()
+                _reject_unreadable_cache(parquet_path, observed, error)
+                return None, covered, f'read-error: {error!r}'
+
+            frame = map_index(frame)
+            if covered is not None:
+                frame = self._restrict_to_waves(frame, waves)
+            # GH #1066: replay stored evidence without asserting freshness.
+            # Clear both ledgers before a strict grain report can raise.
+            _GRAIN_LEDGER.pop((self.name, method_name), None)
+            _DATETIME_LEDGER.pop((self.name, method_name), None)
+            _replay_grain_audit(
+                self._grain_reports_for_waves(
+                    footer._country_grain_stamp(), waves),
+                self.name, method_name,
+            )
+            replay_datetime_audit(footer._country_datetime_stamp(),
+                                  self.name, method_name, waves=waves)
+            return frame
 
     def _evict_hashless_wave_caches(self, method_name: str) -> None:
         """Delete L2-wave parquets for *method_name* that carry NO embedded

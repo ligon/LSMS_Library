@@ -30,6 +30,7 @@ source data is read and no ``make`` runs.
 """
 from __future__ import annotations
 
+import os
 import warnings
 from pathlib import Path
 
@@ -487,26 +488,26 @@ def test_site3_unreadable_old_cache_hands_off_coverage(acf):
     assert not path.exists() and finalized == []
 
 
+@pytest.mark.skipif(os.name == "nt", reason="Windows may disallow unlinking an open file")
 @pytest.mark.parametrize("coverage", ["covered-full", "covered-subset", "legacy-full"])
-def test_site3_disappearing_data_read_falls_through(acf, monkeypatch, coverage):
-    """GH #778: losing a parquet after its footer read is an ordinary miss."""
+def test_site3_disappearing_after_open_keeps_snapshot(acf, monkeypatch, coverage):
+    """A removed directory entry does not invalidate the admitted descriptor."""
     make, path, frame, finalized = acf
     c = make()
     metadata = {} if coverage == "legacy-full" else {"cache_waves": list(c.waves)}
     _plant(path, frame, cache_hash="x", **metadata)
-    waves = [c.waves[-1]] if coverage == "covered-subset" else list(c.waves)
-    reads = []
+    subset = coverage == "covered-subset"
+    waves = [c.waves[-1]] if subset else list(c.waves)
+    read_waves = C._CountryCacheFooter._country_coverage_manifest
 
-    def disappear(candidate, *args, **kwargs):
-        assert candidate == path and candidate.exists()
-        reads.append(candidate)
-        candidate.unlink()
-        raise FileNotFoundError(candidate)
+    def disappear(footer):
+        path.unlink()
+        return read_waves(footer)
 
-    monkeypatch.setattr(LT, "open", disappear, raising=False)
-    with pytest.raises(_FellThrough):
-        c._aggregate_wave_data(waves, CF_TABLE)
-    assert reads == [path] and finalized == []
+    monkeypatch.setattr(C._CountryCacheFooter, "_country_coverage_manifest", disappear)
+    got = c._aggregate_wave_data(waves, CF_TABLE)
+    assert _ts(got) == sorted(map(str, waves))
+    assert not path.exists() and len(finalized) == 1
 
 
 @pytest.mark.parametrize("error", [PermissionError("denied"), OSError("I/O failure"),
@@ -529,28 +530,25 @@ def test_site3_other_data_read_errors_still_raise(acf, monkeypatch, error, manif
 
 
 @pytest.mark.parametrize("subset", [False, True])
-def test_site3_disappearing_before_footer_falls_through(acf, monkeypatch, subset):
+def test_site3_disappearing_before_open_falls_through(acf, monkeypatch, subset):
     make, path, frame, finalized = acf
     c = make()
     _plant(path, frame, cache_hash="x", cache_waves=list(c.waves))
-    read_footer = C.read_parquet_cache_waves
+    original_open = open
     reads = []
 
-    def disappear_before_footer(candidate):
+    def disappear_before_open(candidate, *args, **kwargs):
+        if candidate != path:
+            return original_open(candidate, *args, **kwargs)
         candidate.unlink()
-        return read_footer(candidate)
-
-    def read_missing(candidate, *args, **kwargs):
-        assert not candidate.exists()
         reads.append(candidate)
         raise FileNotFoundError(candidate)
 
-    monkeypatch.setattr(C, "read_parquet_cache_waves", disappear_before_footer)
-    monkeypatch.setattr(LT, "open", read_missing, raising=False)
+    monkeypatch.setattr(C, "open", disappear_before_open, raising=False)
     waves = [c.waves[-1]] if subset else list(c.waves)
     with pytest.raises(_FellThrough):
         c._aggregate_wave_data(waves, CF_TABLE)
-    assert reads == ([] if subset else [path]) and finalized == []
+    assert reads == [path] and finalized == []
 
 
 @pytest.mark.parametrize("manifest", [True, False])
@@ -577,13 +575,15 @@ def test_site3_disappearance_does_not_hide_ordinary_source_error(acf, monkeypatc
     source_error = FileNotFoundError("required source is unavailable")
 
     def disappear(candidate, *args, **kwargs):
+        if candidate != path:
+            return open(candidate, *args, **kwargs)
         candidate.unlink()
         raise FileNotFoundError(candidate)
 
     def ordinary(self, *args, **kwargs):
         raise source_error
 
-    monkeypatch.setattr(LT, "open", disappear, raising=False)
+    monkeypatch.setattr(C, "open", disappear, raising=False)
     monkeypatch.setattr(C.Country, "_read_l2_country_cache", ordinary)
     with pytest.raises(FileNotFoundError) as caught:
         c._aggregate_wave_data(list(c.waves), CF_TABLE)
@@ -599,6 +599,8 @@ def test_site3_disappearance_can_serve_an_ordinary_cache_hit(acf, monkeypatch):
     replacement["Sex"] = "ordinary replacement"
 
     def disappear(candidate, *args, **kwargs):
+        if candidate != path:
+            return open(candidate, *args, **kwargs)
         candidate.unlink()
         raise FileNotFoundError(candidate)
 
@@ -606,7 +608,7 @@ def test_site3_disappearance_can_serve_an_ordinary_cache_hit(acf, monkeypatch):
         assert method_name == CF_TABLE and candidate == path
         return replacement, list(waves), None
 
-    monkeypatch.setattr(LT, "open", disappear, raising=False)
+    monkeypatch.setattr(C, "open", disappear, raising=False)
     monkeypatch.setattr(C.Country, "_read_l2_country_cache", ordinary)
     got = c._aggregate_wave_data(list(c.waves), CF_TABLE)
     pd.testing.assert_frame_equal(got, replacement)

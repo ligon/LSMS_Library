@@ -7,7 +7,7 @@ import sys
 import warnings
 from pathlib import Path
 from types import SimpleNamespace, ModuleType
-from unittest.mock import Mock, patch, PropertyMock
+from unittest.mock import ANY, Mock, patch, PropertyMock
 import pandas as pd
 import pytest
 
@@ -29,7 +29,7 @@ if not hasattr(_ligon_dataframes, "from_dta"):
     _ligon_dataframes.from_dta = _dummy_from_dta
 
 from lsms_library.country import Country, StageInfo, _normalize_dataframe_index
-from lsms_library.local_tools import to_parquet as write_parquet, _read_managed_parquet_cache
+from lsms_library.local_tools import to_parquet as write_parquet, _read_open_country_parquet_cache
 
 
 @pytest.fixture
@@ -270,7 +270,7 @@ class TestDVCCaching:
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "_augment_index_from_related_tables", new=_augment_passthrough), \
-            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_get_df, \
+            patch("lsms_library.country._read_open_country_parquet_cache", wraps=_read_open_country_parquet_cache) as mock_get_df, \
             patch("lsms_library.country.map_index", side_effect=lambda dataframe: dataframe) as mock_map_index, \
             patch("lsms_library.country.Repo") as mock_repo:
 
@@ -282,7 +282,7 @@ class TestDVCCaching:
             result = country._aggregate_wave_data(None, "test_data")
 
         mock_repo.assert_not_called()
-        mock_get_df.assert_called_once_with(cache_path, open_errors=(FileNotFoundError,), check_null=True, engine='pyarrow')
+        mock_get_df.assert_called_once_with(cache_path, ANY)
         mock_map_index.assert_called_once()
         pd.testing.assert_frame_equal(
             result.reset_index(drop=True),
@@ -458,7 +458,7 @@ class TestDVCCaching:
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe", return_value=cached_df) as mock_get_dataframe, \
-            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_read_cache, \
+            patch("lsms_library.country._read_open_country_parquet_cache", wraps=_read_open_country_parquet_cache) as mock_read_cache, \
             patch.object(Country, "_table_cache_hash", return_value=cache_hash), \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
@@ -501,7 +501,7 @@ class TestDVCCaching:
         mock_repo_class.assert_not_called()
         mock_get_dataframe.assert_not_called()
         mock_read_cache.assert_called_once_with(
-            cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
+            cache_path, ANY)
 
     def test_dvc_cache_applies_location_index(
         self,
@@ -749,7 +749,7 @@ class TestDVCCaching:
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe") as mock_get_dataframe, \
-            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_read_cache, \
+            patch("lsms_library.country._read_open_country_parquet_cache", wraps=_read_open_country_parquet_cache) as mock_read_cache, \
             patch("lsms_library.country.map_index", side_effect=lambda frame: frame), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
             patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
@@ -814,7 +814,7 @@ class TestDVCCaching:
         assert mock_stages[0].reproduce.call_count == 1, "Second call should not rerun DVC stage"
         mock_get_dataframe.assert_called_once_with(build_output_path)
         mock_read_cache.assert_called_once_with(
-            cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
+            cache_path, ANY)
 
     # ------------------------------------------------------------------
     # v0.7.0 cache-read fix coverage
@@ -851,7 +851,7 @@ class TestDVCCaching:
 
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
-            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_get_df, \
+            patch("lsms_library.country._read_open_country_parquet_cache", wraps=_read_open_country_parquet_cache) as mock_get_df, \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
             patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
