@@ -112,6 +112,9 @@ def test_rainy_harvest_and_unallocated_native_sales(modern_crop):
     assert i.loc[('cs-24-shared', 'reported:I:50'), 'Unit_sold'] == 'Other (Specify)'
     assert i.loc[('cs-24-shared', 'reported:I:50'), 'Value_sold'] == 5
     assert i.loc[('retained', 'reported:I:50'), 'Value_sold'] == 20
+    # Both harvest and sale name cowpea from their native code, not from text.
+    native_cowpea = rows['production_obs'].isin({'reported:G:50', 'reported:I:50'})
+    assert rows['crop'].eq('Cowpea (Khobwe)').tolist() == native_cowpea.tolist()
     assert rows['Derivation'].isna().all()
     assert not rows['perennial'].any()
     assert 'season' not in rows

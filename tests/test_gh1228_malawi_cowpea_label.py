@@ -1,8 +1,8 @@
 """Malawi: code 48 lines whose crop text says cowpea get a cowpea label (GH #1228).
 
-Seasonal Module G has no cowpea code, so respondents who grew it were coded 48
-OTHER (SPECIFY) and served ``crop = 'Other'``.  2010-11 carries the name on the
-row (``ag_g0d_os``; ruling 2026-11-04, the smallest step).  2016-17 / 2019-20
+Historical seasonal Module G has no cowpea code, so respondents who grew it were
+coded 48 OTHER (SPECIFY) and served ``crop = 'Other'``.  2010-11 carries the name
+on the row (``ag_g0d_os``; ruling 2026-11-04, the smallest step).  2016-17 / 2019-20
 carry it in Module D question 20's "Other Crop" text; the ruling of 2026-11-12
 ("Join D, single-text only") names a line from D only where its plot has exactly
 one text, and a code-48 sale follows the household's lines.  2013-14 (no text
@@ -21,6 +21,7 @@ from lsms_library.paths import countries_root
 
 MALAWI = countries_root() / 'Malawi'
 LABEL = 'Cowpea (Khobwe)'
+# Historical crop producers, including the 2013-14 no-text control.
 WAVES = ['2010-11', '2013-14', '2016-17', '2019-20']
 
 
@@ -493,7 +494,8 @@ def test_the_served_rows_are_the_source_lines(malawi):
     lines = _g_lines()
     assert len(lines) == 157
     cp = Country('Malawi').crop_production()
-    named = cp[cp.index.get_level_values('crop') == LABEL]
+    historical = cp.index.get_level_values('t').isin(WAVES)
+    named = cp[historical & (cp.index.get_level_values('crop') == LABEL)]
     # GH #1457's Farm-level sale rows take the household's label too; they are no harvest line.
     named = named[named.index.get_level_values('plot_id') != 'Farm-level']
     assert set(named.index.get_level_values('t')) == {'2010-11', '2016-17', '2019-20'}
@@ -551,10 +553,12 @@ def test_every_relabelled_row_carries_the_key_and_joins_its_inputs(table, key):
     served = getattr(malawi, table)().reset_index()
     keys = served['Derivation'].astype('string').str.split('+')
     keyed = keys.map(lambda ks: isinstance(ks, list) and key in ks).to_numpy(dtype=bool)
-    # These shipped waves have no code mapped directly to LABEL. That is a
-    # corpus check, not the general provenance rule (#1724).
     cowpea = served['crop'].astype(str).eq(LABEL).to_numpy(dtype=bool)
-    if table == 'plot_inputs':      # Module H's acquisition rows keep their code's label
+    if table == 'crop_production':
+        # The historical label is an independent oracle for the text match.
+        # Compare against keyed on the full frame to catch stamps outside it.
+        cowpea = cowpea & served['t'].astype(str).isin(WAVES).to_numpy(dtype=bool)
+    elif table == 'plot_inputs':    # Module H's acquisition rows keep their code's label
         cowpea = cowpea & served['input'].astype(str).eq('Seed').to_numpy(dtype=bool)
     assert (keyed == cowpea).all()
     assert set(served.loc[keyed, 't'].astype(str)) == {'2010-11', '2016-17', '2019-20'}
@@ -574,3 +578,16 @@ def test_every_relabelled_row_carries_the_key_and_joins_its_inputs(table, key):
         if wave != '2010-11':
             assert inputs['ag_d20_oth'].astype('string').str.strip().str.upper() \
                 .isin(['COWPEAS', 'COW PEAS']).all(), wave
+
+
+@pytest.mark.requires_s3
+def test_modern_native_cowpea_does_not_carry_the_text_key():
+    from lsms_library.country import Country
+    served = Country('Malawi').crop_production().reset_index()
+    modern = served[served['t'].astype(str).eq('2024-25')]
+    origin = modern['production_obs'].astype(str)
+    assert origin.eq('reported:G:50').any()
+    native = origin.isin({'reported:G:50', 'reported:I:50'})
+    assert modern['crop'].astype(str).eq(LABEL).tolist() == native.tolist()
+    keys = modern.loc[native, 'Derivation'].astype('string').str.split('+')
+    assert not keys.map(lambda ks: isinstance(ks, list) and KEY in ks).any()
