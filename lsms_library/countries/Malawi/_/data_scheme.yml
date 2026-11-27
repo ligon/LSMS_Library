@@ -200,9 +200,13 @@ Data Scheme:
     materialize: make
   crop_production:
     # Item-level (t, i, plot_id, crop) harvest feature for the four IHS3+
-    # IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 1.  Reported
-    # harvest Quantity + native unit + condition, and household-crop sale
-    # Quantity_sold / Value_sold.  Sales attach to a harvest row of single-plot
+    # IHPS waves (2010-11 through 2019-20) plus rainy-season coverage in
+    # 2024-25. Reported harvest Quantity + native unit + condition, and
+    # household-crop sale Quantity_sold / Value_sold. In 2024-25 Module G13
+    # supplies actual harvest (not necessarily complete) and all positive
+    # Module I sales are Farm-level, with no allocation to plots. See
+    # CONTENTS.org for this wave's scope, excluding dry-season and tree data.
+    # In the four older waves, sales attach to a harvest row of single-plot
     # crops only, in the sale's OWN unit (ag_i02b / ag_q02b, GH #824).  The sale-basis
     # ladder admits exact stated condition matches, an unknown wildcard,
     # registered price rules (including resolving contradictions), and

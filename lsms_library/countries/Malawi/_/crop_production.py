@@ -7,10 +7,10 @@ intercropped, perennial).  This script concatenates them.  Cross-wave
 id_walk (panel-id chaining) and the join of the cluster id ``v`` are
 applied by the framework at API time in _finalize_result.
 
-Only the four IHS3+ IHPS waves are buildable (2010-11, 2013-14, 2016-17,
-2019-20) -- these are the World Bank Plotcrop panel's waves 1-4.  2004-05
-(IHS2) is DEFERRED: its agricultural file is household-level aggregated
-(wide crop columns), with no plot-crop roster.
+The four IHS3+ IHPS waves (2010-11 through 2019-20) are the World Bank
+Plotcrop panel's waves 1-4. The 2024-25 wave serves rainy harvest and
+household-crop sales only. 2004-05 (IHS2) is deferred: its agricultural file
+is household-level aggregated (wide crop columns), with no plot-crop roster.
 """
 import pandas as pd
 
