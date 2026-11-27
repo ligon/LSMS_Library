@@ -1205,7 +1205,10 @@ def _country_script_dvc_hash_parts(country_dir: Path, script: Path) -> list[str]
                 if stat.S_ISREG(sidecar.lstat().st_mode):
                     digest = cached_file_hash(sidecar)
                     if digest is not None:
-                        parts.append(f"csrc:{relative.as_posix()}={digest}")
+                        # A POSIX byte filename can contain surrogateescape
+                        # characters even though the table hash input is UTF-8.
+                        key = json.dumps(relative.as_posix(), ensure_ascii=True)
+                        parts.append(f"csrc:{key}={digest}")
         except (OSError, UnicodeEncodeError):
             continue
     return parts

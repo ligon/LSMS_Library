@@ -141,6 +141,21 @@ def test_unencodable_literal_does_not_hide_other_sidecars(model):
 
 
 @pytest.mark.parametrize('model', ['Alpha'], indirect=True)
+def test_filesystem_surrogateescape_sidecar_has_valid_hash(model):
+    if os.name != 'posix' or os.fsencode('\udcff') != b'\xff':
+        pytest.skip('environment lacks POSIX byte filenames')
+    script = model.source / '_/facts.py'
+    script.write_text("SOURCE = '../Data/raw\\udcff.csv'\n")
+    sidecar = model.source / 'Data/raw\udcff.csv.dvc'
+    _sidecar(sidecar)
+    hash_table = model.country._table_cache_hash
+    previous = hash_table(TABLE, WAVES)
+    _sidecar(sidecar, 'b')
+    following = hash_table(TABLE, WAVES)
+    assert previous and following and previous != following
+
+
+@pytest.mark.parametrize('model', ['Alpha'], indirect=True)
 @pytest.mark.parametrize('no_repo', [False, True], ids=['no-stages', 'repo-unavailable'])
 def test_default_country_only_rebuild_replaces_stale_payload(model, monkeypatch, no_repo):
     """Both default writers reach the existing country-only producer, not the old file."""
