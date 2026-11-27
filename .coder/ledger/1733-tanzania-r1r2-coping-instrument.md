@@ -20,8 +20,8 @@ One folder 2008-15 holds four rounds. 2008-09 and 2010-11 `shocks` grade `sane`,
 No quantity computed; no new library symbol. Throwaway stdlib readers live in the dispatch evidence directory.
 
 ## §6 Findings
-Section R of the R1 workbook and the R2 form (English, Swahili) has questions 1-5 only; manuals, the UPQ R1/R2 panels and DDI 76 / 1050 agree; R3 is the first round with a coping question (positive control). Not asked in the published forms; acquisition would not recover it. Report, hashes and checks (20 of 20) are in the dispatch evidence directory, not in the repository.
-Open for the maintainer: how to record a column-and-wave "not asked".
+Section R of the R1 workbook and the R2 form (English, Swahili) has questions 1-5 only; manuals, the UPQ R1/R2 panels and DDI 76 / 1050 agree; R3 is the first round with a coping question (positive control). Not asked in the published forms inspected. This does not establish the exact fielded Y1 revision or show that a different field pack or deployed form could not resolve the question. Report, hashes and checks (20 of 20) are in the dispatch evidence directory, not in the repository.
+Open: authenticate the fielded Y1 authority specified in #1733 before any fielded-scope or column-and-wave verdict. Do not reinterpret Year 2 food coping or record a whole-shocks verdict.
 
 ---
 ### Phase 3

@@ -3331,7 +3331,7 @@ original R1/R2 forms is not established (GH #1562 audit F5, a residual).
 
 * 2026-11-25 -- Published NPS Y1 and Y2 household forms have no shock coping (GH #1733)
 
-The published originals fill the gap left by the earlier bounded Section R check.
+Inspection of the published copies extends the earlier bounded Section R check.
 The [[https://microdata.worldbank.org/catalog/76/download/11558][Y1 household workbook]], sheet =R SHOCKS=, and the [[https://microdata.worldbank.org/catalog/1050/download/30525][English]] and [[https://microdata.worldbank.org/catalog/1050/download/30526][Swahili]] Y2 household forms, p.44, have five shock questions and stop at the timing of the event.
 The Y1/Y2 enumerator manuals, the two published data dictionaries and the corresponding panels on p.129 of the [[https://microdata.worldbank.org/catalog/3814/download/48978][Uniform Panel Questionnaire]] agree.
 Round 3 is a positive control: its form asks what the household did after the shock.
@@ -3339,11 +3339,11 @@ The Y2 food-coping questions are a separate battery and do not refer to the Sect
 
 The combined 2008-15 folder and Uniform Panel Dataset use a common layout across four rounds.
 A coping column in the common layout does not establish that every round asked it.
-The published evidence does not support acquiring Y1/Y2 originals to recover coping answers.
+These public copies do not justify acquiring another copy of the same release to recover coping answers.
 Do not file a =not-asked= coverage verdict for =shocks= itself: those waves asked about shocks and serve answers.
 The missing coping fields and read-time warning are unchanged.
 
-The exact fielded Y1 revision is not authenticated.
+The exact fielded Y1 revision is not authenticated. The missing authority is the NBS English/Kiswahili Section R field pack and addenda, or the deployed CSPro Section R form and logic with a producer bridge to the paper revision and SEC_R export.
 The published Y1 workbook was saved in October 2010 after fieldwork, and the catalog does not post a Y1 Swahili household form.
 Some hidden boxes in the workbook are template material, including medical-treatment responses rather than shock coping.
 The figure and question-code checks are recorded in the issue ledger.
