@@ -40,3 +40,16 @@ of losslessness. Neither is an oracle for distinct item keys after relabeling.
 
 Togo, Benin and Côte d’Ivoire remain outside this ruling. No claims about
 native records or an untested survey shape follow from the synthetic tests.
+
+### Phase 3 — verification
+
+- `Country._finalize_result` — OK (§2, §4). Tracks actual rename positions
+  through the existing hollow-row filter. Six country and twelve wave hashes,
+  three build-transform fingerprints and the registry/exclusions matched.
+- `_asset_label_collision_counts` — OK (§1, §3). Two groups and five surviving
+  rows in the discriminating fixture, with no byte change to compared frame
+  representations. No inference for incomplete identity or a spelling-only
+  duplicate.
+- `AssetLabelCollisionWarning` — OK (§1, §5). Count-only output. Country and
+  Feature each showed one warning for the affected result. The old pre-map
+  reducer, warning, ledger and strict rejection behaved the same.
