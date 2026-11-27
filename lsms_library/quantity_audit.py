@@ -401,6 +401,8 @@ from __future__ import annotations
 
 import os
 import warnings
+from contextlib import contextmanager
+from contextvars import ContextVar
 from typing import Any
 
 import numpy as np
@@ -429,6 +431,17 @@ __all__ = [
 
 
 _QUANTITY_STRICT_ENV = "LSMS_QUANTITY_STRICT"
+_SITE_Q_AUDIT_SUMMARY = ContextVar("lsms_site_q_audit_summary", default=False)
+
+
+@contextmanager
+def _site_q_strict_audit_summary():
+    """Use a publishable strict diagnostic for one Feature-audit build."""
+    token = _SITE_Q_AUDIT_SUMMARY.set(True)
+    try:
+        yield
+    finally:
+        _SITE_Q_AUDIT_SUMMARY.reset(token)
 
 #: How many times its comparison cell's :data:`QUANTITY_REFERENCE_QUANTILE` a
 #: value must exceed before it is reported.  See the module docstring for the
@@ -1732,9 +1745,16 @@ def _record_quantity_report(report: dict[str, Any]) -> None:
 
 def _emit_quantity_report(report: dict[str, Any]) -> None:
     """Raise (strict) or warn (default).  The single choke point."""
-    msg = _format_quantity_report(report)
     if _quantity_strict():
-        raise QuantityImplausibleError(msg)
+        if _SITE_Q_AUDIT_SUMMARY.get():
+            # Feature can wrap a per-country exception in an untyped warning.
+            # Keep row detail out of its text before either route captures it.
+            raise QuantityImplausibleError(
+                "Site Q rejected an implausible recorded value in strict mode. "
+                "Inspect the local diagnostic for row details."
+            )
+        raise QuantityImplausibleError(_format_quantity_report(report))
+    msg = _format_quantity_report(report)
     category = (SurveyKgPriceWarning if report.get("site") == _SURVEY_KG_PRICE_SITE
                 else QuantityImplausibleWarning)
     warnings.warn(msg, category, stacklevel=2)
