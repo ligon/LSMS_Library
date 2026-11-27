@@ -14,3 +14,5 @@ On development d18b47de60e49b2369ec85a212ba494381b4a4e9 an invented applied-quan
 ## Verification plan
 
 Require a real emitter and Feature wrapper on invented data in all three phases. Assert that recorded and clustered detail withholds row keys and magnitude while loading outcomes remain recognizable. Confirm ordinary detailed diagnostics after normal and exceptional unwind, tolerating nested audit calls, and preserve unrelated exception messages. Compare the exact composed pending warning-taxonomy and purchase changes as well as the live-base route. Measure fingerprints rather than assuming no churn.
+
+The separate coverage-matrix proof traced the same raw strict message through the broken grade, saved CSV, public snapshot reader and docs HTML. Its existing _safe_build enters the same context. Coverage-only grading still does not call the builder. No other audit or diagnostic is redacted by this change.

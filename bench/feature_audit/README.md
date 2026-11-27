@@ -48,9 +48,9 @@ LSMS_DATA_DIR=$COLD PYTHONPATH=/abs/path python /abs/path/bench/feature_audit/sc
 Flags: `--features canonical|all|<names…>`, `--countries <names…>`,
 `--phases 1,2`, `--limit-countries N` (smoke), `--out`.
 
-When Site Q runs in strict mode, the scan retains the failure but omits its
-row-level detail from findings and grouped examples. Run the Country or Feature
-call locally outside the scanner to inspect the full diagnostic.
+When Site Q runs in strict mode, the scan and coverage matrix retain the
+failure but omit its row-level detail from their reports. Run the Country or
+Feature call locally to inspect the full diagnostic.
 
 **What it checks**
 

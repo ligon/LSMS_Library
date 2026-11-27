@@ -616,10 +616,13 @@ def _safe_build(co, feature, env):
     Returns ``(df_or_None, err_str_or_None)``. Mirrors ``scan.py:_build``
     (thinner; we don't need the per-warning findings here).
     """
+    from .quantity_audit import _site_q_strict_audit_summary
+
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         try:
-            return env["load_feature"](co, feature), None
+            with _site_q_strict_audit_summary():
+                return env["load_feature"](co, feature), None
         except Exception as e:  # noqa: BLE001 — any build failure is a 'broken' cell
             return None, f"{type(e).__name__}: {e}"
 

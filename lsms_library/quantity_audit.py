@@ -436,7 +436,7 @@ _SITE_Q_AUDIT_SUMMARY = ContextVar("lsms_site_q_audit_summary", default=False)
 
 @contextmanager
 def _site_q_strict_audit_summary():
-    """Use a publishable strict diagnostic for one Feature-audit build."""
+    """Use a publishable strict diagnostic for one reporting build."""
     token = _SITE_Q_AUDIT_SUMMARY.set(True)
     try:
         yield

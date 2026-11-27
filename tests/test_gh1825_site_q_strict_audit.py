@@ -1,5 +1,6 @@
 """Strict Site Q diagnostics stay local even when Feature wraps the failure."""
 
+import csv
 import json
 from types import SimpleNamespace
 import warnings
@@ -104,3 +105,32 @@ def test_normal_local_warning_and_unrelated_exception_unchanged(invented_site_q,
 
     _, _, error, _ = scan._build(unrelated)
     assert error == "ValueError: unrelated failure containing the words QuantityImplausibleError"
+
+
+def test_strict_coverage_snapshot_and_render_do_not_expose_rows(invented_site_q, tmp_path):
+    from docs_hooks import coverage_matrix as docs_coverage
+    from lsms_library import coverage_matrix as coverage, diagnostics
+
+    country = SimpleNamespace(plot_inputs=invented_site_q)
+    env = {"load_feature": diagnostics.load_feature}
+    options = dict(avail_by_wave={"2021-22": {"plot_inputs"}})
+    rows = coverage.grade_feature("Niger", "plot_inputs", ["2021-22"], country, env, **options)
+    broken, = rows
+    assert broken["tier"] == "broken"
+    assert broken["detail"].startswith("QuantityImplausibleError:")
+    snapshot = tmp_path / "coverage.csv"
+    coverage.save_snapshot(pd.DataFrame(rows, columns=coverage.COLUMNS), snapshot, merge=False)
+    recovered = coverage.coverage(snapshot=snapshot)
+    assert recovered.iloc[0]["detail"] == broken["detail"]
+    with snapshot.open(newline="") as saved:
+        html = docs_coverage.render_fragment(list(csv.DictReader(saved)))
+    assert "QuantityImplausibleError:" in html
+    for surface in (broken["detail"], snapshot.read_text(), html):
+        assert not any(marker in surface for marker in (_HOUSEHOLD, _PLOT, "9,000", "9000"))
+
+    cheap, = coverage.grade_feature(
+        "Niger", "plot_inputs", ["2021-22"], country, env, readiness=False, **options
+    )
+    assert cheap["tier"] == "declared"
+    with pytest.raises(q.QuantityImplausibleError, match=_HOUSEHOLD):
+        invented_site_q()
