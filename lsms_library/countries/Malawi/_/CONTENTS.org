@@ -162,6 +162,17 @@ lines carry it (the =_farm_level_sales= rule GH #1457 already applied for 2010-1
 - =_assert_label_is_text_only= refuses to stamp if a =harmonize_crop= code ever maps to
   =Cowpea (Khobwe)=, because the stamp reads the label as "set from a text".
 
+*2026-11-26 native-code retention (GH #1724).*
+The IHS5 cross-section Module G release lists 66 entries under numeric code 49,
+with no category label for the G code in the NSO dictionary.
+Keep those seasonal rows as literal =49=, as the seed table already does.
+The raw code is not a crop's identity, is not a new country-wide map and is
+not merged with code 48.
+Their native quantities, units, and states are retained.
+The display fallback runs after the existing sale decisions, so it neither
+changes sale price-reference cells nor relocates sale amounts.
+The Panel and earlier waves keep their existing mapping and filters.
+
 *2026-11-26 update (GH #1724).* Crop-text provenance stays distinct from the displayed crop.
 
 The #1228 key follows the existing text-match witness, not any crop that

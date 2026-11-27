@@ -262,7 +262,8 @@ def test_old_helper_and_r1_r3_source_inverse_exact():
             'D20_TEXT_COL','D20_REASON_COL','attach_module_d_text','_D20_TEXT_48',
             # its registration (ruling 2026-11-13, "Register all waves")
             'CROP_TEXT_KEYS','CROP_TEXT_WAVES','derive_cowpea_from_crop_text',
-            'union_derivation_key','_CROP_TEXT_WITNESS',
+            'union_derivation_key','_CROP_TEXT_WITNESS','_RAW_HARVEST_CODE',
+            'keep_unmapped_seasonal_harvest_code',
             'inputs_cowpea_from_crop_text',
             # GH #1712 (ruling 2026-11-13, "Drop the six")
             '_H_EMPTY_IN_RELEASE','_blank'}
