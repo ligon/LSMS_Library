@@ -1,8 +1,12 @@
 """Source-bound PR guards with invented events; no tokens, data or API calls."""
 from copy import deepcopy
 import importlib.util
+import json
+import os
 import re
 from pathlib import Path
+import subprocess
+import sys
 import textwrap
 
 import pytest
@@ -12,14 +16,27 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / '.github/workflows/pr-data-validation.yml'
 
 
-def _inline(marker):
+def _inline_source(marker):
     text = WORKFLOW.read_text()
     body = text.split('# BEGIN_' + marker + '\n', 1)[1].split('# END_' + marker, 1)[0]
     lines = textwrap.dedent(body).strip().splitlines()
     assert lines[0] == "python3 - <<'PY'" and lines[-1] == 'PY'
+    return '\n'.join(lines[1:-1]) + '\n'
+
+
+def _inline(marker):
     namespace = {'__name__': 'source_bound_guard'}
-    exec(compile('\n'.join(lines[1:-1]), str(WORKFLOW), 'exec'), namespace)
+    exec(compile(_inline_source(marker), str(WORKFLOW), 'exec'), namespace)
     return namespace
+
+
+def _run_inline(marker, directory, **env):
+    # Use only the invented runner inputs and the Windows process prerequisite.
+    if os.name == 'nt':
+        env['SystemRoot'] = os.environ['SystemRoot']
+    return subprocess.run([sys.executable, '-I', '-'], input=_inline_source(marker),
+                          cwd=directory, env=env, capture_output=True, encoding='utf-8',
+                          timeout=30)
 
 
 @pytest.fixture
@@ -33,6 +50,56 @@ def event(action='opened'):
                              'head': {'sha': 'a' * 40, 'repo': {'full_name': 'owner/project'}},
                              'base': {'sha': 'b' * 40, 'ref': 'development',
                                       'repo': {'full_name': 'owner/project'}}}}
+
+
+@pytest.mark.parametrize('fault', [None, 'draft', 'invalid-json'])
+def test_event_entrypoint_exit_and_output(tmp_path, fault):
+    value = event('ready_for_review')
+    if fault == 'draft':
+        value['pull_request']['draft'] = True
+    event_path = tmp_path / 'event.json'
+    event_path.write_text('{' if fault == 'invalid-json' else json.dumps(value),
+                          encoding='utf-8')
+    output = tmp_path / 'output'
+    initial = 'previous=preserved\n'
+    output.write_text(initial, encoding='utf-8')
+
+    run = _run_inline('PR_DATA_EVENT_GATE', tmp_path,
+                      GITHUB_EVENT_PATH=str(event_path), GITHUB_OUTPUT=str(output),
+                      GITHUB_REPOSITORY='owner/project', GITHUB_EVENT_NAME='pull_request')
+    if fault is None:
+        assert run.returncode == 0, run.stderr
+        assert output.read_text(encoding='utf-8') == (
+            initial + f"mode=validate\nhead={'a' * 40}\nbase={'b' * 40}\n")
+        assert run.stdout == 'PR data request classification: validate\n'
+    else:
+        assert run.returncode == 1
+        assert not run.stdout
+        assert run.stderr.startswith('PR data request refused before checkout: ')
+        assert output.read_text(encoding='utf-8') == initial
+
+
+@pytest.mark.parametrize('result,mode,error', [
+    ('success', 'validate', None),
+    ('failure', 'validate', 'Event classification failed; no data validation claimed'),
+    ('success', 'metadata', 'Event classification failed; no data validation claimed'),
+    ('success', None, "'REQUEST_MODE'"),
+])
+def test_result_entrypoint_exit_and_output(tmp_path, result, mode, error):
+    output = tmp_path / 'output'
+    env = {'CLASSIFICATION_RESULT': result, 'GITHUB_OUTPUT': str(output)}
+    if mode is not None:
+        env['REQUEST_MODE'] = mode
+
+    run = _run_inline('PR_DATA_RESULT_GATE', tmp_path, **env)
+    if error is None:
+        assert run.returncode == 0, run.stderr
+        assert run.stdout == 'Eligible ready development PR: validating the exact synthetic merge\n'
+    else:
+        assert run.returncode == 1
+        assert not run.stdout
+        assert run.stderr == error + '\n'
+    assert not output.exists()
 
 
 @pytest.mark.parametrize('action', ['opened', 'synchronize', 'reopened', 'ready_for_review'])
