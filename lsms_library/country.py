@@ -1177,11 +1177,16 @@ _BUILD_INPUT_SUFFIXES = {".py", ".csv", ".json", ".txt", ".tab", ".tsv"}
 
 def _country_script_dvc_hash_parts(country_dir: Path, script: Path) -> list[str]:
     """Portable, sidecar-only input identities for one country-table script."""
-    paths = {
-        Path(os.path.normpath(script.parent / ref))
-        for ref in scan_script_data_refs(script)
-        if "\x00" not in ref and not Path(ref).is_absolute()
-    }
+    try:
+        paths = {
+            Path(os.path.normpath(script.parent / ref))
+            for ref in scan_script_data_refs(script)
+            if "\x00" not in ref and not Path(ref).is_absolute()
+        }
+    except UnicodeDecodeError:
+        # The shared literal scanner expects UTF-8. Keep the script's byte
+        # hash even when it cannot discover literal inputs for this encoding.
+        return []
     parts = []
     for path in sorted(paths):
         if not path.is_relative_to(country_dir):
@@ -1201,7 +1206,7 @@ def _country_script_dvc_hash_parts(country_dir: Path, script: Path) -> list[str]
                     digest = cached_file_hash(sidecar)
                     if digest is not None:
                         parts.append(f"csrc:{relative.as_posix()}={digest}")
-        except OSError:
+        except (OSError, UnicodeEncodeError):
             continue
     return parts
 

@@ -113,6 +113,34 @@ def test_script_edit_refreshes_literal_discovery(model):
 
 
 @pytest.mark.parametrize('model', ['Alpha'], indirect=True)
+def test_non_utf8_country_script_keeps_content_invalidation(model):
+    script = model.source / '_/facts.py'
+    one = b"# coding: latin-1\nNOTE = 'caf\xe9'\n"
+    two = b"# coding: latin-1\nNOTE = 'caf\xe8'\n"
+    for src in (one, two):
+        compile(src, str(script), 'exec')
+    hash_table = model.country._table_cache_hash
+    script.write_bytes(one)
+    previous = hash_table(TABLE, WAVES)
+    script.write_bytes(two)
+    following = hash_table(TABLE, WAVES)
+    assert previous and following and previous != following
+
+
+@pytest.mark.parametrize('model', ['Alpha'], indirect=True)
+def test_unencodable_literal_does_not_hide_other_sidecars(model):
+    script = model.source / '_/facts.py'
+    script.write_text("INVALID = '../Data/00\\ud800.csv'\nSOURCE = '../Data/facts.csv'\n")
+    sidecar = model.source / 'Data/facts.csv.dvc'
+    _sidecar(sidecar)
+    hash_table = model.country._table_cache_hash
+    previous = hash_table(TABLE, WAVES)
+    _sidecar(sidecar, 'b')
+    following = hash_table(TABLE, WAVES)
+    assert previous and following and previous != following
+
+
+@pytest.mark.parametrize('model', ['Alpha'], indirect=True)
 @pytest.mark.parametrize('no_repo', [False, True], ids=['no-stages', 'repo-unavailable'])
 def test_default_country_only_rebuild_replaces_stale_payload(model, monkeypatch, no_repo):
     """Both default writers reach the existing country-only producer, not the old file."""
