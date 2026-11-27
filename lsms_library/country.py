@@ -4682,7 +4682,68 @@ class Country:
 
         return df
 
+    @cached_property
+    def _country_cache_dependencies(self) -> dict[str, tuple[str, ...]]:
+        """Opt-in L2-country build dependencies, independent of output columns."""
+        resources = self.resources
+        if not isinstance(resources, dict) or "Cache Dependencies" not in resources:
+            return {}
+        declared = resources["Cache Dependencies"]
+        scheme = resources.get("Data Scheme")
+        tables = (set(scheme) - JSON_CACHE_METHODS if isinstance(scheme, dict) else set())
+        tables -= set(self._ROSTER_DERIVED) | set(self._FOOD_DERIVED)
+        label = f"{self.name}/Cache Dependencies"
+        if not isinstance(declared, dict):
+            raise ValueError(f"{label}: expected a mapping of table names to lists")
+        graph = {}
+        for owner, dependencies in declared.items():
+            if not isinstance(owner, str) or owner not in tables:
+                raise ValueError(f"{label}: unknown cached table {owner!r}")
+            if (not isinstance(dependencies, list) or not dependencies
+                    or any(not isinstance(dep, str) or dep not in tables for dep in dependencies)):
+                raise ValueError(f"{label}: {owner!r} needs a nonempty list of cached table names")
+            if len(set(dependencies)) != len(dependencies):
+                raise ValueError(f"{label}: duplicate dependency for {owner!r}")
+            graph[owner] = tuple(sorted(dependencies))
+
+        visiting, checked = set(), set()
+
+        def visit(name):
+            if name in visiting:
+                raise ValueError(f"{label}: cycle involving {name!r}")
+            if name in checked:
+                return
+            visiting.add(name)
+            for dep in graph.get(name, ()):
+                visit(dep)
+            visiting.remove(name)
+            checked.add(name)
+
+        for owner in graph:
+            visit(owner)
+        return graph
+
     def _table_cache_hash(self, method_name: str, waves: list[str]) -> str | None:
+        """Fingerprint declared country inputs as well as the table's own build."""
+        graph = self._country_cache_dependencies
+        if method_name not in graph:
+            return self._own_table_cache_hash(method_name, waves)
+        memo = {}
+
+        def digest(name, selected_waves):
+            if name not in memo:
+                own = self._own_table_cache_hash(name, selected_waves)
+                if own is None:
+                    raise ValueError(f"{self.name}/{method_name}: no cache fingerprint for {name!r}")
+                inputs = [(dep, digest(dep, self.waves)) for dep in graph.get(name, ())]
+                memo[name] = (hashlib.sha256(json.dumps(
+                    ["country-cache-dependencies-v1", own, inputs]).encode()).hexdigest()
+                    if inputs else own)
+            return memo[name]
+
+        return digest(method_name, waves)
+
+    def _own_table_cache_hash(self, method_name: str, waves: list[str]) -> str | None:
         """Composite content hash for the L2-country parquet of
         *method_name* across *waves* (v0.8.0 cache invalidation).
 
@@ -5196,6 +5257,9 @@ class Country:
         ``_restrict_to_waves`` stay fingerprinted through their build-path
         call sites.)
         """
+        # Validate the declaration before any cache hit or cold producer.
+        # A valid assume_cache_fresh call still deliberately bypasses hashes.
+        _ = self._country_cache_dependencies
         prefer_parquet_cache = bool(getattr(self, "assume_cache_fresh", False)) and method_name not in JSON_CACHE_METHODS
         if prefer_parquet_cache:
             parquet_path = data_root(self.name) / "var" / f"{method_name}.parquet"

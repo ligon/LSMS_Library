@@ -118,6 +118,15 @@ cache automatically — no manual step required. The recompute is cheap
 (~1–4 ms; small config/sidecar reads only, no `.dta` hashing, no S3, no
 directory walk), preserving the v0.7.0 fast-path win.
 
+A country compiler that reads other harmonized country tables can declare
+them in the top-level `Cache Dependencies` mapping in `data_scheme.yml`.
+Uganda's `income` declares `earnings` and `enterprise_income`. Their
+full-country hashes contribute to the selected table's country-cache hash on either
+backend, so changing a declared input invalidates income even if it was
+written without a Make receipt. This is an opt-in country-level rule, not
+inference of dependencies from arbitrary scripts. It does not change
+L2-wave input hashes or add dependency checks to wave producers.
+
 **Known limitations.** (1) Script-path tables whose sources are
 referenced via *dynamically-constructed* paths (not string literals in
 the `_/{table}.py`) are covered only by hashing the script text, not the
