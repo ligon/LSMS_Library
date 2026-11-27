@@ -1424,3 +1424,47 @@ Nigeria::crop_production::w3-ag-conversion:
   contents: >-
     Nigeria/_/CONTENTS.org, "W3 shipped harvest factors" (GH #1518)
   since: '2026-11-13'
+
+Nigeria::crop_production::w2-release-kg:
+  waves: ['2012-13']
+  columns: [Quantity_kg]
+  rows: {t: '2013Q1'}
+  rule: >-
+    On retained 2013Q1 A3 lines with Q3 Yes (sa3q3=1), positive finite
+    Q6a1, and a named nonstandard unit on the wave's own Q6a2 card, multiply
+    sa3q6a1 by the unique positive finite conversion from w2agnsconversion.csv
+    at the exact native (cropcode, nscode=sa3q6a2) key, only with kg=1
+    and a finite positive product. All other lines are unchanged. This
+    release-table estimate is not enumerator-weighed mass, a reported
+    KgFactor, or a sale conversion. The survey_kg rung does not replace
+    this Derivation identity.
+  function: lsms_library.countries.Nigeria._.nigeria:derive_w2_crop_release_kg
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_w2_crop_release_kg
+  raw_variables: [hhid, plotid, cropid, cropcode, sa3q3, sa3q6a1, sa3q6a2,
+                  cropname, nscode, conversion, kg]
+  assumptions:
+    - text: >-
+        Only the own release's kg=1 is identified as kilograms. Code 0,
+        missing or unsupported basis flags and unmatched pairs are not
+        assigned by this key. No alternate card, density, or geography is inferred.
+      basis: variable-label
+      evidence: >-
+        World Bank GHS-Panel Wave 2 dictionary F99 (A3 V2935, V2940 and
+        V2941) and F118 (w2agnsconversion V3299 through V3303).
+    - text: >-
+        Apply the released rate to the recorded Q6 amount as a labelled
+        estimate. Neither a less-than-one threshold nor the published
+        examples establish the respondent's harvest quantity convention.
+      basis: modelling-choice
+      evidence: >-
+        Maintainer ruling 2026-11-27 (GH #1518), "Serve the labeled W2
+        estimate". The W2 BID §7.27 describes multiplication to a standard
+        unit, but its landowner-transfer example is not Q6 and its printed
+        arithmetic is inconsistent.
+  validated_against: >-
+    Historical native-key coverage was 5,269 documented kg matches of 5,430
+    eligible raw candidates, not an API or yield delta. The Q6 reporting
+    convention and physical mass are not independently established.
+  contents: >-
+    Nigeria/_/CONTENTS.org, "W2 release-table harvest kilogram estimate" (GH #1518)
+  since: '2026-11-27'

@@ -3,8 +3,8 @@
 
 Natural grain (t, i, plot_id, crop, production_obs): one row per harvest line of
 the post-harvest crop module (secta3*).  Stores REPORTED item-level fields --
-no yield, no main_crop, no value shares (those are transformations) -- plus one
-construction: W3's Quantity_kg from the World Bank's own ag_conv_w3 table
+no yield, no main_crop, no value shares (those are transformations) -- plus
+registered release-table harvest estimates in Quantity_kg for W2 and W3
 (GH #1518, below).
 
 production_obs (GH #1433) names the line, because harmonize_food folds several codes
@@ -93,6 +93,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, source_fingerprint, to_parquet
 from nigeria import (PH_QUARTER, W3_HARVEST_UNIT_OVERRIDE, crop_production_for_wave,
+                     crop_production_w2,
                      _crop_labels, format_id, hh_crop_sale_records)
 
 crop_labels = _crop_labels()
@@ -163,19 +164,21 @@ pieces.append(crop_production_for_wave(t, [dict(
     intercropped=inter, perennial=False)], crop_labels))
 
 # ----------------------------- W2 2012-13 -----------------------------
-t = PH_QUARTER['2012-13']
 f = '../2012-13/Data/Post Harvest Wave 2/Agriculture/secta3_harvestw2.dta'
 raw = get_dataframe(f, convert_categoricals=False)
 dec = get_dataframe(f, convert_categoricals=True)
+# Required release lookup, declared literally for the managed build manifest.
+# Only this wave's native crop and named production unit, never the sale unit.
+w2_conv = get_dataframe('../2012-13/Data/w2agnsconversion.csv', convert_categoricals=False)
 inter = _align_intercropped(
     raw, 'hhid', 'plotid', 'cropcode',
     '../2012-13/Data/Post Planting Wave 2/Agriculture/sect11f_plantingw2.dta')
-pieces.append(crop_production_for_wave(t, [dict(
+pieces.append(crop_production_w2(dict(
     df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode', line='cropid',
     qty='sa3q6a1', unit='sa3q6a2',
     qty_sold='sa3q11a', unit_sold='sa3q11b', value_sold='sa3q12', sold_on='plot',
     value_harvested='sa3q18',
-    intercropped=inter, perennial=False)], crop_labels))
+    intercropped=inter, perennial=False), crop_labels, w2_conv))
 
 # ----------------------------- W3 2015-16 -----------------------------
 # secta3i: annual plot-crop harvest.  Sold/value are hh-crop grain (secta3ii);

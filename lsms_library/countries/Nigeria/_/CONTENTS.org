@@ -5127,3 +5127,39 @@ coverage verdict"): =empty-pending-machinery=.  2011Q1 and 2013Q1 now carry that
 =dropped=, open as future work; 2016Q1 and 2019Q1 stay =correctly-empty=.]  Measured at the integrated tree (job 41283638):
 =shocks= rows by quarter 2011Q1 2,202, 2013Q1 2,882, 2016Q1 2,323, 2019Q1 3,870 (none at post-planting);
 =assets= 2010Q3 38,947, 2012Q3 161,125, 2015Q3 188,229, 2018Q3 44,358 (none at post-harvest).
+
+* 2026-11-27 -- W2 release-table harvest kilogram estimate (GH #1518)
+
+This supersedes “=w1agnsconversion.csv= / =w2agnsconversion.csv= are unwired”
+above for W2 harvest only. The food-side quantity-mode result there is not
+evidence for the W2 A3 convention.
+
+The maintainer selected “Serve the labeled W2 estimate” for =2013Q1= A3
+(=2012-13/Data/Post Harvest Wave 2/Agriculture/secta3_harvestw2.dta=).
+On an already retained line, =sa3q3= must be Yes (1), =sa3q6a1= must be
+finite and positive, and =sa3q6a2= must name a nonstandard unit on the
+own W2 card. Look up that raw unit code and =cropcode= in the shipped
+=W2= =w2agnsconversion.csv= (by =nscode= and =cropcode=). Only a unique
+finite positive =conversion= with =kg=1= may be multiplied by the recorded
+Q6 amount. Only a finite positive product fills optional =Quantity_kg=.
+The distinct row key =Nigeria::crop_production::w2-release-kg= and its
+=derivation_inputs= recover the exact native answers and rate, on the
+existing line key. The harvest ladder calls the rung =survey_kg=, which
+does not mean the estimate was weighed by an enumerator.
+
+The W2 BID §7.27 describes conversion to a standard unit, but its example
+is a different question (Q8 landowner transfer) and has inconsistent printed
+arithmetic. The respondent's Q6 quantity convention is not independently
+established. A food-side fraction rule, another round's unit codes, and
+public crop or base unit labels do not identify the W2 factor. The 5,269
+matches from the earlier held comparison are native candidates, not a
+promise of new API or yield rows. The 93 unlabelled-basis matches (code 0,
+not established as litres), 68 missing pairs and six off-route kg matches
+from that comparison do not enter this assignment. W1's released lookup
+has no counterpart basis discriminator and is not adopted here.
+
+The new rule adds no lines and writes neither =KgFactor= nor sale fields
+or denominators. Native standard kg/g and litre/centilitre rows keep the
+old rungs. The W2 planting attachment stays keyed by native household,
+plot and crop, and does not set the harvest factor. W3's distinct release
+lookup, other rounds and the choice between PP and PH areas are unchanged.
