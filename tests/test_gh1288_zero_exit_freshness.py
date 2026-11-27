@@ -722,7 +722,7 @@ def test_country_only_literal_source_drift_invalidates_direct_warm_proof(model):
     model.assert_literal(model.load())
     selected_hash, calls = model.country._table_cache_hash(TABLE, WAVES), len(model.calls)
     sidecar.write_text('outs:\n- md5: ' + 'b' * 32 + '\n')
-    assert model.country._table_cache_hash(TABLE, WAVES) == selected_hash
+    assert model.country._table_cache_hash(TABLE, WAVES) != selected_hash
     model.assert_literal(model.load())
     assert len(model.calls) > calls
     manifest = L.read_parquet_make_inputs(model.selected)

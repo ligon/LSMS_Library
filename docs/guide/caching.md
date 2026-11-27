@@ -158,6 +158,12 @@ sources and grouped-rule companions retain their original bytes and availability
 The optional `lsms_make_inputs` footer records declared Other-table hashes and
 literal source fingerprints not already covered by the selected wave hashes.
 Direct Make reuse checks this witness as well as the normal hash/coverage gate.
+The ordinary country Parquet hash also includes existing DVC sidecars for
+relative source literals in the selected country-level `_/{table}.py`.
+These references resolve beside the declaring script and stay within the
+country tree. The hash does not follow symlinks, open raw payloads, or discover
+computed paths or other tables' inputs. JSON caches and the per-wave hash
+have separate policies.
 Available declared L1 blobs are copied into the temporary root; there is no
 shared writable L1 link. Cold builds therefore need extra temporary disk space.
 
