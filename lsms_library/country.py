@@ -4406,7 +4406,8 @@ class Country:
 
             # Expand Relationship -> Generation, Distance, Affinity
             if "Relationship" in df.columns:
-                df = _expand_kinship(df)
+                roster_country = self.name if method_name == "household_roster" else None
+                df = _expand_kinship(df, roster_country=roster_country)
 
             # Apply ``harmonize_<method_name>`` mapping to the ``j`` index
             # level when such a categorical_mapping table exists (GH #180,
@@ -8574,10 +8575,11 @@ def _load_kinship_map() -> dict[str, tuple[int, int, str]]:
     return {label: tuple(vals) for label, vals in data.items()}
 
 
-def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
+def _expand_kinship(df: pd.DataFrame, *, roster_country: str | None = None) -> pd.DataFrame:
     """Expand a Relationship column into Generation, Distance, Affinity.
 
-    Uses the dictionary in ``categorical_mapping/kinship.yml``.
+    Uses the dictionary in ``categorical_mapping/kinship.yml`` except for
+    confirmed roster-specific labels, which require both country and row wave.
     Unrecognised labels produce NA values and a warning listing the
     unknown strings so they can be added to kinship.yml.
 
@@ -8603,6 +8605,18 @@ def _expand_kinship(df: pd.DataFrame) -> pd.DataFrame:
 
     # Try title-case first, fall back to raw stripped (mirrors original logic).
     mapped = titled.map(kinship).fillna(stripped.map(kinship))
+
+    # GH #1102: IHS2 b04 and UNHS h2q5 separately released an explicit
+    # non-relative and this bare residual. The residual determines no component.
+    scope = {
+        "Malawi": ("2004-05", "Other"),
+        "Uganda": ("2005-06", "other"),
+    }.get(roster_country)
+    if scope is not None and "t" in df.index.names:
+        wave, label = scope
+        match = (df.index.get_level_values("t") == wave) & rel_str.eq(label).fillna(False)
+        # Store a matched tuple, not a missing lookup (which would warn).
+        mapped.loc[match] = rel_str.loc[match].map({label: (None, None, None)}).to_numpy()
 
     def _component(series, i):
         return series.map(lambda x: x[i] if isinstance(x, (list, tuple)) else pd.NA)
