@@ -642,6 +642,40 @@ def _augment_numeric_code_keys(rdict: dict) -> dict:
 # ``#+name:`` table in that directory is); it decides only the merge rule.
 _ADDITIVE_CATEGORICAL_TABLES = frozenset({'u', 'u_kg', 'harmonize_assets', 'harmonize_education'})
 
+# GH #1710: the approved warning scope, not a claim about other countries.
+_ASSET_LABEL_COLLISION_COUNTRIES = frozenset({'Burkina_Faso', 'Mali', 'Niger', 'Uganda'})
+
+
+class AssetLabelCollisionWarning(UserWarning):
+    """Preferred asset labels give distinct item keys the same served index key.
+
+    This is a read-time diagnostic, not a grain reduction or a cache audit.
+    """
+
+
+def _asset_label_collision_counts(index: pd.MultiIndex, before: np.ndarray,
+                                  preferred: np.ndarray) -> tuple[int, int]:
+    """Count affected final keys and rows using positional item-code snapshots."""
+    names = index.names
+    canonical = _canonical_index_levels().get('assets')
+    if (not canonical or not set(canonical).issubset(names)
+            or None in names or len(set(names)) != len(names) or index.is_unique):
+        return 0, 0
+    eligible = index.duplicated(keep=False) & (before >= 0) & (preferred >= 0)
+    # A missing key cannot establish row identity. Include any extra index
+    # levels that really survived, rather than pooling across those levels.
+    for codes in index.codes:
+        eligible &= codes >= 0
+    if not eligible.any():
+        return 0, 0
+    keys = index[eligible]
+    # Require a shared label at the rename itself, not merely a duplicate
+    # produced by some later spelling rule. No payload participates.
+    groupers = [*keys.codes, preferred[eligible]]
+    distinct = pd.Series(before[eligible]).groupby(groupers, sort=False).transform('nunique')
+    colliding = keys[distinct.to_numpy() > 1]
+    return len(colliding.unique()), len(colliding)
+
 
 def _categorical_key_column(table: "pd.DataFrame", idxvars: str | None = None,
                             *, exclude=()) -> str | None:
@@ -4416,6 +4450,7 @@ class Country:
             # above cannot fire.  Generalises the original assets-only hook
             # so future ``harmonize_education``, ``harmonize_housing``, etc.
             # tables auto-apply by convention.
+            asset_item_codes = None
             if (method_name
                     and isinstance(df.index, pd.MultiIndex)
                     and 'j' in df.index.names):
@@ -4424,7 +4459,15 @@ class Country:
                     source = _categorical_key_column(ha_table)
                     if source is not None:
                         rdict = ha_table.set_index(source)['Preferred Label'].to_dict()
+                        observe_assets = (method_name == 'assets'
+                                          and self.name in _ASSET_LABEL_COLLISION_COUNTRIES
+                                          and rdict and df.index.names.count('j') == 1)
+                        if observe_assets:
+                            j_pos = df.index.names.index('j')
+                            before = df.index.codes[j_pos]
                         df = df.rename(index=rdict, level='j')
+                        if observe_assets:
+                            asset_item_codes = (before, df.index.codes[j_pos])
 
             # Normalise variant spellings to canonical forms
             if method_name:
@@ -4463,14 +4506,21 @@ class Country:
             # should escalate above some rate is a judgement for the
             # maintainer, deliberately not made here.
             n_before = len(df)
+            unfiltered = df if asset_item_codes is not None else None
             df = df.dropna(how='all')
             if len(df) < n_before and n_before:
+                if unfiltered is not None:
+                    # dropna preserves order but the relabeled index is not a
+                    # safe join key. Apply its row mask to the snapshots.
+                    kept = unfiltered.notna().any(axis=1).to_numpy()
+                    asset_item_codes = tuple(codes[kept] for codes in asset_item_codes)
                 n_dropped = n_before - len(df)
                 logger.info(
                     "%s/%s: dropna(how='all') removed %d of %d rows (%.1f%%) "
                     "-- every dropped row had NO non-index data at all",
                     self.name, method_name or "?", n_dropped, n_before,
                     100.0 * n_dropped / n_before)
+            del unfiltered
 
             # GH #1562: coping strategies.  Fillers and missing codes are served
             # NA in their HowCoped<n> position, and HowCopedSet is the build's
@@ -4679,6 +4729,15 @@ class Country:
                 check_cluster_identity(
                     audited, country=self.name, table=str(method_name or "?"),
                     waves=self.waves)
+
+            if asset_item_codes is not None and isinstance(df.index, pd.MultiIndex):
+                groups, rows = _asset_label_collision_counts(df.index, *asset_item_codes)
+                if groups:
+                    warnings.warn(
+                        f"Preferred asset labels create duplicate index keys from distinct "
+                        f"item keys ({groups} groups, {rows} affected rows). "
+                        "The relabel does not collapse or remove rows.",
+                        AssetLabelCollisionWarning, stacklevel=2)
 
         return df
 
