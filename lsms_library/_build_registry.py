@@ -307,6 +307,10 @@ _EXCLUDED_CALLABLES = frozenset({
     # run_make_target, so without this exclusion re-wording the warning would
     # move every table's fingerprint.
     "lsms_library.country._warn_intree_parquet_artefact",
+    # GH #1069: only formats the bare RuntimeError at exhausted routes.
+    # Preserve the caller's raise/admission policy in the build fingerprint,
+    # not the terminal diagnostic text. This does not exclude any selector.
+    "lsms_library.country._rebuild_failure_error",
     # Wave-parallel dispatch (GH #797): ORCHESTRATION, not transformation.
     # ``prebuild`` moves a wave's DataFrame from a forked worker to the
     # parent and ``relay`` replays the worker's warnings / ledger entries;
