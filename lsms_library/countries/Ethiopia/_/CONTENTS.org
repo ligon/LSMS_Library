@@ -2095,14 +2095,17 @@ parcel, no field: the grain of §11.
 | Q7 quantity sold           | =ph_s12q07= (KG)            | =ph_s12q07= (KG)            | =ph_s12q07= + unit =ph_s12q0b=            | =ph_s11q03_a=     |
 | Q8 value sold (Birr)       | =ph_s12q08=                 | =ph_s12q08= ("IF SOLD IN-KIND, PLEASE RECORD THE CASH VALUE OF SALES") | =ph_s12q08= (same) | =ph_s11q04[_a]= |
 
-*What is wired.*  =ethiopia._attach_sect12_sales= fills =Value_sold= /
-=Quantity_sold= on existing §9 rows by the SALES GRAIN CAVEAT rule §11
-already uses -- the precedent is §11 itself, and Malawi Module Q /
+*What was wired on 2026-10-23 (attachment only).*
+=ethiopia._attach_sect12_sales= fills =Value_sold= / =Quantity_sold= on
+existing §9 rows by the SALES GRAIN CAVEAT rule §11 already uses -- the
+precedent is §11 itself, and Malawi Module Q /
 Tanzania 7A-7B (perennial sale modules at household-crop grain attached
 to single-plot rows).  It adds no row, never overwrites a cell §11 filled,
-and asserts both.  §12 Q3 (harvest) is NOT read: in W2/W3 every §12
-(holder, crop) pair has a §9 field row (W2 7,399 of 7,399, W3 7,317 of
-7,317 distinct pairs), so Q3 would double-count the harvest §9 serves.
+and asserts both.  The sale build does not use §12 Q3 as harvest: in
+W2/W3 every §12 (holder, crop) pair has a §9 field row (W2 7,399 of 7,399,
+W3 7,317 of 7,317 distinct pairs), so Q3 would double-count the harvest
+§9 serves.  The later producer can add a separate sale row (see the W1
+correction below and the 2026-11-04 Farm-level note).
 
 Every §12 line lands in exactly one of EIGHT classes (seven since GH #1461
 retired =folded key=; see "production_obs and §9 repeat records" below; the
@@ -2296,17 +2299,35 @@ an explicitly requested =t= item key still groups by wave.  The preceding
 -19.0% / -18.2% figures describe the historical old-default measurement and
 are retained unchanged; this correction does not remeasure those data.
 
-*W1 is the odd wave, and most of its §12 is NOT served.*  W1 §9 EXCLUDES
-tree/root crops, so 6,134 of W1's 6,999 coded §12 pairs (1,679 positive
-sales, 1.83M Birr) have no §9 row to attach to.  W1's tree-crop *harvest*
-therefore lives only in §12 Q3 -- a KG total over the last production
-period / 12 months, per holder-crop, no field -- and is in no served
-table.  =sect4_pp_w1= does list those crops by field: 3,740 of the 6,134
-pairs sit on exactly one §4 field (828 positive sales), 2,067 on several.
-Serving them would mean minting harvest rows at a §4-derived =plot_id= (or
-a sentinel) on a different recall window from §9's -- a new construction
-with no precedent in this repo, so it is NOT done and is an open decision
-(GH #820 report).
+*W1 at the 2026-10-23 attachment stage (GH #820 report).*  Of 6,999
+coded §12 pairs, 6,134 had no §9 row to attach to (1,679 positive sales,
+1.83M Birr).  Of those 6,134, 3,740 had exactly one §4 field (828 positive
+sales) and 2,067 had several.  These are historical counts, not the
+coverage of the current sale route.
+
+*W1 correction, 2026-11-27 (GH #1570).*  The wave combines PP §4 planting
+with PH §9 field-crop harvest and PH §11/§12 household-holder-crop sales.
+=i= is the household, while field identity includes holder, parcel and
+field.  The §4 planting join uses that field identity and crop code.
+Neither disposition file identifies a field.  W1's printed §9 instruction
+says "EXCLUDE TREE/ROOT CROPS", but the 2026-11-25 #1570 census found
+1,606 released §9 keys with codes also in W1's §12 roster.  That overlap
+does not identify fielded eligibility or explain the short §9 release.
+
+- *Eligible unattached sales are served.*  Since PR #1568 (GH #1457),
+  eligible §11/§12 sales without an attached §9 line have their own
+  =plot_id='Farm-level'= row, with =Unit_sold= for the sale quantity when
+  served, =u='Unknown'=, and no harvest =Quantity=.  This supersedes the
+  W1 driver's "counted, not served" wording, not the existing eligibility
+  or attachment rules.
+- *Q3 harvest is trace-only.*  W1 §12 Q3 (=ph_s12q03=, Kg in the past
+  12 months) is exposed by =inputs_sect12_sale= under
+  =Ethiopia::crop_production::sect12-sale-period=, but is not published as
+  =crop_production.Quantity=.  The [[https://github.com/ligon/LSMS_Library/pull/1257#issuecomment-6366560103][2026-10-23 ruling on PR #1257]]
+  scoped a follow-up Q3 harvest plus Q6-Q8 sale row with window provenance
+  to a unique, verified §4 field.  That follow-up is not deployed.  It
+  supplies no harvest branch for zero or multiple valid links, and does
+  not equate Q3's window to Q2's production period or the §9 season.
 
 *Pre-existing, found while doing this, NOT changed:*
 - The §11 path sums its (holder, crop) values with a bare =.sum()=, so an
@@ -2335,8 +2356,8 @@ with no precedent in this repo, so it is NOT done and is an open decision
 
 Codes 103 =WEPAL= and 105 =BUYA= (W1 §12 roster only) were the only §12
 codes =harmonize_crop= could not decode; they are now in the table under
-the survey's own names.  Both fall in the "no §9 row" class, so no served
-value changes.
+the survey's own names.  Both fell in the "no §9 row" class, so no served
+value changed in the 2026-10-23 attachment build.
 
 ** §11 sale path: no fabricated zeros (GH #1253, 2026-10-23)
 
@@ -4567,7 +4588,11 @@ Served equals the raw =sect11= + =sect12= sum in every wave, less three things t
 - *The key is the HOLDER, and =i= is the household.*  A household with two holders who sold one crop (11 / 28 / 35 / 6 / 11 pairs by wave) keeps two rows; the holder is in =production_obs=.
 - *W4/W5's =harvestedcrop_id= does not link a sale to a §9 line.*  It is a per-holder ordinal, unique on (holder, id), and §9's =crop_id= has the same small range, so 2,618 and 2,117 lines agree by accident.  The source has no plot here, measured.
 - *W1 §9 is a 7,750-row file against §4's 29,317 (above, "Unexplained; recorded").*  So 821 of W1's 1,754 §11 sales (820,239 Birr) have no §9 row, and 774 of those 821 have a §4 line: they were planted.  The Farm-level row holds the sale as recorded.  It does NOT resolve why W1 §9 is short.
-- *W1 §12's 1,683 no-§9-row sales (1.83M Birr) are the expected ones* (§9 excludes those crops), and their HARVEST (§12 Q3) is still in no served table: the open decision above stands.  So a W1 tree crop now shows a sale and no harvest.  See the report.
+- *W1 §12 had 1,683 no-§9-row sales (1.83M Birr) in this 2026-11-04 build.*
+  Those sale rows have no harvest. The printed §9 exclusion is not an
+  unconditional release filter, and §12 Q3 is a trace input, not a served
+  harvest quantity (2026-11-27 correction above). See the report for the
+  historical count.
 - *W5 §11 lists 84 (holder, crop) pairs twice* under two =harvestedcrop_id=, and the values differ on 80.  The sum predates this; =hh-crop-sale-records-summed= and =-two-units= name it, on Nigeria's ruling B.
 - *Two served lines of one crop on ONE plot (GH #1461, W4 1 sale 600 Birr; W5 7, 31,870 Birr) go to Farm-level.*  The plot is knowable.  Nigeria's ruling is pending on the same question.
 - *=Quantity_sold= on a §9 row stays as it is: only where the sale's unit equals =u=.*  That leaves 1 / 1,915 / 695 / 343 / 393 §9 rows with a value and no quantity, while a Farm-level row shows both, in its own =Unit_sold=.  Filling those rows would be a separate change.
