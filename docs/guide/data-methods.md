@@ -245,6 +245,37 @@ numeraire : str, optional
     country or date absent from the factor table, or a
     blank cell, yields ``NA`` with a warning.  See
     :func:`lsms_library.conversion.convert`.
+
+Total-basis coverage (GH #828)
+------------------------------
+Explicit ``basis='total'`` keeps all available values. For
+the 2018-19 and 2021-22 EHCVM waves of Burkina_Faso, Mali
+and Niger, ``Country`` and ``Feature`` also attach
+``attrs['food_expenditure_coverage'][country][wave]``. Its
+``roles`` entries for ``produced`` and ``inkind`` give the
+reviewed section 7B source and counts of acquisition rows,
+input values present (including explicit zeros), input zeros,
+observed missing inputs, rows imputed (including a separate
+count from input zeros), and rows still unvalued. A gap is
+a positive physical quantity with missing input value that
+remains missing after any requested valuation. One
+``lsms_library.errors.FoodExpenditureCoverageWarning`` per
+call reports such gaps. It does not change totals or pricing.
+
+Counts are at harmonized acquisition grain, before zeros and
+nulls are omitted or expenditures are summed. They do not give
+response rates. An absent role is not an unasked question.
+A wave may have counts but ``result='no_expenditure_rows'``;
+this does not mean the wave was period-converted. Failed or
+rejected results are not covered, including when period
+degradation drops the whole country. An acquisition input
+with no identifiable rows does not establish a zero gap.
+
+Default or explicit purchased basis, waves without reviewed
+sources, alternate config trees, unchecked cache mode and
+legacy expenditure builds do not report coverage. Neither
+does the standalone ``food_expenditures_from_acquired``
+transform, which takes a frame without source provenance.
 ```
 
 ## `household_characteristics()`

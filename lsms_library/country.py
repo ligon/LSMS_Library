@@ -7983,6 +7983,19 @@ class Country:
                         transform_kwargs['no_kg'] = self._no_kg_factor_cells()
                     if name == 'food_expenditures' and basis is not None:
                         transform_kwargs['basis'] = basis
+                    coverage = {}
+                    coverage_slot = None
+                    if name == 'food_expenditures' and basis == 'total':
+                        from ._food_expenditure_coverage import (
+                            _attach_coverage, _claim_coverage_handoff,
+                            _count_coverage, _result_coverage, _reviewed_sources,
+                        )
+                        sources = _reviewed_sources(self, waves)
+                        if sources:
+                            coverage_slot = _claim_coverage_handoff(self)
+                            def _observe_valuation(original, valued):
+                                coverage.update(_count_coverage(original, valued, sources))
+                            transform_kwargs['_observe_valuation'] = _observe_valuation
                     if name == 'food_expenditures' and valuation is not None:
                         transform_kwargs['valuation'] = valuation
                         transform_kwargs['geo'] = self._valuation_geo(waves)
@@ -8110,6 +8123,11 @@ class Country:
                                 value = _convert(value, to=numeraire, country=self.name)
                             if _val_attrs:
                                 value.attrs.update(_val_attrs)
+                            if coverage_slot is not None:
+                                # Feature finishes and filters this same call
+                                # (including a period continuation). Passing
+                                # counts separately keeps concat attrs unchanged.
+                                coverage_slot["counts"] = coverage
                             return value
                         if period is not None:
                             # GH #851 Phase II.  Outside the except for the
@@ -8134,7 +8152,12 @@ class Country:
                                     lambda frame=derived, finish=_finish_food_result:
                                         finish(frame))
                                 raise
-                        return _finish_food_result(derived)
+                        result = _finish_food_result(derived)
+                        if coverage and coverage_slot is None:
+                            covered = _result_coverage(result, coverage)
+                            if covered:
+                                _attach_coverage(result, {self.name: covered}, stacklevel=4)
+                        return result
 
                 # Derive household_characteristics from household_roster
                 if (name in self._ROSTER_DERIVED
@@ -8411,6 +8434,39 @@ class Country:
                     "    country or date absent from the factor table, or a\n"
                     "    blank cell, yields ``NA`` with a warning.  See\n"
                     "    :func:`lsms_library.conversion.convert`.\n"
+                )
+            if name == 'food_expenditures':
+                doc_parts.append(
+                    "\nTotal-basis coverage (GH #828)\n"
+                    "------------------------------\n"
+                    "Explicit ``basis='total'`` keeps all available values. For\n"
+                    "the 2018-19 and 2021-22 EHCVM waves of Burkina_Faso, Mali\n"
+                    "and Niger, ``Country`` and ``Feature`` also attach\n"
+                    "``attrs['food_expenditure_coverage'][country][wave]``. Its\n"
+                    "``roles`` entries for ``produced`` and ``inkind`` give the\n"
+                    "reviewed section 7B source and counts of acquisition rows,\n"
+                    "input values present (including explicit zeros), input zeros,\n"
+                    "observed missing inputs, rows imputed (including a separate\n"
+                    "count from input zeros), and rows still unvalued. A gap is\n"
+                    "a positive physical quantity with missing input value that\n"
+                    "remains missing after any requested valuation. One\n"
+                    "``lsms_library.errors.FoodExpenditureCoverageWarning`` per\n"
+                    "call reports such gaps. It does not change totals or pricing.\n"
+                    "\n"
+                    "Counts are at harmonized acquisition grain, before zeros and\n"
+                    "nulls are omitted or expenditures are summed. They do not give\n"
+                    "response rates. An absent role is not an unasked question.\n"
+                    "A wave may have counts but ``result='no_expenditure_rows'``;\n"
+                    "this does not mean the wave was period-converted. Failed or\n"
+                    "rejected results are not covered, including when period\n"
+                    "degradation drops the whole country. An acquisition input\n"
+                    "with no identifiable rows does not establish a zero gap.\n"
+                    "\n"
+                    "Default or explicit purchased basis, waves without reviewed\n"
+                    "sources, alternate config trees, unchecked cache mode and\n"
+                    "legacy expenditure builds do not report coverage. Neither\n"
+                    "does the standalone ``food_expenditures_from_acquired``\n"
+                    "transform, which takes a frame without source provenance.\n"
                 )
             method.__doc__ = "".join(doc_parts)
             method.__name__ = name

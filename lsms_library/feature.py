@@ -54,6 +54,9 @@ from .derivations import merge_attrs as _derivations_merge_attrs
 from .country import merge_label_pass_through_reports as _labels_merge_reports
 from .transformations import UNIT_KG_ATTRS_KEY as _UNIT_KG_ATTRS_KEY
 from .transformations import merge_unit_kg_attrs as _unit_kg_merge_attrs
+from ._food_expenditure_coverage import (
+    _attach_coverage, _coverage_handoff, _result_coverage,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -1271,6 +1274,12 @@ class Feature:
         # re-attached after assembly for the KEPT frames only -- so `attrs`
         # describes what the caller actually receives.
         captured_attrs: dict[str, dict[str, Any]] = {}
+        # Unlike the attrs carriers, expenditure coverage describes an
+        # acquisition read and can be meaningful even with no output rows.
+        # Keep it off concat operands so it cannot disrupt ordinary attrs.
+        disclose = self.table_name == "food_expenditures" and kwargs.get("basis") == "total"
+        food_coverage: dict[str, dict] = {}
+        empty_food_coverage: dict[str, dict] = {}
 
         for name in targets:
             try:
@@ -1294,37 +1303,43 @@ class Feature:
                             f"{self.table_name}: {name}'s method does not accept "
                             f"{key!r}; ignored for this country"
                         )
-                if period is None:
-                    df = method(**call_kwargs)
-                else:
-                    with _period_handoff(c, self.table_name, period) as handoff:
-                        try:
-                            df = method(**call_kwargs)
-                        except PeriodUnavailableError as e:
-                            # Preserve strict Country dispatch and its full
-                            # inference universe. Finish this SAME unconverted
-                            # read; never re-call the method with period=None
-                            # or a smaller wave set.
-                            period_unavailable[name] = sorted(e.unavailable)
-                            if not e.convertible:
-                                continue
-                            continuation = _take_period_continuation(handoff, e)
-                            if continuation is None:
-                                # A foreign/custom error supplied no matching
-                                # same-call result. Refuse, never retry/serve an
-                                # unscaled frame as converted.
-                                raise
+                with _coverage_handoff(c if disclose else None) as coverage_slot:
+                    if period is None:
+                        df = method(**call_kwargs)
+                    else:
+                        with _period_handoff(c, self.table_name, period) as handoff:
                             try:
-                                df = continuation()
-                            finally:
-                                del continuation
-                            df = _convert_convertible_waves(
-                                df, name, self.table_name, period, e.convertible,
-                                known_waves=c.waves)
+                                df = method(**call_kwargs)
+                            except PeriodUnavailableError as e:
+                                # Preserve strict Country dispatch and its full
+                                # inference universe. Finish this SAME unconverted
+                                # read; never re-call the method with period=None
+                                # or a smaller wave set.
+                                period_unavailable[name] = sorted(e.unavailable)
+                                if not e.convertible:
+                                    continue
+                                continuation = _take_period_continuation(handoff, e)
+                                if continuation is None:
+                                    # A foreign/custom error supplied no matching
+                                    # same-call result. Refuse, never retry/serve an
+                                    # unscaled frame as converted.
+                                    raise
+                                try:
+                                    df = continuation()
+                                finally:
+                                    del continuation
+                                df = _convert_convertible_waves(
+                                    df, name, self.table_name, period, e.convertible,
+                                    known_waves=c.waves)
+                counts = coverage_slot.get("counts") if coverage_slot is not None else None
                 if not isinstance(df, pd.DataFrame) or df.empty:
                     warnings.warn(
                         f"No data for {self.table_name} in {name}"
                     )
+                    if counts and isinstance(df, pd.DataFrame):
+                        covered = _result_coverage(df, counts, excluded=period_unavailable.get(name, ()))
+                        if covered:
+                            empty_food_coverage[name] = covered
                     continue
                 if required_levels:
                     # Check before harmonization can project/collapse detail or
@@ -1351,6 +1366,10 @@ class Feature:
                     continue
                 # Prepend country as an index level
                 df = pd.concat({name: df}, names=["country"])
+                if counts:
+                    covered = _result_coverage(df, counts, excluded=period_unavailable.get(name, ()))
+                    if covered:
+                        food_coverage[name] = covered
                 frames.append(df)
             except LabelUnavailableError:
                 # Country curates no such label column -> degrade, don't conflate
@@ -1456,7 +1475,8 @@ class Feature:
                     _mark_labels_unavailable(result, n_kept), n_kept), n_kept)
 
         if not frames:
-            return _mark_unavailable(_empty_assembly(canonical_levels), 0)
+            result = _mark_unavailable(_empty_assembly(canonical_levels), 0)
+            return _attach_coverage(result, empty_food_coverage)
 
         # pandas cannot stack frames whose index DEPTH/NAMES differ into a named
         # MultiIndex -- it falls back to an unnamed object index, collapsing the
@@ -1574,4 +1594,9 @@ class Feature:
                 f"unnamed object index; per-country index names differ: {shapes}"
             )
 
-        return _mark_unavailable(result, n_kept)
+        result = _mark_unavailable(result, n_kept)
+        if food_coverage:
+            kept_names = set(result.index.get_level_values("country"))
+            empty_food_coverage.update(
+                (name, waves) for name, waves in food_coverage.items() if name in kept_names)
+        return _attach_coverage(result, empty_food_coverage)
