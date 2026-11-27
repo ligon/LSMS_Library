@@ -156,21 +156,56 @@ def test_default_and_explicit_purchased_do_not_disclose(reads, kwargs):
     assert KEY not in got.attrs
 
 
+@pytest.mark.parametrize("endpoint", ["country", "feature"])
 @pytest.mark.parametrize("rows", [
-    [],  # absent role, but a purchased row establishes the wave
-    [_row(NEW, "produced", 3, 0)],
-    [_row(NEW, "produced", 0, None), _row(NEW, "inkind", None, None),
-     _row(NEW, "produced", float("inf"), None), _row(NEW, "inkind", 2, None, unit="Value")],
-    [_row(NEW, "inkind", None, 19, unit="Value")],
-    [_row(NEW, "purchased", 3, None, hh="fixture-missing-purchased")],
+    pytest.param([], id="nonpurchase-absent"),
+    pytest.param([_row(NEW, "produced", 3, 0)], id="input-zero"),
+    pytest.param([_row(NEW, "produced", 3, 45), _row(NEW, "inkind", 2, 19)],
+                 id="already-valued"),
+    pytest.param([_row(NEW, "produced", 0, None), _row(NEW, "inkind", None, None),
+                  _row(NEW, "produced", float("inf"), None),
+                  _row(NEW, "inkind", 2, None, unit="Value")], id="nonphysical"),
+    pytest.param([_row(NEW, "inkind", None, 19, unit="Value")], id="money-only"),
+    pytest.param([_row(NEW, "purchased", 3, None, hh="fixture-missing-purchased")],
+                 id="missing-purchase"),
 ])
-def test_no_remaining_gap_controls(reads, rows):
+def test_no_remaining_gap_controls(reads, rows, endpoint):
     frames, _, _ = reads
     frames["Niger"] = _acquired(_partition()[0], *rows)
-    got, caught = _invoke(C("Niger").food_expenditures, basis="total")
+    method, args = (C("Niger").food_expenditures, ()) if endpoint == "country" else (
+        F("food_expenditures"), (["Niger"],))
+    got, caught = _assert_old_contract(method, *args, basis="total")
     assert not _coverage_warnings(caught)
-    for role in _cell(got)["roles"].values():
-        assert role["remaining_unvalued"] == 0
+    assert KEY not in got.attrs
+
+
+def test_no_remaining_gap_in_empty_results_preserves_no_data_warnings(reads):
+    frames, _, _ = reads
+    frames["Niger"] = _acquired(_row(NEW, "produced", 2, 0))
+    frames["Mali"] = _acquired(_row(OLD, "inkind", 1, 0))
+    country, caught = _assert_old_contract(C("Niger").food_expenditures, basis="total")
+    assert country.empty and KEY not in country.attrs and not _coverage_warnings(caught)
+    feature, caught = _assert_old_contract(F("food_expenditures"), list(frames), basis="total")
+    assert feature.empty and KEY not in feature.attrs and not _coverage_warnings(caught)
+    assert sum("No data" in str(w.message) for w in caught) == 2
+
+
+def test_surviving_gap_preserves_neutral_wave_and_country_context(reads):
+    frames, _, _ = reads
+    frames["Niger"] = _acquired(*_partition(), _row(OLD, "produced", 2, 0))
+    frames["Mali"] = _acquired(_partition()[0])
+    for method, args in ((C("Niger").food_expenditures, ()),
+                         (F("food_expenditures"), (list(frames),))):
+        got, caught = _assert_old_contract(method, *args, basis="total")
+        neutral = _cell(got, wave=OLD)
+        assert neutral["result"] == "no_expenditure_rows"
+        produced = neutral["roles"]["produced"]
+        assert produced["input_zero"] == 1
+        assert produced["observed_missing_input"] == produced["remaining_unvalued"] == 0
+        warning, = _coverage_warnings(caught)
+        assert OLD not in str(warning.message) and "Mali" not in str(warning.message)
+        if args:
+            assert _cell(got, "Mali")["roles"]["inkind"]["acquisition_rows"] == 0
 
 
 @pytest.mark.parametrize("axis", ["t", "s", "u", "Quantity"])
@@ -228,11 +263,7 @@ def test_reviewed_scope_matches_the_shipped_wave_bindings():
             assert "GiftValue" not in binding["myvars"]
 
 
-@pytest.mark.parametrize("valuation, gift_gap", [
-    ("own_price", 1),
-    (("own_price", "median_price"), 0),
-])
-def test_opt_in_valuation_and_explicit_input_zero(reads, valuation, gift_gap):
+def test_opt_in_valuation_and_explicit_input_zero_with_surviving_gap(reads):
     frames, _, _ = reads
     frames["Niger"] = _acquired(
         *_partition(),
@@ -240,32 +271,54 @@ def test_opt_in_valuation_and_explicit_input_zero(reads, valuation, gift_gap):
         _row(NEW, "purchased", 1, 30, item="fixture-gift", hh="fixture-neighbor"),
     )
     got, caught = _assert_old_contract(
-        C("Niger").food_expenditures, basis="total", valuation=valuation)
+        C("Niger").food_expenditures, basis="total", valuation="own_price")
     roles = _cell(got)["roles"]
     assert roles["produced"]["observed_missing_input"] == roles["produced"]["imputed"] == 1
     assert roles["produced"]["remaining_unvalued"] == 0
     assert roles["inkind"]["input_zero"] == roles["inkind"]["imputed_from_input_zero"] == 1
     assert roles["inkind"]["observed_missing_input"] == 1
-    assert roles["inkind"]["remaining_unvalued"] == gift_gap
-    assert roles["inkind"]["imputed"] == 2 - gift_gap
-    assert len(_coverage_warnings(caught)) == gift_gap
+    assert roles["inkind"]["remaining_unvalued"] == 1
+    assert roles["inkind"]["imputed"] == 1
+    assert len(_coverage_warnings(caught)) == 1
     assert any(isinstance(w.message, T.ValuationLadderWarning) for w in caught)
     assert got.attrs["valuation_sources"]["own_price"] == 2
     assert 10 in got["Expenditure"].tolist()
 
 
-def test_unpriced_input_zero_is_not_a_gap_after_opt_in(reads):
+@pytest.mark.parametrize("endpoint", ["country", "feature"])
+def test_all_missing_origin_rows_priced_after_opt_in(reads, endpoint):
     frames, _, _ = reads
     frames["Niger"] = _acquired(
-        _partition()[0], _row(NEW, "produced", 2, 0, item="fixture-no-donor"),
+        *_partition(),
+        _row(NEW, "inkind", 0.5, 0),
+        _row(NEW, "purchased", 1, 30, item="fixture-gift", hh="fixture-neighbor"),
     )
-    got, caught = _assert_old_contract(F("food_expenditures"), ["Niger"],
-                                       basis="total", valuation="own_price")
-    role = _cell(got)["roles"]["produced"]
-    assert role["input_zero"] == 1
-    assert role["imputed"] == role["observed_missing_input"] == role["remaining_unvalued"] == 0
-    assert got.attrs["valuation_sources"]["none"] == 1
-    assert got["Expenditure"].tolist() == [60]
+    method, args = (C("Niger").food_expenditures, ()) if endpoint == "country" else (
+        F("food_expenditures"), (["Niger"],))
+    got, caught = _assert_old_contract(
+        method, *args, basis="total", valuation=("own_price", "median_price"))
+    assert KEY not in got.attrs and not _coverage_warnings(caught)
+    assert any(isinstance(w.message, T.ValuationLadderWarning) for w in caught)
+    assert got.attrs["valuation_sources"]["own_price"] == 2
+    assert sorted(got["Expenditure"].tolist()) == [10, 30, 40, 60, 120]
+
+
+@pytest.mark.parametrize("endpoint", ["country", "feature"])
+@pytest.mark.parametrize("item, rung, outlays", [
+    ("fixture-grain", "own_price", [40, 60]),
+    ("fixture-no-donor", "none", [60]),
+])
+def test_input_zero_is_not_a_gap_after_opt_in(reads, endpoint, item, rung, outlays):
+    frames, _, _ = reads
+    frames["Niger"] = _acquired(
+        _partition()[0], _row(NEW, "produced", 2, 0, item=item),
+    )
+    method, args = (C("Niger").food_expenditures, ()) if endpoint == "country" else (
+        F("food_expenditures"), (["Niger"],))
+    got, caught = _assert_old_contract(method, *args, basis="total", valuation="own_price")
+    assert KEY not in got.attrs
+    assert got.attrs["valuation_sources"][rung] == 1
+    assert sorted(got["Expenditure"].tolist()) == outlays
     assert not _coverage_warnings(caught)
 
 
@@ -298,11 +351,12 @@ def test_country_empty_and_feature_single_mixed_and_all_empty(reads):
     assert sum("No data" in str(x.message) for x in w) == 2
 
 
+@pytest.mark.parametrize("kept_gap", [True, False], ids=["kept-gap", "no-kept-gap"])
 @pytest.mark.parametrize("rejection", ["build", "label", "shape", "required"])
-def test_feature_only_discloses_kept_or_valid_empty_scopes(reads, monkeypatch, rejection):
+def test_feature_only_discloses_kept_or_valid_empty_scopes(reads, monkeypatch, rejection, kept_gap):
     frames, _, relabel = reads
     for c in ["Niger", "Mali", "Burkina_Faso"]:
-        frames[c] = _acquired(*_partition())
+        frames[c] = _acquired(*(_partition() if c == "Niger" or kept_gap else _partition()[:1]))
     if rejection == "build":
         frames["Niger"] = FileNotFoundError("invented source failure")
     else:
@@ -315,9 +369,12 @@ def test_feature_only_discloses_kept_or_valid_empty_scopes(reads, monkeypatch, r
         monkeypatch.setattr(C, "_relabel_j", finish)
     out, w = _assert_old_contract(
         F("food_expenditures"), list(frames), currency=None, basis="total")
-    assert set(out.attrs[KEY]) == {"Mali", "Burkina_Faso"}
-    assert len(_coverage_warnings(w)) == 1
-    assert "Niger" not in str(_coverage_warnings(w)[0].message)
+    if kept_gap:
+        assert set(out.attrs[KEY]) == {"Mali", "Burkina_Faso"}
+        warning, = _coverage_warnings(w)
+        assert "Niger" not in str(warning.message)
+    else:
+        assert KEY not in out.attrs and not _coverage_warnings(w)
     assert "Niger" not in out.index.get_level_values("country")
     assert any("Niger" in str(x.message) for x in w)
     if rejection == "label":
@@ -352,10 +409,13 @@ def test_period_continuation_prunes_only_rejected_waves(reads, monkeypatch, mode
     assert out["Expenditure"].tolist() == [10]
     assert out.attrs["period_unavailable"] == {"Burkina_Faso": [rejected]}
     assert set(out.attrs["period"]["Burkina_Faso"]["waves"]) == {good}
+    if mode == "rejected_gap":
+        assert KEY not in out.attrs and not _coverage_warnings(w)
+        return
     assert rejected not in out.attrs[KEY]["Burkina_Faso"]
     if mode == "empty_gap":
         assert _cell(out, "Burkina_Faso", OLD)["result"] == "no_expenditure_rows"
-    assert len(_coverage_warnings(w)) == (mode != "rejected_gap")
+    assert len(_coverage_warnings(w)) == 1
 
 
 def test_output_empty_does_not_extend_period_validation(reads, monkeypatch):
@@ -381,6 +441,26 @@ def test_no_period_survivor_does_not_publish_unfinished_coverage(reads, monkeypa
     assert calls["Niger", "food_acquired"] == 1
     assert got.empty and got.attrs["period_unavailable"] == {"Niger": [NEW]}
     assert KEY not in got.attrs and not _coverage_warnings(caught)
+
+
+def test_prior_rejected_gap_does_not_leak_into_later_calls(reads, monkeypatch):
+    frames, calls, _ = reads
+    frames["Niger"] = _acquired(*_partition())
+    monkeypatch.setattr(R, "recall_records", lambda country: {})
+    c = C("Niger")
+    feature = F("food_expenditures")
+    with pytest.raises(PeriodUnavailableError):
+        c.food_expenditures(basis="total", period="day")
+    rejected, caught = _invoke(feature, ["Niger"], basis="total", period="day")
+    assert rejected.empty and rejected.attrs["period_unavailable"] == {"Niger": [NEW]}
+    assert KEY not in rejected.attrs and not _coverage_warnings(caught)
+    frames["Niger"] = _acquired(_partition()[0])
+    for method, args in ((c.food_expenditures, ()), (feature, (["Niger"],))):
+        before = calls["Niger", "food_acquired"]
+        final, caught = _invoke(method, *args, basis="total")
+        assert calls["Niger", "food_acquired"] == before + 1
+        assert final["Expenditure"].tolist() == [60]
+        assert KEY not in final.attrs and not _coverage_warnings(caught)
 
 
 def test_warnings_as_errors_are_not_caught_as_build_failures(reads):

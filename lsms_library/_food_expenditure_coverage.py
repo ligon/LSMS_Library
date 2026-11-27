@@ -146,7 +146,6 @@ def _result_coverage(result, counts, *, excluded=()):
 
 def _attach_coverage(result, coverage, *, stacklevel=3):
     if coverage:
-        result.attrs[ATTRS_KEY] = coverage
         gaps = [
             f"{country} {wave} {role}: {record['remaining_unvalued']}"
             for country, waves in coverage.items()
@@ -155,6 +154,7 @@ def _attach_coverage(result, coverage, *, stacklevel=3):
             if record["remaining_unvalued"]
         ]
         if gaps:
+            result.attrs[ATTRS_KEY] = coverage
             warnings.warn(
                 "food_expenditures(basis='total') has observed acquisitions still "
                 "without expenditure value (" + ", ".join(gaps) + "). "

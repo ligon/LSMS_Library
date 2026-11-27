@@ -36,8 +36,10 @@ Do not treat explicit zeros, money-only rows, or missing purchases as gaps.
 ## §5 Reuse decision
 
 Extend the post-read transform with an internal observation point and deliver
-a count record after existing output guards. No new valuation, build,
-registry entry, or cache rule.
+a count record after existing output guards only if a true remaining gap
+survives anywhere in the public call. If one does, report the accepted
+same-call context as well, including reviewed observations without gaps.
+No new valuation, build, registry entry, or cache rule.
 
 ## §6 Boundaries
 
@@ -56,6 +58,9 @@ post-processing is not successful coverage.
 - OK (§§2, 4) — Feature transports only counts outside concat, preserves
   valid zero-row scopes, excludes rejected scopes, and uses the existing
   period continuation without a second acquisition read.
+- The final public attachment gate leaves no new attr or warning when all
+  accepted records are gap-free, including when the only gap was rejected.
+  Neutral role counts are still available as context for a surviving gap.
 - OK (§§3–5) — no wave input, builder, registry, cache rule or exemption was
   changed. Pinned-base synthetic checks compare full results and scoped
   fingerprints. No survey data or corpus coverage measurement is claimed.
