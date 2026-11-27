@@ -1223,11 +1223,9 @@ Columns:
         possible, since the two numbers stay distinct.  An earlier version
         of this note read "the survey (or a survey-supplied conversion
         table)", which pointed a loader author at this column; it does not
-        any more.  The one sanctioned exception routes a shipped table into
-        `Quantity_kg`, never here: Nigeria W3 (`ag_conv_w3`, GH #1518, ruling
-        @ligon 2026-11-12), joined at build time on the row's native crop,
-        sized-unit and zone codes and registered as a derivation -- see
-        `Quantity_kg` below.
+        any more. The Nigeria W2 and W3 release-table estimates approved
+        under GH #1518 go into `Quantity_kg`, never here. Each joins native
+        keys and carries its own derivation. See `Quantity_kg` below.
 
         A FACTOR HERE, A PRODUCT IN `Quantity_kg`.  The antecedent is
         `food_acquired.Quantity_kg` (Nigeria `s10bq2_cvn`, Malawi
@@ -1259,11 +1257,15 @@ Columns:
         e.g. Niger 2011-12 `as02eq07c` "quantite en kgs recoltee", or 2021-22
         `s16cq16c` "Estimation Quantite totale UML en kg" -- OR, where a
         ruling says so, `Quantity` times the survey's own SHIPPED conversion
-        table at the line's native key: Nigeria 2015-16 (2016Q1) reads the
-        World Bank's `ag_conv_w3` on crop code, sized unit code and the
-        household's zone (GH #1518, ruling @ligon 2026-11-12), registered as
-        `Nigeria::crop_production::w3-ag-conversion`, whose `Derivation` key
-        is on every such row.  So `survey_kg` here says the kilograms come
+        table at the line's native key. Nigeria 2012-13 (2013Q1) estimates
+        qualified Q3 Yes lines with a positive finite Q6 amount in a named
+        nonstandard unit and a unique positive finite kg-marked
+        `w2agnsconversion.csv` rate at the exact native crop and unit codes.
+        The key is `Nigeria::crop_production::w2-release-kg`. This does not
+        establish the W2 quantity convention. Nigeria 2015-16 (2016Q1) reads
+        `ag_conv_w3` on crop code, sized unit code and the household's zone
+        (GH #1518), registered as `Nigeria::crop_production::w3-ag-conversion`.
+        Each estimate carries its own `Derivation` key. So `survey_kg` here says the kilograms come
         from the survey's own material, not that an enumerator wrote them.  A
         TOTAL, not a factor: within a unit it scales with `Quantity`, where a
         factor per unit would not move.  NaN where the survey does not record
