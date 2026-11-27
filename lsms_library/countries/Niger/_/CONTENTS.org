@@ -2666,13 +2666,26 @@ They are the wave's only =Farm-level= rows; Niger has no =season= level, so that
   state no such window.  The DDI's English file agrees.  The Stata label on =as03eq09a=, "en moyenne pour
   chaque cycle", reads as an average, but it is not independent evidence for one: the rainy =as02eq07a=
   carries the same label in a module with no cycle question, whose English label says "on this plot", so
-  it is a template, and which way the copy ran is unknown.  The French instrument is not held.  The ruled
-  =Quantity = as03eq09a x as03eq06= (=Niger::crop_production::dry-season-cycle-total=) is the season's
+  it is a template, and which way the copy ran is unknown.  The French instrument was not held at the
+  time of the ruling.  Since GH #1690 the published French questionnaire and enumerator manual are
+  DVC-managed and read back (WB 2050 resources 31148 and 31157; see the 2026-11-10 French 3E review
+  and its readback continuation below).  That holding does not identify the fielded or export version.
+  The ruled =Quantity = as03eq09a x as03eq06= (=Niger::crop_production::dry-season-cycle-total=) is the season's
   harvest on an average and an extrapolation on the first cycle, and it stands.  It matters on 48 rows
   (49 have two to four cycles, one with no harvest), 43,204 kg: 6.3% of 3E's kilograms, 3.4% of the
   wave's.  On the 23 multi-cycle rows whose disposition units all match, the dispositions sum to
   =as03eq09a= on 18 and to the product on none, so the answers share one per-cycle footing, first or
   average.
+- *3E.8 area has its own conflict (GH #1529).*  The published French questionnaire (resource 31148,
+  PDF p. 28) asks for first-cycle area in square metres.  The manual (resource 31157, PDF p. 89)
+  retains =moyenne= in its first-cycle heading but does not specify averaging across cycles.  The
+  WB 2050 DDI describes =as03eq08= as average area per cycle for =ecvmaas3e_p1= (PDF p. 403,
+  corroborated by that French-labelled release's Stata label) and as first-cycle area in square
+  metres for =ecvmaas3e_p1_en= (PDF pp. 841-842).  The harvest-label template evidence above is for
+  =as03eq09a=, not =as03eq08=.  The library reads the French-labelled file.  Matching DDI summaries
+  do not establish equality of values between the variants, and neither label settles what was
+  fielded or exported.  See the GH #1529 document and native-header check and the exact French
+  quotations in the 2026-11-10 review below.
 - *The sale keeps its recorded window* (=dry-season-sale-window=, an identity, the Mali tree shape):
   =as03eq11a= per cycle, =as03eq12= with none stated.  On a multi-cycle row (42 with a sale)
   =Quantity_sold / Quantity= is not a sold share.
@@ -4123,12 +4136,16 @@ gift columns equal the old purchase columns row for row; the four columns are NA
 =seed_kg= and =nitrogen_kg= are frame-equal, and =Feature('plot_inputs')= equals the Country table on every
 value column.
 
-*Unit vocabulary, one mismatch disclosed and not folded.*  Every served =Unit_purchased= / =Unit_received_as_gift=
+*Unit vocabulary, purchase-card conflict (GH #1751).*  Every served =Unit_purchased= / =Unit_received_as_gift=
 label is a label =u= serves, except 2021-22's =Charrette Bovine= (62 lines) and =Charrette Asine= (12) on
-=Unit_purchased=: =s16bq09b='s value labels capitalise them, while =s16bq03b= and =s16bq07b= write
-=Charrette bovine= / =Charrette asine=, which is what =u= and =Unit_received_as_gift= serve.  Folding the case
-needs a row in =_/categorical_mapping.org='s =u= table, which is a build input of every Niger wave (the ECVMA
-ones included), so it is left for the next edit of that table.
+=Unit_purchased=.  The INS Survey Solutions programmed snapshot dated 2021-11-16 (PDF p. 218,
+as recorded in GH #1751) lists a generic cart at purchase code 5, =Sachet= at 6 and no code 13.
+Released =s16bq09b= instead labels 5 =Charrette Bovine=, agrees at 6 =Sachet=, and labels 13
+=Charrette Asine=.  The separate released used (=s16bq03b=) and gift (=s16bq07b=) cards above
+are not purchase-code authority.  This is not a verified case-only difference.  Keep the purchase
+labels as released pending an attributable deployed purchase card or version-bound export dictionary.
+The historical =u= mapping proposal would re-warm every Niger wave, but cache cost is not the reason
+for the hold.
 
 *Cost, measured* (hash census against =f138a3d61=): Niger 25 of 25 =Country._table_cache_hash= and 50 of 100
 =Wave._input_hash= (the 25 of 2018-19 and the 25 of 2021-22; 2011-12 and 2014-15 do not move, because

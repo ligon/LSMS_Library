@@ -310,15 +310,27 @@ Niger::crop_production::dry-season-cycle-total:
         moyenne pour chaque cycle", would make it the season's harvest, but it is not
         independent evidence for an average: the rainy as02eq07a carries the same
         label in a module with no cycle question, whose English label says "on this
-        plot", so it is a template, and which way the copy ran is unknown.  The French
-        instrument is not held.  The ruled product stands, on 48 rows and 43,204 kg:
+        plot", so it is a template, and which way the copy ran is unknown.  The
+        published French questionnaire and enumerator manual were DVC-managed and
+        read back under GH #1690.  The questionnaire asks for "la superficie
+        consacrée au premier cycle" in 3E.8 (square metres), and the manual's
+        first-cycle heading retains "moyenne".  For as03eq08 the French-labelled
+        release metadata says average area per cycle, whereas the English-file DDI
+        says first-cycle area in square metres (GH #1529).  The evidence for a
+        shared harvest-label template does not extend to the area label.  Neither
+        the document holding nor the file-specific metadata establishes the
+        fielded/export version or value equality between the variants.  The ruled
+        product stands, on 48 rows and 43,204 kg:
         6.3% of section 3E's kilograms and 3.4% of the wave's.
       basis: modelling-choice
       evidence: >-
         ecvmaas3e_p1.dta and ecvmaas2e_p2.dta variable labels;
         ECVMA_Quest_AGR_P1_V10_eng.pdf, Section 3E, printed pp. 27-29;
-        ddi-documentation-english_microdata-2050.pdf; ruling @ligon 2026-11-04 on GH
-        #1462.
+        ddi-documentation-english_microdata-2050.pdf (3E.8: ecvmaas3e_p1, PDF p. 403;
+        ecvmaas3e_p1_en, PDF pp. 841-842); ruling @ligon 2026-11-04 on GH #1462;
+        WB 2050 French questionnaire resource 31148 (PDF p. 28) and manual resource
+        31157 (PDF p. 89), quoted in Niger/_/CONTENTS.org, "2026-11-10 -- Independent
+        French 3E review; two-document archival attempt (GH #1529)".
     - text: >-
         as03eq09a == 99999 is a "don't know", masked before the product, never on
         the total.  It is unlabelled, and a different width from the rainy module's
