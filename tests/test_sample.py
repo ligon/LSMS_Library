@@ -7,6 +7,7 @@ weight, strata, and Rural columns, indexed by (i, t).
 
 import importlib.util
 import os
+from unittest.mock import patch
 import pytest
 import pandas as pd
 
@@ -135,6 +136,45 @@ NO_DATA_COUNTRIES = _countries_without_data()
 
 
 _sample_cache: dict[str, pd.DataFrame | None] = {}
+_ALBANIA_SNAPSHOT_ROUTE: str | None = None
+
+
+def _build_albania_sample_with_route(country):
+    """Observe only the first fixture-producing Country call, in its own worker."""
+    global _ALBANIA_SNAPSHOT_ROUTE
+    outcomes = []
+    try:
+        read = country._read_l2_country_cache
+        expected_waves = frozenset(country.waves)
+        expected_path = data_root('Albania') / 'var' / 'sample.parquet'
+    except Exception:
+        _ALBANIA_SNAPSHOT_ROUTE = 'unknown'
+        return country.sample()
+
+    def observe(table, path, waves, **kwargs):
+        answer = read(table, path, waves, **kwargs)
+        try:
+            if (table == 'sample' and path == expected_path
+                    and not kwargs.get('_borrowed_input')
+                    and frozenset(waves) == expected_waves):
+                branch = 'unknown'
+                frame, _, miss = answer
+                if miss is not None:
+                    branch = 'miss'
+                elif isinstance(frame, pd.DataFrame) and 't' in frame.index.names:
+                    observed = frozenset(frame.index.get_level_values('t').unique())
+                    branch = 'hit-complete' if expected_waves <= observed else 'hit-partial'
+                outcomes.append(branch)
+        except Exception:
+            # Test-only observation must not alter the original answer.
+            outcomes.append('unknown')
+        return answer
+
+    with patch.object(country, '_read_l2_country_cache', observe):
+        result = country.sample()
+    # Nothing observed, or multiple observations, is not an identified route.
+    _ALBANIA_SNAPSHOT_ROUTE = outcomes[0] if len(outcomes) == 1 else 'unknown'
+    return result
 
 
 def _get_sample(country_name: str) -> pd.DataFrame | None:
@@ -142,7 +182,8 @@ def _get_sample(country_name: str) -> pd.DataFrame | None:
     if country_name not in _sample_cache:
         try:
             c = ll.Country(country_name)
-            result = c.sample()
+            result = (_build_albania_sample_with_route(c) if country_name == 'Albania'
+                      else c.sample())
             if isinstance(result, pd.DataFrame) and not result.empty:
                 _sample_cache[country_name] = result
             else:
@@ -998,3 +1039,35 @@ class TestUganda2009MarketFallback:
         assert nan_hh <= 4, (
             f"{nan_hh} Uganda 2009-10 households have NaN m after the "
             f"HH-level fallback; the measured residual is 4.")
+
+def _assert_albania_snapshot_branch_complete(branch):
+    # The ordinary all-waves assertion is unchanged. This second static
+    # locator adds only one controlled route distinction if that same
+    # cached, first fixture result is nonempty and genuinely incomplete.
+    if 'Albania' in NO_DATA_COUNTRIES:
+        return
+    df = _get_sample('Albania')
+    if df is None:
+        return
+    route = _ALBANIA_SNAPSHOT_ROUTE or 'unknown'
+    if branch != route or 't' not in df.index.names:
+        return
+    expected = frozenset(ll.Country('Albania').waves) - PARTIALLY_WIRED_SAMPLE.get('Albania', set())
+    observed = frozenset(df.index.get_level_values('t').unique())
+    assert expected <= observed, 'Incomplete first Albania sample fixture on this route'
+
+
+def test_albania_sample_incomplete_on_l2_hit_partial():
+    _assert_albania_snapshot_branch_complete('hit-partial')
+
+
+def test_albania_sample_incomplete_after_l2_hit_complete():
+    _assert_albania_snapshot_branch_complete('hit-complete')
+
+
+def test_albania_sample_incomplete_on_l2_miss():
+    _assert_albania_snapshot_branch_complete('miss')
+
+
+def test_albania_sample_incomplete_on_unidentified_route():
+    _assert_albania_snapshot_branch_complete('unknown')
