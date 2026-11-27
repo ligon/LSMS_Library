@@ -182,6 +182,9 @@ def test_actual_script_preserves_every_old_w2_field_and_only_adds_estimates(monk
     all_rows, reads = _run_country_script(monkeypatch, raw, dec, lookup)
     assert reads == [(A3, False), (A3, True), (LOOKUP, False)]
     got = all_rows.loc[all_rows.index.get_level_values('t') == '2013Q1']
+    # Compare W2 payloads at the same dtypes as the isolated producer below.
+    # The exact-base whole-script gate separately checks every concat dtype.
+    got = got.astype({'Quantity': 'Float64', 'intercropped': 'boolean'})
     # Pre-assignment frame with independently constructed native PP attachment.
     inter = pd.Series(pd.NA, index=raw.index, dtype='boolean')
     inter.loc[raw.plotid.eq(1) & raw.cropcode.eq(1121) & raw.hhid.notna()] = True
@@ -191,9 +194,8 @@ def test_actual_script_preserves_every_old_w2_field_and_only_adds_estimates(monk
         qty='sa3q6a1', unit='sa3q6a2', qty_sold='sa3q11a', unit_sold='sa3q11b',
         value_sold='sa3q12', sold_on='plot', value_harvested='sa3q18',
         intercropped=inter, perennial=False)], LABELS)
-    # The country concat widens the fixture's nullable native Quantity and
-    # pins the sale amounts. The exact-base whole-script gate checks dtypes.
-    baseline = baseline.astype({'Quantity': object, 'Quantity_sold': float, 'Value_sold': float})
+    baseline = baseline.astype({'Quantity_sold': float, 'Value_sold': float,
+                                'perennial': 'boolean'})
     expected = baseline.copy()
     lookup_series = pd.Series(ESTIMATES).rename_axis(INDEX)
     expected['Quantity_kg'] = lookup_series.reindex(expected.index)
