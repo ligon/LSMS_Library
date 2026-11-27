@@ -160,22 +160,54 @@ def test_ast_warnings_are_private(public_repo, tmp_path, capsys):
     assert output.out == output.err == ''
 
 
-def test_real_wrapper_optin_preserves_stream_privacy_cleanup_status_and_static_names(tmp_path):
-    private = tmp_path / 'private-temp';private.mkdir()
-    xml = (f'<testsuite><testcase classname="tests.test_private_ci_check" '
-           f'name="test_startup_failure_does_not_publish_command_or_exception[{SECRET}]">'
+@pytest.mark.parametrize('operation', [
+    ('rev-parse',), ('ls-tree',), ('cat-file', '-s'), ('cat-file', 'blob'),
+], ids=['revision', 'tree', 'blob-size', 'blob-data'])
+def test_git_lookup_timeout_is_count_only(public_repo, tmp_path, monkeypatch, operation):
+    root, _, _ = public_repo
+    path = _xml(tmp_path, '<testcase classname="tests.test_visible" name="test_top"><failure/></testcase>')
+    run = subprocess.run
+    timed_out = []
+
+    def run_with_timeout(argv, *args, **kwargs):
+        command = argv[argv.index('-C') + 2:]
+        if tuple(command[:len(operation)]) == operation:
+            timed_out.append(operation)
+            raise subprocess.TimeoutExpired(argv, kwargs['timeout'])
+        return run(argv, *args, **kwargs)
+
+    monkeypatch.setattr(wrapper.subprocess, 'run', run_with_timeout)
+    revision = wrapper._source_head(root)
+    assert wrapper._junit_failure_locations(path, root, revision) == (
+        {}, {'failures': 1, 'errors': 0})
+    assert timed_out == [operation]
+
+
+def test_real_wrapper_optin_preserves_stream_privacy_cleanup_status_and_static_names(public_repo, tmp_path):
+    root, _, _ = public_repo
+    # Keep the actual wrapper and its Git proof. Make the checked-in test
+    # source local to the fixture so a timeout in the caller checkout's
+    # object store cannot turn this positive control into a count-only read.
+    isolated_script = root / 'scripts' / SCRIPT.name
+    isolated_script.parent.mkdir()
+    shutil.copyfile(SCRIPT, isolated_script)
+
+    private = tmp_path / 'private-temp'
+    private.mkdir()
+    xml = (f'<testsuite><testcase classname="tests.test_visible" name="test_top[{SECRET}]">'
            f'<failure message="{SECRET}">{SECRET}</failure></testcase>'
            f'<testcase classname="{SECRET}" name="{SECRET}"><error/></testcase></testsuite>')
     code = ('import pathlib,sys; pathlib.Path(sys.argv[1]).write_text(sys.argv[2]); '
             f'print({SECRET!r}); print({SECRET!r},file=sys.stderr); sys.exit(7)')
-    env = os.environ.copy();env.update(TMPDIR=str(private), TMP=str(private), TEMP=str(private))
-    result = subprocess.run([sys.executable, str(SCRIPT), '--stage', 'data-tests',
+    env = os.environ.copy()
+    env.update(TMPDIR=str(private), TMP=str(private), TEMP=str(private))
+    result = subprocess.run([sys.executable, str(isolated_script), '--stage', 'data-tests',
         '--junit', 'results.xml', '--public-test-failures', '--', sys.executable,
         '-c', code, '{junit}', xml], cwd=tmp_path, env=env, capture_output=True, text=True, timeout=30)
     assert result.returncode == 7 and result.stderr == '' and SECRET not in result.stdout
     assert result.stdout == ('private-ci-check stage=data-tests exit=7\n'
         'junit tests=2 passed=0 failures=1 errors=1 skipped=0\n'
-        'junit failures tests/test_private_ci_check.py::test_startup_failure_does_not_publish_command_or_exception count=1\n'
+        'junit failures tests/test_visible.py::test_top count=1\n'
         'junit unmapped failures=0 errors=1\n')
     assert list(private.iterdir()) == []
 
