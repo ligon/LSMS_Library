@@ -4009,12 +4009,23 @@ held PDFs (the W2 PDFs did not extract).
 - *W1 / W2 PP are served.*  Each wave's =individual_education= =file:= list
   gains its PP section-2 file with a per-file override (=t:= the PP quarter,
   =Educational Attainment= read from =s2q7= in W1, =s2q8= in W2, through
-  =harmonize_education=), so =Wave.column_mapping= reads it only for that
-  quarter; the PH entry is unchanged.  Measured cold (burst job 41275807,
+  =harmonize_education=). The planting rows are served only for that
+  quarter; the PH entry is unchanged. Measured cold (burst job 41275807,
   =reports/nigeria/out/v1-f6361d068/=): 2010Q3 gains 17,116 rows, 2012Q3
   17,403 (no duplicate =(i, pid)=); 2011Q1's 643, 2013Q1's 313 and W3-W5 are
   unchanged (0 values differ).  The PP and PH series are different questions
   to different members and are not pooled.
+
+  /Source-read clarification (2026-11-27, #1281)./ On current development,
+  cold Country controls for all four W1/W2 visits used both configured
+  PH and PP bindings in the selected physical folder with invented inputs,
+  then filtered to the requested logical =t=. Denying either file failed
+  the cold build without stamping country coverage. Denying both files
+  in the other folder did not affect a cold singleton. Covered warm
+  requests made no education reads, but a coverage miss can rebuild prior
+  visits as part of the union. This does not change the dated survey
+  counts or recheck the two planting inputs.
+
 - *Seven PP spellings joined =harmonize_education=* under its documented
   collapse (no new level): =teacher training= / =TEACHER TRAINING= ->
   Tertiary certificate/diploma; =HIGHER DEGREE= -> Postgraduate; =quaranic
