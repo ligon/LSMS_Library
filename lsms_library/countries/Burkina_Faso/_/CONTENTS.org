@@ -3349,6 +3349,38 @@ points are excluded too. Exact metadata hash checks belong to the task receipt,
 not a claim that the country was rebuilt. Ledger:
 =.coder/ledger/1482-1485-quantity-diagnostics.md=.
 
+** Published household-input form validation and campaign wording (GH #1482)
+
+The public UEMOA catalogue 43 household Designer exports for
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/98#page=182][Vague 1, PDF p.182]] and
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/99#page=185][Vague 2, PDF p.185]]
+both ask for the household's total amount of each listed input used during
+the rainy season at Q16B.03a. The answer is decimal and its printed check
+requires a positive value. Q16B.03b separately lists gram, kilogram, tonne,
+litre and cartload (codes 1–5). The household input roster is built from
+Q16B.02. The printed Q16B2 gate uses =s16Aq00==1= and =visite2==2=, the
+latter referring to the second household visit described on PDF p.9, not
+to the Vague 2 form. Gift Q16B.07 and purchase Q16B.09 are separate
+amount/unit pairs (Vague 1 PDF pp.183–184 and Vague 2 pp.186–187).
+The Appendix B checks at Vague 1 PDF p.267 and Vague 2 p.271 relate
+reported use to positive amounts in parcel Q16A.29. They do not
+establish that Q16B.03a must equal a sum of parcel amounts.
+
+The campaign substitution in both printed exports is =2018/2019=
+([[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/98#page=6][Vague 1, PDF p.6]] and
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/99#page=6][Vague 2, PDF p.6]]).
+The public [[https://microdata.worldbank.org/catalog/4290/data-dictionary/F43][WB4290 v04 household input dictionary]]
+instead describes =s16bq03a= as using =2017/2018=. This is a discrepancy
+between published documents, not evidence of the campaign shown in a
+deployed instrument or a byte comparison with the library's v03 source.
+
+The inspected exports do not give a tonne-specific upper limit or scale
+rule for Q16B.03a. The dictionary's display decimals do not establish a
+storage convention. Confirm the actual fielded build and campaign binding,
+unit-specific entry instructions, and any changes before release before
+interpreting the magnitudes. Keep existing quantities and units and the
+report-only Site Q diagnostic. This check read no household records.
+
 * 2026-11-09 -- GH #1437: own2021 printed finished-harvest route confirmed
 
 Both own forms =2021-22/Documentation/Questionnaire/bfa_ehcvm2_vague1.pdf=
