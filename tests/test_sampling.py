@@ -2308,6 +2308,7 @@ class TestServedStrataAgreesWithTheRegistry:
 # `native-label` definition says.
 
 _VARIABLE = re.compile(r"^(\S+) \((.+)\)$")
+_TANZANIA_UPD_WAVES = ("2008-09", "2010-11", "2012-13", "2014-15")
 
 
 def _strata_declarations(block):
@@ -2452,10 +2453,79 @@ class TestANativeRecordIsWhatTheConfigServes:
 
     @pytest.mark.parametrize("country,wave", _native_records())
     def test_the_variable_is_the_configs_and_nothing_relabels_it(self, country,
-                                                                wave):
+                                                                wave, monkeypatch):
         rec = sampling_records(country)[wave]
+        if country == "Tanzania" and wave in _TANZANIA_UPD_WAVES:
+            self._check_tanzania_upd_source(wave, rec, monkeypatch)
+            return
         assert _native_config_problems(
             country, wave, rec.served_strata["variable"]) == []
+
+    @staticmethod
+    def _check_tanzania_upd_source(wave, rec, monkeypatch):
+        import runpy
+
+        import lsms_library as ll
+        from lsms_library import local_tools
+        from lsms_library.yaml_utils import load_yaml
+
+        w = ll.Country("Tanzania", preload_panel_ids=False)[wave]
+        assert w.wave_folder == "2008-15"
+        yaml_path = w.file_path / "_" / "data_info.yml"
+        if yaml_path.exists():
+            with yaml_path.open(encoding="utf-8") as fh:
+                assert not (load_yaml(fh) or {}).get("sample")
+        assert rec.strata_holds == "native-code"
+        assert rec.served_strata["variable"] == "strataid (upd4_hh_a.dta)"
+        # R3 and R4 reuse an invented HHID. R4 includes a duplicate
+        # tracking line and a blank with a populated, unrelated strataid2.
+        raw = pd.DataFrame({
+            "r_hhid": ["one", "two", "repeat", "repeat", "repeat", "blank"],
+            "round": [1, 2, 3, 4, 4, 4],
+            "clusterid": [811, 822, 833, 844, 844, 855],
+            "weight": [1.0] * 6,
+            "strataid": [1, 2, 3, 4, 4, None],
+            "strataid2": ["Wrong label"] * 6,
+            "urb_rur": ["RURAL"] * 6,
+            "ha_07_1": ["YES", "YES", "YES", "YES", "YES", "NO"],
+        })
+        reads, outputs = [], []
+
+        def read(path):
+            assert str(path) == "../Data/upd4_hh_a.dta"
+            reads.append(path)
+            return raw.copy()
+
+        def write(frame, path):
+            assert path == "sample.parquet"
+            outputs.append(frame)
+
+        monkeypatch.setattr(local_tools, "get_dataframe", read)
+        monkeypatch.setattr(local_tools, "to_parquet", write)
+        runpy.run_path(str(w.file_path / "_" / "sample.py"))
+        assert len(reads) == len(outputs) == 1
+        expected = pd.Series(
+            ["1", "2", "3", "4", pd.NA], name="strata", dtype="string",
+            index=pd.MultiIndex.from_tuples([
+                ("one", "2008-09"), ("two", "2010-11"),
+                ("repeat", "2012-13"), ("repeat", "2014-15"),
+                ("blank", "2014-15"),
+            ], names=["i", "t"]),
+        )
+        pd.testing.assert_series_equal(outputs[0]["strata"].astype("string"), expected)
+
+    def test_tanzania_first_wave_record_has_no_preceding_boundary(self):
+        expected = dict.fromkeys(_TANZANIA_UPD_WAVES, "native-code")
+        expected.update({"2019-20": "native-label", "2020-21": "native-label"})
+        records = sampling_records("Tanzania")
+        assert {wave: rec.strata_holds for wave, rec in records.items()} == expected
+        frame = pd.DataFrame({"t": ["2008-09"], "v": ["invented"]}).set_index("t")
+        S.attach(frame, "Tanzania", known_waves=["2008-09", "2010-11"])
+        assert frame.attrs["sampling_resolution"] == {"Tanzania": "exact"}
+        record = frame.attrs["sampling"]["Tanzania"]["2008-09"]
+        assert record.strata_holds == "native-code"
+        assert record.get("panel") is None
+        assert record.get("design_tag") is None
 
     def test_there_are_native_records_to_check(self):
         assert len(_native_records()) >= 2

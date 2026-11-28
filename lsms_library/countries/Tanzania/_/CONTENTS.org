@@ -448,6 +448,10 @@ gives no share.  (The "~20% sub-sample" figure in [[#panel-design]] and in
 pp. 7-8, and is not restated in any statement quoted here; it is not
 contradicted either.)
 
+The pooled sample's served =strata= comes from the UPD cover's numeric =strataid=, not the separately labelled =strataid2= (#1577).
+At household-round grain, all 3,352 records the loader identifies as Refresh (=ha_07_1= is =NO=) have no =strataid=, and all 989 other records have a code.
+The library preserves those blanks. This describes the served field, not the absence of a Refresh sampling design.
+
 *** 2019-20: the Extended Panel sub-cohort only
 
 Sample design, =2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf=,
