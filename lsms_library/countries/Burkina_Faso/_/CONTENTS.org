@@ -1723,8 +1723,8 @@ PDFs (=bfa_ehcvm1_nomenclature_vague{1,2}.pdf=) are still not held.
 
 Measured on =s16b_me_bfa2018.dta=:
 - *All 602 code-21 rows are vague 2* (0 in vague 1), against 11,425 / 11,452
-  applied rows per vague; 2,251 / 2,258 households.  So 21 is a slot the
-  vague-2 CAPI added, not part of the printed list.
+  applied rows per vague; 2,251 / 2,258 households. The released file
+  therefore carries code 21 only in Vague 2. Neither held workbook lists it.
 - When it appears, code 20 « Autres semences » falls from 649 rows (vague 1)
   to 234 (vague 2); 105 households report both 20 and 21 in vague 2.
 - 591 of the 602 are in unit code 2 (Kilogramme).
@@ -1757,6 +1757,22 @@ rows), and =crop_production= is unchanged (15,587 rows).  At the household
 an Arachide harvest.  Cache: =_/categorical_mapping.org= is a build input, so
 every Burkina hash moves.  Pinned by =tests/test_burkina_faso_seed_crop_labels.py=
 and =tests/test_burkina_faso_plot_inputs_identity.py=.
+
+*Later documentary corroboration (2026-11-28).* The public UEMOA Designer
+exports differ from the held Excel workbooks above. Annex D for the
+Q16B.02 roster in
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/98#page=286][Vague 1, PDF p.286]]
+does not list code 21. The corresponding
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/99#page=290][Vague 2, PDF p.290]]
+explicitly lists =21 Semences d'arachide= immediately before
+=20 Autres semences=. The public
+[[https://microdata.worldbank.org/catalog/4290/data-dictionary/F43][WB4290 v04 F43 dictionary]]
+for =s16bq01= still lists code 21 without a label. This supports the
+existing =Arachide= / =Seed= reading in this wave. It does not identify
+the deployed revision, bind v04 to the tracked v03 files, or identify
+which Vague 1 records in code 20 were groundnut. The original decision
+was data-validated and the historical workbook observations remain
+correct. No native records were read and no mapping or cache hash changes.
 
 
 Independent review of the identity repair at =3848778d0e8676c798883c11ea3e33fc88e8a591=
