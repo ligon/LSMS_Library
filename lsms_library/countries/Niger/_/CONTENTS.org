@@ -1024,6 +1024,37 @@ sibling, so they merge nothing); no other (table, wave) moves under
 *Cache.*  =categorical_mapping.org= is a build input in every Niger
 table's hash: one Niger re-warm, shared with GH #679 / #824 / #811.
 
+* 2026-11-27 -- Niger EHCVM2 food code 166 in public companion dictionaries (GH #833)
+
+The public [[https://microdata.worldbank.org/metadata/export/6276/ddi][World Bank XML for =NER_2021_EHCVM-2_v02_M=]]
+separates three uses of the number. These are file-level definitions and
+frequencies, not a new reading of responses.
+
+| Public file and card | Code 166 value label | File cases with that code |
+|-
+| =s07b_me_ner2021::s07bq01= (F12/V503) | blank | 468 |
+| =ehcvm_conso_ner2021::codpr= (F46/V1722) | Yaji margamarga | 468 |
+| =ehcvm_nsu_ner2021::produit= (F51/V1832) | Yazi margamarga | 3 |
+
+The aggregate is a derived annual-expenditure file with household, product
+and acquisition-mode fields, not the original seven-day recall roster. Its matching code count and the two
+complementary labels support a likely name, but do not establish a row
+crosswalk, deployed wording, or physical state. Comparing identical numeric codes 1–165 with nonblank labels in both
+dictionaries, 136 of 153 recall/aggregate pairs and 132 of 151 recall/NSU
+pairs match after stripping leading item numbers, case-folding, removing
+accents and dropping non-alphanumeric characters including spaces, without
+transliterating ligatures. This is not a semantic crosswalk and does not
+validate the product-level join left unverified in GH #876. The aggregate declares =grappe=, =menage=, =vague= and =codpr=,
+which identifies a possible future lineage check with the producer's
+derivation specification. No row uniqueness or match was checked. The repository's provenance refers
+to v01, so this v02 dictionary does not certify the held bytes.
+
+The November 3 ruling in GH #833 still stands. Serve the native ='166'=
+without relabelling or folding it. The remaining authority is the own deployed
+Section 7B item list, an attributable export/derivation bridge, or a producer
+correction that explicitly binds this recall code. No source, quantity, unit,
+label map or served data changed in this documentation update.
+
 * household_roster 2018-19: cp1252 roster labels read as Latin-1 (GH #801)
 
 =s01_me_ner2018.dta= is Stata format 115 with no declared encoding, and its
@@ -4138,33 +4169,3 @@ ones included), so it is left for the next edit of that table.
 =Wave._input_hash= (the 25 of 2018-19 and the 25 of 2021-22; 2011-12 and 2014-15 do not move, because
 =niger.py= is not edited); =build_transforms_fingerprint= 0 of 42, =framework_imports_fingerprint= 0 of 38.
 
-* 2026-11-27 -- Niger EHCVM2 food code 166 in public companion dictionaries (GH #833)
-
-The public [[https://microdata.worldbank.org/metadata/export/6276/ddi][World Bank XML for =NER_2021_EHCVM-2_v02_M=]]
-separates three uses of the number. These are file-level definitions and
-frequencies, not a new reading of responses.
-
-| Public file and card | Code 166 value label | File cases with that code |
-|-
-| =s07b_me_ner2021::s07bq01= (F12/V503) | blank | 468 |
-| =ehcvm_conso_ner2021::codpr= (F46/V1722) | Yaji margamarga | 468 |
-| =ehcvm_nsu_ner2021::produit= (F51/V1832) | Yazi margamarga | 3 |
-
-The aggregate is a derived annual-expenditure file with household, product
-and acquisition-mode fields, not the original seven-day recall roster. Its matching code count and the two
-complementary labels support a likely name, but do not establish a row
-crosswalk, deployed wording, or physical state. Comparing identical numeric codes 1–165 with nonblank labels in both
-dictionaries, 136 of 153 recall/aggregate pairs and 132 of 151 recall/NSU
-pairs match after stripping leading item numbers, case-folding, removing
-accents and dropping non-alphanumeric characters including spaces, without
-transliterating ligatures. This is not a semantic crosswalk and does not
-validate the product-level join left unverified in GH #876. The aggregate declares =grappe=, =menage=, =vague= and =codpr=,
-which identifies a possible future lineage check with the producer's
-derivation specification. No row uniqueness or match was checked. The repository's provenance refers
-to v01, so this v02 dictionary does not certify the held bytes.
-
-The November 3 ruling in GH #833 still stands. Serve the native ='166'=
-without relabelling or folding it. The remaining authority is the own deployed
-Section 7B item list, an attributable export/derivation bridge, or a producer
-correction that explicitly binds this recall code. No source, quantity, unit,
-label map or served data changed in this documentation update.
