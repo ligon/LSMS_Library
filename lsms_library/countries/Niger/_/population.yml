@@ -78,14 +78,25 @@ Population:
     confidence: low
     survey: 'Enquête Harmonisée sur le Conditions de Vie des Ménages (EHCVM) 2021-2022 (WB catalog 6276; NER_2021_EHCVM-2_v01_M)'
     language: 'en'
-    source_file: 'lsms_library/countries/Niger/2021-22/Documentation/SOURCE.org (contains only the URL https://microdata.worldbank.org/index.php/catalog/6276); quoted text from https://microdata.worldbank.org/index.php/catalog/6276/study-description'
-    locator: 'WB Microdata catalog 6276, study-description page: sections ''Coverage > Geographic Coverage'', ''Identification > Series Information'', and ''Abstract''. Also checked: catalog 6276 ''Documentation'' tab -> ''Basic Information Document'' (download id 100374, EN, section ''4. Sampling'', pp. 9-10) and ''Basic Information Document - French version'' (download id 100375, section ''Base de sondage'' / ''Stratégie d''échantillonnage'').'
+    source_file: 'lsms_library/countries/Niger/2021-22/Documentation/SOURCE.org (historical v01 catalog pointer); the coverage claim comes from the WB6276 study description'
+    locator: >-
+      World Bank catalog 6276, study description, Geographic Coverage, Series Information and Abstract.
+      Separate field evidence: Niger INS, Profil de pauvreté 2021/2022 (September 2023), §1.3.3, PDF pp. 14–15,
+      https://stat-niger.org/wp-content/uploads/rapport_enquete/EHCVM/rapport_profil_pauvrete.pdf#page=14.
     population_statement: |-
-      NOT FOUND — no universe/target-population statement exists for this wave. The strongest coverage claims available, quoted verbatim from the WB catalog study description (there is no local documentation beyond SOURCE.org):  [Coverage > Geographic Coverage:] National coverage  [Series Information:] The Niger EHCVM 2021/22 is the second edition of a nationally representative household survey conducted within the West Africa Economic Monetary Union (WAEMU) Household Survey harmonization Project (P153702) a joint program by the World Bank and the WAEMU Commision that aims at producing household survey data in member countries (Benin, Burkina Faso, Chad, Cote d'Ivoire, Guinea Bissau, Mali, Niger, Senegal and Togo). The survey covers all regions and includes approximately 6,000 households.  [Abstract:] The EHCVM is a nationally representative survey of 6,000 households, which are also representative of the geopolitical zones (at both the urban and rural level).
+      No formal household universe or institutional target population was identified in the sources reviewed.
+      WB6276 claims national coverage and representativeness. Coverage of all regions does not mean coverage of every department.
     exclusions: |-
-      NOT FOUND — no exclusion statement (no institutional-population exclusion, no dropped region, no security-related exclusion) appears in the catalog metadata, the DDI/XML, or either language version of the Basic Information Document.
+      The Niger INS poverty report states that the survey field excluded the departments of Bosso (Diffa)
+      and Banibangou (Tillabéri). This is a geographic scope statement. The institutional universe is not established.
     translation: |-
-      n/a — the quoted catalog text is in English. The French-language Basic Information Document ('Document d'Information de Base', catalog 6276 download id 100375) was also checked and likewise contains no universe statement; its closest text is 'Base de sondage — La base de sondage de l'enquête de 2018/19 était le recensement général de la population et de l'habitat (RGPH) de [PRECISER L'ANNÉE]. En 2021/22, il a été procédé à un dénombrement dans les mêmes grappes.' (note the unfilled placeholder, verbatim in the source).
+      The catalog claim is in English. The geographic exclusions above paraphrase the French producer report.
     notes: |-
-      IMPORTANT — the quoted text is a geographic-coverage / representativeness claim, NOT a universe declaration; it should not be recorded as one. Unlike 2018-19 (catalog 4296), the 2021-22 catalog entry has no DDI 'Universe' field. The 2021-22 BID is visibly an incomplete template: it contains unfilled placeholders in the sampling chapter, verbatim 'For a sample size of [xxxxx households], the precision was [...] at the national level and varied from [...] to [...] for the regions.' and 'the general population and housing census (RGPH) of [SPECIFY THE YEAR]'. SAMPLE DESIGN context (BID '4. Sampling' and catalog 'Sampling Procedure'): a cluster PANEL of the 2018/19 survey — the same clusters are revisited, the 2018/19 12 households per cluster re-interviewed where found and topped back up to 12 where fewer are found; stratum = region x milieu (urban/rural); stage 1 PPS by number of households, stage 2 12 households with equal probability; final sample 6,622 households (2,511 urban, 4,111 rural), wave 1 = 3,303 HH (Nov 17 2021 - Feb 13 2022), wave 2 = 3,319 HH (Jun 3 - Aug 31 2022). Because 2021-22 is a panel on the 2018/19 frame, the 2018-19 universe statement ('all de jure households excluding prisons, hospitals, military barracks, and school dormitories') is the natural candidate to inherit — but NO document says so, and that inference is explicitly NOT made here.
-    record_source: slurm_logs/POPULATION_STATEMENTS_2026-07-21.org (section 3, 'Niger 2021-22')
+      The INS report separately reports 25 selected enumeration areas not interviewed (555 interviewed of 580 selected).
+      A named field exclusion is not the same as non-interview of a selected area. The report does not make them equivalent.
+      The 2021–22 BIDs describe revisits and household top-ups as the follow-up strategy, not proof that every cluster
+      or the 2018–19 institutional-universe statement carried forward. The BIDs' region-by-milieu sentence describes
+      the earlier 2018–19 draw. No survey-design or weighting inference follows from this record.
+      WB6276 currently displays v02 and its public DDI has no Universe element. The historical v01 source declaration
+      above is retained. This metadata check does not authenticate or replace any held release.
+    record_source: 'July 2026 population sweep (slurm_logs/POPULATION_STATEMENTS_2026-07-21.org, Niger 2021-22); geographic source reconciliation in GH #1134'
