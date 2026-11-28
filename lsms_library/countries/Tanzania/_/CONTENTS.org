@@ -2097,8 +2097,9 @@ Measured, cold builds of development =9a0ed5f3c=, the PR head before the rulings
 
 * Cluster id renumbering at round 3 (GH #942)
 
-*UPD4 round 3 (2012-13) renumbers 82 of the 409 NPS clusters, whole clusters
-at a time.*  Measured 2026-10-19 in the raw =2008-15/Data/upd4_hh_a.dta=, by
+*In the API, UPD4 round 3 (2012-13) has 82 one-to-one cluster ID changes
+among linked households.*
+Separately, the 2026-10-19 comparison of raw =2008-15/Data/upd4_hh_a.dta= is by
 tracking line (=UPHI=): 1,565 of the 7,082 lines present in both round 2 and
 round 3 change =clusterid=, but they collapse to only *83* distinct
 (round-2, round-3) id pairs, *81 of which differ in the last digit only*
@@ -2114,29 +2115,24 @@ clusters are in region codes 17--21 and 51--55 (Zanzibar).  Through the API
 pairs.  At round 4 (2014-15) the change is partly undone: 12 of the 82 return
 to their round-2 id (58 households).  6 of the 82 round-3 ids still occur in
 2014-15, but no linked household keeps one; the other non-reverting
-households (10, in 8 clusters) move to new-format ids (11 or 12 characters,
+households (10, in 8 clusters) carry new-format IDs (11 or 12 characters,
 the 2014-15 refresh layout).  (Corrected 2026-10-19 after red team r1 R3; this
 paragraph used to say "6 keep the round-3 id", and that no renumbered id
 occurred on the other side at all.)
 
-So the 20% of linked households whose =v= changes at 2010-11 -> 2012-13 are
-*not movers*.  Two existing readings say they are, and both are contradicted:
+The count describes ID pairs, not household moves or unchanged physical EAs.
+The NBS [[https://microdata.worldbank.org/index.php/catalog/2252][Round 3 study description]] (Data collection, Field Work) says the fieldwork clusters grouped Round 2 households with nearby local and distance-tracking cases, including households outside the same EA.
+It does not identify which of the 82 pairs reflect operational regrouping, recoding, or actual changes in EA boundaries, or explain the last-digit edits.
 
-- =2008-15/_/sample.py=: "the NPS TRACKS movers, and 1,607 of the 8,359 panel
-  lines seen in more than one round change clusterid over their life."  At the
-  round-2 -> round-3 step, 1,565 of those changes are this renumbering.
-- =slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org= §2, Tanzania
-  2010-11 -> 2012-13: "panel-stable; 20% are /movers/".  A mover does not take
-  its whole cluster with it; a bijection of whole clusters is a renumbering.
+The older =DESIGN.org= §2 called the 20% /movers/, while this note formerly called them /not movers/.
+Neither claim follows from a linked ID pair or a change in =clusterid=.
+The =2008-15/_/sample.py= count of 1,607 changed IDs over 8,359 repeated tracking lines is also not a mover count.
+We have not classified individual household movement for this boundary.
 
-Why it matters: grouping on =v= across 2010-11 and 2012-13 (or clustering
-standard errors on it) splits each of the 82 clusters in two.
-=Tanzania/_/sampling.yml= therefore declares the 2012-13 and 2014-15 boundaries
-=cluster_id_continuity: wave-scoped= (partial), and a =Country('Tanzania')=
-frame carrying =v= across them raises a =ClusterIdentityWarning=; nothing
-served changes.  The cause (a correction of mis-coded EA serials? a re-listing?)
-is not documented in anything the repository holds.  A crosswalk is derivable
-for this boundary (it is a bijection) but is out of scope (GH #942 ruling).
+Cross-wave grouping on =v= still splits the 82 observed ID pairs.
+=Tanzania/_/sampling.yml= therefore keeps the 2012-13 and 2014-15 boundaries =cluster_id_continuity: wave-scoped=, and a =Country('Tanzania')= frame carrying =v= across them raises =ClusterIdentityWarning=.
+Nothing served changes.
+The ID pairing alone is not authority for a physical-cluster crosswalk or a net-of-movers count.
 
 * The cluster key of =cluster_features= (GH #323, Site 2)
 
