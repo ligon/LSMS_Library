@@ -93,3 +93,12 @@ def cluster_features(df):
     (``Panel/hh_mod_a_filt_19.dta``); cross-sectional rows carry NaN.
     """
     return _ihps_panel_cluster_features(df, status_source=_STATUS_SOURCE)
+
+
+from _malawi_interview_dates import panel_date_source  # noqa: E402,F401
+
+
+def interview_date(df):
+    from _malawi_interview_dates import parsed_interview_dates
+
+    return parsed_interview_dates(df, '2019-20', panel_visit=True)

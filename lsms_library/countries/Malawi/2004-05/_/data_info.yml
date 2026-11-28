@@ -44,13 +44,10 @@ interview_date:
     idxvars:
         i: case_id
     myvars:
-        # a14a/b/c = Day / Month / Year of interview (numeric).
-        # Combined into a datetime by malawi_date_ymd (year, month, day order).
-        int_t:
-            - a14c
-            - a14b
-            - a14a
-            - mapping: malawi_date_ymd
+        # A14 Day / Month / Year are distinct numeric operands (GH #1045).
+        int_t_y: a14c
+        int_t_m: a14b
+        int_t_d: a14a
 
 cluster_features:
     file: sec_a.dta
