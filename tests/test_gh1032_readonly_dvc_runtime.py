@@ -236,8 +236,10 @@ def test_live_uncommitted_sidecar_and_config_local_are_used(tiny):
     subprocess.run(["git", "init", "-q", str(root)], check=True)
     subprocess.run(["git", "-C", str(root), "add", "tiny.csv.dvc", ".dvc/config"],
                    check=True)
+    # The fixture needs a tracked predecessor, not the caller's signing setup.
     subprocess.run(["git", "-C", str(root), "-c", "user.name=Fixture",
-                    "-c", "user.email=fixture@example.invalid", "commit", "-qm", "base"],
+                    "-c", "user.email=fixture@example.invalid",
+                    "-c", "commit.gpgsign=false", "commit", "-qm", "base"],
                    check=True)
     changed = b"amount\n3\n5\n"
     _sidecar(root, "tiny.csv", changed)
