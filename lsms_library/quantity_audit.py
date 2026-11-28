@@ -512,11 +512,11 @@ _TAILS: dict[str, tuple[float, float]] = {
 #: census: 2,005 of 11.57M rows (0.017%) at #884, 1,998 of 11.93M under #1259;
 #: 3,030 ms on a 5.34M-row GhanaLSS read (3.5% of the 85 s warm read).
 _SCREENED_COLUMNS: dict[str, tuple[str, ...]] = {
-    # GH #1482/#1485: native amounts only, not acquisition amounts in their
-    # own unit columns, monetary values, ownership flags or TLU.  The head
-    # columns are the union of all 16 declared livestock schemes (ledger
-    # 1482-1485 §2); absent columns cost no audit and are never manufactured.
-    "plot_inputs": ("Quantity",),
+    # GH #1482/#1485 and #1739: applied and purchased amounts use their own
+    # unit columns. Gifts, monetary values, ownership flags and TLU stay out.
+    # The head columns are the union of all 16 declared livestock schemes
+    # (ledger 1482-1485 section 2); absent columns are not manufactured.
+    "plot_inputs": ("Quantity", "Quantity_purchased"),
     "livestock": ("HeadCount", "HeadAcquired", "HeadSold",
                   "HeadCount12MonthsAgo", "HeadBornOrReceived", "HeadEaten",
                   "HeadLostOrDied"),
@@ -931,6 +931,57 @@ def _audit_crop_sales(df: Any, column: str, *, country: str,
     return reports
 
 
+def _audit_plot_purchases(df: Any, *, country: str,
+                          tails: tuple[str, ...]) -> list[dict[str, Any]]:
+    """Screen purchase amounts only against their own unit and input kind (#1739)."""
+    column = "Quantity_purchased"
+    if not isinstance(df, pd.DataFrame) or df.empty or column not in df.columns:
+        return []
+    named = {axis: _axis(df, axis) for axis in (
+        "country", "t", "i", "plot", "j", "input", "period", "season", "visit",
+        "Unit_purchased")}
+    unit = named["Unit_purchased"]
+    if unit is None or named["input"] is None:
+        return []
+    # Ledger 1739 sections 3-5: neither applied u nor the scale of another
+    # kind of input can stand in for a purchase denominator.
+    codes, categories = unit
+    quantity = _numeric(df[column])
+    valid_unit = (codes >= 0) & np.r_[_usable_units(categories), False][codes]
+    eligible = np.isfinite(quantity) & (quantity > 0) & valid_unit
+    if not eligible.any():
+        return []
+
+    named["u"] = unit
+    base = [axis for axis in (
+        "country", "t", "period", "season", "visit", "Unit_purchased", "input")
+            if named[axis] is not None]
+    keys = {axis: named[axis] for axis in base}
+    rungs = [(",".join(base), base)]
+    if named["j"] is not None:
+        keys["j"] = named["j"]
+        fine = base + ["j"]
+        rungs.insert(0, (",".join(fine), fine))
+    references, rung = _cell_references(
+        np.where(eligible, quantity, np.nan), keys, tuple(_TAILS[t] for t in tails),
+        rungs=rungs)
+    reports = []
+    for tail, reference in zip(tails, references):
+        with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+            ratio = quantity / reference if tail == "high" else reference / quantity
+        quantile, floor = _TAILS[tail]
+        reports.extend(_reports_for(
+            df, column, named, eligible & (ratio > QUANTITY_OUTLIER_K), ratio,
+            quantity, reference, rung, country=country, table="plot_inputs",
+            direction=tail, quantile=quantile, floor=floor))
+    for report in reports:
+        report["unit_column"] = "Unit_purchased"
+        report["unit_semantics"] = "as-reported"
+        for offender in report["offenders"]:
+            offender["Unit_purchased"] = offender["u"]
+    return reports
+
+
 def audit_quantities(df: Any, column: str, *, country: str, table: str,
                      tails: tuple[str, ...] = ("high",),
                      ) -> list[dict[str, Any]]:
@@ -954,7 +1005,11 @@ def audit_quantities(df: Any, column: str, *, country: str, table: str,
     ``Sale_price`` names the native ratio ``Value_sold / Quantity_sold``, not a
     served column. No sold unit is inferred from harvest labels. Missing unit
     or insufficient positive support returns no report, as on the other paths.
+    Plot-input purchases likewise use their explicit purchase unit and
+    never pool different input kinds.
     """
+    if table == "plot_inputs" and column == "Quantity_purchased":
+        return _audit_plot_purchases(df, country=country, tails=tails)
     if table == "crop_production" and column in {"Quantity_sold", "Sale_price"}:
         return _audit_crop_sales(df, column, country=country, tails=tails)
     if not isinstance(df, pd.DataFrame) or df.empty or column not in df.columns:
@@ -1585,6 +1640,8 @@ def _format_offender(offender: dict[str, Any], direction: str = "high",
                      "production_obs"):
             if offender.get(axis) is not None:
                 parts.append(f"{axis}={offender[axis]}")
+    elif offender.get("Unit_purchased") is not None:
+        parts.append(f"Unit_purchased={offender['Unit_purchased']}")
     elif offender["u"] is not None:
         parts.append(f"{'harvest_u' if kg_total else 'u'}={offender['u']}")
     scale = (f"x{offender['ratio']:,.1f} its" if direction == "high"
@@ -1685,6 +1742,11 @@ def _format_quantity_report(report: dict[str, Any]) -> str:
             + ("species kept separate at every rung; " if report["table"] == "livestock"
                else "crop, then input may pool within those boundaries; ")
             + f"at least {report['min_cell']} positive rows; zeros never set the scale")
+    if report.get("unit_column") == "Unit_purchased":
+        comparison = (
+            "explicit Unit_purchased, input kind, country, wave and any "
+            "period/season/visit kept separate; crops may pool within those "
+            f"bounds; at least {report['min_cell']} positive finite rows")
     if report["table"] == "crop_production" and report["column"] in {"Quantity_sold", "Sale_price"}:
         comparison = (
             "explicit Unit_sold and sold condition kept separate within country/"
