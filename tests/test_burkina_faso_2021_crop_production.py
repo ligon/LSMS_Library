@@ -68,8 +68,8 @@ def mapping():
 def test_the_builder_reads_both_files_by_literal_path():
     text = (WAVE_DIR / "crop_production.py").read_text(encoding="utf-8")
     # Literal paths: the cache hash folds a script's literal data refs (scan_script_data_refs).
-    assert "'../Data/s16c_me_bfa2021.dta'" in text
-    assert "'../Data/s16d_me_bfa2021.dta'" in text
+    assert "'../Data/Panel/s16c_me_bfa2021.dta'" in text
+    assert "'../Data/Panel/s16d_me_bfa2021.dta'" in text
 
 
 def test_unruled_kilograms_are_not_served():
@@ -146,7 +146,7 @@ def test_household_id_is_the_country_rule(mapping):
 
 @pytest.fixture(scope="module")
 def raw():
-    data = ROOT / WAVE / "Data"
+    data = ROOT / WAVE / "Data" / "Panel"
     c = get_dataframe(str(data / "s16c_me_bfa2021.dta"), convert_categoricals=False)
     d = get_dataframe(str(data / "s16d_me_bfa2021.dta"), convert_categoricals=False)
     c = c[c["s16cq04"].notna()].copy()
@@ -184,7 +184,7 @@ def _lines_per_pair(c, d):
 
 @requires_s3
 def test_value_sold_is_the_raw_s16d_sum(served):
-    d = get_dataframe(str(ROOT / WAVE / "Data" / "s16d_me_bfa2021.dta"),
+    d = get_dataframe(str(ROOT / WAVE / "Data" / "Panel" / "s16d_me_bfa2021.dta"),
                       convert_categoricals=False)
     assert served["Value_sold"].sum() == pytest.approx(
         pd.to_numeric(d["s16dq06"], errors="coerce").sum(), rel=1e-12)

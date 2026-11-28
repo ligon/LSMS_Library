@@ -44,7 +44,7 @@ def _tests_conftest():
 requires_s3 = _tests_conftest().requires_s3
 
 COUNTRY = "Burkina_Faso"
-PANEL_COVER = "s00_me_bfa2021.dta"
+PANEL_COVER = "Panel/s00_me_bfa2021.dta"
 CS_COVER = "Cross_Section/s00_me_bfa2021.dta"
 GPS_2018 = "grappe_gps_bfa2018.dta"
 ROOT = countries_root() / COUNTRY

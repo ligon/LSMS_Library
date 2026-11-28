@@ -30,9 +30,9 @@ def _module(path, name):
 def raw_reader(monkeypatch):
     monkeypatch.setenv('LSMS_NO_CACHE', '1')
     frames = {
-        's00_me_bfa2021.dta': pd.DataFrame({
+        'Panel/s00_me_bfa2021.dta': pd.DataFrame({
             'grappe': [2, 2], 'menage': [1, 2], 's00q04': ['Rural', 'Rural']}),
-        'ehcvm_panel_ponderations_bfa2021.dta': pd.DataFrame({
+        'Panel/ehcvm_panel_ponderations_bfa2021.dta': pd.DataFrame({
             'grappe': [2], 'hhweight2021': [100.], 'hhweight_panel': [150.]}),
         'Cross_Section/s00_me_bfa2021.dta': pd.DataFrame({
             'grappe': [20], 'menage': [126], 's00q04': ['Urbain'],

@@ -249,8 +249,8 @@ food_acquired:
     # labels: the table uses that wave's codes, which are not this wave's.
     unit_weights:
         file:
-            - ../../2021-22/Data/ehcvm_nsu_bfa2021.dta
-            - ../../2021-22/Data/s07b_me_bfa2021.dta
+            - ../../2021-22/Data/Panel/ehcvm_nsu_bfa2021.dta
+            - ../../2021-22/Data/Panel/s07b_me_bfa2021.dta
     idxvars:
         v: grappe
         visit: vague

@@ -35,7 +35,7 @@ def _tests_conftest():
 requires_s3 = _tests_conftest().requires_s3
 
 COUNTRY = "Burkina_Faso"
-PANEL_COVER = "s00_me_bfa2021.dta"
+PANEL_COVER = "Panel/s00_me_bfa2021.dta"
 CS_COVER = "Cross_Section/s00_me_bfa2021.dta"
 ROOT = countries_root() / COUNTRY
 STAMPS = ("s00q23a", "s00q23b", "s00q24a", "s00q24b", "s00q25a", "s00q25b")

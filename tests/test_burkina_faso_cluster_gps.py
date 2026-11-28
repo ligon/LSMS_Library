@@ -70,7 +70,7 @@ COUNTRY = "Burkina_Faso"
 WAVES = ("2014", "2018-19", "2021-22")
 GPS_2018 = "grappe_gps_bfa2018.dta"
 AGRI_GPS_2014 = "emc2014_agri_gps.dta"
-S00_2021 = "s00_me_bfa2021.dta"
+S00_2021 = "Panel/s00_me_bfa2021.dta"
 
 # Burkina Faso lies within roughly 9.4N-15.1N, 5.5W-2.4E.
 LAT = (9.3, 15.2)

@@ -65,7 +65,7 @@ from mapping import (CROP_CODES_FROM_TEXT, CROP_OBS_NA, FARM_LEVEL, KEY_CROP_FRO
 T = '2021-22'
 UNIT_NA = 'Unknown'
 CONDITION_NA = 'unknown_condition'
-SOURCE = '../Data/s16c_me_bfa2021.dta'
+SOURCE = '../Data/Panel/s16c_me_bfa2021.dta'
 INDEX = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs']
 
 
@@ -104,8 +104,8 @@ def _stamp(frame, mask, key):
 
 src = get_dataframe(SOURCE, convert_categoricals=True)
 codes = get_dataframe(SOURCE, convert_categoricals=False)
-rec = get_dataframe('../Data/s16d_me_bfa2021.dta', convert_categoricals=True)
-rec_codes = get_dataframe('../Data/s16d_me_bfa2021.dta', convert_categoricals=False)
+rec = get_dataframe('../Data/Panel/s16d_me_bfa2021.dta', convert_categoricals=True)
+rec_codes = get_dataframe('../Data/Panel/s16d_me_bfa2021.dta', convert_categoricals=False)
 RAW_VALUE_SOLD = pd.to_numeric(rec_codes['s16dq06'], errors='coerce').sum()
 
 crop_table, unit_table = _crop_tables(src, codes, rec, rec_codes)

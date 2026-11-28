@@ -104,7 +104,7 @@ Sampling:
       derivation: 'Burkina_Faso::sample::region-milieu-stratum'
       source_type: derived-from-data
       confidence: high
-      locator: '_/derivations.yml, Burkina_Faso::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2021-22/_/data_info.yml `sample.df_cover.strata` over both covers (s00_me_bfa2021.dta and Cross_Section/s00_me_bfa2021.dta), stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)", "2021-22 has two components"'
+      locator: '_/derivations.yml, Burkina_Faso::sample::region-milieu-stratum (waves 2018-19, 2021-22); 2021-22/_/data_info.yml `sample.df_cover.strata` over both covers (Panel/s00_me_bfa2021.dta and Cross_Section/s00_me_bfa2021.dta), stamped by 2021-22/_/mapping.py `sample`; CONTENTS.org, "2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)", "2021-22 has two components"'
       note: |-
         One construction over both components.  The cross-section's catalog entry
         (6277) names no stratum, so its label is an inference, recorded as a
@@ -132,5 +132,5 @@ Sampling:
         does not change whether this boundary warns.
       source_type: derived-from-data
       confidence: high
-      source_file: 'lsms_library/countries/Burkina_Faso/2021-22/Data/s00_me_bfa2021.dta'
+      source_file: 'lsms_library/countries/Burkina_Faso/2021-22/Data/Panel/s00_me_bfa2021.dta'
       locator: 'grappe vs grappe_EHCVM1 in that file, and grappe in Data/Cross_Section/s00_me_bfa2021.dta, read via get_dataframe 2026-10-23; design: bid_bfa_ehcvm2.pdf p. 4 (quoted in CONTENTS.org, "THE THING TO KNOW") and the WB 6277 catalog entry (sampling_procedure; quoted in CONTENTS.org, GH #1276 section)'

@@ -932,10 +932,10 @@ NSU_TABLE_WAVE = "2021-22"
 #: because ``p50`` is scaled, and ``annee`` because the file is cumulative; Senegal's
 #: ``_nat`` because its three files are one table.
 NSU_TABLES = {
-    "Burkina_Faso": dict(table="ehcvm_nsu_bfa2021.dta", product="codpr", unit="uniteID",
+    "Burkina_Faso": dict(table="Panel/ehcvm_nsu_bfa2021.dta", product="codpr", unit="uniteID",
                          size="tailleID", weight="poids_moyen", year=None, names=None,
                          sources={"2018-19": "s07b_me_bfa2018.dta",
-                                  "2021-22": "s07b_me_bfa2021.dta"}),
+                                  "2021-22": "Panel/s07b_me_bfa2021.dta"}),
     "Mali": dict(table="ehcvm_nsu_mli2021.dta", product="produitID", unit="uniteID",
                  size="tailleID", weight="poids", year=None, names=None,
                  sources={"2018-19": "s07b_me_mli2018.dta",

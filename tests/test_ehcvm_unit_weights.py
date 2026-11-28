@@ -387,7 +387,7 @@ class TestWiring:
     def test_the_spec_is_the_one_the_tables_were_measured_on(self):
         """Why each: lsms_library/ehcvm.py and each country's CONTENTS.org."""
         got = {c: (SPEC[c]['table'], SPEC[c]['weight'], SPEC[c]['year']) for c in NSU_COUNTRIES}
-        assert got == {'Burkina_Faso': ('ehcvm_nsu_bfa2021.dta', 'poids_moyen', None),
+        assert got == {'Burkina_Faso': ('Panel/ehcvm_nsu_bfa2021.dta', 'poids_moyen', None),
                        'Mali': ('ehcvm_nsu_mli2021.dta', 'poids', None),
                        'Niger': ('ehcvm_nsu_ner2021.dta', 'mu', 'annee'),
                        'Senegal': ('ehcvm_nsu_sen2021_nat.dta', 'poids', None)}
@@ -643,7 +643,7 @@ class TestTheTablesAreWhatTheWiringSays:
 
     def test_burkina_two_columns_are_labelled_the_wrong_way_round(self):
         """A median of gram weighings is an integer or a half; a mean is rarely either."""
-        t = _source('Burkina_Faso', 'ehcvm_nsu_bfa2021.dta', convert_categoricals=False)
+        t = _source('Burkina_Faso', 'Panel/ehcvm_nsu_bfa2021.dta', convert_categoricals=False)
         spread = t['poids_sd'].astype(float) > 0
 
         def half_integer(col):

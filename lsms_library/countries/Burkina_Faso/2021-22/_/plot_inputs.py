@@ -21,4 +21,4 @@ def _write_wave(frame, filename):
 
 build_s16b_candidate(read=get_dataframe, write=_write_wave,
                      get_map=get_categorical_mapping, id_fn=i, format_id=format_id,
-                     source_path='../Data/s16b_me_bfa2021.dta')
+                     source_path='../Data/Panel/s16b_me_bfa2021.dta')

@@ -11,7 +11,7 @@ admitted answers and the combined wording remain available. No2018 edit.
 import pandas as pd
 
 
-SOURCE = '../Data/s16b_me_bfa2021.dta'
+SOURCE = '../Data/Panel/s16b_me_bfa2021.dta'
 CARD_FILE = 's16b_2021_cards.org'
 UNIT_FIELDS = ('s16bq03b', 's16bq07b', 's16bq09b')
 CARD_FIELDS = ('s16bq01', 's16bq02', 's16bq05', 's16bq08') + UNIT_FIELDS
