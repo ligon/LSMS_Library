@@ -2926,11 +2926,19 @@ after the welfare file, and the =sample= hook in =2014/_/mapping.py= keeps the w
 unchanged and first, then appends one row per household the welfare file lacks.  As in
 Ethiopia, a household's item rows must agree before they are reduced, and nothing is guessed.
 
-*A gap in the hash, not fixed here.*  =local_tools._collect_file_paths_from_block= yields only
+*A gap in the hash at the time of #1464.*  =local_tools._collect_file_paths_from_block= yielded only
 the plain-string members of a =file:= list, so a member with a per-file override (the form the
-food file takes here, and =Cross_Section/...= in 2021-22) is not in =Wave._input_hash=.  A new
-release of the p1 food file would rebuild =food_acquired=, where it is a plain string, and not
-=sample=.  It is a framework matter, filed as GH #1510: 28 such entries in 9 wave files.
+food file takes here, and =Cross_Section/...= in 2021-22) was not in =Wave._input_hash=.  Updating
+the p1 food sidecar would have invalidated =food_acquired= on the ordinary cache path, because
+its declaration is a plain string, but not =sample=.  GH #1510 counted 28 such entries in nine wave files.
+
+*Resolved 2026-11-07 in PR #1601 (GH #1510).*  The dependency walker now follows the first key
+of a per-file override when that key is a string, matching =Wave.column_mapping=.  It does not interpret
+the override's variable mappings as source paths.  This covers the 2014 p1 source for =sample=
+and configured 2021-22 =Cross_Section/...= entries in the wave and country dependency hashes.
+The separate Data-relative prewarm resolver fix landed via PR #1610 (GH #1602).  Neither fix
+makes the Python script-literal scanner resolve paths built dynamically, or proves that a
+particular source release is available.
 
 *Why that file and not the logement one.*  Logement holds the same 10,800 households at
 household grain, but it has no =strate=, and the food file does.  The food file writes the
