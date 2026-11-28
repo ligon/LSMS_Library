@@ -622,10 +622,12 @@ EHCVM uses two binary eligibility filters:
   least 6 months?"
 - =s01q13= :: "Does [NAME] intend to stay at least 6 months?"
 
-These determine membership eligibility but do not give a continuous
-duration measure.  Downstream analysts who need a presence filter for
-=household_characteristics= should use these binary variables directly
-rather than expecting a =MonthsSpent= column in =household_roster()=.
+These questions concern membership eligibility, not continuous duration.
+For 2018-19 and 2021-22, the roster configuration maps =s01q12= to
+=MonthsSpent= as =Oui= to 12 and =Non= to 0. These values encode the
+answer to the six-month question. They are not months actually spent in
+the household. The roster configurations do not select =s01q13=.
+See the dated GH #1565 note below for the 2021-22 form's separate routing.
 
 The pre-EHCVM waves DO have a continuous months-of-presence variable:
 
@@ -3616,6 +3618,18 @@ Evidence (custody, six text pages/two rasters PER form, exact options and
 finite UNRUN follow-on controls):
 =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-queue-refill-20261109-v2/refill-country-authority-d47-20261110/workers/Niger1565/ba850e6737f44335b5cdfb2d7c1a3712/evidence/REPORT.md=.
 This completes only the own-form authority slice; whole #1565 remains open.
+
+Public catalogue addendum, 2026-11-28: the
+[[https://microdata.worldbank.org/metadata/export/6276/ddi][World Bank 6276 v02 DDI]]
+lists 5,327 No answers to =s01q00aa= in F2. It still lists no coded
+=s01q00b=, only the character =s01q00b_autre=. Its single numeric
+=s01q00c= has published bounds of 0 to 2022, which do not establish a
+unit, encoding or missing code. The separate entry/previously missed
+reason =s01q00f= is not an exit reason. The tracked =SOURCE.org= names
+v01, so the v02 dictionary neither identifies the tracked source bytes
+nor verifies a joint match or a served roster count. The reason source,
+timing interpretation and membership representation remain separate
+questions. No roster output or policy changed.
 
 
 * 2026-11-10 -- Independent French 3E review; two-document archival attempt (GH #1529)
