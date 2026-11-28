@@ -6078,6 +6078,47 @@ correction rule for both populations. Labels, units, Aggregate buckets, native
 values, weights and all scientific defaults remain unchanged. Whole #1525 is
 open; no native/header/API/build/cache or new statistical check ran here.
 
+** Printed item lists from two distinct Uganda surveys (2026-11-28)
+
+The PDFs matching the repository's document sidecars for the
+[[https://microdata.worldbank.org/catalog/3795/download/48888#page=11][2018/19 UNPS questionnaire]] (catalogue 3795) and
+[[https://microdata.worldbank.org/catalog/3902/download/50254#page=11][2019/20 UNPS questionnaire]] (catalogue 3902) show the same Section 15B
+item list on PDF p. 11: fresh cassava =107=, dry cassava =108=, and cassava
+flour =108_1=. The grid heads item description and item code separately.
+The [[https://microdata.worldbank.org/catalog/3795/variable/F93/V1680?name=CEB01][2018/19 v02 main recall card]] publishes no =CEB01= category list.
+The [[https://microdata.worldbank.org/catalog/3902/variable/F98/V1763?name=CEB01][2019/20 v03 main recall card]] labels both =108= and =1081= dry cassava,
+and =1082= cassava flour. That is a published export dictionary, not a
+look-up from printed codes or evidence about any household's consumption.
+
+The [[https://microdata.worldbank.org/catalog/3902/download/50259#page=22][training manual matching the 2019/20 document sidecar]] has a 2019/2020
+UNPS cover but 2018/19 running headers on the Section 15B instructions
+(PDF pp. 22--23). These describe names in the first column and codes in the
+second. Interviewers were to ask the seven-day =CEB03= screen for all items,
+then ask the remaining details only for affirmative responses. The manual
+calls the quantity-unit column =CEB05=, where the 2019/20 questionnaire and
+release call it =CEB03C=. The manual supports the item and screen roles,
+not a literal schema match or a deployed cassava roster crosswalk.
+
+The [[https://www.ubos.org/wp-content/uploads/publications/09_2021Uganda-National-Survey-Report-2019-2020.pdf#page=339][2019/20 Uganda National Household Survey report]] identifies a different
+survey (PDF p. 2). Its Section 6 questionnaire (PDF p. 339, printed p. 28)
+lists fresh =107=, dry =108_1= and flour =108_2=, with preparation recorded
+separately in =CEB05A=. In this other survey =108_1= denotes /dry/, not the
+/flour/ printed in both UNPS forms. The resemblance to the UNPS export
+digits is not a basis to remove underscores or import the other survey's
+code list, preparation field, or physical-state meanings. Nearby items also
+fail an underscore rule: the UNHS yams =108_4= and sugarcane =147_3= would
+become codes absent from the UNPS v03 card, which lists those items at
+=1741= and =1742=. Even the own UNPS printed sugarcane =147_2= would
+land on a jam/marmalade label. These controls cannot exclude a producer
+item-specific export mapping.
+
+The open dependency is still the deployed UNPS Section 15B roster/question
+GUID and exact version for each wave, its option-to-release =CEB01= export
+specification, or an attributable producer correction identifying affected
+records and releases. The library's getter, item mapping, quantities, units,
+labels and buckets are unchanged. No native files were read or counts
+remeasured. The public documents do not establish a swap rule.
+
 * 2026-11-09 -- Remaining processing-state scope and current holds (#833 / #647 / #1000)
 
 The six-family Aggregate change above is already merged in PR #1534
