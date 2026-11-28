@@ -79,6 +79,63 @@ the code's common `dist_market` name does not erase that distinction. Plot
 `dist01` means household distance in the W1/W2 code, whereas W3 uses `plot01`.
 These are source mappings to retain, not a curated covariate/default choice.
 
+## Wave 2 producer-catalogue cross-check and plot coverage
+
+The [Tanzania National Data Archive DDI](https://microdata.nbs.go.tz/index.php/metadata/export/29/ddi)
+is a distinct metadata record, `TZA-NBS-NPS-2010-V01`, not a mirror of
+`TZA_2010_NPS-R2_v03_M`. Its [household file card F62](https://microdata.nbs.go.tz/index.php/catalog/29/data-dictionary/F62?file_name=HH)
+lists `HH` with 49 fields. The [World Bank household card F189](https://microdata.worldbank.org/catalog/1050/data-dictionary/F189)
+lists `HH.Geovariables_Y2` with 3,917 cases and 50 fields. The catalogues share
+48 field names, but several names do not carry the same meaning.
+
+| Published distance description (km) | NBS `HH` | World Bank `HH.Geovariables_Y2` |
+| --- | --- | --- |
+| Nearest major road | `dist02` | `dist01` |
+| Nearest population centre above 20,000 | `dist03` | `dist02` |
+| Nearest market (NBS), nearest agricultural market (World Bank) | `dist04` | `dist03` |
+| Nearest border crossing | `dist05` | `dist04` |
+| Headquarters of the district of residence | `dist06` | `dist05` |
+| Distance from Year 1 location | Not listed | `dist_Y1Y2` |
+
+This comparison illustrates why a shared `dist02`–`dist05` name does not
+establish a shared field. The market wording is also different. In addition,
+`land01` and `land02` exchange the majority land-cover class and the
+percentage of agriculture in an approximately 1 km buffer. Use the
+release-specific label and unit if a member is later admitted. The national
+DDI's `caseQnty` is zero for all 94 files, so it reports no usable case counts
+for this comparison. The national `HH` card matches neither the documented
+50-field member nor the historically measured 43-field alternate by field
+count. The separate national F94 `TZY2.HH` card has 41 fields and no distance
+variables. It is not a description of the alternate geovariables just because
+the names begin alike. The [Wave 2 BID, PDF p. 7](https://microdata.worldbank.org/catalog/1050/download/30536#page=7)
+does name the household geovariables with the base name
+`TZY2.HH.Geovariables`. The appendix on PDF p. 36 uses the more generic
+`HH.Geovariables`. The matching BID name documents the alternate at the
+level of file naming, not its checksum, coverage or place in the revision
+sequence. The current World Bank dictionary and the official v2.0 cleaner
+are still the two documented authorities for the named WB1050 pair.
+
+The national [`Plot` card F24](https://microdata.nbs.go.tz/index.php/catalog/29/data-dictionary/F24?file_name=Plot)
+and the World Bank [`Plot.Geovariables_Y2` card F120](https://microdata.worldbank.org/catalog/1050/data-dictionary/F120)
+name the same four fields. Both label `dist01` as plot-to-household distance
+in kilometres. This supports the concept, not a file or revision match. In
+the NBS [Wave 2 BID, PDF p. 36](https://microdata.worldbank.org/catalog/1050/download/30536#page=36)
+and [Wave 3 BID, PDF p. 37](https://www.nbs.go.tz/nbs/takwimu/Statistical_Methods_and_Standards/TZNPS_2012-2013_BID-DEC2014.pdf#page=37),
+plot geovariables cover rainy-season plots owned or cultivated by the
+household and visited for GPS area measurement, not every plot on the
+roster. The native key is `(y2_hhid, plotnum)` or `(y3_hhid, plotnum)`
+respectively. Wave 2 documents distance to the household as the only
+plot covariate. Wave 3 also documents landscape covariates. These statements
+describe intended coverage, not the disposition of any missing key.
+
+This document check does not choose the W2 pair or explain the seven-household
+difference in the already recorded WB1050 member counts. Ask the producer
+which archive member or checksum corresponds to the national `HH` and `Plot`
+cards, whether either WB1050 alternate was superseded, and what the respective
+revision changed. The UPD input manifest and key construction are a separate
+dependency. No native payload or coordinate values were read for this check,
+and the extractor, exposed grain and covariates remain undecided.
+
 ## Exact boundary still held
 
 BID12 establishes key *meaning*. It does not supply the exact input-release

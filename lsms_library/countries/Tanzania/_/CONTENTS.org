@@ -3319,6 +3319,19 @@ no raw payload/header/row, Country/Feature, source join, test or census ran.
 WAITING114, back-casting,1441 code frames,587 fielding,1497 continuation,
 Extended/Refresh and all ID/weight/cluster rules remain separate and unchanged.
 
+** 2026-11-28 -- GH #449: Wave 2 public geovariables schema and plot coverage
+
+The national W2 catalogue's =HH= (49 fields) and the WB1050 revised named
+=HH.Geovariables_Y2= (50 fields) do not assign the same distance concepts to
+=dist02= through =dist05= and put majority land cover and agricultural
+share under opposite =land01=/=land02= names. Preserve release-specific
+meaning and units. The Wave 2 BID names =TZY2.HH.Geovariables=, but neither
+national card binds the 43-field WB1050 alternate or its revision.
+The W2 and W3 producer BIDs describe geovariables for rainy-season plots
+visited for GPS area measurement, not every roster plot. These are public
+documentary findings, not a choice of archive member, a coverage measurement
+or a change to serving. See =_/449_OFFICIAL_BRIDGE.md=.
+
 * shocks: coping and the set (GH #1562, 2026-11-13)
 
 Rulings (=isa-decisions.org=): 2026-11-12 and 2026-11-13 "Coping-strategy ... GH1562".  =HowCoped0..2=
