@@ -64,7 +64,7 @@ os.environ.setdefault("LSMS_BUILD_WORKERS", "1")
 import pandas as pd
 
 import lsms_library as ll
-from lsms_library import diagnostics
+from lsms_library import diagnostics, quantity_audit
 from lsms_library.diagnostics import (
     is_this_feature_sane,
     load_feature,
@@ -220,7 +220,8 @@ def _build(fn: Callable[[], Any]) -> tuple[Any, list[warnings.WarningMessage], s
     with warnings.catch_warnings(record=True) as captured:
         warnings.simplefilter("always")
         try:
-            result = fn()
+            with quantity_audit._site_q_strict_audit_summary():
+                result = fn()
         except Exception as e:  # noqa: BLE001 - sweep must continue
             err = f"{type(e).__name__}: {e}"
     return result, captured, err, time.perf_counter() - t0

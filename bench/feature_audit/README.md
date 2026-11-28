@@ -48,6 +48,10 @@ LSMS_DATA_DIR=$COLD PYTHONPATH=/abs/path python /abs/path/bench/feature_audit/sc
 Flags: `--features canonical|all|<names…>`, `--countries <names…>`,
 `--phases 1,2`, `--limit-countries N` (smoke), `--out`.
 
+When Site Q runs in strict mode, the scan and coverage matrix retain the
+failure but omit its row-level detail from their reports. Run the Country or
+Feature call locally to inspect the full diagnostic.
+
 **What it checks**
 
 - *Phase 1a* — per country: `Country(c).<feature>()` + `is_this_feature_sane`
