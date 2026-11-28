@@ -678,8 +678,9 @@ sample stands for.  It is a representativeness claim wearing a universe label.
 *The universe statement for this wave exists in no file this repo ships.*  The
 local DDI (=ddi-documentation-english_microdata-3823.pdf=, 14 pp.) is a stub:
 it contains only the documentation/questionnaire listing and a variable index,
-with no Overview or Coverage section.  The ESS4 Basic Information Document,
-which the catalog and the local DDI both reference, is *not in the repo*.
+with no Overview or Coverage section.  The ESS4 Basic Information Document
+was not tracked at that audit. Its now-tracked documentation sidecar is
+verified in the separate Section 5B note below.
 
 Verbatim from WB Microdata catalog entry 3823
 (https://microdata.worldbank.org/index.php/catalog/3823 , JSON field
@@ -728,8 +729,55 @@ Rural".)
   nor any local file says whether the Panel I zone exclusion carried over.
   Searched: the wave's =Documentation/= (SOURCE.org, LICENSE.org, the DDI stub,
   all four questionnaire sidecars) and the full catalog JSON for id 3823.  The
-  ESS4 BID would answer it and is not in the repo.  *Recorded as a gap, not
-  resolved by inheritance from ESS1-ESS3.*
+  BID was not tracked at that check. The Section 5B review below does not
+  revisit this frame question. *Recorded as a gap, not resolved by
+  inheritance from ESS1-ESS3.*
+
+**** ESS4 Section 5B screens by person and asset type (GH #439)
+
+The exact [[https://microdata.worldbank.org/catalog/3823/download/49200#page=32][household form]] (PDF pp. 32--33) and
+[[https://microdata.worldbank.org/catalog/3823/download/49208#page=19][ESS4 BID]] (PDF p. 19, printed p. 18) match the tracked documentation
+sidecars. This supplies the specific Section 5B evidence, not a
+resolution of the earlier general universe question. The printed form
+targets adult household members aged 18 or over. Q1/Q2 ask whether and
+how many assets of each type are owned exclusively or jointly. A type
+screen is not itself an account report or proof the named member was
+the person interviewed.
+
+BID Table 5.1 prints =household_id= twice in both Section 5B key entries.
+The [[https://microdata.worldbank.org/index.php/metadata/export/3823/ddi][current WB public DDI]] instead lists =household_id=, =individual_id= and
+=asset_type= in F7 (=sect5b1_hh_w4=), with =asset_id= in F8
+(=sect5b2_hh_w4=) as well. Those are candidates for a person/type screen
+and a person/type/asset report. Verify cardinality and routing before
+a join. A joint financial asset can be described by more than one
+person, so a respondent's asset ID does not prove a shared account key.
+F8 records reported co-owners in Q4/Q5 and names on the account in
+Q6--Q8 separately. Neither a named co-owner nor a named account holder
+is another respondent on that row.
+
+The archived form marks Other as =96=, while F7/F8 list =5= in
+=asset_type=. F8 V386 labels =-97= refusal and =-98= Don't know for
+current value. The printed Birr cell says 97 and 98 without the
+minus signs. That is reason to check same-release value labels and
+numeric support, not to interpret those codes as amounts or to
+blank a positive amount on the authority of the printed convention
+alone. The separate interview-privacy question is on the form but
+is not documented in the two selected public file inventories.
+
+At review, WB 3823 and [[https://catalog.ihsn.org/metadata/export/8725/ddi][IHSN 8725]] deliver byte-identical =v05_M= DDI
+exports, even though earlier descriptions name =v04_M=. The
+[[https://microdata.fao.org/index.php/metadata/export/1759/ddi][older FAO catalogue DDI]] has a separate ID and corroborates these
+selected cards, not exact native-release identity. Keep the tracked
+=v04_M= source declaration unchanged. Public file and variable
+marginals do not establish the held files' keys, eligibility,
+interview privacy, prevalence or coverage.
+
+After the defect queue, any Ethiopia prototype still needs a
+release-bound Section 1 roster bridge, separate screen/asset response
+and sentinel checks, and a choice about respondent and owner roles.
+Do not use =pw_w4= as an individual interview weight without design
+authority. No native rows were read, and no feature, weight, default
+or output changed in this check.
 
 *** 2021-22 (ESPS-5) -- catalog only, and Tigray is outside the represented population
 
@@ -873,16 +921,17 @@ wave as covering a population it explicitly does not cover.
 | 2018-19 | *no* -- local DDI is a stub          | catalog only                       |
 | 2021-22 | *no* -- no documentation at all       | catalog only                       |
 
-Two documents would close most of the remaining gaps and are *not* in the repo:
+The earlier universe audit identified two then-untracked documents:
 
 - ESS4 Basic Information Document ("Basic Information Document, Ethiopia
   Socioeconomic Survey 2018-19 V2.pdf", catalog 3823, Related Materials).
 - ESPS-5 Basic Information Document (catalog 6161 refers to "Section 3 of the
   Basic Information Document provided under the Related Materials tab").
 
-Worth acquiring: they are the only plausible source for (a) whether the
-nine-zone frame exclusion survives into Panel II, and (b) the ESPS-5
-longitudinal-weight construction.
+These were the proposed sources for (a) whether the nine-zone frame
+exclusion survives into Panel II, and (b) the ESPS-5 longitudinal-weight
+construction. The ESS4 BID sidecar is now tracked. Its separate Section
+5B check above does not settle these universe and weight questions.
 
 ** Relation to =* Sampling Design= above
 
@@ -3875,7 +3924,7 @@ and its other country/eligibility scopes remain open.
 absent from the household cover are (a) a frame/module mismatch in the
 release, (b) dropped during anonymisation, or (c) the wrong cover file
 ((c) was ruled out on #660, 2026-10-23).  The two Panel II Basic
-Information Documents -- not in this repo; read from the WB catalog's
+Information Documents -- obtained at the time from the WB catalog's
 Related Materials -- answer it for W4 and W5: *fieldwork*, not anonymisation.
 
 - *ESS4 BID* (https://microdata.worldbank.org/catalog/3823/download/49208,
