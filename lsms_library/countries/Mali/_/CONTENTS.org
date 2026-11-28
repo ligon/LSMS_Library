@@ -3671,6 +3671,35 @@ change follows. Closed reports under the 20261103 burst =reports/= are
 =1574-mali-bid-poppler-layout-20261109/= and
 =1574-mali-sampling-header-20261109/=.
 
+* 2026-11-28 -- GH #1574: native design codes and a separate production codebook
+
+In the [[https://microdata.instat.ml/index.php/metadata/export/77/ddi][INSTAT 77 public dictionary]], the sampling file F62/V1788,
+passage-2 livestock F51/V1509, and passage-2 food security F89/V2563 all
+label =strate= as =codestrate=. Each card lists 8,390 valid values, minimum 1,
+maximum 51, mean 26.048 and standard deviation 15.866. None has value
+categories. F51 lists a further 101,410 invalid entries. The matching
+marginals do not establish a rowwise join or supply labels. In the
+[[https://microdata.worldbank.org/catalog/3409/data-dictionary/F50?file_name=EACI17_ECHANTILLON][World Bank]] and [[https://microdata.fao.org/index.php/catalog/1432/data-dictionary/F50?file_name=EACI17_ECHANTILLON][FAO]] catalogues, the exact =strate= field is in F50/V1632
+and likewise lacks categories.
+
+The INSTAT production base F48/V1277 carries a different labelled field,
+=STRATE1=. It has 17 defined region/residence categories, while its observed
+range is 11–72. Its label for 51 is Mopti urban, and 91 is Bamako with
+zero entries on that card. The historical served design audit above
+instead locates native 51 in Bamako. The two fields do not share a
+dictionary. Do not recode the native weight-file key using =STRATE1=,
+the production =CERCLE= fields or an EHCVM region/residence label.
+
+The [[https://www.instat-mali.org/laravel-filemanager/files/shares/eq/rapport-eva-stat-agric_eq.pdf#page=29][INSTAT February 2019 evaluation]], section 3.2.1.4 (printed pp. 15–17),
+describes the general EAC first-stage frame. The SPSS frame aggregates RGPH
+2009 records to households and then enumeration sections, with geography
+and counts of agricultural and other households. The description names
+45 cercles and six Bamako communes treated as analogous. It does not
+enumerate or bind the EAC-I 2017–18 numeric codes. Request the round-specific
+stratum assignment list, including unused codes, with any regrouping or
+export recode and confirmation for =EACI17_ECHANTILLON.dta::strate=.
+No new sample records were examined, and no labels, tags or weights changed.
+
 * 2026-11-09 -- GH #1437: own printed harvest routes; fielded CAPI still unknown
 
 Both own2021/2022 passage forms,
