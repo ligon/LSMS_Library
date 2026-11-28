@@ -657,9 +657,8 @@ def dummies(df,cols,suffix=False):
 
     v = concat([use_indices(df,idxcols),df[colcols]],axis=1)
 
-    usecols = []
-    for s in idxcols+colcols:
-        usecols.append(v[s].squeeze())
+    # Keep columns iterable even when the roster has only one eligible row.
+    usecols = [v[s] for s in idxcols+colcols]
 
     tuples = pd.Series(list(zip(*usecols)),index=v.index)
 
