@@ -26,6 +26,7 @@ import pytest
 import lsms_library as ll
 from lsms_library import country as C, local_tools as L, transformations as T
 from lsms_library.build_transforms import GrainConflictWarning
+from lsms_library.derivations import MULTI_SEP
 from lsms_library.countries.Mali._ import mali as M
 
 COUNTRY_DIR = Path(M.__file__).resolve().parents[1]
@@ -181,8 +182,11 @@ def test_the_served_factors_are_the_files_answers(built):
 def test_no_derivation_key_is_minted_for_the_factor(built):
     flat = _flat(built)
     has = flat['KgFactor'].notna()
-    keys = set(flat.loc[has, 'Derivation'].dropna().astype(str))
-    assert keys <= {M.DERIVATION_HH_CROP_SALE}, keys
+    # Keys on these rows name the sale's attachment or, since GH #1756, the harvest
+    # window of an unfinished row; neither is a key for the factor.
+    keys = {k for joined in flat.loc[has, 'Derivation'].dropna().astype(str)
+            for k in joined.split(MULTI_SEP)}
+    assert keys <= {M.DERIVATION_HH_CROP_SALE, M.DERIVATION_HARVEST_TO_DATE}, keys
 
 
 @pytest.mark.requires_s3

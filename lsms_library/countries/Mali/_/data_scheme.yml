@@ -183,7 +183,8 @@ Data Scheme:
     # A finished 2021-22 crop with no recorded harvest and one-unit s16d dispositions
     # takes their sum, the same way, keyed harvest-from-dispositions (GH #1437); the
     # rest stay NA.  A recorded harvest of an unfinished crop is keyed harvest-to-date
-    # in both waves: a part of the season, as recorded.  EXCLUDE plot_id == 'Farm-level'
+    # in both waves, and on 2017-18's seasonal rows (s7fq10 = Non, GH #1756): a part of
+    # the season, as recorded.  EXCLUDE plot_id == 'Farm-level'
     # for plot-grain work; KEEP it for household or crop totals: an EAC-I tree row
     # on it carries a harvest as well as a sale.  Neither wave
     # zero-fills a 'Non' (unlike 2017-18), and neither records planting_month,

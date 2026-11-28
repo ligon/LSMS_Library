@@ -876,7 +876,8 @@ def crop_production_finalize(df):
 # s16d dispositions where they share one unit, placed the same way, on the single
 # row or the Farm-level row: derive_hh_crop_harvest_total (GH #1437).  Everything
 # else stays NA.  A recorded harvest of an unfinished crop keeps its value and takes
-# the window key harvest-to-date, in both waves.
+# the window key harvest-to-date, in both waves.  (EAC-I 2017-18 takes the same key on
+# its own s7fq10, after crop_production_finalize: stamp_eaci17_harvest_to_date, GH #1756.)
 #
 # Why these waves do not go through crop_production_finalize:
 #   - it masks 99 and 9999 as the EACI "Manquant" codes.  s16cq12a carries no
@@ -1115,6 +1116,7 @@ def derive_harvest_to_date(quantity):
     The registry is the point: s16cq12a (2018-19) and s16cq16a (2021-22) ask the
     quantity ALREADY harvested, so on a row whose harvest is not finished the served
     ``Quantity`` covers a part of the season under a name that implies all of it.
+    2017-18's s7fq13a is the same by instruction (P2 manual, 7F.13), GH #1756.
     """
     return quantity
 
@@ -1129,6 +1131,93 @@ def stamp_harvest_to_date(df):
     out['Derivation'] = _with_key(derivation, unfinished & out['Quantity'].notna(),
                                   DERIVATION_HARVEST_TO_DATE)
     return out
+
+
+#: 2017-18 (GH #1756, ruling @ligon 2026-11-25): the s7f file, 7F.10 "Fin de la
+#: récolte", and Q7F13's quantity and unit.  7F.06 is the pre-harvest loss, not this.
+_EACI17_HARVEST_WINDOW_RAW = ('eaci17_s7fp2.dta', 's7fq10', 's7fq13a', 's7fq13c')
+
+#: Stands in for a missing key part while s7f lines are matched to served rows.
+_NO_KEY_PART = '\x00missing'
+
+
+def eaci17_plot_ids(src, field='s7fq01', parcel='s7fq02'):
+    """``"{field}_{parcel}"``, the 2017-18 seasonal ``plot_id``; NA where either is."""
+    f = src[field].astype('Int64').astype('string')
+    p = src[parcel].astype('Int64').astype('string')
+    return (f + '_' + p).where(f.notna() & p.notna(), pd.NA)
+
+
+def _unfinished(answer):
+    """True where a "harvest finished?" answer reads ``Non``."""
+    return answer.astype('string').str.strip().eq('Non').fillna(False).astype(bool)
+
+
+def _line_keys(i, plot_id, crop):
+    """(i, plot_id, crop) as one object-string key per row, a missing part named."""
+    return pd.MultiIndex.from_arrays(
+        [pd.Series(np.asarray(part, dtype=object)).astype('string').fillna(_NO_KEY_PART)
+         .to_numpy(dtype=object) for part in (i, plot_id, crop)],
+        names=['i', 'plot_id', 'crop'])
+
+
+def stamp_eaci17_harvest_to_date(derivation, df, lines):
+    """``derivation`` with the window key on an unfinished 2017-18 seasonal harvest.
+
+    2017-18 only, and AFTER ``crop_production_finalize`` (GH #1756, ruling @ligon
+    2026-11-25, "Add the key and correct the documentation").  ``lines`` holds one row
+    per s7f line: ``i``, ``plot_id``, the decoded ``crop`` as the file spells it, and
+    ``finished``, the answer to 7F.10 (s7fq10, "Fin de la récolte").  A served row
+    takes :data:`DERIVATION_HARVEST_TO_DATE` where its line answers ``Non`` and its
+    served ``Quantity`` is recorded, that is, not NA after the finalizer's 99 / 9999
+    mask: the rule of :func:`stamp_harvest_to_date`, the registered identity
+    :func:`derive_harvest_to_date`.  Only ``Derivation`` is returned; no served
+    value is read for anything but its presence, and a key already on the row is
+    kept (``_with_key``).
+
+    The answer is matched to the served row on (i, plot_id, harmonized crop), the
+    key the finalizer collapses on.  Refused, never guessed (``ValueError``):
+
+    * an answer column in which no line reads ``Oui`` or ``Non`` (undecoded);
+    * a served key whose lines disagree about ``Non``, since the summed
+      ``Quantity`` would be part window and part season;
+    * an unfinished key that lands on no served row, or on more than one;
+    * an unfinished key that lands on a tree row or a ``Farm-level`` row, neither
+      of which has an s7f line.
+    """
+    lines = lines.copy()
+    lines['crop'] = _crop_labels(lines['crop'])
+    lines = lines.dropna(subset=['crop'])          # as crop_production_finalize drops
+    answers = lines['finished'].astype('string').str.strip()
+    if answers.notna().any() and not answers.isin(['Oui', 'Non']).any():
+        raise ValueError('crop_production 2017-18: s7fq10 reads neither Oui nor Non on any '
+                         'line; refusing to stamp harvest-to-date from an undecoded answer')
+    per_key = (pd.DataFrame({'lines': 1, 'non': _unfinished(lines['finished']).to_numpy()},
+                            index=_line_keys(lines['i'], lines['plot_id'], lines['crop']))
+               .groupby(level=['i', 'plot_id', 'crop']).sum())
+    mixed = (per_key['non'] > 0) & (per_key['non'] < per_key['lines'])
+    if mixed.any():
+        raise ValueError(f'crop_production 2017-18: {int(mixed.sum())} served key(s) whose s7f '
+                         f'lines disagree on s7fq10; refusing to stamp harvest-to-date')
+    want = per_key.index[(per_key['non'] > 0).to_numpy()]
+    level = df.index.get_level_values
+    served = _line_keys(level('i'), level('plot_id'), level('crop'))
+    hit = np.asarray(served.isin(want), dtype=bool)
+    landed = pd.Series(1, index=served[hit]).groupby(level=['i', 'plot_id', 'crop']).size()
+    if len(landed) != len(want) or (landed != 1).any():
+        raise ValueError(
+            f'crop_production 2017-18: {len(want)} unfinished s7f key(s) land on '
+            f'{len(landed)} served key(s), {int((landed != 1).sum())} of them more than once; '
+            f'refusing to stamp harvest-to-date')
+    tree = df['perennial'].astype('boolean').fillna(False).to_numpy(dtype=bool)
+    farm = np.asarray(pd.Series(np.asarray(level('plot_id'), dtype=object))
+                      .astype('string').eq(FARM_LEVEL).fillna(False), dtype=bool)
+    if (hit & (tree | farm)).any():
+        raise ValueError('crop_production 2017-18: an unfinished s7f key lands on a tree or '
+                         'Farm-level row; refusing to stamp harvest-to-date')
+    recorded = pd.to_numeric(df['Quantity'], errors='coerce').notna().to_numpy()
+    return _with_key(derivation, pd.Series(hit & recorded, index=derivation.index),
+                     DERIVATION_HARVEST_TO_DATE)
 
 
 def derive_survey_kg_estimate(kilograms, quantity):
@@ -1418,7 +1507,21 @@ def inputs_harvest_to_date(wave):
     The registry ``inputs`` callable for ``harvest-to-date``: "finished?", the share
     still to harvest, the quantity and its unit, and the kilograms where the wave asks
     them, as recorded.
+    2017-18 (EAC-I, GH #1756) is s7f: s7fq10, s7fq13a and s7fq13c.  No share-left
+    answer is read for that wave (whether 7F asks one was not checked), and
+    s7fq13d is kg per unit, not a quantity.
     """
+    if wave == '2017-18':
+        # s7f, on the build's rule: 7F.10 = Non, a quantity that is not a "Manquant"
+        # code, and a crop the build serves (GH #1756).
+        name, finished, quantity, unit = _EACI17_HARVEST_WINDOW_RAW
+        src = _eaci17_keyed(name, 's7fq03')
+        src['plot_id'] = eaci17_plot_ids(src)
+        recorded = pd.to_numeric(src[quantity], errors='coerce')
+        keep = (_unfinished(src[finished]) & recorded.notna()
+                & ~_is_quantity_sentinel(recorded) & src['crop'].notna())
+        return src.loc[keep, ['t', 'i', 'plot_id', 'crop', finished, quantity, unit]
+                       ].set_index(['t', 'i', 'plot_id', 'crop'])
     name, finished, left, quantity, unit = _HARVEST_WINDOW_RAW[wave]
     src = _ehcvm_keyed(wave, name, 's16cq04')
     src['plot_id'] = ehcvm_plot_ids(src)

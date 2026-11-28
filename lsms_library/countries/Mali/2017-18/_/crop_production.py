@@ -26,7 +26,8 @@ plot rule below: a filled-in 0 on a crop's one plot, and nothing elsewhere.
 Variable map (Stata labels; WB MLI_EACI2.do for the field/parcel keys):
   field=s7fq01 parcel=s7fq02 crop=s7fq03 harvest_qty=s7fq13a unit=s7fq13c
   kg per ONE harvest unit=s7fq13d (served as KgFactor, below)
-  fully_harvested=s7fq06 harvest_month=s7fq12b
+  harvest_finished=s7fq10 ("Fin de la récolte"; NOT s7fq06, which is 7F.06
+  "Perte pré-récolte" and is not read) harvest_month=s7fq12b
   sold: crop=s7gq01 sold_y/n=s7gq20 sold_qty=s7gq21a SOLD UNIT=s7gq21b
         sold_value=s7gq22
   perennial: crop=s11fq01 still_prod=s11fq03 months_harvested=s11fq10
@@ -81,6 +82,18 @@ equal to the quantity and are served as recorded too.  Tree rows (11F) and
 Farm-level sale rows carry no factor.  Counts, by unit, and the rows that
 look like totals: Mali/_/CONTENTS.org (2026-11-13, GH #1749).
 
+Partial harvests (GH #1756, ruling @ligon 2026-11-25, "Add the key and
+correct the documentation").  7F.13 records, on a harvest that is not
+finished, only what has already been harvested (P2 manual, 7F.13: "Si la
+récolte est partielle on report seulement la production déjà récolte").  A
+seasonal row whose s7f line answers s7fq10 = 'Non' and whose Quantity is
+recorded (not NA after the 99 / 9999 mask) carries the EHCVM waves' window
+key, Mali::crop_production::harvest-to-date, joined to a sale key already
+on the row.  An identity: no quantity, unit, factor or sale is changed, and
+tree rows and Farm-level sale rows, which have no s7f line, never carry it.
+Stamped after crop_production_finalize (mali.stamp_eaci17_harvest_to_date),
+which refuses a key it cannot place on exactly one served row.
+
 Unanswered sales (ruling @ligon 2026-10-23, PR #1272).  The s7g sale is
 summed with sum(min_count=1), so a sale whose quantity or value was not
 recorded stays NA; 0 is filled ONLY where s7gq20 == 'Non'.  The rows it
@@ -99,7 +112,8 @@ from lsms_library.country import grain_reports
 from mali import (eaci17_i as mali_i, crop_production_finalize, producing_trees,
                   tree_crop_rows, stamp_tree_derivations, FARM_LEVEL,
                   derive_hh_crop_sale_attachment, ehcvm_is_sale,
-                  stamp_hh_crop_sale, _is_quantity_sentinel)
+                  stamp_hh_crop_sale, _is_quantity_sentinel,
+                  eaci17_plot_ids as _plot, stamp_eaci17_harvest_to_date)
 
 WAVE = '2017-18'
 
@@ -107,12 +121,6 @@ WAVE = '2017-18'
 def _hhid(df):
     return df.apply(lambda r: mali_i(pd.Series([r['grappe'], r['exploitation']])),
                     axis=1)
-
-
-def _plot(df, fcol, pcol):
-    f = df[fcol].astype('Int64').astype('string')
-    p = df[pcol].astype('Int64').astype('string')
-    return (f + '_' + p).where(f.notna() & p.notna(), pd.NA)
 
 
 # --- seasonal harvest (s7f) ---
@@ -134,6 +142,10 @@ seasonal = pd.DataFrame({
                              # intercrop binary; left NaN (honest missing).
     'perennial': False,
 })
+
+# 7F.10 "Fin de la récolte", one answer per s7f line, kept BESIDE the frame: it
+# is matched to the served rows after crop_production_finalize (GH #1756).
+harvest_lines = seasonal[['i', 'plot_id', 'crop']].assign(finished=s7f['s7fq10'])
 
 # --- sold (s7g): household-crop grain ---
 s7g = get_dataframe('../Data/eaci17_s7gp2.dta').copy()
@@ -258,8 +270,11 @@ assert not df.duplicated(['i', 'plot_id', 'crop']).any(), 'a sale met a tree row
 df = crop_production_finalize(df)
 # Stamp AFTER the collapse (CLAUDE.md "Derived Values", registering step 3):
 # the harvest key on every tree row, the sale-window key beside it on a tree
-# row with a positive sale, the attachment key on a harvest row holding an s7g sale.
-df['Derivation'] = stamp_hh_crop_sale(stamp_tree_derivations(df), df)
+# row with a positive sale, the attachment key on a harvest row holding an s7g sale,
+# and the window key on an unfinished seasonal harvest with a recorded Quantity
+# (GH #1756), joined to whatever the row already carries.
+df['Derivation'] = stamp_eaci17_harvest_to_date(
+    stamp_hh_crop_sale(stamp_tree_derivations(df), df), df, harvest_lines)
 
 assert len(df) > 0, "crop_production 2017-18 produced no rows"
 assert df.index.is_unique, "Non-unique (t, i, plot, crop, condition) in crop_production 2017-18"

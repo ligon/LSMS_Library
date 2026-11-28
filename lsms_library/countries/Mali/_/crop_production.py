@@ -5,7 +5,8 @@ indexed by ``(t, i, plot, crop, condition)`` with the reported item-level harves
 columns (Quantity, u, Quantity_sold, Value_sold, planting_month,
 harvest_month, intercropped, perennial; since GH #824 / #1267 also
 Unit_sold, field-only KgFactor_sold, months_harvested and, on tree rows,
-Derivation; since GH #1749 the 2017-18 harvest KgFactor, NA elsewhere).
+Derivation; since GH #1749 the 2017-18 harvest KgFactor, NA elsewhere; since
+GH #1756 an unfinished 2017-18 seasonal harvest carries the harvest-to-date key).
 Native grain footers are relayed independently from attrs.
 All four waves contribute: EAC-I 2014-15 (EACI14) and 2017-18 (EACI17), and,
 since GH #824, EHCVM 2018-19 (s16c) and 2021-22 (s16c + s16d).  In 2017-18 and
