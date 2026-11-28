@@ -60,15 +60,30 @@ def _served_units(series):
 def _finish_with_acquisition(df, t):
     """niger._finish_plot_inputs, then the acquisition columns in line order.
 
-    The shared tail drops lines with no input identity and keeps row order, so
-    the same filter is applied first and the columns are re-attached by
-    position (asserted).  ``Quantity_received_as_gift`` is coerced as the tail
-    coerces ``Quantity_purchased``."""
+    The shared tail drops lines with no input identity, so apply the same
+    filter first. Check the surviving rows' order before reattaching the
+    acquisition columns. Coerce gift quantity just as the tail coerces
+    purchase quantity."""
     df = df[df['input'].astype('string').notna()].reset_index(drop=True)
     acq = df[list(ACQUISITION)].copy()
     acq['Quantity_received_as_gift'] = pd.to_numeric(acq['Quantity_received_as_gift'], errors='coerce')
-    out = _finish_plot_inputs(df.drop(columns=list(ACQUISITION)), t)
-    assert len(out) == len(acq), f'plot_inputs {t}: shared tail changed the line count'
+    # GH #1751: the tail already carries input_obs into the index. Use it
+    # only here to distinguish lines even when normalized keys/payloads match.
+    tail_input = df.drop(columns=list(ACQUISITION))
+    if 'input_obs' in tail_input:
+        raise AssertionError(f'plot_inputs {t}: expected no reported input_obs')
+    positions = pd.RangeIndex(len(df)).astype('string')
+    tail_input['input_obs'] = positions
+    out = _finish_plot_inputs(tail_input, t)
+    if len(out) != len(acq):
+        raise AssertionError(f'plot_inputs {t}: shared tail changed the line count')
+    if not out.index.get_level_values('input_obs').equals(positions):
+        raise AssertionError(f'plot_inputs {t}: shared tail changed the line order')
+    # Restore the original public level without changing any other index
+    # axis or letting the temporary positions become observation identities.
+    public_level = pd.Index(['unresolved_observation'] if len(out) else [], dtype='string')
+    out.index = out.index.set_codes(pd.RangeIndex(len(out)) * 0, level='input_obs')
+    out.index = out.index.set_levels(public_level, level='input_obs')
     for col, dtype in ACQUISITION.items():
         out[col] = acq[col].astype(dtype).array
     return out[['Quantity', 'Purchased', 'Quantity_purchased', 'Unit_purchased',
