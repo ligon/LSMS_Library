@@ -109,7 +109,7 @@ served as `strata`, because that is what each survey's design or files offer:
 
 | `strata` holds | Where | `served_strata.holds` |
 |---|---|---|
-| Region x milieu, a registered construction | EHCVM waves of Senegal, Mali, Niger, Burkina Faso, Benin, Togo, Cote d'Ivoire; Guinea-Bissau 2018-19 (2021-22 once it is wired) | `constructed` (Benin, Guinea-Bissau: not recorded yet) |
+| Region x milieu, a registered construction | Selected EHCVM waves of Senegal, Mali, Niger, Burkina Faso, Benin, Togo, Cote d'Ivoire and Guinea-Bissau. Both 2018-19 and 2021-22 are tagged in Benin and Guinea-Bissau. | `constructed` |
 | Region x milieu, built in a wave script and not registered | Ethiopia | not recorded |
 | Region alone | GhanaLSS 1991-92 onward | not recorded |
 | The file's own stratum, a label | Niger 2011-12 and 2014-15 (region x agro-ecological zone); Uganda 2005-06 to 2010-11 | `native-label` |
@@ -120,8 +120,9 @@ served as `strata`, because that is what each survey's design or files offer:
 This table covers the cases measured for GH #812 and #1575, not every country. So
 `strata` identifies a stratum within one wave of one country. Do not compare or
 group on it across countries, and check before doing so across waves. Spelling
-differs too: the EHCVM labels end in `Urbain` or `Rural`, as the surveys write
-them, and Ethiopia's in `Urban` or `Rural`. Where the
+differs too: EHCVM labels retain local suffixes, including `Urbain` or `Urbano`
+for urban and `Rural` for rural. Ethiopia appends `Urban` or `Rural` to the
+region when the residence category is known. Where the
 label is a registered construction, `df.attrs['derivations']` names those
 countries, and `Country(c).derivations()` gives the rule and its evidence. Each
 country's `_/CONTENTS.org` records what its `strata` holds.
@@ -142,11 +143,11 @@ and an uncurated wave of one that has it (Burkina Faso 2014, the Cote d'Ivoire
 CILSS waves), are absent from it. The same records ride on
 `df.attrs['sampling']`, where an uncurated wave of a curated country appears as
 an `unrecorded` placeholder. A `None` from `strata_holds` means nobody has
-recorded what the wave serves, never that it serves nothing. A region,
-district or province served as `strata`, and a code the library decodes
-through its own lookup, are not recorded yet: see the last column. Benin and
-Guinea-Bissau, whose strata are registered constructions, have no
-`served_strata` record yet.
+recorded what the wave serves, never that it serves nothing. Check the
+wave's own record instead of inferring its tag from the label. For example,
+Burkina Faso 2014's library-decoded labels are not tagged, while the two
+Guinea-Bissau EHCVM waves carry a `constructed` tag and name their registered
+derivation.
 
 Read `strata` with `df.get('strata')` where a wave may serve nothing: for
 Mali 2014-15, whether a one-wave `sample()` frame has the column at all
