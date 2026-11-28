@@ -60,20 +60,27 @@ two rounds — it does not.
 
 Evidence: `slurm_logs/ghanasps/FINDINGS_agriculture.org` (GH #729).
 
-## Why YAML cannot express this
+## Choose YAML or a script by the source shape
 
-The YAML path (`data_info.yml`) assumes **one directory = one `t`
-value**. In pp/ph countries, a single wave directory (e.g.
-`Nigeria/2018-19/`) contains two source files that need **different
-`t` values** (e.g. `2018Q3` post-planting, `2019Q1` post-harvest).
-The YAML path has no mechanism to:
+A physical folder can serve more than one logical visit. When each file
+maps directly to the feature's grain, YAML can list the sources under
+`file:`, set a constant `t` for each file, and override that file's
+column mappings. Nigeria W1/W2 `individual_education` uses this route.
+See `Nigeria/{2010-11,2012-13}/_/data_info.yml` for the exact bindings.
+It does not require `materialize: make`.
 
-1. Load two different source files from the same directory
-2. Assign a different `t` value to each
-3. Concatenate the results and deduplicate
+Do not confuse the served visit with which sources are opened. In that
+education route, a cold Wave build reads both configured files in its
+physical folder before filtering by `t`. A missing same-folder companion
+can fail the request even when the requested visit's file is present.
+This does not imply that a strict subset reads a different physical folder
+or that a covered warm cache opens either source. A Country coverage miss
+can rebuild prior visits as part of the requested coverage union.
 
-This is why pp/ph features **must use `materialize: make`** (or
-`!make`) with a Python script.
+Use a script when the feature needs per-round processing that cannot be
+expressed by the declarative mappings, such as custom source joins,
+cross-round attrition handling, or feature-specific grain work. Keep its
+existing Make contract when applicable.
 
 ## How pp/ph affects index construction
 
@@ -109,8 +116,7 @@ Symptoms:
 
 ## How to fix: the script pattern
 
-Assign distinct `t` values to each round, concatenate, and
-deduplicate:
+Assign distinct `t` values, concatenate and verify the declared grain:
 
 ```python
 from lsms_library.local_tools import df_data_grabber, to_parquet
@@ -129,7 +135,7 @@ myvars_ph  = dict(Sex=('s1q2', extract_string),
                   Relationship=('s1q3', extract_string))
 ph = df_data_grabber('../Data/sect1_harvestw4.dta', idxvars_ph, **myvars_ph)
 
-# Concatenate and drop people who left between rounds
+# Concatenate visits and drop rows with no selected payload
 df = pd.concat([pp, ph])
 df = df.replace('', pd.NA).sort_index().dropna(how='all')
 
@@ -142,10 +148,10 @@ Key details:
   file.
 - Variable names may differ between pp and ph files (e.g. Nigeria's
   `s1q6` vs `s1q4` for Age).
-- `dropna(how='all')` removes individuals who appeared in one round
-  but have no data in the other (attrition between rounds).
-- The `data_scheme.yml` must use `materialize: make` for these
-  features.
+- `dropna(how='all')` removes all-null selected payload rows. It does not
+  deduplicate keys or establish which households or people left.
+- This script-based roster example uses `materialize: make` in
+  `data_scheme.yml`. The YAML route above does not require it.
 
 ## Variable-name differences between rounds
 
@@ -234,51 +240,45 @@ one directory) and uses a single-file pattern with a `round`
 column rather than separate pp/ph files.  These are distinct
 mechanisms that can co-occur:
 
-- **pp/ph** = two source files per wave, each needing a different
-  `t` → solved by script-level `t` assignment.
-- **multi-round-waves** = multiple logical waves sharing one
-  physical directory → solved by `Wave(year=..., wave_folder=...)`
-  and filtering by `t`.
+- **PP/PH source binding** gives each source its correct `t` through a
+  YAML file override or the owning script.
+- **Multi-round layout** lets multiple logical waves share a physical
+  directory through `Wave(year=..., wave_folder=...)` and filtering by `t`.
 
-Both require `materialize: make`.  A single script can handle both
-patterns (e.g., Tanzania `2008-15/_/food_acquired.py`).
+The folder layout does not select the backend. A script can handle both
+patterns, as in Tanzania `2008-15/_/food_acquired.py`.
 
 ## Common bugs and how to avoid them
 
 | Bug | Cause | Fix |
 |-----|-------|-----|
 | 50–87% duplicate indices | Both rounds assigned the same `t` value | Assign distinct `t` values (e.g. `2018Q3` / `2019Q1`) |
-| Missing half the data | Loaded only pp or only ph | Load both files and concatenate |
+| An expected round is missing | Its own source is omitted or assigned the wrong `t` | Check both bindings against what was fielded and released |
 | Wrong variable names | Used pp variable names for ph file (or vice versa) | Check column names in both files separately |
 | Ghost rows after concat | Individual enumerated in pp but absent in ph | `dropna(how='all')` after concat |
 | Double-counted households | Concatenated without distinct `t` on a household-level feature | Assign distinct `t` values; for hh-level features, also confirm data is truly from both rounds |
-| `data_info.yml` used for pp/ph feature | YAML cannot express two-file + distinct-`t` pattern | Switch to `materialize: make` with a `.py` script |
+| Requested visit is present but its cold YAML build fails | The other configured file in the physical folder is unavailable before visit filtering | Check source reads separately from served `t` and warm coverage |
 
 ## Checklist for adding a pp/ph feature
 
 1. Confirm the country has dual-round structure (file naming in `Data/`).
 2. Identify which source files contain the needed variables for each round.
 3. Check variable names in **both** pp and ph files (they may differ).
-4. Write a `.py` script that:
-   - Loads pp file with distinct `t` value
-   - Loads ph file with different `t` value
-   - Concatenates and deduplicates
-   - Uses `df_data_grabber()` for data access
-   - Uses `to_parquet()` for output
-5. Mark the feature as `materialize: make` in `data_scheme.yml`.
-6. Verify with `is_this_feature_sane()` — duplicate rate should be small.
-7. Confirm both rounds appear in `df.index.get_level_values('t').unique()`.
+4. Choose per-file YAML bindings for a direct mapping, or a script for
+   feature-specific joins, attrition handling or grain work.
+5. If using a script, use `df_data_grabber()` and `to_parquet()` with its
+   applicable Make contract. Assign distinct `t` values before combining.
+6. Check the intended grain and which visits actually serve rows. Test
+   cold source requirements separately from strict-subset warm coverage.
 
 ## Relationship to the `add-feature` parent skill
 
 This skill extends the general `add-feature` workflow.  When the
 target country is identified as a pp/ph country:
 
-- **YAML vs Script step**: always **script** for features that use
-  both rounds' data.
-- **Configuration step**: use the script template above; the
-  `data_scheme.yml` entry must include `materialize: make`.
-- **Verify step**: pay special attention to duplicate rates and
-  `t` value coverage in diagnostics.
+- **YAML vs script step**: choose by the processing required, not by the
+  number of visits in the folder.
+- **Verify step**: check the declared grain, served `t` coverage and the
+  difference between source dependency and visit selection.
 
 All other steps in the `add-feature` workflow apply unchanged.
