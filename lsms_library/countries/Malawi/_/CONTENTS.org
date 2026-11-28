@@ -445,6 +445,14 @@ No shared rewarm is claimed here.
 
 Brief table of contents and todo list. Malawi has 6 waves of data (2004-05 to 2024-25), corresponding to IHS2-IHS6 plus IHPS.
 
+* 2026-11-27 -- IHS2 roster bare Other leaves kinship missing (GH #1102)
+
+The cross-sectional 2004-05 IHS2 is not the later IHS3/IHPS panel baseline.
+Its =b04= releases code 16 as =Other=, distinct from =Other relative= (12)
+and the explicit =Other non-relative= (15). By the 2026-11-27 ruling, the
+roster preserves =Other= and leaves =Generation=, =Distance=, and =Affinity=
+missing at read time, for this wave only. The named responses are unchanged.
+
 * 2026-11-07 -- Nonseed deletion provenance (GH #1174)
 
 The existing all-payload-NA finalizer also removes one 2010-11 Module D DAP

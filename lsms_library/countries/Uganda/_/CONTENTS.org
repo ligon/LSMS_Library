@@ -2465,6 +2465,14 @@ no later wave does.  So Uganda's children are =consanguineal= through
 "repair" it by filing the 2018-20 code consanguineal -- its wording admits the
 spouse's children, which is exactly what the ruling says not to guess.
 
+* 2026-11-27 -- UNHS baseline roster bare other leaves kinship missing (GH #1102)
+
+UNHS 2005-06, the UNPS baseline, releases =h2q5= code 12 as =other=,
+distinct from =Other relatives= (9) and the explicit =Non-relative= (11).
+By the 2026-11-27 ruling, the roster preserves =other= and leaves
+=Generation=, =Distance=, and =Affinity= missing at read time, for this
+wave only. The named responses and the GH #698 kinship rule are unchanged.
+
 * Known Issues
 ** DONE =earnings= shipped a dense phantom panel, and the column was named =earnings= (GH #772)
 
