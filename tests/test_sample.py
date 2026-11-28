@@ -152,18 +152,32 @@ def _get_sample(country_name: str) -> pd.DataFrame | None:
     return _sample_cache[country_name]
 
 
+def _require_sample(country_name):
+    """Reuse the same per-country frame and absence policy in both checks."""
+    if country_name in NO_DATA_COUNTRIES:
+        pytest.skip(f"{country_name}: microdata not available (see CLAUDE.md)")
+    df = _get_sample(country_name)
+    if df is None:
+        pytest.skip(f"{country_name}.sample() could not be built (missing data or DVC error)")
+    return df
+
+
+def _expected_sample_waves(country_name):
+    c = ll.Country(country_name)
+    return set(c.waves) - PARTIALLY_WIRED_SAMPLE.get(country_name, set())
+
+
+def _actual_sample_waves(sample_df):
+    return set(sample_df.index.get_level_values("t").unique())
+
+
 @pytest.mark.parametrize("country_name", SAMPLE_COUNTRIES)
 class TestSample:
 
     @pytest.fixture()
     def sample_df(self, country_name):
         """Build sample() once per country (cached across tests)."""
-        if country_name in NO_DATA_COUNTRIES:
-            pytest.skip(f"{country_name}: microdata not available (see CLAUDE.md)")
-        df = _get_sample(country_name)
-        if df is None:
-            pytest.skip(f"{country_name}.sample() could not be built (missing data or DVC error)")
-        return df
+        return _require_sample(country_name)
 
     def test_index_is_i_t(self, country_name, sample_df):
         """sample() should be indexed by (i, t)."""
@@ -217,9 +231,8 @@ class TestSample:
 
     def test_covers_all_waves(self, country_name, sample_df):
         """sample() should cover all waves the country declares."""
-        c = ll.Country(country_name)
-        expected_waves = set(c.waves) - PARTIALLY_WIRED_SAMPLE.get(country_name, set())
-        actual_waves = set(sample_df.index.get_level_values("t").unique())
+        expected_waves = _expected_sample_waves(country_name)
+        actual_waves = _actual_sample_waves(sample_df)
         missing = expected_waves - actual_waves
         assert not missing, (
             f"{country_name} sample missing waves: {sorted(missing)}"
@@ -459,6 +472,208 @@ class TestSample:
             f"{country_name}: {bad.sum()} refreshment households have "
             f"non-positive cross-sectional weight"
         )
+
+
+# These supplemental checks give private CI a static, source-verified
+# locator for each known ISA country/wave. Do not parametrize or generate
+# the functions at import time: private_ci_check.py publishes only declared
+# test names, never parameters or assertion messages. Keep the dynamic
+# TestSample.test_covers_all_waves assertion for every country/new wave.
+
+
+def _require_named_sample_wave(country_name, wave):
+    if country_name not in SAMPLE_COUNTRIES:
+        pytest.skip("country no longer declares a sample table")
+    sample_df = _require_sample(country_name)
+    if wave not in _expected_sample_waves(country_name):
+        pytest.skip("wave no longer expected by the sample coverage check")
+    assert wave in _actual_sample_waves(sample_df), (
+        "declared wave absent from the same sample() frame"
+    )
+
+
+def test_covers_all_waves_Burkina_Faso_2014():
+    _require_named_sample_wave("Burkina_Faso", "2014")
+
+
+def test_covers_all_waves_Burkina_Faso_2018_19():
+    _require_named_sample_wave("Burkina_Faso", "2018-19")
+
+
+def test_covers_all_waves_Burkina_Faso_2021_22():
+    _require_named_sample_wave("Burkina_Faso", "2021-22")
+
+
+def test_covers_all_waves_Ethiopia_2011_12():
+    _require_named_sample_wave("Ethiopia", "2011-12")
+
+
+def test_covers_all_waves_Ethiopia_2013_14():
+    _require_named_sample_wave("Ethiopia", "2013-14")
+
+
+def test_covers_all_waves_Ethiopia_2015_16():
+    _require_named_sample_wave("Ethiopia", "2015-16")
+
+
+def test_covers_all_waves_Ethiopia_2018_19():
+    _require_named_sample_wave("Ethiopia", "2018-19")
+
+
+def test_covers_all_waves_Ethiopia_2021_22():
+    _require_named_sample_wave("Ethiopia", "2021-22")
+
+
+def test_covers_all_waves_Malawi_2004_05():
+    _require_named_sample_wave("Malawi", "2004-05")
+
+
+def test_covers_all_waves_Malawi_2010_11():
+    _require_named_sample_wave("Malawi", "2010-11")
+
+
+def test_covers_all_waves_Malawi_2013_14():
+    _require_named_sample_wave("Malawi", "2013-14")
+
+
+def test_covers_all_waves_Malawi_2016_17():
+    _require_named_sample_wave("Malawi", "2016-17")
+
+
+def test_covers_all_waves_Malawi_2019_20():
+    _require_named_sample_wave("Malawi", "2019-20")
+
+
+def test_covers_all_waves_Malawi_2024_25():
+    _require_named_sample_wave("Malawi", "2024-25")
+
+
+def test_covers_all_waves_Mali_2014_15():
+    _require_named_sample_wave("Mali", "2014-15")
+
+
+def test_covers_all_waves_Mali_2017_18():
+    _require_named_sample_wave("Mali", "2017-18")
+
+
+def test_covers_all_waves_Mali_2018_19():
+    _require_named_sample_wave("Mali", "2018-19")
+
+
+def test_covers_all_waves_Mali_2021_22():
+    _require_named_sample_wave("Mali", "2021-22")
+
+
+def test_covers_all_waves_Niger_2011_12():
+    _require_named_sample_wave("Niger", "2011-12")
+
+
+def test_covers_all_waves_Niger_2014_15():
+    _require_named_sample_wave("Niger", "2014-15")
+
+
+def test_covers_all_waves_Niger_2018_19():
+    _require_named_sample_wave("Niger", "2018-19")
+
+
+def test_covers_all_waves_Niger_2021_22():
+    _require_named_sample_wave("Niger", "2021-22")
+
+
+def test_covers_all_waves_Nigeria_2010Q3():
+    _require_named_sample_wave("Nigeria", "2010Q3")
+
+
+def test_covers_all_waves_Nigeria_2011Q1():
+    _require_named_sample_wave("Nigeria", "2011Q1")
+
+
+def test_covers_all_waves_Nigeria_2012Q3():
+    _require_named_sample_wave("Nigeria", "2012Q3")
+
+
+def test_covers_all_waves_Nigeria_2013Q1():
+    _require_named_sample_wave("Nigeria", "2013Q1")
+
+
+def test_covers_all_waves_Nigeria_2015Q3():
+    _require_named_sample_wave("Nigeria", "2015Q3")
+
+
+def test_covers_all_waves_Nigeria_2016Q1():
+    _require_named_sample_wave("Nigeria", "2016Q1")
+
+
+def test_covers_all_waves_Nigeria_2018Q3():
+    _require_named_sample_wave("Nigeria", "2018Q3")
+
+
+def test_covers_all_waves_Nigeria_2019Q1():
+    _require_named_sample_wave("Nigeria", "2019Q1")
+
+
+def test_covers_all_waves_Nigeria_2023Q3():
+    _require_named_sample_wave("Nigeria", "2023Q3")
+
+
+def test_covers_all_waves_Nigeria_2024Q1():
+    _require_named_sample_wave("Nigeria", "2024Q1")
+
+
+def test_covers_all_waves_Tanzania_2008_09():
+    _require_named_sample_wave("Tanzania", "2008-09")
+
+
+def test_covers_all_waves_Tanzania_2010_11():
+    _require_named_sample_wave("Tanzania", "2010-11")
+
+
+def test_covers_all_waves_Tanzania_2012_13():
+    _require_named_sample_wave("Tanzania", "2012-13")
+
+
+def test_covers_all_waves_Tanzania_2014_15():
+    _require_named_sample_wave("Tanzania", "2014-15")
+
+
+def test_covers_all_waves_Tanzania_2019_20():
+    _require_named_sample_wave("Tanzania", "2019-20")
+
+
+def test_covers_all_waves_Tanzania_2020_21():
+    _require_named_sample_wave("Tanzania", "2020-21")
+
+
+def test_covers_all_waves_Uganda_2005_06():
+    _require_named_sample_wave("Uganda", "2005-06")
+
+
+def test_covers_all_waves_Uganda_2009_10():
+    _require_named_sample_wave("Uganda", "2009-10")
+
+
+def test_covers_all_waves_Uganda_2010_11():
+    _require_named_sample_wave("Uganda", "2010-11")
+
+
+def test_covers_all_waves_Uganda_2011_12():
+    _require_named_sample_wave("Uganda", "2011-12")
+
+
+def test_covers_all_waves_Uganda_2013_14():
+    _require_named_sample_wave("Uganda", "2013-14")
+
+
+def test_covers_all_waves_Uganda_2015_16():
+    _require_named_sample_wave("Uganda", "2015-16")
+
+
+def test_covers_all_waves_Uganda_2018_19():
+    _require_named_sample_wave("Uganda", "2018-19")
+
+
+def test_covers_all_waves_Uganda_2019_20():
+    _require_named_sample_wave("Uganda", "2019-20")
 
 
 # ---------------------------------------------------------------------------
