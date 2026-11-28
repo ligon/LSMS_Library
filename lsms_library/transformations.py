@@ -8838,27 +8838,40 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     ``tests/test_863_transforms.py::
     test_crop_diversity_count_separates_plots_and_seasons``.
 
-    **A ``Farm-level`` row is not a further occurrence of a crop the household
-    reports on a plot (GH #1469).**  It holds a sale without a unique
-    harvest-row attachment (70 rows in Mali 2021-22 and, with GH #843, 2,303
-    in Nigeria W3-W5, none with a harvest ``Quantity``) or a harvest from a roster off
-    the field grid (Mali's 627 EAC-I tree rows, GH #1476, 534 with a ``Quantity``, none
-    repeating a plotted crop).  Counted as a land unit, the sale rows move 50 of 2,857
-    Mali households (mean 0.6435 against 0.6448) and 1,572 Nigeria households, so the
-    ``'count'`` basis drops one wherever the household has a plot row of that
-    crop in that wave.  It keeps one where it has none, because then the row is
-    the only record of the crop: 10 of Nigeria's, and all 37,280 rows of GhanaLSS
-    1987-88 and 1988-89, which a blanket filter would delete.  The ``'value'``
-    basis keeps every such row: that is where the sale value is.  The Nigeria
-    counts and effects above are the pre-#1433 GH #843 measurements, not current
-    counts.  GH #1433 (2026-11-04) retained every labelled harvest line and
-    changed sale attachment; see ``countries/Nigeria/_/CONTENTS.org``.
+    **How ``Farm-level`` rows count (GH #1469).**  These household-level
+    records are not allocated to an individual plot.  They can carry a sale,
+    a harvest, or both (PR #1644).  The ``'count'`` basis excludes a
+    ``Farm-level`` row when another surviving row records that crop outside
+    ``Farm-level`` for the same household and wave (and country, if supplied).
+    It does not inspect harvest quantities or sale values.  This avoids
+    counting a sale-only duplicate as another plot.  Otherwise a
+    ``Farm-level`` row can count.  This retains harvests from Mali's off-plot
+    EAC-I tree roster (GH #1476) and the household-grain crop records of
+    GhanaLSS 1987-88 and 1988-89, which do not report harvest quantities.
+    A sale-only record can also count when it is the only evidence of the
+    crop.  In Ethiopia W1 (2011-12) that includes some crops from section 11
+    and tree crops from section 12 whose harvests are not served (GH #1570).
+    The ``'value'`` basis does not apply this filter and uses positive sale
+    value.
+
+    The current ``crop_production`` producers with these household-level
+    rows are Benin, Burkina Faso, Cote d'Ivoire, Ethiopia, GhanaLSS, Malawi,
+    Mali, Niger, Nigeria, Tanzania, and Togo (GH #843, #1457, #1697, #1436,
+    #1437, and #1476).
+
+    Earlier measurements are historical, not current row or household
+    counts.  Treating Mali 2021-22's 70 sale rows as another land unit moved
+    50 of 2,857 household scores (mean H 0.6435 vs. 0.6448, GH #1469).
+    The older Nigeria W3-W5 comparison (GH #843, before #1433) reported
+    2,303 sale rows and 1,572 affected households.  A blanket exclusion
+    would have removed all 37,280 GhanaLSS rows in the GH #1469 comparison.
 
     **An ``unknown_plot`` row is not an occurrence (GH #1460).**  Each distinct
     plot counts once, and such a row names no plot: two of them may be one plot
     or two.  The ``'count'`` basis leaves them out, before the ``Farm-level``
-    rule, so only a real plot can make a ``Farm-level`` row redundant.  A
-    household with no other crop row then has no score.  Reported in
+    rule, so they cannot make a ``Farm-level`` row redundant.  A null plot
+    key is not either sentinel.  A household with no other crop row then
+    has no score.  Reported in
     ``result.attrs['unknown_plot_excluded']`` as ``{'rows', 'households_lost'}``:
     Uganda 403 rows, 173 of 16,561 households move and 6 are lost; Malawi 41
     rows, 22 of 36,682 move and 3 are lost.  The ``'value'`` basis keeps them,
