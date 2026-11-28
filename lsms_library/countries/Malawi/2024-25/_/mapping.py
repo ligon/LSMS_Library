@@ -16,6 +16,40 @@ def cs_i(value):
     # so a shared or absent prefix would make false panel links (GH #1278).
     return CS_24 + format_id(value.iloc[0])
 
+def housing(df):
+    """Serve each Module F interview once, after verifying the refresh copies."""
+    helpers = ['_housing_module_key', '_housing_cover_key',
+               '_housing_previous_key', '_housing_ihs6_key']
+    if not set(helpers).issubset(df):
+        raise ValueError('Malawi 2024-25 housing requires Module F and the IHPS panel cover')
+    if df.index.to_frame(index=False).isna().any(axis=None) or df.index.has_duplicates:
+        raise ValueError('Malawi 2024-25 housing has missing or duplicate household keys')
+
+    i = df.index.get_level_values('i')
+    panel = ~i.str.startswith(CS_24)
+    in_module = df[helpers[0]].map(format_id).notna().to_numpy()
+    in_cover = df[helpers[1]].map(format_id).notna().to_numpy()
+    if not in_module.all() or (in_cover != panel).any():
+        raise ValueError('Malawi 2024-25 housing and IHPS cover disagree on household membership')
+
+    copy = panel & df[helpers[2]].map(format_id).isna().to_numpy()
+    target = CS_24 + df.loc[copy, helpers[3]].map(format_id)
+    keys = pd.MultiIndex.from_arrays([df.index.get_level_values('t')[copy], target],
+                                    names=df.index.names)
+    if target.isna().any() or keys.has_duplicates or not keys.isin(df.index[~panel]).all():
+        raise ValueError('Malawi 2024-25 housing has missing or duplicate IHS6 refresh counterparts')
+
+    # The two releases use the same native F08/F09 codebooks. Compare the
+    # decoded answers before finalization; preserve ordinary missingness.
+    materials = ['Roof', 'Floor']
+    ihps = df.loc[copy, materials].set_axis(keys)
+    ihs6 = df.loc[~panel, materials].reindex(keys)
+    equal = ihps.eq(ihs6) | (ihps.isna() & ihs6.isna())
+    if not equal.fillna(False).to_numpy().all():
+        raise ValueError('Malawi 2024-25 IHS6 and IHPS refresh housing answers disagree')
+    return df.loc[~copy].drop(columns=helpers)
+
+
 def sample(df):
     """Move the 815's IHPS id and weight to their IHS6 rows, drop the copies.
 
