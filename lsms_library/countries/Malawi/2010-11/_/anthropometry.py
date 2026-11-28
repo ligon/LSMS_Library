@@ -24,10 +24,8 @@ from malawi import _anthropometry_block, assemble_anthropometry
 
 
 WAVE = '2010-11'
-BASE = '../Data/Full_Sample/Household/'
-
-health = get_dataframe(BASE + 'hh_mod_v.dta')
-roster = get_dataframe(BASE + 'hh_mod_b.dta')
+health = get_dataframe('../Data/Full_Sample/Household/hh_mod_v.dta')
+roster = get_dataframe('../Data/Full_Sample/Household/hh_mod_b.dta')
 
 piece = _anthropometry_block(
     health, roster, t=WAVE,
