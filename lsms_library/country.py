@@ -104,6 +104,7 @@ import inspect
 import logging
 import os
 import re
+import stat
 import warnings
 from pathlib import Path
 import shutil
@@ -1174,6 +1175,45 @@ _ORG_HASH_SKIP = {"CONTENTS.org"}
 # list above).  Build OUTPUTS go to the cache (data_root()), not _/, so every
 # matching _/ file is a committed build input (GH #522, rounds 7-8).
 _BUILD_INPUT_SUFFIXES = {".py", ".csv", ".json", ".txt", ".tab", ".tsv"}
+
+
+def _country_script_dvc_hash_parts(country_dir: Path, script: Path) -> list[str]:
+    """Portable, sidecar-only input identities for one country-table script."""
+    try:
+        paths = {
+            Path(os.path.normpath(script.parent / ref))
+            for ref in scan_script_data_refs(script)
+            if "\x00" not in ref and not Path(ref).is_absolute()
+        }
+    except UnicodeDecodeError:
+        # The shared literal scanner expects UTF-8. Keep the script's byte
+        # hash even when it cannot discover literal inputs for this encoding.
+        return []
+    parts = []
+    for path in sorted(paths):
+        if not path.is_relative_to(country_dir):
+            continue
+        sidecar = path.with_name(path.name + ".dvc")
+        relative = sidecar.relative_to(country_dir)
+        # Config can select its root. Below that root, don't traverse links
+        # or try to hash a payload, a directory, or another non-regular file.
+        parent = country_dir
+        try:
+            for component in relative.parts[:-1]:
+                parent /= component
+                if not stat.S_ISDIR(parent.lstat().st_mode):
+                    break
+            else:
+                if stat.S_ISREG(sidecar.lstat().st_mode):
+                    digest = cached_file_hash(sidecar)
+                    if digest is not None:
+                        # A POSIX byte filename can contain surrogateescape
+                        # characters even though the table hash input is UTF-8.
+                        key = json.dumps(relative.as_posix(), ensure_ascii=True)
+                        parts.append(f"csrc:{key}={digest}")
+        except (OSError, UnicodeEncodeError):
+            continue
+    return parts
 
 
 def _parse_data_info_cached(path: Path, content_hash: str | None) -> dict[str, Any]:
@@ -4735,9 +4775,12 @@ class Country:
             # Without these, editing the concatenator or the country
             # module leaves the hash unchanged and serves stale data --
             # exactly the food_acquired_to_canonical class of bug.
-            cdir = self.file_path / "_"
+            country_dir = self.file_path
+            cdir = country_dir / "_"
+            country_script = cdir / f"{method_name}.py"
+            script_hash = cached_file_hash(country_script)
             country_parts = [
-                "ctbl=" + (cached_file_hash(cdir / f"{method_name}.py") or "none"),
+                "ctbl=" + (script_hash or "none"),
                 "cmod=" + (cached_file_hash(cdir / f"{self.name.lower()}.py") or "none"),
                 "cmap=" + (cached_file_hash(cdir / "mapping.py") or "none"),
                 # data_scheme.yml declares the table registry and the
@@ -4756,6 +4799,12 @@ class Country:
                 # since the Makefile is edited rarely).
                 "cmake=" + (cached_file_hash(cdir / "Makefile") or "none"),
             ]
+            # Wave._input_hash does not see country-script source literals
+            # (GH #1288). Keep the Make closure separate: it also hashes
+            # Other tables, which can themselves call this method.
+            if script_hash is not None and method_name not in JSON_CACHE_METHODS:
+                country_parts += _country_script_dvc_hash_parts(
+                    country_dir, country_script)
             # Content-hash EVERY country-level build INPUT (not just ctbl/cmod/cmap):
             # .py helper bodies (e.g. _age_helpers.py) AND .csv/.json/.txt data
             # tables -- so a LOCAL helper or conversion table is versioned
