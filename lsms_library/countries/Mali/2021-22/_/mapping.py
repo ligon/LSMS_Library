@@ -15,6 +15,11 @@ def i(value):
     return _ehcvm21_i(value)
 
 from lsms_library.ehcvm import (
+    COPING_RANK_LABELS as _COPING_RANK_LABELS,
+    COPING_UNRANKED_OPTION as _COPING_UNRANKED_OPTION,
+    coping_autre_rank_key as _coping_autre_rank_key,
+    derive_coping_autre_rank as _derive_coping_autre_rank,
+    inputs_coping_autre_rank as _inputs_coping_autre_rank,
     derivation_key as _derivation_key,
     food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
     inputs_unit_weight as _inputs_unit_weight,
@@ -179,47 +184,65 @@ def household_roster(df):
     return df
 
 
+CODE25_RANK_DERIVATION = _coping_autre_rank_key('Mali')
+
+
+def inputs_shocks_code25_rank(wave='2021-22'):
+    """The native operands of the mixed code-25 answers occupying a served slot."""
+    if wave != '2021-22':
+        raise ValueError(f'Mali code-25 rank inputs are scoped to 2021-22, not {wave}')
+    raw = _inputs_coping_autre_rank('Mali', wave)
+    other = raw.drop(columns=f's14bq05__{_COPING_UNRANKED_OPTION}')
+    # The shared reader returns all mixed answers. If all three ranks were
+    # reported, no inferred position is served (or stamped) in Mali.
+    full = np.logical_and.reduce([
+        other.eq(label).any(axis=1).to_numpy(dtype=bool)
+        for label in _COPING_RANK_LABELS
+    ])
+    return raw.iloc[~full]
+
+
 def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
-    # For 2021-22: coping columns have ranked string values
-    # "Première stratégie", "Deuxième strategie", "Troisième stratégie", "Non";
-    # code 25 alone is "Oui"/"Non".
-    rank_map = {
-        'Première stratégie': 0,
-        'Deuxième strategie': 1,
-        'Troisième stratégie': 2,
-    }
-
     how_coped = {0: [], 1: [], 2: []}
+    inferred = []
     for _, row in df[cope_cols].iterrows():
         ranked = [np.nan, np.nan, np.nan]
+        held = set()
         autre = None
         for c in cope_cols:
             num = int(c.replace('Cope', ''))
             val = row[c]
-            if val in rank_map:
-                idx = rank_map[val]
-                ranked[idx] = COPING_LABELS.get(num, f'Strategy {num}')
-            elif str(val) == 'Oui':
-                autre = COPING_LABELS.get(num, f'Strategy {num}')
-        # Code 25 (Autre strategie) alone carries the Oui/Non label set, so its
-        # rank is not in the file (GH #1556).  It takes the first slot no other
-        # strategy holds: ranks are otherwise gapless, and Burkina, which keeps
-        # the raw rank, shows 25 always filling the next one.  The instrument
-        # allows three strategies, so a fourth has no slot and is dropped, as in
-        # Niger and Senegal (0 held rows).
-        free = [k for k in range(3) if pd.isna(ranked[k])]
-        if autre is not None and free:
-            ranked[free[0]] = autre
+            rank = _COPING_RANK_LABELS.get(val)
+            if rank is not None:
+                ranked[rank - 1] = COPING_LABELS.get(num, f'Strategy {num}')
+                held.add(rank)
+            elif num == _COPING_UNRANKED_OPTION and str(val) == 'Oui':
+                autre = COPING_LABELS[num]
+
+        # GH #1731: keep the least free slot and register the inference only
+        # beside a reported rank. Keep physical rank gaps and the three-slot
+        # limit. Alone, the only answer is unambiguously first.
+        stamped = False
+        if autre is not None:
+            slot = _derive_coping_autre_rank(held) - 1
+            if slot < len(ranked):
+                ranked[slot] = autre
+                stamped = bool(held)
+        inferred.append(stamped)
         for k in range(3):
             how_coped[k].append(ranked[k])
 
     df['HowCoped0'] = how_coped[0]
     df['HowCoped1'] = how_coped[1]
     df['HowCoped2'] = how_coped[2]
-    df = df.drop(columns=cope_cols)
-    return df
+    if any(inferred):
+        df['Derivation'] = pd.array(
+            [CODE25_RANK_DERIVATION if stamp else pd.NA for stamp in inferred],
+            dtype='string',
+        )
+    return df.drop(columns=cope_cols)
 
 
 def panel_ids(df):
