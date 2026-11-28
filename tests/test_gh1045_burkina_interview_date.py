@@ -54,7 +54,7 @@ TARGETS = {"int_start": "s00q23a", "int_end": "s00q23b",
            "int_start_v2": "s00q24a", "int_end_v2": "s00q24b",
            "int_start_v3": "s00q25a", "int_end_v3": "s00q25b"}
 COVERS = {"2018-19": ["s00_me_bfa2018.dta"],
-          "2021-22": ["s00_me_bfa2021.dta", "Cross_Section/s00_me_bfa2021.dta"]}
+          "2021-22": ["Panel/s00_me_bfa2021.dta", "Cross_Section/s00_me_bfa2021.dta"]}
 
 # Measured 2026-11-13, cold on base f138a3d61 (job 41271518): per wave and target
 # column, (sentinel '##N/A##', missing = blank).  n is 7,010 (2018-19) and

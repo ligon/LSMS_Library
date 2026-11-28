@@ -147,7 +147,7 @@ def inputs_cluster_features(wave='2021-22'):
     from lsms_library.paths import countries_root
     root = countries_root() / 'Burkina_Faso'
     gps = tools.get_dataframe(root / '2018-19' / 'Data' / 'grappe_gps_bfa2018.dta')
-    cover = tools.get_dataframe(root / wave / 'Data' / 's00_me_bfa2021.dta')
+    cover = tools.get_dataframe(root / wave / 'Data' / 'Panel' / 's00_me_bfa2021.dta')
     out = gps[['grappe', *_GPS_COLUMNS.values()]].merge(
         cover[['grappe', 'grappe_EHCVM1']].drop_duplicates(), on='grappe')
     v = out['grappe'].map(tools.format_id)
@@ -474,7 +474,7 @@ def _country_dir():
 
 def _raw_crop_file(name):
     from lsms_library.paths import countries_root
-    path = countries_root() / 'Burkina_Faso' / _CROP_WAVE / 'Data' / name
+    path = countries_root() / 'Burkina_Faso' / _CROP_WAVE / 'Data' / 'Panel' / name
     return (tools.get_dataframe(str(path), convert_categoricals=True),
             tools.get_dataframe(str(path), convert_categoricals=False))
 

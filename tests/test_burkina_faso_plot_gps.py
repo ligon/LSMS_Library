@@ -183,7 +183,7 @@ def test_held_wave_output_matches_native_source_coordinates(wave):
         assert list(frame.columns) == OLD_COLUMNS
     else:
         source = tools.get_dataframe(ROOT / wave / 'Data' /
-                                     's16a_me_bfa2021.dta',
+                                     'Panel/s16a_me_bfa2021.dta',
                                      convert_categoricals=False)
         _assert_positions(frame, source, wave)
 
@@ -193,7 +193,7 @@ def test_public_coordinates_follow_existing_panel_key_mapping():
     country = ll.Country('Burkina_Faso')
     actual = country.plot_features(waves=['2021-22'])
     source = tools.get_dataframe(ROOT / '2021-22' / 'Data' /
-                                 's16a_me_bfa2021.dta',
+                                 'Panel/s16a_me_bfa2021.dta',
                                  convert_categoricals=False)
     expected = tools.id_walk(_expected(source, '2021-22'), country.updated_ids)
     actual = actual[['Latitude', 'Longitude']].droplevel('v')

@@ -65,7 +65,7 @@ COVERS = {
     ("Niger", "2018-19"): ["Data/s00_me_ner2018.dta"],
     ("Niger", "2021-22"): ["Data/s00_me_ner2021.dta"],
     ("Burkina_Faso", "2018-19"): ["Data/s00_me_bfa2018.dta"],
-    ("Burkina_Faso", "2021-22"): ["Data/s00_me_bfa2021.dta",
+    ("Burkina_Faso", "2021-22"): ["Data/Panel/s00_me_bfa2021.dta",
                                   "Data/Cross_Section/s00_me_bfa2021.dta"],
 }
 CELLS = {("Senegal", "2018-19"): 28, ("Senegal", "2021-22"): 28,

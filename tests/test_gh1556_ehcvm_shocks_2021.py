@@ -28,7 +28,7 @@ from lsms_library.paths import countries_root
 ROOT = countries_root()
 WAVE = '2021-22'
 FIXED = {'Niger': 's14b_me_ner2021.dta', 'Mali': 's14b_me_mli2021.dta',
-         'Senegal': 's14b_me_sen2021.dta', 'Burkina_Faso': 's14b_me_bfa2021.dta'}
+         'Senegal': 's14b_me_sen2021.dta', 'Burkina_Faso': 'Panel/s14b_me_bfa2021.dta'}
 #: The labelled files; Burkina's section 14.05 carries no value labels at all.
 LABELLED = ['Niger', 'Mali', 'Senegal']
 AFFECTED = {'AffectedIncome': 'a', 'AffectedAssets': 'b', 'AffectedProduction': 'c',

@@ -430,7 +430,7 @@ def test_the_parcel_oracle_says_why_when_the_coordinates_are_gone():
 @pytest.fixture(scope="module")
 def sources():
     gps = _read("2018-19", GPS_FILE)
-    panel = _read("2021-22", "s00_me_bfa2021.dta")
+    panel = _read("2021-22", "Panel/s00_me_bfa2021.dta")
     cs = _read("2021-22", "Cross_Section/s00_me_bfa2021.dta")
     return gps.assign(v=gps["grappe"].astype(int).astype(str)).set_index("v"), panel, cs
 
@@ -467,7 +467,7 @@ class TestOracleCarriedGps:
         hold; the current release of 6224 no longer has these columns, so acquiring it fails
         here (Burkina_Faso/_/CONTENTS.org, "what the World Bank states about 6224's versions")."""
         gps, panel, _ = sources
-        parcels = _parcel_positions(_read("2021-22", "s16a_me_bfa2021.dta"))
+        parcels = _parcel_positions(_read("2021-22", "Panel/s16a_me_bfa2021.dta"))
         medians = parcels.groupby(parcels["grappe"].astype(int).astype(str))[
             ["s16aq46__latitude", "s16aq46__longitude"]].median()
         shared = sorted((set(medians.index) & set(gps[gps[LAT].notna()].index)

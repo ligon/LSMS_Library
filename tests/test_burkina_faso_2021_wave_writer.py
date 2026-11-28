@@ -33,7 +33,7 @@ def test_actual_wrapper_helper_writer_resolves_private_wave_and_keeps_payload(mo
 
     def invented_leaf(filename, *args, **kwargs):
         if Path(filename).suffix == '.dta':
-            assert filename == '../Data/s16b_me_bfa2021.dta'
+            assert filename == '../Data/Panel/s16b_me_bfa2021.dta'
             assert kwargs == {'convert_categoricals': False}
             reads.append(filename)
             return source.copy(deep=True)
@@ -86,7 +86,7 @@ def test_actual_wrapper_helper_writer_resolves_private_wave_and_keeps_payload(mo
             'component': 'panel source only; no Cross_Section coverage claim',
         },
     }
-    assert reads == ['../Data/s16b_me_bfa2021.dta'] and len(writes) == 1
+    assert reads == ['../Data/Panel/s16b_me_bfa2021.dta'] and len(writes) == 1
     pd.testing.assert_frame_equal(writes[0], expected, check_exact=True)
     assert writes[0].attrs == expected.attrs
     assert type(writes[0].attrs['invented']) is tuple

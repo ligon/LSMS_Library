@@ -357,7 +357,7 @@ def test_driver_reads_only_own_numeric_source_and_writes_after_validation(adapte
 
     def read(path, **kwargs):
         calls.append(('read', path, kwargs))
-        assert path == '../Data/s16b_me_bfa2021.dta'
+        assert path == '../Data/Panel/s16b_me_bfa2021.dta'
         assert kwargs == {'convert_categoricals': False}
         return _source()
 
@@ -390,7 +390,7 @@ def test_driver_reads_only_own_numeric_source_and_writes_after_validation(adapte
     assert isinstance(writer_arg, ast.Name) and writer_arg.id == writer.name
     source_arg = next(item.value for item in call.value.keywords if item.arg == 'source_path')
     assert isinstance(source_arg, ast.Constant)
-    assert source_arg.value == '../Data/s16b_me_bfa2021.dta'
+    assert source_arg.value == '../Data/Panel/s16b_me_bfa2021.dta'
     namespace = dict(build_s16b_candidate=adapter.build_s16b_candidate,
                      get_dataframe=read, to_parquet=write, get_categorical_mapping=get_map,
                      i=bindings[0]['id_fn'], format_id=bindings[1])

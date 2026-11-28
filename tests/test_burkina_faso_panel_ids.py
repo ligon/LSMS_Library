@@ -152,7 +152,7 @@ def test_every_target_is_the_source_households_own_2018_19_id():
     i18, i21 = _formatters()
     try:
         c18 = get_dataframe(str(root / PREV / 'Data' / 's00_me_bfa2018.dta'))
-        c21 = get_dataframe(str(root / CUR / 'Data' / 's00_me_bfa2021.dta'))
+        c21 = get_dataframe(str(root / CUR / 'Data' / 'Panel' / 's00_me_bfa2021.dta'))
     except Exception as exc:                      # noqa: BLE001 - data absent
         pytest.skip(f'Burkina_Faso EHCVM cover sheets unavailable: {exc}')
 
