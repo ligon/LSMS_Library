@@ -1765,7 +1765,8 @@ class Wave:
         # (GH #953).  Whole-table over the country's merged tables, even for
         # _ADDITIVE_CATEGORICAL_TABLES -- pinned report-only, not changed here.
         dic = dict(self.country.categorical_mapping)
-        dic.update(load_categorical_level(self.file_path / "_"))
+        dic.update(load_categorical_level(
+            self.file_path / "_", packaged_level=Path("countries") / self.folder / "_"))
         return dic
 
     @property
@@ -2794,7 +2795,7 @@ class Country:
             global_maps: dict[str, pd.DataFrame] = {}
             try:
                 global_maps = load_categorical_level(
-                    Path(str(files("lsms_library"))),
+                    Path(str(files("lsms_library"))), packaged_level=Path("."),
                     on_unreadable=lambda path, exc: logger.info(
                         "Skipping global categorical mapping %s: %s", path.name, exc))
             except (FileNotFoundError, OSError) as exc:
@@ -2807,7 +2808,9 @@ class Country:
             for rel in ['./', '../']:
                 level = Path(self.file_path / rel / "_")
                 if categorical_mapping_files(level):
-                    country_maps = load_categorical_level(level)
+                    # A parent fallback is user-managed, not this country's packaged level.
+                    packaged_level = Path("countries") / self.name / "_" if rel == './' else None
+                    country_maps = load_categorical_level(level, packaged_level=packaged_level)
                     break
 
             self.__dict__['_categorical_mapping_cache'] = _merge_categorical_tables(
