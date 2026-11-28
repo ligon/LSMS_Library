@@ -349,6 +349,31 @@ def test_malawi_unit_specify_text_is_not_a_food(text):
     assert bool(_malawi().names_a_food([text]).iloc[0]) is False
 
 
+def test_malawi_food_vocabulary_ignores_default_text_locale(monkeypatch):
+    import builtins
+
+    malawi = _malawi()
+    org = Path(malawi.__file__).resolve().parent / 'categorical_mapping.org'
+    original_open = builtins.open
+    default_codec = 'utf-8'
+
+    def locale_open(file, *args, **kwargs):
+        if isinstance(file, (str, Path)) and Path(file) == org:
+            if kwargs.get('encoding') is None:
+                kwargs['encoding'] = default_codec
+        return original_open(file, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, 'open', locale_open)
+    monkeypatch.setattr(malawi, '_FOOD_TEXT_VOCAB', None)
+    expected = malawi._food_text_vocab()
+    default_codec = 'ascii'
+    monkeypatch.setattr(malawi, '_FOOD_TEXT_VOCAB', None)
+    assert malawi._food_text_vocab() == expected
+    assert malawi.names_a_food(['Mango', 'Whole Chicken', 'Packet']).tolist() == [
+        True, False, False,
+    ]
+
+
 def test_malawi_code23_food_text_goes_to_the_sentinel():
     df = pd.DataFrame({
         'unitsdetail_bought': ['MANGO', 'COFFEE', 'WHOLE CHICKEN', 'MEALS'],
