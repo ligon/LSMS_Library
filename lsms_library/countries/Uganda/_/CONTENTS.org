@@ -5850,6 +5850,22 @@ weights/GPS, #647/#1297/#829 WAITING and broader country work remain. See =.code
 and =slurm_logs/isa_recovery_2026-10-29/Uganda/1287-interview-date-public-checkpoint/REPORT.md=.
 
 
+** 2026-11-25 -- Gregorian cover-date parsing (GH #1045)
+
+The eight existing household covers record a civil date, not a time or visit ordinal.
+The original 24,362 records contained 24,264 complete valid dates.
+Four 2005-06 records report only a year, and seven 2010-11 records report a year and month but no day.
+Under the shared policy the former use 1 January and the latter the first of
+the month, with distinct registered =Derivation= keys that identify the
+unobserved components.
+The 15 impossible 2010-11 dates and 72 wholly blank dates remain unserved.
+No original full date, household or wave identity, sample weight, or visit convention changes.
+The 2019-20 date script still uses =Data1/HH/gsec1.dta=.
+Its alternate sample path has the same declared bytes.
+The country compiler keeps dates without a derivation key and carries each
+wave's parse report so the diagnostics are available on warm reads.
+
+
 * Uganda plot_features: qualified fixed-STORAGE compiler/consumer checkpoint
 
 The bounded result is independently and root-qualified accepted; exact public
