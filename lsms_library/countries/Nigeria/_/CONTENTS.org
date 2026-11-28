@@ -4707,6 +4707,41 @@ No actual CSV/header/row, producer, Make, Country/Feature, cache/census or
 scientific acceptance follows. Whole1288, exact conservative hash footprint
 and the WAITING pooled-recall-window question remain separate.
 
+* 2026-11-28 -- W5 housing release and consumption-rent visit (GH #587)
+
+The two Section 9 names do not mean the same module. The
+[[https://microdata.nigerianstat.gov.ng/index.php/catalog/82/data-dictionary/F24][NBS v01 PP dictionary]] and [[https://microdata.worldbank.org/catalog/6410/data-dictionary/F24?file_name=sect9_plantingw5][WB v03 PP dictionary]]
+identify =sect9_plantingw5= as Food Security. The corresponding
+[[https://microdata.nigerianstat.gov.ng/index.php/catalog/82/data-dictionary/F77][NBS v01 PH dictionary]] and [[https://microdata.worldbank.org/catalog/6410/data-dictionary/F77?file_name=sect9_harvestw5][WB v03 PH dictionary]]
+identify =sect9_harvestw5= as household Housing, including actual and
+hypothetical rent, roof and floor. Both publish 4,715 PH cases; identical
+case counts and core names do not authenticate equal release bytes. The
+2024 [[https://microdata.nigerianstat.gov.ng/index.php/catalog/82/download/1038#page=70][PH interviewer manual, PDF p70]] describes the standard housing section
+on that visit. The exact library W5 producer reads PH =s9q10/11= by =hhid=
+and emits =2024Q1= only; it does not serve the consumption rent aggregate.
+
+The publisher's [[https://microdata.worldbank.org/catalog/6410/related-materials][consumption aggregate code archive (resource 360263)]]
+provides a direct source trace. =08_rent_ph.do= reads PH Section 9,
+annualizes actual rent from =s9q5a/b=, and writes household =rent33= to
+=rent_ph.dta=. It also constructs potential rent separately; the active
+weighted regression uses logged actual rent. =09_consagg.do= assigns the
+PP stack visit 1 and the PH stack visit 2, merging this rent intermediate
+only into the latter. After appending, it accounts for rent as a component
+observed once, rather than averaging it as two separately collected
+values. PP non-food expenses related to housing are not this standard
+housing module or another rent input to that code.
+
+The [[https://microdata.worldbank.org/catalog/6410/download/180540#page=70][W5 BID v2 consumption appendix, PDF p70]] contains a paragraph
+explicitly about GHS-Panel 2018–19. Its 864-character span through the
+visit-1 rent statement and seasonal averaging explanation, after
+whitespace normalization, matches the [[https://microdata.worldbank.org/catalog/3557/download/47680#page=64][W4 BID, PDF p64]] exactly. It is
+not evidence of a W5 PP housing or rent module. The W5 release table
+(PDF p49), both published dictionaries, and the producer calculation
+agree on PH. They do not establish unarchived instrument revisions.
+A =correctly-empty= classification for W5 PP standard housing is a
+supported decision candidate, not applied here. No grade, source pin,
+served table, earlier visit, or plot-area policy is changed.
+
 * 2026-11-12 -- C8 decoder: two W4/W5 labels were PLACED WRONGLY, not unplaced (GH #587)
 
 =_canon_community_unit= falls through to the shared substring decoder
