@@ -96,8 +96,12 @@ to an unavailable or refused target.
 Blank keys and targets are excluded from the rename map. A non-null `j` not in
 that map remains unchanged, with `LabelPassThroughWarning` and
 `result.attrs['labels_unmatched']` carrying `labels`, `column`, `n_unmatched`,
-`n_values`, `rows`, `row_share`, and `examples`. For example, the reviewed Malawi
-`labels='2004-05'` call leaves 32 of 147 foods unrenamed on 42,206 rows (6.2%).
+`n_values`, `rows`, `row_share`, and `examples`. In the October 14, 2026
+review at `6922c077a`, `Country('Malawi').food_expenditures(labels='2004-05')`
+left 32 of 147 foods unrenamed on 42,206 expenditure rows (6.2%).
+Here `'2004-05'` selects the label vocabulary, not the survey waves.
+[Review results](https://github.com/ligon/LSMS_Library/blob/75a4497447b981471580cad7f51bbbaff47603a4/slurm_logs/backlog_review_2026-10-14/verdicts/labels-relabel-787.md#L8).
+
 Set `LSMS_LABELS_STRICT=1` (also `true` or `yes`) to raise
 `LabelPassThroughError` before renaming or summing. Null `j` is handled by the
 null-index audit instead. Fully covered crosswalks emit no pass-through report.
@@ -116,12 +120,21 @@ such a result carried the *flat* Country report (`{'labels': …, 'n_unmatched':
 off a `Feature` result must index by country first. What the carrier *fixes*
 is the case of two or more kept countries whose reports differ, including
 when one of them has no report: there the concat dropped `attrs` entirely
-and the report was lost. `Feature('food_prices')(['Malawi', 'Ethiopia'],
-labels='2004-05')` keeps only Malawi, because Ethiopia is dropped as
-unavailable, so it carried the flat report before the fix as well (32 of 147
-foods, 42,240 rows); it now carries `{'Malawi': …}`. `Feature('food_prices')(
-['Malawi', 'Uganda', 'Nigeria'], labels='Aggregate')` is that case. Measured
-2026-11-04, Malawi and Uganda match every label and Nigeria passes 3 of 121
+and the report was lost.
+
+In the October 17, 2026 comparison recorded at `801e276d9`,
+`Feature('food_prices')(['Malawi', 'Ethiopia'], labels='2004-05')` with
+default units (`kgvalue`) kept only Malawi because Ethiopia lacked that
+label variant. Before the fix it carried the flat Malawi report (32 of 147
+foods, 42,240 price rows), and after the fix it carried the same counts under
+`{'Malawi': …}`. The price accessor filters unpriceable rows and keeps the
+unit in its grain, unlike the expenditure accessor above. Both counts are
+historical examples, not current totals.
+[Before-and-after comparison](https://github.com/ligon/LSMS_Library/commit/801e276d9f1217f22859f2c5aedf48dcad8acf74).
+
+An example with more than one kept country is
+`Feature('food_prices')(['Malawi', 'Uganda', 'Nigeria'], labels='Aggregate')`.
+Measured 2026-11-04, Malawi and Uganda match every label and Nigeria passes 3 of 121
 through (`Groundnuts`, `Maize (shelled)`, `Pepper`; 11,649 rows, 2.4%), so it
 carries `{'Nigeria': …}`. (Since GH #1537 all three are curated: `Groundnuts`
 and `Maize (shelled)` on 2026-11-08, `Pepper` -> `Fresh Pepper` on 2026-11-13,
