@@ -37,6 +37,11 @@ The library maintains three independent caches, all rooted under
 | **L2-wave (parquet)** | `~/.local/share/lsms_library/{Country}/{wave}/_/{table}.parquet` | Per-wave harmonized output (one wave's portion of the table) | `Wave.grab_data()` on first call (YAML path, since 2026-04-15) or `_/{table}.py` scripts via `to_parquet()` (script path, always) | `Wave.grab_data()` on subsequent calls, through the read gates `Wave._read_l2_wave_cache` (YAML path) and `Wave._fresh_script_parquet` (script path), since GH #1040; `run_make_target` for script-path tables |
 | **L1 (DVC blobs)** | `~/.local/share/lsms_library/dvc-cache/{md5[:2]}/{md5[2:]}` | Content-addressed copies of the raw `.dta` files (and other DVC-tracked sources) | `_ensure_dvc_pulled()` in `local_tools.py` downloads the blob **directly from S3** (sidecar md5 + the active DVC remote's fsspec backend) on first read, bypassing the DVC CLI / `Repo.fetch` (v0.7.3) | `DVCFS.open()` via `DataFileSystem._get_fs_path`'s `typ == "cache"` branch |
 
+L1 looks for the blob named by the current source's `.dvc` sidecar.
+The local warm-up check tests for that blob's presence rather than hashing it
+again. Changing the sidecar digest selects a different blob. This is separate
+from the L2 checks on harmonized outputs.
+
 All three tiers live under the same root, so a single `LSMS_DATA_DIR`
 environment variable moves them together. On a shared cluster, set
 `LSMS_DATA_DIR=/shared/...` and every user gets the same warm caches.
@@ -88,14 +93,13 @@ rebuilds (Uganda `cluster_features`: 408 s → 0.02 s per wave).
 
 As of v0.7.0, the library reads `{data_root}/{Country}/var/{table}.parquet`
 at the top of `load_dataframe_with_dvc` -- via the read gate
-`Country._read_l2_country_cache` since GH #908 -- when the file exists **and its
-embedded content hash is fresh (or unverifiable; a hashless country parquet is
-graded stale since GH #809)** — the v0.8.0 staleness check
-described next; before v0.8.0 this read was unconditional. Every country
-benefits from this; there is no longer a special-case for the seven
-DVC-stage countries.
+`Country._read_l2_country_cache` since GH #908 -- when the file is readable
+and passes freshness, coverage, and degraded-source checks. When the expected
+hash can be computed, a country parquet must carry a matching hash (GH #809).
+When it cannot, freshness alone does not block the read. The v0.8.0 freshness
+check applies to all countries, not only those with DVC stages.
 
-**Automatic content-hash staleness (v0.8.0).** Each cached parquet
+**Automatic content-hash staleness (v0.8.0).** A stamped L2 parquet
 carries an embedded content hash (in its pyarrow schema metadata) that
 covers everything determining its *pre-finalize* contents: the
 `LSMS_CACHE_SCHEMA` version, the wave's `data_info.yml`, the country's
@@ -107,10 +111,20 @@ sidecar md5** of each declared source file (the `.dta` itself is never
 hashed or downloaded). On read,
 the hash is recomputed from the current sources and compared:
 
-- **match** → the cached parquet is served (fast path preserved);
-- **mismatch** → the cache is treated as stale and rebuilt from source;
-- **no embedded hash** (a parquet built before v0.8.0) → trusted once and
-  re-stamped, so the *next* read is guarded (no rebuild-all on upgrade).
+- **Matching stored hash.** The parquet is eligible to serve. Coverage and
+  degraded-source checks still apply where used.
+- **Different stored hash.** The read gate rejects the stale parquet.
+- **No stored hash, with a computable expected hash.** The route matters:
+    - **L2-country, ordinary read gate.** Reject it as stale and rebuild
+      (GH #809). The reader must not stamp an unverified country output as fresh.
+    - **L2-wave, YAML producer.** A valid hit is trusted once and stamped with
+      the expected hash, so the next read can compare it.
+    - **L2-wave, script producer.** The gate can reuse a readable hashless
+      parquet but does not stamp it. Before a default country rebuild descends
+      into wave loading, it evicts existing hashless wave parquets for that
+      table (GH #479). Stamped wave parquets retain their own freshness checks.
+- **No computable expected hash.** The gate treats freshness as unverifiable,
+  not as a hash mismatch. Other eligibility and read checks still apply.
 
 So editing a `data_info.yml`, a wave/country `_/{table}.py` script, the
 country module, or a source `.dta` (via its sidecar) now invalidates the
@@ -123,16 +137,16 @@ referenced via *dynamically-constructed* paths (not string literals in
 the `_/{table}.py`) are covered only by hashing the script text, not the
 source content — an out-of-band edit to such a source still needs a
 manual `cache clear`. (2) `assume_cache_fresh=True` deliberately skips
-the hash check ("I promise the cache is current"). (3) `LSMS_NO_CACHE=1`
-still forces a full rebuild.
+the country hash check on an eligible cached read ("I promise the cache is current").
+(3) `LSMS_NO_CACHE=1` does not affect L1 or the script-path wave read gate.
 
 You can still invalidate manually:
 
-- Set `LSMS_NO_CACHE=1` for the session to force a rebuild from source. Only
-  `1`, `true` or `yes` (case-insensitive) bypass the cache reads and skip the
-  YAML-path L2-wave write during a rebuild; all other values leave those gates
-  on their ordinary routes. The rebuild rewrites the L2-country parquet in the
-  data root you are pointed at, with the frame an ordinary build would write.
+- Set `LSMS_NO_CACHE=1` to bypass ordinary L2-country and YAML-path L2-wave
+  reads and skip YAML-path L2-wave writes. The accepted values are `1`,
+  `true`, and `yes` (case-insensitive). This does not disable all writes:
+  a default country rebuild can replace the L2-country parquet in the
+  selected data root.
 - Run `lsms-library cache clear --country {Country}` (optionally with
   `--method {table}`) to evict the affected L2-country and L2-wave
   parquets before the next call.
