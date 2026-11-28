@@ -364,7 +364,7 @@ _FR_MONTHS = {
 
 def _crop_labels(series):
     """Map a Series of decoded crop names -> harmonize_food Preferred Label."""
-    m = tools.get_categorical_mapping(tablename='harmonize_food', idxvars='Code',
+    m = tools._get_packaged_categorical_mapping(tablename='harmonize_food', idxvars='Code',
                                       **{'Preferred Label': 'Preferred Label'})
     out = series.astype('string').str.strip().map(m)
     return out.astype('string')
@@ -372,7 +372,7 @@ def _crop_labels(series):
 
 def _unit_labels(series):
     """Map a Series of decoded harvest-unit names -> u Preferred Label."""
-    m = tools.get_categorical_mapping(tablename='u', idxvars='Code',
+    m = tools._get_packaged_categorical_mapping(tablename='u', idxvars='Code',
                                       **{'Preferred Label': 'Preferred Label'})
     out = series.astype('string').str.strip().map(m)
     return out.astype('string')
@@ -1977,7 +1977,7 @@ def inputs_gram_centilitre_poids(wave):
     from pathlib import Path
     from lsms_library.paths import countries_root
     data = Path(countries_root()) / 'Mali' / wave / 'Data'
-    crop_map = tools.get_categorical_mapping(
+    crop_map = tools._get_packaged_categorical_mapping(
         tablename='harmonize_food', idxvars='Code',
         dirs=[f'{data.parent / "_"}/', f'{data.parent.parent / "_"}/'],
         **{'Preferred Label': 'Preferred Label'})

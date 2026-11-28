@@ -494,7 +494,7 @@ def community_prices_s05(codes, labels):
     pairs = pd.DataFrame({'code': codes['s05q02'], 'u': served_units}).dropna().drop_duplicates()
     if pairs['code'].duplicated().any() or pairs['u'].duplicated().any():
         raise ValueError('s05 unit codes and served labels must be one to one')
-    item_map = tools.get_categorical_mapping(
+    item_map = tools._get_packaged_categorical_mapping(
         tablename='harmonize_food', idxvars='Code',
         **{'Preferred Label': 'Preferred Label'})
     base = pd.DataFrame({

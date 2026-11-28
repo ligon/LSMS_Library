@@ -3025,6 +3025,30 @@ def _raise_if_declared_empty(path: str | Path, tablename: str, rung: str,
 _GRABBER_OPTIONS = frozenset({'convert_categoricals', 'encoding', 'missing_ok'})
 
 
+def _named_packaged_org_encoding(path: Path, level: str) -> str | None:
+    """Codec for an already selected, package-authoritative categorical file."""
+    rung = Path(level)
+    try:
+        selected = rung.resolve(strict=True)
+        package = global_categorical_level().resolve(strict=True)
+        if selected == package:
+            packaged_level = Path(".")
+        else:
+            for root in (package / "countries", countries_root()):
+                root = root.resolve()
+                if not selected.is_relative_to(root):
+                    continue
+                rel = selected.relative_to(root)
+                if len(rel.parts) in (2, 3) and rel.name == "_":
+                    packaged_level = Path("countries") / rel
+                    break
+            else:
+                return None
+    except (OSError, RuntimeError):
+        return None
+    return "utf-8" if _matches_packaged_categorical_file(path, rung, packaged_level) else None
+
+
 def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str | None = None, idxvars: str = 'Code',
                             dirs: list[str] = ['./','../../_/'], asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
     """Return one named categorical table, resolved wave -> country -> global.
@@ -3110,6 +3134,28 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
     most bare callers wanted.  The ``.dta`` form needs no value column and is
     unaffected.
     """
+    return _get_categorical_mapping(fn, tablename, idxvars, dirs, asdict, kwargs,
+                                    use_packaged_org=False)
+
+
+def _get_packaged_categorical_mapping(
+        fn: str = 'categorical_mapping.org', tablename: str | None = None,
+        idxvars: str = 'Code', dirs: list[str] = ['./', '../../_/'],
+        asdict: bool = True, **kwargs: Any) -> dict[Any, Any] | pd.DataFrame | pd.Series:
+    """Opt in to UTF-8 for the selected shipped Org file or unchanged mirror.
+
+    Uses the same named cascade as :func:`get_categorical_mapping`. An explicit
+    codec wins. Arbitrary directories and altered user files keep the old
+    defaults, as do explicit alternative filenames and the binary reader.
+    """
+    return _get_categorical_mapping(fn, tablename, idxvars, dirs, asdict, kwargs,
+                                    use_packaged_org=True)
+
+
+def _get_categorical_mapping(
+        fn: str, tablename: str | None, idxvars: str, dirs: list[str],
+        asdict: bool, kwargs: dict[str, Any], *, use_packaged_org: bool
+        ) -> dict[Any, Any] | pd.DataFrame | pd.Series:
     ext = Path(fn).suffix
 
     if ext.lower()=='.dta': # A stata file.
@@ -3149,8 +3195,13 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
                     raise KeyError(f'No table {tablename} at level {d}.')
             else:
                 path = d+fn
+            options = kwargs
+            if use_packaged_org and levels and kwargs.get('encoding') is None:
+                encoding = _named_packaged_org_encoding(path, d)
+                if encoding is not None:
+                    options = {**kwargs, 'encoding': encoding}
             try:
-                df = df_data_grabber(path,idxvars,orgtbl=tablename,**kwargs)
+                df = df_data_grabber(path,idxvars,orgtbl=tablename,**options)
             except (KeyError, IndexError) as error:
                 # A DECLARED zero-row table is not an absent one (GH #1036):
                 # raise past this loop's KeyError handler instead of falling
@@ -3158,7 +3209,7 @@ def get_categorical_mapping(fn: str = 'categorical_mapping.org', tablename: str 
                 if tablename is not None:
                     _raise_if_declared_empty(path, tablename, d, rungs[k+1:],
                                              levels, fn, error,
-                                             encoding=kwargs.get('encoding'))
+                                             encoding=options.get('encoding'))
                 raise
             # Columns only: a one-row table must stay a Series/frame, not
             # collapse to a scalar (GH #674).

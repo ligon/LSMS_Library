@@ -371,7 +371,7 @@ def _price_u_by_code(unit_codes, community_categories, household_categories):
     """
     from lsms_library.paths import countries_root
     path = countries_root() / 'Burkina_Faso'
-    codebook = tools.get_categorical_mapping(
+    codebook = tools._get_packaged_categorical_mapping(
         tablename='ehcvm_units', idxvars='Code',
         dirs=[str(path / '2018-19' / '_'), str(path / '_')],
         **{'Preferred Label': 'Preferred Label'})
@@ -417,7 +417,7 @@ def _price_base(codes, community_categories, household_categories):
     """
     from lsms_library.paths import countries_root
     path = countries_root() / 'Burkina_Faso'
-    item_map = tools.get_categorical_mapping(
+    item_map = tools._get_packaged_categorical_mapping(
         tablename='harmonize_food', idxvars='Original Label',
         dirs=[str(path / '2018-19' / '_'), str(path / '_')],
         **{'Preferred Label': 'Preferred Label'})
