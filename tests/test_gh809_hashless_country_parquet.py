@@ -92,6 +92,7 @@ def _country_read_path_source() -> str:
     # Only the actual read gates, not fresh_make_country's verified producer
     # stamp. Caller linkage/cache-hit branches are pinned independently below.
     return (inspect.getsource(Country._read_l2_country_cache)
+            + inspect.getsource(Country._inspect_l2_country_cache)
             + inspect.getsource(Country._read_assumed_fresh_cache))
 
 
