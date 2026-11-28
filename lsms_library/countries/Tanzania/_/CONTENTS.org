@@ -485,6 +485,50 @@ associated household.
 (The truncated sentence "who moved into another This constituted" is in the
 source, in both the BID and the DDI; quoted as printed.)
 
+**** Mobile-phone summary and detail are different respondent records (GH #439)
+
+The 2019-20 SDD household/individual [[https://microdata.worldbank.org/catalog/3885/download/54804#page=47][questionnaire]] (PDF p. 47),
+[[https://microdata.worldbank.org/catalog/3885/download/55609#page=18][Basic Information Document]] (BID, PDF p. 18), and
+[[https://microdata.worldbank.org/index.php/metadata/export/3885/ddi][v06 DDI]] match the tracked document sidecars. The SDD BID describes G3A
+for the primary male and primary female, with at least three months'
+residence in the preceding twelve. This is a module-specific description,
+not the Extended Panel tracking rule or a roster-wide denominator. The
+form cover prints 2018/2019, so the sidecar match binds the archived
+document, not the exact revision deployed for 2019-20.
+
+The printed G3 question 1 lists Yes =1=, No =2= and refusal =97=. Both No
+and refusal skip the rest of the module. The separate interview-privacy
+item records whether the respondent was alone and who else was present. The
+public [[https://microdata.worldbank.org/catalog/3885/data-dictionary/F18?file_name=HH_SEC_G3A][G3A dictionary]] F18/V635 (=hh_g301=) lists only Yes and No. Neither
+G3A nor [[https://microdata.worldbank.org/catalog/3885/data-dictionary/F19][G3B]] lists a privacy field or usable response counts. The form
+alone cannot establish whether refusal is retained, recoded or omitted
+in the release, and neither the label list nor an absent row
+assigns a status to an unobserved answer. Likewise G3B Q7 prints =98=
+for Don't know about working condition, but V648 lists only Yes/No.
+
+Both BID rows carry a generic /Individual-Plot/ observation heading.
+Read their explicit keys and questions separately. G3A refers to a
+respondent via =sdd_hhid, sdd_indid= and asks whether and how many phones
+they own, counting exclusive and joint ownership together. G3B adds
+=phone_id= for details about that respondent's phone, not a plot ID or a
+device identifier shared across interviews. The public =sdd_indid= card
+in G3B points to the =t2_roster=; named household co-owners are distinct
+from the respondent, and outside-household co-owners are counted. These
+are source definitions, not a verified join or proof of unique devices.
+The shipped Section B roster maps those names to =i= and =pid=. Shared
+field names are a candidate link, not observed key cardinality. All
+three files also list =interview__key=; that does not authenticate a
+cross-file join or displace the BID's listed keys.
+
+A bounded G3A pilot remains sequenced after the defect queue. Before
+wiring, establish exact release linkage to Section B and the module's
+eligibility and response states, including what happened to printed =97=.
+Check actual key uniqueness and missingness and retain observed No as
+distinct from missing and outside-universe. Do not borrow another
+module's respondent rules, infer zeros or individual weights, or claim
+exclusive ownership from a combined report. No native rows were read
+and no feature, default, weight or output changed in this check.
+
 *** 2020-21: Refresh Panel plus an explicit URBAN OVERSAMPLE
 
 Catalog id 5639, =sampProc= (same text at
