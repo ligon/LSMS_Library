@@ -1217,6 +1217,43 @@ made.  Aggregate proof and reproduction scripts are in the release
 =dtype-roundtrip= evidence bundle.  The separate =interview_date= wave/row
 coverage loss under GH #798 is not covered by this scalar-type exception.
 
+** EHCVM 2021–22 printed departure fields, not released roster fields (GH #1565)
+
+Both public WB6275 household forms
+([[https://microdata.worldbank.org/catalog/6275/download/100365#page=5][Vague 1, PDF p.5]] and
+[[https://microdata.worldbank.org/catalog/6275/download/100366#page=5][Vague 2, PDF p.5]])
+match their tracked documentation sidecar digests and sizes. On the
+roster flap (PDF p.4), the printed instruction carries forward the
+2018–19 members of reinterviewed households and appends arrivals. A new
+household instead lists current residents, even if absent at interview.
+On the first page of Section 1, Q1.00a asks if the named person still
+lives in the household. Q1.00b asks why they no longer live there, with 14 printed
+reason codes (including separate COVID-19 and other deaths, and code 14
+Other). Q1.00c asks when they left, in month and year. Q1.00d–f address
+new or previously missed members and are not departure questions.
+The two [[https://phmecv.uemoa.int/nada/index.php/catalog/63/related-materials][UEMOA catalogue 63 workbooks]]
+agree at =S01_Demo=, notably the question stems =F5:H5=, reason card =G8=
+and separate entry stems =J5=, =K5= and =M5=.
+
+The [[https://microdata.worldbank.org/catalog/6275/data-dictionary/F2][public v02 F2 roster dictionary]]
+instead labels =s01q00aa= as still a household member. It lists 28,009
+Yes and 15,463 missing, no observed No, and no =s01q00b= or =s01q00c=.
+The published entry reasons in =s01q00f= cannot substitute. These are
+release-dictionary marginals, not paired records or proof of no departures.
+The [[https://microdata.worldbank.org/catalog/6275/download/100367#page=17][French BID, PDF p.17]]
+describes prior-wave household linkage for the panel. It does not say
+where departed person records, reasons or dates went. Its person-ID
+name =s01q00a= is not listed in F2. The listed =membres__id= and the
+labelled membership question =s01q00aa= are not established aliases.
+
+Establish which Q1.00a–c revision fed each release, whether and how the
+prior-member roster was filtered, and whether a release-linked departures
+register or correction exists. The printed questions alone do not identify
+the deployed revision, actual fielded universe or export decisions. Do not
+promote the public v02 metadata to a byte match with the tracked v01
+source, infer nonmembership from the missing answers, or change the active
+roster. This check read no survey records.
+
 * Warm interview-date loss (GH #798, found 2026-10-15, FIXED 2026-10-17)
 
 *Resolved on branch =fix/798-datetime=.*  Both declared-datetime casts in
