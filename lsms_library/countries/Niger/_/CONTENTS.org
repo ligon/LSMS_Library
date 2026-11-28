@@ -4134,3 +4134,29 @@ ones included), so it is left for the next edit of that table.
 =Wave._input_hash= (the 25 of 2018-19 and the 25 of 2021-22; 2011-12 and 2014-15 do not move, because
 =niger.py= is not edited); =build_transforms_fingerprint= 0 of 42, =framework_imports_fingerprint= 0 of 38.
 
+
+* 2026-11-26 -- 2021-22 household input checklist, detail roster and released rows (GH #1483)
+
+The [[https://www.stat-niger.org/anado/index.php/catalog/191/download/1491][INS Survey Solutions questionnaire]] is labelled EHCVM 2 - VNER, with a November 16, 2021 generation timestamp.
+PDF pp. 214-216 show a household yes/no input checklist and a separate =cout_intrants= detail roster generated from the inputs marked yes on =s16bq02=.
+The quantity used is for the household, not an individual parcel.
+Gift and purchase follow separately (pp. 217-218).
+The programmed =visite2= condition is not documentation that it equals the released =vague=.
+
+The held v01 =s16b_me_ner2021.dta= (MD5 =ddd47b641a90cba06d228b7feaa06f3d=) has 73,006 rows and 5,140 distinct =(grappe, menage, vague)= groups.
+Only 3,319 contain all 20 input codes.
+The household/pass/input key is complete and unique.
+There are 12,439 yes, 27,067 no and 33,500 blank =s16bq02= records.
+The published checklist and selected-detail design is not a recipe for reconstructing that partially populated long release.
+The existing adapter keeps the explicit yes before its subsequent key and payload steps, not every roster entry or every positive amount.
+
+The four current World Bank questionnaire PDFs for Niger and Senegal match their tracked sidecars.
+The [[https://microdata.worldbank.org/metadata/export/6276/ddi][newer v02 metadata]] lists the same 73,006 cases and 17 columns, and all held menu, use and three unit-card labels agree with the listed v02 categories.
+This does not establish that the v02 records match the held v01 bytes.
+The 2021 Designer snapshot used-unit card ends at 12, but the release also labels code 13 =Sachet=.
+Its purchase card differs from the released cart codes as well (GH #1751).
+Ask INS for the deployed questionnaire revision(s) and the checklist/detail-to-long export crosswalk before equating these layouts.
+
+The separate [[https://datacatalog.ihsn.org/catalog/12263/data-dictionary/F29?file_name=s16a_me_ner2021][released s16a parcel roster]] asks about manure and NPK quantities at the parcel level.
+Representing those observations is a separate question (GH #1696).
+It does not justify splitting any s16b household amount among parcels.

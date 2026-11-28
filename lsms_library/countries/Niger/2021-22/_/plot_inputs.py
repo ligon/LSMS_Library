@@ -21,9 +21,10 @@ Unit_received_as_gift, served in the vocabulary of `u`
 (ehcvm.served_unit_labels).  `u` still describes the quantity USED.
 s16bq09c (purchase value) is not read.  See _/CONTENTS.org.
 
-The 2021-22 roster lists EVERY input-type per household (most not used), so
-the s16bq02==1 gate is essential: of 73006 raw rows only ~12439 are applied
-inputs.  As in 2018-19 the seed's crop is embedded in the input-type label
+The 2021-22 release is not a complete input-type grid for every household.
+Of 73,006 released rows, 12,439 have s16bq02 == 1, the application gate.
+See _/CONTENTS.org for the distinction between CAPI detail and export rows.
+As in 2018-19 the seed's crop is embedded in the input-type label
 and resolved via harmonize_seed_crop (2021-22 adds 'Semences de coton',
 'Plants/boutures de tubercules' etc.).  Non-seed rows carry crop NaN.
 i is the EHCVM composite id via niger.i.  Grain (t, i, input, crop, u).
