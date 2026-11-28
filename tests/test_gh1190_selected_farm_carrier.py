@@ -262,15 +262,18 @@ def test_old_helper_and_r1_r3_source_inverse_exact():
             'D20_TEXT_COL','D20_REASON_COL','attach_module_d_text','_D20_TEXT_48',
             # its registration (ruling 2026-11-13, "Register all waves")
             'CROP_TEXT_KEYS','CROP_TEXT_WAVES','derive_cowpea_from_crop_text',
-            'union_derivation_key','_assert_label_is_text_only',
+            'union_derivation_key','_CROP_TEXT_WITNESS',
             'inputs_cowpea_from_crop_text',
             # GH #1712 (ruling 2026-11-13, "Drop the six")
             '_H_EMPTY_IN_RELEASE','_blank'}
     # ... and the definitions it changed, named exactly and dropped from BOTH sides,
     # so every other definition of malawi.py is still compared byte for byte.
+    # GH #1724 transports the existing text witness across the same harvest,
+    # Farm-level, and seed reductions. It does not modify this pinned baseline.
     changed={'_CROP_TEXT_RECODE','_crop_text_labels','_harvest_block',
              'assemble_crop_production','_CROP_SALE_SOURCES','_crop_pieces',
-             'assemble_plot_inputs'}
+             'assemble_plot_inputs','_consolidate_harvest','_farm_level_sales',
+             '_seed_block'}
     added_imports={'functools'}
     def named(n,names):
         return getattr(n,'name',None) in names or isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id in names for t in n.targets)
