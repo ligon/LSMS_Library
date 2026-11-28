@@ -50,12 +50,18 @@ def _unit_canonicalizer():
     unavailability and raises.  Unmatched unit labels pass through
     unchanged, exactly as `.replace()` does.
     '''
-    from lsms_library.country import _categorical_key_column
+    from pathlib import Path
 
-    org = os.path.join(os.path.dirname(__file__), '..', '..', '_',
-                       'categorical_mapping.org')
+    from lsms_library.country import _categorical_key_column
+    from lsms_library.local_tools import _matches_packaged_categorical_file
+
+    org = Path(os.path.join(os.path.dirname(__file__), '..', '..', '_',
+                            'categorical_mapping.org'))
+    packaged_level = Path('countries') / 'Mali' / '_'
+    encoding = ('utf-8' if _matches_packaged_categorical_file(
+        org, org.parent, packaged_level) else None)
     try:
-        tables = all_dfs_from_orgfile(org, to_numeric=False)
+        tables = all_dfs_from_orgfile(org, to_numeric=False, encoding=encoding)
     except (OSError, ValueError):
         return {}
     tbl = tables.get('u')

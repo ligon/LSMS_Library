@@ -1947,10 +1947,10 @@ def _community_prices_maps(dirs=None):
     sees; a caller running elsewhere (a registry ``inputs`` callable) passes
     the absolute wave and country ``_/`` directories instead."""
     kw = {} if dirs is None else {'dirs': [str(d) for d in dirs]}
-    item_map = tools.get_categorical_mapping(
+    item_map = tools._get_packaged_categorical_mapping(
         tablename='harmonize_food', idxvars='Original Label',
         **kw, **{'Preferred Label': 'Preferred Label'})
-    unit_map = tools.get_categorical_mapping(
+    unit_map = tools._get_packaged_categorical_mapping(
         tablename='u', idxvars='Original Label',
         **kw, **{'Preferred Label': 'Preferred Label'})
     return item_map, unit_map
