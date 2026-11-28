@@ -110,7 +110,7 @@ served as `strata`, because that is what each survey's design or files offer:
 | `strata` holds | Where | `served_strata.holds` |
 |---|---|---|
 | Region x milieu, a registered construction | EHCVM waves of Senegal, Mali, Niger, Burkina Faso, Benin, Togo, Cote d'Ivoire; Guinea-Bissau 2018-19 (2021-22 once it is wired) | `constructed` (Benin, Guinea-Bissau: not recorded yet) |
-| Region x milieu, built in a wave script and not registered | Ethiopia | not recorded |
+| Region x rural/urban, a registered construction | Ethiopia 2011-12 to 2021-22 | `constructed` |
 | Region alone | GhanaLSS 1991-92 onward | not recorded |
 | The file's own stratum, a label | Niger 2011-12 and 2014-15 (region x agro-ecological zone); Uganda 2005-06 to 2010-11 | `native-label` |
 | The file's own stratum, a code | Mali 2017-18 | `native-code` |

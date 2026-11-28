@@ -1,20 +1,48 @@
 # Sampling design record -- HOW this survey's sample was drawn (GH #793).
 #
-# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only
-# the `panel:` block -- does `v` denote the same cluster as in the PRECEDING
-# wave of `Country('Ethiopia').waves`?  The design fields are #793's curation
-# and are not written yet; their absence here is "not curated", not "not
-# found".
+# NO DESIGN FIELDS (GH #942, ruling 2026-10-18, option A): an entry carries the
+# `panel:` block -- does `v` denote the same cluster as in the PRECEDING wave of
+# `Country('Ethiopia').waves`? -- and the `served_strata:` block below, each with
+# its own provenance.  The design fields are #793's curation and are not written
+# yet; their absence here is "not curated", not "not found".
 #
 # Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in
 # {wave-scoped, redefined, mixed} makes a `Country('Ethiopia')` frame that
 # carries `v` across that boundary warn (`ClusterIdentityWarning`); nothing is
 # ever dropped or rewritten.  The first wave (2011-12) has no preceding wave
-# and so no entry.  Vocabulary and field names: see sampling.py.
+# and so no `panel:` block.  Vocabulary and field names: see sampling.py.
+#
+# SERVED STRATA (GH #1577 ruling 2026-11-12; GH #1741): all five waves serve one
+# construction, region x Rural, registered in _/derivations.yml.  It is a tag on the
+# served column, not a reading of the design: no document quoted in CONTENTS.org
+# states that cross.  `confidence: medium` because the build scripts were read and no
+# frame was; tests/test_sampling.py::test_the_tag_agrees_with_the_served_strata checks
+# the frame where the data are held.
 
 Sampling:
 
+  '2011-12':
+    served_strata:
+      holds: constructed
+      derivation: 'Ethiopia::sample::region-rural-stratum'
+      source_type: derived-from-data
+      confidence: medium
+      locator: '_/derivations.yml, Ethiopia::sample::region-rural-stratum; 2011-12/_/sample.py builds it from sect_cover_hh_w1.dta `saq01` and `rural` through ethiopia.derive_region_rural_stratum and stamps it through ethiopia.stamp_region_rural_stratum; CONTENTS.org, "2026-11-25 -- sample.strata is a registered construction (GH #1741)"'
+      note: |-
+        `Urban` is small towns only: ESS1 has no large-town sample (CONTENTS.org,
+        GH #683).  18 occupied cells are recorded for 10 regions x 2; CONTENTS.org's
+        table names one empty cell (Dire Dawa Urban), not the other.
+
   '2013-14':
+    served_strata:
+      holds: constructed
+      derivation: 'Ethiopia::sample::region-rural-stratum'
+      source_type: derived-from-data
+      confidence: medium
+      locator: '_/derivations.yml, Ethiopia::sample::region-rural-stratum; 2013-14/_/sample.py builds it from sect_cover_hh_w2.dta `saq01` and `rural` through ethiopia.derive_region_rural_stratum and stamps it through ethiopia.stamp_region_rural_stratum; CONTENTS.org, "2026-11-25 -- sample.strata is a registered construction (GH #1741)"'
+      note: |-
+        `Urban` pools small towns and large towns, which came from two frames, so
+        the served cell is coarser than the draw (the registry entry).
     panel:
       household_continuity: panel
       cluster_id_continuity: wave-scoped
@@ -45,6 +73,15 @@ Sampling:
       locator: 'CONTENTS.org, "Cluster (PSU) identifier" (ea_id vs ea_id2); slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2.4; re-measured 2026-10-19 through Country("Ethiopia").sample()'
 
   '2015-16':
+    served_strata:
+      holds: constructed
+      derivation: 'Ethiopia::sample::region-rural-stratum'
+      source_type: derived-from-data
+      confidence: medium
+      locator: '_/derivations.yml, Ethiopia::sample::region-rural-stratum; 2015-16/_/sample.py builds it from sect_cover_hh_w3.dta `saq01` and `rural` through ethiopia.derive_region_rural_stratum and stamps it through ethiopia.stamp_region_rural_stratum; CONTENTS.org, "2026-11-25 -- sample.strata is a registered construction (GH #1741)"'
+      note: |-
+        `Urban` pools small towns and large towns, which came from two frames, so
+        the served cell is coarser than the draw (the registry entry).
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
@@ -60,6 +97,15 @@ Sampling:
       locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Ethiopia rows); re-measured 2026-10-19 through Country("Ethiopia").sample(); sample() figure 2026-11-04, CONTENTS.org "W3 households the survey counts as ESS1"'
 
   '2018-19':
+    served_strata:
+      holds: constructed
+      derivation: 'Ethiopia::sample::region-rural-stratum'
+      source_type: derived-from-data
+      confidence: medium
+      locator: '_/derivations.yml, Ethiopia::sample::region-rural-stratum; 2018-19/_/sample.py builds it from sect_cover_hh_w4.dta `saq01` and `saq14` through ethiopia.derive_region_rural_stratum and stamps it through ethiopia.stamp_region_rural_stratum; CONTENTS.org, "2026-11-25 -- sample.strata is a registered construction (GH #1741)"'
+      note: |-
+        A new draw (Panel II): a cell shares its name with a Panel I cell and nothing
+        else is claimed.
     panel:
       household_continuity: independent
       cluster_id_continuity: unobservable
@@ -73,6 +119,14 @@ Sampling:
       locator: 'WB catalog 3823, series_info (quoted in CONTENTS.org, "ESS4 is a NEW panel -- Panel I and Panel II do not link")'
 
   '2021-22':
+    served_strata:
+      holds: constructed
+      derivation: 'Ethiopia::sample::region-rural-stratum'
+      source_type: derived-from-data
+      confidence: medium
+      locator: '_/derivations.yml, Ethiopia::sample::region-rural-stratum; 2021-22/_/sample.py builds it from sect_cover_hh_w5.dta `saq01` and `saq14` through ethiopia.derive_region_rural_stratum and stamps it through ethiopia.stamp_region_rural_stratum; CONTENTS.org, "2026-11-25 -- sample.strata is a registered construction (GH #1741)"'
+      note: |-
+        No Tigray cell: Tigray is outside the represented population (CONTENTS.org).
     panel:
       household_continuity: panel
       cluster_id_continuity: stable
