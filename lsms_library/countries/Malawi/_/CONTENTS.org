@@ -5879,6 +5879,21 @@ Regression coverage: =tests/test_shocks_malawi_iraq_food_effects.py= checks
 independent synthetic answers and missingness, then compares every served
 effect and coping answer to the raw source by household and shock.
 
+* 2026-11-25 -- IHS6 and retained IHPS shocks (GH #1275 and #1556)
+
+The 2024-25 producer serves the Module U effects and coping answers from both IHS6 and the retained IHPS, under the existing household/shock grain.
+The paired cover establishes that all 815 IHPS refresh interviews also occur in IHS6, with the same interview dates and a one-to-one match on 26,080 household/shock keys.
+Their released effects and coping missingness agree, but on 91 records in 67 interviews the Panel export gives a ranked "OTHER (SPECIFY)" code and IHS6 gives a named code at the same rank.
+Keep the IHS6 version of each shared interview, as ruled, without reconciling its answers or interpreting any text.
+
+Module U p. 85 of =ihps_ihs6_household_questionnaire.pdf= asks in U01 about the last five years, whereas =hh_u01= in both released exports is labelled "last 3 Years".
+No recall horizon or all-experience indicator is assigned here.
+U02 separately ranks the three most severe shocks in the last twelve months and routes U03/04 to those.
+The producer keeps =hh_u03d= stocks and =hh_u03e= purchases separate, and the three =hh_u04a/b/c= positions follow the existing #1562 coping rules.
+There are 30,568 answered IHS6 records in 12,183 households and 4,512 answered retained IHPS records in 1,820 households.
+One ranked retained record has no answers in the five effect or three coping fields and is omitted by the existing all-blank payload rule.
+Neither open-ended coping text nor sample weights enter the table.
+
 * 2026-11-08 -- TLU coverage is disclosed; anonymous fertilizer keys remain unresolved (GH #1485)
 
 =tlu= retains its existing factors, returned households and numerical totals.
