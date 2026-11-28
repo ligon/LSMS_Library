@@ -9,12 +9,19 @@ allocation, nutrient-grade, unit-factor or2018 change.
 import sys
 
 sys.path.append('../../_/')
+from lsms_library.ehcvm import served_unit_labels
 from lsms_library.local_tools import (get_dataframe, to_parquet,
                                       get_categorical_mapping, format_id)
 from burkina_faso import i
 from s16b_2021 import build_s16b_candidate
 
 def _write_wave(frame, filename):
+    # The Country read-time table named 'u' does not reach these payload
+    # columns. Use the same vocabulary, retaining their independent roles.
+    for column in ('Unit_purchased', 'Unit_received_as_gift'):
+        labels = frame[column].dropna().unique()
+        frame[column] = frame[column].replace(dict(zip(
+            labels, served_unit_labels('Burkina_Faso', labels))))
     # Keep sanctioned caller inference in this wave, not the country helper.
     return to_parquet(frame, filename)
 

@@ -27,6 +27,7 @@ import sys
 sys.path.append('../../_/')
 import pandas as pd
 
+from lsms_library.ehcvm import served_unit_labels
 from lsms_library.local_tools import (get_dataframe, to_parquet,
                                        get_categorical_mapping)
 from burkina_faso import ehcvm_i
@@ -136,6 +137,12 @@ df = pd.DataFrame({
 })
 
 df = _finish_plot_inputs(df, '2018-19')
+# These payload columns do not meet the read-time table named 'u'. Align
+# their own decoded labels to the served vocabulary without changing the key.
+for column in ('Unit_purchased', 'Unit_received_as_gift'):
+    labels = df[column].dropna().unique()
+    df[column] = df[column].replace(dict(zip(
+        labels, served_unit_labels('Burkina_Faso', labels))))
 
 assert len(df) > 0, 'plot_inputs 2018-19 produced no rows'
 # GH #1123: distinct native input slots must retain distinct declared keys,

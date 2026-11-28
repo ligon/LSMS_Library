@@ -3867,3 +3867,18 @@ set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical co
 - *Read time.*  "Aucune stratégie" is a "did nothing" answer (=_/coping.yml=): alone it is the set,
   beside a real strategy it leaves the set and keeps its position.  2014 uses it to fill later slots
   after a strategy (146 rows): those positions are kept as recorded, per the ruling.
+
+* 2026-11-25 -- =plot_inputs= acquisition-unit spelling (GH #1740)
+
+The name-matched read-time =u= table reaches only the used-unit index.
+The two acquisition columns now use that same served vocabulary, after decoding each question against its own labels.
+Do not match the fields by numeric code.
+For example, 2018-19 code 5 means =Charrettée= for use (3,889 applied rows), but =Charrette= for purchase (132) and gift (397).
+Those reported distinctions are not folded.
+
+On the two committed s16b providers the 2018-19 and 2021-22 builders emit 22,877 and 12,223 applied rows.
+Before this change, the shared observed units had the same spellings within each role across waves, but the used index served =Kg= while both acquisition fields served =Kilogramme=.
+The only changed cells are purchase 5,197 and gift 331 in 2018-19, and purchase 1,122 and gift 53 in 2021-22.
+All are affirmative answers with positive quantities.
+Quantities, flags, missing values, 2021 raw operands and the used-unit index are unchanged.
+This does not harmonize carts or sacks, change the 2021 panel-only coverage, or add parcel allocation.
