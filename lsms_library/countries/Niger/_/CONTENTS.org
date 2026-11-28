@@ -3464,6 +3464,52 @@ default or public API changed; whole GH1555 remains open.
 Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1555-held-protocol-followup-20261109/REPORT.md=;
 original diagnosis and its independent review remain separate.
 
+** Published Designer menus and distinct market weights (GH #1555)
+
+The public UEMOA catalogue 48 household Designer exports
+([[https://phmecv.uemoa.int/nada/index.php/catalog/48/download/191#page=227][Vague 1, PDF pp.227–231]] and
+[[https://phmecv.uemoa.int/nada/index.php/catalog/48/download/192#page=228][Vague 2, PDF pp.228–232]])
+show Section 16C nested by field, parcel and crop. The outer section
+gates differ (=s00q24a!=null= versus =s16Aq00==1 && visite2==2=).
+The interview visit is distinct from the catalogue Vague. Within
+both sections Q16C.12a is a positive decimal amount already
+harvested, enabled when harvest is
+finished or reported remaining area is below 100 percent. Vague 2
+adds Q16C.10 code 03 =Réponse nulle=, which is unlabeled in v03. This
+printed status is not a measured zero or a quantity missing code. The
+unit and harvest state boxes follow a positive amount. Q16C.16a–c instead
+ask the amount already sold and its own unit and state, on the sale
+path. Q16C.16c is a state here, not estimated kilograms.
+
+Both exports print nine unit choices, including 7 Botte, 8 Tia and
+9 Autre, and state 5 Non concerné on both the harvest and sale cards.
+These agree with the substantive menus in the public
+[[https://microdata.worldbank.org/metadata/export/4296/ddi][WB4296 v03 F32 dictionary]],
+unlike the seven-unit and Entier cards of the held workbooks above.
+The booklet findings therefore differ by document type. They do not
+identify the instrument deployed or match v03 data bytes to an earlier
+edition. The printed Q16C.12a amount uses =campagneAgricole=, which
+PDF p.6 sets to 2017/2018 in Vague 1 and 2018/2019 in Vague 2.
+The public v03 harvest amount label has only 2017/18. Preserve this
+literal discrepancy without assigning a new reference year to rows.
+
+The separate [[https://phmecv.uemoa.int/nada/index.php/catalog/48/download/197#page=4][Niger NSU Designer collection]]
+prints 2016/2017 on its market and cereals covers (PDF pp.3 and 13)
+and identifies markets on p.4. A printed cover is not a measurement
+date or proof of the operation described in the 2018–19 reports. Its millet section
+([[https://phmecv.uemoa.int/nada/index.php/catalog/48/download/197#page=71][PDF pp.71–73]])
+uses market codes 110 Botte and 512 Tiya and asks prices and weight in
+grams by its own measurement and size choices. Those are not the
+Section 16C unit codes. The inspected printouts supply no binding
+between that operation and a kilogram factor per one harvested unit
+at the applicable crop, harvest state and geography.
+
+Obtain the exact fielded household revision and export rule for each
+Vague and an authoritative harvest-specific factor or documented
+bridge. Keep the recorded kilogram route and unsupported nonmetric
+rows unchanged. Do not borrow the market units, the sold state or
+another wave's capacity. No native rows were read or counts repeated.
+
 * 2026-11-09 -- Native cultivation and payment operands (GH #1529)
 
 The 2011-12 =cultivation_records= table now transports the complete own3B
