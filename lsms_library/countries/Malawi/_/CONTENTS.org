@@ -1,6 +1,37 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* 2026-11-27 -- Nseula is documented as cowpea; survey routing unchanged (GH #1228)
+
+The [[https://docs.dcafs-tipdep-donors-mw.org/dt_docs/DOC20230307082517.pdf#page=150][Guide to Agricultural Production]] (PDF subject =GAP 2012 Merged edition 3=,
+printed p151, §3.2.6) uses Nseula for determinate cowpea (=Vigna unguiculata=)
+and uses the name for cultivar Sudan 1 in its planting guidance. The
+[[https://www.tropentag.de/2006/abstracts/links/Malidadi_BaGY0fVK.pdf][Malidadi and Maass 2006 Malawi field trial]] treats its Nseula and Sudan trial
+entries separately. Both attest cowpea, not a particular cultivar in the
+survey, harvested part, condition or conversion factor. The harmonized
+=Cowpea (Khobwe)= label is not a statement that the two local types are identical.
+
+The NSO's 2010-11 IHS3 =AG_MOD_G.ag_g0d_os= public category card lists 79
+=NSEULA= and 8 =MSEWULA= among 476 valid responses to the field. The
+[[https://microdata.worldbank.org/catalog/1003/variable/F36/V1278?name=ag_g0d_os][World Bank card]] (=MWI_2010_IHS-III_v01_M=) and [[https://microdata.fao.org/index.php/catalog/1417/variable/V1278][FAO card]]
+(=MWI_2010-2011_IHS-W3_v01_EN_M_v01_A_OCS=) agree on all 40 category counts.
+These are field frequencies, not population estimates or independent survey
+measurements. Neither tabulates text by the recorded crop code. Do not
+substitute 79 public entries for the historical 77 in the screened code-48
+cohort described below, or infer why they differ. The separately documented
+2016-17 XS =COWPEAS(NSEULA)= in =ag_d20_oth= is a later Module D observation
+and remains outside that wave's exact rule.
+
+This supersedes only the earlier absence of a cited identity for =NSEULA=.
+The smallest prospective decision is the crop display label on own 2010-11
+Full_Sample G text exactly =NSEULA= after existing normalization on native
+code 48. It needs the recorded-code and text cross-tab and a check of sale
+attachment, row keys, and quantities before any change. Do not add a shared
+alias to the later Module D route. No mapping changes here. =MSEWULA= is not
+treated as a spelling variant, =NKHOBWE= is not resolved by =Khobwe=, the six
+conflicting Module G codes stay as released, and =MPHODZA= in Module I needs
+its own sale evidence.
+
 * 2026-11-13 -- GH #1228 later waves: the season, the Module D join, and the registered relabel
 
 Rulings @ligon 2026-11-12 ("Join D, single-text only") and 2026-11-13, after the red
@@ -1265,9 +1296,9 @@ lines are now named, next entry; this reading still holds for 2016-17 and 2019-2
 The ruling is the smallest step.  Of 2010-11's 328 code-48 G lines, 157 say exactly
 =COWPEAS= in =ag_g0d_os= (=malawi._CROP_TEXT_RECODE=; no other spelling occurs on
 code 48 in that wave), and they are served =crop = 'Cowpea (Khobwe)'=.  Everything
-else stays =Other=: the other 171 in 2010-11 (=NSEULA= 77 and =MSEWULA= 8 among
-them, which no source names), 2013-14 (no text held), and 2016-17 and 2019-20, whose
-names are only in Module D.
+in the 2010-11 code-48 cohort stayed =Other= under this ruling (171 lines, including
+77 =NSEULA= and 8 =MSEWULA=). See the 2026-11-27 note for =NSEULA= species
+evidence and the 2026-11-13 note for the later-wave ruling.
 
 *No crop code is reserved.*  The instrument has none, and the #1228 diagnostic says
 absence from a label table is not absence from the namespace, so only the LABEL
