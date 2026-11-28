@@ -3303,6 +3303,49 @@ With #1487 a lone request serves the all-waves column.  =KgFactorSource=, =surve
 
 *GH #1451, measured here, not served.*  The 176 bare 2018-19 rows (=Litre= / =Grand= 175, =Kg= / =Grand= 1) cannot be sized from this table: it, like the other three countries', holds =Kg= and =Litre= at =taille unique= only, and =Kg= and =Litre= stay on their labels, here too now that 2018-19 reads the table.  The 175 are =Jus de fruits= (130) and =Vinaigre /moutarde= (45), median 2.0 L, with no size-free row of the same product and unit to compare them with.  Serving them as =Litre (Grand)= needs the kg ladder to read a metric base under a size, which is =transformations.py=; see #1451.
 
+** 2026-11-28 -- GH #1451: published metric-size filters and separate weighing
+
+The own Burkina 2018–19 household Designer PDFs give the full Category
+Filters in Appendix F for spices and beverages:
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/98#page=291][Vague 1, PDF pp. 291–292]] and
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/99#page=294][Vague 2, PDF pp. 294–295]].
+For a product present in =unitesTaillesValides=, the unit menu uses that
+product's listed units. The size menu then requires the exact product, unit
+and size combination. For a product absent from the table, the unit menu
+keeps its listed choices and the size filter looks for the selected unit
+and size across the whole lookup. The consumption size uses =7B.03b= as its
+unit. The last-purchase size uses =7B.07b= instead. The question pages for
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/98#page=109][Vague 1 (PDF pp. 109–112)]] and
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/99#page=110][Vague 2 (PDF pp. 110–113)]]
+list category =03 Grand= before filtering. That list does not show whether
+=Grand= was offered for litres of a given product.
+
+The [[https://microdata.worldbank.org/metadata/export/4290/ddi][4290 v04 DDI]]
+lists code 101 in the consumption and purchase unit cards, F22/V770 and
+V776, with 6,054 and 4,784 occurrences but no explicit category label on
+those cards. The beverage question pages and =F54_V1743= in the 2018
+=ehcvm_nsu_conso_bfa2018= dictionary call 101 =Litre=. Size code 3 is =Grand=
+in the separate size
+cards, V771 and V777. These are marginal counts, not a unit-by-size
+cross-tabulation or a new measurement of the 176 earlier records. Product
+card V767 labels 125 as vinegar/mustard and 133 as fruit juice.
+
+The household PDFs are Designer exports generated in February 2020, not
+proof of the deployed version or of any lookup row. To adjudicate what was
+offered, obtain the exact =unitesTaillesValides= rows for the two passages,
+bound to the deployed questionnaire revision and matching release. The
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/102#page=9][separate 2016/17 NSU market instrument, PDF pp. 4 and 9]]
+records weight in grams, not category eligibility. The conversion table
+previously checked for #1452, =ehcvm_nsu_bfa2021=, supplies only size-free
+metric calibration. It is distinct from the 2018 NSU dictionary above.
+Neither a permitted =Grand= answer nor the size label itself establishes
+a physical conversion for a sized unit.
+
+Keep the ruled bare display and current conversion unchanged. A future
+display choice and a defensible size-specific factor are separate decisions.
+No survey rows, lookup payload, or calibration records were opened here.
+
+
 * 2026-11-07 — own sold condition, 2018-19 (GH1528)
 The 2018-19 s16c sold answer s16cq16c (16C.16c.Etat du produit) is
 separate from harvest s16cq12c. Its own released dictionary is 1 Epis, 2 Grain,
