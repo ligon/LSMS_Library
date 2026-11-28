@@ -1413,7 +1413,7 @@ def _hh_sale_answer_columns(spec):
             if spec.get(k) is not None]
 
 
-def _hh_crop_sale_frame(raw, dec, spec, crop_labels):
+def _hh_crop_sale_frame(raw, dec, spec, crop_labels, *, unit_override=None):
     """The records of one A3.ii file that record a SALE, one row per record.
 
     A sale is a record with a positive sold quantity or a positive sale value.
@@ -1452,16 +1452,23 @@ def _hh_crop_sale_frame(raw, dec, spec, crop_labels):
         factor = factor.where(factor > 0)
     else:
         factor = pd.Series(np.nan, index=raw.index, dtype='float64')
+    sold_unit = _canon_units(
+        dec[spec['unit']],
+        where=f"crop_production {spec['fn']} {spec['unit']}",
+        disposition='served with Unit_sold NA')
+    if unit_override:
+        # #1721 (ledger section 2): the W3 sale has its own raw unit code.
+        # Change only the label, never the raw grouping key or factor.
+        raw_unit = pd.to_numeric(raw[spec['unit']], errors='coerce')
+        override_labels = raw_unit.map(unit_override)
+        sold_unit = sold_unit.mask(override_labels.notna(), override_labels)
     out = pd.DataFrame({
         'i': raw['hhid'].apply(format_id).astype('string').values,
         'crop': crop.values,
         'source_row': source_row.values,
         'Quantity_sold': q.values,
         'Value_sold': v.values,
-        'Unit_sold': _canon_units(
-            dec[spec['unit']],
-            where=f"crop_production {spec['fn']} {spec['unit']}",
-            disposition='served with Unit_sold NA').values,
+        'Unit_sold': sold_unit.values,
         'KgFactor_sold': factor.values,
         '_unit_key': unit_key.values,
     }, index=raw.index)
@@ -1481,7 +1488,8 @@ def hh_crop_sale_records(folder, crop_labels=None):
     dec = get_dataframe(fn, convert_categoricals=True)
     return _hh_crop_sale_frame(
         raw, dec, spec,
-        _crop_labels_from_anywhere() if crop_labels is None else crop_labels)
+        _crop_labels_from_anywhere() if crop_labels is None else crop_labels,
+        unit_override=W3_HARVEST_UNIT_OVERRIDE if folder == '2015-16' else None)
 
 
 def derive_hh_crop_sale_attachment(records, served):
