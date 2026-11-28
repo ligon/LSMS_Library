@@ -676,7 +676,10 @@ Burkina_Faso::crop_production::crop-code-from-roster-text:
     records all sit with s16c code-65 lines), and its rows carry no key, being a source
     label.  The file's own Precisez field s16cq03_autre agrees: it is filled on 38 of 38
     code-65 lines and on 0 of 59 code-55 lines.  Every remaining code keeps the harvest
-    file's own label (mapping.derive_crop_code_label).
+    file's own label (mapping.derive_crop_code_label); four of them (3, 8, 9, 27) are then
+    served in s16d's and 2018-19's spelling by a display alias bound to code and label
+    (mapping.CROP_DISPLAY_ALIASES, GH #1723), which is a source label of the same code and
+    carries no key.
   function: lsms_library.countries.Burkina_Faso.2021-22._.mapping:derive_crop_code_label
   inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_crop_code_from_text
   raw_variables: [s16cq04, s16cq03b, s16cq03_autre, s16dq01]

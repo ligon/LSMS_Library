@@ -315,7 +315,8 @@ def shocks(df):
 # by label, 332 of the 1,548 sales find no line, by code none.
 #
 # The served label is the harvest file's own, through harmonize_food as in 2018-19,
-# except:
+# except (and but for the four display aliases of CROP_DISPLAY_ALIASES, GH #1723,
+# applied to the decoded label AFTER this selection and never to a join):
 # * 55, 58 and 64, whose s16c label is wrong or absent, take the label the file's own
 #   roster text gives them (CROP_CODES_FROM_TEXT, registered as
 #   Burkina_Faso::crop_production::crop-code-from-roster-text);
@@ -339,6 +340,29 @@ CROP_OBS_NA = 'unresolved_observation'
 #: codes come from (Mali, Togo, Benin, Senegal).  Ruling default (coordinator, 2026-11-13,
 #: "labelled from the file's own free text", basis derived-from-data).
 CROP_CODES_FROM_TEXT = {55: 'Anacarde', 58: 'Banane douce', 64: 'Soja'}
+
+#: Display aliases, 2021-22 only (GH #1723; ruling @ligon 2026-11-25, "Align all four crop
+#: labels"): ``{code: (the label the code decodes to, the label served)}``.  s16c carries
+#: the labels of the list that ends at 55; for these four codes s16d's own value label and
+#: 2018-19's served spelling are the right-hand word (_/CONTENTS.org, the 2026-11-13 table),
+#: so 2021-22 serves it and a crop keeps one spelling across the two EHCVM waves and
+#: across plot_inputs' seed crops (GH #1119).  An alias is bound to the CODE and to the
+#: decoded label together: it renames nothing else, changes no code, join, quantity,
+#: Derivation key or raw answer, and is applied in _crop_label_table only, the one table
+#: the builder and every `inputs_` helper read.  Not a registered derivation: no value is
+#: computed, and the served word is a source label of the same code, as for code 65.
+CROP_DISPLAY_ALIASES = {
+    3: ('Riz', 'Riz Paddy'),
+    8: ('Niébé/Haricot', 'Niébé'),
+    9: ('Voandzou (pois de terre)', 'Voandzou'),
+    27: ('Laitue (salade)', 'Laitue'),
+}
+
+
+class CropAliasError(Exception):
+    """A display alias met a label it is not bound to, or would fold two codes into one
+    crop.  An ``Exception`` and no builtin subclass, so no handler reads it as absence."""
+
 
 #: The four s16d dispositions, each with its quantity <var>a and unit <var>b.
 _DISPOSITION_UNITS = ('s16dq02b', 's16dq03b', 's16dq05b', 's16dq13b')
@@ -419,12 +443,61 @@ def derive_crop_code_label(code, harvest_labels, record_labels):
     return _qualified('s16cq04', code)
 
 
+def _crop_display_aliases(decoded, harvest_labels, record_labels):
+    """``decoded`` (``{code: label}`` from derive_crop_code_label) with the four display
+    aliases of CROP_DISPLAY_ALIASES applied (GH #1723).  Each alias is bound to its code
+    AND the label that code decodes to:
+
+    * a code the wave does not hold is skipped, and the same word on any other code is
+      left alone;
+    * a code already decoding to the served word is left as it is;
+    * a code decoding to anything else, or labelled by s16d with a third word, is refused
+      (a silent pass would split the crop across waves again);
+    * an alias whose served word is the decoded label, or either file's own label, of a
+      DIFFERENT code is refused: it would fold two codes into one crop.
+
+    Codes 55, 58, 64 and 65 are not aliased and may not be: their labels are settled by
+    derive_crop_code_label."""
+    special = sorted(set(CROP_DISPLAY_ALIASES) & (set(CROP_CODES_FROM_TEXT) | {65}))
+    if special:
+        raise CropAliasError(f'crop display alias on a specially labelled code: {special}')
+    out = dict(decoded)
+    for code, (expected, served) in CROP_DISPLAY_ALIASES.items():
+        if code not in decoded:
+            continue
+        label = decoded[code]
+        other_file = record_labels.get(code)
+        if label not in (expected, served) or other_file not in (None, expected, served):
+            raise CropAliasError(
+                f'crop code {code}: the alias is bound to {expected!r}, but the code '
+                f'decodes to {label!r} (s16d: {other_file!r})')
+        clash = sorted(c for c in set(decoded) | set(harvest_labels) | set(record_labels)
+                       if c != code and served in (decoded.get(c), harvest_labels.get(c),
+                                                   record_labels.get(c)))
+        if clash:
+            raise CropAliasError(
+                f'crop code {code}: {served!r} already names code(s) {clash}; the alias '
+                'would fold two codes into one crop')
+        out[code] = served
+    return out
+
+
 def _crop_label_table(harvest_labels, record_labels, food_map):
-    """``{code: served crop label}`` for the wave, through harmonize_food."""
-    table = {}
-    for code in sorted(set(harvest_labels) | set(record_labels) | set(CROP_CODES_FROM_TEXT)):
-        label = derive_crop_code_label(code, harvest_labels, record_labels)
-        table[code] = food_map.get(label, label)
+    """``{code: served crop label}`` for the wave: the decoded label, its display alias
+    where one is bound (GH #1723), then harmonize_food, as 2018-19 passes its own."""
+    codes = sorted(set(harvest_labels) | set(record_labels) | set(CROP_CODES_FROM_TEXT))
+    decoded = _crop_display_aliases(
+        {code: derive_crop_code_label(code, harvest_labels, record_labels) for code in codes},
+        harvest_labels, record_labels)
+    table = {code: food_map.get(label, label) for code, label in decoded.items()}
+    # harmonize_food (which passes the four served words through today, as it does for
+    # 2018-19) may not fold an aliased crop onto another code's.
+    for code in CROP_DISPLAY_ALIASES:
+        shared = sorted(c for c, label in table.items()
+                        if code in table and c != code and label == table[code])
+        if shared:
+            raise CropAliasError(
+                f'crop code {code}: served {table[code]!r} is also code(s) {shared}')
     return table
 
 
