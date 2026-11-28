@@ -2899,7 +2899,26 @@ def categorical_level_table_file(level: str | Path, tablename: str) -> Path | No
     return hits[0] if hits else None
 
 
-def load_categorical_level(level: str | Path, *, on_unreadable: Any = None
+def _matches_packaged_categorical_file(path: Path, level: Path, packaged_level: Path) -> bool:
+    """Recognize the corresponding installed file, or its unchanged copy."""
+    if packaged_level.is_absolute():
+        return False
+    try:
+        package = global_categorical_level().resolve(strict=True)
+        reference_level = (package / packaged_level).resolve(strict=True)
+        if not reference_level.is_relative_to(package):
+            return False
+        reference = (reference_level / path.relative_to(level)).resolve(strict=True)
+        if not reference.is_relative_to(reference_level):
+            return False
+        return path.samefile(reference) or path.read_bytes() == reference.read_bytes()
+    except (OSError, RuntimeError):
+        # Missing or inaccessible authority does not change the old reader policy.
+        return False
+
+
+def load_categorical_level(level: str | Path, *, on_unreadable: Any = None,
+                           packaged_level: Path | None = None
                            ) -> dict[str, pd.DataFrame]:
     """Every table one level declares, keyed by ``#+name:``.
 
@@ -2907,13 +2926,21 @@ def load_categorical_level(level: str | Path, *, on_unreadable: Any = None
     same conflict rule.  ``on_unreadable(path, exc)``, if given, is called for
     a file the org reader cannot parse and that file is skipped (the
     package-global level has always skipped such files); otherwise the parse
-    error propagates.
+    error propagates. ``packaged_level`` names the corresponding level
+    relative to the imported package. Only files matching its installed
+    resources use explicit UTF-8; custom and unqualified levels keep
+    the process default.
     """
     tables: dict[str, pd.DataFrame] = {}
     source: dict[str, Path] = {}
+    level = Path(level)
     for path in categorical_mapping_files(level):
         try:
-            found = all_dfs_from_orgfile(path)
+            if packaged_level is not None and _matches_packaged_categorical_file(
+                    path, level, packaged_level):
+                found = all_dfs_from_orgfile(path, encoding="utf-8")
+            else:
+                found = all_dfs_from_orgfile(path)
         except (ValueError, OSError, pd.errors.ParserError) as exc:
             if on_unreadable is None:
                 raise
