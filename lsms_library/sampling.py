@@ -117,7 +117,7 @@ import yaml
 from .derivations import format_key as _format_derivation_key
 from .derivations import parse_key as _parse_derivation_key
 from .paths import countries_root
-from .yaml_utils import SchemeLoader
+from .yaml_utils import UniqueKeySchemeLoader
 
 __all__ = [
     "ATTRS_KEY",
@@ -1072,8 +1072,12 @@ class _NonCanonicalIntError(ValueError):
 _CANONICAL_INT = re.compile(r"-?(0|[1-9][0-9]*)")
 
 
-class _SamplingLoader(SchemeLoader):
-    """``SchemeLoader`` with one change: integers must be plain decimal.
+class _DuplicateSamplingKeyError(ValueError):
+    """A repeated explicit key in a sampling configuration mapping."""
+
+
+class _SamplingLoader(UniqueKeySchemeLoader):
+    """Refuse repeated mapping keys and require integers to be plain decimal.
 
     PyYAML implements YAML 1.1, which reads ``012`` as octal 10, ``0x10`` as
     16, ``1_493`` as 1493 and ``1:30`` (sexagesimal) as 90 -- silently.  A
@@ -1081,6 +1085,11 @@ class _SamplingLoader(SchemeLoader):
     not an octal literal: refused at load (GH #1135 red team), as a config
     bug, not swallowed as an unreadable file.
     """
+
+    def _duplicate_key_error(self, key, first, repeated):
+        return _DuplicateSamplingKeyError(
+            f"line {repeated.line + 1}: duplicate key {key!r} "
+            f"(first declared at line {first.line + 1}).")
 
 
 def _construct_canonical_int(loader: yaml.SafeLoader, node: yaml.Node) -> int:
@@ -1122,14 +1131,21 @@ def sampling_records(country: str) -> dict[str, SamplingRecord]:
     try:
         with open(path, "r", encoding="utf-8") as fh:
             data = yaml.load(fh, Loader=_SamplingLoader) or {}
-    except _NonCanonicalIntError as exc:           # a config bug: refuse
+    except (_DuplicateSamplingKeyError, _NonCanonicalIntError) as exc:
         raise ValueError(f"{path}: {exc}") from None
     except Exception as exc:                       # unreadable / invalid YAML
         warnings.warn(f"could not read {path}: {type(exc).__name__}: {exc}")
         return {}
     blocks = data.get("Sampling") or {}
-    return {str(wave): SamplingRecord.from_config(country, str(wave), block)
-            for wave, block in blocks.items()}
+    normalized = {}
+    for raw_wave, block in blocks.items():
+        wave = str(raw_wave)
+        if wave in normalized:
+            raise ValueError(f"{path}: duplicate wave {wave!r} after converting "
+                             "wave keys to strings.")
+        normalized[wave] = block
+    return {wave: SamplingRecord.from_config(country, wave, block)
+            for wave, block in normalized.items()}
 
 
 # ---------------------------------------------------------------------------
