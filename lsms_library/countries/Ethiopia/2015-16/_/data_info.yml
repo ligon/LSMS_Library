@@ -18,6 +18,11 @@ Wave: 2015-16
 # for this wave (see _/CONTENTS.org).  Verified unique and blank-free in BOTH
 # frames (4,954 / 4,954 rows, 0 keys duplicated in both).
 cluster_features:
+    # GH #1288: the cluster hook reads these beyond the YAML subframes.
+    locating_covers:
+        file:
+            - sect_cover_pp_w3.dta
+            - ../../2013-14/Data/sect_cover_hh_w2.dta
     dfs:
         - df_main
         - df_geo

@@ -152,3 +152,22 @@ def test_cluster_only_adds_missing_eas_and_joins_geo_by_household(eth,monkeypatc
     assert out.index.tolist()==list(df.index)+[('2018-19','N','d'),('2018-19','N','f')]
     assert out.Latitude.tolist()[:3]==[1.,2.,12.]
     assert pd.isna(out.Latitude.iloc[3]) and pd.isna(out.Longitude.iloc[3])
+
+
+@pytest.mark.parametrize('year', ['2011-12', '2013-14', '2015-16', '2018-19', '2021-22'])
+def test_cluster_hook_sources_are_in_wave_and_country_input_declarations(eth, year):
+    from lsms_library import Country
+    from lsms_library.local_tools import _collect_file_paths_from_block, source_fingerprint
+
+    wave = Country('Ethiopia', preload_panel_ids=False)[year]
+    root = wave.file_path.parent
+    spec = eth.CLUSTER_AGRICULTURE_SOURCES[year]
+    hook_sources = [(year, spec['cover']), (year, spec['agri']), (year, spec['geo'][0])]
+    hook_sources += list(spec.get('crosswalk', ()))
+    required = {root / y / 'Data' / f for y, f in hook_sources}
+    declared = {
+        (wave.file_path / 'Data' / f).resolve()
+        for f in _collect_file_paths_from_block(wave.resources['cluster_features'])
+    }
+    assert required == declared
+    assert all(source_fingerprint(f).startswith('dvc:') for f in declared)

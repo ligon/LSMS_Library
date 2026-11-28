@@ -18,6 +18,9 @@ Wave: 2021-22
 # 4,890 rows.  It was the KEY that was wrong, not the data -- so this is wired
 # up, NOT marked optional.  Joining on household_id lets the cover supply v.
 cluster_features:
+    # GH #1288: the cluster hook reads these beyond the YAML subframes.
+    locating_covers:
+        file: sect_cover_pp_w5.dta
     dfs:
         - df_main
         - df_geo

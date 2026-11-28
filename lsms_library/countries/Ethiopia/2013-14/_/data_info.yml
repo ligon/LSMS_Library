@@ -21,6 +21,9 @@ Wave: 2013-14
 # 0 keys duplicated in both).  This matches the wave's v (ea_id2) and the
 # i that sample/household_roster emit -- see _/CONTENTS.org.
 cluster_features:
+    # GH #1288: the cluster hook reads these beyond the YAML subframes.
+    locating_covers:
+        file: sect_cover_pp_w2.dta
     dfs:
         - df_main
         - df_geo
