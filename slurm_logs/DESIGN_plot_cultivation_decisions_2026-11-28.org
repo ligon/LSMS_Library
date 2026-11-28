@@ -1,0 +1,287 @@
+#+TITLE: Plot cultivation: preserve reported decision roles by plot and season
+#+DATE: 2026-11-28
+
+* Status and recommendation
+
+Design proposal for GH #862 under #167 and #439, not a registration or a
+commitment to ship the table. Keep the after-defect-queue implementation
+order. Review the proposed contract first. If accepted, Uganda 2015–16
+is the first candidate, conditional on its own release-specific person,
+plot and branch validation. No country is cleared for implementation by
+this note.
+
+Keep the plot-season as the parent and use a *separate actor relation*.
+The older =DESIGN_erhs_plot_features_2026-05-20.org= reserves
+=plot_cultivation= for seasonal plot detail and illustrates crop rows
+with =crop_seq=. A crop occurrence and a reported decision reference are
+not the same grain. Recommend reserving =plot_cultivation= for seasonal
+plot/crop detail and explicitly naming the actor relation
+=plot_cultivation_decisions=. This is a naming proposal, not a second
+registration. If review instead assigns =plot_cultivation= to the actor
+relation, give any future crop occurrence relation its own name and retain
+the same separation. Do not retrofit =plot_features=, repurpose Niger's
+=cultivation_records= (raw household/observation grain), or multiply
+each actor by every crop on that plot.
+
+Use the owner-expansion precedent from
+=DESIGN_lsms_plus_individual_disaggregation_2026-06-14.org= only for
+preserving distinct people and roles. It does not make an interviewer-
+selected plot respondent the decision-maker, turn a slot into a rank,
+or imply private self-report. This proposal is not an ownership,
+sex-of-decision-maker, consent, legal-rights or input-allocation output.
+
+* Proposed source and serving contracts
+
+** Observation accounting before serving
+
+Start from one verified native agricultural observation key per
+country, edition, physical source block and household/plot. Bind the
+section's slot fields to that observation and record the release, source
+block, visit, branch, role, slot and decision domain as separate operands.
+Do not infer identity from interleaving, stable-looking row numbers,
+DDI extrema or coincident numeric codes. Preserve raw rows and slots
+losslessly in private reconciliation. An exact-file row ordinal can
+locate evidence in the same bytes, not identify an episode across
+versions. Repeated native parent keys are an unresolved serving problem
+unless an authoritative stable source coordinate distinguishes them.
+
+Account for every candidate slot before projection, including not asked
+by the printed route, eligible blank, unresolved route, nonblank off
+branch, unresolved identity/season, verified identity and explicit
+source conflict. Do not make totals from public DDI marginals or equate
+blank, unchecked and No. A nonblank slot with a null, nonmatching or
+ambiguous roster bridge is unresolved source evidence. It is not a
+person key or a synthetic household-head row. Keep its source evidence
+in bounded private reconciliation and report counts by approved
+country/wave/module/status. Public actor rows cover verified reported
+participants only, not all decisions, all plots or everyone responsible
+for cultivation. A plot with no actor row is not a known negative.
+Before serving any partial pilot, review which unresolved statuses may
+remain and how the resulting coverage is disclosed. Distinguish a
+reference proven absent from its applicable roster from an unverified
+namespace, unavailable roster or missing response. Absent review, a
+source error or unresolved release mapping keeps the affected scope held.
+
+** Proposed actor grain
+
+=(t, v, i, plot_id, season, decision_domain, pid, role, role_slot)=
+for the Country result, with =country= prefixed by Feature. Retain =v=
+under the ordinary sample-join policy, using the canonical plot axis
+=plot_id=, not an automatic textual translation of any source plot number.
+Do not use =v= as a roster-identity operand. Bind =pid= to its verified
+same-wave roster namespace before the normal API-time alignment. If the
+ordinary sample join cannot supply required =v=, treat the scope as held
+instead of dropping actors or borrowing a cluster.
+
+The substantive relation in #862 is plot × season × person × role.
+=decision_domain= and =role_slot= preserve observations lost by that
+projection. A reported person can occupy two slots with the same role,
+or contribute to both crop choice and input use. Keep both reports
+until an explicitly requested analytic projection. Slots are literal
+reported positions, not ordered shares, scores or priorities. The role
+says what the question means, for example sole decision-maker, joint
+decision-maker, primary decision-maker or consulted member. A domain
+may be a combined management question rather than a single action.
+Never manufacture distinct decision-domain rows from one combined
+answer. Check source and public uniqueness before reduction, even if repeated
+rows agree. The current =most_complete_row= reducer can still discard
+a distinct report if its identity level is lost. Do not depend on a
+post-projection row count to recognize this.
+
+A =season= is a supported wave-local agricultural reference key, not a
+physical module, recorded interview date, elapsed period or inferred
+season from another table. Uganda can retain A/B as local encoded season
+keys only alongside the documented reference mapping for the two
+management blocks. Module and visit also travel separately. Preserve
+reference year and season meaning as explicit provenance, not a
+cross-country calendar category. If a season cannot be resolved,
+do not publish an actor row in this first *seasonal* schema. A later
+non-null unknown-season sentinel or a separate unseasoned observation
+product would require its own review and cannot be an equivalence join
+key. Avoid null index coordinates and don't let a default sentinel
+supply missing identities.
+
+** Disclosure and joins
+
+Roster enrichment is a validated left many-to-one join on the proven
+in-scope person namespace, with counts for unmatched, multiply matched
+and out-of-universe references. Use native interview scope where source
+IDs require it and check the final bridge to the served roster
+separately. Retain =t= and =i= even if a file claims globally unique
+person IDs. Keep household head, plot respondent, consulted person,
+owner and external network role in their actual domains. A later
+gender-summary transform may specify a fallback if approved and labelled
+as derived. It is not a stored actor or evidence for who decided.
+
+An identical spelling of =plot_id= or a shared A/B token is not a
+cross-table join contract. A lasting plot may need a many-to-one
+own-wave bridge from a subdivision to the library's parcel key.
+Another plot/season/crop table can have multiple outputs, conditions
+or observations per native plot-season. Verify the keys, temporal
+reference and intended many-to-many cardinality before making any
+explicit actor-to-crop link. Do not assume that crop-level costs, area,
+amounts or yield are person-level quantities. The first pilot supplies
+no default join or imputation.
+
+* Evidence-bound starting points
+
+** Uganda 2015–16: first candidate, not yet admitted
+
+The [[https://microdata.worldbank.org/catalog/3460/download/46595][UBOS agriculture form, PDF pp.7 and 15]] prints AGSEC3A
+as visit 1, second cropping season of 2014, and AGSEC3B as visit 2,
+first cropping season of 2015 for these management questions. The
+[[https://microdata.worldbank.org/catalog/3460/download/46598][producer BID, PDF pp.15–18]]
+corroborates the visit/file separation and the intended season windows
+in its main agricultural descriptions. Localized inconsistent year or
+season wording in the BID and the separate Section 5 crop-production
+form must not be normalized away. Existing library A/B tokens are
+source-letter conventions, not universal calendar seasons.
+
+Q3.1 is the respondent. Q3.2 codes 1 as Single and 2 as Multiple.
+Single selects Q3.3, the sole primary report, while Multiple selects
+the unranked Q3.4a/Q3.4b references. This is one combined plot-management
+domain spanning timing, crop choice and input use. Do not take the union
+of all populated columns. The [[https://microdata.worldbank.org/catalog/3460/data-dictionary/F9][public B dictionary]]
+shows 3,886 Multiple answers but 3,888 reported-valid first multiple
+slots. If those summaries refer to the same cases, at least two valid
+cells cannot be in the Multiple branch. This is a bound on card
+marginals, not an attribution to specific records or proof about
+valid person IDs. Resolve branch/carrier, missing codes and off-branch
+reports from the exact release before serving.
+
+Use current native household, parcel and plot fields
+(=HHID=, =parcelID=, =plotID=) on the two core files. Verify exact
+case grain, version and lineage to the existing Uganda agricultural
+plot key. It uses the native household inside the plot key even when
+the public household walk changes =i=. Do not reconstruct that key from
+walked =i=. The existing =plot_features= uses AGSEC2A/B parcel suffixes
+for owned or use-rights land, not for cropping seasons. Its plot axis
+is not the agricultural subdivision key. Existing crop-producer A/B and agricultural key
+recipes are useful join candidates, not verification of cross-module
+membership or the Section 5 reference year. The person dictionary and
+BID describe a dynasty =PID=, while a visit roster has its own member
+reference scope and update. Test the actual Q3 reference namespace
+against the same-release, same-household roster applicable to the
+visit. A visit update is not proof of membership during every earlier
+reference season. Neither
+=h2q1= nor =gsec2.pid= is an approved direct mapping merely because it
+exists. Keep household panel walking distinct from these person IDs.
+
+** Tanzania 2019–20 and 2020–21: later, separate approvals per block
+
+Both [[https://microdata.worldbank.org/catalog/3885/download/54805][SDD form]] and
+[[https://microdata.worldbank.org/catalog/5639/download/60750][Wave 5 form]]
+distinguish A long rains and B last completed short rains. The intended
+A windows are Masika 2018 and Masika 2020 respectively. Short-rains
+reference year is a reported choice, not the wave start or the A year.
+SDD's public B decision-card labels repeat A's long-rains wording and
+the printed SDD year choices also disagree in separate places. Wave
+5's B block corroborates the short-rains frame but does not supply a
+uniform year. In that release =ag_filters.ag2a_11=, =hh_sec_u2.ag2a_11=
+and A's Q75 are candidate year carriers with different scopes or
+provenance. Show which carrier applies to each B observation and
+reconcile any overlaps. A proved season key includes both kind and
+year (for example =vuli:2019= versus =vuli:2020=), not B alone. In both forms the B plot already listed in A follows a
+printed Q1b skip towards Q40, not another Q8/Q9 answer by assumption.
+Distinguish an unavailable B block or missing B parent from a verified
+structural skip, asked-but-unanswered, or explicit No. A short-rain
+cultivation screen is not the Q1b repeat-list flag. Do not infer B
+values from A.
+
+Treat Q8 crop choice and Q9 input decisions as separate domains.
+In both waves the household person slots are =08b_1= through =08b_3=
+and =09b_1= through =09b_3= within the A or B prefix. The =a_1/a_2=
+fields indicate household or outside-household participation. They
+are not person IDs. The corresponding =c1/c2= network report and
+location, and the separate plot respondent, are not household person
+slots and do not become actors by casting to strings or numbers.
+An affirmative participation indicator without a linkable reference
+does not identify a person.
+
+Bind each field to the exact released A/B and same-wave roster
+namespaces, with the current plot keys and the actually applicable
+interview scope. Do not borrow previous-round plot IDs, a reused
+plot number, or a household key from a split-off as a person bridge.
+The historical Tanzania Section 2-to-3A plot cross-check is A-only.
+The B stage needs admitted bytes for the exact already-declared
+operands and version-bound evidence for the source, routing, year
+and roster. Count by exact block and domain, including shared, A-only
+and B-only plot classes and unresolved routes or keys. A proof for A
+or one wave cannot clear B or the other.
+See the public [[https://microdata.worldbank.org/catalog/3885/data-dictionary/F41][SDD B]] and
+[[https://microdata.worldbank.org/catalog/5639/data-dictionary/F42][Wave 5 B]] dictionaries.
+
+** Ethiopia ESS4 2018–19: preserve role evidence, defer seasonal serving
+
+The [[https://microdata.worldbank.org/catalog/3823/download/49204][post-planting field form, PDF pp.6–8]]
+and [[https://microdata.worldbank.org/catalog/3823/data-dictionary/F47][public v05 dictionary]]
+identify Q13 as one primary actor for the combined management
+question on the applicable cultivated field, Q14 as the household
+consultation gate, and Q15.1/Q15.2 as up to two consulted household
+members, unranked. Consultation is not joint decision-making; Q14 No
+does not prove there was no outsider consultation. Preserve the
+holder-qualified field key already used by Ethiopia. Resolve
+references against the same post-planting agriculture roster first,
+starting from the candidate household/holder/member-reference tuple.
+Then independently verify any bridge to the main household roster.
+The printed prefill intent and similarly numbered person fields do
+not establish identity. Keep an unmatched PP-only household
+unresolved rather than using its holder, contact or head.
+
+Post-planting dates, the wave range and nearby questions about
+Meher/Belg do not bind a role-specific season. Do not call the wave,
+post-planting or the interview month a season. A later unseasoned
+source-observation view could preserve role/slot evidence without the
+claim, but is not part of the first public seasonal contract. This
+issue neither implements that view nor changes Ethiopia source versions.
+
+* Discriminating acceptance cases (invented)
+
+| Situation | Required result |
+|-----------+-----------------|
+| Uganda A Single, Q3 points to P, Q4a contains Q | Serve only the verified sole report. Account for Q as off-branch, never as joint. |
+| Uganda B Multiple, Q3 contains P, Q4a and Q4b refer to Q | Preserve two distinct reported positions for Q, not two unique people. P remains an off-branch observation. |
+| Same Uganda current plot and person answer in A and B | Keep both seasons even if every payload cell is equal. |
+| Missing/unknown Uganda route with a populated slot, or multiple roster matches | Count unresolved evidence. No synthetic or arbitrarily selected person row. |
+| Tanzania same verified person at Q8 and Q9, and an unrelated numeric network code | Preserve both domains. Network code is not a third household person. |
+| Tanzania B prints short rains but its export label says long rains, or the year is not bound | Do not assign A's window or publish a claimed B season without independent authority. |
+| Ethiopia Q13 refers to P, Q14 Yes, Q15 refers to Q and R | Keep the roles distinct in reconciliation. No seasonal rows on the current evidence. |
+| Same printed person number or plot number in two households or releases | Prove the correct scope. Never use a generic lookup on the number alone. |
+| One plot-season has two crops and two actor slots | Preserve two crop occurrences and two actor reports independently, not four default records. |
+| A populated household-head identifier is the only available person | No reported actor. A separately reviewed derived rule may be labelled as such. |
+
+* Review gates and staging
+
+1. Review naming and grain, with the long actor relation and separately
+   reserved crop detail as the recommendation. Keep GH #862 open.
+2. After the defect queue and design approval, admit the exact Uganda
+   2015–16 A/B management files, declared roster/cover and necessary
+   native key operands for a private bounded projection. Verify both
+   branch marginals and their joint row membership, every eligible
+   slot's lineage, repeated keys, missing/special codes, within-
+   household roster cardinalities, source-only vs served plot keys,
+   and cold/warm and coverage behavior. Report aggregate discrepancy
+   counts and reason categories without publishing keys. A source
+   discrepancy or an irresolvable grain means revise or hold the
+   relevant scope, not automatic source repair.
+3. A later reviewed implementation should preserve native observations
+   through extraction, use approved schema and =index_info= with the
+   canonical level names, and verify Country and Feature on invented
+   mixed-slot cases plus the admitted pilot. Check distinct-season,
+   slot and role preservation, Country-to-Feature row conservation,
+   named levels, absence of hidden collapse, valid coverage for
+   one versus both seasons, separate bridge cardinality checks, and
+   unchanged existing plot, roster, input and crop outputs. Use
+   =bench/feature_audit/= only within the admitted feature/country/data
+   scope. Include no unsupported registered schema or missing-country
+   default rows.
+4. Treat later Uganda waves, Tanzania and Ethiopia as separate source
+   and contract reviews. Do not extend this proposal to Niger's
+   existing household/observation table, an imputed gender statistic,
+   or a remote data acquisition task.
+
+This design uses public form/dictionary evidence and tracked code
+inspected at =d18b47de60e4=. It neither remeasures source rows nor binds
+a deployed questionnaire or published export to previously checked
+bytes. No library declaration, source input, cache, served data or
+analysis default changes.
