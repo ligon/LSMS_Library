@@ -188,10 +188,28 @@ purch = s2d[s2d['input'].notna()].copy()
 purch['bought'] = bought.loc[purch.index]
 purch['qty'] = pd.to_numeric(purch['s2dq09a'], errors='coerce')
 # collapse to (i, input): any purchase -> True; sum reported purchased qty.
-hh_purch = purch.groupby(['i', 'input'], as_index=False).agg(
-    Purchased=('bought', 'max'),
-    Quantity_purchased=('qty', lambda s: s.sum(min_count=1)),
-)
+def _purchase_totals(purch):
+    # GH #905: use the grouped result only for float64 singleton keys.
+    # Repeated keys keep the original scalar sum in native source order.
+    keys = ['i', 'input']
+    if str(purch['qty'].dtype) != 'float64':
+        return purch.groupby(keys, as_index=False).agg(
+            Purchased=('bought', 'max'),
+            Quantity_purchased=('qty', lambda s: s.sum(min_count=1)),
+        )
+    grouped = purch.groupby(keys)
+    quantity = grouped['qty'].sum(min_count=1)
+    repeated = purch.duplicated(keys, keep=False)
+    if repeated.any():
+        exact = (purch.loc[repeated].groupby(keys)['qty']
+                 .agg(lambda s: s.sum(min_count=1)))
+        quantity.loc[exact.index] = exact
+    hh = grouped['bought'].max().rename('Purchased').to_frame()
+    hh['Quantity_purchased'] = quantity
+    return hh.reset_index()
+
+
+hh_purch = _purchase_totals(purch)
 
 df = pd.concat(pieces, ignore_index=True)
 
