@@ -1061,6 +1061,26 @@ def _crop_line_observations(df, crop, line=None, source_ref=None):
     return token.fillna('missing-id:row:' + source_ref + ':' + row)
 
 
+def _crop_line_keys(fr, crop_labels):
+    """Producer and inverse-input witness use the same native line identity."""
+    df = fr['df']
+    i = df[fr['hhid']].apply(format_id)
+    crop_code = pd.to_numeric(df[fr['crop']], errors='coerce').astype('Int64')
+    crop = crop_code.map(crop_labels).astype('string')
+    if fr.get('plot') is not None:
+        plot = df[fr['plot']].apply(format_id)
+    else:
+        plot = pd.Series(pd.NA, index=df.index, dtype='string')
+    return pd.DataFrame({
+        'i': i.values,
+        'plot_id': plot.values,
+        'crop': crop.values,
+        'production_obs': _crop_line_observations(
+            df, fr['crop'], line=fr.get('line'),
+            source_ref=fr.get('source_ref')).values,
+    }, index=df.index)
+
+
 def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
     """Assemble item-level crop_production for one Nigeria GHS-Panel wave.
 
@@ -1151,23 +1171,7 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
     for fr in frames:
         df = fr['df']
         dec = fr['dec']
-        n = len(df)
-        i = df[fr['hhid']].apply(format_id)
-        crop_code = pd.to_numeric(df[fr['crop']], errors='coerce').astype('Int64')
-        crop = crop_code.map(crop_labels).astype('string')
-        if fr.get('plot') is not None:
-            plot = df[fr['plot']].apply(format_id)
-        else:
-            plot = pd.Series(pd.NA, index=df.index, dtype='string')
-
-        piece = pd.DataFrame({
-            'i': i.values,
-            'plot_id': plot.values,
-            'crop': crop.values,
-            'production_obs': _crop_line_observations(
-                df, fr['crop'], line=fr.get('line'),
-                source_ref=fr.get('source_ref')).values,
-        }, index=df.index)
+        piece = _crop_line_keys(fr, crop_labels)
 
         piece['Quantity'] = (pd.to_numeric(df[fr['qty']], errors='coerce')
                              if fr.get('qty') in df.columns else pd.NA)
@@ -4055,6 +4059,121 @@ def derive_food_conversion_kg(quantity, kg_per_unit):
     q = pd.to_numeric(pd.Series(quantity), errors='coerce').to_numpy(dtype='float64')
     f = pd.to_numeric(pd.Series(kg_per_unit), errors='coerce').to_numpy(dtype='float64')
     return np.where((q > 0) & (f > 0), q * f, np.nan)
+
+
+# W2 A3/F99 V2941, its own named nonstandard unit codes. The other named
+# codes (1–4) are kg, g, litre and centilitre and keep their existing rungs.
+_W2_A3_NONSTANDARD = frozenset((
+    *range(5, 16), *range(21, 29), *range(31, 35), *range(41, 44), *range(51, 54),
+    *range(61, 64), *range(71, 75), *range(81, 84), *range(91, 96),
+))
+W2_CROP_CONVERSION_KEY = 'Nigeria::crop_production::w2-release-kg'
+
+
+def _w2_numbers(series):
+    """Numeric view, retaining nonfinite or missing inputs for explicit checks."""
+    if pd.api.types.is_bool_dtype(series):
+        return np.full(len(series), np.nan)
+    return pd.to_numeric(series, errors='coerce').to_numpy(dtype='float64', na_value=np.nan)
+
+
+def _w2_crop_conversion_table(table):
+    """Validate the declared W2 release CSV without selecting among duplicates."""
+    src = 'Nigeria 2013Q1: w2agnsconversion.csv'
+    fields = {'cropname', 'cropcode', 'nscode', 'conversion', 'kg'}
+    if (not isinstance(table, pd.DataFrame) or table.empty
+            or len(table.columns) != len(fields) or set(table.columns) != fields):
+        raise ValueError(f'{src}: expected a nonempty table with columns {sorted(fields)}')
+    numbers = {c: _w2_numbers(table[c]) for c in ('cropcode', 'nscode', 'conversion', 'kg')}
+    for c in ('cropcode', 'nscode'):
+        key = numbers[c]
+        if not (np.isfinite(key) & (key > 0) & (key == np.floor(key))).all():
+            raise ValueError(f'{src}: invalid native {c} key')
+    rate = numbers['conversion']
+    if not (np.isfinite(rate) & (rate > 0)).all():
+        raise ValueError(f'{src}: conversion rates must be finite and strictly positive')
+    basis = numbers['kg']
+    has_basis = table['kg'].astype('string').str.strip().fillna('').ne('').to_numpy()
+    if (has_basis
+            & ~(np.isfinite(basis) & (basis == np.floor(basis)))).any():
+        raise ValueError(f'{src}: invalid kg basis code')
+    keys = pd.MultiIndex.from_arrays([numbers['cropcode'], numbers['nscode']])
+    if not keys.is_unique:
+        raise ValueError(f'{src}: repeated native (cropcode, nscode) key')
+    # Only 1 is documented as kilograms. Code 0 and absent/other integer
+    # flags identify no output basis, even when their rate is positive.
+    return table.set_axis(keys).iloc[basis == 1]
+
+
+def derive_w2_crop_release_kg(quantity, conversion):
+    """Multiply routed Q6 by its kg-marked release rate, not a weighed mass."""
+    with np.errstate(over='ignore', under='ignore', invalid='ignore'):
+        total = derive_food_conversion_kg(quantity, conversion)
+    return np.where(np.isfinite(total) & (total > 0), total, np.nan)
+
+
+def _w2_crop_release_trace(fr, crop_labels, lookup):
+    """Common native match and served-grain trace for the W2 producer and API."""
+    table = _w2_crop_conversion_table(lookup)
+    raw, dec = fr['df'], fr['dec']
+    if not raw.index.equals(dec.index):
+        raise ValueError('Nigeria 2013Q1: raw and decoded A3 rows are not aligned')
+    fields = ['hhid', 'plotid', 'cropid', 'cropcode', 'sa3q3', 'sa3q6a1', 'sa3q6a2']
+    witness = raw.reindex(columns=fields)
+    label = dec.get('sa3q6a2', pd.Series(pd.NA, index=raw.index, dtype='string'))
+    unit = _w2_numbers(witness['sa3q6a2'])
+    crop = _w2_numbers(witness['cropcode'])
+    q = _w2_numbers(witness['sa3q6a1'])
+    q3 = _w2_numbers(witness['sa3q3'])
+    # Require the A3 reader's own named label, not a bare code. Some Stata
+    # label spellings include their code, which must agree when present.
+    label = label.astype('string')
+    text = label.str.strip()
+    prefix = _w2_numbers(text.str.extract(r'^(\d+)\.\s*', expand=False))
+    named = (_recorded_label(label).to_numpy()
+             & ~text.map(_strip_code_prefix, na_action='ignore').str.lower()
+             .isin(['unknown', 'unnamed', 'sysmiss']).to_numpy()
+             & (np.isnan(prefix) | (prefix == unit)))
+    native = pd.MultiIndex.from_arrays([crop, unit])
+    matched = table.reindex(native)
+    total = derive_w2_crop_release_kg(q, matched['conversion'])
+    keys = _crop_line_keys(fr, crop_labels)
+    keep = ((q3 == 1) & np.isfinite(q) & (q > 0)
+            & np.isin(unit, tuple(_W2_A3_NONSTANDARD)) & named & np.isfinite(total)
+            & keys['i'].notna().to_numpy() & keys['crop'].notna().to_numpy())
+    inputs = witness.iloc[keep].copy()
+    inputs['unit_label'] = label.iloc[keep].array
+    for col in ('nscode', 'conversion', 'kg', 'cropname'):
+        inputs[col] = matched[col].iloc[keep].array
+    picked = keys.iloc[keep].assign(t=PH_QUARTER['2012-13'])
+    inputs.index = pd.MultiIndex.from_frame(
+        picked[['t', 'i', 'plot_id', 'crop', 'production_obs']])
+    return inputs, total[keep]
+
+
+def crop_production_w2(fr, crop_labels, lookup):
+    """Build W2 A3 as before, adding only the release estimate on retained lines."""
+    out = crop_production_for_wave(PH_QUARTER['2012-13'], [fr], crop_labels)
+    inputs, kg = _w2_crop_release_trace(fr, crop_labels, lookup)
+    out.loc[inputs.index, 'Quantity_kg'] = kg
+    out.loc[inputs.index, 'Derivation'] = W2_CROP_CONVERSION_KEY
+    return out
+
+
+def inputs_w2_crop_release_kg(wave='2012-13'):
+    """Exact native A3 answers and release rate for each W2 estimate."""
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    if wave not in ('2012-13', '2013Q1'):
+        raise ValueError(f'{W2_CROP_CONVERSION_KEY} applies only to W2 post-harvest, not {wave!r}')
+    root = countries_root() / 'Nigeria' / '2012-13' / 'Data'
+    harvest = root / 'Post Harvest Wave 2/Agriculture/secta3_harvestw2.dta'
+    raw = get_dataframe(harvest, convert_categoricals=False)
+    dec = get_dataframe(harvest, convert_categoricals=True)
+    lookup = get_dataframe(root / 'w2agnsconversion.csv', convert_categoricals=False)
+    fr = dict(df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode', line='cropid')
+    inputs, _ = _w2_crop_release_trace(fr, _crop_labels_from_anywhere(), lookup)
+    return inputs.sort_index()
 
 
 # ---------------------------------------------------------------------

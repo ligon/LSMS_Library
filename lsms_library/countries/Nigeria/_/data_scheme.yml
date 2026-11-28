@@ -421,9 +421,8 @@ Data Scheme:
     # Country-level script (_/crop_production.py) joins/reshapes per wave
     # (W3-W5 split the module across secta3i / secta3ii / secta3iii) ->
     # materialize: make.  Stores reported fields -- no yield, main_crop or
-    # value shares (transformations) -- plus one construction: W3 (2016Q1)
-    # `Quantity_kg` from the World Bank's own ag_conv_w3 table (GH #1518,
-    # below; a registered derivation).
+    # value shares (transformations) -- plus the registered W2 (2013Q1)
+    # and W3 (2016Q1) release-table `Quantity_kg` estimates (GH #1518, below).
     # crop (j) on the shared harmonize_food Preferred Label so it joins
     # food_acquired.j; u normalized to the shared `u` table base labels.
     # Quantity_sold / Value_sold: W1/W2 record them on the plot-crop row.
@@ -540,15 +539,17 @@ Data Scheme:
     #          harvested from [PLOT] during ...?"
     # Required (not optional): every wave carries it.  See _/CONTENTS.org.
     Value_harvested: float
-    # The LINE's kilograms, the harvest ladder's survey_kg rung (GH #1518,
-    # ruling @ligon 2026-11-12).  Only W3 (2016Q1) fills it: Quantity x the
-    # World Bank's own ag_conv_w3 factor at the line's native (crop, sized
-    # unit, own zone) key -- NOT a total an enumerator wrote down, and never a
-    # KgFactor, which stays the factor asked beside the quantity (W4/W5).
-    # Registered as Nigeria::crop_production::w3-ag-conversion (Derivation);
-    # metric units and the 9 card-contradicting table rows are not read, the
-    # jerry cans are served at 1 l = 1 kg.  NaN in every other wave, hence
-    # optional.  See _/CONTENTS.org, "W3 shipped harvest factors".
+    # The LINE's estimated kilograms, the harvest ladder's survey_kg rung
+    # (GH #1518). W2 (2013Q1) uses Q3 Yes and positive finite Q6 in an own
+    # named nonstandard unit, with an exact native crop and unit match to a
+    # unique positive finite kg=1 rate in w2agnsconversion.csv. Its key is
+    # Nigeria::crop_production::w2-release-kg. The Q6 quantity convention
+    # remains unverified. W3 (2016Q1) uses Quantity x the ag_conv_w3 factor at
+    # the native (crop, sized unit, own zone) key, registered as
+    # Nigeria::crop_production::w3-ag-conversion. W3 metric units and the 9
+    # card-contradicting table rows are not read, and jerry cans use 1 l = 1 kg.
+    # Neither estimate is a weighed total or a reported KgFactor (W4/W5).
+    # NaN outside the qualified W2/W3 rows. See _/CONTENTS.org.
     Quantity_kg:
       type: float
       optional: true
