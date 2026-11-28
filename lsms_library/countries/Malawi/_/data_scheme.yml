@@ -28,6 +28,11 @@ Data Scheme:
     ihps_weight:
       type: float
       optional: true
+    # Source component for stacked sample waves (GH #1704). A 2024-25
+    # refresh interview is an IHS row even when it also carries ihps_weight.
+    SampleComponent:
+      type: str
+      optional: true
   cluster_features:
     index: (t, v)
     Region: str

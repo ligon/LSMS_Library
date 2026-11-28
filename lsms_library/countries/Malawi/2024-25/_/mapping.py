@@ -11,6 +11,8 @@ from lsms_library.local_tools import format_id
 sys.path.append(str(Path(__file__).resolve().parents[2] / '_'))
 from malawi import CS_24, ihps24_refreshed
 
+from malawi_sample_component import ihs_component, ihps_component
+
 def cs_i(value):
     # Bare IHS6 case_ids coincide with 3 IHS3, 202 IHS4 and 83 IHS5 case_ids,
     # so a shared or absent prefix would make false panel links (GH #1278).
