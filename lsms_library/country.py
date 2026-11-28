@@ -6183,22 +6183,20 @@ class Country:
                 seen.add(cand)
                 unique_candidates.append(cand)
 
-            # A wave fallback can read the shared country parquet. Its mere
-            # presence does not prove this invocation produced the missing
-            # wave: both make and a no-output script may exit zero and leave
-            # it untouched (GH #1590). Keep the legacy data-return path, but
-            # certify this ambiguous output only if the producer changed it.
-            # Wave-specific outputs remain attributable to their wave/folder;
-            # direct country builders retain their existing contract (#866,
-            # #1039). No output is evicted here and t values are not evidence.
+            # A fallback can read the shared country parquet. Its mere
+            # presence does not prove this invocation produced it: both make
+            # and a no-output script may exit zero and leave it untouched
+            # (GH #1590, #1288). When the caller requests proof, check the
+            # identity around each successful invocation. Wave-specific
+            # outputs remain attributable to their own wave/folder. No
+            # output is evicted here and t values are not evidence.
             country_output = unique_candidates[-1]
 
             def prior_output():
-                return (output_identity(country_output)
-                        if wave is not None and _with_output else None)
+                return output_identity(country_output) if _with_output else None
 
             def produced_output(path, prior):
-                return (wave is None or path != country_output
+                return (not _with_output or path != country_output
                         or output_identity(path) != prior)
 
             if makefile_path is None and script_path is None:
@@ -6753,16 +6751,24 @@ class Country:
             if evict_country_cache:
                 self._evict_stale_country_cache(method_name)
 
-            country_fallback = run_make_target(method_name, wave=None)
-            # The country builder remains the producer for its whole request.
-            # Its internal concatenation is opaque here (GH1287/1292); never
-            # infer completion from its observed t values. Wave producers above
-            # have finer, explicit evidence and must not borrow this contract.
+            if _with_coverage:
+                country_fallback, produced = run_make_target(
+                    method_name, wave=None, _with_output=True)
+            else:
+                country_fallback = run_make_target(method_name, wave=None)
+                produced = True  # this caller does not publish coverage
+            # A country builder that produced an output remains responsible
+            # for its whole request. Its internal concatenation is opaque
+            # here (GH1287/1292); never infer completion from observed t.
             if isinstance(country_fallback, dict):
                 if country_fallback:
                     return result(country_fallback, waves)
                 return result({}, waves)
             if isinstance(country_fallback, pd.DataFrame) and not country_fallback.empty:
+                if not produced:
+                    # GH #1288: preserve the legacy response, not a cache
+                    # write. None is distinct from a publishable empty manifest.
+                    return country_fallback, None
                 return result(country_fallback, waves)
 
             raise _rebuild_failure_error(self.name, method_name)
@@ -6900,22 +6906,13 @@ class Country:
             # GH #866: everything below is the rebuild descent, so we have
             # already decided not to serve `cache_path` -- it graded STALE, or
             # fresh-but-coverage-short, or LSMS_NO_CACHE skipped the gate
-            # entirely, or it is absent, or it would not read.  In all of those
-            # the country-level make/script fallback must not be handed it back.
+            # entirely, or it is absent, or it would not read. The fallback
+            # must not publish the rejected file as rebuilt.
             #
-            # The one case where it must NOT be deleted is a request this
-            # descent is not going to replace.  `build_waves` is the UNION of
-            # the request and the cache's own coverage (GH #891), so a stale or
-            # coverage-short descent normally rebuilds everything the parquet
-            # covered and the test passes.  What it excludes is
-            # `LSMS_NO_CACHE=1` with a strict subset of waves -- there the gate
-            # never ran, so no union was taken and `build_waves` is just the
-            # request.  If that subset happens to be barren, `load_from_waves`
-            # returns empty and reaches the country fallback holding a
-            # perfectly FRESH all-waves parquet; today's behaviour there is
-            # accidentally correct (the whole frame comes back and
-            # `_restrict_to_waves` filters it to the right empty frame), and
-            # deleting it would turn a correct answer into a hard failure.
+            # Limit eviction to a full-union request. A strict union can be
+            # stale or coverage-short, or LSMS_NO_CACHE can bypass even a
+            # fresh full-country cache. The strict-subset fallback keeps
+            # an unchanged target available without certifying it (#1288).
             evict_country_cache = (
                 {str(w) for w in build_waves} >= {str(w) for w in self.waves}
             )
@@ -6940,6 +6937,8 @@ class Country:
                             return df
                         if isinstance(df, pd.DataFrame):
                             df = _enforce_rejected_column_spellings(df)
+                            if completed_waves is None:
+                                return self._restrict_to_waves(df, waves)
                             cache_path.parent.mkdir(parents=True, exist_ok=True)
                             build_drops = _stampable_build_drops(self.name, method_name)
                             to_parquet(df, cache_path,
@@ -7306,6 +7305,8 @@ class Country:
                     return df  # never cached; see the no-stage write above
                 if isinstance(df, pd.DataFrame):
                     df = _enforce_rejected_column_spellings(df)
+                    if completed_waves is None:
+                        return self._restrict_to_waves(df, waves)
                     cache_path.parent.mkdir(parents=True, exist_ok=True)
                     build_drops = _stampable_build_drops(self.name, method_name)
                     to_parquet(df, cache_path,
