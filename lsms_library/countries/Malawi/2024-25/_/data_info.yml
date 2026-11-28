@@ -44,6 +44,25 @@ sample:
         District: district
 
 
+interview_date:
+    # Each cover records one ISO interview date. IHPS consumption_date is
+    # a different question, not a second interview visit.
+    file:
+        - Cross_Sectional/hh_mod_a_filt.dta
+        - Panel/hh_mod_a_filt_24.dta:
+            i: y5_hhid
+    idxvars:
+        i:
+            - case_id
+            - mapping: cs_i
+    myvars:
+        int_t:
+            datetime: interviewDate
+            calendar: gregorian
+            format: '%Y-%m-%d'
+            resolution: day
+
+
 panel_ids:
     # The retained half only: y4_hhid is blank on the 815 refreshment
     # households, which format_id reads as missing and panel_ids drops.

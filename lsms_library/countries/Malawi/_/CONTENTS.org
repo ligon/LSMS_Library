@@ -6281,3 +6281,12 @@ A private rerun of the served sample compared weighted rural shares in percent:
 
 All rows in these comparisons had a positive weight and a recognized rural/urban answer for the relevant denominator.
 The retained 2024-25 panel and full 2024 IHPS cohort are different samples.
+
+* 2026-11-25 -- 2024-25 =interview_date= (GH #1275)
+
+Both household covers record one Gregorian day in =interviewDate=.
+The IHPS =consumption_date= is a separate answer, not a second interview visit.
+All 815 refresh dates agree with the corresponding IHS6 dates; the builder checks the dates and keeps the IHS6 row.
+One retained IHPS cover row is blank despite the catalogue's valid-character count; it stays undated.
+The existing visit melt serves 14,835 =visit=1= dates, 12,888 IHS6 and 1,947 retained IHPS.
+The sample population and older waves' recorded visit keys are unchanged.
