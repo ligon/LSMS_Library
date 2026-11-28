@@ -5127,3 +5127,17 @@ coverage verdict"): =empty-pending-machinery=.  2011Q1 and 2013Q1 now carry that
 =dropped=, open as future work; 2016Q1 and 2019Q1 stay =correctly-empty=.]  Measured at the integrated tree (job 41283638):
 =shocks= rows by quarter 2011Q1 2,202, 2013Q1 2,882, 2016Q1 2,323, 2019Q1 3,870 (none at post-planting);
 =assets= 2010Q3 38,947, 2012Q3 161,125, 2015Q3 188,229, 2018Q3 44,358 (none at post-harvest).
+
+* 2026-11-25 -- W1 and W2 post-harvest also record coping day counts (GH #587)
+
+The earlier PP-only wording for W1/W2 was wrong.
+The W1 post-harvest household form (PDF p.66) and W2 post-harvest household form (PDF p.71, printed p.70) both ask Section 12 Q1(a-i), the same nine seven-day coping day counts.
+The corresponding W1 and W2 harvest releases carry these answers as =s12q1a..s12q1i=.
+Use the W1 harvest export for =2011Q1= and the W2 harvest export for =2013Q1=.
+These are separate interviews, not carried-forward PP answers.
+The existing =Days= strategy names and treatment of reported zeros and missing answers are unchanged.
+The three PP visits and W3's existing PH build are unchanged.
+This does not extend the coping day-count interface to W4/W5 FIES or resolve other #587 coverage cells.
+
+- [[https://microdata.worldbank.org/index.php/catalog/1002/download/48230][W1 PH household form]] and [[https://microdata.worldbank.org/catalog/1002/data-dictionary/F51][W1 PH release dictionary]].
+- [[https://microdata.worldbank.org/index.php/catalog/1952/download/48241][W2 PH household form]] and [[https://microdata.worldbank.org/catalog/1952/data-dictionary/F90][W2 PH release dictionary]].
