@@ -3119,6 +3119,25 @@ from visit 1, so the visit chosen moves the rate: 2021-22
 =food_expenditures(numeraire='FX')= is -8.55% against wave-nominal dates on visit 1,
 -8.72% on each household's latest visit start.
 
+** 2026-11-25 -- Explicit parsing of the EHCVM interview clocks (GH #1045)
+
+Section 0 items 22--25 distinguish up to three household contacts from the
+two seasonal survey halves (=vague=).
+Both [[https://microdata.worldbank.org/index.php/catalog/6276/download/100373][2021-22 household form 1]]
+and [[https://microdata.worldbank.org/index.php/catalog/6276/download/100372][form 2]]
+show the date and start/end clock fields (p. 3).
+The tracked releases use unzoned ISO timestamps.
+Both waves now declare the Gregorian ISO format for all six timestamp columns.
+Only the held 2018-19 cover has =##N/A##= (83 values), separate from its six blanks.
+The 2021-22 cover has 140 blanks and no placeholder.
+A visit with neither endpoint remains absent.
+Times, visit ordinals, and recorded pairs with an end earlier than its start are
+unchanged.
+The date used for numeraire conversion is still the lowest dated visit ordinal.
+No fieldwork filter or timezone correction is imposed, and the two ECVMA waves
+continue not to declare this table.
+
+
 * 2026-11-06 -- shocks: purchases and food stocks are separate answers
 
 Ruling @ligon: =AffectedConsumption= means food purchases;
