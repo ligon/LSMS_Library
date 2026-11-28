@@ -6116,6 +6116,43 @@ This is source/document-only progress. No country table, native source/header,
 getter/provider, Make producer, tests, API/cache operation or new demand fit ran.
 No Preferred/Nutrition/Aggregate cell, FCT source note, value or default changed.
 
+* 2026-11-28 -- Published HarvestPlus Uganda workbook recovered (GH #1000)
+
+The archived [[https://web.archive.org/web/20190822080128/https://www.harvestplus.org/node/562][HarvestPlus product page]] identifies the historical Excel link as
+=sites/default/files/publications/HarvestPlus_Uganda_FCT_0.xls=. The live old
+URL redirects to the [[https://www.harvestplus.org/wp-content/uploads/2012/02/HarvestPlus_Uganda_FCT_0.xls][producer's downloadable workbook]].
+The retrieved compound Excel document has 418,816 bytes and SHA256
+=4a1173f0c00f582c7052c28fa6ec8b650ea03fa0f32d8b28fb018562f195f381=.
+This identifies the currently served artifact, not byte identity to a
+historical release. There is no explicit release-version field in the worksheet.
+
+=Sheet1= has 727 unique food codes and 39 fields. Joined by food code, all
+727 rows and all non-key fields match the first tracked =nutrition.org=
+=fct= table from 2021, the current Org table and =fct_original.csv= after
+trimming outer text whitespace and normalizing equivalent numeric formats.
+Worksheet rows 93 and 98 are 4003 and 4008. They differ only in code and
+the with-skin versus without-skin description. Both explicitly record
+67.4 g water, 10 mcg alpha-carotene, 2,697 mcg beta-carotene and
+225 mcg RAE per 100 g, with the general zero statement and the specific
+Kidmose water and beta-carotene note together. The tension is in the
+producer compilation, not an LSMS_Library transcription difference.
+
+The [[https://cgspace.cgiar.org/server/api/core/bitstreams/28455f21-cca1-43d3-a92d-cca76df0d13c/content#page=9][HarvestPlus monograph, p. 4]] describes local dry-matter and beta-carotene
+adjustments. Rescaling the [[https://fdc.nal.usda.gov/download-datasets/][USDA SR21]] food 11507 by 32.6 / 22.72
+reproduces 20 of 24 tested yellow-row values at the workbook's cell display
+precision, including 7 to 10 mcg alpha-carotene. It does not reproduce
+beta-carotene or vitamin A. This is a plausible alpha-carotene pathway,
+not an authenticated calculation trail. No worksheet formulas were found.
+
+White control 3003 has the same generic statement and zero carotene and
+RAE. Orange control 4103 has the same statement and 10 mcg alpha-carotene,
+but its distinct beta-carotene note cites Bengtsson et al. This does not
+identify the origin of alpha-carotene or establish that the peeled cultivar
+measurements apply to an unpeeled food code. The remaining work is readable
+authorized Kidmose Table 2 and methods and the underlying calculation and
+preparation record if the workbook and paper do not supply it. No served
+values, source wording, crosswalk or previous #1000 and #967 rulings changed.
+
 * 2026-11-12 -- =nutrition.py= imports the transform behind =food_quantities()=; the #967 fixture entry moves (GH #1509)
 
 =nutrition.py= (both its =nutrition= and =fct= targets) reads
