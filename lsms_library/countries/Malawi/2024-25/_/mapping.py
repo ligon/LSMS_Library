@@ -17,6 +17,46 @@ def cs_i(value):
     # Bare IHS6 case_ids coincide with 3 IHS3, 202 IHS4 and 83 IHS5 case_ids,
     # so a shared or absent prefix would make false panel links (GH #1278).
     return CS_24 + format_id(value.iloc[0])
+# Education uses the interview-local Module C person key.
+
+def individual_education(df):
+    """Compare the native qualification before dropping its refresh copy."""
+    cover = ['_education_cover_key', '_education_previous_key', '_education_ihs6_key']
+    native = '_education_native_c09'
+    if not {*cover, native}.issubset(df):
+        raise ValueError('Malawi 2024-25 education requires Module C and the IHPS panel cover')
+    if df.index.to_frame(index=False).isna().any(axis=None) or df.index.has_duplicates:
+        raise ValueError('Malawi 2024-25 education has missing or duplicate person keys')
+
+    i = df.index.get_level_values('i')
+    panel = ~i.str.startswith(CS_24)
+    matched_cover = df[cover[0]].map(format_id).notna().to_numpy()
+    if (matched_cover != panel).any():
+        raise ValueError('Malawi 2024-25 education and IHPS cover disagree on household identity')
+
+    copy = panel & df[cover[1]].map(format_id).isna().to_numpy()
+    target = CS_24 + df.loc[copy, cover[2]].map(format_id)
+    # More than one IHPS household may not split the same IHS6 roster.
+    households = pd.DataFrame({'panel': i[copy], 'ihs6': target.to_numpy()}).drop_duplicates()
+    if target.isna().any() or households['ihs6'].duplicated().any():
+        raise ValueError('Malawi 2024-25 education has missing or duplicate IHS6 refresh counterparts')
+
+    keys = pd.MultiIndex.from_arrays(
+        [df.index.get_level_values('t')[copy], target,
+         df.index.get_level_values('pid')[copy]],
+        names=df.index.names,
+    )
+    ihs6 = df.loc[~panel & i.isin(target), native]
+    if len(ihs6) != len(keys) or not keys.isin(ihs6.index).all():
+        raise ValueError('Malawi 2024-25 refresh and IHS6 education disagree on person keys')
+
+    ihps = df.loc[copy, native].set_axis(keys)
+    ihs6 = ihs6.reindex(keys)
+    equal = ihps.eq(ihs6) | (ihps.isna() & ihs6.isna())
+    if not equal.fillna(False).all():
+        raise ValueError('Malawi 2024-25 refresh and IHS6 qualifications disagree')
+    return df.loc[~copy].drop(columns=[native, *cover])
+
 
 def housing(df):
     """Serve each Module F interview once, after verifying the refresh copies."""
