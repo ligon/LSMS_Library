@@ -28,6 +28,33 @@ recorded acquisition values, request `basis='total'` in the food call or
 in-kind values. A fit still requires enough observed goods and households;
 successful input preparation is not an identified demand system.
 
+## EHCVM expenditure basis and fitting coverage (GH #1750)
+
+The shared EHCVM producer leaves `Expenditure` missing on own-produced and
+in-kind rows. The instrument does not ask for their value and the release's
+imputed gift value `depan(Don)` is not served. Without valuation,
+`basis='total'` therefore only has purchased values on this route.
+Identical expenditure keys and values were verified for Togo's 2018 and
+2021-22 waves. For other EHCVM countries this is an expectation from the
+shared implementation, not a measured result.
+
+If you need to value these acquisitions, opt in explicitly on the Country API.
+The ladder only fills rows with a supported price and need not produce a
+complete total.
+
+```python
+niger = ll.Country('Niger')
+x = niger.food_expenditures(
+    market='Region', basis='total', valuation=('own_price', 'median_price')
+)
+```
+
+Report household retention by market and wave after CFE fitting selection,
+especially when comparing expenditure bases or changing `min_prop_items`.
+In the Togo purchased-basis fit behind #1750, that support filter retained
+only about 45% of Savanes households in 2018. Treat that as one observed fit's
+retention, not a default rate for other regions or surveys.
+
 ## Acquisition source and the CFE index (GH #1439 / #1526)
 
 `food_expenditures` intentionally retains acquisition source `s`. CFE accepts
