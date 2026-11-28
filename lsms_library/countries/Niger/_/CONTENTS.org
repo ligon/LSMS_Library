@@ -2914,6 +2914,39 @@ within a grappe.  Table 2 still writes Niamey all urban, so it follows neither f
 
 Cost: a Niger re-warm.  Other countries' =strata= hold other things: see =docs/guide/feature.md=.
 
+* 2026-11-28 -- EHCVM design statements versus served strata (GH #1577)
+
+The public producer documents differ in how they describe the design.
+The INS [[https://phmecv.uemoa.int/index.php/publications/category/6-rapports-techniques-ehcvm1-2018?download=11%3Arapports-techniques-du-niger][August 2020 provisional poverty report]], PDF p. 25, calls the eight administrative
+regions the explicit strata for 2018–19. Table 1 reports 504 enumeration
+areas, 6,048 planned households and 6,024 validated households. By contrast,
+the 2021–22 release's [[https://microdata.worldbank.org/catalog/6276/download/100375][French BID]], PDF p. 12, and [[https://microdata.worldbank.org/catalog/6276/download/100374][English BID]], PDF p. 9, describe
+the *2018–19* design as =région/milieu= or =region/locality= in the same passage.
+The French wording is explicit, so this is not resolved by translating
+=locality=. Both downloaded documents match the tracked BID declarations.
+
+The INS [[https://phmecv.uemoa.int/index.php/publications/category/7-ehcvm2-2021?download=20%3Arapport-technique-du-niger][September 2023 poverty report for 2021–22]], PDF p. 14, again calls the
+eight regions explicit strata, this time for 2021–22. It identifies residence
+milieu separately as a level of representativeness. That passage describes
+580 selected and 555 interviewed enumeration areas. It does not confirm
+that the follow-up edition selected PSUs by every served region × milieu
+label.
+
+One separate discrepancy is in the [[https://microdata.worldbank.org/catalog/4296/download/52570][June 2021 first-edition BID]] itself.
+Its p. 10 prose says Tillabéri respondents were all rural, but final-sample
+Table 1 on PDF p. 11 reports 597 urban individuals in 95 urban households
+in the second visit. This table does not establish that the urban group was
+a distinct selection stratum, and it does not identify any error in an
+individual label.
+
+Keep explicit strata, area of representation, realised sample cells and
+the library's labels constructed from the covers distinct. The public
+accounts do not resolve how the descriptions of the first-edition draw
+relate to each other, or establish implicit strata or stage-specific codes
+on the held records. The 2018–19 and 2021–22 =sample().strata= remain the
+registered region × milieu *construction*. No household, weight, cluster
+key, sampling tag, or representation rule changes here.
+
 * 2026-11-04 -- crop_production: the survey harvest kilograms are served (GH #1436)
 
 *RULED (@ligon, 2026-11-04, option A).*  =Quantity_kg= is served as an optional canonical column and read
