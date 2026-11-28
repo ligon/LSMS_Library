@@ -33,7 +33,7 @@ def _read_food_label_table(fn):
     base = os.path.basename(str(fn))
     if base == 'categorical_mapping.org':
         from lsms_library.local_tools import all_dfs_from_orgfile
-        return all_dfs_from_orgfile(fn)['harmonize_food']
+        return all_dfs_from_orgfile(fn, encoding='utf-8')['harmonize_food']
     # Legacy / code-keyed tables (nonfood_items.org): bare pipe table.
     from lsms_library.local_tools import df_from_orgfile
     return df_from_orgfile(fn, name=None, to_numeric=False)
@@ -4116,13 +4116,15 @@ def community_prices_for_wave(t, df, colmap):
     # the code-prefix-stripped surveyed string.
     item_xwalk = df_from_orgfile(_eth_orgfile_path(),
                                  name='harmonize_community_price',
-                                 set_columns=True, to_numeric=False)
+                                 set_columns=True, to_numeric=False,
+                                 encoding='utf-8')
     item_map = {str(k).strip(): str(v).strip()
                 for k, v in zip(item_xwalk['Original Label'],
                                 item_xwalk['Preferred Label'])
                 if pd.notna(v)}
     u_xwalk = df_from_orgfile(_eth_orgfile_path(), name='u',
-                              set_columns=True, to_numeric=False)
+                              set_columns=True, to_numeric=False,
+                              encoding='utf-8')
     unit_map = {str(k).strip(): str(v).strip()
                 for k, v in zip(u_xwalk['Original Label'],
                                 u_xwalk['Preferred Label'])
