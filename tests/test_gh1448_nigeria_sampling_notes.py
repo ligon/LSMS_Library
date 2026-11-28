@@ -44,7 +44,9 @@ def _stated(note):
 
 def test_every_boundary_counts_the_crosswalk_links():
     """Data-free: the denominator is the number of links the JSON holds."""
-    links, records = _links(), sampling_records("Nigeria")
+    links = _links()
+    records = {t: record for t, record in sampling_records("Nigeria").items()
+               if record.get("panel") is not None}
     assert set(records) == set(links)
     for t, record in records.items():
         kept, linked = _stated(_note(record))

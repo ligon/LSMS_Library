@@ -1464,6 +1464,11 @@ differ only beyond the 6th decimal).  Evidence:
 | 2018-19 | =strata=  | 6 labeled zones               | Matches =zone=              |
 | 2023-24 | =strata=  | 6 numeric codes (1--6)        | Mapped to zone labels       |
 
+The first eight planting and harvest visits serve a label from their own visit's release (#1577).
+This includes the W2 PP agriculture-only cover households and the two W3 PH roster-only households, whose own codes take the matching PH cover labels.
+Each W5 cover instead supplies unlabelled codes, to which the library applies =_W5_STRATA=.
+Keep those two lookup visits untagged under the existing native-record vocabulary. None of these observations establishes cross-visit design strata.
+
 ** Weight variables
 
 | Wave    | Cross-sectional (=weight=) | Panel (=panel_weight=)     | Notes                                           |

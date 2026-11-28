@@ -2391,6 +2391,65 @@ def _is_format_id_passthrough(fn):
             and call.args[0].id == args[0])
 
 
+def _nigeria_native_sample_problems(wave, variable):
+    """Nigeria's sample is a script, with one native cover per logical visit."""
+    from pathlib import PurePosixPath
+
+    from lsms_library import local_tools
+
+    build = wave.formatting_functions["sample_for_wave"]
+    folder = wave.wave_folder
+    spec = build.__globals__["ROUND_COVERS"][folder]
+    role = "pp" if wave.year.endswith("Q3") else "ph"
+    source = spec["strata"]
+    if not isinstance(source, str):
+        return ["The script applies a strata lookup rather than serving a bare value"]
+    location = _VARIABLE.fullmatch(variable or "")
+    if not location or location.group(1) != source:
+        return [f"The script reads {source!r}, record names {variable!r}"]
+    suffix = PurePosixPath(location.group(2)).parts
+    if PurePosixPath(spec[role]).parts[-len(suffix):] != suffix:
+        return [f"The {role} script reads {spec[role]!r}, record names {variable!r}"]
+    assert not wave.resources.get("sample")
+
+    # Exercise the real PP/PH script transform, stubbing only native I/O.
+    # The other source field always carries a different label, and the
+    # same invented household has different labels on PP and PH.
+    root = wave.file_path / "Data"
+    operands = {root / spec[k]: k for k in
+                ("pp", "ph", "pp_roster", "ph_roster", "pp_supplement") if k in spec}
+    used = set()
+
+    def read(path, *, convert_categoricals=True, **kwargs):
+        from pathlib import Path
+
+        key = Path(path)
+        k = operands[key]
+        used.add(key)
+        is_pp = k.startswith("pp")
+        label = "Own planting label" if is_pp else "Own harvest label"
+        cols = dict(hhid=["synthetic"], state=[10], lga=[20], ea=[30],
+                    zone=[77], strata=[88], sector=["RURAL"])
+        # A positive EA cannot trigger the same-location repair.
+        for name in (spec["weight"], spec["panel_weight"], spec["pp_result"],
+                     spec["ph_result"], "hhsmlc"):
+            cols[name] = [1]
+        if convert_categoricals:
+            cols.update(zone=["Different zone"], strata=["Different strata"])
+            cols[source] = [label]
+            cols[spec["pp_result"]] = cols[spec["ph_result"]] = ["Completed"]
+        return pd.DataFrame(cols)
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(local_tools, "get_dataframe", read)
+        got = build(folder)["strata"]
+    expected = "Own planting label" if role == "pp" else "Own harvest label"
+    assert got.xs(wave.year, level="t").tolist() == [expected]
+    assert set(operands) == used
+    assert got.index.is_unique and len(got) == 2
+    return []
+
+
 def _native_config_problems(country, wave, variable=None):
     """Why the wave's `strata` is not a bare, un-relabelled recorded variable
     (and, given `variable`, not the one the record names).  [] if none."""
@@ -2398,6 +2457,9 @@ def _native_config_problems(country, wave, variable=None):
     import lsms_library as ll
     from pathlib import PurePosixPath
     from lsms_library.yaml_utils import load_yaml
+    if country == "Nigeria":
+        return _nigeria_native_sample_problems(
+            ll.Country(country, preload_panel_ids=False)[wave], variable)
     c = ll.Country(country)
     w = c[wave]
     with open(w.file_path / "_" / "data_info.yml", encoding="utf-8") as fh:
@@ -2475,6 +2537,20 @@ class TestANativeRecordIsWhatTheConfigServes:
                                        "strate (EACIPOIDS.dta)")
         assert _native_config_problems("Mali", "2017-18",
                                        "poids_leger (EACI17_ECHANTILLON.dta)")
+
+    def test_nigeria_records_do_not_describe_the_library_lookup_as_native(self):
+        codes = ("2023Q3", "2024Q1")
+        records = sampling_records("Nigeria")
+        assert len(records) == 10
+        first = records["2010Q3"]
+        assert first.get("panel") is None and first.get("design_tag") is None
+        for wave, record in records.items():
+            if wave in codes:
+                assert record.strata_holds is None
+                problem, = _native_config_problems("Nigeria", wave, "strata (cover.dta)")
+                assert "strata lookup" in problem
+            else:
+                assert record.strata_holds == "native-label"
 
 
 # -- delivered: the tag agrees with the served column ----------------------
