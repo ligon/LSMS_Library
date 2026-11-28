@@ -3101,8 +3101,15 @@ derives that count from the raw file and asserts the served sentinel count
 EQUAL to it.  Slot 2's 22-23 distinct unit codes are all inside
 =harvest_units= (the 2 new distinct =u= per cell are slot-2-only labels).
 
-*Not wired*: 2019-20 season A's =_11= / =_21= "part harvest" slots (#647,
-no verdict), on either side.
+*Not wired*: 2019-20 season A's =_11= / =_21= "part harvest" slots, on either
+side.  /Corrected 2026-11-25 (#647); from 2026-09-24 this line said only that
+#647 had no decision./  The [[https://github.com/ligon/LSMS_Library/issues/647#issuecomment-6639391906][2026-11-04 maintainer ruling]] keeps the ordinary-only default:
+PART / 5A1 stays out of both harvest and sale.  That sets the default and does
+not settle the instrument.  Whether 5A1 Q6 / Q7 / Q8 report additional or
+cumulative amounts, and what the released Yes/No follow-up flag =harvest1=
+records, are unresolved and wait on UBOS / the World Bank; #647 stays open for
+that.  See "2026-10-30 -- PART harvest is separate from condition ..." and
+"2026-11-09 -- Remaining processing-state scope and current holds" below.
 
 ** TODO =KgFactor= is wired for 2018-19 only; every other wave ships one too
 
@@ -4933,6 +4940,14 @@ The ordinary family is consequently not confined to fully harvested crops.
 No =_11= / =_21= or =harvest1= family is present in the exact declared
 2019-20 B or 2018-19 A/B source columns; this is checked coverage, not an
 assumption that sibling forms or releases are identical.
+
+/Dated note, 2026-11-25 (#647): the next sentence is historical, as of 2026-10-30.
+Its "not wired" half still holds.  Its other half was superseded on
+2026-11-04, when the maintainer ruled to keep the ordinary-only default (PART
+excluded from both harvest and sale); the entry it refers to, under #848 above,
+now cites that ruling.  Every measurement and question in this section stands
+as written, and the Q6 / Q7 / Q8 relationship and the Yes/No flag remain
+unresolved./
 
 The earlier "not wired; no verdict" entries remain accurate. Simple append
 is not yet justified: GH1198 can preserve source observations, whereas the
