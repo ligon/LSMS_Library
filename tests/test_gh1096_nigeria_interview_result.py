@@ -238,10 +238,14 @@ def _cover(nigeria, t):
 def _dated(raw, t):
     raw = raw.set_index(raw['hhid'].map(format_id))
     if FOLDER[t] == '2018-19':
-        return pd.to_datetime(raw['InterviewStart'], errors='coerce')
+        return pd.to_datetime(raw['InterviewStart'], errors='coerce'), pd.Index([])
     triple = raw[['saq13y', 'saq13m', 'saq13d']].set_axis(['year', 'month', 'day'], axis=1)
-    return pd.to_datetime(triple, errors='coerce')
-
+    # Independent native oracle, not a call to the production parser. The
+    # approved migration adds only the three verified year/month partials.
+    first = pd.to_datetime(triple.assign(day=1), errors='coerce')
+    partial = triple['day'].isna() & first.notna()
+    complete = pd.to_datetime(triple, errors='coerce')
+    return complete.mask(partial, first), triple.index[partial]
 
 @pytest.fixture(scope='module')
 def interview_date():
@@ -257,9 +261,20 @@ def test_served_result_is_the_covers_own(nigeria, interview_date, t):
     cover, raw = _cover(nigeria, t)
     frame = interview_date.xs(t, level='t').droplevel(
         [n for n in interview_date.index.names if n not in ('t', 'i')])
-    dated = _dated(raw, t).dropna()
-    # The rows are exactly the cover's dated households.
+    dates, partial = _dated(raw, t)
+    dated = dates.dropna()
+    # No different status-only cohort. Every addition is an actual
+    # registered partial date, not a row kept by InterviewResult.
+    assert len(partial) == {'2015Q3': 2, '2016Q1': 1}.get(t, 0)
     assert set(frame.index) == set(dated.index)
+    expected_dates = dated.reindex(frame.index)
+    assert frame['Int_t'].eq(expected_dates).all()
+    key = '::interview_date::date-day-imputed'
+    if 'Derivation' in frame:
+        keyed = frame.index[frame['Derivation'].eq(key).fillna(False)]
+        assert set(keyed) == set(partial)
+    else:
+        assert partial.empty
     expected = cover.loc[frame.index, RESULT_COLUMN[t]].astype('string').map(
         nigeria.interview_result_label)
     assert (frame['InterviewResult'].astype('string').values == expected.values).all()

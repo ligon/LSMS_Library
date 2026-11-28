@@ -3582,6 +3582,24 @@ the triple is served (it is what W1/W2 serve).  The three disagreements:
 hhid 40015 (=saq13= ='23042016'=, triple 23 Feb 2016) and 50003 / 50005
 (=saq13= ='26030216'=, a year typo in the text; triple 26 Mar 2016).
 
+** 2026-11-25 -- W1--W3 build-time calendar parser (GH #1045)
+
+The six NBS household forms' Q13 (PDF page 2) records day, month, and
+year, with a separate start time. The PH forms' cover pages print February/March
+2011, 2013, and 2016 respectively, the same civil years as the paired catalog
+releases (1002, 1952, 2734, recorded in each wave's =SOURCE.org=). Those
+civil-calendar anchors ground the Gregorian component spec.
+
+The exact cover census leaves all 28,708 previously served dates unchanged.
+Under the existing registered first-day rule it adds two =2015Q3= rows and
+one =2016Q1= row with known year and month and a blank day. All three report
+a completed interview and carry =::interview_date::date-day-imputed=. Day one
+is not a recorded day. Status without a parsed date still does not admit a
+row. The W1/W2 omissions called "blank" above were 193 wholly blank triples
+and 13 impossible days. Of W3 PP's 23 component blanks, 21 were wholly blank
+and two lacked only the day. The W3 PH alternate text remains unused, and W4
+timestamps and W5's absence from this table are unchanged.
+
 ** The 20 post-planting interviews dated March/April 2016 are PH-ONLY households
 
 2015Q3 (PP) is fielded Aug--Nov 2015, yet 20 PP rows are dated 2016-03-04 ..
