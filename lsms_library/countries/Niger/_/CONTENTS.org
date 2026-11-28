@@ -725,6 +725,22 @@ French names (with a handful of preserved local-language entries for
 which a follow-up =u= table could be added if the harmonization plan
 requires it).
 
+** Curated raw keys also support the Original view (GH #926)
+
+=food_acquired(labels='Original')= reverses the country crosswalk. It
+takes the last nonblank Original Label for each Preferred Label. It is
+not each row's own source label. For example =Arachide grillée= maps
+back to =Arachide grillÃ©e= even though the raw and clean input spellings
+both reach the same default =j= before the 2018-19 wave hook. The
+source-free regression checks this one lookup and display example.
+
+The older-wave NSU crosswalk also reads the same table. With invented
+inputs, the existing =PastÃ¨que, Melon= row supplies the preferred
+stem for a differently punctuated label, allowing a stem match which
+otherwise does not occur. This shows a code-path dependency, not a
+measured release match. Do not infer that a raw row is unused from clean
+default output alone.
+
 * The =u= sentinel: a quantity recorded with no unit (GH #842 / #847)
 
 Niger's enumerators sometimes recorded an amount and left the unit
