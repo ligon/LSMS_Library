@@ -131,19 +131,21 @@ usual duplicate-index instruments can see*:
   payloads are identical the collapse is value-lossless and therefore
   silent too.
 
-What the tables do today (2026-07-21) is *not* consistent:
+Household keys at the wave-producer boundary:
 
 | table            | key            | note                                             |
 |------------------+----------------+--------------------------------------------------|
-| =food_acquired=  | =r_hhid=       | de-duplicated; row counts 408,707 $\to$ 228,281  |
-| =shocks= (2008-15) | =UPHI=       | one row per descendant-household-round           |
+| =food_acquired=  | =r_hhid=       | de-duplicated; row counts 408,707 $\to$ 228,281 (2026-07-21 checkpoint) |
+| =shocks= (2008-15) | =r_hhid=    | agreeing back-cast copies collapse per shock    |
 
-*This inconsistency is unresolved.*  It is a grain decision about
-published tables and belongs to the maintainer; see the discussion on
-[[https://github.com/ligon/LSMS_Library/pull/651][PR #651]].  Until it
-is settled, do not "fix" one table's key to match the other as a side
-effect of unrelated work --- and do not conclude from a zero duplicate
-count that a 2008-15 key is sound.
+*Historical note (2026-07-21).* The old table listed =shocks= under =UPHI=,
+"one row per descendant-household-round", and called the difference
+unresolved (see [[https://github.com/ligon/LSMS_Library/pull/651][PR #651]]). GH #637 superseded the old shocks key at the wave
+producer. The current table describes producer keys, not final API IDs.
+See [[#shocks-occurrence-r4][the R4 shocks note]] for the compiler boundary. Published grain decisions
+belong to the maintainer. Do not re-key other tables as a side effect of
+unrelated work or infer that a 2008-15 key is sound from a zero duplicate
+count.
 
 Related: the Round-4 sub-panel split is a separate matter, documented
 at [[#panel-design][Panel design note]].
@@ -3328,3 +3330,39 @@ ANYTHING" is a "did nothing" answer: alone it is =HowCopedSet=, beside a strateg
 and keeps its position.  Rounds 1-2 (2008-09, 2010-11) carry no coping in the UPD release (0 of 10,241
 and 0 of 10,216 experienced rows), so their set is NA throughout; whether coping was asked in the
 original R1/R2 forms is not established (GH #1562 audit F5, a residual).
+
+* shocks: occurrence and follow-up in NPS Round 4 (2014-15, GH #1834)
+:PROPERTIES:
+:CUSTOM_ID: shocks-occurrence-r4
+:END:
+
+The [[https://microdata.worldbank.org/catalog/2862/download/46540#page=46][NBS Round 4 household questionnaire, Section R (printed p. 45, PDF p. 46)]]
+asks in Q1 whether each listed event caused severe negative effects in
+the previous *two years*. The [[https://microdata.worldbank.org/catalog/3814/variable/F31/V1013?name=hr_01][exact UPD occurrence metadata (=hr_01=)]]
+also says two years for R4. The [[https://microdata.worldbank.org/catalog/2862/data-dictionary/F53][standalone R4 dictionary]] says five,
+which conflicts with the issued form and is not the authority for its
+recall period.
+
+Q2 ranks up to three of the most severe shocks reported in Q1. Only the
+ranked shocks get Q3 (loss of income, assets or both) and Q4 (actions
+taken), with other follow-ups left blank by design. The printed R4 Q4 has
+two coping slots. The pooled UPD third rank (=hr_06_3=) reflects R3's
+three-slot form, not a third R4 question. See the
+[[https://microdata.worldbank.org/catalog/3814/download/48978#page=127][Universal Panel Questionnaire, PDF pp. 127-128]].
+
+The UPD wave producer selects =hr_01= answers of =YES= and projects effects
+and coping without the screen or rank. It collapses back-cast copies
+whose projected answers agree at =(t, r_hhid, Shock)=. Conflicting
+projected copies raise. Here =r_hhid= is the
+round-specific interviewed household, whereas =UPHI= tracks the Round-4
+descendant panel line. The country compiler invokes =id_walk= on the
+household IDs before writing. A synthetic producer-to-finalizer check bypassed that
+step and the full public route. It showed affirmative rows with all-null
+projected follow-ups dropping in finalization, before coping normalization,
+including an invented nonblank effect that mapped to null.
+
+Do not use =Country.shocks()= row counts for incidence or as a denominator
+for outcomes among all experienced shocks in R4. An absent follow-up
+cannot distinguish a skip, a missing answer or a value mapped to null.
+Native keys were not reconciled. This note does not resolve fielding in
+other rounds or the separate [[#issue-114][food #114 WAITING]].

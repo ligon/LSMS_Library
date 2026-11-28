@@ -5857,6 +5857,33 @@ Regression coverage: =tests/test_shocks_malawi_iraq_food_effects.py= checks
 independent synthetic answers and missingness, then compares every served
 effect and coping answer to the raw source by household and shock.
 
+* shocks: occurrence and follow-up in IHS5 2019-20 cross-section (GH #1834)
+
+The [[https://microdata.worldbank.org/catalog/3818/download/49042#page=74][NSO household questionnaire, Module U (printed and PDF p. 74)]]
+asks in U01 whether each shock negatively affected the household in the
+past *three years*. U02 ranks up to three of the most significant shocks
+experienced in the past *12 months*. Only those ranked shocks get the
+U03 effects and U04 coping questions. The form instructs interviewers to
+leave the other follow-ups blank, so a blank does not mean no experience.
+The [[https://microdata.worldbank.org/catalog/3818/data-dictionary/F29][IHS5 cross-sectional Module U dictionary]] distinguishes the
+occurrence screen, last occurrence date, rank and follow-up fields.
+
+The current 2019-20 XS producer maps =case_id= to =cs-19-= household IDs
+and projects effects and coping. It neither selects on =hh_u01= nor
+returns the screen, date or rank. In a synthetic check of the producer
+and finalizer, the finalizer dropped all-null follow-up rows before
+coping normalization, including an affirmative row. Invented rows with
+No or unknown screen responses and non-null follow-up survived. Row
+presence is therefore not proof of experience, and keeping every blank
+grid row would not recover an occurrence table. An affirmative all-null
+projection cannot distinguish an ineligible or unranked row from missing
+or unmapped answers.
+
+Do not use =Country.shocks()= row counts for incidence or as a denominator
+for outcomes among all experienced shocks in this wave. The check did not
+reconcile native keys or exercise the full public route. This note covers
+only the IHS5 cross-section, not the panel or other waves.
+
 * 2026-11-08 -- TLU coverage is disclosed; anonymous fertilizer keys remain unresolved (GH #1485)
 
 =tlu= retains its existing factors, returned households and numerical totals.
