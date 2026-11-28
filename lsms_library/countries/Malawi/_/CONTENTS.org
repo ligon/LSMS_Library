@@ -2890,7 +2890,7 @@ print(c.food_quantities().describe())
 
 * Sampling Design
 ** Overview
-Malawi has five waves from two survey programs:
+Malawi has six waves from two survey programs:
 - IHS2 (2004-05): cross-sectional, 11,280 households
 - IHS3 (2010-11): cross-sectional, 12,271 households
 - IHPS (2013-14): panel only (tracked from IHS3), 4,000 households
@@ -2899,14 +2899,24 @@ Malawi has five waves from two survey programs:
   (this line read "= 14,552" until 2026-07; the two addends were right and
   the total was a typo.  14,612 is what =sample()=, =household_roster()= and
   =cluster_features='s =df_main= all return for the wave.)
+- IHS6 and IHPS (2024-25) contribute 12,888 and 2,763 cover records.
+  The 815 shared interviews are kept once, for 14,836 =sample()= rows.
 
 ** Strata
-District serves as the stratification variable across all waves (~30-32
-districts). The 2013-14 IHPS file also has an explicit =stratum= column
-with 6 Region x Rural values, but we use =district= for consistency.
-District names vary slightly across waves (e.g., "Blanytyre" vs
-"Blantyre", "Nkhatabay" vs "Nkhata Bay"); these are harmonized via the
-=strata= table in =categorical_mapping.org=.
+
+The name =sample().strata= does not by itself identify the survey's design strata.
+In 2004-05 the library reads the IHS2 cover's =strata= (30 occupied labels), not its =dist= (26 codes).
+In 2010-11 it reads =hh_a01= (31 occupied labels).
+In 2013-14 it reads =district= rather than the panel cover's separate six-class =stratum= (region x rural).
+Every one of the 31 served district labels in that wave spans more than one recorded =stratum= value.
+The mixed waves from 2016-17 onward read each component cover's own =district=.
+
+All these paths use the =district= table in =categorical_mapping.org=.
+An exact cover projection for #1577 (2026-11-25) found that the mapping preserves the number of occupied labels in the first two waves, but not always later.
+The 2016-17 panel cover has 29 distinct source labels and 28 mapped labels.
+These are counts of labels, not evidence that the survey combined design strata.
+The two 2024-25 covers give different released district labels for 32 of the 815 shared interviews, and agree for all 815 after the current mapping.
+The loader still keeps IHS6's value on shared interviews and does not take the panel district in its place.
 
 ** Cluster (PSU)
 - 2004-05: =psu= (string, 564 unique EAs)  -- *was* =ea=; see below
