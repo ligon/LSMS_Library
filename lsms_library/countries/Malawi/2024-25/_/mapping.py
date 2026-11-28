@@ -8,6 +8,44 @@ import sys
 from pathlib import Path
 import pandas as pd
 from lsms_library.local_tools import format_id
+
+
+def shocks(df):
+    """Serve IHS6 and retained IHPS Module U, with IHS6 taking precedence."""
+    cover = ['_shocks_cover_key', '_shocks_previous_key', '_shocks_ihs6_key']
+    if not set(cover).issubset(df):
+        raise ValueError('Malawi 2024-25 shocks require the IHPS panel cover')
+    if df.index.to_frame(index=False).isna().any(axis=None) or df.index.has_duplicates:
+        raise ValueError('Malawi 2024-25 shocks have missing or duplicate household-shock keys')
+
+    i = df.index.get_level_values('i')
+    panel = ~i.str.startswith(CS_24)
+    matched_cover = df[cover[0]].map(format_id).notna().to_numpy()
+    if (matched_cover != panel).any():
+        raise ValueError('Malawi 2024-25 shocks and the IHPS cover disagree on household identity')
+
+    # A blank previous-round ID identifies a refresh copy. On the retained
+    # rows, the cover case_id is an older baseline key, not an IHS6 key.
+    copy = panel & df[cover[1]].map(format_id).isna().to_numpy()
+    target = CS_24 + df.loc[copy, cover[2]].map(format_id)
+    matches = pd.DataFrame({'panel': i[copy], 'ihs6': target.to_numpy()}).drop_duplicates()
+    if target.isna().any() or matches['ihs6'].duplicated().any():
+        raise ValueError('Malawi 2024-25 shocks have missing or duplicate IHS6 refresh counterparts')
+
+    keys = pd.MultiIndex.from_arrays(
+        [df.index.get_level_values('t')[copy], target,
+         df.index.get_level_values('Shock')[copy]],
+        names=df.index.names,
+    )
+    ihs6 = df.loc[~panel & i.isin(target)].index
+    if len(keys) != len(ihs6) or not keys.isin(ihs6).all():
+        raise ValueError('Malawi 2024-25 refresh and IHS6 disagree on shared shock keys')
+
+    # The released coping answers can differ. Keep the whole IHS6 row
+    # without reconciling or replacing any of its ranked responses.
+    return df.loc[~copy].drop(columns=cover)
+
+
 sys.path.append(str(Path(__file__).resolve().parents[2] / '_'))
 from malawi import CS_24, ihps24_refreshed
 
