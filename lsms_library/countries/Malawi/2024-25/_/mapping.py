@@ -48,3 +48,46 @@ def panel_ids(df):
     absent; with the JSON present both backends serve it (PR #1604 review).
     """
     return df[df['previous_i'].map(format_id).notna().to_numpy()]
+
+
+def household_roster(df):
+    """Serve each Module B interview once (ledger 1275-malawi-roster, §§3-5).
+
+    The panel cover's blank previous-round ID distinguishes refresh copies.
+    Within those interviews the IHS6 PID corresponds to the IHPS local
+    id_code, not to the IHPS longitudinal serial PID.
+    """
+    cover = ['_roster_y5_hhid', '_roster_y4_hhid', '_roster_ihs6_case_id']
+    if not set(cover).issubset(df):
+        raise ValueError('Malawi 2024-25 roster requires the IHPS panel cover')
+    if df.index.to_frame(index=False).isna().any(axis=None) or df.index.has_duplicates:
+        raise ValueError('Malawi 2024-25 roster has missing or duplicate person keys')
+
+    i = df.index.get_level_values('i')
+    panel = ~i.str.startswith(CS_24)
+    matched_cover = df[cover[0]].map(format_id).notna().to_numpy()
+    if (matched_cover != panel).any():
+        raise ValueError('Malawi 2024-25 roster and the IHPS panel cover disagree '
+                         'on household identity')
+
+    copy = panel & df[cover[1]].map(format_id).isna().to_numpy()
+    target = CS_24 + df.loc[copy, cover[2]].map(format_id)
+    if target.isna().any():
+        raise ValueError('Malawi 2024-25 refresh roster has no IHS6 household key')
+    keys = pd.MultiIndex.from_arrays(
+        [df.index.get_level_values('t')[copy], target,
+         df.index.get_level_values('pid')[copy]],
+        names=df.index.names,
+    )
+    payload = ['Sex', 'Relationship', 'Age', 'MonthsAway']
+    ihs6 = df.loc[~panel & i.isin(target), payload]
+    if keys.has_duplicates or not keys.sort_values().equals(ihs6.index.sort_values()):
+        raise ValueError('Malawi 2024-25 refresh and IHS6 rosters disagree on '
+                         'person keys within their shared interviews')
+    refresh = df.loc[copy, payload].set_axis(keys)
+    ihs6 = ihs6.reindex(keys)
+    same = refresh.eq(ihs6) | (refresh.isna() & ihs6.isna())
+    if not same.fillna(False).to_numpy().all():
+        raise ValueError('Malawi 2024-25 refresh and IHS6 rosters disagree on '
+                         'roster answers within their shared interviews')
+    return df.loc[~copy].drop(columns=cover)

@@ -393,11 +393,21 @@ class TestABrokenWaveInTheRoster:
         c, good, _ = self._broken(registry)
         assert len(c.household_characteristics(waves=[good])) == 3
 
-    def test_a_real_absence_still_answers_empty(self, registry):
+    def test_a_real_absence_still_answers_empty(self, registry, monkeypatch):
         c, waves, _ = registry
-        absent = [w for w in c.waves if w not in waves]
-        assert absent, 'Malawi 2024-25 declares no roster'
-        assert len(c.household_characteristics(waves=absent)) == 0
+        absent = waves[0]
+        resources = C.Wave.resources.fget
+
+        def without_roster(wave):
+            config = resources(wave)
+            if wave.country.name == c.name and wave.year == absent:
+                return {name: block for name, block in config.items()
+                        if name != 'household_roster'}
+            return config
+
+        monkeypatch.setattr(C.Wave, 'resources', property(without_roster))
+        assert 'household_roster' not in c[absent].data_scheme
+        assert len(c.household_characteristics(waves=[absent])) == 0
 
 
 @pytest.mark.usefixtures('quiet')
