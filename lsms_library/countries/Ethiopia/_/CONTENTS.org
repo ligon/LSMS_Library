@@ -344,14 +344,14 @@ World Bank Microdata Library catalog entries:
 
 ** Strata
 
-Ethiopia has no explicit strata variable. Strata are constructed as
-Region x Urban/Rural (=saq01= x =rural= or =saq14=), following the
-ESS sampling documentation. The number of strata varies by wave
-because the coverage expanded over time:
+The library's =sample().strata= serves a constructed Region x Urban/Rural
+label (=saq01= x =rural= or =saq14=). These are observed library groups,
+not the full survey selection strata. The numbers below count the labels
+served in each wave:
 
 | Wave    | Region variable | Rural variable | Strata count | Notes                    |
 |---------+-----------------+----------------+--------------+--------------------------|
-| 2011-12 | =saq01=         | =rural=        |           18 | No Addis Ababa, Dire Dawa Urban |
+| 2011-12 | =saq01=         | =rural=        |           18 | No Addis Ababa; no Urban cells in Dire Dawa or Harar |
 | 2013-14 | =saq01=         | =rural=        |           21 | Adds Addis Ababa, Dire Dawa Urban |
 | 2015-16 | =saq01=         | =rural=        |           21 | Same coverage as wave 2  |
 | 2018-19 | =saq01=         | =saq14=        |           21 | ALL CAPS in source data  |
@@ -529,9 +529,10 @@ this file said so.
 
 *** Not claimed here
 
-The often-quoted "small town = under 10,000" threshold is *not* verified in
-this repo.  It should be confirmed against the survey report before anyone
-relies on it or repeats it in a tracked file.
+For ESS1 only, footnote 8 of the retrospective ESS3 Basic Information
+Document quoted below defines small towns as having fewer than 10,000
+people using 2007 census estimates. Do not apply this definition to other
+waves from this citation alone.
 
 ** Wave by wave
 
