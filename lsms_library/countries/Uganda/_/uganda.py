@@ -1495,7 +1495,7 @@ ACRES_PER_HECTARE = 2.471053814671653  # 1 ha = 2.471... acres
 HECTARES_PER_ACRE = 1.0 / ACRES_PER_HECTARE  # 0.404686 ha / acre
 
 
-def _harmonized_codes(tablename, key='Code', value='Preferred Label'):
+def _harmonized_codes(tablename, key='Code', value='Preferred Label', *, encoding=None):
     """Load a Code -> Preferred Label dict from categorical_mapping.org.
 
     Mirrors the shape of ``harmonized_unit_labels`` but returns integer
@@ -1504,8 +1504,10 @@ def _harmonized_codes(tablename, key='Code', value='Preferred Label'):
     """
     from lsms_library.local_tools import get_categorical_mapping
 
-    raw = get_categorical_mapping(tablename=tablename, idxvars=key,
-                                  **{value: value})
+    options = {value: value}
+    if encoding is not None:
+        options['encoding'] = encoding
+    raw = get_categorical_mapping(tablename=tablename, idxvars=key, **options)
     out = {}
     for k, v in raw.items():
         try:
@@ -1540,7 +1542,7 @@ def _harmonize_acquire_table():
     orgfn = next((c for c in candidates if os.path.exists(c)), candidates[0])
 
     df = df_from_orgfile(orgfn, name='harmonize_acquire',
-                         set_columns=True, to_numeric=True)
+                         set_columns=True, to_numeric=True, encoding='utf-8')
     out = {}
     for _, row in df.iterrows():
         wv = str(row['Wave']).strip()
@@ -1657,9 +1659,9 @@ def plot_features_for_wave(t, source_2a, source_2b, colmap):
     entirely: they come from the GPS ``geovars`` raster file keyed on the
     household (not the parcel) and are not survey-reported plot attributes.
     """
-    tenure_system_map = _harmonized_codes('harmonize_tenure_system')
-    soil_map = _harmonized_codes('harmonize_soil')
-    water_map = _harmonized_codes('harmonize_water')
+    tenure_system_map = _harmonized_codes('harmonize_tenure_system', encoding='utf-8')
+    soil_map = _harmonized_codes('harmonize_soil', encoding='utf-8')
+    water_map = _harmonized_codes('harmonize_water', encoding='utf-8')
     acquire_map = _harmonize_acquire_table()
 
     pieces = []
