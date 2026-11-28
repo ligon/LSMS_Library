@@ -1,6 +1,28 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* 2026-11-25 -- 2024-25 household roster (GH #1275, roster slice)
+
+The 815 IHPS refreshment interviews are the same as their IHS6 cross-sectional counterparts, not 815 new interviews.
+The panel Module B ships two person identifiers: =id_code= is the interview-local code and =PID= is a longitudinal person serial.
+In the 815 shared households, all 3,575 IHS6 =PID= values match the IHPS =id_code= under their IHS6 household key and none match the IHPS =PID=.
+The four served source answers (sex, relationship, age in years and months away) agree on all 3,575 matched person lines.
+
+The new YAML roster takes all 55,911 IHS6 person rows under =cs-24-= and all 8,475 retained IHPS person rows under the same walked household IDs that =sample= uses.
+The panel cover's blank =y4_hhid= distinguishes refresh interviews, as it does for =sample= and =food_acquired=, and its =case_id= gives the IHS6 household key for them.
+The builder checks that every refresh copy is genuinely redundant before discarding it and refuses missing or inconsistent source keys.
+The two roster files and the panel cover are declared L2 inputs.
+The inherited =v= and kinship steps remain framework work.
+Do not impute the two missing IHS6 ages or the one missing months-away answer.
+The joint [[https://microdata.worldbank.org/catalog/8507/download/359615][IHS6 / IHPS household questionnaire]], printed Module B pages 5-6, asks whole years at B05a and cumulative months away over the last 12 months at B07.
+This roster supplies neither a longitudinal person mapping nor a new weighting policy.
+
+Private cold subset, all-wave warm and Make checks all serve the same 64,386 current person rows over 14,836 households.
+All 1,948 retained panel targets now have roster rows and the 2019-20 to 2024-25 attrition warning clears.
+The longstanding updated-ID coverage warning remains.
+Sorted row and schema fingerprints are unchanged for 260,612 earlier roster rows and the full 71,954-row sample.
+The whole-wave YAML and mapping hashes move all 22 registered Malawi country fingerprints and no earlier-wave fingerprints.
+
 * 2026-11-13 -- GH #1228 later waves: the season, the Module D join, and the registered relabel
 
 Rulings @ligon 2026-11-12 ("Join D, single-text only") and 2026-11-13, after the red
@@ -5857,6 +5879,21 @@ Regression coverage: =tests/test_shocks_malawi_iraq_food_effects.py= checks
 independent synthetic answers and missingness, then compares every served
 effect and coping answer to the raw source by household and shock.
 
+* 2026-11-25 -- IHS6 and retained IHPS shocks (GH #1275 and #1556)
+
+The 2024-25 producer serves the Module U effects and coping answers from both IHS6 and the retained IHPS, under the existing household/shock grain.
+The paired cover establishes that all 815 IHPS refresh interviews also occur in IHS6, with the same interview dates and a one-to-one match on 26,080 household/shock keys.
+Their released effects and coping missingness agree, but on 91 records in 67 interviews the Panel export gives a ranked "OTHER (SPECIFY)" code and IHS6 gives a named code at the same rank.
+Keep the IHS6 version of each shared interview, as ruled, without reconciling its answers or interpreting any text.
+
+Module U p. 85 of =ihps_ihs6_household_questionnaire.pdf= asks in U01 about the last five years, whereas =hh_u01= in both released exports is labelled "last 3 Years".
+No recall horizon or all-experience indicator is assigned here.
+U02 separately ranks the three most severe shocks in the last twelve months and routes U03/04 to those.
+The producer keeps =hh_u03d= stocks and =hh_u03e= purchases separate, and the three =hh_u04a/b/c= positions follow the existing #1562 coping rules.
+There are 30,568 answered IHS6 records in 12,183 households and 4,512 answered retained IHPS records in 1,820 households.
+One ranked retained record has no answers in the five effect or three coping fields and is omitted by the existing all-blank payload rule.
+Neither open-ended coping text nor sample weights enter the table.
+
 * 2026-11-08 -- TLU coverage is disclosed; anonymous fertilizer keys remain unresolved (GH #1485)
 
 =tlu= retains its existing factors, returned households and numerical totals.
@@ -6235,3 +6272,36 @@ nothing changes at build time.  At READ time (=lsms_library/coping.py=, labels i
 - *"Did not do anything"* / *"DID NOT DO ANYTHING"*: alone it is the set; beside a strategy (257-530
   rows per wave) it leaves the set and keeps its position.
 - Not wired, as before: the "other, specify" text (=ab07*oth=, =hh_u04*_os=).
+
+* 2026-11-25 -- Interview source for the three stacked sample waves (GH #1704)
+
+The maintainer selected a component label with no change to weights or sample membership.
+In 2016-17, 2019-20 and 2024-25, =sample().SampleComponent= is =IHS= for cross-sectional interviews and =IHPS= for retained panel interviews.
+The 815 refresh interviews in 2024-25 are served on IHS interviews, so they are =IHS= even though they also carry =ihps_hhid= and =ihps_weight=.
+The full IHPS 2024 cohort still uses =ihps_weight.notna()= and its own =ihps_weight=, not the retained IHPS subset alone.
+Earlier waves do not declare this optional column.
+
+For an IHS-only estimate, filter the wave on =SampleComponent == 'IHS'= and use =weight= within those rows.
+For a retained-panel estimate, use the panel rows and the weight appropriate to that estimand.
+Do not treat an estimate pooled across source components as a single national probability sample.
+The joint-inclusion question remains open as a survey-design question, not a change to production weights.
+
+A private rerun of the served sample compared weighted rural shares in percent:
+
+| Wave    | Pooled | IHS cross-section | Retained IHPS | Full IHPS |
+|---------+--------+-------------------+---------------+-----------|
+| 2016-17 |  81.08 |             80.95 |         81.16 |           |
+| 2019-20 |  81.89 |             83.75 |         80.79 |           |
+| 2024-25 |  85.10 |             82.86 |         89.60 |     82.83 |
+
+All rows in these comparisons had a positive weight and a recognized rural/urban answer for the relevant denominator.
+The retained 2024-25 panel and full 2024 IHPS cohort are different samples.
+
+* 2026-11-25 -- 2024-25 =interview_date= (GH #1275)
+
+Both household covers record one Gregorian day in =interviewDate=.
+The IHPS =consumption_date= is a separate answer, not a second interview visit.
+All 815 refresh dates agree with the corresponding IHS6 dates; the builder checks the dates and keeps the IHS6 row.
+One retained IHPS cover row is blank despite the catalogue's valid-character count; it stays undated.
+The existing visit melt serves 14,835 =visit=1= dates, 12,888 IHS6 and 1,947 retained IHPS.
+The sample population and older waves' recorded visit keys are unchanged.

@@ -14,6 +14,8 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
 from malawi import ihps_baseline_status  # noqa: E402,F401
 from malawi import ihps_panel_cluster_features as _ihps_panel_cluster_features  # noqa: E402
 
+from malawi_sample_component import ihs_component, ihps_component
+
 def cs_i(value):
     return 'cs-19-'+format_id(value.iloc[0])
 
