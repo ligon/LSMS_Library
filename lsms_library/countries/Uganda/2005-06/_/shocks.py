@@ -46,6 +46,7 @@ df.h16q2 = df.h16q2.map(s)
 d = {'mortgage': 'Rented out land/building',
     'sell assets': 'Sold assets', 
     'use savings': 'Relied on savings', 
+    'withdraw children from school and sent them for wage employment': 'Withdrew children from school and sent them for wage employment',
     'send children to live else where': 'Sent children to live elsewhere', 
     'migration': 'Household member(s) migrated',
     'formal borrowing': 'Obtained credit',
@@ -56,6 +57,7 @@ d = {'mortgage': 'Rented out land/building',
     'more wage employment': 'More wage employment',
     'change crop choices to avoid bad weather or pest attack': 'Changed cropping practices (crop choices or technology)',
     'improve technology': 'Changed cropping practices (crop choices or technology)',
+    'work as self employed': 'Worked in self-employment',
     'increased agriculture labour supply': 'Increased agriculture labour supply',
     'other': 'Other (specify)'
      }
