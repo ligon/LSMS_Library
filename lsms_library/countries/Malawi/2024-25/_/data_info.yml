@@ -22,6 +22,7 @@ sample:
         - Cross_Sectional/hh_mod_a_filt.dta
         - Panel/hh_mod_a_filt_24.dta:
             i: y5_hhid
+            SampleComponent: [y5_hhid, {mapping: ihps_component}]
             weight: wt_cross
             _ihs6_case_id: case_id
     idxvars:
@@ -29,6 +30,7 @@ sample:
             - case_id
             - mapping: cs_i
     myvars:
+        SampleComponent: [case_id, {mapping: ihs_component}]
         v: ea_id
         weight: hh_wgt
         panel_weight: wt_long
