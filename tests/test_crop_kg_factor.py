@@ -202,6 +202,42 @@ def test_survey_median_fills_a_gap_when_enough_rows_report():
     assert set(f["KgFactorSource"].iloc[:-1]) == {"reported"}
 
 
+@pytest.mark.parametrize("pooled", [False, True])
+@pytest.mark.parametrize("min_reports", [1, 2])
+def test_mali_2017_median_keeps_tree_and_seasonal_reports_separate(pooled, min_reports):
+    """Both the condition-specific median and the unit-only fallback stay
+    within the 7F/11F source class. Metric and other-country paths are intact.
+    """
+    rows = [
+        ("2017-18", "season1", "a", "Crop", "sack", "dry", "A", 2.0, 100.0),
+        ("2017-18", "season2", "a", "Crop", "sack", "fresh", "A", 2.0, 100.0),
+        ("2017-18", "season3", "a", "Crop", "sack", "dry", "A", 2.0, np.nan),
+        ("2017-18", "tree1", "Farm-level", "Mango", "sack", "dry", "A", 2.0, np.nan),
+        ("2017-18", "tree2", "Farm-level", "Mango", "kg", "dry", "A", 2.0, np.nan),
+        ("2017-18", "unclear", "a", "Crop", "sack", "dry", "A", 2.0, np.nan),
+    ]
+    mali = _frame(rows).assign(perennial=pd.array(
+        [False, False, False, True, True, pd.NA], dtype="boolean"))
+    other = mali.copy()
+    if pooled:
+        # Row-level country labels must win over a stale country attr.
+        df = pd.concat({"Mali": mali, "Elsewhere": other}, names=["country"])
+        df.attrs["country"] = "Elsewhere"
+    else:
+        df = mali
+        df.attrs["country"] = "Mali"
+    result = harvest_kg_factors(df, min_reports=min_reports)
+    expected = ["reported", "reported", "survey_median", "none", "metric", "none"]
+    assert result.KgFactorSource.iloc[:len(rows)].tolist() == expected
+    np.testing.assert_equal(
+        result.kg_per_unit.iloc[:len(rows)].to_numpy(),
+        [100., 100., 100., np.nan, 1., np.nan])
+    if pooled:
+        assert result.KgFactorSource.iloc[len(rows):].tolist() == [
+            "reported", "reported", "survey_median", "survey_median", "metric",
+            "survey_median"]
+
+
 def test_survey_median_does_not_fill_when_too_few_report():
     df = _sack_group(SURVEY_MEDIAN_MIN_REPORTS - 1)
     f = harvest_kg_factors(df)

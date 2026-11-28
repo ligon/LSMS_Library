@@ -4380,3 +4380,15 @@ set only) and 2026-11-13 "Coping-strategy implementation, GH1562".  Canonical co
   ruling, and the set drops it beside a real strategy.
 - *2021-22: positions by rank.*  Option 25 (Oui/Non) is chosen on 72 rows, all alone, so nothing is
   inferred beside another strategy and nothing is stamped.
+
+* 2026-11-25 -- Separate seasonal and tree harvest-factor medians (GH #1754)
+
+The maintainer selected separate medians for the 2017-18 7F seasonal and 11F perennial modules.
+This applies to both the unit-by-condition group and the unit-only fallback, for Country and pooled Feature frames with country labels.
+The recorded seasonal factors, refusal screen and lower ladder rungs are unchanged.
+No new tree factor is inferred from the unread 11F equivalent field.
+
+On the held wave, 104 nonmetric tree rows lose the 373,151 kg supplied by seasonal medians and have no supported fallback.
+Another 71 tree rows change from =survey_median= to =metric= without a change in kilograms.
+The private pre-finalize wave comparison found identical factors and rung labels for all non-tree rows.
+The 2017-18 total falls from 32,791,070.26 kg to 32,417,919.26 kg.

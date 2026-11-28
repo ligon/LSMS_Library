@@ -35,8 +35,9 @@ FARM = 'Farm-level'
 
 #: Measured cold at 1a2bd6bd9 (burst jobs 41288942, 41289107; base cd199d4a3 served
 #: none 23,160 and metric 1,761).  A movement here is a data change to explain, not a
-#: pin to bump.
-PARTITION_2017_18 = {'reported': 21039, 'survey_median': 2345, 'none': 1535, 'metric': 2}
+#: pin to bump. GH #1754 subsequently separated 7F and 11F medians: 104
+#: trees lose the seasonal factor, and 71 kg trees use their metric factor.
+PARTITION_2017_18 = {'reported': 21039, 'survey_median': 2170, 'none': 1639, 'metric': 73}
 REFUSED_2017_18 = 2167
 REFUSED_BY_UNIT = {'Charretée': 1581, 'Autre': 534, 'Grenier': 21, 'Sac': 31}
 
@@ -208,7 +209,8 @@ def test_the_ladder_reads_it_through_the_unchanged_screen(built):
 #: harvest_kg for 2017-18, measured cold (burst job 41289107; red team job 41290049): it was
 #: 1,656,240.75 kg on 1,736 plot-crops at base cd199d4a3.  The other waves are unchanged by
 #: the wiring (frame-equal, measured) and are deliberately not pinned here.
-HARVEST_KG_2017_18 = 32_791_070.26
+# GH #1754: the 104 tree rows that had no supported fallback contributed 373,151 kg.
+HARVEST_KG_2017_18 = 32_417_919.26
 
 
 @pytest.mark.requires_s3
@@ -219,4 +221,6 @@ def test_harvest_kg_2017_18(built):
     t = hk.index.get_level_values('t').astype(str)
     got = float(pd.to_numeric(hk['Harvest_kg'])[np.asarray(t == WAVE)].sum())
     assert got == pytest.approx(HARVEST_KG_2017_18, rel=1e-9)
-    assert int((t == WAVE).sum()) == 23_359
+    # 104 input tree records lose their factors but only 103 aggregated
+    # harvest keys disappear, since two records can share a crop key.
+    assert int((t == WAVE).sum()) == 23_256

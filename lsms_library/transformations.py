@@ -4890,7 +4890,9 @@ def _survey_median_factors(df, reported, *, min_reports, sentinel=None):
     unit and condition within the same country-wave, provided at least
     *min_reports* of them reported one; where that group is too thin, fall
     back to the same country-wave's ``u`` alone.  Returns NaN where neither
-    group clears the bar.
+    group clears the bar.  In Mali 2017-18, both groups also distinguish
+    seasonal (7F) from perennial (11F), so the tree roster cannot borrow
+    seasonal reports (GH #1754).
 
     Grouping notes
     --------------
@@ -4921,6 +4923,24 @@ def _survey_median_factors(df, reported, *, min_reports, sentinel=None):
             keys[name] = pd.Series(col).astype(object)
 
     wave = [k for k in ('country', 't') if k in keys]
+    # GH #1754: the factor is elicited only in 7F, and the 11F tree
+    # instrument has a different harvest window. Use the source flag, not
+    # Farm-level (which also holds sales without a matching harvest plot).
+    # A Feature frame has row-level country labels; Country sets attrs.
+    perennial = _level_or_column(df, 'perennial')
+    if perennial is not None and 't' in keys:
+        mali = (keys['country'].eq('Mali') if 'country' in keys
+                else df.attrs.get('country') == 'Mali')
+        target = keys['t'].eq('2017-18') & mali
+        if target.any():
+            flags = pd.Series(perennial, index=target.index)
+            # Unknown flags in the affected wave form their own group; they
+            # must not become donors or recipients of identified rows.
+            seasonal = (target & flags.eq(False)).fillna(False).to_numpy(dtype=bool)
+            tree = (target & flags.eq(True)).fillna(False).to_numpy(dtype=bool)
+            keys['_median_module'] = pd.Series(np.select(
+                [seasonal, tree], ['seasonal', 'perennial'], default='unspecified'))
+            wave += ['_median_module']
     fine = wave + [k for k in ('u', 'condition') if k in keys]
     coarse = wave + [k for k in ('u',) if k in keys]
 
@@ -5493,8 +5513,9 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     ``survey_median``
         The median reported ``KgFactor`` of the same ``(u, condition)``
         within the same country-wave, where at least *min_reports* rows
-        report one; falling back to ``u`` alone.  The survey's own weights
-        filling the survey's own gaps -- see :func:`_survey_median_factors`.
+        report one; falling back to ``u`` alone.  In Mali 2017-18, both
+        groups also distinguish seasonal and perennial harvests (GH #1754).
+        See :func:`_survey_median_factors`.
     ``metric``
         A factor that is READ, never estimated: the country's DECLARED unit
         mass (``u_kg``, see *unit_kg* below), else :data:`KNOWN_METRIC`, else
