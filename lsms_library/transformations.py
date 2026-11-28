@@ -3886,12 +3886,15 @@ def _median_price_rung(df, t, j, u, value, qty, pool, *, geo, threshold):
 
 def food_expenditures_from_acquired(df, basis='purchased', *,
                                     valuation=None, geo=None,
-                                    threshold=10):
+                                    threshold=10, _observe_valuation=None):
     """Derive food expenditures from food_acquired.
 
     Returns a DataFrame of expenditure per household × item × period ×
     acquisition source (when ``s`` is present in the input index), summed
     over units.
+
+    This standalone transform has no reviewed source scope. The GH #828
+    total-basis disclosure is a Country/Feature read-time contract.
 
     Parameters
     ----------
@@ -4000,6 +4003,7 @@ def food_expenditures_from_acquired(df, basis='purchased', *,
         raise ValueError("food_acquired must have an 'Expenditure' column")
 
     valuation_attrs = {}
+    valued = None
     if rungs:
         # Everything above this line is untouched by the valuation and
         # everything below runs identically on the valued frame, so
@@ -4008,6 +4012,11 @@ def food_expenditures_from_acquired(df, basis='purchased', *,
         valuation_attrs = {k: valued.attrs[k] for k in
                            ('valuation_sources', 'valuation',
                             'valuation_geo_levels')}
+    if _observe_valuation is not None:
+        # Country-only read-time disclosure. Observe the original zeros and
+        # the exact rung result before replacing, dropping or aggregating rows.
+        _observe_valuation(df, valued)
+    if valued is not None:
         df = df.assign(Expenditure=valued['Expenditure'].to_numpy())
 
     idx_names = list(df.index.names)

@@ -167,3 +167,7 @@ class WaveWorkerError(Exception):
     def __init__(self, message, original_type=None):
         super().__init__(message)
         self.original_type = original_type
+
+
+class FoodExpenditureCoverageWarning(UserWarning):
+    """Explicit total-basis expenditures still lack values for observed acquisitions."""

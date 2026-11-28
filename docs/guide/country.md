@@ -119,6 +119,14 @@ Some tables are computed automatically from others:
 
 You call them the same way -- the derivation is transparent.
 
+For the reviewed EHCVM waves of Burkina Faso, Mali, and Niger,
+`food_expenditures(basis='total')` keeps the available values and reports
+coverage only if recorded own production or gifts still lack a value after
+any requested valuation. With no remaining gap, neither the coverage attr nor
+its warning is added. The same rule applies to `Feature('food_expenditures')`.
+See [total-basis coverage](data-methods.md#food_expenditures) for the report
+and its scope.
+
 These are derived **tables**, computed at read time from a source table. That
 is a different thing from a derived **value**: a number inside a table that the
 library constructed from raw survey answers rather than reading off one. Those
