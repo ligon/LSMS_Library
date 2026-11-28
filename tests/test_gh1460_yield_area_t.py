@@ -2,7 +2,12 @@
 
 Nigeria's `plot_features` is on the post-planting quarter and its `crop_production`
 on the post-harvest one, so the two share no `t` and `yield_kg` returned nothing.
+Since GH #587 its W1-W3 post-harvest rounds serve plot areas too (GH #1701).
 """
+import inspect
+import itertools
+import textwrap
+import types
 import warnings
 
 import pandas as pd
@@ -118,6 +123,75 @@ class TestThePairs:
             got = pp_ph_area_t(ll.Country('Nigeria'))
         assert got == {'2010Q3': '2011Q1', '2012Q3': '2013Q1', '2015Q3': '2016Q1',
                        '2018Q3': '2019Q1', '2023Q3': '2024Q1'}
+
+
+class _InventedNigeria:
+    """Nigeria's rounds with invented rows: one plot, 10 kg, in every harvest round.
+
+    Its area is 2 ha at post planting in every wave and 5 ha at post harvest in
+    W1-W3, so a yield of 5 used the first and 2 the second (10/7 used both).
+    """
+
+    wave_folder_map = {
+        '2010Q3': '2010-11', '2011Q1': '2010-11', '2012Q3': '2012-13',
+        '2013Q1': '2012-13', '2015Q3': '2015-16', '2016Q1': '2015-16',
+        '2018Q3': '2018-19', '2019Q1': '2018-19', '2023Q3': '2023-24',
+        '2024Q1': '2023-24'}
+    waves = list(wave_folder_map)
+
+    def crop_production(self):
+        return pd.concat([_cp(t=t) for t in self.waves if t.endswith('Q1')])
+
+    def plot_features(self):
+        return _pf([(t, 'h1', '1', 2.0) for t in self.waves if t.endswith('Q3')]
+                   + [(t, 'h1', '1', 5.0) for t in ('2011Q1', '2013Q1', '2016Q1')])
+
+
+def _by_round(yields):
+    assert yields.index.is_unique
+    return dict(zip(yields.index.get_level_values('t'), yields['Yield_kg']))
+
+
+class TestTheDocumentedExample:
+    """`pp_ph_area_t`'s docstring example, run as printed (GH #1701).
+
+    The whole-frame call it used to print began to raise when GH #587 served
+    W1-W3 post-harvest areas, and no test without S3 ran it.
+    """
+
+    @pytest.fixture
+    def printed(self):
+        lines = inspect.getdoc(pp_ph_area_t).splitlines()
+        start = 1 + next(n for n, line in enumerate(lines) if line.endswith('::'))
+        block = itertools.takewhile(lambda line: not line or line.startswith(' '),
+                                    lines[start:])
+        names = {'ll': types.SimpleNamespace(
+                     Country={'Nigeria': _InventedNigeria()}.__getitem__),
+                 'yield_kg': yield_kg, 'pp_ph_area_t': pp_ph_area_t}
+        with warnings.catch_warnings():
+            warnings.simplefilter('error')
+            exec(textwrap.dedent('\n'.join(block)), names)
+        return names
+
+    def test_post_planting_area_moved_serves_every_wave(self, printed):
+        assert _by_round(printed['moved']) == dict.fromkeys(
+            ['2011Q1', '2013Q1', '2016Q1', '2019Q1', '2024Q1'], 5.0)
+
+    def test_post_harvest_area_serves_w1_to_w3_only(self, printed):
+        assert _by_round(printed['direct']) == dict.fromkeys(
+            ['2011Q1', '2013Q1', '2016Q1'], 2.0)
+
+    def test_its_post_harvest_rounds_are_the_ones_nigeria_serves(self, printed):
+        """The wave scripts append post-harvest rows through this adapter only."""
+        from lsms_library.countries.Nigeria._ import nigeria_ph_plot_features as ph
+        assert set(printed['ph']) == {ph.ph_plot_source(folder)['t']
+                                      for folder in ph._SOURCES}
+
+    def test_the_whole_frame_is_still_refused(self):
+        c = _InventedNigeria()
+        with pytest.raises(ValueError, match=(
+                r"\['2011Q1', '2013Q1', '2016Q1'\], which plot_features already")):
+            yield_kg(c.crop_production(), c.plot_features(), area_t=pp_ph_area_t(c))
 
 
 @pytest.mark.requires_s3
