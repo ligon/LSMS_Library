@@ -3574,6 +3574,41 @@ default changes; no 2018 decline or causal export explanation. Whole GH #1530 st
 open. Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1530-niger-2021-gate-metadata-20261109/=
 and =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1530-niger-2021-gate-answers-20261109/=.
 
+** 2026-11-28 -- INS rainy-season onion share is not a crop row count (GH #1530)
+
+The INS [[https://stat-niger.org/wp-content/uploads/rapport_enquete/EHCVM/rapport_agriculture_et_condition_de_vie_des_menages.pdf#page=45][agriculture report, Table 21, printed p. 37 (PDF p. 45)]]
+compares the share of agricultural households practising each rainy-season
+crop. Its =Oignon= row gives 1.2% for National 2018 and 0.1% for National
+2021. Tahoua is shown as 0.5% in the 2021 regional columns. Agadez and Niamey
+are printed =na=, not zero, and the small-sample marker attaches to Agadez.
+[[https://stat-niger.org/wp-content/uploads/rapport_enquete/EHCVM/rapport_agriculture_et_condition_de_vie_des_menages.pdf#page=62][Section 6.1, printed p. 54 (PDF p. 62)]]
+describes agricultural activity as at least one household member working
+land, owned or not, during the preceding rainy campaign.
+
+The producer's table reports a lower rainy-season share in the same
+EHCVM survey series. That agrees in direction with the previously recorded
+114 and 4 crop rows, but the denominators differ. The share is not a raw
+record count or an all-season production estimate. It is not evidence from
+a second survey. The report does not specify the exact export revision,
+crop recode, or weighting procedure, if any, behind Table 21. Nor does it
+identify households missing from the positive-only parcel file.
+
+Separately, [[https://stat-niger.org/wp-content/uploads/rapport_enquete/EHCVM/rapport_agriculture_et_condition_de_vie_des_menages.pdf#page=18][the INS report's Table 3, printed p. 10 (PDF p. 18)]]
+uses the agriculture ministry's rainy and irrigated campaign reports for
+annual onion-and-shallot output, not EHCVM household shares. The Ministry's
+[[https://reca-niger.org/IMG/pdf/rapport_definitif_productions_horticoles_2021-2022.pdf#page=27][2021–22 irrigated and flood-recession horticultural survey, Table 20 (PDF p. 27)]]
+reports about 1.43 million tonnes of onion in its table excluding
+hydro-agricultural developments (AHA). These estimates cannot supply an
+EHCVM household gate or be used to convert the library's rows into a
+national production trend.
+
+The remaining evidence is the household 16A.00 No/omission roster or an
+exact fielded instrument and export specification, plus a version-bound
+Table 21 tabulation showing the crop recode, denominator, any weights and
+filters if reconciling its share. No native data was opened and no crop
+mapping, quantity, coverage rule or sample changed for this note.
+
+
 * 2026-11-10 -- Own departure form versus released fields (GH #1565)
 
 Bounded documentary authority only; no native/API read or policy change.
