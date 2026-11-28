@@ -36,6 +36,28 @@ def sample(df):
         kept[col] = kept[col].where(kept[col].notna(), kept_i.map(carried))
     return kept
 
+def interview_date(df):
+    """Verify the IHPS refresh copies before melting the unique interview dates."""
+    from malawi import interview_date as melt_interview_dates
+
+    ids = df.index.get_level_values('i')
+    if ids.hasnans or not ids.is_unique:
+        raise ValueError('Malawi 2024-25 interview_date: missing or duplicate cover IDs')
+
+    refreshed = ihps24_refreshed()
+    if any(copy is None or case is None for copy, case in refreshed.items()):
+        raise ValueError('Malawi 2024-25 interview_date: missing refresh or IHS6 case ID')
+    targets = pd.Index([CS_24 + case for case in refreshed.values()])
+    if not targets.is_unique or not targets.isin(ids).all() or not set(refreshed) <= set(ids):
+        raise ValueError('Malawi 2024-25 interview_date: missing or non-unique refresh counterparts')
+    dates = pd.Series(df['int_t'].array, index=ids)
+    if not dates.reindex(list(refreshed)).reset_index(drop=True).equals(
+            dates.reindex(targets).reset_index(drop=True)):
+        raise ValueError('Malawi 2024-25 interview_date: IHS6 and IHPS refresh dates disagree')
+
+    return melt_interview_dates(df[~ids.isin(refreshed)])
+
+
 def panel_ids(df):
     """Drop rows with no previous-round id: the 815 refreshment households.
 
