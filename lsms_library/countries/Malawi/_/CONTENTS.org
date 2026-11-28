@@ -3874,6 +3874,49 @@ now holds 2936 + 3819 and COVERS 2939 -- the Panel FILES are 3819's re-release
 of the 2016 round, while the DDI PDF in =Documentation/Panel/= is 2939's
 documentation of the same round, so the universe quoted above is unaffected.
 
+**** IHPS 2016 individual interviews are a separate population (GH #439)
+
+The [[https://microdata.worldbank.org/catalog/3819/download/49085#page=27][IHPS 2016 Basic Information Document]], PDF p. 27 §5.30, matches the
+tracked Panel documentation sidecar and names the Survey Solutions
+=i_HHID= as the link between the household roster and the individual
+questionnaire. It describes =ind_respondent= and =i_HHID= in the roster.
+The [[https://microdata.worldbank.org/catalog/2939/download/48103][2939 individual form]] and [[https://microdata.worldbank.org/catalog/3819/download/49068][3819 individual form]] are byte-identical:
+A12 has fields for the interviewed person's roster ID and name (PDF p. 1),
+and p. 2 directs that the selected member be interviewed alone. The BID
+describes private adult interviews and includes a head/spouse exception
+below age 18 (§2.22, p. 12). Its Table 3 reports incomplete eligible-adult
+participation. Neither the tracking universe nor household membership is
+the individual interview denominator.
+
+Keep the household, person and interview identifiers distinct. Both
+[[https://microdata.worldbank.org/index.php/metadata/export/2939/ddi][2939 v03 public metadata]] and the [[https://catalog.ihsn.org/metadata/export/8702/ddi][v06 catalogue mirror]] show 4,755
+valid =i_HHID= in the household roster (F284/V9936) and interview
+cover (F286/V10000). The roster =ind_respondent= and =i_pid= cards
+(V9934/V9937) each report 4,844 valid entries. The cover also has a
+separate consent field (V10011). These are field marginals, not unique
+matched interviews or a count of consented or completed interviews.
+Do not substitute =i_pid=, a roster line, a response flag or
+the Panel sample's =panelweight_2016= for a verified interview link or
+individual analysis design.
+The current Panel roster uses =y3_hhid= and =id_code= for =i= and =pid=,
+and does not expose the interview bridge. Household Module E's self/proxy
+fields describe that interview, not participation in the supplement.
+
+The printed G roster (PDF p. 25) is prefilled and allows added gardens.
+The v06 [[https://catalog.ihsn.org/catalog/8702/data-dictionary/F296?file_name=IND_MOD_G][G dictionary]] separately names =gardenid= and within-garden plot
+slots, and distinguishes reported ownership, document name and named
+household/network co-owners. The older 2939 XML does not list =IND_MOD_G=.
+An interview-local garden is not automatically a shared agricultural
+plot, and a named co-owner is not the respondent. Do not treat a missing
+G row as a negative.
+
+The =IND_MOD_*= files remain undeclared in this wave. After the defect
+queue and exact licensed source custody, verify the Panel roster-to-cover
+link for uniqueness, conflicts, cardinality and consent/coverage. Then
+verify garden forwarding and added IDs against the correct rosters before
+any table design. Keep Cross_Sectional out of the link. No source rows
+were read, and no feature, output, weight or default changed.
+
 *** 2019-20 (IHS5, catalog 3818 + IHPS 2019, catalog 3819)
 
 **** Two universes in one library wave (again)
