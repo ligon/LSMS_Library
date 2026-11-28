@@ -3645,10 +3645,25 @@ four =s16d= dispositions) codes on one list: codes 1-7 are labelled alike but fo
 code -- the harvest field's label first, a bare code as =Unknown [Burkina_Faso 2021-22
 UML=<code>]= -- and served through the read-path =u= table (=ehcvm.served_unit_labels=), so
 =u=, =Unit_sold= and the dispositions share one spelling: =Kilogramme= is =Kg= everywhere, as
-2018-19's is, and code 3 is =Plat Yoruba= everywhere.  An earlier build mapped =Unit_sold=
-through the country table only and served =Kilogramme= beside a =u= of =Kg=.  =Plat Yoruba=
-(2021-22) and =Plat yorouba= (2018-19) remain two spellings of one unit across waves.
+2018-19's is, and code 3 is served as =Plat Yoruba= in 2021-22.  An earlier build mapped
+=Unit_sold= through the country table only and served =Kilogramme= beside a =u= of =Kg=.
 A missing harvest unit is =Unknown=; a missing sold unit stays NA (the 2018-19 contract).
+
+*Section 16 unit code 3 names a reporting category* (GH #1723, 2026-11-27).
+Both 2018-19 household workbooks (=bfa_ehcvm1_qnr_household_excel_vague{1,2}.xls=) print
+=Plat Yoruba= for code 3 on the =S16c_Agri= unit card (cells M11/P11/S11/W11/AE11/AK11).
+The 2018-19 release labels the harvest unit =s16cq12b=
+and sale unit =s16cq16b= =Plat yorouba= (4290 F44 V1537/V1547).  The 2021-22 panel release
+labels harvest-to-date unit =s16cq16b= =Plat Yoruba= (6224 F59 V2670), and labels the
+consumed, given, sold and in-stock units =s16dq02b=, =s16dq03b=, =s16dq05b= and =s16dq13b=
+=Yorouba= (6224 F60 V2680/V2684/V2689/V2703, respectively).  The 2021-22 household forms
+(=bfa_ehcvm2_vague{1,2}.pdf=, PDF pp. 85-87, printed pp. 84-86) and the enumerator manual
+(PDF p. 128, printed p. 125) distinguish local quantity and unit from the separate kg
+estimate in Q16C.16.  These labels identify the Yoruba reporting category.  They do not
+establish a shared capacity, fill practice, conversion or stable analytical unit across
+waves.  The served spellings stay distinct.  This evidence does not apply to Section 7
+food or Section 16B input units.
+
 *"One UML list" is shown for codes 1-7 only* (red team S4).  Each of the five fields carries
 its own Stata value-label set, all five label codes 1-7 alike (but for code 3's spelling), and
 none labels a code above 7, so that a bare code means one unit in every field is an
