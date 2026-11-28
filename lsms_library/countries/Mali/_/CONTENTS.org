@@ -3907,6 +3907,34 @@ No condition/unit/quantity/default/ID/weight/coverage ruling follows.
 Source/terms/byte custody and exact bounds are recorded in SOURCE.org and
 burst report =1436-mali-p2-manual-restoration-20261110/=.
 
+** 2026-11-28 -- Q7D.26 fertilizer application amount and unit (GH #1482)
+
+The same managed French second-passage enumerator manual (WB3409 resource
+47787, =eaci17_manuel_p2_french.pdf=, SHA256
+=73fe411b153da4df3af02260e88c1b00747c9b37ee47d139345175ee231c9394=) covers the
+own EAC-I 2017–18 agricultural input questions in Part D. On PDF p.27, Q7D.26
+instructs the enumerator to record the quantity used and its corresponding unit
+code for each listed inorganic fertilizer on every parcel where it was used.
+This is use on the parcel, not purchases, quantities per application, or a
+rate. Nearby Q7D.24/Q7D.25 are separate questions about counts and hours. Their
+headings say inorganic while their instruction text says organic. Preserve that
+document discrepancy. Neither question supplies a multiplier for Q7D.26.
+
+The exact [[https://microdata.worldbank.org/catalog/3409/download/47782#page=20][French second-passage form]] and [[https://microdata.worldbank.org/catalog/3409/data-dictionary/F23][v03 dictionary, F23]] distinguish the four
+quantity/unit pairs for urea, DAP, NPK and other inorganic fertilizer. Kg, Tonne,
+Sac and Autre are distinct unit codes. The form instructs recording zero when
+the specific product was not used. The manual's Q7D.26 paragraph does not
+specify decimal-entry precision, validation, unit recoding or an export scale.
+Three displayed decimals in the amount dictionary are not a divisor or a
+storage rule.
+
+The instruction confirms what the field asks, not the accuracy of the
+tonne-coded answers. Keep Site Q report-only and the existing published
+quantities. Any correction needs the deployed Q7D.26 entry/validation and
+editing or export rule, or an attributable producer correction for the exact
+release. No source observations or weights were reread; this is documentary
+evidence, not a new measurement, product grade or nutrient estimate.
+
 * 2026-11-10 -- current served-strata source trace (GH #1577)
 
 Source-only trace at =c8e378920968fde414767855186e64f5e36f54bb=; no data,
