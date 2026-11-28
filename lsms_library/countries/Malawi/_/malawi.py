@@ -224,7 +224,7 @@ def _food_text_vocab():
         from pathlib import Path
         from lsms_library.local_tools import df_from_orgfile
         org = Path(__file__).resolve().parent / 'categorical_mapping.org'
-        hf = df_from_orgfile(str(org), name='harmonize_food')
+        hf = df_from_orgfile(str(org), name='harmonize_food', encoding='utf-8')
         food = set(_FOOD_WORDS_NOT_IN_ITEM_TABLE)
         for col in hf.columns:
             if col in ('GD Category', 'Aggregate Label', 'Aggregate (short)'):
@@ -236,7 +236,7 @@ def _food_text_vocab():
                 food.update(_text_words(name))
         unit = set()
         for tbl in ('u', 'harmonize_crop_unit', 'harmonize_price_unit'):
-            t = df_from_orgfile(str(org), name=tbl)
+            t = df_from_orgfile(str(org), name=tbl, encoding='utf-8')
             for col in t.columns:
                 for v in t[col].dropna():
                     unit.update(_text_words(v))
