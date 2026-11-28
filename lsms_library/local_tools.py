@@ -2191,6 +2191,17 @@ def _read_managed_parquet_cache(path, *, open_errors=(), check_null=False, engin
     return frame, None, identity
 
 
+def _read_open_country_parquet_cache(path, stream):
+    """Managed country payload from the same descriptor as its admission."""
+    identity = os.fstat(stream.fileno())
+    stream.seek(0)
+    frame, error = _read_parquet_with_index_policy(
+        stream, read_errors=(OSError, ArrowInvalid), engine='pyarrow')
+    if error is not None:
+        return None, error, identity
+    return check_read(frame, path), None, identity
+
+
 def _validate_stata_missing_map(option):
     """Validate the explicit source-column -> extended-tag -> label option."""
     if option is None:
@@ -3608,6 +3619,60 @@ def _atomic_write_table(table, fn: str | Path) -> None:
         except OSError:
             pass
         raise
+
+
+class _CountryCacheFooter:
+    """Read-only metadata for an already opened L2-country cache (#1748).
+
+    Path-based wave/Make/build readers keep their existing policies. The
+    country API readers instead grade, replay, and decode one descriptor.
+    Use the existing metadata keys and preserve the path readers' handling
+    of an absent footer, bad list/JSON shape, and missing legacy hash.
+    """
+
+    def __init__(self, stream):
+        try:
+            import pyarrow.parquet as pq
+            self.metadata = pq.read_schema(stream).metadata or {}
+        except Exception:
+            self.metadata = {}
+
+    def _country_hash_grade(self, expected_hash):
+        if expected_hash is None:
+            return "unverifiable"
+        stored = self.metadata.get(_CACHE_HASH_KEY)
+        if stored is None:
+            return "legacy"
+        if isinstance(stored, (bytes, bytearray)):
+            stored = stored.decode()
+        return "fresh" if stored == expected_hash else "stale"
+
+    def _country_metadata_list(self, key):
+        raw = self.metadata.get(key)
+        if raw is None:
+            return None
+        # The existing date-audit reader treats invalid UTF-8 as invalid
+        # JSON. For the other keys, UTF-8 errors remain policy failures.
+        if key != _DATETIME_AUDIT_KEY and isinstance(raw, (bytes, bytearray)):
+            raw = raw.decode()
+        try:
+            items = json.loads(raw.decode() if isinstance(raw, (bytes, bytearray)) else raw)
+        except (ValueError, TypeError):
+            return None
+        return items if isinstance(items, list) else None
+
+    def _country_coverage_manifest(self):
+        waves = self._country_metadata_list(_CACHE_WAVES_KEY)
+        return None if waves is None else [str(w) for w in waves]
+
+    def _country_dropped_builds(self):
+        return [d for d in self._country_metadata_list(_BUILD_DROPS_KEY) or () if isinstance(d, dict)] or None
+
+    def _country_grain_stamp(self):
+        return self._country_metadata_list(_GRAIN_AUDIT_KEY)
+
+    def _country_datetime_stamp(self):
+        return self._country_metadata_list(_DATETIME_AUDIT_KEY)
 
 
 def read_parquet_cache_hash(path: str | Path) -> str | None:

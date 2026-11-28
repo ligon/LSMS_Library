@@ -50,7 +50,7 @@ def test_registry_covers_all_declared_head_counts_and_no_money_or_flags():
     heads = {col for scheme in schemes for col in scheme if col.startswith("Head")}
     assert set(Q._SCREENED_COLUMNS["livestock"]) == heads
     assert "RaisedOrOwned" not in heads
-    assert Q._SCREENED_COLUMNS["plot_inputs"] == ("Quantity",)
+    assert Q._SCREENED_COLUMNS["plot_inputs"] == ("Quantity", "Quantity_purchased")
     assert "livestock" not in Q._NEAR_ZERO_COLUMNS
     assert "plot_inputs" not in Q._NEAR_ZERO_COLUMNS
 

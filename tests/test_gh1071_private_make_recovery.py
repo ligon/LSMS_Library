@@ -42,7 +42,8 @@ def test_borrowed_country_read_never_evicts_and_postread_is_strict(
     def fail(*args, **kwargs):
         raise error
     target, attr = {'payload': (pd, 'read_parquet'),
-                    'footer': (C, 'read_parquet_grain_audit'), 'audit': (L, 'check_read')}[phase]
+                    'footer': (C._CountryCacheFooter, '_country_grain_stamp'),
+                    'audit': (L, 'check_read')}[phase]
     monkeypatch.setattr(target, attr, fail)
     if phase == 'payload':
         with pytest.warns(UserWarning, match='leaving borrowed live input unchanged'):
