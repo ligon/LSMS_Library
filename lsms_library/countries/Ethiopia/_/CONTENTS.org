@@ -2960,6 +2960,35 @@ HARVESTED BETWEEN MARCH 10, 2018 TO MARCH 9, 2019") and are served
 unmarked, where W1-W3's §12 sales now carry =sect12-sale-period= (GH #1256;
 now stamped, see the next-but-one section).
 
+*** 2015–16 ESS3 food and crop reference factors (GH #833)
+
+The [[https://thedocs.worldbank.org/en/doc/de57f32fdf177170d1fe413327b553dd-0050012025/related/Annex-II-Ethiopia.zip][producer's public NSU annex workbook]] has separate =FOOD_CFS= and
+=CROP_CFS= reference sheets. The food item and crop code spaces are different.
+All 355 raw (item/crop code, unit code) intersections name different foods
+or crops. For example, code 1 is food Teff but crop Barley. Comparing Teff
+correctly uses food code 1 and crop code 7, with both listing 1.072 kg per Jog
+(unit 8). Across 581 unique pairs with the same case-folded commodity name
+and native unit code, all national factors and eight-region vectors agree
+within 1e-9 kg per unit. This is internal agreement within one reference
+library, not an independent weighing or a crosswalk for the unpaired items.
+
+The reference workbook is not the released Stata lookup. It has 1,079 food
+and 1,000 crop entries versus 1,269 and 1,174 in the
+[[https://microdata.worldbank.org/catalog/2783/data-dictionary][ESS3 release dictionary]].
+The workbook's crop rows 930 and 931 both label =(74, 62)= Enset, Esir
+Medium, with 6.125 and 4.34 kg per unit. This does not contradict the earlier
+single 4.34 measurement in the held W3 Stata file or change the existing
+loader rule.
+
+The [[https://microdata.worldbank.org/catalog/2783/download/48264][ESS3 Basic Information Document]], section 6.4, gives the food join
+on =item_cd_cf= and its own unit code, and the crop join on =crop_code= and
+its own unit code, using section 9 harvest as the example. The section 11
+and 12 sale cards separately identify =ph_s11q03_b= and =ph_s12q0b= as
+sold units. Matching their unit vocabulary is not a same-release
+crop-by-sold-unit lookup or positive-sale coverage check. Preserve size codes,
+physical state, sale and harvest as distinct operands. This comparison
+applies no factor to sales. No default, quantity or price changes here.
+
 ** _/food_acquired.py lacks the id_walk that _/crop_production.py has
 
 - Fixed :: GH #819, on =development= (merge of =fix/vjoin-leading-zeros-idwalk-order=, 2026-09-08): =_finalize_result= now walks =i= before the =v= join and coerces =v= with =format_id=, so 2013-14 / 2015-16 =food_acquired= serve =v= on 100% of rows (433 / 432 clusters) with no change to the wave script.  The description below is the history of the defect.
