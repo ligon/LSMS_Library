@@ -251,6 +251,21 @@ def old_source(rel):
 def test_old_helper_and_r1_r3_source_inverse_exact():
     rel='lsms_library/countries/Malawi/_/malawi.py'
     old=ast.parse(old_source(rel));new=ast.parse((ROOT/rel).read_text())
+
+    # #926 pinned exactly two tracked UTF-8 Org reads after this fixture's
+    # baseline. Require both pins, then reverse only those keyword additions.
+    # The rest of _food_text_vocab and every other unexempted node stay exact.
+    vocab, = [n for n in new.body
+              if isinstance(n, ast.FunctionDef) and n.name == '_food_text_vocab']
+    reads = [n for n in ast.walk(vocab) if isinstance(n, ast.Call)
+             and isinstance(n.func, ast.Name) and n.func.id == 'df_from_orgfile']
+    assert len(reads) == 2
+    for read in reads:
+        codec = [kw for kw in read.keywords if kw.arg == 'encoding']
+        assert len(codec) == 1
+        assert isinstance(codec[0].value, ast.Constant) and codec[0].value.value == 'utf-8'
+        read.keywords.remove(codec[0])
+
     added={'SEED_ACQUISITION_ROLE','_seed_acquisition_block','_append_seed_acquisitions'}
     # Malawi 2024-25 identity helpers (GH #1275, PR #1604): an independent
     # addition after this fixture's baseline.  Named exactly, so any other
@@ -267,7 +282,7 @@ def test_old_helper_and_r1_r3_source_inverse_exact():
             # GH #1712 (ruling 2026-11-13, "Drop the six")
             '_H_EMPTY_IN_RELEASE','_blank'}
     # ... and the definitions it changed, named exactly and dropped from BOTH sides,
-    # so every other definition of malawi.py is still compared byte for byte.
+    # so every other definition of malawi.py is still compared as an AST.
     changed={'_CROP_TEXT_RECODE','_crop_text_labels','_harvest_block',
              'assemble_crop_production','_CROP_SALE_SOURCES','_crop_pieces',
              'assemble_plot_inputs'}
