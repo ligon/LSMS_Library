@@ -77,6 +77,23 @@ instrument's land keys and definitions, without making crop occurrence
 entropy or differently recorded harvest conditions comparable across countries.
 Other transforms have their own documented grouping and joining contracts.
 
+
+### Nigeria's early crop sales cover the main buyer
+
+For Nigeria's 2011Q1 and 2013Q1 crop data, `Quantity_sold`, `Unit_sold`
+and `Value_sold` describe sales to or through the **main buyer** on the
+source plot-crop line. This applies to both `Country.crop_production()`
+and `Feature('crop_production')`. The separate other-buyer answers are
+not served. `gross_crop_revenue` and the sale prices used by
+`median_price_valuation` therefore use main-buyer reports for these rounds,
+not amounts for all buyers. `Value_harvested` is the household's
+hypothetical whole-harvest value, not an observed sale or a substitute for
+the omitted amounts. See the [2011 dictionary][nigeria-a3-w1] and the
+[2013 dictionary][nigeria-a3-w2].
+
+[nigeria-a3-w1]: https://microdata.worldbank.org/catalog/1002/data-dictionary/F6?file_name=secta3_harvestw1
+[nigeria-a3-w2]: https://microdata.worldbank.org/catalog/1952/data-dictionary/F99?file_name=secta3_harvestw2
+
 ## Design Decisions
 
 ### Lazy Loading
