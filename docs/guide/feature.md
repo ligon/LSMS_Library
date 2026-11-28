@@ -77,6 +77,22 @@ instrument's land keys and definitions, without making crop occurrence
 entropy or differently recorded harvest conditions comparable across countries.
 Other transforms have their own documented grouping and joining contracts.
 
+### Reported crop revenue and harvest valuation
+
+`gross_crop_revenue` sums reported `Value_sold` by default. It does not
+estimate harvest prices or call `median_price_valuation`.
+
+`median_price_valuation` uses the same `item_keys` to pool observed sale
+prices and to look up a price for each row being valued. When `condition`
+is one of those keys on `crop_production`, both sides use the row's harvest
+condition, not the separately recorded `Condition_sold`. The transform
+does not fill a missing condition from the other field. A match on
+`unknown_condition` is not evidence that the sale and harvest states agree.
+If there is no usable sale price in the row's item-key group, even the
+national fallback leaves its price missing. On data pooled by `Feature`,
+keep countries separate. The transform adds a carried wave key (`t`) by
+default, but does not automatically add `country`.
+
 ## Design Decisions
 
 ### Lazy Loading
